@@ -65,6 +65,7 @@ public:
 	bool MakeModal(Window* win, ModalShadow Shadow = ShadowNone);
 	bool IsPresentingModalWindow() const;
 
+	bool DispatchEvent(const Event&);
 	void DrawWindows() const;
 	void RedrawAll() const;
 

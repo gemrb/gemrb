@@ -270,9 +270,9 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 			if (core->ConsolePopped) {
 				break;
 			}
-			if (event.active.state == SDL_APPMOUSEFOCUS) {
-				if (!event.active.gain)
-					EvntManager->OnSpecialKeyPress( GEM_MOUSEOUT );
+			if (event.active.state == SDL_APPMOUSEFOCUS && !event.active.gain) {
+				Event e = EvntManager->CreateKeyEvent(GEM_MOUSEOUT, true);
+				EvntManager->DispatchEvent(e);
 			}
 			break;
 		default:

@@ -50,6 +50,7 @@ WindowManager::WindowManager(Video* vid)
 {
 	modalWin = NULL;
 	modalShadow = ShadowNone;
+	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 	SetVideoDriver(vid);
 }
 
@@ -80,8 +81,6 @@ bool WindowManager::FocusWindow(Window* win)
 	}
 
 	win->SetDisabled(false);
-	eventMgr.AddWindow( win );
-	eventMgr.SetFocused( win, NULL );
 	return true;
 }
 
@@ -133,7 +132,52 @@ void WindowManager::CloseWindow(Window* win)
 
 	win->DeleteScriptingRef();
 	win->SetDisabled(true);
-	eventMgr.DelWindow(win);
+}
+
+bool WindowManager::DispatchEvent(const Event& event)
+{
+#define HIT_TEST(e, w) \
+((w)->Frame().PointInside(e.mouse.Pos()))
+
+	Window* target = NULL;
+	if (IsPresentingModalWindow()) {
+		// modal windows absorb all events that intersect
+		// but also block events from reaching other windows even
+		// when they dont hit
+		if (!event.isScreen || HIT_TEST(event, modalWin)) {
+			target = modalWin;
+		}
+	} else {
+		WindowList::const_iterator it = windows.begin();
+		for (; it != windows.end(); ++it) {
+			Window* win = *it;
+			if (!win->IsDisabled() && HIT_TEST(event,win)) {
+				target = win;
+				break;
+			}
+		}
+	}
+	if (target) {
+		Point winPos = target->ConvertPointFromScreen(event.mouse.Pos());
+		switch (event.type) {
+			case Event::MouseDown:
+				target->DispatchMouseDown(winPos, event.mouse.button, event.mod);
+				break;
+			case Event::MouseUp:
+				target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
+				break;
+			case Event::MouseMove:
+				target->DispatchMouseOver(winPos);
+				break;
+			case Event::MouseScroll:
+				target->DispatchMouseWheelScroll(event.mouse.x, event.mouse.y);
+				break;
+			default: return false;
+		}
+		return true;
+	}
+	return false;
+#undef HIT_TEST
 }
 
 void WindowManager::DrawWindows() const
@@ -171,10 +215,10 @@ void WindowManager::DrawWindows() const
 			const Region& frame = win->Frame();
 			Region intersect = frontWinFrame.Intersect(frame);
 			if (!intersect.Dimensions().IsEmpty()) {
-			if (intersect == frame) {
-				// this window is completely obscured by the front window
-				// we dont have to bother drawing it because IE has no concept of translucent windows
-				continue;
+				if (intersect == frame) {
+					// this window is completely obscured by the front window
+					// we dont have to bother drawing it because IE has no concept of translucent windows
+					continue;
 				} else {
 					// only partialy obscured
 					// must mark front win as dirty to redraw over the intersection

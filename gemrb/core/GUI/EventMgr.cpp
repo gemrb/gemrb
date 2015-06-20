@@ -20,16 +20,9 @@
 
 #include "GUI/EventMgr.h"
 
-#include "GUI/GameControl.h"
-
 #include "win32def.h"
-#include "ie_cursors.h"
 
-#include "Game.h"
-#include "Interface.h"
 #include "KeyMap.h"
-#include "Video.h"
-#include "GUI/Window.h"
 
 namespace GemRB {
 
@@ -38,144 +31,18 @@ unsigned long EventMgr::RCDelay;
 
 EventMgr::EventMgr(void)
 {
-	// Function bar window (for function keys)
-	function_bar = NULL;
-	// Last window focused for keyboard events
-	last_win_focused = NULL;	
-	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
-	mouseTrackingWin = NULL;
-	// Last window we were over. Used to determine MouseEnter and MouseLeave events
-	last_win_over = NULL;
-	MButtons = 0;
-
 	dc_time = 0;
 	dc_delay = 250;
 	rk_delay = 250;
 	rk_flags = GEM_RK_DISABLE;
 }
 
-void EventMgr::SetOnTop(Window* win)
+EventMgr::~EventMgr()
 {
-	WindowList::iterator it;
-	it = std::find(windows.begin(), windows.end(), win);
-
-	if (it != windows.end()) {
-		windows.erase(it);
-		windows.push_front(win);
+	std::vector<EventCallback*>::iterator it = tapsToDelete.begin();
+	for (; it != tapsToDelete.end(); ++it) {
+		delete *it;
 	}
-	SetDefaultFocus(win);
-}
-
-void EventMgr::SetDefaultFocus(Window *win)
-{
-	if (!last_win_focused) {
-		last_win_focused = win;
-		last_win_focused->SetFocused(NULL);
-	}
-	last_win_over = NULL;
-}
-
-/** Adds a Window to the Event Manager */
-void EventMgr::AddWindow(Window* win)
-{
-	if (!win) return;
-
-	WindowList::iterator it;
-	it = std::find(windows.begin(), windows.end(), win);
-
-	if (it != windows.end()) {
-		SetOnTop(win);
-	} else {
-		windows.push_front(win);
-		SetDefaultFocus(win);
-	}
-}
-
-/** Frees and Removes all the Windows in the Array */
-void EventMgr::Clear()
-{
-	windows.clear();
-	last_win_focused = NULL;
-	mouseTrackingWin = NULL;
-	last_win_over = NULL;
-	function_bar = NULL;
-}
-
-/** Remove a Window from the array */
-void EventMgr::DelWindow(Window *win)
-{
-	WindowList::iterator it;
-	it = std::find(windows.begin(), windows.end(), win);
-
-	if (it == windows.end()) {
-		return;
-	}
-
-	windows.erase(it);
-
-	if (last_win_focused == win) {
-		if (windows.size()) {
-			SetFocused(windows.front(), NULL);
-		} else {
-			last_win_focused = NULL;
-		}
-	}
-	if (mouseTrackingWin == win) {
-		mouseTrackingWin = NULL;
-	}
-	if (last_win_over == win) {
-		last_win_over = NULL;
-	}
-	if (function_bar == win) {
-		function_bar = NULL;
-	}
-}
-
-/** BroadCast Mouse Move Event */
-void EventMgr::MouseMove(unsigned short x, unsigned short y)
-{
-	Point p(x, y);
-	GameControl *gc = core->GetGameControl();
-	if (gc && (!mouseTrackingWin || mouseTrackingWin == gc->Owner)) {
-		gc->OnGlobalMouseMove(p);
-	}
-	if (mouseTrackingWin) {
-		mouseTrackingWin->DispatchMouseOver(mouseTrackingWin->ConvertPointFromScreen(p));
-		RefreshCursor(mouseTrackingWin->Cursor);
-		return;
-	}
-
-	WindowList::iterator it;
-	for (it = windows.begin(); it != windows.end(); ++it) {
-		Window* win = *it;
-
-		if (win->IsDisabled())
-			continue;
-
-		if (win->Frame().PointInside(p)) {
-			Point winPoint = win->ConvertPointFromScreen(p);
-			if (last_win_over && win != last_win_over) {
-				last_win_over->OnMouseLeave(winPoint, NULL);
-			}
-			last_win_over = win;
-			win->DispatchMouseOver(winPoint);
-			RefreshCursor(win->Cursor);
-			break;
-		}
-	}
-}
-
-void EventMgr::RefreshCursor(int idx)
-{
-	Video *video = core->GetVideoDriver();
-	if (idx&IE_CURSOR_GRAY) {
-		video->SetMouseGrayed(true);
-	} else {
-		video->SetMouseGrayed(false);
-	}
-	idx &= IE_CURSOR_MASK;
-	video->SetCursor( core->Cursors[idx], VID_CUR_UP );
-	video->SetCursor( core->Cursors[idx ^ 1], VID_CUR_DOWN );
 }
 
 bool EventMgr::ClickMatch(const Point& p, unsigned long thisTime)
@@ -183,106 +50,6 @@ bool EventMgr::ClickMatch(const Point& p, unsigned long thisTime)
 	if (dc_time<thisTime) return false;
 
 	return Region(dc, Size(10, 10)).PointInside(p);
-}
-
-/** BroadCast Mouse Move Event */
-void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button, unsigned short Mod)
-{
-	Point p(x, y);
-
-	std::vector< Window*>::iterator m;
-	unsigned long thisTime;
-
-	thisTime = GetTickCount();
-	if (ClickMatch(p, thisTime)) {
-		Button |= GEM_MB_DOUBLECLICK;
-		dc = Point(0, 0);
-		dc_time = 0;
-	} else {
-		dc = p;
-		dc_time = thisTime+dc_delay;
-	}
-	MButtons |= Button;
-
-	WindowList::iterator it;
-	for (it = windows.begin(); it != windows.end(); ++it) {
-		Window* win = *it;
-
-		if (win->IsDisabled())
-			continue;
-
-		if (win->Frame().PointInside(p)) {
-			mouseTrackingWin = win;
-			win->DispatchMouseDown(win->ConvertPointFromScreen(p), Button, Mod);
-			RefreshCursor(mouseTrackingWin->Cursor);
-			return;
-		}
-	}
-}
-
-/** BroadCast Mouse Up Event */
-void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
-{
-	MButtons &= ~Button;
-	if (mouseTrackingWin == NULL) return;
-
-	Point p = mouseTrackingWin->ConvertPointFromScreen(Point(x, y));
-	mouseTrackingWin->DispatchMouseUp(p, Button, Mod);
-	mouseTrackingWin = NULL;
-}
-
-/** BroadCast Mouse ScrollWheel Event */
-void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
-{
-	if (last_win_over) {
-		last_win_over->DispatchMouseWheelScroll(x, y);
-	}
-}
-
-/** BroadCast Key Press Event */
-void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
-{
-	if (last_win_focused == NULL) return;
-	Control *ctrl = last_win_focused->GetFocus();
-	if (!ctrl || !ctrl->OnKeyPress( Key, Mod )) {
-		// FIXME: need a better way to determine when to call ResolveKey/SetHotKey
-		if (core->GetGameControl()
-			&& !MButtons // checking for drag actions
-			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
-			core->GetGame()->SetHotKey(toupper(Key));
-		}
-	}
-}
-
-/** BroadCast Key Release Event */
-void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
-{
-	if (last_win_focused == NULL) return;
-	if (Key == GEM_GRAB) {
-		core->GetVideoDriver()->ToggleGrabInput();
-		return;
-	}
-	Control *ctrl = last_win_focused->GetFocus();
-	if (ctrl == NULL) return;
-	ctrl->OnKeyRelease( Key, Mod );
-}
-
-/** Special Key Press Event */
-void EventMgr::OnSpecialKeyPress(unsigned char Key)
-{
-	if (!last_win_focused)
-		return;
-
-	last_win_focused->OnSpecialKeyPress(Key);
-}
-
-void EventMgr::SetFocused(Window* win, Control* ctrl)
-{
-	if (!win) return;
-
-	AddWindow(win);
-	last_win_focused->SetFocused(ctrl);
 }
 
 unsigned long EventMgr::GetRKDelay()
@@ -308,12 +75,67 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
-Control* EventMgr::GetFocusedControl()
+void EventMgr::AddEventTap(EventCallback* cb, Event::EventType type)
 {
-	if (mouseTrackingWin) {
-		return mouseTrackingWin->GetFocus();
+	if (type == static_cast<Event::EventType>(-1)) {
+		int t = Event::MouseMove;
+		for (; t < Event::KeyDown; t++) {
+			taps.insert(std::make_pair(static_cast<Event::EventType>(t), cb));
+		}
+	} else {
+		taps.insert(std::make_pair(type, cb));
 	}
-	return NULL;
+	tapsToDelete.push_back(cb);
+}
+
+void EventMgr::DispatchEvent(Event& e)
+{
+	std::pair<EventTaps::iterator, EventTaps::iterator> range;
+	range = taps.equal_range(e.type);
+
+	EventTaps::iterator it = range.first;
+	for (; it != range.second; ++it) {
+		EventCallback* cb = (*it).second;
+		if ((*cb)(e)) {
+			break; // this handler absorbed the event
+		}
+	}
+}
+
+inline Event InitializeEvent(int mod)
+{
+	Event e;
+	e.mod = mod;
+	e.time = GetTickCount();
+	return e;
+}
+
+Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)
+{
+	Event e = InitializeEvent(mod);
+	e.type = (down) ? Event::MouseDown : Event::MouseUp;
+	e.mouse.button = btn;
+	e.mouse.x = pos.x;
+	e.mouse.y = pos.y;
+	e.isScreen = true;
+	return e;
+}
+
+Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
+{
+	Event e = CreateMouseBtnEvent(pos, 0, mod);
+	e.type = Event::MouseMove;
+	return e;
+}
+
+Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
+{
+	Event e = InitializeEvent(mod);
+	e.type = (down) ? Event::KeyDown : Event::KeyUp;
+	e.keyboard.keycode = key;
+	e.isScreen = false;
+	// TODO: need to translate the keycode for e.keyboard.character
+	return e;
 }
 
 }

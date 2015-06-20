@@ -29,9 +29,12 @@
 #define EVENTMGR_H
 
 #include "exports.h"
+
+#include "Callback.h"
 #include "Region.h"
 
-#include <deque>
+#include <map>
+#include <vector>
 
 namespace GemRB {
 
@@ -75,6 +78,72 @@ class Window;
 #define GEM_RK_DISABLE          2
 #define GEM_RK_QUADRUPLESPEED   4
 
+typedef unsigned char EventButton;
+typedef unsigned short KeyboardKey;
+
+struct ScreenEvent {
+	// cant use Point due to non trival constructor
+	int x,y; // mouse position at time of event
+	int deltaX, deltaY; // the vector of motion/scroll
+
+	Point Pos() const { return Point(x,y); }
+};
+
+struct GEM_EXPORT MouseEvent : public ScreenEvent {
+	unsigned short buttonStates;
+	EventButton button;
+};
+
+struct GEM_EXPORT KeyboardEvent {
+	KeyboardKey keycode; // raw keycode
+	KeyboardKey character; // the translated character
+};
+
+// TODO: Unused event type...
+struct GEM_EXPORT ControllerEvent {
+	unsigned short buttonStates;
+	EventButton button;
+};
+
+// TODO: Unused event type...
+struct GEM_EXPORT TouchEvent : public ScreenEvent {
+	ScreenEvent fingers[5];
+
+	unsigned short numFingers;
+	float pressure;
+};
+
+struct GEM_EXPORT Event {
+	enum EventType {
+		MouseMove = 0,
+		MouseUp,
+		MouseDown,
+		MouseScroll,
+
+		KeyUp,
+		KeyDown
+
+		// TODO: need types for touch and controller
+		// leaving off types for unused events
+	};
+
+	union {
+		MouseEvent mouse;
+		//ControllerEvent; unused currently
+		KeyboardEvent keyboard;
+		//TouchEvent touch; unused currently
+	};
+
+	EventType type;
+	unsigned long time;
+	int mod; // modifier keys held during the event
+	unsigned short repeat; // number of times this event has been repeated (within the time interval)
+	bool isScreen; // event coresponsds to location on screen
+};
+
+#define IS_KEY_EVENT(e) \
+(e.type == Event::EventType::KeyUp || e.type == Event::EventType::KeyDown)
+
 /**
  * @class EventMgr
  * Class distributing events from input devices to GUI windows.
@@ -83,66 +152,37 @@ class Window;
 
 class GEM_EXPORT EventMgr {
 private:
-	typedef std::deque<Window*> WindowList;
-	WindowList windows;
+	typedef Callback<const Event&, bool> EventCallback;
+	typedef std::multimap<Event::EventType, EventCallback*> EventTaps;
+	EventTaps taps;
+	// we may register the same tap multiple times. should only delete once
+	std::vector<EventCallback*> tapsToDelete;
 
 	Point dc;
 	unsigned long dc_time, dc_delay;
 	unsigned long rk_delay, rk_flags;
 
-	/** Function bar window containing function key buttons */
-	Window* function_bar;
-	/** Last Window focused */
-	Window* last_win_focused;
-	/** Last Window mouse event focused */
-	Window* mouseTrackingWin;
-	/** Last Window under Mouse Pointer*/
-	Window* last_win_over;
-	/** Sets a Window on the Top of the Window Queue */
 public:
 	static unsigned long DCDelay;
 	static unsigned long RCDelay;
 
+	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
+	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
+	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
+
 public:
 	EventMgr(void);
-	~EventMgr(void) {};
-	/** Adds a Window to the Event Manager */
-	void AddWindow(Window* win);
-	/** Removes a Window from the Event chain */
-	//void DelWindow(unsigned short WindowID, const char *WindowPack);
-	void DelWindow(Window* win);
-	/** Frees and Removes all the Windows in the Array */
-	void Clear();
-	/** Call this to change the cursor (moving over windows will change it back) */
-	void RefreshCursor(int idx);
-	/** BroadCast Mouse Move Event */
-	void MouseMove(unsigned short x, unsigned short y);
-	/** BroadCast Mouse Move Event */
-	void MouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** BroadCast Mouse Move Event */
-	void MouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** BroadCast Mouse Scroll Event */
-	void MouseWheelScroll( short x, short y);
-	/** BroadCast Key Press Event */
-	void KeyPress(unsigned char Key, unsigned short Mod);
-	/** BroadCast Key Release Event */
-	void KeyRelease(unsigned char Key, unsigned short Mod);
-	/** Special Ket Press Event */
-	void OnSpecialKeyPress(unsigned char Key);
-	/** Sets focus to the control of the window */
-	void SetFocused(Window *win, Control *ctrl);
+	~EventMgr(void);
+
+	void AddEventTap(EventCallback* cb, Event::EventType = static_cast<Event::EventType>(-1));
+	void DispatchEvent(Event& e);
+
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
-	void inline SetFunctionBar(Window *win) { function_bar = win; }
-	Control* GetFocusedControl();
-	/** Mask of which Mouse Buttons are pressed */
-	unsigned char MButtons;
+
 private:
-	void SetDefaultFocus(Window *win);
-	void SetOnTop(Window*);
 	bool ClickMatch(const Point& p, unsigned long thisTime);
+
 };
 
 }
