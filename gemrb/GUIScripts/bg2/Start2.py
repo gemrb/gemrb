@@ -210,6 +210,7 @@ def Tutorial():
 
 	#tutorial subwindow
 	TutorialWindow = GemRB.LoadWindow (5)
+	TutorialWindow.ShowModal()
 	TextAreaControl = TutorialWindow.GetControl (1)
 	CancelButton = TutorialWindow.GetControl (11)
 	PlayButton = TutorialWindow.GetControl (10)
@@ -217,7 +218,7 @@ def Tutorial():
 	CancelButton.SetText (13727)
 	PlayButton.SetText (33093)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: TutorialWindow.Close())
 	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)		
 

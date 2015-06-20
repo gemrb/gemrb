@@ -1441,11 +1441,11 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_Unload__doc,
-"UnloadWindow(WindowIndex)\n\n"
-"Unloads a previously Loaded Window." );
+PyDoc_STRVAR( GemRB_Window_Close__doc,
+"CloseWindow(GWindow)\n\n"
+"Closes a window." );
 
-static PyObject* GemRB_Window_Unload(PyObject* self, PyObject* args)
+static PyObject* GemRB_Window_Close(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS(args, "O", &self);
 	Window* win = GetView<Window>(self);
@@ -9130,13 +9130,13 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetFlags, METH_VARARGS),
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_CreateControl, METH_VARARGS),
+	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_GetControl, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
-	METHOD(Window_Unload, METH_VARARGS),
 	METHOD(WorldMap_AdjustScrolling, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
 	METHOD(WorldMap_SetTextColor, METH_VARARGS),

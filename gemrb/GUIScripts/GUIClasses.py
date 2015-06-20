@@ -84,9 +84,12 @@ class GWindow(GView):
   def __nonzero__(self):
     return self.ID != -1
  
-  def Unload(self):
+  def Unload(self): # backwards compatibility
+	  self.Close()
+ 
+  def Close(self):
     if self.ID != -1:
-      _GemRB.Window_Unload(self)
+      _GemRB.Window_Close(self)
       self.ID = -1
 
   @CreateControlDecorator
