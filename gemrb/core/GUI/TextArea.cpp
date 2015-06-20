@@ -654,8 +654,7 @@ void TextArea::ClearText()
 	ClearHover();
 	delete RemoveSubview(textContainer);
 
-	// only the frame origin matters. TextContainer dynamicaly resizes itself based on its contents.
-	textContainer = new TextContainer(Region(), ftext, palette);
+	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palette);
 	AddSubviewInFrontOfView(textContainer);
 
 	UpdateTextLayout();
