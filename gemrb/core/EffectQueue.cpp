@@ -76,6 +76,7 @@ static EffectRef fx_school_immunity_dec_ref = { "Protection:SchoolDec", -1 };
 static EffectRef fx_secondary_type_immunity_dec_ref = { "Protection:SecondaryTypeDec", -1 };
 
 //bounce effects
+static EffectRef fx_projectile_bounce_ref = { "Bounce:Projectile", -1 };
 static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
 //static EffectRef fx_opcode_bounce_ref = { "Bounce:Opcode", -1 };
 static EffectRef fx_spell_bounce_ref = { "Bounce:Spell", -1 };
@@ -967,6 +968,11 @@ static int check_type(Actor* actor, Effect* fx)
 			Log(DEBUG, "EffectQueue", "Bounced by level");
 			return -1;
 		}
+	}
+
+	if((bounce&BNC_PROJECTILE) && actor->fxqueue.HasEffectWithParam(fx_projectile_bounce_ref, fx->Projectile)) {
+		Log(DEBUG, "EffectQueue", "Bounced by projectile");
+		return -1;
 	}
 
 	if( fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
