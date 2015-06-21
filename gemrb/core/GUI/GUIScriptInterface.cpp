@@ -22,6 +22,16 @@
 
 namespace GemRB {
 
+static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, WindowScriptingRef* winref)
+{
+	if (winref) {
+		id &= 0x00000000ffffffff; // control id is lower 32bits
+		id |= (winref->Id << 32); // window id will be storeed in upper 32 bits, but only uses 16
+		id |= 0x8000000000000000; // MSB signifies this is a control id (so that win win id 0 and ctrl 0 on that win have distinct ids)
+	}
+	return id;
+}
+
 View* GetView(ScriptingRefBase* base)
 {
 	ViewScriptingRef* ref = dynamic_cast<ViewScriptingRef*>(base);
@@ -36,10 +46,9 @@ ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 	ResRef group = "Control";
 	if (win) {
 		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(win->GetScriptingRef());
-		group = winref->ScriptingGroup();
-		if (!(id&0xffffffff00000000)) {
-			id |= (winref->Id << 32);
-			id |= 0x8000000000000000;
+		if (winref) {
+			group = winref->ScriptingGroup();
+			id = ModifiedCtrlIdForWin(id, winref);
 		}
 	}
 	ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
@@ -64,12 +73,10 @@ ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
 	assert(ctrl->GetScriptingRef() == NULL);
 
 	ResRef group = "Control";
-	id &= 0x00000000ffffffff;
 	if (ctrl->Owner) {
 		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(ctrl->Owner->GetScriptingRef());
 		if (winref) {
-			id |= (winref->Id << 32);
-			id |= 0x8000000000000000;
+			id = ModifiedCtrlIdForWin(id, winref);
 			group = winref->ScriptingGroup();
 		}
 	}
