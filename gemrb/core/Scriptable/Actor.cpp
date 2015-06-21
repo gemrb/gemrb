@@ -3423,6 +3423,8 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			//percentile
 			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue / 100, 1);
 			break;
+		default:
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%s)!", ModifierType, LongName);
 	}
 	return Modified[StatIndex] - oldmod;
 }
@@ -3444,6 +3446,8 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			//percentile
 			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
 			break;
+		default:
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%s)!", ModifierType, LongName);
 	}
 	return BaseStats[StatIndex] - oldmod;
 }
