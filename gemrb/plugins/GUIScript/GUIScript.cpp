@@ -976,9 +976,9 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					PyErr_Clear(); //clearing the exception
 				}
 
-				Control* ctrl = GetControl(ControlID, win);
-				if (ctrl) {
-					rgn = ctrl->Frame();
+				Control* c = GetControl(ControlID, win);
+				if (c) {
+					rgn = c->Frame();
 					// do *not* delete the existing control, we want to replace
 					// it in the sort order!
 					//win->DelControl( CtrlIndex );
@@ -3201,7 +3201,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		String* string = NULL;
 		if(!PyString_Check(item)) {
 			if (PyInt_Check(item)) {
-				string = core->GetString(PyInt_AsLong(item));
+				string = core->GetString((ieStrRef)PyInt_AsLong(item));
 			} else {
 				return NULL;
 			}

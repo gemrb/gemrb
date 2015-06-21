@@ -3310,12 +3310,10 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
-
-	error("Core", "Unable to load game.");
+	Log(ERROR, "Interface", "Unable to load game.");
 
 	delete new_game;
 	delete new_worldmap;
-
 	delete gam_str;
 	delete wmp_str1;
 	delete wmp_str2;

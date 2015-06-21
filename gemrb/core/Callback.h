@@ -33,7 +33,7 @@ class GEM_EXPORT CallbackBase : public Held<CallbackBase> {
 template<typename P=void, typename R=void>
 class GEM_EXPORT Callback : public CallbackBase {
 public:
-	virtual R operator()(P) const {};
+	virtual R operator()(P) const { return R(); }
 };
 
 // specialization for no argument

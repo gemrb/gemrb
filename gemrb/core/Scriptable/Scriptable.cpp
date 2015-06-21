@@ -528,7 +528,6 @@ void Scriptable::ProcessActions()
 	}
 
 	int lastAction = -1;
-
 	while (true) {
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
@@ -542,7 +541,6 @@ void Scriptable::ProcessActions()
 		}
 		if (!CurrentAction) {
 			ClearActions();
-			lastAction = -1;
 			break;
 		}
 		lastAction = CurrentAction->actionID;

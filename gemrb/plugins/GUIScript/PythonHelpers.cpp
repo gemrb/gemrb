@@ -90,7 +90,7 @@ void PythonControlCallback::operator() () const
 
 void PythonControlCallback::operator() (Control* ctrl) const
 {
-	if (!Function || !Py_IsInitialized()) {
+	if (!ctrl || !Function || !Py_IsInitialized()) {
 		return;
 	}
 

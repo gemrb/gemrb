@@ -532,7 +532,7 @@ public:
 	GameScript(const ieResRef ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
-	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
+	const char *GetName() { return Name; }
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
