@@ -458,10 +458,11 @@ Actor *Projectile::GetTarget()
 		if (res==-1) {
 			if (original) {
 				Target = original->GetGlobalID();
+				target = original;
 			} else {
 				Log(DEBUG, "Projectile", "GetTarget: caster not found, bailing out!");
+				return NULL;
 			}
-			return NULL;
 		}
 		effects->SetOwner(original);
 		return target;
@@ -562,8 +563,8 @@ void Projectile::Payload()
 
 	if (Target) {
 		target = GetTarget();
-		if (!target && (Target==Caster)) {
-			//projectile rebounced
+		if (!target) {
+			//projectile resisted or failed to bounce properly
 			return;
 		}
 	} else {
