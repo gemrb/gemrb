@@ -4733,6 +4733,7 @@ int fx_poison_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 {
 	if(0) print("fx_poison_resistance_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	// this is a gemrb extension, the original only supported flat setting of this resistance
 	STAT_MOD( IE_RESISTPOISON );
 	return FX_APPLIED;
 }
