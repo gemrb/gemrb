@@ -69,9 +69,8 @@ protected:
 	bool hasFocus;
 	/** the value of the control to add to the variable */
 	ieDword Value;
-
-private:
-	ViewScriptingRef* MakeNewScriptingRef(ScriptingId id);
+	/** True if we are currently in an event handler */
+	bool InHandler;
 
 public:
 	Control(const Region& frame);
@@ -97,9 +96,6 @@ public: // Public attributes
 	ieDword ControlID;
 	/** Type of control */
 	ieByte ControlType;
-
-	/** True if we are currently in an event handler */
-	bool InHandler;
 	/** Owner Window */
 	Window* Owner;
 
@@ -133,45 +129,6 @@ public:
 	void operator()(Control* ctrl) {
 		return (*ptr)(ctrl);
 	}
-};
-
-
-class ControlScriptingRef : public ViewScriptingRef {
-	std::string group;
-public:
-	ControlScriptingRef(Control* ctrl, ScriptingId id, ScriptingId winId)
-	: ViewScriptingRef(ctrl, id)
-	{
-		char wid[6];
-		snprintf(wid, sizeof(wid), "Win%02d", winId);
-		group = wid;
-	}
-
-	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const std::string& ScriptingGroup() {
-		return group;
-	}
-	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() {
-		Control* ctrl = static_cast<Control*>(GetObject());
-		assert(ctrl); // shouldnt be able to have a control ref without this
-
-		// would just use type_info here, but its implementation specific...
-		switch (ctrl->ControlType) {
-			case IE_GUI_BUTTON:
-				return "Button";
-			case IE_GUI_LABEL:
-				return "Label";
-			case IE_GUI_TEXTAREA:
-				return "TextArea";
-			case IE_GUI_SCROLLBAR:
-				return "ScrollBar";
-			default:
-				return "Control";
-		}
-	};
-
-	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 }

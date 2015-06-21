@@ -485,7 +485,7 @@ endalign:
 		}
 		if (ctrl) {
 			win->AddSubviewInFrontOfView( ctrl );
-			ctrl->GetScriptingRef( ControlID );
+			RegisterScriptableControl(ctrl, ControlID);
 		}
 	}
 	return win;

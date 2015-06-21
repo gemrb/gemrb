@@ -19,6 +19,7 @@
 
 #include "View.h"
 
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/ScrollBar.h"
 #include "Interface.h"
 #include "Video.h"
@@ -423,26 +424,16 @@ bool View::OnSpecialKeyPress(unsigned char key)
 	return false;
 }
 
-void View::DeleteScriptingRef()
+void View::AssignScriptingRef(ViewScriptingRef* ref)
 {
-	ScriptEngine::UnregisterScriptingRef(scriptingRef);
 	delete scriptingRef;
-	scriptingRef = NULL;
+	scriptingRef = ref;
 }
 
-ViewScriptingRef* View::GetScriptingRef(ScriptingId id)
+inline void View::DeleteScriptingRef()
 {
-	if (scriptingRef) {
-		if (id != ScriptEngine::InvalidId && id != scriptingRef->Id) {
-			Log(MESSAGE, "GUI Scripting", "Reassigning a Scriptable control from %d to %d.", scriptingRef->Id, id);
-			DeleteScriptingRef();
-		}
-	}
-	if (!scriptingRef && id != ScriptEngine::InvalidId) {
-		scriptingRef = MakeNewScriptingRef(id);
-		ScriptEngine::RegisterScriptingRef(scriptingRef);
-	}
-	return scriptingRef;
+	ScriptEngine::UnregisterScriptingRef(scriptingRef);
+	AssignScriptingRef(NULL);
 }
 
 }

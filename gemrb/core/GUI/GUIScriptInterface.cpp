@@ -18,6 +18,8 @@
 
 #include "GUIScriptInterface.h"
 
+#include "Resource.h"
+
 namespace GemRB {
 
 View* GetView(ScriptingRefBase* base)
@@ -31,12 +33,17 @@ View* GetView(ScriptingRefBase* base)
 
 ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 {
-	char group[8] = "Control";
+	ResRef group = "Control";
 	if (win) {
-		snprintf(group, sizeof(group), "Win%02d", win->WindowID);
+		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(win->GetScriptingRef());
+		group = winref->ScriptingGroup();
+		if (!(id&0xffffffff00000000)) {
+			id |= (winref->Id << 32);
+			id |= 0x8000000000000000;
+		}
 	}
 	ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
-	return dynamic_cast<ControlScriptingRef*>(base);
+	return static_cast<ControlScriptingRef*>(base);
 }
 
 Control* GetControl(ScriptingId id, Window* win)
@@ -45,10 +52,52 @@ Control* GetControl(ScriptingId id, Window* win)
 	return static_cast<Control*>(view);
 }
 
-Window* GetWindow(ScriptingId id)
+Window* GetWindow(ScriptingId id, ResRef pack)
 {
-	View* view = GetView( ScriptEngine::GetScripingRef("Window", id) );
-	return static_cast<Window*>(view);
+	View* view = GetView( ScriptEngine::GetScripingRef(pack, id) );
+	return dynamic_cast<Window*>(view);
+}
+
+ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
+{
+	if (!ctrl) return NULL;
+	assert(ctrl->GetScriptingRef() == NULL);
+
+	ResRef group = "Control";
+	id &= 0x00000000ffffffff;
+	if (ctrl->Owner) {
+		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(ctrl->Owner->GetScriptingRef());
+		if (winref) {
+			id |= (winref->Id << 32);
+			id |= 0x8000000000000000;
+			group = winref->ScriptingGroup();
+		}
+	}
+
+	ctrl->ControlID = (ieDword)id;
+	ControlScriptingRef* ref = new ControlScriptingRef(ctrl, id, group);
+	if (ScriptEngine::RegisterScriptingRef(ref)) {
+		ctrl->AssignScriptingRef(ref);
+		return ref;
+	}
+	// registration with script engine failed
+	delete ref;
+	return NULL;
+}
+
+WindowScriptingRef* RegisterScriptableWindow(Window* win, ResRef pack, ScriptingId id)
+{
+	if (!win) return NULL;
+	assert(win->GetScriptingRef() == NULL);
+
+	WindowScriptingRef* ref = new WindowScriptingRef(win, id, pack);
+	if (ScriptEngine::RegisterScriptingRef(ref)) {
+		win->AssignScriptingRef(ref);
+		return ref;
+	}
+	// registration with script engine failed
+	delete ref;
+	return NULL;
 }
 
 }

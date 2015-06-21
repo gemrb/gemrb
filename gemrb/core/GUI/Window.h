@@ -69,9 +69,6 @@ public:
 		PosCentered = 15
 	};
 
-private:
-	ViewScriptingRef* MakeNewScriptingRef(ScriptingId id);
-
 protected:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
@@ -108,9 +105,6 @@ public:
 	void DispatchMouseWheelScroll(short x, short y);
 
 public: //Public attributes
-	/** Window ID */
-	unsigned short WindowID;
-
 	int Cursor;
 private: // Private attributes
 	/** Controls Array */
@@ -122,20 +116,6 @@ private: // Private attributes
 	unsigned long lastMouseMoveTime;
 	bool disabled;
 	WindowManager& manager;
-};
-
-class WindowScriptingRef : public ViewScriptingRef {
-public:
-	WindowScriptingRef(Window* win, ScriptingId id)
-	: ViewScriptingRef(win, id) {}
-
-	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const std::string& ScriptingGroup() {
-		static std::string gid("Window");
-		return gid;
-	}
-
-	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 }

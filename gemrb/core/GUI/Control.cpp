@@ -24,8 +24,6 @@
 #include "win32def.h"
 
 #include "ControlAnimation.h"
-#include "Interface.h"
-#include "ScriptEngine.h"
 #include "Sprite2D.h"
 
 #ifdef ANDROID
@@ -120,13 +118,6 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	MarkDirty();
-}
-
-ViewScriptingRef* Control::MakeNewScriptingRef(ScriptingId id)
-{
-	assert(Owner);
-	ControlID = id;
-	return new ControlScriptingRef(this, id, Owner->WindowID);
 }
 
 }

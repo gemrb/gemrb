@@ -26,9 +26,8 @@ Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame, Sprite2
 {
 	assert(winmgr);
 	Window* win = winmgr->MakeWindow(frame);
-	win->GetScriptingRef(winId);
+	RegisterScriptableWindow(win, winPack, winId);
 	win->SetBackground(bg);
-	//strcpy( win->WindowPack, winPack );
 	return win;
 }
 

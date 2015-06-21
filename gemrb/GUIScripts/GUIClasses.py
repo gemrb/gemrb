@@ -61,6 +61,7 @@ class GView:
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
 	}
+	__slots__ = ['SCRIPT_GROUP']
 	
 	def SetSize(self, w, h):
 		r = self.GetFrame()
@@ -79,7 +80,6 @@ class GWindow(GView):
     'ShowModal': _GemRB.Window_ShowModal,
     'GetControl': _GemRB.Window_GetControl
   }
-  SCRIPT_GROUP = "Window"
 
   def __nonzero__(self):
     return self.ID != -1
@@ -134,7 +134,6 @@ class GControl(GView):
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
-  __slots__ = ['SCRIPT_GROUP']
 
 class GLabel(GControl):
   methods = {

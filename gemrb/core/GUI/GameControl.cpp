@@ -2290,7 +2290,8 @@ bool GameControl::SetGUIHidden(bool hide)
 		//Log(MESSAGE, "GameControl", "window: %s", *val);
 		if (dict->Lookup( *val, id )) {
 			if (id != (ieDword) -1) {
-				Window* w = GetWindow(id);
+				// FIXME: this will only work for non-pst @ 800 res
+				Window* w = GetWindow(id, "GUIW08");
 				if (w) {
 					w->SetFlags(WF_BORDERLESS, BM_OR);
 					if (dict->Lookup( *++val, id )) {
@@ -2299,8 +2300,7 @@ bool GameControl::SetGUIHidden(bool hide)
 						continue;
 					}
 				}
-				Log(ERROR, "GameControl", "Invalid window or position: %s:%u",
-					*val, id);
+				Log(ERROR, "GameControl", "Invalid window or position: %s:%u", *val, id);
 			}
 		}
 	}
@@ -2308,7 +2308,8 @@ bool GameControl::SetGUIHidden(bool hide)
 	//FloatWindow doesn't affect gamecontrol, so it is special
 	if (dict->Lookup("FloatWindow", id)) {
 		if (id != (ieDword) -1) {
-			Window* fw = GetWindow(id);
+			// FIXME: hardcoded to PST
+			Window* fw = GetWindow(id, "GUIWORLD");
 			if (!hide) {
 				assert(fw != NULL);
 				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);

@@ -423,7 +423,7 @@ GameControl* Interface::StartGameControl()
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
 	Window* gamewin = winmgr.MakeWindow(screen);
-	gamewin->GetScriptingRef(99);
+	RegisterScriptableWindow(gamewin, "GameWin", 99);
 	gamectrl = new GameControl(screen);
 	gamewin->AddSubviewInFrontOfView(gamectrl);
 	//setting the focus to the game control
@@ -2478,12 +2478,12 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
-		Window* win = GetWindow(WindowID);
+		Window* win = GetWindow(WindowID, ref);
 	if (!win) {
 		win = guifact->GetWindow( WindowID );
 	}
 	if (win) {
-		win->GetScriptingRef(WindowID);
+		assert(win->GetScriptingRef());
 		win->SetPosition(Window::PosCentered);
 		winmgr.FocusWindow( win );
 
@@ -3718,7 +3718,8 @@ Window* Interface::GetMessageWindow() const
 {
 	ieDword id = (ieDword) -1;
 	if (vars->Lookup( "MessageWindow", id )) {
-		return GetWindow(id);
+		// FIXME: this will only work for non-pst @ 800 res
+		return GetWindow(id, "GUIW08");
 	}
 	return NULL;
 }

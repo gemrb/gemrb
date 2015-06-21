@@ -18,16 +18,9 @@
  *
  */
 
-#include "GUI/Window.h"
+#include "Window.h"
 
-#include "GUI/Button.h"
-#include "GUI/MapControl.h"
-#include "GUI/ScrollBar.h"
-
-#include "win32def.h"
-#include "GameData.h"
-#include "ImageMgr.h"
-#include "ie_cursors.h"
+#include "ScrollBar.h"
 
 namespace GemRB {
 
@@ -35,8 +28,6 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	: View(frame), manager(mgr)
 {
 	disabled = false;
-	Cursor = IE_CURSOR_NORMAL;
-
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
@@ -295,12 +286,6 @@ bool Window::OnSpecialKeyPress(unsigned char key)
 	}
 	// handle scrollbar events
 	return View::OnSpecialKeyPress(key);
-}
-
-ViewScriptingRef* Window::MakeNewScriptingRef(ScriptingId id)
-{
-	WindowID = id;
-	return new WindowScriptingRef(this, id);
 }
 
 }

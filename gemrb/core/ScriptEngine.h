@@ -22,7 +22,9 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
+#include "Resource.h"
 
+#include <stdint.h>
 #include <map>
 #include <string>
 
@@ -30,7 +32,7 @@ namespace GemRB {
 
 class Point;
 
-typedef unsigned int ScriptingId;
+typedef uint64_t ScriptingId;
 typedef std::string ScriptingClassId;
 
 class ScriptingRefBase {
@@ -40,10 +42,10 @@ public:
 	ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
-	virtual ~ScriptingRefBase() {}
+	virtual ~ScriptingRefBase() {};
 
 	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const std::string& ScriptingGroup()=0;
+	virtual const ResRef& ScriptingGroup()=0;
 	// class to instantiate on the script side (Python)
 	virtual const ScriptingClassId ScriptingClass()=0;
 };
@@ -63,18 +65,18 @@ public:
 class GEM_EXPORT ScriptEngine : public Plugin {
 private:
 	typedef std::map<ScriptingId, ScriptingRefBase*> ScriptingDefinitions;
-	typedef std::map<std::string, ScriptingDefinitions> ScriptingDict;
+	typedef std::map<ResRef, ScriptingDefinitions> ScriptingDict;
 	static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(ScriptingRefBase* ref);
 	static bool UnregisterScriptingRef(ScriptingRefBase* ref);
 
-	static ScriptingRefBase* GetScripingRef(ScriptingClassId classId, ScriptingId id)
+	static ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
 	{
 		ScriptingRefBase* ref = NULL;
-		ScriptingDefinitions::iterator it = GUIDict[classId].find(id);
-		if (it != GUIDict[classId].end()) {
+		ScriptingDefinitions::iterator it = GUIDict[group].find(id);
+		if (it != GUIDict[group].end()) {
 			ref = (*it).second;
 		}
 		return ref;

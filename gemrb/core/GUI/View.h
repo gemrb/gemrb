@@ -55,8 +55,6 @@ private:
 	void DrawBackground(const Region*) const;
 	void DrawSubviews(bool drawBg);
 
-	virtual ViewScriptingRef* MakeNewScriptingRef(ScriptingId) { return NULL; }
-
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
 	virtual void DrawTooltip(const Point&) const;
@@ -141,24 +139,12 @@ public:
 	virtual const String& TooltipText() const { return tooltip; }
 
 	// GUIScripting
-	ViewScriptingRef* GetScriptingRef(ScriptingId id = ScriptEngine::InvalidId);
+	void AssignScriptingRef(ViewScriptingRef* ref);
+	ViewScriptingRef* GetScriptingRef() { return scriptingRef; }
 	void DeleteScriptingRef();
 
 	// static methods
 	static void SetTooltipDelay(int);
-};
-
-class ViewScriptingRef : public ScriptingRef<View> {
-public:
-	ViewScriptingRef(View* view, ScriptingId id)
-	: ScriptingRef(view, id) {}
-
-	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() {
-		return ScriptingGroup();
-	};
-
-	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here
 };
 
 }

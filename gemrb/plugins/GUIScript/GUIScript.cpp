@@ -212,16 +212,16 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		RuntimeError("Invalid Scripting reference, must have ID attribute.");
 		return NULL;
 	}
-	ScriptingId id = (ScriptingId)PyInt_AsLong( attr );
+	ScriptingId id = (ScriptingId)PyLong_AsUnsignedLongLong( attr );
 
 	attr = PyObject_GetAttrString(obj, "SCRIPT_GROUP");
 	if (!attr) {
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
 		return NULL;
 	}
-	ScriptingClassId classId = PyString_AsString(attr);
+	ResRef group = PyString_AsString(attr);
 
-	return gs->GetScripingRef(classId, id);
+	return gs->GetScripingRef(group, id);
 }
 
 template <class RETURN=View>
@@ -1040,7 +1040,8 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 
 	assert(ctrl);
 	superview->AddSubviewInFrontOfView( ctrl );
-	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef(ControlID) );
+	RegisterScriptableControl(ctrl, ControlID);
+	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef() );
 }
 
 PyDoc_STRVAR( GemRB_Window_GetControl__doc,
@@ -1231,7 +1232,9 @@ static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 
 	Window* win = GetView<Window>(self);
 	win->Focus();
-	if (win->WindowID == 99) {
+
+	GameControl *gc = core->GetGameControl();
+	if (gc && gc->Owner == win) {
 		core->SetEventFlag(EF_CONTROL);
 	}
 
@@ -9563,14 +9566,14 @@ PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
 	if (!ref) return NULL;
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
-	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup().c_str()));
+	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	return obj;
 }
 
 PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
 {
-	PyObject* kwargs = Py_BuildValue("{s:i}", "ID", id);
+	PyObject* kwargs = Py_BuildValue("{s:K}", "ID", id);
 	PyObject* ret = gs->ConstructObject(pyclassname, NULL, kwargs);
 	Py_DECREF(kwargs);
 	return ret;

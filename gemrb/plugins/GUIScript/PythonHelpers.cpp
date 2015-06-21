@@ -18,7 +18,7 @@
  *
  */
 
-#include "GUI/Window.h"
+#include "GUI/GUIScriptInterface.h"
 #include "PythonHelpers.h"
 
 using namespace GemRB;

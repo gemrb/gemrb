@@ -25,16 +25,79 @@
 
 namespace GemRB {
 
-View* GetView(ScriptingRefBase* base);
-Window* GetWindow(ScriptingId id);
-Control* GetControl(ScriptingId id, Window* win);
+class ViewScriptingRef : public ScriptingRef<View> {
+private:
+	ResRef group;
+public:
+	ViewScriptingRef(View* view, ScriptingId id, ResRef group)
+	: ScriptingRef(view, id), group(group) {}
 
-ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
+	const ResRef& ScriptingGroup() {
+		return group;
+	}
+
+	// class to instantiate on the script side (Python)
+	virtual const ScriptingClassId ScriptingClass() {
+		return ScriptingGroup().CString();
+	};
+
+	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here
+};
+
+class WindowScriptingRef : public ViewScriptingRef {
+public:
+	WindowScriptingRef(Window* win, ScriptingId id, ResRef winpack)
+	: ViewScriptingRef(win, id, winpack) {}
+
+	// class to instantiate on the script side (Python)
+	virtual const ScriptingClassId ScriptingClass() {
+		static ScriptingClassId cls("Window");
+		return cls;
+	};
+
+	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
+};
+
+class ControlScriptingRef : public ViewScriptingRef {
+public:
+	ControlScriptingRef(Control* ctrl, ScriptingId id, ResRef group)
+	: ViewScriptingRef(ctrl, id, group) {}
+
+	// class to instantiate on the script side (Python)
+	const ScriptingClassId ScriptingClass() {
+		Control* ctrl = static_cast<Control*>(GetObject());
+
+		// would just use type_info here, but its implementation specific...
+		switch (ctrl->ControlType) {
+			case IE_GUI_BUTTON:
+				return "Button";
+			case IE_GUI_LABEL:
+				return "Label";
+			case IE_GUI_TEXTAREA:
+				return "TextArea";
+			case IE_GUI_SCROLLBAR:
+				return "ScrollBar";
+			default:
+				return "Control";
+		}
+	};
+
+	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
+};
+
+
+View* GetView(ScriptingRefBase* base);
+Window* GetWindow(ScriptingId id, ResRef pack);
+Control* GetControl(ScriptingId id, Window* win);
 
 template <class T>
 T* GetControl(ScriptingId id, Window* win) {
 	return dynamic_cast<T*>(GetControl(id, win));
 }
+
+ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
+ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
+WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
 
 }
 
