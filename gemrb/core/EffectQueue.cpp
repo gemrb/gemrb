@@ -965,7 +965,7 @@ static int check_type(Actor* actor, Effect* fx)
 	if (fx->Power) {
 		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
 			Log(DEBUG, "EffectQueue", "Bounced by level");
-			return 0;
+			return -1;
 		}
 	}
 
