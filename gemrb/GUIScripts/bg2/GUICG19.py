@@ -32,8 +32,7 @@ SoundIndex = 0
 def OnLoad():
 	global CharSoundWindow, VoiceList
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	CharSoundWindow=GemRB.LoadWindow(19)
+	CharSoundWindow=GemRB.LoadWindow(19, "GUICG")
 
 	VoiceList = CharSoundWindow.GetControl (45)
 	RowCount = VoiceList.ListResources(CHR_SOUNDS)

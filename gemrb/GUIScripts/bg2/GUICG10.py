@@ -34,8 +34,7 @@ MCRowIndices = []
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, MyChar, ButtonCount, MCRowIndices
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassWindow = GemRB.LoadWindow(10)
+	ClassWindow = GemRB.LoadWindow(10, "GUICG")
 
 	MyChar = GemRB.GetVar ("Slot")
 	ClassCount = CommonTables.Classes.GetRowCount()+1

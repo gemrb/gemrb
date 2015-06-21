@@ -138,9 +138,8 @@ def OnLoad():
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindow(4)
+	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)

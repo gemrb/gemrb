@@ -84,8 +84,7 @@ def OpenInventoryWindow ():
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
-	GemRB.LoadWindowPack ("GUIINV", 640, 480)
-	InventoryWindow = Window = GemRB.LoadWindow (2)
+	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

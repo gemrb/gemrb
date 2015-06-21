@@ -37,8 +37,7 @@ def RedrawSkills():
 def OnLoad():
 	global SkillWindow, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindow(9)
+	SkillWindow = GemRB.LoadWindow(9, "GUICG")
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]

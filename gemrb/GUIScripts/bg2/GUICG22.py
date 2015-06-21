@@ -41,7 +41,6 @@ def OnLoad():
 	global SchoolList, ClassName
 	global RowCount, TopIndex, KitTable, Init, MyChar
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MyChar = GemRB.GetVar ("Slot")
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
@@ -56,7 +55,7 @@ def OnLoad():
 
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
-	KitWindow = GemRB.LoadWindow(22)
+	KitWindow = GemRB.LoadWindow(22, "GUICG")
 	if ClassName == "MAGE":
 		Label = KitWindow.GetControl(0xfffffff)
 		Label.SetText(595)

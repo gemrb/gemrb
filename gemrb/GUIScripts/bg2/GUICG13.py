@@ -43,8 +43,7 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ColorWindow=GemRB.LoadWindow(13)
+	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default

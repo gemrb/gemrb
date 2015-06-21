@@ -109,10 +109,8 @@ def UpdateControlStatus():
 	if Override:
 		Expand = GS_LARGEDIALOG
 
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-
 	if Expand == GS_MEDIUMDIALOG:
-		TMessageWindow = GemRB.LoadWindow(12)
+		TMessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
@@ -120,12 +118,12 @@ def UpdateControlStatus():
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	elif Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindow(7)
+		TMessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 	else:
-		TMessageWindow = GemRB.LoadWindow(4)
+		TMessageWindow = GemRB.LoadWindow(4, GUICommon.GetWindowPack())
 		TMessageTA = TMessageWindow.GetControl(3)
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)

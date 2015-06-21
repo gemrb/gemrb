@@ -30,8 +30,7 @@ Window = None
 def OnLoad ():
 	global Table, Picture, Window
 	
-	GemRB.LoadWindowPack("demoend", 640, 480)
-	Window = GemRB.LoadWindow(0)
+	Window = GemRB.LoadWindow(0, "demoend")
 	Picture = 0
 	Table = GemRB.LoadTable ("splashsc")
 	resref = Table.GetValue (Picture,0)
