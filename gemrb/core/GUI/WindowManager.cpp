@@ -18,7 +18,9 @@
 
 #include "WindowManager.h"
 
+#include "GameData.h"
 #include "Interface.h"
+#include "ImageMgr.h"
 #include "Window.h"
 
 #include "defsounds.h"
@@ -208,6 +210,7 @@ void WindowManager::DrawWindows() const
 	}
 	modalShield = false;
 
+	bool drawFrame = true;
 	const Region& frontWinFrame = windows.front()->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::const_reverse_iterator rit = windows.rbegin();
@@ -230,13 +233,28 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
+		const Region& frame = win->Frame();
+		if (drawFrame && !(win->flags&WF_BORDERLESS) && (frame.w < screen.w || frame.h < screen.h)) {
+			video->SetScreenClip( NULL );
+
+			Sprite2D* edge = WinFrameEdge(0); // left
+			video->BlitSprite(edge, 0, 0, true);
+			edge = WinFrameEdge(1); // right
+			int sideW = edge->Width;
+			video->BlitSprite(edge, core->Width - sideW, 0, true);
+			edge = WinFrameEdge(2); // top
+			video->BlitSprite(edge, sideW, 0, true);
+			edge = WinFrameEdge(3); // bottom
+			video->BlitSprite(edge, sideW, core->Height - edge->Height, true);
+			drawFrame = false; // only need to draw this once ever
+		}
 		if (win->IsDisabled()) {
 			if (win->NeedsDraw()) {
 				// Important to only draw if the window itself is dirty
 				// controls on greyed out windows shouldnt be updating anyway
 				win->Draw();
 				Color fill = { 0, 0, 0, 128 };
-				video->DrawRect(win->Frame(), fill);
+				video->DrawRect(frame, fill);
 			}
 		} else {
 			win->Draw();
@@ -275,6 +293,48 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 		screenshot = video->GetScreenshot( Region(Point(), screen) );
 	}
 	return screenshot;
+}
+
+Sprite2D* WindowManager::WinFrameEdge(int edge)
+{
+	std::string refstr = "STON";
+	switch (core->Width) {
+		case 800:
+			refstr += "08";
+			break;
+		case 1024:
+			refstr += "10";
+			break;
+	}
+	switch (edge) {
+		case 0:
+			refstr += "L";
+			break;
+		case 1:
+			refstr += "R";
+			break;
+		case 2:
+			refstr += "T";
+			break;
+		case 3:
+			refstr += "B";
+			break;
+	}
+
+	typedef Holder<Sprite2D> FrameImage;
+	static std::map<ResRef, FrameImage> frames;
+
+	ResRef ref = refstr.c_str();
+	Sprite2D* frame = NULL;
+	if (frames.find(ref) != frames.end()) {
+		frame = frames[ref].get();
+	} else {
+		ResourceHolder<ImageMgr> im(ref);
+		frame = im->GetSprite2D();
+		frames.insert(std::make_pair(ref, frame));
+	}
+	
+	return frame;
 }
 
 #undef WIN_IT

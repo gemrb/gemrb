@@ -80,8 +80,6 @@ protected:
 
 	bool TrySetFocus(View*);
 
-	static Sprite2D* WinFrameEdge(int edge);
-
 public:
 	Window(const Region& frame, WindowManager& mgr);
 	~Window();

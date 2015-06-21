@@ -130,23 +130,9 @@ void Window::SetDisabled(bool disable)
 	MarkDirty();
 }
 
-/** This function Draws the Window on the Output Screen */
 void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
 {
-	if (!(flags&WF_BORDERLESS) && (frame.w < core->Width || frame.h < core->Height)) {
-		Video* video = core->GetVideoDriver();
-		video->SetScreenClip( NULL );
-
-		Sprite2D* edge = WinFrameEdge(0); // left
-		video->BlitSprite(edge, 0, 0, true);
-		edge = WinFrameEdge(1); // right
-		int sideW = edge->Width;
-		video->BlitSprite(edge, core->Width - sideW, 0, true);
-		edge = WinFrameEdge(2); // top
-		video->BlitSprite(edge, sideW, 0, true);
-		edge = WinFrameEdge(3); // bottom
-		video->BlitSprite(edge, sideW, core->Height - edge->Height, true);
-	}
+	// window doesnt actually have anything to draw (subviews only)
 }
 
 Control* Window::GetFocus() const
@@ -309,48 +295,6 @@ bool Window::OnSpecialKeyPress(unsigned char key)
 	}
 	// handle scrollbar events
 	return View::OnSpecialKeyPress(key);
-}
-
-Sprite2D* Window::WinFrameEdge(int edge)
-{
-	std::string refstr = "STON";
-	switch (core->Width) {
-		case 800:
-			refstr += "08";
-		break;
-		case 1024:
-			refstr += "10";
-		break;
-	}
-	switch (edge) {
-		case 0:
-			refstr += "L";
-			break;
-		case 1:
-			refstr += "R";
-			break;
-		case 2:
-			refstr += "T";
-			break;
-		case 3:
-			refstr += "B";
-			break;
-	}
-
-	typedef Holder<Sprite2D> FrameImage;
-	static std::map<ResRef, FrameImage> frames;
-
-	ResRef ref = refstr.c_str();
-	Sprite2D* frame = NULL;
-	if (frames.find(ref) != frames.end()) {
-		frame = frames[ref].get();
-	} else {
-		ResourceHolder<ImageMgr> im(ref);
-		frame = im->GetSprite2D();
-		frames.insert(std::make_pair(ref, frame));
-	}
-
-	return frame;
 }
 
 ViewScriptingRef* Window::MakeNewScriptingRef(ScriptingId id)

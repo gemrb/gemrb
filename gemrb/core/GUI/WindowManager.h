@@ -54,6 +54,7 @@ private:
 
 private:
 	bool IsOpenWindow(Window* win) const;
+	static Sprite2D* WinFrameEdge(int edge);
 
 public:
 	WindowManager(Video* vid);
