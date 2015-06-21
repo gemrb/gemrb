@@ -50,8 +50,6 @@ View::View(const Region& frame)
 	dirty = true;
 	resizeFlags = RESIZE_NONE;
 	flags = 0;
-
-	SizeChanged(frame.Dimensions());
 }
 
 View::~View()
