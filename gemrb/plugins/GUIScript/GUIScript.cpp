@@ -551,16 +551,17 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
-"LoadWindow(WindowID[, WinPack]) => GWindow\n\n"
+"LoadWindow(WindowID[, WinPack, Position]) => GWindow\n\n"
 "Returns a Window." );
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID;
+	Window::WindowPosition pos = Window::PosCentered;
 	char* ref = NULL;
-	PARSE_ARGS( args, "i|s", &WindowID, &ref );
+	PARSE_ARGS( args, "i|si", &WindowID, &ref, &pos );
 
-	Window* win = core->LoadWindow( WindowID, ref );
+	Window* win = core->LoadWindow( WindowID, ref, pos );
 	if (!win) {
 		char buf[256];
 		snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );

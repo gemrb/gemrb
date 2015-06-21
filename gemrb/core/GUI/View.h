@@ -23,7 +23,6 @@
 #include "GUI/EventMgr.h"
 #include "Region.h"
 #include "ScriptEngine.h"
-#include "Sprite2D.h"
 
 #include <list>
 

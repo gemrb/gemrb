@@ -33,6 +33,7 @@
 #include "Cache.h"
 #include "Callback.h"
 #include "GUI/WindowManager.h"
+#include "GUI/Window.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
@@ -435,7 +436,7 @@ public:
 	may apply a single fx on the summoned creature normally an unsummon effect */
 	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
 	/** Loads a Window in the Window Manager */
-	Window* LoadWindow(uint64_t WindowID, const ResRef& ref);
+	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&, char* Background);

@@ -2474,7 +2474,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 }
 
 /** Loads a Window in the Window Manager */
-Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
+Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition pos)
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
@@ -2484,7 +2484,7 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref)
 	}
 	if (win) {
 		assert(win->GetScriptingRef());
-		win->SetPosition(Window::PosCentered);
+		win->SetPosition(pos);
 		winmgr.FocusWindow( win );
 
 		GameControl *gc = GetGameControl ();
