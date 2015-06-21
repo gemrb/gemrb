@@ -314,6 +314,7 @@ private:
 	WindowManager winmgr;
 	Holder<GUIFactory> guifact;
 	Holder<ScriptEngine> guiscript;
+	GameControl* gamectrl;
 	SaveGameIterator *sgiterator;
 	Variables * vars;
 	Variables * tokens;
@@ -513,7 +514,7 @@ public:
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
-	GameControl *GetGameControl() const;
+	GameControl *GetGameControl() const { return gamectrl; }
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */

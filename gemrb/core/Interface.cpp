@@ -129,6 +129,7 @@ Interface::Interface()
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
+	gamectrl = NULL;
 	projserv = NULL;
 	VideoDriverName = "sdl";
 	AudioDriverName = "openal";
@@ -290,6 +291,7 @@ Interface::~Interface(void)
 		if (ambim) ambim->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
+	delete gamectrl;
 	delete game;
 	delete calendar;
 	delete worldmap;
@@ -416,24 +418,22 @@ Interface::~Interface(void)
 
 GameControl* Interface::StartGameControl()
 {
-	//making sure that our window is the first one
-	if (ConsolePopped) {
-		PopupConsole();
-	}
+	if (gamectrl) return gamectrl; // if this was already called we dont want to leak
+
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
 	Window* gamewin = winmgr.MakeWindow(screen);
 	gamewin->GetScriptingRef(99);
-	GameControl* gc = new GameControl(screen);
-	gamewin->AddSubviewInFrontOfView(gc);
+	gamectrl = new GameControl(screen);
+	gamewin->AddSubviewInFrontOfView(gamectrl);
 	//setting the focus to the game control
 	winmgr.FocusWindow(gamewin);
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
-		gc->SetGUIHidden(false);
+		gamectrl->SetGUIHidden(false);
 	}
 
-	return gc;
+	return gamectrl;
 }
 
 /* handle main loop events that might destroy or create windows
@@ -3376,11 +3376,6 @@ void Interface::UpdateMasterScript()
 		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
 	}
-}
-
-GameControl* Interface::GetGameControl() const
-{
-	return GetControl<GameControl>(0, GetWindow(99));
 }
 
 bool Interface::InitItemTypes()
