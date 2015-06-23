@@ -531,7 +531,7 @@ def OpenSequencerWindow ():
 		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpTarget)
 		if Target:
 			TargSelect.SetVarAssoc ("ContTarg", 1)
-			TargSelect.SetOptions (ContTarg[0][0])
+			TargSelect.SetOptions ([ContTarg[0][0]])
 		else:
 			TargSelect.SetVarAssoc ("ContTarg", 0)
 			TargSelect.SetOptions ([elem[0] for elem in ContTarg])
