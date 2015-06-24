@@ -22,6 +22,7 @@ import CreateControlDecorators
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper
+from GemRB import GetControl
 
 def CreateControlDecorator(func):
 	wrapper = getattr(CreateControlDecorators, func.__name__, None)
@@ -78,7 +79,6 @@ class GWindow(GView):
     'SetupControls': _GemRB.Window_SetupControls,
     'Focus': _GemRB.Window_Focus,
     'ShowModal': _GemRB.Window_ShowModal,
-    'GetControl': _GemRB.Window_GetControl
   }
 
   def __nonzero__(self):
@@ -91,6 +91,9 @@ class GWindow(GView):
     if self.ID != -1:
       _GemRB.Window_Close(self)
       self.ID = -1
+      
+  def GetControl(self, id):
+	  return GetControl(id, self)
 
   @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):

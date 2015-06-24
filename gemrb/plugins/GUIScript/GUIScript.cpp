@@ -1045,22 +1045,45 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef() );
 }
 
-PyDoc_STRVAR( GemRB_Window_GetControl__doc,
-			 "GetControl(GWindow, ControlID) => GControl\n\n"
+PyDoc_STRVAR( GemRB_GetControl__doc,
+			 "GetControl(ControlID, GWindow|Alias) => GControl\n\n"
+			 "Lookup control from either a window or from an alias\n"
 			 "Returns a control as an object." );
 
-static PyObject* GemRB_Window_GetControl(PyObject* self, PyObject* args)
+static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
 {
 	ScriptingId controlId = ScriptEngine::InvalidId;
-	PARSE_ARGS( args, "Ol", &self, &controlId );
+	PyObject* lookup = NULL;
+	PARSE_ARGS( args, "lO", &controlId, &lookup );
 
-	Window* win = GetView<Window>(self);
-	assert(win);
+	ScriptingRefBase* ref = NULL;
+	if (PyString_Check(lookup)) {
+		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), controlId);
+	} else {
+		Window* win = GetView<Window>(lookup);
+		assert(win);
+		ref = GetControlRef(controlId, win);
+	}
 
-	ScriptingRefBase* ref = GetControlRef(controlId, win);
 	if (ref) {
 		return gs->ConstructObjectForScriptable(ref);
 	}
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_Control_AddAlias__doc,
+			 "GetControl(GControl, AliasGroup, AliasID])\n\n"
+			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the control." );
+
+static PyObject* GemRB_Control_AddAlias(PyObject* self, PyObject* args)
+{
+	char* group = NULL;
+	ScriptingId controlId = ScriptEngine::InvalidId;
+	PARSE_ARGS( args, "Os", &self, &group, &controlId );
+
+	Control* ctrl = GetView<Control>(self);
+	ControlScriptingRef* aliasref = new ControlScriptingRef(ctrl, controlId, group);
+	ScriptEngine::RegisterScriptingRef(aliasref);
 	Py_RETURN_NONE;
 }
 
@@ -8932,6 +8955,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GetAvatarsValue, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
+	METHOD(GetControl, METH_VARARGS),
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
@@ -9096,6 +9120,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
+	METHOD(Control_AddAlias, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
 	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
@@ -9141,7 +9166,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
-	METHOD(Window_GetControl, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
