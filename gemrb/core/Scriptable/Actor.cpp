@@ -5699,7 +5699,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
-		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
+		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetCString(tmp));
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
 			tmp = STR_GOTABILITY;
