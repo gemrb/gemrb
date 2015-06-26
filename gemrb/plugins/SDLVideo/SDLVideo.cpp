@@ -152,17 +152,15 @@ int SDLVideoDriver::PollEvents()
 		// this is important for SDL2 (Android, iOS currently)
 		Point p = GetMousePos();
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
-		if (!core->ConsolePopped) {
-			Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
-			EvntManager->DispatchEvent(e);
-			/*
-			Control* ctl = EvntManager->GetFocusedControl();
-			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
-				// these are repeat events so the control should stay pressed
-				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
-			*/
-		}
-	} 
+		Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
+		EvntManager->DispatchEvent(e);
+		/*
+		Control* ctl = EvntManager->GetFocusedControl();
+		if (ctl && ctl->ControlType == IE_GUI_BUTTON)
+			// these are repeat events so the control should stay pressed
+			((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
+		*/
+	}
 	return ret;
 }
 
@@ -174,6 +172,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	SDL_Keycode key = SDLK_UNKNOWN;
 	int modstate = GetModState(event.key.keysym.mod);
 	SDLKey sym = event.key.keysym.sym;
+	Event e;
 
 	/* Loop until there are no events left on the queue */
 	switch (event.type) {
@@ -207,16 +206,12 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					}
 					break;
 			}
-			if (!core->ConsolePopped && ( key != 0 )) {
+			if (key != 0) {
 				Event e = EvntManager->CreateKeyEvent(key, false, modstate);
 				EvntManager->DispatchEvent(e);
 			}
 			break;
 		case SDL_KEYDOWN:
-			if ((sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
-				core->PopupConsole();
-				break;
-			}
 #if SDL_VERSION_ATLEAST(1,3,0)
 			key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
 #else
@@ -315,12 +310,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					break;
 				default: break;
 			}
-			if (core->ConsolePopped)
-				core->console->OnSpecialKeyPress( key );
-			else {
-				Event e = EvntManager->CreateKeyEvent(key, true, modstate);
-				EvntManager->DispatchEvent(e);
-			}
+			e = EvntManager->CreateKeyEvent(key, true, modstate);
+			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:
 			MouseMovement(event.motion.x, event.motion.y);
@@ -336,20 +327,16 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				CursorIndex = VID_CUR_DOWN;
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
-			if (!core->ConsolePopped) {
-				Event e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), true, GetModState(SDL_GetModState()));
-				EvntManager->DispatchEvent(e);
-			}
+			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), true, GetModState(SDL_GetModState()));
+			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_UP;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
-			if (!core->ConsolePopped) {
-				Event e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), false, GetModState(SDL_GetModState()));
-				EvntManager->DispatchEvent(e);
-			}
+			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), false, GetModState(SDL_GetModState()));
+			EvntManager->DispatchEvent(e);
 			break;
 	}
 	return GEM_OK;

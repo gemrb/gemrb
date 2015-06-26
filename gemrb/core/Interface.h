@@ -58,7 +58,6 @@ class Actor;
 class Audio;
 class CREItem;
 class Calendar;
-class Console;
 class Container;
 class Control;
 class DataFileMgr;
@@ -449,8 +448,6 @@ public:
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
-	/** Popup the Console */
-	void PopupConsole();
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
@@ -760,12 +757,8 @@ public:
 
 	/** Set Next Script */
 	void SetNextScript(const char *script);
-	/** Console is on Screen */
-	bool ConsolePopped;
 	/** Cheats enabled? */
 	bool CheatFlag;
-	/** The Console Object */
-	Console * console;
 
 	Audio* GetAudioDrv(void) const;
 

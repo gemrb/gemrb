@@ -267,9 +267,6 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	switch (event.type) {
 		case SDL_ACTIVEEVENT:
-			if (core->ConsolePopped) {
-				break;
-			}
 			if (event.active.state == SDL_APPMOUSEFOCUS && !event.active.gain) {
 				Event e = EvntManager->CreateKeyEvent(GEM_MOUSEOUT, true);
 				EvntManager->DispatchEvent(e);

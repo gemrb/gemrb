@@ -145,7 +145,6 @@ Interface::Interface()
 	InfoTextPalette = NULL;
 	timer = NULL;
 	displaymsg = NULL;
-	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
 
@@ -159,7 +158,6 @@ Interface::Interface()
 	mousescrollspd = 10;
 
 	GameType[0] = '\0';
-	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
@@ -352,8 +350,6 @@ Interface::~Interface(void)
 	delete plugin_flags;
 
 	delete projserv;
-
-	delete console;
 
 	delete pal256;
 	delete pal32;
@@ -929,9 +925,6 @@ void Interface::Main()
 
 		GameLoop();
 		winmgr.DrawWindows();
-		if (ConsolePopped) {
-			console->Draw();
-		}
 		if (DrawFPS) {
 			frame++;
 			time = GetTickCount();
@@ -1819,12 +1812,11 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
-	console = new Console(Region(0, 0, Width, 25));
-	Sprite2D* cursor = GetCursorSprite();
-	if (!cursor) {
-		Log(ERROR, "Core", "Failed to load cursor sprite.");
-	} else
-		console->SetCursor (cursor);
+	Region frame(0, 0, 640, 25);
+	Console* console = new Console(frame);
+	console->SetCursor(GetCursorSprite());
+	Window* consoleWin = winmgr.MakeWindow(frame);
+	consoleWin->AddSubviewInFrontOfView(console);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
@@ -2703,13 +2695,6 @@ void Interface::DrawTooltip (const String& string, Point p)
 	video->SetScreenClip(&oldclip);
 }
 
-/** Popup the Console */
-void Interface::PopupConsole()
-{
-	ConsolePopped = !ConsolePopped;
-	winmgr.RedrawAll();
-}
-
 /** Get the Sound Manager */
 SaveGameIterator* Interface::GetSaveGameIterator() const
 {
@@ -2722,9 +2707,6 @@ void Interface::AskAndExit()
 	ieDword askExit = 0;
 	vars->Lookup("AskAndExit", askExit);
 	if (game && !askExit) {
-		if (ConsolePopped) {
-			PopupConsole();
-		}
 		SetPause(PAUSE_ON);
 		vars->SetAt("AskAndExit", 1);
 
