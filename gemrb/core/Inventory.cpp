@@ -1313,6 +1313,14 @@ bool Inventory::FistsEquipped() const
 	return Equipped == IW_NO_EQUIPPED;
 }
 
+bool Inventory::MagicSlotEquipped() const
+{
+	if (SLOT_MAGIC != -1) {
+		return Slots[SLOT_MAGIC] != NULL;
+	}
+	return false;
+}
+
 //returns the fist weapon if there is nothing else
 //This will return the actual weapon, I mean the bow in the case of bow+arrow combination
 CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const

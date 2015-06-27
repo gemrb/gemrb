@@ -338,6 +338,7 @@ public:
 	/** tries to merge the passed item with the one in the passed slot */
 	int MergeItems(int slot, CREItem *item);
 	bool FistsEquipped() const;
+	bool MagicSlotEquipped() const;
 	//setting important constants
 	static void Init();
 	static void SetArmorSlot(int arg);
