@@ -6166,7 +6166,10 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
 
 	//tenser's transformation makes the actor proficient in any weapons
-	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
+	// also conjured weapons are wielded without penalties
+	if (!stars && (HasSpellState(SS_TENSER) || inventory.MagicSlotEquipped())) {
+		stars = 1;
+	}
 
 	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
 	if ((signed)stars > wspecial_max) {
