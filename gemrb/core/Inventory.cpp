@@ -1224,7 +1224,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 	EquippedHeader = header;
 
 	//doesn't work if magic slot is used, refresh the magic slot just in case
-	if (HasItemInSlot("",SLOT_MAGIC) && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
+	if (MagicSlotEquipped() && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
 		UpdateWeaponAnimation();
 		return false;
@@ -1790,7 +1790,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 	}
 
 	//magic items have the highest priority
-	if ( HasItemInSlot("", SLOT_MAGIC)) {
+	if (MagicSlotEquipped()) {
 		//magic weapon is in use
 		return STR_MAGICWEAPON;
 	}
