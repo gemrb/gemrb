@@ -656,6 +656,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_MOUSEWHEEL:
 			/*
 			 TODO: need a preference for inverting these
+			 sdl 2.0.4 autodetects (SDL_MOUSEWHEEL_FLIPPED in SDL_MouseWheelEvent)
 			 */
 			short scrollX;
 			scrollX= event.wheel.x * -1;
