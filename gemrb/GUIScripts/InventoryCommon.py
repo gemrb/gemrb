@@ -315,7 +315,7 @@ def DisplayItem (itemresref, type):
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		read = 0
 	container = (type&1) and (item["Function"]&4)
-	dialog = (type&1) and (item["Dialog"]!="")
+	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
 		Button.SetText (strrefs[3])
