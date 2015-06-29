@@ -487,6 +487,9 @@ def CannotLearnSlotSpell ():
 	spell = GemRB.GetSpell (spell_ref)
 	level = spell['SpellLevel']
 
+	# school conflicts are handled before this is called from inventory
+	# add them here if a need arises
+
 	# maybe she already knows this spell
 	if HasSpell (pc, booktype, level-1, spell_ref) != -1:
 		return LSR_KNOWN

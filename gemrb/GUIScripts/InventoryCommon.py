@@ -717,11 +717,15 @@ def ReadItemWindow ():
 	ret = Spellbook.CannotLearnSlotSpell()
 
 	if ret:
-		# couldn't find any strrefs for the other undhandled values (stat, level)
 		if ret == LSR_KNOWN and GameCheck.HasTOB():
 			strref = 72873
 		elif ret == LSR_KNOWN and GameCheck.IsPST():
 			strref = 50394
+		elif ret == LSR_STAT and GameCheck.HasTOB():
+			# reached for sorcerers, schools/usability is handled before
+			strref = 72874 # your spell school does not permit you to learn
+		elif ret == LSR_LEVEL and GameCheck.HasTOB():
+			strref = 48806 # inadequate intelligence (good enough approximation)
 		elif ret == LSR_FULL and GameCheck.IsBG2():
 			strref = 32097
 		elif ret == LSR_FULL and GameCheck.IsPST():
