@@ -467,17 +467,16 @@ def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# disqualify sorcerers immediately
-	booktype = IE_SPELL_TYPE_WIZARD
-	class_id = GemRB.GetPlayerStat (pc, IE_CLASS)
-	if GameCheck.IsIWD2():
-		if class_id == 10 or class_id == 2:
-			return LSR_STAT
-		booktype = IE_IWD2_SPELL_WIZARD
-	else:
-		if class_id == 19:
-			return LSR_STAT
-
 	import GUICommon
+	ClassName = GUICommon.GetClassRowName (pc)
+	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
+	if SorcererBook:
+		return LSR_STAT
+
+	booktype = IE_SPELL_TYPE_WIZARD
+	if GameCheck.IsIWD2():
+		booktype = IE_IWD2_SPELL_WIZARD
+
 	if GameCheck.IsPST():
 		import GUIINV
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
