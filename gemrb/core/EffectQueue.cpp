@@ -504,11 +504,17 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 
 //this is where we reapply all effects when loading a saved game
 //The effects are already in the fxqueue of the target
+//... but some require reinitialisation
 void EffectQueue::ApplyAllEffects(Actor* target) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		ApplyEffect( target, *f, 0 );
+		if (Opcodes[(*f)->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
+			// pretend to be the first application (FirstApply==1)
+			ApplyEffect(target, *f, 1);
+		} else {
+			ApplyEffect(target, *f, 0);
+		}
 	}
 }
 

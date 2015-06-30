@@ -164,7 +164,8 @@ enum EffectFlags {
 	EFFECT_NORMAL = 0,
 	EFFECT_DICED = 1,
 	EFFECT_NO_LEVEL_CHECK = 2,
-	EFFECT_NO_ACTOR = 4
+	EFFECT_NO_ACTOR = 4,
+	EFFECT_REINIT_ON_LOAD = 8
 };
 
 /** Initializes table of available spell Effects used by all the queues. */
