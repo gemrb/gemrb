@@ -198,17 +198,18 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			if(EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
-				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
-				ScrollBar.SetDefaultScrollBar ()
+#				ScrollBar.SetDefaultScrollBar ()
 
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
 				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
+					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
 					HideUnhideScrollBar(0)
 					if chargen:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-24 ) , 6 ) + 1 )
 					else: #there are five rows of 5 spells in level up of sorcs
 						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-25 ) , 5 ) + 1 )
 				else:
+					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 					HideUnhideScrollBar(1)
 
