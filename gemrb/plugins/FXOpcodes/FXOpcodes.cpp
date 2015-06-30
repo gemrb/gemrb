@@ -639,7 +639,7 @@ static EffectDesc effectnames[] = {
 	{ "PiercingResistanceModifier", fx_piercing_resistance_modifier, 0, -1 },
 	{ "PlayMovie", fx_play_movie, EFFECT_NO_ACTOR, -1 },
 	{ "PlaySound", fx_playsound, EFFECT_NO_ACTOR, -1 },
-	{ "PlayVisualEffect", fx_play_visual_effect, 0, -1 },
+	{ "PlayVisualEffect", fx_play_visual_effect, EFFECT_REINIT_ON_LOAD, -1 },
 	{ "PoisonResistanceModifier", fx_poison_resistance_modifier, 0, -1 },
 	{ "Polymorph", fx_polymorph, 0, -1 },
 	{ "PortraitChange", fx_portrait_change, 0, -1 },
