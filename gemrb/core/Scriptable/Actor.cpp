@@ -4088,6 +4088,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
+		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
+		if (act && LastHitter == 0) {
+			LastHitter = act->GetGlobalID();
+		}
 	}
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
@@ -4130,7 +4134,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
-		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: lastdamager? LastHitter is not set for spell damage
+		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
 	}
 
 	InternalFlags|=IF_ACTIVE;
