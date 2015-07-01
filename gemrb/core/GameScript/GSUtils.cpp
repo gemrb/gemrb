@@ -1976,7 +1976,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				else {
 					i=0;
 				}
-				while (*src != '"' && *src != '#') {
+				// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen)
+				// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
+				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ','))) {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;
@@ -2012,7 +2014,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					}
 					//reading the context string
 					i=0;
-					while (*src != '"' && *src != '#') {
+					while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ','))) {
 						if (*src == 0) {
 							delete newTrigger;
 							return NULL;
