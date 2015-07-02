@@ -1,11 +1,16 @@
-GemRB git (a98cfdba1c):
+GemRB git (b5d9ba7754):
   New features:
-    - text system rewrite for better fidelity, perfomance and maintainability
-    - 
+    - text system rewrite for better fidelity, performance and maintainability
+    - 10 player party support (see the 10pp mod for the script part)
+    - basic test suite for the text system
+    - more tobex triggers and actions
+    - smart cast-on-rest logic
 
   Improved features:
     - 
-    - iwd2 scripting
+    - android build system script is now complete and rerunable
+    - combat and spell immunities/bounces
+    - iwd2 scripting and effects
     - bugfixes
 
 GemRB v0.8.2 (2015-01-01):
