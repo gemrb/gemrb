@@ -4830,7 +4830,8 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	int ret;
 	if (target) {
-		if (fx->FirstApply && fx->IsVariable) {
+		if (fx->FirstApply && (fx->IsVariable || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
+			// FIXME: should this happen for all effects?
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
 			CopyResRef(myfx->Source, fx->Source); // more?
