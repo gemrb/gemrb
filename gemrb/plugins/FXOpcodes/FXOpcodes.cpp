@@ -2258,11 +2258,11 @@ int fx_animation_id_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	case 1: //remove any non permanent change
 		target->fxqueue.RemoveAllEffects(fx_animation_id_modifier_ref);
-		//return FX_NOT_APPLIED;
-		//intentionally passing through (perma change removes previous changes)
+		return FX_NOT_APPLIED;
 	case 2: //permanent animation id change
-		//FIXME: Why no PCF here? (Avenger)
-		target->SetBaseNoPCF(IE_ANIMATION_ID, fx->Parameter1);
+		// also removes previous changes
+		target->SetBase(IE_ANIMATION_ID, fx->Parameter1);
+		target->fxqueue.RemoveAllEffects(fx_animation_id_modifier_ref);
 		return FX_NOT_APPLIED;
 	}
 }
