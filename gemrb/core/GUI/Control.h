@@ -64,6 +64,9 @@ class Window;
  */
 
 class GEM_EXPORT Control : public View {
+private:
+	virtual bool HandleHotKey(const Event&) { return false; }
+
 protected:
 	/** Focused Control */
 	bool hasFocus;
@@ -99,9 +102,12 @@ public: // Public attributes
 	/** Owner Window */
 	Window* Owner;
 
-public: //Events
+public:
+	//Events
 	/** Reset/init event handler */
 	void ResetEventHandler(ControlEventHandler &handler);
+	bool SetHotKey(KeyboardKey key, short mod = 0);
+
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	bool SetFlags(int arg_flags, int opcode);

@@ -41,12 +41,24 @@ Console::Console(const Region& frame)
 	CurPos = 0;
 	HistPos = 0;
 	palette = new Palette( ColorWhite, ColorBlack );
+
+	SetHotKey(' ', GEM_MOD_CTRL);
 }
 
 Console::~Console(void)
 {
 	palette->release();
 	Sprite2D::FreeSprite( Cursor );
+}
+
+bool Console::HandleHotKey(const Event& /*e*/)
+{
+	// the only hot key console registers is for hiding / showing itself
+	Owner->SetVisible(!Owner->IsVisible());
+	if (Owner->IsVisible()) {
+		Owner->Focus();
+	}
+	return true;
 }
 
 /** Draws the Console on the Output Display */

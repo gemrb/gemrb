@@ -83,6 +83,7 @@ private:
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
+	bool HandleHotKey(const Event& e);
 };
 
 }
