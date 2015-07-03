@@ -49,6 +49,7 @@ View::View(const Region& frame)
 	superView = NULL;
 
 	dirty = true;
+	visible = true;
 	resizeFlags = RESIZE_NONE;
 	flags = 0;
 }
@@ -142,6 +143,8 @@ void View::DrawBackground(const Region* rgn) const
 
 void View::Draw()
 {
+	if (!visible) return;
+
 	Video* video = core->GetVideoDriver();
 	video->SetBufferedDrawing(true);
 

@@ -38,6 +38,7 @@ private:
 	ViewScriptingRef* scriptingRef;
 
 	mutable bool dirty;
+	bool visible;
 
 protected:
 	View* superView;
@@ -95,6 +96,8 @@ public:
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
 	virtual bool SetFlags(int arg_flags, int opcode);
+	void SetVisible(bool vis) { visible = vis; }
+	bool IsVisible() { return visible; }
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
