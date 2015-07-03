@@ -295,7 +295,6 @@ void Container::dump() const
 		name = Scripts[0]->GetName();
 	}
 	buffer.appendFormatted( "Script: %s, Key: %s\n", name, KeyResRef );
-	// FIXME: const_cast
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }

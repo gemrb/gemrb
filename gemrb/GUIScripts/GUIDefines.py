@@ -132,8 +132,8 @@ IE_FONT_ALIGN_LEFT       = 0x00
 IE_FONT_ALIGN_CENTER     = 0x01
 IE_FONT_ALIGN_RIGHT      = 0x02
 IE_FONT_ALIGN_BOTTOM     = 0x04
-IE_FONT_ALIGN_TOP        = 0x10   # Single-Line and Multi-Line Text
-IE_FONT_ALIGN_MIDDLE     = 0x20   #Only for single line Text
+IE_FONT_ALIGN_TOP        = 0x10
+IE_FONT_ALIGN_MIDDLE     = 0x20
 IE_FONT_SINGLE_LINE      = 0x40
 
 OP_SET = 0
