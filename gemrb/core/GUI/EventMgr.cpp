@@ -45,13 +45,6 @@ EventMgr::~EventMgr()
 	}
 }
 
-bool EventMgr::ClickMatch(const Point& p, unsigned long thisTime)
-{
-	if (dc_time<thisTime) return false;
-
-	return Region(dc, Size(10, 10)).PointInside(p);
-}
-
 unsigned long EventMgr::GetRKDelay()
 {
 	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;

@@ -158,7 +158,6 @@ private:
 	// we may register the same tap multiple times. should only delete once
 	std::vector<EventCallback*> tapsToDelete;
 
-	Point dc;
 	unsigned long dc_time, dc_delay;
 	unsigned long rk_delay, rk_flags;
 
@@ -179,9 +178,6 @@ public:
 
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
-
-private:
-	bool ClickMatch(const Point& p, unsigned long thisTime);
 
 };
 
