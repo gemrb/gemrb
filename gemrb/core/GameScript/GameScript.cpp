@@ -1321,6 +1321,17 @@ void Targets::Clear()
 	objects.clear();
 }
 
+void Targets::dump() const
+{
+	print("Target dump (actors only):");
+	targetlist::const_iterator m;
+	for (m = objects.begin(); m != objects.end(); ++m) {
+		if ((*m).actor->Type == ST_ACTOR) {
+			print("%s", (*m).actor->GetName(1));
+		}
+	}
+}
+
 /** releasing global memory */
 static void CleanupIEScript()
 {

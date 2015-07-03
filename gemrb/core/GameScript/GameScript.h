@@ -152,6 +152,7 @@ private:
 	targetlist objects;
 public:
 	int Count() const;
+	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
 	const targettype *GetNextTarget(targetlist::iterator &m, int Type);
 	const targettype *GetLastTarget(int Type);
