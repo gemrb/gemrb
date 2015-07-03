@@ -136,13 +136,13 @@ struct GEM_EXPORT Event {
 
 	EventType type;
 	unsigned long time;
-	int mod; // modifier keys held during the event
+	short mod; // modifier keys held during the event
 	unsigned short repeat; // number of times this event has been repeated (within the time interval)
 	bool isScreen; // event coresponsds to location on screen
 };
 
 #define IS_KEY_EVENT(e) \
-(e.type == Event::EventType::KeyUp || e.type == Event::EventType::KeyDown)
+(e.type == Event::KeyUp || e.type == Event::KeyDown)
 
 /**
  * @class EventMgr
@@ -151,23 +151,31 @@ struct GEM_EXPORT Event {
  */
 
 class GEM_EXPORT EventMgr {
-private:
-	typedef Callback<const Event&, bool> EventCallback;
-	typedef std::multimap<Event::EventType, EventCallback*> EventTaps;
-	EventTaps taps;
-	// we may register the same tap multiple times. should only delete once
-	std::vector<EventCallback*> tapsToDelete;
-
-	unsigned long dc_time, dc_delay;
-	unsigned long rk_delay, rk_flags;
-
 public:
+	typedef Callback<const Event&, bool> EventCallback;
+
 	static unsigned long DCDelay;
 	static unsigned long RCDelay;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
 	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
+
+	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
+
+private:
+	typedef std::multimap<Event::EventType, EventCallback*> EventTaps;
+	EventTaps taps;
+	// we may register the same tap multiple times. should only delete once
+	std::vector<EventCallback*> tapsToDelete;
+
+	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
+	// currently the delays are static so it makes sense for now that the HotKeys are...
+	// map combination of keyboard key and modifier keys to a callback
+	static std::map<int, EventCallback*> HotKeys;
+
+	unsigned long dc_time, dc_delay;
+	unsigned long rk_delay, rk_flags;
 
 public:
 	EventMgr(void);

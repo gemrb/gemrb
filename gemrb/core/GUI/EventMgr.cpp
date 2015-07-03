@@ -29,6 +29,8 @@ namespace GemRB {
 unsigned long EventMgr::DCDelay;
 unsigned long EventMgr::RCDelay;
 
+std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
+
 EventMgr::EventMgr(void)
 {
 	dc_time = 0;
@@ -83,6 +85,25 @@ void EventMgr::AddEventTap(EventCallback* cb, Event::EventType type)
 
 void EventMgr::DispatchEvent(Event& e)
 {
+	// TODO: for mouse events: check double click delay and set if repeat
+	// TODO: for key events: check repeat key delay and set if repeat
+
+	// first check for hot key listeners
+	if (IS_KEY_EVENT(e)) {
+		int flags = e.mod << 16;
+		flags |= e.keyboard.keycode;
+
+		std::map<int, EventCallback*>::const_iterator hit;
+		hit = HotKeys.find(flags);
+		if (hit != HotKeys.end()) {
+			EventCallback* cb = (*hit).second;
+			if ((*cb)(e)) {
+				return;
+			}
+		}
+	}
+
+	// no hot keys or their listeners refused the event...
 	std::pair<EventTaps::iterator, EventTaps::iterator> range;
 	range = taps.equal_range(e.type);
 
@@ -93,6 +114,15 @@ void EventMgr::DispatchEvent(Event& e)
 			break; // this handler absorbed the event
 		}
 	}
+}
+
+bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
+{
+	// TODO: return false if something already claimed this hot key combo
+	int flags = mod << 16;
+	flags |= key;
+	HotKeys.insert(std::make_pair(flags, cb));
+	return true;
 }
 
 inline Event InitializeEvent(int mod)
