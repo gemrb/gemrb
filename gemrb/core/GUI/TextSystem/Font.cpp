@@ -104,7 +104,7 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 {
 	GlyphMap::const_iterator it = glyphs.find(chr);
 	if (it != glyphs.end()) {
-		return (*it).second;
+		return it->second;
 	}
 	const static Glyph blank(Size(0,0), Point(0, 0), NULL, 0);
 	return blank;

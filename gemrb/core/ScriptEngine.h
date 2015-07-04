@@ -77,7 +77,7 @@ public:
 		ScriptingRefBase* ref = NULL;
 		ScriptingDefinitions::iterator it = GUIDict[group].find(id);
 		if (it != GUIDict[group].end()) {
-			ref = (*it).second;
+			ref = it->second;
 		}
 		return ref;
 	}

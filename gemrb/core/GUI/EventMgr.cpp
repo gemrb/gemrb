@@ -109,7 +109,7 @@ void EventMgr::DispatchEvent(Event& e)
 
 	EventTaps::iterator it = range.first;
 	for (; it != range.second; ++it) {
-		EventCallback* cb = (*it).second;
+		EventCallback* cb = it->second;
 		if ((*cb)(e)) {
 			break; // this handler absorbed the event
 		}

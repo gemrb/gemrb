@@ -3068,7 +3068,7 @@ void Map::RemoveMapNote(const Point &point)
 {
 	std::vector<MapNote>::iterator it = mapnotes.begin();
 	for (; it != mapnotes.end(); ++it) {
-		if ((*it).Pos == point) {
+		if (it->Pos == point) {
 			mapnotes.erase(it);
 			break;
 		}

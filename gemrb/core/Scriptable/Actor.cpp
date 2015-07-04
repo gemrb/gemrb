@@ -9771,7 +9771,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
-	if (col < (*it).size()) {
+	if (col < it->size()) {
 		for ( ; it != skillrac.end(); it++) {
 			if ((*it)[0] == lookup) {
 				bonus = (*it)[col];
@@ -9784,7 +9784,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	lookup = Modified[IE_DEX];
 	it = skilldex.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
-	if (col < (*it).size()) {
+	if (col < it->size()) {
 		for ( ; it != skilldex.end(); it++) {
 			if ((*it)[0] == lookup) {
 				bonus += (*it)[col];

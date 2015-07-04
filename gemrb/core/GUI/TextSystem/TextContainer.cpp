@@ -386,10 +386,10 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 	while (count > 0) {
 		size_t step = count / 2;
 		std::advance(it, step);
-		if ((*it).PointInside(p)) {
+		if (it->PointInside(p)) {
 			// i know we are casting away const.
 			// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
-			return (Content*)(*it).content;
+			return (Content*)it->content;
 		}
 		if (*it < p) {
 			it++;
@@ -421,7 +421,7 @@ const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 {
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
-		const Regions& rgns = (*it).regions;
+		const Regions& rgns = it->regions;
 		Regions::const_iterator rit = rgns.begin();
 		for (; rit != rgns.end(); ++rit) {
 			if ((*rit).IntersectsRegion(r)) {

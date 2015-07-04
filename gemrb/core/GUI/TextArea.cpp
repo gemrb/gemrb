@@ -499,7 +499,7 @@ void TextArea::OnMouseUp(const Point& p, unsigned short Button, unsigned short M
 		int optIdx = 0;
 		std::vector<OptionSpan>::const_iterator it;
 		for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
-			if( (*it).second == hoverSpan ) {
+			if( it->second == hoverSpan ) {
 				break;
 			}
 			optIdx++;

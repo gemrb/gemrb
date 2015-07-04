@@ -28,7 +28,7 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 {
 	PaletteCache::const_iterator it = PalCache.find(colorString);
 	if (it != PalCache.end()) {
-		return ((*it).second).get();
+		return (it->second).get();
 	}
 
 	Color palCol = { 0, 0, 0, 0 };
