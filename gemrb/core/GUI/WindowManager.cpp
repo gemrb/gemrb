@@ -201,7 +201,7 @@ void WindowManager::DrawWindows() const
 			} else if (modalShadow == ShadowBlack) {
 				shieldColor.a = 0xff;
 			}
-			video->DrawRect( Region(Point(), screen), shieldColor );
+			video->DrawRect( screen, shieldColor );
 			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
 			modalShield = true;
 		}
@@ -290,15 +290,15 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 		RedrawAll();
 		DrawWindows();
 	} else {
-		screenshot = video->GetScreenshot( Region(Point(), screen) );
+		screenshot = video->GetScreenshot( screen );
 	}
 	return screenshot;
 }
 
-Sprite2D* WindowManager::WinFrameEdge(int edge)
+Sprite2D* WindowManager::WinFrameEdge(int edge) const
 {
 	std::string refstr = "STON";
-	switch (core->Width) {
+	switch (screen.w) {
 		case 800:
 			refstr += "08";
 			break;

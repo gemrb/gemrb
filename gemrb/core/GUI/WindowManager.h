@@ -46,15 +46,15 @@ private:
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
 	Video* video;
-	Size screen;
-	Window* modalWin;
+	Region screen; // only a Region for convinience. we dont use x,y
+	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
 	ModalShadow modalShadow;
 
 	EventMgr eventMgr;
 
 private:
 	bool IsOpenWindow(Window* win) const;
-	static Sprite2D* WinFrameEdge(int edge);
+	Sprite2D* WinFrameEdge(int edge) const;
 
 public:
 	WindowManager(Video* vid);
@@ -71,7 +71,7 @@ public:
 	void RedrawAll() const;
 
 	void SetVideoDriver(Video* vid);
-	Size ScreenSize() const { return screen; }
+	Size ScreenSize() const { return screen.Dimensions(); }
 
 	Sprite2D* GetScreenshot(Window* win) const;
 	
