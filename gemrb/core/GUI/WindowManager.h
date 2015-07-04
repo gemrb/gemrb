@@ -48,6 +48,7 @@ private:
 	Video* video;
 	Region screen; // only a Region for convinience. we dont use x,y
 	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
+	Window* gameWin;
 	ModalShadow modalShadow;
 
 	EventMgr eventMgr;
@@ -58,7 +59,7 @@ private:
 
 public:
 	WindowManager(Video* vid);
-	~WindowManager() {};
+	~WindowManager();
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);
@@ -74,6 +75,7 @@ public:
 	Size ScreenSize() const { return screen.Dimensions(); }
 
 	Sprite2D* GetScreenshot(Window* win) const;
+	Window* GetGameWindow() const { return gameWin; }
 	
 };
 

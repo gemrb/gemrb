@@ -54,6 +54,14 @@ WindowManager::WindowManager(Video* vid)
 	modalShadow = ShadowNone;
 	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 	SetVideoDriver(vid);
+
+	gameWin = new Window(screen, *this);
+	gameWin->SetFlags(WF_BORDERLESS, BM_OR);
+}
+
+WindowManager::~WindowManager()
+{
+	delete gameWin;
 }
 
 /** Show a Window in Modal Mode */
@@ -210,6 +218,9 @@ void WindowManager::DrawWindows() const
 	}
 	modalShield = false;
 
+	// draw the game window now (beneath everything else) its not part of the windows collection
+	gameWin->Draw();
+
 	bool drawFrame = true;
 	const Region& frontWinFrame = windows.front()->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
@@ -273,9 +284,12 @@ void WindowManager::SetVideoDriver(Video* vid)
 		screen.w = vid->GetWidth();
 		screen.h = vid->GetHeight();
 		vid->SetEventMgr(&eventMgr);
+
+		gameWin->SetFrame(screen);
 	}
 	video = vid;
 	// TODO: changing screen size should adjust window positions too
+	// TODO: how do we get notified if the Video driver changes size?
 }
 
 //copies a screenshot into a sprite
