@@ -108,7 +108,7 @@ public:
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
 	/** This functions Draws a Circle */
-	void SetPixel(short x, short y, const Color& color, bool clipped = true);
+	void SetPixel(const Point&, const Color& color, bool clipped = true);
 	/** Gets the pixel of the backbuffer surface */
 	void GetPixel(short x, short y, Color& color);
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
@@ -158,6 +158,7 @@ protected:
 	void DrawMovieSubtitle(ieDword strRef);
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
+	void SetPixel(short x, short y, const Color& color, bool clipped = true);
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
 

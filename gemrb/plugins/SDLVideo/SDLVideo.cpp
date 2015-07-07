@@ -905,37 +905,24 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
-	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
-	if (clipped) {
-		x += xCorr;
-		y += yCorr;
-		if (( x >= ( xCorr + Viewport.w ) ) || ( y >= ( yCorr + Viewport.h ) )) {
-			return;
-		}
-		if (( x < xCorr ) || ( y < yCorr )) {
-			return;
-		}
-	} else {
-		if (( x >= width ) || ( y >= height )) {
-			return;
-		}
-		if (( x < 0 ) || ( y < 0 )) {
-			return;
-		}
-	}
-
-	SDLVideoDriver::SetSurfacePixel(backBuf, x, y, color);
+	SetPixel(Point(x, y), color, clipped);
 }
 
-void SDLVideoDriver::GetPixel(short x, short y, Color& c)
+void SDLVideoDriver::SetPixel(const Point& p, const Color& color, bool clipped)
 {
-	SDLVideoDriver::GetSurfacePixel(backBuf, x, y, c);
+	if (!screenClip.PointInside(p) || (clipped && !Viewport.PointInside(p))) {
+		return;
+	}
+
+	short x = p.x + xCorr;
+	short y = p.y + yCorr;
+	SDLVideoDriver::SetSurfacePixel(backBuf, x, y, color);
 }
 
 /*
  * Draws horizontal line. When clipped=true, it draws the line relative
  * to Area origin and clips it by Area viewport borders,
- * else it draws relative to screen origin and ignores the vieport
+ * else it draws relative to screen origin and ignores the viewport
  */
 void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
 {
@@ -956,7 +943,7 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, 
 /*
  * Draws vertical line. When clipped=true, it draws the line relative
  * to Area origin and clips it by Area viewport borders,
- * else it draws relative to screen origin and ignores the vieport
+ * else it draws relative to screen origin and ignores the viewport
  */
 void SDLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
 {

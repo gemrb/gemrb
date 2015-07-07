@@ -162,8 +162,7 @@ public:
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
 	/** this function draws a clipped sprite */
 	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
-	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
-	virtual void GetPixel(short x, short y, Color& color) = 0;
+	virtual void SetPixel(const Point&, const Color& color, bool clipped = true) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
 	/** Draws an Ellipse Segment */
