@@ -193,16 +193,6 @@ void Video::SetMouseEnabled(int enabled)
 	}
 }
 
-/** Mouse cursor is grayed and doesn't click (but visible and movable) */
-void Video::SetMouseGrayed(bool grayed)
-{
-	if (grayed) {
-		MouseFlags |= MOUSE_GRAYED;
-	} else {
-		MouseFlags &= ~MOUSE_GRAYED;
-	}
-}
-
 bool Video::TouchInputEnabled() const
 {
 	return MouseFlags & (MOUSE_GRAYED|MOUSE_DISABLED);
