@@ -683,6 +683,7 @@ void TextArea::ClearText()
 		frame.w = Width - (EDGE_PADDING * 2);
 	}
 
+	parser.ResetColor(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(frame, ftext, palette);
 	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
 

@@ -44,6 +44,8 @@ public:
 	void ResetAttributes(const Font* ftext = NULL, Palette* textPal = NULL,
 						 const Font* finit = NULL, Palette* initPal = NULL);
 
+	void ResetColor();
+
 	TextSpan* ParseMarkupTag(const String&) const;
 	ParseState ParseMarkupStringIntoContainer(const String&, TextContainer&);
 
@@ -125,6 +127,7 @@ private:
 	static PaletteCache PalCache;
 	std::stack<TextAttributes> context;
 	ParseState state;
+	bool danglingTag;
 };
 
 }

@@ -46,11 +46,13 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 GemMarkupParser::GemMarkupParser()
 {
 	state = TEXT;
+	danglingTag = false;
 }
 
 GemMarkupParser::GemMarkupParser(const Font* ftext, Palette* textPal, const Font* finit, Palette* initPal)
 {
 	state = TEXT;
+	danglingTag = false;
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
@@ -58,6 +60,17 @@ void GemMarkupParser::ResetAttributes(const Font* ftext, Palette* textPal, const
 {
 	while(context.size()) context.pop();
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
+}
+
+// a bit of a misnomer, but this is the main use
+void GemMarkupParser::ResetColor()
+{
+	if (danglingTag) {
+		context.pop();
+		danglingTag = false;
+	}
+	/* if we kept the old palette around, we could avoid tracking danglingTag
+	context.top().SetTextPalette(oldPalette);*/
 }
 
 GemMarkupParser::ParseState
@@ -89,6 +102,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 					case '=':
 						if (token == L"color") {
 							state = COLOR;
+							danglingTag = true;
 							token.clear();
 						}
 						// else is a parse error...
@@ -97,8 +111,10 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token == L"cap") {
 							attributes.SwapFonts();
 							//align = IE_FONT_SINGLE_LINE;
+							danglingTag = true;
 						} else if (token == L"p") {
 							frame.w = -1;
+							danglingTag = true;
 						}
 						state = TEXT;
 						token.clear();
@@ -111,6 +127,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				}
 				break;
 			case CLOSE_TAG:
+				danglingTag = false;
 				switch (*it) {
 					case ']':
 						if (token == L"color") {
