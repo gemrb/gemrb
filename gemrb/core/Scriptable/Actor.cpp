@@ -3508,15 +3508,12 @@ void Actor::VerbalConstant(int start, int count, bool force) const
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
 	}
 
-	ieDword subtitles = 0;
-	core->GetDictionary()->Lookup("Subtitles", subtitles);
-
-	if ((!subtitles && !force) || count < 0) {
+	if (count < 0) {
 		return;
 	}
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
-	if (subtitles && PCStats && PCStats->SoundSet[0]) {
+	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
 		do {
 			count--;
