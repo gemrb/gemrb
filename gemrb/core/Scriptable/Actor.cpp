@@ -3501,7 +3501,7 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 	return StrRefs[idx];
 }
 
-void Actor::VerbalConstant(int start, int count, bool force) const
+void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
