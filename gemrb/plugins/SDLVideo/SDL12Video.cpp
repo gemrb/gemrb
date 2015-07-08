@@ -22,12 +22,14 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "SDLSurfaceSprite2D.h"
 
 using namespace GemRB;
 
 SDL12VideoDriver::SDL12VideoDriver(void)
 {
 	overlay = NULL;
+	disp = NULL;
 }
 
 SDL12VideoDriver::~SDL12VideoDriver(void)
@@ -78,19 +80,17 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	Viewport.w = width;
 	Viewport.h = height;
 	SetScreenClip(NULL);
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Main Surface...");
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Back Buffer...");
-	backBuf = SDL_DisplayFormat( tmp );
-	disposableBuf = SDL_DisplayFormat(tmp);
-	SDL_SetColorKey(disposableBuf, SDL_SRCCOLORKEY, 0x00ff0000);
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Extra Buffer...");
-	extra = SDL_DisplayFormat( tmp );
-	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
-	SDL_FillRect( extra, NULL, val );
-	SDL_FreeSurface( tmp );
+	Log(MESSAGE, "SDL 1.2 Driver", "Creating Display Surface...");
 
 	return GEM_OK;
+}
+
+VideoBuffer* SDL12VideoDriver::NewVideoBuffer()
+{
+	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
+	SDL_Surface* buf = SDL_DisplayFormat(tmp);
+	SDL_SetColorKey(buf, SDL_SRCCOLORKEY, 0x00ff0000);
+	return new SDLSurfaceVideoBuffer(buf);
 }
 
 void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
@@ -127,6 +127,7 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 							   unsigned int h, unsigned int dstx, unsigned int dsty,
 							   int g_truecolor, unsigned char *pal, ieDword titleref)
 {
+	/*
 	int i;
 	SDL_Surface* sprite;
 
@@ -154,6 +155,7 @@ void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	}
 	SDL_Flip( disp );
 	SDL_FreeSurface( sprite );
+	*/
 }
 
 // sets brightness and contrast
@@ -181,28 +183,30 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 
 int SDL12VideoDriver::SwapBuffers(void)
 {
-	SDL_BlitSurface( backBuf, NULL, disp, NULL );
-	SDL_BlitSurface( disposableBuf, NULL, disp, NULL);
-	SDL_FillRect(disposableBuf, NULL, SDL_MapRGBA(disposableBuf->format, 0, 0xff, 0, 0));
-
-	if (fadeColor.a) {
-		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
-		SDL_Rect src = {
-			0, 0, (Uint16)Viewport.w, (Uint16)Viewport.h
-		};
-		SDL_Rect dst = {
-			xCorr, yCorr, 0, 0
-		};
-		SDL_BlitSurface( extra, &src, disp, &dst );
+	VideoBuffers::iterator it;
+	it = buffers.begin();
+	for (; it != buffers.end(); ++it) {
+		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer);
+		SDL_BlitSurface( vb->Surface(), NULL, disp, NULL );
 	}
 
-	/** This causes the tooltips/cursors to be rendered directly to display */
-	SetBufferedDrawing(false);
 	int ret = SDLVideoDriver::SwapBuffers();
-	SetBufferedDrawing(true);
-
 	SDL_Flip( disp );
 	return ret;
+}
+
+Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
+{
+	unsigned int Width = r.w ? r.w : width;
+	unsigned int Height = r.h ? r.h : height;
+
+	void* pixels = malloc( Width * Height * 3 );
+	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
+															0x00ff0000, 0x0000ff00, 0x000000ff);
+	SDL_Rect src = RectFromRegion(r);
+	SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
+
+	return screenshot;
 }
 
 bool SDL12VideoDriver::ToggleGrabInput()
@@ -231,6 +235,7 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 								  ieDword titleref) {
 	assert( /* bufw == w && */ bufh == h );
 
+	/*
 	SDL_Rect destRect;
 
 	SDL_LockYUVOverlay(overlay);
@@ -255,12 +260,11 @@ void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.h = h;
 	SDL_Rect rect = RectFromRegion(subtitleregion);
 
-	SetBufferedDrawing(false);
 	SDL_FillRect(currentBuf, &rect, 0);
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
-	SetBufferedDrawing(true);
+	 */
 }
 
 int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)

@@ -146,8 +146,6 @@ void View::Draw()
 	if (!visible) return;
 
 	Video* video = core->GetVideoDriver();
-	video->SetBufferedDrawing(true);
-
 	const Region& clip = video->GetScreenClip();
 	const Region& drawFrame = Region(ConvertPointToScreen(Point(0,0)), Dimensions());
 	const Region& intersect = clip.Intersect(drawFrame);
@@ -173,10 +171,8 @@ void View::Draw()
 	if (TooltipView == this && TooltipText().length()
 		&& TooltipTime && GetTickCount() >= TooltipTime
 	) {
-		video->SetBufferedDrawing(false);
 		Point mp = core->GetVideoDriver()->GetMousePos();
 		DrawTooltip(mp);
-		video->SetBufferedDrawing(true);
 	}
 	// restore the screen clip
 	video->SetScreenClip(&clip);

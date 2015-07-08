@@ -29,6 +29,8 @@ class SDL12VideoDriver : public SDLVideoDriver {
 private:
 	/* yuv overlay for bink movie */
 	SDL_Overlay *overlay;
+	SDL_Surface* disp;
+
 public:
 	SDL12VideoDriver(void);
 	~SDL12VideoDriver(void);
@@ -36,6 +38,7 @@ public:
 	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	int SwapBuffers(void);
+	Sprite2D* GetScreenshot( Region r );
 
 	void InitMovieScreen(int &w, int &h, bool yuv);
 	virtual void DestroyMovieScreen();
@@ -56,6 +59,7 @@ public:
 	void HideSoftKeyboard();
 	void SetGamma(int brightness, int contrast);
 private:
+	VideoBuffer* NewVideoBuffer();
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);

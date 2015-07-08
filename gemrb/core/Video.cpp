@@ -40,6 +40,7 @@ Video::Video(void)
 	Cursor[VID_CUR_DOWN] = NULL;
 	Cursor[VID_CUR_DRAG] = NULL;
 
+	drawingBuffer = NULL;
 	EvntManager = NULL;
 	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
 	// we care only about 2 bits at the moment so mask out the remainder
@@ -49,6 +50,15 @@ Video::Video(void)
 	for (int i = 0; i < 256; i++) {
 		Gamma22toGamma10[i] = (unsigned char)(0.5 + (pow (i/255.0, 2.2/1.0) * 255.0));
 		Gamma10toGamma22[i] = (unsigned char)(0.5 + (pow (i/255.0, 1.0/2.2) * 255.0));
+	}
+}
+
+Video::~Video(void)
+{
+	VideoBuffers::iterator it;
+	it = buffers.begin();
+	for (; it != buffers.end(); ++it) {
+		delete *it;
 	}
 }
 
@@ -65,6 +75,24 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 		r.w = 0;
 	}
 	return r;
+}
+
+VideoBuffer* Video::CreateBuffer()
+{
+	VideoBuffer* buf = NewVideoBuffer();
+	buffers.push_back(buf);
+	return buf;
+}
+
+bool Video::SetDrawingBuffer(VideoBuffer* buf)
+{
+	assert(buf);
+	VideoBuffers::iterator it = std::find(buffers.begin(), buffers.end(), buf);
+	if (it != buffers.end()) {
+		drawingBuffer = *it;
+		return true;
+	}
+	return false;
 }
 
 void Video::SetScreenClip(const Region* clip)
@@ -340,8 +368,8 @@ void Video::SetMovieFont(Font *stfont, Palette *pal)
 
 void Video::SetViewport(const Region& vp)
 {
-	xCorr = (vp.x > width) ? width : vp.x;
-	yCorr = (vp.y > height) ? height : vp.y;
+	Coor.x = (vp.x > width) ? width : vp.x;
+	Coor.y = (vp.y > height) ? height : vp.y;
 	Viewport.w = (vp.w > width) ? 0 : vp.w;
 	Viewport.h = (vp.h > height) ? 0 : vp.h;
 }
@@ -349,7 +377,8 @@ void Video::SetViewport(const Region& vp)
 void Video::MoveViewportTo(const Point& p)
 {
 	if (p != Viewport.Origin()) {
-		core->GetAudioDrv()->UpdateListenerPos( (p.x - xCorr) + width / 2, (p.y - yCorr) + height / 2 );
+		Point dp = p - Coor;
+		core->GetAudioDrv()->UpdateListenerPos( dp.x + width / 2, dp.y + height / 2 );
 		Viewport.x = p.x;
 		Viewport.y = p.y;
 	}

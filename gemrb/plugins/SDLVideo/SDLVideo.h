@@ -46,14 +46,30 @@ inline int GetModState(int modstate)
 	return value;
 }
 
+class SDLSurfaceVideoBuffer : public VideoBuffer {
+	SDL_Surface* buffer;
+
+public:
+	SDLSurfaceVideoBuffer(SDL_Surface* surf) {
+		assert(surf);
+		buffer = surf;
+	}
+
+	~SDLSurfaceVideoBuffer() {
+		SDL_FreeSurface(buffer);
+	}
+
+	void Clear() {
+		SDL_FillRect(buffer, NULL, 0);
+	}
+
+	SDL_Surface* Surface() {
+		return buffer;
+	}
+};
+
 class SDLVideoDriver : public Video {
 protected:
-	SDL_Surface* currentBuf; // points to either standard backBuf, or the disposable surface
-	SDL_Surface* disp;
-	SDL_Surface* backBuf;
-	SDL_Surface* disposableBuf;
-	SDL_Surface* extra;
-
 	unsigned long lastTime;
 	unsigned long lastMouseDownTime;
 
@@ -68,7 +84,6 @@ public:
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual bool SetFullscreenMode(bool set)=0;
 	virtual int SwapBuffers(void);
-	virtual void SetBufferedDrawing(bool);
 
 	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return width; }
@@ -103,7 +118,6 @@ public:
 								SpriteCover* cover, Palette *palette = NULL,
 								const Region* clip = NULL, bool anchor = false);
 
-	virtual Sprite2D* GetScreenshot( Region r );
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
@@ -155,6 +169,7 @@ public:
 	int PollMovieEvents();
 
 protected:
+	inline SDL_Surface* CurrentSurfaceBuffer();
 	void DrawMovieSubtitle(ieDword strRef);
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;

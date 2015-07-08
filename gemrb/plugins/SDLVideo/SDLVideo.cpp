@@ -57,16 +57,9 @@ typedef Sint32 SDL_Keycode;
 
 SDLVideoDriver::SDLVideoDriver(void)
 {
-	xCorr = 0;
-	yCorr = 0;
 	lastTime = 0;
-
-	currentBuf = NULL;
-	backBuf = NULL;
-	disp = NULL;
-	extra = NULL;
-
 	lastMouseDownTime = GetTickCount();
+
 	subtitlestrref = 0;
 	subtitletext = NULL;
 }
@@ -74,9 +67,6 @@ SDLVideoDriver::SDLVideoDriver(void)
 SDLVideoDriver::~SDLVideoDriver(void)
 {
 	delete subtitletext;
-
-	if(backBuf) SDL_FreeSurface( backBuf );
-	if(extra) SDL_FreeSurface( extra );
 
 	SDL_Quit();
 
@@ -99,13 +89,10 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
-void SDLVideoDriver::SetBufferedDrawing(bool buffered)
+SDL_Surface* SDLVideoDriver::CurrentSurfaceBuffer()
 {
-	if (buffered) {
-		currentBuf = backBuf;
-	} else {
-		currentBuf = disposableBuf;
-	}
+	assert(drawingBuffer);
+	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
 }
 
 int SDLVideoDriver::SwapBuffers(void)
@@ -120,18 +107,6 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-	SetBufferedDrawing(false);
-	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
-		
-		if (MouseFlags&MOUSE_GRAYED) {
-			//used for greyscale blitting, fadeColor is unused
-			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
-		} else {
-			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		}
-	}
-
-	SetBufferedDrawing(true);
 	return PollEvents();
 }
 
@@ -411,6 +386,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 		}
 	}
 
+	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 #define DO_BLIT \
 		if (currentBuf->format->BytesPerPixel == 4) \
 			BlitTile_internal<Uint32>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
@@ -522,6 +498,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 		}
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
+		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 
 		SDL_LockSurface(currentBuf);
 
@@ -645,7 +622,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	if (finalclip.w <= 0 || finalclip.h <= 0)
 		return;
 
-	SDL_LockSurface(backBuf);
+	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+	SDL_LockSurface(currentBuf);
 
 	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
 	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
@@ -829,21 +807,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	}
 
 	SDL_UnlockSurface(currentBuf);
-
-}
-
-Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
-{
-	unsigned int Width = r.w ? r.w : width;
-	unsigned int Height = r.h ? r.h : height;
-
-	void* pixels = malloc( Width * Height * 3 );
-	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
-															0x00ff0000, 0x0000ff00, 0x000000ff);
-	SDL_Rect src = RectFromRegion(r);
-	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
-
-	return screenshot;
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
@@ -853,6 +816,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
+			SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 			long val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
@@ -914,9 +878,9 @@ void SDLVideoDriver::SetPixel(const Point& p, const Color& color, bool clipped)
 		return;
 	}
 
-	short x = p.x + xCorr;
-	short y = p.y + yCorr;
-	SDLVideoDriver::SetSurfacePixel(backBuf, x, y, color);
+	short x = p.x + Coor.x;
+	short y = p.y + Coor.y;
+	SDLVideoDriver::SetSurfacePixel(CurrentSurfaceBuffer(), x, y, color);
 }
 
 /*
@@ -1031,9 +995,6 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 	yc = 1;
 	re = 0;
 
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_LockSurface( disp );
-	}
 	while (x >= y) {
 		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
 		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
@@ -1053,9 +1014,6 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 			re += xc;
 			xc += 2;
 		}
-	}
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_UnlockSurface( disp );
 	}
 }
 
@@ -1103,9 +1061,6 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
 
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_LockSurface( disp );
-	}
 	tas = 2 * xr * xr;
 	tbs = 2 * yr * yr;
 	x = xr;
@@ -1164,9 +1119,6 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 			ee += yc;
 			yc += tas;
 		}
-	}
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_UnlockSurface( disp );
 	}
 }
 
@@ -1178,9 +1130,6 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
 
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_LockSurface( disp );
-	}
 	tas = 2 * xr * xr;
 	tbs = 2 * yr * yr;
 	x = xr;
@@ -1232,9 +1181,6 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 			yc += tas;
 		}
 	}
-	if (SDL_MUSTLOCK( disp )) {
-		SDL_UnlockSurface( disp );
-	}
 }
 
 void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
@@ -1243,6 +1189,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 		return;
 	}
 
+	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 	if (fill) {
 		Uint32 alphacol32 = SDL_MapRGBA(currentBuf->format, color.r/2, color.g/2, color.b/2, 0);
 		Uint16 alphacol16 = (Uint16)alphacol32;
@@ -1273,7 +1220,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Point& c = poly->points[redge];
 			Point& d = poly->points[(redge+1)%(poly->count)];
 
-			Pixel* line = (Pixel*)(currentBuf->pixels) + (y_top+yCorr) * currentBuf->pitch;
+			Pixel* line = (Pixel*)(currentBuf->pixels) + (y_top+Coor.y) * currentBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
 				int py = y + Viewport.y;
@@ -1295,12 +1242,12 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 				// Draw a 50% alpha line from (y,lt) to (y,rt)
 
 				if (currentBuf->format->BytesPerPixel == 2) {
-					Uint16* pix = (Uint16*)line + lt + xCorr;
+					Uint16* pix = (Uint16*)line + lt + Coor.x;
 					Uint16* end = pix + (rt - lt);
 					for (; pix < end; pix++)
 						*pix = ((*pix >> 1)&mask16) + alphacol16;
 				} else if (currentBuf->format->BytesPerPixel == 4) {
-					Uint32* pix = (Uint32*)line + lt + xCorr;
+					Uint32* pix = (Uint32*)line + lt + Coor.y;
 					Uint32* end = pix + (rt - lt);
 					for (; pix < end; pix++)
 						*pix = ((*pix >> 1)&mask32) + alphacol32;
@@ -1337,8 +1284,8 @@ void SDLVideoDriver::SetFadeColor(int r, int g, int b)
 	if (b>255) b=255;
 	else if(b<0) b=0;
 	fadeColor.b=b;
-	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
-	SDL_FillRect( extra, NULL, val );
+	//long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
+	//SDL_FillRect( extra, NULL, val );
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)
@@ -1448,7 +1395,7 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 
 	SDL_Rect drect = RectFromRegion(dclipped);
 	// since we should already be clipped we can call SDL_LowerBlit directly
-	SDL_LowerBlit(surf, &srect, currentBuf, &drect);
+	SDL_LowerBlit(surf, &srect, CurrentSurfaceBuffer(), &drect);
 }
 
 // static class methods

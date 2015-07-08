@@ -33,6 +33,8 @@
 #include "Polygon.h"
 #include "ScriptedAnimation.h"
 
+#include <vector>
+
 namespace GemRB {
 
 class EventMgr;
@@ -81,6 +83,13 @@ const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
 // used for calculating the tooltip delay limit and the real tooltip delay
 #define TOOLTIP_DELAY_FACTOR 250
 
+class GEM_EXPORT VideoBuffer {
+public:
+	virtual ~VideoBuffer() {}
+
+	virtual void Clear() = 0;
+};
+
 /**
  * @class Video
  * Base class for video output plugins.
@@ -91,7 +100,7 @@ public:
 	static const TypeID ID;
 protected:
 	int MouseFlags;
-	short xCorr, yCorr;
+	Point Coor;
 	EventMgr* EvntManager;
 	Region Viewport;
 	Region screenClip;
@@ -109,10 +118,18 @@ protected:
 	Region subtitleregion;
 	Color fadeColor;
 protected:
+	typedef std::vector<VideoBuffer*> VideoBuffers;
+
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
+	VideoBuffers buffers;
+	VideoBuffer* drawingBuffer;
+
+private:
+	virtual VideoBuffer* NewVideoBuffer()=0;
+
 public:
 	Video(void);
-	virtual ~Video(void) {};
+	virtual ~Video(void);
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode. */
@@ -120,7 +137,9 @@ public:
 	virtual bool SetFullscreenMode(bool set) = 0;
 	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
-	virtual void SetBufferedDrawing(bool) = 0;
+	// TODO: allow passing format params
+	VideoBuffer* CreateBuffer();
+	bool SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual short GetWidth() = 0;
