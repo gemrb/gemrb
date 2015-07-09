@@ -53,6 +53,7 @@ def getRace(area):
 	RaceID = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	RaceIndex = CommonTables.Races.FindValue(3,RaceID)
 	RaceCap = CommonTables.Races.GetValue(RaceIndex,2)
+	area.Append("\n")
 	area.Append(1048)
 	area.Append(": ")
 	area.Append(RaceCap)
@@ -68,6 +69,7 @@ def getClass(area):
 	MyChar = GemRB.GetVar ("Slot")
 	ClassTitle = GUICommon.GetActorClassTitle(MyChar)
 
+	area.Append("\n")
 	area.Append(12136)
 	area.Append(": ")
 	area.Append(ClassTitle)
@@ -88,6 +90,7 @@ def getAlignment(area):
 	MyChar = GemRB.GetVar ("Slot")
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
+	area.Append("\n")
 	area.Append(1049)
 	area.Append(": ")
 	AllignIndex = CommonTables.Aligns.FindValue (3, AllignID)
@@ -111,12 +114,12 @@ def getAbilities(area):
 	MyChar = GemRB.GetVar ("Slot")
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
+	area.Append("\n")
 	for i in range(AbilityCount):
 		v = AbilityTable.GetValue(i,2)
 		id = AbilityTable.GetValue(i,3)
 		area.Append(v)
-		area.Append(": "+str(GemRB.GetPlayerStat(MyChar,id)))
-	area.Append("\n")
+		area.Append(": " + str(GemRB.GetPlayerStat(MyChar,id)) + "\n")
 	area.Append("\n")
 
 #Skill
@@ -165,7 +168,7 @@ def getMageSpells(TextAreaControl):
 			Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 			info += GemRB.GetString (Spell) + "\n"
 	if info != "":
-		info = "\n" + info + "\n"
+		info = "\n" + info + ""
 		TextAreaControl.Append (11027)
 		TextAreaControl.Append (info)
 
@@ -218,8 +221,7 @@ def getSkills(TextAreaControl):
 				info += name + ": " + str(value) + "\n"
 				
 	if info != "":
-		info = "\n" + info + "\n"
-		TextAreaControl.Append("\n")
+		info = "\n" + info + ""
 		TextAreaControl.Append (8442)
 		TextAreaControl.Append (info)
 	
@@ -317,7 +319,7 @@ def getDivineSpells(TextAreaControl):
 			Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 			info += GemRB.GetString (Spell) + "\n"
 	if info != "":
-		info = "\n" + info + "\n"
+		info = "\n" + info + ""
 		TextAreaControl.Append (11028)
 		TextAreaControl.Append (info)
 		
