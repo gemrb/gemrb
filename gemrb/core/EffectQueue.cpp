@@ -2195,5 +2195,10 @@ void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int 
 	}
 }
 
+bool EffectQueue::OverrideTarget(Effect *fx)
+{
+	if (!fx) return false;
+	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);
+}
 
 }
