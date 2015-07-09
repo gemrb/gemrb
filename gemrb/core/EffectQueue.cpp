@@ -554,6 +554,15 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		fx->CasterID = Owner->GetGlobalID();
 		fx->SetSourcePosition(Owner->Pos);
 	}
+	if (!fx->CasterLevel) {
+		// happens for effects that we apply directly from within, not through a spell/item
+		// for example through GemRB_ApplyEffect
+		Actor *caster = GetCasterObject();
+		if (caster) {
+			// FIXME: guessing, will be fine most of the time
+			fx->CasterLevel = caster->GetAnyActiveCasterLevel();
+		}
+	}
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
