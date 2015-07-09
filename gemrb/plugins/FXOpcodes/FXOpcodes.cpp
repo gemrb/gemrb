@@ -691,7 +691,7 @@ static EffectDesc effectnames[] = {
 	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier, 0, -1 },
 	{ "ScreenShake", fx_screenshake, EFFECT_NO_ACTOR, -1 },
 	{ "ScriptingState", fx_scripting_state, 0, -1 },
-	{ "Sequencer:Activate", fx_activate_spell_sequencer, 0, -1 },
+	{ "Sequencer:Activate", fx_activate_spell_sequencer, EFFECT_PRESET_TARGET, -1 },
 	{ "Sequencer:Create", fx_create_spell_sequencer, 0, -1 },
 	{ "Sequencer:Store", fx_store_spell_sequencer, 0, -1 },
 	{ "SetAIScript", fx_set_ai_script, 0, -1 },
