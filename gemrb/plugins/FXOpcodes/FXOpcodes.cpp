@@ -6453,10 +6453,10 @@ int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 	Effect *sequencer = ((Actor *) Owner)->fxqueue.HasEffect(fx_spell_sequencer_active_ref);
 	if (sequencer) {
 		//cast 1-4 spells stored in the spell sequencer
-		core->ApplySpell(sequencer->Resource, target, Owner, fx->Power);
-		core->ApplySpell(sequencer->Resource2, target, Owner, fx->Power);
-		core->ApplySpell(sequencer->Resource3, target, Owner, fx->Power);
-		core->ApplySpell(sequencer->Resource4, target, Owner, fx->Power);
+		core->ApplySpell(sequencer->Resource, target, Owner, fx->CasterLevel);
+		core->ApplySpell(sequencer->Resource2, target, Owner, fx->CasterLevel);
+		core->ApplySpell(sequencer->Resource3, target, Owner, fx->CasterLevel);
+		core->ApplySpell(sequencer->Resource4, target, Owner, fx->CasterLevel);
 		//remove the spell sequencer store effect
 		sequencer->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
