@@ -463,14 +463,18 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	# not found
 	return -1
 
+def HasSorcererBook (pc):
+	import GUICommon
+
+	ClassName = GUICommon.GetClassRowName (pc)
+	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
+	return SorcererBook
+
 def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# disqualify sorcerers immediately
-	import GUICommon
-	ClassName = GUICommon.GetClassRowName (pc)
-	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
-	if SorcererBook:
+	if HasSorcererBook (pc):
 		return LSR_STAT
 
 	booktype = IE_SPELL_TYPE_WIZARD
