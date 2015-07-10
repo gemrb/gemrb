@@ -638,6 +638,7 @@ def ContingencyOk ():
 	if GemRB.LearnSpell (pc, Source+"d", LS_MEMO):
 		print "EEEEK! Failed to learn sequencer/contingency!\n\n"
 	OtherWindow.Unload()
+	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyCancel ():
@@ -645,6 +646,7 @@ def ContingencyCancel ():
 
 	GemRB.SetPlayerStat (pc, IE_IDENTIFYMODE, 0)
 	OtherWindow.Unload()
+	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyHelpSpell ():
