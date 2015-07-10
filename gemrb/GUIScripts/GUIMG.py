@@ -743,10 +743,10 @@ def BuildSpellList (pc, type, level):
 			if spell in dummy:
 				dummy.remove(spell)
 				continue
-			if not (spell in SpellList):
-				SpellList[spell] = 1
+			if spell in SpellList:
+				SpellList[spell] += 1
 			else:
-				SpellList[spell] = SpellList[spell]+1
+				SpellList[spell] = 1
 	return
 
 def LevelIncrease():
