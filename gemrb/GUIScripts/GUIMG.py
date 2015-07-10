@@ -611,6 +611,32 @@ def UpdateSpellList ():
 		OkButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
+#TODO: build a correct list for sorcerers too!
+def BuildSpellList (pc, type, level):
+	global SpellList
+
+	if not Exclusions:
+		LoadExclusions()
+
+	SpellList = {}
+	dummy = [Spell1,Spell2,Spell3]
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+
+	for i in range(mem_cnt):
+		ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+		if ms["Flags"]:
+			spell = ms["SpellResRef"]
+			if spell in Exclusions[level]:
+				continue
+			if spell in dummy:
+				dummy.remove(spell)
+				continue
+			if spell in SpellList:
+				SpellList[spell] += 1
+			else:
+				SpellList[spell] = 1
+	return
+
 def ContTypePressed ():
 	global SpellType
 
@@ -721,32 +747,6 @@ def LoadExclusions():
 				break
 			Exclusions[i].append (spell.lower())
 
-	return
-
-#TODO: build a correct list for sorcerers too!
-def BuildSpellList (pc, type, level):
-	global SpellList
-
-	if not Exclusions:
-		LoadExclusions()
-
-	SpellList = {}
-	dummy = [Spell1,Spell2,Spell3]
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-
-	for i in range(mem_cnt):
-		ms = GemRB.GetMemorizedSpell (pc, type, level, i)
-		if ms["Flags"]:
-			spell = ms["SpellResRef"]
-			if spell in Exclusions[level]:
-				continue
-			if spell in dummy:
-				dummy.remove(spell)
-				continue
-			if spell in SpellList:
-				SpellList[spell] += 1
-			else:
-				SpellList[spell] = 1
 	return
 
 def LevelIncrease():
