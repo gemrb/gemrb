@@ -85,8 +85,8 @@ def OpenMageWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
-	SetupMageWindow()
 	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
+	SetupMageWindow()
 	return
 
 def SetupMageWindow ():
