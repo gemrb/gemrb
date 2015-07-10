@@ -611,30 +611,48 @@ def UpdateSpellList ():
 		OkButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-#TODO: build a correct list for sorcerers too!
 def BuildSpellList (pc, type, level):
 	global SpellList
+
+	import Spellbook
 
 	if not Exclusions:
 		LoadExclusions()
 
 	SpellList = {}
-	dummy = [Spell1,Spell2,Spell3]
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+	memoedSpells = Spellbook.GetMemorizedSpells (pc, type, level)
 
-	for i in range(mem_cnt):
-		ms = GemRB.GetMemorizedSpell (pc, type, level, i)
-		if ms["Flags"]:
-			spell = ms["SpellResRef"]
-			if spell in Exclusions[level]:
-				continue
-			if spell in dummy:
-				dummy.remove(spell)
-				continue
-			if spell in SpellList:
-				SpellList[spell] += 1
-			else:
-				SpellList[spell] = 1
+	# are we a sorcerer-style?
+	SorcererBook = Spellbook.HasSorcererBook (pc)
+
+	names = []
+	for s in memoedSpells:
+		names.append(s["SpellResRef"])
+
+	if SorcererBook:
+		dec = 0
+		for selected in Spell1, Spell2, Spell3:
+			if selected in names:
+				dec += 1
+		# decrease count for all spells
+		if dec > 0:
+			for ms in memoedSpells:
+				ms["MemoCount"] -= dec
+	else:
+		for s in memoedSpells:
+			sref = s["SpellResRef"]
+			for selected in Spell1, Spell2, Spell3:
+				if sref == selected:
+					s["MemoCount"] -= 1
+
+	for s in memoedSpells:
+		if s["MemoCount"] < 1:
+			continue
+
+		spell = s["SpellResRef"]
+		if spell in Exclusions[level]:
+			continue
+		SpellList[spell] = s["MemoCount"]
 	return
 
 def ContTypePressed ():
