@@ -4595,7 +4595,7 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 
 int Actor::GetWildMod(int level)
 {
-	if(GetStat(IE_KIT)&0x1e) {
+	if (GetStat(IE_KIT) == (KIT_BASECLASS|0x1e)) {
 		// avoid rerolling the mod, since we get called multiple times per each cast
 		if (!WMLevelMod) {
 			if (level>=MAX_LEVEL) level=MAX_LEVEL;
