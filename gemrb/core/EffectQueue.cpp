@@ -65,7 +65,6 @@ static EffectRef fx_opcode_immunity_ref = { "Protection:Opcode", -1 }; //bg2
 static EffectRef fx_opcode_immunity2_ref = { "Protection:Opcode2", -1 };//iwd
 static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
 static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
-static EffectRef fx_store_spell_sequencer_ref = { "Sequencer:Store", -1 }; //bg2, works against sequencers
 static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
 static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
 
@@ -889,10 +888,6 @@ static int check_type(Actor* actor, Effect* fx)
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity2");
-			return 0;
-		}
-		if (actor->fxqueue.HasEffectWithResource(fx_store_spell_sequencer_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Contingency/sequencer already active!");
 			return 0;
 		}
 	}
