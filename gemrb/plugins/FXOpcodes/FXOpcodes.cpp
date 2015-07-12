@@ -5787,11 +5787,18 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->FirstApply && fx->Parameter3) {
 		// TODO: display strings
-
-		target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE );
-		target->spellbook.HaveSpell( fx->Resource2, HS_DEPLETE );
-		target->spellbook.HaveSpell( fx->Resource3, HS_DEPLETE );
-		target->spellbook.HaveSpell( fx->Resource4, HS_DEPLETE );
+		if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID)) {
+			target->spellbook.HaveSpell(fx->Resource, HS_DEPLETE);
+		}
+		if (gamedata->Exists(fx->Resource2, IE_SPL_CLASS_ID)) {
+			target->spellbook.HaveSpell(fx->Resource2, HS_DEPLETE);
+		}
+		if (gamedata->Exists(fx->Resource3, IE_SPL_CLASS_ID)) {
+			target->spellbook.HaveSpell(fx->Resource3, HS_DEPLETE);
+		}
+		if (gamedata->Exists(fx->Resource4, IE_SPL_CLASS_ID)) {
+			target->spellbook.HaveSpell(fx->Resource4, HS_DEPLETE);
+		}
 	}
 
 	if (fx->Parameter3) {
