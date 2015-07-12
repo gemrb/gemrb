@@ -1276,7 +1276,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		pairs[i] = Window.GetControl (i)
 
 	# nothing left to do
-	if PARTY_SIZE <= oldSlotCount:
+	if GemRB.GetPartySize () <= oldSlotCount:
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
