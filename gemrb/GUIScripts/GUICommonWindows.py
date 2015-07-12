@@ -1276,7 +1276,8 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		pairs[i] = Window.GetControl (i)
 
 	# nothing left to do
-	if GemRB.GetPartySize () <= oldSlotCount:
+	PartySize = GemRB.GetPartySize ()
+	if PartySize <= oldSlotCount:
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
@@ -1294,6 +1295,8 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	windowHeight = windowRect["Height"]
 	windowWidth = windowRect["Width"]
 	limit = limitStep = 0
+	scale = 0
+	portraitGap = 0
 	if Mode ==  "horizontal":
 		xOffset += 3*buttonWidth  # width of other controls in party reform; we'll draw on the other side (atleast in guiw8, guiw10 has no need for this)
 		maxWidth = windowWidth - xOffset
@@ -1302,16 +1305,22 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	else:
 		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
 		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-		maxHeight = windowHeight - buttonHeight*7
+		maxHeight = windowHeight - buttonHeight*6 - buttonHeight/2
 		#print "GetPortraitButtonPairs:", ScreenHeight, windowHeight, maxHeight
 		if windowHeight != ScreenHeight:
-			maxHeight += buttonHeight
-		# TODO: until scrolling is added, we semi-fixate the count for the framed views, since they're limited to 6
-		if maxHeight < buttonHeight:
-			return pairs
+			maxHeight += buttonHeight/2
 		limit = maxHeight
+		# for framed views, limited to 6, we downscale the buttons to fit, clipping their portraits
+		if maxHeight < buttonHeight:
+			unused = 20 # remaining unused space below the portraits
+			scale = 1
+			portraitGap = buttonHeight
+			buttonHeight = (buttonHeight*6 + unused) / PartySize
+			portraitGap = portraitGap - buttonHeight - 2 # 2 for a quasi border
+			limit = windowHeight - buttonHeight*6 + unused
 		limitStep = buttonHeight
-	for i in range(len(pairs), PARTY_SIZE):
+
+	for i in range(len(pairs), PartySize):
 		if limitStep > limit:
 			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d vs %d" %(limit, buttonHeight)
 		nextID = 1000 + i
@@ -1322,12 +1331,24 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
 		else:
 			# vertical
-			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset, buttonWidth, buttonHeight)
+			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
 		button = Window.GetControl (nextID)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 
 		pairs[i] = button
 		limit -= limitStep
+
+	# move the buttons back up, to combine the freed space
+	if scale:
+		for i in range(oldSlotCount):
+			button = pairs[i]
+			button.SetSize (buttonWidth, buttonHeight)
+			if i == 0:
+				continue # don't move the first portrait
+			rect = button.GetRect ()
+			x = rect["X"]
+			y = rect["Y"]
+			button.SetPos (x, y-portraitGap*i)
 
 	return pairs
 
