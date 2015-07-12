@@ -101,18 +101,21 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	delete dlg;
 	dlg = NULL;
 
+	if (tgt->Type == ST_ACTOR) {
+		Actor *tar = (Actor *) tgt;
+		tar->DialogInterrupt();
+	}
+
+	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
+		return false;
+	}
+
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
 		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
-		// display the greeting VB instead
-		if (tgt->Type == ST_ACTOR) {
-			Actor *tar = (Actor *) tgt;
-			//tar->DialogInterrupt();
-			tar->VerbalConstant(VB_INITIALMEET, 1, true);
-		}
 		return false;
 	}
 
@@ -163,11 +166,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	gc->SetScreenFlags(/*SF_GUIENABLED|*/SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
 	Log(WARNING, "DialogHandler", "Errors occuring while in dialog mode cannot be logged in the MessageWindow.");
 	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
-
-	if (tgt->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) tgt;
-		tar->DialogInterrupt();
-	}
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {

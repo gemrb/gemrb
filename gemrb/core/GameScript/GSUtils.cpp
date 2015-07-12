@@ -1077,13 +1077,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			break;
 	}
 
-
-	//dialog is not meaningful
-	if (!Dialog || Dialog[0]=='*') {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
@@ -1142,32 +1135,21 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
-	bool ret;
-
-	if (Dialog[0]) {
-		//increasing NumTimesTalkedTo or NumTimesInteracted
-		if (Flags & BD_TALKCOUNT) {
-			gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
-		} else if ((Flags & BD_LOCMASK) == BD_INTERACT) {
-			gc->SetDialogueFlags(DF_INTERACT, BM_OR);
-		}
-
-		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-		ret = gc->dialoghandler->InitDialog( scr, tar, Dialog);
+	//increasing NumTimesTalkedTo or NumTimesInteracted
+	if (Flags & BD_TALKCOUNT) {
+		gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
+	} else if ((Flags & BD_LOCMASK) == BD_INTERACT) {
+		gc->SetDialogueFlags(DF_INTERACT, BM_OR);
 	}
-	else {
-		ret = false;
+
+	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
+	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
+		if (!(Flags & BD_NOEMPTY)) {
+			displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, DMC_RED, tar);
+		}
 	}
 
 	Sender->ReleaseCurrentAction();
-
-	if (!ret) {
-		if (Flags & BD_NOEMPTY) {
-			return;
-		}
-		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, DMC_RED, tar);
-		return;
-	}
 }
 
 static EffectRef fx_movetoarea_ref = { "MoveToArea", -1 };
