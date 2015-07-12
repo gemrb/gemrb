@@ -1313,7 +1313,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		limitStep = buttonHeight
 	for i in range(len(pairs), PARTY_SIZE):
 		if limitStep > limit:
-			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d" %(limit)
+			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d vs %d" %(limit, buttonHeight)
 		nextID = 1000 + i
 		if Window.HasControl (nextID):
 			pairs[i] = Window.GetControl (nextID)
