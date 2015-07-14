@@ -489,20 +489,6 @@ def OpenSequencerWindow ():
 
 	ContingencyTextArea = Window.GetControl (25)
 
-	if Target == 2:
-		if Count < 3:
-			Title.SetText (55374)
-			ContingencyTextArea.SetText (60420)
-		else:
-			Title.SetText (55375)
-			ContingencyTextArea.SetText (55372)
-	else:
-		if Count < 3:
-			Title.SetText (11941)
-		else:
-			Title.SetText (55376)
-		ContingencyTextArea.SetText (55373)
-
 	CondSelect = Window.GetControl (4)
 	CondLabel = Window.GetControl (0x10000000)
 	TargSelect = Window.GetControl (6)
@@ -559,6 +545,22 @@ def OpenSequencerWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyCancel)
 	ContTypePressed ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+	# this is here because core runs the selection change event handler too often
+	if Target == 2:
+		if Count < 3:
+			Title.SetText (55374)
+			ContingencyTextArea.SetText (60420)
+		else:
+			Title.SetText (55375)
+			ContingencyTextArea.SetText (55372)
+	else:
+		if Count < 3:
+			Title.SetText (11941)
+		else:
+			Title.SetText (55376)
+		ContingencyTextArea.SetText (55373)
+
 	return
 
 def UpdateSpellList ():
