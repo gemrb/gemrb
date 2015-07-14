@@ -589,7 +589,7 @@ def UpdateSpellList ():
 		if j<cnt:
 			Button.SetSpellIcon (names[j], 1)
 			Button.SetText( str(SpellList[names[j]]) )
-			Button.SetVarAssoc("Index", j)
+			Button.SetVarAssoc("PickedSpell", j)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyHelpSpell)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
@@ -701,7 +701,7 @@ def ContingencyHelpSpell ():
 
 	names = SpellList.keys()
 	names.sort()
-	i = GemRB.GetVar("Index")
+	i = GemRB.GetVar("PickedSpell")
 	spell = names[i]
 
 	if Spell1=="" and Count>0:
