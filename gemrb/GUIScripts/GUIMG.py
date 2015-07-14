@@ -570,7 +570,8 @@ def UpdateSpellList ():
 		Type = IE_SPELL_TYPE_WIZARD
 
 	Label = Window.GetControl (0x1000001d)
-	Label.SetText (GemRB.GetString(12137)+str(Level) )
+	GemRB.SetToken ('LEVEL', str(Level))
+	Label.SetText (12137)
 
 	BuildSpellList(pc, Type, Level-1)
 
