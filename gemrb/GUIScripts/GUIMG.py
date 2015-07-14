@@ -579,7 +579,7 @@ def UpdateSpellList ():
 
 	cnt = len(names)
 	j = 0
-	for i in range(11,20):
+	for i in range(11, 22):
 		Button = Window.GetControl (i)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM,OP_OR)
