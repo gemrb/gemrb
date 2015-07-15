@@ -141,6 +141,7 @@ GUIEnhancements = 15
 # NOTE: You need to choose a big enough resolution, so
 #   there will be enough room for all the party portraits.
 #   THE GAME WILL CRASH OTHERWISE!
+# Requires 10pp mod: https://github.com/lynxlynxlynx/gemrb-mods
 #MaxPartySize = 6
 
 #####################################################
