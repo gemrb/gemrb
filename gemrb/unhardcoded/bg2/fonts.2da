@@ -17,5 +17,7 @@ NORMAL
 # state "fonts" are the status icons. You probably don't want to edit these.
 13	STATES  	0		STATES		14		0	0xffffffff
 14	STATES2 	0		STATES2		14		0	0xffffffff
+# uncomment this if you installed 1pp's gui changes
+#15 STONECAP  0  STONECAP   14      0   0xffffffff
 
 # Customization How To: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
