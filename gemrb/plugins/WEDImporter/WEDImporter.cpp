@@ -135,11 +135,15 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 				( y * overlays->Width + x) * 10,
 				GEM_STREAM_START );
 			ieWord startindex, count, secondary;
-			ieByte overlaymask;
+			ieByte overlaymask, animspeed;
 			str->ReadWord( &startindex );
 			str->ReadWord( &count );
 			str->ReadWord( &secondary );
 			str->Read( &overlaymask, 1 );
+			str->Read( &animspeed, 1 );
+			if (animspeed == 0) {
+				animspeed = ANI_DEFAULT_FRAMERATE;
+			}
 			str->Seek( overlays->TILOffset + ( startindex * 2 ),
 				GEM_STREAM_START );
 			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
@@ -152,7 +156,9 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 				tile = tis->GetTile( indices, count );
 			} else {
 				tile = tis->GetTile( indices, 1, &secondary );
+				tile->anim[1]->fps = animspeed;
 			}
+			tile->anim[0]->fps = animspeed;
 			tile->om = overlaymask;
 			usedoverlays |= overlaymask;
 			over->AddTile( tile );
