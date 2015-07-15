@@ -11,7 +11,7 @@ NORMAL
 7	STONEBIG	0		STONEBIG	14		1	0xffffffff
 8	STONESML	0		STONESML	14		1	0xffffffff
 9	TOOLFONT	1		TOOLFONT	14		0	0xf0b08000
-10	STONESM2	0		STONESM2	14		1	0xffffffff
+#10	STONESM2	0		STONESM2	14		1	0xffffffff
 11	TOOLTIP		1		TOOLTIP		14		0	0xf0b08000
 12	STONSML		0		STONSML		14		1	0xffffffff
 # state "fonts" are the status icons. You probably don't want to edit these.
