@@ -1233,7 +1233,7 @@ int Interface::LoadFonts()
 		gamedata->FreePalette(pal);
 
 		if (!fnt) {
-			Log(WARNING, "Core", "Unable to load font resource: %s for ResRef %s", font_name, resref.CString());
+			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());
 		} else {
 			fonts[resref] = fnt;
 			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
