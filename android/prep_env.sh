@@ -160,6 +160,7 @@ function prepare_config {
   sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&
   sed -i 's,^#\?AudioDriver.*,AudioDriver = openal,' "$out" &&
   sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&
+  sed -i 's,^#MouseFeedback=.*,MouseFeedback=3,' "$out" &&
   # unclear why these default clearings are needed
   # currently the activity doesn't do anything with them
   sed -i 's,@DATA_DIR@,,' "$out" &&
