@@ -50,6 +50,7 @@ def OpenSaveWindow ():
 		CloseSaveWindow ()
 		return
 
+	GemRB.GamePause (1, 3)
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
