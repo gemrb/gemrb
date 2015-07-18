@@ -89,7 +89,6 @@ def CloseOptionsWindow ():
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 
-	GemRB.GamePause (0, 3)
 	return
 
 ###################################################
