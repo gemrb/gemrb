@@ -168,6 +168,11 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
+	// NOTE: besides marking pause/not pause, they determine what happens if
+	// hostile actions are taken against the speaker from a EA < GOODCUTOFF creature:
+	//Bit 0: Enemy()
+	//Bit 1: EscapeArea()
+	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
 	if (!(dlg->Flags&7) ) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 	}
