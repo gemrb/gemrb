@@ -33,7 +33,7 @@ class TileOverlay;
 #define DOOR_RESET       4   //reset trap
 #define DOOR_DETECTABLE  8   //trap detectable
 #define DOOR_BROKEN      16  //door is broken (force opened)
-#define DOOR_CANTCLOSE   32  //from IE dev source
+#define DOOR_CANTCLOSE   32  // used in BG1 (at least TotSC). Prevents random closing of doors in CGameDoor::CompressTime. (The random closing is only done when more than a hour of ingame time passed.) 
 #define DOOR_LINKED      64   //info trigger linked to this door
 #define DOOR_SECRET      128  //door is secret
 #define DOOR_FOUND       256  //secret door found
