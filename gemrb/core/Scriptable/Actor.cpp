@@ -5881,6 +5881,7 @@ void Actor::AttackedBy( Actor *attacker)
 
 void Actor::FaceTarget( Scriptable *target)
 {
+	if (!target) return;
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
 }
 
