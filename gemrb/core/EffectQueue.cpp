@@ -1197,7 +1197,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	if (first_apply) {
 		fx->FirstApply = 1;
-		fx->SetPosition(target->Pos);
+		// we do proper target vs targetless checks below
+		if (target) fx->SetPosition(target->Pos);
 
 		//gemrb specific, stat based chance
 		if ((fx->ProbabilityRangeMin == 100) && Owner && (Owner->Type==ST_ACTOR) ) {
