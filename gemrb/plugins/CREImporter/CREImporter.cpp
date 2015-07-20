@@ -778,18 +778,20 @@ void CREImporter::ReadChrHeader(Actor *act)
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
+		ieResRef spell;
 		for (i=0;i<QSPCount;i++) {
-			str->ReadResRef(Signature);
-			if (Signature[0]) {
+			str->ReadResRef(spell);
+			// FIXME: why is this needed or why do we overwrite it immediately after?
+			if (spell[0]) {
 				act->PCStats->QuickSpellClass[i]=0xff;
-				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
+				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
 			}
 		}
 		for (i=0;i<QSPCount;i++) {
-			str->ReadResRef(Signature);
-			if (Signature[0]) {
+			str->ReadResRef(spell);
+			if (spell[0]) {
 				act->PCStats->QuickSpellClass[i]=0xfe;
-				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
+				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
 			}
 		}
 		//fallthrough
