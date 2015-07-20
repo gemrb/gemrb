@@ -4341,11 +4341,11 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 		if (type > 5) type = 5;
 		armor = IE_ARMOR_TYPE; // goes from 0 (none) to 3 (eg. plate)
 		switch (armor) {
-			case 0: armor = 5;
-			case 1: armor = core->Roll(1, 2, 1);
-			case 2: armor = 1;
-			case 3: armor = 7;
-			default: armor = 6;
+			case 0: armor = 5; break;
+			case 1: armor = core->Roll(1, 2, 1); break;
+			case 2: armor = 1; break;
+			case 3: armor = 7; break;
+			default: armor = 6; break;
 		}
 
 		snprintf(Sound, 9, "H_%s_%s%d", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
