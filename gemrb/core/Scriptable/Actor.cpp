@@ -8411,7 +8411,6 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			} else {
 				// weapon is unsuitable for sneak attack
 				displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-				wi.backstabbing = false;
 			}
 		}
 	}
@@ -8442,7 +8441,6 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 				} else {
 					// weapon is unsuitable for backstab
 					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-					wi.backstabbing = false;
 				}
 			}
 		}
