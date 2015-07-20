@@ -128,7 +128,7 @@ namespace GemRB {
 #define  GF_3ED_RULES              	38 //iwd2
 #define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
 #define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
-#define  GF_HAS_HIDE_IN_SHADOWS    	41 // not in bg1 and pst
+#define  GF_HAS_HIDE_IN_SHADOWS    	41 // bg2, iwd2
 #define  GF_AREA_VISITED_VAR    	42 //iwd, iwd2
 #define  GF_PROPER_BACKSTAB     	43 //bg2, iwd2, how?
 #define  GF_ONSCREEN_TEXT       	44 //pst
