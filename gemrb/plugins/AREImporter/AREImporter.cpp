@@ -735,6 +735,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
 		Flags = FixIWD2DoorFlags(Flags, false);
+		if (AreaType & AT_OUTDOOR) Flags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
 		str->ReadWord( &ClosedVerticesCount );
