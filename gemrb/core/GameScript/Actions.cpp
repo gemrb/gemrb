@@ -4601,9 +4601,10 @@ void GameScript::EndCredits(Scriptable* Sender, Action* /*parameters*/)
 }
 
 //easily hardcoded end sequence
-void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 {
 	core->PlayMovie("ecredit");
+	QuitGame(Sender, parameters);
 }
 
 //always quits game, but based on game it can play end animation, or display

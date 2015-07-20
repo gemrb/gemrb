@@ -606,7 +606,7 @@ static const ActionLink actionnames[] = {
 	{"escapeareaobject", GameScript::EscapeAreaObject, AF_BLOCKING},
 	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, AF_BLOCKING},
 	{"exitpocketplane", GameScript::ExitPocketPlane, 0},
-	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
+	{"expansionendcredits", GameScript::ExpansionEndCredits, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
 	{"exportparty", GameScript::ExportParty, 0},
