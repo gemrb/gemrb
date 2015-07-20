@@ -1256,6 +1256,8 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		}
 		actor->AddActionInFront(newaction);
 		actor->SetWait(1);
+	} else {
+		delete newaction;
 	}
 
 	Sender->ReleaseCurrentAction();
