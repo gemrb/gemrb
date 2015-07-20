@@ -50,6 +50,11 @@ struct wed_polygon {
 WEDImporter::WEDImporter(void)
 {
 	str = NULL;
+	OverlaysCount = DoorsCount = OverlaysOffset = SecHeaderOffset = 0;
+	DoorPolygonsCount = DoorsOffset = DoorTilesOffset = PILTOffset = 0;
+	WallPolygonsCount = PolygonsOffset = VerticesOffset = WallGroupsOffset = 0;
+	OpenPolyCount = ClosedPolyCount = OpenPolyOffset = ClosedPolyOffset = 0;
+	ExtendedNight = false;
 }
 
 WEDImporter::~WEDImporter(void)
