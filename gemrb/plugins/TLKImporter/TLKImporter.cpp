@@ -57,6 +57,7 @@ TLKImporter::TLKImporter(void)
 	}
 	str = NULL;
 	override = NULL;
+	StrRefCount = Offset = 0;
 
 	AutoTable tm("gender");
 	if (tm) {
