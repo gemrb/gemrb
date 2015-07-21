@@ -1445,6 +1445,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 	if (strRef!=subtitlestrref) {
 		delete subtitletext;
 		if (!strRef)
+			subtitletext = NULL;
 			return;
 		subtitletext = core->GetString(strRef);
 		subtitlestrref = strRef;
