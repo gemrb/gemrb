@@ -4339,7 +4339,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 		// TODO: RE and unhardcode, especially the "armor" mapping
 		// no idea what RK stands for, so use it for everything else
 		if (type > 5) type = 5;
-		armor = IE_ARMOR_TYPE; // goes from 0 (none) to 3 (eg. plate)
+		armor = Modified[IE_ARMOR_TYPE]; // goes from 0 (none) to 3 (eg. plate)
 		switch (armor) {
 			case 0: armor = 5; break;
 			case 1: armor = core->Roll(1, 2, 1); break;
