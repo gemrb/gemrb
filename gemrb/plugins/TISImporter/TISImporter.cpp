@@ -32,6 +32,7 @@ using namespace GemRB;
 TISImporter::TISImporter(void)
 {
 	str = NULL;
+	headerShift = TilesCount = TilesSectionLen = TileSize = 0;
 }
 
 TISImporter::~TISImporter(void)
