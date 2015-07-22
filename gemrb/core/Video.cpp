@@ -77,11 +77,12 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 	return r;
 }
 
-VideoBuffer* Video::CreateBuffer()
+VideoBuffer* Video::CreateBuffer(const Size& s, BufferFormat fmt)
 {
-	VideoBuffer* buf = NewVideoBuffer();
+	VideoBuffer* buf = NewVideoBuffer(s, fmt);
+	assert(buf); // FIXME: we should probably deal with this happening
 	buffers.push_back(buf);
-	return buf;
+	return buffers.back();
 }
 
 void Video::SetDrawingBuffer(VideoBuffer* buf)

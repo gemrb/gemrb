@@ -64,7 +64,9 @@ protected:
 	virtual void SubviewAdded(View* view, View* parent);
 	virtual void SubviewRemoved(View* view, View* parent);
 
-	virtual void SizeChanged(const Size& /*oldSize*/) {}
+	// notifications
+	virtual void SizeChanged(const Size&) {}
+	virtual void WillDraw() {}
 
 public:
 	String tooltip;

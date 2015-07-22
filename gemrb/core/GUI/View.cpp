@@ -153,6 +153,8 @@ void View::Draw()
 
 	// clip drawing to the control bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
+	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
+	WillDraw();
 
 	bool drawBg = (background != NULL) || !IsOpaque();
 	if (NeedsDraw()) {

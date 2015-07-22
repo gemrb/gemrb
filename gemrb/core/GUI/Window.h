@@ -73,6 +73,9 @@ protected:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
+	void SizeChanged(const Size&);
+	void WillDraw();
+
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 	bool TrySetFocus(View*);
@@ -116,6 +119,7 @@ private: // Private attributes
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
 	bool disabled;
+	VideoBuffer* backBuffer;
 	WindowManager& manager;
 };
 

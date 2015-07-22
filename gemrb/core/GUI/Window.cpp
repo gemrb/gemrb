@@ -31,13 +31,16 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
+	backBuffer = NULL;
 
 	lastMouseMoveTime = GetTickCount();
+
+	SizeChanged(frame.Dimensions());
 }
 
 Window::~Window()
 {
-
+	core->GetVideoDriver()->DestroyBuffer(backBuffer);
 }
 
 void Window::Close()
@@ -76,6 +79,19 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 	if (focusView == ctrl) {
 		focusView = NULL;
 	}
+}
+
+void Window::SizeChanged(const Size& /*oldSize*/)
+{
+	Video* video = core->GetVideoDriver();
+	video->DestroyBuffer(backBuffer);
+
+	backBuffer = video->CreateBuffer(frame.Dimensions());
+}
+
+void Window::WillDraw()
+{
+	core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
 }
 
 void Window::Focus()

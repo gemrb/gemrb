@@ -98,6 +98,13 @@ public:
 class GEM_EXPORT Video : public Plugin {
 public:
 	static const TypeID ID;
+
+	enum BufferFormat {
+		DISPLAY = 0, // whatever format the video driver thinks is best for the display
+		RGBA8888 = 1, // RGBA format for some videos (palettized videos can be converted)
+		IYUV = 2,    // YUV format for some videos
+	};
+
 protected:
 	unsigned long lastTime;
 	int MouseFlags;
@@ -135,7 +142,7 @@ protected:
 	virtual void Wait(int) = 0;
 
 private:
-	virtual VideoBuffer* NewVideoBuffer()=0;
+	virtual VideoBuffer* NewVideoBuffer(const Size&, BufferFormat)=0;
 	virtual void SwapBuffers(VideoBuffers&)=0;
 	virtual int PollEvents() = 0;
 
@@ -149,9 +156,9 @@ public:
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
 	/** Swaps displayed and back buffers */
-	// TODO: allow passing format params
-	VideoBuffer* CreateBuffer();
 	int SwapBuffers();
+	VideoBuffer* CreateBuffer(const Size&, BufferFormat = DISPLAY);
+	void DestroyBuffer(VideoBuffer*) {}; // FIXME: implement this
 	void SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;

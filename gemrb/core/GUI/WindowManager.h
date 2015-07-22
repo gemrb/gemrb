@@ -20,13 +20,13 @@
 #define __GemRB__WindowManager__
 
 #include "EventMgr.h"
+#include "Video.h"
 
 #include <deque>
 
 namespace GemRB {
 
 class Sprite2D;
-class Video;
 class Window;
 
 typedef std::deque<Window*> WindowList;

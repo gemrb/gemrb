@@ -85,8 +85,9 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	return GEM_OK;
 }
 
-VideoBuffer* SDL12VideoDriver::NewVideoBuffer()
+VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Size& s, BufferFormat fmt)
 {
+	// FIXME/TODO: this should use s for sizing the surface. need to nix the Viewport first tho.
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
 	SDL_SetColorKey(tmp, SDL_SRCCOLORKEY, SDL_MapRGBA(tmp->format, 0, 0xff, 0, 0));
 	SDL_Surface* buf = SDL_DisplayFormat(tmp);
