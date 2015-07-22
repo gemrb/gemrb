@@ -88,8 +88,9 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 VideoBuffer* SDL12VideoDriver::NewVideoBuffer()
 {
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
+	SDL_SetColorKey(tmp, SDL_SRCCOLORKEY, SDL_MapRGBA(tmp->format, 0, 0xff, 0, 0));
 	SDL_Surface* buf = SDL_DisplayFormat(tmp);
-	SDL_SetColorKey(buf, SDL_SRCCOLORKEY, 0x00ff0000);
+
 	return new SDLSurfaceVideoBuffer(buf);
 }
 

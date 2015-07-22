@@ -53,6 +53,8 @@ public:
 	SDLSurfaceVideoBuffer(SDL_Surface* surf) {
 		assert(surf);
 		buffer = surf;
+
+		Clear();
 	}
 
 	~SDLSurfaceVideoBuffer() {
@@ -60,7 +62,7 @@ public:
 	}
 
 	void Clear() {
-		SDL_FillRect(buffer, NULL, 0);
+		SDL_FillRect(buffer, NULL, buffer->format->colorkey);
 	}
 
 	SDL_Surface* Surface() {
