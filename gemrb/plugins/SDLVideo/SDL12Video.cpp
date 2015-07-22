@@ -181,18 +181,16 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 	return false;
 }
 
-int SDL12VideoDriver::SwapBuffers(void)
+void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
 	VideoBuffers::iterator it;
 	it = buffers.begin();
+	SDL_FillRect(disp, NULL, 0xffffffaa);
 	for (; it != buffers.end(); ++it) {
-		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer);
+		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
 		SDL_BlitSurface( vb->Surface(), NULL, disp, NULL );
 	}
-
-	int ret = SDLVideoDriver::SwapBuffers();
 	SDL_Flip( disp );
-	return ret;
 }
 
 Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )

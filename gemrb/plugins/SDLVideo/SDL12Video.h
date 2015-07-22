@@ -37,7 +37,6 @@ public:
 	
 	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
-	int SwapBuffers(void);
 	Sprite2D* GetScreenshot( Region r );
 
 	void InitMovieScreen(int &w, int &h, bool yuv);
@@ -60,6 +59,7 @@ public:
 	void SetGamma(int brightness, int contrast);
 private:
 	VideoBuffer* NewVideoBuffer();
+	void SwapBuffers(VideoBuffers&);
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);

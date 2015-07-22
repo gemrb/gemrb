@@ -70,7 +70,6 @@ public:
 
 class SDLVideoDriver : public Video {
 protected:
-	unsigned long lastTime;
 	unsigned long lastMouseDownTime;
 
 	String *subtitletext;
@@ -79,11 +78,9 @@ public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
 	int Init(void);
-	virtual int PollEvents();
 
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual bool SetFullscreenMode(bool set)=0;
-	virtual int SwapBuffers(void);
 
 	virtual bool ToggleGrabInput()=0;
 	short GetWidth() { return width; }
@@ -174,8 +171,10 @@ protected:
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
+	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
+	void Wait(int w) { SDL_Delay(w); }
 
 public:
 	// static functions for manipulating surfaces

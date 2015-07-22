@@ -84,15 +84,27 @@ VideoBuffer* Video::CreateBuffer()
 	return buf;
 }
 
-bool Video::SetDrawingBuffer(VideoBuffer* buf)
+void Video::SetDrawingBuffer(VideoBuffer* buf)
 {
-	assert(buf);
-	VideoBuffers::iterator it = std::find(buffers.begin(), buffers.end(), buf);
-	if (it != buffers.end()) {
-		drawingBuffer = *it;
-		return true;
+	drawingBuffers.push_back(buf);
+	drawingBuffer = drawingBuffers.back();
+}
+
+int Video::SwapBuffers()
+{
+	SwapBuffers(drawingBuffers);
+	drawingBuffers.clear();
+
+	unsigned long time = GetTickCount();
+	if (( time - lastTime ) < 33) {
+#ifndef NOFPSLIMIT
+		Wait(33 - int(time - lastTime));
+#endif
+		time = GetTickCount();
 	}
-	return false;
+	lastTime = time;
+
+	return PollEvents();
 }
 
 void Video::SetScreenClip(const Region* clip)

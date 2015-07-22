@@ -99,6 +99,7 @@ class GEM_EXPORT Video : public Plugin {
 public:
 	static const TypeID ID;
 protected:
+	unsigned long lastTime;
 	int MouseFlags;
 	Point Coor;
 	EventMgr* EvntManager;
@@ -117,29 +118,41 @@ protected:
 	Palette *subtitlepal;
 	Region subtitleregion;
 	Color fadeColor;
+
 protected:
 	typedef std::vector<VideoBuffer*> VideoBuffers;
 
-	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
+	// collection of all existing video buffers
 	VideoBuffers buffers;
+	// collection built by calls to SetDrawingBuffer() and cleared after SwapBuffers()
+	// the collection is iterated and drawn in order during SwapBuffers()
+	// Note: we can add the same buffer more than once to drawingBuffers!
+	VideoBuffers drawingBuffers;
+	// the current top of drawingBuffers that draw operations occur on
 	VideoBuffer* drawingBuffer;
+
+	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
+	virtual void Wait(int) = 0;
 
 private:
 	virtual VideoBuffer* NewVideoBuffer()=0;
+	virtual void SwapBuffers(VideoBuffers&)=0;
+	virtual int PollEvents() = 0;
 
 public:
 	Video(void);
 	virtual ~Video(void);
+
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
 	/** Swaps displayed and back buffers */
-	virtual int SwapBuffers(void) = 0;
 	// TODO: allow passing format params
 	VideoBuffer* CreateBuffer();
-	bool SetDrawingBuffer(VideoBuffer*);
+	int SwapBuffers();
+	void SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual short GetWidth() = 0;

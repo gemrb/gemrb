@@ -95,21 +95,6 @@ SDL_Surface* SDLVideoDriver::CurrentSurfaceBuffer()
 	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
 }
 
-int SDLVideoDriver::SwapBuffers(void)
-{
-	unsigned long time;
-	time = GetTickCount();
-	if (( time - lastTime ) < 33) {
-#ifndef NOFPSLIMIT
-		SDL_Delay( 33 - (time - lastTime) );
-#endif
-		time = GetTickCount();
-	}
-	lastTime = time;
-
-	return PollEvents();
-}
-
 int SDLVideoDriver::PollEvents()
 {
 	int ret = GEM_OK;
