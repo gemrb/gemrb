@@ -45,7 +45,6 @@ private:
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
-	Video* video;
 	Region screen; // only a Region for convinience. we dont use x,y
 	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
 	Window* gameWin;
@@ -53,9 +52,15 @@ private:
 
 	EventMgr eventMgr;
 
+	Video* video;
+	VideoBuffer* cursorBuf;// buffer the cursors and tooltips are drawn to (layer 3)
+
 private:
 	bool IsOpenWindow(Window* win) const;
 	Sprite2D* WinFrameEdge(int edge) const;
+
+	void DrawCursor() const;
+	void DrawTooltip(const String& tooltip, const Point&) const;
 
 public:
 	WindowManager(Video* vid);

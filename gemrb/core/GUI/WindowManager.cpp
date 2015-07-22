@@ -51,6 +51,8 @@ bool WindowManager::IsPresentingModalWindow() const
 WindowManager::WindowManager(Video* vid)
 {
 	modalWin = NULL;
+	cursorBuf = NULL;
+
 	modalShadow = ShadowNone;
 	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 	SetVideoDriver(vid);
@@ -61,6 +63,7 @@ WindowManager::WindowManager(Video* vid)
 
 WindowManager::~WindowManager()
 {
+	video->DestroyBuffer(cursorBuf);
 	delete gameWin;
 }
 
@@ -193,6 +196,14 @@ bool WindowManager::DispatchEvent(const Event& event)
 #undef HIT_TEST
 }
 
+void WindowManager::DrawCursor() const
+{
+}
+
+void WindowManager::DrawTooltip(const String& /*tooltip*/, const Point& /*p*/) const
+{
+}
+
 void WindowManager::DrawWindows() const
 {
 	if (!windows.size()) {
@@ -221,7 +232,7 @@ void WindowManager::DrawWindows() const
 	// draw the game window now (beneath everything else) its not part of the windows collection
 	gameWin->Draw();
 
-	bool drawFrame = true;
+	bool drawFrame = false;
 	const Region& frontWinFrame = windows.front()->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::const_reverse_iterator rit = windows.rbegin();
@@ -244,21 +255,11 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
-		const Region& frame = win->Frame();
-		if (drawFrame && !(win->flags&WF_BORDERLESS) && (frame.w < screen.w || frame.h < screen.h)) {
-			video->SetScreenClip( NULL );
-
-			Sprite2D* edge = WinFrameEdge(0); // left
-			video->BlitSprite(edge, 0, 0, true);
-			edge = WinFrameEdge(1); // right
-			int sideW = edge->Width;
-			video->BlitSprite(edge, core->Width - sideW, 0, true);
-			edge = WinFrameEdge(2); // top
-			video->BlitSprite(edge, sideW, 0, true);
-			edge = WinFrameEdge(3); // bottom
-			video->BlitSprite(edge, sideW, core->Height - edge->Height, true);
-			drawFrame = false; // only need to draw this once ever
+		if (!drawFrame && !(win->flags&WF_BORDERLESS) && (frame.w < screen.w || frame.h < screen.h)) {
+			// the window requires us to draw the frame border (happens later, on the cursor buffer)
+			drawFrame = true;
 		}
+
 		if (win->IsDisabled()) {
 			if (win->NeedsDraw()) {
 				// Important to only draw if the window itself is dirty
@@ -271,6 +272,32 @@ void WindowManager::DrawWindows() const
 			win->Draw();
 		}
 	}
+
+	cursorBuf->Clear(); // erase the last frame
+	video->SetDrawingBuffer(cursorBuf);
+
+	if (drawFrame) {
+		// the window buffers dont (well wont after im done) have room for the frame
+		// we also only need to draw the frame *once* (even if it applies to multiple windows)
+		// therefore, draw the frame on the cursor buffer (above everything else)
+		// ... I'm not 100% certain this works for all use cases.
+		// if it doesnt... i think it might be better to just forget about the window frames once the game is loaded
+
+		video->SetScreenClip( NULL );
+
+		Sprite2D* edge = WinFrameEdge(0); // left
+		video->BlitSprite(edge, 0, 0, true);
+		edge = WinFrameEdge(1); // right
+		int sideW = edge->Width;
+		video->BlitSprite(edge, screen.w - sideW, 0, true);
+		edge = WinFrameEdge(2); // top
+		video->BlitSprite(edge, sideW, 0, true);
+		edge = WinFrameEdge(3); // bottom
+		video->BlitSprite(edge, sideW, screen.h - edge->Height, true);
+	}
+
+	// tooltips and cursor are always last
+	DrawCursor();
 }
 
 void WindowManager::SetVideoDriver(Video* vid)
