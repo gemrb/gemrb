@@ -244,10 +244,9 @@ void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned sho
 	trackingView = NULL;
 }
 
-void Window::DispatchMouseWheelScroll(short x, short y)
+void Window::DispatchMouseWheelScroll(const Point& p, short x, short y)
 {
-	Point mp = core->GetVideoDriver()->GetMousePos();
-	View* target = SubviewAt(ConvertPointFromScreen(mp), false, true);
+	View* target = SubviewAt(ConvertPointFromScreen(p), false, true);
 	if (target) {
 		target->OnMouseWheelScroll( x, y );
 		return;

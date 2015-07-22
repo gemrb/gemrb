@@ -168,14 +168,6 @@ void View::Draw()
 
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews(drawBg);
-
-	// draw tooltip if needed
-	if (TooltipView == this && TooltipText().length()
-		&& TooltipTime && GetTickCount() >= TooltipTime
-	) {
-		Point mp = core->GetVideoDriver()->GetMousePos();
-		DrawTooltip(mp);
-	}
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }

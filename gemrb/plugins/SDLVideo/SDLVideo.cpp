@@ -104,23 +104,26 @@ int SDLVideoDriver::PollEvents()
 		ret = ProcessEvent(currentEvent);
 	}
 
+	/*
+	TODO: move this logic to Event/Window manager
 	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
 		&& lastTime>lastMouseDownTime
 		&& SDL_GetMouseState(NULL, NULL)==SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
 		// get our internal mouse coordinates instead of system coordinates
 		// this is important for SDL2 (Android, iOS currently)
+
 		Point p = GetMousePos();
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
 		EvntManager->DispatchEvent(e);
-		/*
+
 		Control* ctl = EvntManager->GetFocusedControl();
 		if (ctl && ctl->ControlType == IE_GUI_BUTTON)
 			// these are repeat events so the control should stay pressed
 			((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
-		*/
 	}
+	*/
 	return ret;
 }
 

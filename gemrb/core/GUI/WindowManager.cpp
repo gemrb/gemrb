@@ -192,7 +192,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 					target->DispatchMouseOver(winPos);
 					break;
 				case Event::MouseScroll:
-					target->DispatchMouseWheelScroll(event.mouse.x, event.mouse.y);
+					target->DispatchMouseWheelScroll(winPos, event.mouse.deltaX, event.mouse.deltaY);
 					break;
 				default: return false;
 			}

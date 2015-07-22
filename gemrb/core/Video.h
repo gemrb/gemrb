@@ -116,7 +116,6 @@ protected:
 	bool fullscreen;
 	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
 	CursorType CursorIndex;
-	Point CursorPos;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
@@ -239,10 +238,6 @@ public:
 	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() { return screenClip; }
-	/** returns the current mouse coordinates */
-	Point GetMousePos() { return CursorPos; }
-	/** moves the mouse forcibly */
-	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
 	/** initializes the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
 	/** called when a video player is done. clean up any video specific resources.  */

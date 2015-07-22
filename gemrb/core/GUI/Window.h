@@ -106,7 +106,7 @@ public:
 	void DispatchMouseOver(const Point&);
 	void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void DispatchMouseWheelScroll(short x, short y);
+	void DispatchMouseWheelScroll(const Point&, short x, short y);
 
 public: //Public attributes
 	int Cursor;

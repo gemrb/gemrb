@@ -756,12 +756,6 @@ void SDL20VideoDriver::ShowSoftKeyboard()
 	}
 }
 
-/* no idea how elaborate this should be*/
-void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
-{
-	SDL_WarpMouseInWindow(window, x, y);
-}
-
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
 	// FIXME: hardcoded hack. in in Interface our default brigtness value is 10

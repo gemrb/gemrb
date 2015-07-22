@@ -51,12 +51,12 @@ public:
 					  unsigned int dstx, unsigned int dsty,
 					  ieDword titleref);
 	bool SetFullscreenMode(bool set);
-	void MoveMouse(unsigned int x, unsigned int y);
 
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
 	void SetGamma(int brightness, int contrast);
+
 private:
 	void SwapBuffers(VideoBuffers&);
 	VideoBuffer* NewVideoBuffer(const Size& rgn, BufferFormat fmt);

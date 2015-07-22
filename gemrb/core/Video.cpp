@@ -33,7 +33,7 @@ namespace GemRB {
 const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
-	: Viewport(), CursorPos(), fadeColor()
+	: Viewport(), fadeColor()
 {
 	CursorIndex = VID_CUR_UP;
 	Cursor[VID_CUR_UP] = NULL;

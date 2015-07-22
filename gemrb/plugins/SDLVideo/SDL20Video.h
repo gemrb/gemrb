@@ -77,7 +77,7 @@ public:
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
-	void MoveMouse(unsigned int x, unsigned int y);
+
 private:
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
