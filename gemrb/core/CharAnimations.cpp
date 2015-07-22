@@ -808,6 +808,15 @@ IE_ANI_TWO_FILES_3B:	Animations using this type are stored using the following t
 			This is the standard IWD animation, but BG2 also has it.
 			See MOR2
 
+IE_ANI_TWO_FILES_3C:	Animations using this type are stored using the following template:
+			[NAME][ACTIONTYPE]
+
+			Example:
+			MWDR*
+
+			This is a cut down version of IE_ANI_TWO_FILES_3. E(ast) files are missing.
+			See MWOR (missing de and gu suffixes)
+
 IE_ANI_TWO_FILES_4: This type stores animations in two files (G1 and G2) which each having only
 			one cycle. And both of those seem to be identical.
 
@@ -1125,6 +1134,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			case IE_ANI_PST_ANIMATION_2: //no std just stc
 			case IE_ANI_PST_ANIMATION_1:
 			case IE_ANI_FRAGMENT:
+			case IE_ANI_TWO_FILES_3C:
 			case IE_ANI_TWO_FILES_5:
 				if (Orient > 8) {
 					a->MirrorAnimation( );
@@ -1158,6 +1168,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_TWO_FILES_3B:
+		case IE_ANI_TWO_FILES_3C:
 		case IE_ANI_FOUR_FILES:
 		case IE_ANI_FOUR_FILES_2:
 		case IE_ANI_SIX_FILES_2:
@@ -1272,11 +1283,15 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
-			AddMMRSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddMMRSuffix(NewResRef, StanceID, Cycle, Orient, false);
 			break;
 
 		case IE_ANI_TWO_FILES_3B: //IWD style anims
 			AddMMR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_TWO_FILES_3C: //IWD style anims
+			AddMMRSuffix(NewResRef, StanceID, Cycle, Orient, true);
 			break;
 
 		case IE_ANI_TWO_FILES_4:
@@ -2569,62 +2584,57 @@ void CharAnimations::AddMMR2Suffix(char* ResRef, unsigned char StanceID,
 }
 
 void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient)
+	unsigned char& Cycle, unsigned char Orient, bool mirror)
 {
+	if (mirror) {
+		Cycle = SixteenToFive[Orient];
+	} else {
+		Cycle = Orient / 2;
+	}
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "a1" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_SHOOT:
 			strcat( ResRef, "a4" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			strcat( ResRef, "a2" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_AWAKE:
 		case IE_ANI_READY:
 			strcat( ResRef, "sd" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_CONJURE:
 			strcat( ResRef, "ca" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_CAST:
 			strcat( ResRef, "sp" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_HEAD_TURN:
 			strcat( ResRef, "sc" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "gh" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_DIE:
 			strcat( ResRef, "de" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
 			strcat( ResRef, "gu" );
-			Cycle = ( Orient / 2 );
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -2633,23 +2643,20 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_SLEEP:
 			strcat( ResRef, "sl" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "tw" );
-			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_WALK:
 			strcat( ResRef, "wk" );
-			Cycle = ( Orient / 2 );
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			break;
 	}
-	if (Orient > 9) {
+	if (!mirror && Orient > 9) {
 		strcat( ResRef, "e" );
 	}
 }
