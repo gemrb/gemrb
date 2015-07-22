@@ -50,15 +50,13 @@ bool WindowManager::IsPresentingModalWindow() const
 
 WindowManager::WindowManager(Video* vid)
 {
+	gameWin = NULL;
 	modalWin = NULL;
 	cursorBuf = NULL;
 
 	modalShadow = ShadowNone;
 	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 	SetVideoDriver(vid);
-
-	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(WF_BORDERLESS, BM_OR);
 }
 
 WindowManager::~WindowManager()
@@ -229,7 +227,7 @@ void WindowManager::DrawWindows() const
 	}
 	modalShield = false;
 
-	// draw the game window now (beneath everything else) its not part of the windows collection
+	// draw the game window now (beneath everything else); its not part of the windows collection
 	gameWin->Draw();
 
 	bool drawFrame = false;
@@ -238,19 +236,16 @@ void WindowManager::DrawWindows() const
 	WindowList::const_reverse_iterator rit = windows.rbegin();
 	for (; rit != windows.rend(); ++rit) {
 		Window* win = *rit;
+		const Region& frame = win->Frame();
 
+		// FYI... this only checks if the front window obscures... could be covered by another window too
 		if (win != windows.front() && win->NeedsDraw()) {
-			const Region& frame = win->Frame();
 			Region intersect = frontWinFrame.Intersect(frame);
 			if (!intersect.Dimensions().IsEmpty()) {
 				if (intersect == frame) {
 					// this window is completely obscured by the front window
 					// we dont have to bother drawing it because IE has no concept of translucent windows
 					continue;
-				} else {
-					// only partialy obscured
-					// must mark front win as dirty to redraw over the intersection
-					windows.front()->MarkDirty();
 				}
 			}
 		}
@@ -304,6 +299,8 @@ void WindowManager::SetVideoDriver(Video* vid)
 {
 	if (vid == video) return;
 
+	delete gameWin;
+	gameWin = NULL;
 	RedrawAll();
 
 	// FIXME: technically we should unset the current video event manager...
@@ -312,7 +309,15 @@ void WindowManager::SetVideoDriver(Video* vid)
 		screen.h = vid->GetHeight();
 		vid->SetEventMgr(&eventMgr);
 
+		gameWin = new Window(screen, *this);
+		gameWin->SetFlags(WF_BORDERLESS, BM_OR);
 		gameWin->SetFrame(screen);
+
+		cursorBuf = vid->CreateBuffer(screen.Dimensions());
+
+		// set the buffer that always gets cleared just in case anything
+		// tries to draw 
+		vid->SetDrawingBuffer(cursorBuf);
 	}
 	video = vid;
 	// TODO: changing screen size should adjust window positions too
