@@ -93,6 +93,11 @@ void Window::SetFocused(Control* ctrl)
 	}
 }
 
+const String& Window::TooltipText() const
+{
+	return hoverView->TooltipText();
+}
+
 void Window::SetPosition(WindowPosition pos)
 {
 	// start at top left
