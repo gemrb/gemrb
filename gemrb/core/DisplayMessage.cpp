@@ -87,7 +87,7 @@ ieStrRef DisplayMessage::GetStringReference(size_t idx)
 
 bool DisplayMessage::HasStringReference(size_t idx)
 {
-	return DisplayMessage::SRefs[idx] != (ieStrRef)-1;
+	return DisplayMessage::SRefs[idx] != ieStrRef(-1);
 }
 
 

@@ -450,8 +450,8 @@ Actor::Actor()
 
 	memset(ShortName, 0, sizeof(ShortName));
 	memset(LongName, 0, sizeof(LongName));
-	LongStrRef = (ieStrRef) -1;
-	ShortStrRef = (ieStrRef) -1;
+	LongStrRef = ieStrRef(-1);
+	ShortStrRef = ieStrRef(-1);
 
 	playedCommandSound = false;
 
@@ -3479,13 +3479,13 @@ void Actor::Interact(int type)
 ieStrRef Actor::GetVerbalConstant(int index) const
 {
 	if (index<0 || index>=VCONST_COUNT) {
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 
 	int idx = VCMap[index];
 
 	if (idx<0 || idx>=VCONST_COUNT) {
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 	return StrRefs[idx];
 }
@@ -3516,7 +3516,7 @@ void Actor::VerbalConstant(int start, int count, bool force) const
 			}
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
-		while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
+		while (count > 0 && GetVerbalConstant(start+count-1) == ieStrRef(-1) ) {
 			count--;
 		}
 		if (count > 0) {

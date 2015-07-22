@@ -662,7 +662,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 			bool valid = valid_number(ret, val);
 			if (type == 3) {
 				//if which = 3 then return resolved string
-				return PyString_FromString(core->GetCString((ieStrRef)val));
+				return PyString_FromString(core->GetCString( ieStrRef(val) ));
 			}
 			if (valid || type == 1) {
 				return PyInt_FromLong( val );
@@ -1142,7 +1142,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck( str, &PyInt_Type )) { // strref
-		ieStrRef StrRef = (ieStrRef)PyInt_AsLong( str );
+		ieStrRef StrRef = ieStrRef(PyInt_AsLong( str ));
 		String* string = core->GetString( StrRef );
 		ctrl->SetText(string);
 		delete string;
@@ -1176,7 +1176,7 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 	if (PyObject_TypeCheck( pystr, &PyString_Type )) {
 		str = StringFromCString(PyString_AsString( pystr ));
 	} else if (PyObject_TypeCheck( pystr, &PyInt_Type )) {
-		str = core->GetString( (ieStrRef)PyInt_AsLong( pystr ), flags );
+		str = core->GetString( ieStrRef(PyInt_AsLong( pystr )), flags );
 	} else {
 		return NULL;
 	}
@@ -1230,8 +1230,8 @@ static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 			core->SetTooltip(ctrl, string );
 	}
 	} else {
-		ieStrRef StrRef = (ieStrRef)PyInt_AsLong( str );
-		if (StrRef != static_cast<ieStrRef>(-1)) {
+		ieStrRef StrRef = ieStrRef(PyInt_AsLong( str ));
+		if (StrRef != ieStrRef(-1)) {
 			char* str = core->GetCString( StrRef );
 
 			if (function) {
@@ -3225,7 +3225,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		String* string = NULL;
 		if(!PyString_Check(item)) {
 			if (PyInt_Check(item)) {
-				string = core->GetString((ieStrRef)PyInt_AsLong(item));
+				string = core->GetString( ieStrRef(PyInt_AsLong(item)) );
 			} else {
 				return NULL;
 			}

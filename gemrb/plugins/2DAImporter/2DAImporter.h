@@ -107,7 +107,7 @@ public:
 	{
 		for (unsigned int index = 0; index < rowNames.size(); index++) {
 			if (stricmp( rowNames[index], string ) == 0) {
-				return (int) index;
+				return int(index);
 			}
 		}
 		return -1;
@@ -117,7 +117,7 @@ public:
 	{
 		for (unsigned int index = 0; index < colNames.size(); index++) {
 			if (stricmp( colNames[index], string ) == 0) {
-				return (int) index;
+				return int(index);
 			}
 		}
 		return -1;
@@ -148,7 +148,7 @@ public:
 			const char* ret = QueryField( row, col );
 			long Value;
 			if (valid_number( ret, Value ) && (Value == val) )
-				return (int) row;
+				return int(row);
 		}
 		return -1;
 	}
@@ -161,7 +161,7 @@ public:
 		for (row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			if (stricmp(ret, val) == 0)
-				return (int) row;
+				return int(row);
 		}
 		return -1;
 	}

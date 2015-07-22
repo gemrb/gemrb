@@ -1147,10 +1147,10 @@ int Interface::LoadFonts()
 			if (colorString) {
 				ieDword c;
 				sscanf(colorString, "0x%x", &c);
-				fore.r = (ieByte)((c >> 24) & 0xFF);
-				fore.g = (ieByte)((c >> 16) & 0xFF);
-				fore.b = (ieByte)((c >> 8) & 0xFF);
-				fore.a = (ieByte)(c & 0xFF);
+				fore.r = ieByte((c >> 24) & 0xFF);
+				fore.g = ieByte((c >> 16) & 0xFF);
+				fore.b = ieByte((c >> 8) & 0xFF);
+				fore.a = ieByte(c & 0xFF);
 			}
 			if (TooltipFontResRef == resref) {
 				if (fore.a != 0xff) {
@@ -3920,7 +3920,7 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	strnlwrcpy( GoldResRef, tab->QueryField((size_t)0, (size_t)0), 8);
+	strnlwrcpy( GoldResRef, tab->QueryField(size_t(0), size_t(0)), 8);
 	if ( GoldResRef[0]=='*' ) {
 		return false;
 	}
@@ -4186,11 +4186,11 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 
 	if (!dlg) {
 		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
 
-	ieStrRef ret = (ieStrRef) -1;
+	ieStrRef ret = ieStrRef(-1);
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {
 		ret = dlg->GetState( i )->StrRef;

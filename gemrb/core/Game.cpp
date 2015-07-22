@@ -1014,7 +1014,7 @@ void Game::DeleteJournalEntry(ieStrRef strref)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if ((Journals[i]->Text==strref) || (strref==(ieStrRef) -1) ) {
+		if ((Journals[i]->Text==strref) || (strref == ieStrRef(-1)) ) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}

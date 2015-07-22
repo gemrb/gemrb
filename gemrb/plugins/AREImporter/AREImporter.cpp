@@ -107,7 +107,7 @@ static int GetTrackString(const ieResRef areaName)
 			} else {
 				tracks[i].trackFlag=trackflag;
 			}
-			tracks[i].text=(ieStrRef) atoi(poi);
+			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty=atoi(tm->QueryField(i,1));
 			strnlwrcpy(tracks[i].areaName, tm->GetRowName(i), 8 );
 		}
@@ -362,7 +362,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (idx>=0) {
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
 	} else {
-		map->SetTrackString((ieStrRef) -1, false, 0);
+		map->SetTrackString(ieStrRef(-1), false, 0);
 	}
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
@@ -690,7 +690,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c->Scripts[0] = NULL;
 		}
 		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
-		if (!OpenFail) OpenFail = (ieStrRef)-1; // rewrite 0 to -1
+		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
 
@@ -892,7 +892,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
-		if (!OpenStrRef) OpenStrRef = (ieStrRef)-1; // rewrite 0 to -1
+		if (!OpenStrRef) OpenStrRef = ieStrRef(-1); // rewrite 0 to -1
 		door->OpenStrRef=OpenStrRef;
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
