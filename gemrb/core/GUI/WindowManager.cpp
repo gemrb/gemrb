@@ -50,6 +50,7 @@ bool WindowManager::IsPresentingModalWindow() const
 
 WindowManager::WindowManager(Video* vid)
 {
+	hoverWin = NULL;
 	gameWin = NULL;
 	modalWin = NULL;
 	cursorBuf = NULL;
@@ -162,33 +163,41 @@ bool WindowManager::DispatchEvent(const Event& event)
 		WindowList::const_iterator it = windows.begin();
 		for (; it != windows.end(); ++it) {
 			Window* win = *it;
-			if (!win->IsDisabled() && HIT_TEST(event,win)) {
+			if (HIT_TEST(event,win)) {
+				// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
+				// we still need to update which window is under the mouse and block events from reaching the windows below
 				target = win;
 				break;
 			}
 		}
 	}
 	if (target) {
-		Point winPos = target->ConvertPointFromScreen(event.mouse.Pos());
-		switch (event.type) {
-			case Event::MouseDown:
-				target->DispatchMouseDown(winPos, event.mouse.button, event.mod);
-				if (target != windows.front()) {
-					FocusWindow(target);
-				}
-				break;
-			case Event::MouseUp:
-				target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
-				break;
-			case Event::MouseMove:
-				target->DispatchMouseOver(winPos);
-				break;
-			case Event::MouseScroll:
-				target->DispatchMouseWheelScroll(event.mouse.x, event.mouse.y);
-				break;
-			default: return false;
+		if (event.isScreen) {
+			hoverWin = target;
 		}
-		return true;
+		// disabled windows get no events, but should block them from going to windows below
+		if (!target->IsDisabled()) {
+			Point winPos = target->ConvertPointFromScreen(event.mouse.Pos());
+			switch (event.type) {
+				case Event::MouseDown:
+					target->DispatchMouseDown(winPos, event.mouse.button, event.mod);
+					if (target != windows.front()) {
+						FocusWindow(target);
+					}
+					break;
+				case Event::MouseUp:
+					target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
+					break;
+				case Event::MouseMove:
+					target->DispatchMouseOver(winPos);
+					break;
+				case Event::MouseScroll:
+					target->DispatchMouseWheelScroll(event.mouse.x, event.mouse.y);
+					break;
+				default: return false;
+			}
+			return true;
+		}
 	}
 	return false;
 #undef HIT_TEST

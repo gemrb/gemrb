@@ -48,6 +48,7 @@ private:
 	Region screen; // only a Region for convinience. we dont use x,y
 	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
 	Window* gameWin;
+	Window* hoverWin;
 	ModalShadow modalShadow;
 
 	EventMgr eventMgr;
