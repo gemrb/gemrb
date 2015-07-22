@@ -323,16 +323,17 @@ void WindowManager::SetVideoDriver(Video* vid)
 Sprite2D* WindowManager::GetScreenshot(Window* win) const
 {
 	Sprite2D* screenshot = NULL;
-	if (IsOpenWindow(win)) {
+	if (win) { // we dont really care if we are managing the window
 		// only a screen shot of passed win
 		win->MarkDirty();
 		win->Draw();
 		screenshot = video->GetScreenshot( win->Frame() );
-		RedrawAll();
-		DrawWindows();
 	} else {
+		// we dont want cursors and tooltips in the shot
+		cursorBuf->Clear();
 		screenshot = video->GetScreenshot( screen );
 	}
+
 	return screenshot;
 }
 
