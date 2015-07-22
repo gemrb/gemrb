@@ -150,10 +150,12 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	alutContext = NULL;
 	MusicPlaying = false;
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
-	MusicSource = 0;
+	MusicSource = num_streams = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	musicMutex = SDL_CreateMutex();
 	ambim = NULL;
+	musicThread = NULL;
+	stayAlive = false;
 }
 
 void OpenALAudioDriver::PrintDeviceList ()
