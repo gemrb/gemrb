@@ -33,6 +33,7 @@ PCStatsStruct::PCStatsStruct()
 	AwayTime = 0;
 	JoinDate = 0;
 	unknown10 = 0;
+	Happiness = 0;
 	KillsChapterXP = 0;
 	KillsChapterCount = 0;
 	KillsTotalXP = 0;
@@ -44,6 +45,7 @@ PCStatsStruct::PCStatsStruct()
 	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
 	SoundSet[0]=0;
 	SoundFolder[0]=0;
+	memset(QSlots, 0, sizeof(QSlots));
 	QSlots[0]=0xff;
 	memset( QuickSpells, 0, sizeof(QuickSpells) );
 	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
