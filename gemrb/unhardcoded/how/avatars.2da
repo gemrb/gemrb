@@ -232,7 +232,7 @@
 0xB510    NSIWL     NSIWL      NSIWL      NSIWL      18         2          0          *
 0xB600    NNOML     NNOML      NNOML      NNOML      2          2          0          *
 0xB610    NNOWL     NNOWL      NNOWL      NNOWL      2          2          0          *
-0xB700    NSVLL     NSVLL      NSIWL      NSIWL      18         2          0          *
+0xB700    NSLVL     NSLVL      NSIWL      NSIWL      18         2          0          *
 0xC000    ABAT      ABAT       ABAT       ABAT       2          1          1          *
 0xC100    ACAT      ACAT       ACAT       ACAT       2          1          1          *
 0xC200    ACHK      ACHK       ACHK       ACHK       2          1          1          *
