@@ -194,7 +194,7 @@ function move_and_edit_projectfiles {
   prepare_config "$GEMRB_GIT_PATH/gemrb/GemRB.cfg.sample.in" "$ENVROOT/packaged.GemRB.cfg" &&
   mv "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
-  mkdir -p "$ENVROOT/build/gemrb/res/drawable-ldpi/" &&
+  mkdir -p "$ENVROOT/build/gemrb/res"/drawable-{l,m,h,xh,xxh}dpi &&
   # copy the icons
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/ic_launcher.png" &&
   cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/ic_launcher.png" &&
