@@ -1244,6 +1244,9 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	}
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
+		if (flags&IF_NOINT) {
+			actor->Interrupt();
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1258,6 +1261,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		actor->SetWait(1);
 	} else {
 		delete newaction;
+		actor->Interrupt();
 	}
 
 	Sender->ReleaseCurrentAction();
