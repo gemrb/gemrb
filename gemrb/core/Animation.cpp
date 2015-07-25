@@ -238,7 +238,7 @@ void Animation::MirrorAnimationVert()
 	}
 
 	// flip animArea vertically as well
-//	animArea.y = -animArea.h - animArea.y;
+	animArea.y = -animArea.h - animArea.y;
 }
 
 void Animation::AddAnimArea(Animation* slave)
