@@ -2687,23 +2687,27 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
+	static bool reverse = core->HasFeature(GF_REVERSE_TOHIT);
 	if (!STATE_GET(STATE_BLIND)) {
 		STATE_SET( STATE_BLIND );
 		//the feat normally exists only in IWD2, but won't hurt
 		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
 			target->AddPortraitIcon(PI_BLIND);
-			if (core->HasFeature(GF_REVERSE_TOHIT)) {
+			if (reverse) {
 				//BG2
 				target->AC.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 				target->ToHit.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 			} else {
 				//IWD2
 				target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-				// 50% inherent miss chance (full concealment)
-				STAT_ADD(IE_ETHEREALNESS, 50<<8);
-				target->AC.SetDexterityBonus(0); // no dexterity bonus to AC (caught flatfooted)
+				// no dexterity bonus to AC (caught flatfooted) is handled in core
 			}
 		}
+	}
+	// this part is unaffected by blind fighting feat
+	if (!reverse) {
+		// 50% inherent miss chance (full concealment)
+		STAT_ADD(IE_ETHEREALNESS, 50<<8);
 	}
 	//this should be FX_PERMANENT, but the current code is a mess here. Review after cleaned up
 	return FX_APPLIED;
