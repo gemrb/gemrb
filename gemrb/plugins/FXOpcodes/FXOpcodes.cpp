@@ -2699,9 +2699,9 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			} else {
 				//IWD2
 				target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-				// TODO: 50% inherent miss chance (full concealment)
+				// 50% inherent miss chance (full concealment)
+				STAT_ADD(IE_ETHEREALNESS, 50<<8);
 				target->AC.SetDexterityBonus(0); // no dexterity bonus to AC (caught flatfooted)
-				target->ToHit.HandleFxBonus(-5, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 			}
 		}
 	}
