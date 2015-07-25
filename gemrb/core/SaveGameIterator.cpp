@@ -518,10 +518,10 @@ static int CanSave()
 			return 6;
 		}
 
-                if (map->AnyEnemyNearPoint(actor->Pos)) {
-                        displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
-                        return 7;
-                }
+		if (map->AnyEnemyNearPoint(actor->Pos)) {
+			displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
+			return 7;
+		}
 
 	}
 
