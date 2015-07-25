@@ -2560,7 +2560,7 @@ ieDword Actor::GetSpellFailure(bool arcana) const
 {
 	ieDword base = arcana?Modified[IE_SPELLFAILUREMAGE]:Modified[IE_SPELLFAILUREPRIEST];
 	if (HasSpellState(SS_DOMINATION)) base += 100;
-	if (HasSpellState(SS_BLINK)) base += 20;
+	// blink's malus of 20% is handled in the effect
 	// IWD2 has this as 20, other games as 50
 	if (HasSpellState(SS_DEAF)) {
 		base += 20;
