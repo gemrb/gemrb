@@ -216,8 +216,9 @@ namespace GemRB {
 #define STR_CANTMOVE 181
 #define STR_CASTS 182
 #define STR_WEAPONINEFFECTIVE 183
+#define STR_CONCEALED_MISS 184
 
-#define STRREF_COUNT 184
+#define STRREF_COUNT 185
 }
 
 #endif //! IE_STRINGS_H

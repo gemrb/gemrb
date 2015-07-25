@@ -6674,6 +6674,23 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
+	// check for concealment first (iwd2), both our enemies' and from our phasing problems
+	int concealment = (GetStat(IE_ETHEREALNESS)>>8) + (target->GetStat(IE_ETHEREALNESS) & 0x64);
+	if (concealment) {
+		if (LuckyRoll(1, 100, 0) < concealment) {
+			// can we retry?
+			if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
+				// Missed <TARGETNAME> due to concealment.
+				core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
+				displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+				buffer.append("[Concealment Miss]");
+				Log(COMBAT, "Attack", buffer);
+				ResetState();
+				return;
+			}
+		}
+	}
+
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
 	// CriticalBonus is negative, it is added to the minimum roll needed for a critical hit
 	// IE_CRITICALHITBONUS is positive, it is subtracted
@@ -6691,6 +6708,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			criticalroll = ATTACKROLL;
 		}
 	}
+
 	if (roll==1) {
 		//critical failure
 		buffer.append("[Critical Miss]");
