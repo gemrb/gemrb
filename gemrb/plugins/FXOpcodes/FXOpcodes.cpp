@@ -424,6 +424,7 @@ int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e ChangeWeather
+int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -695,6 +696,7 @@ static EffectDesc effectnames[] = {
 	{ "Sequencer:Create", fx_create_spell_sequencer, 0, -1 },
 	{ "Sequencer:Store", fx_store_spell_sequencer, 0, -1 },
 	{ "SetAIScript", fx_set_ai_script, 0, -1 },
+	{ "SetConcealment", fx_set_concealment, 0, -1 },
 	{ "SetMapNote", fx_set_map_note, EFFECT_NO_ACTOR, -1 },
 	{ "SetMeleeEffect", fx_generic_effect, 0, -1 },
 	{ "SetRangedEffect", fx_generic_effect, 0, -1 },
@@ -7327,6 +7329,22 @@ int fx_change_weather (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	core->GetGame()->StartRainOrSnow(false, fx->Parameter1 & WB_TYPEMASK);
 
 	return FX_NOT_APPLIED;
+}
+
+// 458 SetConcealment
+// adds concealment/etherealness bonus (harder to hit) or malus (harder to hit for you)
+// not safe for negative values!
+int fx_set_concealment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	print("fx_set_concealment(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	int concealment = fx->Parameter1 & 0x64;
+	if (fx->Parameter2 == 0) {
+		STAT_ADD(IE_ETHEREALNESS, concealment);
+	} else {
+		STAT_ADD(IE_ETHEREALNESS, concealment<<8);
+	}
+
+	return FX_APPLIED;
 }
 
 // unknown
