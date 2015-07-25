@@ -3172,12 +3172,15 @@ int fx_blink (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	fx->Parameter4=Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
 	STAT_ADD(IE_SPELLFAILUREMAGE, 20);
+	STAT_ADD(IE_ETHEREALNESS, 50); // how likely are people to miss us?
 
 	if(fx->Parameter2) {
 		target->AddPortraitIcon(PI_EMPTYBODY);
 		return FX_APPLIED;
 	}
 
+	// how likely are we to miss others? Combined in the same stat
+	STAT_ADD(IE_ETHEREALNESS, 20<<8);
 	target->AddPortraitIcon(PI_BLINK);
 	return FX_APPLIED;
 }
