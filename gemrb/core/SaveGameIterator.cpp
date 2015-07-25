@@ -525,8 +525,21 @@ static int CanSave()
 
 	}
 
+	Point pc1 =  game->GetPC(0, true)->Pos;
+	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*4);
+	i = 0;
+	while (nearActors[i]) {
+		Actor *actor = nearActors[i];
+		if (actor->GetInternalFlag() & IF_NOINT) {
+			// dialog about to start or similar
+			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, DMC_BG2XPGREEN);
+			return 8;
+		}
+		i++;
+	}
+	free(nearActors);
+
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
-	//TODO: can't save while IF_NOINT is set on any actor -> CANTSAVEDIALOG2 (dialog about to start)
 	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
 
 	return 0;
