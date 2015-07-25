@@ -3278,6 +3278,10 @@ int fx_reputation_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_turn_undead(%2d): Level %d", fx->Opcode, fx->Parameter1);
+
+	if (target->GetStat(IE_NOTURNABLE)) {
+		return FX_NOT_APPLIED;
+	}
 	if (fx->Parameter1) {
 		target->Turn(Owner, fx->Parameter1);
 	} else {
