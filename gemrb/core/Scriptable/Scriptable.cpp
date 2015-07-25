@@ -932,7 +932,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
-	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, 15*10);
+	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
 	int i=0;
 	while(nearActors[i]!=NULL) {
 		nearActors[i]->AddTrigger(entry);
