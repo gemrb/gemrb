@@ -715,6 +715,7 @@ static const ActionLink actionnames[] = {
 	{"lock", GameScript::Lock, 0},//key not checked at this time!
 	{"lockscroll", GameScript::LockScroll, 0},
 	{"log", GameScript::Debug, 0}, //the same until we know better
+	{"losegame", GameScript::QuitGame, 0}, // tobex
 	{"makeglobal", GameScript::MakeGlobal, 0},
 	{"makeunselectable", GameScript::MakeUnselectable, 0},
 	{"markobject", GameScript::MarkObject, 0},
