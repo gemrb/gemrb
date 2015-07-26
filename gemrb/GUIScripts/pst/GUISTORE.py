@@ -52,7 +52,6 @@ ITEM_PC    = 0
 ITEM_STORE = 1
 
 Inventory = None
-RentIndex = -1
 Store = None
 inventory_slots = ()
 total_price = 0
@@ -486,14 +485,13 @@ def OpenStoreRumourWindow ():
 	return
 
 def OpenStoreRentWindow ():
-	global StoreRentWindow, RentIndex
+	global StoreRentWindow
 
 	CloseWindows()
 
 	StoreRentWindow = Window = GemRB.LoadWindow (8)
 
 	# room types
-	RentIndex = -1
 	room_type = (45308, 45310, 45313, 45316)
 	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
@@ -503,8 +501,6 @@ def OpenStoreRentWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED) #disabled room icons are selected, not disabled
 		else:
 			Button.SetVarAssoc ("RentIndex", i)
-			if RentIndex==-1:
-				RentIndex = i
 
 		Button = Window.GetControl (i+4)
 		Button.SetText (room_type[i])
@@ -519,7 +515,7 @@ def OpenStoreRentWindow ():
 	Button.SetText (45306)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
 
-	GemRB.SetVar ("RentIndex", RentIndex)
+	GemRB.SetVar ("RentIndex", 0)
 
 	UpdateStoreRentWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -1290,8 +1286,6 @@ def GulpDrink ():
 	return
 
 def UpdateStoreRentWindow ():
-	global RentIndex
-
 	Window = StoreRentWindow
 	UpdateStoreCommon (Window, 0x1000000a, 0, 0x1000000b)
 	RentIndex = GemRB.GetVar ("RentIndex")
@@ -1336,7 +1330,7 @@ def RentDeny () :
 	return
 
 def RentRoom ():
-	global RentIndex, RentConfirmWindow
+	global RentConfirmWindow
 
 	RentIndex = GemRB.GetVar ("RentIndex")
 	price = Store['StoreRoomPrices'][RentIndex]
