@@ -1106,7 +1106,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 
 	// check for area dead magic
 	// tob AR3004 is a dead magic area, but using a script with personal dead magic
-	if (area->GetInternalFlag()&AF_DEADMAGIC) {
+	if (area->GetInternalFlag()&AF_DEADMAGIC && !(spl->Flags&SF_HLA)) {
 		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 		return 0;
 	}
@@ -1132,7 +1132,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 		}
 
 		// check for personal dead magic
-		if (actor->Modified[IE_DEADMAGIC]) {
+		if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
 			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 			return 0;
 		}
