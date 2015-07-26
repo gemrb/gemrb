@@ -6578,6 +6578,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
+	if (target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+		Log(DEBUG, "Actor", "Attacking invulnerable target, skipping!");
+		return;
+	}
+
 	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));
 	target->AttackedBy(this);
 	ieDword state = GetStat(IE_STATE_ID);

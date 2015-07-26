@@ -1295,6 +1295,11 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
+	if (target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+		Log(DEBUG, "fx_damage", "Attacking invulnerable target, skipping!");
+		return FX_NOT_APPLIED;
+	}
+
 	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable, fx->SavingThrowType);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
