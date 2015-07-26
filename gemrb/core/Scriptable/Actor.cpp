@@ -10058,7 +10058,7 @@ void Actor::ReleaseCurrentAction()
 // check if there's an enemy nearby
 bool Actor::ConcentrationCheck() const
 {
-	if (!core->HasFeature(GF_3ED_RULES)) return true;
+	if (!third) return true;
 
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
