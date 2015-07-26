@@ -180,7 +180,8 @@ namespace GemRB {
 #define EXTSTATE_SEVEN_EYES  0x000007f0
 
 //Multiclass flags
-#define MC_SHOWLONGNAME         0x0001
+#define MC_SHOWLONGNAME         0x0001 // in iwd2 this supposedly prevents casting disruption from damage
+#define MC_NO_DISRUPTION        0x0001 // but it is set on non-casters only (all halfgoblins) and most have no scripts
 #define MC_REMOVE_CORPSE        0x0002
 #define MC_KEEP_CORPSE          0x0004
 #define MC_WAS_FIGHTER		0x0008
@@ -192,15 +193,22 @@ namespace GemRB {
 #define MC_WAS_ANY	        0x01f8 // MC_WAS_FIGHTER | ... | MC_WAS_RANGER
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
-#define MC_EXPORTABLE           0x0800
+#define MC_EXPORTABLE           0x0800  // iwd2: either different meaning or leftover cruft (set in a few creatures)
 #define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
 #define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
+#define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
 #define MC_SEENPARTY            0x10000 //iwd2
 #define MC_INVULNERABLE         0x20000 //iwd2
+#define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
+#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, ignore return to start pos, random walk / guarding related?
+#define MC_IGNORE_INHIBIT_AI    0x200000 // TODO: iwd2, difficulty related?
+//#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
+//#define                       0x20000000 // iwd2, unkown, probably irrelevant
+//#define                       0x40000000 // iwd2, unkown, probably irrelevant
 
 //stats
 #define IE_HITPOINTS		0
