@@ -961,7 +961,9 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 		// but only if we have really just recovered, so panic from other
 		// sources isn't affected
 		if ((actor->Modified[IE_MORALE]-1 == actor->Modified[IE_MORALEBREAK]) || (actor->Modified[IE_MORALEBREAK] == 0) ) {
-			actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
+			if (!third || !(actor->Modified[IE_SPECFLAGS]&SPECF_DRIVEN)) {
+				actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
+			}
 		}
 	}
 	//for new colour
@@ -10057,6 +10059,8 @@ void Actor::ReleaseCurrentAction()
 bool Actor::ConcentrationCheck() const
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return true;
+
+	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
 	// 9 is from the GetSpellDistance estimate
