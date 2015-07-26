@@ -6756,6 +6756,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellLevel", PyInt_FromLong (spell->SpellLevel));
 	PyDict_SetItemString(dict, "Completion", PyString_FromResRef (spell->CompletionSound));
 	PyDict_SetItemString(dict, "SpellTargetType", PyInt_FromLong (spell->GetExtHeader(0)->Target));
+	PyDict_SetItemString(dict, "HeaderFlags", PyInt_FromLong (spell->Flags));
 	PyDict_SetItemString(dict, "NonHostile", PyInt_FromLong (!(spell->Flags&SF_HOSTILE) && !spell->ContainsDamageOpcode()));
 	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (spell->Name));
 	gamedata->FreeSpell( spell, ResRef, false );
