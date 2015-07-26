@@ -262,6 +262,8 @@ def OpenSaveDetailWindow ():
 
 	# PC portraits
 	for j in range (PARTY_SIZE):
+		if not Window.HasControl (6 + j):
+			continue
 		Button = Window.GetControl (6 + j)
 		Button.SetSprite2D(GemRB.GetGamePortraitPreview(j))
 
