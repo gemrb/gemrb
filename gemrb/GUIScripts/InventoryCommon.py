@@ -310,9 +310,8 @@ def DisplayItem (itemresref, type):
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
 	# sorcerers cannot learn spells
-	# FIXME: unhardcode
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+	if Spellbook.HasSorcererBook (pc):
 		read = 0
 	container = (type&1) and (item["Function"]&4)
 	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
