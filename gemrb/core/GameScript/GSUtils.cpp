@@ -2694,9 +2694,18 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if (act) {
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
-			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
+			if (PersonalDistance(tar, Sender) > dist) {
 				MoveNearerTo(Sender, tar, dist);
 				return;
+			}
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
+				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				if (!(spl->Flags&SF_NO_LOS)) {
+					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					MoveNearerTo(Sender, tar, dist);
+					return;
+				}
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 			}
 		}
 
@@ -2787,9 +2796,20 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 		Actor *act = (Actor *) Sender;
 		//move near to target
-		if ((flags&SC_RANGE_CHECK) && (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter))) {
-			MoveNearerTo(Sender,parameters->pointParameter, dist, 0);
-			return;
+		if (flags&SC_RANGE_CHECK) {
+			if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
+				MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
+				return;
+			}
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter)) {
+				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				if (!(spl->Flags&SF_NO_LOS)) {
+					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+					MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
+					return;
+				}
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+			}
 		}
 
 		//face target
