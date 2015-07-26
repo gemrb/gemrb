@@ -23,6 +23,7 @@
 #include "strrefs.h"
 #include "ie_cursors.h"
 
+#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -371,9 +372,11 @@ void Scriptable::TickScripting()
 
 void Scriptable::ExecuteScript(int scriptCount)
 {
+	GameControl *gc = core->GetGameControl();
+
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
 	// but not in bg2 (kill Abazigal in ar6005)
-	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
+	if (gc->GetScreenFlags() & SF_CUTSCENE) {
 		if (! (core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
 			return;
 		}
@@ -395,6 +398,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 	Actor *act = NULL;
 	if (Type == ST_ACTOR) {
 		act = (Actor *) this;
+	}
+
+	// don't run scripts if we're in dialog
+	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
+		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
+		return;
 	}
 
 	if (act) {

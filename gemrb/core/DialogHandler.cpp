@@ -510,4 +510,9 @@ Actor *DialogHandler::GetSpeaker()
 	return GetActorByGlobalID(speakerID);
 }
 
+bool DialogHandler::InDialog(const Scriptable *scr) const
+{
+	return scr->GetGlobalID() == speakerID || scr->GetGlobalID() == targetID;
+}
+
 }
