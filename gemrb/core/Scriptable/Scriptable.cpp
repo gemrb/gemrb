@@ -1123,9 +1123,9 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 		// check for silence
 		// only a handful of spells don't have a verbal component -
 		// the original hardcoded vocalize and a few more
-		// we (also) ignore nonmagic spells
+		// we (also) ignore tobex modded spells
 		if (actor->CheckSilenced()) {
-			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
+			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
 				Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 				return 0;
 			}
