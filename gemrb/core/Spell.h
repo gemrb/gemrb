@@ -39,12 +39,15 @@ class Projectile;
 
 //values for Spell usability Flags
 
-#define SF_HOSTILE	0x400
+#define SF_HOSTILE	0x400 // bit 18
 #define SF_NO_LOS	0x800
+// unknown Allow spotting  0x1000
 #define SF_NOT_INDOORS	0x2000
 #define SF_HLA  	0x4000 // probably this means a nonmagical ability
 #define SF_TRIGGER	0x8000
-#define SF_NOT_IN_COMBAT 0x10000
+#define SF_NOT_IN_COMBAT 0x10000 // bit 24 unused, but tobex repurposes it
+#define SF_TARGETS_INVISIBLE 0x10000 // tobex: can target invisible creatures
+#define SF_IGNORES_SILENCE 0x20000 // tobex: can be cast while silenced
 //this is a relocated bit (used in iwd2 as 0x4000)
 #define SF_SIMPLIFIED_DURATION 0x40
 
