@@ -210,6 +210,12 @@ namespace GemRB {
 //#define                       0x20000000 // iwd2, unkown, probably irrelevant
 //#define                       0x40000000 // iwd2, unkown, probably irrelevant
 
+// specflag values
+#define SPECF_DRIVEN          1 // automatic concentration success, no morale failure
+#define SPECF_CRITIMMUNITY    2 // immune to critical hits
+#define SPECF_PALADINOFF      4 // can't choose paladin levels on level up
+#define SPECF_MONKOFF         8 // can't choose monk levels on level up
+
 //stats
 #define IE_HITPOINTS		0
 #define IE_MAXHITPOINTS		1
@@ -379,6 +385,7 @@ namespace GemRB {
 #define IE_EXTRAPROFICIENCY9 		 123
 #define IE_MAGICDEVICE                   123
 #define IE_EXTRAPROFICIENCY10 		 124
+#define IE_SPECFLAGS                     124
 #define IE_EXTRAPROFICIENCY11 		 125
 #define IE_EXTRAPROFICIENCY12 		 126
 #define IE_EXTRAPROFICIENCY13 		 127

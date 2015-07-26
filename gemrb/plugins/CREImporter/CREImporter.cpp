@@ -1917,6 +1917,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_TRANSLUCENT]=tmpByte;
 	str->Read( &tmpByte, 1); //fade speed
 	str->Read( &tmpByte, 1); //spec. flags
+	act->BaseStats[IE_SPECFLAGS] = tmpByte;
 	str->Read( &tmpByte, 1); //invisible
 	str->ReadWord( &tmpWord); //unknown
 	str->Read( &tmpByte, 1); //unused skill points
@@ -2885,7 +2886,10 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( filling, 15);
 	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
 	stream->Write(&tmpByte, 1);
-	stream->Write( filling, 5); //fade speed, spec flags, invisible
+	stream->Write(filling, 1); //fade speed
+	tmpByte = actor->BaseStats[IE_SPECFLAGS];
+	stream->Write(&tmpByte, 1);
+	stream->Write(filling, 3); //invisible, 2 unknowns
 	tmpByte = actor->BaseStats[IE_UNUSED_SKILLPTS];
 	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 124);
