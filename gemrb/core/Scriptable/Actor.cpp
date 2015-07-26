@@ -6705,7 +6705,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		int ThreatRangeMin = wi.critrange;
 		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
 		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
-		if (criticalroll < ThreatRangeMin) {
+		if (criticalroll < ThreatRangeMin || GetStat(IE_SPECFLAGS)&SPECF_CRITIMMUNITY) {
 			// make it an ordinary hit
 			criticalroll = 1;
 		} else {
