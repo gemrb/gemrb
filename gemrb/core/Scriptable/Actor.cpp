@@ -9736,8 +9736,16 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable()
+bool Actor::Untargetable(ieResRef spellRef)
 {
+	if (spellRef[0]) {
+		Spell *spl = gamedata->GetSpell(spellRef, true);
+		if (spl && (spl->Flags&SF_TARGETS_INVISIBLE)) {
+			gamedata->FreeSpell(spl, spellRef, false);
+			return false;
+		}
+		gamedata->FreeSpell(spl, spellRef, false);
+	}
 	return (GetSafeStat(IE_STATE_ID)&state_invisible) || HasSpellState(SS_SANCTUARY);
 }
 
