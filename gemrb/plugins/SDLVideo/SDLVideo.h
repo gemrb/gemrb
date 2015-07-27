@@ -95,9 +95,6 @@ public:
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);
 
-	void MouseMovement(int x, int y);
-	void ClickMouse(unsigned int button);
-	void MouseClickEvent(SDL_EventType type, Uint8 button);
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);

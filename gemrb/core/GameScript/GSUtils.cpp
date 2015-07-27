@@ -306,8 +306,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 	return true;
 }
 
-//don't pass this point by reference, it is subject to change
-void ClickCore(Scriptable *Sender, Point point, int type, int speed)
+void ClickCore(Scriptable *Sender, const Point& point, int type, int speed)
 {
 	Map *map = Sender->GetCurrentArea();
 	if (!map) {
@@ -319,7 +318,6 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Video *video = core->GetVideoDriver();
 	GlobalTimer *timer = core->timer;
 	timer->SetMoveViewPort( point, speed, true );
 	timer->DoStep(0);
@@ -330,12 +328,10 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 		return;
 	}
 
-	video->ConvertToScreen(point);
-	GameControl *win = core->GetGameControl();
+	GameControl* gc = core->GetGameControl();
+	gc->OnMouseDown(point, type, 0);
+	gc->OnMouseUp(point, type, 0);
 
-	point = win->Frame().Origin();
-	video->MoveMouse(point.x, point.y);
-	video->ClickMouse(type);
 	Sender->ReleaseCurrentAction();
 }
 

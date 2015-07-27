@@ -241,8 +241,6 @@ public:
 	const Region& GetScreenClip() { return screenClip; }
 	/** returns the current mouse coordinates */
 	Point GetMousePos() { return CursorPos; }
-	/** clicks the mouse forcibly */
-	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
 	/** initializes the screen for movie */

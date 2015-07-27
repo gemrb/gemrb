@@ -274,7 +274,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:
-			MouseMovement(event.motion.x, event.motion.y);
+			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y));
+			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (MouseFlags & MOUSE_DISABLED)
@@ -285,16 +286,14 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_DOWN;
-			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
-			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
+
 			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), true, GetModState(SDL_GetModState()));
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			if (CursorIndex != VID_CUR_DRAG)
 				CursorIndex = VID_CUR_UP;
-			CursorPos.x = event.button.x;
-			CursorPos.y = event.button.y;
+
 			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), false, GetModState(SDL_GetModState()));
 			EvntManager->DispatchEvent(e);
 			break;
@@ -1278,41 +1277,6 @@ void SDLVideoDriver::SetFadePercent(int percent)
 	if (percent>100) percent = 100;
 	else if (percent<0) percent = 0;
 	fadeColor.a = (255 * percent ) / 100;
-}
-
-void SDLVideoDriver::MouseMovement(int x, int y)
-{
-	if (MouseFlags&MOUSE_DISABLED)
-		return;
-	CursorPos.x = x; // - mouseAdjustX[CursorIndex];
-	CursorPos.y = y; // - mouseAdjustY[CursorIndex];
-	if (EvntManager) {
-		Event e = EvntManager->CreateMouseMotionEvent(CursorPos);
-		EvntManager->DispatchEvent(e);
-	}
-}
-
-void SDLVideoDriver::ClickMouse(unsigned int button)
-{
-	MouseClickEvent(SDL_MOUSEBUTTONDOWN, (Uint8) button);
-	MouseClickEvent(SDL_MOUSEBUTTONUP, (Uint8) button);
-	if (button&GEM_MB_DOUBLECLICK) {
-		MouseClickEvent(SDL_MOUSEBUTTONDOWN, (Uint8) button);
-		MouseClickEvent(SDL_MOUSEBUTTONUP, (Uint8) button);
-	}
-}
-
-void SDLVideoDriver::MouseClickEvent(SDL_EventType type, Uint8 button)
-{
-	SDL_Event evtClick = SDL_Event();
-
-	evtClick.type = type;
-	evtClick.button.type = type;
-	evtClick.button.button = button;
-	evtClick.button.state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
-	evtClick.button.x = CursorPos.x;
-	evtClick.button.y = CursorPos.y;
-	SDL_PushEvent(&evtClick);
 }
 
 int SDLVideoDriver::PollMovieEvents()

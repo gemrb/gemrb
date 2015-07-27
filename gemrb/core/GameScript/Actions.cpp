@@ -6239,9 +6239,11 @@ void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetVideoDriver()->MoveMouse(parameters->pointParameter.x, parameters->pointParameter.y);
+	// according to IESDP this does nothing...
+	// the other cursor actions we implement affect only GameControl
+	// in GemRB you wouldnt need to move the mouse before scripting a click etc, so this is probably not needed.
 }
 
 //false means, no talk
