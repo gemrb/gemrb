@@ -165,8 +165,8 @@ public: // Public Events
 	struct PortraitDragOp : public DragOp {
 		const ieDword PC;
 
-		PortraitDragOp(Button* b, Sprite2D* c)
-		: DragOp(b, c), PC(b->ControlID + 1) {}
+		PortraitDragOp(Button* b)
+		: DragOp(b), PC(b->ControlID + 1) {}
 	};
 
 	Holder<DragOp> DragOperation();

@@ -385,7 +385,7 @@ Holder<Button::DragOp> Button::DragOperation()
 {
 	if (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 		EnableBorder(1, true);
-		return Holder<Button::DragOp>(new PortraitDragOp(this, core->Cursors[14]));
+		return Holder<Button::DragOp>(new PortraitDragOp(this));
 	}
 	return View::DragOperation();
 }

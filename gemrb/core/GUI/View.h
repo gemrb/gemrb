@@ -75,7 +75,7 @@ public:
 	struct DragOp : public Held<DragOp> {
 		View* dragView;
 
-		DragOp(View* v, Sprite2D* c);
+		DragOp(View* v);
 		virtual ~DragOp();
 	};
 

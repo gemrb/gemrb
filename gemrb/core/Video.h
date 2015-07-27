@@ -66,19 +66,6 @@ enum TileBlitFlags {
 	TILE_SEPIA = 4
 };
 
-enum CursorType {
-	VID_CUR_UP = 0,
-	VID_CUR_DOWN = 1,
-	VID_CUR_DRAG = 2
-};
-
-//disable mouse flags
-const int MOUSE_GRAYED		= 1;
-const int MOUSE_DISABLED	= 2;
-//used (primarily with touchscreens) to control graphical feedback related to the mouse
-const int MOUSE_HIDDEN		= 4; // show cursor
-const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
-
 // !!! Keep this synchronized with GUIDefines.py !!!
 // used for calculating the tooltip delay limit and the real tooltip delay
 #define TOOLTIP_DELAY_FACTOR 250
@@ -114,8 +101,6 @@ protected:
 	Region screenClip;
 	int width,height,bpp;
 	bool fullscreen;
-	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
-	CursorType CursorIndex;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
@@ -154,6 +139,7 @@ public:
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
+	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
 	int SwapBuffers();
 	VideoBuffer* CreateBuffer(const Size&, BufferFormat = DISPLAY);
@@ -259,11 +245,6 @@ public:
 	/** handles events during movie */
 	virtual int PollMovieEvents() = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
-
-	void SetMouseEnabled(int enabled);
-	bool GetFullscreenMode() const;
-	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
-	void SetCursor(Sprite2D* cur, enum CursorType curIdx);
 
 	/** Scales down a sprite by a ratio */
 	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );

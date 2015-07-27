@@ -35,11 +35,6 @@ const TypeID Video::ID = { "Video" };
 Video::Video(void)
 	: Viewport(), fadeColor()
 {
-	CursorIndex = VID_CUR_UP;
-	Cursor[VID_CUR_UP] = NULL;
-	Cursor[VID_CUR_DOWN] = NULL;
-	Cursor[VID_CUR_DRAG] = NULL;
-
 	drawingBuffer = NULL;
 	EvntManager = NULL;
 	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
@@ -203,35 +198,6 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 	dest->YPos = sprite->YPos;
 
 	return dest;
-}
-
-void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
-{
-	if (cur) {
-		//cur will be assigned in the end, increase refcount
-		cur->acquire();
-		//setting a dragged sprite cursor, it will 'stick' until cleared
-		if (curIdx == VID_CUR_DRAG)
-			CursorIndex = VID_CUR_DRAG;
-	} else {
-		//clearing the dragged sprite cursor, replace it with the normal cursor
-		if (curIdx == VID_CUR_DRAG)
-			CursorIndex = VID_CUR_UP;
-	}
-	//decrease refcount of the previous cursor
-	if (Cursor[curIdx])
-		Sprite2D::FreeSprite(Cursor[curIdx]);
-	Cursor[curIdx] = cur;
-}
-
-/** Mouse is invisible and cannot interact */
-void Video::SetMouseEnabled(int enabled)
-{
-	if (enabled) {
-		MouseFlags &= ~MOUSE_DISABLED;
-	} else {
-		MouseFlags |= MOUSE_DISABLED;
-	}
 }
 
 /** Get the fullscreen mode */

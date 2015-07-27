@@ -1452,8 +1452,9 @@ void GameControl::UpdateScrolling() {
 	}
 
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-	Video* video = core->GetVideoDriver();
-	video->SetCursor(cursor, VID_CUR_DRAG);
+	// FIXME: reimplement this
+	//Video* video = core->GetVideoDriver();
+	//video->SetCursor(cursor, VID_CUR_DRAG);
 	Sprite2D::FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
@@ -1468,7 +1469,7 @@ void GameControl::SetScrolling(bool scroll) {
 
 			// only clear the drag cursor when changing scrolling to false!
 			// clearing on every move kills drag operations such as dragging portraits
-			core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
+			//core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
 		}
 	}
 }

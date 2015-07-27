@@ -380,10 +380,6 @@ Interface::~Interface(void)
 		if (InfoTextPalette) {
 			gamedata->FreePalette(InfoTextPalette);
 		}
-
-		video->SetCursor(NULL, VID_CUR_DRAG);
-		video->SetCursor(NULL, VID_CUR_UP);
-		video->SetCursor(NULL, VID_CUR_DOWN);
 	}
 
 	delete vars;
@@ -530,7 +526,8 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_TEXTSCREEN) {
 		EventFlag&=~EF_TEXTSCREEN;
-		video->SetMouseEnabled(true);
+		// FIXME: need to reimplement this
+		//video->SetMouseEnabled(true);
 		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
 		return;
 	}
@@ -996,8 +993,6 @@ int Interface::LoadSprites()
 				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
-	video->SetCursor( Cursors[0], VID_CUR_UP );
-	video->SetCursor( Cursors[1], VID_CUR_DOWN );
 
 	// Load fog-of-war bitmaps
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
@@ -3117,7 +3112,8 @@ void Interface::SetCutSceneMode(bool active)
 		}
 		SetEventFlag(EF_CONTROL);
 	}
-	video->SetMouseEnabled(!active);
+	// FIXME: need to reimplement this
+	// video->SetMouseEnabled(!active);
 }
 
 /** returns true if in dialogue or cutscene */
@@ -3837,7 +3833,6 @@ void Interface::LoadProgress(int percent)
 void Interface::ReleaseDraggedItem()
 {
 	DraggedItem=NULL; //shouldn't free this
-	video->SetCursor (NULL, VID_CUR_DRAG);
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef Picture)
@@ -3850,18 +3845,6 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 		delete DraggedItem;
 	}
 	DraggedItem = item;
-	if (video) {
-		Sprite2D* DraggedCursor = NULL;
-		if (item) {
-			DraggedCursor = gamedata->GetBAMSprite(Picture, 0, 0);
-			if (!DraggedCursor) {
-				// use any / the smaller icon if the dragging one is unavailable
-				DraggedCursor = gamedata->GetBAMSprite(Picture, -1, 0);
-			}
-		}
-		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
-		if (DraggedCursor) DraggedCursor->release();
-	}
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)

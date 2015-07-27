@@ -69,11 +69,6 @@ SDLVideoDriver::~SDLVideoDriver(void)
 	delete subtitletext;
 
 	SDL_Quit();
-
-	// This sprite needs to have been freed earlier, because
-	// all AnimationFactories and Sprites have already been
-	// destructed before the video driver is freed.
-	assert(Cursor[VID_CUR_DRAG] == NULL);
 }
 
 int SDLVideoDriver::Init(void)
@@ -82,9 +77,6 @@ int SDLVideoDriver::Init(void)
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
 		//print("[ERROR]");
 		return GEM_ERROR;
-	}
-	if (!(MouseFlags&MOUSE_HIDDEN)) {
-		SDL_ShowCursor( SDL_DISABLE );
 	}
 	return GEM_OK;
 }
@@ -281,22 +273,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (MouseFlags & MOUSE_DISABLED)
-				break;
 			lastMouseDownTime=EvntManager->GetRKDelay();
 			if (lastMouseDownTime != (unsigned long) ~0) {
 				lastMouseDownTime += lastMouseDownTime+lastTime;
 			}
-			if (CursorIndex != VID_CUR_DRAG)
-				CursorIndex = VID_CUR_DOWN;
 
 			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), true, GetModState(SDL_GetModState()));
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
-			if (CursorIndex != VID_CUR_DRAG)
-				CursorIndex = VID_CUR_UP;
-
 			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), false, GetModState(SDL_GetModState()));
 			EvntManager->DispatchEvent(e);
 			break;
