@@ -149,7 +149,7 @@ def StartTextScreen ():
 	return
 
 def EndTextScreen ():
-	global TextScreen
+	global TextScreen, TableName
 
 	if TextScreen:
 		TextScreen.SetVisible (WINDOW_INVISIBLE)
@@ -159,6 +159,9 @@ def EndTextScreen ():
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 3)
+
+	if TableName == "25ecred":
+		GemRB.SetNextScript("QuitGame")
 	return
 
 def ReplayTextScreen ():

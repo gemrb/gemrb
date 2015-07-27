@@ -4591,13 +4591,14 @@ void GameScript::SetRestEncounterChance(Scriptable * Sender, Action* parameters)
 }
 
 //easily hardcoded end sequence
-void GameScript::EndCredits(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::EndCredits(Scriptable* Sender, Action* parameters)
 {
 	if (gamedata->Exists("25ecred", IE_2DA_CLASS_ID, true)) {
 		/* ToB */
-		Sender->AddActionInFront(GenerateAction("TextScreen(\"25ecred\")"));
+		ExecuteString(Sender, "TextScreen(\"25ecred\")");
 	} else {
 		core->PlayMovie("credits");
+		QuitGame(Sender, parameters);
 	}
 }
 

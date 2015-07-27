@@ -2198,7 +2198,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	return rE;
 }
 
-void GameScript::ExecuteString(Scriptable* Sender, char* String)
+void GameScript::ExecuteString(Scriptable* Sender, const char* String)
 {
 	if (String[0] == 0) {
 		return;

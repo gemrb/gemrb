@@ -534,7 +534,7 @@ public:
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
-	static void ExecuteString(Scriptable* Sender, char* String);
+	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 public:
