@@ -317,6 +317,8 @@ def OpenStoreShoppingWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
+	UnselectNoRedraw ()
+
 	# Buy
 	LeftButton = Button = Window.GetControl (0)
 	if Inventory:
@@ -480,6 +482,10 @@ def OpenStoreStealWindow ():
 	Button.SetText (45305)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, StealPressed)
 
+	if Window.HasControl (37):
+		Button = Window.GetControl (37)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+
 	# encumbrance
 	if GameCheck.IsPST():
 		Button = Window.GetControl (22)
@@ -609,11 +615,11 @@ def OpenStoreRumourWindow ():
 	ScrollBar = Window.GetControl (5)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreRumourWindow)
 	Count = Store['StoreDrinkCount']
-	if Count>4:
-		Count = Count-4
+	if Count>5:
+		Count = Count-5
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRumourWindow )
 	UpdateStoreRumourWindow ()

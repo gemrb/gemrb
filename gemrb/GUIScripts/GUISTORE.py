@@ -494,8 +494,9 @@ def OpenStoreStealWindow ():
 	Button.SetText (14179)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, StealPressed)
 
-	Button = Window.GetControl (37)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if Window.HasControl (37):
+		Button = Window.GetControl (37)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# encumbrance
 	if GameCheck.IsPST():
