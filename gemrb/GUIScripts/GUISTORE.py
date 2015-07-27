@@ -690,7 +690,7 @@ def UpdateStoreCommon (Window, title, name, gold):
 
 	if Store['StoreName'] != -1:
 		Label = Window.GetControl (title)
-		Label.SetText (Store['StoreName'])
+		Label.SetText (GemRB.GetString (Store['StoreName']).upper ())
 
 	if name:
 		pc = GemRB.GameGetSelectedPCSingle ()
