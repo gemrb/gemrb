@@ -793,6 +793,7 @@ def RedrawStoreShoppingWindow ():
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	RightIndex = GemRB.GetVar ("RightIndex")
+	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
 	selected_count = 0
@@ -833,7 +834,6 @@ def RedrawStoreShoppingWindow ():
 	# shade the inventory icon if it is full
 	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
 	if Window.HasControl (44):
-		
 		Button = Window.GetControl (44)
 		if free_slots == 0:
 			Button.SetState (IE_GUI_BUTTON_PRESSED)
@@ -864,40 +864,7 @@ def RedrawStoreShoppingWindow ():
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000b+i)
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-		if Slot != None:
-			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, ITEM_STORE)
-			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if Flags & SHOP_BUY:
-				if Flags & SHOP_SELECT:
-					Button.SetState (IE_GUI_BUTTON_SELECTED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-			if Flags & SHOP_ID:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-				Button.EnableBorder (0, 1)
-			else:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-				Button.EnableBorder (0, 0)
-
-			if Inventory:
-				Label.SetText (28337)
-			else:
-				Price = Item['Price'] * Store['SellMarkup'] / 100
-				if Price <= 0:
-					Price = 1
-				GemRB.SetToken ("ITEMCOST", str(Price) )
-				Label.SetText (45374)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Label.SetText ("")
+		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
 		if i+RightTopIndex<RightCount:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
@@ -906,43 +873,9 @@ def RedrawStoreShoppingWindow ():
 		Button = Window.GetControl (i+17)
 		Label = Window.GetControl (0x10000014+i)
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-		if Slot != None:
-			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i+RightTopIndex], ITEM_PC)
-			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if Inventory:
-				Price = 1
-			else:
-				Price = Item['Price'] * Store['BuyMarkup'] / 100
+		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx)
 
-			if (Price>0) and (Flags & SHOP_SELL):
-				if Flags & SHOP_SELECT:
-					Button.SetState (IE_GUI_BUTTON_SELECTED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-			if Flags & SHOP_ID:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-				Price = 1
-				Button.EnableBorder (0, 1)
-			else:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-				Button.EnableBorder (0, 0)
-
-			if Inventory:
-				Label.SetText (28337)
-			else:
-				GemRB.SetToken ("ITEMCOST", str(Price) )
-				Label.SetText (45374)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Label.SetText ("")
+	#GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 	return
 
 def UpdateStoreIdentifyWindow ():
@@ -1172,34 +1105,7 @@ def RedrawStoreStealWindow ():
 		Button = Window.GetControl (i+5)
 		Label = Window.GetControl (0x10000008+i)
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-		if Slot != None:
-			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, ITEM_STORE)
-			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if Flags & SHOP_STEAL:
-				if LeftIndex == LeftTopIndex + i:
-					Button.SetState (IE_GUI_BUTTON_SELECTED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-			if Flags & SHOP_ID:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-				Button.EnableBorder (0, 1)
-			else:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-				Button.EnableBorder (0, 0)
-
-			GemRB.SetToken ("ITEMCOST", str(Slot['Price']) )
-			Label.SetText (45374)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Label.SetText ("")
+		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx, 1)
 
 		if i+RightTopIndex<RightCount:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
@@ -1208,32 +1114,30 @@ def RedrawStoreStealWindow ():
 		Button = Window.GetControl (i+14)
 		Label = Window.GetControl (0x10000011+i)
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-		if Slot != None:
-			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i+RightTopIndex], ITEM_PC)
-			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			Price = Item['Price'] * Store['BuyMarkup'] / 100
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			if Flags & SHOP_ID:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-				Button.EnableBorder (0, 1)
-			else:
-				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-				Button.EnableBorder (0, 0)
+		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx, 1)
 
-			GemRB.SetToken ("ITEMCOST", str(Price) )
-			Label.SetText (45374)
+	selected_count = 0
+	for i in range (LeftCount):
+		Flags = GemRB.IsValidStoreItem (pc, i, ITEM_STORE)
+		if Flags & SHOP_SELECT:
+			selected_count += 1
+
+	# shade the inventory icon if it is full
+	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
+	if Window.HasControl (37):
+		Button = Window.GetControl (37)
+		if free_slots == 0:
+			Button.SetState (IE_GUI_BUTTON_PRESSED)
 		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Label.SetText ("")
-	if LeftIndex>=0:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+
+	# also disable the button if the inventory is full
+	if LeftIndex>=0 and selected_count <= free_slots:
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
+
+	#GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
@@ -1252,6 +1156,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 		if Item['MaxStackAmount']>1:
 			Button.SetText ( str(Slot['Usages0']) )
+			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		else:
 			Button.SetText ("")
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -1318,6 +1223,8 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			LabelText = GemRB.GetString(10162)
+		if GameCheck.IsPST():
+			LabelText = GemRB.GetString (45374)
 		if type == ITEM_STORE:
 			if steal:
 				LabelText = Name
@@ -1365,7 +1272,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
-		mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
+		if RepModTable:
+			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
 	return price * mod / 100
 

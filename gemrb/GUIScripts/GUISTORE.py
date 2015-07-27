@@ -1206,12 +1206,13 @@ def RedrawStoreStealWindow ():
 			selected_count += 1
 
 	# shade the inventory icon if it is full
-	Button = Window.GetControl (37)
 	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
-	if free_slots == 0:
-		Button.SetState (IE_GUI_BUTTON_PRESSED)
-	else:
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if Window.HasControl (37):
+		Button = Window.GetControl (37)
+		if free_slots == 0:
+			Button.SetState (IE_GUI_BUTTON_PRESSED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# also disable the button if the inventory is full
 	if LeftIndex>=0 and selected_count <= free_slots:
@@ -1238,6 +1239,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 		if Item['MaxStackAmount']>1:
 			Button.SetText ( str(Slot['Usages0']) )
+			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		else:
 			Button.SetText ("")
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -1304,6 +1306,8 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			LabelText = GemRB.GetString(10162)
+		if GameCheck.IsPST():
+			LabelText = GemRB.GetString (45374)
 		if type == ITEM_STORE:
 			if steal:
 				LabelText = Name
@@ -1351,7 +1355,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
-		mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
+		if RepModTable:
+			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
 	return price * mod / 100
 
