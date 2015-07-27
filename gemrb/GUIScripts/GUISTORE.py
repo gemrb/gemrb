@@ -186,6 +186,9 @@ def OpenStoreWindow ():
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
 
+	if GameCheck.IsPST():
+		MenuWindow = GemRB.LoadWindow (2)
+
 	Store = GemRB.GetStore ()
 	BarteringPC = GemRB.GameGetFirstSelectedPC ()
 
@@ -223,7 +226,9 @@ def OpenStoreWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	ActionWindow.SetVisible (WINDOW_VISIBLE)
+	ActionWindow.SetVisible (WINDOW_GRAYED)
+	if MenuWindow:
+		MenuWindow.SetVisible (WINDOW_GRAYED)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
 
@@ -299,6 +304,8 @@ def OpenStoreShoppingWindow ():
 		Button = Window.GetControl (i+5)
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		elif GameCheck.IsPST():
+			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
@@ -311,6 +318,8 @@ def OpenStoreShoppingWindow ():
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
+		elif GameCheck.IsPST():
+			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
@@ -891,7 +900,6 @@ def RedrawStoreShoppingWindow ():
 	# shade the inventory icon if it is full
 	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
 	if Window.HasControl (44):
-		free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
 		Button = Window.GetControl (44)
 		if free_slots == 0:
 			Button.SetState (IE_GUI_BUTTON_PRESSED)
@@ -975,6 +983,8 @@ def RedrawStoreIdentifyWindow ():
 		# TODO: recheck they really differ
 		if GameCheck.IsIWD2():
 			Label = Window.GetControl (0x1000000d+i)
+		elif GameCheck.IsPST():
+			Label = Window.GetControl (0x10000009+i)
 		else:
 			Label = Window.GetControl (0x1000000c+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
@@ -1094,6 +1104,9 @@ def InfoWindow (Slot, Item):
 	if GameCheck.IsBG2():
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
+	elif GameCheck.IsPST():
+		NameLabel = Window.GetControl (0x0fffffff)
+		FakeLabel = Window.GetControl (0x10000000)
 	else:
 		NameLabel = Window.GetControl (0x10000007)
 		FakeLabel = Window.GetControl (0x10000000)
@@ -1102,13 +1115,15 @@ def InfoWindow (Slot, Item):
 	FakeLabel.SetText ("")
 
 	#description bam
-	if GameCheck.IsBG1() or GameCheck.IsBG2():
+	if GameCheck.IsBG1() or GameCheck.IsBG2() or GameCheck.IsPST():
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
 	Button = Window.GetControl (2)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
 	TextArea = Window.GetControl (5)
@@ -1239,7 +1254,6 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 		if Item['MaxStackAmount']>1:
 			Button.SetText ( str(Slot['Usages0']) )
-			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		else:
 			Button.SetText ("")
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
