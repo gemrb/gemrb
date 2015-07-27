@@ -372,11 +372,17 @@ def OpenStoreShoppingWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# encumbrance
-	r = Button.GetRect ()
-	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
-		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
-		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+	if GameCheck.IsPST():
+		Button = Window.GetControl (25)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetFont ('NUMBER')
+	else:
+		r = Button.GetRect ()
+		Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
+			"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
+			"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
@@ -492,11 +498,17 @@ def OpenStoreStealWindow ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# encumbrance
-	r = Button.GetRect ()
-	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
-		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
-		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+	if GameCheck.IsPST():
+		Button = Window.GetControl (22)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetFont ('NUMBER')
+	else:
+		r = Button.GetRect ()
+		Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],15,
+			"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-15,r["Width"],15,
+			"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
@@ -940,7 +952,10 @@ def RedrawStoreShoppingWindow ():
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx)
 
-	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
+	if GameCheck.IsPST():
+		GUICommon.SetEncumbranceLabels (Window, 25, None, pc, True)
+	else:
+		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
 def UpdateStoreIdentifyWindow ():
@@ -1235,7 +1250,10 @@ def RedrawStoreStealWindow ():
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
+	if GameCheck.IsPST():
+		GUICommon.SetEncumbranceLabels (Window, 22, None, pc, True)
+	else:
+		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
