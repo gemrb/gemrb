@@ -1148,6 +1148,7 @@ def StealPressed ():
 	#if skill>random(100)+difficulty - success
 	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
+		GemRB.PlaySound(DEF_STOLEN)
 		UpdateStoreStealWindow ()
 	else:
 		GemRB.StealFailed ()
@@ -1425,12 +1426,12 @@ def DonateGold ():
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
 	if GemRB.IncreaseReputation (donation):
 		TextArea.Append (26914)
-		GemRB.PlaySound ("act_03")
+		GemRB.PlaySound (DEF_DONATE1)
 		UpdateStoreDonateWindow ()
 		return
 
 	TextArea.Append (26914)
-	GemRB.PlaySound ("act_03e")
+	GemRB.PlaySound (DEF_DONATE2)
 	UpdateStoreDonateWindow ()
 	return
 
@@ -1606,7 +1607,7 @@ def GulpDrink ():
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
 	text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
 	TextArea.Append (text)
-	GemRB.PlaySound ("gam_07")
+	GemRB.PlaySound (DEF_DRUNK)
 	UpdateStoreRumourWindow ()
 	return
 
