@@ -725,7 +725,6 @@ def UpdateStoreShoppingWindow ():
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots) - ItemButtonCount
 	if RightCount<0:
