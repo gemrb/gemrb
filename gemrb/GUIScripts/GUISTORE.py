@@ -93,7 +93,7 @@ if GameCheck.IsIWD1():
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORSTOR","STORSTOR")
 elif GameCheck.IsPST():
 	#             Buy/Sell Identify   Steal      Aid        Donate    Drink     Rent
-	store_bams = ("SSBBS", "SSBIDNT", "SSBSTEL", "SSBHEAL", "SSBDON", "SSBRMR", "SSBRENT")
+	storebams = ("SSBBS", "SSBIDNT", "SSBSTEL", "SSBHEAL", "SSBDON", "SSBRMR", "SSBRENT")
 	storetips =  (44970,   44971,     44972,     67294,     45121,    45119,    45120)
 	roomdesc = (66865, 66866, 66867, 66868)
 	roomnames = (45308, 45310, 45313, 45316)
@@ -214,7 +214,7 @@ def OpenStoreWindow ():
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
 			elif GameCheck.IsPST():
-				Button.SetSprites (store_bams[Action], 0, 0,1,2,0)
+				Button.SetSprites (storebams[Action], 0, 0,1,2,0)
 			else:
 				Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
 			Button.SetTooltip (storetips[Action])
