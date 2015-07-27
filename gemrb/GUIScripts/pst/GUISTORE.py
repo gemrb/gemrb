@@ -84,7 +84,7 @@ BarteringPC = 0
 # 6 - rent
 
 storetips = (14288,14292,14291,12138,15013,14289,14287)
-roomtypes = (17389,17517,17521,17519)
+roomdesc = (17389,17517,17521,17519)
 roomnames = (14294, 14295, 14296, 14297)
 store_funcs = None
 StoreButtonCount = 4
@@ -95,7 +95,7 @@ elif GameCheck.IsPST():
 	#             Buy/Sell Identify   Steal      Aid        Donate    Drink     Rent
 	store_bams = ("SSBBS", "SSBIDNT", "SSBSTEL", "SSBHEAL", "SSBDON", "SSBRMR", "SSBRENT")
 	storetips =  (44970,   44971,     44972,     67294,     45121,    45119,    45120)
-	roomtypes = (66865, 66866, 66867, 66868)
+	roomdesc = (66865, 66866, 66867, 66868)
 	roomnames = (45308, 45310, 45313, 45316)
 	StoreButtonCount = 7
 else:
@@ -1618,7 +1618,7 @@ def UpdateStoreRentWindow ():
 	Label = Window.GetControl (0x1000000c)
 	if RentIndex>=0:
 		TextArea = Window.GetControl (9)
-		TextArea.SetText (roomtypes[RentIndex] )
+		TextArea.SetText (roomdesc[RentIndex])
 		price = Store['StoreRoomPrices'][RentIndex]
 		Label.SetText (str(price) )
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
