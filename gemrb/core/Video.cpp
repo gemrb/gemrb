@@ -234,11 +234,6 @@ void Video::SetMouseEnabled(int enabled)
 	}
 }
 
-bool Video::TouchInputEnabled() const
-{
-	return MouseFlags & (MOUSE_GRAYED|MOUSE_DISABLED);
-}
-
 /** Get the fullscreen mode */
 bool Video::GetFullscreenMode() const
 {

@@ -4143,7 +4143,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::IsTouchGUI(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
-	return core->GetVideoDriver()->TouchInputEnabled();
+	return EventMgr::TouchInputEnabled;
 }
 
 // always evaluates to true on Windows/OS X/Linux (there's no DLC); on other platforms it depends

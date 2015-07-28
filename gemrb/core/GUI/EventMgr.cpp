@@ -26,8 +26,9 @@
 
 namespace GemRB {
 
-unsigned long EventMgr::DCDelay;
-unsigned long EventMgr::RCDelay;
+unsigned long EventMgr::DCDelay = 250;
+unsigned long EventMgr::RCDelay = 250;
+bool EventMgr::TouchInputEnabled = true;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
 

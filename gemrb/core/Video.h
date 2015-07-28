@@ -261,7 +261,6 @@ public:
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	void SetMouseEnabled(int enabled);
-	bool TouchInputEnabled() const;
 	bool GetFullscreenMode() const;
 	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
 	void SetCursor(Sprite2D* cur, enum CursorType curIdx);

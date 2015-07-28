@@ -156,6 +156,7 @@ public:
 
 	static unsigned long DCDelay;
 	static unsigned long RCDelay;
+	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
 	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
