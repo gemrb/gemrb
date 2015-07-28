@@ -64,6 +64,7 @@ class GWindow:
     'SetPos': _GemRB.Window_SetPos,
     'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,
+    'ReassignControls': _GemRB.Window_ReassignControls,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
     'SetVisible': _GemRB.Window_SetVisible,

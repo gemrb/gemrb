@@ -170,6 +170,8 @@ public: //Events
 	/** Assigned function key */
 	void SetFunctionNumber(int x) { FunctionNumber = x; }
 	int GetFunctionNumber() { return FunctionNumber; }
+
+	void SetControlID(int x) { ControlID = x; }
 };
 
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {

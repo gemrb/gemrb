@@ -577,6 +577,68 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Window_ReassignControls__doc,
+"ReassignControls(windowIndex, origIDtuple, newIDtuple)\n\n"
+"Mass-reassigns control IDs for each element in both parameters.\n"
+"The two tuples need to be of same length.\n" );
+
+static PyObject* GemRB_Window_ReassignControls(PyObject * /*self*/, PyObject* args)
+{
+	PyObject *origIDtuple = NULL;
+	PyObject *newIDtuple = NULL;
+	int win = 0;
+
+	if (!PyArg_ParseTuple(args, "iOO", &win, &origIDtuple, &newIDtuple)) {
+		Log(ERROR, "GUIScript", "ReassignControls: param parsing");
+		return AttributeError(GemRB_Window_ReassignControls__doc);
+	}
+	if (!PyObject_TypeCheck(origIDtuple, &PyTuple_Type)) {
+		Log(ERROR, "GUIScript", "ReassignControls: first tuple type");
+		return AttributeError(GemRB_Window_ReassignControls__doc);
+	}
+	if (!PyObject_TypeCheck(newIDtuple, &PyTuple_Type)) {
+		Log(ERROR, "GUIScript", "ReassignControls: second tuple type");
+		return AttributeError(GemRB_Window_ReassignControls__doc);
+	}
+	int length = PyTuple_Size(origIDtuple);
+	if (length != PyTuple_Size(newIDtuple)) {
+		Log(ERROR, "GUIScript", "ReassignControls: tuple size mismatch");
+		return AttributeError(GemRB_Window_ReassignControls__doc);
+	}
+
+	for (int i=0;i < length; i++) {
+		PyObject *poid = PyTuple_GetItem(origIDtuple, i);
+		PyObject *pnid = PyTuple_GetItem(newIDtuple, i);
+
+		if (!PyObject_TypeCheck(poid, &PyInt_Type)) {
+			Log(ERROR, "GUIScript", "ReassignControls: tuple1 member %d not int", i);
+			return AttributeError(GemRB_Window_ReassignControls__doc);
+		}
+		if (!PyObject_TypeCheck(pnid, &PyInt_Type)) {
+			Log(ERROR, "GUIScript", "ReassignControls: tuple2 member %d not int", i);
+			return AttributeError(GemRB_Window_ReassignControls__doc);
+		}
+		int oid = PyInt_AsLong(poid);
+		int nid = PyInt_AsLong(pnid);
+
+		// child control
+		int ctrlindex = GetControlIndex(win, oid);
+		if (ctrlindex == -1) {
+			Log(ERROR, "GUIScript", "ReassignControls: Control (ID: %d) was not found!", oid);
+			return RuntimeError("Control was not found!");
+		}
+		Control *ctrl = GetControl(win, ctrlindex, -1);
+		if (!ctrl) {
+			Log(ERROR, "GUIScript", "ReassignControls: Control (ID: %d) was not found!", oid);
+			return RuntimeError("Control was not found!");
+		}
+
+		// finally it's time for reassignment
+		ctrl->SetControlID(nid);
+	}
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
 "LoadWindowPack(CHUIResRef, [Width=0, Height=0])\n\n"
 "Loads a WindowPack into the Window Manager Module. "
@@ -10797,6 +10859,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_GetRect, METH_VARARGS),
 	METHOD(Window_HasControl, METH_VARARGS),
 	METHOD(Window_Invalidate, METH_VARARGS),
+	METHOD(Window_ReassignControls, METH_VARARGS),
 	METHOD(Window_SetFrame, METH_VARARGS),
 	METHOD(Window_SetPicture, METH_VARARGS),
 	METHOD(Window_SetPos, METH_VARARGS),
