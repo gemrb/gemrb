@@ -27,7 +27,7 @@
 namespace GemRB {
 
 unsigned long EventMgr::DCDelay = 250;
-unsigned long EventMgr::RCDelay = 250;
+unsigned long EventMgr::RKDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
@@ -35,8 +35,6 @@ std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventM
 EventMgr::EventMgr(void)
 {
 	dc_time = 0;
-	dc_delay = 250;
-	rk_delay = 250;
 	rk_flags = GEM_RK_DISABLE;
 }
 
@@ -51,9 +49,9 @@ EventMgr::~EventMgr()
 unsigned long EventMgr::GetRKDelay()
 {
 	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;
-	if (rk_flags&GEM_RK_DOUBLESPEED) return rk_delay/2;
-	if (rk_flags&GEM_RK_QUADRUPLESPEED) return rk_delay/4;
-	return rk_delay;
+	if (rk_flags&GEM_RK_DOUBLESPEED) return RKDelay/2;
+	if (rk_flags&GEM_RK_QUADRUPLESPEED) return RKDelay/4;
+	return RKDelay;
 }
 
 unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)

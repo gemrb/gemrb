@@ -155,7 +155,7 @@ public:
 	typedef Callback<const Event&, bool> EventCallback;
 
 	static unsigned long DCDelay;
-	static unsigned long RCDelay;
+	static unsigned long RKDelay;
 	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
@@ -175,8 +175,8 @@ private:
 	// map combination of keyboard key and modifier keys to a callback
 	static std::map<int, EventCallback*> HotKeys;
 
-	unsigned long dc_time, dc_delay;
-	unsigned long rk_delay, rk_flags;
+	unsigned long dc_time;
+	unsigned long rk_flags;
 
 public:
 	EventMgr(void);

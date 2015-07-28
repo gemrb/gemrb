@@ -81,6 +81,7 @@ public:
 	}
 	T& operator*() const { return *ptr; }
 	T* operator->() const { return ptr; }
+
 	bool operator!() const { return !ptr; }
 #include "operatorbool.h"
 
@@ -91,6 +92,7 @@ public:
 			ptr->release();
 		ptr = NULL;
 	}
+
 protected:
 	T *ptr;
 };

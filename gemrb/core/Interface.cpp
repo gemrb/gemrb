@@ -1202,7 +1202,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
-	CONFIG_INT("RepeatKeyDelay", EventMgr::RCDelay = );
+	CONFIG_INT("RepeatKeyDelay", EventMgr::RKDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
 	CONFIG_INT("TooltipDelay", TooltipDelay = );
