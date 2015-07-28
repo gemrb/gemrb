@@ -592,7 +592,7 @@ def OpenStoreHealWindow ():
 		Count = Count-4
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreHealWindow )
 	UpdateStoreHealWindow ()
