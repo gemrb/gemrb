@@ -1062,6 +1062,7 @@ def IdentifyPressed ():
 	# enough gold?
 	EndGold = GemRB.GameGetPartyGold () - Store['IDPrice'] * len(toID)
 	if EndGold < 0:
+		ErrorWindow (strrefs["idtoocostly"])
 		return
 
 	# identify
