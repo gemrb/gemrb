@@ -263,6 +263,20 @@ def OpenStoreShoppingWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 
 	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		# the trick is not to break any circular logic (extra 110 below)
+		oldIDs = (0, 1, 07, 10, 8, 9, 11, 16, 110)
+		oldIDs += (0x10000003, 0x10000004, 0x10000001, 0x10000005, 0x10000002)
+		oldIDs += tuple(map(lambda x: x+17, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x10000014, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x1000000b, range(ItemButtonCount)))
+		newIDs = (2, 3, 110, 07, 5, 6,  8, 12, 11)
+		newIDs += (0x1000002b, 0x1000002c, 0x10000003, 0x1000002e, 0x1000002a)
+		newIDs += tuple(map(lambda x: x+13, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x1000001e, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x10000012, range(ItemButtonCount)))
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControl (11)

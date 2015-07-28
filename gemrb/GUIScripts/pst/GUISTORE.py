@@ -263,13 +263,27 @@ def OpenStoreShoppingWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 
 	StoreShoppingWindow = Window = GemRB.LoadWindow (4)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		# the trick is not to break any circular logic (extra 110 below)
+		oldIDs = (0, 1, 07, 10, 8, 9, 11, 16, 110)
+		oldIDs += (0x10000003, 0x10000004, 0x10000001, 0x10000005, 0x10000002)
+		oldIDs += tuple(map(lambda x: x+17, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x10000014, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x1000000b, range(ItemButtonCount)))
+		newIDs = (2, 3, 110, 07, 5, 6,  8, 12, 11)
+		newIDs += (0x1000002b, 0x1000002c, 0x10000003, 0x1000002e, 0x1000002a)
+		newIDs += tuple(map(lambda x: x+13, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x1000001e, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x10000012, range(ItemButtonCount)))
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# left scrollbar
-	ScrollBarLeft = Window.GetControl (7)
+	ScrollBarLeft = Window.GetControl (11)
 	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
 	# right scrollbar
-	ScrollBarRight = Window.GetControl (16)
+	ScrollBarRight = Window.GetControl (12)
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
 	if Inventory:
@@ -295,15 +309,15 @@ def OpenStoreShoppingWindow ():
 		Label.SetText ("")
 	else:
 		# buy price ...
-		Label = Window.GetControl (0x10000003)
+		Label = Window.GetControl (0x1000002b)
 		Label.SetText ("0")
 
 		# sell price ...
-		Label = Window.GetControl (0x10000004)
+		Label = Window.GetControl (0x1000002c)
 		Label.SetText ("0")
 
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+8)
+		Button = Window.GetControl (i+5)
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		elif GameCheck.IsPST():
@@ -316,7 +330,7 @@ def OpenStoreShoppingWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarLeft)
 
-		Button = Window.GetControl (i+17)
+		Button = Window.GetControl (i+13)
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
@@ -334,7 +348,7 @@ def OpenStoreShoppingWindow ():
 	UnselectNoRedraw ()
 
 	# Buy
-	LeftButton = Button = Window.GetControl (0)
+	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26287)
@@ -348,7 +362,7 @@ def OpenStoreShoppingWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyPressed)
 
 	# Sell
-	RightButton = Button = Window.GetControl (1)
+	RightButton = Button = Window.GetControl (3)
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26288)
@@ -866,7 +880,7 @@ def RedrawStoreShoppingWindow ():
 
 	Window = StoreShoppingWindow
 
-	UpdateStoreCommon (Window, 0x10000001, 0x10000005, 0x10000002)
+	UpdateStoreCommon (Window, 0x10000003, 0x1000002e, 0x1000002a)
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
@@ -905,7 +919,7 @@ def RedrawStoreShoppingWindow ():
 				Price = 1
 			SellSum = SellSum + Price
 
-	Label = Window.GetControl (0x10000003)
+	Label = Window.GetControl (0x1000002b)
 	if Inventory:
 		Label.SetText ("")
 	else:
@@ -926,7 +940,7 @@ def RedrawStoreShoppingWindow ():
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	Label = Window.GetControl (0x10000004)
+	Label = Window.GetControl (0x1000002c)
 	if Inventory:
 		Label.SetText ("")
 	else:
@@ -941,8 +955,8 @@ def RedrawStoreShoppingWindow ():
 			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		else:
 			Slot = None
-		Button = Window.GetControl (i+8)
-		Label = Window.GetControl (0x1000000b+i)
+		Button = Window.GetControl (i+5)
+		Label = Window.GetControl (0x10000012+i)
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
@@ -950,8 +964,8 @@ def RedrawStoreShoppingWindow ():
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
 			Slot = None
-		Button = Window.GetControl (i+17)
-		Label = Window.GetControl (0x10000014+i)
+		Button = Window.GetControl (i+13)
+		Label = Window.GetControl (0x1000001e+i)
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx)
 
