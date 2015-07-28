@@ -182,9 +182,6 @@ def OpenStoreWindow ():
 	else:
 		GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
@@ -234,7 +231,22 @@ def OpenStoreWindow ():
 		MenuWindow.SetVisible (WINDOW_GRAYED)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
+	# Portrait window must be loaded after store, because UpdatePortraitWindow
+	# checks GUISTORE.StoreHealWindow
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	if GameCheck.IsIWD2() or GameCheck.IsBG1():
+		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
+		pass
+	else:
+		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+
+	if not GameCheck.IsIWD2():
+		if GameCheck.IsBG1():
+			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		else:
+			PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenStoreShoppingWindow ():
