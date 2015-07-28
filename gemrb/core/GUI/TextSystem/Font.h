@@ -35,7 +35,7 @@
 #include "globals.h"
 #include "exports.h"
 
-#include "Sprite2D.h"
+#include "SpriteSheet.h"
 
 #include <deque>
 #include <map>

@@ -29,13 +29,13 @@
 #define SCROLLBAR_H
 
 #include "GUI/Control.h"
-#include "GUI/TextArea.h"
 
 #include "exports.h"
 
-#include "Sprite2D.h"
-
 namespace GemRB {
+
+class Sprite2D;
+class TextArea;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000

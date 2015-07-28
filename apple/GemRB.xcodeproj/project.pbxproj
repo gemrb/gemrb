@@ -429,6 +429,7 @@
 		A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
 		A2D672E21B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
 		A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672E01B30F40C00264D16 /* WindowManager.h */; };
+		A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D72B181B671329009F4D33 /* SpriteSheet.h */; };
 		A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
@@ -1747,6 +1748,7 @@
 		A2D672DC1B30F24400264D16 /* GUIFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIFactory.h; sourceTree = "<group>"; };
 		A2D672DF1B30F40C00264D16 /* WindowManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WindowManager.cpp; sourceTree = "<group>"; };
 		A2D672E01B30F40C00264D16 /* WindowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowManager.h; sourceTree = "<group>"; };
+		A2D72B181B671329009F4D33 /* SpriteSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteSheet.h; sourceTree = "<group>"; };
 		A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = SpriteRenderer.inl; sourceTree = "<group>"; };
 		A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = TileRenderer.inl; sourceTree = "<group>"; };
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
@@ -3142,6 +3144,7 @@
 				A2BFA04C1395FF62006ADC12 /* Sprite2D.h */,
 				A2BFA04D1395FF62006ADC12 /* SpriteCover.cpp */,
 				A2BFA04E1395FF62006ADC12 /* SpriteCover.h */,
+				A2D72B181B671329009F4D33 /* SpriteSheet.h */,
 				A2BFA04F1395FF62006ADC12 /* Store.cpp */,
 				A2BFA0501395FF62006ADC12 /* Store.h */,
 				A2BFA0511395FF62006ADC12 /* StoreMgr.cpp */,
@@ -3427,6 +3430,7 @@
 				A2E66374139E883100310FC8 /* DialogHandler.h in Headers */,
 				A2E66376139E883100310FC8 /* DialogMgr.h in Headers */,
 				A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */,
+				A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */,
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,

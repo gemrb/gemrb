@@ -18,13 +18,15 @@
  *
  */
 
-#include "GUI/ScrollBar.h"
+#include "ScrollBar.h"
 
 #include "win32def.h"
 
 #include "Interface.h"
 #include "Variables.h"
+#include "Sprite2D.h"
 #include "GUI/EventMgr.h"
+#include "GUI/TextArea.h"
 #include "GUI/Window.h"
 
 namespace GemRB {

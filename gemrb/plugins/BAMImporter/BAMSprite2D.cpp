@@ -21,6 +21,7 @@
 #include "BAMSprite2D.h"
 
 #include "AnimationFactory.h"
+#include "Video.h"
 
 namespace GemRB {
 

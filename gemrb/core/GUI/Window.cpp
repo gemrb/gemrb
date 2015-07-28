@@ -20,6 +20,7 @@
 
 #include "Window.h"
 
+#include "Interface.h"
 #include "ScrollBar.h"
 
 namespace GemRB {

@@ -22,6 +22,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/ScrollBar.h"
 #include "Interface.h"
+#include "Sprite2D.h"
 #include "Video.h"
 
 namespace GemRB {
