@@ -701,6 +701,11 @@ def OpenStoreRentWindow ():
 	CloseWindows()
 
 	StoreRentWindow = Window = GemRB.LoadWindow (8)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (8, 9, 0x1000000a, 0x1000000b, 0x1000000c)
+		newIDs = (11, 12, 0x10000008, 0x10000009, 0x1000000d)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# room types
 	RentIndex = -1
@@ -735,7 +740,7 @@ def OpenStoreRentWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# Rent
-	Button = Window.GetControl (8)
+	Button = Window.GetControl (11)
 	Button.SetText (strrefs["rent"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
 
@@ -1696,12 +1701,12 @@ def GulpDrink ():
 
 def UpdateStoreRentWindow ():
 	Window = StoreRentWindow
-	UpdateStoreCommon (Window, 0x1000000a, 0, 0x1000000b)
+	UpdateStoreCommon (Window, 0x10000008, 0, 0x10000009)
 	RentIndex = GemRB.GetVar ("RentIndex")
-	Button = Window.GetControl (8)
-	Label = Window.GetControl (0x1000000c)
+	Button = Window.GetControl (11)
+	Label = Window.GetControl (0x1000000d)
 	if RentIndex>=0:
-		TextArea = Window.GetControl (9)
+		TextArea = Window.GetControl (12)
 		TextArea.SetText (roomdesc[RentIndex])
 		price = Store['StoreRoomPrices'][RentIndex]
 		Label.SetText (str(price) )
@@ -1724,7 +1729,7 @@ def RentConfirm ():
 	if cutscene:
 		CloseStoreWindow ()
 	else:
-		TextArea = Window.GetControl (9)
+		TextArea = Window.GetControl (12)
 		#is there any way to change this???
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
 		TextArea.SetText (strrefs["restedfor"])

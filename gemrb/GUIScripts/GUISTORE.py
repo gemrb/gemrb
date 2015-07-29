@@ -701,6 +701,11 @@ def OpenStoreRentWindow ():
 	CloseWindows()
 
 	StoreRentWindow = Window = GemRB.LoadWindow (7)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (8, 9, 0x1000000a, 0x1000000b, 0x1000000c)
+		newIDs = (11, 12, 0x10000008, 0x10000009, 0x1000000d)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# room types
 	RentIndex = -1
