@@ -656,6 +656,11 @@ def OpenStoreRumourWindow ():
 	CloseWindows()
 
 	StoreRumourWindow = Window = GemRB.LoadWindow (8)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (0x1000000a, 0x1000000b)
+		newIDs = (0x10000011, 0x10000012)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	#removing those pesky labels
 	if not GameCheck.IsIWD2():

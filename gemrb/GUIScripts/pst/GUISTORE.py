@@ -656,6 +656,11 @@ def OpenStoreRumourWindow ():
 	CloseWindows()
 
 	StoreRumourWindow = Window = GemRB.LoadWindow (9)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (0x1000000a, 0x1000000b)
+		newIDs = (0x10000011, 0x10000012)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	#removing those pesky labels
 	if not GameCheck.IsIWD2():
@@ -1632,7 +1637,7 @@ def BuyHeal ():
 def UpdateStoreRumourWindow ():
 	Window = StoreRumourWindow
 
-	UpdateStoreCommon (Window, 0x1000000a, 0, 0x1000000b)
+	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	DrinkButtonCount = ItemButtonCount + 1
 	offset = 0
