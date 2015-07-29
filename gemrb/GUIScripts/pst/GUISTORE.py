@@ -86,6 +86,7 @@ BarteringPC = 0
 storetips = (14288,14292,14291,12138,15013,14289,14287)
 roomdesc = (17389,17517,17521,17519)
 roomnames = (14294, 14295, 14296, 14297)
+windowIDs = { 'shop' : 2, 'ident' : 4, 'steal' : 6, 'donate' : 9, 'heal' : 5, 'rumour' : 8, 'rent' : 7, 'iteminfo' : 12,  'cureinfo' : 14, 'rentconfirm' : 11, 'error' : 10 }
 strrefs = { 'done' : 11973, 'cancel' : 13727, 'buy' : 13703, 'sell' : 13704, 'identify' : 14133, 'steal' : 14179, 'donate' : 15101, 'heal' : 8786, 'rumors' : 14144, 'rent' : 14293, 'itemnamecost' : 10162, 'restedfor' : 16476, 'rest' : 17199, 'confirmrest' : 15358, 'itemstoocostly' : 11047, 'spelltoocostly' : 11048, 'drinktoocostly' : 11049, 'toodrunk' : 10832, 'idtoocostly' : 11050, 'roomtoocostly' : 11051, 'donorgood' : 10468, 'donorfail' : 10468 }
 store_funcs = None
 StoreButtonCount = 4
@@ -98,6 +99,7 @@ elif GameCheck.IsPST():
 	storetips =  (44970,   44971,     44972,     67294,     45121,    45119,    45120)
 	roomdesc = (66865, 66866, 66867, 66868)
 	roomnames = (45308, 45310, 45313, 45316)
+	windowIDs = { 'shop' : 4, 'ident' : 5, 'steal' : 7, 'donate' : 10, 'heal' : 6, 'rumour' : 9, 'rent' : 8, 'iteminfo' : 13,  'cureinfo' : 13, 'rentconfirm' : 12, 'error' : 11 }
 	strrefs = { 'done' : 1403, 'cancel' : 4196, 'identify' : 44971, 'buy' : 45303, 'sell' : 45304, 'steal' : 45305, 'rent' : 45306, 'donate' : 45307, 'heal' : 8836, 'rumors' : 0, 'itemnamecost' : 45374, 'restedfor' : 19262, 'rest' : 4242, 'confirmrest' : 4241, 'itemstoocostly' : 50081, 'spelltoocostly' : 50082, 'drinktoocostly' : 50083, 'toodrunk' : 0, 'idtoocostly' : 50084, 'roomtoocostly' : 50085, 'donorgood' : 26914, 'donorfail' : 26914}
 	StoreButtonCount = 7
 else:
@@ -262,7 +264,7 @@ def OpenStoreShoppingWindow ():
 	GemRB.SetVar ("RightTopIndex", 0)
 	GemRB.SetVar ("LeftTopIndex", 0)
 
-	StoreShoppingWindow = Window = GemRB.LoadWindow (4)
+	StoreShoppingWindow = Window = GemRB.LoadWindow (windowIDs["shop"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		# the trick is not to break any circular logic (extra 110 below)
@@ -413,7 +415,7 @@ def OpenStoreIdentifyWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreIdentifyWindow = Window = GemRB.LoadWindow (5)
+	StoreIdentifyWindow = Window = GemRB.LoadWindow (windowIDs["ident"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs = tuple(map(lambda x: 9-x, range(ItemButtonCount)))
@@ -475,7 +477,7 @@ def OpenStoreStealWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 	CloseWindows()
 
-	StoreStealWindow = Window = GemRB.LoadWindow (7)
+	StoreStealWindow = Window = GemRB.LoadWindow (windowIDs["steal"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs = (0, 4, 13)
@@ -559,7 +561,7 @@ def OpenStoreDonateWindow ():
 
 	CloseWindows ()
 
-	StoreDonateWindow = Window = GemRB.LoadWindow (10)
+	StoreDonateWindow = Window = GemRB.LoadWindow (windowIDs["donate"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs += (5, 3, 2, 4, 0x10000005, 0x10000006)
@@ -603,7 +605,7 @@ def OpenStoreHealWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreHealWindow = Window = GemRB.LoadWindow (6)
+	StoreHealWindow = Window = GemRB.LoadWindow (windowIDs["heal"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs = tuple(map(lambda x: x+5, range(ItemButtonCount)))
@@ -655,7 +657,7 @@ def OpenStoreRumourWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreRumourWindow = Window = GemRB.LoadWindow (9)
+	StoreRumourWindow = Window = GemRB.LoadWindow (windowIDs["rumour"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs = (0x1000000a, 0x1000000b)
@@ -700,7 +702,7 @@ def OpenStoreRentWindow ():
 
 	CloseWindows()
 
-	StoreRentWindow = Window = GemRB.LoadWindow (8)
+	StoreRentWindow = Window = GemRB.LoadWindow (windowIDs["rent"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		oldIDs = (8, 9, 0x1000000a, 0x1000000b, 0x1000000c)
@@ -1176,7 +1178,7 @@ def InfoWindow (Slot, Item):
 
 	Identify = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
 
-	MessageWindow = Window = GemRB.LoadWindow (13)
+	MessageWindow = Window = GemRB.LoadWindow (windowIDs["iteminfo"])
 
 	# TODO: check non-bg2 games to see which label is which
 	if GameCheck.IsBG2():
@@ -1587,7 +1589,7 @@ def InfoHealWindow ():
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
-	MessageWindow = Window = GemRB.LoadWindow (13)
+	MessageWindow = Window = GemRB.LoadWindow (windowIDs["cureinfo"])
 
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (Spell['SpellName'])
@@ -1757,7 +1759,7 @@ def RentRoom ():
 		ErrorWindow (strrefs['roomtoocostly'])
 		return
 
-	RentConfirmWindow = Window = GemRB.LoadWindow (12)
+	RentConfirmWindow = Window = GemRB.LoadWindow (windowIDs["rentconfirm"])
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["rest"])
@@ -1780,7 +1782,7 @@ def RentRoom ():
 def ErrorWindow (strref):
 	global MessageWindow
 
-	MessageWindow = Window = GemRB.LoadWindow (11)
+	MessageWindow = Window = GemRB.LoadWindow (windowIDs["error"])
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)
