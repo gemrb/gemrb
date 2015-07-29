@@ -604,6 +604,15 @@ def OpenStoreHealWindow ():
 	CloseWindows()
 
 	StoreHealWindow = Window = GemRB.LoadWindow (5)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = tuple(map(lambda x: x+5, range(ItemButtonCount)))
+		oldIDs += (4, 3, 13)
+		oldIDs += (0x10000001, 0x10000000, 0x0fffffff)
+		newIDs = tuple(map(lambda x: x+8, range(ItemButtonCount)))
+		newIDs += (7, 5, 23)
+		newIDs += (0x10000003, 0x10000001, 0x10000000)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)

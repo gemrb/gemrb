@@ -604,13 +604,22 @@ def OpenStoreHealWindow ():
 	CloseWindows()
 
 	StoreHealWindow = Window = GemRB.LoadWindow (6)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = tuple(map(lambda x: x+5, range(ItemButtonCount)))
+		oldIDs += (4, 3, 13)
+		oldIDs += (0x10000001, 0x10000000, 0x0fffffff)
+		newIDs = tuple(map(lambda x: x+8, range(ItemButtonCount)))
+		newIDs += (7, 5, 23)
+		newIDs += (0x10000003, 0x10000001, 0x10000000)
+		Window.ReassignControls (oldIDs, newIDs)
 
-	ScrollBar = Window.GetControl (4)
+	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)
 
 	#spell buttons
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+5)
+		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
@@ -619,11 +628,11 @@ def OpenStoreHealWindow ():
 	UnselectNoRedraw ()
 
 	# price tag
-	Label = Window.GetControl (0x10000001)
+	Label = Window.GetControl (0x10000003)
 	Label.SetText ("0")
 
 	# Heal
-	Button = Window.GetControl (3)
+	Button = Window.GetControl (5)
 	Button.SetText (strrefs["heal"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1506,7 +1515,7 @@ def DonateGold ():
 def UpdateStoreHealWindow ():
 	Window = StoreHealWindow
 
-	UpdateStoreCommon (Window, 0x0fffffff, 0x1000000e, 0x10000000)
+	UpdateStoreCommon (Window, 0x10000000, 0, 0x10000001)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1518,7 +1527,7 @@ def UpdateStoreHealWindow ():
 	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
 
-		Button = Window.GetControl (i+5)
+		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (labelOffset+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Cure:
@@ -1549,12 +1558,13 @@ def UpdateStoreHealWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
 			Label.SetText ("")
+
 		if TopIndex+i==Index:
-			TextArea = Window.GetControl (13)
+			TextArea = Window.GetControl (23)
 			TextArea.SetText (Cure['Description'])
-			Label = Window.GetControl (0x10000001)
+			Label = Window.GetControl (0x10000003)
 			Label.SetText (str(Cure['Price']) )
-			Button = Window.GetControl (3)
+			Button = Window.GetControl (5)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
