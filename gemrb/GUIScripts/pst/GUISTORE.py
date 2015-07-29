@@ -560,6 +560,11 @@ def OpenStoreDonateWindow ():
 	CloseWindows ()
 
 	StoreDonateWindow = Window = GemRB.LoadWindow (10)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs += (5, 3, 2, 4, 0x10000005, 0x10000006)
+		newIDs += (7, 5, 3, 6, 0x10000007, 0x10000008)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# graphics
 	if Window.HasControl (10):
@@ -568,22 +573,22 @@ def OpenStoreDonateWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Donate
-	Button = Window.GetControl (2)
+	Button = Window.GetControl (3)
 	Button.SetText (strrefs["donate"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Entry
-	Field = Window.GetControl (3)
+	Field = Window.GetControl (5)
 	Field.SetText ("0")
 	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
 	Field.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# +
-	Button = Window.GetControl (4)
+	Button = Window.GetControl (6)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncrementDonation)
 	# -
-	Button = Window.GetControl (5)
+	Button = Window.GetControl (7)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecrementDonation)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreDonateWindow )
@@ -1435,15 +1440,15 @@ def GetRealPrice (pc, mode, Item, Slot):
 def UpdateStoreDonateWindow ():
 	Window = StoreDonateWindow
 
-	UpdateStoreCommon (Window, 0x10000005, 0, 0x10000006)
-	Field = Window.GetControl (3)
+	UpdateStoreCommon (Window, 0x10000007, 0, 0x10000008)
+	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
 	gold = GemRB.GameGetPartyGold ()
 	if donation>gold:
 		donation = gold
 		Field.SetText (str(gold) )
 
-	Button = Window.GetControl (2)
+	Button = Window.GetControl (3)
 	if donation:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -1453,7 +1458,7 @@ def UpdateStoreDonateWindow ():
 def IncrementDonation ():
 	Window = StoreDonateWindow
 
-	Field = Window.GetControl (3)
+	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
 	if donation<GemRB.GameGetPartyGold ():
 		Field.SetText (str(donation+1) )
@@ -1465,7 +1470,7 @@ def IncrementDonation ():
 def DecrementDonation ():
 	Window = StoreDonateWindow
 
-	Field = Window.GetControl (3)
+	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
 	if donation>0:
 		Field.SetText (str(donation-1) )
@@ -1484,7 +1489,7 @@ def DonateGold ():
 		Button = Window.GetControl (10)
 		Button.SetAnimation ("DONATE")
 
-	Field = Window.GetControl (3)
+	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
 	if GemRB.IncreaseReputation (donation):

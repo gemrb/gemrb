@@ -560,6 +560,11 @@ def OpenStoreDonateWindow ():
 	CloseWindows ()
 
 	StoreDonateWindow = Window = GemRB.LoadWindow (9)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs += (5, 3, 2, 4, 0x10000005, 0x10000006)
+		newIDs += (7, 5, 3, 6, 0x10000007, 0x10000008)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# graphics
 	if Window.HasControl (10):
