@@ -273,15 +273,16 @@ void MapControl::OnMouseOver(const Point& p)
 	lastMouseX = p.x;
 	lastMouseY = p.y;
 
+	// FIXME: implement cursor changing
 	switch (Value) {
 		case MAP_REVEAL: //for farsee effect
-			Owner->Cursor = IE_CURSOR_CAST;
+			//Owner->Cursor = IE_CURSOR_CAST;
 			break;
 		case MAP_SET_NOTE:
-			Owner->Cursor = IE_CURSOR_GRAB;
+			//Owner->Cursor = IE_CURSOR_GRAB;
 			break;
 		default:
-			Owner->Cursor = IE_CURSOR_NORMAL;
+			//Owner->Cursor = IE_CURSOR_NORMAL;
 			break;
 	}
 
@@ -316,12 +317,6 @@ void MapControl::OnMouseOver(const Point& p)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( L"" );
 	}
-}
-
-/** Mouse Leave Event */
-void MapControl::OnMouseLeave(const Point&, const DragOp*)
-{
-	Owner->Cursor = IE_CURSOR_NORMAL;
 }
 
 void MapControl::ClickHandle(unsigned short Button)

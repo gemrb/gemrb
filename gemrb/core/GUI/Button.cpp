@@ -531,7 +531,6 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 
 void Button::OnMouseOver(const Point& p)
 {
-	Owner->Cursor = IE_CURSOR_NORMAL;
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}

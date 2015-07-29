@@ -1218,7 +1218,6 @@ void GameControl::OnMouseOver(const Point& mp)
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
-		Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
@@ -1360,7 +1359,6 @@ void GameControl::OnMouseOver(const Point& mp)
 	}
 end_function:
 	if (lastCursor != nextCursor) {
-		Owner->Cursor = nextCursor;
 		lastCursor = (unsigned char) nextCursor;
 	}
 }
@@ -1810,7 +1808,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 	}
 	if (FormationRotation) {
 		lastCursor = IE_CURSOR_USE;
-		Owner->Cursor = lastCursor;
 	}
 }
 

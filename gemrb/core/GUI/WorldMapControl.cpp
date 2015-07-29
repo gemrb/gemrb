@@ -267,14 +267,11 @@ void WorldMapControl::OnMouseOver(const Point& p)
 			SetTooltip(L"");
 		}
 	}
-
-	Owner->Cursor = lastCursor;
 }
 
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(const Point& /*p*/, const DragOp*)
 {
-	Owner->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;
 }
 

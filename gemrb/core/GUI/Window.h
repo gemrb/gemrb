@@ -108,8 +108,6 @@ public:
 	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseWheelScroll(const Point&, short x, short y);
 
-public: //Public attributes
-	int Cursor;
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;

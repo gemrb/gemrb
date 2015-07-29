@@ -85,8 +85,6 @@ public:
 	//void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
-	/** Mouse Leave Event */
-	void OnMouseLeave(const Point&, const DragOp*);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
