@@ -78,6 +78,7 @@ int SDLVideoDriver::Init(void)
 		//print("[ERROR]");
 		return GEM_ERROR;
 	}
+	SDL_ShowCursor(SDL_DISABLE);
 	return GEM_OK;
 }
 
