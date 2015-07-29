@@ -476,17 +476,32 @@ def OpenStoreStealWindow ():
 	CloseWindows()
 
 	StoreStealWindow = Window = GemRB.LoadWindow (7)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (0, 4, 13)
+		oldIDs += tuple(map(lambda x: x+5, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+14, range(ItemButtonCount)))
+		oldIDs += (0x10000002, 0x10000000, 0x10000001)
+		oldIDs += tuple(map(lambda x: x+0x10000011, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x10000008, range(ItemButtonCount)))
+		newIDs = (1, 9, 10)
+		newIDs += tuple(map(lambda x: x+4, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+11, range(ItemButtonCount)))
+		newIDs += (0x10000027, 0x10000002, 0x10000023)
+		newIDs += tuple(map(lambda x: x+0x10000019, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x1000000f, range(ItemButtonCount)))
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# left scrollbar
-	ScrollBarLeft = Window.GetControl (4)
+	ScrollBarLeft = Window.GetControl (9)
 	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
 	# right scrollbar
-	ScrollBarRight = Window.GetControl (13)
+	ScrollBarRight = Window.GetControl (10)
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+5)
+		Button = Window.GetControl (i+4)
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		elif GameCheck.IsPST():
@@ -498,7 +513,7 @@ def OpenStoreStealWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.AttachScrollBar (ScrollBarLeft)
 
-		Button = Window.GetControl (i+14)
+		Button = Window.GetControl (i+11)
 		if GameCheck.IsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		elif GameCheck.IsPST():
@@ -513,7 +528,7 @@ def OpenStoreStealWindow ():
 	UnselectNoRedraw ()
 
 	# Steal
-	LeftButton = Button = Window.GetControl (0)
+	LeftButton = Button = Window.GetControl (1)
 	Button.SetText (strrefs["steal"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, StealPressed)
 
@@ -1194,13 +1209,13 @@ def UpdateStoreStealWindow ():
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
 	LeftCount = Store['StoreItemCount']
-	ScrollBar = Window.GetControl (4)
+	ScrollBar = Window.GetControl (9)
 	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount-ItemButtonCount)
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
-	ScrollBar = Window.GetControl (13)
+	ScrollBar = Window.GetControl (10)
 	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount-ItemButtonCount)
 	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1229,7 +1244,7 @@ def StealPressed ():
 def RedrawStoreStealWindow ():
 	Window = StoreStealWindow
 
-	UpdateStoreCommon (Window, 0x10000000, 0x10000002, 0x10000001)
+	UpdateStoreCommon (Window, 0x10000002, 0x10000027, 0x10000023)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
@@ -1240,8 +1255,8 @@ def RedrawStoreStealWindow ():
 	RightCount = len(inventory_slots)
 	for i in range (ItemButtonCount):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
-		Button = Window.GetControl (i+5)
-		Label = Window.GetControl (0x10000008+i)
+		Button = Window.GetControl (i+4)
+		Label = Window.GetControl (0x1000000f+i)
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx, 1)
 
@@ -1249,8 +1264,8 @@ def RedrawStoreStealWindow ():
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
 			Slot = None
-		Button = Window.GetControl (i+14)
-		Label = Window.GetControl (0x10000011+i)
+		Button = Window.GetControl (i+11)
+		Label = Window.GetControl (0x10000019+i)
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx, 1)
 

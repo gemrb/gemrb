@@ -476,6 +476,21 @@ def OpenStoreStealWindow ():
 	CloseWindows()
 
 	StoreStealWindow = Window = GemRB.LoadWindow (6)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = (0, 4, 13)
+		oldIDs += tuple(map(lambda x: x+5, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+14, range(ItemButtonCount)))
+		oldIDs += (0x10000002, 0x10000000, 0x10000001)
+		oldIDs += tuple(map(lambda x: x+0x10000011, range(ItemButtonCount)))
+		oldIDs += tuple(map(lambda x: x+0x10000008, range(ItemButtonCount)))
+		newIDs = (1, 9, 10)
+		newIDs += tuple(map(lambda x: x+4, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+11, range(ItemButtonCount)))
+		newIDs += (0x10000027, 0x10000002, 0x10000023)
+		newIDs += tuple(map(lambda x: x+0x10000019, range(ItemButtonCount)))
+		newIDs += tuple(map(lambda x: x+0x1000000f, range(ItemButtonCount)))
+		Window.ReassignControls (oldIDs, newIDs)
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControl (9)
