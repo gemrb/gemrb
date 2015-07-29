@@ -33,6 +33,7 @@
 #include "Callback.h"
 #include "Region.h"
 
+#include <bitset>
 #include <map>
 #include <vector>
 
@@ -177,6 +178,8 @@ private:
 
 	unsigned long dc_time;
 	unsigned long rk_flags;
+	std::bitset<16> mouseButtonFlags;
+	Point mousePos;
 
 public:
 	EventMgr(void);
@@ -188,6 +191,9 @@ public:
 	unsigned long GetRKDelay();
 	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 
+	bool ButtonState(unsigned short btn) const;
+	bool MouseDown() const;
+	Point MousePos() const { return mousePos; }
 };
 
 }

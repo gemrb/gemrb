@@ -69,6 +69,16 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
+bool EventMgr::ButtonState(unsigned short btn) const
+{
+	return mouseButtonFlags.test(btn);
+}
+
+bool EventMgr::MouseDown() const
+{
+	return mouseButtonFlags.any();
+}
+
 void EventMgr::AddEventTap(EventCallback* cb, Event::EventType type)
 {
 	if (type == static_cast<Event::EventType>(-1)) {
@@ -100,6 +110,10 @@ void EventMgr::DispatchEvent(Event& e)
 				return;
 			}
 		}
+	} else {
+		// set/clear the appropriate buttons
+		mouseButtonFlags = e.mouse.buttonStates;
+		mousePos = e.mouse.Pos();
 	}
 
 	// no hot keys or their listeners refused the event...
