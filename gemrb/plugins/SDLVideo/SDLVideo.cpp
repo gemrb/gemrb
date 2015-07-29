@@ -278,13 +278,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				lastMouseDownTime += lastMouseDownTime+lastTime;
 			}
 
-			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), true, GetModState(SDL_GetModState()));
+			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), SDL_BUTTON(event.button.button), true, GetModState(SDL_GetModState()));
+			e.mouse.buttonStates = SDL_GetMouseState(NULL, NULL);
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
-			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), 1 << ( event.button.button - 1 ), false, GetModState(SDL_GetModState()));
+			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), SDL_BUTTON(event.button.button), false, GetModState(SDL_GetModState()));
+			e.mouse.buttonStates = SDL_GetMouseState(NULL, NULL);
 			EvntManager->DispatchEvent(e);
-			break;
+			break;			
 	}
 	return GEM_OK;
 }
