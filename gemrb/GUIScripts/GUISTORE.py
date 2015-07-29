@@ -1594,6 +1594,7 @@ def InfoHealWindow ():
 	Button = Window.GetControl (2)
 	Button.SetSpellIcon (Cure['CureResRef'], 1)
 	if GameCheck.IsPST():
+		Window.ReassignControls ((3,4), (5,3))
 		Button = Window.GetControl (6)
 		Button.SetSpellIcon (Cure['CureResRef'], 2)
 

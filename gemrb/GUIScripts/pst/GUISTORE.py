@@ -1594,14 +1594,15 @@ def InfoHealWindow ():
 	Button = Window.GetControl (2)
 	Button.SetSpellIcon (Cure['CureResRef'], 1)
 	if GameCheck.IsPST():
+		Window.ReassignControls ((3,4), (5,3))
 		Button = Window.GetControl (6)
 		Button.SetSpellIcon (Cure['CureResRef'], 2)
 
-	TextArea = Window.GetControl (5)
+	TextArea = Window.GetControl (3)
 	TextArea.SetText (Spell['SpellDesc'])
 
 	#Done
-	Button = Window.GetControl (3)
+	Button = Window.GetControl (5)
 	Button.SetText (strrefs["done"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
