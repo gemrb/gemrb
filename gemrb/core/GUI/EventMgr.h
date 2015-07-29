@@ -81,6 +81,7 @@ class Window;
 
 typedef unsigned char EventButton;
 typedef unsigned short KeyboardKey;
+typedef unsigned short ButtonMask;
 
 struct ScreenEvent {
 	// cant use Point due to non trival constructor
@@ -91,7 +92,7 @@ struct ScreenEvent {
 };
 
 struct GEM_EXPORT MouseEvent : public ScreenEvent {
-	unsigned short buttonStates;
+	ButtonMask buttonStates;
 	EventButton button;
 };
 
@@ -102,7 +103,7 @@ struct GEM_EXPORT KeyboardEvent {
 
 // TODO: Unused event type...
 struct GEM_EXPORT ControllerEvent {
-	unsigned short buttonStates;
+	ButtonMask buttonStates;
 	EventButton button;
 };
 
@@ -110,7 +111,7 @@ struct GEM_EXPORT ControllerEvent {
 struct GEM_EXPORT TouchEvent : public ScreenEvent {
 	ScreenEvent fingers[5];
 
-	unsigned short numFingers;
+	ButtonMask numFingers;
 	float pressure;
 };
 

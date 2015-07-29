@@ -149,7 +149,12 @@ inline Event InitializeEvent(int mod)
 Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)
 {
 	Event e = InitializeEvent(mod);
-	e.type = (down) ? Event::MouseDown : Event::MouseUp;
+	if (down) {
+		e.type = Event::MouseDown;
+		e.mouse.buttonStates |= 1 << (btn-1);
+	} else {
+		e.type = Event::MouseUp;
+	}
 	e.mouse.button = btn;
 	e.mouse.x = pos.x;
 	e.mouse.y = pos.y;
