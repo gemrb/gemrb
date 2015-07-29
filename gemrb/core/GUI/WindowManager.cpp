@@ -30,6 +30,9 @@ std::find(windows.begin(), windows.end(), w)
 
 namespace GemRB {
 
+Holder<Sprite2D> WindowManager::CursorMouseUp;
+Holder<Sprite2D> WindowManager::CursorMouseDown;
+
 void WindowManager::RedrawAll() const
 {
 	for (size_t i=0; i < windows.size(); i++) {
@@ -205,6 +208,25 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 void WindowManager::DrawCursor() const
 {
+	Holder<Sprite2D> cur(NULL);
+	if (hoverWin) {
+		cur = hoverWin->Cursor();
+	}
+
+	if (!cur) {
+		// no cursor override
+		cur = (eventMgr.MouseDown()) ? CursorMouseDown : CursorMouseUp;
+	}
+	assert(cur); // must have a cursor
+
+	Point pos = eventMgr.MousePos();
+	if (hoverWin && hoverWin->IsDisabled()) {
+		// draw greayed cursor
+		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, NULL, true);
+	} else {
+		// draw normal cursor
+		video->BlitSprite(cur.get(), pos.x, pos.y, true);
+	}
 }
 
 void WindowManager::DrawTooltip(const String& /*tooltip*/, const Point& /*p*/) const

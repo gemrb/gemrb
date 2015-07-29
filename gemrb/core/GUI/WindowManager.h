@@ -20,6 +20,7 @@
 #define __GemRB__WindowManager__
 
 #include "EventMgr.h"
+#include "Sprite2D.h"
 #include "Video.h"
 
 #include <deque>
@@ -40,6 +41,9 @@ public:
 		ShadowGray,
 		ShadowBlack
 	};
+
+	static Holder<Sprite2D> CursorMouseUp;
+	static Holder<Sprite2D> CursorMouseDown;
 
 private:
 	WindowList windows;

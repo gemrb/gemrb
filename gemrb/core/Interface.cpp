@@ -993,6 +993,8 @@ int Interface::LoadSprites()
 				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
+	WindowManager::CursorMouseUp = Cursors[0];
+	WindowManager::CursorMouseDown = Cursors[1];
 
 	// Load fog-of-war bitmaps
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
