@@ -1183,6 +1183,7 @@ def InfoWindow (Slot, Item):
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
 	elif GameCheck.IsPST():
+		Window.ReassignControls ((4,3,6), (5,4,7))
 		NameLabel = Window.GetControl (0x0fffffff)
 		FakeLabel = Window.GetControl (0x10000000)
 	else:
@@ -1194,7 +1195,7 @@ def InfoWindow (Slot, Item):
 
 	#description bam
 	if GameCheck.IsBG1() or GameCheck.IsBG2() or GameCheck.IsPST():
-		Button = Window.GetControl (6)
+		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetItemIcon (Slot['ItemResRef'], 2)
@@ -1205,7 +1206,7 @@ def InfoWindow (Slot, Item):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
-	TextArea = Window.GetControl (4)
+	TextArea = Window.GetControl (5)
 	if Identify:
 		NameLabel.SetText (Item['ItemNameIdentified'])
 		TextArea.SetText (Item['ItemDescIdentified'])
@@ -1214,7 +1215,7 @@ def InfoWindow (Slot, Item):
 		TextArea.SetText (Item['ItemDesc'])
 
 	#Done
-	Button = Window.GetControl (3)
+	Button = Window.GetControl (4)
 	Button.SetText (strrefs["done"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 

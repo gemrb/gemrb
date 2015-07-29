@@ -1183,6 +1183,7 @@ def InfoWindow (Slot, Item):
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
 	elif GameCheck.IsPST():
+		Window.ReassignControls ((4,3,6), (5,4,7))
 		NameLabel = Window.GetControl (0x0fffffff)
 		FakeLabel = Window.GetControl (0x10000000)
 	else:
