@@ -625,7 +625,6 @@ def OpenStoreHealWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
-		#Button.AttachScrollBar (ScrollBar)
 
 	UnselectNoRedraw ()
 
@@ -1059,7 +1058,7 @@ def RedrawStoreIdentifyWindow ():
 		else:
 			Slot = None
 		Button = Window.GetControl (i+8)
-		# TODO: recheck they really differ
+		# TODO: recheck iwd2 vs non-pst really differ
 		if GameCheck.IsIWD2():
 			Label = Window.GetControl (0x1000000d+i)
 		elif GameCheck.IsPST():
@@ -1180,7 +1179,7 @@ def InfoWindow (Slot, Item):
 
 	MessageWindow = Window = GemRB.LoadWindow (windowIDs["iteminfo"])
 
-	# TODO: check non-bg2 games to see which label is which
+	# TODO: check if we can simplify bg2 vs non-pst games to see which label is which
 	if GameCheck.IsBG2():
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
@@ -1551,7 +1550,6 @@ def UpdateStoreHealWindow ():
 			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
 			# toggle raise dead/resurrect based on state
 			# unfortunately the flags are not set properly in iwd
-			# TODO: recheck pst spells
 			if not GameCheck.IsIWD1() and not GameCheck.IsPST() and (  # 3 - non-living
 					(dead and Spell["SpellTargetType"] != 3) or \
 					(not dead and Spell["SpellTargetType"] == 3)):
