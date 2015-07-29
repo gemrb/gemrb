@@ -137,8 +137,8 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->release();
 	}
 
-	Picture2->XPos = (short)frames[1]->XPos;
-	Picture2->YPos = (short)frames[1]->YPos - 80;
+	Picture2->XPos = frames[1]->XPos;
+	Picture2->YPos = frames[1]->YPos - 80;
 
 	Sprite2D* spr = frames[0]->copy();
 	if (Colors) {
@@ -148,8 +148,8 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->release();
 	}
 
-	spr->XPos = (short)frames[0]->XPos;
-	spr->YPos = (short)frames[0]->YPos;
+	spr->XPos = frames[0]->XPos;
+	spr->YPos = frames[0]->YPos;
 
 	return spr;
 }
