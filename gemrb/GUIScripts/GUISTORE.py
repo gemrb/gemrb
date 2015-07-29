@@ -414,13 +414,20 @@ def OpenStoreIdentifyWindow ():
 	CloseWindows()
 
 	StoreIdentifyWindow = Window = GemRB.LoadWindow (4)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = tuple(map(lambda x: 9-x, range(ItemButtonCount)))
+		oldIDs += (5, 4, 14, 0x10000001, 0x10000000, 0x0fffffff, 0x10000002)
+		newIDs = tuple(map(lambda x: 11-x, range(ItemButtonCount)))
+		newIDs += (7, 5, 23, 0x10000003, 0x10000001, 0x10000000, 0x10000005)
+		Window.ReassignControls (oldIDs, newIDs)
 
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
 
-	if not GameCheck.IsPST():
-		TextArea = Window.GetControl (23)
-		TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+	TextArea = Window.GetControl (23)
+	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+	TextArea.AttachScrollBar (ScrollBar) # for pst
 
 	# Identify
 	LeftButton = Button = Window.GetControl (5)

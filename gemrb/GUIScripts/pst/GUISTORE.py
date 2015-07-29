@@ -414,27 +414,34 @@ def OpenStoreIdentifyWindow ():
 	CloseWindows()
 
 	StoreIdentifyWindow = Window = GemRB.LoadWindow (5)
+	if GameCheck.IsPST():
+		# remap controls, so we can avoid too many ifdefs
+		oldIDs = tuple(map(lambda x: 9-x, range(ItemButtonCount)))
+		oldIDs += (5, 4, 14, 0x10000001, 0x10000000, 0x0fffffff, 0x10000002)
+		newIDs = tuple(map(lambda x: 11-x, range(ItemButtonCount)))
+		newIDs += (7, 5, 23, 0x10000003, 0x10000001, 0x10000000, 0x10000005)
+		Window.ReassignControls (oldIDs, newIDs)
 
-	ScrollBar = Window.GetControl (5)
+	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
 
-	if not GameCheck.IsPST():
-		TextArea = Window.GetControl (23)
-		TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+	TextArea = Window.GetControl (23)
+	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+	TextArea.AttachScrollBar (ScrollBar) # for pst
 
 	# Identify
-	LeftButton = Button = Window.GetControl (4)
+	LeftButton = Button = Window.GetControl (5)
 	Button.SetText (strrefs["identify"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyPressed)
 	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
 	# price ...
-	Label = Window.GetControl (0x10000001)
+	Label = Window.GetControl (0x10000003)
 	Label.SetText ("0")
 
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+6)
+		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
@@ -983,7 +990,7 @@ def UpdateStoreIdentifyWindow ():
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
-	ScrollBar = Window.GetControl (5)
+	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetVarAssoc ("TopIndex", Count-ItemButtonCount)
 	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow ()
@@ -992,7 +999,7 @@ def UpdateStoreIdentifyWindow ():
 def RedrawStoreIdentifyWindow ():
 	Window = StoreIdentifyWindow
 
-	UpdateStoreCommon (Window, 0x0fffffff, 0x10000002, 0x10000000)
+	UpdateStoreCommon (Window, 0x10000000, 0x10000005, 0x10000001)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1010,7 +1017,7 @@ def RedrawStoreIdentifyWindow ():
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[TopIndex+i])
 		else:
 			Slot = None
-		Button = Window.GetControl (i+6)
+		Button = Window.GetControl (i+8)
 		# TODO: recheck they really differ
 		if GameCheck.IsIWD2():
 			Label = Window.GetControl (0x1000000d+i)
@@ -1052,8 +1059,8 @@ def RedrawStoreIdentifyWindow ():
 			Button.SetText ("")
 			Label.SetText ("")
 
-	Button = Window.GetControl (4)
-	Label = Window.GetControl (0x10000001)
+	Button = Window.GetControl (5)
+	Label = Window.GetControl (0x10000003)
 	if Selected:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Label.SetText (str(IDPrice * Selected) )
@@ -1081,7 +1088,7 @@ def IdentifyPressed ():
 
 	# identify
 	Window = StoreIdentifyWindow
-	TextArea = Window.GetControl (44)
+	TextArea = Window.GetControl (23)
 	for i in toID:
 		GemRB.ChangeStoreItem (pc, inventory_slots[i], SHOP_ID)
 		Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
