@@ -748,7 +748,7 @@ def UpdateStoreShoppingWindow ():
 	LeftCount = Store['StoreItemCount'] - ItemButtonCount
 	if LeftCount<0:
 		LeftCount=0
-	ScrollBar = Window.GetControl (7)
+	ScrollBar = Window.GetControl (11)
 	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
@@ -758,7 +758,7 @@ def UpdateStoreShoppingWindow ():
 	RightCount = len(inventory_slots) - ItemButtonCount
 	if RightCount<0:
 		RightCount=0
-	ScrollBar = Window.GetControl (16)
+	ScrollBar = Window.GetControl (12)
 	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	if RightTopIndex>RightCount:
