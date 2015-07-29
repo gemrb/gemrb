@@ -37,9 +37,6 @@ Video::Video(void)
 {
 	drawingBuffer = NULL;
 	EvntManager = NULL;
-	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
-	// we care only about 2 bits at the moment so mask out the remainder
-	MouseFlags = ((core->MouseFeedback & 0x3) << 2);
 
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {

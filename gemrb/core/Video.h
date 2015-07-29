@@ -94,7 +94,6 @@ public:
 
 protected:
 	unsigned long lastTime;
-	int MouseFlags;
 	Point Coor;
 	EventMgr* EvntManager;
 	Region Viewport;
