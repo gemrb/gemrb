@@ -1199,7 +1199,10 @@ def InfoWindow (Slot, Item):
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetItemIcon (Slot['ItemResRef'], 2)
+		if GameCheck.IsPST():
+			Button.SetItemIcon (Slot['ItemResRef'], 1)
+		else:
+			Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
 	Button = Window.GetControl (2)
