@@ -31,7 +31,7 @@ import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from ie_feats import FEAT_WEAPON_FINESSE, FEAT_ARMORED_ARCANA
+from ie_feats import FEAT_ARMORED_ARCANA
 
 SelectWindow = 0
 Topic = None

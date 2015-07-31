@@ -19,12 +19,10 @@
 
 import GemRB
 import GameCheck
-import CommonTables
 import GUICommon
 import Spellbook
 from GUIDefines import *
 from ie_stats import *
-from ie_restype import RES_BAM
 
 # storage variables
 pc = 0

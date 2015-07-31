@@ -28,7 +28,6 @@ from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import SLOT_ALL
-from ie_feats import FEAT_STRONG_BACK
 
 OtherWindowFn = None
 NextWindowFn = None

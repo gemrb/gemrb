@@ -26,7 +26,6 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
-import GameCheck
 import GUICommon
 import Spellbook
 import CommonTables

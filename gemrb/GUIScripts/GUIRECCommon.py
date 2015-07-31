@@ -22,7 +22,7 @@ import GameCheck
 import GUICommon
 import Portrait
 from GUIDefines import *
-from ie_stats import IE_SEX, IE_CLASS, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
+from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
 
 BiographyWindow = None
