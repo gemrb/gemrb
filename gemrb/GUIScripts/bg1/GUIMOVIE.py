@@ -34,7 +34,7 @@ def OnLoad():
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	opts = [MoviesTable.GetValue (i, 0) for i in range( MoviesTable.GetRowCount()) if GemRB.GetVar(MoviesTable.GetRowName (i) == 1 ]
+	opts = [MoviesTable.GetValue (i, 0) for i in range( MoviesTable.GetRowCount()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1 ]
 	TextAreaControl.SetOptions(opts)
 	TextAreaControl.SetVarAssoc ("MovieIndex",0)
 	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, MoviePress)
