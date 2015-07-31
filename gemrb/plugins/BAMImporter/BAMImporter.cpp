@@ -48,6 +48,8 @@ BAMImporter::BAMImporter(void)
 	palette = NULL;
 	FramesCount = 0;
 	CyclesCount = 0;
+	CompressedColorIndex = DataStart = 0;
+	FramesOffset = PaletteOffset = FLTOffset = 0;
 }
 
 BAMImporter::~BAMImporter(void)
