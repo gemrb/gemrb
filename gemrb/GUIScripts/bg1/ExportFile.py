@@ -18,11 +18,12 @@
 #
 #character generation, export (GUICG21)
 import GemRB
-from GUIDefines import *
-import GUICommon
-import CharGenCommon
+import GameCheck
+if GameCheck.IsBG1():
+	import GUICommon
+	import CharGenCommon
 
-#import from a character sheet
+# export to a character file (.chr)
 ExportWindow = 0
 TextAreaControl = 0
 
@@ -32,7 +33,8 @@ def OnLoad():
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
 	ExportWindow = GemRB.LoadWindow (21)
 
-	GUICommon.CloseOtherWindow(ExportWindow.Unload)
+	if GameCheck.IsBG1():
+		GUICommon.CloseOtherWindow (ExportWindow.Unload)
 
 	TextAreaControl = ExportWindow.GetControl (4)
 	TextAreaControl.SetText (10962)
@@ -50,7 +52,7 @@ def OnLoad():
 
 	CancelButton = ExportWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	#CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
@@ -76,11 +78,21 @@ def DonePress ():
 	FileName = FileNameEditBox.QueryText ()
 	Slot = GemRB.GetVar ("Slot")
 	GemRB.SaveCharacter (Slot, FileName)
-	GUICommon.CloseOtherWindow(None)
-	CharGenCommon.close()
-	GemRB.SetNextScript ("Start")
+	if GameCheck.IsBG1():
+		GUICommon.CloseOtherWindow (None)
+		CharGenCommon.close()
+		GemRB.SetNextScript ("Start")
+	else:
+		if ExportWindow:
+			ExportWindow.Unload ()
+		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
 
 def CancelPress ():
-	CharGenCommon.jumpTo("accept")
+	if GameCheck.IsBG1():
+		CharGenCommon.jumpTo ("accept")
+	else:
+		if ExportWindow:
+			ExportWindow.Unload ()
+		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
