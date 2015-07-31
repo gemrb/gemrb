@@ -21,7 +21,7 @@ their own files. User specific configuration is in other file (GemRB.cfg).
 Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
 AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
-HasSpecificDamageBonus (mod required), HasWisdomBonusTable (mod required),
+HasSpecificDamageBonus (mod required),
 HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack
  and TeamMovement.
 
@@ -359,12 +359,6 @@ wider selection of spell books/types.
 HasUsePointFlag = <bool>
 - - - - - - - - - - - - -
 Detail about how infopoints react when used (iwd2).
-
-
-HasWisdomBonusTable = <bool>
-- - - - - - - - - - - - - - -
-Toggles whether the game has a wisxpbon.2da that dictates a bonus or malus
-to gained experience according to the actor's wisdom (pst).
 
 
 IgnoreButtonFrames = <bool>

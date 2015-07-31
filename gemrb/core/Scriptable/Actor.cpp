@@ -7203,9 +7203,7 @@ void Actor::Heal(int hp)
 
 void Actor::AddExperience(int exp, int combat)
 {
-	if (core->HasFeature(GF_WISDOM_BONUS)) {
-		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
-	}
+	exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
 	int adjustmentPercent = xpadjustments[GameDifficulty];
 	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {

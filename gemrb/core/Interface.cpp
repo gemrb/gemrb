@@ -742,7 +742,7 @@ bool Interface::ReadAbilityTables()
 	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
 	if (!ret)
 		return ret;
-	if (HasFeature(GF_WISDOM_BONUS)) {
+	if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
 		ret = ReadAbilityTable("wisxpbon", wisbon, 1, MaximumAbility + 1);
 		if (!ret)
 			return ret;
@@ -2169,7 +2169,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
-		"HasWisdomBonusTable",//47GF_WISDOM_BONUS
+		"HasWisdomBonusTable",//47GF_UNUSED1
 		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
 		"NoBiography",        //49GF_NO_BIOGRAPHY
 		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
@@ -5262,7 +5262,7 @@ int Interface::GetWisdomBonus(int column, int value) const
 		return value/2-5;
 	}
 
-	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
+	if (!wisbon) return 0;
 
 	// xp bonus
 	if (column<0 || column>0)
