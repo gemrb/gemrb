@@ -442,11 +442,11 @@ Actor *Projectile::GetTarget()
 		target = area->GetActorByGlobalID(Target);
 		if (!target) return NULL;
 		Actor *original = area->GetActorByGlobalID(Caster);
-		if (original==target) {
-			effects->SetOwner(target);
+		if (!effects) {
 			return target;
 		}
-		if (!effects) {
+		if (original==target) {
+			effects->SetOwner(target);
 			return target;
 		}
 
