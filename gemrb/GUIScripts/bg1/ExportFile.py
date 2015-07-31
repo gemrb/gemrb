@@ -54,7 +54,7 @@ def OnLoad():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SelectPress)
+	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SelectPress)
 	ExportWindow.ShowModal(MODAL_SHADOW_NONE)
 	FileNameEditBox.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return

@@ -59,7 +59,7 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, ChangeVoice)
+	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, ChangeVoice)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	CharSoundWindow.SetVisible(WINDOW_VISIBLE)
