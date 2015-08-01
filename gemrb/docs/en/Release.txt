@@ -44,6 +44,9 @@ Source release
 * via cmake/autotools:
   make dist
 
+* via github:
+  if you've pused the new tagged release already, github will have generated
+  a clean tarball for you at https://github.com/gemrb/gemrb/releases
 
 Linux binary release
 ====================
