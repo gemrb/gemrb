@@ -358,7 +358,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->ReadWord( &pcInfo.ViewYPos );
 	str->ReadWord( &pcInfo.ModalState ); //see Modal.ids
 	str->ReadWord( &pcInfo.Happiness );
-	for (i=0;i<24;i++) {
+	for (i=0; i<MAX_INTERACT; i++) {
 		str->ReadDword( &pcInfo.Interact[i] ); //interact counters
 	}
 
@@ -922,7 +922,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	tmpWord = ac->PCStats->Happiness;
 	stream->WriteWord( &tmpWord);
 	//interact counters
-	for (i=0;i<24;i++) {
+	for (i=0; i<MAX_INTERACT; i++) {
 		stream->WriteDword( ac->PCStats->Interact+i);
 	}
 
