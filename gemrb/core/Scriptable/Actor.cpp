@@ -89,6 +89,7 @@ static char **classabilities = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
+static int *xpcap = NULL;
 static int *defaultprof = NULL;
 static int *castingstat = NULL;
 static int *iwd2spltypes = NULL;
@@ -1541,6 +1542,12 @@ void Actor::ReleaseMemory()
 			xpbonuslevels = -1;
 			xpbonustypes = -1;
 		}
+		
+		if (xpcap) {
+			free(xpcap);
+			xpcap = NULL;
+		}
+		
 		if (levelslots) {
 			for (i=0; i<classcount; i++) {
 				if (levelslots[i]) {
@@ -2034,6 +2041,9 @@ static void InitActorTables()
 	}
 
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
+	xpcap = (int *) calloc(classcount, sizeof(int));
+	AutoTable xpcapt("xpcap");
+	
 	tm.load("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
@@ -2052,6 +2062,8 @@ static void InitActorTables()
 				//kitcount++;
 				continue;
 			}
+
+			xpcap[classis] = atoi(xpcapt->QueryField(classname, "VALUE"));
 
 			// set up the tohit/apr tables
 			char tohit[9];
@@ -2083,6 +2095,7 @@ static void InitActorTables()
 			buffer.appendFormatted("Name: %s, ", classname);
 			buffer.appendFormatted("Classis: %d, ", classis);
 			buffer.appendFormatted("ToHit: %s ", tohit);
+			buffer.appendFormatted("XPCap: %d", xpcap[classis]);
 
 			//TODO: generate classesiwd2 here, so it can be unhardcoded
 			Log(DEBUG, "Actor", buffer);
@@ -2132,6 +2145,10 @@ static void InitActorTables()
 			}
 
 			buffer.appendFormatted("Name: %s ", classname);
+
+			xpcap[tmpindex] = atoi(xpcapt->QueryField(classname, "VALUE"));
+			buffer.appendFormatted("XPCAP: %d ", xpcap[tmpindex]);
+
 			int classis = 0;
 			//default all levelslots to 0
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
@@ -7207,8 +7224,14 @@ void Actor::AddExperience(int exp, int combat)
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
 		bonus += adjustmentPercent;
 	}
-	exp = (exp * (100 + bonus)) / 100;
-	SetBase(IE_XP,BaseStats[IE_XP]+exp);
+	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
+	if (xpcap != NULL) {
+		int classid = BaseStats[IE_CLASS] - 1;
+		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
+			exp = xpcap[classid];
+		}
+	}
+	SetBase(IE_XP, exp);
 }
 
 int Actor::CalculateExperience(int type, int level)
