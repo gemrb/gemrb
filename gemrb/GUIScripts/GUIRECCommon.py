@@ -384,22 +384,30 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	row = ScriptsTable.GetRowCount ()
-	
+	scriptCount = ScriptTextArea.ListResources (CHR_SCRIPTS)
+	defaultCount = ScriptsTable.GetRowCount ()
+
 	options = []
-	for i in range (row):
-		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
-		title = ScriptsTable.GetValue (i,0)
-		if title!=-1:
-			desc = ScriptsTable.GetValue (i,1)
-			txt = GemRB.GetString (title)
-			if (desc!=-1):
-				txt += GemRB.GetString (desc) + "\n"
-			options.append(txt) 
+	tat = ScriptTextArea.QueryText ().split("\n")
+	tat.pop() # last item is empty
+	for i in range (scriptCount):
+		script = tat[i]
+		if i < defaultCount:
+			GemRB.SetToken ("script", ScriptsTable.GetRowName (i))
+			title = ScriptsTable.GetValue (i,0)
+			if title!=-1:
+				  desc = ScriptsTable.GetValue (i,1)
+				  txt = GemRB.GetString (title)
+				  if (desc!=-1):
+					  txt += GemRB.GetString (desc) + "\n"
+				  options.append(txt)
+			else:
+				  options.append (ScriptsTable.GetRowName (i) + "\n")
 		else:
-			options.append (ScriptsTable.GetRowName (i) + "\n")
+			GemRB.SetToken ("script", script)
+			options.append (17167)
 	ScriptTextArea.SetOptions (options)
-	
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
 	if script == None:
