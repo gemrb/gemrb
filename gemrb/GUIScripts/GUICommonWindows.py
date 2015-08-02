@@ -1560,7 +1560,6 @@ def UpdatePortraitWindow ():
 
 def UpdateAnimatedPortrait (Window,i):
 	"""Selects the correct portrait cycle depending on character state"""
-	#FIXME: Actually doesn't, and I can't see why. Same in master. Help?
 	#note: there are actually two portraits per chr, eg PPPANN, WMPANN
 	Button = Window.GetControl (i)
 	ButtonHP = Window.GetControl (6 + i)
@@ -1569,8 +1568,7 @@ def UpdateAnimatedPortrait (Window,i):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		return
-		#sel = GemRB.GameGetSelectedPCSingle () == i + 1
-	Button.SetBAM (pic, 0, 0, -1)
+
 	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 	hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 	hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
@@ -1619,10 +1617,6 @@ def UpdateAnimatedPortrait (Window,i):
 		op = OP_OR
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
-	#if sel:
-	#	Button.EnableBorder(FRAME_PC_SELECTED, 1)
-	#else:
-	#	Button.EnableBorder(FRAME_PC_SELECTED, 0)
 	return
 
 def PortraitButtonOnDrag ():
