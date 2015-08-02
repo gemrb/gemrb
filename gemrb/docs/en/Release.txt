@@ -45,7 +45,7 @@ Source release
   make dist
 
 * via github:
-  if you've pused the new tagged release already, github will have generated
+  if you've pushed the new tagged release already, github will have generated
   a clean tarball for you at https://github.com/gemrb/gemrb/releases
 
 Linux binary release
@@ -96,6 +96,6 @@ options should also be mentioned here if they're not part of the changelog.
   (a template is available in admin/announcement.template)
     - homepages: sidebar (versions and news), news, start (version), changelog (status
       and log swap), old_changelogs
-    - we also have a Google+ page, but it is currently mostly unused
+    - our Google+ page: https://plus.google.com/+GemrbOrg
 
 * Run admin/restart_news.sh to restart the NEWS cycle
