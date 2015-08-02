@@ -574,6 +574,13 @@ String TextArea::QueryText() const
 {
 	if (selectedSpan) {
 		return selectedSpan->Text();
+	} else if (OptSpans.size()) {
+		String options;
+		for (size_t i = 0; i < OptSpans.size(); i++) {
+			options.append(OptSpans[i].second->Text());
+			options.append(L"\n");
+		}
+		return options;
 	}
 	return textContainer->Text();
 }
