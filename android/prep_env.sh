@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# TODO: create the whole dir struct first, i.e. get SDL2.0, get GemRb, create symlinks etc.
-#       get rid of everything pelya if possible
-#       figure out, what exactly openal needs
+# TODO: figure out, what exactly openal needs or try sdl-mixer2
 
 GEMRB_GIT_PATH=$1
 ENVROOT=${2:-$1/android}
