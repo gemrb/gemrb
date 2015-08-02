@@ -219,8 +219,8 @@
 0xB310    NGRLL     NGRLL      NGRLL      NGRLL      3          2          0          *
 0xB400    NFAML     NFAML      NFAML      NFAML      2          2          0          *
 0xB410    NFAWL     NFAWL      NFAWL      NFAWL      2          2          0          *
-0xB500    NSIML     NSIML      NSIML      NSIML      18         2          0          *
-0xB510    NSIWL     NSIWL      NSIWL      NSIWL      18         2          0          *
+0xB500    NSIML     NSIML      NSIML      NSIML      2          2          0          *
+0xB510    NSIWL     NSIWL      NSIWL      NSIWL      2          2          0          *
 0xB600    NNOML     NNOML      NNOML      NNOML      2          2          0          *
 0xB610    NNOWL     NNOWL      NNOWL      NNOWL      2          2          0          *
 0xB700    NSLVL     NSLVL      NSIWL      NSIWL      18         2          0          *
@@ -236,8 +236,8 @@
 0xC710    NGRLH     NGRLH      NGRLH      NGRLH      3          2          0          *
 0xC800    NFAMH     NFAMH      NFAMH      NFAMH      2          2          0          *
 0xC810    NFAWH     NFAWH      NFAWH      NFAWH      2          2          0          *
-0xC900    NSIMH     NSIMH      NSIMH      NSIMH      18         2          0          *
-0xC910    NSIWH     NSIWH      NSIWH      NSIWH      18         2          0          *
+0xC900    NSIMH     NSIMH      NSIMH      NSIMH      2          2          0          *
+0xC910    NSIWH     NSIWH      NSIWH      NSIWH      2          2          0          *
 0xCA00    NNOMH     NNOMH      NNOMH      NNOMH      2          2          0          *
 0xCA10    NNOWH     NNOWH      NNOWH      NNOWH      2          2          0          *
 0xCB00    NSLVH     NSLVH      NSLVH      NSLVH      2          2          0          *
