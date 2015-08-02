@@ -3502,6 +3502,11 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			resourcePath = GameCharactersPath;
 			filter = new ExtFilter("CHR");
 			break;
+		case DIRECTORY_CHR_SCRIPTS:
+			resourcePath = GameScriptsPath;
+			filter = new ExtFilter("BS");
+			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
+			break;
 	}
 
 	PathJoin( Path, GamePath, resourcePath, NULL );

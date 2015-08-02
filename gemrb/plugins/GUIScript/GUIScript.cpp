@@ -4330,6 +4330,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:
+		case DIRECTORY_CHR_SCRIPTS:
 		default:
 			break;
 	}
