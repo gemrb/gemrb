@@ -141,6 +141,7 @@ def CustomDone():
 def CustomAbort():
 	if CustomWindow:
 		CustomWindow.Unload ()
+	AppearanceWindow.ShowModal (MODAL_SHADOW_NONE) # narrower than CustomWindow, so borders will remain
 	return
 
 def LargeCustomPortrait():
