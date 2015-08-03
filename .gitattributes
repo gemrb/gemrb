@@ -7,3 +7,5 @@
 *.wmp diff=ie
 *.gam diff=ie
 *.sav diff=ie
+
+testing export-ignore
