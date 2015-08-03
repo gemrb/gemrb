@@ -41,10 +41,10 @@ Preparing and testing GIT
 Source release
 ==============
 
-* via cmake/autotools:
+* via cmake/autotools (excludes useless files intentionally!):
   make dist
 
-* via github:
+* via github (fallback):
   if you've pushed the new tagged release already, github will have generated
   a clean tarball for you at https://github.com/gemrb/gemrb/releases
 
