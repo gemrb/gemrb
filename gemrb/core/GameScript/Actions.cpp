@@ -23,6 +23,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "AmbientMgr.h"
@@ -4815,7 +4816,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	//max. shouting distance, please adjust it if you know better
-	map->Shout(actor, parameters->int0Parameter, MAX_TRAVELING_DISTANCE);
+	map->Shout(actor, parameters->int0Parameter, VOODOO_SHOUT_RANGE);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)

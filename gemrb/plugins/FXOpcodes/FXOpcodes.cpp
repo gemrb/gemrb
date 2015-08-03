@@ -22,6 +22,7 @@
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "Audio.h"
@@ -4342,7 +4343,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_find_traps(%2d)", fx->Opcode);
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword id = target->GetGlobalID();
-	ieDword range = target->GetStat(IE_VISUALRANGE)*10;
+	ieDword range = target->GetStat(IE_VISUALRANGE) * VOODOO_FINDTRAP_RANGE;
 	ieDword skill;
 	bool detecttraps = true;
 

@@ -28,6 +28,7 @@
 #include "overlays.h"
 #include "strrefs.h"
 #include "opcode_params.h"
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "Bitmap.h"
@@ -5393,7 +5394,7 @@ int Actor::GetHpAdjustment(int multiplier) const
 void Actor::InitStatsOnLoad()
 {
 	//default is 9 in Tob (is this true? or just most anims are 9?)
-	SetBase(IE_MOVEMENTRATE,9);
+	SetBase(IE_MOVEMENTRATE, VOODOO_CHAR_SPEED);
 
 	ieWord animID = ( ieWord ) BaseStats[IE_ANIMATION_ID];
 	//this is required so the actor has animation already
@@ -6800,9 +6801,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	ResetState();
 }
 
-// FIXME: figure out and use proper weapon ranges
-// long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
-// 400 units is about the normal sight range
 int Actor::GetWeaponRange(const WeaponInfo &wi) const
 {
 	if (!wi.range) {
@@ -6810,9 +6808,9 @@ int Actor::GetWeaponRange(const WeaponInfo &wi) const
 		return 0;
 	}
 
-	int rangemultiplier = 10;
+	int rangemultiplier = VOODOO_WPN_RANGE1;
 	if (wi.wflags&WEAPON_RANGED) {
-		rangemultiplier = 4; // ranged weapons are almost fine
+		rangemultiplier = VOODOO_WPN_RANGE2; // ranged weapons are almost fine
 	}
 	return rangemultiplier * wi.range;
 }
@@ -10064,8 +10062,7 @@ bool Actor::ConcentrationCheck() const
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
-	// 9 is from the GetSpellDistance estimate
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*9);
+	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F);
 	Actor **poi = neighbours;
 	bool enemyFound = false;
 	while (*poi) {

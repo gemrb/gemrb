@@ -24,6 +24,7 @@
 #include "strrefs.h"
 #include "defsounds.h"
 #include "ie_feats.h"
+#include "voodooconst.h"
 
 #include "AmbientMgr.h"
 #include "Audio.h"
@@ -544,7 +545,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 			los = false;
 		}
 
-		if (Distance(target->Pos, Sender->Pos) > dist * 15) {
+		if (Distance(target->Pos, Sender->Pos) > dist * VOODOO_CANSEE_F) {
 			return 0;
 		}
 		if (!los) {
@@ -2432,7 +2433,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 	if (dist>0xff000000) {
 		return dist;
 	}
-	return dist*9; //FIXME: empirical constant to convert from points to (feet)
+	return dist * VOODOO_SPL_RANGE_F;
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
