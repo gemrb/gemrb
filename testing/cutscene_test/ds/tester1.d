@@ -38,28 +38,28 @@ IF ~NumTimesTalkedTo(1)~ THEN BEGIN TestRan
                   Dialogue(Player1)~ EXIT
 END
 
-IF ~Global("CutsceneIdDoesNotFreezeScript", "GLOBAL", 1)
+IF ~Global("CSIdNotFreezingScript", "GLOBAL", 1)
    NumTimesTalkedTo(2)~ THEN BEGIN DoesNotFreezeScript
    SAY ~CutSceneId does not freeze script~
    IF ~~ THEN DO ~SetNumTimesTalkedTo(3)
                   Dialogue(Player1)~ EXIT
 END
 
-IF ~!Global("CutsceneIdDoesNotFreezeScript", "GLOBAL", 1)
+IF ~!Global("CSIdNotFreezingScript", "GLOBAL", 1)
    NumTimesTalkedTo(2)~ THEN BEGIN DoesFreezeScript
    SAY ~CutSceneId does freeze script~
    IF ~~ THEN DO ~SetNumTimesTalkedTo(3)
                   Dialogue(Player1)~ EXIT
 END
 
-IF ~Global("CutsceneDoesNotFreezeOtherActorsScript", "GLOBAL", 1)
+IF ~Global("CSNotFreezingOther", "GLOBAL", 1)
    NumTimesTalkedTo(3)~ THEN BEGIN DoesNotFreezeOthersScript
    SAY ~CutScene does not freeze other actors scripts~
    IF ~~ THEN DO ~SetNumTimesTalkedTo(0)~ EXIT
 END
 
 //IE scripting really lacks ELSE!!
-IF ~!Global("CutsceneDoesNotFreezeOtherActorsScript", "GLOBAL", 1)
+IF ~!Global("CSNotFreezingOther", "GLOBAL", 1)
    NumTimesTalkedTo(3)~ THEN BEGIN DoesFreezeOthersScript
    SAY ~CutScene does freeze other actors scripts~
    IF ~~ THEN DO ~SetNumTimesTalkedTo(0)~ EXIT
