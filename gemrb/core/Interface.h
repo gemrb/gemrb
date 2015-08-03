@@ -32,7 +32,6 @@
 #include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
-#include "GUI/WindowManager.h"
 #include "GUI/Window.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
@@ -94,7 +93,7 @@ class TableMgr;
 class TextArea;
 class Variables;
 class Video;
-class Window;
+class WindowManager;
 class WorldMap;
 class WorldMapArray;
 
@@ -311,7 +310,7 @@ private:
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
 
-	WindowManager winmgr;
+	WindowManager* winmgr;
 	Holder<GUIFactory> guifact;
 	Holder<ScriptEngine> guiscript;
 	GameControl* gamectrl;

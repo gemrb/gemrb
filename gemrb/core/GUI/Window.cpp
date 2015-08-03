@@ -25,8 +25,20 @@
 
 namespace GemRB {
 
+// FIXME: if we ever switch to C++11 just delegate construction
+Window::Window(const Region& frame)
+	: View(frame), manager(WindowManager::DefaultWindowManager())
+{
+	Init();
+}
+
 Window::Window(const Region& frame, WindowManager& mgr)
 	: View(frame), manager(mgr)
+{
+	Init();
+}
+
+void Window::Init()
 {
 	disabled = false;
 	focusView = NULL;

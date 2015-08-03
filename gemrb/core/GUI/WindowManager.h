@@ -81,12 +81,12 @@ public:
 	void DrawWindows() const;
 	void RedrawAll() const;
 
-	void SetVideoDriver(Video* vid);
 	Size ScreenSize() const { return screen.Dimensions(); }
 
 	Sprite2D* GetScreenshot(Window* win) const;
 	Window* GetGameWindow() const { return gameWin; }
-	
+
+	static WindowManager& DefaultWindowManager();
 };
 
 

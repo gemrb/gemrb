@@ -80,6 +80,7 @@
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/TextArea.h"
+#include "GUI/WindowManager.h"
 #include "GUI/WorldMapControl.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
@@ -121,7 +122,6 @@ static ieWord IDT_SKILLPENALTY = 3;
 static int MagicBit = 0;
 
 Interface::Interface()
-: winmgr(NULL)
 {
 	unsigned int i;
 	for(i=0;i<256;i++) {
@@ -414,12 +414,12 @@ GameControl* Interface::StartGameControl()
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
-	Window* gamewin = winmgr.MakeWindow(screen);
+	Window* gamewin = winmgr->MakeWindow(screen);
 	RegisterScriptableWindow(gamewin, "GameWin", 99);
 	gamectrl = new GameControl(screen);
 	gamewin->AddSubviewInFrontOfView(gamectrl);
 	//setting the focus to the game control
-	winmgr.FocusWindow(gamewin);
+	winmgr->FocusWindow(gamewin);
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
 		gamectrl->SetGUIHidden(false);
@@ -921,7 +921,7 @@ void Interface::Main()
 		HandleGUIBehaviour();
 
 		GameLoop();
-		winmgr.DrawWindows();
+		winmgr->DrawWindows();
 		if (DrawFPS) {
 			frame++;
 			time = GetTickCount();
@@ -1406,7 +1406,8 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
-	winmgr.SetVideoDriver(video.get());
+
+	winmgr = &WindowManager::DefaultWindowManager();
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
@@ -1620,7 +1621,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to load GUIFactory.");
 		return GEM_ERROR;
 	}
-	guifact->SetWindowManager(winmgr);
+	guifact->SetWindowManager(*winmgr);
 
 	int ret = LoadSprites();
 	if (ret) return ret;
@@ -1812,7 +1813,7 @@ int Interface::Init(InterfaceConfig* config)
 	Region frame(0, 0, 640, 25);
 	Console* console = new Console(frame);
 	console->SetCursor(GetCursorSprite());
-	Window* consoleWin = winmgr.MakeWindow(frame);
+	Window* consoleWin = winmgr->MakeWindow(frame);
 	consoleWin->AddSubviewInFrontOfView(console);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
@@ -2474,7 +2475,7 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::W
 	if (win) {
 		assert(win->GetScriptingRef());
 		win->SetPosition(pos);
-		winmgr.FocusWindow( win );
+		winmgr->FocusWindow( win );
 
 		GameControl *gc = GetGameControl ();
 		if (gc)
@@ -2907,7 +2908,7 @@ int Interface::PlayMovie(const char* ResRef)
 	if (ambim) ambim->activate();
 	//this will fix redraw all windows as they looked like
 	//before the movie
-	winmgr.RedrawAll();
+	winmgr->RedrawAll();
 
 	//Setting the movie name to 1
 	vars->SetAt( ResRef, 1 );
@@ -3828,7 +3829,7 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
-	winmgr.DrawWindows();
+	winmgr->DrawWindows();
 	video->SwapBuffers();
 }
 
@@ -4853,7 +4854,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		winmgr.DrawWindows();
+		winmgr->DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 

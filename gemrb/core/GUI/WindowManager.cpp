@@ -33,6 +33,49 @@ namespace GemRB {
 Holder<Sprite2D> WindowManager::CursorMouseUp;
 Holder<Sprite2D> WindowManager::CursorMouseDown;
 
+WindowManager& WindowManager::DefaultWindowManager()
+{
+	static WindowManager wm(core->GetVideoDriver());
+	return wm;
+}
+
+WindowManager::WindowManager(Video* vid)
+{
+	assert(vid);
+
+	hoverWin = NULL;
+	gameWin = NULL;
+	modalWin = NULL;
+	cursorBuf = NULL;
+
+	modalShadow = ShadowNone;
+	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
+
+	screen.w = vid->GetWidth();
+	screen.h = vid->GetHeight();
+	// FIXME: technically we should unset the current video event manager...
+	vid->SetEventMgr(&eventMgr);
+
+	gameWin = new Window(screen, *this);
+	gameWin->SetFlags(WF_BORDERLESS, BM_OR);
+	gameWin->SetFrame(screen);
+
+	cursorBuf = vid->CreateBuffer(screen.Dimensions());
+
+	// set the buffer that always gets cleared just in case anything
+	// tries to draw
+	vid->SetDrawingBuffer(cursorBuf);
+	video = vid;
+	// TODO: changing screen size should adjust window positions too
+	// TODO: how do we get notified if the Video driver changes size?
+}
+
+WindowManager::~WindowManager()
+{
+	video->DestroyBuffer(cursorBuf);
+	delete gameWin;
+}
+
 void WindowManager::RedrawAll() const
 {
 	for (size_t i=0; i < windows.size(); i++) {
@@ -49,24 +92,6 @@ bool WindowManager::IsOpenWindow(Window* win) const
 bool WindowManager::IsPresentingModalWindow() const
 {
 	return modalWin != NULL;
-}
-
-WindowManager::WindowManager(Video* vid)
-{
-	hoverWin = NULL;
-	gameWin = NULL;
-	modalWin = NULL;
-	cursorBuf = NULL;
-
-	modalShadow = ShadowNone;
-	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
-	SetVideoDriver(vid);
-}
-
-WindowManager::~WindowManager()
-{
-	video->DestroyBuffer(cursorBuf);
-	delete gameWin;
 }
 
 /** Show a Window in Modal Mode */
@@ -231,6 +256,17 @@ void WindowManager::DrawCursor() const
 
 void WindowManager::DrawTooltip(const String& /*tooltip*/, const Point& /*p*/) const
 {
+	/*
+	// draw tooltip if needed
+	if (TooltipView == this && TooltipText().length()
+		&& TooltipTime && GetTickCount() >= TooltipTime
+		) {
+		video->SetBufferedDrawing(false);
+		Point mp = core->GetVideoDriver()->GetMousePos();
+		DrawTooltip(mp);
+		video->SetBufferedDrawing(true);
+	}
+	*/
 }
 
 void WindowManager::DrawWindows() const
@@ -239,6 +275,7 @@ void WindowManager::DrawWindows() const
 		return;
 	}
 
+	// TODO: this can probably be done cleaner by drawing to cursorBuf
 	static bool modalShield = false;
 	if (modalWin) {
 		if (!modalShield) {
@@ -324,35 +361,6 @@ void WindowManager::DrawWindows() const
 
 	// tooltips and cursor are always last
 	DrawCursor();
-}
-
-void WindowManager::SetVideoDriver(Video* vid)
-{
-	if (vid == video) return;
-
-	delete gameWin;
-	gameWin = NULL;
-	RedrawAll();
-
-	// FIXME: technically we should unset the current video event manager...
-	if (vid) {
-		screen.w = vid->GetWidth();
-		screen.h = vid->GetHeight();
-		vid->SetEventMgr(&eventMgr);
-
-		gameWin = new Window(screen, *this);
-		gameWin->SetFlags(WF_BORDERLESS, BM_OR);
-		gameWin->SetFrame(screen);
-
-		cursorBuf = vid->CreateBuffer(screen.Dimensions());
-
-		// set the buffer that always gets cleared just in case anything
-		// tries to draw 
-		vid->SetDrawingBuffer(cursorBuf);
-	}
-	video = vid;
-	// TODO: changing screen size should adjust window positions too
-	// TODO: how do we get notified if the Video driver changes size?
 }
 
 //copies a screenshot into a sprite

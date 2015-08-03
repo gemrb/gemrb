@@ -70,6 +70,7 @@ public:
 	};
 
 protected:
+	void Init();
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
@@ -81,6 +82,7 @@ protected:
 	bool TrySetFocus(View*);
 
 public:
+	Window(const Region& frame);
 	Window(const Region& frame, WindowManager& mgr);
 	~Window();
 
