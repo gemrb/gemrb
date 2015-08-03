@@ -1,0 +1,6 @@
+IF
+  Global("TestCutsceneRunning", "GLOBAL", 1)
+THEN
+  RESPONSE #100
+    SetGlobal("CutsceneIdDoesNotFreezeScript", "GLOBAL", 1)
+END
