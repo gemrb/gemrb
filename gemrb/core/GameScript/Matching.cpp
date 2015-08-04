@@ -102,6 +102,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 
 	// TODO: what do we check for non-actors?
 	// non-actors have a visual range (15), we should do visual range and LOS
+	// see voodooconst.h for more info, currently the rest of the code uses 30 for non-actors
 
 	if (Sender->Type == ST_ACTOR) {
 		Actor *source = (Actor *)Sender;

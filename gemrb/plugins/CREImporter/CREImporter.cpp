@@ -21,6 +21,7 @@
 #include "CREImporter.h"
 
 #include "ie_stats.h"
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "EffectMgr.h"
@@ -946,8 +947,8 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	poi = core->GetCString( act->ShortStrRef );
 	act->SetName( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
-	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
-	act->BaseStats[IE_DIALOGRANGE] = 15; //this is just a hack
+	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
+	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword( &act->BaseStats[IE_MC_FLAGS] );
 	str->ReadDword( &act->BaseStats[IE_XPVALUE] );
 	str->ReadDword( &act->BaseStats[IE_XP] );

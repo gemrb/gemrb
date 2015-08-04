@@ -541,7 +541,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 			Actor* snd = ( Actor* ) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
 		} else {
-			dist = 30;
+			dist = VOODOO_VISUAL_RANGE;
 			los = false;
 		}
 

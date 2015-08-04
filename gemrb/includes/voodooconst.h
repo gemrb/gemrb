@@ -56,6 +56,10 @@ static const int VOODOO_SHOUT_RANGE = 400;
 
 // visual range stuff
 static const int VOODOO_CANSEE_F = 15;
+// these two are well understood for actors, but could be different for other scriptables
+// eg. visual range is supposedly 15 (see note in DoObjectChecks)
+static const int VOODOO_VISUAL_RANGE = 30;
+static const int VOODOO_DIALOG_RANGE = 15;
 
 // character speed was also hardcoded depending on the used animation type
 // 9 is a good default for bg2, but it's clearly wrong for bg1 and some animations
