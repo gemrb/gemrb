@@ -61,7 +61,7 @@
 #include "Scriptable/InfoPoint.h"
 #include "System/FileStream.h"
 #include "System/Logger/MessageWindowLogger.h"
-#include "System/VFS.h"
+#include "System/FileFilters.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -3132,22 +3132,6 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	PARSE_ARGS( args,  "Oi|i", &self, &type, &flags );
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
-
-	struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
-		char lastchar;
-		LastCharFilter(char lastchar) {
-			this->lastchar = tolower(lastchar);
-		}
-
-		bool operator()(const char* fname) const {
-			const char* extpos = strrchr(fname, '.');
-			if (extpos) {
-				extpos--;
-				return tolower(*extpos) == lastchar;
-			}
-			return false;
-		}
-	};
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;

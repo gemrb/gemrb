@@ -21,9 +21,10 @@
 #include "SClassID.h" // For PluginID
 #include "win32def.h"
 
-#include "Variables.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "System/FileFilters.h"
+#include "Variables.h"
 
 #include <cstdio>
 #include <cstdlib>

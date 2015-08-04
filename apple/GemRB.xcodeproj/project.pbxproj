@@ -1725,6 +1725,7 @@
 		A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyStringTransformer.m; sourceTree = "<group>"; };
 		A2CB5AC115000A0D00B5C154 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		A2CB5AC215000A0D00B5C154 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
+		A2CE96891B70596100E189C4 /* FileFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileFilters.h; sourceTree = "<group>"; };
 		A2D0505014D0B06C00D8CD77 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
 		A2D4C51E13A978110086BCC4 /* defsounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defsounds.h; sourceTree = "<group>"; };
 		A2D4C51F13A978110086BCC4 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
@@ -3274,6 +3275,7 @@
 			children = (
 				A2BFA05C1395FF62006ADC12 /* DataStream.cpp */,
 				A2BFA05D1395FF62006ADC12 /* DataStream.h */,
+				A2CE96891B70596100E189C4 /* FileFilters.h */,
 				A2BFA05E1395FF62006ADC12 /* FileStream.cpp */,
 				A2BFA05F1395FF62006ADC12 /* FileStream.h */,
 				A2DE329B14EB078200117503 /* Logger */,

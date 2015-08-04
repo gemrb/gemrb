@@ -85,7 +85,7 @@
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
-#include "System/VFS.h"
+#include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 
 #ifdef HAVE_UNISTD_H
