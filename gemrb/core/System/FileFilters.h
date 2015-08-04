@@ -26,14 +26,14 @@ namespace GemRB {
 struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 	char extension[9];
 	ExtFilter(const char* ext) {
-		memcpy(extension, ext, sizeof(extension));
+		strncpy(extension, ext, sizeof(extension)-1);
+		extension[sizeof(extension)-1] = '\0';
 	}
 
 	bool operator()(const char* fname) const {
 		const char* extpos = strrchr(fname, '.');
 		if (extpos) {
-			extpos++;
-			return stricmp(extpos, extension) == 0;
+			return stricmp(++extpos, extension) == 0;
 		}
 		return false;
 	}
