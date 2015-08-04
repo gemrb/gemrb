@@ -7989,16 +7989,15 @@ void Actor::SetSoundFolder(const char *soundset)
 
 		DirectoryIterator dirIt(filepath);
 		dirIt.SetFilterPredicate(new EndsWithFilter("01"));
+		dirIt.SetFlags(DirectoryIterator::Directories);
 		if (dirIt) {
 			do {
-				if ( dirIt.IsDirectory() ) {
-					const char* name = dirIt.GetName();
-					// need to truncate the "01" from the name
-					size_t len = strlen(name) - 2;
-					if(len < sizeof(ieResRef)) {
-						strnlwrcpy(PCStats->SoundSet, name, int(len));
-						break;
-					}
+				const char* name = dirIt.GetName();
+				// need to truncate the "01" from the name
+				size_t len = strlen(name) - 2;
+				if(len < sizeof(ieResRef)) {
+					strnlwrcpy(PCStats->SoundSet, name, int(len));
+					break;
 				}
 			} while (++dirIt);
 		}

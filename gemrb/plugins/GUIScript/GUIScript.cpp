@@ -3151,14 +3151,14 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			break;
 	}
 
+	int itflags = DirectoryIterator::Files;
+	itflags |= (dirs) ? DirectoryIterator::Directories : 0;
+	dirit.SetFlags(itflags);
+
 	std::vector<String> strings;
 	if (dirit) {
 		do {
-			const char *name = dirit.GetName();
-			if (name[0] == '.' || dirit.IsDirectory() != dirs)
-				continue;
-
-			String* string = StringFromCString(name);
+			String* string = StringFromCString(dirit.GetName());
 			if (dirs == false) {
 				size_t pos = string->find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
@@ -9371,21 +9371,19 @@ bool GUIScript::Autodetect(void)
 	gametype_hint[0] = '\0';
 	gametype_hint_weight = 0;
 
+	iter.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *dirent = iter.GetName();
 		char module[_MAX_PATH];
 
-		//print("DE: %s", dirent);
-		if (iter.IsDirectory() && dirent[0] != '.') {
-			// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
-			// Method1:
-			PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", NULL);
-			ExecFile(module);
-			// Method2:
-			//strcpy( module, dirent );
-			//strcat( module, ".Autodetect");
-			//LoadScript(module);
-		}
+		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
+		// Method1:
+		PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", NULL);
+		ExecFile(module);
+		// Method2:
+		//strcpy( module, dirent );
+		//strcat( module, ".Autodetect");
+		//LoadScript(module);
 	} while (++iter);
 
 	if (gametype_hint[0]) {

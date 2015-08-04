@@ -167,14 +167,9 @@ void LoadPlugins(const char* pluginpath)
 
 	typedef std::set<std::string> PathSet;
 	PathSet delayedPlugins;
+	dirIt.SetFlags(DirectoryIterator::Files);
 	do {
 		const char *name = dirIt.GetName();
-		if (name[0] == '.' || dirIt.IsDirectory())
-			continue;
-
-		PathJoin( path, pluginpath, name, NULL );
-
-
 		ieDword flags = 0;
 		core->plugin_flags->Lookup (name, flags);
 
@@ -191,6 +186,7 @@ void LoadPlugins(const char* pluginpath)
 			continue;
 		}
 
+		PathJoin( path, pluginpath, name, NULL );
 		LoadPlugin(path);
 
 	} while (++dirIt);

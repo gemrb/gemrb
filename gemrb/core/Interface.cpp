@@ -3792,16 +3792,12 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 	if (!Pt[0]) return; //Don't delete the root filesystem :)
 	strcpy( Path, Pt );
 	DirectoryIterator dir(Path);
+	dir.SetFlags(DirectoryIterator::Files);
 	if (!dir) {
 		return;
 	}
 	do {
 		const char *name = dir.GetName();
-		if (dir.IsDirectory())
-			continue;
-		// FIXME: we need a more universal isHidden type method on DirectoryIterator
-		if (name[0] == '.')
-			continue;
 		if (!onlysave || SavedExtension(name) ) {
 			char dtmp[_MAX_PATH];
 			dir.GetFullPath(dtmp);
@@ -4488,15 +4484,12 @@ int Interface::CompressSave(const char *folder)
 	PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
+	dir.SetFlags(DirectoryIterator::Files);
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
 	int priority=2;
 	while(priority) {
 		do {
 			const char *name = dir.GetName();
-			if (dir.IsDirectory())
-				continue;
-			if (name[0] == '.')
-				continue;
 			if (SavedExtension(name)==priority) {
 				char dtmp[_MAX_PATH];
 				dir.GetFullPath(dtmp);

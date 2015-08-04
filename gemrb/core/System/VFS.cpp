@@ -463,6 +463,7 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
 DirectoryIterator::DirectoryIterator(const char *path)
 	: predicate(NULL), Directory(NULL), Entry(NULL)
 {
+	SetFlags(Files|Directories);
 	Path = strdup(path);
 	Rewind();
 }
@@ -473,6 +474,12 @@ DirectoryIterator::~DirectoryIterator()
 		closedir(static_cast<DIR*>(Directory));
 	free(Path);
 	delete predicate;
+}
+
+void DirectoryIterator::SetFlags(int flags)
+{
+	// store the inverse
+	entrySkipFlags = Flags(~flags);
 }
 
 void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
@@ -507,9 +514,27 @@ void DirectoryIterator::GetFullPath(char *name)
 
 DirectoryIterator& DirectoryIterator::operator++()
 {
+	bool cont = false;
 	do {
 		Entry = readdir(static_cast<DIR*>(Directory));
-	} while (predicate && Entry && !(*predicate)(GetName()));
+		cont = false;
+		if (Entry) {
+			const char* name = GetName();
+
+			if (entrySkipFlags&Directories) {
+				cont = IsDirectory();
+			}
+			if (cont == false && entrySkipFlags&Files) {
+				cont = !IsDirectory();
+			}
+			if (cont == false && entrySkipFlags&Hidden) {
+				cont = name[0] == '.';
+			}
+			if (cont == false && predicate) {
+				cont = !(*predicate)(name);
+			}
+		}
+	} while (cont);
 
 	return *this;
 }

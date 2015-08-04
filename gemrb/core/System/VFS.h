@@ -123,6 +123,12 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
 
 class GEM_EXPORT DirectoryIterator {
 public:
+	enum Flags {
+		Files = 1,
+		Directories = 2,
+		Hidden = 4
+	};
+
 	typedef Predicate<const char*> FileFilterPredicate;
 	/**
 	 * @param[in] path Path to directory to search.
@@ -135,6 +141,7 @@ public:
 
 	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
 	bool IsDirectory();
+	void SetFlags(int flags);
 	/**
 	 * Returns name of current entry.
 	 *
@@ -151,7 +158,8 @@ private:
 	FileFilterPredicate* predicate;
 	void* Directory;
 	void* Entry;
-	char *Path;
+	char* Path;
+	Flags entrySkipFlags;
 };
 
 }
