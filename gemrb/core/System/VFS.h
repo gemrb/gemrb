@@ -86,15 +86,6 @@ const char PathListSeparator = ':';
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
 const char SPathListSeparator[] = { PathListSeparator, '\0' };
 
-/**
- * Finds a file matching a glob.
- *
- * @param[out] target name of matching file
- * @param[in] Dir directory to look in
- * @param[in] glob pattern to match
- * @return true if match is found
- */
-GEM_EXPORT bool FileGlob(char *target, const char* Dir, const char* glob);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT bool file_exists(const char* path);
 

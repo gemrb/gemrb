@@ -308,38 +308,6 @@ void FixPath (char *path, bool needslash)
 	path[i] = 0;
 }
 
-static int strmatch(const char *string, const char *mask)
-{
-	while(*mask) {
-		if (*mask!='?') {
-			if (tolower(*mask)!=tolower(*string)) {
-				return 1;
-			}
-		}
-		mask++;
-		string++;
-	}
-	return 0;
-}
-
-bool FileGlob(char* target, const char* Dir, const char *glob)
-{
-	DirectoryIterator dir(Dir);
-	if (!dir) {
-		return false;
-	}
-
-	do {
-		const char *name = dir.GetName();
-		if (strmatch( name, glob ) == 0) {
-			strcpy( target, name );
-			return true;
-		}
-	} while (++dir);
-	return false;
-}
-
-
 #ifndef WIN32
 
 void ResolveFilePath(char* FilePath)
