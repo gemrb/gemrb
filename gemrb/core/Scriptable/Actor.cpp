@@ -53,6 +53,7 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "RNG/RNG_SFMT.h"
+#include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -7983,23 +7984,26 @@ void Actor::SetSoundFolder(const char *soundset)
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		char filepath[_MAX_PATH];
 
-		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
+		strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
 		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
-		char file[_MAX_PATH];
 
-		//TODO: this could be simpler with *
-		if (FileGlob(file, filepath, "??????01")) {
-			file[6] = '\0';
-		} else if (FileGlob(file, filepath, "?????01")) {
-			file[5] = '\0';
-		} else if (FileGlob(file, filepath, "????01")) {
-			file[4] = '\0';
-		} else {
-			return;
+		DirectoryIterator dirIt(filepath);
+		dirIt.SetFilterPredicate(new EndsWithFilter("01"));
+		if (dirIt) {
+			do {
+				if ( dirIt.IsDirectory() ) {
+					const char* name = dirIt.GetName();
+					// need to truncate the "01" from the name
+					size_t len = strlen(name) - 2;
+					if(len < sizeof(ieResRef)) {
+						strnlwrcpy(PCStats->SoundSet, name, int(len));
+						break;
+					}
+				}
+			} while (++dirIt);
 		}
-		strnlwrcpy(PCStats->SoundSet, file, 8);
 	} else {
-		strnlwrcpy(PCStats->SoundSet, soundset, 8);
+		CopyResRef(PCStats->SoundSet, soundset);
 		PCStats->SoundFolder[0]=0;
 	}
 }
