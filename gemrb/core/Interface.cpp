@@ -2934,22 +2934,6 @@ int Interface::Roll(int dice, int size, int add) const
 
 DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 {
-	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
-		char extension[9];
-		ExtFilter(const char* ext) {
-			memcpy(extension, ext, sizeof(extension));
-		}
-
-		bool operator()(const char* fname) const {
-			const char* extpos = strrchr(fname, '.');
-			if (extpos) {
-				extpos++;
-				return stricmp(extpos, extension) == 0;
-			}
-			return false;
-		}
-	};
-
 	char Path[_MAX_PATH];
 	const char* resourcePath = NULL;
 	DirectoryIterator::FileFilterPredicate* filter = NULL;

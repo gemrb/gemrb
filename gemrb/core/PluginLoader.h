@@ -29,7 +29,7 @@ namespace GemRB {
  * It goes over all appropriately named files in PluginPath directory
  * and tries to load them one after another.
  */
-void LoadPlugins(char* pluginpath);
+void LoadPlugins(const char* pluginpath);
 
 }
 
