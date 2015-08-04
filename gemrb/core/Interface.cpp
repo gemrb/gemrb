@@ -2817,6 +2817,28 @@ int Interface::PlayMovie(const char* ResRef)
 	int cnt = 0;
 	int offset = 0;
 
+	//check whether there is an override for this movie
+	const char *sound_resref = NULL;
+	AutoTable mvesnd;
+	if (mvesnd.load("mvesnd", true)) {
+		int row = mvesnd->GetRowIndex(ResRef);
+		if (row != -1) {
+			int mvecol = mvesnd->GetColumnIndex("override");
+			if (mvecol != -1) {
+				realResRef = mvesnd->QueryField(row, mvecol);
+			}
+			int sndcol = mvesnd->GetColumnIndex("sound_override");
+			if (sndcol != -1) {
+				sound_resref = mvesnd->QueryField(row, sndcol);
+			}
+		}
+	}
+
+	ResourceHolder<MoviePlayer> mp(realResRef);
+	if (!mp) {
+		return -1;
+	}
+
 	//one of these two should exist (they both mean the same thing)
 	vars->Lookup("Display Movie Subtitles", subtitles);
 	if (subtitles) {
@@ -2853,31 +2875,6 @@ int Interface::PlayMovie(const char* ResRef)
 				palette = new Palette( fore, back );
 			}
 		}
-	}
-	
-	//check whether there is an override for this movie
-	const char *sound_resref = NULL;
-	AutoTable mvesnd;
-	if (mvesnd.load("mvesnd", true)) {
-		int row = mvesnd->GetRowIndex(ResRef);
-		if (row != -1) {
-			int mvecol = mvesnd->GetColumnIndex("override");
-			if (mvecol != -1) {
-				realResRef = mvesnd->QueryField(row, mvecol);
-			}
-			int sndcol = mvesnd->GetColumnIndex("sound_override");
-			if (sndcol != -1) {
-				sound_resref = mvesnd->QueryField(row, sndcol);
-			}
-		}
-	}
-
-	ResourceHolder<MoviePlayer> mp(realResRef);
-	if (!mp) {
-		gamedata->FreePalette(palette);
-		free(frames);
-		free(strrefs);
-		return -1;
 	}
 
 	//shutting down music and ambients before movie
