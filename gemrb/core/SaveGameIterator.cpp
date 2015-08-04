@@ -527,12 +527,10 @@ static int CanSave()
 			displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 			return 6;
 		}
-
-                if (map->AnyEnemyNearPoint(actor->Pos)) {
-                        displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
-                        return 7;
-                }
-
+		if (map->AnyEnemyNearPoint(actor->Pos)) {
+			displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
+			return 7;
+		}
 	}
 
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
