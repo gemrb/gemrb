@@ -39,19 +39,43 @@ struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 	}
 };
 
-struct LastCharFilter : DirectoryIterator::FileFilterPredicate {
-	char lastchar;
-	LastCharFilter(char lastchar) {
-		this->lastchar = tolower(lastchar);
+struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
+	char* endMatch;
+	size_t len;
+
+	EndsWithFilter(const char* endString) {
+		endMatch = strdup(endString);
+		len = strlen(endMatch);
+	}
+
+	~EndsWithFilter() {
+		free(endMatch);
 	}
 
 	bool operator()(const char* fname) const {
-		const char* extpos = strrchr(fname, '.');
-		if (extpos) {
-			extpos--;
-			return tolower(*extpos) == lastchar;
+		// this filter ignores file extension
+		const char* rpos = strrchr(fname, '.');
+		if (rpos) {
+			// has an extension
+			--rpos;
+		} else {
+			rpos = fname + strlen(fname)-1;
 		}
-		return false;
+
+		const char* fpos = rpos - len;
+		if (fpos < fname) {
+			// impossible to be equal. this length is out of bounds
+			return false;
+		}
+
+		const char* cmp = endMatch;
+		while (fpos <= rpos) {
+			// our fileters are case insensitive
+			if (tolower(*cmp++) != tolower(*fpos++)) {
+				return false;
+			}
+		}
+		return true;
 	}
 };
 

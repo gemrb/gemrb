@@ -3137,13 +3137,13 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	bool dirs = false;
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
-			dirit.SetFilterPredicate(new LastCharFilter((flags) ? 'S' : 'M'), true);
+			dirit.SetFilterPredicate(new EndsWithFilter((flags) ? "S" : "M"), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			if (core->HasFeature( GF_SOUNDFOLDERS )) {
 				dirs = true;
 			} else {
-				dirit.SetFilterPredicate(new LastCharFilter('A'), true);
+				dirit.SetFilterPredicate(new EndsWithFilter("A"), true);
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:
