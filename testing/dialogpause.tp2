@@ -6,12 +6,26 @@ BEGIN ~Test of dialog related script pause~
 OUTER_TEXT_SPRINT crefile ~charbase.cre~
 OUTER_SET anims = ~0x7200~ // bears
 OUTER_TEXT_SPRINT pscript ~dplayer3.bcs~
+OUTER_SET death = ~0x0280~ // death variable / script name
 ACTION_IF (ENGINE_IS ~pst~)
 THEN BEGIN
-	FAIL ~PST: no known convenient global or tno script~
 	OUTER_TEXT_SPRINT crefile ~0201md1.cre~
 	OUTER_SET anims = ~0xE040~ // misc
-	OUTER_TEXT_SPRINT pscript ~~
+	OUTER_TEXT_SPRINT pscript ~pcname.bcs~
+	OUTER_SET death = ~0x0324~
+END
+
+ACTION_IF (ENGINE_IS ~iwd how totlm~)
+THEN BEGIN
+	OUTER_SET death = ~0x02e8~
+END
+
+OUTER_TEXT_SPRINT cc1 ~CreateCreature("tester1", [1000.1000], 4)~
+OUTER_TEXT_SPRINT cc2 ~CreateCreature("tester2", [1009.1009], 0)~
+ACTION_IF (ENGINE_IS ~iwd2~)
+THEN BEGIN
+	OUTER_TEXT_SPRINT cc1 ~CreateCreature("tester1", "tester1", [1000.1000], 4)~
+	OUTER_TEXT_SPRINT cc2 ~CreateCreature("tester2", "tester2", [1009.1009], 0)~
 END
 
 // append a script so the magic can be triggered via hotkey
@@ -20,20 +34,21 @@ END
 IF Hotkey(K)
 THEN
   RESPONSE #100
-	ClearAllActions()
+//	ClearAllActions()
 	JumpToPoint([1030.1030])
 	MoveViewPoint([1030.1030], INSTANT)
-	CreateCreature("tester1", [1000.1000], 4)
-	CreateCreature("tester2", [1009.1009], 0)
+	%cc1%
+	%cc2%
 	Wait(1)
 	ActionOverride("tester2", ChangeAIScript("tester2", OVERRIDE))
 	Wait(1)
-	ActionOverride("tester1", StartDialog("tester1", Player1))
+	ChangeEnemyAlly("tester1", NEUTRAL)
+	ActionOverride("tester1", StartDialog("tester1", [PC]))
 END
 >>>>>>>>
 
-COMPILE ~starter.baf~
-EXTEND_TOP ~%pscript%~ ~starter.baf~
+COMPILE EVAL ~starter.baf~
+EXTEND_TOP ~%pscript%~ ~starter.baf~ EVALUATE_BUFFER
 
 // polymorph, wait and repeat
 OUTER_SET anims2 = %anims% + 1
@@ -81,13 +96,11 @@ COPY_EXISTING ~%crefile%~ ~override/tester1.cre~
               SAY NAME1 ~tester1~
               SAY NAME2 ~tester1~
               /*Death variable*/
-              WRITE_ASCII 0x0280 ~TESTER1~ #8
-//              /*Dialog*/
-//              WRITE_ASCII 0x02cc ~TESTER1~ #8
+              WRITE_ASCII %death% ~TESTER1~ #8
 BUT_ONLY_IF_IT_CHANGES
 COPY_EXISTING ~%crefile%~ ~override/tester2.cre~
               SAY NAME1 ~tester2~
               SAY NAME2 ~tester2~
               /*Death variable*/
-              WRITE_ASCII 0x0280 ~TESTER2~ #8
+              WRITE_ASCII %death% ~TESTER2~ #8
 BUT_ONLY_IF_IT_CHANGES
