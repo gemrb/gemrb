@@ -1,0 +1,93 @@
+BACKUP ~gem_test2/backup~
+AUTHOR ~GemRB team - www.gemrb.org~
+
+BEGIN ~Test of dialog related script pause~
+
+OUTER_TEXT_SPRINT crefile ~charbase.cre~
+OUTER_SET anims = ~0x7200~ // bears
+OUTER_TEXT_SPRINT pscript ~dplayer3.bcs~
+ACTION_IF (ENGINE_IS ~pst~)
+THEN BEGIN
+	FAIL ~PST: no known convenient global or tno script~
+	OUTER_TEXT_SPRINT crefile ~0201md1.cre~
+	OUTER_SET anims = ~0xE040~ // misc
+	OUTER_TEXT_SPRINT pscript ~~
+END
+
+// append a script so the magic can be triggered via hotkey
+// dplayer3 is the protagonist script in all games but pst grrr
+<<<<<<<< starter.baf
+IF Hotkey(K)
+THEN
+  RESPONSE #100
+	ClearAllActions()
+	JumpToPoint([1030.1030])
+	MoveViewPoint([1030.1030], INSTANT)
+	CreateCreature("tester1", [1000.1000], 4)
+	CreateCreature("tester2", [1009.1009], 0)
+	Wait(1)
+	ActionOverride("tester2", ChangeAIScript("tester2", OVERRIDE))
+	Wait(1)
+	ActionOverride("tester1", StartDialog("tester1", Player1))
+END
+>>>>>>>>
+
+COMPILE ~starter.baf~
+EXTEND_TOP ~%pscript%~ ~starter.baf~
+
+// polymorph, wait and repeat
+OUTER_SET anims2 = %anims% + 1
+OUTER_SET anims3 = %anims% + 2
+OUTER_SET anims4 = %anims% + 3
+<<<<<<<< tester2.baf
+IF True()
+THEN
+  RESPONSE #100
+	Polymorph(%anims%)
+	Wait(1)
+	Polymorph(%anims2%)
+	Wait(1)
+	Polymorph(%anims3%)
+	Wait(1)
+	Polymorph(%anims4%)
+	Wait(1)
+END
+>>>>>>>>
+
+COMPILE EVALUATE_BUFFER ~tester2.baf~
+
+// now for the dummy dialog for tester1
+<<<<<<<< tester1.d
+BEGIN ~tester1~
+
+IF ~True()~ THEN BEGIN 0
+	SAY #1
+	IF ~~ THEN GOTO 1
+END
+IF ~~ THEN BEGIN 1
+	SAY #2
+	IF ~~ THEN REPLY #3 GOTO 2
+END
+IF ~~ THEN BEGIN 2
+	SAY #3
+	IF ~~ THEN REPLY #4 GOTO 0
+	IF ~~ THEN REPLY #5 DO ~Wait(2)~ EXIT
+END
+>>>>>>>>
+COMPILE ~tester1.d~
+
+// create the actors for interaction
+COPY_EXISTING ~%crefile%~ ~override/tester1.cre~
+              SAY NAME1 ~tester1~
+              SAY NAME2 ~tester1~
+              /*Death variable*/
+              WRITE_ASCII 0x0280 ~TESTER1~ #8
+//              /*Dialog*/
+//              WRITE_ASCII 0x02cc ~TESTER1~ #8
+BUT_ONLY_IF_IT_CHANGES
+COPY_EXISTING ~%crefile%~ ~override/tester2.cre~
+              SAY NAME1 ~tester2~
+              SAY NAME2 ~tester2~
+              /*Death variable*/
+              WRITE_ASCII 0x0280 ~TESTER2~ #8
+BUT_ONLY_IF_IT_CHANGES
