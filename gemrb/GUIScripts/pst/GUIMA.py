@@ -61,7 +61,7 @@ def OpenMapWindow ():
 	# Add Note
 	Button = Window.GetControl (1)
 	Button.SetText (4182)
-	Button.SetVarAssoc ("x", IE_GUI_MAP_SET_NOTE)
+	Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_SET_NOTE)
 
 	# Note text
 	Text = Window.GetControl (4)
@@ -74,8 +74,8 @@ def OpenMapWindow ():
 	# 4 is the Label's control ID
 	Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
 	Map = Window.GetControl (3)
-	GemRB.SetVar ("x", IE_GUI_MAP_VIEW_NOTES)
-	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
 	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
@@ -120,7 +120,7 @@ def NoteChanged ():
 def SetMapNote ():
 	global PosX, PosY
 
-	if GemRB.GetVar ("x")!=IE_GUI_MAP_SET_NOTE:
+	if GemRB.GetVar ("ShowMapNotes") != IE_GUI_MAP_SET_NOTE:
 		return
 
 	Label = MapWindow.GetControl (4)
@@ -136,8 +136,8 @@ def SetMapNote ():
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
 	Map = MapWindow.GetControl (3)
-	GemRB.SetVar ("x", IE_GUI_MAP_VIEW_NOTES)
-	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	return
 
 def OpenWorldMapWindowInside ():
