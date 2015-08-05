@@ -21,7 +21,7 @@ their own files. User specific configuration is in other file (GemRB.cfg).
 Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
 AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
-HasSpecificDamageBonus (mod required),
+HasSpecificDamageBonus (mod required), SimplifiedDisruption,
 HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack
  and TeamMovement.
 
@@ -511,6 +511,12 @@ SelectiveMagicRes = <bool>
 - - - - - - - - - - - -
 Determines whether the magic resistance applies to all effects, even the
 beneficial ones.
+
+
+SimplifiedDisruption = <bool>
+- - - - - - - - - - - - - - -
+Use the ToBEx simplified "concentration" checks, ie. damage only disrupts
+casting if enough was made ([1D20 + luck] < [spell level + damage taken]).
 
 
 SkipUpdateHack = <bool>

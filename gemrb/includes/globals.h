@@ -134,7 +134,7 @@ namespace GemRB {
 #define  GF_ONSCREEN_TEXT       	44 //pst
 #define  GF_SPECIFIC_DMG_BONUS		45 //how, iwd2
 #define  GF_STRREF_SAVEGAME       	46 //iwd2
-#define  GF_UNUSED1       	    	47 // removed - reuse when needing a new flag!
+#define  GF_SIMPLE_DISRUPTION      	47 // ToBEx: simplified disruption
 #define  GF_BIOGRAPHY_RES               48 //iwd branch
 #define  GF_NO_BIOGRAPHY                49 //pst
 #define  GF_STEAL_IS_ATTACK             50 //bg2 for sure

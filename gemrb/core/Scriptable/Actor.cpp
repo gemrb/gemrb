@@ -3943,9 +3943,13 @@ void Actor::GetHit(int damage, int spellLevel)
 // - concentration is checked when casting is taking place <= 5' from an enemy
 bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 {
+	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
+		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
+	}
 	if (!third) {
 		return true;
 	}
+
 	if (!LastSpellTarget && LastTargetPos.isempty()) {
 		// not casting, nothing to do
 		return false;

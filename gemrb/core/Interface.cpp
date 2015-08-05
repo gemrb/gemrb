@@ -2169,7 +2169,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
-		"HasWisdomBonusTable",//47GF_UNUSED1
+		"SimplifiedDisruption",//47GF_SIMPLE_DISRUPTION
 		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
 		"NoBiography",        //49GF_NO_BIOGRAPHY
 		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
