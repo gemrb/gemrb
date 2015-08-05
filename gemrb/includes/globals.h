@@ -163,7 +163,7 @@ namespace GemRB {
 #define  GF_ZERO_TIMER_IS_VALID         73 // how, not bg2, other unknown
 #define  GF_SKIPUPDATE_HACK             74 // how, not bg2
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
-#define  GF_FORCE_DIALOGPAUSE           76 // iwd/how, not bg1, bg2 is special
+#define  GF_FORCE_DIALOGPAUSE           76 // iwd/how, bg1, bg2 is special
 
 //update this or bad things can happen
 #define GF_COUNT 77
