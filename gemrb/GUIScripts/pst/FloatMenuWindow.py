@@ -110,7 +110,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 			FloatMenuWindow.Unload ()
 		FloatMenuWindow = None
 
-		#FIXME: UnpauseGameTimer
 		GemRB.GamePause (False, 0)
 		GemRB.SetVar ("FloatWindow", -1)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
@@ -133,8 +132,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	if not GemRB.GameGetFirstSelectedPC ():
 		GemRB.UnhideGUI ()
 		return
-	# FIXME: remember current selection
-	#FIXME: PauseGameTimer
+
 	GemRB.GamePause (True, 0)
 	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
@@ -142,7 +140,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 	FloatMenuWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
-	# FIXME: keep the menu inside the viewport!!!
 	Window.SetPos (x, y, WINDOW_CENTER | WINDOW_BOUNDED)
 
 	# portrait button
@@ -371,7 +368,7 @@ def RefreshSpellList(pc, innate):
 		else:
 			type = IE_SPELL_TYPE_PRIEST
 
-	# FIXME: ugly, should be in Spellbook.cpp
+	# FIXME: ugly, rewrite using Spellbook.py
 	spell_hash = {}
 	spell_list = []
 	#level==0 is level #1
@@ -527,7 +524,6 @@ def FloatMenuSelectWeapons ():
 	float_menu_mode = MENU_MODE_WEAPONS
 	float_menu_index = 0
 	float_menu_selected = None
-	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 	return
