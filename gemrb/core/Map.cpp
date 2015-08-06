@@ -3800,7 +3800,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	//this will make the animation stop when the game is stopped
 	//a possible gemrb feature to have this flag settable in .are
 	anim->gameAnimation = true;
-	anim->pos = frame;
+	anim->SetPos(frame); // sanity check it first
 	anim->Flags = Flags;
 	anim->x = Pos.x;
 	anim->y = Pos.y;
