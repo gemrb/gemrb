@@ -4816,7 +4816,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
 		return (ieStrRef) -1;
 	}
-	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
+	Scriptable *pc = game->GetSelectedPCSingle(false);
 
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
