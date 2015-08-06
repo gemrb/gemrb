@@ -1673,6 +1673,8 @@ Selectable::Selectable(ScriptableType type)
 	cover = NULL;
 	circleBitmap[0] = NULL;
 	circleBitmap[1] = NULL;
+	selectedColor = ColorBlack;
+	overColor = ColorBlack;
 }
 
 void Selectable::SetSpriteCover(SpriteCover* c)
