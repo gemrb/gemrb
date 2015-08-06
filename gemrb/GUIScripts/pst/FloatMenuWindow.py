@@ -117,7 +117,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
-			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 			return
 
 		if float_menu_mode == MENU_MODE_ITEMS:
@@ -137,6 +136,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	# FIXME: remember current selection
 	#FIXME: PauseGameTimer
 	GemRB.GamePause (True, 0)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 	GemRB.LoadWindowPack ("GUIWORLD")
 	FloatMenuWindow = Window = GemRB.LoadWindow (3)
