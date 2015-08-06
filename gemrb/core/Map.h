@@ -407,7 +407,7 @@ public:
 	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
-	Actor* GetActorByDialog(const char* resref);
+	Scriptable* GetActorByDialog(const char* resref);
 	Actor* GetActorByResource(const char* resref);
 	Actor* GetActorByScriptName(const char* name);
 	bool HasActor(Actor *actor);

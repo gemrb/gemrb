@@ -1813,7 +1813,7 @@ Actor* Map::GetActor(int index, bool any)
 	return NULL;
 }
 
-Actor* Map::GetActorByDialog(const char *resref)
+Scriptable* Map::GetActorByDialog(const char *resref)
 {
 	size_t i = actors.size();
 	while (i--) {
@@ -1822,6 +1822,28 @@ Actor* Map::GetActorByDialog(const char *resref)
 		//set this to GD_CHECK
 		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
 			return actor;
+		}
+	}
+
+	if (!core->HasFeature(GF_INFOPOINT_DIALOGS)) {
+		return NULL;
+	}
+
+	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
+	i = TMap->GetInfoPointCount();
+	while (i--) {
+		InfoPoint* ip = TMap->GetInfoPoint(i);
+		if (strnicmp(ip->GetDialog(), resref, 8) == 0) {
+			return ip;
+		}
+	}
+
+	// move higher if someone needs talking doors
+	i = TMap->GetDoorCount();
+	while (i--) {
+		Door* door = TMap->GetDoor(i);
+		if (strnicmp(door->GetDialog(), resref, 8) == 0) {
+			return door;
 		}
 	}
 	return NULL;

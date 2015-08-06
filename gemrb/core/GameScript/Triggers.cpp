@@ -216,7 +216,7 @@ int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 {
-	Actor *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
+	Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
 	if ( !target ) {
 		return 0;
 	}

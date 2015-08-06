@@ -255,9 +255,10 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	Actor *tgt = NULL;
+	Scriptable *tgt = NULL;
+	Actor *tgta = NULL;
 	if (target->Type == ST_ACTOR) {
-		tgt = (Actor *)target;
+		tgta = (Actor *)target;
 	}
 
 	int si;
@@ -271,13 +272,13 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			return false;
 		}
 
-		if (tgt) {
+		if (tgta) {
 			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
 				gc->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
-				tgt->TalkCount++;
+				tgta->TalkCount++;
 			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
 				gc->SetDialogueFlags(DF_INTERACT, BM_NAND);
-				tgt->InteractCount++;
+				tgta->InteractCount++;
 			}
 		}
 		// does this belong here? we must clear actions somewhere before
@@ -334,18 +335,24 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
 			tgt = NULL;
+			tgta = NULL;
 			if (originalTargetID) {
 				// always try original target first (sometimes there are multiple
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
-				tgt = GetActorByGlobalID(originalTargetID);
-				if (tgt && strnicmp( tgt->GetDialog(GD_NORMAL), tr->Dialog, 8 ) != 0) {
-					tgt = NULL;
+				tgta = GetActorByGlobalID(originalTargetID);
+				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
+					tgta = NULL;
+				} else {
+					tgt = tgta;
 				}
 			}
 			if (!tgt) {
 				// then just search the current area for an actor with the dialog
 				tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+				if (tgt && tgt->Type == ST_ACTOR) {
+					tgta = (Actor *) tgt;
+				}
 			}
 			if (!tgt) {
 				// try searching for banter dialogue: the original engine seems to
@@ -365,6 +372,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					}
 					int row = pdtable->FindTableValue( col, tr->Dialog );
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
+					if (tgt && tgt->Type == ST_ACTOR) {
+						tgta = (Actor *) tgt;
+					}
 				}
 			}
 
@@ -375,7 +385,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 			Actor *oldTarget = GetActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
-			tgt->SetCircleSize();
+			if (tgta) tgta->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
 			target = tgt;
 
@@ -407,8 +417,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	// displaying npc text and portrait
 	const char *portrait = NULL;
-	if (tgt) {
-		portrait = tgt->GetPortrait(1);
+	if (tgta) {
+		portrait = tgta->GetPortrait(1);
 	}
 	if (portrait) {
 		// dialog speaker pic
