@@ -1790,6 +1790,17 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
 		case ST_TRIGGER:
+			// pst, eg. ar1500
+			if (trap->GetDialog()[0]) {
+				Point TalkPos = trap->Pos; //wtf, TalkPos doesn't work for ar1800
+
+				if (PersonalDistance(TalkPos, actor) > MAX_OPERATING_DISTANCE ) {
+					MoveNearerTo(actor, TalkPos, MAX_OPERATING_DISTANCE, 1);
+				}
+				trap->AddAction(GenerateAction("Dialogue([PC])"));
+				return true;
+			}
+
 			// always display overhead text; totsc's ar0511 library relies on it
 			if (!trap->GetOverheadText().empty()) {
 				if (!trap->OverheadTextIsDisplaying()) {
