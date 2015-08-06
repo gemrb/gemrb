@@ -312,7 +312,11 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			target->AddAction( GenerateAction( "SetInterrupt(FALSE)" ) );
 			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
-			target->AddAction( GenerateAction( "BreakInstants()" ) );
+			// FIXME: figure out if pst needs something similar (action missing)
+			//        (not conditional on GenerateAction to prevent console spam)
+			if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+				target->AddAction(GenerateAction("BreakInstants()"));
+			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
 			}
