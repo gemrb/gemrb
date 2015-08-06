@@ -342,6 +342,7 @@ public:
 	bool SelectPCSingle(int index);
 	/** Get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle() const;
+	Actor* GetSelectedPCSingle(bool onlyalive);
 	/** (De)selects actor. */
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 

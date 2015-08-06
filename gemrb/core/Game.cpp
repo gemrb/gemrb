@@ -589,6 +589,17 @@ int Game::GetSelectedPCSingle() const
 	return SelectedSingle;
 }
 
+Actor* Game::GetSelectedPCSingle(bool onlyalive)
+{
+	Actor *pc = FindPC(SelectedSingle);
+	if (!pc) return NULL;
+
+	if (onlyalive && !IsAlive(pc)) {
+		return NULL;
+	}
+	return pc;
+}
+
 /*
  * SelectActor() - handle (de)selecting actors.
  * If selection was changed, runs "SelectionChanged" handler
