@@ -45,6 +45,7 @@ def OpenMapWindow ():
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		return
 
