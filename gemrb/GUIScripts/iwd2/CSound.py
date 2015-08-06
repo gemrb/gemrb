@@ -52,18 +52,13 @@ def OnLoad():
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
 	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
 
-	DefaultButton = SoundWindow.GetControl(47)
-	DefaultButton.SetText(33479)
+	PlayButton = SoundWindow.GetControl(47)
+	PlayButton.SetText(17318)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DefaultPress)
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	SoundWindow.SetVisible(WINDOW_VISIBLE)
-	return
-
-def DefaultPress():
-	GemRB.SetVar("Sound",0)  #scrapping the sound value
-	TextAreaControl.SetVarAssoc("Sound", 0)
 	return
 
 def BackPress():
