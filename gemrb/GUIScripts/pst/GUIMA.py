@@ -72,7 +72,7 @@ def OpenMapWindow ():
 	# Map Control
 	# ronote and usernote are the pins for the notes
 	# 4 is the Label's control ID
-	Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
+	Window.CreateMapControl (3, 24, 23, 480, 360, 0x10000005, "USERNOTE","RONOTE")
 	Map = Window.GetControl (3)
 	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)

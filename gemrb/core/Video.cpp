@@ -50,6 +50,12 @@ Video::Video(void)
 		Gamma22toGamma10[i] = (unsigned char)(0.5 + (pow (i/255.0, 2.2/1.0) * 255.0));
 		Gamma10toGamma22[i] = (unsigned char)(0.5 + (pow (i/255.0, 1.0/2.2) * 255.0));
 	}
+
+	// boring inits just to be extra clean
+	xCorr = yCorr = width = height = bpp = 0;
+	fullscreen = false;
+	subtitlefont = NULL;
+	subtitlepal = NULL;
 }
 
 Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
