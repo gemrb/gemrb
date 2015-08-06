@@ -1821,6 +1821,8 @@ Highlightable::Highlightable(ScriptableType type)
 	Cursor = IE_CURSOR_NORMAL;
 	KeyResRef[0] = 0;
 	EnterWav[0] = 0;
+	outlineColor = ColorBlack;
+	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
 
 Highlightable::~Highlightable(void)
