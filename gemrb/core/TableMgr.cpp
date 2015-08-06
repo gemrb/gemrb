@@ -35,6 +35,7 @@ TableMgr::~TableMgr()
 
 AutoTable::AutoTable()
 {
+	tableref = 0;
 }
 
 AutoTable::AutoTable(const char* ResRef, bool silent)
