@@ -25,6 +25,9 @@
  * @author The GemRB Project
  */
 
+#ifndef VOODOO_H
+#define VOODOO_H
+
 namespace GemRB {
 
 // Constant to convert from points to (feet) for spell distance calculation
@@ -67,3 +70,5 @@ static const int VOODOO_DIALOG_RANGE = 15;
 static const int VOODOO_CHAR_SPEED = 9;
 
 }
+
+#endif
