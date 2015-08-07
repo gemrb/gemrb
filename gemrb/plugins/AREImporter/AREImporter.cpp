@@ -2151,13 +2151,13 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			int len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
-				// we convert to MB because it fits more than if we jsut wrote the wide characters
+				// we convert to MB because it fits more than if we wrote the wide characters
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
 				if (mbstring) {
 					// FIXME: do we require the \0 byte? doing 499 just to be safe...
-					// just care about number of bytes before null so strlen is what we want despite being MB stirng
-					len = std::min(int(strlen(mbstring)), 499);
+					// only care about number of bytes before null so strlen is what we want despite being MB string
+					len = std::min(static_cast<int>(strlen(mbstring)), 499);
 					stream->Write( mbstring, len);
 					free(mbstring);
 				} else {
