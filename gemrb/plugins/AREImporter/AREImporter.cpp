@@ -2148,18 +2148,18 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn.Pos.y;
 			stream->WriteDword( &tmpDword );
-			int len = 0;
+			size_t len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = (std::min)(mbtowc(0, mbstring, mn.text->length()), 500);
-				stream->Write( mbstring, len);
+				len = std::min<size_t>(mbstowcs(0, mbstring, mn.text->length()), 500);
+				stream->Write( mbstring, int(len));
 				free(mbstring);
 			}
 
 			// pad the remaining space
-			x = 500-len;
+			x = int(500-len);
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}
