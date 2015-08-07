@@ -2148,18 +2148,25 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn.Pos.y;
 			stream->WriteDword( &tmpDword );
-			size_t len = 0;
+			int len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
+				// we convert to MB because it fits more than if we jsut wrote the wide characters
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = std::min<size_t>(mbstowcs(0, mbstring, mn.text->length()), 500);
-				stream->Write( mbstring, int(len));
-				free(mbstring);
+				if (mbstring) {
+					// FIXME: do we require the \0 byte? doing 499 just to be safe...
+					// just care about number of bytes before null so strlen is what we want despite being MB stirng
+					len = std::min(int(strlen(mbstring)), 499);
+					stream->Write( mbstring, len);
+					free(mbstring);
+				} else {
+					Log(WARNING, "AREImporter", "MapNote converted to an invalid multibyte sequence; cannot write it to file.\nFailed Note: %ls", mn.text->c_str());
+				}
 			}
 
 			// pad the remaining space
-			x = int(500-len);
+			x = 500 - len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}
