@@ -4847,7 +4847,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	}
 	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
-	map->Shout((Actor *) Sender, 0, 40);
+	map->Shout((Actor *) Sender, 0, VOODOO_SHOUT_RANGE);
 }
 
 void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)

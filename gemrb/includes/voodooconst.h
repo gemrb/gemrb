@@ -57,7 +57,7 @@ static unsigned int MAX_OPERATING_DISTANCE = 40; //a search square is 16x12 (dia
 static const unsigned int ___MOD = MAX_OPERATING_DISTANCE; // just to silence var-unused errors
 
 // used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
-// while it looks too big, it still seems too small for pst
+// while it looks too big, it is needed this big in at least pst (help())
 static const int VOODOO_SHOUT_RANGE = 400;
 
 // visual range stuff
