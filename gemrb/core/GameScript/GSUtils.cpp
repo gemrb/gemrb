@@ -119,6 +119,11 @@ void InitScriptTables()
 			rmodchr[charisma] = strtol(rmc->QueryField(0, charisma), NULL, 0);
 		}
 	}
+
+	// see note in voodooconst.h
+	if (core->HasFeature(GF_AREA_OVERRIDE)) {
+		MAX_OPERATING_DISTANCE = 40*3;
+	}
 }
 
 int GetReaction(Actor *target, Scriptable *Sender)

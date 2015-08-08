@@ -50,8 +50,6 @@ class SpriteCover;
 #define MAX_GROUND_ICON_DRAWN   3
 #define MAX_TIMER		256
 
-/** The distance of operating a trigger, container, etc. */
-#define MAX_OPERATING_DISTANCE      40 //a search square is 16x12 (diagonal of 20), so that's two search squares
 /** The distance between PC's who are about to enter a new area */
 #define MAX_TRAVELING_DISTANCE      400
 

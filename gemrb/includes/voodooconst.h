@@ -49,9 +49,12 @@ static const int VOODOO_FINDTRAP_RANGE = 10;
 // ypos_by_direction and xpos_by_direction
 
 // MAX_TRAVELING_DISTANCE is our choice, only used for party travel
-// MAX_OPERATING_DISTANCE is a guess too and seems to be wrong for pst
-// FIXME: not included here until more is known, since it is used in many files
-// test cases: tob pp summoning spirit, pst portals, pst AR0405 and AR0508
+// MAX_OPERATING_DISTANCE is a guess
+// test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
+// it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
+// The distance of operating a trigger, container, dialog buffer etc.
+static unsigned int MAX_OPERATING_DISTANCE = 40; //a search square is 16x12 (diagonal of 20), so that's about two
+static const unsigned int ___MOD = MAX_OPERATING_DISTANCE; // just to silence var-unused errors
 
 // used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
 // while it looks too big, it still seems too small for pst
