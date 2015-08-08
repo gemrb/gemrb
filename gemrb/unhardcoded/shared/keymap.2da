@@ -3,6 +3,7 @@
                       MODULE           FUNCTION                          GROUP
 Inventory             GUIINV           OpenInventoryWindow               0
 Character_Record      GUIREC           OpenRecordsWindow                 0
+Character_Stats       GUIREC           OpenRecordsWindow                 0
 Return_To_Game        GUICommonWindows ReturnToGame                      0
 Journal               GUIJRNL          OpenJournalWindow                 0
 Map                   GUIMA            OpenMapWindow                     0 
@@ -35,6 +36,7 @@ Toggle_AI             GUICommonWindows AIPress                           0
 Hard_Pause            GUICommonWindows HardPausePressed                  0
 Location              GUICommon        LocationPressed                   0
 Chat_Window           GUIMP            *
+Center_Character      GUICommonWindows OnLockViewPress                   0
 Spell_Slot_1          GUICommonWindows ActionQSpell1Pressed              0
 Spell_Slot_2          GUICommonWindows ActionQSpell2Pressed              0
 Spell_Slot_3          GUICommonWindows ActionQSpell3Pressed              0
