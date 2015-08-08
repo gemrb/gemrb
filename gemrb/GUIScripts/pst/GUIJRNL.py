@@ -438,7 +438,6 @@ def OpenLogWindow ():
 		#   of the first journal entry compared to journal in
 		#   orig. game. So it's probably computed since "awakening"
 		#   there instead of start of the day.
-		# FIXME: use strref 19310 or 64192
 
 		gt = StartTime + je["GameTime"]
 		dt = int (gt/86400)
