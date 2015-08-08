@@ -4678,18 +4678,23 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 void GameScript::Damage(Scriptable* Sender, Action* parameters)
 {
 	Actor *damagee;
-	Actor *damager;
+	Scriptable *damager = Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
+
+	int diceNum = (parameters->int1Parameter>>12)&15;
+	int diceSize = (parameters->int1Parameter>>4)&255;
+	int diceAdd = parameters->int1Parameter&15;
+	int damage = 0;
 	damagee = (Actor *) tar;
 	if (Sender->Type==ST_ACTOR) {
-		damager=(Actor *) Sender;
+		Actor *damager2 = (Actor *) Sender;
+		damage = damager2->LuckyRoll(diceNum, diceSize, diceAdd, LR_DAMAGELUCK, damagee);
 	} else {
-		damager=damagee;
+		damage = core->Roll(diceNum, diceSize, diceAdd);
 	}
-	int damage = damager->LuckyRoll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15, LR_DAMAGELUCK, damagee);
 	int type=MOD_ADDITIVE;
 	switch(parameters->int0Parameter) {
 	case 2: //raise
