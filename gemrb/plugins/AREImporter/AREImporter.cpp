@@ -2155,9 +2155,8 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
 				if (mbstring) {
-					// FIXME: do we require the \0 byte? doing 499 just to be safe...
 					// only care about number of bytes before null so strlen is what we want despite being MB string
-					len = (std::min)(static_cast<int>(strlen(mbstring)), 499);
+					len = (std::min)(static_cast<int>(strlen(mbstring)), 500);
 					stream->Write( mbstring, len);
 					free(mbstring);
 				} else {
