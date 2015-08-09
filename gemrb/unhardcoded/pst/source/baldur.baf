@@ -136,6 +136,18 @@ THEN
 END
 
 IF
+  GlobalGT("lady","GLOBAL",49)
+  Global("ar1900_visited","GLOBAL",1)
+  UsedExit("sigil",Protagonist)
+  !CreatureInArea("ar1900")
+THEN
+  RESPONSE #100
+    ClearAllActions()
+    StartMovie("maze2")
+    QuitGame(0,0,0) // movval.ids only has the finale movies
+END
+
+IF
   Global("sabotage","GLOBAL",5)
   CreatureInArea("ar0512")
   UsedExit("foundry",[PC])
