@@ -1167,7 +1167,7 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
+		actor->WalkTo(parameters->pointParameter, 0, parameters->int1Parameter);
 	}
 
 	//hopefully this hack will prevent lockups
