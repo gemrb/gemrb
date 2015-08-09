@@ -1610,7 +1610,7 @@ bool Scriptable::AuraPolluted()
 	if (AuraTicks >= core->Time.attack_round_size) {
 		AuraTicks = -1;
 		return false;
-	} else if (CurrentActionTicks == 0 && AuraTicks != 1 && Type == ST_ACTOR) {
+	} else if (CurrentActionTicks == 0 && AuraTicks != 1) {
 		Actor *act = (Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
