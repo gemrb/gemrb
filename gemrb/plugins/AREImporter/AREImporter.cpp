@@ -1251,8 +1251,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Read(bytes, 500 );
 			bytes[500] = '\0';
 			String* text = StringFromCString(bytes);
-			map->AddMapNote( point, color, text);
 			str->ReadDword(&color); //readonly == 1
+			map->AddMapNote(point, color, text);
 			str->Seek(20, GEM_CURRENT_POS);
 		} else {
 			ieWord px,py;
