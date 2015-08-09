@@ -49,7 +49,7 @@ DialogHandler::DialogHandler(void)
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
-	initialState = -1;
+	initialState = previousX = previousY = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
 		sectionMap = bg2Sections;
 	} else {
@@ -143,19 +143,27 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
+	initialState = dlg->FindFirstState( tgt );
+	if (initialState < 0) {
+		return false;
+	}
+
 	Video *video = core->GetVideoDriver();
+	if (previousX == -1) {
+		//save previous viewport so we can restore it at the end
+		Region vp = video->GetViewport();
+		previousX = vp.x;
+		previousY = vp.y;
+	}
+
 	//allow mouse selection from dialog (even though screen is locked)
 	video->SetMouseEnabled(true);
+	//TODO: this should not jump but scroll to the destination
 	gc->MoveViewportTo(tgt->Pos.x, tgt->Pos.y, true);
 
 	//check if we are already in dialog
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return true;
-	}
-
-	initialState = dlg->FindFirstState( tgt );
-	if (initialState < 0) {
-		return false;
 	}
 
 	//we need GUI for dialogs
@@ -225,6 +233,8 @@ void DialogHandler::EndDialog(bool try_to_break)
 		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);
 	}
 	gc->SetDialogueFlags(0, BM_SET);
+	gc->MoveViewportTo(previousX, previousY, false);
+	previousX = previousY = -1;
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
