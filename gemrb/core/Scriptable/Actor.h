@@ -319,7 +319,7 @@ public:
 	ToHitStats ToHit;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
-	ieDword UsedExit;
+	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ieResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];

@@ -53,6 +53,7 @@
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "RNG/RNG_SFMT.h"
+#include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -9381,8 +9382,14 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
-		UsedExit = LastExit;
 		memcpy(LastArea, Area, 8);
+		memset(UsedExit, 0, sizeof(ieVariable));
+		if (LastExit) {
+			const char *ipName = area->GetInfoPointByGlobalID(LastExit)->GetScriptName();
+			if (ipName[0]) {
+				snprintf(UsedExit, sizeof(ieVariable), "%s", ipName);
+			}
+		}
 	}
 	LastExit = exitID;
 }

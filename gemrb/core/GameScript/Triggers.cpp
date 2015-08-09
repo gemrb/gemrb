@@ -4110,14 +4110,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 
-	Map *ca = core->GetGame()->GetMap(actor->LastArea, false);
-
-	if (!ca) {
-		return 0;
-	}
-
-	InfoPoint *ip = ca->GetInfoPointByGlobalID(actor->UsedExit);
-	if (!ip || ip->Type!=ST_TRAVEL) {
+	if (!actor->LastArea[0]) {
 		return 0;
 	}
 
@@ -4133,7 +4126,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(ip->GetScriptName(), exit, 32) ) {
+		if (strnicmp(actor->UsedExit, exit, 32) ) {
 			continue;
 		}
 		return 1;
