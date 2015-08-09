@@ -4689,8 +4689,12 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	int diceAdd = parameters->int1Parameter&15;
 	int damage = 0;
 	damagee = (Actor *) tar;
+	Actor *damager2 = NULL;
 	if (Sender->Type==ST_ACTOR) {
-		Actor *damager2 = (Actor *) Sender;
+		damager2 = (Actor *) Sender;
+	}
+
+	if (damager2 && damager2 != damagee) {
 		damage = damager2->LuckyRoll(diceNum, diceSize, diceAdd, LR_DAMAGELUCK, damagee);
 	} else {
 		damage = core->Roll(diceNum, diceSize, diceAdd);
