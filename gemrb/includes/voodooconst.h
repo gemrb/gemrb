@@ -60,6 +60,10 @@ static const unsigned int ___MOD = MAX_OPERATING_DISTANCE; // just to silence va
 // while it looks too big, it is needed this big in at least pst (help())
 static const int VOODOO_SHOUT_RANGE = 400;
 
+// NearLocation range multiplier (currently the same for pst and iwd2/how)
+// arbitrary, started as 20 and has no effect for callers that want exact position
+static const int VOODOO_NEARLOC_F = 10;
+
 // visual range stuff
 static const int VOODOO_CANSEE_F = 15;
 // these two are well understood for actors, but could be different for other scriptables

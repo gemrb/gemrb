@@ -23,6 +23,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "AmbientMgr.h"
@@ -1557,14 +1558,14 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	if (parameters->pointParameter.isnull()) {
 		Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		int distance = PersonalDistance(p, scr);
-		if (distance <= ( parameters->int2Parameter * 10 )) {
+		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
 			return 1;
 		}
 		return 0;
 	}
 	//personaldistance is needed for modron constructs in PST maze
 	int distance = PersonalDistance(parameters->pointParameter, scr);
-	if (distance <= ( parameters->int0Parameter * 10 )) {
+	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
 		return 1;
 	}
 	return 0;
