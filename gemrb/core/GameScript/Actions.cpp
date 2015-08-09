@@ -3900,7 +3900,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	}
 	GameControl* gc = core->GetGameControl();
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		gc->dialoghandler->speakerID = tar->GetGlobalID();
+		gc->dialoghandler->SetSpeaker(tar);
 	} else {
 		Log(WARNING, "GameScript", "Can't set gabber!");
 	}

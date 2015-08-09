@@ -243,15 +243,14 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//this might disturb some modders, but this is the correct behaviour
 	//for example the aaquatah dialog in irenicus dungeon depends on it
 	GameControl *gc = core->GetGameControl();
-	Actor *pc = (Actor *) scr;
-	if (pc->GetGlobalID() == gc->dialoghandler->targetID || pc->GetGlobalID()==gc->dialoghandler->speakerID) {
+	if (gc->dialoghandler->InDialog(scr)) {
 		return 0;
 	}
 
 	//don't accept parties with the no interrupt flag
 	//this fixes bug #2573808 on gamescript level
 	//(still someone has to turn the no interrupt flag off)
-	if(!pc->GetDialog(GD_CHECK)) {
+	if(!target->GetDialog(GD_CHECK)) {
 		return 0;
 	}
 	return CanSee( Sender, target, false, GA_NO_DEAD|GA_NO_UNSCHEDULED );
@@ -320,7 +319,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (scr->GetGlobalID() == core->GetGameControl()->dialoghandler->speakerID)
+	if (core->GetGameControl()->dialoghandler->IsSpeaker(Sender))
 		return 1;
 	return 0;
 }
@@ -3121,7 +3120,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if ( (tar->GetGlobalID() != gc->dialoghandler->targetID) && (tar->GetGlobalID() != gc->dialoghandler->speakerID) ) {
+	if (!gc->dialoghandler->InDialog(tar)) {
 		return 1;
 	}
 	return 0;
@@ -3242,10 +3241,10 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if (Sender->GetGlobalID() != gc->dialoghandler->targetID && Sender->GetGlobalID() != gc->dialoghandler->speakerID) {
+	if (!gc->dialoghandler->InDialog(Sender)) {
 		return 0;
 	}
-	if (tar->GetGlobalID() != gc->dialoghandler->targetID && tar->GetGlobalID() != gc->dialoghandler->speakerID) {
+	if (!gc->dialoghandler->InDialog(tar)) {
 		return 0;
 	}
 	return 1;

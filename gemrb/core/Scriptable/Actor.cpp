@@ -724,7 +724,7 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_CHECKFORBERSERK]) {
 		color = &yellow;
 		color_index = 5;
-	} else if (gc && gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	} else if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
 		color = &white;
 		color_index = 3; //?? made up
 	} else {
@@ -5151,7 +5151,7 @@ bool Actor::CheckOnDeath()
 	}
 	// don't destroy actors currently in a dialog
 	GameControl *gc = core->GetGameControl();
-	if (gc && (GetGlobalID() == gc->dialoghandler->targetID || GetGlobalID() == gc->dialoghandler->speakerID)) {
+	if (gc && gc->dialoghandler->InDialog(this)) {
 		return false;
 	}
 
@@ -7612,7 +7612,7 @@ void Actor::Draw(const Region &screen)
 		drawcircle = false;
 	}
 	// the speaker should get a circle even in cutscenes
-	if (gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	if ((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
 		drawcircle = true;
 	}
 	bool drawtarget = false;

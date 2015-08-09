@@ -166,13 +166,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return true;
 	}
 
-	//we need GUI for dialogs
-	//but the guiscript must be in control here
-	//gc->UnhideGUI();
-
 	//no exploring while in dialogue
-	gc->SetScreenFlags(/*SF_GUIENABLED|*/SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
-	Log(WARNING, "DialogHandler", "Errors occuring while in dialog mode cannot be logged in the MessageWindow.");
+	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
 	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
@@ -184,26 +179,21 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!(dlg->Flags&7) ) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 	}
-	//opening control size to maximum, enabling dialog window
-	//but the guiscript must be in control here
-	//core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
-	//core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
-	//core->SetEventFlag(EF_PORTRAIT);
 	return true;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
+		return;
+	}
+
 	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		// reset the TA
 		ta->SetAnimPicture(NULL);
 		ta->ClearSelectOptions();
-	}
-
-	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
-		return;
 	}
 
 	Actor *tmp = GetSpeaker();
@@ -406,14 +396,6 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
-			/*if (target->GetInternalFlag()&IF_NOINT) {
-				// this whole check moved out of InitDialog by fuzzie, see comments
-				// for the IF_NOINT check in BeginDialog
-				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
-				ta->SetMinRow( false );
-				EndDialog();
-				return;
-			}*/
 			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
 				EndDialog();
@@ -532,11 +514,6 @@ Scriptable *DialogHandler::GetTarget()
 Actor *DialogHandler::GetSpeaker()
 {
 	return GetActorByGlobalID(speakerID);
-}
-
-bool DialogHandler::InDialog(const Scriptable *scr) const
-{
-	return scr->GetGlobalID() == speakerID || scr->GetGlobalID() == targetID;
 }
 
 }

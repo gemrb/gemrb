@@ -1696,7 +1696,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
 	source->SetModal(MS_NONE);
-	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
+	dialoghandler->SetTarget(tgt); //this is a hack, but not so deadly
 	source->CommandActor(GenerateActionDirect( "NIDSpecial1()", tgt));
 }
 
