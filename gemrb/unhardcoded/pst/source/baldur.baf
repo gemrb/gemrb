@@ -148,6 +148,17 @@ THEN
 END
 
 IF
+  CreatureInArea("ar1501")
+  UsedExit("pcmaze",Protagonist)
+THEN
+  RESPONSE #100
+    ClearActions()
+    // force it to this area, as we have no clue from where we teleported to
+    // extend SaveObjectLocation / MoveToSavedLocation or the pp variant if unsatisfied
+    TeleportParty("ar0200",[289.3391],0)
+END
+
+IF
   Global("sabotage","GLOBAL",5)
   CreatureInArea("ar0512")
   UsedExit("foundry",[PC])
