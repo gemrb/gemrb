@@ -125,6 +125,7 @@ IF
 THEN
   RESPONSE #100
     ClearAllActions()
+    StartMovie("maze1")
     ActionOverride(Player6,LeaveParty())
     ActionOverride(Player5,LeaveParty())
     ActionOverride(Player4,LeaveParty())
