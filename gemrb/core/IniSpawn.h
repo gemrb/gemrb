@@ -153,6 +153,8 @@ private:
 	int localscount;
 	VariableSpec *Locals;
 	Point NamelessSpawnPoint;
+	Point PartySpawnPoint;
+	ieResRef PartySpawnArea;
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
