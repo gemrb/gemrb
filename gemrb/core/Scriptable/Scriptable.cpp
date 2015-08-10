@@ -317,6 +317,12 @@ void Scriptable::Update()
 		}
 	}
 
+	for (int i=0; i<MAX_TIMER; i++) {
+		if (script_timers[i] > 0) {
+			script_timers[i]--;
+		}
+	}
+
 	TickScripting();
 
 	ProcessActions();
@@ -1631,7 +1637,7 @@ bool Scriptable::TimerActive(ieDword ID)
 	if (ID>=MAX_TIMER) {
 		return false;
 	}
-	if (script_timers[ID]) {
+	if (script_timers[ID] > core->GetGame()->GameTime) {
 		return true;
 	}
 	return false;
