@@ -3302,9 +3302,21 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
 
 	// regenerate actors with high enough constitution
-	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-	if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
-		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
+		int rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
+		if (rate && !(game->GameTime % rate)) {
+			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+			// eeeh, no token (Heal: 1)
+			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
+				String text = *core->GetString(28895) + L"1"; // FIXME
+				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
+			}
+		}
+	} else {
+		int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
+		if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
+			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+		}
 	}
 
 	// adjust thieving skills with dex and race
