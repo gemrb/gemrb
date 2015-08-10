@@ -630,7 +630,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 
 		if (newline || eos) {
 			w = (lineW > w) ? lineW : w;
-			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
+			if (stop && stop->h && (LineHeight * (lines + 1)) > stop->h ) {
 				break;
 			}
 			if (newline) {
