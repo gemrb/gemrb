@@ -3110,7 +3110,12 @@ const MapNote* Map::MapNoteAtPoint(const Point &point)
 void Map::LoadIniSpawn()
 {
 	INISpawn = new IniSpawn(this);
-	INISpawn->InitSpawn(WEDResRef);
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
+		INISpawn->InitSpawn(scriptName);
+	} else {
+		INISpawn->InitSpawn(WEDResRef);
+	}
 }
 
 bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, int *difficulty, unsigned int *creCount)
