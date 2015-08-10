@@ -3339,6 +3339,8 @@ void Actor::UpdateFatigue()
 
 	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / 18000; // 18000 == 4 hours
 	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
+	// pst has TNO regeneration stored there
+	if (core->HasFeature(GF_AREA_OVERRIDE)) FatigueBonus = 0;
 	FatigueLevel = (signed)FatigueLevel - FatigueBonus >= 0 ? FatigueLevel - FatigueBonus : 0;
 	FatigueLevel = ClampStat(IE_FATIGUE, FatigueLevel);
 

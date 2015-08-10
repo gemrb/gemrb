@@ -271,6 +271,7 @@ enum MODAL_SHADOW {
 #define STAT_CON_HP_MIN      2
 #define STAT_CON_HP_REGEN    3
 #define STAT_CON_FATIGUE     4
+#define STAT_CON_TNO_REGEN   4
 
 #define STAT_DEX_REACTION    0
 #define STAT_DEX_MISSILE     1
