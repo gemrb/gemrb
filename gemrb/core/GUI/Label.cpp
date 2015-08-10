@@ -37,13 +37,9 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	this->font = font;
 	useRGB = false;
 	ResetEventHandler( LabelOnPress );
-
-	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
-	if (frame.h < (font->LineHeight * 2)) {
-		// FIXME: is this a poor way of determinine if we are single line?
-		Alignment |= IE_FONT_SINGLE_LINE;
-	}
 	palette = NULL;
+
+	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
 	SetText(string);
 }
 
@@ -55,6 +51,9 @@ Label::~Label()
 void Label::DrawInternal(Region& rgn)
 {
 	if (font && Text.length()) {
+		if (!(Alignment&IE_FONT_SINGLE_LINE) && rgn.h < font->LineHeight * 2) {
+			rgn.h = font->LineHeight * 2;
+		}
 		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
 	}
 
@@ -89,6 +88,10 @@ void Label::SetColor(Color col, Color bac)
 
 void Label::SetAlignment(unsigned char Alignment)
 {
+	if (Height <= font->LineHeight) {
+		// FIXME: is this a poor way of determinine if we are single line?
+		Alignment |= IE_FONT_SINGLE_LINE;
+	}
 	this->Alignment = Alignment;
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
