@@ -51,8 +51,12 @@ Label::~Label()
 void Label::DrawInternal(Region& rgn)
 {
 	if (font && Text.length()) {
-		if (!(Alignment&IE_FONT_SINGLE_LINE) && rgn.h < font->LineHeight * 2) {
-			rgn.h = font->LineHeight * 2;
+		if (!(Alignment&(IE_FONT_SINGLE_LINE)) && rgn.h < font->LineHeight * 2) {
+			// FIXME: this is entirely a hack around some seemingly bad data
+			// where a label should be multiline, but the CHU height is 1px too short for 2 lines of text (causing misalingment and clipping)
+			// exapmle can be seen in PST GUIStores with items having a long name.
+			// not sure of any other occurances.
+			rgn.h++;
 		}
 		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
 	}
