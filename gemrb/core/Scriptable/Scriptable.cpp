@@ -121,7 +121,6 @@ Scriptable::Scriptable(ScriptableType type)
 	InitTriggers();
 	AddTrigger(TriggerEntry(trigger_oncreation));
 
-	memset( script_timers,0, sizeof(script_timers));
 	startActive = core->HasFeature(GF_START_ACTIVE);
 	third = core->HasFeature(GF_3ED_RULES);
 }
@@ -317,9 +316,10 @@ void Scriptable::Update()
 		}
 	}
 
-	for (int i=0; i<MAX_TIMER; i++) {
-		if (script_timers[i] > 0) {
-			script_timers[i]--;
+	std::map<ieDword,ieDword>::iterator tit = script_timers.begin();
+	for (; tit != script_timers.end(); tit++) {
+		if (tit->second > 0) {
+			tit->second--;
 		}
 	}
 
@@ -1634,10 +1634,11 @@ bool Scriptable::AuraPolluted()
 
 bool Scriptable::TimerActive(ieDword ID)
 {
-	if (ID>=MAX_TIMER) {
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit == script_timers.end()) {
 		return false;
 	}
-	if (script_timers[ID] > core->GetGame()->GameTime) {
+	if (tit->second > core->GetGame()->GameTime) {
 		return true;
 	}
 	return false;
@@ -1645,12 +1646,13 @@ bool Scriptable::TimerActive(ieDword ID)
 
 bool Scriptable::TimerExpired(ieDword ID)
 {
-	if (ID>=MAX_TIMER) {
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit == script_timers.end()) {
 		return false;
 	}
-	if (script_timers[ID] && script_timers[ID] < core->GetGame()->GameTime) {
+	if (tit->second && tit->second < core->GetGame()->GameTime) {
 		// expired timers become inactive after being checked
-		script_timers[ID] = 0;
+		tit->second = 0;
 		return true;
 	}
 	return false;
@@ -1658,12 +1660,13 @@ bool Scriptable::TimerExpired(ieDword ID)
 
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
-	if (ID>=MAX_TIMER) {
-		Log(ERROR, "Scriptable", "Timer id %d exceeded MAX_TIMER %d",
-			ID, MAX_TIMER);
+	ieDword newTime = core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit != script_timers.end()) {
+		tit->second = newTime;
 		return;
 	}
-	script_timers[ID]= core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
+	script_timers.insert(std::pair<ieDword,ieDword>(ID, newTime));
 }
 
 /********************
