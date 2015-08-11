@@ -1033,7 +1033,15 @@ def OpenItemAmountWindow ():
 	if ItemAmountWindow != None:
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindow (16)
+	wid = 16
+	if GameCheck.IsIWD2():
+		wid = 20
+	elif GameCheck.IsBG2():
+		pass
+	else:
+		return
+
+	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
 	Index = GemRB.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Amount = Slot['Purchased']
