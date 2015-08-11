@@ -818,10 +818,10 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	delete( gs );
 }
 
-void GameScript::CutSceneID(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::CutSceneID(Scriptable *Sender, Action* /*parameters*/)
 {
 	// shouldn't get called
-	Log(DEBUG, "GameScript", "CutSceneID was called!");
+	Log(DEBUG, "GameScript", "CutSceneID was called by %s!", Sender->GetScriptName());
 }
 
 static EffectRef fx_charm_ref = { "State:Charmed", -1 };
