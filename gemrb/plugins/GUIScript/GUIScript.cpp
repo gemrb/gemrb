@@ -6188,7 +6188,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 		//the amount of items is stored in si->PurchasedAmount
 		//it will adjust AmountInStock/PurchasedAmount
-		actor->inventory.AddStoreItem(si, action);
+		actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
 		if (si->PurchasedAmount) {
 			//was not able to buy it due to lack of space
 			res = ASI_FAILED;
