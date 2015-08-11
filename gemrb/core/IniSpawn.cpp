@@ -828,7 +828,7 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 	}
 	unsigned int interval = event.interval;
 	if (interval) {
-		if(core->GetGame()->GameTime/interval<=last_spawndate/interval) {
+		if (core->GetGame()->GameTime + interval <= last_spawndate) {
 			return;
 		}
 	}
