@@ -316,13 +316,6 @@ void Scriptable::Update()
 		}
 	}
 
-	std::map<ieDword,ieDword>::iterator tit = script_timers.begin();
-	for (; tit != script_timers.end(); tit++) {
-		if (tit->second > 0) {
-			tit->second--;
-		}
-	}
-
 	TickScripting();
 
 	ProcessActions();
