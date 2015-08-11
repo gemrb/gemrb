@@ -150,6 +150,14 @@ if (config->Open(path) \
 		ATTEMPT_INIT
 #endif
 
+		// Now try ~/.gemrb folder
+		CopyHomePath(datadir, _MAX_PATH);
+		char confpath[_MAX_PATH] = ".";
+		strcat(confpath, name);
+		PathJoin(datadir, datadir, confpath, NULL);
+		PathJoinExt( path, datadir, name, "cfg" );
+		ATTEMPT_INIT;
+
 		// Don't try with default binary name if we have tried it already
 		if (strcmp( name, PACKAGE ) != 0) {
 			PathJoinExt( path, datadir, PACKAGE, "cfg" );
