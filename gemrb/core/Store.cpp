@@ -245,13 +245,8 @@ void Store::RechargeItem(CREItem *item)
 	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (!h) {
-				item->Usages[i]=0;
-				continue;
-			}
-			if (h->RechargeFlags&IE_ITEM_RECHARGE) {
-				item->Usages[i] = h->Charges;
-			}
+                        if (h && item->Usages[i] < h->Charges)
+                            item->Usages[i] = h->Charges;
 		}
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, 0);
