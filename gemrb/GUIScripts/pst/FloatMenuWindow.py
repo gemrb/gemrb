@@ -392,6 +392,9 @@ def UpdateFloatMenuItem (pc, i, weapons):
 	#no float menu index needed for weapons or quick items
 	if weapons:
 		slot_item = GemRB.GetSlotItem (pc, 10 + i)
+		if i == 0 and not slot_item:
+				# default weapon
+				slot_item = GemRB.GetSlotItem (pc, 10 + i, 1)
 	else:
 		slot_item = GemRB.GetSlotItem (pc, 21 + i)
 	Button = Window.GetControl (CID_SLOTS + i)
