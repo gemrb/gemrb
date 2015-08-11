@@ -8359,7 +8359,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	}
 
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
-	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
+	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
 	gamedata->FreeItem(itm,tmpresref, false);
 	ResetCommentTime();
 	if (pro) {
@@ -8549,7 +8549,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	}
 
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
-	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
+	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
 	gamedata->FreeItem(itm,tmpresref, false);
 	ResetCommentTime();
 	if (pro) {
@@ -8583,7 +8583,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	return false;
 }
 
-void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent)
+void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent, bool expend)
 {
 	if (!itm) {
 		item = inventory.GetSlotItem(slot);
@@ -8619,7 +8619,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		}
 	}
 
-	switch(itm->UseCharge(item->Usages, header, true)) {
+	switch(itm->UseCharge(item->Usages, header, expend)) {
 		case CHG_DAY:
 			break;
 		case CHG_BREAK: //both
