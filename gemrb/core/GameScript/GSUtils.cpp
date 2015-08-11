@@ -162,7 +162,7 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	if (reputation > 200) {
 		reputation = 200;
 	}
-	return happiness[alignment][reputation/10-1];
+	return happiness[alignment-1][reputation/10-1];
 }
 
 int GetHPPercent(Scriptable* Sender)
