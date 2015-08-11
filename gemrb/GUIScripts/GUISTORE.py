@@ -31,6 +31,7 @@ from ie_stats import *
 from ie_slots import *
 from ie_sounds import *
 from ie_feats import FEAT_MERCANTILE_BACKGROUND
+import CommonTables
 
 StoreWindow = None
 
@@ -1448,6 +1449,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 		count = GemRB.FindStoreItem (Slot["ItemResRef"])
 		if count:
 			oc = count
+			# jewelry doesn't suffer from deprecation, at least in BG2
+			if Item['Type'] in [CommonTables.ItemType.GetRowIndex ("GEM"),
+                                            CommonTables.ItemType.GetRowIndex ("RING"),
+                                            CommonTables.ItemType.GetRowIndex ("AMULET")]:
+                                count = 0
 			if count > 2:
 				count = 2
 			mod -= count * Store['Depreciation']
