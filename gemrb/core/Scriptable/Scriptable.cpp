@@ -1643,7 +1643,7 @@ bool Scriptable::TimerExpired(ieDword ID)
 	if (tit == script_timers.end()) {
 		return false;
 	}
-	if (tit->second && tit->second < core->GetGame()->GameTime) {
+	if (tit->second && tit->second <= core->GetGame()->GameTime) {
 		// expired timers become inactive after being checked
 		tit->second = 0;
 		return true;
