@@ -750,9 +750,11 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 	CRESpellMemorization* sm = GetSpellMemorization(type, level);
 	if (bonus) {
 		if (!Value) {
-			Value=sm->SlotCount;
+			Value=sm->SlotCountWithBonus;
 		}
-		sm->SlotCountWithBonus=(ieWord) (sm->SlotCountWithBonus+Value);
+                //if can't cast w/o bonus then can't cast at all!
+                if (sm->SlotCount)
+                    sm->SlotCountWithBonus=(ieWord) (sm->SlotCountWithBonus+Value);
 	}
 	else {
 		diff=sm->SlotCountWithBonus-sm->SlotCount;

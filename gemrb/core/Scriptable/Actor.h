@@ -171,6 +171,7 @@ namespace GemRB {
 #define UI_CRITICAL  4       //a critical hit happened
 #define UI_FAKE      8       //deplete the item but don't actually apply its effects
 #define UI_NOAURA    16      //ignore spellcasting aura checks
+#define UI_NOCHARGE  32      //don't deplete the item
 
 //used to mask off current profs
 #define PROFS_MASK  0x07
@@ -749,7 +750,7 @@ public:
 	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
-	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
+	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent, bool expend = true);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override

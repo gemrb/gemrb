@@ -31,6 +31,7 @@ from ie_stats import *
 from ie_slots import *
 from ie_sounds import *
 from ie_feats import FEAT_MERCANTILE_BACKGROUND
+import CommonTables
 
 StoreWindow = None
 
@@ -39,6 +40,7 @@ ActionWindow = None
 MenuWindow = None
 PortraitWindow = None
 StoreShoppingWindow = None
+ItemAmountWindow = None
 StoreIdentifyWindow = None
 StoreStealWindow = None
 StoreDonateWindow = None
@@ -67,6 +69,7 @@ RepModTable = None
 SpellTable = None
 PreviousPC = 0
 BarteringPC = 0
+MaxAmount = 0
 
 # 0 - Store
 # 1 - Tavern
@@ -327,6 +330,7 @@ def OpenStoreShoppingWindow ():
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -875,7 +879,7 @@ def BuyPressed ():
 		if Flags:
 			Slot = GemRB.GetStoreItem (i-1)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Price = GetRealPrice (pc, "sell", Item, Slot)
+			Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
 				Price = 1
 
@@ -946,7 +950,7 @@ def RedrawStoreShoppingWindow ():
 			if Inventory:
 				Price = 1
 			else:
-				Price = GetRealPrice (pc, "sell", Item, Slot)
+				Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
 				Price = 1
 			BuySum = BuySum + Price
@@ -1020,6 +1024,109 @@ def RedrawStoreShoppingWindow ():
 		GUICommon.SetEncumbranceLabels (Window, 25, None, pc, True)
 	else:
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
+	return
+
+def OpenItemAmountWindow ():
+	global ItemAmountWindow
+	global MaxAmount
+
+	if ItemAmountWindow != None:
+		return
+
+	ItemAmountWindow = Window = GemRB.LoadWindow (16)
+	Index = GemRB.GetVar ("LeftIndex")
+	Slot = GemRB.GetStoreItem (Index)
+	Amount = Slot['Purchased']
+	if Amount == 0:
+		Amount = 1
+	MaxAmount = Slot['Amount']
+	if MaxAmount == -1:
+		MaxAmount = 999
+
+	# item icon
+	Icon = Window.GetControl (0)
+	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Icon.SetItemIcon (Slot['ItemResRef'])
+
+	# item amount
+	Text = Window.GetControl (6)
+	Text.SetText (str (Amount))
+	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+
+	# Decrease
+	Button = Window.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseItemAmount)
+
+	# Increase
+	Button = Window.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseItemAmount)
+
+	# Done
+	Button = Window.GetControl (2)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmItemAmount)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	# Cancel
+	Button = Window.GetControl (1)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelItemAmount)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def DecreaseItemAmount ():
+	global ItemAmountWindow
+
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	Number = int ("0"+Amount)-1
+	if Number < 0:
+		Number = 0
+	Text.SetText (str (Number))
+	return
+
+def IncreaseItemAmount ():
+	global ItemAmountWindow
+	global MaxAmount
+
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	Number = int ("0"+Amount)+1
+	if Number > MaxAmount:
+		Number = MaxAmount
+	Text.SetText (str (Number))
+	return
+
+def ConfirmItemAmount ():
+	global ItemAmountWindow
+	global MaxAmount
+
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	Number = int ("0"+Amount)
+	if Number > MaxAmount:
+		Number = MaxAmount
+	elif Number < 0:
+		Number = 0
+	Index = GemRB.GetVar ("LeftIndex")
+	GemRB.SetPurchasedAmount (Index, Number)
+
+	ItemAmountWindow.Unload ()
+	ItemAmountWindow = None
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
+	UpdateStoreShoppingWindow ()
+	return
+
+def CancelItemAmount ():
+	global ItemAmountWindow
+
+	ItemAmountWindow.Unload ()
+	ItemAmountWindow = None
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
+	UpdateStoreShoppingWindow ()
 	return
 
 def UpdateStoreIdentifyWindow ():
@@ -1448,6 +1555,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 		count = GemRB.FindStoreItem (Slot["ItemResRef"])
 		if count:
 			oc = count
+			# jewelry doesn't suffer from deprecation, at least in BG2
+			if Item['Type'] in [CommonTables.ItemType.GetRowIndex ("GEM"),
+                                            CommonTables.ItemType.GetRowIndex ("RING"),
+                                            CommonTables.ItemType.GetRowIndex ("AMULET")]:
+                                count = 0
 			if count > 2:
 				count = 2
 			mod -= count * Store['Depreciation']
