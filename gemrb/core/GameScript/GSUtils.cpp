@@ -2661,10 +2661,6 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		parameters->int2Parameter = 1;
 	}
 
-	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
-		return;
-	}
-
 	// use the passed level instead of the caster's casting level
 	if (flags&SC_SETLEVEL) {
 		if (parameters->string0Parameter[0]) {
@@ -2722,6 +2718,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 		//stop doing anything else
 		act->SetModal(MS_NONE);
+	}
+
+	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
+		return;
 	}
 
 	int duration;
@@ -2784,10 +2784,6 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		parameters->int2Parameter = 1;
 	}
 
-	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
-		return;
-	}
-
 	// use the passed level instead of the caster's casting level
 	if (flags&SC_SETLEVEL) {
 		if (parameters->string0Parameter[0]) {
@@ -2822,6 +2818,10 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
 		//stop doing anything else
 		act->SetModal(MS_NONE);
+	}
+
+	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
+		return;
 	}
 
 	int duration;
