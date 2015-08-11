@@ -158,7 +158,7 @@ private:
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
-	int last_spawndate;
+	ieDword last_spawndate;
 	int eventcount;
 	SpawnEntry *eventspawns;
 	ieDword detail_level;
