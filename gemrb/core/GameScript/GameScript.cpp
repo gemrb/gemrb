@@ -2099,10 +2099,12 @@ void GameScript::EvaluateAllBlocks()
 					rS->responses[0]->Execute(target);
 					// TODO: this will break blocking instants, if there are any
 					target->ReleaseCurrentAction();
-				} else if ((InDebug&ID_CUTSCENE) || !action->objects[1]) {
-					Log(WARNING, "GameScript", "Failed to find CutSceneID target!");
-					if (action->objects[1]) {
-						action->objects[1]->dump();
+				} else {
+					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
+					if (InDebug&ID_CUTSCENE) {
+						if (action->objects[1]) {
+							action->objects[1]->dump();
+						}
 					}
 				}
 			}
