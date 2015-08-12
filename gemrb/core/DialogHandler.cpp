@@ -381,6 +381,13 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					}
 				}
 			}
+			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
+			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
+				tgt = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+				if (tgt) { // only returns Actors
+					tgta = (Actor *) tgt;
+				}
+			}
 
 			if (!tgt) {
 				Log(WARNING, "DialogHandler", "Can't redirect dialog");
