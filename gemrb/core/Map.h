@@ -408,6 +408,7 @@ public:
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
 	Scriptable* GetActorByDialog(const char* resref);
+	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
 	Actor* GetActorByScriptName(const char* name);
 	bool HasActor(Actor *actor);
