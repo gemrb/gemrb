@@ -525,6 +525,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	const char *s;
 	
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
+	if (entry.interval < 15) entry.interval = 15; // lower bound from the original
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	s = inifile->GetKeyAsString(entryname,"critters","");
