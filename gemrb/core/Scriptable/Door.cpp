@@ -172,6 +172,7 @@ void Door::SetDoorLocked(int Locked, int playsound)
 	if (Locked) {
 		if (Flags & DOOR_LOCKED) return;
 		Flags|=DOOR_LOCKED;
+		SetDoorOpen(false, playsound, 0);
 		if (playsound && ( LockSound[0] != '\0' ))
 			core->GetAudioDrv()->Play( LockSound );
 	}
