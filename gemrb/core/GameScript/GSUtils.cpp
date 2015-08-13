@@ -1122,7 +1122,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (scr->Type==ST_ACTOR) {
 			// might not be equal to speaker anymore due to swapping
 			Actor *talker = (Actor *) scr;
-			if (!talker->Immobile() && !(talker->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
+			if (!talker->Immobile() && !(talker->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talker->AppearanceFlags&APP_NOTURN)) {
 				talker->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
 				if (talker->InParty) {
 					talker->SetStance(IE_ANI_READY);
@@ -1132,7 +1132,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (tar->Type==ST_ACTOR) {
 			// might not be equal to target anymore due to swapping
 			Actor *talkee = (Actor *) tar;
-			if (!talkee->Immobile() && !(talkee->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
+			if (!talkee->Immobile() && !(talkee->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talkee->AppearanceFlags&APP_NOTURN)) {
 				talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
 				if (talkee->InParty) {
 					talkee->SetStance(IE_ANI_READY);
