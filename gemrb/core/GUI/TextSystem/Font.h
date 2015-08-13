@@ -57,7 +57,10 @@ class Palette;
 #define IE_FONT_ALIGN_BOTTOM 0x04
 #define IE_FONT_ALIGN_TOP    0x10
 #define IE_FONT_ALIGN_MIDDLE 0x20
+// optimization to make printing faster when text should be on a single line
 #define IE_FONT_SINGLE_LINE  0x40
+// work around to use the region passed to Font::Print as if it were the actual print size when the text cant actually fit the region
+#define IE_FONT_NO_CALC		 0x80
 
 struct Glyph {
 	const Size size;
