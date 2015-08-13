@@ -998,7 +998,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
-			str->Seek( 4, GEM_CURRENT_POS );
+			str->Seek( 4, GEM_CURRENT_POS ); // TODO: movement restriction distance for spawns, random walk http://gibberlings3.net/forums/index.php?showtopic=21724
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
