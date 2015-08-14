@@ -240,6 +240,8 @@ void InfoPoint::dump() const
 	}
 	buffer.appendFormatted( "Region Global ID: %d\n", GetGlobalID());
 	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
+	buffer.appendFormatted( "TalkPos: %d.%d\n", TalkPos.x, TalkPos.y);
+	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
 		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
