@@ -31,7 +31,9 @@ using namespace GemRB;
 DLGImporter::DLGImporter(void)
 {
 	str = NULL;
-	Version = 0;
+	Version = Flags = 0;
+	StatesCount = TransitionsCount = StateTriggersCount = TransitionTriggersCount = ActionsCount = 0;
+	StatesOffset = TransitionsOffset = StateTriggersOffset = TransitionTriggersOffset = ActionsOffset = 0;
 }
 
 DLGImporter::~DLGImporter(void)
