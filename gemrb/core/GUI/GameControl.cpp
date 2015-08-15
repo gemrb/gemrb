@@ -228,8 +228,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	static bool CanRun = true;
 
 	//try running (in PST) only if not encumbered
-	ieDword speed = actor->CalculateSpeed(true);
-	if ( (speed==actor->GetStat(IE_MOVEMENTRATE)) && CanRun && (DoubleClick || AlwaysRun)) {
+	if (CanRun && ShouldRun(actor)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
@@ -242,6 +241,17 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	}
 
 	actor->CommandActor(action);
+}
+
+// were we instructed to run and can handle it (no movement impairments)?
+bool GameControl::ShouldRun(Actor *actor) const
+{
+	if (!actor) return false;
+	ieDword speed = actor->CalculateSpeed(true);
+	if (speed != actor->GetStat(IE_MOVEMENTRATE)) {
+		return false;
+	}
+	return (DoubleClick || AlwaysRun);
 }
 
 GameControl::~GameControl(void)

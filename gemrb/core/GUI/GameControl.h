@@ -244,6 +244,8 @@ public:
 	Point GetFormationPoint(Map *map, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p);
+	/** checks if the actor should be running instead of walking */
+	bool ShouldRun(Actor *actor) const;
 	/** Displays a string over an object */
 	void DisplayString(Scriptable* target);
 	/** Displays a string on screen */
