@@ -527,6 +527,9 @@ Actor::Actor()
 	RollSaves();
 	WMLevelMod = 0;
 	TicksLastRested = 0;
+	speed = 0;
+	WeaponType = AttackStance = 0;
+	DifficultyMargin = disarmTrap = 0;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
