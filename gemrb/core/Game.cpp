@@ -1684,11 +1684,28 @@ bool Game::RestParty(int checks, int dream, int hp)
 			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 			return false;
 		}
-		//you may not rest here, find an inn
-		if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
-		{
-			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-			return false;
+
+		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
+			// and repurposes these area flags!
+			if (area->AreaFlags&(AF_TUTORIAL|AF_DEADMAGIC)/* == (AF_TUTORIAL|AF_DEADMAGIC)*/) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // get permission 38587
+				return false;
+			/* TODO: add all the other strings
+			} else if (area->AreaFlags&AF_TUTORIAL) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // here 34601
+				return false;
+			} else if (area->AreaFlags&AF_DEADMAGIC) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // actual STR_MAYNOTREST
+				return false;*/
+			}
+		} else {
+			//you may not rest here, find an inn
+			if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+			{
+				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
+				return false;
+			}
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
