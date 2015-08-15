@@ -56,7 +56,7 @@ struct MapKey {
 	ieResRef ref;
 	ieWord type;
 
-	MapKey()
+	MapKey() : type(0)
 	{
 	}
 };
