@@ -75,7 +75,7 @@ def OpenSaveWindow ():
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
 		Button.SetText (15588)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SavePress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenConfirmWindow)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("SaveIdx",i)
 
@@ -197,7 +197,7 @@ def ConfirmedSaveGame():
 	GemRB.UnhideGUI ()
 	return
 
-def SavePress():
+def OpenConfirmWindow ():
 	global ConfirmWindow, NameField, SaveButton
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
