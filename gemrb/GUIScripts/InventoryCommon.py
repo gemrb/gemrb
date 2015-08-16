@@ -692,7 +692,10 @@ def OpenErrorWindow (strref):
 
 	ErrorWindow = Window = GemRB.LoadWindow (7)
 	Button = Window.GetControl (0)
-	Button.SetText (11973)
+	if GameCheck.IsPST():
+		Button.SetText (1403)
+	else:
+		Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseErrorWindow)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
