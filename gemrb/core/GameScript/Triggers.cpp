@@ -1583,7 +1583,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
 	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);
-	if (distance <= ( parameters->int0Parameter * 10 )) {
+	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
 		return 1;
 	}
 	return 0;
