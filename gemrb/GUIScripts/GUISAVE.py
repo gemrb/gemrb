@@ -70,20 +70,20 @@ def OpenSaveWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	GemRB.SetVar ("LoadIdx",0)
+	GemRB.SetVar ("SaveIdx",0)
 
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
 		Button.SetText (15588)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SavePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetVarAssoc ("SaveIdx",i)
 
 		Button = Window.GetControl (ctrl_offset[1]+i)
 		Button.SetText (13957)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetVarAssoc ("SaveIdx",i)
 
 		#area previews
 		Button = Window.GetControl (1+i)
@@ -179,7 +179,7 @@ def AbortedSaveGame():
 def ConfirmedSaveGame():
 	global ConfirmWindow
 
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
 	Slotname = Slotname.replace ("/", "|") # can't have path separators in the name
@@ -200,7 +200,7 @@ def ConfirmedSaveGame():
 def SavePress():
 	global ConfirmWindow, NameField, SaveButton
 
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 	ConfirmWindow = GemRB.LoadWindow (1)
 
 	#slot name
@@ -274,7 +274,7 @@ def DeleteGameConfirm():
 	global Games, ConfirmWindow
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex +GemRB.GetVar ("LoadIdx")
+	Pos = TopIndex + GemRB.GetVar ("SaveIdx")
 	GemRB.DeleteSaveGame(Games[Pos])
 	del Games[Pos]
 	if TopIndex>0:
