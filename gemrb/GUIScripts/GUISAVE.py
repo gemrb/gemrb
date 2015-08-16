@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -18,7 +18,7 @@
 #
 
 
-# GUISAVE.py - Save window
+# GUISAVE.py - Save game screen from GUISAVE winpack
 
 ###################################################
 
@@ -203,19 +203,20 @@ def OpenConfirmWindow ():
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 	ConfirmWindow = GemRB.LoadWindow (1)
 
-	#slot name
-	if Pos<len(Games):
+	# Slot name
+	if Pos < len(Games):
 		Slotname = Games[Pos].GetName()
 		save_strref = 15306
 	else:
 		Slotname = ""
 		save_strref = 15588
+
 	NameField = ConfirmWindow.GetControl (3)
 	NameField.SetText (Slotname)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, EditChange)
 
 	#game hours (should be generated from game)
-	if Pos<len(Games):
+	if Pos < len(Games):
 		if GameCheck.IsBG2():
 			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 			Slotname = GemRB.GetString(str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
@@ -226,33 +227,32 @@ def OpenConfirmWindow ():
 	Label = ConfirmWindow.GetControl (0x10000004)
 	Label.SetText (Slotname)
 
-	#areapreview
+	# Areapreview
 	if not GameCheck.IsIWD2():
-		Button=ConfirmWindow.GetControl (0)
+		Button = ConfirmWindow.GetControl (0)
 		if Pos<len(Games):
 			Button.SetSprite2D(Games[Pos].GetPreview())
 		else:
 			Button.SetPicture("")
 
-	#portraits
+	# PC portraits
 		for j in range(min(6, PARTY_SIZE)):
-			Button=ConfirmWindow.GetControl (40+j)
+			Button = ConfirmWindow.GetControl (40+j)
 			if Pos<len(Games):
 				Button.SetSprite2D(Games[Pos].GetPortrait(j))
 			else:
 				Button.SetPicture("")
 
-	#save
-	SaveButton=ConfirmWindow.GetControl (7)
+	# Save/Overwrite
+	SaveButton = ConfirmWindow.GetControl (7)
 	SaveButton.SetText (save_strref)
 	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
 	SaveButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	#SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
 	if Slotname == "":
 		SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	#cancel
-	CancelButton=ConfirmWindow.GetControl (8)
+	# Cancel
+	CancelButton = ConfirmWindow.GetControl (8)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
@@ -264,7 +264,7 @@ def OpenConfirmWindow ():
 
 def EditChange():
 	Name = NameField.QueryText ()
-	if len(Name)==0:
+	if len(Name) == 0:
 		SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		SaveButton.SetState (IE_GUI_BUTTON_ENABLED)
