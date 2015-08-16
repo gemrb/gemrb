@@ -5175,7 +5175,9 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	game->RestParty(REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER, parameters->int0Parameter, parameters->int1Parameter);
+	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
+	if (((Actor *)Sender)->InParty == 0) flags |= REST_NOAREA;
+	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
