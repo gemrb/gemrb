@@ -1129,6 +1129,7 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_NORETICLE|IF_RUNNING, 0 );
 	}
 	if (!actor->InMove()) {
@@ -1145,6 +1146,7 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 	}
 	if (!actor->InMove()) {
