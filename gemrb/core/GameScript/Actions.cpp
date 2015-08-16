@@ -1803,7 +1803,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 }
 
 //pst and bg2 can play a song designated by index
-//actually pst has some extra params not currently implemented
+//actually pst has some extra params not currently implemented (never used - always the same)
 //switchplaylist implements fade by simply scheduling the next
 //music after the currently running one
 //FIXME: This code is similar to PlayAreaSong, consider refactoring
