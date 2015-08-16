@@ -1,12 +1,12 @@
 2DA V1.0
 -1
            1          2          3          4          TOOLTIP    RESREF
-Stealth    *          *          *          *          *          *
-Thieving   *          *          *          *          *          *
+Stealth    0          1          2          3          41651      SP086
+Thieving   0          1          2          3          41650      SP087
 Cast       *          *          *          *          *          *
-QSpell1    *          *          *          *          *          *
-QSpell2    *          *          *          *          *          *
-QSpell3    *          *          *          *          *          *
+QSpell1    *          *          *          *          41658      *
+QSpell2    *          *          *          *          41658      *
+QSpell3    *          *          *          *          41658      *
 Turn       *          *          *          *          *          *
 Talk       0          1          2          3          41653      AMTLK
 UseItem    *          *          *          *          *          *
@@ -23,7 +23,7 @@ QWeapon3   *          *          *          *          *          *
 QWeapon4   *          *          *          *          *          *
 BardSong   *          *          *          *          11798      *
 Stop       0          1          2          3          41655      AMALLSTP
-Search     0          1          2          3          -1         AMGENS
+Search     0          1          2          3          41649      SP085
 23         *          *          *          *          *          *
 24         *          *          *          *          *          *
 25         *          *          *          *          *          *
