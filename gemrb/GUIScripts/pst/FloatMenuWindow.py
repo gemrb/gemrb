@@ -469,6 +469,13 @@ def UpdateFloatMenuSpell (pc, i):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
 		#Button.SetVarAssoc ('ItemButton', i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
+		# handle thieving
+		thieving = [ ACT_SEARCH, ACT_THIEVING, ACT_STEALTH ]
+		acts = [ GUICommonWindows.ActionSearchPressed, GUICommonWindows.ActionThievingPressed, GUICommonWindows.ActionStealthPressed ]
+		Button.SetActionIcon (globals(), thieving[i])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, acts[i])
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		ClearSlot (i)
 
