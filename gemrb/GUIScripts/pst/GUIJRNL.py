@@ -81,7 +81,8 @@ def OpenJournalWindow ():
 		PortraitWindow = None
 		ActionsWindow = None
 		JournalWindow = None
-		
+
+		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		return
 		
