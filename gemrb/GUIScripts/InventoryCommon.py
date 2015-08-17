@@ -804,7 +804,10 @@ def IdentifyUseSpell ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
+	if GameCheck.IsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
@@ -821,7 +824,10 @@ def IdentifyUseScroll ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
+	if GameCheck.IsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
 	if ItemInfoWindow:
