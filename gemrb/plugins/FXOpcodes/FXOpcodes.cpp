@@ -1179,6 +1179,10 @@ int fx_charisma_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_charisma_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	// in pst (only) this is a diced effect (eg. Friends)
+	if (fx->FirstApply == 1 && fx->Parameter1 == 0 && fx->Parameter2 == 0) {
+		fx->Parameter1 = DICE_ROLL(0);
+	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_CHR );
 	} else {
