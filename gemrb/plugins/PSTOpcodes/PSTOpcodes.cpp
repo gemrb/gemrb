@@ -399,6 +399,9 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xc3 fx_tint_screen
 //FIXME: implement bit4 which would mean duration
+// param1 contains the target color, but only two users have non-gray (rgb in first three bytes)
+// param2 is mostly used with 1 or 5; only one occurrence of 100 (our spells excluded)
+// timing is mostly 16, with one 8, one 48 and one 64
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if(0) print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
@@ -408,8 +411,9 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		case 0: toTime = 0; break;
 		case 2: fromTime = 0; break;
 	}
-	core->timer->SetFadeFromColor(fromTime);
+	// order matters here, as SetFadeToColor resets fadeFromCounter
 	core->timer->SetFadeToColor(toTime);
+	core->timer->SetFadeFromColor(fromTime);
 	return FX_NOT_APPLIED;
 }
 
