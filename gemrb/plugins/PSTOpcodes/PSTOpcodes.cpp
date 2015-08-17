@@ -907,9 +907,9 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			fx->Parameter1=core->Roll(1,6,1);
 		}
-		BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 	}
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1);
+	BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 	if (fx->Parameter2) {
 		target->AC.HandleFxBonus(2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	} else {
