@@ -399,21 +399,33 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xc3 fx_tint_screen
 //FIXME: implement bit4 which would mean duration
-// param1 contains the target color, but only two users have non-gray (rgb in first three bytes)
 // param2 is mostly used with 1 or 5; only one occurrence of 100 (our spells excluded)
 // timing is mostly 16, with one 8, one 48 and one 64
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if(0) print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	int fromTime = fx->DiceSides;
-	int toTime = fx->DiceSides;
+	// some effects contain garbage in DiceSides
+	// FIXME: should we really be just using DiceThrown?
+	int fromTime = fx->DiceThrown;
+	int toTime = fromTime;
 	switch(fx->Parameter2&6) {
 		case 0: toTime = 0; break;
 		case 2: fromTime = 0; break;
 	}
+
+	// set the fade color (usually gray)
+	// it was a gentle effect, so use a high dose of transparency
+	// since it was so high, we just skip setting the fade color
+/*	int r, g, b;
+	r = fx->Parameter1&255;
+	g = (fx->Parameter1>>8)&255;
+	b = (fx->Parameter1>>16)&255;
+	core->GetVideoDriver()->SetFadeColor(r, g, b); // will be permanent!
+*/
+
 	// order matters here, as SetFadeToColor resets fadeFromCounter
-	core->timer->SetFadeToColor(toTime);
-	core->timer->SetFadeFromColor(fromTime);
+	core->timer->SetFadeToColor(toTime, 2);
+	core->timer->SetFadeFromColor(fromTime, 2);
 	return FX_NOT_APPLIED;
 }
 
