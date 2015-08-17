@@ -45,6 +45,7 @@ private:
 
 	int fadeToCounter, fadeToMax;
 	int fadeFromCounter, fadeFromMax;
+	unsigned short fadeToFactor, fadeFromFactor;
 	int shakeCounter;
 	int shakeX, shakeY;
 	unsigned int first_animation;
@@ -66,8 +67,8 @@ public:
 	bool ViewportIsMoving();
 	void DoStep(int count);
 	void SetMoveViewPort(ieDword x, ieDword y, int spd, bool center);
-	void SetFadeToColor(unsigned long Count);
-	void SetFadeFromColor(unsigned long Count);
+	void SetFadeToColor(unsigned long Count, unsigned short factor = 1);
+	void SetFadeFromColor(unsigned long Count, unsigned short factor = 1);
 	void SetScreenShake(int shakeX, int shakeY, unsigned long Count);
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
