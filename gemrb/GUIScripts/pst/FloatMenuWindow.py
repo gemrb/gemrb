@@ -260,9 +260,9 @@ def UpdateFloatMenuWindow ():
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetSprites (GUICommonWindows.GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
 	Button = Window.GetControl (CID_PREV)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
 	Button = Window.GetControl (CID_NEXT)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if float_menu_mode == MENU_MODE_SINGLE:
 		for i in range (SLOT_COUNT):
