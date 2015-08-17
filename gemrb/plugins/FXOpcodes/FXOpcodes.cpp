@@ -595,7 +595,7 @@ static EffectDesc effectnames[] = {
 	{ "LevelModifier", fx_level_modifier, 0, -1 },
 	{ "LevelDrainModifier", fx_leveldrain_modifier, 0, -1 },
 	{ "LoreModifier", fx_lore_modifier, 0, -1 },
-	{ "LuckModifier", fx_luck_modifier, 0, -1 },
+	{ "LuckModifier", fx_luck_modifier, EFFECT_NO_LEVEL_CHECK, -1 },
 	{ "LuckCumulative", fx_luck_cumulative, 0, -1 },
 	{ "LuckNonCumulative", fx_luck_non_cumulative, 0, -1 },
 	{ "MagicalColdResistanceModifier", fx_magical_cold_resistance_modifier, 0, -1 },
@@ -1689,6 +1689,11 @@ int fx_lore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_luck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_luck_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	// in pst (only) this is a diced effect (eg. Luck)
+	if (fx->FirstApply == 1 && fx->Parameter1 == 0 && fx->Parameter2 == 0) {
+		fx->Parameter1 = DICE_ROLL(0);
+	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_LUCK );
