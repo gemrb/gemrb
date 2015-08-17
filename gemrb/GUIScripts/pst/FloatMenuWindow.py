@@ -24,6 +24,7 @@
 import GemRB
 import GUICommon
 import CommonTables
+import Spellbook
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
@@ -368,23 +369,14 @@ def RefreshSpellList(pc, innate):
 		else:
 			type = IE_SPELL_TYPE_PRIEST
 
-	# FIXME: ugly, rewrite using Spellbook.py
-	spell_hash = {}
+	type = 1<<type
 	spell_list = []
-	#level==0 is level #1
-	for level in range (9):
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
-		for j in range (mem_cnt):
-			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
+	for i in range(16):
+		if type & (1<<i):
+			spell_list += Spellbook.GetUsableMemorizedSpells (pc, i)
 
-			# Spell was already used up
-			if not ms['Flags']: continue
-
-			if ms['SpellResRef'] in spell_hash:
-				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
-			else:
-				spell_hash[ms['SpellResRef']] = 1
-				spell_list.append( ms['SpellResRef'] )
+	GemRB.SetVar ("Type", type)
+	GemRB.SetVar ("QSpell", -1)
 	return
 
 def UpdateFloatMenuItem (pc, i, weapons):
@@ -460,14 +452,14 @@ def UpdateFloatMenuSpell (pc, i):
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	if i + float_menu_index < len (spell_list):
-		SpellResRef = spell_list[i + float_menu_index]
+		SpellResRef = spell_list[i + float_menu_index]["SpellResRef"]
 		Button.SetSpellIcon (SpellResRef)
-		Button.SetText ("%d" %spell_hash[SpellResRef])
+		Button.SetText ("%d" % spell_list[i + float_menu_index]["MemoCount"])
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
-		#Button.SetVarAssoc ('ItemButton', i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)
+		Button.SetVarAssoc ("Spell", spell_list[i + float_menu_index]['SpellIndex'])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
 		# handle thieving
