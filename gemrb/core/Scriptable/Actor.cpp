@@ -5206,7 +5206,7 @@ bool Actor::CheckOnDeath()
 
 	//TODO: verify removal times
 	ieDword time = core->GetGame()->GameTime;
-	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) {
+	if (!pstflags && Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) {
 		RemovalTime = time;
 		return true;
 	}
