@@ -358,7 +358,7 @@ def UpdateFloatMenuGroupAction (i):
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 def RefreshSpellList(pc, innate):
-	global spell_hash, spell_list, type
+	global spell_list, type
 
 	if innate:
 		type = IE_SPELL_TYPE_INNATE
