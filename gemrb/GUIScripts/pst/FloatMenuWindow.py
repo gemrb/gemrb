@@ -286,12 +286,10 @@ def UpdateFloatMenuWindow ():
 	elif float_menu_mode == MENU_MODE_SPELLS:
 		# spells
 		RefreshSpellList(pc, False)
-		if float_menu_index:
-			Button = Window.GetControl (CID_PREV)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		if float_menu_index+3<len(spell_list):
-			Button = Window.GetControl (CID_NEXT)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button = Window.GetControl (CID_PREV)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button = Window.GetControl (CID_NEXT)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		for i in range (SLOT_COUNT):
 			UpdateFloatMenuSpell (pc, i)
 
@@ -557,6 +555,9 @@ def FloatMenuSelectAbilities ():
 
 def FloatMenuPreviousItem ():
 	global float_menu_index, float_menu_selected
+	if float_menu_mode == MENU_MODE_SPELLS and float_menu_index <= 0:
+		# enable backcycling for spells
+		float_menu_index = len(spell_list) - SLOT_COUNT + 1
 	if float_menu_index > 0:
 		float_menu_index = float_menu_index - 1
 		if float_menu_selected!=None:
@@ -566,7 +567,11 @@ def FloatMenuPreviousItem ():
 
 def FloatMenuNextItem ():
 	global float_menu_index, float_menu_selected
-	float_menu_index = float_menu_index + 1
+	if float_menu_mode == MENU_MODE_SPELLS and float_menu_index >= len(spell_list) - SLOT_COUNT:
+		# enable overflow for spells
+		float_menu_index = 0
+	else:
+		float_menu_index = float_menu_index + 1
 	if float_menu_selected!=None:
 		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()
