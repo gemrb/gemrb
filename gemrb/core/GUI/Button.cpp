@@ -210,19 +210,6 @@ void Button::DrawInternal(Region& rgn)
 	}
 
 	// Button picture
-	if (AnimPicture) {
-		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
-
-		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
-		} else {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
-		}
-	}
-
-	// Button picture
 	int picXPos = 0, picYPos = 0;
 	if (Picture && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
@@ -256,6 +243,19 @@ void Button::DrawInternal(Region& rgn)
 		else {
 			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
 			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, true, &r );
+		}
+	}
+
+	// Button animation
+	if (AnimPicture) {
+		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
+
+		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
+		} else {
+			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
 		}
 	}
 
