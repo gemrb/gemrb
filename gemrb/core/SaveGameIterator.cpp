@@ -69,16 +69,17 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	hours -= days*24;
 	char *a=NULL,*b=NULL,*c=NULL;
 
+	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
 	if (days) {
-		if (days==1) a=core->GetCString(10698);
-		else a=core->GetCString(10697);
+		if (days==1) a = core->GetCString(displaymsg->GetStringReference(STR_DAY), 0);
+		else a = core->GetCString(displaymsg->GetStringReference(STR_DAYS), 0);
 	}
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (hours || !a) {
-		if (a) b=core->GetCString(10699);
-		if (hours==1) c=core->GetCString(10701);
-		else c=core->GetCString(10700);
+		if (a) b=core->GetCString(10699); // and
+		if (hours==1) c = core->GetCString(displaymsg->GetStringReference(STR_HOUR), 0);
+		else c = core->GetCString(displaymsg->GetStringReference(STR_HOURS), 0);
 	}
 	if (b) {
 		strcat(Date, a);
