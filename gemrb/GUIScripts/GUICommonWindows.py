@@ -1561,7 +1561,7 @@ def UpdatePortraitWindow ():
 
 def UpdateAnimatedPortrait (Window,i):
 	"""Selects the correct portrait cycle depending on character state"""
-	#note: there are actually two portraits per chr, eg PPPANN, WMPANN
+	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
 	Button = Window.GetControl (i)
 	ButtonHP = Window.GetControl (6 + i)
 	pic = GemRB.GetPlayerPortrait (i+1, 0)
@@ -1587,10 +1587,10 @@ def UpdateAnimatedPortrait (Window,i):
 		cycle = 4
 	else:
 		cycle = 0
+
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE |IE_GUI_BUTTON_MULTILINE, OP_SET)
 	if cycle<6:
-		Button.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_PLAYRANDOM|IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
-	else:
-		Button.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 
 	Button.SetAnimation (pic, cycle)
 	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
