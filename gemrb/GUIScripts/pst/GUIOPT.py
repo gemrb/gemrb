@@ -76,6 +76,7 @@ def OpenOptionsWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (28638)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
+	Button.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
 
 	# Quit Game
 	Button = Window.GetControl (1)
