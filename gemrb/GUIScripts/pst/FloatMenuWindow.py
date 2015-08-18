@@ -35,6 +35,7 @@ import GUIJRNL
 import GUIINV
 import GUIREC
 import GUIMG
+import GUIPR
 
 FloatMenuWindow = None
 
@@ -97,8 +98,12 @@ def DoSingleAction ():
 	elif i == 3:
 		GUIREC.OpenRecordsWindow ()
 	elif i == 4:
-		# FIXME: Or priest scroll ....
-		GUIMG.OpenMageWindow ()
+		pc = GemRB.GameGetFirstSelectedPC ()
+		ClassName = GUICommon.GetClassRowName (pc)
+		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
+			GUIMG.OpenMageWindow ()
+		else:
+			GUIPR.OpenPriestWindow ()
 
 def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
