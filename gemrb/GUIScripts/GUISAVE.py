@@ -68,13 +68,14 @@ def OpenSaveWindow ():
 
 	SaveWindow = Window = GemRB.LoadWindow (0)
 	Window.SetFrame ()
+	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
 	# Cancel button
 	CancelButton = Window.GetControl (ctrl_offset[6])
 	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	GemRB.SetVar ("SaveIdx",0)
+	GemRB.SetVar ("SaveIdx", 0)
 
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
@@ -92,17 +93,17 @@ def OpenSaveWindow ():
 		# area previews
 		Button = Window.GetControl (1+i)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 		# PC portraits
 		for j in range(min(6, PARTY_SIZE)):
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	ScrollBar = Window.GetControl (ctrl_offset[5])
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	Games=GemRB.GetSaveGames ()
+	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
 	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
@@ -114,7 +115,7 @@ def OpenSaveWindow ():
 def ScrollBarPress():
 	Window = SaveWindow
 
-	#draw load game portraits
+	# draw load game portraits
 	Pos = GemRB.GetVar ("TopIndex")
 	for i in range(num_rows):
 		ActPos = Pos + i
@@ -150,6 +151,7 @@ def ScrollBarPress():
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture ("")
+
 		for j in range(min(6, PARTY_SIZE)):
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
 			if ActPos < len(Games):
@@ -216,6 +218,7 @@ def OpenConfirmWindow ():
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 	ConfirmWindow = GemRB.LoadWindow (1)
+	GemRB.SetVar ("FloatWindow", ConfirmWindow.ID)
 
 	# Slot name
 	if Pos < len(Games):

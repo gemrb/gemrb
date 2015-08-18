@@ -67,6 +67,7 @@ def OpenSaveWindow ():
 			strs = { 'cancel' : 4196, 'save' : 28645, 'delete' : 28640, 'empty' : 28647, 'overwrite' : 28644, 'yousure' : 28639 }
 
 	SaveWindow = Window = GemRB.LoadWindow (0)
+	Window.SetFrame ()
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
 	# Cancel button
@@ -96,7 +97,7 @@ def OpenSaveWindow ():
 
 		# PC portraits
 		for j in range (min(6, PARTY_SIZE)):
-			Button = Window.GetControl (ctrl_offset[2] + i*6 + j)
+			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -106,7 +107,7 @@ def OpenSaveWindow ():
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
 
 	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
 	ScrollBar.SetDefaultScrollBar ()
 	ScrollBarPress ()
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -114,6 +115,7 @@ def OpenSaveWindow ():
 
 def ScrollBarPress():
 	Window = SaveWindow
+
 	# draw load game portraits
 	Pos = GemRB.GetVar ("TopIndex")
 	for i in range (num_rows):
@@ -273,7 +275,8 @@ def OpenConfirmWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
+	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED) # ShowModal will happily reset this..
 	return
 
