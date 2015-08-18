@@ -174,11 +174,6 @@ void Button::DrawInternal(Region& rgn)
 		Sprite2D* Image = NULL;
 
 		switch (State) {
-			case IE_GUI_BUTTON_UNPRESSED:
-			case IE_GUI_BUTTON_LOCKED:
-			case IE_GUI_BUTTON_LOCKED_PRESSED:
-				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
-				break;
 			case IE_GUI_BUTTON_FAKEPRESSED:
 			case IE_GUI_BUTTON_PRESSED:
 				Image = buttonImages[BUTTON_IMAGE_PRESSED];
@@ -190,9 +185,9 @@ void Button::DrawInternal(Region& rgn)
 			case IE_GUI_BUTTON_FAKEDISABLED:
 				Image = buttonImages[BUTTON_IMAGE_DISABLED];
 				break;
-		}
-		if (!Image) {
-			Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
+			default:
+				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
+				break;
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
