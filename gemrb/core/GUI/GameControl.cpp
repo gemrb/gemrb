@@ -1967,10 +1967,18 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 					}
 					if (overInfoPoint) {
 						if (overInfoPoint->Type==ST_TRAVEL) {
-							int i = game->selected.size();
 							ieDword exitID = overInfoPoint->GetGlobalID();
-							while(i--) {
-								game->selected[i]->UseExit(exitID);
+							if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+								// pst forces everyone to travel (eg. ar0201 outside_portal)
+								int i = game->GetPartySize(false);
+								while(i--) {
+									game->GetPC(i, false)->UseExit(exitID);
+								}
+							} else {
+								int i = game->selected.size();
+								while(i--) {
+									game->selected[i]->UseExit(exitID);
+								}
 							}
 						}
 						if (HandleActiveRegion(overInfoPoint, pc, p)) {

@@ -93,8 +93,10 @@ int InfoPoint::CheckTravel(Actor *actor)
 		if (!pm && (Flags&_TRAVEL_NONPC) ) return CT_CANTMOVE;
 	}
 
-	if (pm && (Flags&TRAVEL_PARTY) ) {
-		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
+	// pst doesn't care about distance, selection or the party bit at all
+	static const bool teamMove = core->HasFeature(GF_TEAM_MOVEMENT);
+	if (pm && ((Flags&TRAVEL_PARTY) || teamMove)) {
+		if (teamMove || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
 		}
 		return CT_GO_CLOSER;
