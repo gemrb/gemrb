@@ -39,8 +39,10 @@ message("Detected version: ${GEMRB_VERSION}")
 unset(GLOBALS)
 
 IF(PREFIX)
-	SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
 	SET(CMAKE_INSTALL_PREFIX ${PREFIX})
+	# cmake 3 makes internal use of this variable ...
+	UNSET(PREFIX)
+	UNSET(PREFIX CACHE)
 ENDIF(PREFIX)
 
 if (NOT LAYOUT)
