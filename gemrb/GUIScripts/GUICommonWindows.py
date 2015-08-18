@@ -1455,6 +1455,7 @@ def OpenPortraitWindow (needcontrols=0):
 		elif GameCheck.IsPST():
 			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
 			ButtonHP.SetVarAssoc ('PressedPortraitHP', i+1)
 			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
