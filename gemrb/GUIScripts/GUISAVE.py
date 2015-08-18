@@ -40,10 +40,11 @@ str_chapter = (48007, 48006, 16205, 16206, 16207, 16208, 16209, 71020, 71021, 71
 num_rows = 4
 ctrl_offset = (26, 30, 40, 0x10000008, 0x10000010, 25, 34, 3, 0x10000004, 40, 7, 8, 2)
 sav_version = 0
+strs = { 'cancel' : 13727, 'save' : 15588, 'delete' : 13957, 'empty' : 15304, 'overwrite' : 15306, 'yousure' : 15305 }
 
 def OpenSaveWindow ():
 	global SaveWindow, Games, ScrollBar
-	global num_rows, ctrl_offset, sav_version
+	global num_rows, ctrl_offset, sav_version, strs
 
 	if GUICommon.CloseOtherWindow (OpenSaveWindow):
 		GemRB.SetVar ("OtherWindow", -1)
@@ -63,25 +64,27 @@ def OpenSaveWindow ():
 		GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 		if GameCheck.IsPST():
 			ctrl_offset = (14, 18, 22, 0x10000004, 0x10000008, 13, 46, 1, 0x10000002, 6, 4, 5, 3)
+			strs = { 'cancel' : 4196, 'save' : 28645, 'delete' : 28640, 'empty' : 28647, 'overwrite' : 28644, 'yousure' : 28639 }
+
 	SaveWindow = Window = GemRB.LoadWindow (0)
 	Window.SetFrame ()
 
 	# Cancel button
 	CancelButton = Window.GetControl (ctrl_offset[6])
-	CancelButton.SetText (13727)
+	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("SaveIdx",0)
 
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
-		Button.SetText (15588)
+		Button.SetText (strs['save'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenConfirmWindow)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("SaveIdx", i)
 
 		Button = Window.GetControl (ctrl_offset[1]+i)
-		Button.SetText (13957)
+		Button.SetText (strs['delete'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("SaveIdx", i)
@@ -128,7 +131,7 @@ def ScrollBarPress():
 			Slottime = Games[ActPos].GetDate ()
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == len(Games):
-			Slotname = 15304
+			Slotname = strs['empty']
 			Slottime = ""
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
@@ -217,10 +220,10 @@ def OpenConfirmWindow ():
 	# Slot name
 	if Pos < len(Games):
 		Slotname = Games[Pos].GetName()
-		save_strref = 15306
+		save_strref = strs['overwrite']
 	else:
 		Slotname = ""
-		save_strref = 15588
+		save_strref = strs['save']
 
 	NameField = ConfirmWindow.GetControl (ctrl_offset[7])
 	NameField.SetText (Slotname)
@@ -264,7 +267,7 @@ def OpenConfirmWindow ():
 
 	# Cancel
 	CancelButton = ConfirmWindow.GetControl (ctrl_offset[11])
-	CancelButton.SetText (13727)
+	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -316,15 +319,15 @@ def DeleteGamePress():
 	ConfirmWindow=GemRB.LoadWindow (ctrl_offset[12])
 
 	Text=ConfirmWindow.GetControl (0)
-	Text.SetText (15305)
+	Text.SetText (strs['yousure'])
 
 	DeleteButton=ConfirmWindow.GetControl (1)
-	DeleteButton.SetText (13957)
+	DeleteButton.SetText (strs['delete'])
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
 	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CancelButton=ConfirmWindow.GetControl (2)
-	CancelButton.SetText (13727)
+	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
