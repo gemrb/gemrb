@@ -50,6 +50,10 @@ strings = ("30","60","90","99","00")
 extras = (30,60,90,99,100)
 
 def OnLoad():
+	OpenLUStatsWindow (0)
+	return
+
+def OpenLUStatsWindow(Type = 1):
 	global NewLifeWindow, QuitWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
