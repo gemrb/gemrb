@@ -1776,9 +1776,9 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 		return 0;
 	}
 
-	//chasing is unbreakable
-	//TODO: is this true?
-	Sender->CurrentActionInterruptable = false;
+	// chasing is not unbreakable
+	// would prevent smart ai from dropping a target that's running away
+	//Sender->CurrentActionInterruptable = false;
 
 	Actor *actor = (Actor *)Sender;
 
