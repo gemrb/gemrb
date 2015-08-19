@@ -72,51 +72,37 @@ def OpenOptionsWindow ():
 	GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 	
+	def ConfigOptButton(button, strref, action):
+		button.SetText (strref)
+		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+		button.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
+	
 	# Return to Game
-	Button = Window.GetControl (0)
-	Button.SetText (28638)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
+	ConfigOptButton(Window.GetControl (0), 28638, OpenOptionsWindow)
 
 	# Quit Game
-	Button = Window.GetControl (1)
-	Button.SetText (2595)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
+	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
 
 	# Load Game
-	Button = Window.GetControl (2)
-	Button.SetText (2592)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
+	ConfigOptButton(Window.GetControl (2), 2592, OpenLoadMsgWindow)
 
 	# Save Game
-	Button = Window.GetControl (3)
-	Button.SetText (20639)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUISAVE.OpenSaveWindow)
+	ConfigOptButton(Window.GetControl (3), 20639, GUISAVE.OpenSaveWindow)
 
 	# Video Options
-	Button = Window.GetControl (4)
-	Button.SetText (28781)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenVideoOptionsWindow)
+	ConfigOptButton(Window.GetControl (4), 28781, OpenVideoOptionsWindow)
 
 	# Audio Options
-	Button = Window.GetControl (5)
-	Button.SetText (29720)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenAudioOptionsWindow)
+	ConfigOptButton(Window.GetControl (5), 29720, OpenAudioOptionsWindow)
 
 	# Gameplay Options
-	Button = Window.GetControl (6)
-	Button.SetText (29722)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
+	ConfigOptButton(Window.GetControl (6), 29722, OpenGameplayOptionsWindow)
 
 	# Keyboard Mappings
-	Button = Window.GetControl (7)
-	Button.SetText (29723)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKeyboardMappingsWindow)
+	ConfigOptButton(Window.GetControl (7), 29723, OpenKeyboardMappingsWindow)
 
 	# Movies
-	Button = Window.GetControl (9)
-	Button.SetText (38156)   # or  2594
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMoviesWindow)
+	ConfigOptButton(Window.GetControl (9), 38156, OpenMoviesWindow)
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x10000007)
