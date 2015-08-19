@@ -763,8 +763,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 3: case 16: //pain mirror or balance in all things
 		if (target->LastHitter) {
-			//well, someone took LastDamage out
-			//terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
+			terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
 		}
 		break;
 	case 4:
