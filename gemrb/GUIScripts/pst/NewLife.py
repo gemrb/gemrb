@@ -42,7 +42,9 @@ StatTable = 0
 Stats = [ 0, 0, 0, 0, 0, 0 ]
 StatLimit = [ 23, 18, 18, 18, 18, 18 ]
 StatLabels = [ None ] * 6
+StatLowerLimit = [ 9 ] * 6
 
+LevelUp = 0
 TotPoints = 0
 AcPoints = 0
 HpPoints = 0
@@ -57,10 +59,12 @@ def OpenLUStatsWindow(Type = 1):
 	global NewLifeWindow, QuitWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
-	global TextArea, Stats, StatLabels
+	global TextArea, Stats, StatLabels, StatLowerLimit, StatLimit, LevelUp
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
-	GemRB.LoadGame(None)  #loading the base game
+	LevelUp = Type
+	if not LevelUp:
+		GemRB.LoadGame(None)  #loading the base game
 	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
@@ -70,14 +74,21 @@ def OpenLUStatsWindow(Type = 1):
 	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindow(0)
 	
-	Str = 9
-	Dex = 9
-	Con = 9
-	Wis = 9
-	Int = 9
-	Cha = 9
-	Stats = [ Str, Int, Wis, Dex, Con, Cha ]
-	TotPoints = 21
+	if LevelUp:
+		Str = GemRB.GetPlayerStat(1, IE_STR, 1)
+		Dex = GemRB.GetPlayerStat(1, IE_DEX, 1)
+		Con = GemRB.GetPlayerStat(1, IE_CON, 1)
+		Wis = GemRB.GetPlayerStat(1, IE_WIS, 1)
+		Int = GemRB.GetPlayerStat(1, IE_INT, 1)
+		Cha = GemRB.GetPlayerStat(1, IE_CHR, 1)
+		TotPoints = 1 # FIXME: actually LevelDiff
+		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
+		StatLowerLimit = list(Stats) # so we copy the values or the lower limit would increase with them
+		StatLimit = [ 25 ] * 6
+	else:
+		Str = Dex = Con = Wis = Int = Cha = 9
+		TotPoints = 21
+		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
 	
 	# stat label controls
 	for i in range(len(Stats)):
@@ -167,17 +178,23 @@ def UpdateLabels():
 		StatLabels[i].SetText(str(Stats[i]))
 
 	TotLabel.SetText(str(TotPoints))
-	AcPoints = 10
-	Dex = Stats[3]
-	if Dex>14:
-		AcPoints = AcPoints - (Dex-14)
-
-	HpPoints = 20
-	Con = Stats[4]
-	if Con>14:
-		HpPoints = HpPoints + (Con-9)*2 + (Con-14)
+	if LevelUp:
+		AcPoints = GemRB.GetPlayerStat(1, IE_ARMORCLASS, 1)
 	else:
-		HpPoints = HpPoints + (Con-9)*2
+		AcPoints = 10
+		Dex = Stats[3]
+		if Dex > 14:
+			AcPoints = AcPoints - (Dex-14)
+
+	if LevelUp:
+		HpPoints = GemRB.GetPlayerStat(1, IE_HITPOINTS, 1)
+	else:
+		HpPoints = 20
+		Con = Stats[4]
+		if Con > 14:
+			HpPoints = HpPoints + (Con-9)*2 + (Con-14)
+		else:
+			HpPoints = HpPoints + (Con-9)*2
 
 	AcLabel.SetText(str(AcPoints))
 	HpLabel.SetText(str(HpPoints))
@@ -212,7 +229,8 @@ def AcceptPress():
 	if QuitWindow:
 		QuitWindow.Unload()
 	#set my character up
-	MyChar = GemRB.CreatePlayer("charbase", 1 ) 
+	if not LevelUp:
+		MyChar = GemRB.CreatePlayer ("charbase", 1)
 
 	Str = Stats[0]
 	if Str<=18:
@@ -228,13 +246,17 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_CON, Stats[4])
 	GemRB.SetPlayerStat(1, IE_CHR, Stats[5])
 
+	if LevelUp:
+		# hp is handled in GUIREC
+		return
+
 	#don't add con bonus, it will be calculated by the game
 	#interestingly enough, the game adds only one level's con bonus
 	Con = Stats[4]
-	if Con>14:
+	if Con > 14:
 		x = 30
 	else:
-		x = 20+(Con-9)*2
+		x = 20 + (Con-9)*2
 
 	print "Setting max hp to: ",x
 	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
@@ -348,7 +370,7 @@ def DecreasePress():
 
 	Pressed = GemRB.GetVar("Pressed")
 	Sum = Stats[Pressed]
-	if Sum<=9:
+	if Sum <= StatLowerLimit[Pressed]:
 		return
 	TotPoints = TotPoints+1
 	Sum = Sum-1
