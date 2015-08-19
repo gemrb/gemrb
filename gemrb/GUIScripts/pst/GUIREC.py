@@ -1182,6 +1182,7 @@ def OpenLevelUpWindow ():
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
 	if Thac0Updated:
+		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
 		overview = overview + GemRB.GetString (38718) + '\n'
 
 	Text = Window.GetControl (3)
