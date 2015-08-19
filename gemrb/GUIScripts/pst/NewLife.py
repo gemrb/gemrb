@@ -248,6 +248,8 @@ def AcceptPress():
 
 	if LevelUp:
 		# hp is handled in GUIREC
+		import GUIREC
+		GUIREC.OpenLevelUpWindow ()
 		return
 
 	#don't add con bonus, it will be calculated by the game
