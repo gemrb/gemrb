@@ -365,7 +365,7 @@ public:
 	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
-	int SpellCast(bool instant);
+	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the wierd/awesome wild surges */

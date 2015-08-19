@@ -1352,13 +1352,13 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
 	}
-	return SpellCast(instant);
+	return SpellCast(instant, target);
 }
 
 static EffectRef fx_force_surge_modifier_ref = { "ForceSurgeModifier", -1 };
 
 //start spellcasting (common part)
-int Scriptable::SpellCast(bool instant)
+int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	Actor *actor = NULL;
@@ -1393,13 +1393,24 @@ int Scriptable::SpellCast(bool instant)
 	}
 	if (actor) {
 		//cfb
-		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
-		fxqueue->SetOwner(actor);
+		EffectQueue *fxqueue = new EffectQueue();
+		// casting glow is always on the caster
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			ieDword gender = actor->GetCGGender();
 			spl->AddCastingGlow(fxqueue, duration, gender);
+			fxqueue->SetOwner(actor);
+			fxqueue->AddAllEffects(actor, actor->Pos);
 		}
-		fxqueue->AddAllEffects(actor, actor->Pos);
+		delete fxqueue;
+
+		// actual cfb
+		fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
+		fxqueue->SetOwner(actor);
+		if (target && target->Type == ST_ACTOR) {
+			fxqueue->AddAllEffects((Actor *)target, target->Pos);
+		} else {
+			fxqueue->AddAllEffects(actor, actor->Pos);
+		}
 		delete fxqueue;
 		actor->WMLevelMod = 0;
 		if (actor->Modified[IE_FORCESURGE] == 1) {
