@@ -63,7 +63,14 @@ def OpenLUStatsWindow(Type = 1):
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
 	LevelUp = Type
-	if not LevelUp:
+	if LevelUp:
+		import GUICommonWindows
+		import GUIREC
+		GUICommonWindows.OptionsWindow.SetVisible (WINDOW_INVISIBLE)
+		GUICommonWindows.PortraitWindow.SetVisible (WINDOW_INVISIBLE)
+		GUICommonWindows.ActionsWindow.SetVisible (WINDOW_INVISIBLE)
+		GUIREC.RecordsWindow.SetVisible (WINDOW_INVISIBLE)
+	else:
 		GemRB.LoadGame(None)  #loading the base game
 	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
