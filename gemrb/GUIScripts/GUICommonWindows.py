@@ -1916,7 +1916,10 @@ def UpdateClock ():
 		ActionsWindow = GemRB.LoadWindow(0)
 		Button = ActionsWindow.GetControl (0)
 		SetPSTGamedaysAndHourToken ()
-		Button.SetTooltip (GemRB.GetString(65027))
+		# The check prevents the tooltip being set on a wrong control
+		#   when switching windows, e.g. GUIOPT's 'Return to Game' button
+		if Button.HasAnimation('WMTIME'):
+			Button.SetTooltip (GemRB.GetString(65027))
 		#this function does update the clock tip, but the core fails to display it
 
 	else:
