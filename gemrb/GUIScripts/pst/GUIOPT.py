@@ -64,6 +64,7 @@ def OpenOptionsWindow ():
 		return
 
 	GemRB.GamePause (1, 1)
+	TrySavingConfiguration ()
 
 	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()

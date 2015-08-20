@@ -1353,8 +1353,6 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	return pairs
 
-#NOTE: this is for pst's hp buttons, but it could be optionally exported to other games
-portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
 def OpenPortraitWindow (needcontrols=0):
 	global PortraitWindow
@@ -1612,10 +1610,10 @@ def UpdateAnimatedPortrait (Window,i):
 	#print "PORTRAIT DEBUG:"
 	#print "state: " + str(state) + " hp: " + str(hp) + " hp_max: " + str(hp_max) + "ratio: " + str(ratio) + " cycle: " + str(cycle) + " state: " + str(state)
 
-	if portrait_hp_numeric[i]:
-		op = OP_NAND
-	else:
+	if GemRB.GetVar('Health Bar Settings') & (1 << i):
 		op = OP_OR
+	else:
+		op = OP_NAND
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
 	return
@@ -1672,17 +1670,16 @@ def PortraitButtonHPOnPress (): ##pst hitpoint display
 	Window = PortraitWindow
 
 	i = GemRB.GetVar ('PressedPortraitHP')
-
-	portrait_hp_numeric[i-1] = not portrait_hp_numeric[i-1]
+	hbs = GemRB.GetVar('Health Bar Settings')
 	ButtonHP = Window.GetControl (5 + i)
-#	ButtonHP = Window.GetControl (PortraitButtons[i])
 
-	if portrait_hp_numeric[i-1]:
+	if hbs & (1 << (i-1)):
 		op = OP_NAND
 	else:
 		op = OP_OR
 
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (i-1)))
 	return
 
 def SelectionChanged ():
