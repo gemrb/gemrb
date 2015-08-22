@@ -5181,7 +5181,9 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
 	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
-	if (((Actor *)Sender)->InParty == 0) flags |= REST_NOAREA;
+	if (Sender->Type != ST_ACTOR || ((Actor *)Sender)->InParty == 0) {
+		flags |= REST_NOAREA;
+	}
 	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
