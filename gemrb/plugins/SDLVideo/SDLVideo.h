@@ -46,30 +46,6 @@ inline int GetModState(int modstate)
 	return value;
 }
 
-class SDLSurfaceVideoBuffer : public VideoBuffer {
-	SDL_Surface* buffer;
-
-public:
-	SDLSurfaceVideoBuffer(SDL_Surface* surf) {
-		assert(surf);
-		buffer = surf;
-
-		Clear();
-	}
-
-	~SDLSurfaceVideoBuffer() {
-		SDL_FreeSurface(buffer);
-	}
-
-	void Clear() {
-		SDL_FillRect(buffer, NULL, buffer->format->colorkey);
-	}
-
-	SDL_Surface* Surface() {
-		return buffer;
-	}
-};
-
 class SDLVideoDriver : public Video {
 protected:
 	unsigned long lastMouseDownTime;
@@ -183,6 +159,57 @@ public:
 
 	// we need to beable to convert between Region and SDL_Rect
 	static SDL_Rect RectFromRegion(const Region& rgn);
+};
+
+class SDLSurfaceVideoBuffer : public VideoBuffer {
+	SDL_Surface* buffer;
+
+public:
+	SDLSurfaceVideoBuffer(SDL_Surface* surf) {
+		assert(surf);
+		buffer = surf;
+
+		Clear();
+	}
+
+	~SDLSurfaceVideoBuffer() {
+		SDL_FreeSurface(buffer);
+	}
+
+	void Clear() {
+		SDL_FillRect(buffer, NULL, buffer->format->colorkey);
+	}
+
+	SDL_Surface* Surface() {
+		return buffer;
+	}
+
+	class Size Size() {
+		return GemRB::Size(buffer->w, buffer->h);
+	}
+
+	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+		SDL_Surface* sprite = NULL;
+
+		if (buffer->format->BitsPerPixel == 16) {
+			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
+		} else {
+			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
+			va_list args;
+			va_start(args, pitch);
+			ieByte* pal = va_arg(args, ieByte*);
+			for (int i = 0; i < 256; i++) {
+				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
+				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
+				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
+				sprite->format->palette->colors[i].unused = 0;
+			}
+		}
+
+		SDL_Rect dst = SDLVideoDriver::RectFromRegion(bufDest);
+		SDL_BlitSurface(sprite, NULL, buffer, &dst);
+		SDL_FreeSurface(sprite);
+	}
 };
 
 }
