@@ -106,10 +106,7 @@ protected:
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
-	//subtitle specific variables
-	Font *subtitlefont;
-	Palette *subtitlepal;
-	Region subtitleregion;
+
 	Color fadeColor;
 
 protected:
@@ -226,26 +223,6 @@ public:
 	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() { return screenClip; }
-	/** initializes the screen for movie */
-	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
-	/** called when a video player is done. clean up any video specific resources.  */
-	virtual void DestroyMovieScreen() = 0;
-	/** sets the font and color of the movie subtitles */
-	void SetMovieFont(Font *stfont, Palette *pal);
-	/** draws a movie frame */
-	virtual void showFrame(unsigned char* buf, unsigned int bufw,
-		unsigned int bufh, unsigned int sx, unsigned int sy,
-		unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty, int truecolor, unsigned char *palette,
-		ieDword titleref) = 0;
-	virtual void showYUVFrame(unsigned char** buf, unsigned int *strides,
-		unsigned int bufw, unsigned int bufh,
-		unsigned int w, unsigned int h,
-		unsigned int dstx, unsigned int dsty,
-		ieDword titleref) = 0;
-	virtual void DrawMovieSubtitle(ieStrRef text) = 0;
-	/** handles events during movie */
-	virtual int PollMovieEvents() = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */

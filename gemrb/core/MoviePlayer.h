@@ -33,6 +33,11 @@
 
 #include "Resource.h"
 
+#include "GUI/TextSystem/Font.h"
+#include "GUI/Window.h"
+#include "System/String.h"
+#include "Video.h"
+
 namespace GemRB {
 
 /**
@@ -43,10 +48,74 @@ namespace GemRB {
 class GEM_EXPORT MoviePlayer : public Resource {
 public:
 	static const TypeID ID;
+
+	class SubtitleSet {
+		Font* font;
+		Palette* palette;
+	public:
+		SubtitleSet(Font* fnt, Palette* pal = NULL) {
+			font = fnt;
+			palette = pal;
+		}
+
+		virtual const String& SubtitleAtFrame(size_t) const = 0;
+
+		const Font* Font() const { return font; }
+		Palette* Palette() const {
+			if (!palette) {
+				class Palette* pal = font->GetPalette();
+				pal->release();
+				return pal;
+			}
+			return palette;
+		}
+	};
+
+private:
+	bool isPlaying;
+	const SubtitleSet* subtitles;
+
+protected:
+	Video::BufferFormat movieFormat;
+	Size movieSize;
+	size_t framePos;
+
+protected:
+	void DisplaySubtitle(const String& sub);
+	void PresentMovie(const Region&, Video::BufferFormat fmt);
+
+	virtual bool DecodeFrame(VideoBuffer&) = 0;
+
+public:
 	MoviePlayer(void);
 	virtual ~MoviePlayer(void);
-	virtual int Play() = 0;
-	virtual void CallBackAtFrames(ieDword cnt, ieDword *frames, ieDword *strrefs) = 0;
+
+	Size Dimensions() { return movieSize; }
+	void Play();
+	virtual void Stop();
+
+	void SetSubtitles(const SubtitleSet& subs);
+};
+
+class MoviePlayerControls : public View {
+	MoviePlayer& player;
+
+protected:
+	// currently dont have any real controls
+	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {}
+
+public:
+	MoviePlayerControls(MoviePlayer& player)
+	: View(Region(Point(), player.Dimensions())), player(player) {}
+
+	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) {
+		player.Stop();
+		return true;
+	}
+
+	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/) {
+		player.Stop();
+	}
 };
 
 }

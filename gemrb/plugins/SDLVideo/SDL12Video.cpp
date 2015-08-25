@@ -32,11 +32,6 @@ SDL12VideoDriver::SDL12VideoDriver(void)
 	disp = NULL;
 }
 
-SDL12VideoDriver::~SDL12VideoDriver(void)
-{
-	DestroyMovieScreen();
-}
-
 int SDL12VideoDriver::Init(void)
 {
 	int ret = SDLVideoDriver::Init();
@@ -95,71 +90,6 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Size& s, BufferFormat fmt)
 	return new SDLSurfaceVideoBuffer(buf);
 }
 
-void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
-{
-	if (yuv) {
-		if (overlay) {
-			SDL_FreeYUVOverlay(overlay);
-		}
-		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
-		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
-	}
-	SDL_FillRect(disp, NULL, 0);
-	SDL_Flip( disp );
-	w = width;
-	h = height;
-
-	//setting the subtitle region to the bottom 1/4th of the screen
-	subtitleregion.w = w;
-	subtitleregion.h = h/4;
-	subtitleregion.x = 0;
-	subtitleregion.y = h-h/4;
-}
-
-void SDL12VideoDriver::DestroyMovieScreen()
-{
-	if (overlay) {
-		SDL_FreeYUVOverlay(overlay);
-		overlay = NULL;
-	}
-}
-
-void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
-							   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-							   unsigned int h, unsigned int dstx, unsigned int dsty,
-							   int g_truecolor, unsigned char *pal, ieDword titleref)
-{
-	/*
-	int i;
-	SDL_Surface* sprite;
-
-	assert( bufw == w && bufh == h );
-
-	if (g_truecolor) {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
-										  0x7C00, 0x03E0, 0x001F, 0 );
-	} else {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 );
-		for (i = 0; i < 256; i++) {
-			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].unused = 0;
-		}
-	}
-
-	currentBuf = disp;
-	BlitSurfaceClipped(sprite, Region(sx, sy, w, h), Region(dstx, dsty, w, h));
-	if (titleref>0) {
-		SDL_Rect rect = RectFromRegion(subtitleregion);
-		SDL_FillRect(currentBuf, &rect, 0xff);
-		DrawMovieSubtitle( titleref );
-	}
-	SDL_Flip( disp );
-	SDL_FreeSurface( sprite );
-	*/
-}
-
 // sets brightness and contrast
 // FIXME:SetGammaRamp doesn't seem to work
 // WARNING: SDL 1.2.13 crashes in SetGamma on Windows (it was fixed in SDL's #3533 Revision)
@@ -185,7 +115,6 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
 	VideoBuffers::iterator it;
 	it = buffers.begin();
-	SDL_FillRect(disp, NULL, 0xffffffaa);
 	for (; it != buffers.end(); ++it) {
 		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
 		SDL_BlitSurface( vb->Surface(), NULL, disp, NULL );
@@ -217,45 +146,6 @@ bool SDL12VideoDriver::ToggleGrabInput()
 		SDL_WM_GrabInput( SDL_GRAB_OFF );
 		return false;
 	}
-}
-
-void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-								  unsigned int /*bufw*/, unsigned int bufh,
-								  unsigned int w, unsigned int h,
-								  unsigned int dstx, unsigned int dsty,
-								  ieDword titleref) {
-	assert( /* bufw == w && */ bufh == h );
-
-	/*
-	SDL_Rect destRect;
-
-	SDL_LockYUVOverlay(overlay);
-	for (unsigned int plane = 0; plane < 3; plane++) {
-		unsigned char *data = buf[plane];
-		unsigned int size = overlay->pitches[plane];
-		if (strides[plane] < size) {
-			size = strides[plane];
-		}
-		unsigned int srcoffset = 0, destoffset = 0;
-		for (unsigned int i = 0; i < ((plane == 0) ? bufh : (bufh / 2)); i++) {
-			memcpy(overlay->pixels[plane] + destoffset,
-				   data + srcoffset, size);
-			srcoffset += strides[plane];
-			destoffset += overlay->pitches[plane];
-		}
-	}
-	SDL_UnlockYUVOverlay(overlay);
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-	SDL_Rect rect = RectFromRegion(subtitleregion);
-
-	SDL_FillRect(currentBuf, &rect, 0);
-	SDL_DisplayYUVOverlay(overlay, &destRect);
-	if (titleref>0)
-		DrawMovieSubtitle( titleref );
-	 */
 }
 
 int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)

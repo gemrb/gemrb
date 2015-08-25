@@ -59,19 +59,6 @@ public:
 	int SwapBuffers(void);
 	int PollEvents();
 
-	void InitMovieScreen(int &w, int &h, bool yuv);
-	virtual void DestroyMovieScreen();
-
-	void showFrame(unsigned char* buf, unsigned int bufw,
-									unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-									unsigned int h, unsigned int dstx, unsigned int dsty,
-									int g_truecolor, unsigned char *pal, ieDword titleref);
-	void showYUVFrame(unsigned char** buf, unsigned int *strides,
-					  unsigned int bufw, unsigned int bufh,
-					  unsigned int w, unsigned int h,
-					  unsigned int dstx, unsigned int dsty,
-					  ieDword titleref);
-
 	bool SetFullscreenMode(bool set);
 	void SetGamma(int brightness, int contrast);
 	bool ToggleGrabInput();

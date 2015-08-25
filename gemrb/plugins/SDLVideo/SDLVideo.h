@@ -50,8 +50,6 @@ class SDLVideoDriver : public Video {
 protected:
 	unsigned long lastMouseDownTime;
 
-	String *subtitletext;
-	ieDword subtitlestrref;
 public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
@@ -127,22 +125,8 @@ public:
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
 
-	virtual void InitMovieScreen(int &w, int &h, bool yuv=false)=0;
-	virtual void DestroyMovieScreen() = 0;
-	virtual void showFrame(unsigned char* buf, unsigned int bufw,
-							unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-							unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,
-							unsigned char *palette, ieDword strRef)=0;
-	void showYUVFrame(unsigned char** buf, unsigned int *strides,
-							unsigned int bufw, unsigned int bufh,
-							unsigned int w, unsigned int h,
-							unsigned int dstx, unsigned int dsty,
-							ieDword titleref)=0;
-	int PollMovieEvents();
-
 protected:
 	inline SDL_Surface* CurrentSurfaceBuffer();
-	void DrawMovieSubtitle(ieDword strRef);
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);

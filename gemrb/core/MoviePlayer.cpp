@@ -20,16 +20,68 @@
 
 #include "MoviePlayer.h"
 
+#include "GUI/Label.h"
+#include "Interface.h"
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
 MoviePlayer::MoviePlayer(void)
 {
+	framePos = 0;
+	subtitles = NULL;
 }
 
 MoviePlayer::~MoviePlayer(void)
 {
+	Stop();
+}
+
+void MoviePlayer::SetSubtitles(const SubtitleSet& subs)
+{
+	subtitles = &subs;
+}
+
+void MoviePlayer::Play()
+{
+	Video* video = core->GetVideoDriver();
+
+	VideoBuffer* vb = video->CreateBuffer(movieSize, movieFormat);
+	Region frame(Point(), movieSize);
+	Window* win = WindowManager::DefaultWindowManager().MakeWindow(frame);
+	win->SetPosition(Window::PosCentered);
+	win->AddSubviewInFrontOfView(new MoviePlayerControls(*this));
+
+	// currently, our MoviePlayer implementation takes over the entire screen
+	// not only that but the Play method blocks until movie is done/stopped.
+	win->DisplayModal(); // we bypass the WindowManager for drawing, but for event handling we need this
+	isPlaying = true;
+	do {
+		// taking over the application runloop...
+		video->SetDrawingBuffer(vb);
+		if (DecodeFrame(*vb)) {
+			if (subtitles) {
+				subtitles->Font()->Print(frame, subtitles->SubtitleAtFrame(framePos), subtitles->Palette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+			}
+			// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
+			// However, since we completely block the normal game loop we will bypass WindowManager drawing
+			//WindowManager::DefaultWindowManager().DrawWindows();
+
+			//win.Draw(); // if we had any playback controls we would need to draw them
+		} else {
+			Stop(); // error / end
+		}
+		// TODO: pass movie fps (and remove the cap from within the movie decoders)
+	} while (isPlaying && (video->SwapBuffers(0) == GEM_OK));
+
+	win->Close();
+	video->DestroyBuffer(vb);
+}
+
+void MoviePlayer::Stop()
+{
+	isPlaying = false;
 }
 
 }

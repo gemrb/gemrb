@@ -33,23 +33,11 @@ private:
 
 public:
 	SDL12VideoDriver(void);
-	~SDL12VideoDriver(void);
 	
 	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	Sprite2D* GetScreenshot( Region r );
 
-	void InitMovieScreen(int &w, int &h, bool yuv);
-	virtual void DestroyMovieScreen();
-	void showFrame(unsigned char* buf, unsigned int bufw,
-				   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-				   unsigned int h, unsigned int dstx, unsigned int dsty,
-				   int g_truecolor, unsigned char *pal, ieDword titleref);
-	void showYUVFrame(unsigned char** buf, unsigned int *strides,
-					  unsigned int bufw, unsigned int bufh,
-					  unsigned int w, unsigned int h,
-					  unsigned int dstx, unsigned int dsty,
-					  ieDword titleref);
 	bool SetFullscreenMode(bool set);
 
 	bool ToggleGrabInput();

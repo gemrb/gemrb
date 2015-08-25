@@ -723,14 +723,6 @@ int GLVideoDriver::SwapBuffers()
 	return val;
 }
 
-void GLVideoDriver::DestroyMovieScreen()
-{
-	SDL20VideoDriver::DestroyMovieScreen();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_SCISSOR_TEST);
-}
-
 Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 {
 	unsigned int w = r.w ? r.w : width - r.x;

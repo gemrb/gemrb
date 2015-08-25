@@ -59,15 +59,10 @@ SDLVideoDriver::SDLVideoDriver(void)
 {
 	lastTime = 0;
 	lastMouseDownTime = GetTickCount();
-
-	subtitlestrref = 0;
-	subtitletext = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
-	delete subtitletext;
-
 	SDL_Quit();
 }
 
@@ -1268,50 +1263,6 @@ void SDLVideoDriver::SetFadePercent(int percent)
 	if (percent>100) percent = 100;
 	else if (percent<0) percent = 0;
 	fadeColor.a = (255 * percent ) / 100;
-}
-
-int SDLVideoDriver::PollMovieEvents()
-{
-	SDL_Event event;
-
-	while (SDL_PollEvent( &event )) {
-		switch (event.type) {
-			case SDL_QUIT:
-			case SDL_MOUSEBUTTONUP:
-				return 1;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-					case SDLK_q:
-						return 1;
-					case SDLK_f:
-						ToggleFullscreenMode();
-						break;
-					default:
-						break;
-				}
-				break;
-			default:
-				break;
-		}
-	}
-
-	return 0;
-}
-
-void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
-{
-	if (strRef!=subtitlestrref) {
-		delete subtitletext;
-		if (!strRef)
-			return;
-		subtitletext = core->GetString(strRef);
-		subtitlestrref = strRef;
-	}
-	if (subtitlefont && subtitletext) {
-		//FYI: that 0 is pitch black
-		subtitlefont->Print(subtitleregion, *subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
-	}
 }
 
 void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, const Region& dst)

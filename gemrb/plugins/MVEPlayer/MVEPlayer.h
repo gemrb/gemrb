@@ -23,6 +23,8 @@
 
 #include "MoviePlayer.h"
 
+#include "mve_player.h"
+
 #include "globals.h"
 #include "win32def.h"
 
@@ -32,15 +34,15 @@ class Video;
 
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
+	MVEPlayer decoder;
+	VideoBuffer* vidBuf;
+
 private:
 	Video *video;
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);
-	void showFrame(unsigned char* buf, unsigned int bufw,
-		unsigned int bufh, unsigned int sx, unsigned int sy,
-		unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty);
+	void showFrame(unsigned char* buf, unsigned int bufw, unsigned int bufh);
 	void setPalette(unsigned char* p, unsigned start, unsigned count);
 	int pollEvents();
 	int setAudioStream();
@@ -48,12 +50,14 @@ private:
 	void queueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
 				int size, int samplerate);
+
+protected:
+	bool DecodeFrame(VideoBuffer&);
+
 public:
 	MVEPlay(void);
 	~MVEPlay(void);
 	bool Open(DataStream* stream);
-	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
-	int Play();
 };
 
 }

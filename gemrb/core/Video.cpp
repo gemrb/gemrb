@@ -334,12 +334,6 @@ Region Video::GetViewport() const
 	return Viewport;
 }
 
-void Video::SetMovieFont(Font *stfont, Palette *pal)
-{
-	subtitlefont = stfont;
-	subtitlepal = pal;
-}
-
 void Video::SetViewport(const Region& vp)
 {
 	Coor.x = (vp.x > width) ? width : vp.x;

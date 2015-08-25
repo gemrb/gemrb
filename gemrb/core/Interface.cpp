@@ -2806,22 +2806,14 @@ bool Interface::DelSymbol(unsigned int index)
 	return true;
 }
 /** Plays a Movie */
-int Interface::PlayMovie(const char* ResRef)
+int Interface::PlayMovie(const char* resref)
 {
-	const char *realResRef = ResRef;
-	ieDword subtitles = 0;
-	Font *SubtitleFont = NULL;
-	Palette *palette = NULL;
-	ieDword *frames = NULL;
-	ieDword *strrefs = NULL;
-	int cnt = 0;
-	int offset = 0;
-
+	const char *realResRef = resref;
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
 	AutoTable mvesnd;
 	if (mvesnd.load("mvesnd", true)) {
-		int row = mvesnd->GetRowIndex(ResRef);
+		int row = mvesnd->GetRowIndex(resref);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");
 			if (mvecol != -1) {
@@ -2840,41 +2832,58 @@ int Interface::PlayMovie(const char* ResRef)
 	}
 
 	//one of these two should exist (they both mean the same thing)
+	ieDword subtitles = 0;
 	vars->Lookup("Display Movie Subtitles", subtitles);
-	if (subtitles) {
-		//HoW flag
-		cnt=-3;
-		offset = 3;
-	} else {
-		//ToB flag
+	if (!subtitles) {
 		vars->Lookup("Display Subtitles", subtitles);
 	}
-	AutoTable sttable;
-	if (subtitles && sttable.load(ResRef)) {
-		cnt += sttable->GetRowCount();
-		if (cnt>0) {
-			frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
-			strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
-		} else {
-			cnt = 0;
-		}
-		if (frames && strrefs) {
-			for (int i=0;i<cnt;i++) {
-				frames[i] = atoi (sttable->QueryField(i+offset, 0) );
-				strrefs[i] = atoi (sttable->QueryField(i+offset, 1) );
+
+	if (subtitles) {
+		class IESubtitles : public MoviePlayer::SubtitleSet {
+			typedef std::map<size_t, ieStrRef> FrameMap;
+			FrameMap subs;
+
+		public:
+			IESubtitles(class Font* fnt, class Palette* pal, ResRef resref)
+			: MoviePlayer::SubtitleSet(fnt, pal)
+			{
+				AutoTable sttable(resref);
+
+				for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
+					const char* frameField = sttable->QueryField(i, 0);
+					const char* strField = sttable->QueryField(i, 1);
+					if (frameField && strField) {
+						subs[atoi(frameField)] = atoi(strField);
+					}
+				}
 			}
-		}
+
+			const String& SubtitleAtFrame(size_t frameNum) const {
+				// TODO?: this isnt very efficient; it is performing a subtitle search every frame
+				// with our use case, we could get by with an iterator set in construction and advanced here when frameNum matches/exceeds the next value
+				// obviously if we do that change the interface to be something like NextSubtitle(frame)
+				FrameMap::const_iterator it;
+				it = subs.upper_bound(frameNum);
+				if (it != subs.begin()) {
+					--it;
+				}
+				return *core->GetString(it->second);
+			}
+		};
+
+		AutoTable sttable(resref);
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
-		SubtitleFont = GetFont (MovieFontResRef); //will change
+		Palette* pal = NULL;
 		if (r || g || b) {
-			if (SubtitleFont) {
-				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
-				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = new Palette( fore, back );
-			}
+			Color fore = { ieByte(r), ieByte(g), ieByte(b), 0x00 };
+			Color back = { 0x00, 0x00, 0x00, 0x00 };
+			pal = new Palette( fore, back );
 		}
+
+		mp->SetSubtitles(IESubtitles(GetFont(MovieFontResRef), pal, resref));
+		gamedata->FreePalette( pal );
 	}
 
 	//shutting down music and ambients before movie
@@ -2882,8 +2891,6 @@ int Interface::PlayMovie(const char* ResRef)
 		music->HardEnd();
 	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 	if (ambim) ambim->deactivate();
-	video->SetMovieFont(SubtitleFont, palette );
-	mp->CallBackAtFrames(cnt, frames, strrefs);
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
@@ -2894,21 +2901,14 @@ int Interface::PlayMovie(const char* ResRef)
 		sound_override->Stop();
 		sound_override.release();
 	}
-	gamedata->FreePalette( palette );
-	if (frames)
-		free(frames);
-	if (strrefs)
-		free(strrefs);
+
 	//restarting music
 	if (music)
 		music->Start();
 	if (ambim) ambim->activate();
-	//this will fix redraw all windows as they looked like
-	//before the movie
-	winmgr->RedrawAll();
 
 	//Setting the movie name to 1
-	vars->SetAt( ResRef, 1 );
+	vars->SetAt( resref, 1 );
 	return 0;
 }
 

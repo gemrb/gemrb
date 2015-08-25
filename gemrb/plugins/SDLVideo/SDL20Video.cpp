@@ -50,7 +50,6 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
-	// no need to call DestroyMovieScreen()
 	SDL_DestroyTexture(screenTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -167,7 +166,7 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 
 	if (screenTexture) SDL_DestroyTexture(screenTexture);
 	if (yuv) {
-		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
+		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
 	} else {
 		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 	}
@@ -181,19 +180,6 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
 	subtitleregion.y = h-h/4;
-}
-
-void SDL20VideoDriver::DestroyMovieScreen()
-{
-	if (screenTexture) SDL_DestroyTexture(screenTexture);
-	// recreate the texture for gameplay
-	// temporarily hardcoding format: see 91becce77374e96da38eb0d9a45f119a74b07cd4
-	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
-	//SDL_GetWindowPixelFormat(window);
-	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
-	// destroy any events that took place during the movies
-	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
-	SDL_RenderClear(renderer); // I guess the videos can potentially be a larger size then the game.
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -319,8 +305,7 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	SDL_UnlockTexture(screenTexture);
  */
 	SDL_RenderClear(renderer);
-	// FIXME: why do we have to invert the last 2 channels? I dont think the data is in the format we claim...
-	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[2], strides[2], buf[1], strides[1]);
+	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[1], strides[1], buf[2], strides[2]);
 	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
 	SDL_RenderPresent(renderer);
 }
