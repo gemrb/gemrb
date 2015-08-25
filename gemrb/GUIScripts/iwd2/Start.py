@@ -83,7 +83,7 @@ def OnLoad():
 	OptionsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OptionsPress)
 	LoadGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadPress)
 	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuickLoadPress)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.Focus()
 	GemRB.LoadMusicPL("Theme.mus")
 
 	return
@@ -91,7 +91,6 @@ def OnLoad():
 def ProtocolPress():
 	global StartWindow, ProtocolWindow
 	#StartWindow.Unload()
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
 	ProtocolWindow = GemRB.LoadWindow(1)
 
 	#Disabling Unused Buttons in this Window
@@ -129,7 +128,7 @@ def ProtocolPress():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
 	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ProtocolWindow.SetVisible(WINDOW_VISIBLE)
+	ProtocolWindow.Focus()
 	return
 
 def ProtocolDonePress():
@@ -147,7 +146,7 @@ def ProtocolDonePress():
 	elif LastProtocol == 2:
 		ProtocolButton.SetText(13968)
 
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.Focus()
 	return
 
 def LoadPress():
@@ -175,7 +174,6 @@ def OptionsPress():
 
 def QuitPress():
 	global StartWindow, QuitWindow
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
 	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
@@ -189,7 +187,7 @@ def QuitPress():
 	CancelButton.SetText(13727)
 	QuitButton.SetText(15417)
 	TextArea.SetText(19532)
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
+	QuitWindow.Focus()
 	return
 
 def NewGamePress():
@@ -203,7 +201,7 @@ def QuitCancelPress():
 	global StartWindow, QuitWindow
 	if QuitWindow:
 		QuitWindow.Unload()
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.Focus()
 	return
 
 def QuitQuitPress():

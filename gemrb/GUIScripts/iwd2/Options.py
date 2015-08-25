@@ -29,13 +29,8 @@ def OnLoad():
 	global OptionsWindow
 
 	MessageBarWindow = GemRB.LoadWindow(0, "GUIOPT")
-	MessageBarWindow.SetVisible(WINDOW_VISIBLE) #This will startup the window as grayed
 
 	CharactersBarWindow = GemRB.LoadWindow(1)
-	CharactersBarWindow.SetVisible(WINDOW_VISIBLE)
-
-	MessageBarWindow.SetVisible(WINDOW_INVISIBLE)
-	CharactersBarWindow.SetVisible(WINDOW_INVISIBLE)
 
 	if MessageBarWindow:
 		MessageBarWindow.Unload()
@@ -69,7 +64,7 @@ def OnLoad():
 	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
 	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	OptionsWindow.SetVisible(WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 
 	return
 

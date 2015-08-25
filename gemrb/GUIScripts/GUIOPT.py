@@ -81,7 +81,7 @@ def CloseOptionsWindow ():
 
 	GameOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommon.GameWindow.Focus()
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
@@ -107,7 +107,6 @@ def OpenOptionsWindow ():
 
 	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 	if GameCheck.IsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
@@ -496,10 +495,9 @@ def MoviePlayPress():
 def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	SubOptionsWindow = Window = GemRB.LoadWindow(2)
+	SubOptionsWindow = Window = GemRB.LoadWindow(2, "GUIMOVIE")
 	#reloading the guiopt windowpack
-	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
+	#GemRB.LoadWindowPack ("GUIOPT", 800, 600)
 	TextAreaControl = Window.GetControl(0)
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)
@@ -540,11 +538,11 @@ def CloseSubSubOptionsWindow ():
 
 def RestoreWinVisibility ():
 	if OptionsWindow:
-		OptionsWindow.SetVisible (WINDOW_VISIBLE)
+		OptionsWindow.Focus()
 	if GameOptionsWindow:
-		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+		GameOptionsWindow.Focus()
 	if PortraitWindow:
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		PortraitWindow.Focus()
 
 ###################################################
 

@@ -27,8 +27,7 @@ MoviesTable = 0
 def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	MovieWindow = GemRB.LoadWindow(2)
+	MovieWindow = GemRB.LoadWindow(2, "GUIMOVIE")
 	TextAreaControl = MovieWindow.GetControl(0)
 	PlayButton = MovieWindow.GetControl(2)
 	CreditsButton = MovieWindow.GetControl(3)
