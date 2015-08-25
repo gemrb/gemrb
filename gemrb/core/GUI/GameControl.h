@@ -59,7 +59,6 @@ class DialogHandler;
 #define SF_GUIENABLED    8  //
 #define SF_LOCKSCROLL    16 //don't scroll
 #define SF_CUTSCENE      32 //don't push new actions onto the action queue
-#define SF_TRACKING      64 //draw blue arrows on the edge for creatures
 
 // target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!
