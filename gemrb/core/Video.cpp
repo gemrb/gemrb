@@ -83,19 +83,22 @@ void Video::SetDrawingBuffer(VideoBuffer* buf)
 	drawingBuffer = drawingBuffers.back();
 }
 
-int Video::SwapBuffers()
+int Video::SwapBuffers(int fpscap)
 {
 	SwapBuffers(drawingBuffers);
 	drawingBuffers.clear();
 
-	unsigned long time = GetTickCount();
-	if (( time - lastTime ) < 33) {
-#ifndef NOFPSLIMIT
-		Wait(33 - int(time - lastTime));
-#endif
-		time = GetTickCount();
+	if (fpscap) {
+		unsigned int lim = fpscap/1000;
+		unsigned long time = GetTickCount();
+		if (( time - lastTime ) < lim) {
+			Wait(lim - int(time - lastTime));
+			time = GetTickCount();
+		}
+		lastTime = time;
+	} else {
+		lastTime = GetTickCount();
 	}
-	lastTime = time;
 
 	return PollEvents();
 }

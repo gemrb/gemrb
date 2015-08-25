@@ -140,7 +140,7 @@ public:
 	virtual bool SetFullscreenMode(bool set) = 0;
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
-	int SwapBuffers();
+	int SwapBuffers(int fpscap = 30);
 	VideoBuffer* CreateBuffer(const Size&, BufferFormat = DISPLAY);
 	void DestroyBuffer(VideoBuffer*) {}; // FIXME: implement this
 	void SetDrawingBuffer(VideoBuffer*);
