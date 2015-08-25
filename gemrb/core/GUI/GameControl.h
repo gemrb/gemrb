@@ -69,19 +69,6 @@ class DialogHandler;
 #define TARGET_MODE_DEFEND  4
 #define TARGET_MODE_PICK    5
 
-/*
-#define TARGET_SELECT       16
-#define TARGET_NO_DEAD      32
-#define TARGET_POINT        64
-#define TARGET_NO_HIDDEN    128
-#define TARGET_TYPE_NONE    0x000
-#define TARGET_NO_ALLY      0x100 //0x100
-#define TARGET_NO_ENEMY     0x200 //0x200
-#define TARGET_NO_NEUTRAL   0x400
-#define TARGET_NO_SELF      0x800
-#define TARGET_TYPE_ALL      0 //(TARGET_TYPE_ALLY | TARGET_TYPE_ENEMY | TARGET_TYPE_NEUTRAL)
-*/
-
 static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
 /**
