@@ -494,7 +494,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	lines += ta->RowCount();
 	delete chapText;
 	// animate the scroll: duration = 2500 * lines of text
-	ta->ScrollToY((int)(rowHeight * lines), NULL, lines * 2500);
+	ta->ScrollToY(int(rowHeight * lines), NULL, ieDword(lines * 2500));
 	Py_RETURN_NONE;
 }
 
