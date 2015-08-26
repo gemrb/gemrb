@@ -9440,7 +9440,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 
 	PyObject *module;
 	if (moduleName) {
-		module = PyImport_ImportModule(const_cast<char*>(moduleName));
+		module = PyImport_ImportModule(moduleName);
 	} else {
 		module = pModule;
 		Py_XINCREF(module);
@@ -9451,7 +9451,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	}
 	PyObject *dict = PyModule_GetDict(module);
 
-	PyObject *pFunc = PyDict_GetItemString(dict, const_cast<char*>(functionName));
+	PyObject *pFunc = PyDict_GetItemString(dict, functionName);
 	/* pFunc: Borrowed reference */
 	if (!pFunc || !PyCallable_Check(pFunc)) {
 		if (report_error) {
