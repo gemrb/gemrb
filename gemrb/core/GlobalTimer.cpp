@@ -51,6 +51,7 @@ void GlobalTimer::Init()
 	fadeFromMax = 0;
 	fadeToMax = 0;
 	fadeToFactor = fadeFromFactor = 1;
+	shakeX = shakeY = 0;
 	shakeCounter = 0;
 	startTime = 0; //forcing an update
 	speed = 0;
