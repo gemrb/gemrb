@@ -38,7 +38,6 @@
 #include "ie_types.h"
 
 #include "Audio.h"
-#include "Interface.h"
 #include "Variables.h"
 #include "Video.h"
 
@@ -51,10 +50,6 @@
 
 using namespace GemRB;
 
-static int g_truecolor;
-static ieDword *cbAtFrame = NULL;
-static ieDword *strRef = NULL;
-
 static const int ff_wma_critical_freqs[25] = {
 	100,   200,  300, 400,   510,  630,  770,    920,
 	1080, 1270, 1480, 1720, 2000, 2320, 2700,   3150,
@@ -64,19 +59,21 @@ static const int ff_wma_critical_freqs[25] = {
 
 BIKPlayer::BIKPlayer(void)
 {
-	video = core->GetVideoDriver();
+	movieFormat = Video::YV12;
 	inbuff = NULL;
-	maxRow = 0;
-	rowCount = 0;
-	frameCount = 0;
+
 	//force initialisation of static tables
 	memset(bink_trees, 0, sizeof(bink_trees));
 	memset(table, 0, sizeof(table));
+
+	frame_wait = 0;
+	timer_last_sec = 0;
+	video_frameskip = 0;
 }
 
 BIKPlayer::~BIKPlayer(void)
 {
-	av_freep((void **) &inbuff);
+	Stop();
 }
 
 void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
@@ -192,40 +189,48 @@ int BIKPlayer::ReadHeader()
 
 bool BIKPlayer::Open(DataStream* stream)
 {
-	validVideo = false;
 	str = stream;
-
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
+
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
-		validVideo = ReadHeader()==0;
-		return validVideo;
+		if (ReadHeader()==0) {
+			sound_init( core->GetAudioDrv()->CanPlay());
+			return video_init() == 0;
+		}
 	}
 	return false;
 }
 
-void BIKPlayer::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
-{
-	maxRow = cnt;
-	frameCount = 0;
-	rowCount = 0;
-	cbAtFrame = arg;
-	strRef = arg2;
-}
-
-int BIKPlayer::Play()
+bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 {
 	if (!validVideo) {
-		return 0;
+		return false;
 	}
-	//Start Movie Playback
-	frameCount = 0;
-	int ret = doPlay( );
 
-	if (s_stream > -1)
-		EndAudio();
-	EndVideo();
-	av_freep((void **) &inbuff);
-	return ret;
+	if (timer_last_sec) {
+		timer_wait();
+	}
+	if(framePos >= header.framecount) {
+		return false;
+	}
+	binkframe frame = frames[framePos++];
+	str->Seek(frame.pos, GEM_STREAM_START);
+	ieDword audframesize;
+	str->ReadDword(&audframesize);
+	frame.size = str->Read( inbuff, frame.size - 4 );
+	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
+		//buggy frame, we stop immediately
+		//return false;
+	}
+	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize, buf)) {
+		//buggy frame, we stop immediately
+		return false;
+	}
+	if (!timer_last_sec) {
+		timer_start();
+	}
+
+	return true;
 }
 
 //this code could be in the movieplayer parent class
@@ -277,87 +282,20 @@ void BIKPlayer::timer_wait()
 	timer_start();
 }
 
-bool BIKPlayer::next_frame()
+void BIKPlayer::Stop()
 {
-	if (timer_last_sec) {
-		timer_wait();
-	}
-	if(frameCount>=header.framecount) {
-		return false;
-	}
-	binkframe frame = frames[frameCount++];
-	str->Seek(frame.pos, GEM_STREAM_START);
-	ieDword audframesize;
-	str->ReadDword(&audframesize);
-	frame.size = str->Read( inbuff, frame.size - 4 );
-	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
-		//buggy frame, we stop immediately
-		//return false;
-	}
-	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize)) {
-		//buggy frame, we stop immediately
-		return false;
-	}
-	if (!timer_last_sec) {
-		timer_start();
-	}
-	return true;
-}
+	if (s_stream > -1)
+		EndAudio();
+	EndVideo();
+	av_freep((void **) &inbuff);
 
-int BIKPlayer::doPlay()
-{
-	int done = 0;
-
-	//bink is always truecolor
-	g_truecolor = 1;
-
-	frame_wait = 0;
-	timer_last_sec = 0;
-	video_frameskip = 0;
-
-	if (sound_init( core->GetAudioDrv()->CanPlay())) {
-		//sound couldn't be initialized
-		return 1;
-	}
-
-	//last parameter is to enable YUV overlay
-	outputwidth = (int) header.width;
-	outputheight= (int) header.height;
-	video->InitMovieScreen(outputwidth,outputheight, true);
-
-	if (video_init(outputwidth,outputheight)) {
-		return 2;
-	}
-
-	while (!done && next_frame()) {
-		done = video->PollMovieEvents();
-	}
-
-	video->DestroyMovieScreen();
-	return 0;
+	MoviePlayer::Stop();
 }
 
 unsigned int BIKPlayer::fileRead(unsigned int pos, void* buf, unsigned int count)
 {
 	str->Seek(pos, GEM_STREAM_START);
 	return str->Read( buf, count );
-}
-
-void BIKPlayer::showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
-	unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx, unsigned int dsty)
-{
-	ieDword titleref = 0;
-
-	if (cbAtFrame && strRef) {
-		if ((rowCount<maxRow) && (frameCount >= cbAtFrame[rowCount]) ) {
-			rowCount++;
-		}
-		//draw subtitle here
-		if (rowCount) {
-			titleref = strRef[rowCount-1];
-		}
-	}
-	video->showYUVFrame(buf,strides,bufw,bufh,w,h,dstx,dsty, titleref);
 }
 
 int BIKPlayer::setAudioStream()
@@ -493,7 +431,7 @@ void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
 	}
 }
 
-int BIKPlayer::video_init(int w, int h)
+int BIKPlayer::video_init()
 {
 	int bw, bh, blocks;
 	int i;
@@ -511,11 +449,6 @@ int BIKPlayer::video_init(int w, int h)
 	memset(&c_pic,0, sizeof(AVFrame));
 	memset(&c_last,0, sizeof(AVFrame));
 
-	if (w<(signed) header.width || h<(signed) header.height) {
-		//movie dimensions are higher than available screen
-		return 1;
-	}
-
 	ff_init_scantable(&c_scantable, bink_scan);
 
 	bw = (header.width  + 7) >> 3;
@@ -526,7 +459,7 @@ int BIKPlayer::video_init(int w, int h)
 		c_bundle[i].data = (uint8_t *) av_malloc(blocks * 64);
 		//not enough memory
 		if(!c_bundle[i].data) {
-			return 2;
+			return 1;
 		}
 		c_bundle[i].data_end = (uint8_t *) c_bundle[i].data + blocks * 64;
 	}
@@ -580,7 +513,6 @@ int BIKPlayer::EndVideo()
 	for (i = 0; i < BINK_NB_SRC; i++) {
 		av_freep((void **) &c_bundle[i].data);
 	}
-	video->DrawMovieSubtitle(0);
 	return 0;
 }
 static const uint8_t rle_length_tab[16] = {
@@ -1374,7 +1306,7 @@ static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 	add_pixels_nonclamped(block, dest, line_size);
 }
 
-int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
+int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 {
 	int blk, bw, bh;
 	int i, j, plane, bx, by;
@@ -1603,9 +1535,14 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 		video_frameskip--;
 		video_skippedframes++;
 	} else {
-		unsigned int dest_x = (outputwidth - header.width) >> 1;
-		unsigned int dest_y = (outputheight - header.height) >> 1;
-		showFrame((ieByte **) c_pic.data, (unsigned int *) c_pic.linesize, header.width, header.height, header.width, header.height, dest_x, dest_y);
+		const Size& bufsize = buf.Size();
+		int dest_x = unsigned(bufsize.w - header.width) >> 1;
+		int dest_y = unsigned(bufsize.w - header.height) >> 1;
+
+		buf.CopyPixels(Region(dest_x, dest_y, header.width, header.height),
+					   c_pic.data[0], &c_pic.linesize[0], // Y
+					   c_pic.data[1], &c_pic.linesize[1], // U
+					   c_pic.data[2], &c_pic.linesize[2]);// V
 	}
 
 	//release the old frame even when frame is skipped

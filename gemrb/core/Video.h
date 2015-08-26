@@ -92,7 +92,7 @@ public:
 	enum BufferFormat {
 		DISPLAY = 0, // whatever format the video driver thinks is best for the display
 		RGBA8888 = 1, // RGBA format for some videos (palettized videos can be converted)
-		IYUV = 2,    // YUV format for some videos
+		YV12 = 2,    // YUV format for BIK videos
 	};
 
 protected:

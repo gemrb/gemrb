@@ -110,7 +110,6 @@ public:
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 
-
 	/** Convers a Screen Coordinate to a Game Coordinate */
 	Point ConvertToGame(const Point& p)
 	{
@@ -168,11 +167,16 @@ public:
 		return buffer;
 	}
 
+	virtual void RenderOnDisplay(SDL_Surface* display) {
+		// FIXME: eventually buffers wont always be the screen size...
+		SDL_BlitSurface( buffer, NULL, display, NULL );
+	}
+
 	class Size Size() {
 		return GemRB::Size(buffer->w, buffer->h);
 	}
 
-	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
 		SDL_Surface* sprite = NULL;
 
 		if (buffer->format->BitsPerPixel == 16) {
@@ -188,11 +192,78 @@ public:
 				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].unused = 0;
 			}
+			va_end(args);
 		}
 
 		SDL_Rect dst = SDLVideoDriver::RectFromRegion(bufDest);
 		SDL_BlitSurface(sprite, NULL, buffer, &dst);
 		SDL_FreeSurface(sprite);
+	}
+};
+
+class SDLOverlayVideoBuffer : public SDLSurfaceVideoBuffer {
+	SDL_Overlay* overlay;
+	Point renderPos;
+
+public:
+	SDLOverlayVideoBuffer(SDL_Surface* buffer, SDL_Overlay* overlay)
+	: SDLSurfaceVideoBuffer(buffer)
+	{
+		assert(overlay);
+		this->overlay = overlay;
+	}
+
+	~SDLOverlayVideoBuffer() {
+		SDL_FreeYUVOverlay(overlay);
+	}
+
+	void Clear() {}
+
+	class Size Size() {
+		return GemRB::Size(overlay->w, overlay->h);
+	}
+
+	void RenderOnDisplay(SDL_Surface* display) {
+		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
+
+		SDL_Rect dest = {0, 0, overlay->w, overlay->h};
+		SDL_DisplayYUVOverlay(overlay, &dest);
+	}
+
+	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+		va_list args;
+		va_start(args, pitch);
+
+		enum PLANES {Y, U, V};
+		ieByte* planes[3];
+		unsigned int strides[3];
+
+		planes[Y] = static_cast<ieByte*>(pixelBuf);
+		strides[Y] = *pitch;
+		planes[U] = va_arg(args, ieByte*);
+		strides[U] = *va_arg(args, int*);
+		planes[V] = va_arg(args, ieByte*);
+		strides[V] = *va_arg(args, int*);
+
+		va_end(args);
+
+		SDL_LockYUVOverlay(overlay);
+		for (unsigned int plane = 0; plane < 3; plane++) {
+			unsigned char *data = planes[plane];
+			unsigned int size = overlay->pitches[plane];
+			if (strides[plane] < size) {
+				size = strides[plane];
+			}
+			unsigned int srcoffset = 0, destoffset = 0;
+			for (int i = 0; i < ((plane == 0) ? bufDest.h : (bufDest.h / 2)); i++) {
+				memcpy(overlay->pixels[plane] + destoffset,
+					   data + srcoffset, size);
+				srcoffset += strides[plane];
+				destoffset += overlay->pitches[plane];
+			}
+		}
+		SDL_UnlockYUVOverlay(overlay);
+		renderPos = bufDest.Origin();
 	}
 };
 

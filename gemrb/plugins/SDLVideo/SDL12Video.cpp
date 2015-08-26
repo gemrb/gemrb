@@ -28,7 +28,6 @@ using namespace GemRB;
 
 SDL12VideoDriver::SDL12VideoDriver(void)
 {
-	overlay = NULL;
 	disp = NULL;
 }
 
@@ -86,7 +85,11 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Size& s, BufferFormat fmt)
 	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
 	SDL_SetColorKey(tmp, SDL_SRCCOLORKEY, SDL_MapRGBA(tmp->format, 0, 0xff, 0, 0));
 	SDL_Surface* buf = SDL_DisplayFormat(tmp);
+	SDL_FreeSurface(tmp);
 
+	if (fmt == YV12) {
+		return new SDLOverlayVideoBuffer(buf, SDL_CreateYUVOverlay(width, height, SDL_YV12_OVERLAY, disp));
+	}
 	return new SDLSurfaceVideoBuffer(buf);
 }
 
@@ -117,7 +120,7 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	it = buffers.begin();
 	for (; it != buffers.end(); ++it) {
 		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
-		SDL_BlitSurface( vb->Surface(), NULL, disp, NULL );
+		vb->RenderOnDisplay(disp);
 	}
 	SDL_Flip( disp );
 }

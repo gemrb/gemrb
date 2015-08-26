@@ -83,7 +83,7 @@ enum Sources {
 	  BINK_SRC_COLORS,          ///< pixel values used for different block types
 	  BINK_SRC_PATTERN,         ///< 8-bit values for 2-colour pattern fill
 	  BINK_SRC_X_OFF,           ///< X components of motion value
-	  BINK_SRC_Y_OFF,           ///< Y components of motion value
+	  BINK_SRC_Y_OFF,           ///< Y scomponents of motion value
 	  BINK_SRC_INTRA_DC,        ///< DC values for intrablocks with DCT
 	  BINK_SRC_INTER_DC,        ///< DC values for intrablocks with DCT
 	  BINK_SRC_RUN,             ///< run lengths for special fill block
@@ -153,20 +153,12 @@ typedef struct Bundle {
 	  uint8_t *cur_ptr;  ///< pointer to the data that is not read from buffer yet
 } Bundle;
 
-class Video;
-
 class BIKPlayer : public MoviePlayer {
 private:
-	Video *video;
 	bool validVideo;
 	binkheader header;
 	std::vector<binkframe> frames;
 	ieByte *inbuff;
-
-	//subtitle and frame counting
-	ieDword maxRow;
-	ieDword rowCount;
-	ieDword frameCount;
 	
 	//audio context (consider packing it in a struct)
 	unsigned int s_frame_len;
@@ -200,8 +192,6 @@ private:
 	unsigned int frame_wait;
 	bool video_rendered_frame;
 	unsigned int video_frameskip;
-	bool done;
-	int outputwidth, outputheight;
 	unsigned int video_skippedframes;
 	//bink specific
 	ScanTable c_scantable;
@@ -219,20 +209,15 @@ private:
 	void timer_start();
 	void timer_wait();
 	void segment_video_play();
-	bool next_frame();
-	int doPlay();
 	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
-	void showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
-		unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty);
-	int pollEvents();
+
 	int setAudioStream();
 	void freeAudioStream(int stream);
 	void queueBuffer(int stream, unsigned short bits,
 		int channels, short* memory, int size, int samplerate);
 	int sound_init(bool need_init);
 	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable);
-	int video_init(int w, int h);
+	int video_init();
 	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
 	int ReadHeader();
 	void DecodeBlock(short *out);
@@ -249,15 +234,19 @@ private:
 	int get_vlc2(int16_t (*table)[2], int bits, int max_depth);
 	void read_bundle(int bundle_num);
 	void init_lengths(int width, int bw);
-	int DecodeVideoFrame(void *data, int data_size);
+	int DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf);
 	int EndAudio();
 	int EndVideo();
+
+protected:
+	bool DecodeFrame(VideoBuffer&);
+
 public:
 	BIKPlayer(void);
 	~BIKPlayer(void);
 	bool Open(DataStream* stream);
-	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
-	int Play();	
+
+	void Stop();
 };
 
 }
