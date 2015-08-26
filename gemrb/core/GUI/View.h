@@ -46,6 +46,7 @@ protected:
 	ieDword resizeFlags;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
+	String tooltip;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;
@@ -69,7 +70,6 @@ protected:
 	virtual void WillDraw() {}
 
 public:
-	String tooltip;
 	ieDword flags;
 	// using Held so we can have polymorphic drag operations
 	struct DragOp : public Held<DragOp> {
