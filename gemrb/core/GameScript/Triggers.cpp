@@ -1141,6 +1141,9 @@ int GameScript::HasItemTypeSlot(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Item *itm = gamedata->GetItem(slot->ItemResRef);
+	if (!itm) {
+		return 0;
+	}
 	int itemtype = itm->ItemType;
 	gamedata->FreeItem(itm, slot->ItemResRef, 0);
 	if (itemtype==parameters->int1Parameter) {
@@ -3961,6 +3964,9 @@ int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) Sender;
 
 	Item *item = gamedata->GetItem(parameters->string0Parameter);
+	if (!item) {
+		return 0;
+	}
 	int ret;
 	if (actor->Unusable(item)) {
 		ret = 0;
