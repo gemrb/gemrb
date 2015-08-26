@@ -2872,18 +2872,20 @@ int Interface::PlayMovie(const char* resref)
 		};
 
 		AutoTable sttable(resref);
-		int r = atoi(sttable->QueryField("red", "frame"));
-		int g = atoi(sttable->QueryField("green", "frame"));
-		int b = atoi(sttable->QueryField("blue", "frame"));
-		Palette* pal = NULL;
-		if (r || g || b) {
-			Color fore = { ieByte(r), ieByte(g), ieByte(b), 0x00 };
-			Color back = { 0x00, 0x00, 0x00, 0x00 };
-			pal = new Palette( fore, back );
-		}
+		if (sttable) {
+			int r = atoi(sttable->QueryField("red", "frame"));
+			int g = atoi(sttable->QueryField("green", "frame"));
+			int b = atoi(sttable->QueryField("blue", "frame"));
+			Palette* pal = NULL;
+			if (r || g || b) {
+				Color fore = { ieByte(r), ieByte(g), ieByte(b), 0x00 };
+				Color back = { 0x00, 0x00, 0x00, 0x00 };
+				pal = new Palette( fore, back );
+			}
 
-		mp->SetSubtitles(IESubtitles(GetFont(MovieFontResRef), pal, resref));
-		gamedata->FreePalette( pal );
+			mp->SetSubtitles(IESubtitles(GetFont(MovieFontResRef), pal, resref));
+			gamedata->FreePalette( pal );
+		}
 	}
 
 	//shutting down music and ambients before movie
