@@ -3682,12 +3682,10 @@ bool Interface::GSUpdate(bool update_scripts)
 void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
-	if (timer) {
-		//clear cutscenes
-		//clear fade/screenshake effects
-		timer->Init();
-		timer->SetFadeFromColor(0);
-	}
+	//clear cutscenes
+	//clear fade/screenshake effects
+	timer->Init();
+	timer->SetFadeFromColor(0);
 
 	DelAllWindows(); //delete all windows, including GameControl
 
