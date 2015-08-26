@@ -773,8 +773,6 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		// FIXME: delete previous WindowFrames
-		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
 	}
 
