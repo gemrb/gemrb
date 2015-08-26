@@ -1691,8 +1691,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 		handler = new PythonCallback(function);
 	} else {
 		char buf[256];
-		// TODO: Print function name. (func.__name__)
-		snprintf(buf, sizeof(buf), "Can't set timed event handler!");
+		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
 		return RuntimeError(buf);
 	}
 	Game *game = core->GetGame();
@@ -1727,8 +1726,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 	}
 	if (!ctrl->SetEvent(event, handler)) {
 		char buf[256];
-		// TODO: Print function name. (func.__name__)
-		snprintf(buf, sizeof(buf), "Can't set event handler!");
+		snprintf(buf, sizeof(buf), "Can't set event handler %s!", PyEval_GetFuncName(func));
 		return RuntimeError(buf);
 	}
 
@@ -10220,8 +10218,7 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 		handler = new PythonCallback(function);
 	} else {
 		char buf[256];
-		// TODO: Print function name. (func.__name__)
-		snprintf(buf, sizeof(buf), "Can't set timed event handler!");
+		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
 		return RuntimeError(buf);
 	}
 
