@@ -40,7 +40,7 @@ class Sprite2D;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 // Window Flags
-#define WF_FLOAT		1 //floating window
+#define WF_DRAGGABLE	1 // window can be moved via dragging (PST radial menu for example)
 #define WF_BORDERLESS	2 //doesnt draw the window frame
 
 // Window position anchors (actually flags for WindowSetPos())
@@ -108,6 +108,10 @@ public:
 	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void DispatchMouseWheelScroll(const Point&, short x, short y);
 
+	void OnMouseOver(const Point&);
+	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	void OnMouseLeave(const Point&, const DragOp*);
+
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
@@ -116,6 +120,8 @@ private: // Private attributes
 	View* hoverView; // view the mouse was last over
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
+	Point dragOrigin;
+	bool isDragging;
 	bool disabled;
 	VideoBuffer* backBuffer;
 	WindowManager& manager;

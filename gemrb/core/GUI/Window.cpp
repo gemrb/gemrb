@@ -28,6 +28,7 @@ namespace GemRB {
 Window::Window(const Region& frame, WindowManager& mgr)
 	: View(frame), manager(mgr)
 {
+	isDragging = false;
 	disabled = false;
 	focusView = NULL;
 	trackingView = NULL;
@@ -94,6 +95,13 @@ void Window::SizeChanged(const Size& /*oldSize*/)
 void Window::WillDraw()
 {
 	core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
+	if (flags&WF_DRAGGABLE && NeedsDraw()) {
+		// FIXME: this shouldnt be needed after the buffers are sized to the window
+		// this *really* slows things down (more than 50% frame loss if all windows do it)
+		// its needed now because moving a window smears its backbuffer
+		// due to the window moving within it instead of the buffer itself being blitted at the new pos
+		backBuffer->Clear();
+	}
 }
 
 void Window::Focus()
@@ -178,8 +186,12 @@ bool Window::TrySetFocus(View* target)
 
 void Window::DispatchMouseOver(const Point& p)
 {
-	TooltipTime = GetTickCount() + ToolTipDelay;
+	if (isDragging) {
+		OnMouseOver(ConvertPointFromScreen(p));
+		return;
+	}
 
+	TooltipTime = GetTickCount() + ToolTipDelay;
 	// need screen coordinates because the target may not be a direct subview
 	Point screenP = ConvertPointToScreen(p);
 	View* target = SubviewAt(p, false, true);
@@ -227,12 +239,15 @@ void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned s
 		trackingView = target; // all views track the mouse within their bounds
 		return;
 	}
-	// handle scrollbar events
-	View::OnMouseDown(p, button, mod);
+	OnMouseDown(ConvertPointFromScreen(p), button, mod);
 }
 
 void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned short mod)
 {
+	if (isDragging) {
+		isDragging = false;
+		return;
+	}
 	if (trackingView) {
 		Point subP = trackingView->ConvertPointFromScreen(ConvertPointToScreen(p));
 		trackingView->OnMouseUp(subP, button, mod);
@@ -255,6 +270,38 @@ void Window::DispatchMouseWheelScroll(const Point& p, short x, short y)
 	}
 	// handle scrollbar events
 	View::OnMouseWheelScroll(x, y);
+}
+
+void Window::OnMouseOver(const Point& p)
+{
+	if (isDragging) {
+		Point delta = dragOrigin - p;
+		Point newOrigin = frame.Origin() - delta;
+		SetFrameOrigin(newOrigin);
+		dragOrigin = dragOrigin + delta;
+	}
+}
+
+void Window::OnMouseLeave(const Point&, const DragOp*)
+{
+	// not sure this can happen... maybe in a low fps scenario?
+	isDragging = false;
+}
+
+void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
+{
+	switch (button) {
+		case GEM_MB_ACTION:
+			if (flags&WF_DRAGGABLE) {
+				isDragging = true;
+				dragOrigin = p;
+				break;
+			}
+			// fallthrough
+		default:
+			View::OnMouseDown(p, button, mod);
+			break;
+	}
 }
 
 bool Window::OnSpecialKeyPress(unsigned char key)

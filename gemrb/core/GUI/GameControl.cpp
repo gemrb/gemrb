@@ -2310,7 +2310,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			Window* fw = GetWindow(id, "GUIWORLD");
 			if (!hide) {
 				assert(fw != NULL);
-				fw->SetFlags(WF_FLOAT|WF_BORDERLESS, BM_OR);
+				fw->SetFlags(WF_DRAGGABLE|WF_BORDERLESS, BM_OR);
 				fw->Focus();
 			}
 		}

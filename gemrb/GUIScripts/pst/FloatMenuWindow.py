@@ -142,7 +142,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	FloatMenuWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
-	# FIXME: keep the menu inside the viewport!!!
+	Window.SetFlags (WF_DRAGGABLE, OP_OR)
 	Window.SetPos (x, y)
 
 	# portrait button
@@ -176,16 +176,10 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
-	Button = Window.GetControl (CID_HANDLE1)
-	Button.SetTooltip (8199)
-	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
-
-	Button = Window.GetControl (CID_HANDLE2)
-	Button.SetTooltip (8199)
-	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
-
+	Window.DeleteControl (CID_HANDLE1)
+	Window.DeleteControl (CID_HANDLE2)
+	Window.SetTooltip (8199)
+	
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (CID_PREV)
 	Button.SetTooltip (8197)
@@ -572,11 +566,6 @@ def FloatMenuNextItem ():
 	if float_menu_selected!=None:
 		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()
-	return
-
-def FloatMenuDrag ():
-	dx, dy = GemRB.GetVar ("DragX"), GemRB.GetVar ("DragY")
-	FloatMenuWindow.SetPos (dx, dy, WINDOW_RELATIVE | WINDOW_BOUNDED)
 	return
 
 #############################
