@@ -295,7 +295,7 @@ def MarkMenuButton (MenuWindow):
 
 def OptionsPress ():
 	"""Toggles the options pane """
-	PP = GemRB.GetMessageWindowSize () & GS_OPTIONPANE
+	PP = GemRB.GetGUIFlags () & GS_OPTIONPANE
 	if PP:
 		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_NAND)
 	else:
@@ -323,7 +323,7 @@ OnLockViewPress.counter = 1
 
 def PortraitPress (): #not used in pst. TODO:make an enhancement option?
 	"""Toggles the portraits pane """
-	PP = GemRB.GetMessageWindowSize () & GS_PORTRAITPANE
+	PP = GemRB.GetGUIFlags () & GS_PORTRAITPANE
 	if PP:
 		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_NAND)
 	else:
@@ -338,11 +338,11 @@ def AIPress (toggle=1):
 	else:
 		Button = PortraitWindow.GetControl (OptionControl['AI'])
 
-	print "AIPress: GS_PARTYAI was:", GemRB.GetMessageWindowSize () & GS_PARTYAI, "at toggle:", toggle
+	#print "AIPress: GS_PARTYAI was:", GemRB.GetGUIFlags () & GS_PARTYAI, "at toggle:", toggle
 	if toggle:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
 
-	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
+	AI = GemRB.GetGUIFlags () & GS_PARTYAI
 	if AI:
 		GemRB.SetVar ("AI", 0)
 		Button.SetTooltip (AITip['Deactivate'])

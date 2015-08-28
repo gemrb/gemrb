@@ -90,7 +90,7 @@ def OnLoad():
 def UpdateControlStatus ():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow, MessageTA
 
-	Expand = GemRB.GetMessageWindowSize() & (GS_DIALOGMASK|GS_DIALOG)
+	Expand = GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG)
 
 	hideflags = GemRB.HideGUI ()
 	if Expand:

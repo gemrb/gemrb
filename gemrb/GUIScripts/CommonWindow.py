@@ -22,7 +22,7 @@ from GUIDefines import GS_DIALOGMASK, OP_SET
 
 # message window expansion
 def OnIncreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
+	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand>2:
@@ -32,7 +32,7 @@ def OnIncreaseSize():
 
 # message window contraction
 def OnDecreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
+	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand<2:

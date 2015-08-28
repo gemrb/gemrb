@@ -2764,11 +2764,11 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
+PyDoc_STRVAR( GemRB_GetGUIFlags__doc,
 "GetMessageWindowSize() => int\n\n"
 "Returns current MessageWindowSize, it works only when a game is loaded." );
 
-static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
+static PyObject* GemRB_GetGUIFlags(PyObject * /*self*/, PyObject* /*args*/)
 {
 	GET_GAME();
 
@@ -8951,6 +8951,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GetGameVar, METH_VARARGS),
+	METHOD(GetGUIFlags, METH_VARARGS),
 	METHOD(GetINIBeastsKey, METH_VARARGS),
 	METHOD(GetINIPartyCount, METH_NOARGS),
 	METHOD(GetINIPartyKey, METH_VARARGS),
@@ -8967,7 +8968,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
 	METHOD(MessageWindowDebug, METH_VARARGS),
-	METHOD(GetMessageWindowSize, METH_NOARGS),
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
