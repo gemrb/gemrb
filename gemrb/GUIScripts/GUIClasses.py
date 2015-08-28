@@ -61,6 +61,7 @@ class GView:
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
+    'SetVisible': _GemRB.View_SetVisible,
 	}
 	__slots__ = ['SCRIPT_GROUP']
 	

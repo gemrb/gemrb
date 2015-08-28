@@ -1087,6 +1087,19 @@ static PyObject* GemRB_Control_AddAlias(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_View_SetVisible__doc,
+			 "SetVisible(hide)\n\n"
+			 "Hides/Shows a view." );
+
+static PyObject* GemRB_View_SetVisible(PyObject* self, PyObject* args)
+{
+	PyObject* param;
+	PARSE_ARGS(args, "OO", &self, &param);
+	View* view = GetView(self);
+	view->SetVisible(PyObject_IsTrue(param));
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
 "QueryText(GControl) => string\n\n"
 "Returns the Text of a control." );
@@ -9144,9 +9157,10 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(View_GetFrame, METH_VARARGS),
+	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
-	METHOD(View_SetBackground, METH_VARARGS),
+	METHOD(View_SetVisible, METH_VARARGS),
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
