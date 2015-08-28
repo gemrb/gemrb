@@ -144,7 +144,9 @@ namespace GemRB {
 
 #define STATE_STILL      (STATE_STUNNED | STATE_FROZEN | STATE_PETRIFIED) //0xc8: not animated
 
-#define STATE_CANTMOVE   0x180fef   //can't walk or attack - confused characters can do these
+// can't walk or attack - helpless
+// FIXME: why is STATE_BERSERK on the list?
+#define STATE_CANTMOVE (STATE_SLEEP|STATE_BERSERK|STATE_PANIC|STATE_STUNNED|STATE_HELPLESS|STATE_FROZEN|STATE_PETRIFIED|STATE_EXPLODING|STATE_FLAME|STATE_ACID|STATE_DEAD|STATE_DEACTIVATED|STATE_FEEBLE) // 0x180fef
 #define STATE_CANTLISTEN 0x80080fef
 #define STATE_CANTSTEAL  0x00180fc0 //can't steal from
 #define STATE_CANTSEE    0x00080fc0 //can't explore (even itself)
