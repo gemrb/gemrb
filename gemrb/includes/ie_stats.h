@@ -106,10 +106,10 @@ namespace GemRB {
 #define STATE_HELPLESS   0x00000020
 #define STATE_FROZEN     0x00000040
 #define STATE_PETRIFIED  0x00000080
-#define STATE_EXPLODING  0x00000100
-#define STATE_PST_MIRROR 0x00000100
-#define STATE_FLAME      0x00000200
-#define STATE_ACID       0x00000400
+#define STATE_EXPLODING  0x00000100 // chunky death
+#define STATE_PST_MIRROR 0x00000100 // pst version of STATE_MIRROR (overlaps STATE_EXPLODING)
+#define STATE_FLAME      0x00000200 // charred to death
+#define STATE_ACID       0x00000400 // disolved to death
 #define STATE_DEAD       0x00000800
 #define STATE_SILENCED   0x00001000
 #define STATE_CHARMED    0x00002000
@@ -127,7 +127,7 @@ namespace GemRB {
 #define STATE_FEEBLE     0x00100000
 #define STATE_NONDET     0x00200000
 #define STATE_INVIS2     0x00400000
-#define STATE_EE_DUPL    0x00400000
+#define STATE_EE_DUPL    0x00400000 // pst's enola projectile duplication (overlaps improved invisibility)
 #define STATE_BLESS      0x00800000
 #define STATE_CHANT      0x01000000
 #define STATE_DETECT_EVIL 0x01000000
@@ -139,7 +139,7 @@ namespace GemRB {
 #define STATE_ANTIMAGIC  0x10000000
 #define STATE_BLUR       0x20000000
 #define STATE_MIRROR     0x40000000
-#define STATE_EMBALM     0x40000000
+#define STATE_EMBALM     0x40000000 // pst healing with ac bonus
 #define STATE_CONFUSED   0x80000000
 
 #define STATE_STILL      (STATE_STUNNED | STATE_FROZEN | STATE_PETRIFIED) //0xc8: not animated
