@@ -1,9 +1,0 @@
-
-Prototype: GemRB.GameControlGetTargetMode()
-
-Description: Returns the current target mode. It could be: talk, attack, spellcast and such.
-
-Return value: numeric (see GameControlSetTargetMode)
-
-See also: GameControlSetScreenFlags
-

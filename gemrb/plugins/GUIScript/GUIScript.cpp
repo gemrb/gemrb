@@ -373,8 +373,22 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
-"SetInfoTextColor(red, green, blue, [alpha])\n\n"
-"Sets the color of Floating Messages in GameControl." );
+"===== SetInfoTextColor =====\n\
+\n\
+**Prototype:** GemRB.SetInfoTextColor (red, green, blue[, alpha])\n\
+\n\
+**Description:**\n\
+Sets the color of floating messages in GameControl. Floating messages are\n\
+ in-game messages issued by actors, or information text coming from game objects.\n\
+\n\
+**Parameters:** red, green, blue, alpha - color code, alpha defaults to 255 (completely opaque)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetLabelTextColor]], [[guiscript:SetButtonTextColor]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
@@ -389,8 +403,20 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UnhideGUI__doc,
-"UnhideGUI()\n\n"
-"Shows the Game GUI and redraws windows." );
+"===== UnhideGUI =====\n\
+\n\
+**Prototype:** GemRB.UnhideGUI ()\n\
+\n\
+**Description:** Shows the Game GUI and redraws windows.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:HideGUI]], [[guiscript:InvalidateWindow]], [[guiscript:SetVisible]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
@@ -406,8 +432,45 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_HideGUI__doc,
-"HideGUI()=>returns 1 if it did something\n\n"
-"Hides the Game GUI." );
+"===== HideGUI =====\n\
+\n\
+**Prototype:** GemRB.HideGUI ()\n\
+\n\
+**Description:**\n\
+Hides the game GUI (all windows except the GameControl window). It is also used\n\
+ before a major change is made on a GUI window to avoid flickering. After the\n\
+ changes, an UnhideGUI() command should be issued too.\n\
+\n\
+A list of reserved names (variables) and what they hold:\n\
+  * MessageWindow - contains a TextArea for ingame messages/dialogue\n\
+  * OptionsWindow - a series of buttons for Inventory/Spellbook/Journal,etc\n\
+  * PortraitWindow - a series of portrait buttons\n\
+  * ActionsWindow - a series of buttons to Attack/Talk, etc.\n\
+  * TopWindow - unused (might be removed later)\n\
+  * OtherWindow - this window usually covers the GameControl, it is used to display  maps, inventory, journal, etc.\n\
+  * FloatWindow - special window which floats on top of the GameControl\n\
+\n\
+All these windows are associated with a position variable too, these are\n\
+ MessagePosition, OptionsPosition, etc.\n\
+The position value tells the engine the window's relative position to the\n\
+ GameControl GUI. The engine doesn't make any distinction between these\n\
+ windows based on their reference name. The differences come from the\n\
+position value:\n\
+  * -1 - no position (floats over GameControl)\n\
+  * 0  - left\n\
+  * 1  - bottom\n\
+  * 2  - right\n\
+  * 3  - top\n\
+  * 4  - bottom (cummulative)\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** 1 on success\n\
+\n\
+**See also:** [[guiscript:UnhideGUI]], [[guiscript:InvalidateWindow]], [[guiscript:SetVisible]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
@@ -422,8 +485,21 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetGameString__doc,
-"GetGameString(Index) => string\n\n"
-"Returns various string attributes of the Game object, see the docs.");
+"===== GetGameString =====\n\
+\n\
+**Prototype:** GemRB.GetGameString (Index)\n\
+\n\
+**Description:** Returns a system variable of string type referenced by Index.\n\
+\n\
+**Parameters:** Index\n\
+  * 0 - returns the loading picture's name (MOS resref)\n\
+  * 1 - returns the current area's name (ARE resref)\n\
+  * 2 - returns the table name for the text screen (2DA resref)\n\
+\n\
+**Return value:** string - the referenced system variable\n\
+\n\
+**See also:** [[guiscript:GetSystemVariable]], [[guiscript:GetToken]]"
+);
 
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
@@ -452,8 +528,30 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadGame__doc,
-"LoadGame(Index [,version] )\n\n"
-"Loads and enters the Game." );
+"===== LoadGame =====\n\
+\n\
+**Prototype:** GemRB.LoadGame (index[, version])\n\
+\n\
+**Description:**\n\
+Loads a saved game. This must be done before party creation. \n\
+You must set the variable called PlayMode before loading a game (see SetVar). \n\
+The game won't be loaded before the current GUIScript function returns!\n\
+\n\
+**Parameters:**\n\
+  * index - the saved game's index, -1 means new game.\n\
+  * version - optional version to override some buggy default savegame versions\n\
+  * PlayMode (variable) - 0 (single player), 1 (tutorial), 2 (multi player)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    GemRB.SetVar ('PlayMode', 0)\n\
+    GemRB.LoadGame (-1, 22)\n\
+\n\
+**See also:** [[guiscript:EnterGame]], [[guiscript:CreatePlayer]], [[guiscript:SetVar]], [[guiscript:SaveGame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
@@ -469,8 +567,26 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_EnterGame__doc,
-"EnterGame()\n\n"
-"Starts new game and enters it." );
+"===== EnterGame =====\n\
+\n\
+**Prototype:** GemRB.EnterGame ()\n\
+\n\
+**Description:** Starts new game and enters it. \n\
+It destroys all existing windows, and creates a GameControl window as the 0th \n\
+window (the GameControl object will be the games 0th control). \n\
+You should already have loaded a game using LoadGame(), otherwise the engine \n\
+may terminate. The game won't be entered until the execution of the current \n\
+script ends, but a LoadGame() may precede EnterGame() in the same function\n\
+(SetNextScript too).\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:QuitGame]], [[guiscript:LoadGame]], [[guiscript:SetNextScript]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
@@ -479,8 +595,23 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_QuitGame__doc,
-"QuitGame()\n\n"
-"Stops the current game.");
+"===== QuitGame =====\n\
+\n\
+**Prototype:** GemRB.QuitGame ()\n\
+\n\
+**Description:** Ends the current game session. \n\
+To go back to the main screen, you must call SetNextScript. \n\
+Automatically unloads all existing windows and resets the window variables\n\
+used by HideGUI().\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:EnterGame]], [[guiscript:Quit]], [[guiscript:SetNextScript]], [[guiscript:HideGUI]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitFlag=QF_QUITGAME;
@@ -488,8 +619,31 @@ static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_TextArea_SetChapterText__doc,
-"SetChapterText(Win, Ctrl, Text)\n\n"
-"Sets up a TextArea with chapter text.");
+"===== TextArea_SetChapterText =====\n\
+\n\
+**Prototype:** GemRB.SetChapterText (Win, Ctrl, Text)\n\
+\n\
+**Metaclass Prototype:** SetChapterText (Text)\n\
+\n\
+**Description:**\n\
+Sets up a TextArea for scrolling the chapter text from below the TextArea \n\
+to beyond the top.\n\
+\n\
+**Parameters:** \n\
+  * Win - window id\n\
+  * Ctrl - textarea id\n\
+  * Text - The text to set in the TA\n\
+\n\
+**Example:**\n\
+  TextArea = ChapterWindow.GetControl (5)\n\
+  TextArea.SetChapterText (text)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:**\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* args)
 {
@@ -521,8 +675,41 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject * /*self*/, PyObject* ar
 }
 
 PyDoc_STRVAR( GemRB_StatComment__doc,
-"StatComment(Strref, X, Y) => string\n\n"
-"Replaces values X and Y into an strref in place of %%d." );
+"===== StatComment =====\n\
+\n\
+**Prototype:** GemRB.StatComment (Strref, X, Y)\n\
+\n\
+**Description:**\n\
+Replaces %%d's with the values of X and Y in a string referenced by strref.\n\
+\n\
+PST uses %%d values in place of tokens, thus it requires a special command. \n\
+In other engines use GetString after setting the needed tokens with \n\
+SetToken (if you need to set them at all).\n\
+\n\
+**Parameters:**\n\
+  * Strref - a string reference from the dialog.tlk table.\n\
+  * X, Y   - two numerical values to be replaced in place of %%d's.\n\
+\n\
+**Return value:** A string with resolved %%d's.\n\
+\n\
+**Example:**\n\
+def IntPress():\n\
+    global Int, StatTable, TextArea\n\
+    TextArea.SetText (18488)\n\
+    intComment = StatTable.GetValue (Int, 1)\n\
+    TextArea.Append (GemRB.StatComment (intComment, 0, 0))\n\
+\n\
+The above example comes directly from our PST script, it will display the \n\
+description of the intelligence stat (strref==18488), adding a comment \n\
+based on the current Int variable. StatTable (a 2da table) contains the \n\
+comment strref values associated with an intelligence value.\n\
+\n\
+**See also:** [[guiscript:GetString]], [[guiscript:SetToken]],\n\
+[[guiscript:GetTableValue]], [[guiscript:SetText]],[[guiscript:LoadTable]],\n\
+[[guiscript:TextAreaAppend]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 {
@@ -548,8 +735,35 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetString__doc,
-"GetString(strref[,flags]) => string\n\n"
-"Returns string for given strref. " );
+"===== GetString =====\n\
+\n\
+**Prototype:** GemRB.GetString (Strref[, Flags])\n\
+\n\
+**Description:** Returns string for given strref. Usually, you don't need to \n\
+resolve a string before use, as you can use SetText with a strref parameter. \n\
+This command lets you alter the string. For example, if you want to add a \n\
+level value without a token, you'll need this.\n\
+\n\
+**Parameters:** \n\
+  * Strref - a string reference from the dialog.tlk table\n\
+  * Flags - a bitfield:\n\
+    * 1   - display strrefs on\n\
+    * 2   - play attached sound\n\
+    * 4   - speech (stop previous sound)\n\
+    * 256 - strref off (overrides cfg)\n\
+\n\
+**Return value:** A string with resolved tokens. To resolve %d's, you must\n\
+either use StatComment or do it manually.\n\
+\n\
+**Example:**\n\
+   Level = GemRB.GetPlayerStat (pc, IE_LEVEL) # 1 at character generation\n\
+   Label.SetText (GemRB.GetString(12137) + str(Level)) \n\
+The above example will display 'Level: 1' in the addressed label.\n\
+\n\
+**See also:** [[guiscript:StatComment]], [[guiscript:SetText]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
@@ -568,8 +782,23 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
-"EndCutSceneMode()\n\n"
-"Exits the CutScene Mode." );
+"===== EndCutSceneMode =====\n\
+\n\
+**Prototype:** EndCutSceneMode ()\n\
+\n\
+**Description:** Exits the CutScene Mode. It is similar to the gamescript \n\
+command of the same name. It gives back the cursor and shows the game GUI \n\
+windows hidden by the CutSceneMode() gamescript action. \n\
+This is mainly a debugging command.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:HideGUI]], [[guiscript:UnhideGUI]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -640,9 +869,29 @@ static PyObject* GemRB_Window_ReassignControls(PyObject * /*self*/, PyObject* ar
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
-"LoadWindowPack(CHUIResRef, [Width=0, Height=0])\n\n"
-"Loads a WindowPack into the Window Manager Module. "
-"Width and Height set winpack's natural screen size if nonzero." );
+"===== LoadWindowPack =====\n\
+\n\
+**Prototype:** GemRB.LoadWindowPack (CHUIResRef[, Width=0, Height=0])\n\
+\n\
+**Description:** Loads a WindowPack into the Window Manager Module. \n\
+Only one windowpack may be open at a time, but once a window was selected \n\
+by LoadWindow, you can get a new windowpack.\n\
+\n\
+**Parameters:** \n\
+  * CHUIResRef: the name of the GUI set (.CHU resref)\n\
+  * Width, Height: if nonzero, they set the natural screen size for which \n\
+    the windows in the winpack are positioned. LoadWindow() uses this \n\
+    information to automatically reposition loaded windows.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    LoadWindowPack ('START', 640, 480)\n\
+\n\
+**See also:** [[guiscript:LoadWindow]], [[guiscript:LoadWindowFrame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 {
@@ -670,8 +919,23 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
-"LoadWindow(WindowID) => WindowIndex\n\n"
-"Returns a Window." );
+"===== LoadWindow =====\n\
+\n\
+**Prototype:** GemRB.LoadWindow (WindowID)\n\
+\n\
+**Description:** Returns a Window. You must call LoadWindowPack before using \n\
+this command. The window won't be displayed. If LoadWindowPack() set nonzero \n\
+natural screen size with Width and Height parameters, the loaded window is \n\
+then moved by (screen size - winpack size) / 2\n\
+\n\
+**Parameters:** a window ID, see the .chu file specification\n\
+\n\
+**Return value:** GWindow (index)\n\
+\n\
+**See also:** [[guiscript:LoadWindowPack]], [[guiscript:GetControl]], [[guiscript:SetVisible]], [[guiscript:ShowModal]], [[guiscript:accessing_gui_controls]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 {
@@ -746,8 +1010,36 @@ static PyObject* GemRB_Window_SetFrame(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowFrame__doc,
-"LoadWindowFrame(MOSResRef_Left, MOSResRef_Right, MOSResRef_Top, MOSResRef_Bottom))\n\n"
-"Load the parts of window frame used to decorate windows on higher resolutions." );
+"===== LoadWindowFrame =====\n\
+\n\
+**Prototype:** GemRB.LoadWindowFrame (MOSResRef_Left, MOSResRef_Right, MOSResRef_Top, MOSResRef_Bottom))\n\
+\n\
+**Description:** Load the parts of window frame used to decorate windows \n\
+on higher resolutions.\n\
+\n\
+**Parameters:**\n\
+  * MOSResRef_Left, MOSResRef_Right,\n\
+  * MOSResRef_Top, MOSResRef_Bottom: names of MOS files with frame parts\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:** (from bg2's Start.py)\n\
+  # Find proper window border for higher resolutions\n\
+  screen_width = GemRB.GetSystemVariable (SV_WIDTH)\n\
+  screen_height = GemRB.GetSystemVariable (SV_HEIGHT)\n\
+  if screen_width == 800:\n\
+    GemRB.LoadWindowFrame ('STON08L', 'STON08R', 'STON08T', 'STON08B')\n\
+  elif screen_width == 1024:\n\
+    GemRB.LoadWindowFrame ('STON10L', 'STON10R', 'STON10T', 'STON10B')\n\
+\n\
+  # Windows in this winpack were originally made and placed \n\
+  # for 640x480 screen size\n\
+  GemRB.LoadWindowPack ('START', 640, 480)\n\
+  StartWindow = GemRB.LoadWindow (0)\n\
+  GemRB.SetWindowFrame (StartWindow)\n\
+\n\
+**See also:** [[guiscript:SetWindowFrame]], [[guiscript:LoadWindowPack]]"
+);
 
 static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 {
@@ -781,8 +1073,19 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
-"EnableCheatKeys(flag)\n\n"
-"Sets CheatFlags." );
+"===== EnableCheatKeys =====\n\
+\n\
+**Prototype:** GemRB.EnableCheatKeys (flag)\n\
+\n\
+**Description:** Turns the debug keys on or off. \n\
+They are currently turned on by default.\n\
+\n\
+**Parameters:** flag - boolean\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** GameControl.cpp for actual cheat key functions"
+);
 
 static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 {
@@ -914,8 +1217,23 @@ static PyObject* GemRB_Window_GetRect(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadTable__doc,
-"LoadTable(2DAResRef, [ignore_error=0]) => GTable\n\n"
-"Loads a 2DA Table." );
+"===== LoadTable =====\n\
+\n\
+**Prototype:** GemRB.LoadTable (2DAResRef[, ignore_error=0])\n\
+\n\
+**Description:** Loads a 2DA Table. In case it was already loaded, it \n\
+will return the table's existing reference (won't load it again).\n\
+\n\
+**Parameters:** \n\
+  * 2DAResRef    - the table's name (.2da resref)\n\
+  * ignore_error - boolean, if set, handle missing files gracefully\n\
+\n\
+**Return value:** GTable\n\
+\n\
+**See also:** [[guiscript:UnloadTable]], [[guiscript:LoadSymbol]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 {
@@ -938,8 +1256,23 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Table_Unload__doc,
-"UnloadTable(TableIndex)\n\n"
-"Unloads a 2DA Table." );
+"===== UnloadTable =====\n\
+\n\
+**Prototype:** GemRB.UnloadTable (TableIndex)\n\
+\n\
+**Metaclass Prototype:** Unload ()\n\
+\n\
+**Description:** Unloads a 2DA Table.\n\
+\n\
+**Parameters:**\n\
+  * TableIndex - returned by a previous LoadTable command.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadTable]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
 {
@@ -1211,8 +1544,22 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadSymbol__doc,
-"LoadSymbol(IDSResRef) => SymbolIndex\n\n"
-"Loads an IDS Symbol Table." );
+"===== LoadSymbol =====\n\
+\n\
+**Prototype:** GemRB.LoadSymbol (IDSResRef)\n\
+\n\
+**Description:** Loads a IDS Symbol List. In case it was already loaded, \n\
+it will return the list's existing reference (won't load it again).\n\
+\n\
+**Parameters:**\n\
+  * IDSResRef - the symbol list's name (.ids resref)\n\
+\n\
+**Return value:** Symbol table reference index\n\
+\n\
+**See also:** [[guiscript:UnloadSymbol]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 {
@@ -1231,8 +1578,23 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Symbol_Unload__doc,
-"UnloadSymbol(SymbolIndex)\n\n"
-"Unloads an IDS Symbol Table." );
+"===== UnloadSymbol =====\n\
+\n\
+**Prototype:** GemRB.UnloadSymbol (SymbolIndex)\n\
+\n\
+**Metaclass Prototype:** Unload ()\n\
+\n\
+**Description:** Unloads an IDS symbol list.\n\
+\n\
+**Parameters:**\n\
+  * SymbolIndex - returned by a previous LoadSymbol command.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadSymbol]], [[guiscript:UnloadTable]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_Symbol_Unload(PyObject * /*self*/, PyObject* args)
 {
@@ -1624,8 +1986,25 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 
 //useful only for ToB and HoW, sets masterscript/worldmap name
 PyDoc_STRVAR( GemRB_SetMasterScript__doc,
-"SetMasterScript(ScriptResRef, WMPResRef)\n\n"
-"Sets the worldmap and masterscript names." );
+"===== SetMasterScript =====\n\
+\n\
+**Prototype:** GemRB.SetMasterScript (ScriptResRef, WMPResRef[, WMPResRef2])\n\
+\n\
+**Description:** Sets the worldmap and master script names. This function \n\
+ is required if you want to alter the worldmap or the master script \n\
+ (simulating the ToB or HoW expansions).\n\
+\n\
+**Parameters:** \n\
+  * ScriptResRef - the name of the master script (.bcs resref). \n\
+  * WMPResRef    - the name of the worldmap (.wmp resref).\n\
+  * WMPResRef2   - the name of the extra worldmap (optional).\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadGame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
@@ -1671,9 +2050,24 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetTimedEvent__doc,
-"SetTimedEvent(Function, Rounds)\n\n"
-"Sets a timed event, the timing is handled by the game object\n"
-"if the game object doesn't exist, this command is ignored." );
+"===== SetTimedEvent =====\n\
+\n\
+**Prototype:** GemRB.SetTimedEvent (FunctionName, rounds)\n\
+\n\
+**Description:** Sets a timed event to be called by the Game object. If \n\
+there is no game loaded, this command is ignored. If the game is unloaded, \n\
+the event won't be called.\n\
+\n\
+**Parameters:** \n\
+  * FunctionName - a python function object\n\
+  * rounds       - the delay with which the function should be called\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetEvent]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 {
@@ -1732,8 +2126,26 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetNextScript__doc,
-"SetNextScript(GUIScriptName)\n\n"
-"Sets the Next Script File to be loaded." );
+"===== SetNextScript =====\n\
+\n\
+**Prototype:** GemRB.SetNextScript (scriptname)\n\
+\n\
+**Description:** Instructs the GUIScript engine to load the script when \n\
+this script has terminated.\n\
+\n\
+**Parameters:**\n\
+  * scriptname - name of the python script to be executed. May not exceed 60 characters.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    GemRB.SetNextScript ('CharGen')\n\
+    return\n\
+\n\
+**See also:** [[guiscript:QuitGame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 {
@@ -1894,8 +2306,22 @@ static PyObject* GemRB_Window_Invalidate(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateWindow__doc,
-"CreateWindow(WindowID, X, Y, Width, Height, MosResRef) => WindowIndex\n\n"
-"Creates a new empty window and returns its index.");
+"===== CreateWindow =====\n\
+\n\
+**Prototype:** GemRB.CreateWindow (WindowID, X, Y, Width, Height, MosResRef)\n\
+\n\
+**Description:** Creates a new empty window and returns its index.\n\
+\n\
+**Parameters:** \n\
+  * WindowID - the window's ID\n\
+  * X, Y - the window's position\n\
+  * Width, Height - the window's dimensions\n\
+  * MosResRef - the background image (.mos image)\n\
+\n\
+**Return value:** a window index\n\
+\n\
+**See also:**"
+);
 
 static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 {
@@ -2422,8 +2848,22 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_AddNewArea__doc,
-"AddNewArea(_2daresref)\n\n"
-"Adds the extension areas to the game.");
+"===== AddNewArea =====\n\
+\n\
+**Prototype:** GemRB.AddNewArea (2daresref)\n\
+\n\
+**Description:**  Adds the extension areas to the game. \n\
+Used in bg2 with xnewarea.2da for ToB.\n\
+\n\
+**Parameters:** \n\
+  * 2daresref - 2da table with new area mappings\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:**\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 {
@@ -2559,8 +2999,23 @@ static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_CreateMovement__doc,
-"CreateMovement(Area, Entrance, Direction)\n\n"
-"Moves actors to a new area." );
+"===== CreateMovement =====\n\
+\n\
+**Prototype:** GemRB.CreateMovement (Area, Entrance[, Direction])\n\
+\n\
+**Description:** Moves some or all actors of the current area to the destination area.\n\
+\n\
+**Parameters:**\n\
+  * Area - The area resource reference where the player(s) should arrive.\n\
+  * Entrance - The area entrance in the destination area.\n\
+  * Direction - The direction flag (from WMP) to use if the entrance doesn't exist.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetDestinationArea]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 {
@@ -2586,9 +3041,23 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UpdateWorldMap__doc,
-"UpdateWorldMap(ResRef, [AreaResRef])\n\n"
-"Reloads the world map from ResRef.\n"
-"If AreaResRef is given only updates if that area is missing." );
+"===== UpdateWorldMap =====\n\
+\n\
+**Prototype:** GemRB.UpdateWorldMap (ResRef, [AreaResRef])\n\
+\n\
+**Description:** Reloads the world map from ResRef. \n\
+If AreaResRef is given only updates if that area is missing.\n\
+\n\
+**Parameters:**\n\
+  * ResRef - worldmap resref to reload from\n\
+  * AreaResRef - missing area resref (optional)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetWorldMap]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
 {
@@ -3002,8 +3471,22 @@ static PyObject* GemRB_Label_SetUseRGB(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameSetPartySize__doc,
-"GameSetPartySize(size)\n\n"
-"Sets the maximum party size." );
+"===== GameSetPartySize =====\n\
+\n\
+**Prototype:** GemRB.GameSetPartySize (Size)\n\
+\n\
+**Description:** Sets the maximum number of PCs. This command works only \n\
+after a LoadGame(). If the party size was set to 0, then it means unlimited size.\n\
+\n\
+**Parameters:**\n\
+ * Size - must be 0-10; 7 or more requires the 10pp mod for existing games\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetPartySize]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSetPartySize(PyObject * /*self*/, PyObject* args)
 {
@@ -3021,8 +3504,25 @@ static PyObject* GemRB_GameSetPartySize(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameSetProtagonistMode__doc,
-"GameSetProtagonistMode(PM)\n\n"
-"Sets the protagonist mode, 0-no check, 1-protagonist, 2-team." );
+"===== GameSetProtagonistMode =====\n\
+\n\
+**Prototype:** GemRB.GameSetProtagonistMode (Mode)\n\
+\n\
+**Description:** Sets how the game handles the game over event. This action \n\
+works only after a LoadGame().\n\
+\n\
+**Parameters:**\n\
+  *  Mode:\n\
+    * 0 no check\n\
+    * 1 game over when protagonist dies\n\
+    * 2 game over when whole party is dead\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:GameSetPartySize]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* args)
 {
@@ -3040,8 +3540,18 @@ static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* arg
 }
 
 PyDoc_STRVAR( GemRB_GameGetExpansion__doc,
-"GameGetExpansion()=>int\n\n"
-"Gets the expansion mode." );
+"===== GameGetExpansion =====\n\
+\n\
+**Prototype:** GemRB.GameGetExpansion ()\n\
+\n\
+**Description:** Gets the expansion mode.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** int\n\
+\n\
+**See also:** [[guiscript:GameSetExpansion]]"
+);
 static PyObject* GemRB_GameGetExpansion(PyObject * /*self*/, PyObject* /*args*/)
 {
 	GET_GAME();
@@ -3050,8 +3560,23 @@ static PyObject* GemRB_GameGetExpansion(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
-"GameSetExpansion(value)=>bool\n\n"
-"Sets the expansion mode, returns false if it was already set." );
+"===== GameSetExpansion =====\n\
+\n\
+**Prototype:** GemRB.GameSetExpansion (mode)\n\
+\n\
+**Description:** Sets the expansion mode. Most games were created in a two \n\
+in one and could start the game as expansion only (or transfer to the expansion). \n\
+This command selects between these two modes.\n\
+\n\
+**Parameters:**\n\
+  * mode - 0 or 1\n\
+\n\
+**Return value:** false if already set\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:GameGetExpansion]], GameType(variable)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 {
@@ -3073,8 +3598,23 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
-"GameSetScreenFlags(Flags, Operation)\n\n"
-"Sets the Display Flags of the main game screen (pane status, dialog textarea size)." );
+"===== GameSetScreenFlags =====\n\
+\n\
+**Prototype:** GemRB.GameSetScreenFlags (Bits, Operation)\n\
+\n\
+**Description:** Sets the Display Flags of the main game screen (pane \n\
+status, dialog textarea size).\n\
+\n\
+**Parameters:**\n\
+  * Bits - This depends on the game. The lowest 2 bits are the message window size\n\
+  * Operation - The usual bit operations\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetVisible]], [[guiscript:bit_operation]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
@@ -3096,8 +3636,29 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameControlSetScreenFlags__doc,
-"GameControlSetScreenFlags(Flags, Operation)\n\n"
-"Sets the Display Flags of the main game screen control (centeronactor,...)." );
+"===== GameControlSetScreenFlags =====\n\
+\n\
+**Prototype:** GemRB.GameControlSetScreenFlags (Mode, Operation)\n\
+\n\
+**Description:** Sets screen flags, like cutscene mode, disable mouse, etc. \n\
+Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
+\n\
+**Parameters:**\n\
+  * Mode - bitfield:\n\
+    * 1 - disable mouse\n\
+    * 2 - center on actor (one time)\n\
+    * 4 - center on actor (always)\n\
+    * 8 - enable gui\n\
+    * 16 - lock scroll\n\
+    * 32 - cutscene (no action queueing)\n\
+  * Operation - bit operation to use\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameSetScreenFlags]], [[guiscript:bit_operation]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
@@ -3119,8 +3680,37 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 
 
 PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
-"GameControlSetTargetMode(Mode, Types)\n\n"
-"Sets the targeting mode of the main game screen control (attack, cast spell,...) and type of target (ally, enemy and/or neutral; all by default)" );
+"===== GameControlSetTargetMode =====\n\
+\n\
+**Prototype:** GemRB.GameControlSetTargetMode (Mode[, Types])\n\
+\n\
+**Description:** Sets the targeting mode of the main game screen control \n\
+(attack, cast spell, ...) and type of target (ally, enemy and/or neutral; \n\
+all by default). Changes the cursor.\n\
+\n\
+**Parameters:**\n\
+  *  Mode\n\
+    * 0 TARGET_MODE_NONE\n\
+    * 1 TARGET_MODE_TALK\n\
+    * 2 TARGET_MODE_ATTACK (also for bashing)\n\
+    * 4 TARGET_MODE_CAST\n\
+    * 8 TARGET_MODE_DEFEND\n\
+    * 16 TARGET_MODE_PICK\n\
+  * (target) Types - bitfield:\n\
+    * GA_SELECT (selectable actor)\n\
+    * GA_NO_DEAD\n\
+    * GA_POINT - any point could be selected (area effect)\n\
+    * GA_NO_HIDDEN\n\
+    * GA_NO_ALLY\n\
+    * GA_NO_ENEMY\n\
+    * GA_NO_NEUTRAL\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameControlSetScreenFlags]], [[guiscript:GameControlGetTargetMode]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
@@ -3141,8 +3731,16 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_GameControlGetTargetMode__doc,
-"GameControlGetTargetMode() => Mode\n\n"
-"Returns the targeting mode of the main game screen control (attack, cast spell,...)." );
+"===== GameControlGetTargetMode =====\n\
+\n\
+**Prototype:** GemRB.GameControlGetTargetMode ()\n\
+\n\
+**Description:** Returns the current target mode.\n\
+\n\
+**Return value:** numeric (see GameControlSetTargetMode)\n\
+\n\
+**See also:** [[guiscript:GameControlSetTargetMode]], [[guiscript:GameControlSetScreenFlags]]"
+);
 
 static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -3152,8 +3750,16 @@ static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /
 }
 
 PyDoc_STRVAR( GemRB_GameControlToggleAlwaysRun__doc,
-"GameControlToggleAlwaysRun()\n\n"
-"Toggles using running instead of walking by default" );
+"===== GameControlToggleAlwaysRun =====\n\
+\n\
+**Prototype:** GemRB.GameControlToggleAlwaysRun ()\n\
+\n\
+**Description:** Toggles using running instead of walking by default.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -3640,8 +4246,23 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_ValidTarget__doc,
-"ValidTarget(PartyID, flags)\n\n"
-"Checks if an actor is valid for various purposes, like visible, selectable, dead, etc." );
+"===== ValidTarget =====\n\
+\n\
+**Prototype:** GemRB.ValidTarget (PartyID, flags)\n\
+\n\
+**Description:** Checks if an actor is valid for various purposes, like \n\
+being visible, selectable, dead, etc.\n\
+\n\
+**Parameters:** \n\
+  * PartyID - party ID or global ID of the actor to check\n\
+  * flags   - bits to check agains (see GameControlSetTargetMode)\n\
+\n\
+**See also:** [[guiscript:GameControlSetTargetMode]]\n\
+\n\
+**Return value:** boolean\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ValidTarget(PyObject * /*self*/, PyObject* args)
 {
@@ -3665,8 +4286,18 @@ static PyObject* GemRB_ValidTarget(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_VerbalConstant__doc,
-"VerbalConstant(PartyID, str)\n\n"
-"Plays a Character's SoundSet entry." );
+"===== VerbalConstant =====\n\
+\n\
+**Prototype:** GemRB.VerbalConstant (globalID, str)\n\
+\n\
+**Description:**  Plays a Character's SoundSet entry.\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * str - verbal constant index (0-100)\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
@@ -3693,9 +4324,26 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_PlaySound__doc,
-"PlaySound(SoundResource[, xpos, ypos, type])\n"
-"PlaySound(DefSoundIndex)\n\n"
-"Plays a Sound identified by resource reference or defsound.2da index.\n" );
+"===== PlaySound =====\n\
+\n\
+**Prototype:** GemRB.PlaySound (SoundResource[, xpos, ypos, type])\n\
+**Prototype:** GemRB.PlaySound (DefSoundIndex)\n\
+**Prototype:** GemRB.PlaySound (None)\n\
+\n\
+**Description:** Plays a sound identified by resource reference or \n\
+defsound.2da index. If there is a single PC selected, then it will play the \n\
+sound as if it was said by that PC (EAX).\n\
+\n\
+**Parameters:**\n\
+  * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
+  * x coordinate of the position where the sound should be played (optional)\n\
+  *  y coordinate of the position where the sound should be played (optional)\n\
+  * type - defaults to 1, use 4 for speeches or other sounds that should stop the previous sounds (optional)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadMusicPL]]"
+);
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
@@ -3720,8 +4368,20 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DrawWindows__doc,
-"DrawWindows()\n\n"
-"Refreshes the User Interface." );
+"===== DrawWindows =====\n\
+\n\
+**Prototype:** GemRB.DrawWindows ()\n\
+\n\
+**Description:** Refreshes the User Interface by redrawing invalidated controls.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:InvalidateWindow]], [[guiscript:UnhideGUI]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -3731,8 +4391,20 @@ static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_Quit__doc,
-"Quit()\n\n"
-"Quits GemRB." );
+"===== Quit =====\n\
+\n\
+**Prototype:** GemRB.Quit ()\n\
+\n\
+**Description:** Quits GemRB immediately.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:QuitGame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -3742,8 +4414,22 @@ static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
-"LoadMusicPL(MusicPlayListResource, HardEnd)\n\n"
-"Loads and starts a Music PlayList." );
+"===== LoadMusicPL =====\n\
+\n\
+**Prototype:** LoadMusicPL (MusicPlayListResource[, HardEnd])\n\
+\n\
+**Description:** Loads and starts a Music PlayList.\n\
+\n\
+**Parameters:**\n\
+  * MusicPlayListResource - a .mus resref\n\
+  * HardEnd - off by default, set to 1 to disable the fading at the end\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SoftEndPL]], [[guiscript:HardEndPL]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 {
@@ -3760,8 +4446,20 @@ static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SoftEndPL__doc,
-"SoftEndPL()\n\n"
-"Ends a Music Playlist softly." );
+"===== SoftEndPL =====\n\
+\n\
+**Prototype:** GemRB.SoftEndPL ()\n\
+\n\
+**Description:** Ends the currently playing Music Playlist softly.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:HardEndPL]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -3771,8 +4469,20 @@ static PyObject* GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_HardEndPL__doc,
-"HardEndPL()\n\n"
-"Ends a Music Playlist immediately." );
+"===== HardEndPL =====\n\
+\n\
+**Prototype:** GemRB.HardEndPL ()\n\
+\n\
+**Description:** Ends a Music Playlist immediately.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SoftEndPL]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_HardEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -3782,8 +4492,45 @@ static PyObject* GemRB_HardEndPL(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_SetToken__doc,
-"SetToken(VariableName, Value)\n\n"
-"Set/Create a token to be replaced in StrRefs." );
+"===== SetToken =====\n\
+\n\
+**Prototype:** GemRB.SetToken(VariableName, Value)\n\
+\n\
+**Description:** Set/Create a token to be replaced in StrRefs. QueryText() \n\
+will use the actual value of the token when it encounters '<token>' \n\
+substrings in a retrieved dialog.tlk entry. Some tokens are hardcoded and \n\
+you can't affect QueryText() by setting them. Usage of those tokens should \n\
+be avoided. The hardcoded token list:\n\
+  * FIGHTERTYPE  - always resolves to strref #10174\n\
+  * RACE         - always resolves to the race of the last speaker\n\
+  * GABBER       - always resolves to the longname of the last speaker\n\
+  * SIRMAAM      - strref #27473/#27475 depending on last speaker's gender\n\
+  * GIRLBOY      - strref #27477/#27476 depending on last speaker's gender\n\
+  * BROTHERSISTER- strref #27478/#27479 ...\n\
+  * LADYLORD     - strref #27481/#27480 ...\n\
+  * MALEFEMALE   - strref #27483/#27482 ...\n\
+  * HESHE        - strref #27485/#27484 ...\n\
+  * HISHER       - strref #27487/#27486 ...\n\
+  * HIMHER       - strref #27487/#27488 ...\n\
+  * MANWOMAN     - strref #27490/#27489 ...\n\
+  * PRO_*        - same as above with protagonist\n\
+\n\
+**Parameters:**\n\
+  *  VariableName - the name of the variable (shorter than 32!)\n\
+  *  Value        - string, the value of the token\n\
+\n\
+**Example:**\n\
+  ClassTitle = CommonTables.Classes.GetValue (Class, 'CAP_REF', GTV_REF)\n\
+  GemRB.SetToken ('CLASS', ClassTitle)\n\
+  # force an update of the string by refetching it\n\
+  TA.SetText (GemRB.GetString (16480))\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetToken]], [[guiscript:QueryText]], [[guiscript:SetText]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
@@ -3799,8 +4546,38 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetVar__doc,
-"SetVar(VariableName, Value)\n\n"
-"Set/Create a Variable in the Global Dictionary." );
+"===== SetVar =====\n\
+\n\
+**Prototype:** GemRB.SetVar (VariableName, Value)\n\
+\n\
+**Description:** Set a Variable of the Global Dictionary. This is an \n\
+independent dictionary from the gamescript. It contains configuration \n\
+variables, and provides a flexible interface between guiscript and the \n\
+engine core. There are some reserved names that are referenced from the \n\
+core, these are described in different places:\n\
+  * variable  : described in\n\
+  * PlayMode  - LoadGame\n\
+  * *Window   - HideGUI\n\
+  * *Position - HideGUI\n\
+  * Progress  - data_exchange\n\
+\n\
+**Parameters:**\n\
+  * VariableName - the name of the variable (shorter than 32!)\n\
+  * Value        - numeric, the new value\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:**\n\
+  GemRB.SetVar('ActionsWindow', ActionsWindow)\n\
+  GemRB.SetVar('OptionsWindow', OptionsWindow)\n\
+  GemRB.SetVar('MessageWindow', MessageWindow)\n\
+  GemRB.SetVar('ActionsPosition', 4) #BottomAdded\n\
+  GemRB.SetVar('OptionsPosition', 0) #Left\n\
+  GemRB.SetVar('MessagePosition', 4) #BottomAdded\n\
+The above lines set up some windows of the main game screen.\n\
+\n\
+**See also:** [[guiscript:SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]], [[guiscript:data_exchange]]"
+);
 
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
@@ -3820,8 +4597,18 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
-"GetMessageWindowSize() => int\n\n"
-"Returns current MessageWindowSize, it works only when a game is loaded." );
+"===== GetMessageWindowSize =====\n\
+\n\
+**Prototype:** GemRB.GetMessageWindowSize ()\n\
+\n\
+**Description:** Returns current MessageWindowSize. Works only when a game is loaded.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** int (GS_ flag bits)\n\
+\n\
+**See also:**"
+);
 
 static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -3831,8 +4618,26 @@ static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*arg
 }
 
 PyDoc_STRVAR( GemRB_GetToken__doc,
-"GetToken(VariableName) => string\n\n"
-"Get a Variable value from the Token Dictionary." );
+"===== GetToken =====\n\
+\n\
+**Prototype:** GemRB.GetToken (VariableName)\n\
+\n\
+**Description:** Get a Variable value from the Token Dictionary. Tokens are \n\
+string values, used both by the game scripts and the GUI scripts.\n\
+\n\
+**Parameters:**\n\
+  * VariableName - name of the variable (shorter than 32!)\n\
+\n\
+**Return value:** string, the value of the token\n\
+\n\
+**Example:**\n\
+  TextArea.Append (GemRB.GetToken('CHARNAME')\n\
+The above example will add the protagonist's name to the TextArea (if the token was set correctly).\n\
+\n\
+**See also:** [[guiscript:SetToken]], [[guiscript:QueryText]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
@@ -3852,8 +4657,26 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetVar__doc,
-"GetVar(VariableName) => int\n\n"
-"Get a Variable value from the Global Dictionary." );
+"===== GetVar =====\n\
+\n\
+**Prototype:** GemRB.GetVar (VariableName)\n\
+\n\
+**Description:** Get a Variable value from the Global Dictionary. Controls \n\
+could be set up to be associated with such a variable. Even multiple \n\
+controls could affect the same variable.\n\
+\n\
+**Parameters:**\n\
+  * VariableName - name of the variable (shorter than 32!)\n\
+\n\
+**Return value:** numeric, 0 if the variable doesn't exist\n\
+\n\
+**Examples:**\n\
+  selected = GemRB.GetVar ('SelectedMovie')\n\
+\n\
+**See also:** [[guiscript:SetVar]], [[guiscript:SetVarAssoc]], [[guiscript:data_exchange]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
@@ -3875,8 +4698,27 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
-"CheckVar(VariableName, Context) => long\n\n"
-"Return (and output on terminal) the value of a Game Variable." );
+"===== CheckVar =====\n\
+\n\
+**Prototype:** GemRB.CheckVar (VariableName, Context)\n\
+\n\
+**Description:** Return (and output on terminal) the value of a Game \n\
+Variable. It executes the CheckVariable gamescript function in the last \n\
+actor's context, or, short of that, in the current area's context. If there \n\
+is no running game, it terminates the script. \n\
+GetGameVar('variable') is effectively the same as CheckVar('variable','GLOBAL').\n\
+\n\
+**Parameters:**\n\
+  * VariableName - must be shorter than 32 bytes\n\
+  * Context      - must be exactly 6 bytes long\n\
+  * Special cases for Context: LOCALS, GLOBAL, MYAREA\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetGameVar]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
@@ -3906,8 +4748,21 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetGlobal__doc,
-"SetGlobal(VariableName, Context, Value)\n\n"
-"Sets a gamescript variable to the specificed numeric value." );
+"===== SetGlobal =====\n\
+\n\
+**Prototype:** GemRB.SetGlobal (VariableName, Context, Value)\n\
+\n\
+**Description:** Sets a gamescript variable to the specificed numeric value.\n\
+\n\
+**Parameters:** \n\
+  * VariableName - name of the variable\n\
+  * Context - LOCALS, GLOBALS, MYAREA or area specific\n\
+  * Value - value to set\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetVar]], [[guiscript:SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:data_exchange]]"
+);
 
 static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 {
@@ -3941,8 +4796,22 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetGameVar__doc,
-"GetGameVar(VariableName) => long\n\n"
-"Get a Variable value from the Game Global Dictionary." );
+"===== GetGameVar =====\n\
+\n\
+**Prototype:** GemRB.GetGameVar (VariableName)\n\
+\n\
+**Description:** Get a Variable value from the Game Global Dictionary. This \n\
+is what gamescripts know as GLOBAL variables. \n\
+\n\
+**Parameters:**\n\
+  * VariableName - name of the variable\n\
+\n\
+**Return value:**\n\
+\n\
+**Example:** Chapter = GemRB.GetGameVar ('chapter')\n\
+\n\
+**See also:** [[guiscript:GetVar]], [[guiscript:GetToken]], [[guiscript:CheckVar]]"
+);
 
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
@@ -3963,8 +4832,27 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
-"PlayMovie(MOVResRef[, flag]) => int\n\n"
-"Plays the movie named. If flag is set to 1, it won't play it if it was already played once (set in .ini). It returns 0 if it played the movie." );
+"===== PlayMovie =====\n\
+\n\
+**Prototype:** GemRB.PlayMovie (MOVResRef[, flag])\n\
+\n\
+**Description:** Plays the named movie. Sets the configuration variable \n\
+MOVResRef to 1. If flag was set to 1 it won't play the movie if the \n\
+configuration variable was already set (saved in game ini).\n\
+\n\
+**Parameters:**\n\
+  * MOVResRef - a .mve/.bik (or vlc compatible) resource reference.\n\
+  *      flag - don't play movie twice\n\
+\n\
+**Return value:**\n\
+  * 0 - movie played\n\
+  * -1 - error occurred\n\
+  * 1 - movie skipped\n\
+\n\
+**See also:** [[guiscript:SetVar]], [[guiscript:GetVar]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
@@ -3989,8 +4877,17 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DumpActor__doc,
-		"DumpActor(globalID)\n\n"
-		"Prints the character's debug dump.");
+"===== DumpActor =====\n\
+\n\
+**Prototype:** GemRB.DumpActor (globalID)\n\
+\n\
+**Description:** Prints the character's debug dump\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** N/A"
+);
 static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 {
 	int globalID;
@@ -4007,8 +4904,27 @@ static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_SaveCharacter__doc,
-"SaveCharacter(PartyID, CharName)\n\n"
-"Exports the character from party.");
+"===== SaveCharacter =====\n\
+\n\
+**Prototype:** GemRB.SaveCharacter (PartyID, filename)\n\
+\n\
+**Description:** Saves (exports) the designated partymember into the Characters \n\
+directory of the game. This character is importable later by a special \n\
+CreatePlayer call.\n\
+\n\
+**Parameters:**\n\
+  * PartyID  - the saved character's position in the party\n\
+  * filename - the filename of the character\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:** \n\
+  pc = GemRB.GameGetSelectedPCSingle ()\n\
+  GemRB.SaveCharacter (pc, ExportFileName)\n\
+The above example exports the currently selected character.\n\
+\n\
+**See also:** [[guiscript:CreatePlayer]]"
+);
 
 static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 {
@@ -4030,8 +4946,16 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 
 
 PyDoc_STRVAR( GemRB_SaveConfig__doc,
-		"SaveConfig()\n\n"
-		"Exports the game configuration to a file.");
+"===== SaveConfig =====\n\
+\n\
+**Prototype:** GemRB.SaveConfig ()\n\
+\n\
+**Description:** Exports the game configuration to a file.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -4039,8 +4963,29 @@ static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_SaveGame__doc,
-"SaveGame(SlotCount, GameName[,version])\n\n"
-"Dumps the save game, if version is given, it will save a specific version.");
+"===== SaveGame =====\n\
+\n\
+**Prototype:** GemRB.SaveGame (savegame, description[, version])\n\
+**Prototype:** GemRB.SaveGame (position[, version])\n\
+\n\
+**Description:** Saves the current game. If version is given, it will save \n\
+to a specific SAV version.\n\
+\n\
+**Parameters:**\n\
+  * position - the saved game's index; 0 and 1 are reserved\n\
+  * savegame - a save game python object (GetSaveGames)\n\
+  * description - the string that will also appear in the filename\n\
+  * version - an optional SAV version override\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:** \n\
+  GemRB.SaveGame (10, 'After meeting Dhall')\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:SaveCharacter]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 {
@@ -4076,8 +5021,16 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGames__doc,
-"GetSaveGameCount() => int\n\n"
-"Returns the list of saved games." );
+"===== GetSaveGames =====\n\
+\n\
+**Prototype:** GemRB.GetSaveGameCount ()\n\
+\n\
+**Description:** Returns a list of saved games.\n\
+\n\
+**Return value:** python list\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSaveGames(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -4085,8 +5038,19 @@ static PyObject* GemRB_GetSaveGames(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
-"DeleteSaveGame(Slot)\n\n"
-"Deletes a saved game folder completely." );
+"===== DeleteSaveGame =====\n\
+\n\
+**Prototype:** GemRB.DeleteSaveGame (Slot)\n\
+\n\
+**Description:** Deletes a saved game folder completely.\n\
+\n\
+**Parameters:**\n\
+  * Slot - saved game object\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetSaveGameCount]], [[guiscript:GetSaveGames]]"
+);
 
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
@@ -4199,8 +5163,16 @@ static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetGamePreview__doc,
-"GetGamePreview()\n\n"
-"Gets current game area preview." );
+"===== GetGamePreview =====\n\
+\n\
+**Prototype:** GemRB.GetGamePreview ()\n\
+\n\
+**Description:** Gets current game area preview.\n\
+\n\
+**Return value:** python image object\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* args)
 {
@@ -4213,8 +5185,17 @@ static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetGamePortraitPreview__doc,
-"GetGamePortraitPreview(PCSlotCount)\n\n"
-"Gets a current game PC portrait." );
+"===== GetGamePortraitPreview =====\n\
+\n\
+**Prototype:** GemRB.GetGamePortraitPreview (PCSlot)\n\
+\n\
+**Description:** Gets a current game PC portrait.\n\
+\n\
+**Parameters:** \n\
+  * PCSlot - party ID\n\
+\n\
+**Return value:** python image object"
+);
 
 static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
 {
@@ -4229,8 +5210,27 @@ static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* arg
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,
-"Roll(Dice, Size, Add) => int\n\n"
-"Calls traditional dice roll." );
+"===== Roll =====\n\
+\n\
+**Prototype:** GemRB.Roll (Dice, Size, Add)\n\
+\n\
+**Description:** Calls traditional dice roll calculation.\n\
+\n\
+**Parameters:**\n\
+  * Dice - the number of the dice.\n\
+  * Size - the size of the die.\n\
+  * Add  - add this value directly to the sum\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**Example:** \n\
+  dice = 3\n\
+  size = 5\n\
+  v = GemRB.Roll (dice, size, 3)\n\
+The above example generates a 3d5+3 number.\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 {
@@ -4411,8 +5411,21 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPartySize__doc,
-"GetPartySize() => int\n\n"
-"Returns the number of PCs." );
+"===== GetPartySize =====\n\
+\n\
+**Prototype:** GemRB.GetPartySize ()\n\
+\n\
+**Description:** Returns the actual number of PCs (dead included). This \n\
+command works only after a LoadGame().\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** numeric (0-10)\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:QuitGame]], [[guiscript:GameSetPartySize]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -4422,8 +5435,20 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetGameTime__doc,
-"GetGameTime() => int\n\n"
-"Returns current game time." );
+"===== GetGameTime =====\n\
+\n\
+**Prototype:** GemRB.GetGameTime ()\n\
+\n\
+**Description:** Returns current game time (seconds since start).\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GameGetPartyGold]], [[guiscript:GetPartySize]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -4434,8 +5459,20 @@ static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GameGetReputation__doc,
-"GameGetReputation() => int\n\n"
-"Returns party reputation." );
+"===== GameGetReputation =====\n\
+\n\
+**Prototype:** GemRB.GameGetReputation ()\n\
+\n\
+**Description:** Returns current party's reputation.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetPlayerStat]], [[guiscript:GameSetReputation]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetReputation(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -4446,8 +5483,19 @@ static PyObject* GemRB_GameGetReputation(PyObject * /*self*/, PyObject* /*args*/
 }
 
 PyDoc_STRVAR( GemRB_GameSetReputation__doc,
-"GameSetReputation(Reputation)\n\n"
-"Sets current party reputation." );
+"===== GameSetReputation =====\n\
+\n\
+**Prototype:** GemRB.GameSetReputation (Reputation)\n\
+\n\
+**Description:** Sets current party's reputation.\n\
+\n\
+**Parameters:**\n\
+  * Reputation - amount to be set. It is divided by ten when displayed.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameGetReputation]], [[guiscript:IncreaseReputation]]"
+);
 
 static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 {
@@ -4464,8 +5512,21 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IncreaseReputation__doc,
-"IncreaseReputation( donation ) => int\n\n"
-"Increases party reputation according to the donation. (See reputati.2da)" );
+"===== IncreaseReputation =====\n\
+\n\
+**Prototype:** GemRB.IncreaseReputation (Donation)\n\
+\n\
+**Description:** Increases party's reputation based on Donation. (see reputatio.2da)\n\
+\n\
+**Parameters:**\n\
+  * donation - gold spent to increase reputation. You have to change the\n\
+  party's gold separately.\n\
+\n\
+**Return value:** Nonzero if the reputation has been increased. The amount\n\
+of increase is multiplied by ten.\n\
+\n\
+**See also:** [[guiscript:GameGetReputation]], [[guiscript:GameGetPartyGold]], [[guiscript:GameSetPartyGold]]"
+);
 
 static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 {
@@ -4489,8 +5550,20 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
-"GameGetPartyGold() => int\n\n"
-"Returns current party gold." );
+"===== GameGetPartyGold =====\n\
+\n\
+**Prototype:** GemRB.GameGetPartyGold ()\n\
+\n\
+**Description:** Returns current party gold.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetPlayerStat]], [[guiscript:GameSetPartyGold]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -4501,8 +5574,19 @@ static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
-"GameSetPartyGold(Gold)\n\n"
-"Sets current party gold." );
+"===== GameSetPartyGold =====\n\
+\n\
+**Prototype:** GemRB.GameSetPartyGold (Gold)\n\
+\n\
+**Description:** Sets current party gold.\n\
+\n\
+**Parameters:**\n\
+  * Gold - the target party gold amount\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameGetPartyGold]]"
+);
 
 static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 {
@@ -4523,8 +5607,23 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameGetFormation__doc,
-"GameGetFormation([Which]) => int\n\n"
-"Returns current party formation. If Which was supplied, it returns one of the preset formations." );
+"===== GameGetFormation =====\n\
+\n\
+**Prototype:** GemRB.GameGetFormation ([Which])\n\
+\n\
+**Description:** Returns current party formation. The formations are stored \n\
+in the GemRB specific formatio.2da table. If Which was supplied, it returns \n\
+one of the preset formations.\n\
+\n\
+**Parameters:**\n\
+  * Which - optionally return a preset formation (index)\n\
+\n\
+**Return value:** integer\n\
+\n\
+**See also:** [[guiscript:GameSetFormation]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 {
@@ -4548,8 +5647,23 @@ static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameSetFormation__doc,
-"GameSetFormation(Formation[, Which])\n\n"
-"Sets party formation. If Which was supplied, it sets one of the preset formations." );
+"===== GameSetFormation =====\n\
+\n\
+**Prototype:** GemRB.GameSetFormation (Formation[, Which])\n\
+\n\
+**Description:** Sets party formation. If Which was supplied, it sets one \n\
+of the preset formations.\n\
+\n\
+**Parameters:**\n\
+  * Formation - the row index of formatio.2da\n\
+  * Which - the preset formation to use (0-4)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameGetFormation]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 {
@@ -4573,8 +5687,25 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetJournalSize__doc,
-"GetJournalSize(chapter[, section]) => int\n\n"
-"Returns the number of entries in the given section of journal." );
+"===== GetJournalSize =====\n\
+\n\
+**Prototype:** GemRB.GetJournalSize(chapter[, section])\n\
+\n\
+**Description:** Returns the number of entries in the given section of \n\
+journal. Please note that various engines implemented the chapter/sections \n\
+at various degree. For example PST has none of these. Section will default \n\
+to zero.\n\
+\n\
+**Parameters:**\n\
+  * chapter - the chapter of the journal page\n\
+  * section - 0,1,2 or 4 - general, quest, solved quest or user notes.\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetJournalEntry]], [[guiscript:SetJournalEntry]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 {
@@ -4598,8 +5729,28 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_GetJournalEntry__doc,
-"GetJournalEntry(chapter, index[, section]) => JournalEntry\n\n"
-"Returns dictionary representing journal entry w/ given chapter, section and index." );
+"===== GetJournalEntry =====\n\
+\n\
+**Prototype:** GemRB.GetJournalEntry (chapter, index[, section])\n\
+\n\
+**Description:** Returns dictionary representing journal entry with given \n\
+chapter, section and index. Section will default to zero.\n\
+\n\
+**Parameters:**\n\
+  * chapter - the chapter of the journal entry\n\
+  * index - the index of the entry in the given section/chapter\n\
+  * section - the section of the journal to use\n\
+\n\
+**Return value:** dictionary with the following fields:\n\
+  * 'Text'     - strref of the journal entry\n\
+  * 'GameTime' - time of entry\n\
+  * 'Section'  - same as the input parameter\n\
+  * 'Chapter'  - same as the input parameter\n\
+\n\
+**See also:** [[guiscript:GetJournalSize]], [[guiscript:SetJournalEntry]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
@@ -4632,10 +5783,26 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
-"SetJournalEntry(strref[, section, chapter])\n\n"
-"Sets a journal journal entry w/ given chapter and section, if section was not given, then it will delete the entry.\n"
-"Chapter is optional, if it is omitted, then the current chapter will be used.\n"
-"If strref is -1, then it will delete the whole journal." );
+"===== SetJournalEntry =====\n\
+\n\
+**Prototype:** GemRB.SetJournalEntry (strref[, section, chapter])\n\
+\n\
+**Description:** Sets a journal journal entry with given chapter and section. \n\
+If section was not given, then it will delete the entry. Chapter is \n\
+optional, if it is omitted, then the current chapter will be used. If \n\
+strref is -1, then it will delete the whole journal.\n\
+\n\
+**Parameters:**\n\
+  * strref - strref of the journal entry\n\
+  * section - the section of the journal (only if the journal has sections)\n\
+  * chapter - the chapter of the journal entry\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetJournalEntry]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
@@ -4668,8 +5835,22 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
-"GameIsBeastKnown(index) => int\n\n"
-"Returns whether beast with given index is known to PCs (works only on PST)." );
+"===== GameIsBeastKnown =====\n\
+\n\
+**Prototype:** GameIsBeastKnown (index)\n\
+\n\
+**Description:** Returns whether beast with given index is known to PCs. \n\
+Works only in PST.\n\
+\n\
+**Parameters:**\n\
+  * index - the beast's index as of beast.ini\n\
+\n\
+**Return value:** boolean, 1 means beast is known.\n\
+\n\
+**See also:** [[guiscript:GetINIBeastsKey]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 {
@@ -4684,8 +5865,21 @@ static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_GetINIPartyCount__doc,
-"GetINIPartyCount() =>int\n\n"
-"Returns the Number of Party defined in Party.ini (works only on IWD2)." );
+"===== GetINIPartyCount =====\n\
+\n\
+**Prototype:** GemRB.GetINIPartyCount ()\n\
+\n\
+**Description:** Returns the Number of Parties defined in Party.ini. \n\
+Works only in IWD2.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** the number of predefined parties in party.ini\n\
+\n\
+**See also:** [[guiscript:GetINIPartyKey]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	PyObject * /*args*/)
@@ -4697,8 +5891,24 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 }
 
 PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,
-"GetINIQuestsKey(Tag, Key, Default) => string\n\n"
-"Returns a Value from the quests.ini File (works only on PST)." );
+"===== GetINIQuestsKey =====\n\
+\n\
+**Prototype:** GemRB.GetINIQuestsKey (Tag, Key, Default)\n\
+\n\
+**Description:** Returns a Value from the quests.ini file. \n\
+Works only in PST.\n\
+\n\
+**Parameters:**\n\
+  * Tag - a section in the quests.ini file\n\
+  * Key - a field in the section\n\
+  * Default - default value in case the entry doesn't exist\n\
+\n\
+**Return value:** string, the entry from the ini file\n\
+\n\
+**See also:** [[guiscript:GetINIBeastsKey]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 {
@@ -4715,9 +5925,24 @@ static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetINIBeastsKey__doc,
-"GetINIBeastsKey(Tag, Key, Default) => string\n\n"
-"Returns a Value from the beasts.ini File (works only on PST)." );
-
+"===== GetINIBeastsKey =====\n\
+\n\
+**Prototype:** GemRB.GetINIBeastsKey (Tag, Key, Default)\n\
+\n\
+**Description:** Returns a Value from the beast.ini file. \n\
+Works only in PST.\n\
+\n\
+**Parameters:**\n\
+  * Tag - a section in the beast.ini file\n\
+  * Key - a field in the section\n\
+  * Default - default value in case the entry doesn't exist\n\
+\n\
+**Return value:** string, the entry from the ini file\n\
+\n\
+**See also:** [[guiscript:GetINIQuestsKey]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 {
 	char *Tag, *Key, *Default;
@@ -4733,8 +5958,22 @@ static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetINIPartyKey__doc,
-"GetINIPartyKey(Tag, Key, Default) => string\n\n"
-"Returns a Value from the Party.ini File (works only on IWD2)." );
+"===== GetINIPartyKey =====\n\
+\n\
+**Prototype:** GemRB.GetINIPartyKey(Tag, Key, Default)\n\
+\n\
+**Description:** Returns a Value from the party.ini file. \n\
+Works only in IWD2.\n\
+\n\
+**Parameters:**\n\
+  * Tag - a section in the party.ini file\n\
+  * Key - a field in the section\n\
+  * Default - default value in case the entry doesn't exist\n\
+\n\
+**Return value:** string, the entry from the ini file\n\
+\n\
+**See also:** [[guiscript:GetINIPartyCount]]"
+);
 
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
@@ -4751,8 +5990,39 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
-"CreatePlayer(CREResRef, Slot [,Import, VersionOverride] ) => PlayerSlot\n\n"
-"Creates or removes a player character in a given party slot. If import is nonzero, then reads a CHR instead of a CRE." );
+"===== CreatePlayer =====\n\
+\n\
+**Prototype:** CreatePlayer (CREResRef, Slot [,Import, VersionOverride])\n\
+\n\
+**Description:** Adds an actor (PC) to the current game. It works only \n\
+after a LoadGame() was executed, and should be used before an EnterGame(). \n\
+It is also used to import a .chr file as a PC. A new character will need \n\
+additional SetPlayerStat() and FillPlayerInfo() calls to be a working \n\
+character. \n\
+Note: if the slot is already filled, it will delete that pc instead!\n\
+\n\
+**Parameters:**\n\
+  * CREResRef - name of the creature to use, usually 'charbase'\n\
+  * Slot      - The player character's position in the party\n\
+  * Import    - Set it to 1 if you want to import a .chr instead of creating a new character\n\
+  * VersionOverride - Force CRE version of new actor.\n\
+\n\
+**Return value:** the new player's index in the game structure\n\
+\n\
+**Examples:**\n\
+  MyChar = GemRB.GetVar ('Slot')\n\
+  GemRB.CreatePlayer ('charbase', MyChar)\n\
+The above example will create a new player character in the slot selected\n\
+by the Slot variable.\n\
+\n\
+  MyChar = GemRB.GetVar ('Slot')\n\
+  ImportName = 'avenger'\n\
+  GemRB.CreatePlayer (ImportName, MyChar, 1)\n\
+The above example would import avenger.chr into the slot selected by the \n\
+Slot Variable. (If it exists in the Characters directory of the game).\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:EnterGame]], [[guiscript:QuitGame]], [[guiscript:FillPlayerInfo]], [[guiscript:SetPlayerStat]]"
+);
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
@@ -4795,8 +6065,26 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStates__doc,
-"GetPlayerStates(PartyID) => string\n\n"
-"Returns the state string for the player.");
+"===== GetPlayerStates =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerStates (PartyID)\n\
+\n\
+**Description:** Returns the active spell states on the player. The state \n\
+descriptions are in the statdesc.2da file which comes with the original \n\
+games. The values in the character array equal to the corresponding cycle \n\
+number in states.bam. To reference statdesc.2da, subtract 65 from the \n\
+values.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the character's position in the party\n\
+\n\
+**Return value:** a string whose letters are greater or equal ascii 65. \n\
+Using the states.bam font, they will be drawn as the status icons.\n\
+\n\
+**See also:** [[guiscript:GetPlayerName]], [[guiscript:GetPlayerStat]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 {
@@ -4812,8 +6100,26 @@ static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
-"GetPlayerName(PartyID[, LongOrShort]) => string\n\n"
-"Queries the player character's [script]name." );
+"===== GetPlayerName =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerName (PartyID[, LongOrShort])\n\
+\n\
+**Description:** Queries the player character's (script)name.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party (1 based)\n\
+  * LongOrShort - which name to query\n\
+    * -1: default name\n\
+    * 0: shortname\n\
+    * 1: longname\n\
+    * 2: scripting name\n\
+\n\
+**Return value:** string\n\
+\n\
+**See also:** [[guiscript:SetPlayerName]], [[guiscript:GetPlayerStat]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 {
@@ -4834,8 +6140,28 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerName__doc,
-"SetPlayerName(Slot, Name[, LongOrShort])\n\n"
-"Sets the player name." );
+"===== SetPlayerName =====\n\
+\n\
+**Prototype:** GemRB.SetPlayerName(Slot, Name[, LongOrShort])\n\
+\n\
+**Description:** Sets the player name. Each actor has 2 names, this \n\
+command can set either or both.\n\
+\n\
+**Parameters:**\n\
+  * Slot - numeric, the character's slot\n\
+  * Name - string, the name\n\
+  * LongOrShort - 0 (both), 1 (short), 2 (long)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+  GemRB.SetPlayerName (MyChar, GemRB.GetToken('CHARNAME'), 0)\n\
+In the above example we set the player's name to a previously set Token (global string).\n\
+\n\
+**See also:** [[guiscript:QueryText]], [[guiscript:GetToken]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 {
@@ -4855,8 +6181,18 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateString__doc,
-"CreateString(Strref, Text)->StrRef\n\n"
-"Creates or updates a custom string." );
+"===== CreateString =====\n\
+\n\
+**Prototype:** GemRB.CreateString (Strref, Text)\n\
+\n\
+**Description:** Creates or updates a custom string.\n\
+\n\
+**Parameters:**\n\
+  * Strref - string index to use\n\
+  * Text - string contents\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
@@ -4873,8 +6209,23 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerString__doc,
-"SetPlayerString(PlayerSlot, StringSlot, StrRef)\n\n"
-"Sets one of the player character's verbal constants. Mostly useful for setting biography." );
+"===== SetPlayerString =====\n\
+Missing function already used in bg2 biography (cg uses a token)\n\
+\n\
+**Prototype:** GemRB.SetPlayerString (PlayerSlot, StringSlot, StrRef)\n\
+\n\
+**Description:** Sets one of the player character's verbal constants. \n\
+Mostly useful for setting the biography.\n\
+\n\
+**Parameters:**\n\
+  * PlayerSlot - party ID\n\
+  * StringSlot - verbal constant index (0-99)\n\
+  * StrRef - new string resref\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 {
@@ -4896,8 +6247,22 @@ static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
-"SetPlayerSound(Slot, SoundFolder)\n\n"
-"Sets the player character's sound set." );
+"===== SetPlayerSound =====\n\
+\n\
+**Prototype:** GemRB.SetPlayerSound (Slot, SoundFolder)\n\
+\n\
+**Description:** Sets the player character's soundset.\n\
+\n\
+**Parameters:**\n\
+  * Slot        - numeric, the character's slot\n\
+  * SoundFolder - string, a folder in Sounds (iwd2 style), or a filename (bg2 style)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetPlayerSound]], [[guiscript:FillPlayerInfo]], [[guiscript:SetPlayerString]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
@@ -4915,8 +6280,22 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
-"GetPlayerSound(Slot[, flags])\n\n"
-"Gets the player character's sound set." );
+"===== GetPlayerSound =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerSound (Slot[, flags])\n\
+\n\
+**Description:**  Gets the player character's sound set.\n\
+\n\
+**Parameters:** \n\
+  * Slot - party slot\n\
+  * flags - if set, the whole subpath will be returned for games with sound subfolders\n\
+\n\
+**Return value:** string\n\
+\n\
+**See also:** [[guiscript:SetPlayerSound]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
@@ -4935,8 +6314,26 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
-"GetSlotType(idx[, PartyID]) => dict\n\n"
-"Returns dictionary of an itemslot type (slottype.2da).");
+"===== GetSlotType =====\n\
+\n\
+**Prototype:** GemRB.GetSlotType (idx[, PartyID])\n\
+\n\
+**Description:** Returns dictionary of an itemslot type (slottype.2da).\n\
+\n\
+**Parameters:**\n\
+  * idx - a row number of slottype.2da\n\
+  * PartyID - optional actor ID for a richer dictionary\n\
+\n\
+**Return value:** dictionary\n\
+'Type'   - bitfield, The inventory slot's type.\n\
+'ID'     - the gui button's controlID which belongs to this slot.\n\
+'Tip'    - the tooltip resref for this slot.\n\
+'ResRef' - the background .bam of the slot.\n\
+\n\
+**See also:** [[guiscript:SetItemIcon]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 {
@@ -4989,8 +6386,28 @@ continue_quest:
 }
 
 PyDoc_STRVAR( GemRB_GetPCStats__doc,
-"GetPCStats(PartyID) => dict\n\n"
-"Returns dictionary of PC's performance stats." );
+"===== GetPCStats =====\n\
+\n\
+**Prototype:** GemRB.GetPCStats (PartyID)\n\
+\n\
+**Description:** Returns dictionary of PC's performance stats.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party (1 based)\n\
+\n\
+**Return value:** A Python dictionary containing the following items\n\
+  * 'BestKilledName'   - strref of killed creature with biggest XP\n\
+  * 'BestKilledXP'     - XP value of this creature\n\
+  * 'JoinDate'         - date joined the team\n\
+  * 'KillsChapterXP'   - total XP from kills gathered in this chapter\n\
+  * 'KillsChapterCount'- total number of kills in this chapter\n\
+  * 'KillsTotalXP'     - total XP from kills\n\
+  * 'KillsTotalCount'  - total number of kills\n\
+  * 'FavouriteSpell'   - spell used the most of the time\n\
+  * 'FavouriteWeapon'  - weapon bringing the most kill XP\n\
+\n\
+**See also:** [[guiscript:GetPlayerStat]]"
+);
 
 static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 {
@@ -5069,11 +6486,32 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GameSelectPC__doc,
-"GameSelectPC(PartyID, Selected, [Flags = SELECT_NORMAL])\n\n"
-"Selects or deselects PC."
-"if PartyID=0, (De)selects all PC."
-"Flags is combination of SELECT_REPLACE and SELECT_QUIET."
-"SELECT_REPLACE: when selecting other party members, unselect the others." );
+"===== GameSelectPC =====\n\
+\n\
+**Prototype:** GemRB.GameSelectPC (PartyID, Selected[, Flags = SELECT_NORMAL])\n\
+\n\
+**Description:** Selects or deselects a PC. Note: some things use a \n\
+different PC selection mechanism (dialogs and stores are not unified yet).\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party, 0 means ALL\n\
+  * Selected - boolean\n\
+  * Flags - bitflags\n\
+    * SELECT_REPLACE - if set deselect all other actors\n\
+    * SELECT_QUIET - do not run SelectionHandler (no GUI feedback)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+def SelectAllOnPress ():\n\
+  GemRB.GameSelectPC (0, 1)\n\
+  return\n\
+The above function is associated to the 'select all' button of the GUI screen.\n\
+\n\
+**See also:** [[guiscript:GameIsPCSelected]], [[guiscript:GameSelectPCSingle]], [[guiscript:GameGetSelectedPCSingle]], [[guiscript:GameGetFirstSelectedPC]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 {
@@ -5104,8 +6542,21 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameIsPCSelected__doc,
-"GameIsPCSelected(Slot) => bool\n\n"
-"Returns true if the PC is selected." );
+"===== GameIsPCSelected =====\n\
+\n\
+**Prototype:** GemRB.GameIsPCSelected (Slot)\n\
+\n\
+**Description:** Returns true if the PC is selected.\n\
+\n\
+**Parameters:**\n\
+  * Slot - the PC's position in the party (1 based)\n\
+\n\
+**Return value:** boolean, 1 if the PC is selected\n\
+\n\
+**See also:** [[guiscript:GameSelectPC]], [[guiscript:GameGetFirstSelectedPC]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 {
@@ -5125,9 +6576,22 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
-"GameSelectPCSingle(index)\n\n"
-"Selects one PC in non-walk environment (i.e. in shops, inventory,...)"
-"Index must be greater than zero." );
+"===== GameSelectPCSingle =====\n\
+\n\
+**Prototype:** GemRB.GameSelectPCSingle (PartyID)\n\
+\n\
+**Description:** Selects one PC in non-walk environment (i.e. in shops, \n\
+inventory, ...).\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameSelectPC]], [[guiscript:GameGetSelectedPCSingle]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 {
@@ -5145,8 +6609,24 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
-"GameGetSelectedPCSingle(flag) => int\n\n"
-"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...). Index should be greater than zero. If flag is set, then this function will return the PC currently talking." );
+"===== GameGetSelectedPCSingle =====\n\
+\n\
+**Prototype:** GemRB.GameGetSelectedPCSingle (flag)\n\
+\n\
+**Description:** If flag is 0 or omitted, then returns currently active pc \n\
+in non-walk environment (i.e. in shops, inventory, ...).  If flag is set to \n\
+non-zero, then returns the currently speaking PC. \n\
+If there is no such PC, then returns 0.\n\
+\n\
+**Parameters:**\n\
+  * flag - 0/1\n\
+\n\
+**Return value:** PartyID (1-10)\n\
+\n\
+**See also:** [[guiscript:GameSelectPC]], [[guiscript:GameSelectPCSingle]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
 {
@@ -5171,8 +6651,22 @@ static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* ar
 }
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
-"GameGetFirstSelectedPC() => int\n\n"
-"Returns index of the first selected PC or 0 if none." );
+"===== GameGetFirstSelectedPC =====\n\
+\n\
+**Prototype:** GemRB.GameGetFirstSelectedPC ()\n\
+\n\
+**Description:** Returns index of the first selected PC or 0 if none.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** the first selected PC's position in the party (it will \n\
+look in the original party order, thus the protagonist will be always \n\
+first!)\n\
+\n\
+**See also:** [[guiscript:GameSelectPC]], [[guiscript:GameIsPCSelected]], [[guiscript:GameGetFirstSelectedActor]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5185,8 +6679,18 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 }
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedActor__doc,
-"GameGetFirstSelectedActor() => int\n\n"
-"Returns the global ID of the first selected actor or 0 if none." );
+"===== GameGetFirstSelectedActor =====\n\
+\n\
+**Prototype:** GemRB.GameGetFirstSelectedActor ()\n\
+\n\
+**Description:**  Returns the global ID of the first selected actor or 0 if none.\n\
+\n\
+**Return value:** int\n\
+\n\
+**See also:** [[guiscript:GameGetFirstSelectedPC]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5199,8 +6703,23 @@ static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* 
 }
 
 PyDoc_STRVAR( GemRB_GameControlSetLastActor__doc,
-"GameControlSetLastActor() => int\n\n"
-"Sets the last actor that was hovered over by the mouse." );
+"===== GameControlSetLastActor =====\n\
+\n\
+**Prototype:** GemRB.GameControlSetLastActor ([partyID])\n\
+\n\
+**Description:** Sets LastActor in the GameControl object. The LastActor \n\
+object is the character which is currently being hovered over by the \n\
+player. Its feet circle is flickering.\n\
+\n\
+**Parameters:**\n\
+  * partyID - 0 to delete any previous settings, or the pc ID.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GameSelectPCSingle]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* args)
 {
@@ -5221,8 +6740,19 @@ static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* ar
 }
 
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
-"ActOnPC(player)\n\n"
-"Targets the selected PC for an action (cast spell, attack, ...)" );
+"===== ActOnPC =====\n\
+\n\
+**Prototype:** GemRB.ActOnPC (player)\n\
+\n\
+**Description:** Targets the selected PC for an action (cast spell, attack,  ...)\n\
+\n\
+**Parameters:**\n\
+  * player - the pc's party position (1-10)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:ClearActions]], [[guiscript:SetModalState]], [[guiscript:SpellCast]]"
+);
 
 static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 {
@@ -5244,8 +6774,23 @@ static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
-"GetPlayerPortrait(Slot[, SmallOrLarge]) => string\n\n"
-"Queries the player portrait." );
+"===== GetPlayerPortrait =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerPortrait (Slot[, SmallOrLarge])\n\
+\n\
+**Description:** Queries the player's portrait. To set the portrait of a \n\
+new character you must use FillPlayerInfo().\n\
+\n\
+**Parameters:**\n\
+  * Slot         - the PC's position in the party\n\
+  * SmallOrLarge - boolean, specify 1 if you want to get the large portrait\n\
+\n\
+**Return value:** the player's portrait name (image resref)\n\
+\n\
+**See also:** [[guiscript:FillPlayerInfo]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
@@ -5265,8 +6810,25 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerString__doc,
-"GetPlayerString(Slot, ID) => int\n\n"
-"Queries a string reference (verbal constant) from the actor." );
+"===== GetPlayerString =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerString (globalID, StringIndex)\n\
+\n\
+**Description:** Returns the string reference of a Verbal Constant set in the player. \n\
+The biography string is an example of such a string.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * StringIndex - the verbal constant's index\n\
+\n\
+**Return value:** a string reference.\n\
+\n\
+**See also:** [[guiscript:GetPlayerName]], [[guiscript:GetPlayerStat]], [[guiscript:GetPlayerScript]]\n\
+\n\
+**See also:** sndslot.ids, soundoff.ids (it is a bit unclear which one is it)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 {
@@ -5286,8 +6848,24 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
-"GetPlayerStat(Slot, ID[, BaseStat]) => int\n\n"
-"Queries a stat." );
+"===== GetPlayerStat =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerStat(globalID, StatID[, Base])\n\
+\n\
+**Description:** Queries a stat of the player character. The stats are \n\
+listed in ie_stats.py.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * StatID - stat index\n\
+  * Base - if set to 1, the function will return the base instead of the modified (current) value\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:SetPlayerStat]], [[guiscript:GetPlayerName]], [[guiscript:GetPlayerStates]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
@@ -5306,8 +6884,30 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
-"SetPlayerStat(Slot, ID, Value[, pcf])\n\n"
-"Changes a stat." );
+"===== SetPlayerStat =====\n\
+\n\
+**Prototype:** GemRB.SetPlayerStat (globalID, ID, Value[, PCF])\n\
+\n\
+**Description:** Sets a player character's base stat. The stats are listed \n\
+in ie_stats.py.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * ID - Stat index\n\
+  * Value - New stat value\n\
+  * PCF - Set to 0 if you don't want the stat's post-change function to be ran\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:** \n\
+  PickedColor = ColorTable.GetValue (ColorIndex, GemRB.GetVar('Selected'))\n\
+  GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)\n\
+The above example sets the player's color just picked via the color customisation dialog. ColorTable holds the available colors.\n\
+\n\
+**See also:** [[guiscript:GetPlayerStat]], [[guiscript:SetPlayerName]], [[guiscript:ApplyEffect]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
@@ -5326,9 +6926,23 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerScript__doc,
-"GetPlayerScript(Slot[, Index])\n\n"
-"Retrieves the script resource for a player. If index is omitted, it will default to "
-"the class script slot (customisable by players)." );
+"===== GetPlayerScript =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerScript (globalID[, Index])\n\
+\n\
+**Description:** Queries the player's script. If index is omitted, it will \n\
+default to the class script slot (customisable by players).\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Index - script index (see scrlevel.2da)\n\
+\n\
+**Return value:** the player's script (.bcs or .baf resref)\n\
+\n\
+**See also:** [[guiscript:SetPlayerScript]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 {
@@ -5349,9 +6963,22 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerScript__doc,
-"SetPlayerScript(Slot, Resource[, Index])\n\n"
-"Sets the script resource for a player. If index is omitted, it will default to "
-"the class script slot (customisable by players)." );
+"===== SetPlayerScript =====\n\
+\n\
+**Prototype:** GemRB.SetPlayerScript (globalID, ScriptName[, Index])\n\
+\n\
+**Description:** Sets the player character's script. Normally only the class \n\
+script is customisable via the GUI (used if Index is omitted).\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * ScriptName - the script resource\n\
+  * Index      - the script index (see scrlevel.2da)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetPlayerScript]]"
+);
 
 static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 {
@@ -5369,8 +6996,20 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerDialog__doc,
-"SetPlayerDialog(Slot, Resource)\n\n"
-"Sets the dialog resource for a player." );
+"===== SetPlayerDialog =====\n\
+\n\
+**Prototype:** GemRB.SetPlayerDialog (globalID, Resource)\n\
+\n\
+**Description:** Sets the dialog resource for a player.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Resource - the dialog resource\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 {
@@ -5388,8 +7027,55 @@ static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
-"FillPlayerInfo(Slot[, Portrait1, Portrait2])\n\n"
-"Fills basic character info, that is not stored in stats." );
+"===== FillPlayerInfo =====\n\
+\n\
+**Prototype:** GemRB.FillPlayerInfo (globalID[, Portrait1, Portrait2])\n\
+\n\
+**Description:** Fills basic character info that is not stored in stats. \n\
+This command will generate an AnimationID for the character based on the \n\
+avprefix.2da table, the character must have the stats referenced in the \n\
+avprefix structure already set. It will also set the player's portraits if \n\
+given. It will set the actor's area/position according to the 'PlayMode' \n\
+variable and the Slot value (using the startpos.2da table). This command \n\
+must be called once after a character was created and before EnterGame().\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Portrait1 - medium (or large) portrait\n\
+  * Portrait2 - small portrait\n\
+\n\
+avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
+\n\
+**For example:**\n\
+avprefix.2da\n\
+        RESOURCE\n\
+0       0x6000\n\
+1       avprefr\n\
+2       avprefg\n\
+3       avprefc\n\
+\n\
+avprefr.2da\n\
+                RACE\n\
+TYPE            201\n\
+HUMAN           0\n\
+ELF             1\n\
+HALF_ELF        1\n\
+GNOME           4\n\
+HALFLING        3\n\
+DWARF           2\n\
+HALFORC         5\n\
+\n\
+Based on the avatar's stat (201 == race) the animationID (0x6000) will be increased by the given values. For example an elf's animationID will be 0x6001. The animationID will be further modified by gender and class.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:**\n\
+  GemRB.FillPlayerInfo (MyChar, PortraitName+'M', PortraitName+'S')\n\
+\n\
+**See also:** [[guiscript:LoadGame]], [[guiscript:CreatePlayer]], [[guiscript:SetPlayerStat]], [[guiscript:EnterGame]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
@@ -5636,8 +7322,21 @@ static PyObject* GemRB_Button_SetItemIcon(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_EnterStore__doc,
-"EnterStore(STOResRef)\n\n"
-"Loads the store referenced and opens the store window." );
+"===== EnterStore =====\n\
+\n\
+**Prototype:** GemRB.EnterStore (StoreResRef)\n\
+\n\
+**Description:** Loads a store, sets it as current and opens the window.\n\
+\n\
+**Parameters:**\n\
+  * StoreResRef - the store's resource name\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetStore]], [[guiscript:GetStoreCure]], [[guiscript:GetStoreDrink]], [[guiscript:LeaveStore]], [[guiscript:SetPurchasedAmount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 {
@@ -5657,8 +7356,20 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LeaveStore__doc,
-"LeaveStore(STOResRef)\n\n"
-"Saves the current store to the Cache folder and frees it from memory." );
+"===== LeaveStore =====\n\
+\n\
+**Prototype:** GemRB.LeaveStore ()\n\
+\n\
+**Description:** Saves the current store to the Cache folder and removes it \n\
+from memory. If there was no active store, this function causes a runtime \n\
+error.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStore]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5669,8 +7380,21 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LeaveContainer__doc,
-"LeaveContainer()\n\n"
-"Clears the current container variable and initiates the 'CloseContainerWindow' guiscript call in the next window update cycle.");
+"===== LeaveContainer =====\n\
+\n\
+**Prototype:** GemRB.LeaveContainer ()\n\
+\n\
+**Description:** Closes the current container by calling 'CloseContainerWindow' \n\
+in the next update cycle. You cannot call 'CloseContainerWindow' directly, \n\
+because the core system needs to know if the container subwindow is still \n\
+open. This function will also remove empty ground piles.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetContainer]], [[guiscript:GetContainerItem]], [[guiscript:LeaveStore]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LeaveContainer(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5679,8 +7403,28 @@ static PyObject* GemRB_LeaveContainer(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetContainer__doc,
-"GetContainer( PartyID, autoselect ) => dictionary\n\n"
-"Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor. It will create the container if required." );
+"===== GetContainer =====\n\
+\n\
+**Prototype:** GemRB.GetContainer (PartyID[, autoselect])\n\
+\n\
+**Description:** Gets the current container's type and other basic header \n\
+information. The player is always the first selected player. If PartyID is \n\
+0 then the default PC is the first multiselected PC. Autoselect will always \n\
+select a groundpile. If there is no container at the feet of the PC \n\
+autoselect will create the container.\n\
+\n\
+**Parameters:**\n\
+  * PartyID    - the PC's position in the party\n\
+  * autoselect - is 1 if you call this function from a player inventory (so you select the pile at their feet)\n\
+\n\
+**Return value:** dictionary\n\
+  * 'Type'      - the container's type, numeric (see IESDP)\n\
+  * 'ItemCount' - the number of items in the container\n\
+\n\
+**See also:** [[guiscript:GetStore]], [[guiscript:GameGetFirstSelectedPC]], [[guiscript:GetContainerItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 {
@@ -5726,8 +7470,31 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetContainerItem__doc,
-"GetContainerItem(PartyID, idx) => dictionary\n\n"
-"Returns the container item referenced by the index. If PartyID is 0 then the container was opened manually and should be the current container. If PartyID is not 0 then the container is autoselected and should be at the feet of the player." );
+"===== GetContainerItem =====\n\
+\n\
+**Prototype:** GemRB.GetContainerItem (PartyID, index)\n\
+\n\
+**Description:** Returns the container item referenced by the index. If \n\
+PartyID is 0 then the container was opened manually and should be the \n\
+current container. If PartyID is not 0 then the container is autoselected \n\
+and should be at the feet of the player.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * index   - the item's index in the container\n\
+\n\
+**Return value:** dictionary\n\
+  * 'ItemResRef' - the ResRef of the item\n\
+  * 'ItemName'   - the StrRef of the item's name (identified or not)\n\
+  * 'Usages0'    - The primary charges of the item (or the item's stack amount if the item is stackable).\n\
+  * 'Usages1'    - The secondary charges of the item.\n\
+  * 'Usages2'    - The tertiary charges of the item.\n\
+  * 'Flags'      - Item flags.\n\
+\n\
+**See also:** [[guiscript:GetContainer]], [[guiscript:GameGetFirstSelectedPC]], [[guiscript:GetStoreItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 {
@@ -5781,12 +7548,28 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeContainerItem__doc,
-"ChangeContainerItem(PartyID, slot, action)\n\n"
-"Takes an item from a container, or puts it there. "
-"If PC is 0 then it uses the first selected PC and the current container, "
-"if it is not 0 then it autoselects the container. "
-"action=0: move item from PC to container."
-"action=1: move item from container to PC.");
+"===== ChangeContainerItem =====\n\
+\n\
+**Prototype:** GemRB.ChangeContainerItem (PartyID, slot, action)\n\
+\n\
+**Description:** Moves an item from PC's inventory into a container or vice \n\
+versa. If PartyID is 0 then PC is the first selected PC and container is \n\
+the current container. If PartyID is not 0 then the container is the pile \n\
+at the feet of that PC.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * slot    - the item's inventory or container slot\n\
+  * action\n\
+    * 0 - put item of PC into container\n\
+    * 1 - get item from container and put it in PC's inventory\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetContainer]], [[guiscript:GetSlotItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 {
@@ -5917,8 +7700,32 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetStore__doc,
-"GetStore() => dictionary\n\n"
-"Returns relevant data of the current store." );
+"===== GetStore =====\n\
+\n\
+**Prototype:** GemRB.GetStore ()\n\
+\n\
+**Description:** Gets the basic header information of the current store and \n\
+returns it in a dictionary.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** dictionary\n\
+  * 'StoreType'       - numeric (see IESDP)\n\
+  * 'StoreName'       - the StrRef of the store name\n\
+  * 'StoreDrinkCount' - the count of drinks served (tavern)\n\
+  * 'StoreCureCount'  - the count of cures served (temple)\n\
+  * 'StoreItemCount'  - the count of items sold, in case of PST the availability trigger is also checked\n\
+  * 'StoreCapacity'   - the capacity of the store\n\
+  * 'StoreRoomPrices' - a four elements tuple, negative if the room type is unavailable\n\
+  * 'StoreButtons'    - a four elements tuple, possible actions\n\
+  * 'StoreFlags'      - the store flags if you ever need them, StoreButtons is a digested information, but you might have something else in mind based on these\n\
+  * 'TavernRumour'    - ResRef of tavern rumour dialog\n\
+  * 'TempleRumour'    - ResRef of temple rumour dialog\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStoreCure]], [[guiscript:GetStoreDrink]], [[guiscript:GetRumour]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 #define STOREBUTTON_COUNT 7
 #define STORETYPE_COUNT 7
@@ -6011,9 +7818,32 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_IsValidStoreItem__doc,
-"IsValidStoreItem(pc, idx[, type]) => int\n\n"
-"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items. "
-"Type is 1 for store items and 0 for PC items." );
+"===== IsValidStoreItem =====\n\
+\n\
+**Prototype:** GemRB.IsValidStoreItem (PartyID, slot[, type])\n\
+\n\
+**Description:** Returns if a pc's inventory item or a store item is valid \n\
+for buying, selling, identifying or stealing. If Type is 1, then this is a \n\
+ store item.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * slot    - the item's inventory or store slot\n\
+  * type - which inventory to look at?\n\
+    * 0 - PC\n\
+    * 1 - store\n\
+\n\
+**Return value:** bitfield\n\
+  * 1 - valid for buy\n\
+  * 2 - valid for sell\n\
+  * 4 - valid for identify\n\
+  * 8 - valid for steal\n\
+  * 0x40 - selected for buy or sell\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetSlotItem]], [[guiscript:GetStoreItem]], [[guiscript:ChangeStoreItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6077,9 +7907,20 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_FindStoreItem__doc,
-"FindStoreItem(resref)\n\n"
-"Returns the amount of the specified items in the open store."
-"0 is also returned for an infinite ammount.");
+"===== FindStoreItem =====\n\
+\n\
+**Prototype:** GemRB.FindStoreItem (resref)\n\
+\n\
+**Description:** Returns the amount of the specified items in the open \n\
+store. 0 is also returned for an infinite amount.\n\
+\n\
+**Parameters:** \n\
+  * resref - item resource\n\
+\n\
+**Return value:** integer\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6113,8 +7954,24 @@ static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
-"SetPurchasedAmount(idx, amount)\n\n"
-"Sets the amount of purchased items of a type.");
+"===== SetPurchasedAmount =====\n\
+\n\
+**Prototype:** GemRB.SetPurchasedAmount (Index, Amount)\n\
+\n\
+**Description:** Sets the amount of purchased items of a type. If it is 0, \n\
+then the item will be deselected from the purchase list. This function \n\
+works only with an active store.\n\
+\n\
+**Parameters:**\n\
+  * Index  - the store item's index\n\
+  * Amount - a numeric value not less than 0\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:LeaveStore]], [[guiscript:SetPurchasedAmount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 {
@@ -6150,9 +8007,31 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
-"ChangeStoreItem(PartyID, Slot, action)=>int\n\n"
-"Performs an action of buying, selling, identifying or stealing in a store. "
-"It can also toggle the selection of an item." );
+"===== ChangeStoreItem =====\n\
+\n\
+**Prototype:** GemRB.ChangeStoreItem (PartyID, slot, action)\n\
+\n\
+**Description:** Performs a buy, sell, identify or steal action. It has the \n\
+same bit values as IsValidStoreItem. It can also toggle the selection of an item.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * slot    - the item's inventory or store slot\n\
+  * action  - bitfield\n\
+    * 1 - buy\n\
+    * 2 - sell\n\
+    * 4 - identify\n\
+    * 8 - steal\n\
+    * Add 0x40 for selection (in case of buy/sell only)\n\
+\n\
+**Return value:**\n\
+  * 0 - failure\n\
+  * 2 - success\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetSlotItem]], [[guiscript:GetStoreItem]], [[guiscript:IsValidStoreItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6270,8 +8149,33 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
-"GetStoreItem(idx) => dictionary\n\n"
-"Returns the store item referenced by the index." );
+"===== GetStoreItem =====\n\
+\n\
+**Prototype:** GemRB.GetStoreItem (index)\n\
+\n\
+**Description:** Gets the item resref, price and other details of a store \n\
+item referenced by the index. In case of PST stores the item's availability \n\
+is also checked against the availability triggers.\n\
+\n\
+**Parameters:**\n\
+  * index - the number of the item in the store list\n\
+\n\
+**Return value:** dictionary\n\
+  * 'ItemResRef' - the ResRef of the item\n\
+  * 'ItemName'   - the StrRef of the item's name (identified or not)\n\
+  * 'ItemDesc'   - the StrRef of the item's description (identified or not)\n\
+  * 'Price'      - the price of the item (subtract this from the party gold)\n\
+  * 'Amount'     - the amount of item in store (-1 means infinite)\n\
+  * 'Usages0'    - The primary charges of the item (or the item's stack amount if the item is stackable).\n\
+  * 'Usages1'    - The secondary charges of the item.\n\
+  * 'Usages2'    - The tertiary charges of the item.\n\
+  * 'Flags'      - Item flags.\n\
+  * 'Purchased'  - The count of purchased items of this type.\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStoreDrink]], [[guiscript:GetStoreCure]], [[guiscript:GetStore]], [[guiscript:GetSlotItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6337,8 +8241,25 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetStoreDrink__doc,
-"GetStoreDrink(idx) => dictionary\n\n"
-"Returns the drink structure indexed. Returns None if the index is wrong." );
+"===== GetStoreDrink =====\n\
+\n\
+**Prototype:** GemRB.GetStoreDrink (index)\n\
+\n\
+**Description:** Gets the name, strength and price of a store drink \n\
+referenced by the index.\n\
+\n\
+**Parameters:**\n\
+  * index - the number of the drink in the store list\n\
+\n\
+**Return value:** dictionary\n\
+  * 'DrinkName' - the StrRef of the drink name\n\
+  * 'Strength'  - the strength if the drink (affects rumour and intoxication)\n\
+  * 'Price'     - the price of the drink (subtract this from the party gold)\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStoreCure]], [[guiscript:GetStore]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 {
@@ -6453,8 +8374,23 @@ table_loaded:
 }
 
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
-"GetStoreCure(idx) => dictionary\n\n"
-"Returns the cure structure indexed. Returns None if the index is wrong." );
+"===== GetStoreCure =====\n\
+\n\
+**Prototype:** GemRB.GetStoreCure (index)\n\
+\n\
+**Description:** Gets the spell resref, price and description of a store \n\
+cure referenced by the index.\n\
+\n\
+**Parameters:**\n\
+  * index - the number of the cure in the store list\n\
+\n\
+**Return value:** dictionary\n\
+  * 'CureResRef'  - the ResRef of the cure spell\n\
+  * 'Description' - the StrRef of the spell's description\n\
+  * 'Price'       - the price of the spell (subtract this from the party gold)\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStoreDrink]], [[guiscript:GetStore]]"
+);
 
 static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 {
@@ -6480,9 +8416,33 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
-"ExecuteString(String[,PC])\n\n"
-"Executes an In-Game Script Action in the current Area Script Context. "
-"If a number was given, it will execute the action in the numbered PC's context." );
+"===== ExecuteString =====\n\
+\n\
+**Prototype:** GemRB.ExecuteString (String[, Slot])\n\
+\n\
+**Description:** Executes an in-game script action in the current area \n\
+script context. This means that LOCALS will be treated as the current \n\
+area's variable. If a number was given, it will execute the action in the \n\
+numbered PC's context.\n\
+\n\
+**Parameters:**\n\
+  * String - a gamescript action\n\
+  * Slot   - a player slot\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+  GemRB.ExecuteString('ActionOverride([PC], Attack(NearestEnemyOf(Myself)) )')\n\
+The above example will force a player (most likely Player1) to attack an enemy, issuing the command as it would come from the current area's script. The current gametype must support the scripting action.\n\
+\n\
+\n\
+  GemRB.ExecuteString('Attack(NearestEnemyOf(Myself))', 2)\n\
+The above example will force Player2 to attack an enemy, as the example will run in that actor's script context.\n\
+\n\
+**See also:** [[guiscript:EvaluateString]], gamescripts\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
@@ -6508,8 +8468,23 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_EvaluateString__doc,
-"EvaluateString(String)\n\n"
-"Evaluate an In-Game Script Trigger in the current Area Script Context." );
+"===== EvaluateString =====\n\
+\n\
+**Prototype:** GemRB.EvaluateString (String)\n\
+\n\
+**Description:** Evaluates an ingame script trigger in the current area \n\
+script context. It prints the result. The command is more useful from the \n\
+ingame debug console than from scripts.\n\
+\n\
+**Parameters:**\n\
+  * String - a gamescript trigger\n\
+\n\
+**Return value:** N/A (the trigger's return value is printed)\n\
+\n\
+**See also:** [[guiscript:ExecuteString]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 {
@@ -6529,8 +8504,18 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UpdateMusicVolume__doc,
-"UpdateMusicVolume()\n\n"
-"Update music volume on-the-fly." );
+"===== UpdateMusicVolume =====\n\
+\n\
+**Prototype:** GemRB.UpdateMusicVolume ()\n\
+\n\
+**Description:** Updates music volume on-the-fly.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:UpdateAmbientsVolume]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -6540,8 +8525,16 @@ static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/
 }
 
 PyDoc_STRVAR( GemRB_UpdateAmbientsVolume__doc,
-"UpdateAmbientsVolume()\n\n"
-"Update ambients volume on-the-fly." );
+"===== UpdateAmbientsVolume =====\n\
+\n\
+**Prototype:** GemRB.UpdateAmbientsVolume ()\n\
+\n\
+**Description:** Updates ambients volume on-the-fly.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:UpdateMusicVolume]]"
+);
 
 static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -6572,8 +8565,19 @@ static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetCurrentArea__doc,
-"GetCurrentArea()=>resref\n\n"
-"Returns current area's ResRef." );
+"===== GetCurrentArea =====\n\
+\n\
+**Prototype:** GemRB.GetCurrentArea ()\n\
+\n\
+**Description:** Returns the resref of the current area. It is the same as \n\
+GetGameString(1). It works only after a LoadGame() was issued.\n\
+\n\
+**Return value:** string, (ARE resref)\n\
+\n\
+**See also:** [[guiscript:GetGameString]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -6583,8 +8587,21 @@ static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_MoveToArea__doc,
-"MoveToArea(resref)\n\n"
-"Moves the selected characters to the area." );
+"===== MoveToArea =====\n\
+\n\
+**Prototype:** GemRB.MoveToArea (resref)\n\
+\n\
+**Description:** Moves the selected actors to the named area.\n\
+\n\
+**Parameters:**\n\
+  * resref - The name of the area.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetCurrentArea]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 {
@@ -6616,8 +8633,25 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
-"GetMemorizableSpellsCount(PartyID, SpellType, Level [,Bonus])=>int\n\n"
-"Returns number of memorizable spells of given type and level in PC's spellbook." );
+"===== GetMemorizableSpellsCount =====\n\
+\n\
+**Prototype:** GemRB.GetMemorizableSpellsCount (PartyID, SpellType, Level[, Bonus])\n\
+\n\
+**Description:** Returns number of memorizable spells of given type and \n\
+level in a player character's spellbook.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the memorized spell's level\n\
+  * Bonus     - whether querying the (wisdom) modified or the base value\n\
+\n\
+**Return value:** numeric, -1 if the query is invalid (no spellcaster, bad spelltype, too high level).\n\
+\n\
+**See also:** [[guiscript:SetMemorizableSpellsCount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
@@ -6634,8 +8668,25 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
-"SetMemorizableSpellsCount(PartyID, Value, SpellType, Level)=>int\n\n"
-"Sets number of memorizable spells of given type and level in PC's spellbook." );
+"===== SetMemorizableSpellsCount =====\n\
+\n\
+**Prototype:** GemRB.SetMemorizableSpellsCount (PartyID, Value, SpellType, Level)\n\
+\n\
+**Description:** Sets number of memorizable spells of given type and level \n\
+in a player character's spellbook.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * Value     - number of memorizable spells\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the memorized spell's level\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetMemorizableSpellsCount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
@@ -6654,9 +8705,25 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_CountSpells__doc,
-"CountSpells(PartyID, SpellName, SpellType, Flag)=>int\n\n"
-"Returns number of memorized spells of given name and type in PC's spellbook.\n"
-"If flag is set then spent spells are also count.");
+"===== CountSpells =====\n\
+\n\
+**Prototype:** GemRB.CountSpells (PartyID, SpellName, SpellType, Flag)\n\
+\n\
+**Description:** Returns number of memorized spells of given name and type \n\
+in PC's spellbook. If flag is set then spent spells are also count.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellName - spell to count\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Flag      - count depleted spells too?\n\
+\n\
+**Return value:** integer\n\
+\n\
+**See also:** [[guiscript:GetMemorizableSpellsCount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
 {
@@ -6674,9 +8741,25 @@ static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
-"GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PC's spellbook."
-"If level isn't given, it will return the number of all spells of the given type.");
+"===== GetKnownSpellsCount =====\n\
+\n\
+**Prototype:** GemRB.GetKnownSpellsCount (PartyID, SpellType[, Level])\n\
+\n\
+**Description:** Returns number of known spells of given type and level in \n\
+a player character's spellbook. If Level isn't given, it will return the \n\
+number of all spells of the given type.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the known spell's level\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetMemorizedSpellsCount]], [[guiscript:GetKnownSpell]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
@@ -6700,8 +8783,25 @@ static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
-"GetKnownSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
-"Returns dict with specified known spell from PC's spellbook.");
+"===== GetKnownSpell =====\n\
+\n\
+**Prototype:** GemRB.GetKnownSpell (PartyID, SpellType, Level, Index)\n\
+\n\
+**Description:** Returns dictionary with specified known spell from PC's spellbook.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the memorized spell's level\n\
+  * Index     - the memorized spell's index\n\
+\n\
+**Return value:** dictionary\n\
+  * 'SpellResRef' - The name of the spell (.spl resref)\n\
+\n\
+**See also:** [[guiscript:GetMemorizedSpell]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6727,9 +8827,26 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
-"GetMemorizedSpellsCount(PartyID, SpellType, Level, castable)=>int\n\n"
-"Returns number of spells of given type and level in PartyID's memory. "
-"If level is omitted then it returns the number of distinct spells memorised.\n");
+"===== GetMemorizedSpellsCount =====\n\
+\n\
+**Prototype:** GemRB.GetMemorizedSpellsCount (globalID, SpellType, Level, Castable)\n\
+\n\
+**Description:** Returns number of spells of given type and level in \n\
+selected character's memory. If level is negative then it returns the \n\
+number of distinct spells memorised.\n\
+\n\
+**Parameters:**\n\
+  * globalID  - party ID or global ID of the actor to use\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the memorized spell's level\n\
+  * Castable  - ignore depleted spells?\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:GetMemorizedSpell]], [[guiscript:GetKnownSpellsCount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
 {
@@ -6754,8 +8871,26 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 }
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
-"GetMemorizedSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
-"Returns dict with specified memorized spell from PC's spellbook.");
+"===== GetMemorizedSpell =====\n\
+\n\
+**Prototype:** GemRB.GetMemorizedSpell (PartyID, SpellType, Level, Index)\n\
+\n\
+**Description:** Returns dict with specified memorized spell from PC's spellbook.\n\
+\n\
+**Parameters:** \n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the memorized spell's level\n\
+  * Index     - the memorized spell's index\n\
+\n\
+**Return value:** dictionary\n\
+  * 'SpellResRef' - The name of the spell (.spl resref)\n\
+  * 'Flags'       - Is the spell castable, or already spent\n\
+\n\
+**See also:** [[guiscript:GetMemorizedSpellsCount]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6780,8 +8915,37 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetSpell__doc,
-"GetSpell(ResRef[, silent])=>dict\n\n"
-"Returns dict with specified spell. Verbose by default." );
+"===== GetSpell =====\n\
+\n\
+**Prototype:** GemRB.GetSpell (ResRef[, silent])\n\
+\n\
+**Description:** Returns dictionary with the specified spell's data. If silent \n\
+is set, nothing will be printed to the console.\n\
+\n\
+**Parameters:**\n\
+  * ResRef - the resource reference of the spell.\n\
+  * silent - turn off verbose output.\n\
+\n\
+**Return value:** dictionary\n\
+  * 'SpellName'       - strref of unidentified name.\n\
+  * 'SpellDesc'       - strref of unidentified description.\n\
+  * 'SpellbookIcon'   - the spell's icon (.bam resref)\n\
+  * 'SpellExclusion'  - the excluded schools and alignments\n\
+  * 'SpellDivine'     - this field tells divine magics apart\n\
+  * 'SpellSchool'     - the spell's school (primary type)\n\
+  * 'SpellType'       - the type of text that appears on spell dispelling\n\
+  * 'SpellLevel'      - the spell's level\n\
+  * 'Completion'      - the spell's completion sound\n\
+  * 'SpellTargetType' - the spell's target type\n\
+  * 'SpellSecondary'  - the spell's secondary type\n\
+  * 'HeaderFlags'     - the spell's header flags\n\
+  * 'NonHostile'      - is the spell considered hostile?\n\
+  * 'SpellResRef'     - the spell's resource reference\n\
+\n\
+**See also:** [[guiscript:GetItem]], [[guiscript:SetSpellIcon]], spell_structure(IESDP)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6824,8 +8988,25 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CheckSpecialSpell__doc,
-"CheckSpecialSpell(GlobalID, SpellResRef)=>int\n\n"
-"Checks if the specified spell is special. Returns 0 for normal ones." );
+"===== CheckSpecialSpell =====\n\
+\n\
+**Prototype:** GemRB.CheckSpecialSpell (globalID, SpellResRef)\n\
+\n\
+**Description:** Checks if an actor's spell is considered special (splspec.2da).\n\
+\n\
+**Parameters:**\n\
+  * globalID - global ID of the actor to use\n\
+  * SpellResRef - spell resource to check\n\
+\n\
+**Return value:** bitfield\n\
+  * 0 for normal ones\n\
+  * SP_IDENTIFY - any spell that cannot be cast from the menu\n\
+  * SP_SILENCE  - any spell that can be cast in silence\n\
+  * SP_SURGE    - any spell that cannot be cast during a wild surge\n\
+  * SP_REST     - any spell that is cast upon rest if memorized\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6847,8 +9028,21 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpelldataIndex__doc,
-"GetSpelldataIndex(globalID, spellResRef, type)=>int\n\n"
-"Returns the index of the spell in the spellbook's spellinfo structure."
+"===== GetSpelldataIndex =====\n\
+\n\
+**Prototype:** GemRB.GetSpelldataIndex (globalID, SpellResRef, type)\n\
+\n\
+**Description:** Returns the index of the spell in the spellbook's \n\
+spellinfo structure.\n\
+\n\
+**Parameters:**\n\
+  * globalID - global ID of the actor to use\n\
+  * SpellResRef - spell resource to check\n\
+  * type - spell(book) type (0 means any)\n\
+\n\
+**Return value:** integer\n\
+\n\
+[[guiscript:index|Function index]]"
 );
 
 static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
@@ -6870,8 +9064,19 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpelldata__doc,
-"GetSpelldata(globalID[, type])=>tuple\n\n"
-"Returns a tuple containing resrefs of the spells in the spellbook's spellinfo structure."
+"===== GetSpelldata =====\n\
+\n\
+**Prototype:** GemRB.GetSpelldata (globalID[, type])\n\
+\n\
+**Description:** Returns resrefs of the spells in the spellbook's spellinfo structure.\n\
+\n\
+**Parameters:**\n\
+  * globalID - global ID of the actor to use\n\
+  * type - spell(book) type (255 means any)\n\
+\n\
+**Return value:** tuple of spell resresfs\n\
+\n\
+[[guiscript:index|Function index]]"
 );
 
 static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
@@ -6899,10 +9104,30 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_LearnSpell__doc,
-"LearnSpell(PartyID, SpellResRef[, Flags, Booktype, Level])=>int\n\n"
-"Learns specified spell. Returns 0 on success.\n"
-"Flags control xp granting, stat checks and feedback.\n"
-"Booktype and level overrides can be passed (iwd2)." );
+"===== LearnSpell =====\n\
+\n\
+**Prototype:** GemRB.LearnSpell (PartyID, SpellResRef[, Flags, BookType, Level])\n\
+\n\
+**Description:** Tries to learn the specified spell. Flags control xp \n\
+granting, stat checks and feedback.\n\
+\n\
+**Parameters:**\n\
+  * PartyID     - the PC's position in the party\n\
+  * SpellResRef - the spell's Resource Reference\n\
+  * Flags       - bitmap with the following bits (default is 0):\n\
+    * 1 - Give XP for learning (Level * 100)\n\
+    * 2 - Display message\n\
+    * 4 - Check for insufficient stats\n\
+    * 8 - Also memorize it\n\
+  * BookType - override which spellbook to use\n\
+  * Level - override at which level to learn it\n\
+\n\
+**Return value:** integer, 0 on success, nonzero on failure (LSR_*).\n\
+\n\
+**See also:** [[guiscript:MemorizeSpell]], [[guiscript:RemoveSpell]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6924,8 +9149,22 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DispelEffect__doc,
-"DispelEffect(PartyID, EffectName, Parameter2)\n\n"
-"Removes all effects from target whose opcode and second parameter matches the arguments." );
+"===== DispelEffect =====\n\
+\n\
+**Prototype:** GemRB.DispelEffect (globalID, EffectName, Parameter2)\n\
+\n\
+**Description:** Removes all effects from target whose opcode and second \n\
+parameter matches the arguments.\n\
+\n\
+**Parameters:** \n\
+  * globalID  - party ID or global ID of the actor to use\n\
+  * EffectName - effect reference name (eg. 'State:Helpless')\n\
+  * Parameter2 - parameter2 of targetted effect\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static EffectRef work_ref;
 
@@ -6949,8 +9188,21 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_RemoveEffects__doc,
-"RemoveEffects(PartyID, SpellResRef)\n\n"
-"Removes all effects from target whose source is SpellResRef." );
+"===== RemoveEffects =====\n\
+\n\
+**Prototype:** GemRB.RemoveEffects (globalID, SpellResRef)\n\
+\n\
+**Description:** Removes all effects created by the spell/item named SpellResRef. \n\
+This is useful for removing class abilities (CLAB/HLA AP_* entries).\n\
+\n\
+**Parameters:**\n\
+  * globalID  - party ID or global ID of the actor to use\n\
+  * SpellResRef - a spell or item resource reference (source of effects)\n\
+\n\
+**See also:** [[guiscript:RemoveSpell]], [[guiscript:RemoveItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 {
@@ -6969,8 +9221,26 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RemoveSpell__doc,
-"RemoveSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
-"Removes specified known spell. Returns 1 on success." );
+"===== RemoveSpell =====\n\
+\n\
+**Prototype:** GemRB.RemoveSpell (globalID, SpellType, Level, Index)\n\
+**Prototype:** GemRB.RemoveSpell (globalID, SpellResRef)\n\
+\n\
+**Description:** Unlearns a specified known spell.\n\
+\n\
+**Parameters:**\n\
+  * globalID  - party ID or global ID of the actor to use\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the known spell's level\n\
+  * Index     - the known spell's index\n\
+  * SpellResRef - spell resource reference to remove by\n\
+\n\
+**Return value:** boolean, 1 on success\n\
+\n\
+**See also:** [[guiscript:UnmemorizeSpell]], [[guiscript:GetKnownSpellsCount]], [[guiscript:GetKnownSpell]], [[guiscript:LearnSpell]], [[guiscript:RemoveEffects]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -7001,8 +9271,23 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RemoveItem__doc,
-"RemoveItem(PartyID, Slot[, Count])=>bool\n\n"
-"Removes (or decreases the charges) of a specified item. Returns 1 on success." );
+"===== RemoveItem =====\n\
+\n\
+**Prototype:** GemRB.RemoveItem (PartyID, Slot[, Count])\n\
+\n\
+**Description:** Removes and destroys an item in an actor's inventory. This \n\
+works even if the item is cursed or indestructible. If an item has charges \n\
+it decreases the charge count instead.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * Slot    - The inventory slot index of the item\n\
+  * Count   - the number of items\n\
+\n\
+**Return value:** boolean, 1 on success\n\
+\n\
+**See also:** [[guiscript:CreateItem]]"
+);
 
 static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7030,8 +9315,26 @@ static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
-"MemorizeSpell(PartyID, SpellType, Level, Index[, enabled])=>bool\n\n"
-"Memorizes specified known spell. Returns 1 on success." );
+"===== MemorizeSpell =====\n\
+\n\
+**Prototype:** GemRB.MemorizeSpell (PartyID, SpellType, Level, Index[, Enabled])\n\
+\n\
+**Description:** Memorizes specified known spell. If Enabled is set, the \n\
+spell will be ready for use.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level     - the known spell's level\n\
+  * Index     - the known spell's index\n\
+  * Enabled   - defaults to 0, which means the spell is depleted\n\
+\n\
+**Return value:** boolean, 1 on success.\n\
+\n\
+**See also:** [[guiscript:GetKnownSpell]], [[guiscript:UnmemorizeSpell]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -7060,9 +9363,25 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_UnmemorizeSpell__doc,
-"UnmemorizeSpell(PartyID, SpellType, Level, Index[, onlydepleted])=>bool\n\n"
-"Unmemorizes specified known spell. Returns 1 on success.\n"
-"If onlydepleted is set, it will only remove an already depleted spell (with the same resref as the provided spell)." );
+"===== UnmemorizeSpell =====\n\
+\n\
+**Prototype:** GemRB.UnmemorizeSpell (PartyID, SpellType, Level, Index[, onlydepleted])\n\
+\n\
+**Description:** Unmemorizes specified memorized spell. If onlydepleted is \n\
+set, it will only remove an already depleted spell (with the same resref as \n\
+the provided spell).\n\
+\n\
+**Parameters:**\n\
+  * PartyID      - the PC's position in the party\n\
+  * SpellType    - 0 - priest, 1 - wizard, 2 - innate\n\
+  * Level        - the memorized spell's level\n\
+  * Index        - the memorized spell's index\n\
+  * onlydepleted - remove only an already depleted spell with the same resref as the specified spell\n\
+\n\
+**Return value:** boolean, 1 on success\n\
+\n\
+**See also:** [[guiscript:MemorizeSpell]], [[guiscript:GetMemorizedSpellsCount]], [[guiscript:GetMemorizedSpell]]"
+);
 
 static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -7085,9 +9404,40 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
-"GetSlotItem(globalID, slot[, translated])=>dict\n\n"
-"Returns dict with specified slot item from PC's inventory or the dragged item if globalID is 0.\n\n"
-"If translated is nonzero, the slot will not be looked up again.\n");
+"===== GetSlotItem =====\n\
+\n\
+**Prototype:** GemRB.GetSlotItem (PartyID, slot[, translated])\n\
+\n\
+**Description:** Returns dictionary with the specified actor's inventory \n\
+slot data. Or the dragged item if globalID is 0. If translated is nonzero, \n\
+the slot will not be looked up again.\n\
+\n\
+**Parameters:**\n\
+  * PartyID   - the PC's position in the party\n\
+  * slot      - the item's inventory slot\n\
+  * translated - look up the slot again (useful for quickweapons)\n\
+\n\
+**Return value:** dictionary\n\
+  * 'ItemResRef' - The name of the item (.itm resref)\n\
+  * 'Usages0' - The primary charges of the item (or the item's stack amount if the item is stackable).\n\
+  * 'Usages1' - The secondary charges of the item.\n\
+  * 'Usages2' - The tertiary charges of the item.\n\
+  * 'Flags'   - Item flags:\n\
+    * IE_INV_ITEM_IDENTIFIED = 1,   The item is identified.\n\
+    * IE_INV_ITEM_UNSTEALABLE = 2,  The item is unstealable.\n\
+    * IE_INV_ITEM_STOLEN = 4,       The item is stolen.\n\
+    * IE_INV_ITEM_UNDROPPABLE =8,   The item is undroppable.\n\
+    * IE_INV_ITEM_ACQUIRED = 0x10,  The item was recently moved.\n\
+    * IE_INV_ITEM_DESTRUCTIBLE = 0x20,  The item is removable (sellable or destructible).\n\
+    * IE_INV_ITEM_EQUIPPED = 0x40,  The item is currently equipped.\n\
+    * IE_INV_ITEM_STACKED = 0x80,   The item is a stacked item.\n\
+  * 'Header'  - Item's extended header assigned to the inventory slot (the\n\
+  ability to use). Only applicable to quickslots.\n\
+\n\
+**See also:** [[guiscript:GetItem]], [[guiscript:SetItemIcon]], [[guiscript:ChangeItemFlag]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7129,8 +9479,36 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeItemFlag__doc,
-"ChangeItemFlag(PartyID, slot, flags, op) => bool\n\n"
-"Changes an item flag of a player character in inventory slot. Returns false if failed." );
+"===== ChangeItemFlag =====\n\
+\n\
+**Prototype:** GemRB.ChangeItemFlag (PartyID, slot, flags, mode)\n\
+\n\
+**Description:** Changes the flags of an inventory slot. For example, \n\
+identifies an item.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party (1 based)\n\
+  * slot    - inventory slot\n\
+  * flags   - a bitfield, same as the GetSlotItem flags\n\
+    * IE_INV_ITEM_IDENTIFIED    = 0x01 - the item is identified\n\
+    * IE_INV_ITEM_UNSTEALABLE   = 0x02 - the item is unstealable\n\
+    * IE_INV_ITEM_STOLEN        = 0x04 - the item is marked as stolen\n\
+    * IE_INV_ITEM_UNDROPPABLE   = 0x08 - the item is undroppable (dragitem fails)\n\
+    * IE_INV_ITEM_ACQUIRED      = 0x10 - the item was recently acquired\n\
+    * IE_INV_ITEM_DESTRUCTIBLE  = 0x20 - the item is removable\n\
+    * IE_INV_ITEM_EQUIPPED      = 0x40 - the item is equipped\n\
+    * IE_INV_ITEM_STACKED       = 0x80 - the item is a stacked item\n\
+  * mode    - binary operation type\n\
+    * OP_SET = 0  - sets all bits as flag\n\
+    * OP_AND = 1  - turns all other bits off\n\
+    * OP_OR = 2   - turns bit on\n\
+    * OP_XOR = 3  - toggles bit\n\
+    * OP_NAND = 4 - turns bit off\n\
+\n\
+**Return value:** Returns 0 if the item was not found.\n\
+\n\
+**See also:** [[guiscript:GetSlotItem]]"
+);
 
 static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 {
@@ -7150,8 +9528,25 @@ static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CanUseItemType__doc,
-"CanUseItemType( slottype, itemname[, actor, equipped])=>bool\n\n"
-"Checks the itemtype vs. slottype, and also checks the usability flags vs. Actor's stats (alignment, class, race, kit etc.)" );
+"===== CanUseItemType =====\n\
+\n\
+**Prototype:** GemRB.CanUseItemType (slottype, itemname[, actor, equipped])\n\
+\n\
+**Description:** Checks the itemtype vs. slottype, and also checks the \n\
+usability flags vs. actor's stats (alignment, class, race, kit etc.)\n\
+\n\
+**Parameters:**\n\
+  * slottype    - the slot to check (See ie_slots.py)\n\
+  * itemname    - the resource reference of the item\n\
+  * actor       - the actor's PartyID (if 0, skips actor checks)\n\
+  * equipped    - whether the item is equipped (if so, don't consider disabled items to be unusable)\n\
+\n\
+**Return value:** boolean\n\
+\n\
+**See also:** [[guiscript:DropDraggedItem]], [[guiscript:UseItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 {
@@ -7191,12 +9586,27 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
-"GetSlots(PartyID, SlotType[,flag])=>dict\n\n"
-"Returns a tuple of slots of the inventory of a PC matching the slot type criteria.\n"
-"If the flag is >0, it will ignore empty slots.\n"
-"If the flag is <0, it will ignore filled slots.\n"
-"If the flag is 0, it will return all slots.\n"
-"The default is 1." );
+"===== GetSlots =====\n\
+\n\
+**Prototype:** GemRB.GetSlots (PartyID, SlotType[, Flag])\n\
+\n\
+**Description:** Returns the tuple of slots of a PC matching the SlotType \n\
+criteria.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - a PC\n\
+  * SlotType - bitfield, the inventory slot's type (32768 means inventory)\n\
+  * Flag (defaults to 1)\n\
+    * <0 - returns empty slots\n\
+    * 0  - returns all slots.\n\
+    * >0 - returns filled slots\n\
+\n\
+**Return value:** tuple\n\
+\n\
+**See also:** [[guiscript:GetSlotType]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 {
@@ -7245,8 +9655,20 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_FindItem__doc,
-			  "FindItem(globalID, itemname)=>int\n\n"
-			  "Returns the slot number or -1 if the actor does not have the item." );
+"===== FindItem =====\n\
+\n\
+**Prototype:** GemRB.FindItem (globalID, itemname)\n\
+\n\
+**Description:** Returns the slot number of the actor's item (or -1).\n\
+\n\
+**Parameters:**\n\
+  * globalID  - party ID or global ID of the actor to use\n\
+  * itemname - item resource reference\n\
+\n\
+**Return value:** integer, -1 if not found\n\
+\n\
+**See also:** [[guiscript:GetItem]], [[guiscript:GetSlots]], [[guiscript:GetSlotType]]"
+);
 
 static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7269,8 +9691,46 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetItem__doc,
-"GetItem(ResRef)=>dict\n\n"
-"Returns dict with specified item." );
+"===== GetItem =====\n\
+\n\
+**Prototype:** GemRB.GetItem (ResRef[, PartyID])\n\
+\n\
+**Description:** Returns dictionary with the specified item's data.\n\
+\n\
+**Parameters:**\n\
+  * ResRef - the resource reference of the item\n\
+  * PartyID - the resource reference of the item\n\
+\n\
+**Return value:** dictionary\n\
+  * 'ItemName'           - strref of unidentified name.\n\
+  * 'ItemNameIdentified' - strref of identified name.\n\
+  * 'ItemDesc'           - strref of unidentified description.\n\
+  * 'ItemDescIdentified' - strref of identified description.\n\
+  * 'ItemIcon'           - the item's icon (.bam resref)\n\
+  * 'DescIcon'           - the description icon\n\
+  * 'BrokenItem'         - the replacement item (used for items with broken sounds)\n\
+  * 'MaxStackAmount'     - maximum stackable amount\n\
+  * 'Dialog'             - item dialog (.dlg resref)\n\
+  * 'DialogName'         - the item dialog name\n\
+  * 'Price'              - the base item price\n\
+  * 'Type'               - the item type (see itemtype.2da)\n\
+  * 'AnimationType'      - the item animation ID\n\
+  * 'Exclusion'          - the exclusion bit (used by eg. magic armor and rings of protection).\n\
+  * 'LoreToID'           - the required lore to identify the item\n\
+  * 'MaxCharge'          - the maximum amount of charges\n\
+  * 'Tooltips'           - the item tooltips\n\
+  * 'Spell'              - the spell's strref if the item is a copyable scroll\n\
+  * 'Function'           - returns special function\n\
+    * 0 - no special function\n\
+    * 1 - item is a copyable scroll (2nd header's 1st feature is 'Learn spell')\n\
+    * 2 - item is a drinkable potion \n\
+    * 4 - item is a container\n\
+    * 8 - item has selectable abilities (headers)\n\
+\n\
+**See also:** [[guiscript:GetSlotItem]], [[guiscript:GetSpell]], [[guiscript:SetItemIcon]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 #define CAN_DRINK 1  //potions
 #define CAN_READ  2  //scrolls
@@ -7503,8 +9963,25 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 }
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
-"DragItem(globalID, Slot, ResRef, [Count=0, Type])\n\n"
-"Start dragging specified item, if Slot is negative, drag the globalID party portrait instead." );
+"===== DragItem =====\n\
+\n\
+**Prototype:** GemRB.DragItem (PartyID, Slot, ResRef, [Count=0, Type])\n\
+\n\
+**Description:** Start dragging specified item. If Count is given, it will \n\
+try to split the item. If an  item is already dragged, it won't do \n\
+anything. If Slot is negative, drag the actor's party portrait instead.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party\n\
+  * Slot    - actor index in game structure\n\
+  * ResRef  - item name (.itm resref)\n\
+  * Count   - stack size (0 means all)\n\
+  * Type    - if nonzero, drag from pile at actor's feet instead\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:DropDraggedItem]], [[guiscript:IsDraggingItem]]"
+);
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7598,13 +10075,31 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
-"DropDraggedItem(PartyID, Slot)=>int\n\n"
-"Put currently dragged item to specified PC and slot. "
-"If Slot==-1, puts it to a first usable slot. "
-"If Slot==-2, puts it to a ground pile. "
-"If Slot==-3, puts it to the first empty inventory slot. "
-"Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)."
-"Can also return 3 (swapped item)\n" );
+"===== DropDraggedItem =====\n\
+\n\
+**Prototype:** GemRB.DropDraggedItem (PartyID, Slot)\n\
+\n\
+**Description:** Put currently dragged item to specified PC and slot. Stop \n\
+dragging. Dropping the item in an invalid slot will result in 0. Partial \n\
+success may happen if the item was dropped into a stack, but not all items \n\
+were moved. The dragging status will be removed only after a complete \n\
+success. Not all inventory slots may carry any type of item. The item could \n\
+be dropped in an unspecified inventory slot, the ground, or an equippable \n\
+slot fitting for the item.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the actor's inparty index\n\
+  * Slot    - the Inventory Slot or special values:\n\
+    * -1 any equippable slot fitting for the item\n\
+    * -2 ground\n\
+    * -3 any empty inventory slot\n\
+\n\
+**Return value:** integer, 0 (failure), 1 (partial success), 2 (success) or 3 (swapped item)\n\
+\n\
+**See also:** [[guiscript:DragItem]], [[guiscript:IsDraggingItem]], [[guiscript:CanUseItemType]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7798,9 +10293,22 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
-"IsDraggingItem()=>int\n\n"
-"Returns 1 if we are dragging some item.\n"
-"Returns 2 if we are dragging a portrait." );
+"===== IsDraggingItem =====\n\
+\n\
+**Prototype:** GemRB.IsDraggingItem ()\n\
+\n\
+**Description:** Returns 1 if the player is dragging an item with the mouse \n\
+(usually in the inventory screen). Returns 2 if the player is dragging a \n\
+portrait (rearranging the party).\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** integer, 1 if we are dragging an item, 2 for portraits\n\
+\n\
+**See also:** [[guiscript:DropDraggedItem]], [[guiscript:DragItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -7811,8 +10319,25 @@ static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
-"GetSystemVariable(Variable)=>int\n\n"
-"Returns the named Interface attribute." );
+"===== GetSystemVariable =====\n\
+\n\
+**Prototype:** GemRB.GetSystemVariable (Index)\n\
+\n\
+**Description:** Returns the named Interface attribute.\n\
+\n\
+**Parameters:**\n\
+  * Index could have the following values:\n\
+    * SV_BPP = 0 - bpp (color resolution)\n\
+    * SV_WIDTH = 1 - screen width\n\
+    * SV_HEIGHT = 2 - screen height\n\
+    * SV_GAMEPATH = 3 - game path\n\
+\n\
+**Return value:** This function returns -1 if the index is invalid.\n\
+\n\
+**See also:** [[guiscript:GetGameString]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
@@ -7837,8 +10362,22 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateItem__doc,
-"CreateItem(PartyID, ItemResRef, [SlotID, Charge0, Charge1, Charge2])\n\n"
-"Creates Item in the inventory of the player character.");
+"===== CreateItem =====\n\
+\n\
+**Prototype:** GemRB.CreateItem (PartyID, ItemResRef, [SlotID, Charge0, Charge1, Charge2])\n\
+\n\
+**Description:** Creates item in the inventory of the player character.\n\
+\n\
+**Parameters:** \n\
+  * PartyID    - the PC's position in the party\n\
+  * ItemResRef - the item's name (.itm resref)\n\
+  * SlotID     - Inventory Slot (-1 means any backpack slot)\n\
+  * Charge0-2  - the item's stack amount/charges\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 {
@@ -7884,8 +10423,21 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetAvatarsValue__doc,
-"GetAvatarsValue(globalID, column)\n\n"
-"Returns an entry from the avatars.2da table, accounting for animation ID ranges.");
+"===== GetAvatarsValue =====\n\
+\n\
+**Prototype:** GemRB.GetAvatarsValue (globalID, column)\n\
+\n\
+**Description:** Returns an entry from the avatars.2da table, accounting \n\
+for animation ID ranges.\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * column - which armor level to use\n\
+\n\
+**Return value:** string, bam resref\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 // NOTE: currently it can only lookup the animation prefixes!
 static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 {
@@ -7904,8 +10456,23 @@ static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMapAnimation__doc,
-"SetMapAnimation(X, Y, BAMresref[, flags, cycle, height])\n\n"
-"Creates an area animation.");
+"===== SetMapAnimation =====\n\
+\n\
+**Prototype:** GemRB.SetMapAnimation (X, Y, BAMresref[, flags, cycle, height])\n\
+\n\
+**Description:** Creates an area animation. Used for PST Modron mazes.\n\
+\n\
+**Parameters:** \n\
+  * X, Y - map position to create at\n\
+  * BAMresref - bam animation to use\n\
+  * flags - drawing flags\n\
+  * cycle - select a different cycle to play\n\
+  * height - vertical offset \n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 {
@@ -7942,8 +10509,23 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMapnote__doc,
-"SetMapnote(X, Y, color, Text)\n\n"
-"Adds or removes a mapnote.");
+"===== SetMapnote =====\n\
+\n\
+**Prototype:** GemRB.SetMapnote(X, Y, color, text)\n\
+\n\
+**Description:** Adds or removes a mapnote to the current map (area).\n\
+\n\
+**Parameters:**\n\
+  * X, Y - the position of the mapnote\n\
+  * color - the color index (0-7) of the note (in case of PST it is only 0 or 1)\n\
+  * text - string, the text of the note. If it's empty, the mapnote is removed.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:CreateMapControl]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 {
@@ -7970,8 +10552,20 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMapDoor__doc,
-"SetMapDoor(DoorName, State)\n\n"
-"Modifies a door's open state in the current area.");
+"===== SetMapDoor =====\n\
+\n\
+**Prototype:** GemRB.SetMapDoor (DoorName, State)\n\
+\n\
+**Description:** Modifies a door's open state in the current area.\n\
+\n\
+**Parameters:** \n\
+  * DoorName - scripting name of the targe door\n\
+  * State - boolean, opened or closed\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 {
@@ -7996,9 +10590,20 @@ static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMapExit__doc,
-"SetMapExit(ExitName[, NewArea, NewEntrance])\n\n"
-"Modifies the target of an exit in the current area. If no destination is given, "
-"then the exit will be disabled.");
+"===== SetMapExit =====\n\
+\n\
+**Prototype:** GemRB.SetMapExit (ExitName[, NewArea, NewEntrance])\n\
+\n\
+**Description:** Modifies the target of an exit in the current area. If no \n\
+destination is given, then the exit will be disabled.\n\
+\n\
+**Parameters:** \n\
+  * ExitName - scripting name\n\
+  * NewArea - new exit target area\n\
+  * NewEntrance - target areas entrance to link to\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 {
@@ -8037,8 +10642,20 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMapRegion__doc,
-"SetMapRegion(TrapName[, trapscript])\n\n"
-"Enables or disables an infopoint in the current area.");
+"===== SetMapRegion =====\n\
+\n\
+**Prototype:** GemRB.SetMapRegion (TrapName[, trapscript])\n\
+\n\
+**Description:** Enables or disables an infopoint in the current area.\n\
+\n\
+**Parameters:** \n\
+  * TrapName - scripting name\n\
+  * trapscript - new script to assign\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 {
@@ -8067,9 +10684,22 @@ static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CreateCreature__doc,
-"CreateCreature(PartyID, CreResRef[, posX, posY])\n\n"
-"Creates Creature at a point. If the position parameters are unspecified "
-"then the creature will be put near the player character given by the first parameter.");
+"===== CreateCreature =====\n\
+\n\
+**Prototype:** GemRB.CreateCreature (globalID, CreResRef[, posX, posY])\n\
+\n\
+**Description:** Creates creature in the vicinity of the player character or \n\
+at specified point.\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * CreResRef  - the creature's name (.cre resref)\n\
+  * posX, posY - position to create at\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:CreateItem]]"
+);
 
 static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 {
@@ -8094,8 +10724,22 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RevealArea__doc,
-"RevealArea(x, y, radius, type)\n\n"
-"Reveals part of the area.");
+"===== RevealArea =====\n\
+\n\
+**Prototype:** GemRB.RevealArea (x, y, radius, type)\n\
+\n\
+**Description:** Reveals part of the area.\n\
+\n\
+**Parameters:** \n\
+  * x - x coordinate of the center point\n\
+  * y - y coordinate of the center point\n\
+  * radius - radius of the circle to explore\n\
+  * type - if positive will make the effect ignore blocked portions of the map\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:ExploreArea]]"
+);
 
 static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 {
@@ -8118,8 +10762,24 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ExploreArea__doc,
-"ExploreArea([bitvalue=-1])\n\n"
-"Explores or unexplores whole area.");
+"===== ExploreArea =====\n\
+\n\
+**Prototype:** ExploreArea ([bitvalue=-1])\n\
+\n\
+**Description:** Explores or unexplores the whole area. Basically fills the \n\
+explored bitmap with the value given. If there was no value given, it will \n\
+fill with -1 (all bit set).\n\
+\n\
+**Parameters:**\n\
+  * bitvalue:\n\
+    * 0 - undo explore\n\
+    * -1 - explore\n\
+    * all other values give meaningless results\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:MoveToArea]], [[guiscript:RevealArea]]"
+);
 
 static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 {
@@ -8139,8 +10799,22 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetRumour__doc,
-"GetRumour(percent, ResRef) => ieStrRef\n\n"
-"Returns a string to a rumour message. ResRef is a dialog resource.");
+"===== GetRumour =====\n\
+\n\
+**Prototype:** GemRB.GetRumour (percent, DialogResRef)\n\
+\n\
+**Description:** Gets a rumour string reference from a rumour dialog.\n\
+\n\
+**Parameters:**\n\
+  * percent - chance of not returning -1\n\
+  * DialogResRef - a rumour dialog resource\n\
+\n\
+**Return value:** a string reference\n\
+\n\
+**See also:** [[guiscript:EnterStore]], [[guiscript:GetStoreDrink]], [[guiscript:GetStore]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 {
@@ -8159,8 +10833,26 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GamePause__doc,
-"GamePause(Pause, Quiet)==> pause state\n\n"
-"Pause or unpause the game or just toggle the pause state.");
+"===== GamePause =====\n\
+\n\
+**Prototype:** GemRB.GamePause (pause, quiet)\n\
+\n\
+**Description:** Pauses or unpauses the current game or toggle whatever was \n\
+set. This affects all ingame events, including: scripts, animations, \n\
+movement. It doesn't affect the GUI.\n\
+\n\
+**Parameters:**\n\
+  * pause  - int,\n\
+    * 0 = continue\n\
+    * 1 = pause\n\
+    * 2 = toggle pause\n\
+    * 3 = query state\n\
+  * quiet  - int bitfield,\n\
+    * 1 - no feedback\n\
+    * 2 - forced pause\n\
+\n\
+**Return value:** the resulting paused state"
+);
 
 static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 {
@@ -8195,8 +10887,27 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
-"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value[,a_op, b_op, c_op, d_op]) => bool\n\n"
-"Checks if actor in partyslot is eligible for a feat, the formula is: (stat[a]~a or stat[b]~b) and (stat[c]~c or stat[d]~d). Where ~ is a relational operator. If the operators are omitted, the default operator is <=.");
+"===== CheckFeatCondition =====\n\
+\n\
+**Prototype:** GemRB.CheckFeatCondition (partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value[, a_op, b_op, c_op, d_op])\n\
+\n\
+**Description:** Checks if a party character is eligible for a feat. The \n\
+formula is: (stat[a]~a or stat[b]~b) and (stat[c]~c or stat[d]~d). Where ~ \n\
+is a relational operator. If the operators are omitted, the default \n\
+operator is >=.\n\
+\n\
+**Parameters:**\n\
+  * partyslot - the characters position in the party\n\
+  * a_stat ... d_stat - stat IDs\n\
+  * a_value ... d_value - stat value limits\n\
+  * a_op ... d_op - operator to use for comparing x_stat to x_value\n\
+\n\
+**Return value:** bool\n\
+\n\
+**See also:** [[guiscript:GetPlayerStat]], [[guiscript:SetPlayerStat]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 {
@@ -8309,8 +11020,23 @@ endofquest:
 }
 
 PyDoc_STRVAR( GemRB_HasFeat__doc,
-"HasFeat(Slot, feat)\n\n"
-"Returns the number of times this feat was taken if the player in Slot has the passed feat id (from ie_feats.py)." );
+"===== HasFeat =====\n\
+\n\
+**Prototype:** GemRB.HasFeat (globalID, feat)\n\
+\n\
+**Description:** Returns the number of times this feat was taken if the \n\
+actor has the passed feat id (from ie_feats.py).\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * feat - feat index from ie_feats.py\n\
+\n\
+**Return value:** 1 if the pc has it, 0 otherwise\n\
+\n\
+**See also:** [[guiscript:CheckFeatCondition]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 {
@@ -8325,8 +11051,21 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetFeat__doc,
-"SetFeat(Slot, feat)\n\n"
-"Sets a feat value, handles both the boolean and the numeric fields." );
+"===== SetFeat =====\n\
+\n\
+**Prototype:** GemRB.SetFeat (globalID, feat, value)\n\
+\n\
+**Description:** Sets a feat. Handles both boolean and numeric fields.\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * feat - feat index from ie_feats.py\n\
+  * value - target feat value\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:HasFeat]]"
+);
 
 static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 {
@@ -8342,8 +11081,20 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMaxEncumbrance__doc,
-"GetMaxEncumbrance(pc) => int\n\n"
-"Returns the maximum weight the PC may carry before becoming encumbered.");
+"===== GetMaxEncumbrance =====\n\
+\n\
+**Prototype:** GemRB.GetMaxEncumbrance (globalID)\n\
+\n\
+**Description:** Returns the maximum weight the PC may carry before \n\
+becoming encumbered.\n\
+\n\
+**Parameters:** \n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** integer\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMaxEncumbrance(PyObject * /*self*/, PyObject* args)
 {
@@ -8360,8 +11111,32 @@ static PyObject* GemRB_GetMaxEncumbrance(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
-"GetAbilityBonus(stat, column, value[, ex])\n\n"
-"Returns an ability bonus value based on various .2da files.");
+"===== GetAbilityBonus =====\n\
+\n\
+**Prototype:** GemRB.GetAbilityBonus (stat, column, value[, ex])\n\
+\n\
+**Description:** Returns ability based values from different .2da files.\n\
+\n\
+**Parameters:**\n\
+  * stat   - a stat ID, like IE_STR\n\
+  * column - integer, the column index of the value in the .2da file:\n\
+    * **IE_STR:** 0 - To hit, 1 - Damage, 2 - Open doors, 3 - Weight allowance\n\
+    * **IE_INT:** 0 - learn spell, 1 - max spell level, 2 - max spell number on level\n\
+    * **IE_DEX:** 0 - reaction adjustment, 1 - missile,  2 - AC\n\
+    * **IE_CON:** 0 - normal hp, 1 - warrior hp, 2 - minimum hp roll, 3 - hp regen rate, 4 - fatigue\n\
+    * **IE_CHR:** 0 - reaction\n\
+    * **IE_LORE:** 0 - lore bonus (int+wis based)\n\
+    * **IE_REPUTATION:** 0 - reaction (chr+reputation based)\n\
+    * **IE_WIS:** 0 - percentile xp bonus\n\
+  * value - stat value to check with\n\
+  * ex - extra stat value to check with (used for extended strength)\n\
+\n\
+**Return value:** -9999 if the parameters are illegal, otherwise the required bonus\n\
+\n\
+**See also:** [[guiscript:SetPlayerStat]], [[guiscript:GetPlayerStat]], [[guiscript:GetTableValue]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 {
@@ -8411,8 +11186,25 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LeaveParty__doc,
-"LeaveParty(Slot [,dialog])\n\n"
-"Makes player in Slot leave party, and initiate dialog if demanded." );
+"===== LeaveParty =====\n\
+\n\
+**Prototype:** GemRB.LeaveParty (globalID [, Dialog])\n\
+\n\
+**Description:** Removes the character from the party and initiates dialog \n\
+if demanded.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Dialog:\n\
+    * if set to 1, initiate the dialog.\n\
+    * if set to 2, execute 'SetLeavePartyDialogFile' and initiate dialog.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetPartySize]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 {
@@ -8562,8 +11354,21 @@ static PyObject* GemRB_Button_SetActionIcon(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasResource__doc,
-"HasResource(ResRef, ResType[, silent])\n\n"
-"Returns true if resource is accessible." );
+"===== HasResource =====\n\
+\n\
+**Prototype:** GemRB.HasResource (ResRef, ResType[, silent])\n\
+\n\
+**Description:** Returns true if the resource is accessible.\n\
+\n\
+**Parameters:**\n\
+  * ResRef - the resource reference (8 characters filename)\n\
+  * ResType - the class ID of the resource\n\
+  * silent - if nonzero, don't give any output\n\
+\n\
+**Return value:** boolean\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 {
@@ -9076,8 +11881,19 @@ jump_label:
 }
 
 PyDoc_STRVAR( GemRB_ClearActions__doc,
-"ClearActions(slot)\n\n"
-"Stops an action for a PC indexed by slot or by global ID." );
+"===== ClearActions =====\n\
+\n\
+**Prototype:** GemRB.ClearActions (globalID)\n\
+\n\
+**Description:** Stops an actor's movement and any pending action.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 {
@@ -9106,9 +11922,23 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_SetDefaultActions__doc,
-"SetDefaultActions(qslot, slot1, slot2, slot3)\n\n"
-"Sets whether qslots need an additional translation like in iwd2. "
-"Also sets up the first three default action types." );
+"===== SetDefaultActions =====\n\
+\n\
+**Prototype:** GemRB.SetDefaultActions (qslot, action1, action2, action3)\n\
+\n\
+**Description:** Sets whether quick slots need an additional translation \n\
+like in iwd2. Also sets up the first three default action types.\n\
+\n\
+**Parameters:**\n\
+  * qslot     - bool\n\
+  * action1-3 - button codes (slots)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetupControls]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 {
@@ -9124,9 +11954,23 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_SetupQuickSpell__doc,
-"SetupQuickSpell(PartyID, spellslot, spellindex, type)=>int\n\n"
-"Set up a quick spell slot of a PC.\n\n"
-"It also returns the target type of the selected spell.");
+"===== SetupQuickSpell =====\n\
+\n\
+**Prototype:** GemRB.SetupQuickSpell (globalID, spellslot, spellindex, type)\n\
+\n\
+**Description:** Set up a quick spell slot of a PC. It also returns the \n\
+target type of the selected spell.\n\
+\n\
+**Parameters:**\n\
+  * globalID - global ID of the actor to use\n\
+  * spellslot - quickspell slot to use\n\
+  * spellindex - spell to assign\n\
+  * type - spell(book) type (255 means any)\n\
+\n\
+**Return value:** integer, target type constant\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -9159,11 +12003,32 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
-"SetupQuickSlot(PartyID, quickslot, inventoryslot[, headerindex])\n\n"
-"Set up a quick slot or weapon slot of a PC to use a weapon ability.\n\n"
-"If the inventoryslot number is -1, only the header index will be changed. "
-"If the quick slot is 0, then the inventory slot will be used to find which "
-"headerindex should be set. The default value for headerindex is 0.\n");
+"===== SetupQuickSlot =====\n\
+\n\
+**Prototype:** GemRB.SetupQuickSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex])\n\
+\n\
+**Description:** Sets up a quickslot or weapon slot to point to a particular \n\
+inventory slot. Also sets the used ability for that given quickslot. \n\
+If the abilityindex is omitted, it will be assumed as 0. \n\
+If the InventorySlot is -1, then it won't be assigned to the quickslot \n\
+(this way you can alter the used Ability index only). \n\
+If the QuickSlotID is 0, then it will try to find the quickslot/weaponslot \n\
+by the InventorySlot, and assign the AbilityIndex to it. \n\
+(Use this if you don't know the exact quick slot, or don't care to find it).\n\
+\n\
+**Parameters:**\n\
+  * PartyID       - the PC's position in the party (1 based)\n\
+  * QuickSlotID   - the quickslot to set up\n\
+  * InventorySlot - the inventory slot assigned to this quickslot, this is\n\
+usually constant and taken care by the core\n\
+  * AbilityIndex  - the number of the item extended header to use with this quickslot\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetEquippedQuickSlot]], [[guiscript:SetEquippedQuickSlot]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
@@ -9182,8 +12047,24 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
-"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability])\n\n"
-"Sets the named weapon/item slot as equipped weapon slot, optionally sets the used ability.\n");
+"===== SetEquippedQuickSlot =====\n\
+\n\
+**Prototype:** GemRB.SetEquippedQuickSlot (PartyID, QWeaponSlot[, ability])\n\
+\n\
+**Description:** Sets the specified weapon slot as equipped weapon slot. \n\
+Optionally sets the used ability.\n\
+\n\
+**Parameters:**\n\
+  * PartyID     - the PC's position in the party (1 based)\n\
+  * QWeaponSlot - the quickslot to equip\n\
+  * ability     - optional integer, sets the used extended header\n\
+\n\
+**Return value:** 0 success, -1 silent failure\n\
+\n\
+**See also:** [[guiscript:GetEquippedQuickSlot]], [[guiscript:SetupQuickSlot]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
@@ -9213,8 +12094,24 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
-"GetEquippedQuickSlot(PartyID[, NoTrans]) => Slot\n\n"
-"Returns the inventory slot (translation) or quick weapon index (no translation) of the equipped weapon.\n");
+"===== GetEquippedQuickSlot =====\n\
+\n\
+**Prototype:** GemRB.GetEquippedQuickSlot (PartyID[, NoTrans])\n\
+\n\
+**Description:** Returns the quickweapon slot index or the inventory slot.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the PC's position in the party (1 based)\n\
+  * NoTrans - which equipped slot to return?\n\
+    * 0 - return the inventory slot\n\
+    * 1 - return the quickweapon slot index\n\
+\n\
+**Return value:** numeric\n\
+\n\
+**See also:** [[guiscript:SetEquippedQuickSlot]], [[guiscript:GetEquippedAmmunition]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
@@ -9244,8 +12141,21 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedAmmunition__doc,
-"GetEquippedAmmunition(globalID) => QSlot\n\n"
-"Returns the equipped ammunition slot, if any; -1 if none." );
+"===== GetEquippedAmmunition =====\n\
+\n\
+**Prototype:** GemRB.GetEquippedAmmunition (globalID)\n\
+\n\
+**Description:** Returns the equipped ammunition slot, if any\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** If ammunition is equipped, the inventory slot, otherwise -1.\n\
+\n\
+**See also:** [[guiscript:GetEquippedQuickSlot]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args)
 {
@@ -9268,9 +12178,29 @@ static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args
 }
 
 PyDoc_STRVAR( GemRB_SetModalState__doc,
-"SetModalState(slot, state[, spell])\n\n"
-"Sets the modal state of the actor.\n"
-"If 'spell' is not given, it will set a default spell resource associated with the state.\n");
+"===== SetModalState =====\n\
+\n\
+**Prototype:** GemRB.SetModalState (globalID, Value[, spell])\n\
+\n\
+**Description:** Sets an actor's modal state. The modal states are listed \n\
+in ie_modal.py. If 'spell' is not given, it will set a default spell \n\
+resource associated with the state.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Value - new modal state\n\
+  * Spell - the spell resource associated with the state\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:** \n\
+  GemRB.SetModalState (pc, MS_TURNUNDEAD)\n\
+The above example makes the player start the turn undead action.\n\
+\n\
+**See also:** [[guiscript:SetPlayerStat]], [[guiscript:SetPlayerName]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 {
@@ -9291,9 +12221,24 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_PrepareSpontaneousCast__doc,
-"PrepareSpontaneousCast(globalID, spellIndex, type, level, spellResRef) => index\n\n"
-"Depletes the memorised spell and replaces it with another (in memory).\n"
-"WARNING: useful only immediately before casting. Returns index of the new spell.\n");
+"===== PrepareSpontaneousCast =====\n\
+\n\
+**Prototype:** GemRB.PrepareSpontaneousCast (globalID, spellIndex, type, level, spellResRef)\n\
+\n\
+**Description:** Depletes the memorised spell and replaces it with another \n\
+(in memory). WARNING: useful only immediately before casting.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * spellIndex - current spell's index\n\
+  * type - spell's booktype\n\
+  * level - spell's level\n\
+  * spellResRef - replacement spell's resource reference\n\
+\n\
+**Return value:** new spell's spellinfo index\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* args)
 {
@@ -9321,10 +12266,25 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 }
 
 PyDoc_STRVAR( GemRB_SpellCast__doc,
-"SpellCast(slot, type, spell)\n\n"
-"Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
-"If type is -1, then the castable spell list will be deleted and no spell will be cast.\n"
-"Spell is the index of the spell in the memorised spell list.\n");
+"===== SpellCast =====\n\
+\n\
+**Prototype:** GemRB.SpellCast (PartyID, Type, Spell)\n\
+\n\
+**Description:** Makes PartyID cast a spell of Type. This handles targeting \n\
+and executes the appropriate scripting command. If type is -1, then the \n\
+castable spell list will be deleted and no spell will be cast.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - player character's index in the party\n\
+  * Type    - spell type bitfield (1-mage, 2-priest, 4-innate)\n\
+  * Spell   - spell's index in the memorised list\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:UseItem]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 {
@@ -9414,8 +12374,25 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplySpell__doc,
-"ApplySpell(actor, spellname[, caster])\n\n"
-"Applies a spell on actor.");
+"===== ApplySpell =====\n\
+\n\
+**Prototype:** GemRB.ApplySpell (globalID, resref[, casterID])\n\
+\n\
+**Description:** Applies a spell on the actor. \n\
+This function can be used to add abilities that are stored as spells \n\
+(eg. innates).\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * resref   - spell resource reference\n\
+  * casterID - global id of the desired caster\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SpellCast]], [[guiscript:ApplyEffect]], [[guiscript:CountEffects]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 {
@@ -9441,11 +12418,28 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UseItem__doc,
-"UseItem(actor, slot, header[,forcetarget])\n\n"
-"Makes the actor try to use an item. "
-"If slot is -1, then header is the index of the item functionality in the use item list. "
-"If slot is -2, then header is the quickslot index. "
-"If slot is non-negative, then header is the header of the item in the 'slot'.\n");
+"===== UseItem =====\n\
+\n\
+**Prototype:** GemRB.UseItem (globalID, Slot, header[,forcetarget])\n\
+\n\
+**Description:** Makes the actor try to use an item. \n\
+If slot is non-negative, then header is the header of the item in the 'slot'. \n\
+If slot is -1, then header is the index of the item functionality in the use item list. \n\
+If slot is -2, then header is the quickslot index. \n\
+This handles targeting and executes the appropriate scripting command.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * Slot     - item's inventory slot\n\
+  * header   - item index from the SetupEquipmentIcons list, an item may have multiple entries, because of multiple features\n\
+  * forcetarget - overrides Target number if set\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:CanUseItemType]], [[guiscript:SpellCast]], [[guiscript:SetupEquipmentIcons]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 {
@@ -9532,8 +12526,22 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetGamma__doc,
-"SetGamma(brightness, contrast)\n\n"
-"Adjusts brightness and contrast.");
+"===== SetGamma =====\n\
+\n\
+**Prototype:** GemRB.SetGamma (brightness, contrast)\n\
+\n\
+**Description:** Adjusts brightness and contrast.\n\
+\n\
+**Parameters:**\n\
+  * brightness - value must be 0 ... 40\n\
+  * contrast   - value must be 0 ... 5\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetFullScreen]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 {
@@ -9553,8 +12561,19 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMouseScrollSpeed__doc,
-"SetMouseScrollSpeed(mouseSpeed)\n\n"
-"Adjusts mouse scroll speed.");
+"===== SetMouseScrollSpeed =====\n\
+\n\
+**Prototype:** GemRB.SetMouseScrollSpeed (speed)\n\
+\n\
+**Description:** Adjusts the mouse scroll speed.\n\
+\n\
+**Parameters:**\n\
+  * speed - defaults between 30 and 50\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetTooltipDelay]]"
+);
 
 static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
 {
@@ -9570,8 +12589,19 @@ static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
-"SetTooltipDelay(tooltipDelay)\n\n"
-"Adjusts tooltip appearing speed.");
+"===== SetTooltipDelay =====\n\
+\n\
+**Prototype:** GemRB.SetTooltipDelay (time)\n\
+\n\
+**Description:** Sets the tooltip delay.\n\
+\n\
+**Parameters:**\n\
+  * time - 0-10\n\
+\n\
+**See also:** [[guiscript:SetTooltip]], [[guiscript:SetMouseScrollSpeed]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
@@ -9587,8 +12617,24 @@ static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetFullScreen__doc,
-"SetFullScreen(int)\n\n"
-"0 - windowed, 1 - fullscreen, -1 - toggle");
+"===== SetFullScreen =====\n\
+\n\
+**Prototype:** GemRB.SetFullScreen (flag)\n\
+\n\
+**Description:** Adjusts fullscreen mode.\n\
+\n\
+**Parameters:**\n\
+  * flag:\n\
+    * -1 -  toggle fullscreen mode\n\
+    * 0 - set windowed mode\n\
+    * 1 - set fullscreen mode\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetGamma]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 {
@@ -9602,8 +12648,16 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RunRestScripts__doc,
-			  "RunRestScripts()\n\n"
-			  "Executes the party pre-rest scripts if any.");
+"===== RunRestScripts =====\n\
+\n\
+**Prototype:** GemRB.RunRestScripts ()\n\
+\n\
+**Description:** Executes the party pre-rest scripts if any.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -9640,8 +12694,25 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_RestParty__doc,
-"RestParty(noareacheck, dream, hp)\n\n"
-"Executes the party rest function, used from both stores and via the main screen.");
+"===== RestParty =====\n\
+\n\
+**Prototype:** GemRB.RestParty (flags, hp, movie)\n\
+\n\
+**Description:** Makes the party rest. It is possible to check various \n\
+things that may forbid resting (hostile creatures, area flags, party \n\
+scattered). It is possible to play a movie or dream too.\n\
+\n\
+**Parameters:**\n\
+  * flags - which checks to run?\n\
+  * hp    - hit points healed, 0 means full healing\n\
+  * movie - a number, see restmov.2da\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** StartStore(gamescript)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 {
@@ -9657,8 +12728,19 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,
-"ChargeSpells(globalID|pc)\n\n"
-"Recharges the actor's spells.");
+"===== ChargeSpells =====\n\
+\n\
+**Prototype:** GemRB.ChargeSpells (globalID)\n\
+\n\
+**Description:** Recharges the actor's spells.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
@@ -9675,8 +12757,19 @@ static PyObject* GemRB_ChargeSpells(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialItem__doc,
-"HasSpecialItem(pc, itemtype, useup) => bool\n\n"
-"Checks if a team member has an item, optionally uses it.");
+"===== HasSpecialItem =====\n\
+\n\
+**Prototype:** GemRB.HasSpecialItem (globalID, itemtype, useup)\n\
+\n\
+**Description:** Checks if the actor has an item, optionally depletes it.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * itemtype - see itemspec.2da (usually 1)\n\
+  * useup - destroy/remove a charge after use\n\
+\n\
+**Return value:** bool"
+);
 
 //itemtype 1 - identify
 static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
@@ -9719,8 +12812,19 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
-"HasSpecialSpell(pc, specialtype, useup) => bool\n\n"
-"Checks if a team member has a spell, optionally uses it.");
+"===== HasSpecialSpell =====\n\
+\n\
+**Prototype:** GemRB.HasSpecialSpell (globalID, itemtype, useup)\n\
+\n\
+**Description:** Checks if the actor has a spell, optionally depletes it.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * specialtype - see splspec.2da\n\
+  * useup - destroy/remove a charge after use\n\
+\n\
+**Return value:** bool"
+);
 
 //specialtype 1 - identify
 //            2 - can use in silence
@@ -9759,10 +12863,41 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
-"ApplyEffect(pc, effect, param1, param2[, resref, resref2, resref3, source])\n\n"
-"Creates a basic effect and applies it on the player character. "
-"This function could be used to add stats that are stored in effect blocks. "
-"The resource fields are optional.");
+"===== ApplyEffect =====\n\
+\n\
+**Prototype:** GemRB.ApplyEffect (globalID, opcode, param1, param2[, resref, resref2, resref3, source, timing])\n\
+\n\
+**Description:** Creates a basic effect and applies it on the actor marked \n\
+by PartyID. \n\
+This function cam be used to add stats that are stored in effect blocks.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * opcode   - the effect opcode (for values see effects.ids)\n\
+  * param1   - parameter 1 for the opcode\n\
+  * param2   - parameter 2 for the opcode\n\
+  * resref   - optional resource reference to set in effect\n\
+  * resref2  - (optional) resource reference to set in the effect\n\
+  * resref3  - (optional) resource reference to set in the effect\n\
+  * resref4  - (optional) resource reference to set in the effect\n\
+  * source   - (optional) source to set in the effect\n\
+  * timing   - (optional) timing mode to set in the effect\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    for i in range(ProfCount-8):\n\
+        StatID = GemRB.GetTableValue (TmpTable, i+8, 0)\n\
+        Value = GemRB.GetVar ('Prof '+str(i))\n\
+        if Value:\n\
+            GemRB.ApplyEffect (MyChar, 'Proficiency', Value, StatID)\n\
+\n\
+The above example sets the weapon proficiencies in a bg2's CharGen9.py script.\n\
+\n\
+**See also:** [[guiscript:SpellCast]], [[guiscript:SetPlayerStat]], [[guiscript:GetPlayerStat]], [[guiscript:CountEffects]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 {
@@ -9813,10 +12948,31 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CountEffects__doc,
-"CountEffects(pc, effect, param1, param2[,resref])\n\n"
-"Counts how many matching effects are applied on the player character. "
-"This function could be used to get HLA information in ToB. "
-"The resource field is optional.");
+"===== CountEffects =====\n\
+\n\
+**Prototype:** GemRB.CountEffects (globalID, opcode, param1, param2[, resref])\n\
+\n\
+**Description:** Counts how many matching effects are applied on the actor. \n\
+If a parameter is set to -1, it will be ignored.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * opcode   - the effect opcode (for values see effects.ids)\n\
+  * param1   - parameter 1 for the opcode\n\
+  * param2   - parameter 2 for the opcode\n\
+  * resref   - optional resource reference to match the effect\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    res = GemRB.CountEffect (MyChar, 'HLA', -1, -1, AbilityName)\n\
+\n\
+The above example returns how many HLA effects were applied on the character.\n\
+\n\
+**See also:** [[guiscript:ApplyEffect]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 {
@@ -9838,9 +12994,25 @@ static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ModifyEffect__doc,
-"ModifyEffect(pc, effect, p1, p2)\n\n"
-"Changes/sets the target coordinates of the specified effect. "
-"This command is used for the farsight spell.");
+"===== ModifyEffect =====\n\
+\n\
+**Prototype:** GemRB.ModifyEffects (PartyID, opcode, x, y)\n\
+\n\
+**Description:** Changes/sets the target coordinates of the specified effect. \n\
+This command is used for the farsight spell.\n\
+\n\
+**Parameters:**\n\
+  * PartyID - the player character's index in the party\n\
+  * opcode  - the effect opcode (for values see effects.ids)\n\
+  * x       - target x coordinate\n\
+  * y       - target y coordinate\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:ApplyEffect]], [[guiscript:CountEffects]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 {
@@ -9861,9 +13033,19 @@ static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_StealFailed__doc,
-"StealFailed()\n\n"
-"Sends the steal failed trigger (attacked) to the owner of the current store. "
-"The owner of the current store was set to the Sender of StartStore action.");
+"===== StealFailed =====\n\
+\n\
+**Prototype:** GemRB.StealFailed ()\n\
+\n\
+**Description:** Sends the steal failed trigger (attacked) to the owner \n\
+of the current store — the Sender of the StartStore action.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:GetStore]], [[guiscript:EnterStore]], [[guiscript:LeaveStore]], [[guiscript:GameGetSelectedPCSingle]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -9905,8 +13087,20 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_SwapPCs__doc,
-"SwapPCs(idx1, idx2)\n\n"
-"Swaps the party order for two player characters.");
+"===== SwapPCs =====\n\
+\n\
+**Prototype:** GemRB.SwapPCs (idx1, idx2)\n\
+\n\
+**Description:** Swaps the party order for two player characters.\n\
+\n\
+**Parameters:** \n\
+  * idx1 - position in the party\n\
+  * idx2 - position in the party\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 {
@@ -9928,8 +13122,22 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
-"SetRepeatClickFlags(value, op)\n\n"
-"Sets the mode repeat clicks are handled.");
+"===== SetRepeatClickFlags =====\n\
+\n\
+**Prototype:** GemRB.SetRepeatClickFlags (value, op)\n\
+\n\
+**Description:** Sets the mode repeat clicks are handled.\n\
+\n\
+**Parameters:** \n\
+  * value - speed, see the GEM_RK* flags in GUIDefines.py\n\
+  * op - operation (OP_OR, OP_NAND and so on)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:**\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
 {
@@ -9944,9 +13152,25 @@ static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DisplayString__doc,
-"DisplayString(strref, color[,actor])\n\n"
-"Displays string on the MessageWindow using methods supplied by the engine core. "
-"The optional actor is the party ID of the character whose name will be displayed.");
+"===== DisplayString =====\n\
+\n\
+**Prototype:** GemRB.DisplayString (strref, color[, PartyID])\n\
+\n\
+**Description:** Displays a string in the messagewindow using methods \n\
+supplied by the core engine. The optional actor is the party ID of the \n\
+character whose name will be displayed (as saying the string).\n\
+\n\
+**Parameters:**\n\
+  * strref  - the tlk reference\n\
+  * color   - a hex packed RGB value\n\
+  * PartyID - if supplied, then the PC's name will be displayed too\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:SetText]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 {
@@ -9968,8 +13192,26 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetCombatDetails__doc,
-"GetCombatDetails(pc, leftorright) => dict\n\n"
-"Returns the current THAC0 and other data in relation to the equipped weapon.");
+"===== GetCombatDetails =====\n\
+\n\
+**Prototype:** GemRB.GetCombatDetails (pc, leftorright)\n\
+\n\
+**Description:** Returns the current THAC0 and other data relating to the \n\
+equipped weapon.\n\
+\n\
+**Parameters:** \n\
+  * pc - position in the party\n\
+  * leftorright - left or right hand weapon (main or offhand)\n\
+\n\
+**Return value:** dict: 'ToHit', 'Flags', 'DamageBonus', 'Speed', \n\
+'CriticalBonus', 'Style', 'Proficiency', 'Range', 'Enchantment', 'Slot', \n\
+'APR', 'CriticalMultiplier', 'CriticalRange', 'ProfDmgBon', \n\
+'LauncherDmgBon', 'WeaponStrBonus', 'AC' (dict), 'ToHitStats' (dict)\n\
+\n\
+**See also:** [[guiscript:IsDualWielding]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 {
@@ -10080,8 +13322,25 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetDamageReduction__doc,
-			  "GetDamageReduction(pc, enchantment[, missile])\n\n"
-			  "returns the damage reduction for the specified enchantment level and type.");
+"===== GetDamageReduction =====\n\
+\n\
+**Prototype:** GemRB.GetDamageReduction (globalID, enchantment[, missile])\n\
+\n\
+**Description:** returns the actor's damage reduction for the specified \n\
+enchantment level and type. Used in iwd2. Can be cancelled by high \n\
+weapon enchantment.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * enchantment - enchantment level (usually 0-5)\n\
+  * missile - look at missile reduction, not melee\n\
+\n\
+**Return value:** integer, the amount of resisted damage\n\
+\n\
+**See also:** [[guiscript:GetCombatDetails]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 static PyObject* GemRB_GetDamageReduction(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
@@ -10105,8 +13364,20 @@ static PyObject* GemRB_GetDamageReduction(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSpellFailure__doc,
-			  "GetSpellFailure(pc[, cleric])\n\n"
-			  "returns the (arcane unless cleric is set) spell failure in percent.");
+"===== GetSpellFailure =====\n\
+\n\
+**Prototype:** GemRB.GetSpellFailure (globalID[, divine])\n\
+\n\
+**Description:** returns the arcane/divine spell failure in percent.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+  * divine - return divine spell failure instead\n\
+\n\
+**Return value:** dict, spell failure (Total, Armor, Shield)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 static PyObject* GemRB_GetSpellFailure(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
@@ -10131,8 +13402,21 @@ static PyObject* GemRB_GetSpellFailure(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IsDualWielding__doc,
-"IsDualWielding(pc)\n\n"
-"1 if the pc is dual wielding; 0 otherwise.");
+"===== IsDualWielding =====\n\
+\n\
+**Prototype:** GemRB.IsDualWielding (globalID)\n\
+\n\
+**Description:** 1 if the actor is dual wielding; 0 otherwise.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** bool\n\
+\n\
+**See also:** [[guiscript:GetCombatDetails]]\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
 {
@@ -10149,8 +13433,16 @@ static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSelectedSize__doc,
-"GetSelectedSize() => int\n\n"
-"Returns the number of actors selected in the party.");
+"===== GetSelectedSize =====\n\
+\n\
+**Prototype:** GemRB.GetSelectedSize ()\n\
+\n\
+**Description:** Returns the number of actors selected in the party.\n\
+\n\
+**Return value:** int\n\
+\n\
+**See also:** [[guiscript:GetSelectedActors]], [[guiscript:GetSelectedPCSingle]]"
+);
 
 static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 {
@@ -10160,8 +13452,16 @@ static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetSelectedActors__doc,
-"GetSelectedActors() => int\n\n"
-"Returns the global ids of selected actors in a tuple.");
+"===== GetSelectedActors =====\n\
+\n\
+**Prototype:** GemRB.GetSelectedActors ()\n\
+\n\
+**Description:** Returns the global ids of selected actors in a tuple.\n\
+\n\
+**Return value:** tuple of ints\n\
+\n\
+**See also:** [[guiscript:GetSelectedSize]], [[guiscript:GetSelectedPCSingle]]"
+);
 
 static PyObject* GemRB_GetSelectedActors(PyObject* /*self*/, PyObject* /*args*/)
 {
@@ -10176,8 +13476,17 @@ static PyObject* GemRB_GetSelectedActors(PyObject* /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetSpellCastOn__doc,
-"GetSpellCastOn(pc) => resref\n\n"
-"Returns the last spell cast on a partymember.");
+"===== GetSpellCastOn =====\n\
+\n\
+**Prototype:** GemRB.GetSpellCastOn (pc)\n\
+\n\
+**Description:** Returns the last spell cast on a party member.\n\
+\n\
+**Parameters:**\n\
+  * pc - PartyID\n\
+\n\
+**Return value:** resref"
+);
 
 static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 {
@@ -10200,8 +13509,18 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetTickHook__doc,
-"Set callback to be called every main loop iteration.\n\n"
-"This is useful for things like running a twisted reactor.");
+"===== SetTickHook =====\n\
+\n\
+**Prototype:** GemRB.SetTickHook (callback)\n\
+\n\
+**Description:** Set callback to be called every main loop iteration. \n\
+This is useful for things like running a twisted reactor.\n\
+\n\
+**Parameters:**\n\
+  * callback - pyton function to run\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 {
@@ -10226,9 +13545,20 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupMaze__doc,
-"SetupMaze(x,y)\n\n"
-"Initializes a maze of XxY size. "
-"The dimensions shouldn't exceed the maximum possible maze size (8x8).");
+"===== SetupMaze =====\n\
+\n\
+**Prototype:** GemRB.SetupMaze (x,y)\n\
+\n\
+**Description:** Initializes a maze of size XxY. The dimensions shouldn't \n\
+exceed the maximum possible maze size (8x8).\n\
+\n\
+**Parameters:** \n\
+  * x, y - dimensions\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 {
@@ -10259,10 +13589,23 @@ static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMazeEntry__doc,
-"SetMazeEntry(entry, type, value)\n\n"
-"Sets a field in a maze entry. "
-"The entry index shouldn't exceed the maximum possible maze size (64). "
-"The type could be: ME_ACCESSED, ME_WALLS, ME_TRAP or ME_SPECIAL.");
+"===== SetMazeEntry =====\n\
+\n\
+**Prototype:** GemRB.SetMazeEntry (entry, type, value)\n\
+\n\
+**Description:** Sets a field in a maze entry. The entry index shouldn't \n\
+exceed the maximum possible maze size (64).\n\
+\n\
+**Parameters:** \n\
+  * entry - index of entry to change\n\
+  * type - what sort of entry should it be?\n\
+    * ME_ACCESSED, ME_WALLS, ME_TRAP, ME_SPECIAL\n\
+  * value - what to set (meaning depends on type)\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 {
@@ -10344,9 +13687,20 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetMazeData__doc,
-"SetMazeData(type, value)\n\n"
-"Sets a field in the maze header. "
-"The type could be: ME_0, ME_WALLS, ME_TRAP or ME_16.");
+"===== SetMazeData =====\n\
+\n\
+**Prototype:** GemRB.SetMazeData (field, value)\n\
+\n\
+**Description:** Sets a field in the maze header.\n\
+\n\
+**Parameters:** \n\
+  * field - look at MH_* constants in maze_defs.py\n\
+  * value - target value\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 {
@@ -10409,8 +13763,16 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMazeHeader__doc,
-"GetMazeHeader()=>dict\n\n"
-"Returns the Maze header of Planescape Torment savegames." );
+"===== GetMazeHeader =====\n\
+\n\
+**Prototype:** GemRB.GetMazeHeader ()\n\
+\n\
+**Description:** Returns the Maze header of Planescape Torment savegames.\n\
+\n\
+**Return value:** dict\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMazeHeader(PyObject* /*self*/, PyObject* /*args*/)
 {
@@ -10438,8 +13800,19 @@ static PyObject* GemRB_GetMazeHeader(PyObject* /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetMazeEntry__doc,
-"GetMazeEntry(entry)=>dict\n\n"
-"Returns a Maze entry from Planescape Torment savegames. Entry must be 0-63." );
+"===== GetMazeEntry =====\n\
+\n\
+**Prototype:** GemRB.GetMazeEntry (entry)\n\
+\n\
+**Description:** Returns a Maze entry from Planescape Torment savegames.\n\
+\n\
+**Parameters:** \n\
+  * entry - target entry (0-63; lesser than max maze size)\n\
+\n\
+**Return value:** dict\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 {
@@ -10478,10 +13851,22 @@ char gametype_hint[100];
 int gametype_hint_weight;
 
 PyDoc_STRVAR( GemRB_AddGameTypeHint__doc,
-"AddGameTypeHint(type, weight, flags=0)\n\n"
-"Asserts that GameType should be TYPE, with confidence WEIGHT. "
-"Original games should use WEIGHT <= 100, greater values are reserved for new games. "
-"FLAGS are not used at the moment.");
+"===== AddGameTypeHint =====\n\
+\n\
+**Prototype:** GemRB.AddGameTypeHint (type, weight, flags=0)\n\
+\n\
+**Description:** Asserts that GameType should be TYPE, with confidence WEIGHT. \n\
+This is used by Autodetect.py scripts when GameType was set to 'auto'.\n\
+\n\
+**Parameters:**\n\
+  * type - GameType (e.g. bg1, bg2, iwd, how, iwd2, pst and others)\n\
+  * weight - numeric, confidence that TYPE is correct. Standard games should use values <= 100, (eventual) new games based on the standard ones should use values above 100.\n\
+  * flags - numeric, not used now\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 {
@@ -10504,8 +13889,16 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetAreaInfo__doc,
-"GetAreaInfo()=>mapping\n\n"
-"Returns important values about the current area.\n");
+"===== GetAreaInfo =====\n\
+\n\
+**Prototype:** GemRB.GetAreaInfo ()\n\
+\n\
+**Description:** Returns important values about the current area.\n\
+\n\
+**Return value:** dict (area name and mouse position)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_GetAreaInfo(PyObject* /*self*/, PyObject* /*args*/)
 {
@@ -10521,8 +13914,28 @@ static PyObject* GemRB_GetAreaInfo(PyObject* /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_Log__doc,
-"GemRB.Log(log_level, owner, message)\n\n"
-"Log a message to GemRB's logging system.\n");
+"===== Log =====\n\
+\n\
+**Prototype:** GemRB.Log (log_level, owner, message)\n\
+\n\
+**Description:** Log a message to GemRB's logging system.\n\
+\n\
+**Parameters:**\n\
+  * log_level - integer log level (from GUIDefines.py)\n\
+    * LOG_NONE = -1\n\
+    * LOG_FATAL = 0\n\
+    * LOG_ERROR = 1\n\
+    * LOG_WARNING = 2\n\
+    * LOG_MESSAGE = 3\n\
+    * LOG_COMBAT = 4\n\
+    * LOG_DEBUG = 5\n\
+  * owner - name of the context or owner of the message\n\
+  * message - string to log\n\
+\n\
+**Return value:** N/A\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 {
@@ -10540,11 +13953,23 @@ static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_SetFeature__doc,
-"GemRB.SetFeature(feature, value)\n\n"
-"Set GameType flag FEATURE to VALUE, either True or False. \n"
-"FEATURE is defined by GF_xxx defines.\n"
-"Example:\n"
-"GemRB.SetFeature(GF_ALL_STRINGS_TAGGED, True)\n");
+"===== SetFeature =====\n\
+\n\
+**Prototype:** GemRB.SetFeature (feature, value)\n\
+\n\
+**Description:** Set GameType flag FEATURE to VALUE, either True or False.\n\
+\n\
+**Parameters:**\n\
+  * FEATURE - GF_xxx constant defined in GUIDefines.py and globals.h\n\
+  * VALUE - value to set the feature to. Either True or False\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:**\n\
+    GemRB.SetFeature(GF_ALL_STRINGS_TAGGED, True)\n\
+\n\
+[[guiscript:index|Function index]]"
+);
 
 static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)
 {
