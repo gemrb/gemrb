@@ -231,6 +231,9 @@ void Window::DispatchMouseOver(const Point& p)
 
 void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
+	if (button == GEM_MB_ACTION) {
+		Focus();
+	}
 	View* target = SubviewAt(p, false, true);
 	if (target) {
 		TrySetFocus(target);
