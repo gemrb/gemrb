@@ -414,10 +414,12 @@ GameControl* Interface::StartGameControl()
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
-	Window* gamewin = winmgr->MakeWindow(screen);
-	RegisterScriptableWindow(gamewin, "GameWin", 99);
 	gamectrl = new GameControl(screen);
+	Window* gamewin = winmgr->GetGameWindow();
 	gamewin->AddSubviewInFrontOfView(gamectrl);
+	ControlScriptingRef* gcref = new ControlScriptingRef(gamectrl, 0, "GC");
+	gamectrl->AssignScriptingRef(gcref);
+	ScriptEngine::RegisterScriptingRef(gcref);
 	//setting the focus to the game control
 	winmgr->FocusWindow(gamewin);
 	if (guiscript->LoadScript( "MessageWindow" )) {
