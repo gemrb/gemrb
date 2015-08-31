@@ -3678,30 +3678,20 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	return ret;
 }
 
-Window* Interface::GetMessageWindow() const
-{
-	ieDword id = (ieDword) -1;
-	if (vars->Lookup( "MessageWindow", id )) {
-		// FIXME: this will only work for non-pst @ 800 res
-		return GetWindow(id, "GUIW08");
-	}
-	return NULL;
-}
-
 Label* Interface::GetMessageLabel() const
 {
-	ieDword id = (ieDword) -1;
-	if (vars->Lookup( "MessageLabel", id )) {
-		return GetControl<Label>(id, GetMessageWindow());
+	ControlScriptingRef* ref = static_cast<ControlScriptingRef*>(ScriptEngine::GetScripingRef("MsgSys", 1));
+	if (ref) {
+		return dynamic_cast<Label*>(ref->GetObject());
 	}
 	return NULL;
 }
 
 TextArea* Interface::GetMessageTextArea() const
 {
-	ieDword id = (ieDword) -1;
-	if (vars->Lookup( "MessageTextArea", id )) {
-		return GetControl<TextArea>(id, GetMessageWindow());
+	ControlScriptingRef* ref = static_cast<ControlScriptingRef*>(ScriptEngine::GetScripingRef("MsgSys", 0));
+	if (ref) {
+		return dynamic_cast<TextArea*>(ref->GetObject());
 	}
 	return NULL;
 }

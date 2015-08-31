@@ -63,7 +63,6 @@ def DeathWindowEnd ():
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.HideGUI ()
-	GemRB.SetVar ("MessageWindow", -1)
 	GemRB.SetVar ("PortraitWindow", Window.ID)
 	GemRB.UnhideGUI ()
 	#making the playing field gray

@@ -78,7 +78,6 @@ def OpenInventoryWindow ():
 			InventoryWindow.Unload ()
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVar ("MessageLabel", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
 		return
@@ -87,7 +86,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	GemRB.SetVar ("MessageLabel", Window.GetControl(0x1000003d).ID)
+	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
 
 	# inventory slots
 	for i in range (44):

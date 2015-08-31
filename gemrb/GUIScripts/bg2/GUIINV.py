@@ -68,7 +68,6 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVar ("MessageLabel", -1)
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		GUICommonWindows.UpdatePortraitWindow ()
 		OldPortraitWindow = None
@@ -86,7 +85,7 @@ def OpenInventoryWindow ():
 
 	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
+	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.MarkMenuButton (OptionsWindow)

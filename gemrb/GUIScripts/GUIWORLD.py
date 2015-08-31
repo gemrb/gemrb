@@ -286,7 +286,6 @@ def OpenReformPartyWindow ():
 	OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
 	OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", -1)
-	GemRB.SetVar ("MessageWindow", -1)
 
 	# if nobody can be removed, just close the window
 	if not removable_pcs:
@@ -333,7 +332,6 @@ def DeathWindowEnd ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
 
 	GemRB.HideGUI ()
-	GemRB.SetVar ("MessageWindow", -1)
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

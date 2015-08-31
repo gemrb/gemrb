@@ -54,7 +54,6 @@ def OnLoad():
 	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-	GemRB.SetVar ("MessageWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVar ("ActionsPosition", 1) #Bottom
 	GemRB.SetVar ("OptionsPosition", 1) #Bottom
@@ -94,7 +93,6 @@ def UpdateControlStatus ():
 
 	hideflags = GemRB.HideGUI ()
 	if Expand:
-		GemRB.SetVar ("MessageWindow", MessageWindow.ID)
 		GemRB.SetVar ("PortraitWindow", -1)
 		GemRB.SetVar ("ActionsWindow", -1)
 		GemRB.SetVar ("OptionsWindow", -1)
@@ -104,7 +102,6 @@ def UpdateControlStatus ():
 		Label = MessageWindow.GetControl (0x10000003)
 		Label.SetText (str (GemRB.GameGetPartyGold ()))
 	else:
-		GemRB.SetVar ("MessageWindow", -1)
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)

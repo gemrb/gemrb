@@ -173,7 +173,6 @@ def OpenContainerWindow ():
 	else:
 		GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
 		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("MessageWindow", -1)
 		GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	Container = GemRB.GetContainer(0)
