@@ -1058,6 +1058,11 @@ static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
 
 	ScriptingRefBase* ref = NULL;
 	if (PyString_Check(lookup)) {
+		if (controlId == ScriptEngine::InvalidId) {
+			// for convinience we allow an alias to default to the lowest valid id
+			// the typical use case is typically wanting to specify a string name for a single control
+			controlId = 0;
+		}
 		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), controlId);
 	} else {
 		Window* win = GetView<Window>(lookup);
@@ -1078,8 +1083,10 @@ PyDoc_STRVAR( GemRB_Control_AddAlias__doc,
 static PyObject* GemRB_Control_AddAlias(PyObject* self, PyObject* args)
 {
 	char* group = NULL;
-	ScriptingId controlId = ScriptEngine::InvalidId;
-	PARSE_ARGS( args, "Os", &self, &group, &controlId );
+	// default to the lowest valid value (since its optional and we often only want 1 control per alias)
+	// the exception being for creating groups such as the GAMEGUI windows for quickly hiding/showing the entire group
+	ScriptingId controlId = 0;
+	PARSE_ARGS( args, "Os|l", &self, &group, &controlId );
 
 	Control* ctrl = GetView<Control>(self);
 	ControlScriptingRef* aliasref = new ControlScriptingRef(ctrl, controlId, group);

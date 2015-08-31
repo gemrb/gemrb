@@ -126,6 +126,7 @@ class GWindow(GView):
 
 class GControl(GView):
   methods = {
+	'AddAlias': _GemRB.Control_AddAlias,
 	'AttachScrollBar': _GemRB.Control_AttachScrollBar,
     'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
