@@ -27,6 +27,11 @@ def OnIncreaseSize():
 	GSFlags = GSFlags-Expand
 	if Expand>2:
 		return
+		
+	global TMessageTA
+	frame = TMessageTA.GetFrame()
+	MessageWindow.SetFrame(frame['x'], frame['y'], frame['w'], frame['h'] + 100)
+	
 	Expand = (Expand + 1)*2
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
@@ -37,6 +42,11 @@ def OnDecreaseSize():
 	GSFlags = GSFlags-Expand
 	if Expand<2:
 		return
+		
+	global TMessageTA
+	frame = TMessageTA.GetFrame()
+	MessageWindow.SetFrame(frame['x'], frame['y'], frame['w'], frame['h'] - 100)
+
 	Expand = Expand/2 - 1 # 6->2, 2->0
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 

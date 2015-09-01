@@ -68,19 +68,6 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
 		Button=ActionsWindow.GetControl(61)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
-
-	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
-	GemRB.SetVar("ActionsWindow", ActionsWindow.ID)
-	GemRB.SetVar("OptionsWindow", OptionsWindow.ID)
-	GemRB.SetVar("TopWindow", -1)
-	GemRB.SetVar("OtherWindow", -1)
-	GemRB.SetVar("FloatWindow", -1)
-	GemRB.SetVar("PortraitPosition", 2) #Right
-	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
-	GemRB.SetVar("OptionsPosition", 0) #Left
-	GemRB.SetVar("MessagePosition", 4) #BottomAdded
-	GemRB.SetVar("OtherPosition", 5) #Inactivating
-	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
 	UpdateControlStatus()
 	
@@ -98,63 +85,33 @@ def MaximizePortraits():
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton, TMessageTA
 	
-	TMessageWindow = 0
-	TMessageTA = 0
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
-	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 
+	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
+	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
+	TMessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack())
+	TMessageTA = TMessageWindow.GetControl(1)
+	ExpandButton = TMessageWindow.GetControl(0)
+	ExpandButton.SetVisible(True)
+	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
+	ContractButton = TMessageWindow.GetControl(3)
+	ContractButton.SetVisible(True)
+	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
+
 	#a dialogue is running, setting messagewindow size to maximum
-	if Override:
+	if (GSFlags&GS_DIALOG):
 		Expand = GS_LARGEDIALOG
 
-	if Expand == GS_MEDIUMDIALOG:
-		TMessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack())
-		TMessageTA = TMessageWindow.GetControl(1)
-		ExpandButton = TMessageWindow.GetControl(0)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-		ContractButton = TMessageWindow.GetControl(3)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
+	if Expand == GS_LARGEDIALOG:
+		ExpandButton.SetVisible(False)
+	elif Expand == GS_SMALLDIALOG:
+		ContractButton.SetVisible(False)
 
-	elif Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack())
-		TMessageTA = TMessageWindow.GetControl(1)
-		ContractButton = TMessageWindow.GetControl(0)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-	else:
-		TMessageWindow = GemRB.LoadWindow(4, GUICommon.GetWindowPack())
-		TMessageTA = TMessageWindow.GetControl(3)
-		ExpandButton = TMessageWindow.GetControl(2)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-
-	hideflag = GemRB.HideGUI()
-	MessageWindow = GemRB.GetVar("MessageWindow")
-	MessageTA = GUIClasses.GTextArea(ID=GemRB.GetVar("MessageTextArea"))
-	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
-		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
-		GUIClasses.GWindow(MessageWindow).Unload()
-
+	TMessageWindow.SetFlags(WF_BORDERLESS)
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
-	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
-	if Override:
-		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	else:
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
-
-	if GSFlags & GS_OPTIONPANE:
-		GemRB.SetVar("OptionsWindow", -1)
-	else:
-		GemRB.SetVar("OptionsWindow", OptionsWindow.ID)
-
-	if GSFlags & GS_PORTRAITPANE:
-		GemRB.SetVar("PortraitWindow", -1)
-	else:
-		GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
-
-	if hideflag:
-		GemRB.UnhideGUI()
+	TMessageTA.AddAlias("MsgSys", 0)
 	return
 
 def RemoveYoshimo( idx):
