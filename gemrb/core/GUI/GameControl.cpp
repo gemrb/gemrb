@@ -2291,7 +2291,7 @@ bool GameControl::SetGUIHidden(bool hide)
 				// FIXME: this will only work for non-pst @ 800 res
 				Window* w = GetWindow(id, "GUIW08");
 				if (w) {
-					w->SetFlags(WF_BORDERLESS, BM_OR);
+					w->SetFlags(Window::Borderless, BM_OR);
 					if (dict->Lookup( *++val, id )) {
 						//Log(MESSAGE, "GameControl", "position: %s", *val);
 						ResizeParentWindowFor( w, id, op );
@@ -2310,7 +2310,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			Window* fw = GetWindow(id, "GUIWORLD");
 			if (!hide) {
 				assert(fw != NULL);
-				fw->SetFlags(WF_DRAGGABLE|WF_BORDERLESS, BM_OR);
+				fw->SetFlags(Window::Draggable|Window::Borderless, BM_OR);
 				fw->Focus();
 			}
 		}

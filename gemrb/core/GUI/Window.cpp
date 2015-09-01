@@ -95,7 +95,7 @@ void Window::SizeChanged(const Size& /*oldSize*/)
 void Window::WillDraw()
 {
 	core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
-	if (flags&WF_DRAGGABLE && NeedsDraw()) {
+	if (flags&Borderless && NeedsDraw()) {
 		// FIXME: this shouldnt be needed after the buffers are sized to the window
 		// this *really* slows things down (more than 50% frame loss if all windows do it)
 		// its needed now because moving a window smears its backbuffer
@@ -295,7 +295,7 @@ void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short m
 {
 	switch (button) {
 		case GEM_MB_ACTION:
-			if (flags&WF_DRAGGABLE) {
+			if (flags&Draggable) {
 				isDragging = true;
 				dragOrigin = p;
 				break;

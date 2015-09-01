@@ -57,7 +57,7 @@ WindowManager::WindowManager(Video* vid)
 	vid->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(WF_BORDERLESS, BM_OR);
+	gameWin->SetFlags(Window::Borderless, BM_OR);
 	gameWin->SetFrame(screen);
 
 	cursorBuf = vid->CreateBuffer(screen.Dimensions());
@@ -318,7 +318,7 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
-		if (!drawFrame && !(win->flags&WF_BORDERLESS) && (frame.w < screen.w || frame.h < screen.h)) {
+		if (!drawFrame && !(win->flags&Window::Borderless) && (frame.w < screen.w || frame.h < screen.h)) {
 			// the window requires us to draw the frame border (happens later, on the cursor buffer)
 			drawFrame = true;
 		}

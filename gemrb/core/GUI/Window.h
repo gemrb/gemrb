@@ -38,19 +38,6 @@ namespace GemRB {
 class Control;
 class Sprite2D;
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-// Window Flags
-#define WF_DRAGGABLE	1 // window can be moved via dragging (PST radial menu for example)
-#define WF_BORDERLESS	2 //doesnt draw the window frame
-
-// Window position anchors (actually flags for WindowSetPos())
-#define WINDOW_TOPLEFT       0x00
-#define WINDOW_CENTER        0x01
-#define WINDOW_ABSCENTER     0x02
-#define WINDOW_RELATIVE      0x04
-#define WINDOW_SCALE         0x08
-#define WINDOW_BOUNDED       0x10
-
 /**
  * @class Window
  * Class serving as a container for Control/widget objects 
@@ -59,14 +46,19 @@ class Sprite2D;
 
 class GEM_EXPORT Window : public View {
 public:
+	// !!! Keep these synchronized with GUIDefines.py !!!
 	enum WindowPosition {
-		PosTop = 1,
-		PosBottom = 2,
-		PosVmid = 3,
-		PosLeft = 4,
-		PosRight = 8,
-		PosHmid = 12,
-		PosCentered = 15
+		PosTop = 1,		// top
+		PosBottom = 2,	// bottom
+		PosVmid = 3,	// top + bottom = vmid
+		PosLeft = 4,	// left
+		PosRight = 8,	// right
+		PosHmid = 12,	// left + right = hmid
+		PosCentered = 15// top + bottom + left + right = center
+	};
+	enum Flags {
+		Draggable = 1,
+		Borderless = 2
 	};
 
 protected:
