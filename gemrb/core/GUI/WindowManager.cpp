@@ -198,6 +198,11 @@ bool WindowManager::DispatchEvent(const Event& event)
 				break;
 			}
 		}
+		// gameWin is always the full "screen" so no need to check for intersection
+		// its also always the bottom window
+		if (target == NULL && gameWin) {
+			target = gameWin;
+		}
 	}
 	if (target) {
 		if (event.isScreen) {
