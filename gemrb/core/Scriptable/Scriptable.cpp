@@ -1397,8 +1397,8 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 		// casting glow is always on the caster
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			ieDword gender = actor->GetCGGender();
-			spl->AddCastingGlow(fxqueue, duration, gender);
 			fxqueue->SetOwner(actor);
+			spl->AddCastingGlow(fxqueue, duration, gender);
 			fxqueue->AddAllEffects(actor, actor->Pos);
 		}
 		delete fxqueue;
