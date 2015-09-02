@@ -3800,7 +3800,12 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
+
 	winmgr->DrawWindows();
+
+	Window* loadwin = GetWindow(0, "guils");
+	loadwin->RedrawControls("Progress", percent);
+
 	video->SwapBuffers();
 }
 
