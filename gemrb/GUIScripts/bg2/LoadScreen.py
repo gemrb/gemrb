@@ -75,8 +75,7 @@ def StartLoadScreen ():
 			Middle = LoadScreen.GetControl (3)
 			Middle.SetBAM ("COADCNTR", 1, 0)
 	
-		LoadScreen.SetVisible (WINDOW_VISIBLE)
-		LoadScreen.Unload()
+		LoadScreen.Close()
 		return
 
 	Bar = LoadScreen.GetControl (0)
