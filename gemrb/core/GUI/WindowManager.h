@@ -68,7 +68,7 @@ private:
 	Sprite2D* WinFrameEdge(int edge) const;
 
 	void DrawCursor() const;
-	void DrawTooltip() const;
+	bool DrawTooltip() const;
 
 public:
 	WindowManager(Video* vid);

@@ -184,12 +184,10 @@ bool WindowManager::HotKey(const Event& event)
 {
 	switch (event.keyboard.keycode) {
 		case GEM_TAB:
-			DrawTooltip();
-			break;
-
-		default: return false;
+			return DrawTooltip();
+		default:
+			return false;
 	}
-	return true;
 }
 
 bool WindowManager::DispatchEvent(const Event& event)
@@ -276,11 +274,15 @@ void WindowManager::DrawCursor() const
 	}
 }
 
-void WindowManager::DrawTooltip() const
+bool WindowManager::DrawTooltip() const
 {
-	Point pos = eventMgr.MousePos();
-	// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
-	core->DrawTooltip(hoverWin->TooltipText(), pos);
+	if (hoverWin && hoverWin->TooltipText().length()) {
+		Point pos = eventMgr.MousePos();
+		// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
+		core->DrawTooltip(hoverWin->TooltipText(), pos);
+		return true;
+	}
+	return false;
 }
 
 void WindowManager::DrawWindows() const
