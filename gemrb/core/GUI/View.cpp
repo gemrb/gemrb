@@ -306,6 +306,17 @@ void View::SetFrameSize(const Size& s)
 	frame.h = s.h;
 
 	SizeChanged(oldSize);
+
+	if (resizeFlags&RESIZE_SUBVIEWS) {
+		std::list<View*>::iterator it;
+		for (it = subViews.begin(); it != subViews.end(); ++it) {
+			View* subview = *it;
+			Region newSubFrame = subview->Frame();
+			newSubFrame.w += s.w - oldSize.w;
+			newSubFrame.h += s.h - oldSize.h;
+			subview->SetFrame(newSubFrame);
+		}
+	}
 	MarkDirty();
 }
 

@@ -43,7 +43,7 @@ private:
 protected:
 	View* superView;
 	Region frame;
-	ieDword resizeFlags;
+	int resizeFlags;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 	String tooltip;
@@ -76,9 +76,10 @@ public:
 
 	enum AutoresizeFlags {
 		RESIZE_NONE = 0,
-		RESIZE_WIDTH = 1,
-		RESIZE_HEIGHT = 2,
-		RESIZE_SUBVIEWS = 4 // unimplemented
+		RESIZE_WIDTH = 1,   // resize the view horizontally if horizontal content exceeds width
+		RESIZE_HEIGHT = 2,	// resize the view vertically if vertical content exceeds width
+
+		RESIZE_SUBVIEWS = 4 // resize immidiate subviews by the same ammount as this views frame change 
 	};
 
 	View(const Region& frame);
@@ -93,6 +94,8 @@ public:
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
 	virtual bool SetFlags(int arg_flags, int opcode);
+
+	void SetResizeMask(int flags) { resizeFlags = flags; }
 	void SetVisible(bool vis) { visible = vis; }
 	bool IsVisible() { return visible; }
 
