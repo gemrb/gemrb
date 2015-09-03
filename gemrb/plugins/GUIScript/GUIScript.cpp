@@ -2609,7 +2609,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject* self, PyObject* args)
 		//if this control says the resource is the same
 		//we wanted to set, we don't reset it
 		//but we must reinitialize it, if it was play once
-		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->flags&IE_GUI_BUTTON_PLAYONCE)) {
+		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
 			Py_RETURN_NONE;
 		}
 		delete ctl->animation;

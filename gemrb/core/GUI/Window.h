@@ -56,7 +56,7 @@ public:
 		PosHmid = 12,	// left + right = hmid
 		PosCentered = 15// top + bottom + left + right = center
 	};
-	enum Flags {
+	enum WindowFlags {
 		Draggable = 1,
 		Borderless = 2
 	};

@@ -43,6 +43,7 @@ private:
 protected:
 	View* superView;
 	Region frame;
+	ieDword flags;
 	int resizeFlags;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
@@ -65,7 +66,6 @@ protected:
 	virtual void WillDraw() {}
 
 public:
-	ieDword flags;
 	// using Held so we can have polymorphic drag operations
 	struct DragOp : public Held<DragOp> {
 		View* dragView;
@@ -94,6 +94,7 @@ public:
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
 	virtual bool SetFlags(int arg_flags, int opcode);
+	ieDword Flags() { return flags; }
 
 	void SetResizeMask(int flags) { resizeFlags = flags; }
 	void SetVisible(bool vis) { visible = vis; }

@@ -334,7 +334,7 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
-		if (!drawFrame && !(win->flags&Window::Borderless) && (frame.w < screen.w || frame.h < screen.h)) {
+		if (!drawFrame && !(win->Flags()&Window::Borderless) && (frame.w < screen.w || frame.h < screen.h)) {
 			// the window requires us to draw the frame border (happens later, on the cursor buffer)
 			drawFrame = true;
 		}
