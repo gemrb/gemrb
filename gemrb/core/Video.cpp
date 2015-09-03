@@ -87,6 +87,7 @@ int Video::SwapBuffers(int fpscap)
 {
 	SwapBuffers(drawingBuffers);
 	drawingBuffers.clear();
+	drawingBuffer = NULL;
 
 	if (fpscap) {
 		unsigned int lim = fpscap/1000;
