@@ -30,6 +30,9 @@ std::find(windows.begin(), windows.end(), w)
 
 namespace GemRB {
 
+int WindowManager::ToolTipDelay = 500;
+unsigned long WindowManager::TooltipTime = 0;
+
 Holder<Sprite2D> WindowManager::CursorMouseUp;
 Holder<Sprite2D> WindowManager::CursorMouseDown;
 
@@ -50,6 +53,9 @@ WindowManager::WindowManager(Video* vid)
 
 	modalShadow = ShadowNone;
 	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
+
+	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
+	eventMgr.RegisterHotKeyCallback(cb, GEM_TAB, 0);
 
 	screen.w = vid->GetWidth();
 	screen.h = vid->GetHeight();
@@ -174,6 +180,18 @@ void WindowManager::CloseWindow(Window* win)
 	win->SetDisabled(true);
 }
 
+bool WindowManager::HotKey(const Event& event)
+{
+	switch (event.keyboard.keycode) {
+		case GEM_TAB:
+			DrawTooltip();
+			break;
+
+		default: return false;
+	}
+	return true;
+}
+
 bool WindowManager::DispatchEvent(const Event& event)
 {
 #define HIT_TEST(e, w) \
@@ -204,6 +222,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 			target = gameWin;
 		}
 	}
+
 	if (target) {
 		if (event.isScreen) {
 			hoverWin = target;
@@ -219,6 +238,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 					target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
 					break;
 				case Event::MouseMove:
+					TooltipTime = GetTickCount() + ToolTipDelay;
 					target->DispatchMouseOver(winPos);
 					break;
 				case Event::MouseScroll:
@@ -256,19 +276,11 @@ void WindowManager::DrawCursor() const
 	}
 }
 
-void WindowManager::DrawTooltip(const String& /*tooltip*/, const Point& /*p*/) const
+void WindowManager::DrawTooltip() const
 {
-	/*
-	// draw tooltip if needed
-	if (TooltipView == this && TooltipText().length()
-		&& TooltipTime && GetTickCount() >= TooltipTime
-		) {
-		video->SetBufferedDrawing(false);
-		Point mp = core->GetVideoDriver()->GetMousePos();
-		DrawTooltip(mp);
-		video->SetBufferedDrawing(true);
-	}
-	*/
+	Point pos = eventMgr.MousePos();
+	// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
+	core->DrawTooltip(hoverWin->TooltipText(), pos);
 }
 
 void WindowManager::DrawWindows() const
@@ -363,6 +375,9 @@ void WindowManager::DrawWindows() const
 
 	// tooltips and cursor are always last
 	DrawCursor();
+	if (hoverWin && TooltipTime && GetTickCount() >= TooltipTime) {
+		DrawTooltip();
+	}
 }
 
 //copies a screenshot into a sprite

@@ -35,10 +35,6 @@ View::DragOp::~DragOp() {
 	dragView->CompleteDragOperation(*this);
 }
 
-int View::ToolTipDelay = 500;
-unsigned long View::TooltipTime = 0;
-View* View::TooltipView = NULL;
-
 View::View(const Region& frame)
 	: frame(frame)
 {
@@ -107,11 +103,6 @@ void View::DrawSubviews(bool drawBg)
 		}
 		v->Draw();
 	}
-}
-
-void View::DrawTooltip(const Point& p) const
-{
-	core->DrawTooltip(TooltipText(), p);
 }
 
 void View::DrawBackground(const Region* rgn) const
@@ -405,12 +396,6 @@ bool View::OnSpecialKeyPress(unsigned char key)
 {
 	if (scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
 		return scrollbar->OnSpecialKeyPress(key);
-	}
-
-	// tooltip maybe
-	if (key == GEM_TAB && tooltip.length()) {
-		TooltipView = this;
-		return true;
 	}
 
 	return false;

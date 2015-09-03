@@ -1044,18 +1044,13 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	return true;
 }
 
-void GameControl::DrawTooltip(const Point& p) const
-{
-	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return;
-	}
-	Control::DrawTooltip(p);
-}
-
 const String& GameControl::TooltipText() const {
 	// not bothering checking if game or area is null. If we are somehow entering this method when either is false,
 	// then something is horribly broken elsewhere. by definition we cant have a GameControl without these things.
 	Map* area = core->GetGame()->GetCurrentArea();
+	if (area == NULL) {
+		return Control::TooltipText();
+	}
 	Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (actor == NULL) {
 		return Control::TooltipText();

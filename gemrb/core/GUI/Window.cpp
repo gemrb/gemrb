@@ -121,7 +121,10 @@ void Window::SetFocused(Control* ctrl)
 
 const String& Window::TooltipText() const
 {
-	return hoverView->TooltipText();
+	if (hoverView) {
+		return hoverView->TooltipText();
+	}
+	return View::TooltipText();
 }
 
 void Window::SetPosition(WindowPosition pos)
@@ -191,7 +194,6 @@ void Window::DispatchMouseOver(const Point& p)
 		return;
 	}
 
-	TooltipTime = GetTickCount() + ToolTipDelay;
 	// need screen coordinates because the target may not be a direct subview
 	Point screenP = ConvertPointToScreen(p);
 	View* target = SubviewAt(p, false, true);
@@ -226,7 +228,6 @@ void Window::DispatchMouseOver(const Point& p)
 		target->OnMouseOver(target->ConvertPointFromScreen(screenP));
 	}
 	hoverView = target;
-	TooltipView = hoverView;
 }
 
 void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned short mod)

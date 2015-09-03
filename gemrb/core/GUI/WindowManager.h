@@ -60,12 +60,15 @@ private:
 	Video* video;
 	VideoBuffer* cursorBuf;// buffer the cursors and tooltips are drawn to (layer 3)
 
+	static int ToolTipDelay;
+	static unsigned long TooltipTime;
+
 private:
 	bool IsOpenWindow(Window* win) const;
 	Sprite2D* WinFrameEdge(int edge) const;
 
 	void DrawCursor() const;
-	void DrawTooltip(const String& tooltip, const Point&) const;
+	void DrawTooltip() const;
 
 public:
 	WindowManager(Video* vid);
@@ -78,6 +81,7 @@ public:
 	bool IsPresentingModalWindow() const;
 
 	bool DispatchEvent(const Event&);
+	bool HotKey(const Event&);
 	void DrawWindows() const;
 	void RedrawAll() const;
 

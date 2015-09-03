@@ -48,17 +48,12 @@ protected:
 	std::list<View*> subViews;
 	String tooltip;
 
-	static int ToolTipDelay;
-	static unsigned long TooltipTime;
-	static View* TooltipView;
-
 private:
 	void DrawBackground(const Region*) const;
 	void DrawSubviews(bool drawBg);
 
 protected:
 	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
-	virtual void DrawTooltip(const Point&) const;
 
 	virtual void AddedToView(View*) {}
 	virtual void RemovedFromView(View*) {}
