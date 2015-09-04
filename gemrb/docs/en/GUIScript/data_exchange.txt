@@ -1,4 +1,4 @@
-===== Data exchange between GUI controls and Global Dictionary Names =====
+===== Data exchange with GUI controls =====
 
 Each control has an associated 'Value' which could be assigned to it by the SetVarAssoc command. The controls handle this value according to their type and subtype. To set a button's subtype, use the [[guiscript:Button_SetFlags]] command.
 

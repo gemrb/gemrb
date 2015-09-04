@@ -1,4 +1,5 @@
-===== The following functions have a special meaning: =====
+===== Reserved functions =====
+The following functions have a special meaning.
 
 ==== OnLoad() ====
 This function is called when the GUI script was loaded by GemRB.
