@@ -8,12 +8,12 @@ What follows is a listing of available functions from both modules and some spec
 
 ==== Special ====
 
-<nspages guiscript -h1 -textPages="" -simpleLineBreak  -pregPagesOn="/^(accessing_gui_controls|console|controls|bit_operation|data_exchange|reserved_functions)$/">
+<nspages guiscript -h1 -textPages="" -simpleLineBreak  -pregPagesOn="/^(accessing_gui_controls|console|controls|bit_operation|data_exchange|reserved_functions|start)$/">
 
 ==== Main ====
 
-<nspages guiscript -h1 -textPages="" -exclude:accessing_gui_controls -exclude:console -exclude:controls -exclude:bit_operation -exclude:data_exchange -exclude:reserved_functions -pregPagesOff="/^(Button|Control|Label|SaveGame|ScrollBar|Table|TextArea|TextEdit|WorldMap|Window)_/i">
+<nspages guiscript -h1 -textPages="" -exclude:accessing_gui_controls -exclude:console -exclude:controls -exclude:bit_operation -exclude:data_exchange -exclude:reserved_functions -exclude:start -exclude:index -pregPagesOff="/^(Button|Control|Label|SaveGame|ScrollBar|Table|TextArea|TextEdit|WorldMap|Window)_/i">
 
 ==== Controls ====
 
-<nspages guiscript -h1 -textPages="" -exclude:accessing_gui_controls -exclude:console -exclude:controls -exclude:bit_operation -exclude:data_exchange -exclude:reserved_functions -pregPagesOn="/^(Button|Control|Label|SaveGame|ScrollBar|Table|TextArea|TextEdit|WorldMap|Window)_/i">
+<nspages guiscript -h1 -textPages="" -exclude:accessing_gui_controls -exclude:console -exclude:controls -exclude:bit_operation -exclude:data_exchange -exclude:reserved_functions -exclude:start -exclude:index -pregPagesOn="/^(Button|Control|Label|SaveGame|ScrollBar|Table|TextArea|TextEdit|WorldMap|Window)_/i">
