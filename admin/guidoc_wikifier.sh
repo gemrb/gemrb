@@ -34,7 +34,7 @@ function dumpDocs() {
   # extract the functions docs from the doc strings into individual files
   sed -n '/PyDoc_STRVAR/,/PyObject/ { /"=/,/"$/ { s,\\n,,; s,\\,,; p} }' "$plugincpp" |
     awk -v RS='"' -v out="$out_dir" \
-    '{ split($0, t); title=t[2]; if (title) print $0 >  out "/" title ".txt" }' || return 1
+    '{ split($0, t); title=tolower(t[2]); if (title) print $0 >  out "/" title ".txt" }' || return 1
 
   # append a link to the function index
   for txt_file in "$out_dir"/*.txt; do
