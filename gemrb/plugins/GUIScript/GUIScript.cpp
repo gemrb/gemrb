@@ -2604,7 +2604,7 @@ PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
 \n\
 **Description:** Sets the state of a Control. For buttons, this is the \n\
 same as SetButtonState. You can additionally use 0x80 for a focused \n\
-control.\n\
+control (IE_GUI_CONTROL_FOCUSED).\n\
 For other controls, this command will set the common value of the \n\
 control, which has various uses.\n\
 \n\
@@ -2616,7 +2616,9 @@ control, which has various uses.\n\
     * IE_GUI_BUTTON_PRESSED    = 0x00000001, the button is pressed\n\
     * IE_GUI_BUTTON_SELECTED   = 0x00000002, the button stuck in pressed state\n\
     * IE_GUI_BUTTON_DISABLED   = 0x00000003, the button is disabled \n\
-    * IE_GUI_BUTTON_LOCKED     = 0x00000004, the button is inactive\n\
+    * IE_GUI_BUTTON_LOCKED     = 0x00000004, the button is inactive (like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap)\n\
+    * IE_GUI_BUTTON_FAKEDISABLED = 0x00000005, draws DISABLED bitmap, but it isn't disabled\n\
+    * IE_GUI_BUTTON_FAKEPRESSED = 0x00000006, draws PRESSED bitmap, but it isn't shifted\n\
   * Text Edit states\n\
     * IE_GUI_EDIT_NUMBER    =  0x030000001, the textedit will accept only digits\n\
   * Map Control States (add 0x09000000 to these):\n\
