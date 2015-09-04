@@ -1,13 +1,15 @@
-
-Prototype:
-
-Metaclass Prototype:
-
-Description:
-
-Parameters:
-
-Return value:
-
-See also:
-
+"=====  =====\
+\
+**Prototype:**\
+\
+**Metaclass Prototype:**\
+\
+**Description:**\
+\
+**Parameters:**\
+\
+**Return value:**\
+\
+**See also:**\
+\
+[[guiscript:index|Function index]]"
