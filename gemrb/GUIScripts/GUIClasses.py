@@ -146,7 +146,7 @@ class GTextArea(GControl):
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
-    'SetFlags': _GemRB.Control_TextArea_SetFlags,
+    'SetFlags': _GemRB.TextArea_SetFlags,
     'SetOptions': _GemRB.TextArea_SetOptions,
     'ListResources': _GemRB.TextArea_ListResources
   }

@@ -4822,8 +4822,8 @@ static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_TextArea_SetFlags__doc,
-"===== Control_TextArea_SetFlags =====\n\
+PyDoc_STRVAR( GemRB_TextArea_SetFlags__doc,
+"===== TextArea_SetFlags =====\n\
 \n\
 **Prototype:** GemRB.SetTextAreaFlags (WindowIndex, ControlIndex, Flags, Operation)\n\
 \n\
@@ -4851,13 +4851,13 @@ The above code will set up the TextArea as a ListBox control, by reading the nam
 **See also:** [[guiscript:RewindTA]], [[guiscript:SetTAHistory]], [[guiscript:GetCharSounds]], [[guiscript:GetCharacters]], [[guiscript:QueryText]], [[guiscript:accessing_gui_controls]]"
 );
 
-static PyObject* GemRB_Control_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Flags;
 	int Operation=0;
 
 	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
-		return AttributeError( GemRB_Control_TextArea_SetFlags__doc );
+		return AttributeError( GemRB_TextArea_SetFlags__doc );
 	}
 	if (Operation < BM_SET || Operation > BM_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
@@ -15470,7 +15470,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetTooltip, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Control_SubstituteForControl, METH_VARARGS),
-	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
+	METHOD(TextArea_SetFlags, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
