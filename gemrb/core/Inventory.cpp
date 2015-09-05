@@ -876,13 +876,7 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 	if (!item) {
 		return false;
 	}
-	switch (op) {
-	case OP_SET: item->Flags = arg; break;
-	case OP_OR: item->Flags |= arg; break;
-	case OP_NAND: item->Flags &= ~arg; break;
-	case OP_XOR: item->Flags ^= arg; break;
-	case OP_AND: item->Flags &= arg; break;
-	}
+	core->SetBits(item->Flags, arg, op);
 	return true;
 }
 

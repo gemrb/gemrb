@@ -453,7 +453,7 @@ public:
 	/** Sets party reputation */
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
-	void SetControlStatus(int value, int operation);
+	void SetControlStatus(unsigned int value, int operation);
 	/** Sets party size (1-32000) */
 	void SetPartySize(int value);
 	/** Sets a guiscript function to happen after x AI cycles have elapsed */

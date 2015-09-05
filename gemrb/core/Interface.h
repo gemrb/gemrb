@@ -853,6 +853,8 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	void SetTickHook(EventHandler);
+
+	void SetBits(unsigned int &flag, unsigned int value, int mode) const;
 };
 
 extern GEM_EXPORT Interface * core;

@@ -1362,15 +1362,9 @@ void Game::SetReputation(ieDword r)
 	}
 }
 
-void Game::SetControlStatus(int value, int mode)
+void Game::SetControlStatus(unsigned int value, int mode)
 {
-	switch(mode) {
-		case OP_OR: ControlStatus|=value; break;
-		case OP_NAND: ControlStatus&=~value; break;
-		case OP_SET: ControlStatus=value; break;
-		case OP_AND: ControlStatus&=value; break;
-		case OP_XOR: ControlStatus^=value; break;
-	}
+	core->SetBits(ControlStatus, value, mode);
 	core->SetEventFlag(EF_CONTROL);
 }
 

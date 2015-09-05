@@ -2507,24 +2507,12 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 
 void GameControl::SetScreenFlags(unsigned int value, int mode)
 {
-	switch(mode) {
-		case OP_OR: ScreenFlags |= value; break;
-		case OP_NAND: ScreenFlags &= ~value; break;
-		case OP_SET: ScreenFlags = value; break;
-		case OP_AND: ScreenFlags &= value; break;
-		case OP_XOR: ScreenFlags ^= value; break;
-	}
+	core->SetBits(ScreenFlags, value, mode);
 }
 
 void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
-	switch(mode) {
-		case OP_OR: DialogueFlags |= value; break;
-		case OP_NAND: DialogueFlags &= ~value; break;
-		case OP_SET: DialogueFlags = value; break;
-		case OP_AND: DialogueFlags &= value; break;
-		case OP_XOR: DialogueFlags ^= value; break;
-	}
+	core->SetBits(DialogueFlags, value, mode);
 }
 
 //copies a screenshot into a sprite

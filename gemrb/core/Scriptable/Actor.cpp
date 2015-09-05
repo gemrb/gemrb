@@ -3907,13 +3907,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 void Actor::SetMCFlag(ieDword arg, int op)
 {
 	ieDword tmp = BaseStats[IE_MC_FLAGS];
-	switch (op) {
-	case OP_SET: tmp = arg; break;
-	case OP_OR: tmp |= arg; break;
-	case OP_NAND: tmp &= ~arg; break;
-	case OP_XOR: tmp ^= arg; break;
-	case OP_AND: tmp &= arg; break;
-	}
+	core->SetBits(tmp, arg, op);
 	SetBase(IE_MC_FLAGS, tmp);
 }
 

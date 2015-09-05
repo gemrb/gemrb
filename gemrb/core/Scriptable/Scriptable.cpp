@@ -653,15 +653,9 @@ ieDword Scriptable::GetInternalFlag() const
 	return InternalFlags;
 }
 
-void Scriptable::SetInternalFlag(int value, int mode)
+void Scriptable::SetInternalFlag(unsigned int value, int mode)
 {
-	switch (mode) {
-		case OP_OR: InternalFlags|=value; break;
-		case OP_NAND: InternalFlags&=~value; break;
-		case OP_SET: InternalFlags=value; break;
-		case OP_AND: InternalFlags&=value; break;
-		case OP_XOR: InternalFlags^=value; break;
-	}
+	core->SetBits(InternalFlags, value, mode);
 }
 
 void Scriptable::InitTriggers()
