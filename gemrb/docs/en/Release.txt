@@ -99,3 +99,5 @@ options should also be mentioned here if they're not part of the changelog.
     - our Google+ page: https://plus.google.com/+GemrbOrg
 
 * Run admin/restart_news.sh to restart the NEWS cycle
+
+* Run admin/guidoc_wikifier.sh (no params needed) and upload the new docs
