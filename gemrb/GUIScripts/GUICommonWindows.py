@@ -1041,9 +1041,16 @@ def SpellShiftPressed ():
 	SpellIndex = Spell % 1000
 
 	# try spontaneous casting
-	if Type == 1<<IE_IWD2_SPELL_CLERIC and GemRB.HasResource ("sponcast", RES_2DA, 1):
-		pc = GemRB.GameGetFirstSelectedActor ()
-		SponCastTable = GemRB.LoadTable ("sponcast")
+	pc = GemRB.GameGetFirstSelectedActor ()
+	ClassRowName = GUICommon.GetClassRowName (pc)
+	SponCastTableName = CommonTables.ClassSkills.GetValue (ClassRowName, "SPONCAST")
+	if SponCastTableName != "*":
+		SponCastTable = GemRB.LoadTable (SponCastTableName, 1)
+		if not SponCastTable:
+			print "SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName
+			SpellPressed ()
+			return
+
 		# determine the column number (spell variety) depending on alignment
 		CureOrHarm = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
 		if CureOrHarm % 16 == 3: # evil
@@ -1051,10 +1058,17 @@ def SpellShiftPressed ():
 		else:
 			CureOrHarm = 0
 
+		# get the unshifted booktype
+		BaseType = 0
+		tmp = Type
+		while tmp > 1:
+			tmp = tmp>>1
+			BaseType += 1
+
 		# figure out the spell's details
 		# TODO: find a simpler way
 		Spell = None
-		MemorisedSpells = Spellbook.GetSpellinfoSpells(pc, IE_IWD2_SPELL_CLERIC) #FIXME: we need Type unshifted for enabling conversion of other types
+		MemorisedSpells = Spellbook.GetSpellinfoSpells (pc, BaseType)
 		for spell in MemorisedSpells:
 			if spell['SpellIndex']%(255000) == SpellIndex: # 255 is the engine value of Type
 				Spell = spell
