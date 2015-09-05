@@ -583,13 +583,6 @@ def SetupItemAbilities(pc, slot):
 		UpdateActionsWindow ()
 	return
 
- #only in iwd2? could be exported...
-def SetupBookSelection ():
-	for i in range (12):
-		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-		Button.SetActionIcon (globals(), 50+i)
-	return
-
 #you can change this for custom skills, this is the original engine
 skillbar=(ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, 100, 100, 100, 100, 100, 100, 100)
 def SetupSkillSelection ():
