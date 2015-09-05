@@ -1,13 +1,13 @@
-GemRB git (7b1108a0c):
+GemRB git (3067c63):
   New features:
     - 
     - pst should be roughly completable
     - ToBEx simplified "concentration" option
-    - iwd2 concealment
+    - iwd2 concealment, spontaneous casting for everyone
 
   Improved features:
     - 
-    - lots of pst details
+    - lots of pst details and annoyances
     - stores, dialogs, scripts
     - bugfixes
 
