@@ -385,7 +385,7 @@ Sets the color of floating messages in GameControl. Floating messages are\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetLabelTextColor]], [[guiscript:SetButtonTextColor]]"
+**See also:** [[guiscript:Label_SetTextColor]], [[guiscript:Button_SetTextColor]], [[guiscript:WorldMap_SetTextColor]]"
 );
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
@@ -411,7 +411,7 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:HideGUI]], [[guiscript:InvalidateWindow]], [[guiscript:SetVisible]]\n\
+**See also:** [[guiscript:HideGUI]], [[guiscript:Window_Invalidate]], [[guiscript:Window_SetVisible]]\n\
 "
 );
 
@@ -464,7 +464,7 @@ position value:\n\
 \n\
 **Return value:** 1 on success\n\
 \n\
-**See also:** [[guiscript:UnhideGUI]], [[guiscript:InvalidateWindow]], [[guiscript:SetVisible]]\n\
+**See also:** [[guiscript:UnhideGUI]], [[guiscript:Window_Invalidate]], [[guiscript:Window_SetVisible]]\n\
 "
 );
 
@@ -695,8 +695,8 @@ based on the current Int variable. StatTable (a 2da table) contains the \n\
 comment strref values associated with an intelligence value.\n\
 \n\
 **See also:** [[guiscript:GetString]], [[guiscript:SetToken]],\n\
-[[guiscript:GetTableValue]], [[guiscript:SetText]],[[guiscript:LoadTable]],\n\
-[[guiscript:TextAreaAppend]]\n\
+[[guiscript:Table_GetValue]], [[guiscript:Control_SetText]],[[guiscript:LoadTable]],\n\
+[[guiscript:TextArea_Append]]\n\
 "
 );
 
@@ -749,7 +749,7 @@ either use StatComment or do it manually.\n\
    Label.SetText (GemRB.GetString(12137) + str(Level)) \n\
 The above example will display 'Level: 1' in the addressed label.\n\
 \n\
-**See also:** [[guiscript:StatComment]], [[guiscript:SetText]]\n\
+**See also:** [[guiscript:StatComment]], [[guiscript:Control_SetText]]\n\
 "
 );
 
@@ -929,7 +929,7 @@ then moved by (screen size - winpack size) / 2\n\
 \n\
 **Return value:** GWindow (index)\n\
 \n\
-**See also:** [[guiscript:LoadWindowPack]], [[guiscript:GetControl]], [[guiscript:SetVisible]], [[guiscript:ShowModal]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:LoadWindowPack]], [[guiscript:Window_GetControl]], [[guiscript:Window_SetVisible]], [[guiscript:Window_ShowModal]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
@@ -973,7 +973,7 @@ PyDoc_STRVAR( GemRB_Window_SetSize__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:LoadWindow]], [[guiscript:SetWindowPos]], [[guiscript:SetControlSize]]"
+**See also:** [[guiscript:LoadWindow]], [[guiscript:Window_SetPos]], [[guiscript:Control_SetSize]]"
 );
 
 static PyObject* GemRB_Window_SetSize(PyObject * /*self*/, PyObject* args)
@@ -1018,7 +1018,7 @@ frames will erase the whole screen before drawing.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:LoadWindowFrame]], [[guiscript:LoadWindowPack]], [[guiscript:LoadWindow]], [[guiscript:SetWindowPos]]"
+**See also:** [[guiscript:LoadWindowFrame]], [[guiscript:LoadWindowPack]], [[guiscript:LoadWindow]], [[guiscript:Window_SetPos]]"
 );
 
 static PyObject* GemRB_Window_SetFrame(PyObject * /*self*/, PyObject* args)
@@ -1068,7 +1068,7 @@ on higher resolutions.\n\
   StartWindow = GemRB.LoadWindow (0)\n\
   GemRB.SetWindowFrame (StartWindow)\n\
 \n\
-**See also:** [[guiscript:SetWindowFrame]], [[guiscript:LoadWindowPack]]"
+**See also:** [[guiscript:Window_SetFrame]], [[guiscript:LoadWindowPack]]"
 );
 
 static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
@@ -1152,7 +1152,7 @@ PyDoc_STRVAR( GemRB_Window_SetPicture__doc,
     GemRB.SetWindowPicture (LoadScreen, LoadPic)\n\
 The above snippet is responsible to generate a random loading screen.\n\
 \n\
-**See also:** [[guiscript:SetButtonPicture]]"
+**See also:** [[guiscript:Button_SetPicture]]"
 );
 
 static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
@@ -1209,7 +1209,7 @@ PyDoc_STRVAR( GemRB_Window_SetPos__doc,
 The above example is from the PST FloatMenuWindow script. It centers \n\
 pie-menu window around the mouse cursor, but keeps it within screen.\n\
 \n\
-**See also:** [[guiscript:SetWindowSize]], [[guiscript:SetControlPos]]"
+**See also:** [[guiscript:Window_SetSize]], [[guiscript:Control_SetPos]]"
 );
 
 static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
@@ -1395,7 +1395,7 @@ of the same type, unless Type is specified and different.\n\
 \n\
 **Return value:** numeric or string, based on the indices or type\n\
 \n\
-**See also:** [[guiscript:GetSymbolValue]], [[guiscript:FindTableValue]], [[guiscript:LoadTable]]"
+**See also:** [[guiscript:GetSymbolValue]], [[guiscript:Table_FindValue]], [[guiscript:LoadTable]]"
 );
 
 static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
@@ -1493,7 +1493,7 @@ Table. If StartRowis omitted, the search starts from the beginning.\n\
 \n\
 **Return value:** numeric, -1 if the value isn't to be found\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableValue]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetValue]]"
 );
 
 static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
@@ -1580,7 +1580,7 @@ PyDoc_STRVAR( GemRB_Table_GetRowName__doc,
 \n\
 **Return value:** string\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableColumnName]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetColumnName]]"
 );
 
 static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
@@ -1618,7 +1618,7 @@ PyDoc_STRVAR( GemRB_Table_GetColumnIndex__doc,
 \n\
 **Return value:** numeric, -1 if column doesn't exist\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableRowIndex]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetRowIndex]]"
 );
 
 static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
@@ -1654,7 +1654,7 @@ PyDoc_STRVAR( GemRB_Table_GetColumnName__doc,
 \n\
 **Return value:** string\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableRowName]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetRowName]]"
 );
 
 static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
@@ -1690,7 +1690,7 @@ PyDoc_STRVAR( GemRB_Table_GetRowCount__doc,
 \n\
 **Return value:** numeric\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableColumnCount]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetColumnCount]]"
 );
 
 static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
@@ -1724,7 +1724,7 @@ PyDoc_STRVAR( GemRB_Table_GetColumnCount__doc,
 \n\
 **Return value:** numeric\n\
 \n\
-**See also:** [[guiscript:LoadTable]], [[guiscript:GetTableRowCount]]"
+**See also:** [[guiscript:LoadTable]], [[guiscript:Table_GetRowCount]]"
 );
 
 static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
@@ -1834,7 +1834,7 @@ PyDoc_STRVAR( GemRB_Symbol_GetValue__doc,
     sym = GemRB.GetSymbolValue (ss, align)\n\
 The above example will find the symbolic name of the player's alignment.\n\
 \n\
-**See also:** [[guiscript:LoadSymbol]], [[guiscript:GetTableValue]]"
+**See also:** [[guiscript:LoadSymbol]], [[guiscript:Table_GetValue]]"
 );
 
 static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
@@ -2002,7 +2002,7 @@ The above example retrieves the character's name typed into the TextEdit control
   GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
 The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
 \n\
-**See also:** [[guiscript:SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
@@ -2085,7 +2085,7 @@ of the running engine.\n\
 \n\
 **Return value:** 0 on success, -1 otherwise\n\
 \n\
-**See also:** [[guiscript:QueryText]], [[guiscript:DisplayString]], [[guiscript:GetControl]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_QueryText]], [[guiscript:DisplayString]], [[guiscript:Window_GetControl]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
@@ -2142,7 +2142,7 @@ If row is specificed, it can also append text to existing rows.\n\
 \n\
 **Return value:** Index of the row appended or changed\n\
 \n\
-**See also:** [[guiscript:TextAreaClear]], [[guiscript:SetText]], [[guiscript:QueryText]]"
+**See also:** [[guiscript:TextArea_Clear]], [[guiscript:Control_SetText]], [[guiscript:Control_QueryText]]"
 );
 
 static PyObject* GemRB_TextArea_Append(PyObject * /*self*/, PyObject* args)
@@ -2203,7 +2203,7 @@ PyDoc_STRVAR( GemRB_TextArea_Clear__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:TextAreaAppend]]"
+**See also:** [[guiscript:TextArea_Append]]"
 );
 
 static PyObject* GemRB_TextArea_Clear(PyObject * /*self*/, PyObject* args)
@@ -2251,7 +2251,7 @@ The tooltip's visual properties must be set in the gemrb.ini file:\n\
 \n\
 **Return value:** 0 on success, -1 on error\n\
 \n\
-**See also:** [[guiscript:SetText]]"
+**See also:** [[guiscript:Control_SetText]]"
 );
 
 static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
@@ -2336,7 +2336,7 @@ Window index 0 is the game control window (GameWindow python object)\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:ShowModal]], [[guiscript:SetWindowFrame]]"
+**See also:** [[guiscript:Window_ShowModal]], [[guiscript:Window_SetFrame]]"
 );
 
 static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
@@ -2420,7 +2420,7 @@ MODAL_SHADOW_BLACK, they are blacked out.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetVisible]]"
+**See also:** [[guiscript:Window_SetVisible]]"
 );
 
 static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
@@ -2455,7 +2455,7 @@ the event won't be called.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetEvent]]\n\
+**See also:** [[guiscript:Control_SetEvent]]\n\
 "
 );
 
@@ -2526,7 +2526,7 @@ The above example sets up the 'YesButton' function from the Buttons module to be
   Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, ChaPress)\n\
 The above example shows how to implement 'context sensitive help'. The 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.\n\
 \n\
-**See also:** [[guiscript:GetControl]], [[guiscript:SetVarAssoc]], [[guiscript:SetTimedEvent]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Window_GetControl]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetTimedEvent]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
@@ -2628,7 +2628,7 @@ control, which has various uses.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonState]]"
+**See also:** [[guiscript:Button_SetState]]"
 );
 
 static PyObject* GemRB_Control_SetStatus(PyObject * /*self*/, PyObject* args)
@@ -2670,7 +2670,7 @@ SetDefaultScrollBar, this command is not needed.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetDefaultScrollBar]]"
+**See also:** [[guiscript:ScrollBar_SetDefaultScrollBar]]"
 );
 
 static PyObject* GemRB_Control_AttachScrollBar(PyObject * /*self*/, PyObject* args)
@@ -2723,7 +2723,7 @@ control. See more about this in 'data_exchange'.\n\
 \n\
 **Special:** If the 'DialogChoose' variable was set to -1 or 0 during a dialog session, it will terminate (-1) or pick the first available option (0) from the dialog automatically. (0 is used for 'continue', -1 is used for 'end dialogue').\n\
 \n\
-**See also:** [[guiscript:SetButtonFlags]], [[guiscript:SetVar]], [[guiscript:GetVar]], [[guiscript:data_exchange]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Button_SetFlags]], [[guiscript:SetVar]], [[guiscript:GetVar]], [[guiscript:data_exchange]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject * /*self*/, PyObject* args)
@@ -2886,7 +2886,7 @@ will be removed). \n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateButton]], [[guiscript:CreateLabel]]"
+**See also:** [[guiscript:Window_CreateButton]], [[guiscript:Window_CreateLabel]]"
 );
 
 static PyObject* GemRB_Button_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
@@ -2948,7 +2948,7 @@ PyDoc_STRVAR( GemRB_Window_CreateLabel__doc,
   Label.SetText (GEMRB_VERSION)\n\
 The above lines add the GemRB version string to the PST main screen.\n\
 \n\
-**See also:** [[guiscript:CreateButton]], [[guiscript:SetText]]"
+**See also:** [[guiscript:Window_CreateButton]], [[guiscript:Control_SetText]]"
 );
 
 static PyObject* GemRB_Window_CreateLabel(PyObject * /*self*/, PyObject* args)
@@ -2997,7 +2997,7 @@ has no own palette, you can set a default palette by this command.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetLabelUseRGB]]"
+**See also:** [[guiscript:Label_SetUseRGB]]"
 );
 static PyObject* GemRB_Label_SetTextColor(PyObject * /*self*/, PyObject* args)
 {
@@ -3039,7 +3039,7 @@ in PST MapNote editor. The maximum length of the edit field is 500 characters.\n
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateLabel]], [[guiscript:CreateMapControl]], [[guiscript:CreateWorldMapControl]], [[guiscript:CreateButton]]"
+**See also:** [[guiscript:Window_CreateLabel]], [[guiscript:Window_CreateMapControl]], [[guiscript:Window_CreateWorldMapControl]], [[guiscript:Window_CreateButton]]"
 );
 
 static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args)
@@ -3099,7 +3099,7 @@ PyDoc_STRVAR( GemRB_Window_CreateScrollBar__doc,
 \n\
 **Return value:** ControlIndex\n\
 \n\
-**See also:** [[guiscript:SetDefaultScrollBar]], [[guiscript:AttachScrollBar]]"
+**See also:** [[guiscript:ScrollBar_SetDefaultScrollBar]], [[guiscript:Control_AttachScrollBar]]"
 );
 
 static PyObject* GemRB_Window_CreateScrollBar(PyObject * /*self*/, PyObject* args)
@@ -3169,7 +3169,7 @@ PyDoc_STRVAR( GemRB_Window_CreateButton__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateLabel]], [[guiscript:CreateMapControl]], [[guiscript:CreateWorldMapControl]], [[guiscript:CreateTextEdit]]"
+**See also:** [[guiscript:Window_CreateLabel]], [[guiscript:Window_CreateMapControl]], [[guiscript:Window_CreateWorldMapControl]], [[guiscript:Window_CreateTextEdit]]"
 );
 
 static PyObject* GemRB_Window_CreateButton(PyObject * /*self*/, PyObject* args)
@@ -3215,7 +3215,7 @@ PyDoc_STRVAR( GemRB_TextEdit_SetBackground__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonMOS]], [[guiscript:SetButtonBAM]], [[guiscript:SetButtonPicture]], [[guiscript:SetButtonSprites]]"
+**See also:** [[guiscript:Button_SetMOS]], [[guiscript:Button_SetBAM]], [[guiscript:Button_SetPicture]], [[guiscript:Button_SetSprites]]"
 );
 
 static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* args)
@@ -3270,7 +3270,7 @@ setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonFlags]], [[guiscript:SetButtonBAM]], [[guiscript:SetButtonPicture]]"
+**See also:** [[guiscript:Button_SetFlags]], [[guiscript:Button_SetBAM]], [[guiscript:Button_SetPicture]]"
 );
 
 static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
@@ -3334,7 +3334,7 @@ values to the second.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonPictureClipping]]"
+**See also:** [[guiscript:Button_SetPictureClipping]]"
 );
 
 static PyObject* GemRB_Button_SetOverlay(PyObject * /*self*/, PyObject* args)
@@ -3393,7 +3393,7 @@ Not known spells are drawn darkened (the whole button will be overlaid).\n\
   Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)\n\
 This will draw a green frame around the portrait.\n\
 \n\
-**See also:** [[guiscript:EnableButtonBorder]]"
+**See also:** [[guiscript:Button_EnableBorder]]"
 );
 
 static PyObject* GemRB_Button_SetBorder(PyObject * /*self*/, PyObject* args)
@@ -3433,7 +3433,7 @@ PyDoc_STRVAR( GemRB_Button_EnableBorder__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonBAM]], [[guiscript:SetButtonFlags]], [[guiscript:SetButtonBorder]]"
+**See also:** [[guiscript:Button_SetBAM]], [[guiscript:Button_SetFlags]], [[guiscript:Button_SetBorder]]"
 );
 
 static PyObject* GemRB_Button_EnableBorder(PyObject * /*self*/, PyObject* args)
@@ -3470,7 +3470,7 @@ PyDoc_STRVAR( GemRB_Button_SetFont__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateLabel]]"
+**See also:** [[guiscript:Window_CreateLabel]]"
 );
 
 static PyObject* GemRB_Button_SetFont(PyObject * /*self*/, PyObject* args)
@@ -3582,7 +3582,7 @@ for fonts with swapped background and text colors.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetLabelUseRGB]], [[guiscript:SetLabelTextColor]]"
+**See also:** [[guiscript:Label_SetUseRGB]], [[guiscript:Label_SetTextColor]]"
 );
 
 static PyObject* GemRB_Button_SetTextColor(PyObject * /*self*/, PyObject* args)
@@ -3627,7 +3627,7 @@ PyDoc_STRVAR( GemRB_Window_DeleteControl__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:GetControl]]"
+**See also:** [[guiscript:Window_GetControl]]"
 );
 
 static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
@@ -3810,7 +3810,7 @@ PyDoc_STRVAR( GemRB_WorldMap_AdjustScrolling__doc,
     return\
 The above lines set up a button event. When the button is pressed the worldmap will be shifted in the northeastern direction.\n\
 \n\
-**See also:** [[guiscript:CreateWorldMapControl]"
+**See also:** [[guiscript:Window_CreateWorldMapControl]"
 );
 
 static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject * /*self*/, PyObject* args)
@@ -3839,7 +3839,7 @@ PyDoc_STRVAR( GemRB_CreateMovement__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:GetDestinationArea]]\n\
+**See also:** [[guiscript:WorldMap_GetDestinationArea]]\n\
 "
 );
 
@@ -3927,7 +3927,7 @@ encounters will be evaluated too.\n\
   * Destination - The area resource reference where the player arrives (if there was a random encounter, it differs from Target)\n\
   * Entrance    - The area entrance in the Destination area, it could be empty, in this casethe player should appear in middle of the area\n\
 \n\
-**See also:** [[guiscript:CreateWorldMapControl]], [[guiscript:CreateMovement]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Window_CreateWorldMapControl]], [[guiscript:CreateMovement]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject* args)
@@ -4045,7 +4045,7 @@ ignored).\n\
      Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, 'floattxt')\n\
      WorldMapControl = Window.GetControl (4)\n\
 \n\
-**See also:** [[guiscript:GetDestinationArea]], [[guiscript:CreateMovement]]"
+**See also:** [[guiscript:WorldMap_GetDestinationArea]], [[guiscript:CreateMovement]]"
 );
 
 static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
@@ -4154,7 +4154,7 @@ disable mapnotes (you must supply a LabelID and the resources for the pins).\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetVarAssoc]], [[guiscript:SetMapnote]]"
+**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:SetMapnote]]"
 );
 
 static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* args)
@@ -4296,7 +4296,7 @@ PyDoc_STRVAR( GemRB_Control_SetPos__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetControlSize]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_SetSize]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_SetPos(PyObject * /*self*/, PyObject* args)
@@ -4332,7 +4332,7 @@ PyDoc_STRVAR( GemRB_Control_GetRect__doc,
 \n\
 **Return value:** dict\n\
 \n\
-**See also:** [[guiscript:SetControlSize]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_SetSize]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_GetRect(PyObject * /*self*/, PyObject* args)
@@ -4371,7 +4371,7 @@ PyDoc_STRVAR( GemRB_Control_SetSize__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetControlPos]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_SetPos]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_SetSize(PyObject * /*self*/, PyObject* args)
@@ -4409,7 +4409,7 @@ PyDoc_STRVAR( GemRB_Label_SetFont__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateLabel]]"
+**See also:** [[guiscript:Window_CreateLabel]]"
 );
 
 static PyObject* GemRB_Label_SetFont(PyObject * /*self*/, PyObject* args)
@@ -4448,7 +4448,7 @@ to not use the Font's colors you can alter its color by SetLabelTextColor().\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetLabelTextColor]]"
+**See also:** [[guiscript:Label_SetTextColor]]"
 );
 
 static PyObject* GemRB_Label_SetUseRGB(PyObject * /*self*/, PyObject* args)
@@ -4607,7 +4607,7 @@ status, dialog textarea size).\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetVisible]], [[guiscript:bit_operation]]"
+**See also:** [[guiscript:Window_SetVisible]], [[guiscript:bit_operation]]"
 );
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
@@ -4796,7 +4796,7 @@ This command will make the button behave like a checkbox.\n\
   Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)\n\
 This command will re-enable the images of the button (making it visible).\n\
 \n\
-**See also:** [[guiscript:SetButtonSprites]], [[guiscript:SetButtonPicture]], [[guiscript:SetButtonBAM]]"
+**See also:** [[guiscript:Button_SetSprites]], [[guiscript:Button_SetPicture]], [[guiscript:Button_SetBAM]]"
 );
 
 static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
@@ -4850,7 +4850,7 @@ PyDoc_STRVAR( GemRB_TextArea_SetFlags__doc,
     RowCount = TextAreaControl.GetCharSounds ()\n\
 The above code will set up the TextArea as a ListBox control, by reading the names of available character soundsets into the TextArea and setting it up as selectable. When the user clicks on row, the 'Sound' variable will be assigned a row number.\n\
 \n\
-**See also:** [[guiscript:RewindTA]], [[guiscript:SetTAHistory]], [[guiscript:GetCharSounds]], [[guiscript:GetCharacters]], [[guiscript:QueryText]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:RewindTA]], [[guiscript:SetTAHistory]], [[guiscript:GetCharSounds]], [[guiscript:GetCharacters]], [[guiscript:Control_QueryText]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
@@ -4895,7 +4895,7 @@ there is another attached to the control.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:AttachScrollBar]]"
+**See also:** [[guiscript:Control_AttachScrollBar]]"
 );
 
 static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObject* args)
@@ -4940,7 +4940,7 @@ is a checkbox or a radio button though, their states are handled internally.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonFlags]]"
+**See also:** [[guiscript:Button_SetFlags]]"
 );
 
 static PyObject* GemRB_Button_SetState(PyObject * /*self*/, PyObject* args)
@@ -4978,7 +4978,7 @@ SetButtonOverlay().\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonPicture]], [[guiscript:SetButtonOverlay]]"
+**See also:** [[guiscript:Button_SetPicture]], [[guiscript:Button_SetOverlay]]"
 );
 
 static PyObject* GemRB_Button_SetPictureClipping(PyObject * /*self*/, PyObject* args)
@@ -5018,7 +5018,7 @@ PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonBAM]], [[guiscript:SetButtonPLT]], [[guiscript:SetButtonSprites]], [[guiscript:SetButtonPictureClipping]], [[guiscript:SetWindowPicture]]"
+**See also:** [[guiscript:Button_SetBAM]], [[guiscript:Button_SetPLT]], [[guiscript:Button_SetSprites]], [[guiscript:Button_SetPictureClipping]], [[guiscript:Window_SetPicture]]"
 );
 
 static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
@@ -5118,7 +5118,7 @@ PyDoc_STRVAR( GemRB_Button_SetMOS__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonBAM]], [[guiscript:SetButtonPLT]], [[guiscript:SetButtonPicture]]"
+**See also:** [[guiscript:Button_SetBAM]], [[guiscript:Button_SetPLT]], [[guiscript:Button_SetPicture]]"
 );
 
 static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
@@ -5177,7 +5177,7 @@ Sets up the palette based on the eight given gradient colors.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonBAM]]"
+**See also:** [[guiscript:Button_SetBAM]]"
 );
 
 static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
@@ -5270,7 +5270,7 @@ colors palette, it has issues in PST.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetButtonPLT]], [[guiscript:SetButtonPicture]], [[guiscript:SetButtonSprites]]"
+**See also:** [[guiscript:Button_SetPLT]], [[guiscript:Button_SetPicture]], [[guiscript:Button_SetSprites]]"
 );
 
 static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex, int FrameIndex, int col1)
@@ -5347,7 +5347,7 @@ PyDoc_STRVAR( GemRB_Control_SetAnimationPalette__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetAnimation]]"
+**See also:** [[guiscript:Control_SetAnimation]]"
 );
 
 static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject* args)
@@ -5430,7 +5430,7 @@ a BAM file. Optionally an animation cycle could be set too.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetAnimationPalette]]"
+**See also:** [[guiscript:Control_SetAnimationPalette]]"
 );
 
 static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
@@ -5608,7 +5608,7 @@ PyDoc_STRVAR( GemRB_DrawWindows__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:InvalidateWindow]], [[guiscript:UnhideGUI]]\n\
+**See also:** [[guiscript:Window_Invalidate]], [[guiscript:UnhideGUI]]\n\
 "
 );
 
@@ -5750,7 +5750,7 @@ be avoided. The hardcoded token list:\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:GetToken]], [[guiscript:QueryText]], [[guiscript:SetText]]\n\
+**See also:** [[guiscript:GetToken]], [[guiscript:Control_QueryText]], [[guiscript:Control_SetText]]\n\
 "
 );
 
@@ -5798,7 +5798,7 @@ core, these are described in different places:\n\
   GemRB.SetVar('MessagePosition', 4) #BottomAdded\n\
 The above lines set up some windows of the main game screen.\n\
 \n\
-**See also:** [[guiscript:SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]], [[guiscript:data_exchange]]"
+**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]], [[guiscript:data_exchange]]"
 );
 
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
@@ -5856,7 +5856,7 @@ string values, used both by the game scripts and the GUI scripts.\n\
   TextArea.Append (GemRB.GetToken('CHARNAME')\n\
 The above example will add the protagonist's name to the TextArea (if the token was set correctly).\n\
 \n\
-**See also:** [[guiscript:SetToken]], [[guiscript:QueryText]]\n\
+**See also:** [[guiscript:SetToken]], [[guiscript:Control_QueryText]]\n\
 "
 );
 
@@ -5894,7 +5894,7 @@ controls could affect the same variable.\n\
 **Examples:**\n\
   selected = GemRB.GetVar ('SelectedMovie')\n\
 \n\
-**See also:** [[guiscript:SetVar]], [[guiscript:SetVarAssoc]], [[guiscript:data_exchange]]\n\
+**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]], [[guiscript:data_exchange]]\n\
 "
 );
 
@@ -5979,7 +5979,7 @@ PyDoc_STRVAR( GemRB_SetGlobal__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetVar]], [[guiscript:SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:data_exchange]]"
+**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:data_exchange]]"
 );
 
 static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
@@ -6532,7 +6532,7 @@ in PST MapNote editor. The maximum length of the edit field is 500 characters.\n
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateLabel]], [[guiscript:CreateMapControl]], [[guiscript:CreateWorldMapControl]], [[guiscript:CreateButton]], [[guiscript:CreateTextEdit]]"
+**See also:** [[guiscript:Window_CreateLabel]], [[guiscript:Window_CreateMapControl]], [[guiscript:Window_CreateWorldMapControl]], [[guiscript:Window_CreateButton]], [[guiscript:Window_CreateTextEdit]]"
 );
 
 static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args)
@@ -7450,7 +7450,7 @@ command can set either or both.\n\
   GemRB.SetPlayerName (MyChar, GemRB.GetToken('CHARNAME'), 0)\n\
 In the above example we set the player's name to a previously set Token (global string).\n\
 \n\
-**See also:** [[guiscript:QueryText]], [[guiscript:GetToken]]"
+**See also:** [[guiscript:Control_QueryText]], [[guiscript:GetToken]]"
 );
 
 static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
@@ -7612,7 +7612,7 @@ PyDoc_STRVAR( GemRB_GetSlotType__doc,
 'Tip'    - the tooltip resref for this slot.\n\
 'ResRef' - the background .bam of the slot.\n\
 \n\
-**See also:** [[guiscript:SetItemIcon]]\n\
+**See also:** [[guiscript:Button_SetItemIcon]]\n\
 "
 );
 
@@ -8394,7 +8394,7 @@ Spellbook Icon\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetItemIcon]]"
+**See also:** [[guiscript:Button_SetItemIcon]]"
 );
 
 static PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int tooltip, int Function)
@@ -8525,7 +8525,7 @@ PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetSpellIcon]], [[guiscript:SetActionIcon]]"
+**See also:** [[guiscript:Button_SetSpellIcon]], [[guiscript:Button_SetActionIcon]]"
 );
 
 static PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
@@ -10216,7 +10216,7 @@ is set, nothing will be printed to the console.\n\
   * 'NonHostile'      - is the spell considered hostile?\n\
   * 'SpellResRef'     - the spell's resource reference\n\
 \n\
-**See also:** [[guiscript:GetItem]], [[guiscript:SetSpellIcon]], spell_structure(IESDP)\n\
+**See also:** [[guiscript:GetItem]], [[guiscript:Button_SetSpellIcon]], spell_structure(IESDP)\n\
 "
 );
 
@@ -10695,7 +10695,7 @@ the slot will not be looked up again.\n\
   * 'Header'  - Item's extended header assigned to the inventory slot (the\n\
   ability to use). Only applicable to quickslots.\n\
 \n\
-**See also:** [[guiscript:GetItem]], [[guiscript:SetItemIcon]], [[guiscript:ChangeItemFlag]]"
+**See also:** [[guiscript:GetItem]], [[guiscript:Button_SetItemIcon]], [[guiscript:ChangeItemFlag]]"
 );
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
@@ -10983,7 +10983,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
     * 4 - item is a container\n\
     * 8 - item has selectable abilities (headers)\n\
 \n\
-**See also:** [[guiscript:GetSlotItem]], [[guiscript:GetSpell]], [[guiscript:SetItemIcon]]"
+**See also:** [[guiscript:GetSlotItem]], [[guiscript:GetSpell]], [[guiscript:Button_SetItemIcon]]"
 );
 
 #define CAN_DRINK 1  //potions
@@ -11768,7 +11768,7 @@ PyDoc_STRVAR( GemRB_SetMapnote__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CreateMapControl]]\n\
+**See also:** [[guiscript:Window_CreateMapControl]]\n\
 "
 );
 
@@ -12371,7 +12371,7 @@ PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 \n\
 **Return value:** -9999 if the parameters are illegal, otherwise the required bonus\n\
 \n\
-**See also:** [[guiscript:SetPlayerStat]], [[guiscript:GetPlayerStat]], [[guiscript:GetTableValue]]"
+**See also:** [[guiscript:SetPlayerStat]], [[guiscript:GetPlayerStat]], [[guiscript:Table_GetValue]]"
 );
 
 static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
@@ -12521,7 +12521,7 @@ image, the tooltip and the push button event handler.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetSpellIcon]], [[guiscript:SetItemIcon]], [[guiscript:SetupControls]]"
+**See also:** [[guiscript:Button_SetSpellIcon]], [[guiscript:Button_SetItemIcon]], [[guiscript:Window_SetupControls]]"
 );
 
 static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict, int Index, int Function)
@@ -12658,7 +12658,7 @@ If Start is supplied, it will skip the first few items.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetupControls]], [[guiscript:UseItem]]"
+**See also:** [[guiscript:Window_SetupControls]], [[guiscript:UseItem]]"
 );
 
 static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
@@ -12799,7 +12799,7 @@ based on preset preferences and the character's class.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetActionIcon]], [[guiscript:SetDefaultActions]], [[guiscript:SetupEquipmentIcons]]"
+**See also:** [[guiscript:Button_SetActionIcon]], [[guiscript:SetDefaultActions]], [[guiscript:Window_SetupEquipmentIcons]]"
 );
 
 static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
@@ -13216,7 +13216,7 @@ like in iwd2. Also sets up the first three default action types.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetupControls]]\n\
+**See also:** [[guiscript:Window_SetupControls]]\n\
 "
 );
 
@@ -13706,7 +13706,7 @@ This handles targeting and executes the appropriate scripting command.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:CanUseItemType]], [[guiscript:SpellCast]], [[guiscript:SetupEquipmentIcons]]\n\
+**See also:** [[guiscript:CanUseItemType]], [[guiscript:SpellCast]], [[guiscript:Window_SetupEquipmentIcons]]\n\
 "
 );
 
@@ -13866,7 +13866,7 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 **Parameters:**\n\
   * time - 0-10\n\
 \n\
-**See also:** [[guiscript:SetTooltip]], [[guiscript:SetMouseScrollSpeed]]\n\
+**See also:** [[guiscript:Control_SetTooltip]], [[guiscript:SetMouseScrollSpeed]]\n\
 "
 );
 
@@ -14420,7 +14420,7 @@ character whose name will be displayed (as saying the string).\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetText]]\n\
+**See also:** [[guiscript:Control_SetText]]\n\
 "
 );
 
@@ -15603,7 +15603,7 @@ static char* QuotePath(char* tgt, const char* src)
 
 PyDoc_STRVAR( GemRB__doc,
 "Module exposing GemRB data and engine internals\n\n"
-"This module exposes to python GUIScripts GemRB engine data and internals."
+"This module exposes to python GUIScripts GemRB engine data and internals. "
 "It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp" );
 
 PyDoc_STRVAR( GemRB_internal__doc,
