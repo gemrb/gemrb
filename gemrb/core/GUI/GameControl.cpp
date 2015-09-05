@@ -2505,7 +2505,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 }
 
-void GameControl::SetScreenFlags(int value, int mode)
+void GameControl::SetScreenFlags(unsigned int value, int mode)
 {
 	switch(mode) {
 		case OP_OR: ScreenFlags |= value; break;
@@ -2516,7 +2516,7 @@ void GameControl::SetScreenFlags(int value, int mode)
 	}
 }
 
-void GameControl::SetDialogueFlags(int value, int mode)
+void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
 	switch(mode) {
 		case OP_OR: DialogueFlags |= value; break;

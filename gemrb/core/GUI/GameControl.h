@@ -138,8 +138,8 @@ private:
 	Point pfs;
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
-	int ScreenFlags;
-	int DialogueFlags;
+	unsigned int ScreenFlags;
+	unsigned int DialogueFlags;
 	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
@@ -166,8 +166,8 @@ public: //Events
 	void SetScrolling(bool scroll);
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
-	void SetScreenFlags(int value, int mode);
-	void SetDialogueFlags(int value, int mode);
+	void SetScreenFlags(unsigned int value, int mode);
+	void SetDialogueFlags(unsigned int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);
