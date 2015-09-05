@@ -4782,10 +4782,7 @@ PyDoc_STRVAR( GemRB_Button_SetFlags__doc,
     * IE_GUI_BUTTON_RADIOBUTTON= 0x00000020, it is a radio button\n\
     * IE_GUI_BUTTON_DEFAULT    = 0x00000040, it is the default button\n\
     * IE_GUI_BUTTON_DRAGGABLE  = 0x00000080, the image of the button is draggable?\n\
-  * Operation - the binary operation to perform on the current button flags\n\
-    * OP_SET = 0, sets the value completely\n\
-    * OP_OR = 1, sets (turns on) the 1 bits of the value\n\
-    * OP_NAND = 2, resets (turns off) the 1 bits of the value\n\
+  * Operation - bit operation to perform on the current button flags\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -4796,7 +4793,7 @@ This command will make the button behave like a checkbox.\n\
   Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)\n\
 This command will re-enable the images of the button (making it visible).\n\
 \n\
-**See also:** [[guiscript:Button_SetSprites]], [[guiscript:Button_SetPicture]], [[guiscript:Button_SetBAM]]"
+**See also:** [[guiscript:Button_SetSprites]], [[guiscript:Button_SetPicture]], [[guiscript:Button_SetBAM]], [[guiscript:bit_operation]]"
 );
 
 static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
@@ -4839,7 +4836,7 @@ PyDoc_STRVAR( GemRB_TextArea_SetFlags__doc,
     * IE_GUI_TEXTAREA_AUTOSCROLL   - 0x05000001\n\
     * IE_GUI_TEXTAREA_SMOOTHSCROLL - 0x05000002 slowly scroll contents. If it is out of text, it will call the TEXTAREA_OUT_OF_TEXT callback.\n\
     * IE_GUI_TEXTAREA_HISTORY      - 0x05000004 drop some of the scrolled out text.\n\
-  * Operation - could be OP_SET, OP_OR or OP_NAND, default is OP_SET.\n\
+  * Operation - bit operation to perform, default is OP_SET.\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -4850,7 +4847,7 @@ PyDoc_STRVAR( GemRB_TextArea_SetFlags__doc,
     RowCount = TextAreaControl.GetCharSounds ()\n\
 The above code will set up the TextArea as a ListBox control, by reading the names of available character soundsets into the TextArea and setting it up as selectable. When the user clicks on row, the 'Sound' variable will be assigned a row number.\n\
 \n\
-**See also:** [[guiscript:RewindTA]], [[guiscript:SetTAHistory]], [[guiscript:GetCharSounds]], [[guiscript:GetCharacters]], [[guiscript:Control_QueryText]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:RewindTA]], [[guiscript:SetTAHistory]], [[guiscript:GetCharSounds]], [[guiscript:GetCharacters]], [[guiscript:Control_QueryText]], [[guiscript:accessing_gui_controls]], [[guiscript:bit_operation]]"
 );
 
 static PyObject* GemRB_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
@@ -10758,15 +10755,10 @@ identifies an item.\n\
     * IE_INV_ITEM_EQUIPPED      = 0x40 - the item is equipped\n\
     * IE_INV_ITEM_STACKED       = 0x80 - the item is a stacked item\n\
   * mode    - binary operation type\n\
-    * OP_SET = 0  - sets all bits as flag\n\
-    * OP_AND = 1  - turns all other bits off\n\
-    * OP_OR = 2   - turns bit on\n\
-    * OP_XOR = 3  - toggles bit\n\
-    * OP_NAND = 4 - turns bit off\n\
 \n\
 **Return value:** Returns 0 if the item was not found.\n\
 \n\
-**See also:** [[guiscript:GetSlotItem]]"
+**See also:** [[guiscript:GetSlotItem]], [[guiscript:bit_operation]]"
 );
 
 static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
@@ -14384,11 +14376,11 @@ PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
 \n\
 **Parameters:** \n\
   * value - speed, see the GEM_RK* flags in GUIDefines.py\n\
-  * op - operation (OP_OR, OP_NAND and so on)\n\
+  * op - bit operation to perform\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:**\n\
+**See also:** [[guiscript:bit_operation]]\n\
 "
 );
 
