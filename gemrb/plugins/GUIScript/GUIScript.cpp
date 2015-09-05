@@ -5853,7 +5853,7 @@ string values, used both by the game scripts and the GUI scripts.\n\
 **Return value:** string, the value of the token\n\
 \n\
 **Example:**\n\
-  TextArea.Append (GemRB.GetToken('CHARNAME')\n\
+  TextArea.Append (GemRB.GetToken ('CHARNAME'))\n\
 The above example will add the protagonist's name to the TextArea (if the token was set correctly).\n\
 \n\
 **See also:** [[guiscript:SetToken]], [[guiscript:Control_QueryText]]\n\
