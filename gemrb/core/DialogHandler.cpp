@@ -167,8 +167,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	}
 
 	//no exploring while in dialogue
-	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
-	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
+	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_OR);
+	gc->SetDialogueFlags(DF_IN_DIALOG, OP_OR);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	// NOTE: besides marking pause/not pause, they determine what happens if
@@ -177,7 +177,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	//Bit 1: EscapeArea()
 	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
 	if (!(dlg->Flags&7) ) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 	}
 	return true;
 }
@@ -217,12 +217,12 @@ void DialogHandler::EndDialog(bool try_to_break)
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
-	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
+	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
 	GameControl* gc = core->GetGameControl();
 	if ( !(gc->GetScreenFlags()&SF_CUTSCENE)) {
-		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);
+		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_NAND);
 	}
-	gc->SetDialogueFlags(0, BM_SET);
+	gc->SetDialogueFlags(0, OP_SET);
 	gc->MoveViewportTo(previousX, previousY, false);
 	previousX = previousY = -1;
 	core->SetEventFlag(EF_PORTRAIT);
@@ -274,10 +274,10 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tgta) {
 			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
-				gc->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
+				gc->SetDialogueFlags(DF_TALKCOUNT, OP_NAND);
 				tgta->TalkCount++;
 			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
-				gc->SetDialogueFlags(DF_INTERACT, BM_NAND);
+				gc->SetDialogueFlags(DF_INTERACT, OP_NAND);
 				tgta->InteractCount++;
 			}
 		}
@@ -461,7 +461,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
 			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-				gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+				gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
 				break;
 			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 				if (ds->transitions[x]->condition &&
@@ -469,7 +469,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					continue;
 				}
 			}
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
 			break;
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
@@ -486,7 +486,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
-		gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+		gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
 	}
 
 	return true;

@@ -1957,20 +1957,20 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, BM_NAND);
+	game->SetControlStatus(CS_HIDEGUI, OP_NAND);
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, BM_OR);
+	game->SetControlStatus(CS_HIDEGUI, OP_OR);
 }
 
 void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, BM_OR);
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_OR);
 	}
 }
 
@@ -1978,7 +1978,7 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, BM_NAND);
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_NAND);
 	}
 }
 
@@ -3575,9 +3575,9 @@ void GameScript::SetCriticalPathObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if (parameters->int0Parameter) {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_OR);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_OR);
 	} else {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_NAND);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_NAND);
 	}
 }
 
@@ -3588,7 +3588,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetMCFlag(MC_BEENINPARTY, BM_OR);
+	actor->SetMCFlag(MC_BEENINPARTY, OP_OR);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -3599,9 +3599,9 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int1Parameter) {
-		actor->SetMCFlag(parameters->int0Parameter, BM_OR);
+		actor->SetMCFlag(parameters->int0Parameter, OP_OR);
 	} else {
-		actor->SetMCFlag(parameters->int0Parameter, BM_NAND);
+		actor->SetMCFlag(parameters->int0Parameter, OP_NAND);
 	}
 }
 
@@ -3940,7 +3940,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
-	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
+	act->SetMCFlag(MC_FALLEN_PALADIN, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -3951,7 +3951,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
-	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
+	act->SetMCFlag(MC_FALLEN_RANGER, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -3961,7 +3961,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_PALADIN, BM_NAND);
+	act->SetMCFlag(MC_FALLEN_PALADIN, OP_NAND);
 	act->ApplyKit(false);
 }
 
@@ -3971,7 +3971,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_RANGER, BM_NAND);
+	act->SetMCFlag(MC_FALLEN_RANGER, OP_NAND);
 	act->ApplyKit(false);
 }
 
@@ -4792,7 +4792,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_OR);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_OR);
 	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, DMC_BG2XPGREEN);
 }
 
@@ -4803,7 +4803,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_NAND);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_NAND);
 }
 
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
@@ -6099,7 +6099,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 {
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED, DMC_RED);
 	}
 	// releasing this action allows actions to continue executing,
@@ -6268,9 +6268,9 @@ void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if ( parameters->int0Parameter != 0 ) {
-		actor->SetMCFlag(MC_NO_TALK, BM_NAND);
+		actor->SetMCFlag(MC_NO_TALK, OP_NAND);
 	} else {
-		actor->SetMCFlag(MC_NO_TALK, BM_OR);
+		actor->SetMCFlag(MC_NO_TALK, OP_OR);
 	}
 }
 

@@ -2982,22 +2982,22 @@ void Interface::HandleGUIBehaviour(void)
 			}
 			if (flg & DF_OPENCONTINUEWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
 			} else if (flg & DF_OPENENDWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
 			}
 		}
 
 		//handling container
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
+				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
 				guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
 			}
 		} else {
 			if (flg & DF_IN_CONTAINER) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
+				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
 				guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
 			}
 		}
@@ -3863,7 +3863,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 		WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
-			nae->SetAreaStatus(ae->GetAreaStatus(), BM_SET);
+			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
 		}
 	}
 	
@@ -5311,10 +5311,10 @@ bool Interface::SetPause(PauseSetting pause, int flags)
 		int strref;
 		if (pause) {
 			strref = STR_PAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 		} else {
 			strref = STR_UNPAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_NAND);
 		}
 		if (!(flags&PF_QUIET) ) {
 			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)

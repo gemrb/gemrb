@@ -656,11 +656,11 @@ ieDword Scriptable::GetInternalFlag() const
 void Scriptable::SetInternalFlag(int value, int mode)
 {
 	switch (mode) {
-		case BM_OR: InternalFlags|=value; break;
-		case BM_NAND: InternalFlags&=~value; break;
-		case BM_SET: InternalFlags=value; break;
-		case BM_AND: InternalFlags&=value; break;
-		case BM_XOR: InternalFlags^=value; break;
+		case OP_OR: InternalFlags|=value; break;
+		case OP_NAND: InternalFlags&=~value; break;
+		case OP_SET: InternalFlags=value; break;
+		case OP_AND: InternalFlags&=value; break;
+		case OP_XOR: InternalFlags^=value; break;
 	}
 }
 

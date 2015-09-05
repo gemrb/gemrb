@@ -877,11 +877,11 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 		return false;
 	}
 	switch (op) {
-	case BM_SET: item->Flags = arg; break;
-	case BM_OR: item->Flags |= arg; break;
-	case BM_NAND: item->Flags &= ~arg; break;
-	case BM_XOR: item->Flags ^= arg; break;
-	case BM_AND: item->Flags &= arg; break;
+	case OP_SET: item->Flags = arg; break;
+	case OP_OR: item->Flags |= arg; break;
+	case OP_NAND: item->Flags &= ~arg; break;
+	case OP_XOR: item->Flags ^= arg; break;
+	case OP_AND: item->Flags &= arg; break;
 	}
 	return true;
 }

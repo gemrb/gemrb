@@ -1059,10 +1059,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					ab->BaseStats[IE_EA]=EA_EVILCUTOFF;
 				}
 				if (Flags&AF_SEEN_PARTY) {
-					ab->SetMCFlag(MC_SEENPARTY,BM_OR);
+					ab->SetMCFlag(MC_SEENPARTY,OP_OR);
 				}
 				if (Flags&AF_INVULNERABLE) {
-					ab->SetMCFlag(MC_INVULNERABLE,BM_OR);
+					ab->SetMCFlag(MC_INVULNERABLE,OP_OR);
 				}
 				if (!(Flags&AF_ENABLED)) {
 					// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty

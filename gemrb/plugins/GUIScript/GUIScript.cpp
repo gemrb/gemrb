@@ -3724,7 +3724,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		strnuprcpy(entry->AreaName, area, 8);
 		strnuprcpy(entry->AreaResRef, area, 8);
 		strnuprcpy(entry->AreaLongName, script, 32);
-		entry->SetAreaStatus(flags, BM_SET);
+		entry->SetAreaStatus(flags, OP_SET);
 		entry->IconSeq = icon;
 		entry->X = locx;
 		entry->Y = locy;
@@ -4617,7 +4617,7 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &Flags, &Operation )) {
 		return AttributeError( GemRB_GameSetScreenFlags__doc );
 	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
+	if (Operation < OP_SET || Operation > OP_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
 		return NULL;
 	}
@@ -4660,7 +4660,7 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 	if (!PyArg_ParseTuple( args, "ii", &Flags, &Operation )) {
 		return AttributeError( GemRB_GameControlSetScreenFlags__doc );
 	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
+	if (Operation < OP_SET || Operation > OP_NAND) {
 		return AttributeError("Operation must be 0-4\n");
 	}
 
@@ -4806,7 +4806,7 @@ static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
 		return AttributeError( GemRB_Button_SetFlags__doc );
 	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
+	if (Operation < OP_SET || Operation > OP_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
 		return NULL;
 	}
@@ -4861,7 +4861,7 @@ static PyObject* GemRB_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
 		return AttributeError( GemRB_TextArea_SetFlags__doc );
 	}
-	if (Operation < BM_SET || Operation > BM_NAND) {
+	if (Operation < OP_SET || Operation > OP_NAND) {
 		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
 		return NULL;
 	}
@@ -4911,7 +4911,7 @@ static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObje
 		return NULL;
 	}
 
-	sb->SetFlags( (IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, BM_OR );
+	sb->SetFlags((IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, OP_OR);
 
 	Py_RETURN_NONE;
 }
@@ -5241,10 +5241,10 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 		btn->ClearPictureList();
 	btn->StackPicture(Picture);
 	if (Picture2) {
-		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_OR );
+		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, OP_OR);
 		btn->StackPicture( Picture2 );
 	} else if (type == 0) {
-		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_NAND );
+		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, OP_NAND);
 	}
 
 	Py_RETURN_NONE;
@@ -7466,7 +7466,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	actor->SetName(Name, Which);
-	actor->SetMCFlag(MC_EXPORTABLE,BM_OR);
+	actor->SetMCFlag(MC_EXPORTABLE,OP_OR);
 	Py_RETURN_NONE;
 }
 
@@ -8547,7 +8547,7 @@ static PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, 
 		return Py_None;
 	}
 
-	btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
+	btn->SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR);
 	Sprite2D* Picture;
 	bool setpicture = true;
 	int i;
@@ -12567,7 +12567,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	SetButtonCycle(bam, btn, (char) row.bytes[1], IE_GUI_BUTTON_PRESSED);
 	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
-	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BM_NAND );
+	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
 	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(func) );
@@ -12720,7 +12720,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 
 		if (!Picture) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
-			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
+			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET);
 			btn->SetTooltip(NULL);
 		} else {
 			SetButtonCycle(bam, btn, 0, IE_GUI_BUTTON_UNPRESSED);
@@ -12729,7 +12729,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 			SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
-			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
+			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
 			char* tip = core->GetCString(item->Tooltip, 0);
 			btn->SetTooltip(tip);
 			delete tip;
@@ -12879,7 +12879,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		if (!btn) {
 			return NULL;
 		}
-		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
+		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
 		SetItemText(btn, 0, false);
 		PyObject *ret = SetActionIcon(wi,ci,dict, action,i+1);
 

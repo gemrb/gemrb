@@ -474,7 +474,7 @@ int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//BM_OR would make sense only if this trigger changes the value of the variable
+//OP_OR would make sense only if this trigger changes the value of the variable
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {

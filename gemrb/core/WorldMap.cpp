@@ -58,11 +58,11 @@ WMPAreaEntry::~WMPAreaEntry()
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 {
 	switch (op) {
-	case BM_SET: AreaStatus = arg; break;
-	case BM_OR: AreaStatus |= arg; break;
-	case BM_NAND: AreaStatus &= ~arg; break;
-	case BM_XOR: AreaStatus ^= arg; break;
-	case BM_AND: AreaStatus &= arg; break;
+	case OP_SET: AreaStatus = arg; break;
+	case OP_OR: AreaStatus |= arg; break;
+	case OP_NAND: AreaStatus &= ~arg; break;
+	case OP_XOR: AreaStatus ^= arg; break;
+	case OP_AND: AreaStatus &= arg; break;
 	}
 	Sprite2D::FreeSprite(MapIcon);
 }
@@ -503,7 +503,7 @@ void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
 	}
 
 	WMPAreaEntry *ae = GetNewAreaEntry();
-	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BM_SET);
+	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, OP_SET);
 	CopyResRef(ae->AreaName, area);
 	CopyResRef(ae->AreaResRef, area);
 	ae->LocCaptionName = -1;
@@ -595,7 +595,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	//we are here, so we visited and it is visible too (i guess)
 	print("Updated Area visibility: %s(visited, accessible and visible)", AreaName);
 
-	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BM_OR);
+	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 	if (direction<0 || direction>3)
 		return;
 	i=ae->AreaLinksCount[direction];
@@ -604,7 +604,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
 			print("Updated Area visibility: %s(accessible, and visible)", ae2->AreaName);
-			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BM_OR);
+			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 		}
 	}
 }
@@ -636,7 +636,7 @@ void WorldMap::UpdateReachableAreas()
 		const char *varname = tab->QueryField(idx, 0);
 		if (game->locals->Lookup(varname, varval) && varval) {
 			const char *areaname = tab->QueryField(idx, 1);
-			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BM_OR);
+			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, OP_OR);
 		}
 	}
 }

@@ -2508,22 +2508,22 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 void GameControl::SetScreenFlags(int value, int mode)
 {
 	switch(mode) {
-		case BM_OR: ScreenFlags|=value; break;
-		case BM_NAND: ScreenFlags&=~value; break;
-		case BM_SET: ScreenFlags=value; break;
-		case BM_AND: ScreenFlags&=value; break;
-		case BM_XOR: ScreenFlags^=value; break;
+		case OP_OR: ScreenFlags |= value; break;
+		case OP_NAND: ScreenFlags &= ~value; break;
+		case OP_SET: ScreenFlags = value; break;
+		case OP_AND: ScreenFlags &= value; break;
+		case OP_XOR: ScreenFlags ^= value; break;
 	}
 }
 
 void GameControl::SetDialogueFlags(int value, int mode)
 {
 	switch(mode) {
-		case BM_OR: DialogueFlags|=value; break;
-		case BM_NAND: DialogueFlags&=~value; break;
-		case BM_SET: DialogueFlags=value; break;
-		case BM_AND: DialogueFlags&=value; break;
-		case BM_XOR: DialogueFlags^=value; break;
+		case OP_OR: DialogueFlags |= value; break;
+		case OP_NAND: DialogueFlags &= ~value; break;
+		case OP_SET: DialogueFlags = value; break;
+		case OP_AND: DialogueFlags &= value; break;
+		case OP_XOR: DialogueFlags ^= value; break;
 	}
 }
 

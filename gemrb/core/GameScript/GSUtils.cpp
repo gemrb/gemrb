@@ -185,19 +185,19 @@ int GetHPPercent(Scriptable* Sender)
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 {
 	switch(opcode) {
-		case BM_AND:
+		case OP_AND:
 			value1 = ( value1& value2 );
 			break;
-		case BM_OR:
+		case OP_OR:
 			value1 = ( value1| value2 );
 			break;
-		case BM_XOR:
+		case OP_XOR:
 			value1 = ( value1^ value2 );
 			break;
-		case BM_NAND: //this is a GemRB extension
+		case OP_NAND: //this is a GemRB extension
 			value1 = ( value1& ~value2 );
 			break;
-		case BM_SET: //this is a GemRB extension
+		case OP_SET: //this is a GemRB extension
 			value1 = value2;
 			break;
 	}
@@ -1143,9 +1143,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//increasing NumTimesTalkedTo or NumTimesInteracted
 	if (Flags & BD_TALKCOUNT) {
-		gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
+		gc->SetDialogueFlags(DF_TALKCOUNT, OP_OR);
 	} else if ((Flags & BD_LOCMASK) == BD_INTERACT) {
-		gc->SetDialogueFlags(DF_INTERACT, BM_OR);
+		gc->SetDialogueFlags(DF_INTERACT, OP_OR);
 	}
 
 	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
@@ -1199,7 +1199,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 			if (entry) {
 				// make sure the area is marked as revealed and visited
 				if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-					entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
+					entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, OP_OR);
 				}
 			}
 		}
@@ -1211,7 +1211,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 	// should this perhaps be a 'selected' check or similar instead?
 	if (actor->InParty) {
 		GameControl *gc=core->GetGameControl();
-		gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+		gc->SetScreenFlags(SF_CENTERONACTOR,OP_OR);
 		if (newSong) {
 			game->ChangeSong(false, true);
 		}

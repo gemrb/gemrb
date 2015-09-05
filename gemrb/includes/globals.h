@@ -80,11 +80,11 @@ namespace GemRB {
 
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define BM_SET  0 //gemrb extension
-#define BM_AND  1
-#define BM_OR   2
-#define BM_XOR  3
-#define BM_NAND 4 //gemrb extension
+#define OP_SET  0 //gemrb extension
+#define OP_AND  1
+#define OP_OR   2
+#define OP_XOR  3
+#define OP_NAND 4 //gemrb extension
 
 /////feature flags
 #define  GF_HAS_KAPUTZ           	0 //pst

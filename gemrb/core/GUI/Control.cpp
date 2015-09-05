@@ -237,19 +237,19 @@ int Control::SetFlags(int arg_flags, int opcode)
 	}
 	ieDword newFlags = Flags;
 	switch (opcode) {
-		case BM_SET:
+		case OP_SET:
 			newFlags = arg_flags;  //set
 			break;
-		case BM_AND:
+		case OP_AND:
 			newFlags &= arg_flags;
 			break;
-		case BM_OR:
+		case OP_OR:
 			newFlags |= arg_flags; //turn on
 			break;
-		case BM_XOR:
+		case OP_XOR:
 			newFlags ^= arg_flags;
 			break;
-		case BM_NAND:
+		case OP_NAND:
 			newFlags &= ~arg_flags;//turn off
 			break;
 		default:

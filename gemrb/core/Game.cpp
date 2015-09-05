@@ -1365,11 +1365,11 @@ void Game::SetReputation(ieDword r)
 void Game::SetControlStatus(int value, int mode)
 {
 	switch(mode) {
-		case BM_OR: ControlStatus|=value; break;
-		case BM_NAND: ControlStatus&=~value; break;
-		case BM_SET: ControlStatus=value; break;
-		case BM_AND: ControlStatus&=value; break;
-		case BM_XOR: ControlStatus^=value; break;
+		case OP_OR: ControlStatus|=value; break;
+		case OP_NAND: ControlStatus&=~value; break;
+		case OP_SET: ControlStatus=value; break;
+		case OP_AND: ControlStatus&=value; break;
+		case OP_XOR: ControlStatus^=value; break;
 	}
 	core->SetEventFlag(EF_CONTROL);
 }

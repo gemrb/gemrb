@@ -3908,11 +3908,11 @@ void Actor::SetMCFlag(ieDword arg, int op)
 {
 	ieDword tmp = BaseStats[IE_MC_FLAGS];
 	switch (op) {
-	case BM_SET: tmp = arg; break;
-	case BM_OR: tmp |= arg; break;
-	case BM_NAND: tmp &= ~arg; break;
-	case BM_XOR: tmp ^= arg; break;
-	case BM_AND: tmp &= arg; break;
+	case OP_SET: tmp = arg; break;
+	case OP_OR: tmp |= arg; break;
+	case OP_NAND: tmp &= ~arg; break;
+	case OP_XOR: tmp ^= arg; break;
+	case OP_AND: tmp &= arg; break;
 	}
 	SetBase(IE_MC_FLAGS, tmp);
 }
@@ -8675,13 +8675,13 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	ieDword mask = 1<<(feat&31);
 	ieDword idx = feat>>5;
 	switch (mode) {
-		case BM_SET: case BM_OR:
+		case OP_SET: case OP_OR:
 			BaseStats[IE_FEATS1+idx]|=mask;
 			break;
-		case BM_NAND:
+		case OP_NAND:
 			BaseStats[IE_FEATS1+idx]&=~mask;
 			break;
-		case BM_XOR:
+		case OP_XOR:
 			BaseStats[IE_FEATS1+idx]^=mask;
 			break;
 	}
@@ -8698,10 +8698,10 @@ void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 	else if (value>featmax[feat]) value = featmax[feat];
 
 	if (value) {
-		SetFeat(feat, BM_OR);
+		SetFeat(feat, OP_OR);
 		if (featstats[feat]) SetBase(featstats[feat], value);
 	} else {
-		SetFeat(feat, BM_NAND);
+		SetFeat(feat, OP_NAND);
 		if (featstats[feat]) SetBase(featstats[feat], 0);
 	}
 
@@ -9237,7 +9237,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->BaseStats[IE_EXPLORE] = 0;
 
 	//IF_INITIALIZED shouldn't be set here, yet
-	newActor->SetMCFlag(MC_EXPORTABLE, BM_NAND);
+	newActor->SetMCFlag(MC_EXPORTABLE, OP_NAND);
 
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
