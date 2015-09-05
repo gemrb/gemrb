@@ -590,14 +590,6 @@ def SetupSkillSelection ():
 	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
 	return
 
-########################
-
-#None of the following functions are implemented yet for pst (or not fully)
-#some are needed (eg stealth, innates), but some may be redundant
-#however, it would still be nice to add them via game mods for replay value
-
-########################
-
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 	global CurrentWindow, OptionsWindow, PortraitWindow
