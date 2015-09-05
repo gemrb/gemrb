@@ -401,7 +401,6 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
 
 	# Weapons - the last action is 'Guard'
-	# TODO: use SetActionIcon whenever possible
 	if weapons and i==4:
 		# FIXME: rather call UpdateFloatMenuGroupAction?
 		Button.SetActionIcon (globals(), ACT_DEFEND)
