@@ -328,10 +328,10 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 {
 	if (frame.w <= 0) {
-		resizeFlags |= RESIZE_WIDTH;
+		SetFlags(RESIZE_WIDTH, BM_OR);
 	}
 	if (frame.h <= 0) {
-		resizeFlags |= RESIZE_HEIGHT;
+		SetFlags(RESIZE_HEIGHT, BM_OR);
 	}
 	LayoutContentsFrom(contents.begin());
 }
@@ -463,10 +463,10 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 	Size contentBounds = Dimensions();
 	Region layoutFrame = Region(Point(), contentBounds);
-	if (resizeFlags&RESIZE_WIDTH) {
+	if (Flags()&RESIZE_WIDTH) {
 		layoutFrame.w = SHRT_MAX;
 	}
-	if (resizeFlags&RESIZE_HEIGHT) {
+	if (Flags()&RESIZE_HEIGHT) {
 		layoutFrame.h = SHRT_MAX;
 	}
 
@@ -498,13 +498,14 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		layout.push_back(Layout(content, rgns));
 		exContent = content;
 
-		if (resizeFlags) {
-		const Region& bounds = Region::RegionEnclosingRegions(rgns);
-			if (resizeFlags&RESIZE_HEIGHT)
-		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
-			if (resizeFlags&RESIZE_WIDTH)
-		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
-	}
+		ieDword flags = Flags();
+		if (flags&(RESIZE_HEIGHT|RESIZE_WIDTH)) {
+			const Region& bounds = Region::RegionEnclosingRegions(rgns);
+			if (flags&RESIZE_HEIGHT)
+				contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
+			if (flags&RESIZE_WIDTH)
+				contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
+		}
 	}
 
 	// avoid infinite layout loop by setting frame directly...

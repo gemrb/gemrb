@@ -45,7 +45,6 @@ View::View(const Region& frame)
 
 	dirty = true;
 	visible = true;
-	resizeFlags = RESIZE_NONE;
 	flags = 0;
 }
 
@@ -307,7 +306,7 @@ void View::SetFrameSize(const Size& s)
 
 	SizeChanged(oldSize);
 
-	if (resizeFlags&RESIZE_SUBVIEWS) {
+	if (Flags()&RESIZE_SUBVIEWS) {
 		std::list<View*>::iterator it;
 		for (it = subViews.begin(); it != subViews.end(); ++it) {
 			View* subview = *it;

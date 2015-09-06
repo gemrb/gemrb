@@ -43,11 +43,12 @@ private:
 protected:
 	View* superView;
 	Region frame;
-	ieDword flags;
-	int resizeFlags;
 	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 	String tooltip;
+
+	// Flags: top byte is reserved for View flags, subclasses may use the remaining bits however they want
+	ieDword flags;
 
 private:
 	void DrawBackground(const Region*) const;
@@ -75,11 +76,10 @@ public:
 	};
 
 	enum AutoresizeFlags {
-		RESIZE_NONE = 0,
-		RESIZE_WIDTH = 1,   // resize the view horizontally if horizontal content exceeds width
-		RESIZE_HEIGHT = 2,	// resize the view vertically if vertical content exceeds width
+		RESIZE_WIDTH = 1 << 29,		// resize the view horizontally if horizontal content exceeds width
+		RESIZE_HEIGHT = 1 << 30,	// resize the view vertically if vertical content exceeds width
 
-		RESIZE_SUBVIEWS = 4 // resize immidiate subviews by the same ammount as this views frame change 
+		RESIZE_SUBVIEWS = 1 << 31	// resize immidiate subviews by the same ammount as this views frame change
 	};
 
 	View(const Region& frame);
@@ -93,10 +93,10 @@ public:
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
-	virtual bool SetFlags(int arg_flags, int opcode);
-	ieDword Flags() { return flags; }
 
-	void SetResizeMask(int flags) { resizeFlags = flags; }
+	virtual bool SetFlags(int arg_flags, int opcode);
+	inline ieDword Flags() { return flags; }
+
 	void SetVisible(bool vis) { visible = vis; }
 	bool IsVisible() { return visible; }
 
