@@ -7986,25 +7986,7 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
 void Actor::SetActionButtonRow(ActionButtonRow &ar)
 {
 	for(int i=0;i<GUIBT_COUNT;i++) {
-		ieByte tmp = ar[i];
-		if (QslotTranslation && i>2) {
-			if (tmp>ACT_IWDQSONG) {//quick songs
-				tmp = 110+tmp%10;
-			} else if (tmp>ACT_IWDQSPEC) {//quick abilities
-				tmp = 90+tmp%10;
-			} else if (tmp>ACT_IWDQITEM) {//quick items
-				tmp = 80+tmp%10;
-			} else if (tmp>ACT_IWDQSPELL) {//quick spells
-				tmp = 70+tmp%10;
-			} else if (tmp>ACT_BARD) {//spellbooks
-				tmp = 50+tmp%10;
-			} else if (tmp>=32) { // here be dragons
-				Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
-			} else {
-				tmp=gemrb2iwd[tmp];
-			}
-		}
-		PCStats->QSlots[i]=tmp;
+		PCStats->QSlots[i] = Gemrb2IWD2Qslot(ar[i], i);
 	}
 }
 
@@ -8017,6 +7999,29 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		ar[i] = IWD2GemrbQslot(i);
 	}
+}
+
+int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
+{
+	ieByte tmp = actslot;
+	if (QslotTranslation && slotindex>2) {
+		if (tmp > ACT_IWDQSONG) { //quick songs
+			tmp = 110 + tmp%10;
+		} else if (tmp > ACT_IWDQSPEC) { //quick abilities
+			tmp = 90 + tmp%10;
+		} else if (tmp > ACT_IWDQITEM) { //quick items
+			tmp = 80 + tmp%10;
+		} else if (tmp > ACT_IWDQSPELL) { //quick spells
+			tmp = 70 + tmp%10;
+		} else if (tmp > ACT_BARD) { //spellbooks
+			tmp = 50 + tmp%10;
+		} else if (tmp >= 32) { // here be dragons
+			Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
+		} else {
+			tmp = gemrb2iwd[tmp];
+		}
+	}
+	return tmp;
 }
 
 int Actor::IWD2GemrbQslot (int slotindex)

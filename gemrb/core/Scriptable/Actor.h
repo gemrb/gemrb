@@ -691,6 +691,7 @@ public:
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
 	int IWD2GemrbQslot (int slotindex);
+	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
