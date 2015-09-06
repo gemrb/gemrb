@@ -690,7 +690,7 @@ public:
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
-	int IWD2GemrbQslot (int slotindex);
+	int IWD2GemrbQslot (int slotindex) const;
 	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
 
 	/* Handling automatic stance changes */

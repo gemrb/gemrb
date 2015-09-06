@@ -8024,7 +8024,7 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 	return tmp;
 }
 
-int Actor::IWD2GemrbQslot (int slotindex)
+int Actor::IWD2GemrbQslot (int slotindex) const
 {
 	ieByte tmp = PCStats->QSlots[slotindex];
 	//the first three buttons are hardcoded in gemrb
