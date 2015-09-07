@@ -28,6 +28,7 @@ import CommonTables
 import GUICommonWindows
 import GUIRECCommon
 import IDLUCommon
+import LUCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
@@ -161,7 +162,7 @@ def OpenRecordsWindow ():
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow) #TODO: OpenLevelUpWindow
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 
@@ -1185,6 +1186,122 @@ def RefreshHelpWindow ():
 	TextArea = Window.GetControl (2)
 	TextArea.SetText (desc)
 	return
+
+LUWindow = None
+LevelDiff = 1
+def CloseLUWindow ():
+	global LUWindow
+
+	if LUWindow:
+		LUWindow.Unload ()
+		LUWindow = None
+
+def OpenLevelUpWindow ():
+	global LUWindow, LevelDiff
+
+	LUWindow = Window = GemRB.LoadWindow (54)
+
+	# Figure out the level difference
+	# the original ignored all but the fighter row in xplevel.2da
+	# we do the same, since IE_CLASS becomes useless for mc actors
+	# (iwd2 never updates it; it's not a bitfield like IE_KIT)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	xp = GemRB.GetPlayerStat (pc, IE_XP)
+	nextLevel = LUCommon.GetNextLevelFromExp (xp, 5)
+	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	LevelDiff = nextLevel - levelSum - GetECL(pc)
+	print 1111111, nextLevel, levelSum, GetECL(pc), LevelDiff
+
+	# next
+	Button = Window.GetControl (0)
+	Button.SetText (36789)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
+
+	# static Class selection
+	#Label = Window.GetControl (0x10000000)
+	#Label.SetText (7175)
+
+	# 2-12 are the class name buttons
+	# 15-25 are the class level labels
+	GemRB.SetVar ("class", -1)
+	for i in range(2,13):
+		Button = Window.GetControl (i)
+		Label = Window.GetControl (0x10000000 + i+13)
+
+		ClassTitle = CommonTables.Classes.GetRowName (i-2)
+		ClassTitle = CommonTables.Classes.GetValue (ClassTitle, "NAME_REF", GTV_REF)
+		Button.SetText (ClassTitle)
+		level = GemRB.GetPlayerStat (pc, Classes[i-2])
+		if level > 0:
+			Label.SetText (str(level))
+
+		# disable monks/paladins due to order restrictions?
+		specflag = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
+		if specflag&8 and i == 7: # SPECF_MONKOFF
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		elif specflag&4 and i == 8: # SPECF_PALADINOFF
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetVarAssoc ("class", i-2)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUClassPress)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+
+	# description
+	TextArea = Window.GetControl (13)
+	TextArea.SetText (17242)
+
+	# 14 scrollbar
+	# 14 static Level label
+	# 26 does not exist
+
+	# cancel
+	Button = Window.GetControl (27)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
+
+	Window.ShowModal (MODAL_SHADOW_NONE)
+
+OldLevelLabel = 0
+def LUClassPress ():
+	global OldLevelLabel
+
+	Window = LUWindow
+	Button = Window.GetControl (0)
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+	# display class info
+	TextArea = Window.GetControl (13)
+	i = GemRB.GetVar ("class")
+	ClassDesc = CommonTables.Classes.GetRowName (i)
+	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
+	TextArea.SetText (ClassDesc)
+
+	# increase/decrease level label by LevelDiff (usually 1)
+	if OldLevelLabel != i:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		j = OldLevelLabel
+		Label = Window.GetControl (0x10000000 + j+15)
+		level = Label.QueryText ()
+		if level == "":
+			level = 1
+		level = int(level)
+		if level-LevelDiff > 0:
+			Label.SetText (str(level - LevelDiff))
+		else:
+			Label.SetText ("")
+
+		OldLevelLabel = i
+		Label = Window.GetControl (0x10000000 + i+15)
+		level = GemRB.GetPlayerStat (pc, Classes[i])
+		Label.SetText (str(level + LevelDiff))
+
+def LUNextPress ():
+	# TODO: continue with lu/cg (sorc: skills, feats, spell selections)
+	# pass on LevelDiff and selected class
+	# TODO: recheck ECL is handled correctly in the end
+	pass
 
 ###################################################
 # End of file GUIREC.py
