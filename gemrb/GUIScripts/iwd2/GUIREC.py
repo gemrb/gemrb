@@ -274,9 +274,10 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 	if Adjustment>5:
 		Adjustment = 5
 	if (Level < CommonTables.NextLevel.GetColumnCount (4) - 5):
+		exp = CommonTables.NextLevel.GetValue (4, Level + Adjustment)
 		if string:
-			return str(CommonTables.NextLevel.GetValue (4, Level + Adjustment))
-		return CommonTables.NextLevel.GetValue (4, Level + Adjustment )
+			return str(exp)
+		return exp
 
 	if string:
 		return GemRB.GetString(24342) #godhood
