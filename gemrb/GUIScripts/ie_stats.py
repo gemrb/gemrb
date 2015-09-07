@@ -197,6 +197,7 @@ IE_INTIMIDATE                   = 120
 IE_SEARCH                       = 121
 IE_SPELLCRAFT                   = 122
 IE_MAGICDEVICE                  = 123
+IE_SPECFLAGS                    = 124
 IE_PROFICIENCYBASTARDSWORD 	= 89
 IE_PROFICIENCYLONGSWORD 	= 90
 IE_PROFICIENCYSHORTSWORD 	= 91
