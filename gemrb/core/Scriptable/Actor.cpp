@@ -7988,6 +7988,7 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		PCStats->QSlots[i] = Gemrb2IWD2Qslot(ar[i], i);
 	}
+	dumpQSlots();
 }
 
 void Actor::GetActionButtonRow(ActionButtonRow &ar)
@@ -8047,6 +8048,44 @@ int Actor::IWD2GemrbQslot (int slotindex) const
 		}
 	}
 	return tmp;
+}
+
+// debug function; only works on pc classes
+void Actor::dumpQSlots() const
+{
+	ActionButtonRow r;
+	memcpy(&r, GUIBTDefaults+GetStat(IE_CLASS), sizeof(ActionButtonRow));
+	StringBuffer buffer, buffer2, buffer3;
+
+	buffer.append("Current  default: ");
+	buffer2.append("IWD2gem  default: ");
+	buffer3.append("gem2IWD2 default: ");
+	for(int i=0; i<GUIBT_COUNT; i++) {
+		ieByte tmp = r[i];
+		buffer.appendFormatted("%3d ", tmp);
+		buffer2.appendFormatted("%3d ", IWD2GemrbQslot(tmp));
+		buffer3.appendFormatted("%3d ", Gemrb2IWD2Qslot(tmp, i));
+	}
+	buffer.appendFormatted("(class: %d)", GetStat(IE_CLASS));
+	Log(DEBUG, "Actor", buffer);
+//	Log(DEBUG, "Actor", buffer2);
+//	Log(DEBUG, "Actor", buffer3);
+
+	buffer.clear();
+	buffer2.clear();
+	buffer3.clear();
+	buffer.append("Current  QSlots:  ");
+	buffer2.append("IWD2gem  QSlots:  ");
+	buffer3.append("gem2IWD2 QSlots:  ");
+	for(int i=0; i<GUIBT_COUNT; i++) {
+		ieByte tmp = PCStats->QSlots[i];
+		buffer.appendFormatted("%3d ", tmp);
+		buffer2.appendFormatted("%3d ", IWD2GemrbQslot(tmp));
+		buffer3.appendFormatted("%3d ", Gemrb2IWD2Qslot(tmp, i));
+	}
+	Log(DEBUG, "Actor", buffer);
+	Log(DEBUG, "Actor", buffer2);
+	Log(DEBUG, "Actor", buffer3);
 }
 
 void Actor::SetPortrait(const char* ResRef, int Which)
