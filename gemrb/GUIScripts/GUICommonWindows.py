@@ -1387,8 +1387,7 @@ def OpenPortraitWindow (needcontrols=0):
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i in PortraitButtons:
-		Button = PortraitButtons[i]
+	for i, Button in PortraitButtons.iteritems():
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
@@ -1401,10 +1400,10 @@ def OpenPortraitWindow (needcontrols=0):
 		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, PortraitButtonOnPress)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder(PortraitButtonOnPress, i + 1))
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, i))
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, i + 1))
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
 
 		if GameCheck.IsIWD1():
@@ -1424,7 +1423,7 @@ def OpenPortraitWindow (needcontrols=0):
 			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
+			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonHPOnPress, i + 1))
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
@@ -1442,12 +1441,11 @@ def UpdatePortraitWindow ():
 	Inventory = GemRB.GetVar ("Inventory")
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
-	for portid in PortraitButtons:
+	for portid, Button in PortraitButtons.iteritems():
 		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window,portid)
 			continue
 
-		Button = PortraitButtons[portid]
 		pic = GemRB.GetPlayerPortrait (portid+1, 1)
 		if Inventory and pc != portid+1:
 			pic = None
@@ -1469,7 +1467,7 @@ def UpdatePortraitWindow ():
 						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		if GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, portid + 1))
 
 		Button.SetFlags (portraitFlags, OP_SET)
 
@@ -1589,11 +1587,14 @@ def UpdateAnimatedPortrait (Window,i):
 	#else:
 	#	Button.EnableBorder(FRAME_PC_SELECTED, 0)
 	return
+	
+def ButtonIndexBinder (fn, idx):
+	# returned function must take no parameters
+	return lambda: fn(idx)
 
-def PortraitButtonOnPress (btn):
+def PortraitButtonOnPress (i):
 	"""Selects the portrait individually."""
 
-	i = btn.ID + 1
 	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
 		GemRB.ActOnPC (i)
 		return
@@ -1608,10 +1609,9 @@ def PortraitButtonOnPress (btn):
 		RunSelectionChangeHandler ()
 	return
 
-def PortraitButtonOnShiftPress (btn):
+def PortraitButtonOnShiftPress (i):
 	"""Handles selecting multiple portaits with shift."""
 
-	i = btn.ID + 1
 	if (not SelectionChangeHandler):
 		sel = GemRB.GameIsPCSelected (i)
 		sel = not sel
@@ -1622,10 +1622,8 @@ def PortraitButtonOnShiftPress (btn):
 		RunSelectionChangeHandler ()
 	return
 
-def PortraitButtonHPOnPress (): ##pst hitpoint display
+def PortraitButtonHPOnPress (i): ##pst hitpoint display
 	Window = PortraitWindow
-
-	i = btn.ID + 1;
 
 	portrait_hp_numeric[i-1] = not portrait_hp_numeric[i-1]
 	ButtonHP = Window.GetControl (5 + i)
@@ -1651,8 +1649,7 @@ def SelectionChanged ():
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i in PortraitButtons:
-			Button = PortraitButtons[i]
+		for i, Button in PortraitButtons.iteritems():
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 		if SelectionChangeMultiHandler:
 			SelectionChangeMultiHandler ()
@@ -1667,8 +1664,7 @@ def SelectionChanged ():
 			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
 
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i in PortraitButtons:
-			Button = PortraitButtons[i]
+		for i, Button in PortraitButtons.iteritems():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
