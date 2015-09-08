@@ -91,6 +91,14 @@ bool View::NeedsDraw() const
 	return (dirty || IsAnimated());
 }
 
+bool View::IsVisible()
+{
+	if (superView && visible) {
+		return superView->IsVisible();
+	}
+	return visible;
+}
+
 void View::DrawSubviews(bool drawBg)
 {
 	std::list<View*>::iterator it;

@@ -98,7 +98,7 @@ public:
 	inline ieDword Flags() { return flags; }
 
 	void SetVisible(bool vis) { visible = vis; }
-	bool IsVisible() { return visible; }
+	bool IsVisible();
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }
