@@ -1297,11 +1297,22 @@ def LUClassPress ():
 		level = GemRB.GetPlayerStat (pc, Classes[i])
 		Label.SetText (str(level + LevelDiff))
 
+# continue with level up via chargen methods
 def LUNextPress ():
-	# TODO: continue with lu/cg (sorc: skills, feats, spell selections)
+	CloseLUWindow ()
+	#OpenRecordsWindow ()
+
+	# grant an ability point or three (each 4 levels)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	rankDiff = (levelSum+LevelDiff)//4 - levelSum//4
+	if rankDiff > 0:
+		import Abilities
+		Abilities.OpenAbilitiesWindow (0, rankDiff)
+
+	# TODO: continue with lu/cg (enemy(5th+5) 16, skills 55, feats 56, sorc spell selections 8, general: saving throws, hp, tohit, level)
 	# pass on LevelDiff and selected class
 	# TODO: recheck ECL is handled correctly in the end
-	pass
 
 ###################################################
 # End of file GUIREC.py
