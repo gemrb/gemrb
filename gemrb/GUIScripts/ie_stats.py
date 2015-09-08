@@ -329,6 +329,7 @@ IE_ARMOR_TYPE			= 219
 IE_TEAM				= 220
 IE_FACTION			= 221
 IE_SUBRACE			= 222
+IE_UNUSED_SKILLPTS  = 223
 IE_SPECIES                      = 223 #pst specific
 IE_HATEDRACE2                   = 224
 IE_HATEDRACE3                   = 225
