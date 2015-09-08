@@ -25,8 +25,6 @@
 #include "System/String.h"
 
 #include <deque>
-#include <list>
-#include <vector>
 
 namespace GemRB {
 
@@ -35,8 +33,6 @@ class Palette;
 class Sprite2D;
 class ContentContainer;
 class TextContainer;
-
-typedef std::vector<Region> Regions;
 
 // interface for both content and content containers
 class Content {

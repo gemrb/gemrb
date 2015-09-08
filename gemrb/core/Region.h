@@ -31,6 +31,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include <vector>
+
 namespace GemRB {
 
 /**
@@ -123,6 +125,8 @@ public:
 		return bounds;
 	}
 };
+
+typedef std::vector<Region> Regions;
 
 }
 
