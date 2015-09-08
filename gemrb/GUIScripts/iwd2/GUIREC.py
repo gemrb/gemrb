@@ -1224,7 +1224,7 @@ def OpenLevelUpWindow ():
 
 	# 2-12 are the class name buttons
 	# 15-25 are the class level labels
-	GemRB.SetVar ("class", -1)
+	GemRB.SetVar ("LUClass", -1)
 	for i in range(2,13):
 		Button = Window.GetControl (i)
 		Label = Window.GetControl (0x10000000 + i+13)
@@ -1244,7 +1244,7 @@ def OpenLevelUpWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetVarAssoc ("class", i-2)
+		Button.SetVarAssoc ("LUClass", i-2)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUClassPress)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
@@ -1273,7 +1273,7 @@ def LUClassPress ():
 
 	# display class info
 	TextArea = Window.GetControl (13)
-	i = GemRB.GetVar ("class")
+	i = GemRB.GetVar ("LUClass")
 	ClassDesc = CommonTables.Classes.GetRowName (i)
 	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
 	TextArea.SetText (ClassDesc)
@@ -1310,8 +1310,10 @@ def LUNextPress ():
 		import Abilities
 		Abilities.OpenAbilitiesWindow (0, rankDiff)
 
+	# pass on LevelDiff and selected class (already in LUClass)
+	GemRB.SetVar ("LevelDiff", LevelDiff)
+
 	# TODO: continue with lu/cg (enemy(5th+5) 16, skills 55, feats 56, sorc spell selections 8, general: saving throws, hp, tohit, level)
-	# pass on LevelDiff and selected class
 	# TODO: recheck ECL is handled correctly in the end
 
 ###################################################
