@@ -6307,8 +6307,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	// racial enemies suffer 4hp more in all games
-	if (GetRangerLevel() && GetRacialEnemyBonus(target)) {
-		DamageBonus += 4;
+	int favoredEnemy = GetRacialEnemyBonus(target);
+	if (GetRangerLevel() && favoredEnemy) {
+		DamageBonus += favoredEnemy;
 	}
 
 	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
