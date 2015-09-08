@@ -38,14 +38,8 @@ TileMap::TileMap(void)
 
 TileMap::~TileMap(void)
 {
+	ClearOverlays();
 	size_t i;
-
-	for (i = 0; i < overlays.size(); i++) {
-		delete( overlays[i] );
-	}
-	for (i = 0; i < overlays.size(); i++) {
-		delete( rain_overlays[i]);
-	}
 	for (i = 0; i < infoPoints.size(); i++) {
 		delete( infoPoints[i] );
 	}
@@ -60,16 +54,16 @@ TileMap::~TileMap(void)
 //this needs in case of a tileset switch (for extended night)
 void TileMap::ClearOverlays()
 {
-	size_t i;
-
-	for (i = 0; i < overlays.size(); i++) {
-		delete( overlays[i] );
+	// FIXME: assert is to determine if this is actually true
+	// if this fails then it means there was actually a leak or out of bounds access,
+	// and this should actually operate on the individual vectors
+	assert(overlays.size() == rain_overlays.size());
+	while (overlays.size()) {
+		delete( rain_overlays.back() );
+		delete( overlays.back() );
+		rain_overlays.pop_back();
+		overlays.pop_back();
 	}
-	overlays.clear();
-	for (i = 0; i < overlays.size(); i++) {
-		delete( rain_overlays[i]);
-	}
-	rain_overlays.clear();
 }
 
 //tiled objects
