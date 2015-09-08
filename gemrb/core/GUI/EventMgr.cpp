@@ -363,6 +363,7 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 		if (core->GetGameControl()
 			&& !MButtons // checking for drag actions
 			&& !core->IsPresentingModalWindow()
+			&& !core->InCutSceneMode()
 			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
 			core->GetGame()->SetHotKey(toupper(Key));
 		}
