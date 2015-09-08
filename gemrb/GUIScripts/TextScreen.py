@@ -144,6 +144,7 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
 	TextScreen.SetVisible (WINDOW_VISIBLE)
+	TextScreen.ShowModal (MODAL_SHADOW_NONE)
 
 	ReplayTextScreen()
 	return
