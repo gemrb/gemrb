@@ -162,6 +162,7 @@ void WindowManager::CloseWindow(Window* win)
 	if (it == windows.end()) return;
 
 	if (win == modalWin) {
+		core->PlaySound(DS_WINDOW_CLOSE);
 		modalWin = NULL;
 	}
 
@@ -170,7 +171,6 @@ void WindowManager::CloseWindow(Window* win)
 	if (it != windows.end()) {
 		// the window beneath this must get redrawn
 		(*it)->MarkDirty();
-		core->PlaySound(DS_WINDOW_CLOSE);
 		if (isFront)
 			(*it)->Focus();
 	}
