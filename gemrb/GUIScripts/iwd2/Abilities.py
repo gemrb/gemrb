@@ -173,6 +173,8 @@ def OpenAbilitiesWindow(chargen, points):
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	AbilityWindow.SetVisible(WINDOW_VISIBLE)
+	if not chargen:
+		AbilityWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def RightPress():
