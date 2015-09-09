@@ -365,14 +365,17 @@ void WindowManager::DrawWindows() const
 		video->SetScreenClip( NULL );
 
 		Sprite2D* edge = WinFrameEdge(0); // left
-		video->BlitSprite(edge, 0, 0, true);
-		edge = WinFrameEdge(1); // right
-		int sideW = edge->Width;
-		video->BlitSprite(edge, screen.w - sideW, 0, true);
-		edge = WinFrameEdge(2); // top
-		video->BlitSprite(edge, sideW, 0, true);
-		edge = WinFrameEdge(3); // bottom
-		video->BlitSprite(edge, sideW, screen.h - edge->Height, true);
+		if (edge) {
+			// we assume if one fails, they all do
+			video->BlitSprite(edge, 0, 0, true);
+			edge = WinFrameEdge(1); // right
+			int sideW = edge->Width;
+			video->BlitSprite(edge, screen.w - sideW, 0, true);
+			edge = WinFrameEdge(2); // top
+			video->BlitSprite(edge, sideW, 0, true);
+			edge = WinFrameEdge(3); // bottom
+			video->BlitSprite(edge, sideW, screen.h - edge->Height, true);
+		}
 	}
 
 	// tooltips and cursor are always last
@@ -435,7 +438,9 @@ Sprite2D* WindowManager::WinFrameEdge(int edge) const
 		frame = frames[ref].get();
 	} else {
 		ResourceHolder<ImageMgr> im(ref);
-		frame = im->GetSprite2D();
+		if (im) {
+			frame = im->GetSprite2D();
+		}
 		frames.insert(std::make_pair(ref, frame));
 	}
 	
