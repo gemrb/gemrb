@@ -12264,7 +12264,7 @@ actor has the passed feat id (from ie_feats.py).\n\
   * globalID - party ID or global ID of the actor to use\n\
   * feat - feat index from ie_feats.py\n\
 \n\
-**Return value:** 1 if the pc has it, 0 otherwise\n\
+**Return value:** number of feat levels\n\
 \n\
 **See also:** [[guiscript:CheckFeatCondition]]\n\
 "
