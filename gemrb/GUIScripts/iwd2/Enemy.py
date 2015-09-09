@@ -171,8 +171,7 @@ def NextPress(save=1):
 		newHated = GemRB.GetVar ("HatedRace")
 		GemRB.SetPlayerStat (pc, RacialStats[last], newHated)
 
-	# TODO: open up the next levelup window
-	import GUIREC
-	GUIREC.OpenRecordsWindow ()
-	GUIREC.OpenRecordsWindow ()
+	# open up the next levelup window
+	import Skills
+	Skills.OpenSkillsWindow (0)
 	return
