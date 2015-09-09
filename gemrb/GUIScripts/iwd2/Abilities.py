@@ -277,9 +277,8 @@ def NextPress():
 		for i in range (len(Stats)):
 			newValue = GemRB.GetVar ("Ability "+str(i))
 			GemRB.SetPlayerStat (pc, Stats[i], newValue)
-		# TODO: open up the next lu/cg window
-		import GUIREC
-		GUIREC.OpenRecordsWindow ()
-		GUIREC.OpenRecordsWindow ()
+		# open up the next levelup window
+		import Enemy
+		Enemy.OpenEnemyWindow ()
 
 	return

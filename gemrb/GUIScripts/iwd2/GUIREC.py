@@ -1302,6 +1302,9 @@ def LUNextPress ():
 	CloseLUWindow ()
 	#OpenRecordsWindow ()
 
+	# pass on LevelDiff and selected class (already in LUClass)
+	GemRB.SetVar ("LevelDiff", LevelDiff)
+
 	# grant an ability point or three (each 4 levels)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
@@ -1309,11 +1312,12 @@ def LUNextPress ():
 	if rankDiff > 0:
 		import Abilities
 		Abilities.OpenAbilitiesWindow (0, rankDiff)
+	else:
+		import Enemy
+		Enemy.OpenEnemyWindow ()
+	# both fire up the rest of the chain
 
-	# pass on LevelDiff and selected class (already in LUClass)
-	GemRB.SetVar ("LevelDiff", LevelDiff)
-
-	# TODO: continue with lu/cg (enemy(5th+5) 16, skills 55, feats 56, sorc spell selections 8, general: saving throws, hp, tohit, level)
+	# TODO: continue with lu/cg (feats 56, sorc spell selections 8, general: saving throws, hp, tohit, level)
 	# TODO: recheck ECL is handled correctly in the end
 
 ###################################################
