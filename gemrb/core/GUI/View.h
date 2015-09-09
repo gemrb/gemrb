@@ -40,6 +40,11 @@ private:
 	mutable bool dirty;
 	bool visible;
 
+	// TODO: we could/should generalize this
+	// MarkDirty could take a region, and more complicated views could potentially
+	// save a lot of drawing time by only drawing their dirty portions (GameControl?)
+	Regions dirtyBGRects;
+
 protected:
 	View* superView;
 	Region frame;

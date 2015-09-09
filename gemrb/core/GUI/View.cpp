@@ -83,7 +83,7 @@ void View::MarkDirty()
 
 bool View::NeedsDraw() const
 {
-	if (frame.Dimensions().IsEmpty()) return false;
+	if (frame.Dimensions().IsEmpty() || !visible) return false;
 
 	// subviews are drawn over when the superview is drawn, so always redraw when super needs it.
 	if (superView && superView->IsAnimated()) return true;
@@ -161,6 +161,13 @@ void View::Draw()
 		}
 		DrawSelf(drawFrame, intersect);
 		dirty = false;
+	} else {
+		// these are from removed controls
+		Regions::iterator it = dirtyBGRects.begin();
+		while (it != dirtyBGRects.end()) {
+			DrawBackground(&(*it));
+			it = dirtyBGRects.erase(it);
+		}
 	}
 
 	// always call draw on subviews because they can be dirty without us
@@ -243,10 +250,11 @@ View* View::RemoveSubview(const View* view)
 		scrollbar = NULL;
 	}
 	subViews.erase(it);
-	const Region& viewFrame = subView->Frame();
-	DrawBackground(&viewFrame);
-	SubviewRemoved(subView, this);
+	if (background)
+		dirtyBGRects.push_back(subView->Frame());
+
 	subView->superView = NULL;
+	SubviewRemoved(subView, this);
 	return subView;
 }
 
