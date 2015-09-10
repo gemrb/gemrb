@@ -200,7 +200,7 @@ def UpdateSpellBookWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
 			Button.SetVarAssoc ("SpellButton", i)
-			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depeleted)
+			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnSpellBookUnmemorizeSpell(ms['MemoCount']))
