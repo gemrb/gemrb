@@ -5260,11 +5260,6 @@ int Interface::GetLoreBonus(int column, int value) const
 
 int Interface::GetWisdomBonus(int column, int value) const
 {
-	//no wismod in iwd2
-	if (HasFeature(GF_3ED_RULES)) {
-		return value/2-5;
-	}
-
 	if (!wisbon) return 0;
 
 	// xp bonus
