@@ -1217,6 +1217,7 @@ def OpenLevelUpWindow ():
 	Button.SetText (36789)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# static Class selection
 	#Label = Window.GetControl (0x10000000)
@@ -1260,6 +1261,7 @@ def OpenLevelUpWindow ():
 	Button = Window.GetControl (27)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_NONE)
 
