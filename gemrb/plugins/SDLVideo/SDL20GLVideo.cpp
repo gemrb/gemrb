@@ -229,6 +229,8 @@ Sprite2D* GLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask, ieDw
 
 Sprite2D* GLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels, Color* palette, bool cK, int index)
 {
+	if (palette == NULL) return NULL;
+
 	GLTextureSprite2D* spr = new GLTextureSprite2D(w, h, bpp, pixels);
 	spr->SetPaletteManager(paletteManager);
 	Palette* pal = new Palette(palette);
