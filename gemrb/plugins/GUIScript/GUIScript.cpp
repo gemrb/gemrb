@@ -12209,7 +12209,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
 		}
 
-		PyObject *pValue = gs->RunFunction(NULL, fname, param);
+		PyObject *pValue = gs->RunFunction("Feats", fname, param);
 
 		/* we created this parameter, now we don't need it*/
 		Py_DECREF( param );

@@ -79,7 +79,7 @@ def IsFeatUsable(feat):
 		slot = GemRB.GetVar ("Slot")
 	else:
 		slot = GemRB.GameGetSelectedPCSingle ()
-	# FIXME: heroic inspiration etc VS Missing function: Check_AnyOfThreeGE from (null)
+
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
