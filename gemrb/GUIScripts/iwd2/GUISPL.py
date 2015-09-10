@@ -121,8 +121,9 @@ def SelectedNewPlayer ():
 	ActiveSpellBooks=[]
 	
 	for i in range(8):
-		if GemRB.GetKnownSpellsCount(pc, i)>0:
+		if GemRB.GetMemorizableSpellsCount (pc, i, 0) > 0:
 			ActiveSpellBooks+=[i]
+
 	BookCount = len(ActiveSpellBooks)
 	BookTopIndex = 0
 	if len (ActiveSpellBooks):
