@@ -1319,8 +1319,12 @@ def LUNextPress ():
 		Enemy.OpenEnemyWindow ()
 	# both fire up the rest of the chain
 
-	# TODO: continue with lu/cg (sorc spell selections 8, general: saving throws, hp, tohit, level, give spells to bards/rangers/paladins/priests)
-	# TODO: recheck ECL is handled correctly in the end
+# TODO: recheck ECL is handled correctly in the end
+def FinishLevelUp():
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: saving throws, hp, tohit, level, wild shapes and songs??, check what is covered and missing from clabs)
+
+	# now we're finally done
+	pass
 
 ###################################################
 # End of file GUIREC.py
