@@ -204,7 +204,6 @@ def OpenFeatsWindow(chargen=0):
 	global KitColumn, RaceColumn, FeatsClassColumn
 
 	CharGen = chargen
-	print 222222, type(Check_AnyOfThreeGE)
 
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
@@ -385,10 +384,9 @@ def NextPress(save=1):
 		for i in range (featCount):
 			GemRB.SetFeat (pc, i, GemRB.GetVar ("Feat "+str(i)))
 
-	# TODO: open up the next levelup window
-	import GUIREC
-	GUIREC.OpenRecordsWindow ()
-	GUIREC.OpenRecordsWindow ()
+	# open up the next levelup window
+	import Spells
+	Spells.SetupSpellsWindow (0)
 	return
 
 #Custom feat check functions
