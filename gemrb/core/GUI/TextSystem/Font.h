@@ -151,10 +151,13 @@ private:
 	GlyphIndex AtlasIndex;
 	GlyphAtlas Atlas;
 
+protected:
 	Palette* palette;
+
 public:
 	const int LineHeight;
 	const int Baseline;
+
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL

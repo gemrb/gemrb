@@ -176,7 +176,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	// TODO: do an underline if requested
 
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, NULL, true, 0);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, palette, true, 0);
 	spr->YPos = FT_FLOOR(metrics->horiBearingY);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
