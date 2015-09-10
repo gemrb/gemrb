@@ -141,6 +141,9 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 			booktype = IE_IWD2_SPELL_DOMAIN
 			Spellbook.SetupSpellLevels (pc, table, booktype, level)
 		else:
+			# charbase seems to have domain slots reserved, so nuke them
+			if level == 1:
+				Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
 			return
 
 		for slevel in range (9):
