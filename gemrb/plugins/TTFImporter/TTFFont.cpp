@@ -207,7 +207,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 #endif
 	// ttf fonts dont produce glyphs for whitespace
-	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, NULL);
+	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);
