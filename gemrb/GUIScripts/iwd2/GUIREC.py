@@ -1317,7 +1317,7 @@ def LUNextPress ():
 		Enemy.OpenEnemyWindow ()
 	# both fire up the rest of the chain
 
-	# TODO: continue with lu/cg (feats 56, sorc spell selections 8, general: saving throws, hp, tohit, level)
+	# TODO: continue with lu/cg (sorc spell selections 8, general: saving throws, hp, tohit, level, give spells to bards/rangers/paladins/priests)
 	# TODO: recheck ECL is handled correctly in the end
 
 ###################################################

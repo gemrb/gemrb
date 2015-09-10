@@ -308,8 +308,7 @@ def NextPress():
 	else:
 		if PointsLeft > 0:
 			GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
-		# TODO: open up the next levelup window
-		import GUIREC
-		GUIREC.OpenRecordsWindow ()
-		GUIREC.OpenRecordsWindow ()
+		# open up the next levelup window
+		import Feats
+		Feats.OpenFeatsWindow ()
 	return
