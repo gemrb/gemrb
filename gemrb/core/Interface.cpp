@@ -679,7 +679,7 @@ static bool GenerateAbilityTables()
 	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
 	if (!lorebon)
 		return false;
-	wisbon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
+	wisbon = (ieWordSigned *) calloc (tablesize * 1, sizeof(ieWordSigned));
 	if (!wisbon)
 		return false;
 	return true;
