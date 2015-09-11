@@ -72,6 +72,11 @@ protected:
 
 	bool TrySetFocus(View*);
 
+	inline void DispatchMouseOver(const Point&);
+	inline void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	inline void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	inline void DispatchMouseWheelScroll(const Point&, short x, short y);
+
 public:
 	Window(const Region& frame, WindowManager& mgr);
 	~Window();
@@ -95,11 +100,7 @@ public:
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
-	void DispatchMouseOver(const Point&);
-	void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void DispatchMouseWheelScroll(const Point&, short x, short y);
-
+	bool DispatchEvent(const Event&);
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void OnMouseLeave(const Point&, const DragOp*);

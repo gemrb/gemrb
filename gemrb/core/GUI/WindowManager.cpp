@@ -193,6 +193,7 @@ void WindowManager::CloseWindow(Window* win)
 	closedWindows.push_back(win);
 
 	win->DeleteScriptingRef();
+	win->SetVisible(false);
 	win->SetDisabled(true);
 }
 
@@ -223,45 +224,29 @@ bool WindowManager::DispatchEvent(const Event& event)
 		WindowList::const_iterator it = windows.begin();
 		for (; it != windows.end(); ++it) {
 			Window* win = *it;
-			if (HIT_TEST(event,win)) {
+			if (win->IsVisible() && (!event.isScreen || HIT_TEST(event,win))) {
 				// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
 				// we still need to update which window is under the mouse and block events from reaching the windows below
 				target = win;
 				break;
 			}
 		}
-		// gameWin is always the full "screen" so no need to check for intersection
-		// its also always the bottom window
-		if (target == NULL && gameWin) {
-			target = gameWin;
-		}
 	}
 
-	if (target) {
-		if (event.isScreen) {
-			hoverWin = target;
-		}
-		// disabled windows get no events, but should block them from going to windows below
-		if (!target->IsDisabled()) {
-			Point winPos = target->ConvertPointFromScreen(event.mouse.Pos());
-			switch (event.type) {
-				case Event::MouseDown:
-					target->DispatchMouseDown(winPos, event.mouse.button, event.mod);
-					break;
-				case Event::MouseUp:
-					target->DispatchMouseUp(winPos, event.mouse.button, event.mod);
-					break;
-				case Event::MouseMove:
-					TooltipTime = GetTickCount() + ToolTipDelay;
-					target->DispatchMouseOver(winPos);
-					break;
-				case Event::MouseScroll:
-					target->DispatchMouseWheelScroll(winPos, event.mouse.deltaX, event.mouse.deltaY);
-					break;
-				default: return false;
-			}
-			return true;
-		}
+	// gameWin is always the full "screen" so no need to check for intersection
+	// its also always the bottom window
+	if (target == NULL) {
+		target = gameWin;
+	}
+	// at least gameWin should always exist
+	assert(target);
+
+	if (event.isScreen) {
+		hoverWin = target;
+	}
+	// disabled windows get no events, but should block them from going to windows below
+	if (!target->IsDisabled()) {
+		return target->DispatchEvent(event);
 	}
 	return false;
 #undef HIT_TEST

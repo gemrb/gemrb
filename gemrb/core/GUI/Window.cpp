@@ -276,6 +276,32 @@ void Window::DispatchMouseWheelScroll(const Point& p, short x, short y)
 	View::OnMouseWheelScroll(x, y);
 }
 
+bool Window::DispatchEvent(const Event& event)
+{
+	if (event.isScreen) {
+		Point winPos = ConvertPointFromScreen(event.mouse.Pos());
+		switch (event.type) {
+			case Event::MouseDown:
+				DispatchMouseDown(winPos, event.mouse.button, event.mod);
+				break;
+			case Event::MouseUp:
+				DispatchMouseUp(winPos, event.mouse.button, event.mod);
+				break;
+			case Event::MouseMove:
+				DispatchMouseOver(winPos);
+				break;
+			case Event::MouseScroll:
+				DispatchMouseWheelScroll(winPos, event.mouse.deltaX, event.mouse.deltaY);
+				break;
+			default: return false;
+		}
+		return true;
+	} else {
+		// key events
+	}
+	return false;
+}
+
 void Window::OnMouseOver(const Point& p)
 {
 	if (isDragging) {
