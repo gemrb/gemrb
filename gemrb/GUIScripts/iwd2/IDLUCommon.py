@@ -74,12 +74,14 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 
 	# class-based saving throw progression
 	# get the actual xp level of the passed class
-	Level = GemRB.GetPlayerStat(pc, Levels[Class-1])
+	LevelDiff = GemRB.GetVar ("LevelDiff") # only set during level-up
+	Level = GemRB.GetPlayerStat(pc, Levels[Class-1]) + LevelDiff
+	Level -= 1 # we'll use it as row index only
 
 	RowName = GUICommon.GetClassRowName (Class, "class")
 	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", GTV_STR)
 	ClassSaveTable = GemRB.LoadTable (SaveName)
-	if Level > ClassSaveTable.GetRowCount():
+	if Level+1 > ClassSaveTable.GetRowCount():
 		print "SetupSavingThrows: too high level, ignoring!"
 		return
 
@@ -89,8 +91,8 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 	# HOWEVER, permanent effects' effects would get obliterated if we didn't
 	for i in range(3):
 		Base = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE+i, 1)
-		OldClassBonus = ClassSaveTable.GetValue (Level-2, i) # default is 0 if we underflow
-		ClassBonus = ClassSaveTable.GetValue (Level-1, i)
+		OldClassBonus = ClassSaveTable.GetValue (Level-LevelDiff-1, i) # default is 0 if we underflow
+		ClassBonus = ClassSaveTable.GetValue (Level, i)
 		GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, Base + ClassBonus-OldClassBonus)
 
 def LearnAnySpells (pc, BaseClassName, chargen=1):
