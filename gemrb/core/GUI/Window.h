@@ -31,8 +31,6 @@
 #include "View.h"
 #include "WindowManager.h"
 
-#include <vector>
-
 namespace GemRB {
 
 class Control;
@@ -58,7 +56,8 @@ public:
 	};
 	enum WindowFlags {
 		Draggable = 1,
-		Borderless = 2
+		Borderless = 2,
+		DestroyOnClose = 4,
 	};
 
 protected:

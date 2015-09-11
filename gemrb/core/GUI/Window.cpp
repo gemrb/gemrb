@@ -35,6 +35,8 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	hoverView = NULL;
 	backBuffer = NULL;
 
+	flags = DestroyOnClose;
+
 	lastMouseMoveTime = GetTickCount();
 
 	SizeChanged(frame.Dimensions());
@@ -48,7 +50,13 @@ Window::~Window()
 
 void Window::Close()
 {
-	manager.CloseWindow(this);
+	if (flags&DestroyOnClose) {
+		manager.CloseWindow(this);
+	} else {
+		// somebody wants to keep a handle to this window around to display it later
+		manager.OrderBack(this);
+		SetVisible(false);
+	}
 }
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
@@ -298,6 +306,10 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	} else {
 		// key events
+		if (event.keyboard.keycode == GEM_ESCAPE) {
+			Close();
+			return true;
+		}
 	}
 	return false;
 }

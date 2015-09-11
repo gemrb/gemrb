@@ -144,8 +144,9 @@ OP_NAND = 4
 
 # Window position anchors/alignments
 # !!! Keep these synchronized with Window.h !!!
-WF_DRAGGABLE	= 0x01
-WF_BORDERLESS	= 0x02
+WF_DRAGGABLE		= 0x01
+WF_BORDERLESS		= 0x02
+WF_DESTROY_ON_CLOSE	= 0x04
 
 WINDOW_TOP			 = 0x01
 WINDOW_BOTTOM        = 0x02
