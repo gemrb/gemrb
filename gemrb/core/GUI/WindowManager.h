@@ -76,6 +76,11 @@ public:
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);
+
+	bool OrderFront(Window* win);
+	bool OrderBack(Window* win);
+	bool OrderRelativeTo(Window* win, Window* win2, bool front);
+
 	bool FocusWindow(Window* win);
 	bool MakeModal(Window* win, ModalShadow Shadow = ShadowNone);
 	bool IsPresentingModalWindow() const;

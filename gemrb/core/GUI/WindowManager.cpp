@@ -47,7 +47,6 @@ WindowManager::WindowManager(Video* vid)
 	assert(vid);
 
 	hoverWin = NULL;
-	gameWin = NULL;
 	modalWin = NULL;
 	cursorBuf = NULL;
 
@@ -116,17 +115,34 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 /** Sets a Window on the Top */
 bool WindowManager::FocusWindow(Window* win)
 {
-	WindowList::iterator it = WIN_IT(win);
-	if (it == windows.end()) return false;
-
-	if (it != windows.begin()) {
-		if (it != windows.end()) {
-			windows.erase(it);
-		}
-		windows.push_front(win);
+	if (OrderFront(win)) {
+		win->SetDisabled(false);
+		return true;
 	}
+	return false;
+}
 
-	win->SetDisabled(false);
+bool WindowManager::OrderFront(Window* win)
+{
+	if (windows.empty()) return false;
+	return OrderRelativeTo(win, windows.front(), true);
+}
+
+bool WindowManager::OrderBack(Window* win)
+{
+	if (windows.empty()) return false;
+	return OrderRelativeTo(win, windows.back(), false);
+}
+
+bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
+{
+	if (win == win2) return false;
+
+	WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
+	if (it == windows.end() || it2 == windows.end()) return false;
+
+	windows.erase(it);
+	windows.insert((front) ? it2 : ++it2, win);
 	return true;
 }
 
