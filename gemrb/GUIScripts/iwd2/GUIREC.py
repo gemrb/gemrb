@@ -742,7 +742,8 @@ def DisplayWeapons (pc):
 	# Monk Wisdom Bonus: <number> to AC
 	if ac["Wisdom"]:
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
-		RecordsTextArea.Append (394311)
+		AddIndent()
+		RecordsTextArea.Append (DelimitedText (39431, "", 0))
 
 	###################
 	# Armor Class Modifiers
