@@ -334,11 +334,12 @@ def DisplayGeneral (pc):
 
 		if level:
 			Class = GUICommonWindows.GetActorClassTitle (pc, i )
-			RecordsTextArea.Append (DelimitedText (Class, level))
+			RecordsTextArea.Append (DelimitedText (Class, level, 0))
 			if tmp<level:
 				highest = i
 				tmp = level
 
+	RecordsTextArea.Append ("\n")
 	#effective character level
 	if adj:
 		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj, 0))
