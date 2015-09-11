@@ -1320,9 +1320,8 @@ def LUNextPress ():
 		Enemy.OpenEnemyWindow ()
 	# both fire up the rest of the chain
 
-# TODO: recheck ECL is handled correctly in the end
 def FinishLevelUp():
-	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: tohit, wild shapes and songs??, everything is missing from clabs??, kit selection, Multiclassing penalty [displayed right below Next Level:])
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: wild shapes and songs??, everything is missing from clabs??, kit selection, Multiclassing penalty [displayed right below Next Level:])
 
 	# saving throws
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1348,8 +1347,16 @@ def FinishLevelUp():
 	if oldLevel == 0:
 		IDLUCommon.AddResistances (pc, LUKitName, "clssrsmd")
 
-	# class level
+	# bab (to hit)
+	BABTable = CommonTables.Classes.GetValue (LUClassName, "TOHIT")
+	BABTable = GemRB.LoadTable (BABTable)
+	currentBAB = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
+	oldBAB = BABTable.GetValue (str(oldLevel), "BASE_ATTACK")
 	newLevel = oldLevel + LevelDiff
+	newBAB = BABTable.GetValue (str(newLevel), "BASE_ATTACK")
+	GemRB.SetPlayerStat (pc, IE_TOHIT, currentBAB + newBAB - oldBAB)
+
+	# class level
 	GemRB.SetPlayerStat (pc, levelStat, newLevel)
 
 	# now we're finally done
