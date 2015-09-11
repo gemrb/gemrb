@@ -2640,11 +2640,8 @@ int Actor::GetWisdomAC() const
 	}
 
 	int bonus = 0;
-	//if the monk has a shield equipped, no bonus
-	int itemtype = inventory.GetShieldItemType();
-	//items with critical range are weapons, not shields, so they are ok
-	//empty hand is also ok
-	if (itemtype == 0xffff && !core->GetShieldPenalty(itemtype)) {
+	//if the monk has any typo of armor equipped, no bonus
+	if (GetTotalArmorFailure() == 0) {
 		bonus = GetAbilityBonus(IE_WIS);
 	}
 	return bonus;
