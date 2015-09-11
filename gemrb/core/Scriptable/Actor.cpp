@@ -895,8 +895,8 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 	ieDword cls = GetStat(IE_CLASS);
 	Holder<TableMgr> tm;
 	if (iwd2class) {
-		if ((signed)row == -1) { // our caller didn't care to pass a baseclass
-			return false;
+		if ((signed)row == -1) { // baseclass or caller didn't pass a baseclass (a few actions)
+			row = baseclass - 1;
 		}
 		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
 		assert (tm);
