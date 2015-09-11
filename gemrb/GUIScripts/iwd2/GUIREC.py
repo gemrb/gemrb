@@ -1322,7 +1322,7 @@ def LUNextPress ():
 
 # TODO: recheck ECL is handled correctly in the end
 def FinishLevelUp():
-	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: hp, tohit, wild shapes and songs??, everything is missing from clabs??, kit selection, Multiclassing penalty [displayed right below Next Level:])
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: tohit, wild shapes and songs??, everything is missing from clabs??, kit selection, Multiclassing penalty [displayed right below Next Level:])
 
 	# saving throws
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1330,6 +1330,15 @@ def FinishLevelUp():
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	IDLUCommon.SetupSavingThrows (pc, LUClassID)
+
+	# hit points
+	Levels = [ GemRB.GetPlayerStat (pc, l) for l in IDLUCommon.Levels ]
+	LevelDiff = GemRB.GetVar ("LevelDiff")
+	LevelDiffs = [ 0 ] * len(Levels)
+	LevelDiffs[LUClass] = LevelDiff
+	# SetupHP expects the target level already
+	Levels[LUClass] += LevelDiff
+	LUCommon.SetupHP (pc, Levels, LevelDiffs)
 
 	# add class/kit resistances iff we chose a new class
 	levelStat = IDLUCommon.Levels[LUClass]
@@ -1340,7 +1349,7 @@ def FinishLevelUp():
 		IDLUCommon.AddResistances (pc, LUKitName, "clssrsmd")
 
 	# class level
-	newLevel = oldLevel + GemRB.GetVar ("LevelDiff")
+	newLevel = oldLevel + LevelDiff
 	GemRB.SetPlayerStat (pc, levelStat, newLevel)
 
 	# now we're finally done
