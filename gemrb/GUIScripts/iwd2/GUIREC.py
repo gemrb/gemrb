@@ -1321,10 +1321,20 @@ def LUNextPress ():
 
 # TODO: recheck ECL is handled correctly in the end
 def FinishLevelUp():
-	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: saving throws, hp, tohit, level, wild shapes and songs??, check what is covered and missing from clabs)
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: hp, tohit, level, wild shapes and songs??, check what is covered and missing from clabs)
+
+	# saving throws
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LUClass = GemRB.GetVar ("LUClass") # index, not ID
+	LUClassName = CommonTables.Classes.GetRowName (LUClass)
+	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	IDLUCommon.SetupSavingThrows (pc, LUClassID)
 
 	# now we're finally done
-	pass
+	GemRB.SetVar ("LevelDiff", 0)
+	# DisplayGeneral (pc) is not enough for a refresh refresh
+	OpenRecordsWindow ()
+	OpenRecordsWindow ()
 
 ###################################################
 # End of file GUIREC.py
