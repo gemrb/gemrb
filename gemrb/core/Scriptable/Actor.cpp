@@ -9903,6 +9903,19 @@ int Actor::GetBookMask() const
 	return bookmask;
 }
 
+// returns race for non-iwd2
+unsigned int Actor::GetSubRace() const
+{
+	// race
+	int lookup = Modified[IE_RACE];
+	if (third) {
+		// mangle with subrace if any
+		int subrace = Modified[IE_SUBRACE];
+		if (subrace) lookup = lookup<<16 | subrace;
+	}
+	return lookup;
+}
+
 // returns the combined dexterity and racial bonus to specified thieving skill
 // column indices are 1-based, since 0 holds the rowname against which we do the lookup
 int Actor::GetSkillBonus(unsigned int col) const
@@ -9910,12 +9923,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	if (skilldex.empty()) return 0;
 
 	// race
-	int lookup = Modified[IE_RACE];
-	if (third) {
-		// lookup by subrace
-		int subrace = Modified[IE_SUBRACE];
-		if (subrace) lookup = lookup<<16 | subrace;
-	}
+	int lookup = GetSubRace();
 	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
