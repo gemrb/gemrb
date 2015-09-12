@@ -83,7 +83,7 @@ void EventMgr::AddEventTap(EventCallback* cb, Event::EventType type)
 {
 	if (type == static_cast<Event::EventType>(-1)) {
 		int t = Event::MouseMove;
-		for (; t < Event::KeyDown; t++) {
+		for (; t <= Event::KeyDown; t++) {
 			taps.insert(std::make_pair(static_cast<Event::EventType>(t), cb));
 		}
 	} else {
