@@ -821,6 +821,7 @@ public:
 	bool IsDualInactive() const;
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
+	int GetFavoredPenalties() const;
 	bool BlocksSearchMap() const;
 	bool CannotPassEntrance(ieDword exitID) const;
 	void UseExit(ieDword exitID);

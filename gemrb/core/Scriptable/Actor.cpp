@@ -7269,6 +7269,7 @@ void Actor::AddExperience(int exp, int combat)
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
 		bonus += adjustmentPercent;
 	}
+	bonus += GetFavoredPenalties();
 	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
 	if (xpcap != NULL) {
 		int classid = BaseStats[IE_CLASS] - 1;
@@ -7277,6 +7278,70 @@ void Actor::AddExperience(int exp, int combat)
 		}
 	}
 	SetBase(IE_XP, exp);
+}
+
+static bool is_zero(const int& value) {
+	return value == 0;
+}
+
+// for each class pair that is out of level sync for more than 1 level and
+// one of them isn't a favored class, incur a 20% xp penalty (cummulative)
+int Actor::GetFavoredPenalties() const
+{
+	if (!third) return 0;
+	if (!PCStats) return 0;
+
+	std::list<int> classLevels(PCStats->ClassLevels);
+	classLevels.remove_if(is_zero);
+	int classCount = classLevels.size();
+	if (classCount == 1) return 0;
+
+	unsigned int race = GetSubRace();
+	int favored = favoredMap[race];
+	// shortcuts for special case - "any" favored class
+	if (favored == -1 && classCount == 2) return 0;
+
+	int flevel = -1;
+	if (favored != -1) {
+		// get the favored class index from ID
+		// different for (fe)males for some races, but stored in one value
+		if (GetStat(IE_SEX) == 1) {
+			favored = favored & 15;
+		} else {
+			favored = (favored>>8) & 15;
+		}
+		flevel = GetBase(levelslotsiwd2[favored-1]);
+		favored--; // convert to class index, which in turn coresponds to ISCLASS values
+	}
+
+	classLevels.sort(); // ascending
+	if (flevel == -1) {
+		// any class - just remove the highest level
+		classLevels.erase((classLevels.end())--);
+		classCount--;
+	} else {
+		// remove() kills all elements with the same value, so we have to jump through hoops
+		classLevels.remove(flevel);
+		int diff = classCount - classLevels.size();
+		if (diff == classCount) return 0; // all class were at the same level
+		for (int i=1; i < diff; i++) {
+			// re-add missing levels (all but one)
+			classLevels.push_back(flevel);
+		}
+		classCount = classLevels.size();
+		if (classCount == 1) return 0; // only one class besides favored
+	}
+
+	// finally compare adjacent levels - if they're more than 1 apart
+	int penalty = 0;
+	std::list<int>::iterator it;
+	for (it=++classLevels.begin(); it != classLevels.end(); it++) {
+		int level1 = *(--it);
+		int level2 = *(++it);
+		if (level2 - level1 > 1) penalty++;
+	}
+
+	return -20*penalty;
 }
 
 int Actor::CalculateExperience(int type, int level)
