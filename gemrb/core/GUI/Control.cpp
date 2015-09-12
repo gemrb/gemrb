@@ -109,16 +109,6 @@ bool Control::isFocused()
 	return hasFocus;
 }
 
-/** Sets the Display Flags */
-bool Control::SetFlags(int arg_flags, int opcode)
-{
-	if ((arg_flags >>24) != ControlType) {
-		Log(WARNING, "Control", "Trying to modify invalid flag %x on control (opcode %d)", arg_flags, opcode);
-		return false;
-	}
-	return View::SetFlags(arg_flags, opcode);
-}
-
 void Control::SetAnimPicture(Sprite2D* newpic)
 {
 	Sprite2D::FreeSprite(AnimPicture);

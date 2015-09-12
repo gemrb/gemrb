@@ -104,7 +104,7 @@ public:
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
 
-	virtual bool SetFlags(int arg_flags, int opcode);
+	bool SetFlags(int arg_flags, int opcode);
 	inline ieDword Flags() { return flags; }
 
 	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? BM_OR : BM_NAND ); }

@@ -110,7 +110,6 @@ public:
 
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
-	bool SetFlags(int arg_flags, int opcode);
 	virtual void SetFocus(bool focus);
 	bool isFocused();
 	/** Set handler for specified event. Override in child classes */
