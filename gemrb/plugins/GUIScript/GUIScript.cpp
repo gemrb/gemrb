@@ -15209,6 +15209,31 @@ static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_GetMultiClassPenalty__doc,
+"===== GetMultiClassPenalty =====\n\
+\n\
+**Prototype:** GemRB.GetMultiClassPenalty (globalID)\n\
+\n\
+**Description:** Returns the experience penalty from unsynced classes.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** integer"
+);
+
+static PyObject* GemRB_GetMultiClassPenalty(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+
+	if (!PyArg_ParseTuple(args, "i", &globalID)) {
+		return AttributeError(GemRB_GetMultiClassPenalty__doc);
+	}
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	return  PyInt_FromLong(actor->GetFavoredPenalties());
+}
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
@@ -15304,6 +15329,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
+	METHOD(GetMultiClassPenalty, METH_VARARGS),
 	METHOD(MessageWindowDebug, METH_VARARGS),
 	METHOD(GetMessageWindowSize, METH_NOARGS),
 	METHOD(GetPartySize, METH_NOARGS),

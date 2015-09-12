@@ -365,6 +365,11 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (DelimitedText (36928, xp, 0, ""))
 	tmp = GetNextLevelExp (levelsum, adj, 1)
 	RecordsTextArea.Append (DelimitedText (17091, tmp, 0))
+	# Multiclassing penalty
+	tmp = GemRB.GetMultiClassPenalty (pc)
+	if tmp != 0:
+		GemRB.SetToken ("XPPENALTY", str(tmp)+"%")
+		RecordsTextArea.Append (DelimitedText (39418, "", 0, ""))
 
 	#current effects
 	effects = GemRB.GetPlayerStates (pc)
@@ -1322,7 +1327,7 @@ def LUNextPress ():
 	# both fire up the rest of the chain
 
 def FinishLevelUp():
-	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: wild shapes and songs??, everything is missing from clabs??, kit selection, Multiclassing penalty [displayed right below Next Level:])
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: handle the special stuff from clabs (the ones that only display strings), kit selection, fix out of order level stats - thieves and mages)
 
 	# saving throws
 	pc = GemRB.GameGetSelectedPCSingle ()
