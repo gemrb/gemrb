@@ -13953,7 +13953,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 PyDoc_STRVAR( GemRB_RestParty__doc,
 "===== RestParty =====\n\
 \n\
-**Prototype:** GemRB.RestParty (flags, hp, movie)\n\
+**Prototype:** GemRB.RestParty (flags, movie, hp)\n\
 \n\
 **Description:** Makes the party rest. It is possible to check various \n\
 things that may forbid resting (hostile creatures, area flags, party \n\
@@ -13961,8 +13961,8 @@ scattered). It is possible to play a movie or dream too.\n\
 \n\
 **Parameters:**\n\
   * flags - which checks to run?\n\
-  * hp    - hit points healed, 0 means full healing\n\
   * movie - a number, see restmov.2da\n\
+  * hp    - hit points healed, 0 means full healing\n\
 \n\
 **Return value:** N/A\n\
 \n\
