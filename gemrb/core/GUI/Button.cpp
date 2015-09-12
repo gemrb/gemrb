@@ -50,7 +50,7 @@ Button::Button(Region& frame)
 		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
 		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
 	}
-	flags = IE_GUI_BUTTON_NORMAL;
+	SetFlags(IE_GUI_BUTTON_NORMAL, BM_OR);
 	ToggleState = false;
 	pulseBorder = false;
 	Picture = NULL;

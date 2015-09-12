@@ -33,11 +33,9 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	trackingView = NULL;
 	hoverView = NULL;
 	backBuffer = NULL;
-
-	flags = DestroyOnClose;
-
 	lastMouseMoveTime = GetTickCount();
 
+	SetFlags(DestroyOnClose, BM_OR);
 	SizeChanged(frame.Dimensions());
 }
 
