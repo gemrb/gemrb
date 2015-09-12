@@ -7310,8 +7310,7 @@ int Actor::GetFavoredPenalties() const
 		} else {
 			favored = (favored>>8) & 15;
 		}
-		flevel = GetBase(levelslotsiwd2[favored-1]);
-		favored--; // convert to class index, which in turn coresponds to ISCLASS values
+		flevel = GetLevelInClass(favored);
 	}
 
 	classLevels.sort(); // ascending

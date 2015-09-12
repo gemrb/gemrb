@@ -1327,7 +1327,7 @@ def LUNextPress ():
 	# both fire up the rest of the chain
 
 def FinishLevelUp():
-	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: handle the special stuff from clabs (the ones that only display strings), kit selection, fix out of order level stats - thieves and mages)
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: handle the special stuff from clabs (the ones that only display strings), kit selection)
 
 	# saving throws
 	pc = GemRB.GameGetSelectedPCSingle ()
