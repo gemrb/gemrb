@@ -1015,6 +1015,9 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 		actor->ApplyKit(false, baseClass);
 	}
 	actor->GotLUFeedback = false;
+	if (third && actor->PCStats) {
+		actor->PCStats->UpdateClassLevels(actor->ListLevels());
+	}
 }
 
 static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
@@ -5821,10 +5824,23 @@ const char *Actor::GetDialog(int flags) const
 	return Dialog;
 }
 
+std::list<int> Actor::ListLevels() const
+{
+	std::list<int> levels (ISCLASSES, 0);
+	if (third) {
+		std::list<int>::iterator it;
+		int i = 0;
+		for (it=levels.begin(); it != levels.end(); it++) {
+			*it = GetClassLevel(i++);
+		}
+	}
+	return levels;
+}
+
 void Actor::CreateStats()
 {
 	if (!PCStats) {
-		PCStats = new PCStatsStruct();
+		PCStats = new PCStatsStruct(ListLevels());
 	}
 }
 

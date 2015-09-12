@@ -891,6 +891,7 @@ public:
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;
+	std::list<int> ListLevels() const;
 };
 }
 
