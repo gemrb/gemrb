@@ -89,8 +89,7 @@ public:
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	void SetPosition(WindowPosition);
-	void SetDisabled(bool);
-	bool IsDisabled() { return disabled; }
+
 	/** Returns last focused control */
 	Control* GetFocus() const;
 	View* FocusedView() const { return focusView; }
@@ -114,7 +113,6 @@ private: // Private attributes
 	unsigned long lastMouseMoveTime;
 	Point dragOrigin;
 	bool isDragging;
-	bool disabled;
 	VideoBuffer* backBuffer;
 	WindowManager& manager;
 };

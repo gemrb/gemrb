@@ -20,6 +20,7 @@
 #ifndef __GemRB__View__
 #define __GemRB__View__
 
+#include "globals.h"
 #include "GUI/EventMgr.h"
 #include "Region.h"
 #include "ScriptEngine.h"
@@ -38,7 +39,6 @@ private:
 	ViewScriptingRef* scriptingRef;
 
 	mutable bool dirty;
-	bool visible;
 
 	// TODO: we could/should generalize this
 	// MarkDirty could take a region, and more complicated views could potentially
@@ -87,6 +87,11 @@ public:
 		RESIZE_SUBVIEWS = 1 << 31	// resize immidiate subviews by the same ammount as this views frame change
 	};
 
+	enum ViewFlags {
+		Visible = 1 << 28,
+		Disabled = 1 << 27
+	};
+
 	View(const Region& frame);
 	virtual ~View();
 
@@ -102,8 +107,10 @@ public:
 	virtual bool SetFlags(int arg_flags, int opcode);
 	inline ieDword Flags() { return flags; }
 
-	void SetVisible(bool vis) { visible = vis; }
-	bool IsVisible();
+	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? BM_OR : BM_NAND ); }
+	bool IsVisible() const;
+	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? BM_OR : BM_NAND); }
+	bool IsDisabled() const { return flags&Disabled; }
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }

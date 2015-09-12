@@ -44,8 +44,7 @@ View::View(const Region& frame)
 	superView = NULL;
 
 	dirty = true;
-	visible = true;
-	flags = 0;
+	flags = Visible;
 }
 
 View::~View()
@@ -83,7 +82,7 @@ void View::MarkDirty()
 
 bool View::NeedsDraw() const
 {
-	if (frame.Dimensions().IsEmpty() || !visible) return false;
+	if (frame.Dimensions().IsEmpty() || !(flags&Visible)) return false;
 
 	// subviews are drawn over when the superview is drawn, so always redraw when super needs it.
 	if (superView && superView->IsAnimated()) return true;
@@ -91,12 +90,12 @@ bool View::NeedsDraw() const
 	return (dirty || IsAnimated());
 }
 
-bool View::IsVisible()
+bool View::IsVisible() const
 {
-	if (superView && visible) {
+	if (superView && flags&Visible) {
 		return superView->IsVisible();
 	}
-	return visible;
+	return flags&Visible;
 }
 
 void View::DrawSubviews(bool drawBg)
@@ -140,7 +139,7 @@ void View::DrawBackground(const Region* rgn) const
 
 void View::Draw()
 {
-	if (!visible) return;
+	if (!(flags&Visible)) return;
 
 	Video* video = core->GetVideoDriver();
 	const Region& clip = video->GetScreenClip();

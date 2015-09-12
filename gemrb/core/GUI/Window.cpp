@@ -29,7 +29,6 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	: View(frame), manager(mgr)
 {
 	isDragging = false;
-	disabled = false;
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
@@ -155,12 +154,6 @@ void Window::SetPosition(WindowPosition pos)
 		newFrame.y = screen.h - newFrame.h;
 	}
 	SetFrame(newFrame);
-}
-
-void Window::SetDisabled(bool disable)
-{
-	disabled = disable;
-	MarkDirty();
 }
 
 void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
