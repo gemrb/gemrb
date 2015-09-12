@@ -338,6 +338,9 @@ void Button::SetState(unsigned char state)
 	if (state > IE_GUI_BUTTON_LOCKED_PRESSED) {// If wrong value inserted
 		return;
 	}
+	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
+	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
+
 	if (State != state) {
 		MarkDirty();
 		State = state;
@@ -383,7 +386,7 @@ void Button::SetFont(Font* newfont)
 
 Holder<Button::DragOp> Button::DragOperation()
 {
-	if (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+	if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 		EnableBorder(1, true);
 		return Holder<Button::DragOp>(new PortraitDragOp(this));
 	}
@@ -393,7 +396,7 @@ Holder<Button::DragOp> Button::DragOperation()
 bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
 	if (dop.dragView != this && dynamic_cast<const PortraitDragOp*>(&dop)) {
-		return (State != IE_GUI_BUTTON_DISABLED && Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
+		return (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
 	}
 	return View::AcceptsDragOperation(dop);
 }
@@ -434,7 +437,7 @@ bool Button::OnSpecialKeyPress(unsigned char Key)
 /** Mouse Button Down */
 void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED || (core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])) {
+	if ((core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])) {
 		return Control::OnMouseDown(p, Button, Mod);
 	}
 
@@ -465,10 +468,6 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 /** Mouse Button Up */
 void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return Control::OnMouseUp(p, Button, Mod);
-	}
-
 	bool drag = core->GetDraggedItem () != NULL;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
@@ -531,10 +530,6 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 
 void Button::OnMouseOver(const Point& p)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-
 	if ( RunEventHandler( eventHandlers[IE_GUI_MOUSE_OVER_BUTTON] )<0) {
 		//event handler destructed this object
 		return;
@@ -560,9 +555,6 @@ void Button::OnMouseOver(const Point& p)
 
 void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
 	pulseBorder = true;
 
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
@@ -570,9 +562,6 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 
 void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
 	SetState( IE_GUI_BUTTON_UNPRESSED );
 	if (pulseBorder) {
 		pulseBorder = false;
@@ -612,9 +601,6 @@ bool Button::SetEvent(int eventType, ControlEventHandler handler)
 void Button::UpdateState(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-		return;
-	}
-	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
