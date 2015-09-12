@@ -60,6 +60,16 @@ PCStatsStruct::PCStatsStruct()
 	LastJoined = 0;
 }
 
+PCStatsStruct::PCStatsStruct(std::list<int> levels)
+{
+	PCStatsStruct();
+	UpdateClassLevels(levels);
+}
+
+void PCStatsStruct::UpdateClassLevels(std::list<int> levels) {
+	ClassLevels = levels;
+}
+
 void PCStatsStruct::IncrementChapter()
 {
 	KillsChapterXP = 0;

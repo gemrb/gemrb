@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include <list>
+
 namespace GemRB {
 
 #define MAX_QUICKITEMSLOT   5   //pst has 5
@@ -124,10 +126,12 @@ public:
 	ieDword   LastJoined; //trigger
 	ieDword   Interact[MAX_INTERACT];
 	ieWord    Happiness;
+	std::list<int> ClassLevels;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
+	PCStatsStruct(std::list<int> levels);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, int slot, int headerindex);
@@ -135,6 +139,7 @@ public:
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
 	void RegisterFavourite(ieResRef fav, int what);
+	void UpdateClassLevels(std::list<int> levels);
 };
 }
 
