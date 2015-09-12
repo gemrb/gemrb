@@ -188,27 +188,24 @@ bool Window::TrySetFocus(View* target)
 	return true;
 }
 
-void Window::DispatchMouseOver(const Point& p)
+void Window::DispatchMouseOver(View* target, const Point& p)
 {
 	if (isDragging) {
 		OnMouseOver(ConvertPointFromScreen(p));
 		return;
 	}
 
-	// need screen coordinates because the target may not be a direct subview
-	Point screenP = ConvertPointToScreen(p);
-	View* target = SubviewAt(p, false, true);
 	bool left = false;
 	if (target) {
 		if (target != hoverView) {
 			if (hoverView) {
-				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP), drag.get());
+				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(p), drag.get());
 				left = true;
 			}
-			target->OnMouseEnter(target->ConvertPointFromScreen(screenP), drag.get());
+			target->OnMouseEnter(target->ConvertPointFromScreen(p), drag.get());
 		}
 	} else if (hoverView) {
-		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(screenP), drag.get());
+		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(p), drag.get());
 		left = true;
 	}
 	if (left) {
@@ -224,41 +221,36 @@ void Window::DispatchMouseOver(const Point& p)
 	}
 	if (trackingView) {
 		// tracking will eat this event
-		trackingView->OnMouseOver(trackingView->ConvertPointFromScreen(screenP));
+		trackingView->OnMouseOver(trackingView->ConvertPointFromScreen(p));
 	} else if (target) {
-		target->OnMouseOver(target->ConvertPointFromScreen(screenP));
+		target->OnMouseOver(target->ConvertPointFromScreen(p));
 	}
 	hoverView = target;
 }
 
-void Window::DispatchMouseDown(const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseDown(View* target, const Point& p, unsigned short button, unsigned short mod)
 {
 	if (button == GEM_MB_ACTION) {
 		Focus();
 	}
-	View* target = SubviewAt(p, false, true);
-	if (target) {
-		TrySetFocus(target);
-		Point subP = target->ConvertPointFromScreen(ConvertPointToScreen(p));
-		target->OnMouseDown(subP, button, mod);
-		trackingView = target; // all views track the mouse within their bounds
-		return;
-	}
-	OnMouseDown(ConvertPointFromScreen(p), button, mod);
+
+	TrySetFocus(target);
+	Point subP = target->ConvertPointFromScreen(p);
+	target->OnMouseDown(subP, button, mod);
+	trackingView = target; // all views track the mouse within their bounds
 }
 
-void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button, unsigned short mod)
 {
 	if (isDragging) {
 		isDragging = false;
 		return;
 	}
 	if (trackingView) {
-		Point subP = trackingView->ConvertPointFromScreen(ConvertPointToScreen(p));
+		Point subP = trackingView->ConvertPointFromScreen(p);
 		trackingView->OnMouseUp(subP, button, mod);
 	} else if (drag) {
-		View* target = SubviewAt(p, false, true);
-		if (target && target->AcceptsDragOperation(*drag)) {
+		if (target->AcceptsDragOperation(*drag)) {
 			target->CompleteDragOperation(*drag);
 		}
 	}
@@ -266,36 +258,46 @@ void Window::DispatchMouseUp(const Point& p, unsigned short button, unsigned sho
 	trackingView = NULL;
 }
 
-void Window::DispatchMouseWheelScroll(const Point& p, short x, short y)
-{
-	View* target = SubviewAt(ConvertPointFromScreen(p), false, true);
-	if (target) {
-		target->OnMouseWheelScroll( x, y );
-		return;
-	}
-	// handle scrollbar events
-	View::OnMouseWheelScroll(x, y);
-}
-
 bool Window::DispatchEvent(const Event& event)
 {
 	if (event.isScreen) {
-		Point winPos = ConvertPointFromScreen(event.mouse.Pos());
+		Point screenPos = event.mouse.Pos();
+		View* target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+
+		// special event handling
+		switch (event.type) {
+			case Event::MouseScroll:
+				// retarget if NULL or disabled
+				if (target == NULL || target->IsDisabled()) {
+					OnMouseWheelScroll( event.mouse.deltaX, event.mouse.deltaY );
+				} else {
+					target->OnMouseWheelScroll( event.mouse.deltaX, event.mouse.deltaY );
+				}
+				return true;
+			case Event::MouseMove:
+				// allows NULL and disabled targets
+				DispatchMouseOver(target, screenPos);
+				return true;
+			default:
+				if (target == NULL) {
+					target = this;
+				} else if (target->IsDisabled()) {
+					return true; // we still absorb the event
+				}
+				break;
+		}
+
+		// basic event handling
 		switch (event.type) {
 			case Event::MouseDown:
-				DispatchMouseDown(winPos, event.mouse.button, event.mod);
+				DispatchMouseDown(target, screenPos, event.mouse.button, event.mod);
 				break;
 			case Event::MouseUp:
-				DispatchMouseUp(winPos, event.mouse.button, event.mod);
+				DispatchMouseUp(target, screenPos, event.mouse.button, event.mod);
 				break;
-			case Event::MouseMove:
-				DispatchMouseOver(winPos);
-				break;
-			case Event::MouseScroll:
-				DispatchMouseWheelScroll(winPos, event.mouse.deltaX, event.mouse.deltaY);
-				break;
-			default: return false;
+			default: return false; // should never happen, supressing compiler warning
 		}
+		// absorb other screen events i guess
 		return true;
 	} else {
 		// key events

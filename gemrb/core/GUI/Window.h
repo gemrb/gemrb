@@ -71,10 +71,9 @@ protected:
 
 	bool TrySetFocus(View*);
 
-	inline void DispatchMouseOver(const Point&);
-	inline void DispatchMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	inline void DispatchMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	inline void DispatchMouseWheelScroll(const Point&, short x, short y);
+	inline void DispatchMouseOver(View*, const Point&);
+	inline void DispatchMouseDown(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	inline void DispatchMouseUp(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 
 public:
 	Window(const Region& frame, WindowManager& mgr);
