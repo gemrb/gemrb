@@ -315,6 +315,9 @@ static int spllevels;
 std::vector<std::vector<int> > skilldex;
 std::vector<std::vector<int> > skillrac;
 
+// subset of races.2da
+std::map<unsigned int, int> favoredMap;
+
 // iwd2 class to-hit and apr tables read into a single object
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
 typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
@@ -2544,6 +2547,18 @@ static void InitActorTables()
 					avPrefix[i].stat = -1;
 				}
 			}
+		}
+	}
+
+	// races table, initially only used for iwd2 multiclassing xp penalties
+	tm.load("races");
+	if (tm && third) {
+		int racesNRows = tm->GetRowCount();
+
+		for (i = 0; i < racesNRows; i++) {
+			int raceID = strtol(tm->QueryField(i, 3), NULL, 0);
+			int favClass = strtol(tm->QueryField(i, 8), NULL, 0);
+			favoredMap.insert(std::make_pair(raceID, favClass));
 		}
 	}
 }
