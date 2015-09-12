@@ -111,7 +111,7 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 	if not chargen:
 		# LevelDiff + whatever caster level of this type we already had
 		level = GemRB.GetVar ("LevelDiff")
-		classIndex = CommonTables.ClassSkills.GetRowIndex (BaseClassName)
+		classIndex = CommonTables.Classes.GetRowIndex (BaseClassName)
 		level += GemRB.GetPlayerStat (pc, Levels[classIndex], 1)
 
 	bonus = 0 # ignore high-stat granted bonus spell slots
