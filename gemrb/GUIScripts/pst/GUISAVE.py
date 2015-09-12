@@ -160,7 +160,7 @@ def DeleteGameConfirm():
 	ScrollBarPress()
 	if ConfirmWindow:
 		ConfirmWindow.Unload()
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	SaveWindow.Focus()
 	return
 
 def DeleteGameCancel():
@@ -169,13 +169,13 @@ def DeleteGameCancel():
 	if ConfirmWindow:
 		ConfirmWindow.Unload()
 		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	SaveWindow.Focus()
 	return
 
 def DeleteGamePress():
 	global ConfirmWindow
 
-	SaveWindow.SetVisible (WINDOW_INVISIBLE)
+	SaveWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (3)
 
 	Text=ConfirmWindow.GetControl (0)
@@ -191,7 +191,7 @@ def DeleteGamePress():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.Focus()
 	return
 
 def CancelPress():

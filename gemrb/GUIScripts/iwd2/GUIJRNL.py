@@ -60,7 +60,7 @@ def OpenJournalWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 
 
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -70,7 +70,7 @@ def OpenJournalWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible (WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 	GemRB.LoadWindowPack ("GUIJRNL", 800, 600)
 	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow.ID)
@@ -89,9 +89,9 @@ def OpenJournalWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
-	Window.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
+	OptionsWindow.Focus()
+	PortraitWindow.Focus()
 	# this is here just so we redraw the portrait borders properly in case of reselection
 	GUICommonWindows.SetSelectionChangeHandler (UpdateJournalWindow)
 	UpdateJournalWindow ()

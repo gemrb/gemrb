@@ -59,7 +59,7 @@ def RevealMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -93,7 +93,7 @@ def ShowMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -102,7 +102,7 @@ def ShowMap ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -137,7 +137,7 @@ def ShowMap ():
 		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	OptionsWindow.SetVisible (WINDOW_GRAYED)
 	PortraitWindow.SetVisible (WINDOW_GRAYED)
 	OptionsWindow.SetVisible (WINDOW_FRONT)
@@ -166,7 +166,7 @@ def OpenMapWindow ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -176,7 +176,7 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIMAP", WIDTH, HEIGHT)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -216,9 +216,9 @@ def OpenMapWindow ():
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
 	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
+	PortraitWindow.Focus()
+	Window.Focus()
 	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
 	else:
@@ -238,7 +238,7 @@ def LeftDoublePressMap ():
 def CloseNoteWindow ():
 	if NoteWindow:
 		NoteWindow.Unload ()
-	MapWindow.SetVisible (WINDOW_VISIBLE)
+	MapWindow.Focus()
 	return
 
 def RemoveMapNote ():
@@ -395,7 +395,7 @@ def CloseWorldMapWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommon.GameWindow.Focus()
 	GemRB.UnhideGUI ()
 	return
 
@@ -408,7 +408,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUIWMAP",800, 600)
@@ -487,7 +487,7 @@ def WorldMapWindowCommon (Travel):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 

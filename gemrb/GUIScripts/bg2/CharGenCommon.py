@@ -250,7 +250,7 @@ def DisplayOverview(step):
 		elif part == 8:
 			break
 
-	CharGenWindow.SetVisible (WINDOW_VISIBLE)
+	CharGenWindow.Focus()
 	return
 
 def SetButtonStateFromStep (buttonName, button, step):

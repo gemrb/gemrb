@@ -219,7 +219,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	# show the selection window
 	if chargen:
 		if recommend:
-			SpellsWindow.SetVisible (WINDOW_VISIBLE)
+			SpellsWindow.Focus()
 		else:
 			SpellsWindow.ShowModal (MODAL_SHADOW_NONE)
 	else:

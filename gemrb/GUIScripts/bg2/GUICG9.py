@@ -55,7 +55,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 
 	RedrawSkills()
-	SkillWindow.SetVisible(WINDOW_VISIBLE)
+	SkillWindow.Focus()
 	return
 
 def BackPress():

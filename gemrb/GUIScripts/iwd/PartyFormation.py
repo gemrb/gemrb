@@ -103,13 +103,13 @@ def OnLoad ():
 			GemRB.SetVar ("PlayMode",0) #using first row
 
 	LoadScreen.CloseLoadScreen()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
+	PartyFormationWindow.SetVisible(False)
 	CreateCharWindow = GemRB.LoadWindow (3)
 
 	CreateButton = CreateCharWindow.GetControl (0)
@@ -129,7 +129,7 @@ def CreateCharPress ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	CreateCharWindow.SetVisible (WINDOW_VISIBLE)
+	CreateCharWindow.Focus()
 	return
 
 def CreateCharCreatePress ():
@@ -150,7 +150,7 @@ def CreateCharCancelPress ():
 
 	if CreateCharWindow:
 		CreateCharWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def ModifyCharsPress ():
@@ -163,7 +163,7 @@ def EnterGamePress ():
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
+	PartyFormationWindow.SetVisible(False)
 	ExitWindow = GemRB.LoadWindow (7)
 
 	ExitButton = ExitWindow.GetControl (1)
@@ -179,7 +179,7 @@ def ExitPress ():
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)
 
-	ExitWindow.SetVisible (WINDOW_VISIBLE)
+	ExitWindow.Focus()
 	return
 
 def ExitCancelPress ():
@@ -187,7 +187,7 @@ def ExitCancelPress ():
 
 	if ExitWindow:
 		ExitWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def ExitExitPress ():

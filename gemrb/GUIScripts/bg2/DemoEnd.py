@@ -39,7 +39,7 @@ def OnLoad ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	Button.SetPicture (resref)
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 	
 def NextPress ():

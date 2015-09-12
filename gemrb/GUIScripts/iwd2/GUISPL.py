@@ -58,7 +58,7 @@ def OpenSpellBookWindow ():
 
 		SpellBookWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -68,7 +68,7 @@ def OpenSpellBookWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUISPL", 800, 600)
 	SpellBookWindow = Window = GemRB.LoadWindow (2)
@@ -256,8 +256,8 @@ def UpdateSpellBookWindow ():
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
+	OptionsWindow.Focus()
 	return
 
 def GetMemorizedSpellsCount (total=False):

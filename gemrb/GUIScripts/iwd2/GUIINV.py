@@ -64,7 +64,7 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		GUICommonWindows.UpdatePortraitWindow ()
@@ -75,7 +75,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIINV", 800, 600)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
@@ -303,8 +303,8 @@ def RefreshInventoryWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
+	OptionsWindow.Focus()
 	return
 
 ###################################################

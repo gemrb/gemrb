@@ -565,7 +565,7 @@ def CloseBiographyWindow ():
 		if GameCheck.IsBG2() or GameCheck.IsIWD1():
 			GUIREC.InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		else:
-			GUIREC.InformationWindow.SetVisible (WINDOW_VISIBLE)
+			GUIREC.InformationWindow.Focus()
 	return
 
 def GetProtagonistBiography (pc):

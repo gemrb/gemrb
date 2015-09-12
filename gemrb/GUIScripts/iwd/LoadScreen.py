@@ -48,7 +48,7 @@ def StartLoadScreen ():
 	GemRB.SetVar ("Progress", Progress)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
+	LoadScreen.Focus()
 	return
 
 def EndLoadScreen ():
@@ -57,7 +57,7 @@ def EndLoadScreen ():
 	if LoadScreen:
 		Skull = LoadScreen.GetControl (3)
 		Skull.SetMOS ("GTRBPSK2")
-		LoadScreen.SetVisible (WINDOW_VISIBLE)
+		LoadScreen.Focus()
 		LoadScreen.Unload()
 	LoadScreen = None
 	return

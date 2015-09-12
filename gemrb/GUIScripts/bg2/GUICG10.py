@@ -81,7 +81,7 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawMCs()
-	ClassWindow.SetVisible(WINDOW_VISIBLE)
+	ClassWindow.Focus()
 	return
 
 def ClassPress():

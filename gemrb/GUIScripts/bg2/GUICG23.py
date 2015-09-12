@@ -53,7 +53,7 @@ def OnLoad ():
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OkPress)
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearPress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	BioWindow.SetVisible (WINDOW_VISIBLE)
+	BioWindow.Focus()
 	return
 
 def OkPress ():

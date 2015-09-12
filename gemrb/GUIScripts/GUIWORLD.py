@@ -69,7 +69,7 @@ def DialogStarted ():
 	GUICommonWindows.EmptyControls()
 	OldActionsWindow = GUICommonWindows.ActionsWindow
 	#GUICommonWindows.ActionsWindow = None
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	OldActionsWindow.SetVisible(False)
 	GemRB.SetVar ("ActionsWindow", -1)
 
 def DialogEnded ():
@@ -80,7 +80,7 @@ def DialogEnded ():
 		return
 
 	#GUICommonWindows.ActionsWindow = OldActionsWindow
-	OldActionsWindow.SetVisible(WINDOW_VISIBLE)
+	OldActionsWindow.Focus()
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 	GUICommonWindows.UpdateActionsWindow()
 
@@ -99,14 +99,14 @@ def NextDialogState ():
 	if not ContinueWindow:
 		return
 
-	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_VISIBLE)
+	ContinueWindow.SetVisible(False)
+	OldActionsWindow.Focus()
 
 	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenEndMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	ContinueWindow.Focus()
+	OldActionsWindow.SetVisible(False)
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
@@ -114,8 +114,8 @@ def OpenEndMessageWindow ():
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	ContinueWindow.Focus()
+	OldActionsWindow.SetVisible(False)
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)

@@ -133,7 +133,7 @@ class CharGen:
 					commentFn(TextAreaControl)
 		
 		#show
-		CharGenWindow.SetVisible(WINDOW_VISIBLE)
+		CharGenWindow.Focus()
 		self.window = CharGenWindow
 	
 	def unset(self,stage):

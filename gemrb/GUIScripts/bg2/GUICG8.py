@@ -65,7 +65,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	RaceWindow.SetVisible(WINDOW_VISIBLE)
+	RaceWindow.Focus()
 	return
 
 def RacePress():

@@ -54,7 +54,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DefaultPress)
-	SoundWindow.SetVisible(WINDOW_VISIBLE)
+	SoundWindow.Focus()
 	return
 
 def DefaultPress():

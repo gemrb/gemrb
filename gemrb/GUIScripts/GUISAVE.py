@@ -51,7 +51,7 @@ def OpenSaveWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUISAVE", 800, 600)
@@ -105,7 +105,7 @@ def OpenSaveWindow ():
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
 	ScrollBar.SetDefaultScrollBar ()
 	ScrollBarPress ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def ScrollBarPress():
@@ -171,7 +171,7 @@ def AbortedSaveGame():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	SaveWindow.Focus()
 	return
 
 def ConfirmedSaveGame():
@@ -255,7 +255,7 @@ def SavePress():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.Focus()
 	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
@@ -282,7 +282,7 @@ def DeleteGameConfirm():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	SaveWindow.Focus()
 	return
 
 def DeleteGameCancel():
@@ -291,13 +291,13 @@ def DeleteGameCancel():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	SaveWindow.Focus()
 	return
 
 def DeleteGamePress():
 	global ConfirmWindow
 
-	SaveWindow.SetVisible (WINDOW_INVISIBLE)
+	SaveWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (2)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
@@ -309,7 +309,7 @@ def DeleteGamePress():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.Focus()
 	return
 
 def CloseSaveWindow ():
@@ -323,6 +323,6 @@ def CloseSaveWindow ():
 		GemRB.SetNextScript ("Start")
 		return
 
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
+	GUICommon.GameWindow.Focus() #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	return

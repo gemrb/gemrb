@@ -73,7 +73,7 @@ def OpenInventoryWindow ():
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 
 	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		if InventoryWindow:
 			InventoryWindow.Unload ()
 		InventoryWindow = None
@@ -149,9 +149,8 @@ def OpenInventoryWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
 
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-	GUICommonWindows.PortraitWindow.SetVisible(WINDOW_VISIBLE)
-	GUICommonWindows.OptionsWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommonWindows.PortraitWindow.Focus()
+	GUICommonWindows.OptionsWindow.Focus()
 	return
 
 def UpdateInventoryWindow ():

@@ -114,7 +114,7 @@ def CloseStoreWindow ():
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
+		GUICommon.GameWindow.Focus() #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
 
@@ -139,7 +139,7 @@ def OpenStoreWindow ():
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
+	GUICommon.GameWindow.SetVisible(False) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
@@ -192,9 +192,9 @@ def OpenStoreWindow ():
 
 	ActionWindow.SetVisible (WINDOW_GRAYED)
 	MenuWindow.SetVisible (WINDOW_GRAYED)
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	store_funcs[store_buttons[0]] ()
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
 	return
 
 def OpenStoreShoppingWindow ():
@@ -290,7 +290,7 @@ def OpenStoreShoppingWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreIdentifyWindow ():
@@ -325,7 +325,7 @@ def OpenStoreIdentifyWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreStealWindow ():
@@ -372,7 +372,7 @@ def OpenStoreStealWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreDonateWindow ():
@@ -408,7 +408,7 @@ def OpenStoreDonateWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreDonateWindow )
 	UpdateStoreDonateWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreHealWindow ():
@@ -447,7 +447,7 @@ def OpenStoreHealWindow ():
 	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
 
 	UpdateStoreHealWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreRumourWindow ():
@@ -481,7 +481,7 @@ def OpenStoreRumourWindow ():
 	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
 
 	UpdateStoreRumourWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreRentWindow ():
@@ -521,7 +521,7 @@ def OpenStoreRentWindow ():
 	GemRB.SetVar ("RentIndex", RentIndex)
 
 	UpdateStoreRentWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def UpdateStoreCommon (Window, title, name, gold):

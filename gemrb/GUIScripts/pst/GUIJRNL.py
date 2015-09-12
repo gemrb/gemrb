@@ -113,7 +113,7 @@ def OpenJournalWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
-	#JournalWindow.SetVisible (WINDOW_VISIBLE)
+	#JournalWindow.Focus()
 	GemRB.UnhideGUI()
 	
 
@@ -168,7 +168,7 @@ def OpenQuestsWindow ():
 	EvaluateAllQuests ()
 	PopulateQuestsList ()
 
-	#QuestsWindow.SetVisible (WINDOW_VISIBLE)
+	#QuestsWindow.Focus()
 	GemRB.UnhideGUI()
 	
 
@@ -448,7 +448,7 @@ def OpenLogWindow ():
 		Text.Append ("[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]")
 		Text.Append (" " + GemRB.GetString (je['Text']) + "\n\n")
 			
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	
 	GemRB.UnhideGUI()
 

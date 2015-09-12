@@ -556,7 +556,7 @@ def UpdateSlot (pc, slot):
 def CancelColor():
 	if ColorPicker:
 		ColorPicker.Unload ()
-	GUIINV.InventoryWindow.SetVisible (WINDOW_VISIBLE)
+	GUIINV.InventoryWindow.Focus()
 	return
 
 def ColorDonePress():
@@ -648,7 +648,7 @@ def GetColor():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ColorDonePress)
-	ColorPicker.SetVisible (WINDOW_VISIBLE)
+	ColorPicker.Focus()
 	return
 
 def ReleaseFamiliar ():

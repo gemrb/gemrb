@@ -116,7 +116,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	ClassWindow.SetVisible(WINDOW_VISIBLE)
+	ClassWindow.Focus()
 	return
 
 def ClassPress():

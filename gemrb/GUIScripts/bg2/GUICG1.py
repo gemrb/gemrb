@@ -46,7 +46,7 @@ def OnLoad():
 	BiographyButton.SetText(18003)
 	BiographyButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
+	GenderWindow.Focus()
 	if GenderWindow:
 		GenderWindow.Unload()
 	GenderWindow = GemRB.LoadWindow(1)
@@ -74,7 +74,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
+	GenderWindow.Focus()
 	return
 
 def ClickedMale():

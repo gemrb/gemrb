@@ -76,7 +76,7 @@ def OnLoad ():
 
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def ScrollBarPress ():
@@ -150,19 +150,19 @@ def DeleteGameConfirm():
 	ScrollBarPress ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def DeleteGameCancel ():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def DeleteGamePress ():
 	global ConfirmWindow
 
-	LoadWindow.SetVisible (WINDOW_INVISIBLE)
+	LoadWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (1)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
@@ -174,7 +174,7 @@ def DeleteGamePress ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
+	ConfirmWindow.Focus()
 	return
 
 def CancelPress ():

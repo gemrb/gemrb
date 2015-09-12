@@ -123,7 +123,7 @@ def CloseStoreWindow ():
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
+		GUICommon.GameWindow.Focus() #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
 	return
@@ -147,7 +147,7 @@ def OpenStoreWindow ():
 	SpellTable = GemRB.LoadTable ("storespl", 1)
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
+	GUICommon.GameWindow.SetVisible(False) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
@@ -200,8 +200,8 @@ def OpenStoreWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	ActionWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
+	ActionWindow.Focus()
+	Window.Focus()
 	store_funcs[store_buttons[0]] ()
 
 	# Portrait window must be loaded after store, because UpdatePortraitWindow
@@ -216,9 +216,9 @@ def OpenStoreWindow ():
 
 	if not GameCheck.IsIWD2():
 		if GameCheck.IsBG1():
-			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+			GUICommonWindows.PortraitWindow.Focus()
 		else:
-			PortraitWindow.SetVisible (WINDOW_VISIBLE)
+			PortraitWindow.Focus()
 	return
 
 def OpenStoreShoppingWindow ():
@@ -347,7 +347,7 @@ def OpenStoreShoppingWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreIdentifyWindow ():
@@ -397,7 +397,7 @@ def OpenStoreIdentifyWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreStealWindow ():
@@ -460,7 +460,7 @@ def OpenStoreStealWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreDonateWindow ():
@@ -496,7 +496,7 @@ def OpenStoreDonateWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreDonateWindow )
 	UpdateStoreDonateWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreHealWindow ():
@@ -540,7 +540,7 @@ def OpenStoreHealWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreHealWindow )
 	UpdateStoreHealWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreRumourWindow ():
@@ -581,7 +581,7 @@ def OpenStoreRumourWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRumourWindow )
 	UpdateStoreRumourWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def OpenStoreRentWindow ():
@@ -630,7 +630,7 @@ def OpenStoreRentWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRentWindow )
 	UpdateStoreRentWindow ()
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def UpdateStoreCommon (Window, title, name, gold):

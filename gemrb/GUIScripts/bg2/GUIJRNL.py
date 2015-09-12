@@ -57,7 +57,7 @@ def OpenJournalWindow ():
 
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -71,7 +71,7 @@ def OpenJournalWindow ():
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
@@ -136,9 +136,9 @@ def OpenJournalWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
 	return
 
 def ToggleOrderWindow ():
@@ -192,7 +192,7 @@ def UpdateLogWindow ():
 		Text.Append (JournalTitle + GemRB.GetString(15980))
 		Text.Append (JournalText)
 
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 ###################################################

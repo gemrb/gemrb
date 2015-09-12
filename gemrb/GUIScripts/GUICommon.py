@@ -797,7 +797,7 @@ def SetCurrentDateTokens (stat):
 # The third parameter is another check which must be 0 to maintain window visibility
 def AdjustWindowVisibility (Window, pc, additionalCheck):
 	if not additionalCheck and GemRB.ValidTarget (pc, GA_SELECT|GA_NO_DEAD):
-		Window.SetVisible (WINDOW_VISIBLE)
+		Window.Focus()
 	else:
 		Window.SetVisible (WINDOW_GRAYED)
 	return

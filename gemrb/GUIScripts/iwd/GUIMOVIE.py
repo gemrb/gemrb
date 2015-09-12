@@ -48,7 +48,7 @@ def OnLoad ():
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	MovieWindow.SetVisible (WINDOW_VISIBLE)
+	MovieWindow.Focus()
 	return
 
 def PlayPress ():
@@ -58,18 +58,18 @@ def PlayPress ():
 		if GemRB.GetVar(t)==1:
 			if s==0:
 				s = MoviesTable.GetRowName (i)
-				MovieWindow.SetVisible (WINDOW_INVISIBLE)
+				MovieWindow.SetVisible(False)
 				GemRB.PlayMovie (s, 1)
-				MovieWindow.SetVisible (WINDOW_VISIBLE)
+				MovieWindow.Focus()
 				return
 
 			s = s - 1
 
 
 def CreditsPress ():
-	MovieWindow.SetVisible (WINDOW_INVISIBLE)
+	MovieWindow.SetVisible(False)
 	GemRB.PlayMovie ("CREDITS", 1)
-	MovieWindow.SetVisible (WINDOW_VISIBLE)
+	MovieWindow.Focus()
 
 
 def DonePress ():

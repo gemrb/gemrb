@@ -1786,7 +1786,7 @@ def OpenWaitForDiscWindow ():
 	try:
 		GemRB.UnhideGUI ()
 	except:
-		DiscWindow.SetVisible (WINDOW_VISIBLE)
+		DiscWindow.Focus()
 
 def SetPSTGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()

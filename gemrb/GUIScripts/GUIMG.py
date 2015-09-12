@@ -62,7 +62,7 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -72,7 +72,7 @@ def OpenMageWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 
@@ -144,9 +144,9 @@ def SetupMageWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	UpdateMageWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
 	return
 
 def UpdateMageWindow ():

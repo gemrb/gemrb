@@ -119,7 +119,7 @@ def OnLoad():
 	Init = 1
 	RedrawKits()
 	KitPress()
-	KitWindow.SetVisible(WINDOW_VISIBLE)
+	KitWindow.Focus()
 	return
 
 def RedrawKits():

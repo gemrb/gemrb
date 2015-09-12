@@ -62,12 +62,12 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	if screen_type == LS_TYPE_SAVING:
 		GemRB.UnhideGUI ()
 
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 
 
 def EndLoadScreen ():
 	Window = LoadScreen
 	Skull = Window.GetControl (1)
 	Skull.SetMOS ("GSKULON")
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	Window.Unload ()

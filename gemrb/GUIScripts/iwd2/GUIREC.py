@@ -75,7 +75,7 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -85,7 +85,7 @@ def OpenRecordsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIREC", 800, 600)
 	RecordsWindow = Window = GemRB.LoadWindow (2)
@@ -1059,8 +1059,8 @@ def UpdateRecordsWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, 0)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
+	OptionsWindow.Focus()
 	return
 
 def CloseHelpWindow ():

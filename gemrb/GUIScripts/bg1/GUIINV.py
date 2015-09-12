@@ -67,7 +67,7 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		GUICommonWindows.UpdatePortraitWindow ()
@@ -78,7 +78,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
@@ -170,9 +170,9 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
 
 	# force unpause the game
 	GemRB.GamePause(0, 0)

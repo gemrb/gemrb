@@ -65,7 +65,7 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -76,10 +76,7 @@ def OpenRecordsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIREC", 640, 480)
-	RecordsWindow = Window = GemRB.LoadWindow (2)
+	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	# saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
@@ -128,9 +125,9 @@ def OpenRecordsWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
+	Window.Focus()
+	PortraitWindow.Focus()
 	return
 
 #original returns to game before continuing...
@@ -285,7 +282,7 @@ def UpdateRecordsWindow ():
 	Text = Window.GetControl (45)
 	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 
 def GetStatColor (pc, stat):
@@ -850,9 +847,9 @@ def CloseInformationWindow ():
 		InformationWindow.Unload ()
 	InformationWindow = None
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	RecordsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
+	RecordsWindow.Focus()
+	PortraitWindow.Focus()
 	return
 
 def OpenKitInfoWindow ():

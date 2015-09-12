@@ -42,7 +42,7 @@ def OnLoad():
 #	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 #	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-##	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
+##	GUICommon.GameWindow.Focus()
 
 	UpdateControlStatus()
 

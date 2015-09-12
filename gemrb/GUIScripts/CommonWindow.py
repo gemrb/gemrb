@@ -288,7 +288,7 @@ def CloseContainerWindow ():
 		GUICommonWindows.EnableAnimatedWindows ()
 		 #PST needs a reminder to redraw the  clock for some reason
 		if GUICommonWindows.ActionsWindow:
-			GUICommonWindows.ActionsWindow.SetVisible(WINDOW_VISIBLE)
+			GUICommonWindows.ActionsWindow.Focus()
 		
 
 	# FIXME: iwd2 bug or just bad naming?

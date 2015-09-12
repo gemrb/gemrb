@@ -54,7 +54,7 @@ def OpenPriestWindow ():
 
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -64,7 +64,7 @@ def OpenPriestWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindow (2)
@@ -110,10 +110,10 @@ def OpenPriestWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 	#bringing window front
 	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.Focus()
 	return
 
 def UpdatePriestWindow ():

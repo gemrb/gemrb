@@ -53,8 +53,8 @@ def OnLoad():
 
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-	MessageWindow.SetVisible(WINDOW_VISIBLE)
-	PortraitWindow.SetVisible(WINDOW_VISIBLE)
+	MessageWindow.Focus()
+	PortraitWindow.Focus()
 	return
 
 def UpdateControlStatus():

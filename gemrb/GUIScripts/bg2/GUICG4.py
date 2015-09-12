@@ -182,7 +182,7 @@ def OnLoad():
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	AbilityWindow.SetVisible(WINDOW_VISIBLE)
+	AbilityWindow.Focus()
 	return
 
 def RightPress():

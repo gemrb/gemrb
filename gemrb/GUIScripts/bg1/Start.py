@@ -142,8 +142,8 @@ def NewSingle():
 	return
 
 def ExitPress():
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.SetVisible(False)
+	QuitWindow.Focus()
 	return
 	
 def ExitConfirmed():
@@ -160,8 +160,8 @@ def MoviesPress():
 	return
 
 def ExitCancelled():
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	QuitWindow.SetVisible(False)
+	StartWindow.Focus()
 	return
 	
 def BackToMain():

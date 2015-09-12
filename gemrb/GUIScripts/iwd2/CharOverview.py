@@ -248,7 +248,7 @@ def UpdateOverview(CurrentStep):
 	TextAreaControl.SetText(40275)
 	
 	# And we're done, w00t!
-	CharGenWindow.SetVisible(WINDOW_VISIBLE)
+	CharGenWindow.Focus()
 	return
 
 def NextPress():
@@ -275,12 +275,12 @@ def CancelPress():
 	return
 
 def StartOver():
-	StartOverWindow.SetVisible(WINDOW_VISIBLE)
+	StartOverWindow.Focus()
 	return
 
 def NoExitPress():
-	StartOverWindow.SetVisible(WINDOW_INVISIBLE)
-	CharGenWindow.SetVisible(WINDOW_VISIBLE)
+	StartOverWindow.SetVisible(False)
+	CharGenWindow.Focus()
 	return
 
 def ImportPress():

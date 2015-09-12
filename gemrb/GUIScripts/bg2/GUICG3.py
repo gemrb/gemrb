@@ -71,7 +71,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	AlignmentWindow.SetVisible(WINDOW_VISIBLE)
+	AlignmentWindow.Focus()
 	return
 
 def AlignmentPress():
