@@ -5725,7 +5725,7 @@ void Actor::SetDialog(const ieResRef resref)
 Sprite2D* Actor::CopyPortrait(int which) const
 {
 	ResourceHolder<ImageMgr> im( which ? SmallPortrait : LargePortrait );
-	return im->GetSprite2D();
+	return (im) ? im->GetSprite2D() : NULL;
 }
 
 const char *Actor::GetDialog(int flags) const
