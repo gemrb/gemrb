@@ -70,6 +70,9 @@ private:
 	void DrawCursor() const;
 	bool DrawTooltip() const;
 
+	bool DispatchEvent(const Event&);
+	bool HotKey(const Event&);
+
 public:
 	WindowManager(Video* vid);
 	~WindowManager();
@@ -85,8 +88,6 @@ public:
 	bool MakeModal(Window* win, ModalShadow Shadow = ShadowNone);
 	bool IsPresentingModalWindow() const;
 
-	bool DispatchEvent(const Event&);
-	bool HotKey(const Event&);
 	void DrawWindows() const;
 	void RedrawAll() const;
 
