@@ -67,8 +67,8 @@ private:
 	bool IsOpenWindow(Window* win) const;
 	Sprite2D* WinFrameEdge(int edge) const;
 
-	void DrawCursor() const;
-	bool DrawTooltip() const;
+	inline void DrawCursor() const;
+	inline void DrawTooltip() const;
 
 	bool DispatchEvent(const Event&);
 	bool HotKey(const Event&);

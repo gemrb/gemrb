@@ -203,7 +203,8 @@ bool WindowManager::HotKey(const Event& event)
 	if (event.type == Event::KeyDown) {
 		switch (event.keyboard.keycode) {
 			case GEM_TAB:
-				return DrawTooltip();
+				TooltipTime -= ToolTipDelay;
+				return bool(hoverWin);
 			case 'f':
 				video->ToggleFullscreenMode();
 				return true;
@@ -286,15 +287,13 @@ void WindowManager::DrawCursor() const
 	}
 }
 
-bool WindowManager::DrawTooltip() const
+void WindowManager::DrawTooltip() const
 {
-	if (hoverWin && hoverWin->TooltipText().length()) {
+	if (hoverWin && hoverWin->TooltipText().length() && TooltipTime && GetTickCount() >= TooltipTime + ToolTipDelay) {
 		Point pos = eventMgr.MousePos();
 		// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
 		core->DrawTooltip(hoverWin->TooltipText(), pos);
-		return true;
 	}
-	return false;
 }
 
 void WindowManager::DrawWindows() const
@@ -392,9 +391,7 @@ void WindowManager::DrawWindows() const
 
 	// tooltips and cursor are always last
 	DrawCursor();
-	if (hoverWin && TooltipTime && GetTickCount() >= TooltipTime + ToolTipDelay) {
-		DrawTooltip();
-	}
+	DrawTooltip();
 }
 
 //copies a screenshot into a sprite
