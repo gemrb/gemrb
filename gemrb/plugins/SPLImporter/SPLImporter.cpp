@@ -74,6 +74,8 @@ static int GetCGSound(ieDword CastingGraphics)
 		if (core->HasFeature(GF_CASTING_SOUNDS2) ) {
 			ret |= 0x100;
 		}
+	} else if (!core->HasFeature(GF_CASTING_SOUNDS2)) {
+		ret = cgsounds[CastingGraphics];
 	}
 	return ret;
 }
