@@ -77,6 +77,21 @@ VideoBuffer* Video::CreateBuffer(const Size& s, BufferFormat fmt)
 	return buffers.back();
 }
 
+void Video::DestroyBuffer(VideoBuffer* buffer)
+{
+	// FIXME: this is poorly implemented
+	VideoBuffers::iterator it = std::find(drawingBuffers.begin(), drawingBuffers.end(), buffer);
+	if (it != drawingBuffers.end()) {
+		drawingBuffers.erase(it);
+	}
+
+	it = std::find(buffers.begin(), buffers.end(), buffer);
+	if (it != buffers.end()) {
+		buffers.erase(it);
+	}
+	delete buffer;
+}
+
 void Video::SetDrawingBuffer(VideoBuffer* buf)
 {
 	drawingBuffers.push_back(buf);

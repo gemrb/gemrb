@@ -144,7 +144,7 @@ public:
 	/** Swaps displayed and back buffers */
 	int SwapBuffers(int fpscap = 30);
 	VideoBuffer* CreateBuffer(const Size&, BufferFormat = DISPLAY);
-	void DestroyBuffer(VideoBuffer*) {}; // FIXME: implement this
+	void DestroyBuffer(VideoBuffer*);
 	void SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
