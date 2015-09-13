@@ -855,6 +855,7 @@ public:
 	void SetTickHook(EventHandler);
 
 	void SetBits(unsigned int &flag, unsigned int value, int mode) const;
+	ieDword CountBits (ieDword n) const;
 };
 
 extern GEM_EXPORT Interface * core;

@@ -389,17 +389,6 @@ struct avType {
 static avType *avPrefix;
 static int avCount = -1;
 
-/* counts the on bits in a number */
-static ieDword bitcount (ieDword n)
-{
-	ieDword count=0;
-	while (n) {
-		count += n & 0x1u;
-		n >>= 1;
-	}
-			return count;
-}
-
 void ReleaseMemoryActor()
 {
 	if (mxsplwis) {
@@ -2192,7 +2181,7 @@ static void InitActorTables()
 
 			//we have to account for dual-swap in the multiclass field
 			ieDword numfound = 1;
-			ieDword tmpbits = bitcount (tmpclass);
+			ieDword tmpbits = core->CountBits (tmpclass);
 
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
@@ -4618,7 +4607,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		}
 		else if (IsMultiClassed()) {
 				//clscount is the number of on bits in the MULTI field
-				clscount = bitcount (multiclass);
+				clscount = core->CountBits (multiclass);
 				assert(clscount && clscount <= 3);
 				for (int i=1; i<clscount; i++)
 					average += levels[i];
