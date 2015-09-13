@@ -120,9 +120,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	if (!EvntManager)
 		return GEM_ERROR;
 
-	SDL_Keycode key = SDLK_UNKNOWN;
 	int modstate = GetModState(event.key.keysym.mod);
 	SDLKey sym = event.key.keysym.sym;
+	SDL_Keycode key = sym;
 	Event e;
 
 	/* Loop until there are no events left on the queue */
@@ -165,8 +165,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYDOWN:
 #if SDL_VERSION_ATLEAST(1,3,0)
 			key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-#else
-			key = event.key.keysym.unicode;
 #endif
 			// reenable special numpad keys unless numlock is off
 			if (SDL_GetModState() & KMOD_NUM) {
