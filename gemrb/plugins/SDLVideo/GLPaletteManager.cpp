@@ -158,20 +158,22 @@ void GLPaletteManager::ClearUnused(bool attached)
 
 void GLPaletteManager::Clear()
 {
-	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = textures.begin(); it != textures.end(); ++it)
+	std::map<PaletteKey, GLuint, PaletteKey>::iterator it = textures.begin();
+	while (it != textures.end())
 	{
 		it->first.palette->release();
 		glDeleteTextures(1, &(textures[it->first]));
+		it = textures.erase(it);
 	}
-	textures.clear();
 	indexes.clear();
 
-	for(std::map<PaletteKey, GLuint, PaletteKey>::iterator it = a_textures.begin(); it != a_textures.end(); ++it)
+	it = a_textures.begin()
+	while (it != a_textures.end())
 	{
 		it->first.palette->release();
 		glDeleteTextures(1, &(a_textures[it->first]));
+		it = a_textures.erase(it);
 	}
-	a_textures.clear();
 	a_indexes.clear();
 }
 
