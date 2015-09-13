@@ -109,7 +109,7 @@ def OptDone (action, window, button_id):
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_DONE) # Done
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	button.MakeDefault()
 
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 0)
@@ -120,7 +120,7 @@ def OptCancel (action, window, button_id):
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_CANCEL) # Cancel
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	button.MakeEscape()
 
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 1)

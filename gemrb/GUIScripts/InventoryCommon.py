@@ -266,7 +266,7 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (4)
 	Button.SetText (strrefs[0])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseItemInfoWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL|IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	#textarea
 	Text = Window.GetControl (5)
@@ -471,13 +471,13 @@ def OpenItemAmountWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	#GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -641,7 +641,7 @@ def GetColor():
 		if PickedColor == MyColor:
 			GemRB.SetVar ("Selected",i)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+			Button.MakeEscape()
 		else:
 			Button.SetBAM ("COLGRAD", 2, 0, MyColor)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
@@ -681,7 +681,7 @@ def OpenErrorWindow (strref):
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseErrorWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)
@@ -852,7 +852,7 @@ def IdentifyItemWindow ():
 	else:
 		Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseIdentifyItemWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	TextArea = Window.GetControl (3)
 	if GameCheck.IsPST():
@@ -912,12 +912,12 @@ def AbilitiesItemWindow ():
 	Button = Window.GetControl (7)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneAbilitiesItemWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	Button = Window.GetControl (10)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAbilitiesItemWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

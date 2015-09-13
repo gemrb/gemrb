@@ -127,7 +127,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
 		SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsCancelPress)
 		SpellsCancelButton.SetText(13727)
-		SpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		SpellsCancelButton.MakeEscape()
 
 		if (recommend):
 			# recommended spell picks
@@ -156,7 +156,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsDonePress)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 		
 	AlreadyShown = 0
 	for i in range (9):

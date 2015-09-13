@@ -49,8 +49,8 @@ def OnLoad():
 	ConfirmButton.SetText(15417)
 	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ConfirmButton.MakeDefault()
+	CancelButton.MakeEscape()
 
 	#main window
 	StartWindow = GemRB.LoadWindow(0)
@@ -74,7 +74,7 @@ def SinglePlayerPress():
 	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewSingle)
 	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MissionPack)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
-	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
 		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
@@ -88,7 +88,7 @@ def MultiPlayerPress():
 	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PregenPress)
 	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ConnectPress)
 	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
-	MoviesButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	MoviesButton.MakeEscape()
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None)
 	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -179,7 +179,7 @@ def BackToMain():
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	StartWindow.Focus()
 	return

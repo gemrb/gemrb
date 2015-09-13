@@ -250,13 +250,13 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)

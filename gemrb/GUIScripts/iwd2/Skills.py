@@ -166,11 +166,11 @@ def OnLoad():
 
 	BackButton = SkillWindow.GetControl(105)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = SkillWindow.GetControl(92)
 	TextAreaControl.SetText(17248)

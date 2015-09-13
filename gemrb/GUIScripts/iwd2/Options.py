@@ -62,7 +62,7 @@ def OnLoad():
 
 	ReturnButton.SetText(10308)
 	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
-	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ReturnButton.MakeEscape()
 
 	OptionsWindow.Focus()
 

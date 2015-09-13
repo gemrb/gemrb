@@ -110,7 +110,7 @@ def OpenJournalWindow ():
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	#JournalWindow.Focus()
@@ -151,7 +151,7 @@ def OpenQuestsWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuestsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done
@@ -317,7 +317,7 @@ def OpenBeastsWindow ():
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBeastsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done
@@ -414,7 +414,7 @@ def OpenLogWindow ():
 	Button = Window.GetControl (1)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLogWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done

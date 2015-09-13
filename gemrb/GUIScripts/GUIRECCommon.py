@@ -113,7 +113,7 @@ def OpenCustomizeWindow ():
 
 	CancelButton = CustomizeWindow.GetControl (8)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPortraitSelectWindow)
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
@@ -162,13 +162,13 @@ def OpenPortraitSelectWindow ():
 	PortraitDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	PortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitDonePress)
 	PortraitDoneButton.SetText (11973)
-	PortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	PortraitDoneButton.MakeDefault()
 
 	PortraitCancelButton = SubCustomizeWindow.GetControl (4)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 	PortraitCancelButton.SetText (13727)
-	PortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	PortraitCancelButton.MakeEscape()
 
 	PortraitCustomButton = SubCustomizeWindow.GetControl (5)
 	PortraitCustomButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -218,13 +218,13 @@ def OpenCustomPortraitWindow ():
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	CustomPortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPortraitDonePress)
 	CustomPortraitDoneButton.SetText (11973)
-	CustomPortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CustomPortraitDoneButton.MakeDefault()
 
 	CustomPortraitCancelButton = SubSubCustomizeWindow.GetControl (11)
 	CustomPortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CustomPortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubSubCustomizeWindow)
 	CustomPortraitCancelButton.SetText (13727)
-	CustomPortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CustomPortraitCancelButton.MakeEscape()
 
 	if not GameCheck.IsIWD1():
 		SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
@@ -323,11 +323,11 @@ def OpenSoundWindow ():
 
 	DoneButton = SubCustomizeWindow.GetControl (10)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = SubCustomizeWindow.GetControl (11)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlaySoundPressed)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneSoundWindow)
@@ -413,11 +413,11 @@ def OpenScriptWindow ():
 
 	DoneButton = SubCustomizeWindow.GetControl (5)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = SubCustomizeWindow.GetControl (6)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
@@ -479,7 +479,7 @@ def OpenBiographyEditWindow ():
 
 	DoneButton = SubCustomizeWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	ScrollbarID = 6
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
@@ -493,7 +493,7 @@ def OpenBiographyEditWindow ():
 
 	CancelButton = SubCustomizeWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	TextArea = SubCustomizeWindow.GetControl (4)
 	TextArea = TextArea.ConvertEdit (ScrollbarID)
@@ -596,7 +596,7 @@ def OpenExportWindow ():
 
 	CancelButton = ExportWindow.GetControl (5)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	NameField = ExportWindow.GetControl (6)
 

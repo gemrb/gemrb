@@ -62,7 +62,7 @@ def OnLoad():
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 

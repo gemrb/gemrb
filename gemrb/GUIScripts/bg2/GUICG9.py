@@ -46,12 +46,12 @@ def OnLoad():
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 
 	RedrawSkills()

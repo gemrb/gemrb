@@ -106,10 +106,10 @@ def OnLoad():
 
 	BackButton = KitWindow.GetControl(8)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = KitWindow.GetControl(7)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = KitWindow.GetControl(5)
 	TextAreaControl.SetText(17247)

@@ -69,11 +69,11 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(10)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = RaceWindow.GetControl(11)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = RaceWindow.GetControl(8)

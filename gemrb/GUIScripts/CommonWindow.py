@@ -264,7 +264,7 @@ def OpenContainerWindow ():
 		Button.SetText ("")
 	else:
 		Button.SetText (11973)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 
 	GemRB.SetVar ("LeftTopIndex", 0)

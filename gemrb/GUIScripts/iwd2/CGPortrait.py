@@ -60,14 +60,14 @@ def OnLoad ():
 
 	BackButton = AppearanceWindow.GetControl (5)
 	BackButton.SetText (15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	CustomButton = AppearanceWindow.GetControl (6)
 	CustomButton.SetText (17545)
 
 	DoneButton = AppearanceWindow.GetControl (0)
 	DoneButton.SetText (36789)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
@@ -195,13 +195,13 @@ def CustomPress ():
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	Button.MakeDefault()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomAbort)
 
 	Button = Window.GetControl (0)

@@ -83,7 +83,7 @@ def DisplayOverview(step):
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 
 	AcceptButton = CharGenWindow.GetControl (8)
 	playmode = GemRB.GetVar ("PlayMode")
@@ -92,7 +92,7 @@ def DisplayOverview(step):
 	else:
 		AcceptButton.SetText (13956)
 	SetButtonStateFromStep ("AcceptButton", AcceptButton, step)
-	#AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	#AcceptButton.MakeDefault()
 	AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 
 	ScrollBar = CharGenWindow.GetControl (10)
@@ -289,7 +289,7 @@ def SetButtonStateFromStep (buttonName, button, step):
 	button.SetState (state)
 
 	if state == IE_GUI_BUTTON_ENABLED:
-		button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		button.MakeDefault()
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	return
 

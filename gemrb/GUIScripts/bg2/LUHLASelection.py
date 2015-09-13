@@ -69,7 +69,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	HLADoneButton = HLAWindow.GetControl (28)
 	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLADonePress)
 	HLADoneButton.SetText(11973)
-	HLADoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	HLADoneButton.MakeDefault()
 	if HLACount:
 		HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:

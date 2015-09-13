@@ -462,13 +462,13 @@ def OpenItemAmountWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# 0 bmp
 	# 1,2 done/cancel?

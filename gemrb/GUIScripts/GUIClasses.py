@@ -140,6 +140,14 @@ class GControl(GView):
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
+  
+  def MakeDefault(self):
+	  # return key
+	  return self.SetHotKey('\r')
+	  
+  def MakeEscape(self):
+	  # escape key
+	  return self.SetHotKey(chr(27))
 
 class GLabel(GControl):
   methods = {

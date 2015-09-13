@@ -414,26 +414,6 @@ void Button::CompleteDragOperation(const DragOp& dop)
 	}
 }
 
-/** Handling The default button (enter) */
-bool Button::OnSpecialKeyPress(unsigned char Key)
-{
-	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
-		if (Key == GEM_RETURN) {
-			if (flags & IE_GUI_BUTTON_DEFAULT ) {
-				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
-				return true;
-			}
-		}
-		else if (Key == GEM_ESCAPE) {
-			if (flags & IE_GUI_BUTTON_CANCEL ) {
-				RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
-				return true;
-			}
-		}
-	}
-	return Control::OnSpecialKeyPress(Key);
-}
-
 /** Mouse Button Down */
 void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {

@@ -110,7 +110,7 @@ def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
@@ -120,7 +120,7 @@ def OpenContinueMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def UpdateReformWindow ():
@@ -196,13 +196,13 @@ def RemovePlayer ():
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerConfirm)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerCancel)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GemRB.SetVar ("ActionsWindow", -1)

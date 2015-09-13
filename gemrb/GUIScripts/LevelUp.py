@@ -86,7 +86,7 @@ def OpenLevelUpWindow():
 	DoneButton.SetText (11962)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpDonePress)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	# hide "Character Generation"
 	Label = LevelUpWindow.CreateLabel (0x1000007e, 0,0,0,0,"NUMBER","",IE_FONT_ALIGN_CENTER|IE_FONT_SINGLE_LINE)

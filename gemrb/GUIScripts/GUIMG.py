@@ -352,13 +352,13 @@ def OpenMageSpellRemoveWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageRemoveSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -380,13 +380,13 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -547,12 +547,12 @@ def OpenSequencerWindow ():
 
 	OkButton = Window.GetControl (27)
 	OkButton.SetText (11973)
-	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	OkButton.MakeDefault()
 	OkButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	CancelButton = Window.GetControl (29)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyOk)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyCancel)

@@ -317,7 +317,7 @@ def OpenSpellBookSpellInfoWindow ():
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellInfoWindow)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -388,13 +388,13 @@ def OpenSpellBookSpellRemoveWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookRemoveSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

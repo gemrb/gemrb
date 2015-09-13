@@ -305,13 +305,13 @@ def AddNoteWindow ():
 	Label = NoteWindow.GetControl (0)
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMapNote)
 	Label.SetText (11973)
-	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Label.MakeDefault()
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseNoteWindow)
 	Label.SetText (13727)
-	Label.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Label.MakeEscape()
 
 	#remove
 	Label = NoteWindow.GetControl (3)
@@ -485,7 +485,7 @@ def WorldMapWindowCommon (Travel):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
 	else:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.Focus()
 	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)

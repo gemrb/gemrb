@@ -162,7 +162,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
 		Button = InitOptionButton(Window,'Game', ReturnToGame)
-		Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		Button.MakeEscape()
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
 			Button.SetSprites ("GUILSOP", 0,16,17,28,16)

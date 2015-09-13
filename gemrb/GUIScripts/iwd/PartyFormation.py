@@ -50,7 +50,7 @@ def OnLoad ():
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	ExitButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetText (13906)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
@@ -84,7 +84,7 @@ def OnLoad ():
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
 	if not GameCheck.HasHOW():
@@ -116,7 +116,7 @@ def CreateCharPress ():
 	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCreatePress)
 	CreateButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateButton.SetText (13954)
-	CreateButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CreateButton.MakeDefault()
 
 	DeleteButton = CreateCharWindow.GetControl (3)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharDeletePress)
@@ -127,7 +127,7 @@ def CreateCharPress ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCancelPress)
 	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	CreateCharWindow.Focus()
 	return
@@ -169,12 +169,12 @@ def ExitPress ():
 	ExitButton = ExitWindow.GetControl (1)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitExitPress)
 	ExitButton.SetText (13906)
-	ExitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	ExitButton.MakeDefault()
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)

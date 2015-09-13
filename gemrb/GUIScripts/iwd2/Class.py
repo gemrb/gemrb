@@ -97,11 +97,11 @@ def OnLoad():
 
 	BackButton = ClassWindow.GetControl(17)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	ScrollBarControl = ClassWindow.GetControl(15)
 

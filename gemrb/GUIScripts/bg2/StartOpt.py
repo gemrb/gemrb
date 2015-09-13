@@ -40,7 +40,7 @@ def OnLoad():
 	GameButton.SetEvent( IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenGameplayOptionsWindow)
 	GraphicButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenVideoOptionsWindow)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	OptionsWindow.Focus()
 	return
 	

@@ -425,7 +425,7 @@ def OpenQuitMsgWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# The game has not been saved ....
 	Text = Window.GetControl (3)
@@ -496,13 +496,13 @@ def OpenKeyboardMappingsWindow ():
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKeyboardMappingsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKeyboardMappingsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	keys_setup_page (0)
 

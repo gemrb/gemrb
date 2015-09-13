@@ -45,12 +45,12 @@ def OnLoad():
 	CancelButton = PartySelectWindow.GetControl(11)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	CancelButton.SetText(13727)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton = PartySelectWindow.GetControl(10)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	
 	GemRB.SetVar("PartyIdx",0)
 	GemRB.SetVar("TopIndex",0)

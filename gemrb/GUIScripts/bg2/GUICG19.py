@@ -53,10 +53,10 @@ def OnLoad():
 
 	BackButton = CharSoundWindow.GetControl(10)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = CharSoundWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, ChangeVoice)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)

@@ -45,7 +45,7 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = GenderWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = GenderWindow.GetControl(5)
 	TextAreaControl.SetText(17236)

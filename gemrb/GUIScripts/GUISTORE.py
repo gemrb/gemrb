@@ -479,7 +479,7 @@ def OpenStoreDonateWindow ():
 	Button = Window.GetControl (3)
 	Button.SetText (15101)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Entry
 	Field = Window.GetControl (5)
@@ -1616,13 +1616,13 @@ def RentRoom ():
 	Button = Window.GetControl (0)
 	Button.SetText (17199)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentConfirm)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentDeny)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	#textarea
 	TextArea = Window.GetControl (3)

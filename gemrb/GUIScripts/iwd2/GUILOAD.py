@@ -41,7 +41,7 @@ def OnLoad ():
 	CancelButton=LoadWindow.GetControl (22)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	GemRB.SetVar ("LoadIdx",0)
 	for i in range (5):
@@ -172,7 +172,7 @@ def DeleteGamePress ():
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
 	return

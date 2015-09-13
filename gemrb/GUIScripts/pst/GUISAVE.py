@@ -61,7 +61,7 @@ def OpenSaveWindow ():
 	CancelButton = Window.GetControl (46)
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 	GemRB.SetVar ("SaveIdx", 0)
 
 	for i in range (4):
@@ -184,12 +184,12 @@ def DeleteGamePress():
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (28640)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
-	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DeleteButton.MakeDefault()
 
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
 	return
@@ -226,13 +226,13 @@ def OpenSaveDetailWindow ():
 	else:
 		Button.SetText (28645) # Save
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveDetailWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# Slot name and time
 	if Pos < len(Games):

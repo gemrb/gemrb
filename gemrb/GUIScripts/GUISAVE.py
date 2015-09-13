@@ -67,7 +67,7 @@ def OpenSaveWindow ():
 		CancelButton=Window.GetControl (34)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 	GemRB.SetVar ("LoadIdx",0)
 
 	for i in range(num_rows):
@@ -244,7 +244,7 @@ def SavePress():
 	SaveButton=ConfirmWindow.GetControl (7)
 	SaveButton.SetText (save_strref)
 	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
-	SaveButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	SaveButton.MakeDefault()
 	#SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
 	if Slotname == "":
 		SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -253,7 +253,7 @@ def SavePress():
 	CancelButton=ConfirmWindow.GetControl (8)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
 	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
@@ -307,7 +307,7 @@ def DeleteGamePress():
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
 	return

@@ -129,7 +129,7 @@ def OpenOptionsWindow ():
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# Quit Game
 	Button = Window.GetControl (10)
@@ -566,13 +566,13 @@ def OpenLoadMsgWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -643,13 +643,13 @@ def OpenQuitMsgWindow ():
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGamePress)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelQuitMsgWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	# Do you wish to save the game ....
 	Text = Window.GetControl (3)

@@ -70,7 +70,7 @@ def OpenEndMessageWindow ():
 	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
@@ -78,7 +78,7 @@ def OpenContinueMessageWindow ():
 	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenReformPartyWindow ():

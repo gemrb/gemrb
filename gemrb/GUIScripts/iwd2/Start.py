@@ -76,7 +76,7 @@ def OnLoad():
 	JoinGameButton.SetText(13964)
 	OptionsButton.SetText(13905)
 	QuitGameButton.SetText(13731)
-	QuitGameButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	QuitGameButton.MakeEscape()
 	NewGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewGamePress)
 	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
 	ProtocolButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
@@ -126,7 +126,7 @@ def ProtocolPress():
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.MakeEscape()
 
 	ProtocolWindow.Focus()
 	return
@@ -177,11 +177,11 @@ def QuitPress():
 	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
 	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitQuitPress)
-	QuitButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl(0)
 	CancelButton.SetText(13727)

@@ -78,7 +78,7 @@ class CharGen:
 				button.SetText(text);
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
-					button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+					button.MakeDefault()
 					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.next)
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
@@ -92,7 +92,7 @@ class CharGen:
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.back)
-		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		BackButton.MakeEscape()
 
 		AcceptButton = CharGenWindow.GetControl (8)
 		playmode = GemRB.GetVar ("PlayMode")

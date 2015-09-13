@@ -34,7 +34,7 @@ def OnLoad ():
 	ExitButton = PartyFormationWindow.GetControl (30)
 	ExitButton.SetText (13906)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	ModifyCharactersButton = PartyFormationWindow.GetControl (43)
 	ModifyCharactersButton.SetText (18816)
@@ -43,7 +43,7 @@ def OnLoad ():
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	Portraits = 0
 
@@ -77,7 +77,7 @@ def OnLoad ():
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
 	PartyFormationWindow.Focus()
@@ -93,12 +93,12 @@ def ExitPress ():
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
 
 	DoneButton = ExitWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
 
 	ExitWindow.Focus()
@@ -140,8 +140,8 @@ def ReviewPress ():
 
 	DoneButton = ReviewWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.MakeDefault()
+	DoneButton.MakeEscape()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewDonePress)
 
 	LeftTextArea = ReviewWindow.GetControl (2)

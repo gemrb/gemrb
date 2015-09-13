@@ -265,11 +265,11 @@ def OnLoad():
 
 	BackButton = FeatWindow.GetControl(105)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = FeatWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = FeatWindow.GetControl(92)
 	TextAreaControl.SetText(36476)

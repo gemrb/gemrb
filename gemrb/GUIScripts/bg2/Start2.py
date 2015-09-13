@@ -88,7 +88,7 @@ def OnLoad():
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 	StartWindow.Focus ()
 	MusicTable = GemRB.LoadTable ("songlist")
 	# the table has useless rownames, so we can't search for BG2Theme
@@ -219,8 +219,8 @@ def Tutorial():
 	PlayButton.SetText (33093)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: TutorialWindow.Close())
-	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)		
+	PlayButton.MakeDefault()
+	CancelButton.MakeEscape()		
 
 	return
 
@@ -252,8 +252,8 @@ def ExitPress():
 	ConfirmButton.SetText (15417)
 	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
-	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ConfirmButton.MakeDefault()
+	CancelButton.MakeEscape()
 	return
 
 def OptionsPress():

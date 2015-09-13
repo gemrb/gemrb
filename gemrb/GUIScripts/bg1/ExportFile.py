@@ -46,11 +46,11 @@ def OnLoad():
 	DoneButton = ExportWindow.GetControl (0)
 	DoneButton.SetText (11973)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = ExportWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	#CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	#CancelButton.MakeEscape()
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)

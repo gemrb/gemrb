@@ -746,7 +746,7 @@ def OpenInformationWindow ():
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseInformationWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0
@@ -925,11 +925,11 @@ def OpenColorWindow ():
 
 	DoneButton = GUIRECCommon.SubCustomizeWindow.GetControl (12)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = GUIRECCommon.SubCustomizeWindow.GetControl (13)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetHairColor)
 	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetSkinColor)

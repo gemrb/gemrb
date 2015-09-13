@@ -215,7 +215,7 @@ def OnLoad():
 	AcceptButton = NewLifeWindow.GetControl(0)
 	AcceptButton.SetText(4192)
 	AcceptButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AcceptPress)
-	AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	AcceptButton.MakeDefault()
 	
 	CancelButton = NewLifeWindow.GetControl(1)
 	CancelButton.SetText(4196)	
@@ -271,7 +271,7 @@ def AcceptPress():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
-		Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+		Button.MakeDefault()
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
 		NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
 		QuitWindow.Focus()
@@ -324,13 +324,13 @@ def CancelPress():
 
 	Button = QuitWindow.GetControl(1)
 	Button.SetText(23787)
-	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_SET)
+	Button.MakeDefault()
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, YesButton)
 
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
-	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	Button.MakeDefault()
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
 
 	NewLifeWindow.SetDisabled(True) #go dark

@@ -132,7 +132,7 @@ def ProtocolPress ():
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.MakeEscape()
 	
 	ProtocolWindow.ShowModal (1)
 	return
@@ -170,12 +170,12 @@ def CreatePress ():
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton = GameTypeWindow.GetControl (2)
 	DoneButton.SetText (11973)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
@@ -229,12 +229,12 @@ def GameTypeDonePress():
 		NoButton = GameType2Window.GetControl (2)
 		NoButton.SetText (13913)
 		NoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-		NoButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		NoButton.MakeEscape()
 
 		CancelButton = GameType2Window.GetControl (3)
 		CancelButton.SetText (13727)
 		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		CancelButton.MakeEscape()
 
 		GameType2Window.ShowModal(1)
 
@@ -285,12 +285,12 @@ def QuitPress ():
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl (1)
 	QuitButton.SetText (15417)
 	QuitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
-	QuitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl (0)
 	TextArea.SetText (19532)

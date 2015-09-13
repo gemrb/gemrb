@@ -58,7 +58,6 @@ class Palette;
 #define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
-#define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter key triggers it
 #define IE_GUI_BUTTON_ANIMATED     0x00000080
 
 //these bits are hardcoded in the .chu structure
@@ -79,7 +78,6 @@ class Palette;
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00400000 // horizontal clipping of overlay
-#define IE_GUI_BUTTON_CANCEL          0x00800000 // cancel key triggers it
 //WARNING: we cannot add any more flags here
 //the top 8 bits are reserved for the control ID (see setFlags)
 
@@ -183,8 +181,6 @@ public: // Public Events
 	/** Mouse Button Up */
 	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
 
-	/** A special key has been pressed */
-	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 
@@ -225,6 +221,10 @@ private: // Private attributes
 	Point PushOffset;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
+
+	bool HandleHotKey(const Event&) {
+		return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] ) == 0;
+	}
 	bool EventHit (const Point&) const;
 	void CloseUpColor();
 };

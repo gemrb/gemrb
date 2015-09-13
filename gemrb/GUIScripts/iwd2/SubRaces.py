@@ -74,12 +74,12 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(8) 
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = RaceWindow.GetControl(6)
 	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))

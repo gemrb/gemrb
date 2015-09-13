@@ -67,7 +67,7 @@ def UpdateOverview(CurrentStep):
 		State = IE_GUI_BUTTON_DISABLED
 		if CurrentStep - 1 == i:
 			State = IE_GUI_BUTTON_ENABLED
-			StepButtons[Step].SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+			StepButtons[Step].MakeDefault()
 			StepButtons[Step].SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 		StepButtons[Step].SetState(State)
 	
@@ -102,17 +102,17 @@ def UpdateOverview(CurrentStep):
 				State = States[0]
 				Event = None
 			else:
-				PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+				PersistButtons[Key].MakeEscape()
 		
 		if Key == 'Next' and CurrentStep == 9:
 			State = 1
 			Event = NextPress
-			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+			PersistButtons[Key].MakeDefault()
 		
 		if Key == 'Start' and CurrentStep == 1:
 			Text = 13727
 			Event = CancelPress
-			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+			PersistButtons[Key].MakeEscape()
 		
 		PersistButtons[Key].SetText(Text)
 		PersistButtons[Key].SetState(State)
