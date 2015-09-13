@@ -1354,6 +1354,22 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Control_SetHotKey__doc,
+			 "Control.SetHotKey(char)\n\n"
+			 "Binds a keyboard key to trigger the control event when its window is focused." );
+
+static PyObject* GemRB_Control_SetHotKey(PyObject* self, PyObject* args)
+{
+	char* hotkey;
+	PARSE_ARGS(args, "Os", &self, &hotkey);
+
+	Control* ctrl = GetView<Control>(self);
+	assert(ctrl);
+	ctrl->SetHotKey(hotkey[0]);
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
 "Control.SetEvent(EventMask, Function)\n\n"
 "Sets an event of a control on a window to a script defined function." );
@@ -1365,8 +1381,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject* self, PyObject* args)
 	PARSE_ARGS(args, "OiO", &self, &event, &func);
 
 	Control* ctrl = GetView<Control>(self);
-	if (!ctrl)
-		return NULL;
+	assert(ctrl);
 
 	ControlEventHandler handler = NULL;
 	if (func != Py_None && PyCallable_Check(func)) {
@@ -9131,6 +9146,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetHotKey, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetTooltip, METH_VARARGS),

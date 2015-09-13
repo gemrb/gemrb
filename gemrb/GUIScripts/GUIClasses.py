@@ -136,6 +136,7 @@ class GControl(GView):
     'SetText': _GemRB.Control_SetText,
     'SetTooltip': _GemRB.Control_SetTooltip,
     'SetEvent': _GemRB.Control_SetEvent,
+    'SetHotKey': _GemRB.Control_SetHotKey,
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
