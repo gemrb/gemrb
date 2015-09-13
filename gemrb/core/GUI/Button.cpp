@@ -40,6 +40,7 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
+	hotKey = 0;
 
 	hasText = false;
 	font = core->GetButtonFont();
@@ -382,6 +383,17 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
+}
+
+String Button::TooltipText() const
+{
+	if (hotKey) {
+		String s;
+		s.push_back(hotKey);
+		s += L": ";
+		return s += ((tooltip.length()) ? View::TooltipText() : QueryText());
+	}
+	return Control::TooltipText();
 }
 
 Holder<Button::DragOp> Button::DragOperation()
