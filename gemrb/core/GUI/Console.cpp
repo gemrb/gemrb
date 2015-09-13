@@ -43,7 +43,9 @@ Console::Console(const Region& frame)
 	palette = new Palette( ColorWhite, ColorBlack );
 
 	EventMgr::EventCallback* cb = new MethodCallback<Console, const Event&, bool>(this, &Console::HandleHotKey);
-	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
+	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {
+		delete cb;
+	}
 }
 
 Console::~Console(void)
