@@ -2112,12 +2112,6 @@ void GameControl::UpdateTargetMode() {
 bool GameControl::OnSpecialKeyPress(unsigned char Key)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
-		switch(Key) {
-			case GEM_RETURN:
-				//simulating the continue/end button pressed
-				core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContinueWindow");
-				break;
-		}
 		// don't accept keys in dialog
 		// dont forward the even either
 		return false;
