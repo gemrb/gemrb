@@ -165,6 +165,7 @@ public:
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 
+	String QueryText() const { return Text; }
 	String TooltipText() const;
 	Holder<DragOp> DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
