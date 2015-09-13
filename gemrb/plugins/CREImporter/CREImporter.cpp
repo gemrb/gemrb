@@ -464,8 +464,8 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 	if (!tab)
 		return 0;
 
-	int column = tab->GetColumnCount()-1;
-	if (column<1) {
+	int lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
+	if (lastCol < 1) {
 		return 0;
 	}
 
@@ -485,7 +485,7 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 		} else {
 			// find the correct index in listspll.2da
 			ieResRef spellref;
-			strnlwrcpy(spellref, tab->QueryField(i, column), 8);
+			strnlwrcpy(spellref, tab->QueryField(i, lastCol), 8);
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
 			if (spellref[0] == '*') {
 				continue;
@@ -493,8 +493,8 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 			index = FindSpell(spellref, spllist, splcount);
 			assert (index != -1);
 		}
-		reslist[index].SetSpell(tab->QueryField(i, column));
-		for(int col=0;col<column;col++) {
+		reslist[index].SetSpell(tab->QueryField(i, lastCol));
+		for(int col=0; col < lastCol; col++) {
 			reslist[index].AddLevel(atoi(tab->QueryField(i, col)), col);
 		}
 	}
