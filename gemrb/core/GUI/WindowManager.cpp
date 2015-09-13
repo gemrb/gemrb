@@ -55,6 +55,7 @@ WindowManager::WindowManager(Video* vid)
 
 	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
 	eventMgr.RegisterHotKeyCallback(cb, GEM_TAB, 0);
+	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
 
 	screen.w = vid->GetWidth();
 	screen.h = vid->GetHeight();
@@ -199,12 +200,18 @@ void WindowManager::CloseWindow(Window* win)
 
 bool WindowManager::HotKey(const Event& event)
 {
-	switch (event.keyboard.keycode) {
-		case GEM_TAB:
-			return DrawTooltip();
-		default:
-			return false;
+	if (event.type == Event::KeyDown) {
+		switch (event.keyboard.keycode) {
+			case GEM_TAB:
+				return DrawTooltip();
+			case 'f':
+				video->ToggleFullscreenMode();
+				return true;
+			default:
+				return false;
+		}
 	}
+	return false;
 }
 
 bool WindowManager::DispatchEvent(const Event& event)

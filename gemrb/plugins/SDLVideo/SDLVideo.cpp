@@ -142,15 +142,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				case SDLK_SCROLLOCK:
 					key = GEM_GRAB;
 					break;
-				case SDLK_f:
-					// FIXME: this is a poor place to handle this
-					// cant do it in GameControl because it only exists while in a game
-					// could move to event manager, but that seems on par with doing it here
-					if (modstate & GEM_MOD_CTRL) {
-						ToggleFullscreenMode();
-						break;
-					}
-					// fallthrough
 				default:
 					if (sym < 256) {
 						key = sym;
