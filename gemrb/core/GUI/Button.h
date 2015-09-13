@@ -129,10 +129,15 @@ enum BUTTON_IMAGE_TYPE {
  */
 
 class GEM_EXPORT Button : public Control {
-protected:
-	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
-public: 
+public:
+	struct PortraitDragOp : public DragOp {
+		const ieDword PC;
+
+		PortraitDragOp(Button* b)
+		: DragOp(b), PC(b->ControlID + 1) {}
+	};
+
+public:
 	Button(Region& frame);
 	~Button();
 
@@ -159,13 +164,6 @@ public:
 	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
-public: // Public Events
-	struct PortraitDragOp : public DragOp {
-		const ieDword PC;
-
-		PortraitDragOp(Button* b)
-		: DragOp(b), PC(b->ControlID + 1) {}
-	};
 
 	Holder<DragOp> DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
@@ -194,6 +192,14 @@ public: // Public Events
 	void SetAnchor(ieWord x, ieWord y);
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
+
+	bool SetHotKey(KeyboardKey key);
+	KeyboardKey HotKey() { return hotKey; }
+
+protected:
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
+
 private: // Private attributes
 	String Text;
 	bool hasText;
@@ -221,10 +227,9 @@ private: // Private attributes
 	Point PushOffset;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
+	KeyboardKey hotKey;
 
-	bool HandleHotKey(const Event&) {
-		return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] ) == 0;
-	}
+	bool HandleHotKey(const Event&);
 	bool EventHit (const Point&) const;
 	void CloseUpColor();
 };

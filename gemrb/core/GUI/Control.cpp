@@ -64,15 +64,6 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-bool Control::SetHotKey(KeyboardKey key)
-{
-	if (Owner->RegisterHotKeyCallback(MethodCallback<Control, const Event&, bool>(this, &Control::HandleHotKey), key)) {
-		hotKey = key;
-		return true;
-	}
-	return false;
-}
-
 void Control::ResetEventHandler(ControlEventHandler &handler)
 {
 	handler = NULL;

@@ -131,7 +131,8 @@ void EventMgr::DispatchEvent(Event& e)
 
 bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
 {
-	// TODO: return false if something already claimed this hot key combo
+	// TODO: return false if something already claimed this hot key combo?
+	// or maybe should we allow mutliple registrations and iterate them until one accepts the event...
 	int flags = mod << 16;
 	flags |= key;
 	HotKeys.insert(std::make_pair(flags, cb));

@@ -1354,22 +1354,6 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_SetHotKey__doc,
-			 "Control.SetHotKey(char)\n\n"
-			 "Binds a keyboard key to trigger the control event when its window is focused." );
-
-static PyObject* GemRB_Control_SetHotKey(PyObject* self, PyObject* args)
-{
-	char* hotkey;
-	PARSE_ARGS(args, "Os", &self, &hotkey);
-
-	Control* ctrl = GetView<Control>(self);
-	assert(ctrl);
-	ctrl->SetHotKey(hotkey[0]);
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
 "Control.SetEvent(EventMask, Function)\n\n"
 "Sets an event of a control on a window to a script defined function." );
@@ -2163,6 +2147,22 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(lbl);
 
 	lbl->SetFont( core->GetFont( FontResRef ));
+
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
+			 "Button.SetHotKey(char)\n\n"
+			 "Binds a keyboard key to trigger the control event when its window is focused." );
+
+static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
+{
+	char* hotkey;
+	PARSE_ARGS(args, "Os", &self, &hotkey);
+
+	Button* btn = GetView<Button>(self);
+	assert(btn);
+	btn->SetHotKey(hotkey[0]);
 
 	Py_RETURN_NONE;
 }
@@ -9128,6 +9128,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetBAM, METH_VARARGS),
 	METHOD(Button_SetBorder, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
+	METHOD(Button_SetHotKey, METH_VARARGS),
 	METHOD(Button_SetAnchor, METH_VARARGS),
 	METHOD(Button_SetPushOffset, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
@@ -9146,7 +9147,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
-	METHOD(Control_SetHotKey, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetTooltip, METH_VARARGS),

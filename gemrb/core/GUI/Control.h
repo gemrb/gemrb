@@ -60,14 +60,9 @@ class Window;
 /**
  * @class Control
  * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
- * Every GUI element except of a Window is a descendant of this class.
  */
 
 class GEM_EXPORT Control : public View {
-private:
-	virtual bool HandleHotKey(const Event&) { return false; }
-	KeyboardKey hotKey;
-
 protected:
 	/** Focused Control */
 	bool hasFocus;
@@ -107,8 +102,6 @@ public:
 	//Events
 	/** Reset/init event handler */
 	void ResetEventHandler(ControlEventHandler &handler);
-	bool SetHotKey(KeyboardKey key);
-	KeyboardKey HotKey() { return hotKey; }
 
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }

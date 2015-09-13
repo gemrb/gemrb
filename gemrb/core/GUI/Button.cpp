@@ -681,4 +681,18 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 	PushOffset = Point(x,y);
 }
 
+bool Button::SetHotKey(KeyboardKey key)
+{
+	if (Owner->RegisterHotKeyCallback(MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey), key)) {
+		hotKey = key;
+		return true;
+	}
+	return false;
+}
+
+bool Button::HandleHotKey(const Event&)
+{
+	return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+}
+
 }

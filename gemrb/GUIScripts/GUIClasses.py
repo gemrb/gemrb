@@ -136,18 +136,9 @@ class GControl(GView):
     'SetText': _GemRB.Control_SetText,
     'SetTooltip': _GemRB.Control_SetTooltip,
     'SetEvent': _GemRB.Control_SetEvent,
-    'SetHotKey': _GemRB.Control_SetHotKey,
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
-  
-  def MakeDefault(self):
-	  # return key
-	  return self.SetHotKey('\r')
-	  
-  def MakeEscape(self):
-	  # escape key
-	  return self.SetHotKey(chr(27))
 
 class GLabel(GControl):
   methods = {
@@ -183,6 +174,7 @@ class GButton(GControl):
     'SetBorder': _GemRB.Button_SetBorder,
     'EnableBorder': _GemRB.Button_EnableBorder,
     'SetFont': _GemRB.Button_SetFont,
+    'SetHotKey': _GemRB.Button_SetHotKey,
     'SetAnchor': _GemRB.Button_SetAnchor,
     'SetPushOffset': _GemRB.Button_SetPushOffset,
     'SetTextColor': _GemRB.Button_SetTextColor,
@@ -195,6 +187,14 @@ class GButton(GControl):
     'SetItemIcon': _GemRB.Button_SetItemIcon,
     'SetActionIcon': _GemRB.Button_SetActionIcon
   }
+
+  def MakeDefault(self):
+	  # return key
+	  return self.SetHotKey('\r')
+	  
+  def MakeEscape(self):
+	  # escape key
+	  return self.SetHotKey(chr(27))
 
   def SetMOS(self, mos):
 	  self.SetPicture(mos) # backwards compatibility
