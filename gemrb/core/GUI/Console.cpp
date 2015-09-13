@@ -42,7 +42,8 @@ Console::Console(const Region& frame)
 	HistPos = 0;
 	palette = new Palette( ColorWhite, ColorBlack );
 
-	SetHotKey(' ', GEM_MOD_CTRL);
+	EventMgr::EventCallback* cb = new MethodCallback<Console, const Event&, bool>(this, &Console::HandleHotKey);
+	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
 }
 
 Console::~Console(void)

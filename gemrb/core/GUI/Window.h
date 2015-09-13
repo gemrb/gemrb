@@ -83,8 +83,6 @@ public:
 	void Focus();
 	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
 
-	bool OnSpecialKeyPress(unsigned char key);
-
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	void SetPosition(WindowPosition);
@@ -98,13 +96,18 @@ public:
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
 	bool DispatchEvent(const Event&);
+	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void OnMouseLeave(const Point&, const DragOp*);
+	bool OnSpecialKeyPress(unsigned char key);
 
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
+	std::map<KeyboardKey, EventMgr::EventCallback> HotKeys;
+
 	View* focusView; // keyboard focus
 	View* trackingView; // out of bounds mouse tracking
 	View* hoverView; // view the mouse was last over

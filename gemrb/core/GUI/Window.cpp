@@ -299,12 +299,22 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	} else {
 		// key events
-		if (event.keyboard.keycode == GEM_ESCAPE) {
+		std::map<KeyboardKey, EventMgr::EventCallback>::iterator it = HotKeys.find(event.keyboard.keycode);
+		if (it != HotKeys.end()) {
+			it->second(event);
+		} else if (event.keyboard.keycode == GEM_ESCAPE) {
 			Close();
-			return true;
 		}
+		return true;
 	}
 	return false;
+}
+
+bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+{
+	// FIXME: check if something already registerd and either return false or delete the old
+	HotKeys[key] = cb;
+	return true;
 }
 
 void Window::OnMouseOver(const Point& p)

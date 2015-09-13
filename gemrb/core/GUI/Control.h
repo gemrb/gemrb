@@ -66,6 +66,7 @@ class Window;
 class GEM_EXPORT Control : public View {
 private:
 	virtual bool HandleHotKey(const Event&) { return false; }
+	KeyboardKey hotKey;
 
 protected:
 	/** Focused Control */
@@ -106,7 +107,8 @@ public:
 	//Events
 	/** Reset/init event handler */
 	void ResetEventHandler(ControlEventHandler &handler);
-	bool SetHotKey(KeyboardKey key, short mod = 0);
+	bool SetHotKey(KeyboardKey key);
+	KeyboardKey HotKey() { return hotKey; }
 
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }

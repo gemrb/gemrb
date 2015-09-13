@@ -165,6 +165,7 @@ public:
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
 
 	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
+	// TODO/FIXME: need to be able to unregister hotkeys 
 
 private:
 	typedef std::multimap<Event::EventType, EventCallback*> EventTaps;

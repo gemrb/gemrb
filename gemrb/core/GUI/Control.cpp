@@ -64,10 +64,13 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-bool Control::SetHotKey(KeyboardKey key, short mod)
+bool Control::SetHotKey(KeyboardKey key)
 {
-	EventMgr::EventCallback* cb = new MethodCallback<Control, const Event&, bool>(this, &Control::HandleHotKey);
-	return EventMgr::RegisterHotKeyCallback(cb, key, mod);
+	if (Owner->RegisterHotKeyCallback(MethodCallback<Control, const Event&, bool>(this, &Control::HandleHotKey), key)) {
+		hotKey = key;
+		return true;
+	}
+	return false;
 }
 
 void Control::ResetEventHandler(ControlEventHandler &handler)
