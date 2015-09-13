@@ -151,7 +151,7 @@ public:
 	virtual bool OnSpecialKeyPress(unsigned char Key);
 
 	void SetTooltip(const String& string);
-	virtual const String& TooltipText() const { return tooltip; }
+	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
 	Sprite2D* Cursor() const { return NULL; }
 

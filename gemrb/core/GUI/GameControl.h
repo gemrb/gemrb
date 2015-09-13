@@ -197,7 +197,7 @@ public:
 	bool OnSpecialKeyPress(unsigned char Key);
 
 	void DrawTooltip(const Point& p) const;
-	const String& TooltipText() const;
+	String TooltipText() const;
 
 	void UpdateScrolling();
 	void SetScrolling(bool scroll);

@@ -90,7 +90,7 @@ public:
 	/** Returns last focused control */
 	Control* GetFocus() const;
 	View* FocusedView() const { return focusView; }
-	const String& TooltipText() const;
+	String TooltipText() const;
 
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);

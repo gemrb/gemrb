@@ -129,7 +129,7 @@ void Window::SetFocused(Control* ctrl)
 	}
 }
 
-const String& Window::TooltipText() const
+String Window::TooltipText() const
 {
 	if (hoverView) {
 		return hoverView->TooltipText();
