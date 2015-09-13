@@ -43,6 +43,11 @@ Window::~Window()
 {
 	Close();
 	core->GetVideoDriver()->DestroyBuffer(backBuffer);
+
+	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.begin();
+	for (; it != HotKeys.end(); ++it) {
+		delete it->second;
+	}
 }
 
 void Window::Close()
@@ -299,9 +304,9 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	} else {
 		// key events
-		std::map<KeyboardKey, EventMgr::EventCallback>::iterator it = HotKeys.find(event.keyboard.keycode);
+		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
-			it->second(event);
+			(*it->second)(event);
 		} else if (event.keyboard.keycode == GEM_ESCAPE) {
 			Close();
 		}
@@ -310,7 +315,7 @@ bool Window::DispatchEvent(const Event& event)
 	return false;
 }
 
-bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
 {
 	// FIXME: check if something already registerd and either return false or delete the old
 	HotKeys[key] = cb;

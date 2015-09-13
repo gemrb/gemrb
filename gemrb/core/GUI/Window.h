@@ -96,7 +96,7 @@ public:
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
 	bool DispatchEvent(const Event&);
-	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
 
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
@@ -106,7 +106,7 @@ public:
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;
-	std::map<KeyboardKey, EventMgr::EventCallback> HotKeys;
+	std::map<KeyboardKey, EventMgr::EventCallback*> HotKeys;
 
 	View* focusView; // keyboard focus
 	View* trackingView; // out of bounds mouse tracking

@@ -683,10 +683,12 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 
 bool Button::SetHotKey(KeyboardKey key)
 {
-	if (Owner->RegisterHotKeyCallback(MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey), key)) {
+	EventMgr::EventCallback* cb = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
+	if (Owner->RegisterHotKeyCallback(cb, key)) {
 		hotKey = key;
 		return true;
 	}
+	delete cb;
 	return false;
 }
 
