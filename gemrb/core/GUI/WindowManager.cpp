@@ -250,6 +250,10 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 	if (event.isScreen) {
 		hoverWin = target;
+
+		if (event.type == Event::MouseMove) {
+			TooltipTime = GetTickCount();
+		}
 	}
 	// disabled windows get no events, but should block them from going to windows below
 	if (!target->IsDisabled()) {
@@ -388,7 +392,7 @@ void WindowManager::DrawWindows() const
 
 	// tooltips and cursor are always last
 	DrawCursor();
-	if (hoverWin && TooltipTime && GetTickCount() >= TooltipTime) {
+	if (hoverWin && TooltipTime && GetTickCount() >= TooltipTime + ToolTipDelay) {
 		DrawTooltip();
 	}
 }
