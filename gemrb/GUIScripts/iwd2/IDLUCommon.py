@@ -123,6 +123,10 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		# set our memorizable counts
 		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
+		# charbase seems to have domain slots reserved, so nuke them
+		if level == 1:
+			Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
+
 		if table == MageTable:
 			continue
 
@@ -142,11 +146,6 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		if booktype == IE_IWD2_SPELL_CLERIC:
 			booktype = IE_IWD2_SPELL_DOMAIN
 			Spellbook.SetupSpellLevels (pc, table, booktype, level)
-		else:
-			# charbase seems to have domain slots reserved, so nuke them
-			if level == 1:
-				Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
-			return
 
 		for slevel in range (9):
 			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
