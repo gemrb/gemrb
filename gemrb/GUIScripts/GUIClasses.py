@@ -194,7 +194,7 @@ class GButton(GControl):
 	  
   def MakeEscape(self):
 	  # escape key
-	  return self.SetHotKey(chr(27))
+	  return self.SetHotKey(chr(0x8c))
 
   def SetMOS(self, mos):
 	  self.SetPicture(mos) # backwards compatibility
