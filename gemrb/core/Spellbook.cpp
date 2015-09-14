@@ -506,7 +506,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 
 void Spellbook::SetBookType(int bt)
 {
-	sorcerer = bt;
+	sorcerer |= bt;
 }
 
 //returns the page group of the spellbook this spelltype belongs to
