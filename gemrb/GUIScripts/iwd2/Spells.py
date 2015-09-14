@@ -77,8 +77,10 @@ def SetupSpellsWindow(chargen=0):
 	# this value is only used for detecting specialists!
 	KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "SPLTYPE")
+	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
-	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, LevelDiff, KitValue, chargen, True, SpellBookType)
+	if chargen or (BookType & 2): # bard / sorcerer
+		LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, LevelDiff, KitValue, chargen, True, SpellBookType)
 
 	if not chargen:
 		import GUIREC
