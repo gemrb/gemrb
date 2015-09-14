@@ -257,7 +257,10 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 				if (clsmsk & (1<<type)) {
 					int level2 = spllist[i].FindSpell(type);
-					assert(level2 >= 0);
+					if (level2 == -1) {
+						Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name, type);
+						level2 = 0; // internal 0-indexed level
+					}
 					level = level2;
 					// FIXME: returning the first will misplace spells for multiclasses
 					return type;
