@@ -231,6 +231,10 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 // on the wizard page
 //	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
 
+	// strict domain spell check, so we don't steal the spells from other books
+	// still needs to happen first or the laxer check below can misclassify
+	if (IsDomain(name, level, kit) >= 0) return IE_IWD2_SPELL_DOMAIN;
+
 	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
 		if (spllist[i].Equals(name) ) {
@@ -246,7 +250,6 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 			}
 		}
 	}
-	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
 
 	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
 	// pseudorandom fallback
