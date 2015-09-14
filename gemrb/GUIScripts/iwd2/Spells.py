@@ -40,7 +40,7 @@ def SetupSpellsWindow(chargen=0):
 		ClassIndex = GemRB.GetVar ("LUClass")
 		ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
 		LevelDiff = GemRB.GetVar ("LevelDiff")
-		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)#FIXME +1?
+		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)
 
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
@@ -80,7 +80,7 @@ def SetupSpellsWindow(chargen=0):
 	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
 	if chargen or (BookType & 2): # bard / sorcerer
-		LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, LevelDiff, KitValue, chargen, True, SpellBookType)
+		LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)
 
 	if not chargen:
 		import GUIREC
