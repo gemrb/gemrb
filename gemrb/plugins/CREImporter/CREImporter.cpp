@@ -200,8 +200,10 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<splcount;i++) {
 		if (domlist[i].Equals(name) ) {
-			level = domlist[i].FindSpell(kit);
-				return i;
+			int lev = domlist[i].FindSpell(kit);
+			if (lev == -1) return -1;
+			level = lev;
+			return i;
 		}
 	}
 	return -1;
