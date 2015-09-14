@@ -23,6 +23,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "AmbientMgr.h"
@@ -818,10 +819,10 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	delete( gs );
 }
 
-void GameScript::CutSceneID(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::CutSceneID(Scriptable *Sender, Action* /*parameters*/)
 {
 	// shouldn't get called
-	Log(WARNING, "GameScript", "CutSceneID was called!");
+	Log(DEBUG, "GameScript", "CutSceneID was called by %s!", Sender->GetScriptName());
 }
 
 static EffectRef fx_charm_ref = { "State:Charmed", -1 };
@@ -1129,6 +1130,7 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_NORETICLE|IF_RUNNING, 0 );
 	}
 	if (!actor->InMove()) {
@@ -1145,6 +1147,7 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 	}
 	if (!actor->InMove()) {
@@ -1167,7 +1170,7 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
+		actor->WalkTo(parameters->pointParameter, 0, parameters->int1Parameter);
 	}
 
 	//hopefully this hack will prevent lockups
@@ -1439,6 +1442,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->Interrupt();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1544,7 +1548,6 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	//actor->InternalFlags|=IF_NOINT;
 	actor->NoInterrupt();
 	//TODO: actor could use travel areas; once implemented, copy original to RunAwayFromNoInterruptNoLeaveArea and break the alias in GameScript.cpp
 	// we should be using int0Parameter for the timing here, not distance
@@ -1641,7 +1644,7 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->DisplayOverheadText(NULL);
+	target->DisplayOverheadText(false);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
@@ -1803,7 +1806,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 }
 
 //pst and bg2 can play a song designated by index
-//actually pst has some extra params not currently implemented
+//actually pst has some extra params not currently implemented (never used - always the same)
 //switchplaylist implements fade by simply scheduling the next
 //music after the currently running one
 //FIXME: This code is similar to PlayAreaSong, consider refactoring
@@ -1955,20 +1958,20 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, BM_NAND);
+	game->SetControlStatus(CS_HIDEGUI, OP_NAND);
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, BM_OR);
+	game->SetControlStatus(CS_HIDEGUI, OP_OR);
 }
 
 void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, BM_OR);
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_OR);
 	}
 }
 
@@ -1976,7 +1979,7 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, BM_NAND);
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_NAND);
 	}
 }
 
@@ -3573,9 +3576,9 @@ void GameScript::SetCriticalPathObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if (parameters->int0Parameter) {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_OR);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_OR);
 	} else {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_NAND);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_NAND);
 	}
 }
 
@@ -3586,7 +3589,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetMCFlag(MC_BEENINPARTY, BM_OR);
+	actor->SetMCFlag(MC_BEENINPARTY, OP_OR);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -3597,9 +3600,9 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int1Parameter) {
-		actor->SetMCFlag(parameters->int0Parameter, BM_OR);
+		actor->SetMCFlag(parameters->int0Parameter, OP_OR);
 	} else {
-		actor->SetMCFlag(parameters->int0Parameter, BM_NAND);
+		actor->SetMCFlag(parameters->int0Parameter, OP_NAND);
 	}
 }
 
@@ -3900,7 +3903,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	}
 	GameControl* gc = core->GetGameControl();
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		gc->dialoghandler->speakerID = tar->GetGlobalID();
+		gc->dialoghandler->SetSpeaker(tar);
 	} else {
 		Log(WARNING, "GameScript", "Can't set gabber!");
 	}
@@ -3938,7 +3941,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
-	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
+	act->SetMCFlag(MC_FALLEN_PALADIN, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -3949,7 +3952,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
-	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
+	act->SetMCFlag(MC_FALLEN_RANGER, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -3959,7 +3962,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_PALADIN, BM_NAND);
+	act->SetMCFlag(MC_FALLEN_PALADIN, OP_NAND);
 	act->ApplyKit(false);
 }
 
@@ -3969,7 +3972,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_RANGER, BM_NAND);
+	act->SetMCFlag(MC_FALLEN_RANGER, OP_NAND);
 	act->ApplyKit(false);
 }
 
@@ -4591,20 +4594,22 @@ void GameScript::SetRestEncounterChance(Scriptable * Sender, Action* parameters)
 }
 
 //easily hardcoded end sequence
-void GameScript::EndCredits(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::EndCredits(Scriptable* Sender, Action* parameters)
 {
 	if (gamedata->Exists("25ecred", IE_2DA_CLASS_ID, true)) {
 		/* ToB */
-		Sender->AddActionInFront(GenerateAction("TextScreen(\"25ecred\")"));
+		ExecuteString(Sender, "TextScreen(\"25ecred\")");
 	} else {
 		core->PlayMovie("credits");
+		QuitGame(Sender, parameters);
 	}
 }
 
 //easily hardcoded end sequence
-void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 {
 	core->PlayMovie("ecredit");
+	QuitGame(Sender, parameters);
 }
 
 //always quits game, but based on game it can play end animation, or display
@@ -4676,18 +4681,27 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 void GameScript::Damage(Scriptable* Sender, Action* parameters)
 {
 	Actor *damagee;
-	Actor *damager;
+	Scriptable *damager = Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
+
+	int diceNum = (parameters->int1Parameter>>12)&15;
+	int diceSize = (parameters->int1Parameter>>4)&255;
+	int diceAdd = parameters->int1Parameter&15;
+	int damage = 0;
 	damagee = (Actor *) tar;
+	Actor *damager2 = NULL;
 	if (Sender->Type==ST_ACTOR) {
-		damager=(Actor *) Sender;
-	} else {
-		damager=damagee;
+		damager2 = (Actor *) Sender;
 	}
-	int damage = damager->LuckyRoll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15, LR_DAMAGELUCK, damagee);
+
+	if (damager2 && damager2 != damagee) {
+		damage = damager2->LuckyRoll(diceNum, diceSize, diceAdd, LR_DAMAGELUCK, damagee);
+	} else {
+		damage = core->Roll(diceNum, diceSize, diceAdd);
+	}
 	int type=MOD_ADDITIVE;
 	switch(parameters->int0Parameter) {
 	case 2: //raise
@@ -4779,7 +4793,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_OR);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_OR);
 	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, DMC_BG2XPGREEN);
 }
 
@@ -4790,7 +4804,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_NAND);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_NAND);
 }
 
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
@@ -4815,7 +4829,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	//max. shouting distance, please adjust it if you know better
-	map->Shout(actor, parameters->int0Parameter, MAX_TRAVELING_DISTANCE);
+	map->Shout(actor, parameters->int0Parameter, VOODOO_SHOUT_RANGE);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
@@ -4840,7 +4854,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	}
 	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
-	map->Shout((Actor *) Sender, 0, 40);
+	map->Shout((Actor *) Sender, 0, VOODOO_SHOUT_RANGE);
 }
 
 void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
@@ -5162,7 +5176,9 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	game->RestParty(REST_NOAREA|REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER, parameters->int0Parameter, parameters->int1Parameter);
+	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
+	if (((Actor *)Sender)->InParty == 0) flags |= REST_NOAREA;
+	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5469,10 +5485,10 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		actor->SetModal(MS_NONE);
-		if (!container->Trapped && core->HasFeature(GF_PST_STATE_FLAGS)) {
-			container->AddTrigger(TriggerEntry(trigger_harmlessopened, actor->GetGlobalID()));
-		} else {
+		if (container->Trapped) {
 			container->AddTrigger(TriggerEntry(trigger_opened, actor->GetGlobalID()));
+		} else {
+			container->AddTrigger(TriggerEntry(trigger_harmlessopened, actor->GetGlobalID()));
 		}
 		container->TriggerTrap(0, actor->GetGlobalID());
 		core->SetCurrentContainer(actor, container, true);
@@ -6084,7 +6100,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 {
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED, DMC_RED);
 	}
 	// releasing this action allows actions to continue executing,
@@ -6255,9 +6271,9 @@ void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if ( parameters->int0Parameter != 0 ) {
-		actor->SetMCFlag(MC_NO_TALK, BM_NAND);
+		actor->SetMCFlag(MC_NO_TALK, OP_NAND);
 	} else {
-		actor->SetMCFlag(MC_NO_TALK, BM_OR);
+		actor->SetMCFlag(MC_NO_TALK, OP_OR);
 	}
 }
 

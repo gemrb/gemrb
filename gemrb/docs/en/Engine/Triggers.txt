@@ -1,8 +1,8 @@
-			Door		Container	Travel	Trap			Info	Actor
-LastEntered		Opened		-		-       Entered/IsOverMe	-	LastHitter
-LastTrigger		Closed		-		-	-			Clicked LastSummoner
-LastUnlocked    	Unlocked	-		-	-			-	LastTalkedTo
-LastDisarmFailed	DisarmFailed	DisarmFailed	-	DisarmFailed		-	LastTarget
-LastDisarmed		Disarmed	Disarmed	-	Disarmed		-	LastAttacker
-LastOpenFailed          OpenFailed      OpenFailed              -
+                  Door          Container    Travel   Trap              Info     Actor
+LastEntered       Opened        -            -        Entered/IsOverMe  -        LastHitter
+LastTrigger       Closed        -            -        -                 Clicked  LastSummoner
+LastUnlocked      Unlocked      -            -        -                 -        LastTalkedTo
+LastDisarmFailed  DisarmFailed  DisarmFailed -        DisarmFailed      -        LastTarget
+LastDisarmed      Disarmed      Disarmed     -        Disarmed          -        LastAttacker
+LastOpenFailed    OpenFailed    OpenFailed   -
               PickPocketFailed

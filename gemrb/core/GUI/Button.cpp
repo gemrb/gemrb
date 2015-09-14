@@ -51,7 +51,7 @@ Button::Button(Region& frame)
 		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
 		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
 	}
-	SetFlags(IE_GUI_BUTTON_NORMAL, BM_OR);
+	SetFlags(IE_GUI_BUTTON_NORMAL, OP_OR);
 	ToggleState = false;
 	pulseBorder = false;
 	Picture = NULL;
@@ -158,11 +158,6 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Sprite2D* Image = NULL;
 
 		switch (State) {
-			case IE_GUI_BUTTON_UNPRESSED:
-			case IE_GUI_BUTTON_LOCKED:
-			case IE_GUI_BUTTON_LOCKED_PRESSED:
-				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
-				break;
 			case IE_GUI_BUTTON_FAKEPRESSED:
 			case IE_GUI_BUTTON_PRESSED:
 				Image = buttonImages[BUTTON_IMAGE_PRESSED];
@@ -174,9 +169,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			case IE_GUI_BUTTON_FAKEDISABLED:
 				Image = buttonImages[BUTTON_IMAGE_DISABLED];
 				break;
-		}
-		if (!Image) {
-			Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
+			default:
+				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
+				break;
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
@@ -191,19 +186,6 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		//shift the writing/border a bit
 		rgn.x += PushOffset.x;
 		rgn.y += PushOffset.y;
-	}
-
-	// Button picture
-	if (AnimPicture) {
-		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
-
-		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
-		} else {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
-		}
 	}
 
 	// Button picture
@@ -240,6 +222,19 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		else {
 			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
 			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, true, &r );
+		}
+	}
+
+	// Button animation
+	if (AnimPicture) {
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Width * Clipping), AnimPicture->Height );
+
+		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
+		} else {
+			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
 		}
 	}
 

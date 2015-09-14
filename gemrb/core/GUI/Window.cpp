@@ -35,7 +35,7 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	backBuffer = NULL;
 	lastMouseMoveTime = GetTickCount();
 
-	SetFlags(DestroyOnClose, BM_OR);
+	SetFlags(DestroyOnClose, OP_OR);
 	SizeChanged(frame.Dimensions());
 }
 

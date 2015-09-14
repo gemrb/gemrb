@@ -46,7 +46,6 @@ namespace GemRB {
 #define NINE 16           //nine faces (orientation)
 #define SEVENEYES 32      //special hack for seven eyes
 
-#define DEFAULT_FRAMERATE 15
 #define MAX_CYCLE_TYPE 16
 static const ieByte ctypes[MAX_CYCLE_TYPE]={
 	ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
@@ -82,7 +81,7 @@ void ScriptedAnimation::Init()
 	Fade = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
-	FrameRate = DEFAULT_FRAMERATE;
+	FrameRate = ANI_DEFAULT_FRAMERATE;
 	FaceTarget = 0;
 	Orientation = 0;
 	Dither = 0;
@@ -269,7 +268,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 
-	if (!FrameRate) FrameRate = DEFAULT_FRAMERATE;
+	if (!FrameRate) FrameRate = ANI_DEFAULT_FRAMERATE;
 
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );

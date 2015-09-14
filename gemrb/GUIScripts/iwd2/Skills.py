@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 import CommonTables
 import IDLUCommon
+from ie_stats import IE_INT, IE_UNUSED_SKILLPTS, IE_CLASSLEVELSUM
 
 SkillWindow = 0
 TextAreaControl = 0
@@ -31,19 +32,24 @@ TopIndex = 0
 PointsLeft = 0
 Level = 0
 ClassColumn = 0
+CharGen = 0
+StatLowerLimit = [0] * 16
+ButtonCount = 0
 
 def RedrawSkills():
 	global CostTable, TopIndex
 
 	SumLabel = SkillWindow.GetControl(0x1000000c)
-	if PointsLeft == 0:
+	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 		SumLabel.SetTextColor(255, 255, 255)
 	else:
 		SumLabel.SetTextColor(255, 255, 0)
 	SumLabel.SetText(str(PointsLeft) )
 
-	for i in range(10):
+	maxSkill = Level + 3
+	# ^ crossclass skills max is handled implicitly by the higher cost
+	for i in range(ButtonCount):
 		Pos=TopIndex+i
 		Cost = CostTable.GetValue(Pos, ClassColumn)
 		# Skill cost is currently restricted to base classes. This means it is fairly easy
@@ -59,7 +65,7 @@ def RedrawSkills():
 			t=GemRB.StatComment(SkillName,0,0)
 			Label.SetText("%s (%d)"%(t,Cost) )
 			Label.SetTextColor(255, 255, 255)
-			if PointsLeft < 1 or ActPoint * Cost >= Level + 3:
+			if PointsLeft < 1 or ActPoint * Cost >= maxSkill:
 				Label.SetTextColor(150, 150, 150)
 		else:
 			Label.SetText(SkillName)
@@ -72,16 +78,16 @@ def RedrawSkills():
 		if Cost < 1:
 			Btn1State = Btn2State = IE_GUI_BUTTON_DISABLED
 		else:
-			if ActPoint * Cost >= Level + 3 or PointsLeft < 1:
+			if ActPoint * Cost >= maxSkill or PointsLeft < 1:
 				Btn1State = IE_GUI_BUTTON_DISABLED
-			if ActPoint < 1:
+			if ActPoint == StatLowerLimit[Pos]:
 				Btn2State = IE_GUI_BUTTON_DISABLED
 		Button1.SetState(Btn1State)
 		Button2.SetState(Btn2State)
 
 		Label = SkillWindow.GetControl(0x10000069+i)
 		Label.SetText(str(ActPoint) )
-		if ActPoint>0:
+		if ActPoint > StatLowerLimit[Pos]:
 			Label.SetTextColor(0,255,255)
 		elif Cost < 1 or PointsLeft < 1:
 			Label.SetTextColor(150, 150, 150)
@@ -98,60 +104,83 @@ def ScrollBarPress():
 	return
 
 def OnLoad():
+	OpenSkillsWindow (1, 1)
+
+def OpenSkillsWindow(chargen, level=0):
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
 	global SkillTable, CostTable, PointsLeft
 	global KitName, Level, ClassColumn
-	
-	GemRB.SetVar("Level",1) #for simplicity
-	Class = GemRB.GetVar("Class") - 1
-	KitName = CommonTables.Classes.GetRowName(Class)
-	#classcolumn is base class
-	ClassColumn=GemRB.GetVar("BaseClass") - 1
-	SkillPtsTable = GemRB.LoadTable("skillpts")
-	p = SkillPtsTable.GetValue(0, ClassColumn)
-	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus
-	p = p + IntBonus
-	#at least 1 skillpoint / level advanced
-	if p <1:
-		p=1
+	global CharGen, StatLowerLimit, ButtonCount
 
-	Level = GemRB.GetVar("Level")  #this is the level increase
-	PointsLeft = p
-	
+	CharGen = chargen
+
+	#enable repeated clicks
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
+	SkillPtsTable = GemRB.LoadTable ("skillpts")
+	if chargen:
+		pc = GemRB.GetVar ("Slot")
+		Level = level
+		LevelDiff = 4 # start with 4x as many skills points initially
+		Class = GemRB.GetVar ("Class") - 1
+		ClassColumn = GemRB.GetVar ("BaseClass") - 1
+		# TODO: use kit instead of class if available? See conflicting comment below (check clabs, comment may be only about display)
+		KitName = CommonTables.Classes.GetRowName (Class)
+	else:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		LevelDiff = GemRB.GetVar ("LevelDiff")
+		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + LevelDiff
+		BaseClass = GemRB.GetVar ("LUClass")
+		ClassColumn = BaseClass
+		#KitName = kit of LUClass *only* # check if needed, should be one-time like racial bonus
+
+	PointsLeft = SkillPtsTable.GetValue (0, ClassColumn)
+	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
+	PointsLeft += IntBonus
+	# at least 1 skillpoint / level advanced
+	if PointsLeft < 1:
+		PointsLeft = 1
+
+	# TODO:
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
-	
-	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue(3, GemRB.GetVar('Race')))
-	
 	### Example code for implementation of SKILRACE.2da
 	# TmpTable = GemRB.LoadTable('skilrace')
 	# PointsLeft += TmpTable.GetValue(str(Level), RaceName)
 	###
-	
-	if Level < 2:
-		PointsLeft = p * 4 # 4-times skill points @ first level
-	
+	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+
 	### Human skill bonus hack (ignores intelligence modifier):
 	if RaceName == 'HUMAN':
 		if Level < 2: PointsLeft += 2
 		else: PointsLeft += 1
-	
+
+	# now multiply them for all the gained levels (or the cg special)
+	PointsLeft *= LevelDiff
+	PointsLeft += GemRB.GetPlayerStat (pc, IE_UNUSED_SKILLPTS)
 
 	SkillTable = GemRB.LoadTable("skills")
 	RowCount = SkillTable.GetRowCount()
 
 	CostTable = GemRB.LoadTable("skilcost")
 
+	TmpTable = GemRB.LoadTable ("skillsta")
 	for i in range(RowCount):
-		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
-						# so can be safely ignored
+		# Racial/Class bonuses don't factor in char-gen or leveling, so can be safely ignored
+		StatID = TmpTable.GetValue (i, 0, GTV_STAT)
+		StatLowerLimit[i] = GemRB.GetPlayerStat (pc, StatID, 1)
+		GemRB.SetVar ("Skill "+str(i), StatLowerLimit[i])
 
 	GemRB.SetToken("number",str(PointsLeft) )
+	if CharGen:
+		GemRB.LoadWindowPack ("GUICG", 800 ,600)
+		SkillWindow = GemRB.LoadWindow (6)
+		ButtonCount = 10
+	else:
+		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
+		SkillWindow = GemRB.LoadWindow (55)
+		ButtonCount = 9
 
-	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	SkillWindow = GemRB.LoadWindow(6)
-
-	for i in range(10):
+	for i in range(ButtonCount):
 		Button = SkillWindow.GetControl(i+93)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
@@ -164,9 +193,13 @@ def OnLoad():
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 
-	BackButton = SkillWindow.GetControl(105)
-	BackButton.SetText(15416)
-	BackButton.MakeEscape()
+	if chargen:
+		BackButton = SkillWindow.GetControl (105)
+		BackButton.SetText (15416)
+		BackButton.MakeEscape()
+		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+	else:
+		SkillWindow.DeleteControl (105)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(36789)
@@ -184,12 +217,15 @@ def OnLoad():
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10+1)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
-	SkillWindow.Focus()
-	return
 
+	if not chargen:
+		SkillWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		SkillWindow.Focus()
+
+	return
 
 def JustPress():
 	Pos = GemRB.GetVar("Skill")+TopIndex
@@ -206,7 +242,7 @@ def RightPress():
 
 	TextAreaControl.SetText(SkillTable.GetValue(Pos,2) )
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint <= 0:
+	if ActPoint <= StatLowerLimit[Pos]:
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + Cost
@@ -225,7 +261,7 @@ def LeftPress():
 	if PointsLeft < Cost:
 		return
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if Cost*ActPoint >= Level+3:
+	if Cost*ActPoint >= Level+3: # maxSkill
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - Cost
@@ -245,22 +281,36 @@ def BackPress():
 	return
 
 def NextPress():
-	MyChar = GemRB.GetVar("Slot")
+	if CharGen:
+		MyChar = GemRB.GetVar("Slot")
 
-	# deal with racial boni too (skillrac.2da is ignored)
-	RaceIndex = IDLUCommon.GetRace (MyChar)
-	RaceName = CommonTables.Races.GetRowName (RaceIndex)
-	# the column holds the index into feats.2da, which has one less intro column
-	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
+		# deal with racial boni too (skillrac.2da is ignored)
+		RaceIndex = IDLUCommon.GetRace (MyChar)
+		RaceName = CommonTables.Races.GetRowName (RaceIndex)
+		# the column holds the index into feats.2da, which has one less intro column
+		RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
+	else:
+		MyChar = GemRB.GameGetSelectedPCSingle ()
+		RacialBonus = 0
 
 	#setting skills
 	TmpTable = GemRB.LoadTable ("skillsta")
 	SkillCount = TmpTable.GetRowCount ()
 	for i in range (SkillCount):
 		StatID=TmpTable.GetValue (i, 0, GTV_STAT)
-		RacialBonus = SkillTable.GetValue (i, RaceColumn)
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i)) + RacialBonus)
+		if CharGen:
+			RacialBonus = SkillTable.GetValue (i, RaceColumn)
+		newValue = GemRB.GetVar ("Skill "+str(i)) + RacialBonus
+		GemRB.SetPlayerStat (MyChar, StatID, newValue)
+
 	if SkillWindow:
 		SkillWindow.Unload()
-	GemRB.SetNextScript("Feats") #feats
+	if CharGen:
+		GemRB.SetNextScript("Feats") #feats
+	else:
+		if PointsLeft > 0:
+			GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
+		# open up the next levelup window
+		import Feats
+		Feats.OpenFeatsWindow ()
 	return

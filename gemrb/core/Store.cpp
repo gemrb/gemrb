@@ -72,7 +72,7 @@ bool Store::IsItemAvailable(unsigned int slot) const
 
 	Trigger *trigger = items[slot]->trigger;
 	if (trigger) {
-		return trigger->Evaluate(game->GetPC(game->GetSelectedPCSingle(), false))!=0;
+		return trigger->Evaluate(game->GetSelectedPCSingle(false)) != 0;
 	}
 	return true;
 }

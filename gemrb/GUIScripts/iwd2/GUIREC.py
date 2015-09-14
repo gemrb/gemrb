@@ -28,10 +28,11 @@ import CommonTables
 import GUICommonWindows
 import GUIRECCommon
 import IDLUCommon
+import LUCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from ie_feats import FEAT_WEAPON_FINESSE, FEAT_ARMORED_ARCANA
+from ie_feats import FEAT_ARMORED_ARCANA
 
 SelectWindow = 0
 Topic = None
@@ -160,7 +161,7 @@ def OpenRecordsWindow ():
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow) #TODO: OpenLevelUpWindow
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 
@@ -273,9 +274,10 @@ def GetNextLevelExp (Level, Adjustment, string=0):
 	if Adjustment>5:
 		Adjustment = 5
 	if (Level < CommonTables.NextLevel.GetColumnCount (4) - 5):
+		exp = CommonTables.NextLevel.GetValue (4, Level + Adjustment)
 		if string:
-			return str(CommonTables.NextLevel.GetValue (4, Level + Adjustment))
-		return CommonTables.NextLevel.GetValue (4, Level + Adjustment )
+			return str(exp)
+		return exp
 
 	if string:
 		return GemRB.GetString(24342) #godhood
@@ -331,11 +333,12 @@ def DisplayGeneral (pc):
 
 		if level:
 			Class = GUICommonWindows.GetActorClassTitle (pc, i )
-			RecordsTextArea.Append (DelimitedText (Class, level))
+			RecordsTextArea.Append (DelimitedText (Class, level, 0))
 			if tmp<level:
 				highest = i
 				tmp = level
 
+	RecordsTextArea.Append ("\n")
 	#effective character level
 	if adj:
 		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj, 0))
@@ -361,6 +364,11 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append (DelimitedText (36928, xp, 0, ""))
 	tmp = GetNextLevelExp (levelsum, adj, 1)
 	RecordsTextArea.Append (DelimitedText (17091, tmp, 0))
+	# Multiclassing penalty
+	tmp = GemRB.GetMultiClassPenalty (pc)
+	if tmp != 0:
+		GemRB.SetToken ("XPPENALTY", str(tmp)+"%")
+		RecordsTextArea.Append (DelimitedText (39418, "", 0, ""))
 
 	#current effects
 	effects = GemRB.GetPlayerStates (pc)
@@ -739,7 +747,8 @@ def DisplayWeapons (pc):
 	# Monk Wisdom Bonus: <number> to AC
 	if ac["Wisdom"]:
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
-		RecordsTextArea.Append (394311)
+		AddIndent()
+		RecordsTextArea.Append (DelimitedText (39431, "", 0))
 
 	###################
 	# Armor Class Modifiers
@@ -1183,6 +1192,183 @@ def RefreshHelpWindow ():
 	TextArea = Window.GetControl (2)
 	TextArea.SetText (desc)
 	return
+
+LUWindow = None
+LevelDiff = 1
+def CloseLUWindow ():
+	global LUWindow
+
+	if LUWindow:
+		LUWindow.Unload ()
+		LUWindow = None
+
+def OpenLevelUpWindow ():
+	global LUWindow, LevelDiff
+
+	LUWindow = Window = GemRB.LoadWindow (54)
+
+	# Figure out the level difference
+	# the original ignored all but the fighter row in xplevel.2da
+	# we do the same, since IE_CLASS becomes useless for mc actors
+	# (iwd2 never updates it; it's not a bitfield like IE_KIT)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	xp = GemRB.GetPlayerStat (pc, IE_XP)
+	nextLevel = LUCommon.GetNextLevelFromExp (xp, 5)
+	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	LevelDiff = nextLevel - levelSum - GetECL(pc)
+	print 1111111, nextLevel, levelSum, GetECL(pc), LevelDiff
+
+	# next
+	Button = Window.GetControl (0)
+	Button.SetText (36789)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	# static Class selection
+	#Label = Window.GetControl (0x10000000)
+	#Label.SetText (7175)
+
+	# 2-12 are the class name buttons
+	# 15-25 are the class level labels
+	GemRB.SetVar ("LUClass", -1)
+	for i in range(2,13):
+		Button = Window.GetControl (i)
+		Label = Window.GetControl (0x10000000 + i+13)
+
+		ClassTitle = CommonTables.Classes.GetRowName (i-2)
+		ClassTitle = CommonTables.Classes.GetValue (ClassTitle, "NAME_REF", GTV_REF)
+		Button.SetText (ClassTitle)
+		level = GemRB.GetPlayerStat (pc, Classes[i-2])
+		if level > 0:
+			Label.SetText (str(level))
+
+		# disable monks/paladins due to order restrictions?
+		specflag = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
+		if specflag&8 and i == 7: # SPECF_MONKOFF
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		elif specflag&4 and i == 8: # SPECF_PALADINOFF
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetVarAssoc ("LUClass", i-2)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUClassPress)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+
+	# description
+	TextArea = Window.GetControl (13)
+	TextArea.SetText (17242)
+
+	# 14 scrollbar
+	# 14 static Level label
+	# 26 does not exist
+
+	# cancel
+	Button = Window.GetControl (27)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	Window.ShowModal (MODAL_SHADOW_NONE)
+
+OldLevelLabel = 0
+def LUClassPress ():
+	global OldLevelLabel
+
+	Window = LUWindow
+	Button = Window.GetControl (0)
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+	# display class info
+	TextArea = Window.GetControl (13)
+	i = GemRB.GetVar ("LUClass")
+	ClassDesc = CommonTables.Classes.GetRowName (i)
+	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
+	TextArea.SetText (ClassDesc)
+
+	# increase/decrease level label by LevelDiff (usually 1)
+	if OldLevelLabel != i:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		j = OldLevelLabel
+		Label = Window.GetControl (0x10000000 + j+15)
+		level = Label.QueryText ()
+		if level == "":
+			level = 1
+		level = int(level)
+		if level-LevelDiff > 0:
+			Label.SetText (str(level - LevelDiff))
+		else:
+			Label.SetText ("")
+
+		OldLevelLabel = i
+		Label = Window.GetControl (0x10000000 + i+15)
+		level = GemRB.GetPlayerStat (pc, Classes[i])
+		Label.SetText (str(level + LevelDiff))
+
+# continue with level up via chargen methods
+def LUNextPress ():
+	CloseLUWindow ()
+	#OpenRecordsWindow ()
+
+	# pass on LevelDiff and selected class (already in LUClass)
+	GemRB.SetVar ("LevelDiff", LevelDiff)
+
+	# grant an ability point or three (each 4 levels)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	rankDiff = (levelSum+LevelDiff)//4 - levelSum//4
+	if rankDiff > 0:
+		import Abilities
+		Abilities.OpenAbilitiesWindow (0, rankDiff)
+	else:
+		import Enemy
+		Enemy.OpenEnemyWindow ()
+	# both fire up the rest of the chain
+
+def FinishLevelUp():
+	# TODO: continue with lu/cg (sorc/bard spell selections 8, general: handle the special stuff from clabs (the ones that only display strings), kit selection)
+
+	# saving throws
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LUClass = GemRB.GetVar ("LUClass") # index, not ID
+	LUClassName = CommonTables.Classes.GetRowName (LUClass)
+	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	IDLUCommon.SetupSavingThrows (pc, LUClassID)
+
+	# hit points
+	Levels = [ GemRB.GetPlayerStat (pc, l) for l in IDLUCommon.Levels ]
+	LevelDiff = GemRB.GetVar ("LevelDiff")
+	LevelDiffs = [ 0 ] * len(Levels)
+	LevelDiffs[LUClass] = LevelDiff
+	# SetupHP expects the target level already
+	Levels[LUClass] += LevelDiff
+	LUCommon.SetupHP (pc, Levels, LevelDiffs)
+
+	# add class/kit resistances iff we chose a new class
+	levelStat = IDLUCommon.Levels[LUClass]
+	oldLevel = GemRB.GetPlayerStat(pc, levelStat, 1)
+	# FIXME: actually needs to use the kit name if it is available
+	LUKitName = LUClassName
+	if oldLevel == 0:
+		IDLUCommon.AddResistances (pc, LUKitName, "clssrsmd")
+
+	# bab (to hit)
+	BABTable = CommonTables.Classes.GetValue (LUClassName, "TOHIT")
+	BABTable = GemRB.LoadTable (BABTable)
+	currentBAB = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
+	oldBAB = BABTable.GetValue (str(oldLevel), "BASE_ATTACK")
+	newLevel = oldLevel + LevelDiff
+	newBAB = BABTable.GetValue (str(newLevel), "BASE_ATTACK")
+	GemRB.SetPlayerStat (pc, IE_TOHIT, currentBAB + newBAB - oldBAB)
+
+	# class level
+	GemRB.SetPlayerStat (pc, levelStat, newLevel)
+
+	# now we're finally done
+	GemRB.SetVar ("LevelDiff", 0)
+	# DisplayGeneral (pc) is not enough for a refresh refresh
+	OpenRecordsWindow ()
+	OpenRecordsWindow ()
 
 ###################################################
 # End of file GUIREC.py

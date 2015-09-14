@@ -107,9 +107,9 @@ public:
 	bool SetFlags(int arg_flags, int opcode);
 	inline ieDword Flags() { return flags; }
 
-	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? BM_OR : BM_NAND ); }
+	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? OP_OR : OP_NAND ); }
 	bool IsVisible() const;
-	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? BM_OR : BM_NAND); }
+	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? OP_OR : OP_NAND); }
 	bool IsDisabled() const { return flags&Disabled; }
 
 	Region Frame() const { return frame; }

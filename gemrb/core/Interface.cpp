@@ -613,7 +613,7 @@ static bool GenerateAbilityTables()
 	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
 	if (!lorebon)
 		return false;
-	wisbon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
+	wisbon = (ieWordSigned *) calloc (tablesize * 1, sizeof(ieWordSigned));
 	if (!wisbon)
 		return false;
 	return true;
@@ -676,7 +676,7 @@ bool Interface::ReadAbilityTables()
 	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
 	if (!ret)
 		return ret;
-	if (HasFeature(GF_WISDOM_BONUS)) {
+	if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
 		ret = ReadAbilityTable("wisxpbon", wisbon, 1, MaximumAbility + 1);
 		if (!ret)
 			return ret;
@@ -1167,7 +1167,7 @@ int Interface::LoadFonts()
 		gamedata->FreePalette(pal);
 
 		if (!fnt) {
-			Log(WARNING, "Core", "Unable to load font resource: %s for ResRef %s", font_name, resref.CString());
+			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());
 		} else {
 			fonts[resref] = fnt;
 			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
@@ -1535,12 +1535,14 @@ int Interface::Init(InterfaceConfig* config)
 	char gemrbINI[_MAX_PATH] = { '\0' };
 	char tmp[_MAX_PATH] = { '\0' };
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
-	PathJoin(ini_path, GamePath, gemrbINI, NULL);
+	PathJoin(ini_path, SavePath, gemrbINI, NULL);
+	if (!file_exists(ini_path)) {
+		PathJoin(ini_path, GamePath, gemrbINI, NULL);
+	}
 	if (file_exists(ini_path)) {
 		strlcpy(tmp, INIConfig, sizeof(tmp));
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
-	}
-	if (!IgnoreOriginalINI) {
+	} else if (!IgnoreOriginalINI) {
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}
@@ -2081,7 +2083,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
-		"HasWisdomBonusTable",//47GF_WISDOM_BONUS
+		"SimplifiedDisruption",//47GF_SIMPLE_DISRUPTION
 		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
 		"NoBiography",        //49GF_NO_BIOGRAPHY
 		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
@@ -2576,22 +2578,22 @@ void Interface::HandleGUIBehaviour(void)
 			}
 			if (flg & DF_OPENCONTINUEWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
 			} else if (flg & DF_OPENENDWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
 			}
 		}
 
 		//handling container
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
+				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
 				guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
 			}
 		} else {
 			if (flg & DF_IN_CONTAINER) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
+				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
 				guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
 			}
 		}
@@ -2961,6 +2963,11 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			resourcePath = GameCharactersPath;
 			filter = new ExtFilter("CHR");
 			break;
+		case DIRECTORY_CHR_SCRIPTS:
+			resourcePath = GameScriptsPath;
+			filter = new ExtFilter("BS");
+			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
+			break;
 	}
 
 	PathJoin( Path, GamePath, resourcePath, NULL );
@@ -2980,11 +2987,14 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
 	// if filename is not set we assume we are creating defaults without an INI
-	if (iniFileName[0] && !ini->Open(iniStream)) {
+	bool opened = ini->Open(iniStream);
+	if (iniFileName[0] && !opened) {
 		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
-		delete iniStream;
 	} else {
 		overrides = ini.get();
+	}
+	if (!opened || iniFileName[0] == 0) {
+		delete iniStream; // Open deletes it itself on success
 	}
 
 	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
@@ -3134,12 +3144,10 @@ bool Interface::GSUpdate(bool update_scripts)
 void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
-	if (timer) {
-		//clear cutscenes
-		//clear fade/screenshake effects
-		timer->Init();
-		timer->SetFadeFromColor(0);
-	}
+	//clear cutscenes
+	//clear fade/screenshake effects
+	timer->Init();
+	timer->SetFadeFromColor(0);
 
 	//shutting down ingame music
 	//(do it before deleting the game)
@@ -3313,7 +3321,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 		WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
-			nae->SetAreaStatus(ae->GetAreaStatus(), BM_SET);
+			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
 		}
 	}
 	
@@ -4155,7 +4163,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
 		return ieStrRef(-1);
 	}
-	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
+	Scriptable *pc = game->GetSelectedPCSingle(false);
 
 	ieStrRef ret = ieStrRef(-1);
 	int i = dlg->FindRandomState( pc );
@@ -4598,12 +4606,7 @@ int Interface::GetLoreBonus(int column, int value) const
 
 int Interface::GetWisdomBonus(int column, int value) const
 {
-	//no wismod in iwd2
-	if (HasFeature(GF_3ED_RULES)) {
-		return value/2-5;
-	}
-
-	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
+	if (!wisbon) return 0;
 
 	// xp bonus
 	if (column<0 || column>0)
@@ -4649,10 +4652,10 @@ bool Interface::SetPause(PauseSetting pause, int flags)
 		int strref;
 		if (pause) {
 			strref = STR_PAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 		} else {
 			strref = STR_UNPAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_NAND);
 		}
 		if (!(flags&PF_QUIET) ) {
 			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)
@@ -4860,6 +4863,17 @@ void Interface::SetNextScript(const char *script)
 void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB)) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
+	}
+}
+
+void Interface::SetBits(unsigned int &flag, unsigned int value, int mode) const
+{
+	switch(mode) {
+		case OP_OR: flag |= value; break;
+		case OP_NAND: flag &= ~value; break;
+		case OP_SET: flag = value; break;
+		case OP_AND: flag &= value; break;
+		case OP_XOR: flag ^= value; break;
 	}
 }
 

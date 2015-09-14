@@ -28,7 +28,6 @@ from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import SLOT_ALL
-from ie_feats import FEAT_STRONG_BACK
 
 OtherWindowFn = None
 NextWindowFn = None
@@ -337,7 +336,8 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 
 	Control = Window.GetControl (ControlID)
 	if GameCheck.IsPST():
-		# FIXME: there should be a space before LB symbol (':')
+		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it 
+		Control.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
 		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
 	elif GameCheck.IsIWD2() and not Control2ID:
 		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))

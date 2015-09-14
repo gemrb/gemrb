@@ -207,6 +207,7 @@ MODAL_SHADOW_BLACK = 2
 CHR_PORTRAITS = 0
 CHR_SOUNDS = 1
 CHR_EXPORTS = 2
+CHR_SCRIPTS = 3
 
 # Flags for GameSelectPC()
 # !!! Keep these synchronized with Game.h !!!

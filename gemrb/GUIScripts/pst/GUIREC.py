@@ -68,6 +68,7 @@ import GemRB
 import GUICommon
 import CommonTables
 import GUICommonWindows
+import NewLife
 from GUIDefines import *
 from ie_stats import *
 import GUIWORLD
@@ -117,7 +118,7 @@ def OpenRecordsWindow ():
 	# Level Up
 	Button = Window.GetControl (9)
 	Button.SetText (4246)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NewLife.OpenLUStatsWindow)
 
 	statevents = (OnRecordsHelpStrength, OnRecordsHelpIntelligence, OnRecordsHelpWisdom, OnRecordsHelpDexterity, OnRecordsHelpConstitution, OnRecordsHelpCharisma)
 	# stat buttons
@@ -893,6 +894,7 @@ def OpenLevelUpWindow ():
 		GemRB.UnhideGUI()
 		return
 
+	GemRB.LoadWindowPack ("GUIREC") # since we get called from NewLife
 	LevelUpWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", LevelUpWindow.ID)
 
@@ -1180,6 +1182,7 @@ def OpenLevelUpWindow ():
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
 	if Thac0Updated:
+		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
 		overview = overview + GemRB.GetString (38718) + '\n'
 
 	Text = Window.GetControl (3)

@@ -45,7 +45,7 @@ Animation::Animation(int count)
 	x = 0;
 	y = 0;
 	Flags = A_ANI_ACTIVE;
-	fps = 15;
+	fps = ANI_DEFAULT_FRAMERATE;
 	endReached = false;
 	//behaviour flags
 	playReversed = false;
@@ -238,7 +238,7 @@ void Animation::MirrorAnimationVert()
 	}
 
 	// flip animArea vertically as well
-//	animArea.y = -animArea.h - animArea.y;
+	animArea.y = -animArea.h - animArea.y;
 }
 
 void Animation::AddAnimArea(Animation* slave)

@@ -106,10 +106,10 @@ namespace GemRB {
 #define STATE_HELPLESS   0x00000020
 #define STATE_FROZEN     0x00000040
 #define STATE_PETRIFIED  0x00000080
-#define STATE_EXPLODING  0x00000100
-#define STATE_PST_MIRROR 0x00000100
-#define STATE_FLAME      0x00000200
-#define STATE_ACID       0x00000400
+#define STATE_EXPLODING  0x00000100 // chunky death
+#define STATE_PST_MIRROR 0x00000100 // pst version of STATE_MIRROR (overlaps STATE_EXPLODING)
+#define STATE_FLAME      0x00000200 // charred to death
+#define STATE_ACID       0x00000400 // disolved to death
 #define STATE_DEAD       0x00000800
 #define STATE_SILENCED   0x00001000
 #define STATE_CHARMED    0x00002000
@@ -127,7 +127,7 @@ namespace GemRB {
 #define STATE_FEEBLE     0x00100000
 #define STATE_NONDET     0x00200000
 #define STATE_INVIS2     0x00400000
-#define STATE_EE_DUPL    0x00400000
+#define STATE_EE_DUPL    0x00400000 // pst's enola projectile duplication (overlaps improved invisibility)
 #define STATE_BLESS      0x00800000
 #define STATE_CHANT      0x01000000
 #define STATE_DETECT_EVIL 0x01000000
@@ -139,12 +139,14 @@ namespace GemRB {
 #define STATE_ANTIMAGIC  0x10000000
 #define STATE_BLUR       0x20000000
 #define STATE_MIRROR     0x40000000
-#define STATE_EMBALM     0x40000000
+#define STATE_EMBALM     0x40000000 // pst healing with ac bonus
 #define STATE_CONFUSED   0x80000000
 
 #define STATE_STILL      (STATE_STUNNED | STATE_FROZEN | STATE_PETRIFIED) //0xc8: not animated
 
-#define STATE_CANTMOVE   0x180fef   //can't walk or attack - confused characters can do these
+// can't walk or attack - helpless
+// FIXME: why is STATE_BERSERK on the list?
+#define STATE_CANTMOVE (STATE_SLEEP|STATE_BERSERK|STATE_PANIC|STATE_STUNNED|STATE_HELPLESS|STATE_FROZEN|STATE_PETRIFIED|STATE_EXPLODING|STATE_FLAME|STATE_ACID|STATE_DEAD|STATE_DEACTIVATED|STATE_FEEBLE) // 0x180fef
 #define STATE_CANTLISTEN 0x80080fef
 #define STATE_CANTSTEAL  0x00180fc0 //can't steal from
 #define STATE_CANTSEE    0x00080fc0 //can't explore (even itself)
@@ -180,7 +182,8 @@ namespace GemRB {
 #define EXTSTATE_SEVEN_EYES  0x000007f0
 
 //Multiclass flags
-#define MC_SHOWLONGNAME         0x0001
+#define MC_SHOWLONGNAME         0x0001 // in iwd2 this supposedly prevents casting disruption from damage
+#define MC_NO_DISRUPTION        0x0001 // but it is set on non-casters only (all halfgoblins) and most have no scripts
 #define MC_REMOVE_CORPSE        0x0002
 #define MC_KEEP_CORPSE          0x0004
 #define MC_WAS_FIGHTER		0x0008
@@ -192,15 +195,28 @@ namespace GemRB {
 #define MC_WAS_ANY	        0x01f8 // MC_WAS_FIGHTER | ... | MC_WAS_RANGER
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
-#define MC_EXPORTABLE           0x0800
+#define MC_EXPORTABLE           0x0800  // iwd2: either different meaning or leftover cruft (set in a few creatures)
 #define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
 #define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
+#define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
 #define MC_SEENPARTY            0x10000 //iwd2
 #define MC_INVULNERABLE         0x20000 //iwd2
+#define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
+#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests
+#define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess)
+//#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
+//#define                       0x20000000 // iwd2, unkown, probably irrelevant
+//#define                       0x40000000 // iwd2, unkown, probably irrelevant
+
+// specflag values
+#define SPECF_DRIVEN          1 // automatic concentration success, no morale failure
+#define SPECF_CRITIMMUNITY    2 // immune to critical hits
+#define SPECF_PALADINOFF      4 // can't choose paladin levels on level up
+#define SPECF_MONKOFF         8 // can't choose monk levels on level up
 
 //stats
 #define IE_HITPOINTS		0
@@ -371,6 +387,7 @@ namespace GemRB {
 #define IE_EXTRAPROFICIENCY9 		 123
 #define IE_MAGICDEVICE                   123
 #define IE_EXTRAPROFICIENCY10 		 124
+#define IE_SPECFLAGS                     124
 #define IE_EXTRAPROFICIENCY11 		 125
 #define IE_EXTRAPROFICIENCY12 		 126
 #define IE_EXTRAPROFICIENCY13 		 127
@@ -478,6 +495,7 @@ namespace GemRB {
 #define IE_MIRRORIMAGES         182 
 //
 
+#define IE_ETHEREALNESS         202
 #define IE_IMMUNITY             203
 #define IE_DISABLEDBUTTON       204
 #define IE_ANIMATION_ID		205 //cd

@@ -172,17 +172,20 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 		const Color fore = { (ieByte)((color >> 16) & 0xFF), (ieByte)((color >> 8) & 0xFF), (ieByte)(color & 0xFF), (ieByte)((color >> 24) & 0xFF)};
 		l->SetColor( fore, ColorBlack );
 		l->SetText(text);
-	} else {
+	}
+
+	TextArea* ta = core->GetMessageTextArea();
+	if (ta) {
 		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
-		TextArea* ta = core->GetMessageTextArea();
-		if (ta) {
-			DisplayMarkupString( newstr );
-		} else if (target) {
-			target->SetOverheadText( newstr );
-		}
+		DisplayMarkupString( newstr );
 		free( newstr );
+	}
+
+	if (target && l == NULL && ta == NULL) {
+		// overhead text only if we dont have somewhere else for the message
+		target->SetOverheadText( text );
 	}
 }
 

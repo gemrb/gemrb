@@ -101,18 +101,21 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	delete dlg;
 	dlg = NULL;
 
+	if (tgt->Type == ST_ACTOR) {
+		Actor *tar = (Actor *) tgt;
+		tar->DialogInterrupt();
+	}
+
+	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
+		return false;
+	}
+
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
 		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
-		// display the greeting VB instead
-		if (tgt->Type == ST_ACTOR) {
-			Actor *tar = (Actor *) tgt;
-			//tar->DialogInterrupt();
-			tar->VerbalConstant(VB_INITIALMEET, 1, true);
-		}
 		return false;
 	}
 
@@ -140,12 +143,25 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
+	initialState = dlg->FindFirstState( tgt );
+	if (initialState < 0) {
+		return false;
+	}
+
 	/*
 	 FIXME: need to reimplement this
 	Video *video = core->GetVideoDriver();
+	if (previousX == -1) {
+		//save previous viewport so we can restore it at the end
+		Region vp = video->GetViewport();
+		previousX = vp.x;
+		previousY = vp.y;
+	}
+
 	//allow mouse selection from dialog (even though screen is locked)
 	video->SetMouseEnabled(true);
 	*/
+	//TODO: this should not jump but scroll to the destination
 	gc->MoveViewportTo(tgt->Pos, true);
 
 	//check if we are already in dialog
@@ -153,49 +169,34 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return true;
 	}
 
-	initialState = dlg->FindFirstState( tgt );
-	if (initialState < 0) {
-		return false;
-	}
-
-	//we need GUI for dialogs
-	//but the guiscript must be in control here
-	//gc->UnhideGUI();
-
 	//no exploring while in dialogue
-	gc->SetScreenFlags(/*SF_GUIENABLED|*/SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
-	Log(WARNING, "DialogHandler", "Errors occuring while in dialog mode cannot be logged in the MessageWindow.");
-	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
-
-	if (tgt->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) tgt;
-		tar->DialogInterrupt();
-	}
+	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_OR);
+	gc->SetDialogueFlags(DF_IN_DIALOG, OP_OR);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
+	// NOTE: besides marking pause/not pause, they determine what happens if
+	// hostile actions are taken against the speaker from a EA < GOODCUTOFF creature:
+	//Bit 0: Enemy()
+	//Bit 1: EscapeArea()
+	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
 	if (!(dlg->Flags&7) ) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
 	}
-	//opening control size to maximum, enabling dialog window
-	//but the guiscript must be in control here
-	//core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
-	//core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
-	//core->SetEventFlag(EF_PORTRAIT);
 	return true;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
+		return;
+	}
+
 	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		// reset the TA
 		ta->SetAnimPicture(NULL);
 		ta->ClearSelectOptions();
-	}
-
-	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
-		return;
 	}
 
 	Actor *tmp = GetSpeaker();
@@ -219,12 +220,13 @@ void DialogHandler::EndDialog(bool try_to_break)
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
-	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
+	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
 	GameControl* gc = core->GetGameControl();
 	if ( !(gc->GetScreenFlags()&SF_CUTSCENE)) {
-		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);
+		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_NAND);
 	}
-	gc->SetDialogueFlags(0, BM_SET);
+	gc->SetDialogueFlags(0, OP_SET);
+	gc->MoveViewportTo(prevViewPortLoc, false);
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
@@ -255,9 +257,10 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	Actor *tgt = NULL;
+	Scriptable *tgt = NULL;
+	Actor *tgta = NULL;
 	if (target->Type == ST_ACTOR) {
-		tgt = (Actor *)target;
+		tgta = (Actor *)target;
 	}
 
 	int si;
@@ -271,13 +274,13 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			return false;
 		}
 
-		if (tgt) {
+		if (tgta) {
 			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
-				gc->SetDialogueFlags(DF_TALKCOUNT, BM_NAND);
-				tgt->TalkCount++;
+				gc->SetDialogueFlags(DF_TALKCOUNT, OP_NAND);
+				tgta->TalkCount++;
 			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
-				gc->SetDialogueFlags(DF_INTERACT, BM_NAND);
-				tgt->InteractCount++;
+				gc->SetDialogueFlags(DF_INTERACT, OP_NAND);
+				tgta->InteractCount++;
 			}
 		}
 		// does this belong here? we must clear actions somewhere before
@@ -311,7 +314,11 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
 			target->AddAction( GenerateAction( "SetInterrupt(FALSE)" ) );
 			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
-			target->AddAction( GenerateAction( "BreakInstants()" ) );
+			// FIXME: figure out if pst needs something similar (action missing)
+			//        (not conditional on GenerateAction to prevent console spam)
+			if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+				target->AddAction(GenerateAction("BreakInstants()"));
+			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
 			}
@@ -334,18 +341,24 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
 			tgt = NULL;
+			tgta = NULL;
 			if (originalTargetID) {
 				// always try original target first (sometimes there are multiple
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
-				tgt = GetActorByGlobalID(originalTargetID);
-				if (tgt && strnicmp( tgt->GetDialog(GD_NORMAL), tr->Dialog, 8 ) != 0) {
-					tgt = NULL;
+				tgta = GetActorByGlobalID(originalTargetID);
+				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
+					tgta = NULL;
+				} else {
+					tgt = tgta;
 				}
 			}
 			if (!tgt) {
 				// then just search the current area for an actor with the dialog
 				tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+				if (tgt && tgt->Type == ST_ACTOR) {
+					tgta = (Actor *) tgt;
+				}
 			}
 			if (!tgt) {
 				// try searching for banter dialogue: the original engine seems to
@@ -365,6 +378,16 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					}
 					int row = pdtable->FindTableValue( col, tr->Dialog );
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
+					if (tgt && tgt->Type == ST_ACTOR) {
+						tgta = (Actor *) tgt;
+					}
+				}
+			}
+			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
+			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
+				tgt = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+				if (tgt) { // only returns Actors
+					tgta = (Actor *) tgt;
 				}
 			}
 
@@ -375,24 +398,13 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 			Actor *oldTarget = GetActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
-			tgt->SetCircleSize();
+			if (tgta) tgta->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
-			if (target != tgt) {
-				// switching target; clear actions
-				target = tgt;
-				target->Stop();
-			}
+			target = tgt;
+
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
-			/*if (target->GetInternalFlag()&IF_NOINT) {
-				// this whole check moved out of InitDialog by fuzzie, see comments
-				// for the IF_NOINT check in BeginDialog
-				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
-				ta->SetMinRow( false );
-				EndDialog();
-				return;
-			}*/
 			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
 				EndDialog();
@@ -408,15 +420,17 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		return false;
 	}
 
-	// displaying npc text and portrait
-	Sprite2D* portrait = NULL;
-	if (tgt) {
-		portrait = tgt->CopyPortrait(1);
+	if (tgta) {
+		// displaying npc text and portrait
+		Sprite2D* portrait = NULL;
+		if (tgt) {
+			portrait = tgta->CopyPortrait(1);
+		}
+		ta->SetAnimPicture(portrait);
+		ta->AppendText(L"\n");
+		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
+		Sprite2D::FreeSprite(portrait);
 	}
-	ta->SetAnimPicture(portrait);
-	ta->AppendText(L"\n");
-	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
-	Sprite2D::FreeSprite(portrait);
 
 	int idx = 0;
 	std::vector<SelectOption> dialogOptions;
@@ -435,7 +449,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption",x);
 			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-				gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+				gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
 				break;
 			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 				if (ds->transitions[x]->condition &&
@@ -443,7 +457,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 					continue;
 				}
 			}
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BM_OR);
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
 			break;
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
@@ -460,7 +474,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
-		gc->SetDialogueFlags(DF_OPENENDWINDOW, BM_OR);
+		gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
 	}
 
 	return true;

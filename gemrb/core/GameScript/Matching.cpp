@@ -102,6 +102,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 
 	// TODO: what do we check for non-actors?
 	// non-actors have a visual range (15), we should do visual range and LOS
+	// see voodooconst.h for more info, currently the rest of the code uses 30 for non-actors
 
 	if (Sender->Type == ST_ACTOR) {
 		Actor *source = (Actor *)Sender;
@@ -202,7 +203,12 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		Actor *ac = map->GetActor(i, true);
 		if (!ac) continue; // is this check really needed?
 		// don't return Sender in IDS targeting!
-		if (ac == Sender) continue;
+		// unless it's pst, which relies on it in 3012cut2-3012cut7.bcs
+		// FIXME: do we need more fine-grained control?
+		// FIXME: stop abusing old GF flags
+		if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+			if (ac == Sender) continue;
+		}
 		bool filtered = false;
 		if (DoObjectIDSCheck(oC, ac, &filtered)) {
 			// this is needed so eg. Range trigger gets a good object

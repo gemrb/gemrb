@@ -23,15 +23,18 @@ from GUIDefines import *
 SoundWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-TopIndex = 0
+SoundIndex = 0
+VerbalConstants = None
 
 def OnLoad():
-	global SoundWindow, TextAreaControl, DoneButton, TopIndex
+	global SoundWindow, TextAreaControl, DoneButton, VerbalConstants
 
 	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindow(19)
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
+	CharSoundTable = GemRB.LoadTable ("CHARSND")
+	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 
 	BackButton = SoundWindow.GetControl(10)
 	BackButton.SetText(15416)
@@ -46,20 +49,16 @@ def OnLoad():
 
 	TextAreaControl = SoundWindow.GetControl(45)
 	TextAreaControl.SetVarAssoc("Sound", 0)
+	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
 	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
 
-	DefaultButton = SoundWindow.GetControl(47)
-	DefaultButton.SetText(33479)
+	PlayButton = SoundWindow.GetControl(47)
+	PlayButton.SetText(17318)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DefaultPress)
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	SoundWindow.Focus()
-	return
-
-def DefaultPress():
-	GemRB.SetVar("Sound",0)  #scrapping the sound value
-	TextAreaControl.SetVarAssoc("Sound", 0)
 	return
 
 def BackPress():
@@ -74,4 +73,28 @@ def NextPress():
 	if SoundWindow:
 		SoundWindow.Unload()
 	GemRB.SetNextScript("CharGen8") #name
+	return
+
+def SelectSound():
+	PlayPress ()
+	return
+
+def PlayPress():
+	global SoundIndex
+
+	CharSound = TextAreaControl.QueryText()
+	MyChar = GemRB.GetVar ("Slot")
+
+	GemRB.SetPlayerSound (MyChar, CharSound)
+	# play sound as sound slot
+	GemRB.VerbalConstant (MyChar, int(VerbalConstants[SoundIndex]))
+
+	NextSound()
+	return
+
+def NextSound():
+	global SoundIndex
+	SoundIndex += 1
+	if SoundIndex >= len(VerbalConstants):
+		SoundIndex = 0
 	return

@@ -1,0 +1,24 @@
+IF
+  True()
+THEN
+  RESPONSE #100
+//if cutsceneid is not called now, it defaults to Player1
+    DisplayString(Myself, ~I am player1, and I was not cutsceneid'ed before~)
+    Wait(5)
+    DisplayString("tester1", ~CutSceneId being called on tester2~)
+//
+    CutSceneId("tester2")
+    Wait(5)
+    DisplayString(Myself, ~I am still Player1, cutsceneid on the middle of a block is useless~)
+    ActionOverride("Tester1", Dialogue(Player1))
+END
+
+IF
+  True()
+THEN
+  RESPONSE #100
+    CutSceneId("tester2")
+    DisplayString(MySelf, ~Now I am going elsewhere~)
+    MoveToPoint([1375.600])
+END
+

@@ -88,7 +88,7 @@ and edit it with your preferred text editor. Pay attention to the comments in
 the file, the entries you need to change are:
 
   - GamePath
-  - CD1 to CD5
+  - CD1 to CD5 (only if not all data is found - you have a blue screen instead of terrain)
   - CachePath
 
 After you adjust these paths, you have to copy the file back to the correct

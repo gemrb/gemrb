@@ -40,7 +40,7 @@ protected:
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 public:
 	RawPCMReader(int bits)
-		: is16bit( bits == 16 )
+		: samples_left(0), is16bit( bits == 16 )
 	{
 	}
 

@@ -606,7 +606,7 @@ static const ActionLink actionnames[] = {
 	{"escapeareaobject", GameScript::EscapeAreaObject, AF_BLOCKING},
 	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, AF_BLOCKING},
 	{"exitpocketplane", GameScript::ExitPocketPlane, 0},
-	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
+	{"expansionendcredits", GameScript::ExpansionEndCredits, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
 	{"exportparty", GameScript::ExportParty, 0},
@@ -715,6 +715,7 @@ static const ActionLink actionnames[] = {
 	{"lock", GameScript::Lock, 0},//key not checked at this time!
 	{"lockscroll", GameScript::LockScroll, 0},
 	{"log", GameScript::Debug, 0}, //the same until we know better
+	{"losegame", GameScript::QuitGame, 0}, // tobex
 	{"makeglobal", GameScript::MakeGlobal, 0},
 	{"makeunselectable", GameScript::MakeUnselectable, 0},
 	{"markobject", GameScript::MarkObject, 0},
@@ -851,7 +852,7 @@ static const ActionLink actionnames[] = {
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags, 0},
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
-	{"setcutsceneline", GameScript::SetCursorState, 0}, //same as next
+	{"setcutscenelite", GameScript::SetCursorState, 0}, //same as next
 	{"setcursorstate", GameScript::SetCursorState, 0},
 	{"setcreatureareaflag", GameScript::SetCreatureAreaFlag, 0},
 	{"setcriticalpathobject", GameScript::SetCriticalPathObject, 0},
@@ -1321,6 +1322,17 @@ void Targets::Clear()
 	objects.clear();
 }
 
+void Targets::dump() const
+{
+	print("Target dump (actors only):");
+	targetlist::const_iterator m;
+	for (m = objects.begin(); m != objects.end(); ++m) {
+		if ((*m).actor->Type == ST_ACTOR) {
+			print("%s", (*m).actor->GetName(1));
+		}
+	}
+}
+
 /** releasing global memory */
 static void CleanupIEScript()
 {
@@ -1749,7 +1761,7 @@ void InitializeIEScript()
 	} else {
 		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
-			error("GameScript", "Couldn't laod saved trigger symbols!\n");
+			error("GameScript", "Couldn't load saved trigger symbols!\n");
 		}
 		j = savedTriggersTable->GetSize();
 		while (j--) {
@@ -2087,10 +2099,12 @@ void GameScript::EvaluateAllBlocks()
 					rS->responses[0]->Execute(target);
 					// TODO: this will break blocking instants, if there are any
 					target->ReleaseCurrentAction();
-				} else if ((InDebug&ID_CUTSCENE) || !action->objects[1]) {
-					Log(WARNING, "GameScript", "Failed to find CutSceneID target!");
-					if (action->objects[1]) {
-						action->objects[1]->dump();
+				} else {
+					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
+					if (InDebug&ID_CUTSCENE) {
+						if (action->objects[1]) {
+							action->objects[1]->dump();
+						}
 					}
 				}
 			}
@@ -2186,7 +2200,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	return rE;
 }
 
-void GameScript::ExecuteString(Scriptable* Sender, char* String)
+void GameScript::ExecuteString(Scriptable* Sender, const char* String)
 {
 	if (String[0] == 0) {
 		return;
@@ -2456,6 +2470,14 @@ Trigger* GenerateTrigger(char* String)
 		negate = TF_NEGATE;
 	}
 	int len = strlench(String,'(')+1; //including (
+	// remove any preceding space (eg. 51379 pst store item trigger strref)
+	if (String[len-2] == ' ') {
+		String[len-2] = String[len-1];
+		int flen = strlen(String);
+		memmove(String+len-1, String+len, flen-len);
+		String[flen-1] = '\0';
+		len--;
+	}
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);

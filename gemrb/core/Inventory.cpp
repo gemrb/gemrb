@@ -876,13 +876,7 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 	if (!item) {
 		return false;
 	}
-	switch (op) {
-	case BM_SET: item->Flags = arg; break;
-	case BM_OR: item->Flags |= arg; break;
-	case BM_NAND: item->Flags &= ~arg; break;
-	case BM_XOR: item->Flags ^= arg; break;
-	case BM_AND: item->Flags &= arg; break;
-	}
+	core->SetBits(item->Flags, arg, op);
 	return true;
 }
 
@@ -1224,7 +1218,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 	EquippedHeader = header;
 
 	//doesn't work if magic slot is used, refresh the magic slot just in case
-	if (HasItemInSlot("",SLOT_MAGIC) && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
+	if (MagicSlotEquipped() && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
 		UpdateWeaponAnimation();
 		return false;
@@ -1311,6 +1305,14 @@ void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
 bool Inventory::FistsEquipped() const
 {
 	return Equipped == IW_NO_EQUIPPED;
+}
+
+bool Inventory::MagicSlotEquipped() const
+{
+	if (SLOT_MAGIC != -1) {
+		return Slots[SLOT_MAGIC] != NULL;
+	}
+	return false;
 }
 
 //returns the fist weapon if there is nothing else
@@ -1787,7 +1789,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 	}
 
 	//magic items have the highest priority
-	if ( HasItemInSlot("", SLOT_MAGIC)) {
+	if (MagicSlotEquipped()) {
 		//magic weapon is in use
 		return STR_MAGICWEAPON;
 	}

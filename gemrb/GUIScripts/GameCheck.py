@@ -59,3 +59,9 @@ def HasHOW ():
 
 def HasTOTL ():
 	return GemRB.HasResource ("ar9700", RES_ARE)
+
+def HasBGT ():
+	return GemRB.HasResource ("ar7200", RES_ARE)
+
+def HasTutu ():
+	return GemRB.HasResource ("fw0125", RES_ARE)

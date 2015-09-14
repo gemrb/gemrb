@@ -44,6 +44,13 @@
 #include "System/FileStream.h"
 #include "System/SlicedStream.h"
 
+#include <stdlib.h>
+#ifdef ANDROID
+// android lacks mblen
+int wctomb(char *s, wchar_t wc) { return wcrtomb(s, wc, NULL); }
+int mbtowc(wchar_t *pwc, const char *s, size_t n) { return mbrtowc(pwc, s, n, NULL); }
+#endif
+
 using namespace GemRB;
 
 #define DEF_OPEN   0
@@ -555,6 +562,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);
 		ip->Flags = Flags;
+		// ensure repeating traps are armed, fix for bg2 ar1404 mirror trap to fire
+		if (ip->TrapResets()) {
+			ip->Trapped = true;
+		}
 		ip->UsePoint.x = PosX;
 		ip->UsePoint.y = PosY;
 		//FIXME: PST doesn't use this field
@@ -724,6 +735,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
 		Flags = FixIWD2DoorFlags(Flags, false);
+		if (AreaType & AT_OUTDOOR) Flags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
 		str->ReadWord( &ClosedVerticesCount );
@@ -986,7 +998,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
-			str->Seek( 4, GEM_CURRENT_POS );
+			str->Seek( 4, GEM_CURRENT_POS ); // TODO: movement restriction distance for spawns, random walk http://gibberlings3.net/forums/index.php?showtopic=21724
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -1047,10 +1059,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					ab->BaseStats[IE_EA]=EA_EVILCUTOFF;
 				}
 				if (Flags&AF_SEEN_PARTY) {
-					ab->SetMCFlag(MC_SEENPARTY,BM_OR);
+					ab->SetMCFlag(MC_SEENPARTY,OP_OR);
 				}
 				if (Flags&AF_INVULNERABLE) {
-					ab->SetMCFlag(MC_INVULNERABLE,BM_OR);
+					ab->SetMCFlag(MC_INVULNERABLE,OP_OR);
 				}
 				if (!(Flags&AF_ENABLED)) {
 					// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty
@@ -1239,8 +1251,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Read(bytes, 500 );
 			bytes[500] = '\0';
 			String* text = StringFromCString(bytes);
-			map->AddMapNote( point, color, text);
 			str->ReadDword(&color); //readonly == 1
+			map->AddMapNote(point, color, text);
 			str->Seek(20, GEM_CURRENT_POS);
 		} else {
 			ieWord px,py;
@@ -2139,15 +2151,21 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			int len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
+				// we convert to MB because it fits more than if we wrote the wide characters
 				char* mbstring = MBCStringFromString(*mn.text);
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				len = (std::min)(mblen(mbstring, mn.text->length()), 500);
-				stream->Write( mbstring, len);
-				free(mbstring);
+				if (mbstring) {
+					// only care about number of bytes before null so strlen is what we want despite being MB string
+					len = (std::min)(static_cast<int>(strlen(mbstring)), 500);
+					stream->Write( mbstring, len);
+					free(mbstring);
+				} else {
+					Log(WARNING, "AREImporter", "MapNote converted to an invalid multibyte sequence; cannot write it to file.\nFailed Note: %ls", mn.text->c_str());
+				}
 			}
 
 			// pad the remaining space
-			x = 500-len;
+			x = 500 - len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}

@@ -399,17 +399,33 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xc3 fx_tint_screen
 //FIXME: implement bit4 which would mean duration
+// param2 is mostly used with 1 or 5; only one occurrence of 100 (our spells excluded)
+// timing is mostly 16, with one 8, one 48 and one 64
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if(0) print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	int fromTime = fx->DiceSides;
-	int toTime = fx->DiceSides;
+	// some effects contain garbage in DiceSides
+	// FIXME: should we really be just using DiceThrown?
+	int fromTime = fx->DiceThrown;
+	int toTime = fromTime;
 	switch(fx->Parameter2&6) {
 		case 0: toTime = 0; break;
 		case 2: fromTime = 0; break;
 	}
-	core->timer->SetFadeFromColor(fromTime);
-	core->timer->SetFadeToColor(toTime);
+
+	// set the fade color (usually gray)
+	// it was a gentle effect, so use a high dose of transparency
+	// since it was so high, we just skip setting the fade color
+/*	int r, g, b;
+	r = fx->Parameter1&255;
+	g = (fx->Parameter1>>8)&255;
+	b = (fx->Parameter1>>16)&255;
+	core->GetVideoDriver()->SetFadeColor(r, g, b); // will be permanent!
+*/
+
+	// order matters here, as SetFadeToColor resets fadeFromCounter
+	core->timer->SetFadeToColor(toTime, 2);
+	core->timer->SetFadeFromColor(fromTime, 2);
 	return FX_NOT_APPLIED;
 }
 
@@ -747,8 +763,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 3: case 16: //pain mirror or balance in all things
 		if (target->LastHitter) {
-			//well, someone took LastDamage out
-			//terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
+			terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
 		}
 		break;
 	case 4:
@@ -891,9 +906,9 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			fx->Parameter1=core->Roll(1,6,1);
 		}
-		BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 	}
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1);
+	BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 	if (fx->Parameter2) {
 		target->AC.HandleFxBonus(2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	} else {

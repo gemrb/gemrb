@@ -24,6 +24,7 @@
 import GemRB
 import GUICommon
 import CommonTables
+import Spellbook
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
@@ -34,6 +35,7 @@ import GUIJRNL
 import GUIINV
 import GUIREC
 import GUIMG
+import GUIPR
 
 FloatMenuWindow = None
 
@@ -96,8 +98,12 @@ def DoSingleAction ():
 	elif i == 3:
 		GUIREC.OpenRecordsWindow ()
 	elif i == 4:
-		# FIXME: Or priest scroll ....
-		GUIMG.OpenMageWindow ()
+		pc = GemRB.GameGetFirstSelectedPC ()
+		ClassName = GUICommon.GetClassRowName (pc)
+		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
+			GUIMG.OpenMageWindow ()
+		else:
+			GUIPR.OpenPriestWindow ()
 
 def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
@@ -110,14 +116,12 @@ def OpenFloatMenuWindow (x=0, y=0):
 			FloatMenuWindow.Unload ()
 		FloatMenuWindow = None
 
-		#FIXME: UnpauseGameTimer
 		GemRB.GamePause (False, 0)
 		GemRB.SetVar ("FloatWindow", -1)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
 		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
-			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 			return
 
 		if float_menu_mode == MENU_MODE_ITEMS:
@@ -134,9 +138,9 @@ def OpenFloatMenuWindow (x=0, y=0):
 	if not GemRB.GameGetFirstSelectedPC ():
 		GemRB.UnhideGUI ()
 		return
-	# FIXME: remember current selection
-	#FIXME: PauseGameTimer
+
 	GemRB.GamePause (True, 0)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 	GemRB.LoadWindowPack ("GUIWORLD")
 	FloatMenuWindow = Window = GemRB.LoadWindow (3)
@@ -257,9 +261,9 @@ def UpdateFloatMenuWindow ():
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetSprites (GUICommonWindows.GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
 	Button = Window.GetControl (CID_PREV)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
 	Button = Window.GetControl (CID_NEXT)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if float_menu_mode == MENU_MODE_SINGLE:
 		for i in range (SLOT_COUNT):
@@ -282,12 +286,10 @@ def UpdateFloatMenuWindow ():
 	elif float_menu_mode == MENU_MODE_SPELLS:
 		# spells
 		RefreshSpellList(pc, False)
-		if float_menu_index:
-			Button = Window.GetControl (CID_PREV)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		if float_menu_index+3<len(spell_list):
-			Button = Window.GetControl (CID_NEXT)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button = Window.GetControl (CID_PREV)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button = Window.GetControl (CID_NEXT)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		for i in range (SLOT_COUNT):
 			UpdateFloatMenuSpell (pc, i)
 
@@ -354,7 +356,7 @@ def UpdateFloatMenuGroupAction (i):
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 def RefreshSpellList(pc, innate):
-	global spell_hash, spell_list, type
+	global spell_list, type
 
 	if innate:
 		type = IE_SPELL_TYPE_INNATE
@@ -365,23 +367,14 @@ def RefreshSpellList(pc, innate):
 		else:
 			type = IE_SPELL_TYPE_PRIEST
 
-	# FIXME: ugly, should be in Spellbook.cpp
-	spell_hash = {}
+	type = 1<<type
 	spell_list = []
-	#level==0 is level #1
-	for level in range (9):
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
-		for j in range (mem_cnt):
-			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
+	for i in range(16):
+		if type & (1<<i):
+			spell_list += Spellbook.GetUsableMemorizedSpells (pc, i)
 
-			# Spell was already used up
-			if not ms['Flags']: continue
-
-			if ms['SpellResRef'] in spell_hash:
-				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
-			else:
-				spell_hash[ms['SpellResRef']] = 1
-				spell_list.append( ms['SpellResRef'] )
+	GemRB.SetVar ("Type", type)
+	GemRB.SetVar ("QSpell", -1)
 	return
 
 def UpdateFloatMenuItem (pc, i, weapons):
@@ -389,6 +382,9 @@ def UpdateFloatMenuItem (pc, i, weapons):
 	#no float menu index needed for weapons or quick items
 	if weapons:
 		slot_item = GemRB.GetSlotItem (pc, 10 + i)
+		if i == 0 and not slot_item:
+				# default weapon
+				slot_item = GemRB.GetSlotItem (pc, 10 + i, 1)
 	else:
 		slot_item = GemRB.GetSlotItem (pc, 21 + i)
 	Button = Window.GetControl (CID_SLOTS + i)
@@ -400,7 +396,6 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
 
 	# Weapons - the last action is 'Guard'
-	# TODO: use SetActionIcon whenever possible
 	if weapons and i==4:
 		# FIXME: rather call UpdateFloatMenuGroupAction?
 		Button.SetActionIcon (globals(), ACT_DEFEND)
@@ -454,14 +449,21 @@ def UpdateFloatMenuSpell (pc, i):
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	if i + float_menu_index < len (spell_list):
-		SpellResRef = spell_list[i + float_menu_index]
+		SpellResRef = spell_list[i + float_menu_index]["SpellResRef"]
 		Button.SetSpellIcon (SpellResRef)
-		Button.SetText ("%d" %spell_hash[SpellResRef])
+		Button.SetText ("%d" % spell_list[i + float_menu_index]["MemoCount"])
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
-		#Button.SetVarAssoc ('ItemButton', i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)
+		Button.SetVarAssoc ("Spell", spell_list[i + float_menu_index]['SpellIndex'])
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
+		# handle thieving
+		thieving = [ ACT_SEARCH, ACT_THIEVING, ACT_STEALTH ]
+		acts = [ GUICommonWindows.ActionSearchPressed, GUICommonWindows.ActionThievingPressed, GUICommonWindows.ActionStealthPressed ]
+		Button.SetActionIcon (globals(), thieving[i])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, acts[i])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		ClearSlot (i)
@@ -521,7 +523,6 @@ def FloatMenuSelectWeapons ():
 	float_menu_mode = MENU_MODE_WEAPONS
 	float_menu_index = 0
 	float_menu_selected = None
-	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 	return
@@ -553,6 +554,9 @@ def FloatMenuSelectAbilities ():
 
 def FloatMenuPreviousItem ():
 	global float_menu_index, float_menu_selected
+	if float_menu_mode == MENU_MODE_SPELLS and float_menu_index <= 0:
+		# enable backcycling for spells
+		float_menu_index = len(spell_list) - SLOT_COUNT + 1
 	if float_menu_index > 0:
 		float_menu_index = float_menu_index - 1
 		if float_menu_selected!=None:
@@ -562,7 +566,11 @@ def FloatMenuPreviousItem ():
 
 def FloatMenuNextItem ():
 	global float_menu_index, float_menu_selected
-	float_menu_index = float_menu_index + 1
+	if float_menu_mode == MENU_MODE_SPELLS and float_menu_index >= len(spell_list) - SLOT_COUNT:
+		# enable overflow for spells
+		float_menu_index = 0
+	else:
+		float_menu_index = float_menu_index + 1
 	if float_menu_selected!=None:
 		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()

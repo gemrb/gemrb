@@ -152,6 +152,7 @@ private:
 	targetlist objects;
 public:
 	int Count() const;
+	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
 	const targettype *GetNextTarget(targetlist::iterator &m, int Type);
 	const targettype *GetLastTarget(int Type);
@@ -532,8 +533,9 @@ public:
 	GameScript(const ieResRef ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
+
 	const char *GetName() { return Name; }
-	static void ExecuteString(Scriptable* Sender, char* String);
+	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 public:

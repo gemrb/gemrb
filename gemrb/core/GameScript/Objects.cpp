@@ -108,10 +108,6 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters, int ga
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
 			parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
-			// dialog isn't always set up yet (eg. iwd2 60ccmi0)
-			if (gc->dialoghandler->speakerID == 0) {
-				parameters->AddTarget(Sender, 0, ga_flags);
-			}
 		}
 		if (parameters->Count()) {
 			return parameters;

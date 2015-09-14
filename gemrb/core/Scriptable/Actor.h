@@ -171,6 +171,7 @@ namespace GemRB {
 #define UI_CRITICAL  4       //a critical hit happened
 #define UI_FAKE      8       //deplete the item but don't actually apply its effects
 #define UI_NOAURA    16      //ignore spellcasting aura checks
+#define UI_NOCHARGE  32      //don't deplete the item
 
 //used to mask off current profs
 #define PROFS_MASK  0x07
@@ -320,7 +321,7 @@ public:
 	ToHitStats ToHit;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
-	ieDword UsedExit;
+	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ieResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];
@@ -687,7 +688,9 @@ public:
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
-	int IWD2GemrbQslot (int slotindex);
+	int IWD2GemrbQslot (int slotindex) const;
+	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
+	void dumpQSlots() const;
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
@@ -747,7 +750,7 @@ public:
 	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
-	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
+	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent, bool expend = true);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override
@@ -816,6 +819,7 @@ public:
 	bool IsDualInactive() const;
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
+	int GetFavoredPenalties() const;
 	bool BlocksSearchMap() const;
 	bool CannotPassEntrance(ieDword exitID) const;
 	void UseExit(ieDword exitID);
@@ -842,7 +846,7 @@ public:
 	/* checks if the alignment matches one of the masking constants */
 	//bool MatchesAlignmentMask(ieDword mask);
 	/** untargetable by spells/attack due to invisibility or sanctuary */
-	bool Untargetable();
+	bool Untargetable(ieResRef spellRef);
 	/* returns true if this it is futile to try to harm actor (dead/sanctuaried) */
 	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target
@@ -885,6 +889,8 @@ public:
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
+	unsigned int GetSubRace() const;
+	std::list<int> ListLevels() const;
 };
 }
 

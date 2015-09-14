@@ -23,6 +23,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "AmbientMgr.h"
@@ -216,7 +217,7 @@ int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 {
-	Actor *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
+	Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
 	if ( !target ) {
 		return 0;
 	}
@@ -242,15 +243,14 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//this might disturb some modders, but this is the correct behaviour
 	//for example the aaquatah dialog in irenicus dungeon depends on it
 	GameControl *gc = core->GetGameControl();
-	Actor *pc = (Actor *) scr;
-	if (pc->GetGlobalID() == gc->dialoghandler->targetID || pc->GetGlobalID()==gc->dialoghandler->speakerID) {
+	if (gc->dialoghandler->InDialog(scr)) {
 		return 0;
 	}
 
 	//don't accept parties with the no interrupt flag
 	//this fixes bug #2573808 on gamescript level
 	//(still someone has to turn the no interrupt flag off)
-	if(!pc->GetDialog(GD_CHECK)) {
+	if(!target->GetDialog(GD_CHECK)) {
 		return 0;
 	}
 	return CanSee( Sender, target, false, GA_NO_DEAD|GA_NO_UNSCHEDULED );
@@ -319,7 +319,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (scr->GetGlobalID() == core->GetGameControl()->dialoghandler->speakerID)
+	if (core->GetGameControl()->dialoghandler->IsSpeaker(Sender))
 		return 1;
 	return 0;
 }
@@ -474,7 +474,7 @@ int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//BM_OR would make sense only if this trigger changes the value of the variable
+//OP_OR would make sense only if this trigger changes the value of the variable
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
@@ -1141,6 +1141,9 @@ int GameScript::HasItemTypeSlot(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Item *itm = gamedata->GetItem(slot->ItemResRef);
+	if (!itm) {
+		return 0;
+	}
 	int itemtype = itm->ItemType;
 	gamedata->FreeItem(itm, slot->ItemResRef, 0);
 	if (itemtype==parameters->int1Parameter) {
@@ -1557,14 +1560,14 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	if (parameters->pointParameter.isnull()) {
 		Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		int distance = PersonalDistance(p, scr);
-		if (distance <= ( parameters->int2Parameter * 10 )) {
+		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
 			return 1;
 		}
 		return 0;
 	}
 	//personaldistance is needed for modron constructs in PST maze
 	int distance = PersonalDistance(parameters->pointParameter, scr);
-	if (distance <= ( parameters->int0Parameter * 10 )) {
+	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
 		return 1;
 	}
 	return 0;
@@ -1583,7 +1586,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
 	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);
-	if (distance <= ( parameters->int0Parameter * 10 )) {
+	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
 		return 1;
 	}
 	return 0;
@@ -3120,7 +3123,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if ( (tar->GetGlobalID() != gc->dialoghandler->targetID) && (tar->GetGlobalID() != gc->dialoghandler->speakerID) ) {
+	if (!gc->dialoghandler->InDialog(tar)) {
 		return 1;
 	}
 	return 0;
@@ -3241,10 +3244,10 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if (Sender->GetGlobalID() != gc->dialoghandler->targetID && Sender->GetGlobalID() != gc->dialoghandler->speakerID) {
+	if (!gc->dialoghandler->InDialog(Sender)) {
 		return 0;
 	}
-	if (tar->GetGlobalID() != gc->dialoghandler->targetID && tar->GetGlobalID() != gc->dialoghandler->speakerID) {
+	if (!gc->dialoghandler->InDialog(tar)) {
 		return 0;
 	}
 	return 1;
@@ -3961,6 +3964,9 @@ int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) Sender;
 
 	Item *item = gamedata->GetItem(parameters->string0Parameter);
+	if (!item) {
+		return 0;
+	}
 	int ret;
 	if (actor->Unusable(item)) {
 		ret = 0;
@@ -4110,14 +4116,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 
-	Map *ca = core->GetGame()->GetMap(actor->LastArea, false);
-
-	if (!ca) {
-		return 0;
-	}
-
-	InfoPoint *ip = ca->GetInfoPointByGlobalID(actor->UsedExit);
-	if (!ip || ip->Type!=ST_TRAVEL) {
+	if (!actor->LastArea[0]) {
 		return 0;
 	}
 
@@ -4133,7 +4132,7 @@ int GameScript::UsedExit(Scriptable* Sender, Trigger* parameters)
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(ip->GetScriptName(), exit, 32) ) {
+		if (strnicmp(actor->UsedExit, exit, 32) ) {
 			continue;
 		}
 		return 1;

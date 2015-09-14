@@ -1438,7 +1438,7 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 
 	if (!(actor->GetInternalFlag()&IF_STOPATTACK) && !core->GetGame()->AnyPCInCombat()) {
 		if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_TRIGGER_AP)) {
-			actor->SetInternalFlag(IF_TRIGGER_AP, BM_OR);
+			actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
 			core->Autopause(AP_ENEMY, actor);
 		}
 	}
@@ -1814,7 +1814,7 @@ Actor* Map::GetActor(int index, bool any)
 	return NULL;
 }
 
-Actor* Map::GetActorByDialog(const char *resref)
+Scriptable* Map::GetActorByDialog(const char *resref)
 {
 	size_t i = actors.size();
 	while (i--) {
@@ -1824,6 +1824,70 @@ Actor* Map::GetActorByDialog(const char *resref)
 		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
 			return actor;
 		}
+	}
+
+	if (!core->HasFeature(GF_INFOPOINT_DIALOGS)) {
+		return NULL;
+	}
+
+	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
+	i = TMap->GetInfoPointCount();
+	while (i--) {
+		InfoPoint* ip = TMap->GetInfoPoint(i);
+		if (strnicmp(ip->GetDialog(), resref, 8) == 0) {
+			return ip;
+		}
+	}
+
+	// move higher if someone needs talking doors
+	i = TMap->GetDoorCount();
+	while (i--) {
+		Door* door = TMap->GetDoor(i);
+		if (strnicmp(door->GetDialog(), resref, 8) == 0) {
+			return door;
+		}
+	}
+	return NULL;
+}
+
+// NOTE: this function is not as general as it sounds
+// currently only looks at the party, since it is enough for the only known user
+// relies on an override item we create, with the resref matching the dialog one!
+// currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
+Scriptable* Map::GetItemByDialog(ieResRef resref)
+{
+	Game *game = core->GetGame();
+	ieResRef itemref;
+	// choose the owner of the dialog via passed dialog ref
+	if (strnicmp(resref, "dmhead", 8)) {
+		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? %s", resref);
+		return NULL;
+	}
+	CopyResRef(itemref, "mertwyn");
+
+	int i = game->GetPartySize(true);
+	while (i--) {
+		Actor *pc = game->GetPC(i, true);
+		int slot = pc->inventory.FindItem(itemref, 0);
+		if (slot == -1) continue;
+		CREItem *citem = pc->inventory.GetSlotItem(slot);
+		if (!citem) continue;
+		Item *item = gamedata->GetItem(citem->ItemResRef);
+		if (!item) continue;
+		if (strnicmp(item->Dialog, resref, 8)) continue;
+
+		// finally, spawn (dmhead.cre) from our override as a substitute talker
+		// the cre file is set up to be invisible, invincible and immune to several things
+		Actor *surrogate = gamedata->GetCreature(resref);
+		if (!surrogate) {
+			error("Map", "GetItemByDialog found the right item, but creature is missing: %s!", resref);
+			// error is fatal
+		}
+		Map *map = pc->GetCurrentArea();
+		map->AddActor(surrogate, true);
+		surrogate->SetPosition(pc->Pos, 0);
+
+		return surrogate;
 	}
 	return NULL;
 }
@@ -3089,7 +3153,12 @@ const MapNote* Map::MapNoteAtPoint(const Point &point)
 void Map::LoadIniSpawn()
 {
 	INISpawn = new IniSpawn(this);
-	INISpawn->InitSpawn(WEDResRef);
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
+		INISpawn->InitSpawn(scriptName);
+	} else {
+		INISpawn->InitSpawn(WEDResRef);
+	}
 }
 
 bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, int *difficulty, unsigned int *creCount)
@@ -3801,7 +3870,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	//this will make the animation stop when the game is stopped
 	//a possible gemrb feature to have this flag settable in .are
 	anim->gameAnimation = true;
-	anim->pos = frame;
+	anim->SetPos(frame); // sanity check it first
 	anim->Flags = Flags;
 	anim->x = Pos.x;
 	anim->y = Pos.y;

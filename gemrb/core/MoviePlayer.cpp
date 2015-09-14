@@ -50,7 +50,7 @@ void MoviePlayer::Play()
 	VideoBuffer* vb = video->CreateBuffer(movieSize, movieFormat);
 	Region frame(Point(), movieSize);
 	Window* win = WindowManager::DefaultWindowManager().MakeWindow(frame);
-	win->SetFlags(Window::Borderless, BM_OR);
+	win->SetFlags(Window::Borderless, OP_OR);
 	win->SetPosition(Window::PosCentered);
 	win->AddSubviewInFrontOfView(new MoviePlayerControls(*this));
 

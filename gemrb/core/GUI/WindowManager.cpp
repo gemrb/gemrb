@@ -63,7 +63,7 @@ WindowManager::WindowManager(Video* vid)
 	vid->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(Window::Borderless, BM_OR);
+	gameWin->SetFlags(Window::Borderless, OP_OR);
 	gameWin->SetFrame(screen);
 
 	cursorBuf = vid->CreateBuffer(screen.Dimensions());

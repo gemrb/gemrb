@@ -45,6 +45,7 @@ def OpenMageWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		
 		GUICommonWindows.SetSelectionChangeHandler (None)
+		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		return
 		
@@ -139,7 +140,7 @@ def UpdateMageWindow ():
 			Icon.SetTooltip ('')
 
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+#	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel

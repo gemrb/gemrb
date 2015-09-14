@@ -21,6 +21,7 @@
 #include "CREImporter.h"
 
 #include "ie_stats.h"
+#include "voodooconst.h"
 #include "win32def.h"
 
 #include "EffectMgr.h"
@@ -778,18 +779,20 @@ void CREImporter::ReadChrHeader(Actor *act)
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
+		ieResRef spell;
 		for (i=0;i<QSPCount;i++) {
-			str->ReadResRef(Signature);
-			if (Signature[0]) {
+			str->ReadResRef(spell);
+			// FIXME: why is this needed or why do we overwrite it immediately after?
+			if (spell[0]) {
 				act->PCStats->QuickSpellClass[i]=0xff;
-				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
+				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
 			}
 		}
 		for (i=0;i<QSPCount;i++) {
-			str->ReadResRef(Signature);
-			if (Signature[0]) {
+			str->ReadResRef(spell);
+			if (spell[0]) {
 				act->PCStats->QuickSpellClass[i]=0xfe;
-				memcpy(act->PCStats->QuickSpells[i], Signature, sizeof(ieResRef));
+				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
 			}
 		}
 		//fallthrough
@@ -944,8 +947,8 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	poi = core->GetCString( act->ShortStrRef );
 	act->SetName( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
-	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
-	act->BaseStats[IE_DIALOGRANGE] = 15; //this is just a hack
+	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
+	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword( &act->BaseStats[IE_MC_FLAGS] );
 	str->ReadDword( &act->BaseStats[IE_XPVALUE] );
 	str->ReadDword( &act->BaseStats[IE_XP] );
@@ -1915,6 +1918,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_TRANSLUCENT]=tmpByte;
 	str->Read( &tmpByte, 1); //fade speed
 	str->Read( &tmpByte, 1); //spec. flags
+	act->BaseStats[IE_SPECFLAGS] = tmpByte;
 	str->Read( &tmpByte, 1); //invisible
 	str->ReadWord( &tmpWord); //unknown
 	str->Read( &tmpByte, 1); //unused skill points
@@ -2883,7 +2887,10 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( filling, 15);
 	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
 	stream->Write(&tmpByte, 1);
-	stream->Write( filling, 5); //fade speed, spec flags, invisible
+	stream->Write(filling, 1); //fade speed
+	tmpByte = actor->BaseStats[IE_SPECFLAGS];
+	stream->Write(&tmpByte, 1);
+	stream->Write(filling, 3); //invisible, 2 unknowns
 	tmpByte = actor->BaseStats[IE_UNUSED_SKILLPTS];
 	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 124);

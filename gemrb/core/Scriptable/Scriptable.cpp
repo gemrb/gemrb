@@ -23,6 +23,7 @@
 #include "strrefs.h"
 #include "ie_cursors.h"
 
+#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -120,7 +121,6 @@ Scriptable::Scriptable(ScriptableType type)
 	InitTriggers();
 	AddTrigger(TriggerEntry(trigger_oncreation));
 
-	memset( script_timers,0, sizeof(script_timers));
 	startActive = core->HasFeature(GF_START_ACTIVE);
 	third = core->HasFeature(GF_3ED_RULES);
 }
@@ -363,9 +363,11 @@ void Scriptable::TickScripting()
 
 void Scriptable::ExecuteScript(int scriptCount)
 {
+	GameControl *gc = core->GetGameControl();
+
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
 	// but not in bg2 (kill Abazigal in ar6005)
-	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
+	if (gc->GetScreenFlags() & SF_CUTSCENE) {
 		if (! (core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
 			return;
 		}
@@ -387,6 +389,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 	Actor *act = NULL;
 	if (Type == ST_ACTOR) {
 		act = (Actor *) this;
+	}
+
+	// don't run scripts if we're in dialog
+	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
+		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
+		return;
 	}
 
 	if (act) {
@@ -421,7 +429,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName);
 		return;
 	}
 
@@ -455,7 +463,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName);
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -635,15 +643,9 @@ ieDword Scriptable::GetInternalFlag() const
 	return InternalFlags;
 }
 
-void Scriptable::SetInternalFlag(int value, int mode)
+void Scriptable::SetInternalFlag(unsigned int value, int mode)
 {
-	switch (mode) {
-		case BM_OR: InternalFlags|=value; break;
-		case BM_NAND: InternalFlags&=~value; break;
-		case BM_SET: InternalFlags=value; break;
-		case BM_AND: InternalFlags&=value; break;
-		case BM_XOR: InternalFlags^=value; break;
-	}
+	core->SetBits(InternalFlags, value, mode);
 }
 
 void Scriptable::InitTriggers()
@@ -922,7 +924,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
-	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD, 15*10);
+	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
 	int i=0;
 	while(nearActors[i]!=NULL) {
 		nearActors[i]->AddTrigger(entry);
@@ -1096,7 +1098,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 
 	// check for area dead magic
 	// tob AR3004 is a dead magic area, but using a script with personal dead magic
-	if (area->GetInternalFlag()&AF_DEADMAGIC) {
+	if (area->GetInternalFlag()&AF_DEADMAGIC && !(spl->Flags&SF_HLA)) {
 		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 		return 0;
 	}
@@ -1113,16 +1115,16 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 		// check for silence
 		// only a handful of spells don't have a verbal component -
 		// the original hardcoded vocalize and a few more
-		// we (also) ignore nonmagic spells
+		// we (also) ignore tobex modded spells
 		if (actor->CheckSilenced()) {
-			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
+			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
 				Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 				return 0;
 			}
 		}
 
 		// check for personal dead magic
-		if (actor->Modified[IE_DEADMAGIC]) {
+		if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
 			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 			return 0;
 		}
@@ -1222,6 +1224,10 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 // if any user needs casting time support, they should use Spell* actions directly
 void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
+	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
+		return;
+	}
+
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
 	Point TmpPos = LastTargetPos;
 	ieDword TmpTarget = LastSpellTarget;
@@ -1240,6 +1246,10 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, 
 // if any user needs casting time support, they should use Spell* actions directly
 void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete)
 {
+	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
+		return;
+	}
+
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
 	Point TmpPos = LastTargetPos;
 	ieDword TmpTarget = LastSpellTarget;
@@ -1326,13 +1336,13 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
 	}
-	return SpellCast(instant);
+	return SpellCast(instant, target);
 }
 
 static EffectRef fx_force_surge_modifier_ref = { "ForceSurgeModifier", -1 };
 
 //start spellcasting (common part)
-int Scriptable::SpellCast(bool instant)
+int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	Actor *actor = NULL;
@@ -1367,13 +1377,24 @@ int Scriptable::SpellCast(bool instant)
 	}
 	if (actor) {
 		//cfb
-		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
-		fxqueue->SetOwner(actor);
+		EffectQueue *fxqueue = new EffectQueue();
+		// casting glow is always on the caster
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			ieDword gender = actor->GetCGGender();
+			fxqueue->SetOwner(actor);
 			spl->AddCastingGlow(fxqueue, duration, gender);
+			fxqueue->AddAllEffects(actor, actor->Pos);
 		}
-		fxqueue->AddAllEffects(actor, actor->Pos);
+		delete fxqueue;
+
+		// actual cfb
+		fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
+		fxqueue->SetOwner(actor);
+		if (target && target->Type == ST_ACTOR) {
+			fxqueue->AddAllEffects((Actor *)target, target->Pos);
+		} else {
+			fxqueue->AddAllEffects(actor, actor->Pos);
+		}
 		delete fxqueue;
 		actor->WMLevelMod = 0;
 		if (actor->Modified[IE_FORCESURGE] == 1) {
@@ -1583,7 +1604,7 @@ bool Scriptable::AuraPolluted()
 	if (AuraTicks >= core->Time.attack_round_size) {
 		AuraTicks = -1;
 		return false;
-	} else if (CurrentActionTicks == 0 && AuraTicks != 1 && Type == ST_ACTOR) {
+	} else if (CurrentActionTicks == 0 && AuraTicks != 1) {
 		Actor *act = (Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
@@ -1601,23 +1622,22 @@ bool Scriptable::AuraPolluted()
 
 bool Scriptable::TimerActive(ieDword ID)
 {
-	if (ID>=MAX_TIMER) {
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit == script_timers.end()) {
 		return false;
 	}
-	if (script_timers[ID]) {
-		return true;
-	}
-	return false;
+	return tit->second > core->GetGame()->GameTime;
 }
 
 bool Scriptable::TimerExpired(ieDword ID)
 {
-	if (ID>=MAX_TIMER) {
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit == script_timers.end()) {
 		return false;
 	}
-	if (script_timers[ID] && script_timers[ID] < core->GetGame()->GameTime) {
+	if (tit->second <= core->GetGame()->GameTime) {
 		// expired timers become inactive after being checked
-		script_timers[ID] = 0;
+		script_timers.erase(tit);
 		return true;
 	}
 	return false;
@@ -1625,12 +1645,13 @@ bool Scriptable::TimerExpired(ieDword ID)
 
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
-	if (ID>=MAX_TIMER) {
-		Log(ERROR, "Scriptable", "Timer id %d exceeded MAX_TIMER %d",
-			ID, MAX_TIMER);
+	ieDword newTime = core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
+	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
+	if (tit != script_timers.end()) {
+		tit->second = newTime;
 		return;
 	}
-	script_timers[ID]= core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
+	script_timers.insert(std::pair<ieDword,ieDword>(ID, newTime));
 }
 
 /********************
@@ -1646,6 +1667,8 @@ Selectable::Selectable(ScriptableType type)
 	cover = NULL;
 	circleBitmap[0] = NULL;
 	circleBitmap[1] = NULL;
+	selectedColor = ColorBlack;
+	overColor = ColorBlack;
 }
 
 void Selectable::SetSpriteCover(SpriteCover* c)
@@ -1794,6 +1817,8 @@ Highlightable::Highlightable(ScriptableType type)
 	Cursor = IE_CURSOR_NORMAL;
 	KeyResRef[0] = 0;
 	EnterWav[0] = 0;
+	outlineColor = ColorBlack;
+	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
 
 Highlightable::~Highlightable(void)

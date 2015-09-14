@@ -197,7 +197,6 @@ def NextPress():
 	#setting feats
 	TmpTable = GemRB.LoadTable ("featreq")
 	FeatCount = TmpTable.GetRowCount ()
-	ProfOffset = IE_PROFICIENCYBASTARDSWORD
 	for i in range (FeatCount):
 		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
 

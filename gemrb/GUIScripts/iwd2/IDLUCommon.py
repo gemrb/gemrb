@@ -74,12 +74,14 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 
 	# class-based saving throw progression
 	# get the actual xp level of the passed class
-	Level = GemRB.GetPlayerStat(pc, Levels[Class-1])
+	LevelDiff = GemRB.GetVar ("LevelDiff") # only set during level-up
+	Level = GemRB.GetPlayerStat(pc, Levels[Class-1]) + LevelDiff
+	Level -= 1 # we'll use it as row index only
 
 	RowName = GUICommon.GetClassRowName (Class, "class")
 	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", GTV_STR)
 	ClassSaveTable = GemRB.LoadTable (SaveName)
-	if Level > ClassSaveTable.GetRowCount():
+	if Level+1 > ClassSaveTable.GetRowCount():
 		print "SetupSavingThrows: too high level, ignoring!"
 		return
 
@@ -89,11 +91,11 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 	# HOWEVER, permanent effects' effects would get obliterated if we didn't
 	for i in range(3):
 		Base = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE+i, 1)
-		OldClassBonus = ClassSaveTable.GetValue (Level-2, i) # default is 0 if we underflow
-		ClassBonus = ClassSaveTable.GetValue (Level-1, i)
+		OldClassBonus = ClassSaveTable.GetValue (Level-LevelDiff-1, i) # default is 0 if we underflow
+		ClassBonus = ClassSaveTable.GetValue (Level, i)
 		GemRB.SetPlayerStat (pc, IE_SAVEFORTITUDE+i, Base + ClassBonus-OldClassBonus)
 
-def LearnAnySpells (pc, BaseClassName):
+def LearnAnySpells (pc, BaseClassName, chargen=1):
 	MageTable = CommonTables.ClassSkills.GetValue (BaseClassName, "MAGESPELL", GTV_STR)
 	ClericTable = CommonTables.ClassSkills.GetValue (BaseClassName, "CLERICSPELL", GTV_STR)
 
@@ -104,35 +106,50 @@ def LearnAnySpells (pc, BaseClassName):
 	elif MageTable == "MXSPLBRD":
 		MageTable = "SPLBRDKN"
 
+	# this is the current caster level to update to (for SetupSpellLevels)
+	level = 1
+	if not chargen:
+		# LevelDiff + whatever caster level of this type we already had
+		level = GemRB.GetVar ("LevelDiff")
+		classIndex = CommonTables.Classes.GetRowIndex (BaseClassName)
+		level += GemRB.GetPlayerStat (pc, Levels[classIndex], 1)
+
+	bonus = 0 # ignore high-stat granted bonus spell slots
 	for table in MageTable, ClericTable:
 		if table == "*":
 			continue
 
 		booktype = CommonTables.ClassSkills.GetValue (BaseClassName, "SPLTYPE")
-		level = 1
 		# set our memorizable counts
 		Spellbook.SetupSpellLevels (pc, table, booktype, level)
+
+		# charbase seems to have domain slots reserved, so nuke them
+		if level == 1:
+			Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
 
 		if table == MageTable:
 			continue
 
 		# learn all our priest spells up to the level we can learn
-		for i in 1, 2:
-			# FIXME: healing spell hack until we have a separate memo window/phase
-			if i == 2:
-				idx = Spellbook.HasSpell (pc, booktype, 0, "sppr103")
-				if idx != -1:
-					GemRB.MemorizeSpell (pc, booktype, 0, idx, 1)
-			# also take care of domain spells
-			if i == 2 and booktype == IE_IWD2_SPELL_CLERIC:
-				booktype = IE_IWD2_SPELL_DOMAIN
-				Spellbook.SetupSpellLevels (pc, table, booktype, level)
-			elif i == 2:
-				continue
+		for slevel in range (9):
+			if GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus) <= 0:
+				# actually checks level+1 (runs if level-1 has memorizations)
+				Spellbook.LearnPriestSpells (pc, slevel, booktype)
+				break
 
-			for level in range (9):
-				print 111, level, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, level, 0)
-				if GemRB.GetMemorizableSpellsCount (pc, booktype, level, 0) <= 0:
-					# actually checks level+1 (runs if level-1 has memorizations)
-					Spellbook.LearnPriestSpells (pc, level, booktype)
-					break
+		# FIXME: healing spell hack until we have a separate memo window/phase
+		idx = Spellbook.HasSpell (pc, booktype, 0, "sppr103")
+		if idx != -1:
+			GemRB.MemorizeSpell (pc, booktype, 0, idx, 1)
+
+		# learn any domain spells too
+		if booktype == IE_IWD2_SPELL_CLERIC:
+			booktype = IE_IWD2_SPELL_DOMAIN
+			Spellbook.SetupSpellLevels (pc, table, booktype, level)
+
+		for slevel in range (9):
+			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
+			if GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus) <= 0:
+				# actually checks level+1 (runs if level-1 has memorizations)
+				Spellbook.LearnPriestSpells (pc, slevel, booktype)
+				break

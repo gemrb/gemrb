@@ -272,7 +272,7 @@
 0xE022     MBBR       MBBR       MBBR       MBBR       9          2          1          *
 0xE038     MBFI       MBFI       MBFI       MBFI       9          2          1          *
 0xE048     MBRH       MBRH       MBRH       MBRH       9          5          1          *
-0xE050     MREM       MREM       MREM       MREM       9          4          1          *
+0xE050     MREM       MREM       MREM       MREM       16         4          1          *
 0xE060     MLIC       MLIC       MLIC       MLIC       9          2          1          *
 0xEB69     MLIC       MLIC       MLIC       MLIC       9          2          1          *
 0xE068     MHOH       MHOH       MHOH       MHOH       9          2          1          *

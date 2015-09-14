@@ -255,6 +255,7 @@ public:
 #define STAT_CON_HP_MIN      2
 #define STAT_CON_HP_REGEN    3
 #define STAT_CON_FATIGUE     4
+#define STAT_CON_TNO_REGEN   4
 
 #define STAT_DEX_REACTION    0
 #define STAT_DEX_MISSILE     1
@@ -293,7 +294,8 @@ enum PauseSetting {
 enum RESOURCE_DIRECTORY {
 	DIRECTORY_CHR_PORTRAITS,
 	DIRECTORY_CHR_SOUNDS,
-	DIRECTORY_CHR_EXPORTS
+	DIRECTORY_CHR_EXPORTS,
+	DIRECTORY_CHR_SCRIPTS
 };
 
 /**
@@ -761,6 +763,8 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	void SetTickHook(EventHandler);
+
+	void SetBits(unsigned int &flag, unsigned int value, int mode) const;
 };
 
 extern GEM_EXPORT Interface * core;

@@ -342,6 +342,7 @@ public:
 	bool SelectPCSingle(int index);
 	/** Get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle() const;
+	Actor* GetSelectedPCSingle(bool onlyalive);
 	/** (De)selects actor. */
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 
@@ -452,7 +453,7 @@ public:
 	/** Sets party reputation */
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
-	void SetControlStatus(int value, int operation);
+	void SetControlStatus(unsigned int value, int operation);
 	/** Sets party size (1-32000) */
 	void SetPartySize(int value);
 	/** Sets a guiscript function to happen after x AI cycles have elapsed */

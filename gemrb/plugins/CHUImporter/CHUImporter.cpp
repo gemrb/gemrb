@@ -166,13 +166,13 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
-					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
+					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
 				}
 				if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
-					btn->SetFlags(IE_GUI_BUTTON_CAPS, BM_OR);
+					btn->SetFlags(IE_GUI_BUTTON_CAPS, OP_OR);
 				}
 
-				btn->SetFlags( Flags, BM_OR );
+				btn->SetFlags(Flags, OP_OR);
 				if (Flags & IE_GUI_BUTTON_ANCHOR) {
 					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
 				}

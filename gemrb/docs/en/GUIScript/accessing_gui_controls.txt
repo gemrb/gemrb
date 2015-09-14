@@ -1,11 +1,15 @@
-Accessing GUI controls.
+===== Accessing GUI controls =====
 
-Description: To access a GUI control, you must know its window index and control index. You must use LoadWindow and GetControl to obtain these indices. 
+To access a GUI control, you must know its window ID and control ID (CHU index). You must use LoadWindow and GetControl to obtain the control. Inspect the relevant CHU file to find all the control IDs.
+
 Usually a GUI command works only on one type of controls. A wrong control type will cause a Runtime Error and terminates the GUI script (not the game or the engine).
 
-Example: 
-        StartWindow = GemRB.LoadWindow(7)
-        Label = GemRB.GetControl(StartWindow, 0x0fff0000)
-        GemRB.SetText(StartWindow, Label, GEMRB_VERSION)
+**Example:**
 
-In the above example we just load a window whose window ID is 7, and store its window index in StartWindow. We also try to find a control whose control ID is 0xfff0000 and resides on the window pointed by StartWindow.
+    StartWindow = GemRB.LoadWindow (7)
+    Label = StartWindow.GetControl (0x0fff0000)
+    Label.SetText (GEMRB_VERSION)
+
+In the above example we load a window whose window ID is 7 and its child control with ID 0xfff0000. Finally, we use a predefined constant to set the control's text.
+
+[[guiscript:index|Function index]]

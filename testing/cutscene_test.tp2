@@ -1,0 +1,43 @@
+BACKUP ~gem_test/backup~
+AUTHOR ~gemRB team - www.gemrb.sourceforge.net~
+
+AUTO_TRA ~gem_test/tras~
+
+BEGIN ~gem_test~
+
+COMPILE ~gem_test/bafs~
+COMPILE EVALUATE_BUFFER ~gem_test/ds~
+
+/*Let's use those unuseful tutors*/
+COPY_EXISTING ~MONKTU1.cre~ ~override~
+              SAY NAME1 ~tester1~
+              SAY NAME2 ~tester1~
+              /*Death variable*/
+              WRITE_ASCII 0x0280 ~TESTER1~ #8
+              /*override script*/
+              WRITE_ASCII 0x0248 ~TESTER1~ #8
+              /*Dialog*/
+              WRITE_ASCII 0x02cc ~TESTER1~ #8
+BUT_ONLY_IF_IT_CHANGES
+
+COPY_EXISTING ~MONKTU2.cre~ ~override~
+              SAY NAME1 ~tester2~
+              SAY NAME2 ~tester2~
+              /*Death variable*/
+              WRITE_ASCII 0x0280 ~TESTER2~   #8
+              /*override script*/
+              WRITE_ASCII 0x0248 ~TESTER2~   #8
+              /*Dialog*/
+              //WRITE_ASCII 0x02cc ~TESTER2~ no use now
+BUT_ONLY_IF_IT_CHANGES
+
+//let him be in sight of tester1
+//he is the 31st actor of the map
+COPY_EXISTING ~AR2600.are~ ~override~
+              READ_LONG 0x54 "ActorsOffset"
+              READ_SHORT 0x58 "ActorsCount"
+              WRITE_SHORT (%ActorsOffset%+(30*0x110)+0x20) 1315
+              WRITE_SHORT (%ActorsOffset%+(30*0x110)+0x22) 510
+              WRITE_SHORT (%ActorsOffset%+(30*0x110)+0x24) 1315
+              WRITE_SHORT (%ActorsOffset%+(30*0x110)+0x26) 510
+BUT_ONLY_IF_IT_CHANGES

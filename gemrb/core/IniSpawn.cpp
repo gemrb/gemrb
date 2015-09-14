@@ -525,6 +525,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	const char *s;
 	
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
+	if (entry.interval < 15) entry.interval = 15; // lower bound from the original
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	s = inifile->GetKeyAsString(entryname,"critters","");
@@ -567,6 +568,17 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	}
 	NamelessSpawnPoint.x=x;
 	NamelessSpawnPoint.y=y;
+
+	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
+	strnuprcpy(PartySpawnArea, s, 8);
+	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
+	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
+		x = NamelessSpawnPoint.x;
+		y = NamelessSpawnPoint.y;
+	}
+	PartySpawnPoint.x = x;
+	PartySpawnPoint.y = y;
+
 	//35 - already standing
 	//36 - getting up
 	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
@@ -817,7 +829,7 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 	}
 	unsigned int interval = event.interval;
 	if (interval) {
-		if(core->GetGame()->GameTime/interval<=last_spawndate/interval) {
+		if (core->GetGame()->GameTime + interval <= last_spawndate) {
 			return;
 		}
 	}
@@ -841,6 +853,16 @@ void IniSpawn::InitialSpawn()
 	//these variables are set when entering first
 	for (int i=0;i<localscount;i++) {
 		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
+	}
+
+	// move the rest of the party if needed (note the i=1, 0 has the protagonist aka TNO)
+	if (!PartySpawnPoint.isnull()) {
+		Game *game = core->GetGame();
+		for (int i=1; i < game->GetPartySize(false); i++) {
+			Actor *pc = game->GetPC(i, false);
+			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
+			game->LeaveParty(pc);
+		}
 	}
 }
 

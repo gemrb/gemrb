@@ -26,6 +26,7 @@ namespace GemRB {
 
 AmbientMgr::AmbientMgr()
 {
+	active = false;
 }
 
 AmbientMgr::~AmbientMgr()

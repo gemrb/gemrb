@@ -2393,19 +2393,19 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 			//4->0, 5->1, 6->2, 7->3
 			ieWord value = fx->Parameter1>>16;
 			switch(fx->Parameter1&0xffff) {
-				case BM_SET:
+				case OP_SET:
 					an->sequence=value;
 					break;
-				case BM_AND:
+				case OP_AND:
 					an->sequence&=value;
 					break;
-				case BM_OR:
+				case OP_OR:
 					an->sequence|=value;
 					break;
-				case BM_NAND:
+				case OP_NAND:
 					an->sequence&=~value;
 					break;
-				case BM_XOR:
+				case OP_XOR:
 					an->sequence^=value;
 					break;
 			}
@@ -3172,12 +3172,15 @@ int fx_blink (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	fx->Parameter4=Trans;
 	STAT_SET( IE_TRANSLUCENT, Trans);
 	STAT_ADD(IE_SPELLFAILUREMAGE, 20);
+	STAT_ADD(IE_ETHEREALNESS, 50); // how likely are people to miss us?
 
 	if(fx->Parameter2) {
 		target->AddPortraitIcon(PI_EMPTYBODY);
 		return FX_APPLIED;
 	}
 
+	// how likely are we to miss others? Combined in the same stat
+	STAT_ADD(IE_ETHEREALNESS, 20<<8);
 	target->AddPortraitIcon(PI_BLINK);
 	return FX_APPLIED;
 }
@@ -3461,7 +3464,7 @@ static Actor *GetRandomEnemySeen(Map *map, Actor *origin)
 	i -= pos;
 	while(i--) {
 		Actor *ac = map->GetActor(i,true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN)) continue;
+		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED)) continue;
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				return ac;
@@ -3477,7 +3480,7 @@ static Actor *GetRandomEnemySeen(Map *map, Actor *origin)
 	i=map->GetActorCount(true);
 	while(i--!=pos) {
 		Actor *ac = map->GetActor(i,true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN)) continue;
+		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED)) continue;
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				return ac;

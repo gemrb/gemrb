@@ -55,7 +55,7 @@ class Actor;
 #define FX_DURATION_INSTANT_LIMITED          0
 #define FX_DURATION_INSTANT_PERMANENT        1
 #define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
-#define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 6 when applied
+#define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 0 when applied
 #define FX_DURATION_DELAY_PERMANENT          4 //this transforms to 9 (i guess)
 #define FX_DURATION_DELAY_UNSAVED            5 //this transforms to 8
 #define FX_DURATION_DELAY_LIMITED_PENDING    6 //this contains an absolute onset time and a duration

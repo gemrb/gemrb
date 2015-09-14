@@ -180,7 +180,7 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str, WMPAreaEntry* ae)
 	str->ReadDword( &tmpDword );
 	str->ReadDword( &ae->IconSeq );
 	//this should be set after iconseq is known
-	ae->SetAreaStatus( tmpDword, BM_SET );
+	ae->SetAreaStatus(tmpDword, OP_SET);
 	str->ReadDword( &ae->X );
 	str->ReadDword( &ae->Y );
 	str->ReadDword( &ae->LocCaptionName );

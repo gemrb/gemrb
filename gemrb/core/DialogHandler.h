@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "Dialog.h"
+#include "Scriptable/Scriptable.h"
 
 namespace GemRB {
 
@@ -33,26 +34,35 @@ class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
 	~DialogHandler();
-private:
-	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieDword ID);
-	void UpdateJournalForTransition(DialogTransition*);
-private:
-	DialogState* ds;
-	Dialog* dlg;
-	int initialState;
-public:
-	ieDword speakerID;
-	ieDword targetID;
-	ieDword originalTargetID;
-public:
+
 	Scriptable *GetTarget();
 	Actor *GetSpeaker();
+	bool InDialog(const Scriptable *scr) const { return IsSpeaker(scr) || IsTarget(scr); }
+	bool IsSpeaker(const Scriptable *scr) const { return scr->GetGlobalID() == speakerID; }
+	bool IsTarget(const Scriptable *scr) const { return scr->GetGlobalID() == targetID; }
+	void SetSpeaker(const Scriptable *scr) { speakerID = scr->GetGlobalID(); }
+	void SetTarget(const Scriptable *scr) { targetID = scr->GetGlobalID(); }
 
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	bool DialogChoose(unsigned int choose);
-	void DialogChoose(Control*);
+
+private:
+	/** this function safely retrieves an Actor by ID */
+	Actor *GetActorByGlobalID(ieDword ID);
+	void UpdateJournalForTransition(DialogTransition *tr);
+	// internal callback
+	void DialogChoose(Control *ctrl);
+
+	DialogState* ds;
+	Dialog* dlg;
+
+	ieDword speakerID;
+	ieDword targetID;
+	ieDword originalTargetID;
+
+	int initialState;
+	Point prevViewPortLoc;
 };
 
 }

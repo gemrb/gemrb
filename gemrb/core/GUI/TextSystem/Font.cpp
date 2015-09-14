@@ -561,10 +561,14 @@ size_t Font::Print(Region rgn, const String& string,
 			stringSize = rgn.Dimensions();
 			StringSizeMetrics metrics = {stringSize, 0, true};
 			stringSize = StringSize(string, &metrics);
+			if (alignment&IE_FONT_NO_CALC && metrics.numChars < string.length()) {
+				// PST GUISTORE, not sure what else
+				stringSize.h = rgn.h;
+			}
 		}
 
 		// important: we must do this adjustment even if it leads to -p.y!
-		// some labels depend on this behavior :/
+		// some labels depend on this behavior (BG2 GUIINV) :/
 		if (alignment&IE_FONT_ALIGN_MIDDLE) {
 			p.y += (rgn.h - stringSize.h) / 2;
 		} else { // bottom alignment
@@ -630,7 +634,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 
 		if (newline || eos) {
 			w = (lineW > w) ? lineW : w;
-			if (stop && stop->h && (LineHeight * (lines + 1)) >= stop->h ) {
+			if (stop && stop->h && (LineHeight * (lines + 1)) > stop->h ) {
 				break;
 			}
 			if (newline) {

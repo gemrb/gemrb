@@ -60,6 +60,14 @@ void GemMarkupParser::ResetAttributes(const Font* ftext, Palette* textPal, const
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
+void GemMarkupParser::Reset()
+{
+	// keep only the starting text attributes (assuming we have some)
+	while (context.size() > 1) {
+		context.pop();
+	}
+}
+
 GemMarkupParser::ParseState
 GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContainer& container)
 {

@@ -225,8 +225,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	static bool CanRun = true;
 
 	//try running (in PST) only if not encumbered
-	ieDword speed = actor->CalculateSpeed(true);
-	if ( (speed==actor->GetStat(IE_MOVEMENTRATE)) && CanRun && (DoubleClick || AlwaysRun)) {
+	if (CanRun && ShouldRun(actor)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
@@ -239,6 +238,17 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	}
 
 	actor->CommandActor(action);
+}
+
+// were we instructed to run and can handle it (no movement impairments)?
+bool GameControl::ShouldRun(Actor *actor) const
+{
+	if (!actor) return false;
+	ieDword speed = actor->CalculateSpeed(true);
+	if (speed != actor->GetStat(IE_MOVEMENTRATE)) {
+		return false;
+	}
+	return (DoubleClick || AlwaysRun);
 }
 
 GameControl::~GameControl(void)
@@ -1222,6 +1232,12 @@ void GameControl::OnMouseOver(const Point& mp)
 		//nextCursor = overInfoPoint->Cursor;
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
+	// recheck in case the positioon was different, resulting in a new isVisible check
+	if (nextCursor == IE_CURSOR_INVALID) {
+		//Owner->Cursor = IE_CURSOR_BLOCKED;
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
 
 	if (overDoor) {
 		overDoor->Highlight = false;
@@ -1244,6 +1260,13 @@ void GameControl::OnMouseOver(const Point& mp)
 
 		if (overContainer) {
 			nextCursor = GetCursorOverContainer(overContainer);
+		}
+		// recheck in case the positioon was different, resulting in a new isVisible check
+		// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
+		if (nextCursor == IE_CURSOR_INVALID) {
+			//Owner->Cursor = IE_CURSOR_BLOCKED;
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
 		}
 
 		// let us target party members even if they are invisible
@@ -1557,6 +1580,9 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
+                //for multi-shot items like BG wand of lightning
+                if (spellCount)
+                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1577,7 +1603,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 
 	// cannot target spells on invisible or sanctuaried creatures
 	// invisible actors are invisible, so this is usually impossible by itself, but improved invisibility changes that
-	if (source != tgt && tgt->Untargetable() ) {
+	if (source != tgt && tgt->Untargetable(spellName)) {
 		displaymsg->DisplayConstantStringName(STR_NOSEE_NOCAST, DMC_RED, source);
 		ResetTargetMode();
 		return;
@@ -1613,6 +1639,9 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
+                //for multi-shot items like BG wand of lightning
+                if (spellCount)
+                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1628,7 +1657,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
 	source->SetModal(MS_NONE);
-	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
+	dialoghandler->SetTarget(tgt); //this is a hack, but not so deadly
 	source->CommandActor(GenerateActionDirect( "NIDSpecial1()", tgt));
 }
 
@@ -1722,6 +1751,12 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
 		case ST_TRIGGER:
+			// pst, eg. ar1500
+			if (trap->GetDialog()[0]) {
+				trap->AddAction(GenerateAction("Dialogue([PC])"));
+				return true;
+			}
+
 			// always display overhead text; totsc's ar0511 library relies on it
 			if (!trap->GetOverheadText().empty()) {
 				if (!trap->OverheadTextIsDisplaying()) {
@@ -1870,10 +1905,18 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 					}
 					if (overInfoPoint) {
 						if (overInfoPoint->Type==ST_TRAVEL) {
-							size_t i = game->selected.size();
 							ieDword exitID = overInfoPoint->GetGlobalID();
-							while(i--) {
-								game->selected[i]->UseExit(exitID);
+							if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+								// pst forces everyone to travel (eg. ar0201 outside_portal)
+								int i = game->GetPartySize(false);
+								while(i--) {
+									game->GetPC(i, false)->UseExit(exitID);
+								}
+							} else {
+								int i = game->selected.size();
+								while(i--) {
+									game->selected[i]->UseExit(exitID);
+								}
 							}
 						}
 						if (HandleActiveRegion(overInfoPoint, pc, p)) {
@@ -2280,7 +2323,7 @@ bool GameControl::SetGUIHidden(bool hide)
 				// FIXME: this will only work for non-pst @ 800 res
 				Window* w = GetWindow(id, "GUIW08");
 				if (w) {
-					w->SetFlags(Window::Borderless, BM_OR);
+					w->SetFlags(Window::Borderless, OP_OR);
 					if (dict->Lookup( *++val, id )) {
 						//Log(MESSAGE, "GameControl", "position: %s", *val);
 						ResizeParentWindowFor( w, id, op );
@@ -2299,7 +2342,7 @@ bool GameControl::SetGUIHidden(bool hide)
 			Window* fw = GetWindow(id, "GUIWORLD");
 			if (!hide) {
 				assert(fw != NULL);
-				fw->SetFlags(Window::Draggable|Window::Borderless, BM_OR);
+				fw->SetFlags(Window::Draggable|Window::Borderless, OP_OR);
 				fw->Focus();
 			}
 		}
@@ -2395,26 +2438,14 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 }
 
-void GameControl::SetScreenFlags(int value, int mode)
+void GameControl::SetScreenFlags(unsigned int value, int mode)
 {
-	switch(mode) {
-		case BM_OR: ScreenFlags|=value; break;
-		case BM_NAND: ScreenFlags&=~value; break;
-		case BM_SET: ScreenFlags=value; break;
-		case BM_AND: ScreenFlags&=value; break;
-		case BM_XOR: ScreenFlags^=value; break;
-	}
+	core->SetBits(ScreenFlags, value, mode);
 }
 
-void GameControl::SetDialogueFlags(int value, int mode)
+void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
-	switch(mode) {
-		case BM_OR: DialogueFlags|=value; break;
-		case BM_NAND: DialogueFlags&=~value; break;
-		case BM_SET: DialogueFlags=value; break;
-		case BM_AND: DialogueFlags&=value; break;
-		case BM_XOR: DialogueFlags^=value; break;
-	}
+	core->SetBits(DialogueFlags, value, mode);
 }
 
 Actor *GameControl::GetActorByGlobalID(ieDword globalID)

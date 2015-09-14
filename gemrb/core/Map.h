@@ -59,11 +59,12 @@ class Wall_Polygon;
 #define SPF_ONCE		0x0002	//only spawn a single time
 #define SPF_WAIT		0x0004	//spawn temporarily disabled
 
-//area flags
-#define AF_NOSAVE         1
-#define AF_TUTORIAL       2
-#define AF_DEADMAGIC      4
-#define AF_DREAM          8
+//area flags (pst uses them only for resting purposes!)
+#define AF_NOSAVE         1 // unused in pst
+#define AF_TUTORIAL       2 // pst: "You cannot rest here."
+#define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
+//                        6 // pst: "You must obtain permission to rest here."
+#define AF_DREAM          8 // unused in pst
 
 //area types
 #define AT_OUTDOOR        1
@@ -407,7 +408,8 @@ public:
 	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
-	Actor* GetActorByDialog(const char* resref);
+	Scriptable* GetActorByDialog(const char* resref);
+	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
 	Actor* GetActorByScriptName(const char* name);
 	bool HasActor(Actor *actor);

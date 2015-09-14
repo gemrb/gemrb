@@ -58,7 +58,6 @@ class DialogHandler;
 #define SF_GUIENABLED    8  //
 #define SF_LOCKSCROLL    16 //don't scroll
 #define SF_CUTSCENE      32 //don't push new actions onto the action queue
-#define SF_TRACKING      64 //draw blue arrows on the edge for creatures
 
 // target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -68,19 +67,6 @@ class DialogHandler;
 #define TARGET_MODE_CAST    3
 #define TARGET_MODE_DEFEND  4
 #define TARGET_MODE_PICK    5
-
-/*
-#define TARGET_SELECT       16
-#define TARGET_NO_DEAD      32
-#define TARGET_POINT        64
-#define TARGET_NO_HIDDEN    128
-#define TARGET_TYPE_NONE    0x000
-#define TARGET_NO_ALLY      0x100 //0x100
-#define TARGET_NO_ENEMY     0x200 //0x200
-#define TARGET_NO_NEUTRAL   0x400
-#define TARGET_NO_SELF      0x800
-#define TARGET_TYPE_ALL      0 //(TARGET_TYPE_ALLY | TARGET_TYPE_ENEMY | TARGET_TYPE_NEUTRAL)
-*/
 
 static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
@@ -130,8 +116,8 @@ private:
 	Point pfs;
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
-	int ScreenFlags;
-	int DialogueFlags;
+	unsigned int ScreenFlags;
+	unsigned int DialogueFlags;
 	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
@@ -203,8 +189,8 @@ public:
 	void SetScrolling(bool scroll);
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
-	void SetScreenFlags(int value, int mode);
-	void SetDialogueFlags(int value, int mode);
+	void SetScreenFlags(unsigned int value, int mode);
+	void SetDialogueFlags(unsigned int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);
@@ -246,6 +232,8 @@ public:
 	Point GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p);
+	/** checks if the actor should be running instead of walking */
+	bool ShouldRun(Actor *actor) const;
 	/** Displays a string over an object */
 	void DisplayString(Scriptable* target);
 	/** Displays a string on screen */

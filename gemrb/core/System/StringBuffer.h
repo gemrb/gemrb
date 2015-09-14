@@ -50,6 +50,8 @@ public:
 	void append(const char* message);
 	/// Append a std::string to buffer
 	void append(std::string const& message);
+	// clear the contents
+	void clear() { buffer.clear(); };
 
 	/// Return buffer
 	std::string const& get() const;

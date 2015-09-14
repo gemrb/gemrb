@@ -555,6 +555,13 @@ String TextArea::QueryText() const
 {
 	if (selectedSpan) {
 		return selectedSpan->Text();
+	} else if (OptSpans.size()) {
+		String options;
+		for (size_t i = 0; i < OptSpans.size(); i++) {
+			options.append(OptSpans[i].second->Text());
+			options.append(L"\n");
+		}
+		return options;
 	}
 	return textContainer->Text();
 }
@@ -654,6 +661,7 @@ void TextArea::ClearText()
 	ClearHover();
 	delete RemoveSubview(textContainer);
 
+	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palette);
 	AddSubviewInFrontOfView(textContainer);
 

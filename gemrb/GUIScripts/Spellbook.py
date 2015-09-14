@@ -45,7 +45,7 @@ def itemgetter(*items):
 def GetUsableMemorizedSpells(actor, BookType):
 	memorizedSpells = []
 	spellResRefs = []
-	for level in range (10):
+	for level in range (20): # Saradas NPC teaches you a level 14 special ...
 		spellCount = GemRB.GetMemorizedSpellsCount (actor, BookType, level, False)
 		for i in range (spellCount):
 			Spell0 = GemRB.GetMemorizedSpell (actor, BookType, level, i)
@@ -261,6 +261,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# see splspec.2da for all the reasons; silence is handled elsewhere
 		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
 		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == 5)
+		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x20000: # SF_IGNORES_SILENCE
+			specialSpell ^= SP_SILENCE
 		if specialSpell or (disabled_spellcasting&spellType):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.EnableBorder(1, 0)
@@ -463,21 +465,24 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	# not found
 	return -1
 
+def HasSorcererBook (pc):
+	import GUICommon
+
+	ClassName = GUICommon.GetClassRowName (pc)
+	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
+	return SorcererBook
+
 def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# disqualify sorcerers immediately
-	booktype = IE_SPELL_TYPE_WIZARD
-	class_id = GemRB.GetPlayerStat (pc, IE_CLASS)
-	if GameCheck.IsIWD2():
-		if class_id == 10 or class_id == 2:
-			return LSR_STAT
-		booktype = IE_IWD2_SPELL_WIZARD
-	else:
-		if class_id == 19:
-			return LSR_STAT
+	if HasSorcererBook (pc):
+		return LSR_STAT
 
-	import GUICommon
+	booktype = IE_SPELL_TYPE_WIZARD
+	if GameCheck.IsIWD2():
+		booktype = IE_IWD2_SPELL_WIZARD
+
 	if GameCheck.IsPST():
 		import GUIINV
 		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
@@ -486,6 +491,9 @@ def CannotLearnSlotSpell ():
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	level = spell['SpellLevel']
+
+	# school conflicts are handled before this is called from inventory
+	# add them here if a need arises
 
 	# maybe she already knows this spell
 	if HasSpell (pc, booktype, level-1, spell_ref) != -1:
@@ -527,11 +535,14 @@ def LearnPriestSpells (pc, level, mask):
 		for spell in learnable:
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, booktype, i, spell) < 0:
-				if GameCheck.IsIWD2() and booktype == IE_IWD2_SPELL_DOMAIN:
-					GemRB.LearnSpell (pc, spell, 1<<booktype, i)
+				if GameCheck.IsIWD2():
+					if booktype == IE_IWD2_SPELL_DOMAIN:
+						GemRB.LearnSpell (pc, spell, 0, 1<<booktype, i)
+					else:
+						# perhaps forcing would be fine here too, but it's untested and
+						# iwd2 cleric schools grant certain spells at different levels
+						GemRB.LearnSpell (pc, spell, 0, 1<<booktype)
 				else:
-					# perhaps forcing would be fine here too, but it's untested in other games
-					# and iwd2 cleric schools grant certain spells at different levels
 					GemRB.LearnSpell (pc, spell)
 	return
 

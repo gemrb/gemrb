@@ -69,16 +69,24 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	hours -= days*24;
 	char *a=NULL,*b=NULL,*c=NULL;
 
+	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
-	if (days) {
-		if (days==1) a=core->GetCString(10698);
-		else a=core->GetCString(10697);
-	}
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
+	int dayref = displaymsg->GetStringReference(STR_DAY);
+	int daysref = displaymsg->GetStringReference(STR_DAYS);
+	if (dayref == daysref) {
+		strcat(Date, core->GetCString(41277));
+		return;
+	}
+
+	if (days) {
+		if (days==1) a = core->GetCString(dayref, 0);
+		else a = core->GetCString(daysref, 0);
+	}
 	if (hours || !a) {
-		if (a) b=core->GetCString(10699);
-		if (hours==1) c=core->GetCString(10701);
-		else c=core->GetCString(10700);
+		if (a) b=core->GetCString(10699); // and
+		if (hours==1) c = core->GetCString(displaymsg->GetStringReference(STR_HOUR), 0);
+		else c = core->GetCString(displaymsg->GetStringReference(STR_HOURS), 0);
 	}
 	if (b) {
 		strcat(Date, a);
@@ -533,8 +541,21 @@ static int CanSave()
 		}
 	}
 
+	Point pc1 =  game->GetPC(0, true)->Pos;
+	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*4);
+	i = 0;
+	while (nearActors[i]) {
+		Actor *actor = nearActors[i];
+		if (actor->GetInternalFlag() & IF_NOINT) {
+			// dialog about to start or similar
+			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, DMC_BG2XPGREEN);
+			return 8;
+		}
+		i++;
+	}
+	free(nearActors);
+
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
-	//TODO: can't save while IF_NOINT is set on any actor -> CANTSAVEDIALOG2 (dialog about to start)
 	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
 
 	return 0;

@@ -34,7 +34,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.8.2-git"
+#define VERSION_GEMRB "0.8.3-git"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
@@ -79,11 +79,11 @@ namespace GemRB {
 
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define BM_SET  0 //gemrb extension
-#define BM_AND  1
-#define BM_OR   2
-#define BM_XOR  3
-#define BM_NAND 4 //gemrb extension
+#define OP_SET  0 //gemrb extension
+#define OP_AND  1
+#define OP_OR   2
+#define OP_XOR  3
+#define OP_NAND 4 //gemrb extension
 
 /////feature flags
 #define  GF_HAS_KAPUTZ           	0 //pst
@@ -127,13 +127,13 @@ namespace GemRB {
 #define  GF_3ED_RULES              	38 //iwd2
 #define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
 #define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
-#define  GF_HAS_HIDE_IN_SHADOWS    	41 // not in bg1 and pst
+#define  GF_HAS_HIDE_IN_SHADOWS    	41 // bg2, iwd2
 #define  GF_AREA_VISITED_VAR    	42 //iwd, iwd2
 #define  GF_PROPER_BACKSTAB     	43 //bg2, iwd2, how?
 #define  GF_ONSCREEN_TEXT       	44 //pst
 #define  GF_SPECIFIC_DMG_BONUS		45 //how, iwd2
 #define  GF_STRREF_SAVEGAME       	46 //iwd2
-#define  GF_WISDOM_BONUS      	 	47 //pst
+#define  GF_SIMPLE_DISRUPTION      	47 // ToBEx: simplified disruption
 #define  GF_BIOGRAPHY_RES               48 //iwd branch
 #define  GF_NO_BIOGRAPHY                49 //pst
 #define  GF_STEAL_IS_ATTACK             50 //bg2 for sure
@@ -162,7 +162,7 @@ namespace GemRB {
 #define  GF_ZERO_TIMER_IS_VALID         73 // how, not bg2, other unknown
 #define  GF_SKIPUPDATE_HACK             74 // how, not bg2
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
-#define  GF_FORCE_DIALOGPAUSE           76 // iwd/how, not bg1, bg2 is special
+#define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
 
 //update this or bad things can happen
 #define GF_COUNT 77

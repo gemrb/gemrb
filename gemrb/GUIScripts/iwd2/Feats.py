@@ -16,10 +16,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #
-#character generation, skills (GUICG6)
+# character generation, feats (GUICG6)
 import GemRB
 import GUICommon
 import CommonTables
+import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
 
@@ -29,11 +30,12 @@ DoneButton = 0
 FeatTable = 0
 FeatReqTable = 0
 TopIndex = 0
-Level = 0
 KitColumn = 0
 RaceColumn = 0
 FeatsClassColumn = 0
 PointsLeft = 0
+CharGen = 0
+ButtonCount = 0
 
 # returns the number of feat levels (for example cleave can be taken twice)
 def MultiLevelFeat(feat):
@@ -72,7 +74,11 @@ def IsFeatUsable(feat):
 	b_op = FeatReqTable.GetValue(feat, "B_OP")
 	c_op = FeatReqTable.GetValue(feat, "C_OP")
 	d_op = FeatReqTable.GetValue(feat, "D_OP")
-	slot = GemRB.GetVar("Slot")
+
+	if CharGen:
+		slot = GemRB.GetVar ("Slot")
+	else:
+		slot = GemRB.GameGetSelectedPCSingle ()
 
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
@@ -80,6 +86,10 @@ def IsFeatUsable(feat):
 # of granted levels. The bonuses aren't cumulative.
 def GetBaseValue(feat):
 	global FeatsClassColumn, RaceColumn, KitName
+
+	if not CharGen:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		return GemRB.HasFeat (pc, feat) # actually returns count
 
 	Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
 	Val2 = FeatTable.GetValue(feat, RaceColumn)
@@ -112,7 +122,7 @@ def RedrawFeats():
 
 	SumLabel.SetText(str(PointsLeft) )
 
-	for i in range(0,10):
+	for i in range(ButtonCount):
 		Pos=TopIndex+i
 		FeatName = FeatTable.GetValue(Pos, 1)
 		Label = FeatWindow.GetControl(0x10000001+i)
@@ -185,20 +195,38 @@ def ScrollBarPress():
 	return
 
 def OnLoad():
+	OpenFeatsWindow(1)
+
+def OpenFeatsWindow(chargen=0):
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable, FeatReqTable
-	global KitName, Level, PointsLeft
+	global KitName, PointsLeft, ButtonCount, CharGen
 	global KitColumn, RaceColumn, FeatsClassColumn
 
-	GemRB.SetVar("Level",1) #for simplicity
+	CharGen = chargen
 
-	Race = GemRB.GetVar("Race")
+	if chargen:
+		pc = GemRB.GetVar ("Slot")
+		Race = GemRB.GetVar ("Race")
+		ClassIndex = GemRB.GetVar ("Class") - 1
+		Level = LevelDiff = 1
+		ButtonCount = 10
+	else:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Race = IDLUCommon.GetRace (pc)
+		# TODO: instead of the base class, lookup its kit if any
+		# luckily you can only have one kit per class
+		# something like a *Common.GetBaseClassKit (pc) -> kit name/id
+		ClassIndex = GemRB.GetVar ("LUClass")
+		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
+		LevelDiff = GemRB.GetVar ("LevelDiff")
+		ButtonCount = 9
+
 	RaceColumn = CommonTables.Races.FindValue(3, Race)
 	RaceName = CommonTables.Races.GetRowName(RaceColumn)
 	# could use column ID as well, but they tend to change :)
 	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN")
 
-	ClassIndex = GemRB.GetVar("Class") - 1
 	ClassName = KitName = GUICommon.GetClassRowName (ClassIndex, "index")
 	# classcolumn is base class or 0 if it is not a kit
 	ClassColumn = CommonTables.Classes.GetValue(ClassName, "CLASS") - 1
@@ -221,8 +249,6 @@ def OnLoad():
 	FeatClassTable = GemRB.LoadTable("featclas")
 	#calculating the number of new feats for the next level
 	PointsLeft = 0
-	#levels start with 1
-	Level = GemRB.GetVar("Level")-1
 
 	#this one exists only for clerics
 	# Although it should be made extendable to all kits
@@ -232,21 +258,30 @@ def OnLoad():
 			# 3 to get to the class columns (feats.2da) and 11 to get to these cleric kit columns
 			KitColumn = 3 + KitColumn + 11
 
-	#Always raise one level at once
-	PointsLeft += FeatLevelTable.GetValue(Level, 0)
-	PointsLeft += FeatClassTable.GetValue(Level, ClassColumn)
+	# Always raise one level at once
+	for i in range(LevelDiff):
+		PointsLeft += FeatLevelTable.GetValue (str(Level+i), "FEATS")
+		PointsLeft += FeatClassTable.GetValue (Level-1+i, ClassColumn)
 
 	#racial abilities which seem to be hardcoded in the IWD2 engine
 	#are implemented in races.2da
-	if Level<1:
+	if chargen:
 		PointsLeft += CommonTables.Races.GetValue(RaceName,'FEATBONUS')
 	###
 
+	if PointsLeft == 0:
+		NextPress (0)
+		return
 	GemRB.SetToken("number",str(PointsLeft) )
 
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	FeatWindow = GemRB.LoadWindow(55)
-	for i in range(10):
+	if chargen:
+		GemRB.LoadWindowPack ("GUICG", 800, 600)
+		FeatWindow = GemRB.LoadWindow (55)
+	else:
+		GemRB.LoadWindowPack ("GUIREC", 800, 600)
+		FeatWindow = GemRB.LoadWindow (56)
+
+	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)
 		Button.SetVarAssoc("Feat",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
@@ -263,9 +298,13 @@ def OnLoad():
 			Star.SetState(IE_GUI_BUTTON_DISABLED)
 			Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 
-	BackButton = FeatWindow.GetControl(105)
-	BackButton.SetText(15416)
-	BackButton.MakeEscape()
+	if chargen:
+		BackButton = FeatWindow.GetControl(105)
+		BackButton.SetText(15416)
+		BackButton.MakeEscape()
+		BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	else:
+		FeatWindow.DeleteControl (105)
 
 	DoneButton = FeatWindow.GetControl(0)
 	DoneButton.SetText(36789)
@@ -283,11 +322,13 @@ def OnLoad():
 	ScrollBarControl.SetDefaultScrollBar ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	RedrawFeats()
-	FeatWindow.Focus()
-	return
 
+	if not CharGen:
+		FeatWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		FeatWindow.Focus()
+	return
 
 def JustPress():
 	Pos = GemRB.GetVar("Feat")+TopIndex
@@ -318,8 +359,6 @@ def LeftPress():
 	if PointsLeft < 1:
 		return
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
-#	if ActPoint > Level: #Level is 0 for level 1
-#		return
 	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - 1
 	RedrawFeats()
@@ -333,10 +372,24 @@ def BackPress():
 	GemRB.SetNextScript("Skills")
 	return
 
-def NextPress():
+def NextPress(save=1):
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
-	GemRB.SetNextScript("Spells")
+	if CharGen:
+		GemRB.SetNextScript("Spells")
+		return
+
+	if save:
+		# resave the feats
+		featCount = FeatReqTable.GetRowCount ()
+		pc = GemRB.GameGetSelectedPCSingle ()
+		for i in range (featCount):
+			GemRB.SetFeat (pc, i, GemRB.GetVar ("Feat "+str(i)))
+
+	# open up the next levelup window
+	import Spells
+	Spells.SetupSpellsWindow (0)
 	return
 
 #Custom feat check functions

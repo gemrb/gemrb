@@ -250,8 +250,11 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 			printPalette = container->TextPalette();
 		}
 		assert(printFont && printPalette);
-		assert(charsPrinted < text.length());
 #if (DEBUG_TEXT)
+		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
+		// for now only assert when DEBUG_TEXT is set
+		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
+		assert(charsPrinted < text.length());
 		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
 #endif
 		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
@@ -328,10 +331,10 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 {
 	if (frame.w <= 0) {
-		SetFlags(RESIZE_WIDTH, BM_OR);
+		SetFlags(RESIZE_WIDTH, OP_OR);
 	}
 	if (frame.h <= 0) {
-		SetFlags(RESIZE_HEIGHT, BM_OR);
+		SetFlags(RESIZE_HEIGHT, OP_OR);
 	}
 	LayoutContentsFrom(contents.begin());
 }

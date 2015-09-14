@@ -590,6 +590,17 @@ int Game::GetSelectedPCSingle() const
 	return SelectedSingle;
 }
 
+Actor* Game::GetSelectedPCSingle(bool onlyalive)
+{
+	Actor *pc = FindPC(SelectedSingle);
+	if (!pc) return NULL;
+
+	if (onlyalive && !IsAlive(pc)) {
+		return NULL;
+	}
+	return pc;
+}
+
 /*
  * SelectActor() - handle (de)selecting actors.
  * If selection was changed, runs "SelectionChanged" handler
@@ -1338,15 +1349,9 @@ void Game::SetReputation(ieDword r)
 	}
 }
 
-void Game::SetControlStatus(int value, int mode)
+void Game::SetControlStatus(unsigned int value, int mode)
 {
-	switch(mode) {
-		case BM_OR: ControlStatus|=value; break;
-		case BM_NAND: ControlStatus&=~value; break;
-		case BM_SET: ControlStatus=value; break;
-		case BM_AND: ControlStatus&=value; break;
-		case BM_XOR: ControlStatus^=value; break;
-	}
+	core->SetBits(ControlStatus, value, mode);
 	core->SetEventFlag(EF_CONTROL);
 }
 
@@ -1660,11 +1665,28 @@ bool Game::RestParty(int checks, int dream, int hp)
 			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 			return false;
 		}
-		//you may not rest here, find an inn
-		if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
-		{
-			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-			return false;
+
+		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
+			// and repurposes these area flags!
+			if (area->AreaFlags&(AF_TUTORIAL|AF_DEADMAGIC)/* == (AF_TUTORIAL|AF_DEADMAGIC)*/) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // get permission 38587
+				return false;
+			/* TODO: add all the other strings
+			} else if (area->AreaFlags&AF_TUTORIAL) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // here 34601
+				return false;
+			} else if (area->AreaFlags&AF_DEADMAGIC) {
+				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // actual STR_MAYNOTREST
+				return false;*/
+			}
+		} else {
+			//you may not rest here, find an inn
+			if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+			{
+				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
+				return false;
+			}
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
@@ -1721,6 +1743,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			PlayerDream();
 		// all games have these bg1 leftovers, but only bg2 replaced the content
 		} else if (gamedata->GetResource("drmtxt2", IE_2DA_CLASS_ID, true)->Size() > 0) {
+			cutscene = true;
 			TextDream();
 		}
 

@@ -153,7 +153,14 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		} else {
 			t = 'm';
 		}
-		snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
+		//check if bg1
+		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
+			ieResRef s;
+			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0xff, g);
+			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
+		} else {
+			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
+		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
 		caster->casting_sound = core->GetAudioDrv()->Play(Resource, caster->Pos.x, caster->Pos.y);
@@ -238,6 +245,10 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 					}
 				}
 			}
+		}
+
+		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
+			fx->Target = FX_TARGET_PRESET;
 		}
 
 		if (fx->Target != FX_TARGET_SELF) {

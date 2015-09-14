@@ -58,6 +58,7 @@ class Sprite2D;
 #define IE_VVC_HEIGHT           0x00000004
 #define IE_VVC_BAM		0x00000008
 #define IE_VVC_OWN_PAL  	0x00000010
+//#define IE_VVC_PURGEABLE	0x00000020 // purge on next ai update; uses unknown
 #define IE_VVC_NOCOVER		0x00000040
 #define IE_VVC_MID_BRIGHTEN 	0x00000080
 #define IE_VVC_HIGH_BRIGHTEN	0x00000100

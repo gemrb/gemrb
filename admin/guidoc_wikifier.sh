@@ -22,12 +22,33 @@
 docdir="${1:-$PWD/gemrb/docs/en/GUIScript}"
 out_dir="${2:-$PWD/guiscript-docs.wikified}"
 scriptdir="${3:-$docdir/../../../GUIScripts}"
+plugincpp="${4:-$docdir/../../../plugins/GUIScript/GUIScript.cpp}"
 index_title="GUIScript function listing"
 see_also_str="See also:"
 
 mkdir -p "$out_dir"
 rm -f "$out_dir"/*.txt
 test -d "$docdir" || exit 1
+
+function dumpDocs() {
+  # extract the functions docs from the doc strings into individual files
+  sed -n '/PyDoc_STRVAR/,/PyObject/ { /"=/,/"$/ { s,\\n,,; s,\\,,; p} }' "$plugincpp" |
+    awk -v RS='"' -v out="$out_dir" \
+    '{ split($0, t); title=tolower(t[2]); if (title) print $0 >  out "/" title ".txt" }' || return 1
+
+  # append a link to the function index
+  for txt_file in "$out_dir"/*.txt; do
+    echo -e '\n[[guiscript:index|Function index]]' >> "$txt_file"
+  done
+
+  # dump the special pages
+  cp "$docdir"/*.txt "$out_dir"
+  rm "$out_dir"/doc_template.txt
+
+  echo "Done, now manually copy the contents of $out_dir to wiki/data/pages/guiscript"
+}
+
+function convertDocs() {
 
 # intertwine the doc pages based on the "See also" entries
 echo Linking ...
@@ -98,3 +119,13 @@ sort -o index.txt indexX
 rm indexX
 sed -i -e '/guiscript:index/d; /indexX/d' -e "1 s,^,===== $index_title =====\n," index.txt
 echo Done.
+
+}
+
+# old logic switch; all paths or no paths
+if [[ $1 == convert || $5 == convert ]]; then
+  [[ $1 == convert ]] && docdir="$PWD/gemrb/docs/en/GUIScript"
+  convertDocs
+else
+  dumpDocs
+fi

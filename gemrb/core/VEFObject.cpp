@@ -50,7 +50,7 @@ VEFObject::VEFObject(ScriptedAnimation *sca)
 	XPos=sca->XPos;
 	YPos=sca->YPos;
 	ZPos=sca->ZPos; //sometimes this is not an actual ZPos - PST portals, don't use it for rendering?
-	ResName[0]=0;
+	strnlwrcpy(ResName, sca->ResName, 8);
 	SingleObject=true;
 	ScheduleEntry entry;
 	entry.start = core->GetGame()->GameTime;

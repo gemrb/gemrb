@@ -60,7 +60,7 @@ void AppleLogger::LogInternal(log_level level, const char* owner, const char* me
 		}
 		[alert release];
 #elif TARGET_OS_MAC
-		NSRunAlertPanel(alertTitle, alertMessage, @"OK", nil, nil);
+		NSRunAlertPanel(alertTitle, @"%@", @"OK", nil, nil, alertMessage);
 #endif
 	}
 	NSLog(@"%s", message); // send to OS X logging system

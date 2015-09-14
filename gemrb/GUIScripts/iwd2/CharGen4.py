@@ -33,7 +33,11 @@ def OnLoad():
 	Class=GemRB.GetVar ("BaseClass")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	#kit
-	Kit = CommonTables.Classes.GetValue (GemRB.GetVar ("Class")-1, 2)
+	Kit = GemRB.GetVar ("Class")
+	if Kit == Class:
+		Kit = 0
+	else:
+		Kit = CommonTables.Classes.GetValue (Kit-1, 2)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 
 	#works only for the first level character generation

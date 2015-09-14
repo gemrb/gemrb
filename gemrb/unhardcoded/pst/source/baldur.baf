@@ -125,6 +125,7 @@ IF
 THEN
   RESPONSE #100
     ClearAllActions()
+    StartMovie("maze1")
     ActionOverride(Player6,LeaveParty())
     ActionOverride(Player5,LeaveParty())
     ActionOverride(Player4,LeaveParty())
@@ -132,6 +133,29 @@ THEN
     ActionOverride(Player2,LeaveParty())
     //should be the position of mazeentr in ar1900
     TeleportParty("ar1900",[2559.1895],0)
+END
+
+IF
+  GlobalGT("lady","GLOBAL",49)
+  Global("ar1900_visited","GLOBAL",1)
+  UsedExit("sigil",Protagonist)
+  !CreatureInArea("ar1900")
+THEN
+  RESPONSE #100
+    ClearAllActions()
+    StartMovie("maze2")
+    QuitGame(0,0,0) // movval.ids only has the finale movies
+END
+
+IF
+  CreatureInArea("ar1501")
+  UsedExit("pcmaze",Protagonist)
+THEN
+  RESPONSE #100
+    ClearActions()
+    // force it to this area, as we have no clue from where we teleported to
+    // extend SaveObjectLocation / MoveToSavedLocation or the pp variant if unsatisfied
+    TeleportParty("ar0200",[289.3391],0)
 END
 
 IF
@@ -154,4 +178,220 @@ THEN
     TeleportParty("ar0513",[1078.892],0)
 END
 
+// ****************************************************************
+// section for dynamic alignment changes
+// there are only 2 border values, but 24 transitions
+// consider simplifying via masks once we implement tobex' GameScript::Eval (and add XOR)
 
+////// good -> neutral -> evil
+/// good -> neutral
+IF
+  Alignment(Protagonist,LAWFUL_GOOD)
+  GlobalLT("good","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL_GOOD)
+  GlobalLT("good","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_GOOD)
+  GlobalLT("good","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// neutral -> good
+IF
+  Alignment(Protagonist,LAWFUL_NEUTRAL)
+  GlobalGT("good","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL)
+  GlobalGT("good","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_NEUTRAL)
+  GlobalGT("good","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// neutral -> evil
+IF
+  Alignment(Protagonist,LAWFUL_NEUTRAL)
+  GlobalLT("good","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL)
+  GlobalLT("good","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_NEUTRAL)
+  GlobalLT("good","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// evil -> neutral
+IF
+  Alignment(Protagonist,LAWFUL_EVIL)
+  GlobalGT("good","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL_EVIL)
+  GlobalGT("good","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_EVIL)
+  GlobalGT("good","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+////// lawful -> neutral -> chaotic
+/// lawful -> neutral (true)
+IF
+  Alignment(Protagonist,LAWFUL_EVIL)
+  GlobalLT("law","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,LAWFUL_NEUTRAL)
+  GlobalLT("law","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,LAWFUL_GOOD)
+  GlobalLT("law","GLOBAL",15)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// neutral (true) -> lawful
+IF
+  Alignment(Protagonist,NEUTRAL_EVIL)
+  GlobalGT("law","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL)
+  GlobalGT("law","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL_GOOD)
+  GlobalGT("law","GLOBAL",14)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,LAWFUL_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// chaotic -> neutral (true)
+IF
+  Alignment(Protagonist,CHAOTIC_EVIL)
+  GlobalGT("law","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_NEUTRAL)
+  GlobalGT("law","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,CHAOTIC_GOOD)
+  GlobalGT("law","GLOBAL",-21)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,NEUTRAL_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+/// neutral (true) -> chaotic
+IF
+  Alignment(Protagonist,NEUTRAL_EVIL)
+  GlobalLT("law","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_EVIL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL)
+  GlobalLT("law","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_NEUTRAL)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+IF
+  Alignment(Protagonist,NEUTRAL_GOOD)
+  GlobalLT("law","GLOBAL",-20)
+THEN
+  RESPONSE #100
+    ChangeAlignment(Protagonist,CHAOTIC_GOOD)
+    FloatMessage(Protagonist,29454) // alignment changed
+END
+
+////////// end of alignment system
+// ****************************************************************

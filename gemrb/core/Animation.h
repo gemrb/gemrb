@@ -33,6 +33,8 @@ namespace GemRB {
 
 class Sprite2D;
 
+#define ANI_DEFAULT_FRAMERATE	15
+
 class GEM_EXPORT Animation {
 private:
 	Sprite2D **frames;

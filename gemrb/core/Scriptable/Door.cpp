@@ -160,11 +160,19 @@ void Door::SetTiles(unsigned short* Tiles, int cnt)
 	tilecount = cnt;
 }
 
+bool Door::CanDetectTrap() const
+{
+    // Traps can be detected on all types of infopoint, as long
+    // as the trap is detectable and isn't deactivated.
+    return ((Flags&DOOR_DETECTABLE) && Trapped);
+}
+
 void Door::SetDoorLocked(int Locked, int playsound)
 {
 	if (Locked) {
 		if (Flags & DOOR_LOCKED) return;
 		Flags|=DOOR_LOCKED;
+		SetDoorOpen(false, playsound, 0);
 		if (playsound && ( LockSound[0] != '\0' ))
 			core->GetAudioDrv()->Play( LockSound );
 	}
@@ -244,10 +252,10 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 		area->JumpActors(true);
 	}
 	if (Open) {
-		if (!Trapped && core->HasFeature(GF_PST_STATE_FLAGS)) {
-			AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
-		} else {
+		if (Trapped) {
 			AddTrigger(TriggerEntry(trigger_opened, ID));
+		} else {
+			AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
 		}
 
 		// in PS:T, opening a door does not unlock it
@@ -255,10 +263,10 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 			SetDoorLocked(false,playsound);
 		}
 	} else {
-		if (!Trapped && core->HasFeature(GF_PST_STATE_FLAGS)) {
-			AddTrigger(TriggerEntry(trigger_harmlessclosed, ID));
-		} else {
+		if (Trapped) {
 			AddTrigger(TriggerEntry(trigger_closed, ID));
+		} else {
+			AddTrigger(TriggerEntry(trigger_harmlessclosed, ID));
 		}
 	}
 	ToggleTiles(Open, playsound);

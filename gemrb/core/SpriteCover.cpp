@@ -28,6 +28,7 @@ namespace GemRB {
 SpriteCover::SpriteCover()
 {
 	pixels = 0;
+	worldx = worldy = XPos = YPos = Width = Height = flags = 0;
 }
 
 SpriteCover::~SpriteCover()

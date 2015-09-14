@@ -91,6 +91,13 @@ static void FindBIF(BIFEntry *entry)
 	if (entry->found) {
 		return;
 	}
+	// also check the data/Data path for gog
+	char path[_MAX_PATH];
+	PathJoin(path, core->GamePath, core->GameDataPath, NULL);
+	entry->found = PathExists(entry, path);
+	if (entry->found) {
+		return;
+	}
 
 	for (int i = 0; i < MAX_CD; i++) {
 		if (PathExists(entry, core->CD[i]) ) {

@@ -232,7 +232,7 @@
 0xB510    NSIWL     NSIWL      NSIWL      NSIWL      2          2          0          *
 0xB600    NNOML     NNOML      NNOML      NNOML      2          2          0          *
 0xB610    NNOWL     NNOWL      NNOWL      NNOWL      2          2          0          *
-0xB700    NSVLL     NSVLL      NSIWL      NSIWL      2          2          0          *
+0xB700    NSLVL     NSLVL      NSIWL      NSIWL      18         2          0          *
 0xC000    ABAT      ABAT       ABAT       ABAT       2          1          1          *
 0xC100    ACAT      ACAT       ACAT       ACAT       2          1          1          *
 0xC200    ACHK      ACHK       ACHK       ACHK       2          1          1          *
@@ -260,7 +260,7 @@
 0xE020    MBBR      MBBR       MBBR       MBBR       9          2          1          *
 0xE030    MBFI      MBFI       MBFI       MBFI       9          2          1          *
 0xE040    MBRH      MBRH       MBRH       MBRH       9          5          1          *
-0xE050    MREM      MREM       MREM       MREM       9          4          1          *
+0xE050    MREM      MREM       MREM       MREM       16         4          1          *
 0xE060    MLIC      MLIC       MLIC       MLIC       9          2          1          *
 0xE068    MHOH      MHOH       MHOH       MHOH       9          2          1          *
 0xE070    MMIN      MMIN       MMIN       MMIN       9          2          1          *
@@ -373,7 +373,7 @@
 0xEBD0    MSAL      MSAL       MSAL       MSAL       16         2          1          *
 0xEBE0    MSA2      MSA2       MSA2       MSA2       16         2          1          *
 0xEBF0    MARU      MARU       MARU       MARU       9          2          1          *
-0xEC00    MWDR      MWDR       MWDR       MWDR       9          2          1          *
+0xEC00    MWDR      MWDR       MWDR       MWDR       22         2          1          *
 0xEC10    MCHY      MCHY       MCHY       MCHY       9          2          1          *
 0xEC20    MSHE      MSHE       MSHE       MSHE       9          2          1          *
 0xEC30    MCHI      MCHI       MCHI       MCHI       9          2          1          *
