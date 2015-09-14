@@ -2392,23 +2392,7 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 			//0->4, 1->5, 2->6, 3->7
 			//4->0, 5->1, 6->2, 7->3
 			ieWord value = fx->Parameter1>>16;
-			switch(fx->Parameter1&0xffff) {
-				case OP_SET:
-					an->sequence=value;
-					break;
-				case OP_AND:
-					an->sequence&=value;
-					break;
-				case OP_OR:
-					an->sequence|=value;
-					break;
-				case OP_NAND:
-					an->sequence&=~value;
-					break;
-				case OP_XOR:
-					an->sequence^=value;
-					break;
-			}
+			SetBits(an->sequence, value, fx->Parameter1&0xffff);
 			an->frame = 0;
 			an->InitAnimation();
 		}

@@ -876,7 +876,7 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 	if (!item) {
 		return false;
 	}
-	core->SetBits(item->Flags, arg, op);
+	SetBits(item->Flags, arg, op);
 	return true;
 }
 

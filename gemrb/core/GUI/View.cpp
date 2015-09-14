@@ -349,31 +349,10 @@ void View::SetScrollBar(ScrollBar* sb)
 	}
 }
 
-bool View::SetFlags(int arg_flags, int opcode)
+bool View::SetFlags(unsigned int arg_flags, int opcode)
 {
-	ieDword newFlags = flags;
-	switch (opcode) {
-		case OP_SET:
-			newFlags = arg_flags;  //set
-			break;
-		case OP_AND:
-			newFlags &= arg_flags;
-			break;
-		case OP_OR:
-			newFlags |= arg_flags; //turn on
-			break;
-		case OP_XOR:
-			newFlags ^= arg_flags;
-			break;
-		case OP_NAND:
-			newFlags &= ~arg_flags;//turn off
-			break;
-		default:
-			return false;
-	}
-	flags = newFlags;
 	MarkDirty();
-	return true;
+	return SetBits(flags, arg_flags, opcode);
 }
 
 void View::SetTooltip(const String& string)

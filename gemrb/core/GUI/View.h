@@ -53,7 +53,7 @@ protected:
 	String tooltip;
 
 	// Flags: top byte is reserved for View flags, subclasses may use the remaining bits however they want
-	ieDword flags;
+	unsigned int flags;
 
 private:
 	void DrawBackground(const Region*) const;
@@ -104,8 +104,8 @@ public:
 	virtual bool IsOpaque() const { return background != NULL; }
 	virtual bool EventHit(const Point& p) const;
 
-	bool SetFlags(int arg_flags, int opcode);
-	inline ieDword Flags() { return flags; }
+	bool SetFlags(unsigned int arg_flags, int opcode);
+	inline unsigned int Flags() { return flags; }
 
 	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? OP_OR : OP_NAND ); }
 	bool IsVisible() const;

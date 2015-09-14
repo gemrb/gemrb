@@ -3916,7 +3916,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 void Actor::SetMCFlag(ieDword arg, int op)
 {
 	ieDword tmp = BaseStats[IE_MC_FLAGS];
-	core->SetBits(tmp, arg, op);
+	SetBits(tmp, arg, op);
 	SetBase(IE_MC_FLAGS, tmp);
 }
 
@@ -8807,6 +8807,7 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	}
 	ieDword mask = 1<<(feat&31);
 	ieDword idx = feat>>5;
+
 	switch (mode) {
 		case OP_SET: case OP_OR:
 			BaseStats[IE_FEATS1+idx]|=mask;

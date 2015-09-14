@@ -4866,15 +4866,4 @@ void Interface::SanityCheck(const char *ver) {
 	}
 }
 
-void Interface::SetBits(unsigned int &flag, unsigned int value, int mode) const
-{
-	switch(mode) {
-		case OP_OR: flag |= value; break;
-		case OP_NAND: flag &= ~value; break;
-		case OP_SET: flag = value; break;
-		case OP_AND: flag &= value; break;
-		case OP_XOR: flag ^= value; break;
-	}
-}
-
 }

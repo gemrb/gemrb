@@ -57,7 +57,7 @@ WMPAreaEntry::~WMPAreaEntry()
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 {
-	core->SetBits(AreaStatus, arg, op);
+	SetBits(AreaStatus, arg, op);
 	Sprite2D::FreeSprite(MapIcon);
 }
 

@@ -2440,12 +2440,12 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 
 void GameControl::SetScreenFlags(unsigned int value, int mode)
 {
-	core->SetBits(ScreenFlags, value, mode);
+	SetBits(ScreenFlags, value, mode);
 }
 
 void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
-	core->SetBits(DialogueFlags, value, mode);
+	SetBits(DialogueFlags, value, mode);
 }
 
 Actor *GameControl::GetActorByGlobalID(ieDword globalID)

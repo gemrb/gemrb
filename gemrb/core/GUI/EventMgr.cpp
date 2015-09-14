@@ -56,16 +56,7 @@ unsigned long EventMgr::GetRKDelay()
 
 unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 {
-	unsigned long tmp = rk_flags;
-	switch (op) {
-		case OP_SET: tmp = arg; break;
-		case OP_OR: tmp |= arg; break;
-		case OP_NAND: tmp &= ~arg; break;
-		case OP_XOR: tmp ^= arg; break;
-		case OP_AND: tmp &= arg; break;
-		default: tmp = 0; break;
-	}
-	rk_flags=tmp;
+	SetBits(rk_flags, arg, op);
 	return rk_flags;
 }
 

@@ -214,6 +214,20 @@ inline bool valid_number(const char* string, long& val)
 	return ( const char * ) endpr != string;
 }
 
+template <typename T>
+inline bool SetBits(T& flag, const T& value, int mode)
+{
+	switch(mode) {
+		case OP_OR: flag |= value; break;
+		case OP_NAND: flag &= ~value; break;
+		case OP_SET: flag = value; break;
+		case OP_AND: flag &= value; break;
+		case OP_XOR: flag ^= value; break;
+		default: return false;
+	}
+	return true;
+}
+
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40

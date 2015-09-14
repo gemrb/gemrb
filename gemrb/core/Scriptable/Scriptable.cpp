@@ -645,7 +645,7 @@ ieDword Scriptable::GetInternalFlag() const
 
 void Scriptable::SetInternalFlag(unsigned int value, int mode)
 {
-	core->SetBits(InternalFlags, value, mode);
+	SetBits(InternalFlags, value, mode);
 }
 
 void Scriptable::InitTriggers()

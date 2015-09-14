@@ -1351,7 +1351,7 @@ void Game::SetReputation(ieDword r)
 
 void Game::SetControlStatus(unsigned int value, int mode)
 {
-	core->SetBits(ControlStatus, value, mode);
+	SetBits(ControlStatus, value, mode);
 	core->SetEventFlag(EF_CONTROL);
 }
 

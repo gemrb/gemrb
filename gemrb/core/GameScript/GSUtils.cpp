@@ -184,23 +184,7 @@ int GetHPPercent(Scriptable* Sender)
 
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 {
-	switch(opcode) {
-		case OP_AND:
-			value1 = ( value1& value2 );
-			break;
-		case OP_OR:
-			value1 = ( value1| value2 );
-			break;
-		case OP_XOR:
-			value1 = ( value1^ value2 );
-			break;
-		case OP_NAND: //this is a GemRB extension
-			value1 = ( value1& ~value2 );
-			break;
-		case OP_SET: //this is a GemRB extension
-			value1 = value2;
-			break;
-	}
+	SetBits(value1, value2, opcode);
 }
 
 // SPIT is not in the original engine spec, it is reserved for the
