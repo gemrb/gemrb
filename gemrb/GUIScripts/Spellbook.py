@@ -628,7 +628,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 	SpellIndex = HasSpell (pc, booktype, level, spellref)
 	if SpellIndex < 0:
-		ret = GemRB.LearnSpell (pc, spellref, flags)
+		ret = GemRB.LearnSpell (pc, spellref, flags, booktype)
 		if ret != LSR_OK and ret != LSR_KNOWN:
 			raise RuntimeError, "Failed learning spell: %s !" %(spellref)
 			return
