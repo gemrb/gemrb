@@ -220,6 +220,18 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }*/
 
+// just returns the integer part of the log
+// perfect for deducing kit values, since they are bitfields and we don't care about any noise
+static int log2(int value)
+{
+	int pow = -1;
+	while (value) {
+		value = value>>1;
+		pow++;
+	}
+	return pow;
+}
+
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
 	level = 0;
@@ -233,7 +245,10 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 
 	// strict domain spell check, so we don't steal the spells from other books
 	// still needs to happen first or the laxer check below can misclassify
-	if (IsDomain(name, level, kit) >= 0) return IE_IWD2_SPELL_DOMAIN;
+	// first translate the actual kit to a column index to make them comparable
+	// luckily they are in order
+	int kit2 = log2(kit/0x8000); // 0x8000 is the first cleric kit
+	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
@@ -294,18 +309,6 @@ static int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 		}
 	}
 	return -1;
-}
-
-// just returns the integer part of the log
-// perfect for deducing kit values, since they are bitfields and we don't care about any noise
-static int log2(int value)
-{
-	int pow = -1;
-	while (value) {
-		value = value>>1;
-		pow++;
-	}
-	return pow;
 }
 
 //input: index, level, type, kit
