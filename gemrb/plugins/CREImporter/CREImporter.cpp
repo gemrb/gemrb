@@ -116,7 +116,7 @@ int SpellEntry::FindSpell(unsigned int kit) const
 			return levels[i].level;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 static int FindSpell(ieResRef spellref, SpellEntry* list, int listsize)
@@ -235,7 +235,9 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 			// iterate over table columns ("kits" - book types)
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 				if (clsmsk & (1<<type)) {
-					level = spllist[i].FindSpell(type);
+					int level2 = spllist[i].FindSpell(type);
+					assert(level2 >= 0);
+					level = level2;
 					// FIXME: returning the first will misplace spells for multiclasses
 					return type;
 				}
@@ -368,7 +370,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		Log(ERROR, "CREImporter", "Spell (%d of type %d) found at unexpected level (%d)!", index, type, level);
 		int level2 = spllist[index].FindSpell(type);
 		// grrr, some rows have no levels set - they're all 0, but with a valid resref, so just return that
-		if (!level2) {
+		if (level2 == -1) {
 			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
 			return spllist[index].GetSpell();
 		}
