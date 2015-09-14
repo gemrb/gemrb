@@ -893,6 +893,7 @@ public:
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
+	void ChangeSorcererType (ieDword classIdx);
 };
 }
 

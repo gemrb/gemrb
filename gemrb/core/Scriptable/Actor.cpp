@@ -1012,56 +1012,67 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISFIGHTER]);
+	//actor->ChangeSorcererType(ISFIGHTER); // not a caster
 }
 
 static void pcf_level_mage (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMAGE]);
+	actor->ChangeSorcererType(ISMAGE);
 }
 
 static void pcf_level_thief (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISTHIEF]);
+	actor->ChangeSorcererType(ISTHIEF); // not a caster
 }
 
 static void pcf_level_barbarian (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARBARIAN]);
+	//actor->ChangeSorcererType(ISBARBARIAN); // not a caster
 }
 
 static void pcf_level_bard (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARD]);
+	actor->ChangeSorcererType(ISBARD);
 }
 
 static void pcf_level_cleric (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISCLERIC]);
+	actor->ChangeSorcererType(ISCLERIC);
 }
 
 static void pcf_level_druid (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISDRUID]);
+	actor->ChangeSorcererType(ISDRUID);
 }
 
 static void pcf_level_monk (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMONK]);
+	//actor->ChangeSorcererType(ISMONK); // not a caster
 }
 
 static void pcf_level_paladin (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISPALADIN]);
+	actor->ChangeSorcererType(ISPALADIN);
 }
 
 static void pcf_level_ranger (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISRANGER]);
+	actor->ChangeSorcererType(ISRANGER);
 }
 
 static void pcf_level_sorcerer (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISSORCERER]);
+	actor->ChangeSorcererType(ISSORCERER);
 }
 
 static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -1069,14 +1080,19 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
 	actor->InitButtons(newValue, !iwd2class);
+	actor->ChangeSorcererType(newValue);
+}
 
-	int sorcerer=0;
-	if (newValue<(ieDword) classcount) {
-		switch(booktypes[newValue]) {
+// sets (actually ORs in) the new spellbook type as a sorcerer-style one if needed
+void Actor::ChangeSorcererType (ieDword classIdx)
+{
+	int sorcerer = 0;
+	if (classIdx <(ieDword) classcount) {
+		switch(booktypes[classIdx]) {
 		case 2:
 			// arcane sorcerer-style
 			if (third) {
-				sorcerer = 1 << iwd2spltypes[newValue];
+				sorcerer = 1 << iwd2spltypes[classIdx];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_WIZARD;
 			}
@@ -1084,7 +1100,7 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 		case 3:
 			// divine caster with sorc. style spells
 			if (third) {
-				sorcerer = 1 << iwd2spltypes[newValue];
+				sorcerer = 1 << iwd2spltypes[classIdx];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_PRIEST;
 			}
@@ -1093,7 +1109,7 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 		default: break;
 		}
 	}
-	actor->spellbook.SetBookType(sorcerer);
+	spellbook.SetBookType(sorcerer);
 }
 
 static void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
