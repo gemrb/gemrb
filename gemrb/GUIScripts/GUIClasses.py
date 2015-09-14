@@ -61,7 +61,6 @@ class GView:
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
-    'SetVisible': _GemRB.View_SetVisible,
 	}
 	__slots__ = ['SCRIPT_GROUP']
 	
@@ -72,7 +71,13 @@ class GView:
 	def SetPos(self, x, y):
 		r = self.GetFrame()
 		self.SetFrame(x, y, r['w'], r['h']);
-
+		
+	def SetVisible(self, visible):
+		self.SetFlags(IE_GUI_VIEW_VISIBLE, OP_OR if visible else OP_NAND)
+		
+	def SetDisabled(self, disable):
+		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
+	
 class GWindow(GView):
   methods = {
     'DeleteControl': _GemRB.Window_DeleteControl,

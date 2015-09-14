@@ -399,7 +399,7 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:HideGUI]], [[guiscript:Window_Invalidate]], [[guiscript:Window_SetVisible]]\n\
+**See also:** [[guiscript:HideGUI]], [[guiscript:Window_Invalidate]]\n\
 "
 );
 
@@ -452,7 +452,7 @@ position value:\n\
 \n\
 **Return value:** 1 on success\n\
 \n\
-**See also:** [[guiscript:UnhideGUI]], [[guiscript:Window_Invalidate]], [[guiscript:Window_SetVisible]]\n\
+**See also:** [[guiscript:UnhideGUI]], [[guiscript:Window_Invalidate]]\n\
 "
 );
 
@@ -796,7 +796,7 @@ then moved by (screen size - winpack size) / 2\n\
 \n\
 **Return value:** GWindow (index)\n\
 \n\
-**See also:** [[guiscript:LoadWindowPack]], [[guiscript:Window_GetControl]], [[guiscript:Window_SetVisible]], [[guiscript:Window_ShowModal]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:LoadWindowPack]], [[guiscript:Window_GetControl]], [[guiscript:Window_ShowModal]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
@@ -1544,19 +1544,6 @@ static PyObject* GemRB_Control_AddAlias(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_View_SetVisible__doc,
-			 "SetVisible(hide)\n\n"
-			 "Hides/Shows a view." );
-
-static PyObject* GemRB_View_SetVisible(PyObject* self, PyObject* args)
-{
-	PyObject* param;
-	PARSE_ARGS(args, "OO", &self, &param);
-	View* view = GetView(self);
-	view->SetVisible(PyObject_IsTrue(param));
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  "===== Control_QueryText =====\n\
  \n\
@@ -1903,8 +1890,7 @@ MODAL_SHADOW_BLACK, they are blacked out.\n\
     * MODAL_SHADOW_BLACK = 2\n\
 \n\
 **Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Window_SetVisible]]"
+"
 );
 
 static PyObject* GemRB_Window_ShowModal(PyObject* self, PyObject* args)
@@ -3380,7 +3366,7 @@ status, dialog textarea size).\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:Window_SetVisible]], [[guiscript:bit_operation]]"
+**See also:** [[guiscript:bit_operation]]"
 );
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
@@ -13328,7 +13314,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
-	METHOD(View_SetVisible, METH_VARARGS),
 	METHOD(View_CreateControl, METH_VARARGS),
 	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
