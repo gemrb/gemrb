@@ -242,8 +242,12 @@ def OpenFeatsWindow(chargen=0):
 	FeatReqTable = GemRB.LoadTable("featreq")
 
 	for i in range(RowCount):
-		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
-		GemRB.SetVar("BaseFeatValue " + str(i), GetBaseValue(i))
+		featBase = GetBaseValue(i)
+		GemRB.SetVar ("Feat " + str(i), featBase)
+		GemRB.SetVar ("BaseFeatValue " + str(i), featBase)
+		# nullify feats whenever we load the window (in case people go back)
+		if chargen:
+			GemRB.SetFeat (pc, i, 0)
 
 	FeatLevelTable = GemRB.LoadTable("featlvl")
 	FeatClassTable = GemRB.LoadTable("featclas")
@@ -364,6 +368,7 @@ def LeftPress():
 def BackPress():
 	if FeatWindow:
 		FeatWindow.Unload()
+
 	for i in range(FeatTable.GetRowCount()):
 		GemRB.SetVar("Feat "+str(i),0)
 	GemRB.SetNextScript("Skills")
@@ -373,20 +378,23 @@ def NextPress(save=1):
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
-	if CharGen:
-		GemRB.SetNextScript("Spells")
-		return
 
 	if save:
 		# resave the feats
 		featCount = FeatReqTable.GetRowCount ()
-		pc = GemRB.GameGetSelectedPCSingle ()
+		if CharGen:
+			pc = GemRB.GetVar ("Slot")
+		else:
+			pc = GemRB.GameGetSelectedPCSingle ()
 		for i in range (featCount):
 			GemRB.SetFeat (pc, i, GemRB.GetVar ("Feat "+str(i)))
 
-	# open up the next levelup window
-	import Spells
-	Spells.SetupSpellsWindow (0)
+	if CharGen:
+		GemRB.SetNextScript("Spells")
+	else:
+		# open up the next levelup window
+		import Spells
+		Spells.SetupSpellsWindow (0)
 	return
 
 #Custom feat check functions
