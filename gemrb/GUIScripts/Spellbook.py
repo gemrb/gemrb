@@ -395,15 +395,16 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 			Learnable.append (Spell[0])
 	return Learnable
 
-def GetLearnableDomainSpells (pc, Level):
+def GetLearnableDomainSpells (pc, Level, baseClassName = -1):
 	import GUICommon
 	import GUICommonWindows
 	Learnable =[]
 
 	# only clerics have domains due to listdom.2da restrictions
 	# no need to double check, as we only call this for IE_IWD2_SPELL_CLERIC
-	BaseClassName = GUICommon.GetClassRowName (pc)
-	BaseClassIndex = CommonTables.Classes.GetRowIndex (BaseClassName)
+	if baseClassName == -1:
+		baseClassName = GUICommon.GetClassRowName (pc)
+	BaseClassIndex = CommonTables.Classes.GetRowIndex (baseClassName)
 	# columns correspond to kits in the same order
 	KitIndex = GUICommonWindows.GetKitIndex (pc, BaseClassIndex)
 	if KitIndex == -1:
@@ -554,7 +555,7 @@ def CannotLearnSlotSpell ():
 
 	return 0
 
-def LearnPriestSpells (pc, level, mask):
+def LearnPriestSpells (pc, level, mask, baseClassName = -1):
 	"""Learns all the priest spells through the given spell level.
 
 	Mask distinguishes clerical and druidic spells."""
@@ -572,7 +573,7 @@ def LearnPriestSpells (pc, level, mask):
 	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
 	for i in range (level):
 		if booktype == IE_IWD2_SPELL_DOMAIN:
-			learnable = GetLearnableDomainSpells (pc, i+1)
+			learnable = GetLearnableDomainSpells (pc, i+1, baseClassName)
 		else:
 			learnable = GetLearnablePriestSpells (mask, alignment, i+1, booktype)
 

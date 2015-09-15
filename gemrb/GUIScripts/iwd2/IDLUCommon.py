@@ -149,5 +149,5 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
 			if GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus) <= 0:
 				# actually checks level+1 (runs if level-1 has memorizations)
-				Spellbook.LearnPriestSpells (pc, slevel, booktype)
+				Spellbook.LearnPriestSpells (pc, slevel, booktype, BaseClassName)
 				break
