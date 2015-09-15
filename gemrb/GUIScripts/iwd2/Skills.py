@@ -109,7 +109,7 @@ def OnLoad():
 def OpenSkillsWindow(chargen, level=0):
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
 	global SkillTable, CostTable, PointsLeft
-	global KitName, Level, ClassColumn
+	global Level, ClassColumn
 	global CharGen, StatLowerLimit, ButtonCount
 
 	CharGen = chargen
@@ -123,15 +123,12 @@ def OpenSkillsWindow(chargen, level=0):
 		LevelDiff = 4 # start with 4x as many skills points initially
 		Class = GemRB.GetVar ("Class") - 1
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
-		# TODO: use kit instead of class if available? See conflicting comment below (check clabs, comment may be only about display)
-		KitName = CommonTables.Classes.GetRowName (Class)
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + LevelDiff
 		BaseClass = GemRB.GetVar ("LUClass")
 		ClassColumn = BaseClass
-		#KitName = kit of LUClass *only* # check if needed, should be one-time like racial bonus
 
 	PointsLeft = SkillPtsTable.GetValue (0, ClassColumn)
 	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
