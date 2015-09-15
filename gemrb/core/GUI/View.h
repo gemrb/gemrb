@@ -88,7 +88,7 @@ public:
 	};
 
 	enum ViewFlags {
-		Visible = 1 << 28,
+		Invisible = 1 << 28,
 		Disabled = 1 << 27
 	};
 
@@ -107,7 +107,7 @@ public:
 	bool SetFlags(unsigned int arg_flags, int opcode);
 	inline unsigned int Flags() { return flags; }
 
-	void SetVisible(bool vis) { SetFlags(Visible, (vis) ? OP_OR : OP_NAND ); }
+	void SetVisible(bool vis) { SetFlags(Invisible, (vis) ? OP_NAND : OP_OR ); }
 	bool IsVisible() const;
 	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? OP_OR : OP_NAND); }
 	bool IsDisabled() const { return flags&Disabled; }

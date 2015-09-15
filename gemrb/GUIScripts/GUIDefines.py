@@ -25,7 +25,7 @@ IE_GUI_VIEW_RESIZE_SUBVIEWS = 1 << 31	# resize immidiate subviews by the same am
 IE_GUI_VIEW_RESIZE_HEIGHT 	= 1 << 30	# resize the view vertically if vertical content exceeds width
 IE_GUI_VIEW_RESIZE_WIDTH 	= 1 << 29	# resize the view horizontally if horizontal content exceeds width
 
-IE_GUI_VIEW_VISIBLE		= 1 << 28
+IE_GUI_VIEW_INVISIBLE		= 1 << 28
 IE_GUI_VIEW_DISABLED	= 1 << 27
 
 #button flags

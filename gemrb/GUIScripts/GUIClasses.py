@@ -73,7 +73,7 @@ class GView:
 		self.SetFrame(x, y, r['w'], r['h']);
 		
 	def SetVisible(self, visible):
-		self.SetFlags(IE_GUI_VIEW_VISIBLE, OP_OR if visible else OP_NAND)
+		self.SetFlags(IE_GUI_VIEW_INVISIBLE, OP_NAND if visible else OP_OR)
 		
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
