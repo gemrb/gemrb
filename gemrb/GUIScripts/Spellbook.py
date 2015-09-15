@@ -297,35 +297,79 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 #################################################################
 # routines used during character generation and levelup
 #################################################################
-def GetMageSpells (Kit, Alignment, Level):
+
+# Used for bards (level-up), sorcerers and mages (cg and level-up).
+# While iwd2 still has spells.2da, it is actually unused and gives
+# some wrong spells. We need to iterate the whole listspll.2da,
+# looking at our class column and matching on (target) level
+def GetIWD2Spells (kit, usability, level, baseClass = -1):
+	spells = []
+	if baseClass == -1:
+		print "Error, didn't pass a base class in iwd2!"
+		return spells
+	# to use baseClass as a column index, we first need to convert it,
+	# since only casters are in the table. But only casters have spell stats too
+	rowName = CommonTables.Classes.GetRowName (baseClass-1)
+	baseClass = CommonTables.ClassSkills.GetValue (rowName, "SPLTYPE", GTV_INT)
+
+	# iwd2 has only per-kit exclusion, spells can't override it
+	badSchools = 0
+	if rowName == "WIZARD":
+		exclusionTable = GemRB.LoadTable ("magesch")
+		kitRow = exclusionTable.FindValue ("KIT", kit)
+		kitRow = exclusionTable.GetRowName (kitRow)
+		badSchools = exclusionTable.GetValue (kitRow, "EXCLUSION", GTV_INT)
+		if badSchools == -1:
+			badSchools = 0
+	else:
+		# only wizards have alignment and school restrictions
+		kit = usability = 0
+
+	spellsTable = GemRB.LoadTable ("listspll")
+	spellCount = spellsTable.GetRowCount ()
+	for i in range(spellCount):
+		# at which level is the spell given to the actor?
+		atLevel = spellsTable.GetValue (i, baseClass)
+		if atLevel != level:
+			continue
+
+		spellRow = spellsTable.GetRowName (i)
+		spellName = spellsTable.GetValue (spellRow, "SPELL_RES_REF")
+		ms = GemRB.GetSpell (spellName, 1)
+		if ms == None:
+			continue
+
+		if usability & ms['SpellExclusion']:
+			spellType = 0
+		elif badSchools & (1<<ms['SpellSchool']+5):
+			spellType = 0
+		else:
+			spellType = 1
+			if kit & (1 << ms['SpellSchool']+5): # of matching specialist school
+				spellType = 2
+
+		spells.append([spellName, spellType])
+
+	return spells
+
+def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 	MageSpells = []
 	SpellType = 99
 	v = CommonTables.Aligns.FindValue (3, Alignment)
 	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
-	HokeyPokey = "MAGE"
 	WildMages = True
-	BadSchools = 0
+
 	if GameCheck.IsIWD2():
-		HokeyPokey = "WIZARD"
-		WildMages = False
-		# iwd2 has only per-kit exclusion, spells can't override it
-		ExclusionTable = GemRB.LoadTable ("magesch")
-		KitRow = ExclusionTable.FindValue ("KIT", Kit)
-		KitRow = ExclusionTable.GetRowName (KitRow)
-		BadSchools = ExclusionTable.GetValue (KitRow, "EXCLUSION")
-		if BadSchools == -1:
-			BadSchools = 0
+		return GetIWD2Spells (Kit, Usability, Level, baseClass)
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), GTV_INT)):
+	for i in range(SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
 			continue
 
 		if Usability & ms['SpellExclusion']:
-			SpellType = 0
-		elif BadSchools & (1<<ms['SpellSchool']+5):
 			SpellType = 0
 		else:
 			SpellType = 1
