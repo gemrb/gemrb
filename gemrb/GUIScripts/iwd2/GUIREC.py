@@ -1417,8 +1417,9 @@ def FinishLevelUp():
 	# kit
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LUKit = GemRB.GetVar ("LUKit")
-	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
-	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|LUKit)
+	if LUKit != 0:
+		oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+		GemRB.SetPlayerStat (pc, IE_KIT, oldKits|LUKit)
 
 	# saving throws
 	LUClass = GemRB.GetVar ("LUClass") # index, not ID
