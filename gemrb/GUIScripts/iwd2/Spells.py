@@ -86,7 +86,3 @@ def SetupSpellsWindow(chargen=0):
 
 	if chargen or (BookType & 2): # bard / sorcerer
 		LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)
-
-	if not chargen:
-		import GUIREC
-		GUIREC.FinishLevelUp ()

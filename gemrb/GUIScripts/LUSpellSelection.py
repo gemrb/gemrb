@@ -21,6 +21,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import Spellbook
+import CommonTables
 from GUIDefines import *
 from ie_stats import *
 
@@ -28,6 +29,7 @@ from ie_stats import *
 pc = 0
 chargen = 0
 KitMask = 0
+Class = 0
 
 # basic spell selection
 SpellsWindow = 0		# << spell selection window
@@ -72,7 +74,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
-	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount
+	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
 	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS) and not IWD2:
@@ -137,9 +139,14 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsPickButton.SetText(34210)
 	else:
 		SpellsWindow = GemRB.LoadWindow (8)
-		DoneButton = SpellsWindow.GetControl (28)
-		SpellsTextArea = SpellsWindow.GetControl(26)
-		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
+		if IWD2:
+			DoneButton = SpellsWindow.GetControl (33)
+			SpellsTextArea = SpellsWindow.GetControl(30)
+			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000022)
+		else:
+			DoneButton = SpellsWindow.GetControl (28)
+			SpellsTextArea = SpellsWindow.GetControl(26)
+			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(EnhanceGUI):
 			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
 			HideUnhideScrollBar(1)
@@ -151,6 +158,11 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	GemRB.SetVar ("SpellTopIndex", 0)
 	Memorization = 0
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	if IWD2 and not chargen:
+		LUClass = GemRB.GetVar ("LUClass")
+		LUClassName = CommonTables.Classes.GetRowName (LUClass)
+		LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+		Class = LUClassID
 
 	# the done button also doubles as a next button
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -179,7 +191,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level
-		Spells[i] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+		Spells[i] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1, Class)
 
 		# dump all the spells we already know
 		NumDeleted = 0
@@ -248,7 +260,10 @@ def SpellsDonePress ():
 	if not Memorization:
 		for i in range (len (Spells[SpellLevel])):
 			if SpellBook[i]: # we need to learn this spell
-				GemRB.LearnSpell (pc, Spells[SpellLevel][i][0])
+				if IWD2:
+					GemRB.LearnSpell (pc, Spells[SpellLevel][i][0], 0, 1<<SpellBookType)
+				else:
+					GemRB.LearnSpell (pc, Spells[SpellLevel][i][0])
 
 		# check to see if we need to update again
 		for i in range (SpellLevel+1, 9):
@@ -298,7 +313,6 @@ def SpellsDonePress ():
 	# move to the next script if this is chargen
 	if chargen:
 		if GameCheck.IsBG2():
-			# HACK
 			GemRB.SetNextScript("GUICG6")
 		elif GameCheck.IsBG1():
 			# HACK
@@ -306,6 +320,9 @@ def SpellsDonePress ():
 			next()
 		elif IWD2:
 			GemRB.SetNextScript("CharGen7")
+	elif IWD2:
+		import GUIREC
+		GUIREC.FinishLevelUp ()
 
 	return
 
@@ -313,7 +330,7 @@ def ShowKnownSpells ():
 	"""Shows the viewable 24 spells."""
 
 	j = RowIndex()
-	Spells[SpellLevel] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), SpellLevel+1)
+	Spells[SpellLevel] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), SpellLevel+1, Class)
 
 	# reset the title
 	#17224 for priest spells
