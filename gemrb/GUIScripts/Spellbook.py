@@ -299,6 +299,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 #################################################################
 
 # Used for bards (level-up), sorcerers and mages (cg and level-up).
+# Used for rangers and paladins (level-up) and clerics and druids (both).
 # While iwd2 still has spells.2da, it is actually unused and gives
 # some wrong spells. We need to iterate the whole listspll.2da,
 # looking at our class column and matching on (target) level
@@ -338,6 +339,7 @@ def GetIWD2Spells (kit, usability, level, baseClass = -1):
 		ms = GemRB.GetSpell (spellName, 1)
 		if ms == None:
 			continue
+		# ms['SpellDivine'] is unused in iwd2, since it has separate types for all caster classes
 
 		if usability & ms['SpellExclusion']:
 			spellType = 0
@@ -426,14 +428,17 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability = CommonTables.Aligns.GetValue(v, 5)
-	HolyMoly = "PRIEST"
 	SpellListTable = None
 	if GameCheck.IsIWD2():
-		HolyMoly = "CLERIC"
-		SpellListTable = GemRB.LoadTable ("listspll")
+		row = CommonTables.ClassSkills.FindValue ("SPLTYPE", booktype)
+		rowName = CommonTables.ClassSkills.GetRowName (row)
+		Class = CommonTables.Classes.GetValue (rowName, "ID", GTV_INT)
+		spells = GetIWD2Spells (0, Usability, Level, Class)
+		spells = map(lambda e: e[0], spells) # ignore the second member
+		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), GTV_INT)):
+	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
@@ -442,11 +447,6 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 			continue
 		if Usability & ms['SpellExclusion']:
 			continue
-		if SpellListTable:
-			idx = SpellListTable.FindValue ("SPELL_RES_REF", SpellName)
-			# columns are in the same order as booktypes
-			if SpellListTable.GetValue (idx, booktype) <= 0:
-				continue
 		Learnable.append (SpellName)
 	return Learnable
 
