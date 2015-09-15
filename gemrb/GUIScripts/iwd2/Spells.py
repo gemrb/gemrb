@@ -36,12 +36,15 @@ def SetupSpellsWindow(chargen=0):
 		ClassName = GUICommon.GetClassRowName (Class, "class")
 		Level = 0
 		LevelDiff = 1
+		KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	else:
 		MyChar = GemRB.GameGetSelectedPCSingle ()
 		ClassIndex = GemRB.GetVar ("LUClass")
 		ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)
+		# this is only used for detecting specialists!
+		KitValue = GemRB.GetVar ("LUKit")
 
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
@@ -68,8 +71,10 @@ def SetupSpellsWindow(chargen=0):
 		Spellbook.RemoveKnownSpells (MyChar, IE_IWD2_SPELL_DOMAIN, 1,9, 0)
 	IDLUCommon.LearnAnySpells (MyChar, ClassName, chargen)
 
-	# make sure we have a correct table
-	if SpellTableName == "*":
+	# make sure we have a correct table and that we're eligible
+	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
+	canLearn = chargen or (BookType & 2) # bard / sorcerer
+	if SpellTableName == "*" or not canLearn:
 		if chargen:
 			GemRB.SetNextScript ("CharGen7")
 		else:
@@ -77,12 +82,5 @@ def SetupSpellsWindow(chargen=0):
 			GUIREC.FinishLevelUp ()
 		return
 
-	# FIXME: this way will only work for chargen, where there aren't any multikits
-	# extract LUClass kit if any and use that IFF it is a mage kit
-	# this value is only used for detecting specialists!
-	KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "SPLTYPE")
-	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
-
-	if chargen or (BookType & 2): # bard / sorcerer
-		LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)
+	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)
