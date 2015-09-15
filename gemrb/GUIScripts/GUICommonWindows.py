@@ -1354,7 +1354,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 
 def OpenPortraitWindow (needcontrols=0):
-	global PortraitWindow
+	global PortraitWindow, PortraitButtons
 
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
