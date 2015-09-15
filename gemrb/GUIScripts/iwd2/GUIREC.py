@@ -749,7 +749,7 @@ def DisplayWeapons (pc):
 	if ac["Wisdom"]:
 		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
 		AddIndent()
-		RecordsTextArea.Append (DelimitedText (39431, "", 0))
+		RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
 
 	###################
 	# Armor Class Modifiers
