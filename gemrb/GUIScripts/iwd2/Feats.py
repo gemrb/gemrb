@@ -87,16 +87,17 @@ def IsFeatUsable(feat):
 def GetBaseValue(feat):
 	global FeatsClassColumn, RaceColumn, KitName
 
-	if not CharGen:
-		pc = GemRB.GameGetSelectedPCSingle ()
-		return GemRB.HasFeat (pc, feat) # actually returns count
-
-	Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
-	Val2 = FeatTable.GetValue(feat, RaceColumn)
-	if Val2 < Val1:
-		Val = Val1
+	Val = 0
+	if CharGen:
+		Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
+		Val2 = FeatTable.GetValue(feat, RaceColumn)
+		if Val2 < Val1:
+			Val = Val1
+		else:
+			Val = Val2
 	else:
-		Val = Val2
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Val = GemRB.HasFeat (pc, feat) # actually returns count
 
 	Val3 = 0
 	# only cleric kits have feat bonuses in the original, but the column names are shortened
@@ -214,10 +215,13 @@ def OpenFeatsWindow(chargen=0):
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Race = IDLUCommon.GetRace (pc)
-		# TODO: instead of the base class, lookup its kit if any
+		# instead of the base class, lookup its kit if any
 		# luckily you can only have one kit per class
-		# something like a *Common.GetBaseClassKit (pc) -> kit name/id
 		ClassIndex = GemRB.GetVar ("LUClass")
+		KitID = GemRB.GetVar ("LUKit")
+		if KitID != 0:
+			KitIndex = CommonTables.Classes.FindValue ("ID", KitID)
+			ClassIndex = KitIndex
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		ButtonCount = 9
