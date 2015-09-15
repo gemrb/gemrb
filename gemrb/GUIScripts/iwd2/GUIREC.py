@@ -1195,9 +1195,14 @@ def RefreshHelpWindow ():
 	return
 
 LUWindow = None
+LUKitWindow = None
 LevelDiff = 1
 def CloseLUWindow ():
-	global LUWindow
+	global LUWindow, LUKitWindow
+
+	if LUKitWindow:
+		LUKitWindow.Unload ()
+		LUKitWindow = None
 
 	if LUWindow:
 		LUWindow.Unload ()
@@ -1222,7 +1227,7 @@ def OpenLevelUpWindow ():
 	# next
 	Button = Window.GetControl (0)
 	Button.SetText (36789)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLUKitWindow)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -1306,10 +1311,90 @@ def LUClassPress ():
 		level = GemRB.GetPlayerStat (pc, Classes[i])
 		Label.SetText (str(level + LevelDiff))
 
+def OpenLUKitWindow ():
+	global LUKitWindow
+
+	# check if kit selection is needed at all
+	# does the class have any kits at all?
+	# if we're levelling up, we must also check we dont't already
+	# have a kit with this class
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LUClass = GemRB.GetVar ("LUClass") # index, not ID
+	LUClassName = CommonTables.Classes.GetRowName (LUClass)
+	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	hasKits = CommonTables.Classes.FindValue ("CLASS", LUClassID)
+	kitIndex = GUICommonWindows.GetKitIndex (pc, LUClass)
+	if hasKits == -1 or kitIndex > 0:
+		LUNextPress ()
+		return
+
+	LUKitWindow = Window = GemRB.LoadWindow (6)
+
+	# title
+	Label = Window.GetControl (0x10000000)
+	Label.SetText (9894)
+
+	# next
+	Button = Window.GetControl (0)
+	Button.SetText (36789)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	# 1 does not exist, 2-10 are kit buttons
+	# 11 scrollbar, 12 back
+	Window.DeleteControl (12)
+
+	# description
+	TextArea = Window.GetControl (13)
+	TextArea.SetText ("")
+
+    # skip to the first kit of this class
+	kitOffset = hasKits
+
+	GemRB.SetVar ("LUKit", -1)
+	for i in range(9):
+		Button = Window.GetControl (i+2)
+
+		kitClassName = CommonTables.Classes.GetRowName (kitOffset+i)
+		kitClass = CommonTables.Classes.GetValue (kitClassName, "CLASS", GTV_INT)
+		if kitClass != LUClassID:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			continue
+
+		kitTitle = CommonTables.Classes.GetRowName (kitOffset+i)
+		kitTitle = CommonTables.Classes.GetValue (kitTitle, "NAME_REF", GTV_REF)
+		Button.SetText (kitTitle)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetVarAssoc ("LUKit", i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUKitPress)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+
+	Window.ShowModal (MODAL_SHADOW_NONE)
+
+def LUKitPress ():
+	Window = LUKitWindow
+	Button = Window.GetControl (0)
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+	# display kit info
+	TextArea = Window.GetControl (13)
+	i = GemRB.GetVar ("LUKit")
+	LUClass = GemRB.GetVar ("LUClass")
+	LUClassName = CommonTables.Classes.GetRowName (LUClass)
+	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	kitOffset = CommonTables.Classes.FindValue ("CLASS", LUClassID)
+	kitName = CommonTables.Classes.GetRowName (i+kitOffset)
+	kitDesc = CommonTables.Classes.GetValue (kitName, "DESC_REF", GTV_REF)
+	TextArea.SetText (kitDesc)
+
+	# set it to the kit value, so we don't need these gimnastics later
+	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
+	GemRB.SetVar ("LUKit", kitID)
+
 # continue with level up via chargen methods
 def LUNextPress ():
 	CloseLUWindow ()
-	#OpenRecordsWindow ()
 
 	# pass on LevelDiff and selected class (already in LUClass)
 	GemRB.SetVar ("LevelDiff", LevelDiff)
@@ -1327,10 +1412,15 @@ def LUNextPress ():
 	# both fire up the rest of the chain
 
 def FinishLevelUp():
-	# TODO: continue with lu/cg (general: handle the special stuff from clabs (the ones that only display strings), kit selection)
+	# TODO: handle the special stuff from clabs (the ones that only display strings
+
+	# kit
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LUKit = GemRB.GetVar ("LUKit")
+	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|LUKit)
 
 	# saving throws
-	pc = GemRB.GameGetSelectedPCSingle ()
 	LUClass = GemRB.GetVar ("LUClass") # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
@@ -1367,6 +1457,8 @@ def FinishLevelUp():
 
 	# now we're finally done
 	GemRB.SetVar ("LevelDiff", 0)
+	GemRB.SetVar ("LUClass", -1)
+	GemRB.SetVar ("LUKit", -1)
 	# DisplayGeneral (pc) is not enough for a refresh refresh
 	OpenRecordsWindow ()
 	OpenRecordsWindow ()
