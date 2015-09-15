@@ -132,6 +132,7 @@ private:
 public:
 	PCStatsStruct();
 	PCStatsStruct(std::list<int> levels);
+	void Init(bool all=true);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, int slot, int headerindex);

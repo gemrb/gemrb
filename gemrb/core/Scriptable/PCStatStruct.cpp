@@ -26,14 +26,10 @@
 
 namespace GemRB {
 
-PCStatsStruct::PCStatsStruct()
+void PCStatsStruct::Init(bool all)
 {
 	BestKilledName = 0xffffffff;
 	BestKilledXP = 0;
-	AwayTime = 0;
-	JoinDate = 0;
-	unknown10 = 0;
-	Happiness = 0;
 	KillsChapterXP = 0;
 	KillsChapterCount = 0;
 	KillsTotalXP = 0;
@@ -42,9 +38,6 @@ PCStatsStruct::PCStatsStruct()
 	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
 	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
-	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
-	SoundSet[0]=0;
-	SoundFolder[0]=0;
 	memset(QSlots, 0, sizeof(QSlots));
 	QSlots[0]=0xff;
 	memset( QuickSpells, 0, sizeof(QuickSpells) );
@@ -53,6 +46,17 @@ PCStatsStruct::PCStatsStruct()
 	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
 	memset( QuickWeaponSlots, -1, sizeof(QuickWeaponSlots) );
 	memset( QuickWeaponHeaders, -1, sizeof(QuickWeaponHeaders) );
+	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
+	JoinDate = 0;
+	if (!all) {
+		return;
+	}
+	// move them up as needed
+	AwayTime = 0;
+	unknown10 = 0;
+	Happiness = 0;
+	SoundSet[0]=0;
+	SoundFolder[0]=0;
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
 	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
 	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
@@ -60,9 +64,14 @@ PCStatsStruct::PCStatsStruct()
 	LastJoined = 0;
 }
 
+PCStatsStruct::PCStatsStruct()
+{
+	Init();
+}
+
 PCStatsStruct::PCStatsStruct(std::list<int> levels)
 {
-	PCStatsStruct();
+	Init();
 	UpdateClassLevels(levels);
 }
 
