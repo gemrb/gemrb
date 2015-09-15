@@ -1438,8 +1438,11 @@ def FinishLevelUp():
 	# add class/kit resistances iff we chose a new class
 	levelStat = IDLUCommon.Levels[LUClass]
 	oldLevel = GemRB.GetPlayerStat(pc, levelStat, 1)
-	# FIXME: actually needs to use the kit name if it is available
+	# use the kit name if it is available
 	LUKitName = LUClassName
+	if LUKit != 0:
+		kitIndex = CommonTables.Classes.FindValue ("ID", LUKit)
+		LUKitName = CommonTables.Classes.GetRowName (kitIndex)
 	if oldLevel == 0:
 		IDLUCommon.AddResistances (pc, LUKitName, "clssrsmd")
 
