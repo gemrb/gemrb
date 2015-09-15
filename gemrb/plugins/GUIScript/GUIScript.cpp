@@ -2320,8 +2320,8 @@ PyDoc_STRVAR( GemRB_View_SetFlags__doc,
 
 static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 {
-	int Flags;
-	int Operation=0;
+	unsigned int Flags;
+	int Operation = OP_SET;
 	PARSE_ARGS( args, "Oi|i", &self, &Flags, &Operation );
 
 	if (Operation < OP_SET || Operation > OP_NAND) {
