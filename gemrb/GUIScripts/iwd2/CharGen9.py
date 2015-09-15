@@ -199,7 +199,7 @@ def NextPress():
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
-	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait, 1)
 	GemRB.SetNextScript ("SPPartyFormation")
 
 	# apply class/kit abilities

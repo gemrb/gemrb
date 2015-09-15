@@ -8288,7 +8288,7 @@ static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
 "===== FillPlayerInfo =====\n\
 \n\
-**Prototype:** GemRB.FillPlayerInfo (globalID[, Portrait1, Portrait2])\n\
+**Prototype:** GemRB.FillPlayerInfo (globalID[, Portrait1, Portrait2, clear=0])\n\
 \n\
 **Description:** Fills basic character info that is not stored in stats. \n\
 This command will generate an AnimationID for the character based on the \n\
@@ -8302,6 +8302,7 @@ must be called once after a character was created and before EnterGame().\n\
   * globalID - party ID or global ID of the actor to use\n\
   * Portrait1 - medium (or large) portrait\n\
   * Portrait2 - small portrait\n\
+  * clear - clear all the quickslot/spell/item fields?\n\
 \n\
 avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
 \n\
@@ -8337,10 +8338,10 @@ Based on the avatar's stat (201 == race) the animationID (0x6000) will be increa
 
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
-	int globalID;
+	int globalID, clear = 0;
 	const char *Portrait1=NULL, *Portrait2=NULL;
 
-	if (!PyArg_ParseTuple( args, "i|ss", &globalID, &Portrait1, &Portrait2)) {
+	if (!PyArg_ParseTuple( args, "i|ssi", &globalID, &Portrait1, &Portrait2, &clear)) {
 		return AttributeError( GemRB_FillPlayerInfo__doc );
 	}
 	// here comes some code to transfer icon/name to the PC sheet
@@ -8359,6 +8360,13 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	case -1: return RuntimeError("avprefix table contains no entries." );
 	case -2: return RuntimeError("Couldn't load avprefix table.");
 	case -3: return RuntimeError("Couldn't load an avprefix subtable.");
+	}
+
+	// clear several fields (only useful for cg; currently needed only in iwd2, but that will change if its system is ported to the rest)
+	// fixes random action bar mess, kill stats, join time ...
+	if (clear) {
+		actor->PCStats->Init(false);
+		actor->PCStats->JoinDate = 0;//core->GetGame()->GameTime;
 	}
 
 	actor->SetOver( false );
