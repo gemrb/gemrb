@@ -53,6 +53,10 @@ def SetupSpellsWindow(chargen=0):
 	elif SpellTableName == "MXSPLBRD":
 		SpellTableName = "SPLBRDKN"
 
+	# charbase has domain slots reserved, so nuke them
+	if chargen:
+		Spellbook.UnsetupSpellLevels (MyChar, "MXSPLCLR", IE_IWD2_SPELL_DOMAIN, 1)
+
 	# learn priest spells if any and setup spell levels
 	# but first nullify any previous spells
 	if chargen:

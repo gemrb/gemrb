@@ -123,10 +123,6 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		# set our memorizable counts
 		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
-		# charbase seems to have domain slots reserved, so nuke them
-		if level == 1:
-			Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
-
 		if table == MageTable:
 			continue
 
