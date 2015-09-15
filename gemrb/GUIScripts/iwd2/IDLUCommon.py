@@ -138,10 +138,12 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		if idx != -1:
 			GemRB.MemorizeSpell (pc, booktype, 0, idx, 1)
 
+		if booktype != IE_IWD2_SPELL_CLERIC:
+			return
+
 		# learn any domain spells too
-		if booktype == IE_IWD2_SPELL_CLERIC:
-			booktype = IE_IWD2_SPELL_DOMAIN
-			Spellbook.SetupSpellLevels (pc, table, booktype, level)
+		booktype = IE_IWD2_SPELL_DOMAIN
+		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
 		for slevel in range (9):
 			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
