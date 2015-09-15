@@ -26,8 +26,8 @@ static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, WindowScriptingRe
 {
 	if (winref) {
 		id &= 0x00000000ffffffff; // control id is lower 32bits
-		id |= (winref->Id << 32); // window id will be storeed in upper 32 bits, but only uses 16
-		id |= 0x8000000000000000; // MSB signifies this is a control id (so that win win id 0 and ctrl 0 on that win have distinct ids)
+		id |= (winref->Id << 32); // window id will be stored in upper 32 bits, but only uses 16
+		id |= 0x8000000000000000; // MSB signifies this is a control id (so that win id 0 and ctrl 0 on that win have distinct ids)
 	}
 	return id;
 }

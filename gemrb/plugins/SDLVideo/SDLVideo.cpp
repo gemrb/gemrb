@@ -68,9 +68,7 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 int SDLVideoDriver::Init(void)
 {
-	//print("[SDLVideoDriver]: Init...");
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
-		//print("[ERROR]");
 		return GEM_ERROR;
 	}
 	SDL_ShowCursor(SDL_DISABLE);
