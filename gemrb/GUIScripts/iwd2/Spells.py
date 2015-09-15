@@ -34,7 +34,8 @@ def SetupSpellsWindow(chargen=0):
 		MyChar = GemRB.GetVar ("Slot")
 		Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 		ClassName = GUICommon.GetClassRowName (Class, "class")
-		Level = LevelDiff = 1
+		Level = 0
+		LevelDiff = 1
 	else:
 		MyChar = GemRB.GameGetSelectedPCSingle ()
 		ClassIndex = GemRB.GetVar ("LUClass")
