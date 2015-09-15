@@ -1391,6 +1391,9 @@ def LUKitPress ():
 	# set it to the kit value, so we don't need these gimnastics later
 	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|kitID)
 
 # continue with level up via chargen methods
 def LUNextPress ():
@@ -1417,9 +1420,6 @@ def FinishLevelUp():
 	# kit
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LUKit = GemRB.GetVar ("LUKit")
-	if LUKit != 0:
-		oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
-		GemRB.SetPlayerStat (pc, IE_KIT, oldKits|LUKit)
 
 	# saving throws
 	LUClass = GemRB.GetVar ("LUClass") # index, not ID
