@@ -48,6 +48,7 @@ static ieDword *strRef = NULL;
 MVEPlay::MVEPlay(void)
 {
 	video = core->GetVideoDriver();
+	validVideo = false;
 }
 
 MVEPlay::~MVEPlay(void)
