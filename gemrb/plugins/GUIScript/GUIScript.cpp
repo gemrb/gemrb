@@ -8366,7 +8366,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// fixes random action bar mess, kill stats, join time ...
 	if (clear) {
 		actor->PCStats->Init(false);
-		actor->PCStats->JoinDate = 0;//core->GetGame()->GameTime;
 	}
 
 	actor->SetOver( false );
