@@ -144,6 +144,9 @@ WorldMap::WorldMap(void)
 	GotHereFrom = NULL;
 	bam = NULL;
 	encounterArea = -1;
+	Width = Height = 0;
+	MapNumber = AreaName = 0;
+	unknown1 = unknown2 = 0;
 }
 
 //Allocate AE and AL only in Core, otherwise Win32 will
