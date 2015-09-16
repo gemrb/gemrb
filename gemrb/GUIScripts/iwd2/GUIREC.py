@@ -1462,7 +1462,7 @@ def FinishLevelUp():
 	# now we're finally done
 	GemRB.SetVar ("LevelDiff", 0)
 	GemRB.SetVar ("LUClass", -1)
-	GemRB.SetVar ("LUKit", -1)
+	GemRB.SetVar ("LUKit", 0)
 	# DisplayGeneral (pc) is not enough for a refresh refresh
 	OpenRecordsWindow ()
 	OpenRecordsWindow ()
