@@ -1427,7 +1427,7 @@ static void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	}
 }
 
-static int maximum_values[MAX_STATS]={
+static unsigned int maximum_values[MAX_STATS]={
 32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,200,200,//0f
 200,200,200,200,200,100,100,100,100,100,255,255,255,255,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
@@ -2758,8 +2758,8 @@ ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
 			Value = (ieDword) -100;
 		} else {
 			if (maximum_values[StatIndex] > 0) {
-				if ( (signed) Value > maximum_values[StatIndex]) {
-					Value = (ieDword) maximum_values[StatIndex];
+				if ( Value > maximum_values[StatIndex]) {
+					Value = maximum_values[StatIndex];
 				}
 			}
 		}
@@ -7012,7 +7012,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			} else {
 				int resistance = (signed)GetSafeStat(it->second.resist_stat);
 				// avoid buggy data
-				if (abs(resistance) > maximum_values[it->second.resist_stat]) {
+				if ((unsigned)abs(resistance) > maximum_values[it->second.resist_stat]) {
 					resistance = 0;
 					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value (%d).", resistance);
 				}
