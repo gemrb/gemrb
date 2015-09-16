@@ -568,7 +568,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 	}
 
 	spells[type][level]->known_spells.push_back(spl);
-	if (1<<type == innate || type == IE_IWD2_SPELL_SHAPE) {
+	if (1<<type == innate) {
 		spells[type][level]->SlotCount++;
 		spells[type][level]->SlotCountWithBonus++;
 	}
