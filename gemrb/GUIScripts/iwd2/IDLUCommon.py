@@ -138,6 +138,13 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		if idx != -1:
 			GemRB.MemorizeSpell (pc, booktype, 0, idx, 1)
 
+		# set up shapes for druids
+		if not chargen and booktype == IE_IWD2_SPELL_DRUID:
+			ShapeTable = GemRB.LoadTable ("mxdrdshp")
+			newUses = ShapeTable.GetValue (str(level), "USES_PER_DAY")
+			booktype = IE_IWD2_SPELL_SHAPE
+			GemRB.SetMemorizableSpellsCount (pc, newUses, booktype, 0)
+
 		if booktype != IE_IWD2_SPELL_CLERIC:
 			return
 
