@@ -42,28 +42,11 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
-
-	GUICommonWindows.PortraitWindow = None
-	GUICommonWindows.ActionsWindow = None
-
-	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
-	OptionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
-	
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 	
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
 	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags(WF_BORDERLESS, OP_OR)
-
-	# 1280 and higher don't have this control
-	Button = OptionsWindow.GetControl (10)
-	if Button:
-		Button = OptionsWindow.GetControl (10)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
-		Button = PortraitWindow.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
@@ -74,6 +57,20 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
 		Button=ActionsWindow.GetControl(61)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
+		
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
+	OptionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
+
+	# 1280 and higher don't have this control
+	Button = OptionsWindow.GetControl (10)
+	if Button:
+		Button = OptionsWindow.GetControl (10)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
+		Button = PortraitWindow.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
 	
 	UpdateControlStatus()
 	
