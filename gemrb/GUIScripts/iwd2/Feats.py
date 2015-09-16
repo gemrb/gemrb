@@ -23,6 +23,7 @@ import CommonTables
 import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
+from ie_feats import FEAT_POWER_ATTACK
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -44,11 +45,8 @@ def MultiLevelFeat(feat):
 	return FeatReqTable.GetValue(feat, "MAX_LEVEL")
 
 # FIXME: CheckFeatCondition doesn't check for higher level prerequisites
-# (eg. cleave2 needs +4 BAB and weapon specialisation needs 4 fighter levels)
-
-# NOTE: cleave formula is now:
-# HITBONUS>=4 OR FEAT_CLEAVE<1
-#
+# (eg. weapon specialisation needs 4 fighter levels)
+# NOTE:
 # specialisation formulas:
 # FIGHTERLEVEL>=4 OR FEAT_*<2
 # The default operator was set to 4 (greater or equal), so the majority of the formulas
@@ -468,3 +466,20 @@ def Check_MaximizedAttacks(pl, a, ass, *garbage):
 			SpecializationCount += 1
 
 	return SpecializationCount >= 2
+
+# cleave needs special handling for level 1 vs level 2 (great cleave)
+def Check_Cleave(pl, *garbage):
+	cleave = GemRB.GetPlayerStat (pl, IE_FEAT_CLEAVE, 1)
+	# also check if it was selected for learning just now
+	selectedCleave = GemRB.GetVar ("Feat 8")
+	if cleave == 0 and not selectedCleave:
+		# lvl1: strength 13+, power attack
+		if GemRB.GetPlayerStat (pl, IE_STR, 1) < 13:
+			return False
+
+		learned = GemRB.HasFeat (pl, FEAT_POWER_ATTACK)
+		selected = GemRB.GetVar ("Feat 47")
+		return (learned or selected)
+	else:
+		# lvl2: bab 4+
+		return GemRB.GetPlayerStat (pl, IE_TOHIT, 1) >= 4
