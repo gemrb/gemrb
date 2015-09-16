@@ -56,6 +56,7 @@ class GSymbol:
 class GView:
 	__metaclass__ = metaIDWrapper
 	methods = {
+	'AddAlias': _GemRB.View_AddAlias,
     'CreateControl': _GemRB.View_CreateControl,
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
@@ -131,7 +132,6 @@ class GWindow(GView):
 
 class GControl(GView):
   methods = {
-	'AddAlias': _GemRB.Control_AddAlias,
 	'AttachScrollBar': _GemRB.Control_AttachScrollBar,
     'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,

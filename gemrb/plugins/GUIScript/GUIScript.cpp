@@ -1495,6 +1495,24 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef() );
 }
 
+PyDoc_STRVAR( GemRB_View_AddAlias__doc,
+			 "AddAlias(GView, AliasGroup, AliasID])\n\n"
+			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the view." );
+
+static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
+{
+	char* group = NULL;
+	// default to the lowest valid value (since its optional and we often only want 1 control per alias)
+	// the exception being for creating groups such as the GAMEGUI windows for quickly hiding/showing the entire group
+	ScriptingId controlId = 0;
+	PARSE_ARGS( args, "Os|l", &self, &group, &controlId );
+
+	View* ctrl = GetView(self);
+	ViewScriptingRef* aliasref = new ViewScriptingRef(ctrl, controlId, group);
+	ScriptEngine::RegisterScriptingRef(aliasref);
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_GetControl__doc,
 			 "GetControl(ControlID, GWindow|Alias) => GControl\n\n"
 			 "Lookup control from either a window or from an alias\n"
@@ -1523,24 +1541,6 @@ static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
 	if (ref) {
 		return gs->ConstructObjectForScriptable(ref);
 	}
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Control_AddAlias__doc,
-			 "GetControl(GControl, AliasGroup, AliasID])\n\n"
-			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the control." );
-
-static PyObject* GemRB_Control_AddAlias(PyObject* self, PyObject* args)
-{
-	char* group = NULL;
-	// default to the lowest valid value (since its optional and we often only want 1 control per alias)
-	// the exception being for creating groups such as the GAMEGUI windows for quickly hiding/showing the entire group
-	ScriptingId controlId = 0;
-	PARSE_ARGS( args, "Os|l", &self, &group, &controlId );
-
-	Control* ctrl = GetView<Control>(self);
-	ControlScriptingRef* aliasref = new ControlScriptingRef(ctrl, controlId, group);
-	ScriptEngine::RegisterScriptingRef(aliasref);
 	Py_RETURN_NONE;
 }
 
@@ -13271,7 +13271,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
-	METHOD(Control_AddAlias, METH_VARARGS),
 	METHOD(Control_AttachScrollBar, METH_VARARGS),
 	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
@@ -13310,6 +13309,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
+	METHOD(View_AddAlias, METH_VARARGS),
 	METHOD(View_GetFrame, METH_VARARGS),
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
