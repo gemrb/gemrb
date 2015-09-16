@@ -36,6 +36,7 @@ FeatsClassColumn = 0
 PointsLeft = 0
 CharGen = 0
 ButtonCount = 0
+LUStat = 0
 
 # returns the number of feat levels (for example cleave can be taken twice)
 def MultiLevelFeat(feat):
@@ -79,6 +80,21 @@ def IsFeatUsable(feat):
 		slot = GemRB.GetVar ("Slot")
 	else:
 		slot = GemRB.GameGetSelectedPCSingle ()
+
+	# feint a level increase
+	if LUStat > 0:
+		stats = [ a_stat, b_stat, c_stat, d_stat ]
+		vals = [ a_value, b_value, c_value, d_value ]
+		for i in range(len(stats)):
+			if stats[i] == LUStat:
+				vals[i] -= GemRB.GetVar ("LevelDiff")
+				vals[i] = max(0, vals[i])
+				# there must be a better way (using append() to construct the list (same id) is not enough)!?
+				a_value = vals[0]
+				b_value = vals[1]
+				c_value = vals[2]
+				d_value = vals[3]
+				break
 
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
@@ -202,7 +218,7 @@ def OpenFeatsWindow(chargen=0):
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable, FeatReqTable
 	global KitName, PointsLeft, ButtonCount, CharGen
-	global KitColumn, RaceColumn, FeatsClassColumn
+	global KitColumn, RaceColumn, FeatsClassColumn, LUStat
 
 	CharGen = chargen
 
@@ -212,6 +228,7 @@ def OpenFeatsWindow(chargen=0):
 		ClassIndex = GemRB.GetVar ("Class") - 1
 		Level = LevelDiff = 1
 		ButtonCount = 10
+		LUStat = 0
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Race = IDLUCommon.GetRace (pc)
@@ -225,6 +242,8 @@ def OpenFeatsWindow(chargen=0):
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		ButtonCount = 9
+		# fake having leveled up already, so the level checks work
+		LUStat = IDLUCommon.Levels[ClassIndex]
 
 	RaceColumn = CommonTables.Races.FindValue(3, Race)
 	RaceName = CommonTables.Races.GetRowName(RaceColumn)
