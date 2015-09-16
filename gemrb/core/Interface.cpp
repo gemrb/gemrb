@@ -3117,8 +3117,6 @@ void Interface::SetCutSceneMode(bool active)
 		}
 		SetEventFlag(EF_CONTROL);
 	}
-	// FIXME: need to reimplement this
-	// video->SetMouseEnabled(!active);
 }
 
 /** returns true if in dialogue or cutscene */

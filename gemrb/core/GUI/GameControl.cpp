@@ -2281,6 +2281,7 @@ void GameControl::SetCutSceneMode(bool active)
 	} else {
 		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
 	}
+	SetDisabled(active);
 }
 
 //Hide or unhide all other windows on the GUI (gamecontrol is not hidden by this)
