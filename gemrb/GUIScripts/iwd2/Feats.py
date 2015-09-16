@@ -44,15 +44,6 @@ def MultiLevelFeat(feat):
 	global FeatReqTable
 	return FeatReqTable.GetValue(feat, "MAX_LEVEL")
 
-# FIXME: CheckFeatCondition doesn't check for higher level prerequisites
-# (eg. weapon specialisation needs 4 fighter levels)
-# NOTE:
-# specialisation formulas:
-# FIGHTERLEVEL>=4 OR FEAT_*<2
-# The default operator was set to 4 (greater or equal), so the majority of the formulas
-# don't need any more change
-# Avenger
-
 def IsFeatUsable(feat):
 	global FeatReqTable
 
