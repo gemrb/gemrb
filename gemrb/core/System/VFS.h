@@ -126,7 +126,8 @@ public:
 	enum Flags {
 		Files = 1,
 		Directories = 2,
-		Hidden = 4
+		Hidden = 4,
+		All = ~0
 	};
 
 	typedef Predicate<const char*> FileFilterPredicate;
@@ -141,7 +142,7 @@ public:
 
 	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
 	bool IsDirectory();
-	void SetFlags(int flags);
+	void SetFlags(int flags, bool reset = false);
 	/**
 	 * Returns name of current entry.
 	 *

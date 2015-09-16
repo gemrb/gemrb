@@ -476,10 +476,11 @@ DirectoryIterator::~DirectoryIterator()
 	delete predicate;
 }
 
-void DirectoryIterator::SetFlags(int flags)
+void DirectoryIterator::SetFlags(int flags, bool reset)
 {
 	// store the inverse
 	entrySkipFlags = Flags(~flags);
+	if (reset) Rewind();
 }
 
 void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)

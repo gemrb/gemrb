@@ -3766,6 +3766,9 @@ bool Interface::StupidityDetector(const char* Pt)
 	char Path[_MAX_PATH];
 	strcpy( Path, Pt );
 	DirectoryIterator dir(Path);
+	// scan everything
+	dir.SetFlags(DirectoryIterator::All, true);
+
 	if (!dir) {
 		print("\n**cannot open**");
 		return true;
