@@ -139,6 +139,8 @@ static ieDword NoExtraDifficultyDmg = 0;
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
 #define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
+#define MAX_FEATV 2147483648 // 1<<31 (used for the triple-stat feat handling)
+
 //item usability array
 struct ItemUseType {
 	ieResRef table; //which table contains the stat usability flags
@@ -1436,7 +1438,7 @@ static unsigned int maximum_values[MAX_STATS]={
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//7f
-255,255,255,255,255,255,255,100,100,100,999999,5,5,999999,1,1,//8f
+255,255,255,MAX_FEATV,MAX_FEATV,MAX_FEATV,255,100,100,100,999999,5,5,999999,1,1,//8f
 1,25,25,255,1,1,1,25,0,100,100,1,255,255,255,255,//9f
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,20,0,0,0,0,0,0,0,0,0,0,0,//bf
