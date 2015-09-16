@@ -160,14 +160,13 @@ def RedrawFeats():
 				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
 				Label.SetTextColor(150, 150, 150)
 		else:
+			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
+			Label.SetTextColor(150, 150, 150)
 			# check for maximum if there are more feat levels
-			# FIXME also verify that the next level of the feat is usable
-			if MultiLevelFeat(FeatName) > FeatValue:
+			if MultiLevelFeat(FeatName) > FeatValue and IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
 				Label.SetTextColor(255, 255, 255)
-			else:
-				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-				Label.SetTextColor(150, 150, 150)
+
 			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 			if FeatValue > BaseValue:
 				ButtonMinus.SetState(IE_GUI_BUTTON_ENABLED)
