@@ -35,12 +35,10 @@ from CharGenEnd import GiveEquipment
 MessageWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
-ExpandButton = 0
-ContractButton = 0
 TMessageTA = 0 # for dialog code
 
 def OnLoad():
-	global PortraitWindow, OptionsWindow
+	global PortraitWindow, OptionsWindow, MessageWindow
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
@@ -48,9 +46,16 @@ def OnLoad():
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
 
-	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
+	OptionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
+	
+	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
+	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
+	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	MessageWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
@@ -60,8 +65,9 @@ def OnLoad():
 		Button = PortraitWindow.GetControl (8)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
 
-	ActionsWindow = GemRB.LoadWindow(3)
+	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
+	ActionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
 	
 	Button = ActionsWindow.GetControl(60)
 	if Button:
@@ -83,20 +89,17 @@ def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
 
 def UpdateControlStatus():
-	global MessageWindow, ExpandButton, ContractButton, TMessageTA
+	global MessageWindow, TMessageTA
 	
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 
-	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
-	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
-	TMessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack())
-	TMessageTA = TMessageWindow.GetControl(1)
-	ExpandButton = TMessageWindow.GetControl(0)
+	TMessageTA = MessageWindow.GetControl(1)
+	ExpandButton = MessageWindow.GetControl(0)
 	ExpandButton.SetVisible(True)
 	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-	ContractButton = TMessageWindow.GetControl(3)
+	ContractButton = MessageWindow.GetControl(3)
 	ContractButton.SetVisible(True)
 	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
@@ -109,7 +112,6 @@ def UpdateControlStatus():
 	elif Expand == GS_SMALLDIALOG:
 		ContractButton.SetVisible(False)
 
-	TMessageWindow.SetFlags(WF_BORDERLESS)
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	TMessageTA.AddAlias("MsgSys", 0)
 	return

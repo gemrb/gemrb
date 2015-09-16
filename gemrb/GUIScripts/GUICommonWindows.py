@@ -1353,9 +1353,11 @@ def OpenPortraitWindow (needcontrols=0):
 
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindow (26)
+		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
 	else:
-		PortraitWindow = Window = GemRB.LoadWindow (1)
+		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
+		
+	PortraitWindow.SetFlags(WF_BORDERLESS)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst
 		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
