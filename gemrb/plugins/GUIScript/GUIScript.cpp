@@ -766,22 +766,6 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_ReassignControls__doc,
-"===== Window_ReassignControls =====\n\
-\n\
-**Prototype:** ReassignControls (windowIndex, origIDtuple, newIDtuple)\n\
-\n\
-**Metaclass Prototype:** ReassignControls (origIDtuple, newIDtuple)\n\
-\n\
-**Description:** Mass-reassigns control IDs for each element in both \n\
-parameters. The two tuples need to be of same length.\n\
-\n\
-**Parameters:** WindowIndex - the index returned by LoadWindow()\n\
-  * origIDtuple, newIDtuple - python tuples of control IDs\n\
-\n\
-**Return value:** N/A"
-);
-
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
 "===== LoadWindow =====\n\
 \n\

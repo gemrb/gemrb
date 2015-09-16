@@ -85,6 +85,10 @@ def GetWindowPack():
 
 	# fallback to the smallest resolution
 	return default
+	
+def AliasControls (win, map):
+	for alias, cid in map.iteritems():
+		win.GetControl(cid).AddAlias(alias)
 
 def SelectFormation ():
 	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))

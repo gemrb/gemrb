@@ -269,25 +269,41 @@ def OpenStoreShoppingWindow ():
 	StoreShoppingWindow = Window = GemRB.LoadWindow (windowIDs["shop"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
-		# the trick is not to break any circular logic (extra 110 below)
-		oldIDs = (0, 1, 07, 10, 8, 9, 11, 16, 110)
-		oldIDs += (0x10000003, 0x10000004, 0x10000001, 0x10000005, 0x10000002)
-		oldIDs += tuple(map(lambda x: x+17, range(ItemButtonCount)))
-		oldIDs += tuple(map(lambda x: x+0x10000014, range(ItemButtonCount)))
-		oldIDs += tuple(map(lambda x: x+0x1000000b, range(ItemButtonCount)))
-		newIDs = (2, 3, 110, 07, 5, 6,  8, 12, 11)
-		newIDs += (0x1000002b, 0x1000002c, 0x10000003, 0x1000002e, 0x1000002a)
-		newIDs += tuple(map(lambda x: x+13, range(ItemButtonCount)))
-		newIDs += tuple(map(lambda x: x+0x1000001e, range(ItemButtonCount)))
-		newIDs += tuple(map(lambda x: x+0x10000012, range(ItemButtonCount)))
-		Window.ReassignControls (oldIDs, newIDs)
+		# strings must be able to fit into a resref (<= 8 char)
+		aliases = { 'STOLBTN' : 0, 'STORBTN' : 1, 'STODONAT' : 7,
+					'STOTEDIT' : 8, 'STOPLUS' : 9, 'STOMINUS' : 10,
+					'???' : 11, 'STOSBARR' : 16, 'STOSBARL' : 110,
+						
+					'PRICEB' : 0x10000003, 'PRICES' : 0x10000004,
+					'STOTITLE' : 0x10000001, 'STONAME' : 0x10000005, 'STOGOLD' : 0x10000002,
+					}
+		
+		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+17 for x in range(ItemButtonCount)} )
+		GUICommon.AliasControls (Window,  {'RLBL' + str(x) : x+0x10000014 for x in range(ItemButtonCount)} )
+		GUICommon.AliasControls (Window,  {'LLBL' + str(x) : x+0x1000000b for x in range(ItemButtonCount)} )
+		
+	else:
+		aliases = { 'STOLBTN' : 2, 'STORBTN' : 3, 'STODONAT' : 110,
+					'STOTEDIT' : 7, 'STOPLUS' : 5, 'STOMINUS' : 6,
+					'???' : 8, 'STOSBARR' : 12, 'STOSBARL' : 11,
+						
+					'PRICEB' : 0x1000002b, 'PRICES' : 0x1000002c,
+					'STOTITLE' : 0x10000003, 'STONAME' : 0x1000002e, 'STOGOLD' : 0x1000002a,
+					}
+					
+		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+13 for x in range(ItemButtonCount)} )
+		GUICommon.AliasControls (Window,  {'RLBL' + str(x) : x+0x1000001e for x in range(ItemButtonCount)} )
+		GUICommon.AliasControls (Window,  {'LLBL' + str(x) : x+0x10000012 for x in range(ItemButtonCount)} )
+
+	
+	GUICommon.AliasControls (Window, aliases)
 
 	# left scrollbar
-	ScrollBarLeft = Window.GetControl (11)
+	ScrollBarLeft = Window.GetControl ('STOSBARL')
 	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
 	# right scrollbar
-	ScrollBarRight = Window.GetControl (12)
+	ScrollBarRight = Window.GetControl ('STOSBARR')
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
 	if Inventory:
@@ -300,10 +316,10 @@ def OpenStoreShoppingWindow ():
 		else:
 			Label.SetText ("")
 		# buy price ...
-		Label = Window.GetControl (0x1000002b)
+		Label = Window.GetControl ('PRICEB')
 		Label.SetText ("")
 		# sell price ...
-		Label = Window.GetControl (0x1000002c)
+		Label = Window.GetControl ('PRICES')
 		Label.SetText ("")
 		# buy price ...
 		Label = Window.GetControl (0x1000002f)
@@ -313,11 +329,11 @@ def OpenStoreShoppingWindow ():
 		Label.SetText ("")
 	else:
 		# buy price ...
-		Label = Window.GetControl (0x1000002b)
+		Label = Window.GetControl ('PRICEB')
 		Label.SetText ("0")
 
 		# sell price ...
-		Label = Window.GetControl (0x1000002c)
+		Label = Window.GetControl ('PRICES')
 		Label.SetText ("0")
 
 	for i in range (ItemButtonCount):
@@ -353,7 +369,7 @@ def OpenStoreShoppingWindow ():
 	UnselectNoRedraw ()
 
 	# Buy
-	LeftButton = Button = Window.GetControl (2)
+	LeftButton = Button = Window.GetControl ('STOLBTN')
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26287)
@@ -367,7 +383,7 @@ def OpenStoreShoppingWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyPressed)
 
 	# Sell
-	RightButton = Button = Window.GetControl (3)
+	RightButton = Button = Window.GetControl ('STORBTN')
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26288)
@@ -426,22 +442,29 @@ def OpenStoreIdentifyWindow ():
 		newIDs = tuple(map(lambda x: 11-x, range(ItemButtonCount)))
 		newIDs += (7, 5, 23, 0x10000003, 0x10000001, 0x10000000, 0x10000005)
 		Window.ReassignControls (oldIDs, newIDs)
+		
+		GUICommon.AliasControls (Window,  { 'IDSBAR' : 5, 'IDLBTN' : 4, 'IDTA' : 14,
+											'IDPRICE' : 0x10000001, '' : 0x10000000,
+											'' : 0x0fffffff, '' : 0x10000002
+										  } )
+		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+17 for x in range(ItemButtonCount)} )
+		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+17 for x in range(ItemButtonCount)} )
 
-	ScrollBar = Window.GetControl (7)
+	ScrollBar = Window.GetControl ('IDSBAR')
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
 
-	TextArea = Window.GetControl (23)
+	TextArea = Window.GetControl ('IDTA')
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	TextArea.AttachScrollBar (ScrollBar) # for pst
 
 	# Identify
-	LeftButton = Button = Window.GetControl (5)
+	LeftButton = Button = Window.GetControl ('IDLBTN')
 	Button.SetText (strrefs["identify"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyPressed)
 	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
 	# price ...
-	Label = Window.GetControl (0x10000003)
+	Label = Window.GetControl ('IDPRICE')
 	Label.SetText ("0")
 
 	# 8-11 item slots, 0x1000000c-f labels
@@ -578,22 +601,22 @@ def OpenStoreDonateWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Donate
-	Button = Window.GetControl (3)
+	Button = Window.GetControl ('STODONAT')
 	Button.SetText (strrefs["donate"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
 	Button.MakeDefault()
 
 	# Entry
-	Field = Window.GetControl (5)
+	Field = Window.GetControl ('STOTEDIT')
 	Field.SetText ("0")
 	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
 	Field.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# +
-	Button = Window.GetControl (6)
+	Button = Window.GetControl ('STOPLUS')
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncrementDonation)
 	# -
-	Button = Window.GetControl (7)
+	Button = Window.GetControl ('STOMINUS')
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecrementDonation)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreDonateWindow )
@@ -930,7 +953,7 @@ def RedrawStoreShoppingWindow ():
 
 	Window = StoreShoppingWindow
 
-	UpdateStoreCommon (Window, 0x10000003, 0x1000002e, 0x1000002a)
+	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
@@ -1319,7 +1342,7 @@ def InfoWindow (Slot, Item):
 			Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
-	Button = Window.GetControl (2)
+	Button = Window.GetControl ("STOLBTN")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
@@ -1591,7 +1614,7 @@ def UpdateStoreDonateWindow ():
 		donation = gold
 		Field.SetText (str(gold) )
 
-	Button = Window.GetControl (3)
+	Button = Window.GetControl ("STORBTN")
 	if donation:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -1714,7 +1737,7 @@ def InfoHealWindow ():
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (Spell['SpellName'])
 
-	Button = Window.GetControl (2)
+	Button = Window.GetControl ("STOLBTN")
 	Button.SetSpellIcon (Cure['CureResRef'], 1)
 	if GameCheck.IsPST():
 		Window.ReassignControls ((3,4), (5,3))
