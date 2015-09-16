@@ -418,9 +418,6 @@ def ApplyFeats(MyChar):
 		GemRB.RemoveSpell(MyChar, "SPIN236")
 		GemRB.RemoveSpell(MyChar, "SPIN260")
 
-	#TODO: extra shapeshifting
-	#GUICommon.MakeSpellCount(MyChar, "", cnt)
-
 	#extra smiting
 	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
 	if level>1:

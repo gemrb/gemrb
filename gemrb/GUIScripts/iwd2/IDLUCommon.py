@@ -25,6 +25,7 @@ import CommonTables
 import GUICommon
 import Spellbook
 from ie_stats import *
+from ie_feats import FEAT_EXTRA_SHAPESHIFTING
 from GUIDefines import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -143,7 +144,8 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 			ShapeTable = GemRB.LoadTable ("mxdrdshp")
 			newUses = ShapeTable.GetValue (str(level), "USES_PER_DAY")
 			booktype = IE_IWD2_SPELL_SHAPE
-			GemRB.SetMemorizableSpellsCount (pc, newUses, booktype, 0)
+			extras = GemRB.HasFeat (pc, FEAT_EXTRA_SHAPESHIFTING)
+			GemRB.SetMemorizableSpellsCount (pc, newUses+extras, booktype, 0)
 
 		if booktype != IE_IWD2_SPELL_CLERIC:
 			return
