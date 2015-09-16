@@ -88,6 +88,12 @@ Spell::Spell(void)
 		inited = true;
 		InitSpellTables();
 	}
+	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
+	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
+	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
+	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
+	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
+	TimePerLevel = TimeConstant = 0;
 }
 
 Spell::~Spell(void)
