@@ -46,6 +46,8 @@ Console::Console(const Region& frame)
 	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {
 		delete cb;
 	}
+
+	SetVisible(false);
 }
 
 Console::~Console(void)
@@ -57,8 +59,8 @@ Console::~Console(void)
 bool Console::HandleHotKey(const Event& /*e*/)
 {
 	// the only hot key console registers is for hiding / showing itself
-	Owner->SetVisible(!Owner->IsVisible());
-	if (Owner->IsVisible()) {
+	SetVisible(!IsVisible());
+	if (IsVisible()) {
 		Owner->Focus();
 	}
 	return true;
