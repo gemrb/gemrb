@@ -45,6 +45,7 @@ namespace GemRB {
 static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
+static ieResRef UncannyDodgeBonus = {"UNCANNY"};
 
 /***********************
  *  Scriptable Class   *
@@ -1868,6 +1869,18 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
+	// uncanny dodge trap save bonus
+	if (third) {
+		// no info anywhere, but 3ed rules add +1 reflex saves and +1 AC
+		// we approx that by applying this bonus for half a round
+		Actor *victim = core->GetGame()->GetActorByGlobalID(ID);
+		if (victim) {
+			ieDword bonus = victim->GetStat(IE_UNCANNY_DODGE) & 0xff;
+			if (bonus) {
+				core->ApplySpell(UncannyDodgeBonus, victim, this, bonus);
+			}
+		}
+	}
 	if (!TrapResets()) {
 		Trapped = false;
 	}
