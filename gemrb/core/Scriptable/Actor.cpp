@@ -2760,7 +2760,7 @@ ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
 			Value = (ieDword) -100;
 		} else {
 			if (maximum_values[StatIndex] > 0) {
-				if ( Value > maximum_values[StatIndex]) {
+				if ((signed)Value > 0 && Value > maximum_values[StatIndex]) {
 					Value = maximum_values[StatIndex];
 				}
 			}
