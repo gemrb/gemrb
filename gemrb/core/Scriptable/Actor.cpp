@@ -8592,7 +8592,14 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
 	// or one of the stat overrides is set (unconfirmed for iwd2!)
 	if (invisible || always || target->Immobile() || IsBehind(target)) {
-		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity) {
+		bool dodgy = target->GetStat(IE_UNCANNY_DODGE) & 0x200;
+		// if true, we need to be 4+ levels higher to still manage a sneak attack
+		if (dodgy) {
+			if (GetStat(IE_CLASSLEVELSUM) >= target->GetStat(IE_CLASSLEVELSUM) + 4) {
+				dodgy = false;
+			}
+		}
+		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity || dodgy) {
 			displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 			wi.backstabbing = false;
 		} else {
