@@ -389,6 +389,7 @@ namespace GemRB {
 #define IE_EXTRAPROFICIENCY10 		 124
 #define IE_SPECFLAGS                     124
 #define IE_EXTRAPROFICIENCY11 		 125
+#define IE_UNCANNY_DODGE                 125
 #define IE_EXTRAPROFICIENCY12 		 126
 #define IE_EXTRAPROFICIENCY13 		 127
 #define IE_EXTRAPROFICIENCY14 		 128
