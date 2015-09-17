@@ -786,18 +786,17 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 					}
 				}
 				else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
-					//memorize these
-					int x=atoi(res+3);
-					ieResRef resref;
-					ResolveSpellName(resref, x);
-					actor->LearnSpell(resref, LS_MEMO, IE_IWD2_SPELL_INNATE);
+					//memorize these?
+					// we now learn them just to get the feedback string out
+					actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
 				else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
-					//don't memorize these
-					int x=atoi(res+3);
-					ieResRef resref;
-					ResolveSpellName(resref, x);
-					actor->LearnSpell(resref, 0, IE_IWD2_SPELL_SONG);
+					//don't memorize these?
+					actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
 				else if (!memcmp(res,"RA_",3)) {//iwd2 only
 					//remove ability
