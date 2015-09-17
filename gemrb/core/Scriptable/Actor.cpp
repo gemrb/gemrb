@@ -3080,7 +3080,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	// we need to recalc these, since the stats or equipped gear may have changed (and this is relevant in iwd2)
 	AC.SetWisdomBonus(GetWisdomAC());
-	AC.SetDexterityBonus(GetDexterityAC()); // FIXME: but the effects may reset this too and we shouldn't touch it in that case (flatfooted!)
+	// FIXME: but the effects may reset this too and we shouldn't touch it in that case (flatfooted!)
+	// flatfooted by invisible attacker: this is handled by GetDefense and ok
+	AC.SetDexterityBonus(GetDexterityAC());
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] < (ieDword)classcount)
@@ -6588,6 +6590,14 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 			defense = AC.GetTotal() + defense;
 		} else {
 			defense += AC.GetTotal();
+		}
+	}
+
+	// is the attacker invisible? We don't care if we know the right uncanny dodge
+	if (third && attacker && attacker->GetStat(state_invisible)) {
+		if ((GetStat(IE_UNCANNY_DODGE) & 0x100) == 0) {
+			// oops, we lose the dex bonus (like flatfooted)
+			defense -= AC.GetDexterityBonus();
 		}
 	}
 
