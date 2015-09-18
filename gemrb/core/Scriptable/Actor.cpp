@@ -3129,6 +3129,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 	}
 
+	// iwd2 barbarian speed increase isn't handled like for monks (normal clab)!?
+	// TODO: recheck when we have unhardcoded actor speeds (just add it there instead)
+	if (third && GetBarbarianLevel()) {
+		Modified[IE_MOVEMENTRATE] += 1;
+	}
+
 	// check if any new portrait icon was removed or added
 	if (PCStats) {
 		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons))) {
