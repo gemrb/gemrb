@@ -2447,6 +2447,9 @@ void GameControl::SetScreenFlags(unsigned int value, int mode)
 void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
 	SetBits(DialogueFlags, value, mode);
+	if (DialogueFlags&DF_IN_DIALOG) {
+		SetDisabled(false);
+	}
 }
 
 Actor *GameControl::GetActorByGlobalID(ieDword globalID)

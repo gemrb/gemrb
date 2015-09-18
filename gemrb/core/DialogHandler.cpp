@@ -157,9 +157,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		previousX = vp.x;
 		previousY = vp.y;
 	}
-
-	//allow mouse selection from dialog (even though screen is locked)
-	video->SetMouseEnabled(true);
 	*/
 	//TODO: this should not jump but scroll to the destination
 	gc->MoveViewportTo(tgt->Pos, true);
