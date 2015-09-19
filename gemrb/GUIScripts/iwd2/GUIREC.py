@@ -1415,8 +1415,6 @@ def LUNextPress ():
 	# both fire up the rest of the chain
 
 def FinishLevelUp():
-	# TODO: handle the special stuff from clabs (the ones that only display strings
-
 	# kit
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LUKit = GemRB.GetVar ("LUKit")
