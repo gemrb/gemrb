@@ -9193,7 +9193,7 @@ int Actor::GetFeat(unsigned int feat) const
 	if (feat>=MAX_FEATS) {
 		return -1;
 	}
-	if (Modified[IE_FEATS1+(feat>>5)]&(1<<(feat&31)) ) {
+	if (BaseStats[IE_FEATS1+(feat>>5)]&(1<<(feat&31)) ) {
 		//return the numeric stat value, instead of the boolean
 		if (featstats[feat]) {
 			return Modified[featstats[feat]];
@@ -9209,7 +9209,7 @@ bool Actor::HasFeat(unsigned int featindex) const
 	if (featindex>=MAX_FEATS) return false;
 	unsigned int pos = IE_FEATS1+(featindex>>5);
 	unsigned int bit = 1<<(featindex&31);
-	if (Modified[pos]&bit) return true;
+	if (BaseStats[pos]&bit) return true;
 	return false;
 }
 
