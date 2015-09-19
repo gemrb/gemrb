@@ -4659,6 +4659,13 @@ int fx_magic_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 {
 	if(0) print("fx_magic_resistance_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	// iwd2 monk's Diamond soul
+	// for some silly reason the +1/level was not handled as a clab
+	// our clab adds the 10 and sets Special to the rate per level
+	if (core->HasFeature(GF_3ED_RULES) && fx->FirstApply) {
+		fx->Parameter1 += target->GetMonkLevel() * fx->IsVariable;
+	}
+
 	STAT_MOD( IE_RESISTMAGIC );
 	return FX_APPLIED;
 }
