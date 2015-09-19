@@ -23,7 +23,7 @@ import CommonTables
 import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
-from ie_feats import FEAT_POWER_ATTACK
+from ie_feats import FEAT_POWER_ATTACK, FEAT_IMPROVED_EVASION
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -232,6 +232,12 @@ def OpenFeatsWindow(chargen=0):
 		ButtonCount = 9
 		# fake having leveled up already, so the level checks work
 		LUStat = IDLUCommon.Levels[ClassIndex]
+		# give monks their free improved evasion at level 9, so we don't have to add a feat granting opcode
+		# just check for monk tohit table, so we get the kits too
+		monkName = CommonTables.Classes.GetRowName (ClassIndex)
+		if CommonTables.Classes.GetValue(monkName, "TOHIT") == "BAATMKU":
+			if Level <= 9 and Level+LevelDiff >= 9:
+				GemRB.SetFeat (pc, FEAT_IMPROVED_EVASION, 1)
 
 	RaceColumn = CommonTables.Races.FindValue(3, Race)
 	RaceName = CommonTables.Races.GetRowName(RaceColumn)
