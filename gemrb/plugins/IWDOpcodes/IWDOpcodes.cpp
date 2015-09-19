@@ -3309,15 +3309,23 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //same as BG2 OffscreenAIModifier
 
 //440 BarbarianRage
-int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+// both normal and greater rage bonuses are handled by the innate itself
+// we use this effect to add the fatigue maluses that follow afterwards
+static ieResRef FatigueRef = {"FATIGUE"};
+int fx_barbarian_rage (Scriptable* /*Owner*/, Actor *target, Effect* fx)
 {
 	if(0) print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
-	// Greater rage is handled by a different spell and spell state, all set externally
-	// Same goes for normal rage boni
-	// TODO: after 5 rounds (expiry) apply the "Fatigued" effect, whereby the barbarian is weakened (at least STR an DEX)
-	// at level 20 they receive Tireless Rage, which makes this effect useless,
-	//  (unless it really adds immunities to all charm, hold, and fear spells)
-	// it does not appear to be a spell though, so it's was likely a hack
+
+	// Tireless rage (no fatigue)
+	if (target->GetBarbarianLevel() >= 20) return FX_NOT_APPLIED;
+
+	// apply a spell with the maluses just as we're about to expire
+	// currently -2 str, -2 dex, fatigue icon
+	if (core->GetGame()->GameTime + 1 == fx->Duration) {
+		Scriptable *caster = GetCasterObject();
+		core->ApplySpell(FatigueRef, target, caster, 0);
+	}
+
 	return FX_APPLIED;
 }
 
