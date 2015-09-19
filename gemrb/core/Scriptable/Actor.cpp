@@ -139,7 +139,7 @@ static ieDword NoExtraDifficultyDmg = 0;
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
 #define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
-#define MAX_FEATV 2147483648U // 1<<31 (used for the triple-stat feat handling)
+#define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
 
 //item usability array
 struct ItemUseType {
