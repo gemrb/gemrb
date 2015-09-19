@@ -1068,8 +1068,7 @@ static inline int check_magic_res(Actor *actor, Effect *fx, Actor *caster)
 
 	if (iwd2fx) {
 		// 3ed style check
-		// TODO: check if luck really affects it (i doubt it does)
-		int roll = actor->LuckyRoll(1, 20, 0);
+		int roll = core->Roll(1, 20, 0);
 		ieDword check = fx->CasterLevel + roll;
 		int penetration = 0;
 		// +2/+4 level bonus from the (greater) spell penetration feat
