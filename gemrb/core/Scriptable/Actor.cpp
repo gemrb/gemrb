@@ -8836,14 +8836,13 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	ieDword idx = feat>>5;
 	switch (mode) {
 		case OP_SET: case OP_OR:
-			SetBaseBit(IE_FEATS1+idx, mask, 1);
+			BaseStats[IE_FEATS1+idx]|=mask;
 			break;
 		case OP_NAND:
-			SetBaseBit(IE_FEATS1+idx, mask, 0);
+			BaseStats[IE_FEATS1+idx]&=~mask;
 			break;
 		case OP_XOR:
-			// maybe extend SetBaseBit at some point
-			SetBase(IE_FEATS1+idx, BaseStats[IE_FEATS1+idx] ^ mask);
+			BaseStats[IE_FEATS1+idx]^=mask;
 			break;
 	}
 }
