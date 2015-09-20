@@ -762,6 +762,73 @@ def ActionQSpell2RightPressed ():
 def ActionQSpell3RightPressed ():
 	ActionQSpellRightPressed(2)
 
+###############################################
+# quick innates (qspec)
+# TODO: perhaps just generate all these?
+
+def ActionQSpecPressed (which):
+	ActionQSpellPressed (which)
+
+def ActionQSpec1Pressed ():
+	ActionQSpecPressed (0)
+
+def ActionQSpec2Pressed ():
+	ActionQSpecPressed (1)
+
+def ActionQSpec3Pressed ():
+	ActionQSpecPressed (2)
+
+def ActionQSpec4Pressed ():
+	ActionQSpecPressed (3)
+
+def ActionQSpec5Pressed ():
+	ActionQSpecPressed (4)
+
+def ActionQSpec6Pressed ():
+	ActionQSpecPressed (5)
+
+def ActionQSpec7Pressed ():
+	ActionQSpecPressed (6)
+
+def ActionQSpec8Pressed ():
+	ActionQSpecPressed (7)
+
+def ActionQSpec9Pressed ():
+	ActionQSpecPressed (8)
+
+def ActionQSpecRightPressed (which):
+	GemRB.SetVar ("QSpell", which)
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 3)
+	UpdateActionsWindow ()
+
+def ActionQSpec1RightPressed ():
+	ActionQSpecRightPressed (0)
+
+def ActionQSpec2RightPressed ():
+	ActionQSpecRightPressed (1)
+
+def ActionQSpec3RightPressed ():
+	ActionQSpecRightPressed (2)
+
+def ActionQSpec4RightPressed ():
+	ActionQSpecRightPressed (3)
+
+def ActionQSpec5RightPressed ():
+	ActionQSpecRightPressed (4)
+
+def ActionQSpec6RightPressed ():
+	ActionQSpecRightPressed (5)
+
+def ActionQSpec7RightPressed ():
+	ActionQSpecRightPressed (6)
+
+def ActionQSpec8RightPressed ():
+	ActionQSpecRightPressed (7)
+
+def ActionQSpec9RightPressed ():
+	ActionQSpecRightPressed (8)
+
 # can't pass the globals dictionary from another module
 def SetActionIconWorkaround(Button, action, function):
 	Button.SetActionIcon (globals(), action, function)
