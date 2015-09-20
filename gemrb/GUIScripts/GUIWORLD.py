@@ -27,7 +27,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import GUIClasses
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
 import MessageWindow
@@ -128,7 +128,7 @@ def UpdateReformWindow ():
 
 	select = GemRB.GetVar ("Selected")
 
-	need_to_drop = GemRB.GetPartySize ()-PARTY_SIZE
+	need_to_drop = GemRB.GetPartySize ()-MAX_PARTY_SIZE
 	if need_to_drop<0:
 		need_to_drop = 0
 
@@ -248,7 +248,7 @@ def OpenReformPartyWindow ():
 		if hideflag:
 			GemRB.UnhideGUI ()
 		#re-enabling party size control
-		GemRB.GameSetPartySize (PARTY_SIZE)
+		GemRB.GameSetPartySize (MAX_PARTY_SIZE)
 		GUICommonWindows.UpdatePortraitWindow()
 		return
 

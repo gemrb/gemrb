@@ -26,7 +26,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import LoadScreen
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
 SaveWindow = None
@@ -96,8 +96,8 @@ def OpenSaveWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 		# PC portraits
-		for j in range(min(6, PARTY_SIZE)):
-			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
+		for j in range(min(6, MAX_PARTY_SIZE)):
+			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -152,8 +152,8 @@ def ScrollBarPress():
 		else:
 			Button.SetPicture ("")
 
-		for j in range(min(6, PARTY_SIZE)):
-			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
+		for j in range(min(6, MAX_PARTY_SIZE)):
+			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
@@ -253,7 +253,7 @@ def OpenConfirmWindow ():
 			Button.SetPicture("")
 
 		# PC portraits
-		for j in range(min(6, PARTY_SIZE)):
+		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = ConfirmWindow.GetControl (ctrl_offset[9]+j)
 			if Pos<len(Games):
 				Button.SetSprite2D(Games[Pos].GetPortrait(j))

@@ -25,7 +25,7 @@
 import GemRB
 import LoadScreen
 import GameCheck
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 
 LoadWindow = 0
 TextAreaControl = 0
@@ -67,8 +67,8 @@ def OnLoad ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
-		for j in range (min(6, PARTY_SIZE)):
-			Button = LoadWindow.GetControl (40 + i*min(6, PARTY_SIZE) + j)
+		for j in range (min(6, MAX_PARTY_SIZE)):
+			Button = LoadWindow.GetControl (40 + i*min(6, MAX_PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
@@ -116,8 +116,8 @@ def ScrollBarPress ():
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture ("")
-		for j in range (min(6, PARTY_SIZE)):
-			Button=LoadWindow.GetControl (40 + i*min(6, PARTY_SIZE) + j)
+		for j in range (min(6, MAX_PARTY_SIZE)):
+			Button = LoadWindow.GetControl (40 + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos<len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:

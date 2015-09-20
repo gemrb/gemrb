@@ -28,7 +28,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIWORLD
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
 MessageWindow = 0
@@ -40,7 +40,7 @@ MessageTA = 0
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
 
-	GemRB.GameSetPartySize(PARTY_SIZE)
+	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(0)
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	GemRB.SetInfoTextColor(0,255,0,255)

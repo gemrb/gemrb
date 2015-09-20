@@ -18,7 +18,7 @@
 #
 #Single Player Party Select
 import GemRB
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 
 def OnLoad():
 	LoadPartyCharacters()
@@ -29,7 +29,7 @@ def OnLoad():
 def LoadPartyCharacters():
 	i = GemRB.GetVar("PartyIdx")
 	Tag = "Party " + str(i)
-	for j in range(1, PARTY_SIZE+1):
+	for j in range(1, MAX_PARTY_SIZE+1):
 		Key = "Char"+str(j)
 		CharName = GemRB.GetINIPartyKey(Tag, Key, "")
 		if CharName !="":
