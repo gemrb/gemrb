@@ -1284,6 +1284,11 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
 		return pairs
 
+	# GUIWORLD doesn't have a separate portraits window, so we need to skip
+	# all this magic when reforming an overflowing party
+	if GemRB.GetPartySize () > PARTY_SIZE:
+		return pairs
+
 	# generate new buttons by copying from existing ones
 	firstButton = pairs[0]
 	firstRect = firstButton.GetRect ()
