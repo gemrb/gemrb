@@ -163,7 +163,8 @@ def OpenStoreWindow ():
 	if GameCheck.IsPST():
 		CureTable = GemRB.LoadTable("speldesc") #additional info not supported by core
 	else:
-		RepModTable = GemRB.LoadTable ("repmodst")
+		if not GameCheck.IsIWD2(): # present from before, resulting in a 10x price increase
+			RepModTable = GemRB.LoadTable ("repmodst")
 		SpellTable = GemRB.LoadTable ("storespl", 1)
 
 	#these are function pointers, not strings
