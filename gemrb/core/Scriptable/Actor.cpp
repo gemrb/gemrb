@@ -3590,10 +3590,12 @@ void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
+		char chrsound[256];
 		do {
 			count--;
 			ResolveStringConstant(soundref, start+count);
-			if (gamedata->Exists(soundref, IE_WAV_CLASS_ID, true)) {
+			GetSoundFolder(chrsound, 1, soundref);
+			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), DS_CONSOLE|DS_CONST|DS_SPEECH);
 				break;
 			}
@@ -8265,17 +8267,21 @@ void Actor::SetSoundFolder(const char *soundset)
 	}
 }
 
-void Actor::GetSoundFolder(char *soundset, int full) const
+void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 {
+	if (!overrideSet) {
+		strncpy(overrideSet, PCStats->SoundSet, 8);
+	}
+
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
 		if (full) {
 			strcat(soundset,"/");
-			strncat(soundset, PCStats->SoundSet, 8);
+			strncat(soundset, overrideSet, 8);
 		}
 	}
 	else {
-		strnlwrcpy(soundset, PCStats->SoundSet, 8);
+		strnlwrcpy(soundset, overrideSet, 8);
 	}
 }
 

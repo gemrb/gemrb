@@ -472,7 +472,8 @@ public:
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset);
-	void GetSoundFolder(char *soundset, int flag) const;
+	/* Use overrideSet to replace PCStats->SoundSet */
+	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which) const
 	{
