@@ -730,6 +730,9 @@ def ActionQWeapon3Pressed ():
 def ActionQWeapon4Pressed ():
 	ActionQWeaponPressed(3)
 
+###############################################
+# quick icons for spells, innates, songs, shapes
+
 def ActionQSpellPressed (which):
 	pc = GemRB.GameGetFirstSelectedActor ()
 
@@ -744,9 +747,6 @@ def ActionQSpellRightPressed (which):
 	UpdateActionsWindow ()
 	return
 
-###############################################
-# quick innates (qspec)
-
 suf = ["", "Right"]
 # this function is used to generate various action bar actions
 # that should be available in 9 slots (iwd2)
@@ -760,6 +760,10 @@ for i in range(9):
 	GenerateButtonActions(i, "QSpec", globals(), 1)
 	GenerateButtonActions(i, "QSpell", globals(), 0)
 	GenerateButtonActions(i, "QSpell", globals(), 1)
+	GenerateButtonActions(i, "QShape", globals(), 0)
+	GenerateButtonActions(i, "QShape", globals(), 1)
+	GenerateButtonActions(i, "QSong", globals(), 0)
+	GenerateButtonActions(i, "QSong", globals(), 1)
 
 def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
@@ -768,6 +772,24 @@ def ActionQSpecRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
+	UpdateActionsWindow ()
+
+def ActionQShapePressed (which):
+	ActionQSpellPressed (which)
+
+def ActionQShapeRightPressed (which):
+	GemRB.SetVar ("QSpell", which)
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 8)
+	UpdateActionsWindow ()
+
+def ActionQSongPressed (which):
+	ActionQSpellPressed (which)
+
+def ActionQSongRightPressed (which):
+	GemRB.SetVar ("QSpell", which)
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 9)
 	UpdateActionsWindow ()
 
 # can't pass the globals dictionary from another module
