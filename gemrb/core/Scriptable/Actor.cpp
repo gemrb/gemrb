@@ -8113,7 +8113,7 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		PCStats->QSlots[i] = Gemrb2IWD2Qslot(ar[i], i);
 	}
-	dumpQSlots();
+	if (QslotTranslation) dumpQSlots();
 }
 
 void Actor::GetActionButtonRow(ActionButtonRow &ar)
