@@ -8111,7 +8111,7 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
 void Actor::SetActionButtonRow(ActionButtonRow &ar)
 {
 	for(int i=0;i<GUIBT_COUNT;i++) {
-		PCStats->QSlots[i] = Gemrb2IWD2Qslot(ar[i], i);
+		PCStats->QSlots[i] = ar[i];
 	}
 	if (QslotTranslation) dumpQSlots();
 }
