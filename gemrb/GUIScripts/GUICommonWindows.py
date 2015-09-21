@@ -1116,7 +1116,7 @@ def SpellPressed ():
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 
-	if Type == 1024:
+	if Type == 1<<IE_IWD2_SPELL_SONG:
 		#SelectBardSong(Spell)
 		ActionBardSongPressed()
 		return
