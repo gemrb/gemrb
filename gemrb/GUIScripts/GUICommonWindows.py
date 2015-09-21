@@ -858,12 +858,14 @@ def ActionRangePressed ():
 
 def ActionShapeChangePressed ():
 	GemRB.SetVar ("ActionLevel", UAW_QSHAPES)
+	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""
 	GemRB.SetVar ("ActionLevel", UAW_QSONGS)
+	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
 
