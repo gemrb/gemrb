@@ -656,6 +656,12 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				value = WStyleTable.GetValue (profcount, col)
 				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
 		stats.append ("\n")
+	return TypeSetStats (stats, pc)
+
+def TypeSetStats(stats, pc=0):
+	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
+	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	# everyone but bg1 has it somewhere
 	if GameCheck.IsBG2():
@@ -714,14 +720,16 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if isinstance(s, basestring):
 				if s == len(s) * "\n": # check if the string is all newlines
 					# avoid "double" newlines (we use join later so we would get one more newline than is in s!)
-					res[-1] += s
+					if res:
+						res[-1] += s
 				else:
 					res.append (s);
 			else:
-				res.append (GemRB.GetString (s) )				
+				res.append (GemRB.GetString (s))
 
 	# wrap the first part in a tag to prevent status icon drop cap
-	res[0] = "[p]" + res[0] + "[/p]"
+	if res:
+		res[0] = "[p]" + res[0] + "[/p]"
 	return "\n".join (res)
 
 def GetReputation (repvalue):
