@@ -369,7 +369,7 @@ def EmptyControls ():
 		#init spell list
 		GemRB.SpellCast (pc, -1, 0)
 
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -398,7 +398,7 @@ def SetupFormation ():
 
 def GroupControls ():
 	"""Sections that control group actions."""
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GameCheck.IsBG2():
 		Button.SetActionIcon (globals(), 7) #talk icon
@@ -491,7 +491,7 @@ def SelectItemAbility():
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
 	GemRB.SetupQuickSlot (pc, 0, slot, ability)
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 
 #in pst only nordom has bolts and they show on the same floatmenu as quickweapons, so needs work here
@@ -504,7 +504,7 @@ def SelectQuiverSlot():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"]) #, 0, 0)
 		GemRB.DropDraggedItem (pc, slot)
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 
 #this doubles up as an ammo selector (not yet used in pst)
@@ -579,7 +579,7 @@ def SetupItemAbilities(pc, slot):
 			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i])) )
 
 	if reset:
-		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		UpdateActionsWindow ()
 	return
 
@@ -647,49 +647,49 @@ def UpdateActionsWindow ():
 
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
-	if level == 0:
+	if level == UAW_STANDARD:
 		#this is based on class
 		CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
-	elif level == 1:
+	elif level == UAW_EQUIPMENT:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
-	elif level == 2: #spells
+	elif level == UAW_SPELLS: #spells
 		if GameCheck.IsIWD2():
 			type = 255
 		else:
 			type = 3
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == 3: #innates
+	elif level == UAW_INNATES: #innates
 		if GameCheck.IsIWD2():
 			type = 256 + 1024
 		else:
 			type = 4
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == 4: #quick weapon/item ability selection
+	elif level == UAW_QWEAPONS: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
-	elif level == 5: #all known mage spells
+	elif level == UAW_ALLMAGE: #all known mage spells
 		GemRB.SetVar ("Type", -1)
 		Spellbook.SetupSpellIcons(CurrentWindow, -1, TopIndex, ActionBarControlOffset)
-	elif level == 6: # iwd2 skills
+	elif level == UAW_SKILLS: # iwd2 skills
 		SetupSkillSelection()
-	elif level == 7: # quickspells, but with innates too
+	elif level == UAW_QSPELLS: # quickspells, but with innates too
 		if GameCheck.IsIWD2():
 			type = 255 + 256 + 1024
 		else:
 			type = 7
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == 8: # shapes selection
+	elif level == UAW_QSHAPES: # shapes selection
 		GemRB.SetVar ("Type", 1024)
 		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
-	elif level == 9: # songs selection
+	elif level == UAW_QSONGS: # songs selection
 		GemRB.SetVar ("Type", 512)
 		Spellbook.SetupSpellIcons(CurrentWindow, 512, TopIndex, ActionBarControlOffset)
-	elif level == 10: # spellbook selection
+	elif level == UAW_BOOK: # spellbook selection
 		type = GemRB.GetVar ("Type")
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == 11: # spells from a 2da (fx_select_spell)
+	elif level == UAW_2DASPELLS: # spells from a 2da (fx_select_spell)
 		if GameCheck.IsIWD2():
 			type = 255
 		else:
@@ -698,7 +698,7 @@ def UpdateActionsWindow ():
 		Spellbook.SetupSpellIcons (CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	else:
 		print "Invalid action level:", level
-		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 
 def ActionQWeaponPressed (which):
@@ -743,7 +743,7 @@ def ActionQSpellPressed (which):
 def ActionQSpellRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 7)
+	GemRB.SetVar ("ActionLevel", UAW_QSPELLS)
 	UpdateActionsWindow ()
 	return
 
@@ -771,7 +771,7 @@ def ActionQSpecPressed (which):
 def ActionQSpecRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 3)
+	GemRB.SetVar ("ActionLevel", UAW_INNATES)
 	UpdateActionsWindow ()
 
 def ActionQShapePressed (which):
@@ -780,7 +780,7 @@ def ActionQShapePressed (which):
 def ActionQShapeRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 8)
+	GemRB.SetVar ("ActionLevel", UAW_QSHAPES)
 	UpdateActionsWindow ()
 
 def ActionQSongPressed (which):
@@ -789,7 +789,7 @@ def ActionQSongPressed (which):
 def ActionQSongRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 9)
+	GemRB.SetVar ("ActionLevel", UAW_QSONGS)
 	UpdateActionsWindow ()
 
 # can't pass the globals dictionary from another module
@@ -823,7 +823,7 @@ def ActionRightPressed ():
 	print "Type:", Type
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
-	if GemRB.GetVar ("ActionLevel") == 5:
+	if GemRB.GetVar ("ActionLevel") == UAW_ALLMAGE:
 		if Type == 3:
 			Max = len(Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_PRIEST) + Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_WIZARD))
 		else:
@@ -857,13 +857,13 @@ def ActionRangePressed ():
 	return
 
 def ActionShapeChangePressed ():
-	GemRB.SetVar ("ActionLevel", 8)
+	GemRB.SetVar ("ActionLevel", UAW_QSHAPES)
 	UpdateActionsWindow ()
 	return
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""
-	GemRB.SetVar ("ActionLevel", 9)
+	GemRB.SetVar ("ActionLevel", UAW_QSONGS)
 	UpdateActionsWindow ()
 	return
 
@@ -875,7 +875,7 @@ def ActionBardSongPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	GemRB.PlaySound ("act_01")
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
@@ -886,7 +886,7 @@ def ActionSearchPressed ():
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
@@ -895,7 +895,7 @@ def ActionStealthPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07")
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
@@ -904,23 +904,23 @@ def ActionTurnPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	GemRB.PlaySound ("act_06")
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionTamingPressed ():
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionWildernessPressed ():
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionUseItemPressed ():
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 1)
+	GemRB.SetVar ("ActionLevel", UAW_EQUIPMENT)
 	UpdateActionsWindow ()
 	return
 
@@ -928,7 +928,7 @@ def ActionCastPressed ():
 	"""Opens the spell choice scrollbar."""
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 2)
+	GemRB.SetVar ("ActionLevel", UAW_SPELLS)
 	UpdateActionsWindow ()
 	return
 
@@ -963,7 +963,7 @@ def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
-	GemRB.SetVar ("ActionLevel", 4)
+	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
 	UpdateActionsWindow ()
 	return
 
@@ -998,19 +998,19 @@ def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 3)
+	GemRB.SetVar ("ActionLevel", UAW_INNATES)
 	UpdateActionsWindow ()
 	return
 
 def ActionSkillsPressed ():
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", 6)
+	GemRB.SetVar ("ActionLevel", UAW_SKILLS)
 	UpdateActionsWindow ()
 	return
 
 def TypeSpellPressed (type):
 	GemRB.SetVar ("Type", 1<<type)
-	GemRB.SetVar ("ActionLevel", 10)
+	GemRB.SetVar ("ActionLevel", UAW_BOOK)
 	UpdateActionsWindow ()
 	return
 
@@ -1135,11 +1135,11 @@ def SpellPressed ():
 			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 	if Type==-1:
-		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell)
 	if GemRB.GetVar ("Type")!=-1:
-		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		#init spell list
 		GemRB.SpellCast (pc, -1, 0)
 	GemRB.SetVar ("TopIndex", 0)
@@ -1153,7 +1153,7 @@ def EquipmentPressed ():
 	Item = GemRB.GetVar ("Equipment")
 	#equipment index
 	GemRB.UseItem (pc, -1, Item, -1)
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
@@ -1725,7 +1725,7 @@ def SelectionChanged ():
 		return
 
 	# FIXME: hack. If defined, display single selection
-	GemRB.SetVar ("ActionLevel", 0)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)

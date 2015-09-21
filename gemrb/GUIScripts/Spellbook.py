@@ -183,7 +183,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()
 
 	# check if we're dealing with a temporary spellbook
-	if GemRB.GetVar("ActionLevel") == 11:
+	if GemRB.GetVar("ActionLevel") == UAW_2DASPELLS:
 		allSpells = GetSpellinfoSpells (actor, BookType)
 	else:
 		# construct the spellbook of usable (not depleted) memorized spells
@@ -260,7 +260,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# disable spells that should be cast from the inventory or can't be cast while silenced or ...
 		# see splspec.2da for all the reasons; silence is handled elsewhere
 		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
-		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == 5)
+		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == UAW_ALLMAGE)
 		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x20000: # SF_IGNORES_SILENCE
 			specialSpell ^= SP_SILENCE
 		if specialSpell or (disabled_spellcasting&spellType):
