@@ -737,30 +737,12 @@ def ActionQSpellPressed (which):
 	UpdateActionsWindow ()
 	return
 
-def ActionQSpell1Pressed ():
-	ActionQSpellPressed(0)
-
-def ActionQSpell2Pressed ():
-	ActionQSpellPressed(1)
-
-def ActionQSpell3Pressed ():
-	ActionQSpellPressed(2)
-
 def ActionQSpellRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 7)
 	UpdateActionsWindow ()
 	return
-
-def ActionQSpell1RightPressed ():
-	ActionQSpellRightPressed(0)
-
-def ActionQSpell2RightPressed ():
-	ActionQSpellRightPressed(1)
-
-def ActionQSpell3RightPressed ():
-	ActionQSpellRightPressed(2)
 
 ###############################################
 # quick innates (qspec)
@@ -776,6 +758,8 @@ def GenerateButtonActions(num, name, g, right=0):
 for i in range(9):
 	GenerateButtonActions(i, "QSpec", globals(), 0)
 	GenerateButtonActions(i, "QSpec", globals(), 1)
+	GenerateButtonActions(i, "QSpell", globals(), 0)
+	GenerateButtonActions(i, "QSpell", globals(), 1)
 
 def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
