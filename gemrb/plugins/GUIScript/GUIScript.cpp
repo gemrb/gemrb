@@ -12959,6 +12959,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 				type = 1<<IE_IWD2_SPELL_SONG;
 				if (!actor->spellbook.GetSpellInfoSize(type)) {
 					state = IE_GUI_BUTTON_DISABLED;
+				} else if (modalstate == MS_BATTLESONG) {
+					state = IE_GUI_BUTTON_SELECTED;
 				}
 			} else {
 				if (modalstate==MS_BATTLESONG) {
