@@ -280,10 +280,10 @@ void WindowManager::DrawCursor() const
 	Point pos = eventMgr.MousePos();
 	if (hoverWin && hoverWin->IsDisabled()) {
 		// draw greayed cursor
-		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, NULL, true);
+		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, NULL);
 	} else {
 		// draw normal cursor
-		video->BlitSprite(cur.get(), pos.x, pos.y, true);
+		video->BlitSprite(cur.get(), pos.x, pos.y);
 	}
 }
 
@@ -378,14 +378,14 @@ void WindowManager::DrawWindows() const
 		Sprite2D* edge = WinFrameEdge(0); // left
 		if (edge) {
 			// we assume if one fails, they all do
-			video->BlitSprite(edge, 0, 0, true);
+			video->BlitSprite(edge, 0, 0);
 			edge = WinFrameEdge(1); // right
 			int sideW = edge->Width;
-			video->BlitSprite(edge, screen.w - sideW, 0, true);
+			video->BlitSprite(edge, screen.w - sideW, 0);
 			edge = WinFrameEdge(2); // top
-			video->BlitSprite(edge, sideW, 0, true);
+			video->BlitSprite(edge, sideW, 0);
 			edge = WinFrameEdge(3); // bottom
-			video->BlitSprite(edge, sideW, screen.h - edge->Height, true);
+			video->BlitSprite(edge, sideW, screen.h - edge->Height);
 		}
 	}
 

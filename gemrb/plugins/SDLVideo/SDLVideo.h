@@ -81,45 +81,31 @@ public:
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags);
-	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
-							const Region* clip = NULL, Palette* palette = NULL);
+	virtual void BlitSprite(const Sprite2D* spr, int x, int y, const Region* clip = NULL, Palette* palette = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* pal = NULL);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
-								SpriteCover* cover, Palette *palette = NULL,
-								const Region* clip = NULL, bool anchor = false);
+								SpriteCover* cover, Palette *palette = NULL, const Region* clip = NULL);
 
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
+	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
 	/** This functions Draws a Circle */
-	void SetPixel(const Point&, const Color& color, bool clipped = true);
+	void SetPixel(const Point&, const Color& color);
 	/** Gets the pixel of the backbuffer surface */
 	void GetPixel(short x, short y, Color& color);
-	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
+	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
-		double anglefrom, double angleto, bool drawlines = true, bool clipped = true);
+		double anglefrom, double angleto, bool drawlines = true);
 	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
-		const Color& color, bool clipped = true);
+	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color);
 	/** This function Draws a Polygon on the Screen */
 	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
-	virtual void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
-	virtual void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
-	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
+	virtual void DrawHLine(short x1, short y, short x2, const Color& color);
+	virtual void DrawVLine(short x, short y1, short y2, const Color& color);
+	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color);
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
-
-	/** Convers a Screen Coordinate to a Game Coordinate */
-	Point ConvertToGame(const Point& p)
-	{
-		return p + Viewport.Origin();
-	}
-
-	Point ConvertToScreen(const Point& p)
-	{
-		return p - Viewport.Origin();
-	}
+	void BlitTiled(Region rgn, const Sprite2D* img);
 
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
@@ -128,7 +114,7 @@ protected:
 	inline SDL_Surface* CurrentSurfaceBuffer();
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
-	void SetPixel(short x, short y, const Color& color, bool clipped = true);
+	void SetPixel(short x, short y, const Color& color);
 	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);

@@ -43,7 +43,7 @@ public:
 	//adds an item to the container's inventory
 	int AddItem(CREItem *item);
 	//draws the ground icons
-	void DrawPile(bool highlight, Region screen, Color tint);
+	void DrawPile(bool highlight, const Region& viewport, Color tint);
 	//returns dithering option
 	int WantDither();
 	int IsOpen() const;

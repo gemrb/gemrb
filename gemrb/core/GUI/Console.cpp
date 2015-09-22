@@ -84,7 +84,7 @@ void Console::DrawSelf(Region drawFrame, const Region& clip)
 	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
 
 	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
-	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y, true);
+	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y);
 }
 
 /** Set Cursor */

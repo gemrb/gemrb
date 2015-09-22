@@ -960,20 +960,13 @@ void Map::DrawHighlightables()
 
 void Map::DrawPile(Region screen, int pileidx)
 {
-	Region vp = core->GetVideoDriver()->GetViewport();
 	Container *c = TMap->GetContainer(pileidx);
 	assert(c != NULL);
 
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	if (c->Highlight) {
-		c->DrawPile(true, screen, tint);
-	} else {
-		if (c->outline->BBox.IntersectsRegion(vp)) {
-			c->DrawPile(false, screen, tint);
-		}
-	}
+	c->DrawPile(c->Highlight, screen, tint);
 }
 
 Container *Map::GetNextPile(int &index) const
@@ -1086,7 +1079,7 @@ VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 static ieDword oldgametime = 0;
 
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(Region screen)
+void Map::DrawMap(const Region& viewport)
 {
 	if (!TMap) {
 		return;
@@ -1107,7 +1100,7 @@ void Map::DrawMap(Region screen)
 		if (BgDuration<gametime) {
 			Sprite2D::FreeSprite(Background);
 		} else {
-			video->BlitSprite(Background,0,0,true);
+			video->BlitSprite(Background, 0, 0);
 			bgoverride = true;
 		}
 	}
@@ -1129,7 +1122,7 @@ void Map::DrawMap(Region screen)
 			rain = 0;
 		}
 
-		TMap->DrawOverlays( screen, rain, flags );
+		TMap->DrawOverlays( viewport, rain, flags );
 	}
 
 	//drawing queues 1 and 0
@@ -1152,7 +1145,7 @@ void Map::DrawMap(Region screen)
 
 	//draw all background animations first
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
-		a->Draw(screen, this);
+		a->Draw(viewport, this);
 		a = GetNextAreaAnimation(aniidx, gametime);
 	}
 
@@ -1169,20 +1162,20 @@ void Map::DrawMap(Region screen)
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
 			assert(actor != NULL);
-			actor->Draw( screen );
+			actor->Draw( viewport );
 			actor->UpdateAnimations();
 			actor = GetNextActor(q, index);
 			break;
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				DrawPile(screen, pileidx-1);
+				DrawPile(viewport, pileidx-1);
 				pile = GetNextPile(pileidx);
 			}
 			break;
 		case AOT_AREA:
 			//draw animation
-			a->Draw( screen, this );
+			a->Draw( viewport, this );
 			a = GetNextAreaAnimation(aniidx,gametime);
 			break;
 		case AOT_SCRIPTED:
@@ -1191,7 +1184,7 @@ void Map::DrawMap(Region screen)
 
 				Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
 				tint.a = 255;
-				bool endReached = sca->Draw(screen, Pos, tint, this, 0, -1, 0);
+				bool endReached = sca->Draw(viewport, Pos, tint, this, 0, -1, 0);
 				if (endReached) {
 					delete( sca );
 					scaidx=vvcCells.erase(scaidx);
@@ -1210,7 +1203,7 @@ void Map::DrawMap(Region screen)
 					drawn = 1;
 				}
 				if (drawn) {
-					pro->Draw( screen );
+					pro->Draw( viewport );
 					proidx++;
 				} else {
 					delete( pro );
@@ -1228,7 +1221,7 @@ void Map::DrawMap(Region screen)
 					drawn = 1;
 				}
 				if (drawn) {
-					spark->Draw( screen );
+					spark->Draw( viewport );
 					spaidx++;
 				} else {
 					delete( spark );
@@ -1243,14 +1236,13 @@ void Map::DrawMap(Region screen)
 	}
 
 	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
-		DrawSearchMap(screen);
+		DrawSearchMap(viewport);
 	} else {
 		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
-			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
+			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, viewport );
 		}
 	}
 
-	Point origin = screen.Origin();
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
@@ -1258,7 +1250,7 @@ void Map::DrawMap(Region screen)
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		ip->DrawOverheadText(origin);
+		ip->DrawOverheadText();
 	}
 
 	int cnCount = 0;
@@ -1267,7 +1259,7 @@ void Map::DrawMap(Region screen)
 		Container* cn = TMap->GetContainer( cnCount++ );
 		if (!cn)
 			break;
-		cn->DrawOverheadText(origin);
+		cn->DrawOverheadText();
 	}
 
 	int drCount = 0;
@@ -1276,7 +1268,7 @@ void Map::DrawMap(Region screen)
 		Door* dr = TMap->GetDoor( drCount++ );
 		if (!dr)
 			break;
-		dr->DrawOverheadText(origin);
+		dr->DrawOverheadText();
 	}
 
 	size_t i = actors.size();
@@ -1285,32 +1277,31 @@ void Map::DrawMap(Region screen)
 		//This must go AFTER the fog!
 		//(maybe we should be using the queue?)
 		Actor* actor = actors[i];
-		actor->DrawOverheadText(origin);
+		actor->DrawOverheadText();
 	}
 
 	oldgametime=gametime;
 }
 
-void Map::DrawSearchMap(const Region &screen)
+void Map::DrawSearchMap(const Region &vp)
 {
 	Color inaccessible = { 128, 128, 128, 128 };
 	Color impassible = { 128, 64, 64, 128 }; // red-ish
 	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
 	Video *vid=core->GetVideoDriver();
-	Region rgn=vid->GetViewport();
 	Region block;
 
 	block.w=16;
 	block.h=12;
-	int w = screen.w/16+2;
-	int h = screen.h/12+2;
+	int w = vp.w/16+2;
+	int h = vp.h/12+2;
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
+			unsigned char blockvalue = GetBlocked(x+vp.x/16, y+vp.y/12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
-				block.x=screen.x+x*16-(rgn.x % 16);
-				block.y=screen.y+y*12-(rgn.y % 12);
+				block.x=vp.x+x*16-(vp.x % 16);
+				block.y=vp.y+y*12-(vp.y % 12);
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
 					vid->DrawRect(block,impassible);
 				} else if (blockvalue & PATH_MAP_SIDEWALL) {
@@ -3964,7 +3955,7 @@ int AreaAnimation::GetHeight() const
 }
 
 
-void AreaAnimation::Draw(const Region &screen, Map *area)
+void AreaAnimation::Draw(const Region& viewport, Map *area)
 {
 	Video* video = core->GetVideoDriver();
 
@@ -4002,8 +3993,8 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
 			}
 		}
-		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y,
-			BLIT_TINTED, tint, covers?covers[ac]:0, palette, &screen );
+		video->BlitGameSprite( frame, Pos.x - viewport.x, Pos.y - viewport.y,
+							  BLIT_TINTED, tint, covers?covers[ac]:0, palette );
 	}
 }
 

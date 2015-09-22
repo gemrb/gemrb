@@ -204,12 +204,12 @@ void TileMap::AddRainOverlay(TileOverlay* overlay)
 	rain_overlays.push_back( overlay );
 }
 
-void TileMap::DrawOverlays(Region screen, int rain, int flags)
+void TileMap::DrawOverlays(const Region& viewport, int rain, int flags)
 {
 	if (rain) {
-		overlays[0]->Draw( screen, rain_overlays, flags );
+		overlays[0]->Draw( viewport, rain_overlays, flags );
 	} else {
-		overlays[0]->Draw( screen, overlays, flags );
+		overlays[0]->Draw( viewport, overlays, flags );
 	}
 }
 
@@ -225,10 +225,10 @@ void TileMap::DrawOverlays(Region screen, int rain, int flags)
 
 #define IS_VISIBLE( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (visible_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
 
-#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, true, &r )
+#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
 
 
-void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport)
+void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region vp)
 {
 	// viewport - pos & size of the control
 	int w = XCellCount * CELL_RATIO;
@@ -238,11 +238,6 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 		h++;
 	}
 
-	Video* vid = core->GetVideoDriver();
-	Region vp = vid->GetViewport();
-
-	vp.w = viewport.w;
-	vp.h = viewport.h;
 	if (( vp.x + vp.w ) > w * CELL_SIZE) {
 		vp.x = ( w * CELL_SIZE - vp.w );
 	}
@@ -267,12 +262,14 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 		dx++;
 		dy++;
 	}
+
+	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
-			Region r = Region(x0 + viewport.x + ( (x - sx) * CELL_SIZE ), y0 + viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
+			Region r = Region(x0 + ( (x - sx) * CELL_SIZE ), y0 + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
 			if (! IS_EXPLORED( x, y )) {
 				// Unexplored tiles are all black
-				vid->DrawRect(r, ColorBlack, true, true);
+				vid->DrawRect(r, ColorBlack, true);
 				continue;  // Don't draw 'invisible' fog
 			}
 			else {
@@ -333,7 +330,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 					FOG( 12 );
 					break;
 				case 15: //this is black too
-					vid->DrawRect(r, ColorBlack, true, true);
+					vid->DrawRect(r, ColorBlack, true);
 					break;
 				}
 			}

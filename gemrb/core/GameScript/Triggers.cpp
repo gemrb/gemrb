@@ -3568,7 +3568,7 @@ int GameScript::PCInStore( Scriptable* /*Sender*/, Trigger* /*parameters*/)
 //behaviour?
 int GameScript::OnScreen( Scriptable* Sender, Trigger* /*parameters*/)
 {
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	if (vp.PointInside(Sender->Pos) ) {
 		return 1;
 	}

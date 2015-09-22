@@ -26,8 +26,7 @@
 #include "GlobalTimer.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "GUI/EventMgr.h"
-#include "GUI/Window.h"
+#include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -189,13 +188,13 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	Video* video = core->GetVideoDriver();
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
+		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), &rgn );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(rgn);
 
-	Region vp = video->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 
 	vp.x = GAME_TO_SCREENX(vp.x);
 	vp.y = GAME_TO_SCREENY(vp.y);
@@ -207,7 +206,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	if ((vp.y + vp.h) >= MAP_TO_SCREENY( frame.h ))
 		vp.h = MAP_TO_SCREENY( frame.h ) - vp.y;
 
-	video->DrawRect( vp, colors[green], false, false );
+	video->DrawRect( vp, colors[green], false );
 
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
@@ -215,7 +214,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
-			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
+			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -243,9 +242,9 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 				continue;
 
 			if (anim) {
-				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &rgn );
+				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, &rgn );
 			} else {
-				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn.color&7], false );
+				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn.color&7] );
 			}
 		}
 	}
@@ -352,7 +351,6 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 	// clear any previously scheduled moves and then do it asap, so it works while paused
 	Point p(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
 	core->timer->SetMoveViewPort( p, 0, false );
-	core->GetVideoDriver()->MoveViewportTo( p );
 }
 
 /** Mouse Button Down */
@@ -375,7 +373,7 @@ void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sho
 	}
 
 	mouseIsDown = true;
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
 	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
 	ViewHandle(p.x, p.y);

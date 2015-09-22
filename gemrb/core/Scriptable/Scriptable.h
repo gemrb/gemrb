@@ -341,7 +341,7 @@ public:
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0);
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
-	void DrawOverheadText(const Point& sp);
+	void DrawOverheadText();
 	/* check if casting is allowed at all */
 	int CanCast(const ieResRef SpellResRef, bool verbose=true);
 	/* check for and trigger a wild surge */

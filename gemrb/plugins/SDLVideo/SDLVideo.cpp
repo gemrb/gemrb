@@ -319,9 +319,6 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 		return;
 	}
 
-	x -= Viewport.x;
-	y -= Viewport.y;
-
 	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
 
 	const Uint8* data = (const Uint8*)spr->pixels;
@@ -410,16 +407,10 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 }
 
-void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y,
 								const Region* clip, Palette* palette)
 {
 	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
-
-	if (!anchor) {
-		dst.x -= Viewport.x;
-		dst.y -= Viewport.y;
-	}
-
 	Region fClip = ClippedDrawingRect(dst, clip);
 
 	if (fClip.Dimensions().IsEmpty()) {
@@ -427,7 +418,6 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
 	}
 
 	Region src(0, 0, spr->Width, spr->Height);
-
 	// adjust the src region to account for the clipping
 	src.x += fClip.x - dst.x; // the left edge
 	src.w -= dst.w - fClip.w; // the right edge
@@ -503,7 +493,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette,
-		const Region* clip, bool anchor)
+		const Region* clip)
 {
 	assert(spr);
 
@@ -512,7 +502,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		if (surf->format->BytesPerPixel != 4 && surf->format->BytesPerPixel != 1) {
 			// TODO...
 			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
-			BlitSprite(spr, x, y, false, clip);
+			BlitSprite(spr, x, y, clip);
 			return;
 		}
 	} else {
@@ -523,6 +513,10 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	}
 
 	// global tint
+	// FIXME: this has no business being here. it isnt the video drivers responsibility to know about game context
+	// reimplement this as some function called MultiplyTint(Color&, Const Color*) for the BLIT_TINTED case
+	// then rewrite the callers to either pass the result of MultiplyTint, or the global tint itself
+/*
 	if (!anchor && core->GetGame()) {
 		const Color *totint = core->GetGame()->GetGlobalTint();
 		if (totint) {
@@ -537,7 +531,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 			}
 		}
 	}
-
+*/
 
 	// implicit flags:
 	const unsigned int blit_TINTALPHA =    0x40000000U;
@@ -572,10 +566,6 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	const Uint8* srcdata = (const Uint8*)spr->pixels;
 	int tx = x - spr->XPos;
 	int ty = y - spr->YPos;
-	if (!anchor) {
-		tx -= Viewport.x;
-		ty -= Viewport.y;
-	}
 
 	Region finalclip = ClippedDrawingRect(Region(tx, ty, spr->Width, spr->Height), clip);
 	if (finalclip.w <= 0 || finalclip.h <= 0)
@@ -769,7 +759,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
+void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 {
 	if (fill) {
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
@@ -791,10 +781,10 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 			SDL_FreeSurface( rectsurf );
 		}
 	} else {
-		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color, clipped );
-		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color, clipped );
-		DrawHLine( rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color, clipped );
-		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color, clipped );
+		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color );
+		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color );
+		DrawHLine( rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color );
+		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color );
 	}
 }
 
@@ -826,20 +816,18 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const
 	}
 }
 
-void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
+void SDLVideoDriver::SetPixel(short x, short y, const Color& color)
 {
-	SetPixel(Point(x, y), color, clipped);
+	SetPixel(Point(x, y), color);
 }
 
-void SDLVideoDriver::SetPixel(const Point& p, const Color& color, bool clipped)
+void SDLVideoDriver::SetPixel(const Point& p, const Color& color)
 {
-	if (!screenClip.PointInside(p) || (clipped && !Viewport.PointInside(p))) {
+	if (!screenClip.PointInside(p)) {
 		return;
 	}
 
-	short x = p.x + Coor.x;
-	short y = p.y + Coor.y;
-	SDLVideoDriver::SetSurfacePixel(CurrentSurfaceBuffer(), x, y, color);
+	SDLVideoDriver::SetSurfacePixel(CurrentSurfaceBuffer(), p.x, p.y, color);
 }
 
 /*
@@ -847,20 +835,15 @@ void SDLVideoDriver::SetPixel(const Point& p, const Color& color, bool clipped)
  * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the viewport
  */
-void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
+void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color)
 {
 	if (x1 > x2) {
 		short tmpx = x1;
 		x1 = x2;
 		x2 = tmpx;
 	}
-	if (clipped) {
-		x1 -= Viewport.x;
-		y -= Viewport.y;
-		x2 -= Viewport.x;
-	}
 	for (; x1 <= x2 ; x1++ )
-		SetPixel( x1, y, color, clipped );
+		SetPixel( x1, y, color );
 }
 
 /*
@@ -868,32 +851,20 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, 
  * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the viewport
  */
-void SDLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
+void SDLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color)
 {
 	if (y1 > y2) {
 		short tmpy = y1;
 		y1 = y2;
 		y2 = tmpy;
 	}
-	if (clipped) {
-		x -= Viewport.x;
-		y1 -= Viewport.y;
-		y2 -= Viewport.y;
-	}
 
 	for (; y1 <= y2 ; y1++ )
-		SetPixel( x, y1, color, clipped );
+		SetPixel( x, y1, color );
 }
 
-void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
-	const Color& color, bool clipped)
+void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color)
 {
-	if (clipped) {
-		x1 -= Viewport.x;
-		x2 -= Viewport.x;
-		y1 -= Viewport.y;
-		y2 -= Viewport.y;
-	}
 	bool yLonger = false;
 	int shortLen = y2 - y1;
 	int longLen = x2 - x1;
@@ -914,14 +885,14 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 		if (longLen > 0) {
 			longLen += y1;
 			for (int j = 0x8000 + ( x1 << 16 ); y1 <= longLen; ++y1) {
-				SetPixel( j >> 16, y1, color, clipped );
+				SetPixel( j >> 16, y1, color );
 				j += decInc;
 			}
 			return;
 		}
 		longLen += y1;
 		for (int j = 0x8000 + ( x1 << 16 ); y1 >= longLen; --y1) {
-			SetPixel( j >> 16, y1, color, clipped );
+			SetPixel( j >> 16, y1, color );
 			j -= decInc;
 		}
 		return;
@@ -930,20 +901,19 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 	if (longLen > 0) {
 		longLen += x1;
 		for (int j = 0x8000 + ( y1 << 16 ); x1 <= longLen; ++x1) {
-			SetPixel( x1, j >> 16, color, clipped );
+			SetPixel( x1, j >> 16, color );
 			j += decInc;
 		}
 		return;
 	}
 	longLen += x1;
 	for (int j = 0x8000 + ( y1 << 16 ); x1 >= longLen; --x1) {
-		SetPixel( x1, j >> 16, color, clipped );
+		SetPixel( x1, j >> 16, color );
 		j -= decInc;
 	}
 }
 /** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
-	const Color& color, bool clipped)
+void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Color& color)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -955,14 +925,14 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 	re = 0;
 
 	while (x >= y) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
-		SetPixel( cx + ( short ) y, cy + ( short ) x, color, clipped );
-		SetPixel( cx - ( short ) y, cy + ( short ) x, color, clipped );
-		SetPixel( cx - ( short ) y, cy - ( short ) x, color, clipped );
-		SetPixel( cx + ( short ) y, cy - ( short ) x, color, clipped );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) y, cy + ( short ) x, color );
+		SetPixel( cx - ( short ) y, cy + ( short ) x, color );
+		SetPixel( cx - ( short ) y, cy - ( short ) x, color );
+		SetPixel( cx + ( short ) y, cy - ( short ) x, color );
 
 		y++;
 		re += yc;
@@ -984,7 +954,7 @@ static double ellipseradius(unsigned short xr, unsigned short yr, double angle) 
 
 /** This functions Draws an Ellipse Segment */
 void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
-	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, bool clipped)
+	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines)
 {
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
@@ -995,12 +965,8 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 	long yto = (long)round(radiusto * sin(angleto));
 
 	if (drawlines) {
-		// TODO: DrawLine's clipping code works differently to the clipping
-		// here so we add Viewport.x/Viewport.y as a hack for now
-		DrawLine(cx + Viewport.x, cy + Viewport.y,
-			cx + xfrom + Viewport.x, cy + yfrom + Viewport.y, color, clipped);
-		DrawLine(cx + Viewport.x, cy + Viewport.y,
-			cx + xto + Viewport.x, cy + yto + Viewport.y, color, clipped);
+		DrawLine(cx, cy, cx + xfrom, cy + yfrom, color);
+		DrawLine(cx, cy, cx + xto, cy + yto, color);
 	}
 
 	// *Attempt* to calculate the correct x/y boundaries.
@@ -1032,13 +998,13 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 	while (sx >= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+			SetPixel( cx + ( short ) x, cy + ( short ) y, color );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+			SetPixel( cx - ( short ) x, cy + ( short ) y, color );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+			SetPixel( cx - ( short ) x, cy - ( short ) y, color );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -1061,13 +1027,13 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 	while (sx <= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+			SetPixel( cx + ( short ) x, cy + ( short ) y, color );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+			SetPixel( cx - ( short ) x, cy + ( short ) y, color );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+			SetPixel( cx - ( short ) x, cy - ( short ) y, color );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -1084,7 +1050,7 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
-	unsigned short yr, const Color& color, bool clipped)
+								 unsigned short yr, const Color& color)
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -1100,10 +1066,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	sy = 0;
 
 	while (sx >= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -1125,10 +1091,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	sy = tas * yr;
 
 	while (sx <= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -1144,7 +1110,7 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 
 void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
-	if (!poly->count || !poly->BBox.IntersectsRegion(Viewport)) {
+	if (!poly->count || !poly->BBox.IntersectsRegion(screenClip)) {
 		return;
 	}
 
@@ -1165,11 +1131,11 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
 			++iter)
 		{
-			int y_top = iter->y1 - Viewport.y; // inclusive
-			int y_bot = iter->y2 - Viewport.y; // exclusive
+			int y_top = iter->y1; // inclusive
+			int y_bot = iter->y2; // exclusive
 
 			if (y_top < 0) y_top = 0;
-			if (y_bot > Viewport.h) y_bot = Viewport.h;
+			if (y_bot > height) y_bot = height;
 			if (y_top >= y_bot) continue; // clipped
 
 			int ledge = iter->left_edge;
@@ -1179,10 +1145,10 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Point& c = poly->points[redge];
 			Point& d = poly->points[(redge+1)%(poly->count)];
 
-			Pixel* line = (Pixel*)(currentBuf->pixels) + (y_top+Coor.y) * currentBuf->pitch;
+			Pixel* line = (Pixel*)(currentBuf->pixels) + y_top * currentBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
-				int py = y + Viewport.y;
+				int py = y + height;
 
 				// TODO: maybe use a 'real' line drawing algorithm to
 				// compute these values faster.
@@ -1190,23 +1156,20 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 				int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
 				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
 
-				lt -= Viewport.x;
-				rt -= Viewport.x;
-
 				if (lt < 0) lt = 0;
-				if (rt > Viewport.w) rt = Viewport.w;
+				if (rt > width) rt = width;
 				if (lt >= rt) { line += currentBuf->pitch; continue; } // clipped
 
 
 				// Draw a 50% alpha line from (y,lt) to (y,rt)
 
 				if (currentBuf->format->BytesPerPixel == 2) {
-					Uint16* pix = (Uint16*)line + lt + Coor.x;
+					Uint16* pix = (Uint16*)line + lt;
 					Uint16* end = pix + (rt - lt);
 					for (; pix < end; pix++)
 						*pix = ((*pix >> 1)&mask16) + alphacol16;
 				} else if (currentBuf->format->BytesPerPixel == 4) {
-					Uint32* pix = (Uint32*)line + lt + Coor.y;
+					Uint32* pix = (Uint32*)line + lt;
 					Uint32* end = pix + (rt - lt);
 					for (; pix < end; pix++)
 						*pix = ((*pix >> 1)&mask32) + alphacol32;
@@ -1223,11 +1186,11 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 	unsigned int i;
 
 	for (i = 1; i < poly->count; i++) {
-		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color, true );
+		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color );
 		lastX = poly->points[i].x;
 		lastY = poly->points[i].y;
 	}
-	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color, true );
+	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color );
 
 	return;
 }

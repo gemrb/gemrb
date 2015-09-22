@@ -132,7 +132,7 @@ void View::DrawBackground(const Region* rgn) const
 			video->BlitSprite( background, intersect, toClip);
 		} else {
 			Point dp = ConvertPointToScreen(Point(background->XPos, background->YPos));
-			video->BlitSprite( background, dp.x, dp.y, true );
+			video->BlitSprite( background, dp.x, dp.y );
 		}
 	}
 }

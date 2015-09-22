@@ -1242,7 +1242,7 @@ int Projectile::Update()
 	return 1;
 }
 
-void Projectile::Draw(const Region &screen)
+void Projectile::Draw(const Region& viewport)
 {
 	switch (phase) {
 		case P_UNINITED:
@@ -1252,7 +1252,7 @@ void Projectile::Draw(const Region &screen)
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
 			//if (!Extension || (Extension->AFlags&PAF_VISIBLE)) {
-				DrawTravel(screen);
+				DrawTravel(viewport);
 			}
 			/*
 			if (!Extension) {
@@ -1260,20 +1260,20 @@ void Projectile::Draw(const Region &screen)
 			}*/
 			CheckTrigger(Extension->TriggerRadius);
 			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
-				DrawExplosion(screen);
+				DrawExplosion(viewport);
 			}
 			break;
 		case P_TRAVEL: case P_TRAVEL2:
 			//There is no Extension for simple traveling projectiles!
-			DrawTravel(screen);
+			DrawTravel(viewport);
 			return;
 		default:
-			DrawExploded(screen);
+			DrawExploded(viewport);
 			return;
 	}
 }
 
-bool Projectile::DrawChildren(const Region &screen)
+bool Projectile::DrawChildren(const Region& vp)
 {
 	bool drawn = false;
 
@@ -1281,7 +1281,7 @@ bool Projectile::DrawChildren(const Region &screen)
 		for(int i=0;i<child_size;i++){
 			if(children[i]) {
 				if (children[i]->Update()) {
-					children[i]->DrawTravel(screen);
+					children[i]->DrawTravel(vp);
 					drawn = true;
 				} else {
 					delete children[i];
@@ -1295,9 +1295,9 @@ bool Projectile::DrawChildren(const Region &screen)
 }
 
 //draw until all children expire
-void Projectile::DrawExploded(const Region &screen)
+void Projectile::DrawExploded(const Region& viewport)
 {
-	if (DrawChildren(screen)) {
+	if (DrawChildren(viewport)) {
 		return;
 	}
 	phase = P_EXPIRED;
@@ -1319,7 +1319,7 @@ void Projectile::SpawnFragment(Point &dest)
 	}
 }
 
-void Projectile::DrawExplosion(const Region &screen)
+void Projectile::DrawExplosion(const Region& vp)
 {
 	//This seems to be a needless safeguard
 	if (!Extension) {
@@ -1328,7 +1328,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	}
 
 	StopSound();
-	DrawChildren(screen);
+	DrawChildren(vp);
 
 	int pause = core->IsFreezed();
 	if (pause) {
@@ -1373,9 +1373,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
-		Point pos = Pos;
-		pos.x+=screen.x;
-		pos.y+=screen.y;
+		Point pos = Pos - vp.Origin();
 		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, GetZPos());
 	}
 
@@ -1607,26 +1605,24 @@ void Projectile::SetupWall()
 	SetTarget(p2);
 }
 
-void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
+void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
 	Video *video = core->GetVideoDriver();
 	PathNode *iter = path;
 	Sprite2D *frame = travel[face]->NextFrame();
 	while(iter) {
-		Point pos(iter->x, iter->y);
+		Point pos(iter->x - vp.x, iter->y - vp.y);
 
 		if (SFlags&PSF_FLYING) {
 			pos.y-=FLY_HEIGHT;
 		}
-		pos.x+=screen.x;
-		pos.y+=screen.y;
 
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
 		iter = iter->Next;
 	}
 }
 
-void Projectile::DrawTravel(const Region &screen)
+void Projectile::DrawTravel(const Region& viewport)
 {
 	Video *video = core->GetVideoDriver();
 	ieDword flag;
@@ -1653,10 +1649,8 @@ void Projectile::DrawTravel(const Region &screen)
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
-	Point pos = Pos;
-	pos.x+=screen.x;
-	pos.y+=screen.y;
 
+	Point pos = Pos - viewport.Origin();
 	if(bend && phase == P_TRAVEL && Origin != Destination) {
 		double total_distance = Distance(Origin, Destination);
 		double travelled_distance = Distance(Origin, Pos);
@@ -1685,7 +1679,7 @@ void Projectile::DrawTravel(const Region &screen)
 	}
 
 	if (light) {
-		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL, &screen);
+		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL);
 	}
 
 	if (ExtFlags&PEF_POP) {
@@ -1707,18 +1701,18 @@ void Projectile::DrawTravel(const Region &screen)
 				}
 			}
 			
-			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
 			return;
 	}
 	
 	if (ExtFlags&PEF_LINE) {
-		DrawLine(screen, face, flag);
+		DrawLine(viewport, face, flag);
 		return;
 	}
 	
 	if (shadow[face]) {
 		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
 	}
 
 	pos.y-=GetZPos();
@@ -1728,14 +1722,14 @@ void Projectile::DrawTravel(const Region &screen)
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {
 				Sprite2D *frame = travel[i]->NextFrame();
-				video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+				video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
 				pos.y-=frame->YPos;
 			}
 		}
 	} else {
 		if (travel[face]) {
 			Sprite2D *frame = travel[face]->NextFrame();
-			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
 		}
 	}
 

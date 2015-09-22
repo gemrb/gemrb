@@ -71,8 +71,7 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 
 	width = w;
 	height = h;
-	Viewport.w = width;
-	Viewport.h = height;
+
 	SetScreenClip(NULL);
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Display Surface...");
 

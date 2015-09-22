@@ -178,7 +178,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			int xOffs = ( frame.w / 2 ) - ( Image->Width / 2 );
 			int yOffs = ( frame.h / 2 ) - ( Image->Height / 2 );
 
-			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs, true );
+			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs );
 		}
 	}
 
@@ -209,10 +209,10 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
 			Region ro = Region(picXPos, picYPos + buttonHeight, Picture->Width, overlayHeight);
 
-			video->BlitSprite( Picture, picXPos, picYPos, true, &rb );
+			video->BlitSprite( Picture, picXPos, picYPos, &rb );
 
 			// TODO: Add an option to add BLIT_GREY to the flags
-			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, 0, &ro, true);
+			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, 0, &ro);
 
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
@@ -221,7 +221,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 		else {
 			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
-			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, true, &r );
+			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, &r );
 		}
 	}
 
@@ -232,9 +232,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Width * Clipping), AnimPicture->Height );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
+			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, &r );
 		} else {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
+			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, &r );
 		}
 	}
 
@@ -257,7 +257,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite( *iter, rgn.x + xOffs, rgn.y + yOffs, true );
+			video->BlitSprite( *iter, rgn.x + xOffs, rgn.y + yOffs );
 		}
 	}
 

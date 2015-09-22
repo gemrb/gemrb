@@ -637,7 +637,7 @@ retry:
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation, int height)
+bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation, int height)
 {
 	if (FaceTarget) {
 		SetOrientation(orientation);
@@ -645,7 +645,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 
 	// not sure
 	if (twin) {
-		twin->Draw(screen, Pos, p_tint, area, dither, -1, height);
+		twin->Draw(viewport, Pos, p_tint, area, dither, -1, height);
 	}
 
 	Video *video = core->GetVideoDriver();
@@ -707,9 +707,9 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
 	}
 
-	video->BlitGameSprite( frame, cx + screen.x, cy + screen.y, flag, tint, cover, palette, &screen);
+	video->BlitGameSprite( frame, cx - viewport.x, cy - viewport.y, flag, tint, cover, palette);
 	if (light) {
-		video->BlitGameSprite( light, cx + screen.x, cy + screen.y, 0, tint, NULL, NULL, &screen);
+		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, 0, tint, NULL, NULL);
 	}
 	return false;
 }

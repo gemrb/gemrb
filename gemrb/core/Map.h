@@ -362,7 +362,7 @@ public:
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
 	void DrawHighlightables();
-	void DrawMap(Region screen);
+	void DrawMap(const Region& viewport);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
@@ -560,7 +560,7 @@ private:
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
 	void DrawPile (Region screen, int pileidx);
-	void DrawSearchMap(const Region &screen);
+	void DrawSearchMap(const Region &vp);
 	void GenerateQueues();
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);

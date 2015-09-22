@@ -199,15 +199,6 @@ Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& sr
 	return p;
 }
 
-void GameControl::Center(const Point& p) const
-{
-	Video *video = core->GetVideoDriver();
-	Region Viewport = video->GetViewport();
-	Viewport.x += p.x - Viewport.w / 2;
-	Viewport.y += p.y - Viewport.h / 2;
-	MoveViewportTo(Viewport.Origin(), false);
-}
-
 void GameControl::ClearMouseState()
 {
 	MouseIsDown = false;
@@ -253,8 +244,6 @@ bool GameControl::ShouldRun(Actor *actor) const
 
 GameControl::~GameControl(void)
 {
-	//releasing the viewport of GameControl
-	core->GetVideoDriver()->SetViewport( Region() );
 	if (formations)	{
 		free( formations );
 		formations = NULL;
@@ -284,43 +273,37 @@ static const int arrow_orientations[16]={
 
 //Draws arrow markers along the edge of the game window
 //WARNING:don't use reference for point, because it is altered
-void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color)
+void GameControl::DrawArrowMarker(Point p, const Color& color)
 {
-	Video* video = core->GetVideoDriver();
-
-	//p.x-=viewport.x;
-	//p.y-=viewport.y;
 	ieDword draw = 0;
-	if (p.x<viewport.x) {
-		p.x=viewport.x;
+	if (p.x < vpOrigin.x) {
+		p.x = vpOrigin.x;
 		draw|= D_LEFT;
 	}
-	if (p.y<viewport.y) {
-		p.y=viewport.y;
+	if (p.y < vpOrigin.y) {
+		p.y = vpOrigin.y;
 		draw |= D_UP;
 	}
-	int tmp;
 
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
+	int tmp = spr->Width;
 
-	tmp = spr->Width;
-	//tmp = core->ArrowSprites[0]->Width;
-
-	if (p.x>viewport.x+viewport.w-tmp) {
-		p.x=viewport.x+viewport.w;//-tmp;
+	if (p.x > vpOrigin.x + frame.w - tmp) {
+		p.x = vpOrigin.x + frame.w;//-tmp;
 		draw |= D_RIGHT;
 	}
 
 	tmp = spr->Height;
 	//tmp = core->ArrowSprites[0]->Height;
 
-	if (p.y>viewport.y+viewport.h-tmp) {
-		p.y=viewport.y+viewport.h;//-tmp;
+	if (p.y > vpOrigin.y + frame.h - tmp) {
+		p.y = vpOrigin.y + frame.h;//-tmp;
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
+		Video* video = core->GetVideoDriver();
 		Sprite2D *arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
-		video->BlitGameSprite(arrow, p.x+screen.x, p.y+screen.y, BLIT_TINTED, color, NULL);
+		video->BlitGameSprite(arrow, p.x + frame.x, p.y + frame.y, BLIT_TINTED, color, NULL);
 		arrow->release();
 	}
 	spr->release();
@@ -355,19 +338,18 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 		}
 	}
 
-	Region viewport = core->GetVideoDriver()->GetViewport();
 	// TODO: 0.5 and 0.7 are pretty much random values
 	// right segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - viewport.x, p.y - viewport.y, xradius,
+	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - vpOrigin.x, p.y - vpOrigin.y, xradius,
 								yradius, color, -0.5, 0.5 );
 	// top segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - viewport.x, p.y - step - viewport.y, xradius,
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - vpOrigin.x, p.y - step - vpOrigin.y, xradius,
 								yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2 );
 	// left segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - step - viewport.x, p.y - viewport.y, xradius,
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - step - vpOrigin.x, p.y - vpOrigin.y, xradius,
 								yradius, color, -0.5 - M_PI, 0.5 - M_PI );
 	// bottom segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - viewport.x, p.y + step - viewport.y, xradius,
+	core->GetVideoDriver()->DrawEllipseSegment( p.x - vpOrigin.x, p.y + step - vpOrigin.y, xradius,
 								yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
 }
 
@@ -387,18 +369,15 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		return;
 	}
 
-	Region viewport = video->GetViewport();
 	// handle keeping the actor in the spotlight, but only when unpaused
 	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
 		Actor *star = core->GetFirstSelectedActor();
-		moveX = star->Pos.x - viewport.x - viewport.w/2;
-		moveY = star->Pos.y - viewport.y - viewport.h/2;
+		moveX = star->Pos.x - vpOrigin.x - frame.w/2;
+		moveY = star->Pos.y - vpOrigin.y - frame.h/2;
 	}
 
 	if (moveX || moveY) {
-		viewport.x += moveX;
-		viewport.y += moveY;
-		MoveViewportTo( viewport.Origin(), false );
+		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
 	}
 	video->DrawRect( screen, ColorBlack, true );
 
@@ -493,7 +472,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	}
 
 	//drawmap should be here so it updates fog of war
-	area->DrawMap( screen );
+	area->DrawMap( Viewport() );
 	game->DrawWeather(screen, update_scripts);
 
 	if (trackerID) {
@@ -507,7 +486,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 				Actor *target = monsters[i++];
 				if (target->InParty) continue;
 				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, target->Pos, viewport, ColorBlack);
+				DrawArrowMarker(target->Pos, ColorBlack);
 			}
 			free(monsters);
 		} else {
@@ -518,7 +497,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	if (lastActorID) {
 		Actor* actor = GetLastActor();
 		if (actor) {
-			DrawArrowMarker(screen, actor->Pos, viewport, ColorGreen);
+			DrawArrowMarker(actor->Pos, ColorGreen);
 		}
 	}
 
@@ -528,7 +507,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	// Draw selection rect
 	if (DrawSelectionRect) {
 		CalculateSelection( gameMousePos );
-		video->DrawRect( SelectionRect, ColorGreen, false, true );
+		video->DrawRect( SelectionRect, ColorGreen, false );
 	}
 
 	// draw reticles
@@ -592,7 +571,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	// Draw lightmap
 	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
 		Sprite2D* spr = area->LightMap->GetSprite2D();
-		video->BlitSprite( spr, 0, 0, true );
+		video->BlitSprite( spr, 0, 0 );
 		Sprite2D::FreeSprite( spr );
 		Region point( gameMousePos.x / 16, gameMousePos.y / 12, 2, 2 );
 		video->DrawRect( point, ColorRed );
@@ -1206,7 +1185,7 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
-	gameMousePos = core->GetVideoDriver()->ConvertToGame(mp);
+	gameMousePos = mp + vpOrigin;
 
 	if (MouseIsDown && ( !DrawSelectionRect )) {
 		if (( abs( gameMousePos.x - ClickPoint.x ) > 5 ) || ( abs( gameMousePos.y - ClickPoint.y ) > 5 )) {
@@ -1420,34 +1399,37 @@ void GameControl::OnGlobalMouseMove(const Point& p)
 }
 #endif
 
-void GameControl::MoveViewportTo(Point p, bool center) const
+void GameControl::MoveViewportTo(Point p, bool center)
 {
 	Map *area = core->GetGame()->GetCurrentArea();
 	if (!area) return;
 
-	Video *video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
 	Point mapsize = area->TMap->GetMapSize();
 
 	if (center) {
-		p.x -= vp.w/2;
-		p.y -= vp.h/2;
+		p.x -= frame.w/2;
+		p.y -= frame.h/2;
 	}
 	if (p.x < 0) {
 		p.x = 0;
-	} else if (p.x + vp.w >= mapsize.x) {
-		p.x = mapsize.x - vp.w - 1;
+	} else if (p.x + frame.w >= mapsize.x) {
+		p.x = mapsize.x - frame.w - 1;
 	}
 	if (p.y < 0) {
 		p.y = 0;
-	} else if (p.y + vp.h >= mapsize.y) {
-		p.y = mapsize.y - vp.h - 1;
+	} else if (p.y + frame.h >= mapsize.y) {
+		p.y = mapsize.y - frame.h - 1;
 	}
 
 	// override any existing viewport moves which may be in progress
 	core->timer->SetMoveViewPort(p, 0, false);
-	// move it directly ourselves, since we might be paused
-	video->MoveViewportTo(p);
+	core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
+	vpOrigin = p;
+}
+
+Region GameControl::Viewport()
+{
+	return Region(vpOrigin, frame.Dimensions());
 }
 
 void GameControl::UpdateScrolling() {
@@ -1799,7 +1781,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 		return;
 
 	ClickPoint = p;
-	core->GetVideoDriver()->ConvertToGame( ClickPoint );
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
@@ -1851,7 +1832,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
-	Point p = core->GetVideoDriver()->ConvertToGame( mp );
+	Point p = mp + vpOrigin;
 	Game* game = core->GetGame();
 	if (!game) return;
 	Map* area = game->GetCurrentArea( );
@@ -1995,7 +1976,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 			}
 			CreateMovement(actor, move);
 		}
-		if (DoubleClick) Center(mp);
+		if (DoubleClick) MoveViewportTo(p, true);
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
@@ -2017,15 +1998,12 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 void GameControl::OnMouseWheelScroll(short x, short y)
 {
-	Region Viewport = core->GetVideoDriver()->GetViewport();
-	Viewport.x += x;
-	Viewport.y += y;
-
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
 	} else {
-		MoveViewportTo( Viewport.Origin(), false);
+		Point p(x, y);
+		MoveViewportTo( vpOrigin + p, false);
 	}
 }
 
@@ -2348,7 +2326,6 @@ bool GameControl::SetGUIHidden(bool hide)
 			}
 		}
 	}
-	core->GetVideoDriver()->SetViewport( Region(Owner->Frame().Origin(), frame.Dimensions()) );
 	return true;
 }
 

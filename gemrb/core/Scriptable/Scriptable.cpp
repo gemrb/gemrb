@@ -238,7 +238,7 @@ void Scriptable::FixHeadTextPos()
 }
 
 #define MAX_DELAY  6000
-void Scriptable::DrawOverheadText(const Point& sp)
+void Scriptable::DrawOverheadText()
 {
 	if (!overheadTextDisplaying)
 		return;
@@ -270,8 +270,7 @@ void Scriptable::DrawOverheadText(const Point& sp)
 	}
 
 	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
-	core->GetVideoDriver()->ConvertToScreen(p);
-	Region rgn( p - Point(100, cs) + sp, Size(200, 400) );
+	Region rgn( p - Point(100, cs), Size(200, 400) );
 	core->GetTextFont()->Print( rgn, OverheadText, palette,
 							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 
@@ -1724,7 +1723,7 @@ void Selectable::DrawCircle(const Region &vp)
 	}
 
 	if (sprite) {
-		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
+		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y );
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9

@@ -81,8 +81,7 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 			vcenter += rows * font->LineHeight;
 			w = w - (rgn.w * rows);
 		}
-		video->BlitSprite(Cursor, w + rgn.x + FontPosX,
-						  FontPosY + vcenter + rgn.y, true);
+		video->BlitSprite(Cursor, w + rgn.x + FontPosX, FontPosY + vcenter + rgn.y);
 	} else {
 		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
 				palette, Alignment );

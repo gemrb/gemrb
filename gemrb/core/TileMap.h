@@ -92,7 +92,7 @@ public:
 	void ClearOverlays();
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
-	void DrawOverlays(Region screen, int rain, int flags);
+	void DrawOverlays(const Region& screen, int rain, int flags);
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
 	Point GetMapSize();
 public:

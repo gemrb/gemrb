@@ -106,7 +106,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
-	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
+	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), &rgn );
 
 	unsigned int i;
 	unsigned int ec = worldmap->GetEntryCount();
@@ -121,18 +121,18 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
 				icon->SetPalette(pal_selected);
-				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
+				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 				icon->SetPalette(pal);
 				pal->release();
 			} else {
-				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
+				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 			}
 			Sprite2D::FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &rgn );
+			video->BlitSprite( AnimPicture, xOffs, yOffs, &rgn );
 		}
 	}
 

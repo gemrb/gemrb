@@ -68,13 +68,13 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 		case IE_GUI_SLIDER_KNOB:
 			core->GetVideoDriver()->BlitSprite( Knob,
 				rgn.x + KnobXPos + ( Pos * KnobStep ),
-				rgn.y + KnobYPos, true );
+				rgn.y + KnobYPos );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
 			core->GetVideoDriver()->BlitSprite( GrabbedKnob,
 				rgn.x + KnobXPos + ( Pos * KnobStep ),
-				rgn.y + KnobYPos, true );
+				rgn.y + KnobYPos );
 			break;
 	}
 }

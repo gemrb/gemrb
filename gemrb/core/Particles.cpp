@@ -191,15 +191,13 @@ bool Particles::AddNew(const Point &point)
 	return true;
 }
 
-void Particles::Draw(const Region &screen)
+void Particles::Draw(const Region &vp)
 {
-	int length; //used only for raindrops
-
 	Video *video=core->GetVideoDriver();
-	Region region = video->GetViewport();
+	Point p = vp.Origin();
 	if (owner) {
-		region.x-=pos.x;
-		region.y-=pos.y;
+		p.x-=pos.x;
+		p.y-=pos.y;
 	}
 	int i = size;
 	while (i--) {
@@ -218,6 +216,7 @@ void Particles::Draw(const Region &screen)
 			break;
 		}
 
+		int length; //used only for raindrops
 		if (state>=MAX_SPARK_PHASE) {
 			length = 6-abs(state-MAX_SPARK_PHASE-6);
 			state = 0;
@@ -243,26 +242,26 @@ void Particles::Draw(const Region &screen)
 				if (anims) {
 					Animation* anim = anims[0];
 					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-					video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
-						0, clr, NULL, fragments->GetPartPalette(0), &screen);
+					video->BlitGameSprite( nextFrame, points[i].pos.x - p.x, points[i].pos.y - p.y,
+						0, clr, NULL, fragments->GetPartPalette(0));
 				}
 			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos.x-region.x,
-				points[i].pos.y-region.y, 2, clr, true);
+			video->DrawCircle (points[i].pos.x - p.x,
+				points[i].pos.y - p.y, 2, clr);
 			break;
 		case SP_TYPE_POINT:
 		default:
-			video->SetPixel (points[i].pos - region.Origin(), clr);
+			video->SetPixel (points[i].pos - p, clr);
 			break;
 		// this is more like a raindrop
 		case SP_TYPE_LINE:
 			if (length) {
-				video->DrawLine (points[i].pos.x+region.x,
-					points[i].pos.y+region.y,
-					points[i].pos.x+region.x+(i&1),
-					points[i].pos.y+region.y+length, clr, true);
+				video->DrawLine (points[i].pos.x - p.x,
+					points[i].pos.y - p.y,
+					(points[i].pos.x - p.x) + (i&1),
+					(points[i].pos.y - p.y) + length, clr);
 			}
 			break;
 		}

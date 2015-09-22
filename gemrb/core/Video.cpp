@@ -33,7 +33,7 @@ namespace GemRB {
 const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
-	: Viewport(), fadeColor()
+	: fadeColor()
 {
 	drawingBuffer = NULL;
 	EvntManager = NULL;
@@ -226,14 +226,14 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitTiled(Region rgn, const Sprite2D* img, bool anchor)
+void Video::BlitTiled(Region rgn, const Sprite2D* img)
 {
 	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
 	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
 	for (int y = 0; y < yrep; y++) {
 		for (int x = 0; x < xrep; x++) {
 			BlitSprite(img, rgn.x + (x*img->Width),
-				 rgn.y + (y*img->Height), anchor, &rgn);
+				 rgn.y + (y*img->Height), &rgn);
 		}
 	}
 }
@@ -346,30 +346,6 @@ Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, uns
 	sum.a = Gamma10toGamma22[a / count];
 
 	return sum;
-}
-
-//Viewport specific
-Region Video::GetViewport() const
-{
-	return Viewport;
-}
-
-void Video::SetViewport(const Region& vp)
-{
-	Coor.x = (vp.x > width) ? width : vp.x;
-	Coor.y = (vp.y > height) ? height : vp.y;
-	Viewport.w = (vp.w > width) ? 0 : vp.w;
-	Viewport.h = (vp.h > height) ? 0 : vp.h;
-}
-
-void Video::MoveViewportTo(const Point& p)
-{
-	if (p != Viewport.Origin()) {
-		Point dp = p - Coor;
-		core->GetAudioDrv()->UpdateListenerPos( dp.x + width / 2, dp.y + height / 2 );
-		Viewport.x = p.x;
-		Viewport.y = p.y;
-	}
 }
 
 void Video::InitSpriteCover(SpriteCover* sc, int flags)

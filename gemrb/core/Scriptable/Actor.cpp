@@ -7419,7 +7419,7 @@ int Actor::WantDither() const
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint)
+void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Color &tint)
 {
 	Map* area = GetCurrentArea();
 
@@ -7427,7 +7427,7 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 		ScriptedAnimation* vvc = vvcCells[i];
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither(), GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(viewport, Pos, tint, area, WantDither(), GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
@@ -7439,14 +7439,13 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 	}
 }
 
-void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
-			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, const Color& tint)
+void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox,
+							SpriteCover*& newsc, Animation** anims,
+							unsigned char Face, const Color& tint)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
 	unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
 	Game* game = core->GetGame();
@@ -7476,8 +7475,8 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 			}
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
-			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
+			video->BlitGameSprite( nextFrame, cx - vp.x, cy - vp.y,
+				flags, tint, newsc, ca->GetPartPalette(partnum));
 		}
 	}
 }
@@ -7622,7 +7621,7 @@ bool Actor::HasBodyHeat() const
 	return true;
 }
 
-void Actor::Draw(const Region &screen)
+void Actor::Draw(const Region& vp)
 {
 	Map* area = GetCurrentArea();
 	if (!area) {
@@ -7704,10 +7703,7 @@ void Actor::Draw(const Region &screen)
 	cy -= heightmapindex;
 
 	//draw videocells under the actor
-	DrawVideocells(screen, vvcShields, tint);
-
-	Video* video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
+	DrawVideocells(vp, vvcShields, tint);
 
 	bool shoulddrawcircle = ShouldDrawCircle();
 	bool drawcircle = shoulddrawcircle;
@@ -7830,7 +7826,7 @@ void Actor::Draw(const Region &screen)
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(screen, icx, icy, sbbox, newsc,
+					DrawActorSprite(vp, icx, icy, sbbox, newsc,
 						anims, Face, mirrortint);
 					if (newsc != sc) {
 						delete sc;
@@ -7853,7 +7849,7 @@ void Actor::Draw(const Region &screen)
 					sbbox.x += blurdx; sbbox.y += blurdy;
 					blurx += blurdx; blury += blurdy;
 					newsc = sc = extraCovers[i];
-					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
+					DrawActorSprite(vp, blurx, blury, sbbox, newsc,
 						anims, Face, tint);
 					if (newsc != sc) {
 						delete sc;
@@ -7872,7 +7868,7 @@ void Actor::Draw(const Region &screen)
 
 		// actor itself
 		newsc = sc = GetSpriteCover();
-		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
+		DrawActorSprite(vp, cx, cy, BBox, newsc, anims, Face, tint);
 		if (newsc != sc) SetSpriteCover(newsc);
 
 		// blur sprites in front of the actor
@@ -7883,7 +7879,7 @@ void Actor::Draw(const Region &screen)
 					sbbox.x -= blurdx; sbbox.y -= blurdy;
 					blurx -= blurdx; blury -= blurdy;
 					newsc = sc = extraCovers[i];
-					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
+					DrawActorSprite(vp, blurx, blury, sbbox, newsc,
 						anims, Face, tint);
 					if (newsc != sc) {
 						delete sc;
@@ -7906,7 +7902,7 @@ void Actor::Draw(const Region &screen)
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(screen, icx, icy, sbbox, newsc,
+					DrawActorSprite(vp, icx, icy, sbbox, newsc,
 						anims, Face, mirrortint);
 					if (newsc != sc) {
 						delete sc;
@@ -7921,7 +7917,7 @@ void Actor::Draw(const Region &screen)
 	}
 
 	//draw videocells over the actor
-	DrawVideocells(screen, vvcOverlays, tint);
+	DrawVideocells(vp, vvcOverlays, tint);
 
 	// display pc hitpoints if requested
 	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
@@ -8555,7 +8551,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			damage *= wi.critmulti;
 
 			// check if critical hit needs a screenshake
-			if (crit_hit_scr_shake && (InParty || target->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
+			if (crit_hit_scr_shake && (InParty || target->InParty) ) {
 				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
 			}
 

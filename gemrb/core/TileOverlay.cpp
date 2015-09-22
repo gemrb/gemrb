@@ -76,19 +76,20 @@ void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 	}
 }
 
-void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, int flags)
+void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags)
 {
-	Video* vid = core->GetVideoDriver();
-	Region vp = vid->GetViewport();
-
 	// if the video's viewport is partially outside of the map, bump it back
-	BumpViewport(viewport, vp);
-	// determine which tiles are visible
-	int sx = vp.x / 64;
-	int sy = vp.y / 64;
-	int dx = ( vp.x + vp.w + 63 ) / 64;
-	int dy = ( vp.y + vp.h + 63 ) / 64;
+	// FIXME: TitleOverlay should have nothing to do with moving the viewport
+	// move this to GameControl
+	//BumpViewport(viewport, vp);
 
+	// determine which tiles are visible
+	int sx = viewport.x / 64;
+	int sy = viewport.y / 64;
+	int dx = ( viewport.x + viewport.w + 63 ) / 64;
+	int dy = ( viewport.y + viewport.h + 63 ) / 64;
+
+	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
@@ -99,8 +100,8 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, in
 				anim = tile->anim[0];
 			}
 			assert(anim);
-			vid->BlitTile( anim->NextFrame(), 0, viewport.x + ( x * 64 ),
-				viewport.y + ( y * 64 ), &viewport, flags );
+			vid->BlitTile( anim->NextFrame(), 0, ( x * 64 ) - viewport.x,
+						  ( y * 64 ) - viewport.y, NULL, flags );
 			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
@@ -115,18 +116,18 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, in
 						if (RedrawTile) {
 							vid->BlitTile( ovtile->anim[0]->NextFrame(),
 						                   tile->anim[0]->NextFrame(),
-							               viewport.x + ( x * 64 ),
-							               viewport.y + ( y * 64 ),
-							               &viewport, flags );
+							               ( x * 64 ) - viewport.x,
+							               ( y * 64 ) - viewport.y,
+							               NULL, flags );
 						} else {
 							Sprite2D* mask = 0;
 							if (tile->anim[1])
 								mask = tile->anim[1]->NextFrame();
-							vid->BlitTile( ovtile->anim[0]->NextFrame(),
+								vid->BlitTile( ovtile->anim[0]->NextFrame(),
 						                   mask,
-							               viewport.x + ( x * 64 ),
-							               viewport.y + ( y * 64 ),
-							               &viewport, TILE_HALFTRANS | flags );
+							               ( x * 64 ) - viewport.x,
+							               ( y * 64 ) - viewport.y,
+							               NULL, TILE_HALFTRANS | flags );
 						}
 					}
 				}

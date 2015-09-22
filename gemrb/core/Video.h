@@ -99,9 +99,7 @@ public:
 
 protected:
 	unsigned long lastTime;
-	Point Coor;
 	EventMgr* EvntManager;
-	Region Viewport;
 	Region screenClip;
 	int width,height,bpp;
 	bool fullscreen;
@@ -169,7 +167,7 @@ public:
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags) = 0;
-	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
+	virtual void BlitSprite(const Sprite2D* spr, int x, int y,
 							const Region* clip = NULL, Palette* palette = NULL) = 0;
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst,
 							Palette* pal = NULL) = 0;
@@ -177,33 +175,30 @@ public:
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
-		unsigned int flags, Color tint,
-		SpriteCover* cover, Palette *palette = NULL,
-		const Region* clip = NULL, bool anchor = false) = 0;
+								unsigned int flags, Color tint,
+								SpriteCover* cover, Palette *palette = NULL,
+								const Region* clip = NULL) = 0;
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
+	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true) = 0;
 	/** this function draws a clipped sprite */
 	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
-	virtual void SetPixel(const Point&, const Color& color, bool clipped = true) = 0;
+	virtual void SetPixel(const Point&, const Color& color) = 0;
 	/** Draws a circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
+	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color) = 0;
 	/** Draws an Ellipse Segment */
 	virtual void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
-		double anglefrom, double angleto, bool drawlines = true, bool clipped = true) = 0;
+									double anglefrom, double angleto, bool drawlines = true) = 0;
 	/** Draws an ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
-		unsigned short yr, const Color& color, bool clipped = true) = 0;
+	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color) = 0;
 	/** Draws a polygon on the screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color,
-		bool fill = false) = 0;
+	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false) = 0;
 	/** Draws a line segment */
-	virtual void DrawLine(short x1, short y1, short x2, short y2,
-		const Color& color, bool clipped = false) = 0;
+	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color) = 0;
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
+	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite vertically, returns new sprite */
@@ -213,10 +208,6 @@ public:
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
-	/** Converts a Screen Coordinate to a Game Coordinate */
-	virtual Point ConvertToGame(const Point& p) = 0;
-	/** Converts a Game Coordinate to a Screen Coordinate */
-	virtual Point ConvertToScreen(const Point& p) = 0;
 	/** Sets the Fading Color */
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */
@@ -234,9 +225,6 @@ public:
 	Sprite2D* CreateLight(int radius, int intensity);
 
 	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
-	Region GetViewport(void) const;
-	void SetViewport(const Region&);
-	void MoveViewportTo(const Point&);
 };
 
 }

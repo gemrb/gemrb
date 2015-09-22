@@ -104,6 +104,7 @@ private:
 	Point ClickPoint;
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
+	Point vpOrigin;
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
@@ -146,7 +147,7 @@ private:
 	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
+	void DrawArrowMarker(Point p, const Color& color);
 
 protected:
 	/** Draws the Control on the Output Display */
@@ -195,10 +196,10 @@ public:
 	int GetDialogueFlags() { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
-	/* centers viewport to the points specified */
-	void Center(const Point&) const;
 	void ClearMouseState();
-	void MoveViewportTo(Point, bool center) const;
+
+	void MoveViewportTo(Point, bool center);
+	Region Viewport();
 
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);

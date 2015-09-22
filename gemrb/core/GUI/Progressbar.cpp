@@ -67,8 +67,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		bcksprite=BackGround;
 	}
 	if (bcksprite) {
-		core->GetVideoDriver()->BlitSprite( bcksprite,
-			rgn.x, rgn.y, true, &rgn );
+		core->GetVideoDriver()->BlitSprite( bcksprite, rgn.x, rgn.y, &rgn );
 		if( bcksprite==BackGround2) {
 			return; //done for animated progbar
 		}
@@ -83,11 +82,10 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		//this is the PST/IWD specific part
 		Count = Value*w/100;
 		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
-		core->GetVideoDriver()->BlitSprite( BackGround2, 
-			r.x, r.y, true, &r );
+		core->GetVideoDriver()->BlitSprite( BackGround2, r.x, r.y, &r );
 
 		core->GetVideoDriver()->BlitSprite( PBarCap,
-			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos, true );
+			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos );
 		return;
 	}
 
@@ -95,7 +93,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, Owner->Origin().x, Owner->Origin().y, true );
+		core->GetVideoDriver()->BlitSprite( Knob, Owner->Origin().x, Owner->Origin().y );
 	}
 }
 

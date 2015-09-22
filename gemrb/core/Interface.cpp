@@ -2679,9 +2679,9 @@ void Interface::DrawTooltip (const String& string, Point p)
 
 	Region clip = Region( x, y, w, h );
 	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &clip );
-		video->BlitSprite( TooltipBack[1], x, y, true );
-		video->BlitSprite( TooltipBack[2], x + w, y, true );
+		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, &clip );
+		video->BlitSprite( TooltipBack[1], x, y );
+		video->BlitSprite( TooltipBack[2], x + w, y );
 	}
 
 	if (TooltipBack) {
@@ -4681,8 +4681,8 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 			ieDword autopause_center = 0;
 			vars->Lookup("Auto Pause Center", autopause_center);
 			if (autopause_center && target) {
-				const GameControl* gc = GetGameControl();
-				gc->Center(GetVideoDriver()->ConvertToScreen(target->Pos));
+				GameControl* gc = GetGameControl();
+				gc->MoveViewportTo(target->Pos, true);
 
 				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
 					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);

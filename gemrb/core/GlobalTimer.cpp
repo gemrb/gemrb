@@ -23,7 +23,6 @@
 #include "ControlAnimation.h"
 #include "Game.h"
 #include "Interface.h"
-#include "Video.h"
 #include "GUI/GameControl.h"
 #include "RNG/RNG_SFMT.h"
 
@@ -94,17 +93,18 @@ bool GlobalTimer::ViewportIsMoving()
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 {
-	speed=spd;
-	currentVP=core->GetVideoDriver()->GetViewport();
 	if (center) {
+		GameControl* gc = core->GetGameControl();
+		currentVP = gc->Viewport();
 		p = p - currentVP.Origin();
 	}
 	goal = p;
+	speed = spd;
 }
 
 void GlobalTimer::DoStep(int count)
 {
-	Video *video = core->GetVideoDriver();
+	GameControl* gc = core->GetGameControl();
 
 	Point p = currentVP.Origin();
 	if (p != goal) {
@@ -144,7 +144,7 @@ void GlobalTimer::DoStep(int count)
 			}
 		}
 	}
-	video->MoveViewportTo(p);
+	gc->MoveViewportTo(p, false);
 }
 
 bool GlobalTimer::Update()
@@ -340,6 +340,8 @@ void GlobalTimer::ClearAnimations()
 void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
 	unsigned long Count)
 {
+	// FIXME: should this only happen if it occurs inside the viewport?
+	//gc->Viewport().PointInside(Pos)
 	this->shakeX = shakeX;
 	this->shakeY = shakeY;
 	shakeCounter = Count+1;

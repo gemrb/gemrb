@@ -1434,7 +1434,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	Actor* actor = ( Actor* ) Sender;
 	Point p((short) (vp.x+vp.w/2), (short) (vp.y+vp.h/2) );
 	if (!actor->InMove() || actor->Destination != p) {

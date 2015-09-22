@@ -71,7 +71,7 @@ Container::~Container()
 	FreeGroundIcons();
 }
 
-void Container::DrawPile(bool highlight, Region screen, Color tint)
+void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 {
 	Video* video = core->GetVideoDriver();
 	CreateGroundIconCover();
@@ -79,7 +79,7 @@ void Container::DrawPile(bool highlight, Region screen, Color tint)
 		if (groundicons[i]) {
 			//draw it with highlight
 			video->BlitGameSprite(groundicons[i],
-				screen.x + Pos.x, screen.y + Pos.y,
+				Pos.x - vp.x, Pos.y - vp.y,
 				BLIT_TINTED | (highlight ? 0:BLIT_NOSHADOW),
 				tint, groundiconcover);
 		}

@@ -42,7 +42,6 @@
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
 #include "RNG/RNG_SFMT.h"
@@ -710,7 +709,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		//creates creature just off the screen
 		case CC_OFFSCREEN:
 			{
-			Region vp = core->GetVideoDriver()->GetViewport();
+			Region vp = core->GetGameControl()->Viewport();
 			radius=vp.w/2;
 			//center of screen
 			pnt.x = vp.x+radius;
