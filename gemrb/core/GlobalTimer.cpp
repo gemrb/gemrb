@@ -100,6 +100,10 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 	}
 	goal = p;
 	speed = spd;
+	if (speed == 0) {
+		// do this instantly, even if paused
+		core->GetGameControl()->MoveViewportTo(goal, false);
+	}
 }
 
 void GlobalTimer::DoStep(int count)
@@ -108,24 +112,23 @@ void GlobalTimer::DoStep(int count)
 
 	Point p = currentVP.Origin();
 	if (p != goal) {
-		if (speed) {
-			if (p.x < goal.x) {
-				p.x += speed*count;
-				if (p.x > goal.x) p.x = goal.x;
-			} else {
-				p.x -= speed*count;
-				if (p.x < goal.x) p.x = goal.x;
-			}
-			if (p.y < goal.y) {
-				p.y += speed*count;
-				if (p.y > goal.y) p.y = goal.y;
-			} else {
-				p.y -= speed*count;
-				if (p.y < goal.y) p.y = goal.y;
-			}
+		assert(speed);
+
+		if (p.x < goal.x) {
+			p.x += speed*count;
+			if (p.x > goal.x) p.x = goal.x;
 		} else {
-			p = goal;
+			p.x -= speed*count;
+			if (p.x < goal.x) p.x = goal.x;
 		}
+		if (p.y < goal.y) {
+			p.y += speed*count;
+			if (p.y > goal.y) p.y = goal.y;
+		} else {
+			p.y -= speed*count;
+			if (p.y < goal.y) p.y = goal.y;
+		}
+
 		currentVP.x = p.x;
 		currentVP.y = p.y;
 	}
