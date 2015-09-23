@@ -7188,8 +7188,20 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 void Actor::ApplyModal(ieResRef modalSpell)
 {
-	if (core->ModalStates[ModalState].aoe_spell) {
+	unsigned int aoe = core->ModalStates[ModalState].aoe_spell;
+	if (aoe == 1) {
 		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
+	} else if (aoe == 2) {
+		// target actors around us manually
+		// used for iwd2 songs, as the spells don't use an aoe projectile
+		if (!area) return;
+		Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
+		Actor **poi = neighbours;
+		while (*poi) {
+			core->ApplySpell(modalSpell, *poi, this, 0);
+			poi++;
+		}
+		free(neighbours);
 	} else {
 		core->ApplySpell(modalSpell, this, this, 0);
 	}
