@@ -718,17 +718,9 @@ def ActionQWeaponPressed (which):
 	UpdateActionsWindow ()
 	return
 
-def ActionQWeapon1Pressed ():
-	ActionQWeaponPressed(0)
-
-def ActionQWeapon2Pressed ():
-	ActionQWeaponPressed(1)
-
-def ActionQWeapon3Pressed ():
-	ActionQWeaponPressed(2)
-
-def ActionQWeapon4Pressed ():
-	ActionQWeaponPressed(3)
+# TODO: implement full weapon set switching instead
+def ActionQWeaponRightPressed (action):
+	ActionQItemRightPressed (action)
 
 ###############################################
 # quick icons for spells, innates, songs, shapes
@@ -750,9 +742,9 @@ def ActionQSpellRightPressed (which):
 suf = ["", "Right"]
 # this function is used to generate various action bar actions
 # that should be available in 9 slots (iwd2)
-def GenerateButtonActions(num, name, g, right=0):
+def GenerateButtonActions(num, name, g, right=0, offset=0):
 	dec = "def Action" + name + str(num+1) + suf[right] + "Pressed():\n"
-	dec += "\tAction" + name + suf[right] + "Pressed(" + str(num) + ")"
+	dec += "\tAction" + name + suf[right] + "Pressed(" + str(num+offset) + ")"
 	exec(dec, g) # pass on the same global dict, so we remain in the top scope
 
 for i in range(9):
@@ -764,6 +756,9 @@ for i in range(9):
 	GenerateButtonActions(i, "QShape", globals(), 1)
 	GenerateButtonActions(i, "QSong", globals(), 0)
 	GenerateButtonActions(i, "QSong", globals(), 1)
+for i in range(4):
+	GenerateButtonActions(i, "QWeapon", globals(), 0)
+	GenerateButtonActions(i, "QWeapon", globals(), 1, 10)
 
 def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
@@ -994,18 +989,6 @@ def ActionQItem4RightPressed ():
 
 def ActionQItem5RightPressed ():
 	ActionQItemRightPressed (23)
-
-def ActionQWeapon1RightPressed ():
-	ActionQItemRightPressed (10)
-
-def ActionQWeapon2RightPressed ():
-	ActionQItemRightPressed (11)
-
-def ActionQWeapon3RightPressed ():
-	ActionQItemRightPressed (12)
-
-def ActionQWeapon4RightPressed ():
-	ActionQItemRightPressed (13)
 
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
