@@ -1399,6 +1399,11 @@ void GameControl::OnGlobalMouseMove(const Point& p)
 }
 #endif
 
+void GameControl::MoveViewPortTo(const Point& p, int speed)
+{
+	core->timer->SetMoveViewPort(p, speed, false);
+}
+
 void GameControl::MoveViewportTo(Point p, bool center)
 {
 	Map *area = core->GetGame()->GetCurrentArea();
@@ -1421,8 +1426,6 @@ void GameControl::MoveViewportTo(Point p, bool center)
 		p.y = mapsize.y - frame.h - 1;
 	}
 
-	// override any existing viewport moves which may be in progress
-	core->timer->SetMoveViewPort(p, 0, false);
 	core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
 	vpOrigin = p;
 }

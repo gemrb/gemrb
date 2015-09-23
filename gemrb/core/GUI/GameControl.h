@@ -198,6 +198,7 @@ public:
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	void ClearMouseState();
 
+	void MoveViewPortTo(const Point&, int speed);
 	void MoveViewportTo(Point, bool center);
 	Region Viewport();
 
