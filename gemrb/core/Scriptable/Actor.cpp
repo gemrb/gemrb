@@ -7148,11 +7148,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		// handle lingering modal spells like bardsong in iwd2
 		if (modalSpellLingering && LingeringModalSpell[0]) {
 			modalSpellLingering--;
-			if (core->ModalStates[ModalState].aoe_spell) {
-				core->ApplySpellPoint(LingeringModalSpell, GetCurrentArea(), Pos, this, 0);
-			} else {
-				core->ApplySpell(LingeringModalSpell, this, this, 0);
-			}
+			ApplyModal(LingeringModalSpell);
 		}
 		if (ModalState == MS_NONE) {
 			return;
@@ -7172,11 +7168,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			ModalSpell[0]='*';
 		} else if(ModalSpell[0]!='*') {
 			if (ModalSpellSkillCheck()) {
-				if (core->ModalStates[ModalState].aoe_spell) {
-					core->ApplySpellPoint(ModalSpell, GetCurrentArea(), Pos, this, 0);
-				} else {
-					core->ApplySpell(ModalSpell, this, this, 0);
-				}
+				ApplyModal(ModalSpell);
 				if (InParty) {
 					displaymsg->DisplayStringName(core->ModalStates[ModalState].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
@@ -7192,6 +7184,15 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		core->GetGame()->ResetPartyCommentTimes();
 	}
 
+}
+
+void Actor::ApplyModal(ieResRef modalSpell)
+{
+	if (core->ModalStates[ModalState].aoe_spell) {
+		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
+	} else {
+		core->ApplySpell(modalSpell, this, this, 0);
+	}
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
