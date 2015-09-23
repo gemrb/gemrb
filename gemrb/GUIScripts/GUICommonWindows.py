@@ -871,7 +871,7 @@ def SelectBardSong (which):
 	qsong = songs[idx]['SpellResRef']
 	# the effect needs to be set each tick, so we use FX_DURATION_INSTANT_PERMANENT==1 timing mode
 	# GemRB.SetModalState can also set the spell, but it wouldn't persist
-	GemRB.ApplyEffect (pc, 'ChangeBardSong', 0, 0, qsong, "", "", "", 1) # FX_DURATION_INSTANT_PERMANENT
+	GemRB.ApplyEffect (pc, 'ChangeBardSong', 0, idx, qsong, "", "", "", 1)
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""

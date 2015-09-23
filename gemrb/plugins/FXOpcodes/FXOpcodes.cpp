@@ -832,6 +832,7 @@ static EffectRef fx_pst_jumble_curse_ref = { "JumbleCurse", -1 };  //PST specifi
 static EffectRef fx_deaf_state_iwd2_ref = { "State:DeafnessIWD2", -1 }; //iwd2
 static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
+static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 
 static void Cleanup()
 {
@@ -6342,6 +6343,15 @@ int fx_damageluck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
+	// remove any previous song effects, as they are used with permanent timing
+	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1, NULL);
+	unsigned int songCount = target->spellbook.GetSpellInfoSize(1<<IE_IWD2_SPELL_SONG);
+	if (count > 0 && songCount > 0) {
+		for (unsigned int i=0; i<songCount; i++) {
+			if (i == fx->Parameter2) continue;
+			target->fxqueue.RemoveAllEffectsWithParam(fx_change_bardsong_ref, i);
+		}
+	}
 	memcpy(target->BardSong, fx->Resource, 8);
 	return FX_APPLIED;
 }
