@@ -784,7 +784,8 @@ def ActionQShapeRightPressed (which):
 	UpdateActionsWindow ()
 
 def ActionQSongPressed (which):
-	ActionQSpellPressed (which)
+	SelectBardSong (which) # TODO: verify parameter once we have actionbar customisation
+	ActionBardSongPressed ()
 
 def ActionQSongRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
@@ -861,6 +862,16 @@ def ActionShapeChangePressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
+
+def SelectBardSong (which):
+	pc = GemRB.GameGetFirstSelectedActor ()
+	songs = Spellbook.GetKnownSpells (pc, IE_IWD2_SPELL_SONG)
+	# "which" is a mashup of the spell index with it's type
+	idx = which % ((1<<IE_IWD2_SPELL_SHAPE)*100)
+	qsong = songs[idx]['SpellResRef']
+	# the effect needs to be set each tick, so we use FX_DURATION_INSTANT_PERMANENT==1 timing mode
+	# GemRB.SetModalState can also set the spell, but it wouldn't persist
+	GemRB.ApplyEffect (pc, 'ChangeBardSong', 0, 0, qsong, "", "", "", 1) # FX_DURATION_INSTANT_PERMANENT
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""
@@ -1117,7 +1128,7 @@ def SpellPressed ():
 	Type = GemRB.GetVar ("Type")
 
 	if Type == 1<<IE_IWD2_SPELL_SONG:
-		#SelectBardSong(Spell)
+		SelectBardSong (Spell)
 		ActionBardSongPressed()
 		return
 
