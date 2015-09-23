@@ -545,7 +545,7 @@ def FloatMenuSelectSpells ():
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
 	float_menu_selected = None
-	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
+#	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 	return
 
