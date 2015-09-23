@@ -8282,19 +8282,22 @@ void Actor::SetSoundFolder(const char *soundset)
 
 void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 {
-	if (!overrideSet) {
-		strncpy(overrideSet, PCStats->SoundSet, 8);
+	ieResRef set;
+	if (overrideSet) {
+		CopyResRef(set, overrideSet);
+	} else {
+		CopyResRef(set, PCStats->SoundSet);
 	}
 
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
 		if (full) {
 			strcat(soundset,"/");
-			strncat(soundset, overrideSet, 8);
+			strncat(soundset, set, 8);
 		}
 	}
 	else {
-		strnlwrcpy(soundset, overrideSet, 8);
+		strnlwrcpy(soundset, set, 8);
 	}
 }
 
