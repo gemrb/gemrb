@@ -73,6 +73,11 @@ void ReleaseMemorySpell()
 SPLExtHeader::SPLExtHeader(void)
 {
 	features = NULL;
+	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
+	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
+	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
+	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
+	MemorisedIcon[0] = 0;
 }
 
 SPLExtHeader::~SPLExtHeader(void)
