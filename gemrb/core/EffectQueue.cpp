@@ -883,11 +883,13 @@ static int check_type(Actor* actor, Effect* fx)
 	//if source is unspecified, don't resist it
 	if( fx->Source[0]) {
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity");
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->Source);
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity2");
+			if (strnicmp(fx->Source, "detect", 6)) { // our secret door pervasive effect
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->Source);
+			}
 			return 0;
 		}
 	}
