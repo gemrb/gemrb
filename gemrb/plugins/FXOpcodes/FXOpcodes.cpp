@@ -1673,16 +1673,16 @@ int fx_lore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_lore_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	ieDword mode = fx->Parameter1, value = fx->Parameter2;
+	ieDword mode = fx->Parameter2, value = fx->Parameter1;
 	if (mode == 2) {
 		//guaranteed identification
 		mode = MOD_ABSOLUTE;
 		value = 100;
 	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		target->NewBase(IE_LORE, mode, value);
+		target->NewBase(IE_LORE, value, mode);
 	} else {
-		target->NewStat(IE_LORE, mode, value);
+		target->NewStat(IE_LORE, value, mode);
 	}
 	return FX_PERMANENT;
 }
