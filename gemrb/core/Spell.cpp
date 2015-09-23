@@ -94,6 +94,7 @@ Spell::Spell(void)
 	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
 	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
 	TimePerLevel = TimeConstant = 0;
+	SpellName = SpellNameIdentified = Flags = SpellType = ExclusionSchool = PriestType;
 }
 
 Spell::~Spell(void)
