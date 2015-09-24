@@ -583,11 +583,38 @@ def SetupItemAbilities(pc, slot):
 		UpdateActionsWindow ()
 	return
 
- #only in iwd2? could be exported...
+# iwd2 spell book/class selection
 def SetupBookSelection ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+
+	# get all the books that still have non-depleted memorisations
+	# we need this list, so we can avoid holes in the action bar
+	usableBooks = []
+	for i in range (IE_IWD2_SPELL_SONG):
+		bookClass = i
+		if i == IE_IWD2_SPELL_INNATE: # shape stat comes later (8 vs 10)
+			bookClass = IE_IWD2_SPELL_SHAPE
+
+		enabled = False
+		if i <= (IE_IWD2_SPELL_DOMAIN + 1): # booktypes up to and including domain + shapes
+			spellCount = len(Spellbook.GetUsableMemorizedSpells (pc, bookClass))
+			enabled = spellCount > 0
+		if enabled:
+			usableBooks.append(i)
+
+	# if we have only one or only cleric+domain, skip to the spells
+	bookCount = len(usableBooks)
+	if bookCount == 1 or (bookCount == 2 and IE_IWD2_SPELL_CLERIC in usableBooks):
+		GemRB.SetVar ("ActionLevel", UAW_SPELLS_DIRECT)
+		UpdateActionsWindow ()
+		return
+
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-		Button.SetActionIcon (globals(), 50+i)
+		if i >= len(usableBooks):
+			Button.SetActionIcon (globals(), -1)
+			continue
+		Button.SetActionIcon (globals(), 40+usableBooks[i])
 	return
 
 #you can change this for custom skills, this is the original engine
@@ -659,8 +686,14 @@ def UpdateActionsWindow ():
 		CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
 	elif level == UAW_EQUIPMENT:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
-	elif level == UAW_SPELLS: #spells
+	elif level == UAW_SPELLS or level == UAW_SPELLS_DIRECT: #spells
+
 		if GameCheck.IsIWD2():
+			if level == UAW_SPELLS:
+				# set up book selection if appropriate
+				SetupBookSelection ()
+				return
+			# otherwise just throw everything in a single list
 			# everything but innates, songs and shapes
 			type = (1<<IE_IWD2_SPELL_INNATE) - 1
 		else:
