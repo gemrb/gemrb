@@ -362,6 +362,12 @@ Map::Map(void)
 	Background = NULL;
 	BgDuration = 0;
 	LastGoCloser = 0;
+	AreaFlags = AreaType = AreaDifficulty = 0;
+	Rain = Snow = Fog = Lightning = DayNight = 0;
+	trackString = trackFlag = trackDiff = 0;
+	Width = Height = 0;
+	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
+	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
 }
 
 Map::~Map(void)
