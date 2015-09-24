@@ -125,9 +125,9 @@ def OpenRecordsWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
-	OptionsWindow.Focus()
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
 	Window.Focus()
-	PortraitWindow.Focus()
 	return
 
 #original returns to game before continuing...
@@ -282,7 +282,7 @@ def UpdateRecordsWindow ():
 	Text = Window.GetControl (45)
 	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
-	Window.Focus()
+
 	return
 
 def GetStatColor (pc, stat):
@@ -847,9 +847,9 @@ def CloseInformationWindow ():
 		InformationWindow.Unload ()
 	InformationWindow = None
 
-	OptionsWindow.Focus()
+	OptionsWindow.SetVisible(True)
+	PortraitWindow.SetVisible(True)
 	RecordsWindow.Focus()
-	PortraitWindow.Focus()
 	return
 
 def OpenKitInfoWindow ():
