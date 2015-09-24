@@ -654,16 +654,17 @@ def UpdateActionsWindow ():
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == UAW_SPELLS: #spells
 		if GameCheck.IsIWD2():
-			type = 255
+			# everything but innates, songs and shapes
+			type = (1<<IE_IWD2_SPELL_INNATE) - 1
 		else:
-			type = 3
+			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_INNATES: #innates
 		if GameCheck.IsIWD2():
-			type = 256 + 1024
+			type = (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
 		else:
-			type = 4
+			type = 1<<IE_SPELL_TYPE_INNATE
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QWEAPONS: #quick weapon/item ability selection
@@ -675,25 +676,29 @@ def UpdateActionsWindow ():
 		SetupSkillSelection()
 	elif level == UAW_QSPELLS: # quickspells, but with innates too
 		if GameCheck.IsIWD2():
-			type = 255 + 256 + 1024
+			type = (1<<IE_IWD2_SPELL_INNATE) - 1
+			type += (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
 		else:
-			type = 7
+			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD) + (1<<IE_SPELL_TYPE_INNATE)
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QSHAPES: # shapes selection
-		GemRB.SetVar ("Type", 1024)
-		Spellbook.SetupSpellIcons(CurrentWindow, 1024, TopIndex, ActionBarControlOffset)
+		type = 1<<IE_IWD2_SPELL_SHAPE
+		GemRB.SetVar ("Type", type)
+		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QSONGS: # songs selection
-		GemRB.SetVar ("Type", 512)
-		Spellbook.SetupSpellIcons(CurrentWindow, 512, TopIndex, ActionBarControlOffset)
+		type = 1<<IE_IWD2_SPELL_SONG
+		GemRB.SetVar ("Type", type)
+		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_BOOK: # spellbook selection
 		type = GemRB.GetVar ("Type")
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	elif level == UAW_2DASPELLS: # spells from a 2da (fx_select_spell)
 		if GameCheck.IsIWD2():
-			type = 255
+			# everything but innates, songs and shapes
+			type = (1<<IE_IWD2_SPELL_INNATE) - 1
 		else:
-			type = 3
+			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons (CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	else:
