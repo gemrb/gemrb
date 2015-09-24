@@ -420,6 +420,7 @@ GameControl* Interface::StartGameControl()
 	ControlScriptingRef* gcref = new ControlScriptingRef(gamectrl, 0, "GC");
 	gamectrl->AssignScriptingRef(gcref);
 	ScriptEngine::RegisterScriptingRef(gcref);
+	RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
