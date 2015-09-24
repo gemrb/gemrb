@@ -116,7 +116,7 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 /** Sets a Window on the Top */
 bool WindowManager::FocusWindow(Window* win)
 {
-	if (OrderFront(win)) {
+	if (!IsPresentingModalWindow() && OrderFront(win)) {
 		win->SetDisabled(false);
 		return true;
 	}
