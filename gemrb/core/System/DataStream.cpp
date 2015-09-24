@@ -32,7 +32,7 @@ static bool EndianSwitch = false;
 
 DataStream::DataStream(void)
 {
-	Pos = 0;
+	Pos = size = 0;
 	Encrypted = false;
 }
 
