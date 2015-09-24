@@ -1741,12 +1741,16 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::CreatureHidden(Scriptable* Sender, Trigger* /*parameters*/)
+int GameScript::CreatureHidden(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target) {
 		return 0;
 	}
-	Actor *act=(Actor *) Sender;
+	if (target->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *act = (Actor *) target;
 
 	//this stuff is not completely clear, but HoW has a flag for this
 	//and GemRB uses the avatarremoval stat for it.
