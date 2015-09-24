@@ -2349,6 +2349,11 @@ void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_DOOR) {
 		return;
 	}
+	// two dialog states in pst (and nothing else) use "FALSE" (yes, quoted)
+	// they're on a critical path so we have to handle this data bug ourselves
+	if (parameters->int0Parameter == -1) {
+		parameters->int0Parameter = 0;
+	}
 	Door* door = ( Door* ) tar;
 	door->SetDoorLocked( parameters->int0Parameter!=0, false);
 }
