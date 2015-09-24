@@ -73,7 +73,6 @@ def OpenInventoryWindow ():
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 
 	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		GUICommon.GameWindow.Focus()
 		if InventoryWindow:
 			InventoryWindow.Unload ()
 		InventoryWindow = None

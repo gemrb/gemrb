@@ -144,7 +144,6 @@ def CloseStoreWindow ():
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
-		GUICommon.GameWindow.Focus() #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
 
@@ -174,7 +173,6 @@ def OpenStoreWindow ():
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1

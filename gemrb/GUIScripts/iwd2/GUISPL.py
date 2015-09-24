@@ -58,7 +58,6 @@ def OpenSpellBookWindow ():
 
 		SpellBookWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -68,7 +67,6 @@ def OpenSpellBookWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUISPL", 800, 600)
 	SpellBookWindow = Window = GemRB.LoadWindow (2)

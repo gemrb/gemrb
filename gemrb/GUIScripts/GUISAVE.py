@@ -53,7 +53,6 @@ def OpenSaveWindow ():
 
 	GemRB.GamePause (1, 3)
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 
 	if GameCheck.IsIWD2():
 		GemRB.LoadWindowPack ("GUISAVE", 800, 600)
@@ -350,6 +349,5 @@ def CloseSaveWindow ():
 		GemRB.SetNextScript ("Start")
 		return
 
-	GUICommon.GameWindow.Focus() #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	return

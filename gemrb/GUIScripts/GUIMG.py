@@ -62,7 +62,6 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -72,7 +71,6 @@ def OpenMageWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 
@@ -684,7 +682,6 @@ def ContingencyOk ():
 	if GemRB.LearnSpell (pc, Source+"d", LS_MEMO):
 		print "EEEEK! Failed to learn sequencer/contingency!\n\n"
 	OtherWindow.Unload()
-	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyCancel ():
@@ -692,7 +689,6 @@ def ContingencyCancel ():
 
 	GemRB.SetPlayerStat (pc, IE_IDENTIFYMODE, 0)
 	OtherWindow.Unload()
-	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyHelpSpell ():

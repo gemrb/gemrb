@@ -75,13 +75,11 @@ def OpenInventoryWindow ():
 		OldOptionsWindow = None
 		#don't go back to multi selection mode when going to the store screen
 		if not GemRB.GetVar ("Inventory"):
-			GUICommon.GameWindow.Focus()
 			GemRB.UnhideGUI ()
 			GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 
 	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)

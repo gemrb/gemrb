@@ -76,7 +76,6 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -86,7 +85,6 @@ def OpenRecordsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 
 	GemRB.LoadWindowPack ("GUIREC", 800, 600)
 	RecordsWindow = Window = GemRB.LoadWindow (2)

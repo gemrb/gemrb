@@ -60,7 +60,6 @@ def OpenJournalWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 
 
-		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -70,7 +69,6 @@ def OpenJournalWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 	GemRB.LoadWindowPack ("GUIJRNL", 800, 600)
 	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow.ID)

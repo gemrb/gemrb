@@ -42,8 +42,6 @@ def OnLoad():
 #	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 #	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-##	GUICommon.GameWindow.Focus()
-
 	UpdateControlStatus()
 
 	# set up some *initial* text (UpdateControlStatus will get called several times)

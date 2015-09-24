@@ -81,7 +81,6 @@ def CloseOptionsWindow ():
 
 	GameOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.Focus()
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None

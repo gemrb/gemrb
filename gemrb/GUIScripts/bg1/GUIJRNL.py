@@ -52,7 +52,6 @@ def OpenJournalWindow ():
 		
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.Focus()
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -68,7 +67,6 @@ def OpenJournalWindow ():
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(False)
 	
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
 	JournalWindow = Window = GemRB.LoadWindow (2)

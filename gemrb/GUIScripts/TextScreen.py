@@ -148,7 +148,6 @@ def EndTextScreen ():
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
 
-	GUICommon.GameWindow.Focus() # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 3)
 

@@ -45,7 +45,6 @@ def OpenMageWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		
 		GUICommonWindows.SetSelectionChangeHandler (None)
-		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		return
 		
