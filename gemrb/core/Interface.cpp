@@ -420,8 +420,7 @@ GameControl* Interface::StartGameControl()
 	ControlScriptingRef* gcref = new ControlScriptingRef(gamectrl, 0, "GC");
 	gamectrl->AssignScriptingRef(gcref);
 	ScriptEngine::RegisterScriptingRef(gcref);
-	//setting the focus to the game control
-	winmgr->FocusWindow(gamewin);
+
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
 		gamectrl->SetGUIHidden(false);
