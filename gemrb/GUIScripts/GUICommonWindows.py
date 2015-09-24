@@ -323,7 +323,7 @@ def OnLockViewPress ():
 
 OnLockViewPress.counter = 1
 
-def PortraitPress (): #not used in pst. TODO:make an enhancement option?
+def PortraitPress ():
 	"""Toggles the portraits pane """
 	PP = GemRB.GetMessageWindowSize () & GS_PORTRAITPANE
 	if PP:
@@ -431,7 +431,7 @@ def GroupControls ():
 		Button.SetTooltip (4935, 8+i)
 	return
 
-def OpenActionsWindowControls (Window): #FIXME:unused in pst. one day could be?
+def OpenActionsWindowControls (Window):
 	global ActionsWindow
 
 	ActionsWindow = Window
@@ -923,7 +923,6 @@ def ActionBardSongRightPressed ():
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 
-	##FIXME: check if the actor can actually switch to this state
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
@@ -935,7 +934,6 @@ def ActionBardSongPressed ():
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
 
-	##FIXME: check if the actor can actually switch to this state
 	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
@@ -1864,7 +1862,7 @@ def ActionAttackPressed ():
 
 def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-#FIXME: there is currently no way to use this  in pst
+
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
