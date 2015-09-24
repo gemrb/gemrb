@@ -69,13 +69,11 @@ def OpenEnemyWindow(chargen=0):
 
 	rankDiff = 0
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		RaceWindow = GemRB.LoadWindow (15)
+		RaceWindow = GemRB.LoadWindow (15, "GUICG")
 		pc = GemRB.GetVar ("Slot")
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		RaceWindow = GemRB.LoadWindow (16)
+		RaceWindow = GemRB.LoadWindow (16, "GUIREC")
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Class = GemRB.GetVar ("LUClass") + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")

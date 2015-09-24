@@ -72,11 +72,9 @@ def OpenMageWindow ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindow (0, "GUIMG")
 	GUICommonWindows.MarkMenuButton (OptionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMageWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -477,10 +475,8 @@ def OpenSequencerWindow ():
 	if Count > 3:
 		Count = 3
 
-	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-
 	#saving the original portrait window
-	OtherWindow = Window = GemRB.LoadWindow (6)
+	OtherWindow = Window = GemRB.LoadWindow (6, "GUIMG")
 
 	Title = Window.GetControl (0x0fffffff)
 

@@ -92,13 +92,11 @@ def OpenReformPartyWindow ():
 
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.LoadWindowPack ("GUIREC")
 		GemRB.UnhideGUI ()
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 
@@ -133,8 +131,7 @@ def OpenFormationWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	FormationWindow = Window = GemRB.LoadWindow (27)
+	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 

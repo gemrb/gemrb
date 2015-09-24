@@ -75,8 +75,7 @@ def OpenInventoryWindow ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIINV", 800, 600)
-	InventoryWindow = Window = GemRB.LoadWindow (2)
+	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	#TODO: Setup the MessageLabel here if needed
 	#saving the original portrait window

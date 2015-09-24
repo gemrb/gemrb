@@ -56,8 +56,7 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global Color1, Color2, Color3, Color4, PDollResRef
 	
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	ColorWindow=GemRB.LoadWindow(13)
+	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 
 	Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race") )
 	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 5))

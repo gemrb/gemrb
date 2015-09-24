@@ -275,11 +275,9 @@ def OpenFeatsWindow(chargen=0):
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800, 600)
-		FeatWindow = GemRB.LoadWindow (55)
+		FeatWindow = GemRB.LoadWindow (55, "GUICG")
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800, 600)
-		FeatWindow = GemRB.LoadWindow (56)
+		FeatWindow = GemRB.LoadWindow (56, "GUIREC")
 
 	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)

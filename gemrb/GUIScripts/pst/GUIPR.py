@@ -51,8 +51,7 @@ def OpenPriestWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIPR")
-	PriestWindow = Window = GemRB.LoadWindow (3)
+	PriestWindow = Window = GemRB.LoadWindow (3, "GUIPR")
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 
 	Button = Window.GetControl (0)

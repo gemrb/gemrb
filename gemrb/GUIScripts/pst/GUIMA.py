@@ -49,8 +49,7 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIMA")
-	MapWindow = Window = GemRB.LoadWindow (3)
+	MapWindow = Window = GemRB.LoadWindow (3, "GUIMA")
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 
 	# World Map
@@ -163,8 +162,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GUICommonWindows.DisableAnimatedWindows ()
-	GemRB.LoadWindowPack ("GUIWMAP")
-	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 	MapWindow = None
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
 

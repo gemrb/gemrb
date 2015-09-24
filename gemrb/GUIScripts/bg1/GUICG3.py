@@ -46,8 +46,7 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AlignmentWindow = GemRB.LoadWindow(3)
+	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)

@@ -28,11 +28,10 @@ ScrollBar = 0
 
 def OnLoad():
 	global PartySelectWindow, TextArea, PartyCount, ScrollBar
-	GemRB.LoadWindowPack("GUISP", 800, 600)
 	
 	PartyCount = GemRB.GetINIPartyCount()
 	
-	PartySelectWindow = GemRB.LoadWindow(10)
+	PartySelectWindow = GemRB.LoadWindow(10, "GUISP")
 	TextArea = PartySelectWindow.GetControl(6)
 	ScrollBar = PartySelectWindow.GetControl(8)
 	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)

@@ -68,8 +68,7 @@ def OpenOptionsWindow ():
 
 	CommonWindow.CloseContainerWindow ()
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIOPT")
-	OptionsWindow = Window = GemRB.LoadWindow (0)
+	OptionsWindow = Window = GemRB.LoadWindow (0, "GUIOPT")
 	GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 	
@@ -466,13 +465,10 @@ def OpenKeyboardMappingsWindow ():
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
 		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
-		
-		GemRB.LoadWindowPack ("GUIOPT")
 		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.LoadWindowPack ("GUIKEYS")
-	SubOptionsWindow = Window = GemRB.LoadWindow (0)
+	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIKEYS")
 	GemRB.SetVar ("OtherWindow", SubOptionsWindow.ID)
 
 	# Default
@@ -565,12 +561,10 @@ def OpenMoviesWindow ():
 
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
-		GemRB.LoadWindowPack ("GUIOPT")
 		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.LoadWindowPack ("GUIMOVIE")
-	SubOptionsWindow = Window = GemRB.LoadWindow (0)
+	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIMOVIE")
 	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 
 	# Play Movie

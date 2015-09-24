@@ -168,9 +168,7 @@ def OpenContainerWindow ():
 
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindow (8)
-
+	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack())
 
 	#stop gears from interfering
 	if GameCheck.IsPST():

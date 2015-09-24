@@ -172,12 +172,10 @@ def OpenSkillsWindow(chargen, level=0):
 
 	GemRB.SetToken("number",str(PointsLeft) )
 	if CharGen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		SkillWindow = GemRB.LoadWindow (6)
+		SkillWindow = GemRB.LoadWindow (6, "GUICG")
 		ButtonCount = 10
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		SkillWindow = GemRB.LoadWindow (55)
+		SkillWindow = GemRB.LoadWindow (55, "GUIREC")
 		ButtonCount = 9
 
 	for i in range(ButtonCount):

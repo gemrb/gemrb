@@ -68,8 +68,7 @@ def OpenJournalWindow ():
 
 	GemRB.HideGUI ()
 	
-	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
-	JournalWindow = Window = GemRB.LoadWindow (2)
+	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

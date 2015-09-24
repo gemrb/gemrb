@@ -38,8 +38,7 @@ def OnLoad ():
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.SelectionChangeHandler = None
 
-	GemRB.LoadWindowPack ("GUISP", 640, 480)
-	PartyFormationWindow = GemRB.LoadWindow (0)
+	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
 	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: ModifyPress

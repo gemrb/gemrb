@@ -1773,7 +1773,6 @@ def OpenWaitForDiscWindow ():
 		if DiscWindow:
 			DiscWindow.Unload ()
 		GemRB.SetVar ("OtherWindow", -1)
-		# ...LoadWindowPack()
 		EnableAnimatedWindows ()
 		DiscWindow = None
 		GemRB.UnhideGUI ()

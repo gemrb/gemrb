@@ -49,8 +49,7 @@ def OpenMageWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIMG")
-	MageWindow = Window = GemRB.LoadWindow (3)
+	MageWindow = Window = GemRB.LoadWindow (3, "GUIMG")
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	
 	Button = Window.GetControl (0)

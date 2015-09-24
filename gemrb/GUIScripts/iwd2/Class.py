@@ -57,10 +57,9 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, BackButton
 	global ClassCount
 
-	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
 	ClassCount = CommonTables.Classes.GetRowCount()+1
-	ClassWindow = GemRB.LoadWindow(2)
+	ClassWindow = GemRB.LoadWindow(2, "GUICG")
 	rid = CommonTables.Races.FindValue(3, GemRB.GetVar('BaseRace'))
 	RaceName = CommonTables.Races.GetRowName(rid)
 

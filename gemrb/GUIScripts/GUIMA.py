@@ -101,8 +101,7 @@ def ShowMap ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindow (2)
+	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
@@ -173,8 +172,7 @@ def OpenMapWindow ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIMAP", WIDTH, HEIGHT)
-	MapWindow = Window = GemRB.LoadWindow (2)
+	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
@@ -402,13 +400,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GemRB.HideGUI ()
-
-	if GameCheck.IsIWD2():
-		GemRB.LoadWindowPack ("GUIWMAP",800, 600)
-		WorldMapWindow = Window = GemRB.LoadWindow (2)
-	else:
-		GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
-		WorldMapWindow = Window = GemRB.LoadWindow (0)
+	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
 	#(fuzzie just copied this from the map window code..)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)

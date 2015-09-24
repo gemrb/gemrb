@@ -100,8 +100,7 @@ def OpenRecordsWindow ():
 		return	
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIREC")
-	RecordsWindow = Window = GemRB.LoadWindow (3)
+	RecordsWindow = Window = GemRB.LoadWindow (3, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
 
@@ -894,8 +893,7 @@ def OpenLevelUpWindow ():
 		GemRB.UnhideGUI()
 		return
 
-	GemRB.LoadWindowPack ("GUIREC") # since we get called from NewLife
-	LevelUpWindow = Window = GemRB.LoadWindow (4)
+	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
 	GemRB.SetVar ("FloatWindow", LevelUpWindow.ID)
 
 	# Accept

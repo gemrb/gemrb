@@ -53,8 +53,7 @@ def DialogStarted ():
 
 	MessageWindow.UpdateControlStatus()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindow (9)
+	ContinueWindow = Window = GemRB.LoadWindow (9, GUICommon.GetWindowPack())
 
 def DialogEnded ():
 	global ContinueWindow, OldActionsWindow
@@ -107,13 +106,11 @@ def OpenReformPartyWindow ():
 		ReformPartyWindow = None
 
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.LoadWindowPack ("GUIREC", 800, 600)
 		if hideflag:
 			GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# Remove
@@ -147,8 +144,7 @@ def DeathWindow():
 def DeathWindowEnd ():
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (17)
+	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack())
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

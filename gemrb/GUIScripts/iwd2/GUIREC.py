@@ -86,8 +86,7 @@ def OpenRecordsWindow ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIREC", 800, 600)
-	RecordsWindow = Window = GemRB.LoadWindow (2)
+	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

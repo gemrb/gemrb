@@ -182,11 +182,8 @@ def OpenStoreWindow ():
 		GemRB.GamePause (1, 3)
 
 	GemRB.SetVar ("Action", 0)
-	if GameCheck.IsIWD2():
-		GemRB.LoadWindowPack ("GUISTORE", 800, 600)
-	else:
-		GemRB.LoadWindowPack ("GUISTORE", 640, 480)
-	StoreWindow = Window = GemRB.LoadWindow (3)
+
+	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE")
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 

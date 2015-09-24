@@ -82,8 +82,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIINV")
-	InventoryWindow = Window = GemRB.LoadWindow (3)
+	InventoryWindow = Window = GemRB.LoadWindow (3, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
 

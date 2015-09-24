@@ -55,17 +55,15 @@ def OpenSaveWindow ():
 	GemRB.HideGUI ()
 
 	if GameCheck.IsIWD2():
-		GemRB.LoadWindowPack ("GUISAVE", 800, 600)
 		num_rows = 5
 		ctrl_offset = (55, 60, 25, 0x10000005, 0x1000000a, 23, 22, 3, 0x10000004, 40, 7, 8, 2)
 		sav_version = 22
 	else:
-		GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 		if GameCheck.IsPST():
 			ctrl_offset = (14, 18, 22, 0x10000004, 0x10000008, 13, 46, 1, 0x10000002, 6, 4, 5, 3)
 			strs = { 'cancel' : 4196, 'save' : 28645, 'delete' : 28640, 'empty' : 28647, 'overwrite' : 28644, 'yousure' : 28639 }
 
-	SaveWindow = Window = GemRB.LoadWindow (0)
+	SaveWindow = Window = GemRB.LoadWindow (0, "GUISAVE")
 	Window.SetFrame ()
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 

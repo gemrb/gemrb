@@ -29,9 +29,8 @@ VerbalConstants = None
 def OnLoad():
 	global SoundWindow, TextAreaControl, DoneButton, VerbalConstants
 
-	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
-	SoundWindow = GemRB.LoadWindow(19)
+	SoundWindow = GemRB.LoadWindow(19, "GUICG")
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]

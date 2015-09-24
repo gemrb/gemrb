@@ -74,9 +74,8 @@ def OpenLUStatsWindow(Type = 1):
 		GemRB.LoadGame(None)  #loading the base game
 
 	StatTable = GemRB.LoadTable("abcomm")
-	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
-	QuitWindow = GemRB.LoadWindow(1)
+	QuitWindow = GemRB.LoadWindow(1, "GUICG")
 	QuitWindow.SetVisible(False)
 
 	#setting up CG window

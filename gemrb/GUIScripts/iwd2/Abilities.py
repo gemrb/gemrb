@@ -134,11 +134,9 @@ def OpenAbilitiesWindow(chargen, points):
 
 	# in a fit of clarity, they used the same ids in both windowpacks
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		AbilityWindow = GemRB.LoadWindow (4)
+		AbilityWindow = GemRB.LoadWindow (4, "GUICG")
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		AbilityWindow = GemRB.LoadWindow (7)
+		AbilityWindow = GemRB.LoadWindow (7, "GUIREC")
 
 	RollPress ()
 	for i in range(0,6):

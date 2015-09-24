@@ -86,8 +86,7 @@ def OpenJournalWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIJRNL")
-	JournalWindow = GemRB.LoadWindow (0)
+	JournalWindow = GemRB.LoadWindow (0, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 

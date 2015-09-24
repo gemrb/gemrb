@@ -41,7 +41,6 @@ def OnLoad():
 			KitWindow = None
 		return
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	KitTable = GemRB.LoadTable("kittable")
@@ -51,7 +50,7 @@ def OnLoad():
 	SchoolList = GemRB.LoadTable("magesch")
 
 	#there is only a specialist mage window for bg1
-	KitWindow = GemRB.LoadWindow(12)
+	KitWindow = GemRB.LoadWindow(12, "GUICG")
 
 	for i in range(8):
 		Button = KitWindow.GetControl(i+2)

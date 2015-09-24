@@ -63,8 +63,7 @@ def DialogStarted ():
 	# we want this to happen before we start fiddling with the GUI
 	MessageWindow.UpdateControlStatus()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindow (9)
+	ContinueWindow = Window = GemRB.LoadWindow (9, GUICommon.GetWindowPack())
 
 	GUICommonWindows.EmptyControls()
 	OldActionsWindow = GUICommonWindows.ActionsWindow
@@ -179,13 +178,12 @@ def RemovePlayer ():
 
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
 	wid = 25
 	if GameCheck.IsHOW ():
 		wid = 0 # at least in guiw08, this is the correct window
-	ReformPartyWindow = Window = GemRB.LoadWindow (wid)
+	ReformPartyWindow = Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
@@ -252,8 +250,7 @@ def OpenReformPartyWindow ():
 		GUICommonWindows.UpdatePortraitWindow()
 		return
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# skip exportable party members (usually only the protagonist)
@@ -314,8 +311,7 @@ def DeathWindowEnd ():
 		GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (17)
+	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack())
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

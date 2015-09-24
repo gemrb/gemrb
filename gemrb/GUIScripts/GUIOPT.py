@@ -108,8 +108,7 @@ def OpenOptionsWindow ():
 	if GameCheck.IsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
-	GemRB.LoadWindowPack ("GUIOPT", WIDTH, HEIGHT)
-	GameOptionsWindow = Window = GemRB.LoadWindow (2)
+	GameOptionsWindow = Window = GemRB.LoadWindow (2, "GUIOPT")
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
 
 	if OldOptionsWindow == None:
@@ -494,8 +493,6 @@ def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
 	SubOptionsWindow = Window = GemRB.LoadWindow(2, "GUIMOVIE")
-	#reloading the guiopt windowpack
-	#GemRB.LoadWindowPack ("GUIOPT", 800, 600)
 	TextAreaControl = Window.GetControl(0)
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)

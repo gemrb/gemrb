@@ -142,8 +142,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	GemRB.GamePause (True, 0)
 	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
-	GemRB.LoadWindowPack ("GUIWORLD")
-	FloatMenuWindow = Window = GemRB.LoadWindow (3)
+	FloatMenuWindow = Window = GemRB.LoadWindow (3, "GUIWORLD")
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
 	Window.SetFlags (WF_DRAGGABLE, OP_OR)

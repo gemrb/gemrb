@@ -64,8 +64,7 @@ def OpenPriestWindow ():
 
 	GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIPR", 640, 480)
-	PriestWindow = Window = GemRB.LoadWindow (2)
+	PriestWindow = Window = GemRB.LoadWindow (2, "GUIPR")
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

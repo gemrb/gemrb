@@ -25,9 +25,8 @@ ExitWindow = 0
 
 def OnLoad():
 	global PartyFormationWindow
-	GemRB.LoadWindowPack("GUIMP", 640, 480)
 
-	PartyFormationWindow = GemRB.LoadWindow(0)
+	PartyFormationWindow = GemRB.LoadWindow(0, "GUIMP")
 
 	ExitButton = PartyFormationWindow.GetControl(30)
 	ExitButton.SetText(13906)
