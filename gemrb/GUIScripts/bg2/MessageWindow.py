@@ -46,11 +46,11 @@ def OnLoad():
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
 	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	MessageWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	MessageWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
-	ActionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	ActionsWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
 	
 	Button = ActionsWindow.GetControl(60)
 	if Button:
@@ -59,7 +59,7 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
 		
 	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
-	OptionsWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	OptionsWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)

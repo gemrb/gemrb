@@ -1357,7 +1357,7 @@ def OpenPortraitWindow (needcontrols=0):
 	else:
 		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
 		
-	PortraitWindow.SetFlags(WF_BORDERLESS)
+	PortraitWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst
 		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
