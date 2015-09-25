@@ -134,11 +134,13 @@ def ShowMap ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
 	Window.Focus()
-	OptionsWindow.SetVisible (WINDOW_GRAYED)
-	PortraitWindow.SetVisible (WINDOW_GRAYED)
-	OptionsWindow.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_FRONT)
-	Window.SetVisible (WINDOW_FRONT)
+	OptionsWindow.SetDisabled (True)
+	PortraitWindow.SetDisabled (True)
+	
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
+	Window.Focus()
+	
 	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED|IE_GUI_MAP_REVEAL_MAP)
 	else:

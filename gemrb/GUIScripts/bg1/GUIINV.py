@@ -167,9 +167,10 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
-	OptionsWindow.Focus()
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.Focus()
+	
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
+	Window.Focus()
 
 	# force unpause the game
 	GemRB.GamePause(0, 0)

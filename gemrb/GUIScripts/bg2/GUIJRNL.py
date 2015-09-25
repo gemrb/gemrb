@@ -134,9 +134,10 @@ def OpenJournalWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
-	OptionsWindow.Focus()
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.Focus()
+	
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
+	Window.Focus()
 	return
 
 def ToggleOrderWindow ():

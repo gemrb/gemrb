@@ -107,10 +107,10 @@ def OpenPriestWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
-	OptionsWindow.Focus()
-	#bringing window front
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.Focus()
+	
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
+	Window.Focus()
 	return
 
 def UpdatePriestWindow ():

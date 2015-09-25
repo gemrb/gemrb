@@ -140,9 +140,10 @@ def SetupMageWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	UpdateMageWindow ()
-	OptionsWindow.Focus()
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.Focus()
+	
+	PortraitWindow.SetVisible(True)
+	OptionsWindow.SetVisible(True)
+	Window.Focus()
 	return
 
 def UpdateMageWindow ():

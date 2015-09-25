@@ -803,7 +803,7 @@ def AdjustWindowVisibility (Window, pc, additionalCheck):
 	if not additionalCheck and GemRB.ValidTarget (pc, GA_SELECT|GA_NO_DEAD):
 		Window.Focus()
 	else:
-		Window.SetVisible (WINDOW_GRAYED)
+		Window.SetDisabled (True)
 	return
 
 # return ceil(n/d)

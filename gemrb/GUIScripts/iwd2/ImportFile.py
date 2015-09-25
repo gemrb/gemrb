@@ -92,6 +92,6 @@ def SelectFile():
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	Portrait = GemRB.GetPlayerPortrait (Slot,0)
 	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
-	ImportWindow.SetVisible(WINDOW_FRONT) #bring it to the front
+	ImportWindow.Focus() #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
