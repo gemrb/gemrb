@@ -1185,6 +1185,29 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
+	int mousescrollspd = core->GetMouseScrollSpeed();
+
+#define SCROLL_AREA_WIDTH 5
+	if (mp.x <= SCROLL_AREA_WIDTH)
+		moveX = -mousescrollspd;
+	else {
+		if (mp.x >= ( core->Width - SCROLL_AREA_WIDTH ))
+			moveX = mousescrollspd;
+		else
+			moveX = 0;
+	}
+	if (mp.y <= SCROLL_AREA_WIDTH)
+		moveY = -mousescrollspd;
+	else {
+		if (mp.y >= ( core->Height - SCROLL_AREA_WIDTH ))
+			moveY = mousescrollspd;
+		else
+			moveY = 0;
+	}
+#undef SCROLL_AREA_WIDTH
+
+	SetScrolling(moveX != 0 || moveY != 0);
+
 	gameMousePos = mp + vpOrigin;
 
 	if (MouseIsDown && ( !DrawSelectionRect )) {
@@ -1359,45 +1382,6 @@ end_function:
 		lastCursor = (unsigned char) nextCursor;
 	}
 }
-
-/** Global Mouse Move Event */
-#if TARGET_OS_IPHONE
-// iOS will never have a mouse.
-void GameControl::OnGlobalMouseMove(unsigned short /*x*/, unsigned short /*y*/) {}
-#else
-void GameControl::OnGlobalMouseMove(const Point& p)
-{
-	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return;
-	}
-	if (Owner->IsDisabled()) {
-		return;
-	}
-
-	int mousescrollspd = core->GetMouseScrollSpeed();
-
-#define SCROLL_AREA_WIDTH 5
-	if (p.x <= SCROLL_AREA_WIDTH)
-		moveX = -mousescrollspd;
-	else {
-		if (p.x >= ( core->Width - SCROLL_AREA_WIDTH ))
-			moveX = mousescrollspd;
-		else
-			moveX = 0;
-	}
-	if (p.y <= SCROLL_AREA_WIDTH)
-		moveY = -mousescrollspd;
-	else {
-		if (p.y >= ( core->Height - 5 ))
-			moveY = mousescrollspd;
-		else
-			moveY = 0;
-	}
-#undef SCROLL_AREA_WIDTH
-
-	SetScrolling(moveX != 0 || moveY != 0);
-}
-#endif
 
 void GameControl::MoveViewPortTo(const Point& p, int speed)
 {

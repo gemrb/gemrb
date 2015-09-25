@@ -173,8 +173,6 @@ public:
 	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
-	/** Global Mouse Move Event */
-	void OnGlobalMouseMove(const Point&);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
