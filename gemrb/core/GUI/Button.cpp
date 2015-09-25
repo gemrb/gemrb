@@ -384,7 +384,19 @@ String Button::TooltipText() const
 {
 	if (hotKey) {
 		String s;
-		s.push_back(hotKey);
+		switch (hotKey) {
+			// FIXME: these arent localized...
+			case GEM_ESCAPE:
+				s += L"Esc";
+				break;
+			case GEM_RETURN:
+				s += L"Ret";
+				break;
+			default:
+				// FIXME: plenty of other keys that should be translated
+				s.push_back(hotKey);
+				break;
+		}
 		s += L": ";
 		return s += ((tooltip.length()) ? View::TooltipText() : QueryText());
 	}
