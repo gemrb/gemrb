@@ -125,19 +125,17 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
-	if (windows.empty()) return false;
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
 bool WindowManager::OrderBack(Window* win)
 {
-	if (windows.empty()) return false;
 	return OrderRelativeTo(win, windows.back(), false);
 }
 
 bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
-	if (win == win2) return false;
+	if (windows.size() < 2 || win == win2) return false;
 
 	WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
 	if (it == windows.end() || it2 == windows.end()) return false;
