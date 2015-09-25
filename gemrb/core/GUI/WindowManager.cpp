@@ -215,11 +215,36 @@ bool WindowManager::HotKey(const Event& event)
 	return false;
 }
 
-bool WindowManager::DispatchEvent(const Event& event)
-{
 #define HIT_TEST(e, w) \
 ((w)->Frame().PointInside(e.mouse.Pos()))
 
+Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_iterator& current)
+{
+	Window* target = NULL;
+
+	while (current != windows.end()) {
+		Window* win = *current++;
+		if (win->IsVisible() && (!event.isScreen || HIT_TEST(event,win))) {
+			// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
+			// we still need to update which window is under the mouse and block events from reaching the windows below
+			target = win;
+			break;
+		}
+	}
+
+	// we made it though with no takers...
+	// send it to the game win
+	if (target == NULL) {
+		target = gameWin;
+	}
+	return target;
+}
+
+bool WindowManager::DispatchEvent(const Event& event)
+{
+	if (windows.empty()) return false;
+
+	WindowList::const_iterator it = windows.end(); // start invalid, only init if no modal
 	Window* target = NULL;
 	if (IsPresentingModalWindow()) {
 		// modal windows absorb all events that intersect
@@ -229,40 +254,31 @@ bool WindowManager::DispatchEvent(const Event& event)
 			target = modalWin;
 		}
 	} else {
-		WindowList::const_iterator it = windows.begin();
-		for (; it != windows.end(); ++it) {
-			Window* win = *it;
-			if (win->IsVisible() && (!event.isScreen || HIT_TEST(event,win))) {
-				// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
-				// we still need to update which window is under the mouse and block events from reaching the windows below
-				target = win;
-				break;
-			}
-		}
+		it = windows.begin();
+		target = NextEventWindow(event, it);
 	}
 
-	// gameWin is always the full "screen" so no need to check for intersection
-	// its also always the bottom window
-	if (target == NULL) {
-		target = gameWin;
-	}
 	// at least gameWin should always exist
 	assert(target);
 
-	if (event.isScreen) {
-		hoverWin = target;
+	if (event.type == Event::MouseMove) {
+		TooltipTime = GetTickCount();
+	}
 
-		if (event.type == Event::MouseMove) {
-			TooltipTime = GetTickCount();
+	do {
+		// disabled windows get no events, but should block them from going to windows below
+		if ((!target->IsDisabled() && target->DispatchEvent(event)) || target == gameWin) {
+			if (event.isScreen) {
+				hoverWin = target;
+			}
+			return true;
 		}
-	}
-	// disabled windows get no events, but should block them from going to windows below
-	if (!target->IsDisabled()) {
-		return target->DispatchEvent(event);
-	}
+	} while ((target = NextEventWindow(event, it)));
+
 	return false;
-#undef HIT_TEST
 }
+
+#undef HIT_TEST
 
 void WindowManager::DrawCursor() const
 {

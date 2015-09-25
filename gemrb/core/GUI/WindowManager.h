@@ -70,6 +70,7 @@ private:
 	inline void DrawCursor() const;
 	inline void DrawTooltip() const;
 
+	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);
 	bool HotKey(const Event&);
 
