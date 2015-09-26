@@ -46,8 +46,6 @@ Console::Console(const Region& frame)
 	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {
 		delete cb;
 	}
-
-	SetVisible(false);
 }
 
 Console::~Console(void)
@@ -56,10 +54,12 @@ Console::~Console(void)
 	Sprite2D::FreeSprite( Cursor );
 }
 
-bool Console::HandleHotKey(const Event& /*e*/)
+bool Console::HandleHotKey(const Event& e)
 {
+	if (e.type != Event::KeyDown) return false;
+
 	// the only hot key console registers is for hiding / showing itself
-	SetVisible(!IsVisible());
+	Owner->SetVisible(!IsVisible());
 	if (IsVisible()) {
 		Owner->Focus();
 	}

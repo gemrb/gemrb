@@ -1819,7 +1819,7 @@ int Interface::Init(InterfaceConfig* config)
 	console->SetCursor(GetCursorSprite());
 	Window* consoleWin = winmgr->MakeWindow(frame);
 	consoleWin->AddSubviewInFrontOfView(console);
-	consoleWin->SetFlags(Window::Borderless, OP_OR);
+	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetPosition(Window::PosHmid);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
