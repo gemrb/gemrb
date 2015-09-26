@@ -99,18 +99,14 @@ void Window::SizeChanged(const Size& /*oldSize*/)
 	Video* video = core->GetVideoDriver();
 	video->DestroyBuffer(backBuffer);
 
-	backBuffer = video->CreateBuffer(frame.Dimensions());
+	backBuffer = video->CreateBuffer(frame);
 }
 
 void Window::WillDraw()
 {
-	core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
-	if (flags&Borderless && NeedsDraw()) {
-		// FIXME: this shouldnt be needed after the buffers are sized to the window
-		// this *really* slows things down (more than 50% frame loss if all windows do it)
-		// its needed now because moving a window smears its backbuffer
-		// due to the window moving within it instead of the buffer itself being blitted at the new pos
-		backBuffer->Clear();
+	if (!(flags&Invisible)) {
+		backBuffer->origin = frame.Origin();
+		core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
 	}
 }
 

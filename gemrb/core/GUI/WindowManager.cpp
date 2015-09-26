@@ -48,7 +48,6 @@ WindowManager::WindowManager(Video* vid)
 
 	hoverWin = NULL;
 	modalWin = NULL;
-	cursorBuf = NULL;
 
 	modalShadow = ShadowNone;
 	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
@@ -66,7 +65,8 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFlags(Window::Borderless, OP_OR);
 	gameWin->SetFrame(screen);
 
-	cursorBuf = vid->CreateBuffer(screen.Dimensions());
+	cursorBuf = vid->CreateBuffer(screen);
+	cursorBuf->SetColorKey(ColorGreen);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw

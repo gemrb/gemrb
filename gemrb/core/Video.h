@@ -72,12 +72,16 @@ enum TileBlitFlags {
 
 class GEM_EXPORT VideoBuffer {
 public:
+	Point origin;
+
+public:
 	virtual ~VideoBuffer() {}
 
 	virtual void Clear() = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
 	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) = 0;
 	virtual Size Size() = 0;
+	virtual void SetColorKey(const Color&) = 0;
 };
 
 /**
@@ -125,7 +129,7 @@ protected:
 	virtual void Wait(int) = 0;
 
 private:
-	virtual VideoBuffer* NewVideoBuffer(const Size&, BufferFormat)=0;
+	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
 	virtual void SwapBuffers(VideoBuffers&)=0;
 	virtual int PollEvents() = 0;
 
@@ -141,7 +145,7 @@ public:
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
 	int SwapBuffers(int fpscap = 30);
-	VideoBuffer* CreateBuffer(const Size&, BufferFormat = DISPLAY);
+	VideoBuffer* CreateBuffer(const Region&, BufferFormat = DISPLAY);
 	void DestroyBuffer(VideoBuffer*);
 	void SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */

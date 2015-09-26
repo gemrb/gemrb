@@ -78,18 +78,15 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	return GEM_OK;
 }
 
-VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Size& s, BufferFormat fmt)
+VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	// FIXME/TODO: this should use s for sizing the surface. need to nix the Viewport first tho.
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, width, height, bpp, 0, 0, 0, 0 );
-	SDL_SetColorKey(tmp, SDL_SRCCOLORKEY, SDL_MapRGBA(tmp->format, 0, 0xff, 0, 0));
+	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 	SDL_Surface* buf = SDL_DisplayFormat(tmp);
 	SDL_FreeSurface(tmp);
-
 	if (fmt == YV12) {
-		return new SDLOverlayVideoBuffer(buf, SDL_CreateYUVOverlay(width, height, SDL_YV12_OVERLAY, disp));
+		return new SDLOverlayVideoBuffer(buf, r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
 	}
-	return new SDLSurfaceVideoBuffer(buf);
+	return new SDLSurfaceVideoBuffer(buf, r.Origin());
 }
 
 // sets brightness and contrast

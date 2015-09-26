@@ -134,9 +134,10 @@ class SDLSurfaceVideoBuffer : public VideoBuffer {
 	SDL_Surface* buffer;
 
 public:
-	SDLSurfaceVideoBuffer(SDL_Surface* surf) {
+	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p) {
 		assert(surf);
 		buffer = surf;
+		origin = p;
 
 		Clear();
 	}
@@ -146,7 +147,11 @@ public:
 	}
 
 	void Clear() {
-		SDL_FillRect(buffer, NULL, buffer->format->colorkey);
+		if (buffer->format->colorkey) {
+			SDL_FillRect(buffer, NULL, buffer->format->colorkey);
+		} else {
+			SDL_FillRect(buffer, NULL, SDL_MapRGBA(buffer->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT));
+		}
 	}
 
 	SDL_Surface* Surface() {
@@ -154,12 +159,16 @@ public:
 	}
 
 	virtual void RenderOnDisplay(SDL_Surface* display) {
-		// FIXME: eventually buffers wont always be the screen size...
-		SDL_BlitSurface( buffer, NULL, display, NULL );
+		SDL_Rect dst = { origin.x, origin.y, buffer->w, buffer->h };
+		SDL_BlitSurface( buffer, NULL, display, &dst );
 	}
 
 	class Size Size() {
 		return GemRB::Size(buffer->w, buffer->h);
+	}
+
+	void SetColorKey(const Color& c) {
+		SDL_SetColorKey(buffer, SDL_SRCCOLORKEY, SDL_MapRGBA(buffer->format, c.r, c.g, c.b, c.a));
 	}
 
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
@@ -192,8 +201,8 @@ class SDLOverlayVideoBuffer : public SDLSurfaceVideoBuffer {
 	Point renderPos;
 
 public:
-	SDLOverlayVideoBuffer(SDL_Surface* buffer, SDL_Overlay* overlay)
-	: SDLSurfaceVideoBuffer(buffer)
+	SDLOverlayVideoBuffer(SDL_Surface* buffer, const Point& p, SDL_Overlay* overlay)
+	: SDLSurfaceVideoBuffer(buffer, p)
 	{
 		assert(overlay);
 		this->overlay = overlay;
@@ -212,7 +221,7 @@ public:
 	void RenderOnDisplay(SDL_Surface* display) {
 		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
 
-		SDL_Rect dest = {0, 0, overlay->w, overlay->h};
+		SDL_Rect dest = {origin.x, origin.y, overlay->w, overlay->h};
 		SDL_DisplayYUVOverlay(overlay, &dest);
 	}
 

@@ -47,12 +47,13 @@ void MoviePlayer::Play()
 {
 	Video* video = core->GetVideoDriver();
 
-	VideoBuffer* vb = video->CreateBuffer(movieSize, movieFormat);
 	Region frame(Point(), movieSize);
 	Window* win = WindowManager::DefaultWindowManager().MakeWindow(frame);
 	win->SetFlags(Window::Borderless, OP_OR);
 	win->SetPosition(Window::PosCentered);
 	win->AddSubviewInFrontOfView(new MoviePlayerControls(*this));
+
+	VideoBuffer* vb = video->CreateBuffer(win->Frame(), movieFormat);
 
 	// currently, our MoviePlayer implementation takes over the entire screen
 	// not only that but the Play method blocks until movie is done/stopped.

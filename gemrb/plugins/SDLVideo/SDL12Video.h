@@ -45,7 +45,7 @@ public:
 
 private:
 	void SwapBuffers(VideoBuffers&);
-	VideoBuffer* NewVideoBuffer(const Size& rgn, BufferFormat fmt);
+	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt);
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);

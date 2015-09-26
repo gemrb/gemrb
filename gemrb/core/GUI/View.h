@@ -129,6 +129,8 @@ public:
 
 	Point ConvertPointToSuper(const Point&) const;
 	Point ConvertPointFromSuper(const Point&) const;
+	Point ConvertPointToWindow(const Point&) const;
+	Point ConvertPointFromWindow(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
 

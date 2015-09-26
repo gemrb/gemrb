@@ -127,11 +127,11 @@ void View::DrawBackground(const Region* rgn) const
 		if (rgn) {
 			Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
 			Region intersect = rgn->Intersect(bgRgn);
-			Point screenPt = ConvertPointToScreen(intersect.Origin());
+			Point screenPt = ConvertPointToWindow(intersect.Origin());
 			Region toClip(screenPt, intersect.Dimensions());
 			video->BlitSprite( background, intersect, toClip);
 		} else {
-			Point dp = ConvertPointToScreen(Point(background->XPos, background->YPos));
+			Point dp = ConvertPointToWindow(Point(background->XPos, background->YPos));
 			video->BlitSprite( background, dp.x, dp.y );
 		}
 	}
@@ -143,7 +143,7 @@ void View::Draw()
 
 	Video* video = core->GetVideoDriver();
 	const Region& clip = video->GetScreenClip();
-	const Region& drawFrame = Region(ConvertPointToScreen(Point(0,0)), Dimensions());
+	const Region& drawFrame = Region(ConvertPointToWindow(Point(0,0)), Dimensions());
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
@@ -183,6 +183,24 @@ Point View::ConvertPointToSuper(const Point& p) const
 Point View::ConvertPointFromSuper(const Point& p) const
 {
 	return p - Origin();
+}
+
+Point View::ConvertPointToWindow(const Point& p) const
+{
+	// NULL superview is screen
+	if (superView) {
+		return superView->ConvertPointToWindow(ConvertPointToSuper(p));
+	}
+	return p;
+}
+
+Point View::ConvertPointFromWindow(const Point& p) const
+{
+	// NULL superview is screen
+	if (superView) {
+		return superView->ConvertPointFromWindow(ConvertPointFromSuper(p));
+	}
+	return p;
 }
 
 Point View::ConvertPointToScreen(const Point& p) const
