@@ -361,22 +361,12 @@ void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short m
 bool Window::OnSpecialKeyPress(unsigned char key)
 {
 	bool handled = false;
-	if (key == GEM_TAB && hoverView) {
-		// tooltip maybe
-		handled = hoverView->View::OnSpecialKeyPress(key);
-	} else if (focusView) {
+	if (focusView) {
 		handled = focusView->OnSpecialKeyPress(key);
 	}
 
 	Control* ctrl = NULL;
-	//the default control will get only GEM_RETURN
-	if (key == GEM_RETURN) {
-		//ctrl = GetDefaultControl(0);
-	}
-	//the default cancel control will get only GEM_ESCAPE
-	else if (key == GEM_ESCAPE) {
-		//ctrl = GetDefaultControl(1);
-	} else if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
+	if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
 		// TODO: implement hotkeys
 	} else {
 		ctrl = dynamic_cast<Control*>(FocusedView());
