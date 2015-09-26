@@ -553,7 +553,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 	case STI_EVASION:
 		if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
-			// NOTE: no idea if this is used in iwd2 too
+			// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
 			// FIXME: check for evasion itself
 			if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
 				return 0;
