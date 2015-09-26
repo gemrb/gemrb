@@ -30,6 +30,7 @@
 #include "GlobalTimer.h"
 #include "ImageMgr.h"
 #include "Interface.h"
+#include "KeyMap.h"
 #include "PathFinder.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
@@ -646,8 +647,11 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			break;
 #endif
-	default:
-			return false;
+		default:
+			if (!core->GetKeyMap()->ResolveKey(Key, 0)) {
+				core->GetGame()->SetHotKey(toupper(Key));
+			}
+			break;
 	}
 	return true;
 }

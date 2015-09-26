@@ -22,8 +22,6 @@
 
 #include "win32def.h"
 
-#include "KeyMap.h"
-
 namespace GemRB {
 
 unsigned long EventMgr::DCDelay = 250;
