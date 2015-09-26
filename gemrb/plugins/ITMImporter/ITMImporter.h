@@ -45,7 +45,7 @@ public:
 	Item* GetItem(Item *s);
 private:
 	void GetExtHeader(Item *s, ITMExtHeader* eh);
-	void GetFeature(Effect *f);
+	void GetFeature(Effect *f, Item *s);
 };
 
 
