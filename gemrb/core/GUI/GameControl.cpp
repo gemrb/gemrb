@@ -363,9 +363,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		return;
 
 	Map *area = core->GetGame()->GetCurrentArea();
-	Video* video = core->GetVideoDriver();
 	if (!area) {
-		video->DrawRect( screen, ColorBlue, true );
 		return;
 	}
 
@@ -379,7 +377,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	if (moveX || moveY) {
 		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
 	}
-	video->DrawRect( screen, ColorBlack, true );
 
 	// setup outlines
 	InfoPoint *i;
@@ -504,6 +501,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
 
+	Video* video = core->GetVideoDriver();
 	// Draw selection rect
 	if (DrawSelectionRect) {
 		CalculateSelection( gameMousePos );
