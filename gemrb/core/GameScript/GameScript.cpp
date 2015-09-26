@@ -2277,6 +2277,10 @@ int Trigger::Evaluate(Scriptable* Sender)
 		Log(ERROR, "GameScript", "Trigger evaluation fails due to NULL trigger.");
 		return 0;
 	}
+	if (triggerID > MAX_TRIGGERS) {
+		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: %d", triggerID);
+		return 0;
+	}
 	TriggerFunction func = triggers[triggerID];
 	const char *tmpstr=triggersTable->GetValue(triggerID);
 	if (!tmpstr) {
