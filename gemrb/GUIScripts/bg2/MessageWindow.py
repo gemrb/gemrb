@@ -52,6 +52,10 @@ def OnLoad():
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 	ActionsWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
 	
+	aFrame = ActionsWindow.GetFrame()
+	mFrame = MessageWindow.GetFrame()
+	MessageWindow.SetPos(mFrame['x'], mFrame['y'] - aFrame['h'])
+	
 	Button = ActionsWindow.GetControl(60)
 	if Button:
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
