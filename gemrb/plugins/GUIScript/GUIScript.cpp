@@ -2236,32 +2236,32 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
-			 "GetRect(WindowIndex, ControlID)\n\n"
-			 "Creates and adds a new Label to a Window." );
+			 "GetFrame(GView)\n\n"
+			 "Returns a dictionary with members 'x', 'y', 'w', and 'h' representing the views frame rect." );
 
 static PyObject* GemRB_View_GetFrame(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS(args, "O", &self);
-	Control* ctrl = GetView<Control>(self);
-	ABORT_IF_NULL(ctrl);
+	View* view = GetView(self);
+	ABORT_IF_NULL(view);
 
-	const Region& ctrlFrame = ctrl->Frame();
-	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", ctrlFrame.x, "y", ctrlFrame.y, "w", ctrlFrame.w, "h", ctrlFrame.h);
+	const Region& frame = view->Frame();
+	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", frame.x, "y", frame.y, "w", frame.w, "h", frame.h);
 }
 
 PyDoc_STRVAR( GemRB_View_SetFrame__doc,
-			 "GetRect(WindowIndex, ControlID)\n\n"
-			 "Creates and adds a new Label to a Window." );
+			 "SetFrame(GView, x, y, w, h)\n\n"
+			 "Set the views frame to the region created from x, y, w, and h." );
 
 static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 {
 	int x, y, w, h;
 	PARSE_ARGS( args,  "Oiiii", &self, &x, &y, &w, &h);
 
-	Control* ctrl = GetView<Control>(self);
-	ABORT_IF_NULL(ctrl);
+	View* view = GetView(self);
+	ABORT_IF_NULL(view);
 
-	ctrl->SetFrame(Region(x, y, w, h));
+	view->SetFrame(Region(x, y, w, h));
 	Py_RETURN_NONE;
 }
 
