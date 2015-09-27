@@ -36,6 +36,7 @@ class ViewScriptingRef;
 class View {
 private:
 	Sprite2D* background;
+	Sprite2D* cursor;
 	ViewScriptingRef* scriptingRef;
 
 	mutable bool dirty;
@@ -155,7 +156,8 @@ public:
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
-	Sprite2D* Cursor() const { return NULL; }
+	virtual Sprite2D* Cursor() const { return cursor; }
+	void SetCursor(Sprite2D* c);
 
 	// GUIScripting
 	void AssignScriptingRef(ViewScriptingRef* ref);

@@ -133,6 +133,14 @@ String Window::TooltipText() const
 	return View::TooltipText();
 }
 
+Sprite2D* Window::Cursor() const
+{
+	if (hoverView) {
+		return hoverView->Cursor();
+	}
+	return View::Cursor();
+}
+
 void Window::SetPosition(WindowPosition pos)
 {
 	// start at top left

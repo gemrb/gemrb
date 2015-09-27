@@ -92,6 +92,7 @@ public:
 	Control* GetFocus() const;
 	View* FocusedView() const { return focusView; }
 	String TooltipText() const;
+	Sprite2D* Cursor() const;
 
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);

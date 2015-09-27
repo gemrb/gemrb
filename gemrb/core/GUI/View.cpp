@@ -41,6 +41,7 @@ View::View(const Region& frame)
 	scriptingRef = NULL;
 	scrollbar = NULL;
 	background = NULL;
+	cursor = NULL;
 	superView = NULL;
 
 	dirty = true;
@@ -59,7 +60,9 @@ View::~View()
 		view->superView = NULL;
 		delete view;
 	}
-	if (background) background->release();
+
+	Sprite2D::FreeSprite(background);
+	Sprite2D::FreeSprite(cursor);
 }
 
 void View::SetBackground(Sprite2D* bg)
@@ -69,6 +72,15 @@ void View::SetBackground(Sprite2D* bg)
 	background = bg;
 
 	MarkDirty();
+}
+
+void View::SetCursor(Sprite2D* c)
+{
+	if (c) {
+		c->acquire();
+	}
+	Sprite2D::FreeSprite(cursor);
+	cursor = c;
 }
 
 void View::MarkDirty()
