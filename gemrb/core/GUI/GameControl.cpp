@@ -98,7 +98,6 @@ GameControl::GameControl(const Region& frame)
 	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
-	scrolling = false;
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
@@ -1209,8 +1208,6 @@ void GameControl::OnMouseOver(const Point& mp)
 	}
 #undef SCROLL_AREA_WIDTH
 
-	SetScrolling(moveX != 0 || moveY != 0);
-
 	gameMousePos = mp + vpOrigin;
 
 	if (MouseIsDown && ( !DrawSelectionRect )) {
@@ -1426,7 +1423,11 @@ Region GameControl::Viewport()
 
 void GameControl::UpdateScrolling() {
 	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
-	if (!scrolling || !core->GetMouseScrollSpeed() || (moveX == 0 && moveY == 0)) return;
+	if (!core->GetMouseScrollSpeed() || (moveX == 0 && moveY == 0)) {
+		// FIXME: this should be something with lastCursor...
+		SetCursor(NULL);
+		return;
+	}
 
 	int cursorFrame = 0; // right
 	if (moveY < 0) {
@@ -1442,26 +1443,10 @@ void GameControl::UpdateScrolling() {
 	}
 
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-	// FIXME: reimplement this
-	//Video* video = core->GetVideoDriver();
-	//video->SetCursor(cursor, VID_CUR_DRAG);
+	SetCursor(cursor);
 	Sprite2D::FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;
-}
-
-void GameControl::SetScrolling(bool scroll) {
-	if (scrolling != scroll) {
-		scrolling = scroll;
-		if (!scrolling) {
-			moveX = 0;
-			moveY = 0;
-
-			// only clear the drag cursor when changing scrolling to false!
-			// clearing on every move kills drag operations such as dragging portraits
-			//core->GetVideoDriver()->SetCursor(NULL, VID_CUR_DRAG);
-		}
-	}
 }
 
 //generate action code for source actor to try to attack a target

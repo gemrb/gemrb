@@ -2482,10 +2482,6 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::W
 		assert(win->GetScriptingRef());
 		win->SetPosition(pos);
 		winmgr->FocusWindow( win );
-
-		GameControl *gc = GetGameControl ();
-		if (gc)
-			gc->SetScrolling( false );
 	}
 	return win;
 }

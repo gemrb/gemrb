@@ -113,7 +113,6 @@ private:
 	unsigned char lastCursor;
 	short moveX, moveY;
 	int numScrollCursor;
-	bool scrolling;
 	int DebugFlags;
 	Point pfs;
 	PathNode* drawPath;
@@ -186,7 +185,6 @@ public:
 	String TooltipText() const;
 
 	void UpdateScrolling();
-	void SetScrolling(bool scroll);
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
 	void SetScreenFlags(unsigned int value, int mode);
