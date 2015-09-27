@@ -105,6 +105,7 @@ private:
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
 	Point vpOrigin;
+	bool updateVPTimer;
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
@@ -196,8 +197,7 @@ public:
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	void ClearMouseState();
 
-	void MoveViewPortTo(const Point&, int speed);
-	void MoveViewportTo(Point, bool center);
+	void MoveViewportTo(Point, bool center, int speed = 0);
 	Region Viewport();
 
 	/** Selects one or all PC */
