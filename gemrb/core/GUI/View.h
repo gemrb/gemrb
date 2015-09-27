@@ -143,7 +143,7 @@ public:
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
-	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
+	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
 	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual void OnMouseEnter(const Point&, const DragOp*) {};
 	virtual void OnMouseLeave(const Point&, const DragOp*) {};
@@ -151,7 +151,6 @@ public:
 	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(short x, short y);
-	virtual bool OnSpecialKeyPress(unsigned char Key);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }

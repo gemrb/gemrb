@@ -114,21 +114,6 @@ void TextEdit::SetCursor(Sprite2D* cur)
 /** Key Press Event */
 bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	if (Key >= 0x20) {
-		if (Value && ( (Key<'0') || (Key>'9') ) )
-			return false;
-		MarkDirty();
-		if (Text.length() < max) {
-			Text.insert(CurPos++, 1, Key);
-		}
-		RunEventHandler( EditOnChange );
-		return true;
-	}
-	return false;
-}
-/** Special Key Press */
-bool TextEdit::OnSpecialKeyPress(unsigned char Key)
-{
 	MarkDirty();
 	switch (Key) {
 		case GEM_HOME:
@@ -158,6 +143,17 @@ bool TextEdit::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_RETURN:
 			RunEventHandler( EditOnDone );
+			break;
+		default:
+			if (Key >= 0x20) {
+				if (Value && ( (Key<'0') || (Key>'9') ) )
+					return false;
+				if (Text.length() < max) {
+					Text.insert(CurPos++, 1, Key);
+				}
+				break;
+			}
+			return false;
 	}
 	RunEventHandler( EditOnChange );
 	return true;

@@ -178,8 +178,6 @@ public:
 	/** Mouse Button Up */
 	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
 	void OnMouseWheelScroll(short x, short y);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
 
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const;

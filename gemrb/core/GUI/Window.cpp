@@ -314,11 +314,12 @@ bool Window::DispatchEvent(const Event& event)
 		// key events
 		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
-			(*it->second)(event);
+			return (*it->second)(event);
 		} else if (event.keyboard.keycode == GEM_ESCAPE) {
 			Close();
+			return true;
 		}
-		return true;
+		return (focusView && focusView->OnKeyPress(event.keyboard.character, event.mod) );
 	}
 	return false;
 }
@@ -360,49 +361,6 @@ void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short m
 			View::OnMouseDown(p, button, mod);
 			break;
 	}
-}
-
-bool Window::OnSpecialKeyPress(unsigned char key)
-{
-	bool handled = false;
-	if (focusView) {
-		handled = focusView->OnSpecialKeyPress(key);
-	}
-
-	Control* ctrl = NULL;
-	if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
-		// TODO: implement hotkeys
-	} else {
-		ctrl = dynamic_cast<Control*>(FocusedView());
-	}
-
-	if (ctrl) {
-		switch (ctrl->ControlType) {
-				//scrollbars will receive only mousewheel events
-			case IE_GUI_SCROLLBAR:
-				if (key != GEM_UP && key != GEM_DOWN) {
-					return false;
-				}
-				break;
-				//buttons will receive only GEM_RETURN
-			case IE_GUI_BUTTON:
-				if (key >= GEM_FUNCTION1 && key <= GEM_FUNCTION16) {
-					//fake mouse button
-					ctrl->OnMouseDown(Point(), GEM_MB_ACTION, 0);
-					ctrl->OnMouseUp(Point(), GEM_MB_ACTION, 0);
-					return false;
-				}
-				if (key != GEM_RETURN && key!=GEM_ESCAPE) {
-					return false;
-				}
-				break;
-				// shouldnt be any harm in sending these events to any control
-		}
-		ctrl->OnSpecialKeyPress( key );
-		return true;
-	}
-	// handle scrollbar events
-	return View::OnSpecialKeyPress(key);
 }
 
 }

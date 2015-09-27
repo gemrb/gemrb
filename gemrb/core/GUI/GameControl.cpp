@@ -590,16 +590,61 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 }
 
 /** Key Press Event */
-bool GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return false;
 	}
+
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 	if (!game) return false;
-
+#define GEM_LEFT		0x81
+#define GEM_RIGHT		0x82
+#define GEM_UP			0x83
+#define GEM_DOWN		0x84
 	switch (Key) {
+		case GEM_UP:
+		case GEM_DOWN:
+		case GEM_LEFT:
+		case GEM_RIGHT:
+			{
+				ieDword keyScrollSpd = 64;
+				core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
+				if (Key >= GEM_UP) {
+					int v = (Key == GEM_UP) ? -1 : 1;
+					OnMouseWheelScroll(0, keyScrollSpd * v);
+				} else {
+					int v = (Key == GEM_LEFT) ? -1 : 1;
+					OnMouseWheelScroll(keyScrollSpd * v, 0);
+				}
+			}
+			break;
+		case GEM_ALT:
+			DebugFlags |= DEBUG_SHOW_CONTAINERS;
+			break;
+		case GEM_TAB:
+			// show partymember hp/maxhp as overhead text
+			for (int pm=0; pm < game->GetPartySize(false); pm++) {
+				Actor *pc = game->GetPC(pm, true);
+				if (!pc) continue;
+				pc->DisplayHeadHPRatio();
+			}
+			break;
+		case GEM_MOUSEOUT:
+			moveX = 0;
+			moveY = 0;
+			break;
+		case GEM_ESCAPE:
+			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+			break;
+		case GEM_PGUP:
+			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
+			break;
+		case GEM_PGDOWN:
+			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
+			break;
 		case '0':
 			game->SelectActor( NULL, false, SELECT_NORMAL );
 			i = game->GetPartySize(false)/2+1;
@@ -650,6 +695,7 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		default:
 			if (!core->GetKeyMap()->ResolveKey(Key, 0)) {
 				core->GetGame()->SetHotKey(toupper(Key));
+				return Control::OnKeyPress(Key, mod);
 			}
 			break;
 	}
@@ -1762,10 +1808,10 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
 	case GEM_MB_SCRLUP:
-		OnSpecialKeyPress(GEM_UP);
+		OnKeyPress(GEM_UP, 0);
 		break;
 	case GEM_MB_SCRLDOWN:
-		OnSpecialKeyPress(GEM_DOWN);
+		OnKeyPress(GEM_DOWN, 0);
 		break;
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
@@ -2104,65 +2150,6 @@ void GameControl::ResetTargetMode() {
 
 void GameControl::UpdateTargetMode() {
 	SetTargetMode(target_mode);
-}
-
-/** Special Key Press */
-bool GameControl::OnSpecialKeyPress(unsigned char Key)
-{
-	if (DialogueFlags&DF_IN_DIALOG) {
-		// don't accept keys in dialog
-		// dont forward the even either
-		return false;
-	}
-	Game *game = core->GetGame();
-	if (!game) return false;
-	int partysize = game->GetPartySize(false);
-	
-	int pm;
-	ieDword keyScrollSpd = 64;
-	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
-		case GEM_LEFT:
-			OnMouseWheelScroll(keyScrollSpd * -1, 0);
-			break;
-		case GEM_UP:
-			OnMouseWheelScroll(0, keyScrollSpd * -1);
-			break;
-		case GEM_DOWN:
-			OnMouseWheelScroll(0, keyScrollSpd);
-			break;
-		case GEM_RIGHT:
-			OnMouseWheelScroll(keyScrollSpd, 0);
-			break;
-		case GEM_ALT:
-			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			break;
-		case GEM_TAB:
-			// show partymember hp/maxhp as overhead text
-			for (pm=0; pm < partysize; pm++) {
-				Actor *pc = game->GetPC(pm, true);
-				if (!pc) continue;
-				pc->DisplayHeadHPRatio();
-			}
-			break;
-		case GEM_MOUSEOUT:
-			moveX = 0;
-			moveY = 0;
-			break;
-		case GEM_ESCAPE:
-			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
-			break;
-		case GEM_PGUP:
-			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
-			break;
-		case GEM_PGDOWN:
-			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
-			break;
-		default:
-			return Control::OnSpecialKeyPress(Key);
-	}
-	return true;
 }
 
 void GameControl::CalculateSelection(const Point &p)

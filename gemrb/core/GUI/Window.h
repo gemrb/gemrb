@@ -103,7 +103,6 @@ public:
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void OnMouseLeave(const Point&, const DragOp*);
-	bool OnSpecialKeyPress(unsigned char key);
 
 private: // Private attributes
 	/** Controls Array */

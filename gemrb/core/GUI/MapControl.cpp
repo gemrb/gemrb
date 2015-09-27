@@ -358,10 +358,10 @@ void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sho
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
 		case GEM_MB_SCRLUP:
-			OnSpecialKeyPress(GEM_UP);
+			OnKeyPress(GEM_UP, 0);
 			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_SCRLDOWN:
-			OnSpecialKeyPress(GEM_DOWN);
+			OnKeyPress(GEM_DOWN, 0);
 			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_ACTION:
 			if (Button & GEM_MB_DOUBLECLICK) {
@@ -413,7 +413,7 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 }
 
 /** Special Key Press */
-bool MapControl::OnSpecialKeyPress(unsigned char Key)
+bool MapControl::OnKeyPress(unsigned char Key, unsigned short mod)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
@@ -431,7 +431,7 @@ bool MapControl::OnSpecialKeyPress(unsigned char Key)
 			ScrollY += keyScrollSpd;
 			break;
 		default:
-			return Control::OnSpecialKeyPress(Key);
+			return Control::OnKeyPress(Key, mod);
 	}
 
 	if (ScrollX > MapWidth - frame.w)

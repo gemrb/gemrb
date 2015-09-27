@@ -284,10 +284,10 @@ void WorldMapControl::OnMouseDown(const Point& p, unsigned short Button, unsigne
 		LastMousePos = p;
 		break;
 	case GEM_MB_SCRLUP:
-		OnSpecialKeyPress(GEM_UP);
+		OnKeyPress(GEM_UP, 0);
 		break;
 	case GEM_MB_SCRLDOWN:
-		OnSpecialKeyPress(GEM_DOWN);
+		OnKeyPress(GEM_DOWN, 0);
 		break;
 	}
 }
@@ -320,8 +320,7 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 		ScrollY = 0;
 }
 
-/** Special Key Press */
-bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
+bool WorldMapControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);

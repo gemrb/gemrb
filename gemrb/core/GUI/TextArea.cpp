@@ -320,8 +320,58 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (flags & IE_GUI_TEXTAREA_EDITABLE) {
 		if (Key >= 0x20) {
 			MarkDirty();
-
 			// TODO: implement this! currently does nothing
+			size_t CurPos = 0, len = 0;
+			switch (Key) {
+				case GEM_HOME:
+					CurPos = 0;
+					break;
+				case GEM_UP:
+					break;
+				case GEM_DOWN:
+					break;
+				case GEM_END:
+					break;
+				case GEM_LEFT:
+					if (CurPos > 0) {
+						CurPos--;
+					} else {
+
+					}
+					break;
+				case GEM_RIGHT:
+					if (CurPos < len) {
+						CurPos++;
+					} else {
+
+					}
+					break;
+				case GEM_DELETE:
+					if (CurPos>=len) {
+						break;
+					}
+					break;
+				case GEM_BACKSP:
+					if (CurPos != 0) {
+						if (len<1) {
+							break;
+						}
+						CurPos--;
+					} else {
+
+					}
+					break;
+				case GEM_RETURN:
+					//add an empty line after CurLine
+					// TODO: implement this
+					//copy the text after the cursor into the new line
+
+					//truncate the current line
+					
+					//move cursor to next line beginning
+					CurPos=0;
+					break;
+			}
 
 			RunEventHandler( TextAreaOnChange );
 		}
@@ -337,71 +387,6 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (lookupIdx < OptSpans.size()) {
 		UpdateState(VarName, lookupIdx);
 	}
-	return true;
-}
-
-/** Special Key Press */
-bool TextArea::OnSpecialKeyPress(unsigned char Key)
-{
-	size_t len = 0;
-	size_t CurPos = 0;
-
-	if (!(flags&IE_GUI_TEXTAREA_EDITABLE)) {
-		return false;
-	}
-	MarkDirty();
-	// TODO: implement text editing. (going to be tricky...)
-	switch (Key) {
-		case GEM_HOME:
-			CurPos = 0;
-			break;
-		case GEM_UP:
-			break;
-		case GEM_DOWN:
-			break;
-		case GEM_END:
-			break;
-		case GEM_LEFT:
-			if (CurPos > 0) {
-				CurPos--;
-			} else {
-
-			}
-			break;
-		case GEM_RIGHT:
-			if (CurPos < len) {
-				CurPos++;
-			} else {
-
-			}
-			break;
-		case GEM_DELETE:
-			if (CurPos>=len) {
-				break;
-			}
-			break;
-		case GEM_BACKSP:
-			if (CurPos != 0) {
-				if (len<1) {
-					break;
-				}
-				CurPos--;
-			} else {
-
-			}
-			break;
-		 case GEM_RETURN:
-			//add an empty line after CurLine
-			// TODO: implement this
-			//copy the text after the cursor into the new line
-
-			//truncate the current line
-
-			//move cursor to next line beginning
-			CurPos=0;
-			break;
-	}
-	RunEventHandler( TextAreaOnChange );
 	return true;
 }
 

@@ -78,6 +78,22 @@ public:
 	WMPAreaEntry *Area;
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
+
+	/** Mouse Over Event */
+	void OnMouseOver(const Point& p);
+	/** Mouse Leave Event */
+	void OnMouseLeave(const Point& p, const DragOp*);
+	/** Mouse Button Down */
+	void OnMouseDown(const Point& p, unsigned short Button,
+					 unsigned short Mod);
+	/** Mouse Button Up */
+	void OnMouseUp(const Point& p, unsigned short Button,
+				   unsigned short Mod);
+	/** Mouse Wheel Event */
+	void OnMouseWheelScroll(short x, short y);
+
+	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+
 private:
 	//font for printing area names
 	Font* ftext;
@@ -95,21 +111,6 @@ private:
 	Palette *pal_notvisited;
 	/** guiscript Event when button pressed */
 	ControlEventHandler WorldMapControlOnPress;
-
-	/** Mouse Over Event */
-	void OnMouseOver(const Point& p);
-	/** Mouse Leave Event */
-	void OnMouseLeave(const Point& p, const DragOp*);
-	/** Mouse Button Down */
-	void OnMouseDown(const Point& p, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(const Point& p, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Wheel Event */
-	void OnMouseWheelScroll(short x, short y);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
 };
 
 }

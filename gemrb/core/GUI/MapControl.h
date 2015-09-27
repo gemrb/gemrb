@@ -82,15 +82,13 @@ public:
 	void Realize();
 
 	/** Key Press Event */
-	//void OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
 	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 private:

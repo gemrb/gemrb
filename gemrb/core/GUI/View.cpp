@@ -426,10 +426,10 @@ void View::OnMouseWheelScroll(short x, short y)
 	}
 }
 
-bool View::OnSpecialKeyPress(unsigned char key)
+bool View::OnKeyPress(unsigned char key, unsigned short mod)
 {
 	if (scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
-		return scrollbar->OnSpecialKeyPress(key);
+		return scrollbar->OnKeyPress(key, mod);
 	}
 
 	return false;

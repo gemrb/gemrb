@@ -159,8 +159,6 @@ private: //internal functions
 public: //Events
 	/** Key Press Event */
 	bool OnKeyPress(unsigned char Key, unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
 	/** Mousewheel scroll */
 	void OnMouseWheelScroll(short x, short y);
 	/** Mouse Over Event */

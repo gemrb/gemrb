@@ -103,17 +103,6 @@ void Console::SetText(const String& string)
 /** Key Press Event */
 bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	if (Key >= 0x20) {
-		if (Buffer.length() < max) {
-			Buffer.insert(CurPos++, 1, Key);
-		}
-		return true;
-	}
-	return false;
-}
-/** Special Key Press */
-bool Console::OnSpecialKeyPress(unsigned char Key)
-{
 	switch (Key) {
 		case GEM_BACKSP:
 			if (CurPos != 0) {
@@ -147,17 +136,27 @@ bool Console::OnSpecialKeyPress(unsigned char Key)
 			}
 			break;			
 		case GEM_RETURN:
-			char* cBuf = MBCStringFromString(Buffer);
-			// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
-			core->GetGUIScriptEngine()->ExecString(cBuf, true);
-			free(cBuf);
-			HistoryAdd();
-			Buffer.erase();
-			CurPos = 0;
-			HistPos = 0;
+			{
+				char* cBuf = MBCStringFromString(Buffer);
+				// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
+				core->GetGUIScriptEngine()->ExecString(cBuf, true);
+				free(cBuf);
+				HistoryAdd();
+				Buffer.erase();
+				CurPos = 0;
+				HistPos = 0;
+			}
 			break;
+		default:
+			if (Key >= 0x20) {
+				if (Buffer.length() < max) {
+					Buffer.insert(CurPos++, 1, Key);
+				}
+				return true;
+			}
+			return false;
 	}
-	return Control::OnSpecialKeyPress(Key);
+	return true;
 }
 
 void Console::HistoryBack()
