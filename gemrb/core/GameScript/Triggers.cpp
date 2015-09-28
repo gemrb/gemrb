@@ -1735,6 +1735,11 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	Actor* actor = ( Actor* ) target;
+	// make sure to discout unscheduled actors - count them as dead
+	// alternatively we could set their death vars when disabling them wrt AreaDifficulty
+	if (!actor->ValidTarget(GA_NO_UNSCHEDULED)) {
+		return 1;
+	}
 	if (actor->GetStat( IE_STATE_ID ) & STATE_DEAD) {
 		return 1;
 	}
