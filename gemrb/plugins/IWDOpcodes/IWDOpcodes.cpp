@@ -3422,7 +3422,7 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->ToHit.HandleFxBonus(chrmod, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	}
 	STAT_ADD(IE_DAMAGEBONUS, target->GetPaladinLevel());
-	return FX_NOT_APPLIED;
+	return FX_APPLIED;
 }
 
 //447 Restoration

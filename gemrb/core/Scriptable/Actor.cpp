@@ -362,6 +362,7 @@ static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
 static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
 static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
+static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 
 //used by iwd2
 static ieResRef resref_cripstr={"cripstr"};
@@ -6774,6 +6775,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Missed]");
 		Log(COMBAT, "Attack", buffer);
 		return;
+	}
+
+	// iwd2 smite evil only lasts for one attack, but has an insane duration, so remove it manually
+	if (HasSpellState(SS_SMITEEVIL)) {
+		fxqueue.RemoveAllEffects(fx_smite_evil_ref);
 	}
 
 	// check for concealment first (iwd2), both our enemies' and from our phasing problems
