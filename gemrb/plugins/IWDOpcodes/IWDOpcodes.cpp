@@ -954,8 +954,8 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	Actor *donor;
 
 	switch(fx->Parameter2) {
-		case 0: receiver = target; donor = owner; break;
-		case 1: receiver = owner; donor = target; break;
+		case 0: receiver = owner; donor = target; break;
+		case 1: receiver = target; donor = owner; break;
 		default:
 			return FX_NOT_APPLIED;
 	}
