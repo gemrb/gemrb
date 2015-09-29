@@ -400,7 +400,7 @@ static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0x
 static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
-
+static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -2599,7 +2599,17 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_FIRESHIELD);
 		target->SetOverlay(OV_FIRESHIELD1);
 	}
-	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
+	// create a general CastSpellOnCondition effect (bg2) for the payload
+	// much nicer than iwd's ApplyDamageNearby
+	if (fx->FirstApply) {
+		Effect *fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_INSTANT_LIMITED);
+		assert(fx2);
+		fx2->Duration = fx->Duration;
+		CopyResRef(fx2->Source, fx->Source);
+		CopyResRef(fx2->Resource, fx->Resource);
+		core->ApplyEffect(fx2, target, target);
+		delete fx2;
+	}
 	return FX_APPLIED;
 }
 
