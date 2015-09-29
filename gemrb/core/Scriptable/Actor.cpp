@@ -4680,7 +4680,7 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 	default:
 		// checking if anyone uses the psion, item and song types
 		if (spelltype != IE_SPL_INNATE) {
-			Log(ERROR, "Actor", "Unhandled SPL type: %d!", spelltype);
+			Log(WARNING, "Actor", "Unhandled SPL type %d, using average casting level!", spelltype);
 		}
 		break;
 	}
