@@ -6487,6 +6487,9 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
 	}
 
+	// add generic bonus
+	generic += GetStat(IE_HITBONUS);
+
 	// finally involve the Modified stat and add to it the rest of the generic bonus
 	if (ReverseToHit) {
 		ToHit.SetGenericBonus(ToHit.GetGenericBonus()-generic);
