@@ -1551,6 +1551,7 @@ int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 
 //in pst this is a point
 //in iwd2 this is not a point
+//  and -2,-2 is treated specially in iwd2 (Jorun in Targos)
 int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1558,8 +1559,13 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (parameters->pointParameter.isnull()) {
-		Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-		int distance = PersonalDistance(p, scr);
+		int distance;
+		if (parameters->int0Parameter < 0) { // use Sender's position
+			distance = PersonalDistance(Sender, scr);
+		} else {
+			Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+			distance = PersonalDistance(p, scr);
+		}
 		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
 			return 1;
 		}
