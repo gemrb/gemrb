@@ -2978,15 +2978,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	spellbook.ClearBonus();
 	/* these apply resrefs should be on a list as a trigger+resref */
-	memset(applyWhenHittingMelee,0,sizeof(ieResRef));
-	memset(applyWhenHittingRanged,0,sizeof(ieResRef));
-	memset(applyWhenNearLiving,0,sizeof(ieResRef));
-	memset(applyWhen50Damage,0,sizeof(ieResRef));
-	memset(applyWhen90Damage,0,sizeof(ieResRef));
-	memset(applyWhenEnemySighted,0,sizeof(ieResRef));
-	memset(applyWhenPoisoned,0,sizeof(ieResRef));
-	memset(applyWhenHelpless,0,sizeof(ieResRef));
-	memset(applyWhenAttacked,0,sizeof(ieResRef));
 	memset(applyWhenBeingHit,0,sizeof(ieResRef));
 	memset(BardSong,0,sizeof(ieResRef));
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));

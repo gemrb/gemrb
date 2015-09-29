@@ -272,15 +272,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef applyWhenHittingMelee;  //set melee effect
-	ieResRef applyWhenHittingRanged; //set ranged effect
-	ieResRef applyWhenNearLiving;    //cast spell on condition
-	ieResRef applyWhen50Damage;      //cast spell on condition
-	ieResRef applyWhen90Damage;      //cast spell on condition
-	ieResRef applyWhenEnemySighted;  //cast spell on condition
-	ieResRef applyWhenPoisoned;      //cast spell on condition
-	ieResRef applyWhenHelpless;      //cast spell on condition
-	ieResRef applyWhenAttacked;      //cast spell on condition
 	ieResRef applyWhenBeingHit;      //cast spell on condition
 	ieResRef ModalSpell;             //apply this spell once per round
 	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
