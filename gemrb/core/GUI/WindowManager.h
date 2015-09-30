@@ -69,6 +69,7 @@ private:
 
 	inline void DrawCursor() const;
 	inline void DrawTooltip() const;
+	inline void DrawWindowFrame() const;
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);

@@ -312,6 +312,30 @@ void WindowManager::DrawTooltip() const
 	}
 }
 
+void WindowManager::DrawWindowFrame() const
+{
+	// the window buffers dont have room for the frame
+	// we also only need to draw the frame *once* (even if it applies to multiple windows)
+	// therefore, draw the frame on the cursor buffer (above everything else)
+	// ... I'm not 100% certain this works for all use cases.
+	// if it doesnt... i think it might be better to just forget about the window frames once the game is loaded
+
+	video->SetScreenClip( NULL );
+
+	Sprite2D* edge = WinFrameEdge(0); // left
+	if (edge) {
+		// we assume if one fails, they all do
+		video->BlitSprite(edge, 0, 0);
+		edge = WinFrameEdge(1); // right
+		int sideW = edge->Width;
+		video->BlitSprite(edge, screen.w - sideW, 0);
+		edge = WinFrameEdge(2); // top
+		video->BlitSprite(edge, sideW, 0);
+		edge = WinFrameEdge(3); // bottom
+		video->BlitSprite(edge, sideW, screen.h - edge->Height);
+	}
+}
+
 void WindowManager::DrawWindows() const
 {
 	if (!windows.size()) {
@@ -383,26 +407,7 @@ void WindowManager::DrawWindows() const
 	video->SetDrawingBuffer(cursorBuf);
 
 	if (drawFrame) {
-		// the window buffers dont (well wont after im done) have room for the frame
-		// we also only need to draw the frame *once* (even if it applies to multiple windows)
-		// therefore, draw the frame on the cursor buffer (above everything else)
-		// ... I'm not 100% certain this works for all use cases.
-		// if it doesnt... i think it might be better to just forget about the window frames once the game is loaded
-
-		video->SetScreenClip( NULL );
-
-		Sprite2D* edge = WinFrameEdge(0); // left
-		if (edge) {
-			// we assume if one fails, they all do
-			video->BlitSprite(edge, 0, 0);
-			edge = WinFrameEdge(1); // right
-			int sideW = edge->Width;
-			video->BlitSprite(edge, screen.w - sideW, 0);
-			edge = WinFrameEdge(2); // top
-			video->BlitSprite(edge, sideW, 0);
-			edge = WinFrameEdge(3); // bottom
-			video->BlitSprite(edge, sideW, screen.h - edge->Height);
-		}
+		DrawWindowFrame();
 	}
 
 	// tooltips and cursor are always last
