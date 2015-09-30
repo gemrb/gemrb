@@ -38,6 +38,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		GemRB.HideGUI ()
 		
 	LoadScreen = Window = GemRB.LoadWindow (0, "guils")
+	LoadScreen.AddAlias("LOADWIN")
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 

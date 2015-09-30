@@ -41,6 +41,7 @@ def StartLoadScreen ():
 	global LoadScreen
 
 	LoadScreen = GemRB.LoadWindow (0, "guils")
+	LoadScreen.AddAlias("LOADWIN")
 
 	SetLoadScreen()
 	Bar = LoadScreen.GetControl (0)

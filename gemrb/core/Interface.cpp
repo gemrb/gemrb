@@ -3815,8 +3815,11 @@ void Interface::LoadProgress(int percent)
 
 	winmgr->DrawWindows();
 
-	Window* loadwin = GetWindow(0, "guils");
-	loadwin->RedrawControls("Progress", percent);
+	Window* loadwin = GetWindow(0, "LOADWIN");
+	if (loadwin) {
+		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
+		loadwin->RedrawControls("Progress", percent);
+	}
 
 	video->SwapBuffers();
 }
