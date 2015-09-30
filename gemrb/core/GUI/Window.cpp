@@ -272,6 +272,13 @@ bool Window::DispatchEvent(const Event& event)
 {
 	if (event.isScreen) {
 		Point screenPos = event.mouse.Pos();
+		if (!frame.PointInside(screenPos)) {
+			// this can hapen if the window is modal since it will absorb all events
+			// the window manager maybe shouldnt dispatch the events in this case
+			// but this is a public function and its possible to post a phoney event from anywhere anyway
+			return true;
+		}
+
 		View* target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
 
 		if (target == NULL && flags&MousePassthrough) {
@@ -301,6 +308,7 @@ bool Window::DispatchEvent(const Event& event)
 				break;
 		}
 
+		assert(target);
 		// basic event handling
 		switch (event.type) {
 			case Event::MouseDown:
@@ -309,7 +317,7 @@ bool Window::DispatchEvent(const Event& event)
 			case Event::MouseUp:
 				DispatchMouseUp(target, screenPos, event.mouse.button, event.mod);
 				break;
-			default: return false; // should never happen, supressing compiler warning
+			default: return false; // we dont handle touch events yet...
 		}
 		// absorb other screen events i guess
 		return true;
