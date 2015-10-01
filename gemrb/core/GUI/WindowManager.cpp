@@ -108,8 +108,11 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 	FocusWindow( win );
 	modalWin = win;
 
-	core->PlaySound(DS_WINDOW_OPEN);
 	modalShadow = Shadow;
+	if (win->Flags()&Window::Borderless) {
+		core->PlaySound(DS_WINDOW_OPEN);
+	}
+
 	return true;
 }
 
@@ -179,7 +182,10 @@ void WindowManager::CloseWindow(Window* win)
 	if (it == windows.end()) return;
 
 	if (win == modalWin) {
-		core->PlaySound(DS_WINDOW_CLOSE);
+		if (win->Flags()&Window::Borderless) {
+			core->PlaySound(DS_WINDOW_CLOSE);
+		}
+
 		modalWin = NULL;
 	}
 
