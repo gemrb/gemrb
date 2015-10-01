@@ -2393,6 +2393,7 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
+		case IE_ANI_HIDE: // unknown, just a guess
 			strcat( ResRef, "g1" );
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle = Orient / 2;
