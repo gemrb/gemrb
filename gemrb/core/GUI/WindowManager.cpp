@@ -220,60 +220,53 @@ bool WindowManager::HotKey(const Event& event)
 
 Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_iterator& current)
 {
-	Window* target = NULL;
+	if (current == windows.end()) {
+		// we already we through them all and returned gameWin or modalWin once. there is no target window after gameWin
+		return NULL;
+	}
+
+	if (IsPresentingModalWindow()) {
+		// modal win is always the target for all events no matter what
+		// if the window shouldnt handle sreen events outside its bounds (ie negative coords etc)
+		// then the Window class should be responsible for bounds checking
+
+		// the NULL return is so that if this is called again after returning modalWindow there is no NextTarget
+		current = windows.end(); // invalidate the iterator, no other target s possible.
+		return modalWin;
+	}
 
 	while (current != windows.end()) {
 		Window* win = *current++;
 		if (win->IsVisible() && (!event.isScreen || HIT_TEST(event,win))) {
 			// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
 			// we still need to update which window is under the mouse and block events from reaching the windows below
-			target = win;
-			break;
+			return win;
 		}
 	}
 
 	// we made it though with no takers...
 	// send it to the game win
-	if (target == NULL) {
-		target = gameWin;
-	}
-	return target;
+	return gameWin;
 }
 
 bool WindowManager::DispatchEvent(const Event& event)
 {
 	if (windows.empty()) return false;
 
-	WindowList::const_iterator it = windows.end(); // start invalid, only init if no modal
-	Window* target = NULL;
-	if (IsPresentingModalWindow()) {
-		// modal windows absorb all events that intersect
-		// but also block events from reaching other windows even
-		// when they dont hit
-		if (!event.isScreen || HIT_TEST(event, modalWin)) {
-			target = modalWin;
-		}
-	} else {
-		it = windows.begin();
-		target = NextEventWindow(event, it);
-	}
-
-	// at least gameWin should always exist
-	assert(target);
-
 	if (event.type == Event::MouseMove) {
 		TooltipTime = GetTickCount();
 	}
 
-	do {
+	WindowList::const_iterator it = windows.begin();
+	while (Window* target = NextEventWindow(event, it)) {
 		// disabled windows get no events, but should block them from going to windows below
-		if ((!target->IsDisabled() && target->DispatchEvent(event)) || target == gameWin) {
+		if (target->IsDisabled() || target->DispatchEvent(event)) {
 			if (event.isScreen) {
 				hoverWin = target;
 			}
 			return true;
 		}
-	} while ((target = NextEventWindow(event, it)));
+	}
 
 	return false;
 }
