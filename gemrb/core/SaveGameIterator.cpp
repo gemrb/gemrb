@@ -488,7 +488,6 @@ static int CanSave()
 		return 2; //can't save while in dialog
 	}
 
-	//TODO: can't save while in combat
 	Game *game = core->GetGame();
 	if (!game) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
