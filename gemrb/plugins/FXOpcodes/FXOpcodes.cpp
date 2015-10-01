@@ -3158,6 +3158,13 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	}
 
+	// different in iwd2 only?
+	// x hp per 1 round
+	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
+		damage = fx->Parameter1;
+		fx->Parameter3 = gameTime + core->Time.round_sec*AI_UPDATE_TIME;
+	}
+
 	if (fx->FirstApply) {
 		//don't add hp in the first occasion, so it cannot be used for cheat heals
 		return FX_APPLIED;
