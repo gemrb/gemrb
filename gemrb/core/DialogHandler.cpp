@@ -96,7 +96,7 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
+bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref, ieDword si)
 {
 	delete dlg;
 	dlg = NULL;
@@ -143,7 +143,14 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
-	initialState = dlg->FindFirstState( tgt );
+	// iwd2 ignores conditions when following external references and
+	// also just goes directly for the referenced state
+	// look at 41cmolb1 and 41cmolb2 for an example
+	if (core->HasFeature(GF_3ED_RULES) && originalTargetID != targetID) {
+		initialState = si;
+	} else {
+		initialState = dlg->FindFirstState( tgt );
+	}
 	if (initialState < 0) {
 		return false;
 	}
@@ -403,7 +410,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
-			if (!InitDialog( speaker, target, tmpresref)) {
+			if (!InitDialog(speaker, target, tmpresref, si)) {
 				// error was displayed by InitDialog
 				EndDialog();
 				return false;
