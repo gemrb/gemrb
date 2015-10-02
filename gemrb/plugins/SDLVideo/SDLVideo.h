@@ -88,7 +88,6 @@ public:
 
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true);
-	void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite);
 	/** This functions Draws a Circle */
 	void SetPixel(const Point&, const Color& color);
 	/** Gets the pixel of the backbuffer surface */

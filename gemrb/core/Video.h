@@ -187,8 +187,7 @@ public:
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true) = 0;
-	/** this function draws a clipped sprite */
-	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
+
 	virtual void SetPixel(const Point&, const Color& color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color) = 0;

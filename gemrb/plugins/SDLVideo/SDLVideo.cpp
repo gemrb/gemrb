@@ -788,34 +788,6 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 	}
 }
 
-/** This function Draws a clipped sprite */
-void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite)
-{
-	if (sprite->BAM) {
-		Log(ERROR, "SDLVideo", "DrawRectSprite not supported for this sprite");
-		return;
-	}
-
-	SDL_Surface* surf = ((SDLSurfaceSprite2D*)sprite)->GetSurface();
-	SDL_Rect drect = RectFromRegion(rgn);
-	if ( SDL_ALPHA_TRANSPARENT == color.a ) {
-		return;
-	} else if ( SDL_ALPHA_OPAQUE == color.a ) {
-		long val = SDL_MapRGBA( surf->format, color.r, color.g, color.b, color.a );
-		SDL_FillRect( surf, &drect, val );
-	} else {
-		SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
-		SDL_Color c;
-		c.r = color.r;
-		c.b = color.b;
-		c.g = color.g;
-		SDLVideoDriver::SetSurfacePalette(rectsurf, &c, 1);
-		SetSurfaceAlpha(rectsurf, color.a);
-		SDL_BlitSurface( rectsurf, NULL, surf, &drect );
-		SDL_FreeSurface( rectsurf );
-	}
-}
-
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color)
 {
 	SetPixel(Point(x, y), color);
