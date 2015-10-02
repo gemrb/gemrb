@@ -226,6 +226,29 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
+void Video::BlitSprite(const Sprite2D* spr, int x, int y,
+								const Region* clip, Palette* palette)
+{
+	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
+	Region fClip = ClippedDrawingRect(dst, clip);
+
+	if (fClip.Dimensions().IsEmpty()) {
+		return; // already know blit fails
+	}
+
+	Region src(0, 0, spr->Width, spr->Height);
+	// adjust the src region to account for the clipping
+	src.x += fClip.x - dst.x; // the left edge
+	src.w -= dst.w - fClip.w; // the right edge
+	src.y += fClip.y - dst.y; // the top edge
+	src.h -= dst.h - fClip.h; // the bottom edge
+
+	assert(src.w == fClip.w && src.h == fClip.h);
+
+	// just pass fclip as dst
+	BlitSprite(spr, src, fClip, palette);
+}
+
 void Video::BlitTiled(Region rgn, const Sprite2D* img)
 {
 	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;

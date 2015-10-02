@@ -407,29 +407,6 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 }
 
-void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y,
-								const Region* clip, Palette* palette)
-{
-	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
-	Region fClip = ClippedDrawingRect(dst, clip);
-
-	if (fClip.Dimensions().IsEmpty()) {
-		return; // already know blit fails
-	}
-
-	Region src(0, 0, spr->Width, spr->Height);
-	// adjust the src region to account for the clipping
-	src.x += fClip.x - dst.x; // the left edge
-	src.w -= dst.w - fClip.w; // the right edge
-	src.y += fClip.y - dst.y; // the top edge
-	src.h -= dst.h - fClip.h; // the bottom edge
-
-	assert(src.w == fClip.w && src.h == fClip.h);
-
-	// just pass fclip as dst
-	BlitSprite(spr, src, fClip, palette);
-}
-
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
 {
 	if (dst.w <= 0 || dst.h <= 0)
@@ -502,7 +479,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		if (surf->format->BytesPerPixel != 4 && surf->format->BytesPerPixel != 1) {
 			// TODO...
 			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
-			BlitSprite(spr, x, y, clip);
+			Video::BlitSprite(spr, x, y, clip);
 			return;
 		}
 	} else {
