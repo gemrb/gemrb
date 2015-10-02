@@ -56,9 +56,10 @@ public:
 	~SDL20VideoDriver(void);
 
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
-	int SwapBuffers(void);
+	void SwapBuffers(VideoBuffers& buffers);
 	int PollEvents();
 
+	Sprite2D* GetScreenshot( Region r );
 	bool SetFullscreenMode(bool set);
 	void SetGamma(int brightness, int contrast);
 	bool ToggleGrabInput();
@@ -66,6 +67,8 @@ public:
 	void HideSoftKeyboard();
 
 private:
+	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
+
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);

@@ -51,6 +51,73 @@ private:
 	int ProcessEvent(const SDL_Event & event);
 };
 
+
+class SDLOverlayVideoBuffer : public SDLSurfaceVideoBuffer {
+	SDL_Overlay* overlay;
+	Point renderPos;
+
+public:
+	SDLOverlayVideoBuffer(SDL_Surface* buffer, const Point& p, SDL_Overlay* overlay)
+	: SDLSurfaceVideoBuffer(buffer, p)
+	{
+		assert(overlay);
+		this->overlay = overlay;
+	}
+
+	~SDLOverlayVideoBuffer() {
+		SDL_FreeYUVOverlay(overlay);
+	}
+
+	void Clear() {}
+
+	class Size Size() {
+		return GemRB::Size(overlay->w, overlay->h);
+	}
+
+	void RenderOnDisplay(SDL_Surface* /*display*/) {
+		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
+
+		SDL_Rect dest = {origin.x, origin.y, overlay->w, overlay->h};
+		SDL_DisplayYUVOverlay(overlay, &dest);
+	}
+
+	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+		va_list args;
+		va_start(args, pitch);
+
+		enum PLANES {Y, U, V};
+		ieByte* planes[3];
+		unsigned int strides[3];
+
+		planes[Y] = static_cast<ieByte*>(pixelBuf);
+		strides[Y] = *pitch;
+		planes[U] = va_arg(args, ieByte*);
+		strides[U] = *va_arg(args, int*);
+		planes[V] = va_arg(args, ieByte*);
+		strides[V] = *va_arg(args, int*);
+
+		va_end(args);
+
+		SDL_LockYUVOverlay(overlay);
+		for (unsigned int plane = 0; plane < 3; plane++) {
+			unsigned char *data = planes[plane];
+			unsigned int size = overlay->pitches[plane];
+			if (strides[plane] < size) {
+				size = strides[plane];
+			}
+			unsigned int srcoffset = 0, destoffset = 0;
+			for (int i = 0; i < ((plane == 0) ? bufDest.h : (bufDest.h / 2)); i++) {
+				memcpy(overlay->pixels[plane] + destoffset,
+					   data + srcoffset, size);
+				srcoffset += strides[plane];
+				destoffset += overlay->pitches[plane];
+			}
+		}
+		SDL_UnlockYUVOverlay(overlay);
+		renderPos = bufDest.Origin();
+	}
+};
+
 }
 
 #endif

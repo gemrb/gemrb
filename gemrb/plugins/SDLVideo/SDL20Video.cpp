@@ -94,9 +94,6 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	// but the window will always be the size of the screen
 	SDL_RenderSetLogicalSize(renderer, width, height);
 
-	Viewport.w = width;
-	Viewport.h = height;
-
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
 
@@ -143,22 +140,17 @@ doneFormat:
 	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
 	a = 0; //force a to 0 or screenshots will be all black!
 
-	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
-		width, height, SDL_GetPixelFormatName(format));
-	backBuf = SDL_CreateRGBSurface( 0, width, height,
-									bpp, r, g, b, a );
 	this->bpp = bpp;
-
-	if (!backBuf) {
-		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
-			SDL_GetPixelFormatName(format), SDL_GetError());
-		return GEM_ERROR;
-	}
-	disp = backBuf;
 
 	return GEM_OK;
 }
 
+VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region&, BufferFormat)
+{
+	return NULL;
+}
+
+/*
 void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -175,11 +167,6 @@ void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	}
 	w = width;
 	h = height;
-	//setting the subtitle region to the bottom 1/4th of the screen
-	subtitleregion.w = w;
-	subtitleregion.h = h/4;
-	subtitleregion.x = 0;
-	subtitleregion.y = h-h/4;
 }
 
 void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -248,18 +235,14 @@ void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_RenderPresent(renderer);
 }
 
-void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-				  unsigned int /*bufw*/, unsigned int /*bufh*/,
-				  unsigned int w, unsigned int h,
-				  unsigned int dstx, unsigned int dsty,
-				  ieDword /*titleref*/)
+void SDL20VideoDriver::showYUVFrame()
 {
 	SDL_Rect destRect;
 	destRect.x = dstx;
 	destRect.y = dsty;
 	destRect.w = w;
 	destRect.h = h;
-/*
+
  // This is superseded by SDL_UpdateYUVTexture, but I havent throughly tested it.
  // Not that I expect it to perform worse than the manual code :)
 	Uint8 *pixels;
@@ -303,18 +286,23 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		}
 	}
 	SDL_UnlockTexture(screenTexture);
- */
+ *//*
 	SDL_RenderClear(renderer);
 	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[1], strides[1], buf[2], strides[2]);
 	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
 	SDL_RenderPresent(renderer);
 }
-
-int SDL20VideoDriver::SwapBuffers(void)
+*/
+void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
-	int ret = SDLVideoDriver::SwapBuffers();
+	VideoBuffers::iterator it;
+	it = buffers.begin();
+	for (; it != buffers.end(); ++it) {
+		//SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
+		//vb->RenderOnDisplay(disp);
+	}
 
-	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+	//SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
 	/*
 	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
 	 Don't know how universal it is yet so leaving this in commented out just in case
@@ -336,18 +324,13 @@ int SDL20VideoDriver::SwapBuffers(void)
 	 SDL_UnlockTexture(screenTexture);
 	 */
 
-	/*
-	 if (fadeColor.a) {
-	 SDL_Rect dst = {
-	 xCorr, yCorr, Viewport.w, Viewport.h
-	 };
-	 SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
-	 SDL_RenderFillRect(renderer, &dst);
-	 }
-	 */
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
-	return ret;
+}
+
+Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
+{
+	return NULL;
 }
 
 int SDL20VideoDriver::PollEvents()
@@ -358,11 +341,12 @@ int SDL20VideoDriver::PollEvents()
 		// enough time has passed to transform firstTouch into a right click event
 
 		// store the finger coordinates before calling ProcessFirstTouch (they get cleared)
-		int x = firstFingerDown.x;
-		int y = firstFingerDown.y;
+		//int x = firstFingerDown.x;
+		//int y = firstFingerDown.y;
 		ProcessFirstTouch(GEM_MB_MENU);
 
 		if (currentGesture.type == GESTURE_NONE) {
+			/*
 			Control* focusCtrl = EvntManager->GetFocusedControl();
 			if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
 				&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE) {
@@ -372,6 +356,7 @@ int SDL20VideoDriver::PollEvents()
 				EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
 				ignoreNextFingerUp = 1;
 			}
+			*/
 		}
 	}
 
@@ -407,9 +392,11 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 		if (!currentGesture.endPoint.isempty()) {
 			// dont send events for invalid coordinates
 			// we assume this means the gesture doesnt want an up event
+			/*
 			EvntManager->MouseUp(currentGesture.endPoint.x,
 								 currentGesture.endPoint.y,
 								 currentGesture.endButton, GetModState(SDL_GetModState()) );
+			 */
 		}
 	}
 	if (currentGesture.type) {
@@ -426,13 +413,11 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 
 bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 {
+	/*
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
 		// do an actual mouse move first! this is important for things such as ground piles to work!
 		// also ensure any referencing of the cursor is accurate
 		MouseMovement(firstFingerDown.x, firstFingerDown.y);
-
-		if (CursorIndex != VID_CUR_DRAG)
-			CursorIndex = VID_CUR_DOWN;
 
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
@@ -442,6 +427,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 		ignoreNextFingerUp--;
 		return true;
 	}
+	 */
 	return false;
 }
 
@@ -460,10 +446,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// need 2 separate tests.
 	// sometimes finger0 will become null while we are still processig its touches
 	if (numFingers) {
-		focusCtrl = EvntManager->GetFocusedControl();
+		focusCtrl = NULL;//EvntManager->GetFocusedControl();
 	}
-
-	bool ConsolePopped = core->ConsolePopped;
 
 	// TODO: we need a method to process gestures when numFingers changes
 	// some gestures would want to continue while some would want to end/abort
@@ -480,6 +464,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				ignoreNextFingerUp = numFingers;
 			}
 
+			/*
 			if (numFingers == core->NumFingScroll
 				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
 				//any # of fingers != NumFingKBoard will scroll a text area
@@ -523,12 +508,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						(y >= -MIN_GESTURE_DELTA_PIXELS
 						&& y <= MIN_GESTURE_DELTA_PIXELS)) {
 						break;
-					} else /*if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)*/ {
+					} else //if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)
+					{
 						//break;
 					}
 					ProcessFirstTouch(GEM_MB_ACTION);
 				}
-				CursorIndex = VID_CUR_DRAG;
 
 				// standard mouse movement
 				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
@@ -536,6 +521,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			// we set this on finger motion because simple up/down are not part of gestures
 			continuingGesture = true;
+			*/
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
@@ -565,8 +551,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			} else if (currentGesture.type == GESTURE_NONE) {
 				if (EvntManager && numFingers == core->NumFingInfo) {
-					EvntManager->OnSpecialKeyPress( GEM_TAB );
-					EvntManager->OnSpecialKeyPress( GEM_ALT );
+					//EvntManager->OnSpecialKeyPress( GEM_TAB );
+					//EvntManager->OnSpecialKeyPress( GEM_ALT );
 				}
 				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
 					&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
@@ -583,13 +569,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
 				continuingGesture = false;
 				EndMultiGesture(true);
-
+				/*
 				if (numFingers == 0) { // this event was the last finger that was in contact
 					ProcessFirstTouch(mouseButton);
 					if (ignoreNextFingerUp <= 0) {
 						ignoreNextFingerUp = 1; // set to one because we decrement unconditionally later
-						if (CursorIndex != VID_CUR_DRAG)
-							CursorIndex = VID_CUR_UP;
+
 						// move cursor to ensure any referencing of the cursor is accurate
 						MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
 									  ScaleCoordinateVertical(event.tfinger.y));
@@ -609,6 +594,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// this isn't causing a problem currently
 					EvntManager->KeyRelease( GEM_ALT, 0 );
 				}
+				*/
 				ignoreNextFingerUp--;
 			}
 			break;
@@ -627,7 +613,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						if (secondFinger && gc->GetTargetMode() == TARGET_MODE_NONE) {
 							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
 							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
-							gc->OnMouseOver(x, y);
+							//gc->OnMouseOver(x, y);
 							currentGesture.endPoint = Point(x, y);
 						}
 						break;
@@ -647,15 +633,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			scrollX= event.wheel.x * -1;
 			short scrollY;
 			scrollY= event.wheel.y * -1;
-			EvntManager->MouseWheelScroll( scrollX, scrollY );
+			//EvntManager->MouseWheelScroll( scrollX, scrollY );
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
 			for (size_t i=0; i < strlen(event.text.text); i++) {
-				if (core->ConsolePopped)
-					core->console->OnKeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
-				else
-					EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
+				//EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
 			}
 			break;
 		/* not user input events */
@@ -726,10 +709,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
  */
 void SDL20VideoDriver::HideSoftKeyboard()
 {
+	/*
 	if(core->UseSoftKeyboard){
 		SDL_StopTextInput();
 		if(core->ConsolePopped) core->PopupConsole();
 	}
+	*/
 }
 
 /*
@@ -737,9 +722,11 @@ void SDL20VideoDriver::HideSoftKeyboard()
  */
 void SDL20VideoDriver::ShowSoftKeyboard()
 {
+	/*
 	if(core->UseSoftKeyboard){
 		SDL_StartTextInput();
 	}
+	*/
 }
 
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)

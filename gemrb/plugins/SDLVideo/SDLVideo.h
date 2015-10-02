@@ -37,6 +37,23 @@ typedef unsigned char
 
 namespace GemRB {
 
+#if SDL_VERSION_ATLEAST(1,3,0)
+#define SDL_SRCCOLORKEY SDL_TRUE
+#define SDL_SRCALPHA 0
+#define SDLKey SDL_Keycode
+#define SDLK_SCROLLOCK SDLK_SCROLLLOCK
+#define SDLK_KP1 SDLK_KP_1
+#define SDLK_KP2 SDLK_KP_2
+#define SDLK_KP3 SDLK_KP_3
+#define SDLK_KP4 SDLK_KP_4
+#define SDLK_KP6 SDLK_KP_6
+#define SDLK_KP7 SDLK_KP_7
+#define SDLK_KP8 SDLK_KP_8
+#define SDLK_KP9 SDLK_KP_9
+#else
+	typedef Sint32 SDL_Keycode;
+#endif
+
 inline int GetModState(int modstate)
 {
 	int value = 0;
@@ -145,8 +162,14 @@ public:
 	}
 
 	void Clear() {
-		if (buffer->format->colorkey) {
-			SDL_FillRect(buffer, NULL, buffer->format->colorkey);
+		Uint32 ck = 0;
+#if SDL_VERSION_ATLEAST(1,3,0)
+		if (SDL_GetColorKey(buffer, &ck) == 0) {
+#else
+		ck = buffer->format->colorkey;
+		if (ck) {
+#endif
+			SDL_FillRect(buffer, NULL, ck);
 		} else {
 			SDL_FillRect(buffer, NULL, SDL_MapRGBA(buffer->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT));
 		}
@@ -183,7 +206,11 @@ public:
 				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
+#if SDL_VERSION_ATLEAST(1,3,0)
+				sprite->format->palette->colors[i].a = 0;
+#else
 				sprite->format->palette->colors[i].unused = 0;
+#endif
 			}
 			va_end(args);
 		}
@@ -191,72 +218,6 @@ public:
 		SDL_Rect dst = SDLVideoDriver::RectFromRegion(bufDest);
 		SDL_BlitSurface(sprite, NULL, buffer, &dst);
 		SDL_FreeSurface(sprite);
-	}
-};
-
-class SDLOverlayVideoBuffer : public SDLSurfaceVideoBuffer {
-	SDL_Overlay* overlay;
-	Point renderPos;
-
-public:
-	SDLOverlayVideoBuffer(SDL_Surface* buffer, const Point& p, SDL_Overlay* overlay)
-	: SDLSurfaceVideoBuffer(buffer, p)
-	{
-		assert(overlay);
-		this->overlay = overlay;
-	}
-
-	~SDLOverlayVideoBuffer() {
-		SDL_FreeYUVOverlay(overlay);
-	}
-
-	void Clear() {}
-
-	class Size Size() {
-		return GemRB::Size(overlay->w, overlay->h);
-	}
-
-	void RenderOnDisplay(SDL_Surface* display) {
-		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
-
-		SDL_Rect dest = {origin.x, origin.y, overlay->w, overlay->h};
-		SDL_DisplayYUVOverlay(overlay, &dest);
-	}
-
-	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
-		va_list args;
-		va_start(args, pitch);
-
-		enum PLANES {Y, U, V};
-		ieByte* planes[3];
-		unsigned int strides[3];
-
-		planes[Y] = static_cast<ieByte*>(pixelBuf);
-		strides[Y] = *pitch;
-		planes[U] = va_arg(args, ieByte*);
-		strides[U] = *va_arg(args, int*);
-		planes[V] = va_arg(args, ieByte*);
-		strides[V] = *va_arg(args, int*);
-
-		va_end(args);
-
-		SDL_LockYUVOverlay(overlay);
-		for (unsigned int plane = 0; plane < 3; plane++) {
-			unsigned char *data = planes[plane];
-			unsigned int size = overlay->pitches[plane];
-			if (strides[plane] < size) {
-				size = strides[plane];
-			}
-			unsigned int srcoffset = 0, destoffset = 0;
-			for (int i = 0; i < ((plane == 0) ? bufDest.h : (bufDest.h / 2)); i++) {
-				memcpy(overlay->pixels[plane] + destoffset,
-					   data + srcoffset, size);
-				srcoffset += strides[plane];
-				destoffset += overlay->pitches[plane];
-			}
-		}
-		SDL_UnlockYUVOverlay(overlay);
-		renderPos = bufDest.Origin();
 	}
 };
 
