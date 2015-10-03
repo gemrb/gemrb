@@ -3189,9 +3189,7 @@ void Actor::RefreshHP() {
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
 
 	//we must limit the levels to the max allowable
-	if (third) {
-		bonlevel = Modified[IE_CLASSLEVELSUM];
-	} else {
+	if (!third) {
 		if (bonlevel>maxLevelForHpRoll[bonindex]) {
 			bonlevel = maxLevelForHpRoll[bonindex];
 		}
