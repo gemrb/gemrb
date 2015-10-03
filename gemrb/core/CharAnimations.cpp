@@ -1914,6 +1914,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
+		case IE_ANI_HIDE: //could be wrong
 			strcat( ResRef, "g2" );
 			Cycle = 16 + Orient;
 			break;
