@@ -4617,10 +4617,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	float average = 0;
 	if (iwd2class) {
 		// iwd2
-		for (int i=0; i < ISCLASSES; i++) {
-			if (stats[levelslotsiwd2[i]] > 0) clscount++;
-		}
-		average = stats[IE_CLASSLEVELSUM] / (float) clscount + 0.5;
+		return stats[IE_CLASSLEVELSUM];
 	} else {
 		unsigned int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
