@@ -448,7 +448,6 @@ def OpenStoreIdentifyWindow ():
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+8)
-		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
