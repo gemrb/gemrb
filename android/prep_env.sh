@@ -3,7 +3,8 @@
 # TODO: figure out, what exactly openal needs or try sdl-mixer2
 
 GEMRB_GIT_PATH=$1
-ENVROOT=${2:-$1/android}
+APILEVEL=${2:-17}
+ENVROOT=${3:-$1/android}
 GEMRB_VERSION=""
 
 function get_sources {
@@ -266,7 +267,7 @@ setup_dir_struct &&
 move_and_edit_projectfiles &&
 build_deps &&
 move_libraries &&
-android update project -t android-17 -p "$ENVROOT/build/gemrb" &&
+android update project -t android-$APILEVEL -p "$ENVROOT/build/gemrb" &&
 finished || {
   echo 'Building failed!'
   exit 2
