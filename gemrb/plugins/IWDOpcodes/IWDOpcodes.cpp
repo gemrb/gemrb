@@ -2680,7 +2680,7 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 
 //412 Control2
 
-int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//prot from evil deflects it
 	if (target->fxqueue.HasEffect(fx_protection_from_evil_ref)) return FX_NOT_APPLIED;
@@ -2700,22 +2700,23 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
-	if (Owner->Type==ST_ACTOR) {
-		enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+	Scriptable *caster = GetCasterObject();
+	if (caster->Type==ST_ACTOR) {
+		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF;
 	}
 
-	switch(fx->Parameter2)
-	{
-	case 0:
-		displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
-		break;
-	case 1:
-		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
-		break;
-	default:
-		displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
-
-		break;
+	if (fx->FirstApply) {
+		switch (fx->Parameter2) {
+		case 0:
+			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
+			break;
+		case 1:
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
+			break;
+		default:
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
+			break;
+		}
 	}
 	STATE_SET( STATE_CHARMED );
 	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
