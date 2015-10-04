@@ -422,15 +422,17 @@ void Door::TryBashLock(Actor *actor)
 {
 	//Get the strength bonus against lock difficulty
 	int bonus;
+	unsigned int roll;
 
 	if (core->HasFeature(GF_3ED_RULES)) {
 		bonus = actor->GetAbilityBonus(IE_STR);
+		roll = actor->LuckyRoll(1, 100, bonus, 0);
 	} else {
 		int str = actor->GetStat(IE_STR);
 		int strEx = actor->GetStat(IE_STREXTRA);
 		bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+		roll = actor->LuckyRoll(1, 10, bonus, 0);
 	}
-	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
 	actor->FaceTarget(this);
 	if (core->HasFeature(GF_3ED_RULES)) {
