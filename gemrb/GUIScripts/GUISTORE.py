@@ -1819,6 +1819,7 @@ def GulpDrink ():
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
 	text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
 	TextArea.Append (text)
+	if text > -1: TextArea.Append ("\n\n")
 	GemRB.PlaySound (DEF_DRUNK)
 	UpdateStoreRumourWindow ()
 	return
