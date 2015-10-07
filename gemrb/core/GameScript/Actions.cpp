@@ -6838,6 +6838,9 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	actor->SetOrientation(parameters->int1Parameter, false);
 	actor->MoveTo(parameters->pointParameter);
 	actor->Die(NULL);
+	actor->SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
+	// TODO: we shouldn't be spawning them, but using the ones stored in the GAM
+	// otherwise the levels are off and they have no equipment
 }
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
