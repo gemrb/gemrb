@@ -6283,8 +6283,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
 	// but everyone is proficient with fists
-	// TODO: figure out if this should be cheesily limited to party only (10gob hits it)
-	if (!inventory.FistsEquipped()) {
+	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
+	if (InParty && !inventory.FistsEquipped()) {
 		prof += wspecial[stars][0];
 	}
 
