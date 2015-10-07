@@ -6837,6 +6837,7 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	}
 	actor->SetOrientation(parameters->int1Parameter, false);
 	actor->MoveTo(parameters->pointParameter);
+	actor->Die(NULL);
 }
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
