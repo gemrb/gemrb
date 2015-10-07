@@ -6832,6 +6832,9 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	if (!actor) {
 		return;
 	}
+	if (!actor->GetCurrentArea()) {
+		core->GetGame()->GetCurrentArea()->AddActor(actor, true);
+	}
 	actor->SetOrientation(parameters->int1Parameter, false);
 	actor->MoveTo(parameters->pointParameter);
 }
