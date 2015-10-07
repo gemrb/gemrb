@@ -66,7 +66,7 @@ static inline Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Obje
 	const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 	while (tt) {
 		Actor *target = (Actor *) tt->actor;
-		if (target->ValidTarget(GA_NO_DEAD)) {
+		if (oC->objectName[0] || target->ValidTarget(GA_NO_DEAD)) {
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		} else {
 			tt = tgts->RemoveTargetAt(m);
