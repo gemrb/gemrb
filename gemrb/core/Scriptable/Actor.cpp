@@ -5936,8 +5936,15 @@ int Actor::GetAttackStyle() const
 		return WEAPON_MELEE;
 	}
 
-	int qh = PCStats->GetHeaderForSlot(inventory.GetEquippedSlot());
-	ITMExtHeader *eh = inventory.GetEquippedExtHeader(qh);
+	ITMExtHeader *eh;
+	if (inventory.MagicSlotEquipped()) {
+		// this should be fine, as long as we default to melee,
+		// since there are no "magic" weapons with switchable headers
+		eh = rangedheader;
+	} else {
+		int qh = PCStats->GetHeaderForSlot(inventory.GetEquippedSlot());
+		eh = inventory.GetEquippedExtHeader(qh);
+	}
 	if (!eh) return WEAPON_MELEE; // default to melee
 	if (eh->AttackType && eh->AttackType%2 == 0) return WEAPON_RANGED;
 	return WEAPON_MELEE;
