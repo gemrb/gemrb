@@ -6716,7 +6716,7 @@ Since the repeating effects are stored in a list inside those stats, they are be
 The repeating effect itself internally uses a counter to store how often it has been called. And when this counter equals the period it fires of the effect. When the list is being recreated all those counters are lost.
 */
 // 0x110 ApplyEffectRepeat
-int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword i; //moved here because msvc6 cannot handle it otherwise
 
@@ -6735,29 +6735,30 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	Scriptable *caster = GetCasterObject();
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
 			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
-				core->ApplyEffect(newfx, target, Owner);
+				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 2://param1 times every second
 			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
 				for (i=0;i<fx->Parameter1;i++) {
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
-				core->ApplyEffect(newfx, target, Owner);
+				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter3;i++) {
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
