@@ -6824,11 +6824,9 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	const char* string = pcs->GetRowName(parameters->int0Parameter);
-	int pos = gamedata->LoadCreature(string,0,false);
-	if (pos<0) {
-		return;
-	}
-	Actor *actor = core->GetGame()->GetNPC(pos);
+	char name[32];
+	strnlwrcpy(name, string, 32);
+	Actor *actor = core->GetGame()->FindNPC(string);
 	if (!actor) {
 		return;
 	}
@@ -6839,8 +6837,6 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	actor->MoveTo(parameters->pointParameter);
 	actor->Die(NULL);
 	actor->SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
-	// TODO: we shouldn't be spawning them, but using the ones stored in the GAM
-	// otherwise the levels are off and they have no equipment
 }
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
