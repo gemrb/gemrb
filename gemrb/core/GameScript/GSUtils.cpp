@@ -134,8 +134,7 @@ int GetReaction(Actor *target, Scriptable *Sender)
 	if (target->GetStat(IE_EA) == EA_PC) {
 		rep = core->GetGame()->Reputation/10-1;
 	} else {
-		//FIXME: shouldn't this be divided by 10?
-		rep = target->GetStat(IE_REPUTATION)-1;
+		rep = target->GetStat(IE_REPUTATION)/10-1;
 	}
 	if (rep<0) rep = 0;
 	else if (rep>=MAX_REP_COLUMN) rep=MAX_REP_COLUMN-1;
