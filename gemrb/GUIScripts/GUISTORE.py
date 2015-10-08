@@ -1041,6 +1041,7 @@ def OpenItemAmountWindow ():
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
+	GemRB.SetRepeatClickFlags (GEM_RK_QUADRUPLESPEED, OP_OR)
 	Index = GemRB.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Amount = Slot['Purchased']
