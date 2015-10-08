@@ -78,7 +78,7 @@ public:
 	void ScrollDown();
 	double GetStep();
 	/** refreshes scrollbar if associated with VarName */
-	void UpdateState(const char* VarName, unsigned int Sum);
+	void UpdateState(unsigned int Sum);
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
 	void SetScrollAmount(unsigned short amount) { ScrollDelta = amount; }

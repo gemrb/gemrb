@@ -178,6 +178,13 @@ int Control::RunEventHandler(ControlEventHandler handler)
 	return 1;
 }
 
+void Control::UpdateState(const char* varname, unsigned int val)
+{
+	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
+		UpdateState(val);
+	}
+}
+
 /** Mouse Button Down */
 void Control::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short Button, unsigned short Mod)

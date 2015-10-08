@@ -90,7 +90,9 @@ public:
 	/** Displays the tooltip text, Worldmap handles this differently */
 	virtual void DisplayTooltip();
 	/** Update the control if it's tied to a GUI variable */
-	virtual void UpdateState(const char*, unsigned int) {}
+	void UpdateState(const char*, unsigned int);
+	virtual void UpdateState(unsigned int) {}
+
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the control to add to the variable */

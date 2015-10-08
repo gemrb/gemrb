@@ -336,7 +336,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 	unsigned int lookupIdx = Key - '1';
 	if (lookupIdx < OptSpans.size()) {
-		UpdateState(VarName, lookupIdx);
+		UpdateState(lookupIdx);
 	}
 	return true;
 }
@@ -531,7 +531,7 @@ void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 			}
 			optIdx++;
 		}
-		UpdateState(VarName, optIdx);
+		UpdateState(optIdx);
 	}
 }
 
@@ -540,9 +540,9 @@ void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 	ClearHover();
 }
 
-void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
+void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VariableName[0] || optIdx >= OptSpans.size()) {
+	if (!VarName[0] || optIdx >= OptSpans.size()) {
 		return;
 	}
 	if (!selectOptions) {

@@ -94,7 +94,7 @@ public:
 	/** Returns the selected text */
 	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(const char* VariableName, unsigned int optIdx);
+	void UpdateState(unsigned int optIdx);
 	int SetScrollBar(Control *ptr);
 private: // Private attributes
 	// dialog and listbox handling
