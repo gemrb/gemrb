@@ -9988,7 +9988,7 @@ bool Actor::Untargetable(ieResRef spellRef)
 		}
 		gamedata->FreeSpell(spl, spellRef, false);
 	}
-	return (GetSafeStat(IE_STATE_ID)&state_invisible) || HasSpellState(SS_SANCTUARY);
+	return IsInvisibleTo(NULL);
 }
 
 //it is futile to try to harm target (used by AI scripts)
