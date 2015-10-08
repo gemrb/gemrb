@@ -590,10 +590,8 @@ def OpenMoviesWindow ():
 
 	# movie list
 	List = Window.GetControl (0)
-	List.SetVarAssoc ('SelectedMovie', -1)
-
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
-	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())])
+	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())], 'SelectedMovie', -1)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_BLACK)

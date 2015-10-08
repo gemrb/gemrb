@@ -147,9 +147,13 @@ class GTextArea(GControl):
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
     'SetFlags': _GemRB.TextArea_SetFlags,
-    'SetOptions': _GemRB.TextArea_SetOptions,
     'ListResources': _GemRB.TextArea_ListResources
   }
+  
+  def SetOptions(self, optList, varname=None, val=0):
+    _GemRB.TextArea_SetOptions(self.WinID, self.ID, optList)
+    if varname:
+    	self.SetVarAssoc(varname, val)
 
 class GTextEdit(GControl):
   __metaclass__ = metaControl

@@ -406,7 +406,6 @@ def OpenScriptWindow ():
 		else:
 			GemRB.SetToken ("script", script)
 			options.append (17167)
-	ScriptTextArea.SetOptions (options)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
@@ -414,7 +413,7 @@ def OpenScriptWindow ():
 		script = "None"
 	scriptindex = ScriptsTable.GetRowIndex (script)
 	GemRB.SetVar ("Selected", scriptindex)
-	ScriptTextArea.SetVarAssoc ("Selected", scriptindex)
+	ScriptTextArea.SetOptions (options, "Selected", scriptindex)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
 	UpdateScriptSelection ()
