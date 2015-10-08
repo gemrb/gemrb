@@ -10230,7 +10230,8 @@ bool Actor::IsInvisibleTo(Scriptable *checker) const
 	if (checker && checker->Type == ST_ACTOR) {
 		canSeeInvisibles = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
 	}
-	if (!canSeeInvisibles && (Modified[IE_STATE_ID] & state_invisible)) {
+	bool invisible = GetSafeStat(IE_STATE_ID) & state_invisible;
+	if (!canSeeInvisibles && (invisible || HasSpellState(SS_SANCTUARY))) {
 		return true;
 	}
 
