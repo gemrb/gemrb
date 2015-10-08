@@ -146,7 +146,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	// iwd2 ignores conditions when following external references and
 	// also just goes directly for the referenced state
 	// look at 41cmolb1 and 41cmolb2 for an example
-	if (core->HasFeature(GF_3ED_RULES) && originalTargetID != targetID) {
+	// Actually bg2 is the same, misca vs imoenj (freeing minsc)
+	if (originalTargetID != targetID) {
 		initialState = si;
 	} else {
 		initialState = dlg->FindFirstState( tgt );
