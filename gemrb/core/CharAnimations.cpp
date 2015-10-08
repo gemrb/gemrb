@@ -1909,6 +1909,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
+		case IE_ANI_CONJURE:
 			strcat( ResRef, "g2" );
 			Cycle = 0 + Orient;
 			break;
