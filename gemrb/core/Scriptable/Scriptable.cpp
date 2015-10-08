@@ -45,7 +45,9 @@ namespace GemRB {
 static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
+static bool pst_flags = false;
 static ieResRef UncannyDodgeBonus = {"UNCANNY"};
+static unsigned short ClearActionsID = 133; // same for all games
 
 /***********************
  *  Scriptable Class   *
@@ -124,6 +126,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 	startActive = core->HasFeature(GF_START_ACTIVE);
 	third = core->HasFeature(GF_3ED_RULES);
+	pst_flags = core->HasFeature(GF_PST_STATE_FLAGS);
 }
 
 Scriptable::~Scriptable(void)
@@ -500,13 +503,19 @@ Action* Scriptable::PopNextAction()
 
 void Scriptable::ClearActions()
 {
-	ReleaseCurrentAction();
-	for (unsigned int i = 0; i < actionQueue.size(); i++) {
-		Action* aC = actionQueue.front();
-		actionQueue.pop_front();
-		aC->Release();
+	// pst sometimes uses clearactions in the middle of a cutscene (eg. 1203cd21)
+	// and expect it to clear only the previous actions, not the whole queue
+	if (pst_flags && CurrentAction && CurrentAction->actionID == ClearActionsID) {
+		ReleaseCurrentAction();
+	} else {
+		ReleaseCurrentAction();
+		for (unsigned int i = 0; i < actionQueue.size(); i++) {
+			Action* aC = actionQueue.front();
+			actionQueue.pop_front();
+			aC->Release();
+		}
+		actionQueue.clear();
 	}
-	actionQueue.clear();
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -739,7 +748,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 	}
 
-	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
+	if (pst_flags && (Type == ST_ACTOR)) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			//seriously, wild surges and EE in the same game?
 			//anyway, it would be too many duplications
