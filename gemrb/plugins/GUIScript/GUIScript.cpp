@@ -4165,15 +4165,12 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	char *Flag=NULL;
 	char *Flag2=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiiis|s", &WindowIndex, &ControlID,
-			&rgn.x, &rgn.y, &rgn.w, &rgn.h, &LabelID, &Flag, &Flag2)) {
-		Flag=NULL;
-		PyErr_Clear(); //clearing the exception
-		if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID,
-			&rgn.x, &rgn.y, &rgn.w, &rgn.h)) {
-			return AttributeError( GemRB_Window_CreateMapControl__doc );
-		}
+	if (!PyArg_ParseTuple( args, "iiiiiii|ss", &WindowIndex, &ControlID,
+			&rgn.x, &rgn.y, &rgn.w, &rgn.h, &LabelID, &Flag, &Flag2))
+	{
+		return AttributeError( GemRB_Window_CreateMapControl__doc );
 	}
+
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
@@ -4189,11 +4186,14 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 
 	MapControl* map = new MapControl(rgn);
 	map->ControlID = ControlID;
+
+	CtrlIndex = GetControlIndex( WindowIndex, LabelID );
+	Control *lc = win->GetControl( CtrlIndex );
+	map->LinkedLabel = lc;
+
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
-		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
-		Control *lc = win->GetControl( CtrlIndex );
-		map->LinkedLabel = lc;
+
 		ResourceHolder<ImageMgr> anim(Flag);
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
@@ -4202,12 +4202,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		if (anim2) {
 			map->Flag[1] = anim2->GetSprite2D();
 		}
-		goto setup_done;
-	}
-	if (Flag) {
-		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
-		Control *lc = win->GetControl( CtrlIndex );
-		map->LinkedLabel = lc;
+	} else if (Flag) {
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( Flag,
 					IE_BAM_CLASS_ID, IE_NORMAL );
@@ -4218,7 +4213,6 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 
 		}
 	}
-setup_done:
 	win->AddControl( map );
 
 	int ret = GetControlIndex( WindowIndex, ControlID );
