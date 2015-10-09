@@ -2519,7 +2519,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 
 		// mark the summon, but only if they don't have a special sex already
-		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA) {
+		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA && ab->BaseStats[IE_SEX] != SEX_ILLUSION) {
 			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
