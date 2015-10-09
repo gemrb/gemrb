@@ -67,19 +67,28 @@ void TextEdit::SetAlignment(unsigned char Alignment)
 void TextEdit::DrawInternal(Region& rgn)
 {
 	ieWord yOff = FontPosY;
+	ieWord xOff = FontPosX;
+
 	Video* video = core->GetVideoDriver();
 	if (Back) {
+		// FIXME: temporary hack for PST map labels.
+		// once subviews branch is merged this is not needed
+		video->DrawRect(rgn, ColorBlack);
 		video->BlitSprite( Back, rgn.x, rgn.y, true );
-		if (yOff) yOff += Back->Height;
+		xOff += Back->XPos;
+		yOff += Back->YPos;
+	} else if (Text != L"") {
+		// FIXME: temporary hack for PST map labels.
+		// once subviews branch is merged this is not needed
+		video->DrawRect(rgn, ColorBlack);
 	}
-	if (!font)
-		return;
+	assert(font);
 
-	// FIXME: we should clip text to the background right?
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
+	font->Print( Region( rgn.x + xOff, rgn.y + yOff, Width, Height ),
+				 Text, palette, Alignment );
+
 	if (hasFocus) {
-		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, Width, Height ),
-					Text, palette, Alignment );
 		int w = font->StringSize(Text.substr(0, CurPos)).w;
 		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
 		if (w > rgn.w) {
@@ -87,11 +96,8 @@ void TextEdit::DrawInternal(Region& rgn)
 			vcenter += rows * font->LineHeight;
 			w = w - (rgn.w * rows);
 		}
-		video->BlitSprite(Cursor, w + rgn.x + FontPosX,
-						  FontPosY + vcenter + rgn.y, true);
-	} else {
-		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
-				palette, Alignment );
+		video->BlitSprite(Cursor, w + rgn.x + xOff,
+						  yOff + vcenter + rgn.y, true);
 	}
 }
 

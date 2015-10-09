@@ -59,7 +59,7 @@ public:
 	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
 
-	bool IsOpaque() const { return Back; }
+	bool IsOpaque() const { return true; } // FIXME: hack for PST map notes... no matter, this will be fixed once the subviews branch is merged
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();
