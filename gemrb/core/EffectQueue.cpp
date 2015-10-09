@@ -864,15 +864,6 @@ static int check_type(Actor* actor, Effect* fx)
 
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
-	//immunity checks
-/*opcode immunity is in the per opcode checks
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		return 0;
-	}
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		return 0;
-	}
-*/
 	//spell level immunity
 	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
 		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
@@ -1120,13 +1111,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		Log(MESSAGE, "EffectQueue", "immune2 to effect: %s", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
-
-/* opcode bouncing isn't implemented?
-	//opcode bouncing
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_bounce_ref, fx->Opcode) ) {
-		return false;
-	}
-*/
 
 	//not resistable (but check saves - for chromatic orb instakill)
 	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
