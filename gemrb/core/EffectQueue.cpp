@@ -865,9 +865,13 @@ static int check_type(Actor* actor, Effect* fx)
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
 	//spell level immunity
+	// but ignore it if we're casting beneficial stuff on ourselves
 	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
-		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
-		return 0;
+		Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		if (caster != actor || (fx->SourceFlags & SF_HOSTILE)) {
+			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
+			return 0;
+		}
 	}
 
 	//source immunity (spell name)
