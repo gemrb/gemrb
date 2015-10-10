@@ -233,6 +233,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		if (pst_hostile) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
+		fx->CasterID = self->GetGlobalID(); // needed early for check_type, reset later
 		fx->CasterLevel = level;
 		fx->SpellLevel = SpellLevel;
 
