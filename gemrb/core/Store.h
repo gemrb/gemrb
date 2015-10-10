@@ -170,7 +170,6 @@ public: //queries
 	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
-	void RemoveItem(unsigned int idx);
 	void RemoveItem( STOItem *itm);
 	/** Returns index of item */
 	unsigned int FindItem(const ieResRef item, bool usetrigger) const;

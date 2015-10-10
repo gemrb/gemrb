@@ -303,7 +303,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 		if (si->AmountInStock > count) {
 			si->AmountInStock -= count;
 		} else {
-			store->RemoveItem(idx);
+			store->RemoveItem(si);
 		}
 		//store changed, save it
 		gamedata->SaveStore(store);

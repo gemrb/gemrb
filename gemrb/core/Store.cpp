@@ -317,18 +317,6 @@ void Store::AddItem(CREItem *item)
 	ItemsCount++;
 }
 
-void Store::RemoveItem( unsigned int idx )
-{
-	if (items.size()!=ItemsCount) {
-		error("Store", "Inconsistent store");
-	}
-	if (ItemsCount<=idx) {
-		return;
-	}
-	items.erase(items.begin()+idx);
-	ItemsCount--;
-}
-
 void Store::RemoveItem( STOItem *itm )
 {
 	size_t i = items.size();
