@@ -1830,10 +1830,13 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//don't apply it twice in a round
-	if (EXTSTATE_GET(EXTSTATE_SHROUD)) {
-		return FX_APPLIED;
+	// how has special duration applied with a fixed delay (3s): 1 round/2 levels
+	ieDword time = core->GetGame()->GameTime;
+	if (fx->FirstApply) {
+		fx->Duration = time + fx->Parameter1 * core->Time.round_size;
+		fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	}
+
 	EXTSTATE_SET(EXTSTATE_SHROUD);
 	//directly modifying the color of the target
 	if (fx->Parameter2==1) {
@@ -1844,7 +1847,6 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//timing
-	ieDword time = core->GetGame()->GameTime;
 	if ((fx->Parameter4==time) || (time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
@@ -1854,17 +1856,21 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 	ieDword damagetype = DAMAGE_FIRE;
 
+/* how's shroud of flame has this set ...
 	if (fx->Parameter2==1) {
 		damagetype = DAMAGE_COLD;
 	}
+*/
 
 	// shroud of flames does not have the dice fields set
 	if (fx->Parameter1 == 0) {
-		fx->Parameter1 = core->Roll(3, 6, 0);
+		fx->Parameter1 = core->Roll(2, 6, 0);
 	}
 
 	target->Damage(fx->Parameter1, damagetype, Owner, fx->IsVariable, fx->SavingThrowType);
+	fx->Parameter1 = core->Roll(1, 4, 0);
 	ApplyDamageNearby(Owner, target, fx, damagetype);
+	fx->Parameter1 = 0;
 	return FX_APPLIED;
 }
 
