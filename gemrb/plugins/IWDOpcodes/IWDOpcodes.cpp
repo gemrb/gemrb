@@ -1845,7 +1845,7 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%6) ) {
+	if ((fx->Parameter4==time) || (time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
@@ -1898,7 +1898,7 @@ int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%6) ) {
+	if ((fx->Parameter4==time) || (time%time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
