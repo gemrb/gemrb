@@ -35,7 +35,7 @@ namespace GemRB {
 
 STOItem::~STOItem(void)
 {
-	if (trigger) trigger->Release();
+	if (triggers) triggers->Release();
 }
 
 Store::Store(void)
@@ -70,9 +70,10 @@ bool Store::IsItemAvailable(unsigned int slot) const
 	//-1    - infinite
 	//other - pst trigger ref
 
-	Trigger *trigger = items[slot]->trigger;
-	if (trigger) {
-		return trigger->Evaluate(game->GetSelectedPCSingle(false)) != 0;
+	Condition *triggers = items[slot]->triggers;
+	if (triggers) {
+		Scriptable *shopper = game->GetSelectedPCSingle(false);
+		return triggers->Evaluate(shopper) != 0;
 	}
 	return true;
 }
