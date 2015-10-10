@@ -401,6 +401,7 @@ static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
+static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -1874,11 +1875,13 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+//apply effsof1 on target
+//apply effsof2 on nearby
 static ieResRef resref_sof1={"effsof1"};
 static ieResRef resref_sof2={"effsof2"};
 
 //0x116 ShroudOfFlame (iwd2)
-int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_shroud_of_flame2(%2d)", fx->Opcode);
 
@@ -1888,18 +1891,12 @@ int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (target->SetSpellState( SS_FLAMESHROUD)) return FX_APPLIED;
+	if (target->fxqueue.HasEffect(fx_shroud_of_flame2_ref)) return FX_APPLIED;
+
 	EXTSTATE_SET(EXTSTATE_SHROUD); //just for compatibility
 
 	if(core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xa0, 0, 0);
-	}
-
-	//apply resource on hitter
-	//actually, this should be a list of triggers
-	if (fx->Resource[0]) {
-		memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
-	} else {
-		memcpy(target->applyWhenBeingHit,resref_sof1,sizeof(ieResRef));
 	}
 
 	//timing
@@ -1909,10 +1906,21 @@ int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	fx->Parameter4=time;
 
-	if (fx->Resource2[0]) {
-		core->ApplySpell(fx->Resource2, target, Owner, fx->Power);
+	//apply resource on owner
+	//actually, this should be a list of triggers
+	ieResRef firedmg;
+	if (fx->Resource[0]) {
+		CopyResRef(firedmg, fx->Resource);
 	} else {
-		core->ApplySpell(resref_sof2, target, Owner, fx->Power);
+		CopyResRef(firedmg, resref_sof1);
+	}
+	Actor *caster = GetCasterObject();
+	core->ApplySpell(firedmg, target, caster, fx->Power);
+
+	if (fx->Resource2[0]) {
+		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
+	} else {
+		core->ApplySpell(resref_sof2, target, caster, fx->Power);
 	}
 	return FX_APPLIED;
 }
