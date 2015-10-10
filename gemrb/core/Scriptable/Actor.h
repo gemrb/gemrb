@@ -272,7 +272,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef applyWhenBeingHit;      //cast spell on condition
 	ieResRef ModalSpell;             //apply this spell once per round
 	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)

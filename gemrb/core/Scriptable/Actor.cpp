@@ -2977,8 +2977,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		anims->CheckColorMod();
 	}
 	spellbook.ClearBonus();
-	/* these apply resrefs should be on a list as a trigger+resref */
-	memset(applyWhenBeingHit,0,sizeof(ieResRef));
 	memset(BardSong,0,sizeof(ieResRef));
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
 
