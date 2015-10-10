@@ -1822,7 +1822,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 
 //0x116 ShroudOfFlame (how)
 //FIXME: maybe it is cheaper to port effsof1/2 to how than having an alternate effect
-int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_shroud_of_flame(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 
@@ -1868,9 +1868,10 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		fx->Parameter1 = core->Roll(2, 6, 0);
 	}
 
-	target->Damage(fx->Parameter1, damagetype, Owner, fx->IsVariable, fx->SavingThrowType);
+	Actor *caster = GetCasterObject();
+	target->Damage(fx->Parameter1, damagetype, caster, fx->IsVariable, fx->SavingThrowType);
 	fx->Parameter1 = core->Roll(1, 4, 0);
-	ApplyDamageNearby(Owner, target, fx, damagetype);
+	ApplyDamageNearby(caster, target, fx, damagetype);
 	fx->Parameter1 = 0;
 	return FX_APPLIED;
 }
