@@ -1821,7 +1821,6 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x116 ShroudOfFlame (how)
-//FIXME: maybe it is cheaper to port effsof1/2 to how than having an alternate effect
 int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_shroud_of_flame(%2d): Type: %d", fx->Opcode, fx->Parameter2);
