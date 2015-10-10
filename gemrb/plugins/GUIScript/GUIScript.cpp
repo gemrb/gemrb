@@ -9363,7 +9363,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 		} else {
-			store->RemoveItem( Slot );
+			store->RemoveItem(si);
 			delete si;
 		}
 		//keep encumbrance labels up to date
