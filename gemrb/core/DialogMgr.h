@@ -33,6 +33,7 @@ public:
 	virtual ~DialogMgr(void);
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Dialog* GetDialog() const = 0;
+	virtual Condition* GetCondition(char *string) const = 0;
 };
 
 }

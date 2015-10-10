@@ -167,7 +167,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 
 static char** GetStrings(char* string, unsigned int& count);
 
-static Condition* GetCondition(char* string)
+Condition* DLGImporter::GetCondition(char* string) const
 {
 	unsigned int count;
 	char **lines = GetStrings( string, count );
