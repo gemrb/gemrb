@@ -310,6 +310,7 @@ public:
 	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance=1) const;
 	/** just checks if it is a particularly stupid effect that needs its target reset */
 	static bool OverrideTarget(Effect *fx);
+	bool HasHostileEffects() const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;

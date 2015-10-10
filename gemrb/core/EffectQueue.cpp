@@ -2203,4 +2203,20 @@ bool EffectQueue::OverrideTarget(Effect *fx)
 	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);
 }
 
+bool EffectQueue::HasHostileEffects() const
+{
+	bool hostile = false;
+
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		Effect* fx = *f;
+		if (fx->SourceFlags&SF_HOSTILE) {
+			hostile = true;
+			break;
+		}
+	}
+
+	return hostile;
+}
+
 }
