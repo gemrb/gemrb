@@ -1858,6 +1858,11 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		damagetype = DAMAGE_COLD;
 	}
 
+	// shroud of flames does not have the dice fields set
+	if (fx->Parameter1 == 0) {
+		fx->Parameter1 = core->Roll(3, 6, 0);
+	}
+
 	target->Damage(fx->Parameter1, damagetype, Owner, fx->IsVariable, fx->SavingThrowType);
 	ApplyDamageNearby(Owner, target, fx, damagetype);
 	return FX_APPLIED;
