@@ -534,6 +534,9 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 		//not IWD2
 		if (spell->SpellType<6) {
 			spl->Type = spelltypes[spell->SpellType];
+			if (spell->SpellLevel == 0) { // totemic druid has some broken innates (fixed by fixpack)
+				spell->SpellLevel = 1;
+			}
 			spl->Level = spell->SpellLevel-1;
 		} else {
 			spl->Type = IE_SPELL_TYPE_INNATE;
