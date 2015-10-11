@@ -2621,7 +2621,7 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// create a general CastSpellOnCondition effect (bg2) for the payload
 	// much nicer than iwd's ApplyDamageNearby
 	if (fx->FirstApply) {
-		Effect *fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_INSTANT_LIMITED);
+		Effect *fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_ABSOLUTE);
 		assert(fx2);
 		fx2->Duration = fx->Duration;
 		CopyResRef(fx2->Source, fx->Source);
