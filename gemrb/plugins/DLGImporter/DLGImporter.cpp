@@ -187,7 +187,8 @@ Condition* DLGImporter::GetCondition(char* string) const
 
 Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 {
-	if (index >= StateTriggersCount && (signed)index != -1) {
+	if ((signed)index == -1) index = 0;
+	if (index >= StateTriggersCount) {
 		return NULL;
 	}
 	//8 = sizeof(VarOffset)
