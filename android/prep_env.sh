@@ -212,7 +212,7 @@ function move_and_edit_projectfiles {
   echo -en "Performing neccessary edits...\n" &&
   app="$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java"
   if ! grep -q python <<< "$app"; then
-    sed -i 's/"SDL2_image",/&\n "ogg", "vorbis", "openal", "python",/' "$app"
+    sed -i 's/"SDL2_image",/&\n "ogg", "vorbis", "openal", "python2.6",/' "$app"
   fi &&
 
   sed -i -e 's,sdlFormat = 0x8,sdlFormat = 0x1,g' "$app" &&
