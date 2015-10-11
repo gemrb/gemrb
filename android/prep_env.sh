@@ -210,7 +210,7 @@ function move_and_edit_projectfiles {
 
   # add the neccessary libraries to the base activity
   echo -en "Performing neccessary edits...\n" &&
-  app="$ENVROOT/build/gemrb/android-project/src/org/libsdl/app/SDLActivity.java"
+  app="$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java"
   if ! grep -q python <<< "$app"; then
     sed -i 's/"SDL2_image",/&\n "ogg", "vorbis", "openal", "python",/' "$app"
   fi &&
