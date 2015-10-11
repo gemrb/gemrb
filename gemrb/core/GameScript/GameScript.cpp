@@ -2474,14 +2474,6 @@ Trigger* GenerateTrigger(char* String)
 		negate = TF_NEGATE;
 	}
 	int len = strlench(String,'(')+1; //including (
-	// remove any preceding space (eg. 51379 pst store item trigger strref)
-	if (String[len-2] == ' ') {
-		String[len-2] = String[len-1];
-		int flen = strlen(String);
-		memmove(String+len-1, String+len, flen-len);
-		String[flen-1] = '\0';
-		len--;
-	}
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
