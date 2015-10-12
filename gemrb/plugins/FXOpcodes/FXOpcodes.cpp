@@ -3728,22 +3728,20 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
-	//the only addition to the original engine is that fx->Resource can be
-	//used to specify a 2da (if parameter2 is >= 10)
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
 	ieResRef table;
 	int level = fx->Parameter1;
 
-	if (fx->Parameter2>=FX_MS) {
-		if (fx->Resource[0]) {
-			strnuprcpy(table, fx->Resource, 8);
-		} else {
-			strnuprcpy(table, "ANISUM03", 8);
-		}
+	if (fx->Resource[0]) {
+		strnuprcpy(table, fx->Resource, 8);
 	} else {
-		strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+		if (fx->Parameter2 >= FX_MS) {
+			strnuprcpy(table, "ANISUM03", 8);
+		} else {
+			strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+		}
 	}
 	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
