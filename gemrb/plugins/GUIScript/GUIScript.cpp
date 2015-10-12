@@ -4161,11 +4161,11 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 {
 	int WindowIndex, ControlID;
 	Region rgn;
-	int LabelID;
+	int LabelID = -1;
 	char *Flag=NULL;
 	char *Flag2=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiiii|ss", &WindowIndex, &ControlID,
+	if (!PyArg_ParseTuple( args, "iiiiii|iss", &WindowIndex, &ControlID,
 			&rgn.x, &rgn.y, &rgn.w, &rgn.h, &LabelID, &Flag, &Flag2))
 	{
 		return AttributeError( GemRB_Window_CreateMapControl__doc );
@@ -4187,9 +4187,14 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	MapControl* map = new MapControl(rgn);
 	map->ControlID = ControlID;
 
-	CtrlIndex = GetControlIndex( WindowIndex, LabelID );
-	Control *lc = win->GetControl( CtrlIndex );
-	map->LinkedLabel = lc;
+	if (LabelID >= 0) {
+		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
+		Control* lc = win->GetControl( CtrlIndex );
+		if (lc == NULL) {
+			return RuntimeError("Cannot find label!");
+		}
+		map->LinkedLabel = lc;
+	}
 
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
