@@ -698,7 +698,7 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	}
 	Map *map = origin->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	ga_flags |= GA_NO_UNSCHEDULED;
+	ga_flags |= GA_NO_UNSCHEDULED|GA_NO_DEAD;
 	while (i--) {
 		Actor *ac = map->GetActor(i,true);
 		if (ac == origin) continue;
