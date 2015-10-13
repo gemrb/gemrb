@@ -9592,8 +9592,10 @@ void Actor::UseExit(ieDword exitID) {
 		memcpy(LastArea, Area, 8);
 		memset(UsedExit, 0, sizeof(ieVariable));
 		if (LastExit) {
-			const char *ipName = area->GetInfoPointByGlobalID(LastExit)->GetScriptName();
-			if (ipName[0]) {
+			const char *ipName = NULL;
+			Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
+			if (ip) ipName = ip->GetScriptName();
+			if (ipName && ipName[0]) {
 				snprintf(UsedExit, sizeof(ieVariable), "%s", ipName);
 			}
 		}
