@@ -147,12 +147,13 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	// also just goes directly for the referenced state
 	// look at 41cmolb1 and 41cmolb2 for an example
 	// Actually bg2 is the same, misca vs imoenj (freeing minsc)
-	if (originalTargetID != targetID) {
-		initialState = si;
+	if (initialState == -1) {
+		initialState = dlg->FindFirstState(tgt);
 	} else {
-		initialState = dlg->FindFirstState( tgt );
+		initialState = si;
 	}
 	if (initialState < 0) {
+		Log(DEBUG, "DialogHandler", "Could not find a proper state");
 		return false;
 	}
 
