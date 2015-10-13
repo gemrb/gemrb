@@ -310,10 +310,11 @@ def GSNN (pc, stat):
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
+	cdet = GemRB.GetCombatDetails (pc, 0)
 
 	outputtext = GetClassTitles (pc,LevelDiff)
 	outputtext+= GetEffectIcons (pc,LevelDiff)
-	outputtext+= GetProficiencies (pc)
+	outputtext+= GetProficiencies (pc, cdet)
 	outputtext+= GetLore (pc)
 	outputtext+= GetMagicResistance (pc)
 	outputtext+= GetPartyReputation (pc)
@@ -325,7 +326,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	outputtext+= GetAbilityBonuses (pc)
 	outputtext+= GetBonusSpells (pc)
 	outputtext+= GetResistances (pc)
-	outputtext+= GetWeaponStyleBonuses (pc)
+	outputtext+= GetWeaponStyleBonuses (pc, cdet)
 
 	return outputtext
 
@@ -467,10 +468,9 @@ def GetEffectIcons(pc,LevelDiff):
 
 ########################################################################
 
-def GetProficiencies(pc):
+def GetProficiencies(pc, cdet):
 
 	stats = []
-	cdet = GemRB.GetCombatDetails(pc, 0)
 	tohit = cdet["ToHitStats"]
 
 	#proficiencies
@@ -760,10 +760,9 @@ def GetResistances(pc):
 
 ########################################################################
 
-def GetWeaponStyleBonuses(pc):
+def GetWeaponStyleBonuses(pc, cdet):
 
 	stats = []
-	cdet = GemRB.GetCombatDetails(pc, 0)
 	if GameCheck.IsBG2():
 		# Weapon Style bonuses
 		stats.append (32131)
@@ -795,6 +794,7 @@ def TypeSetStats(stats, pc=0):
 		str_None = GemRB.GetString (17093)
 
 	res = []
+	noP = False
 	for s in stats:
 		try:
 			strref, val, type = s
@@ -827,6 +827,7 @@ def TypeSetStats(stats, pc=0):
 			elif type == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
 				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				noP = True
 			elif type == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
 			elif type == 'c': #normal string
@@ -848,10 +849,11 @@ def TypeSetStats(stats, pc=0):
 			else:
 				res.append (GemRB.GetString (s))
 
-	# wrap the first part in a tag to prevent status icon drop cap
-	if res:
-		res[0] = "[p]" + res[0] + "[/p]"
-	return "\n".join (res)
+	# effects only need a bump at the end
+	if noP:
+		return "\n".join (res) + "[p] [/p]"
+	else:
+		return "[p]" + "\n".join (res) + "[/p]"
 
 def GetReputation (repvalue):
 	table = GemRB.LoadTable ("reptxt")
