@@ -150,7 +150,14 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (initialState == -1) {
 		initialState = dlg->FindFirstState(tgt);
 	} else {
-		initialState = si;
+		if (originalTargetID == targetID) {
+			initialState = dlg->FindFirstState(tgt);
+			if (initialState < 0) {
+				initialState = si;
+			}
+		} else {
+			initialState = si;
+		}
 	}
 	if (initialState < 0) {
 		Log(DEBUG, "DialogHandler", "Could not find a proper state");
