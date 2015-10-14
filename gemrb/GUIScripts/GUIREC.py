@@ -599,14 +599,13 @@ def GetWeaponProficiencies(pc):
 	else:
 		offset = 0
 	for i in range (offset, RowCount):
-		# iwd displays capitalised strings
-		# FIXME: ignore it and do the capitalisation manually, so it works for everyone
+		# iwd has separate field for capitalised strings
 		if GameCheck.IsIWD1():
 			text = table.GetValue (i, 3)
 		else:
 			text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		if not offset and not GameCheck.IsIWD1(): # TODO: fishy, recheck
+		if GameCheck.IsBG1():
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		if text < 0x20000:
 			stats.append ( (text, GS (pc, stat)&0x07, '+') )
