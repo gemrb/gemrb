@@ -82,7 +82,10 @@ void TextEdit::DrawInternal(Region& rgn)
 		// once subviews branch is merged this is not needed
 		video->DrawRect(rgn, ColorBlack);
 	}
-	assert(font);
+	if (!font) {
+		// no font was specified; happens with cheat input edits
+		return;
+	}
 
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	font->Print( Region( rgn.x + xOff, rgn.y + yOff, Width, Height ),
