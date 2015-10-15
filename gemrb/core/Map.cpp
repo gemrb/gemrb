@@ -3801,8 +3801,16 @@ bool Map::DisplayTrackString(Actor *target)
 	// according to the HoW manual the chance of success is:
 	// +5% for every three levels and +5% per point of wisdom
 	int skill = target->GetStat(IE_TRACKING);
-	skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
-	if (core->Roll(1, 100, trackDiff) > skill) {
+	int success;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		// ~Wilderness Lore check. Wilderness Lore (skill + D20 roll + WIS modifier) =  %d vs. ((Area difficulty pct / 5) + 10) = %d ( Skill + WIS MOD = %d ).~
+		skill += target->LuckyRoll(1, 20, 0) + target->GetAbilityBonus(IE_WIS);
+		success = skill > (trackDiff/5 + 10);
+	} else {
+		skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
+		success = core->Roll(1, 100, trackDiff) > skill;
+	}
+	if (!success) {
 		displaymsg->DisplayConstantStringName(STR_TRACKINGFAILED, DMC_LIGHTGREY, target);
 		return true;
 	}
