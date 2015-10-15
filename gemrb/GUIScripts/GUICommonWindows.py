@@ -965,6 +965,8 @@ def ActionTamingPressed ():
 	return
 
 def ActionWildernessPressed ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.ApplyEffect (pc, "Reveal:Tracks", 0, 0)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
