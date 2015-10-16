@@ -2199,6 +2199,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
+		"ShopsRechargeItems", //77GF_SHOP_RECHARGE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

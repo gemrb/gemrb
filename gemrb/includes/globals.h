@@ -164,9 +164,10 @@ namespace GemRB {
 #define  GF_SKIPUPDATE_HACK             74 // how, not bg2
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
 #define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
+#define  GF_SHOP_RECHARGE               77 // all?
 
 //update this or bad things can happen
-#define GF_COUNT 77
+#define GF_COUNT 78
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
