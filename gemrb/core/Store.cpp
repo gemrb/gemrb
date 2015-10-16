@@ -247,7 +247,11 @@ void Store::RechargeItem(CREItem *item)
 		bool feature = core->HasFeature(GF_SHOP_RECHARGE);
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h && (feature || h->RechargeFlags&IE_ITEM_RECHARGE)
+			if (!h) {
+				item->Usages[i] = 0;
+				continue;
+			}
+			if ((feature || h->RechargeFlags&IE_ITEM_RECHARGE)
 			    && item->Usages[i] < h->Charges)
 				item->Usages[i] = h->Charges;
 		}
