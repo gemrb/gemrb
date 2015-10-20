@@ -2622,6 +2622,7 @@ void Action::dump(StringBuffer& buffer) const
 	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
+	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
 	for (i=0;i<3;i++) {
 		if (objects[i]) {
 			buffer.appendFormatted( "%d. ",i+1);
@@ -2631,7 +2632,7 @@ void Action::dump(StringBuffer& buffer) const
 		}
 	}
 
-	buffer.appendFormatted("RefCount: %d\n", RefCount);
+	buffer.appendFormatted("RefCount: %d\tactionID: %d\n", RefCount, actionID);
 }
 
 }
