@@ -46,8 +46,8 @@
 42         0x105      217        5          moral_alignment_not_same 
 43         0x100      *          *          source     
 44         0x101      *          *          not_source 
-45         ?          *          *          water_using-FIXME
-46         ?          *          *          not_water_using-FIXME
+45         0x110      1          *          water_based
+46         0x110      0          *          not_water_based
 47         0x104      32         27         breathes/not_undead_fungus_golem
 48         0x103      32         27         not_breathes/undead_fungus_or_golem
 49         EA         30         0          allies     
@@ -56,8 +56,8 @@
 52         EA         200        2          not_enemies 
 53         0x103      3          25         race/fire_or_cold_using 
 54         0x104      3          25         race/not_fire_or_cold_using 
-55         ?          *          *          unnatural  
-56         ?          *          *          not_unnatural 
+55         0x103      1          27         unnatural:undead+constructs
+56         0x104      1          27         not_unnatural
 57         SEX        1          1          gender/male 
 58         SEX        1          5          gender/not_male 
 59         ALIGNMENT  0x10       1          alignment/lawful 

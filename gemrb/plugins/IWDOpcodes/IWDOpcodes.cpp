@@ -492,6 +492,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_DAYTIME           0x107
 #define STI_EA                0x108
 #define STI_EVASION           0x109
+#define STI_WATERY            0x110
 #define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
@@ -512,6 +513,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	if (val==0xffffffff) {
 		val = value;
 	}
+	ieDword animID; int ret;
 	switch (idx) {
 	case STI_INVALID:
 		return 0;
@@ -572,6 +574,15 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 			return 1;
 		}
 		return 0;
+	case STI_WATERY:
+		// hardcoded via animation id, so we can't use STI_TWO_ROWS
+		// sahuagin x2, water elementals x2 (and water weirds)
+		animID = target->GetSafeStat(IE_ANIMATION_ID);
+		ret = !val;
+		if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+			ret = val;
+		}
+		return ret;
 	default:
 		{
 			//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
