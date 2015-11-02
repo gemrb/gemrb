@@ -1,6 +1,5 @@
 ## uncomment these lines to build TTFImporter
-## our build slave doesn't have SDL_TTF
-## in the near future SDL_TTF will be unneeded
+## add Freetype includes/libs as necessary
 
 #plugin_LTLIBRARIES = TTFImporter.la
 #INCLUDES = $(SDL_CFLAGS)

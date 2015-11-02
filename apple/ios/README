@@ -8,7 +8,6 @@ You need to alter the iOS SSK if you wish to develop without an Apple developer 
 Required 3rd party libraries
 ----------------------------
 * SDL
-* SDL_ttf
 * freetype2
 * Python
 
