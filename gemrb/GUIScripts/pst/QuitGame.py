@@ -62,9 +62,7 @@ def DeathWindowEnd ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	Button.MakeDefault()
 
-	GemRB.HideGUI ()
 	GemRB.SetVar ("PortraitWindow", Window.ID)
-	GemRB.UnhideGUI ()
 	#making the playing field gray
 	GUICommon.GameWindow.SetDisabled(True)
 	return

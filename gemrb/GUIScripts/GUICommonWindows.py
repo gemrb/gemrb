@@ -1769,19 +1769,12 @@ def OpenWaitForDiscWindow ():
 	global DiscWindow
 
 	if DiscWindow:
-		GemRB.HideGUI ()
 		if DiscWindow:
 			DiscWindow.Unload ()
 		GemRB.SetVar ("OtherWindow", -1)
 		EnableAnimatedWindows ()
 		DiscWindow = None
-		GemRB.UnhideGUI ()
 		return
-
-	try:
-		GemRB.HideGUI ()
-	except:
-		pass
 
 	DiscWindow = Window = GemRB.LoadWindow (0, "GUIID")
 	GemRB.SetVar ("OtherWindow", Window.ID)
@@ -1801,11 +1794,6 @@ def OpenWaitForDiscWindow ():
 	# 31571 - There is no disc in drive
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
-
-	try:
-		GemRB.UnhideGUI ()
-	except:
-		DiscWindow.Focus()
 
 def SetPSTGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()

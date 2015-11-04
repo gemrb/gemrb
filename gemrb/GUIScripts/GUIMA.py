@@ -59,7 +59,6 @@ def RevealMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
@@ -92,14 +91,12 @@ def ShowMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		return
 
-	GemRB.HideGUI ()
+		return
 
 	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
 	#this window type blocks the game normally, but map window doesn't
@@ -164,15 +161,12 @@ def OpenMapWindow ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-
-	GemRB.HideGUI ()
 
 	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
 	#this window type blocks the game normally, but map window doesn't
@@ -390,7 +384,6 @@ def CloseWorldMapWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.UnhideGUI ()
 	return
 
 def WorldMapWindowCommon (Travel):
@@ -401,7 +394,6 @@ def WorldMapWindowCommon (Travel):
 	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
 		return
 
-	GemRB.HideGUI ()
 	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
 	#(fuzzie just copied this from the map window code..)

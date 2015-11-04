@@ -54,15 +54,12 @@ def OpenJournalWindow ():
  
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		return
 		
-	GemRB.HideGUI ()
-
 	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	#saving the original portrait window

@@ -24,6 +24,5 @@
 import GemRB
 
 def OnLoad ():
-	GemRB.HideGUI ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript("Start")

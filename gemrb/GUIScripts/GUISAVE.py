@@ -52,7 +52,6 @@ def OpenSaveWindow ():
 		return
 
 	GemRB.GamePause (1, 3)
-	GemRB.HideGUI ()
 
 	if GameCheck.IsIWD2():
 		num_rows = 5
@@ -195,13 +194,11 @@ def ConfirmedSaveGame():
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
 	CloseSaveWindow ()
-	GemRB.HideGUI ()
 
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname, sav_version)
 	else:
 		GemRB.SaveGame (None, Slotname, sav_version)
-	GemRB.UnhideGUI ()
 	return
 
 def OpenConfirmWindow ():
@@ -347,5 +344,4 @@ def CloseSaveWindow ():
 		GemRB.SetNextScript ("Start")
 		return
 
-	GemRB.UnhideGUI () #enabling the other windows
 	return

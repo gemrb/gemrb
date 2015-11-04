@@ -87,7 +87,6 @@ def OpenRecordsWindow ():
 	StatTable = GemRB.LoadTable("abcomm")
 	
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-		GemRB.HideGUI ()
 		if InformationWindow: OpenInformationWindow ()
 		
 		if RecordsWindow:
@@ -96,10 +95,8 @@ def OpenRecordsWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
-		GemRB.UnhideGUI ()
 		return	
 
-	GemRB.HideGUI ()
 	RecordsWindow = Window = GemRB.LoadWindow (3, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
@@ -149,8 +146,6 @@ def OpenRecordsWindow ():
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
-
-	GemRB.UnhideGUI ()
 
 
 stats_overview = None
@@ -695,9 +690,7 @@ def GetStatOverview (pc):
 
 def OpenInformationWindow ():
 	global InformationWindow
-	
-	GemRB.HideGUI ()
-	
+		
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
@@ -706,7 +699,6 @@ def OpenInformationWindow ():
 		InformationWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI()
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (5)
@@ -803,14 +795,11 @@ def OpenInformationWindow ():
 	Label = Window.GetControl (0x10000012)
 	Label.SetTextColor (255, 255, 255)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
 def OpenBiographyWindow ():
 	global BiographyWindow
-
-	GemRB.HideGUI ()
 	
 	if BiographyWindow != None:
 		if BiographyWindow:
@@ -818,7 +807,6 @@ def OpenBiographyWindow ():
 		BiographyWindow = None
 		GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 		
-		GemRB.UnhideGUI()
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
@@ -842,7 +830,6 @@ def OpenBiographyWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
 	Button.MakeEscape()
 	
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 
@@ -882,15 +869,12 @@ def OpenLevelUpWindow ():
 	global WeapProfType, CurrWeapProf, WeapProfGained
 	global NumOfPrimLevUp, NumOfSecoLevUp
 
-	GemRB.HideGUI ()
-
 	if LevelUpWindow != None:
 		if LevelUpWindow:
 			LevelUpWindow.Unload ()
 		LevelUpWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI()
 		return
 
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
@@ -1186,7 +1170,6 @@ def OpenLevelUpWindow ():
 	Text = Window.GetControl (3)
 	Text.SetText (overview)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def GetSingleClassHP (Class, Level):

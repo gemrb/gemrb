@@ -40,17 +40,14 @@ def OpenPriestWindow ():
 	global PriestWindow
 
 	if GUICommon.CloseOtherWindow (OpenPriestWindow):
-		GemRB.HideGUI ()
 		if PriestWindow:
 			PriestWindow.Unload ()
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		
 		GUICommonWindows.SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.HideGUI ()
 	PriestWindow = Window = GemRB.LoadWindow (3, "GUIPR")
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 
@@ -67,7 +64,6 @@ def OpenPriestWindow ():
 
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
-	GemRB.UnhideGUI ()
 	UpdatePriestWindow ()
 
 def UpdatePriestWindow ():
@@ -165,8 +161,6 @@ def PriestNextLevelPress ():
 
 def OpenPriestSpellInfoWindow ():
 	global PriestSpellInfoWindow
-
-	GemRB.HideGUI ()
 	
 	if PriestSpellInfoWindow != None:
 		if PriestSpellInfoWindow:
@@ -174,7 +168,6 @@ def OpenPriestSpellInfoWindow ():
 		PriestSpellInfoWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 		
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
@@ -206,8 +199,6 @@ def OpenPriestSpellInfoWindow ():
 	Icon = Window.GetControl (5)
 	Icon.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
-
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
@@ -226,16 +217,13 @@ def OnPriestMemorizeSpell ():
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
-	
-	GemRB.HideGUI ()
-	
+		
 	if PriestSpellUnmemorizeWindow != None:
 		if PriestSpellUnmemorizeWindow:
 			PriestSpellUnmemorizeWindow.Unload ()
 		PriestSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 		
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
@@ -257,7 +245,6 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
 	Button.MakeEscape()
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 

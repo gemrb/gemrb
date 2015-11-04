@@ -109,8 +109,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index, float_menu_selected
 
-	GemRB.HideGUI ()
-
 	if FloatMenuWindow:
 		if FloatMenuWindow:
 			FloatMenuWindow.Unload ()
@@ -119,7 +117,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 		GemRB.GamePause (False, 0)
 		GemRB.SetVar ("FloatWindow", -1)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
-		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
 			return
@@ -136,7 +133,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	ActionLevel = 0
 	if not GemRB.GameGetFirstSelectedPC ():
-		GemRB.UnhideGUI ()
 		return
 
 	GemRB.GamePause (True, 0)
@@ -246,7 +242,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 	GUICommonWindows.SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
 	UpdateFloatMenuWindow ()
 
-	GemRB.UnhideGUI ()
 	return
 
 def UpdateFloatMenuWindow ():

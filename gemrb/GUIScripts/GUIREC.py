@@ -65,16 +65,15 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.UpdatePortraitWindow ()
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
-	GemRB.HideGUI ()
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	# saving the original portrait window

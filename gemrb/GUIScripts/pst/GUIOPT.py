@@ -53,21 +53,18 @@ def OpenOptionsWindow ():
 	global OptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		GemRB.HideGUI ()
 		if OptionsWindow:
 			OptionsWindow.Unload ()
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
 		OptionsWindow = None
 		
-		GemRB.UnhideGUI ()
 		return
 
 	GemRB.GamePause (1, 1)
 	TrySavingConfiguration ()
 
 	CommonWindow.CloseContainerWindow ()
-	GemRB.HideGUI ()
 	OptionsWindow = Window = GemRB.LoadWindow (0, "GUIOPT")
 	GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -108,8 +105,6 @@ def OpenOptionsWindow ():
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GEMRB_VERSION)
 	
-	GemRB.UnhideGUI ()
-
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
 		print "ARGH, could not write config to disk!!"
@@ -120,12 +115,9 @@ def OpenVideoOptionsWindow ():
 	"""Open video options window"""
 	global SubOptionsWindow, VideoHelpText
 
-	GemRB.HideGUI ()
-
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
 		TrySavingConfiguration()
-		GemRB.UnhideGUI ()
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (1)
@@ -144,7 +136,6 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
 	GUIOPTControls.OptCheckbox (31052, 31220, VideoHelpText, Window, 5, 14, 30897, "SoftSrcKeyBlt")
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
@@ -161,8 +152,6 @@ def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
 	global SubOptionsWindow, AudioHelpText
 
-	GemRB.HideGUI ()
-
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
 
@@ -174,7 +163,6 @@ def OpenAudioOptionsWindow ():
 			UpdateVolume (31210)
 
 		TrySavingConfiguration()
-		GemRB.UnhideGUI ()
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (5)
@@ -201,7 +189,6 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
 	GUIOPTControls.OptCheckbox (31210, 63247, AudioHelpText, Window, 18, 19, 63243, "Music Processing")
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 def UpdateVolume (volume_ref):
@@ -216,12 +203,9 @@ def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global SubOptionsWindow, GameplayHelpText
 
-	GemRB.HideGUI ()
-
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
 		TrySavingConfiguration()
-		GemRB.UnhideGUI ()
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (6)
@@ -245,7 +229,6 @@ def OpenGameplayOptionsWindow ():
 	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
 	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -263,11 +246,8 @@ def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
 	global SubSubOptionsWindow, FeedbackHelpText
 	
-	GemRB.HideGUI ()
-
 	if SubSubOptionsWindow:
 		CloseSubSubOptionsWindow ()
-		GemRB.UnhideGUI ()
 		return
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (8)
@@ -292,7 +272,6 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, "")
 	GUIOPTControls.OptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, "")
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 def UpdateMarkerFeedback ():
@@ -304,11 +283,8 @@ def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 	global SubSubOptionsWindow, AutopauseHelpText
 	
-	GemRB.HideGUI ()
-
 	if SubSubOptionsWindow:
 		CloseSubSubOptionsWindow ()
-		GemRB.UnhideGUI ()
 		return
 
 	
@@ -330,7 +306,6 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "Auto Pause State", None, 32)
 	GUIOPTControls.OptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "Auto Pause State", None, 64)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 ###################################################
@@ -339,15 +314,12 @@ def OpenAutopauseOptionsWindow ():
 def OpenLoadMsgWindow ():
 	global LoadMsgWindow
 
-	GemRB.HideGUI()
-
 	if LoadMsgWindow:		
 		if LoadMsgWindow:
 			LoadMsgWindow.Unload ()
 		LoadMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 		
 	LoadMsgWindow = Window = GemRB.LoadWindow (3)
@@ -367,7 +339,6 @@ def OpenLoadMsgWindow ():
 	Text = Window.GetControl (3)
 	Text.SetText (39432)
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
@@ -384,15 +355,12 @@ def LoadGame ():
 def OpenQuitMsgWindow ():
 	global QuitMsgWindow
 
-	#GemRB.HideGUI()
-
 	if QuitMsgWindow:		
 		if QuitMsgWindow:
 			QuitMsgWindow.Unload ()
 		QuitMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		#GemRB.UnhideGUI ()
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindow (4)
@@ -418,7 +386,6 @@ def OpenQuitMsgWindow ():
 	Text = Window.GetControl (3)
 	Text.SetText (39430)  # or 39431 - cannot be saved atm
 
-	#GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -460,12 +427,9 @@ def OpenKeyboardMappingsWindow ():
 
 	last_key_action = None
 
-	GemRB.HideGUI()
-
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
 		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
-		GemRB.UnhideGUI ()
 		return
 		
 	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIKEYS")
@@ -489,8 +453,6 @@ def OpenKeyboardMappingsWindow ():
 	Button.MakeEscape()
 
 	keys_setup_page (0)
-
-	GemRB.UnhideGUI ()
 
 def keys_setup_page (pageno):
 	Window = SubOptionsWindow
@@ -557,11 +519,8 @@ def OnActionLabelPress ():
 def OpenMoviesWindow ():
 	global SubOptionsWindow
 
-	GemRB.HideGUI()
-
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
-		GemRB.UnhideGUI ()
 		return
 		
 	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIMOVIE")
@@ -589,7 +548,6 @@ def OpenMoviesWindow ():
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())])
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_BLACK)
 
 ###################################################

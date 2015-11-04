@@ -144,7 +144,6 @@ def CloseStoreWindow ():
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
-		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
 
 	CureTable = None
@@ -171,8 +170,6 @@ def OpenStoreWindow ():
 	OpenStoreIdentifyWindow,OpenStoreStealWindow,
 	OpenStoreHealWindow, OpenStoreDonateWindow,
 	OpenStoreRumourWindow,OpenStoreRentWindow )
-
-	GemRB.HideGUI ()
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1

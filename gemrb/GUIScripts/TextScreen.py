@@ -134,7 +134,6 @@ def StartTextScreen ():
 
 	#if this was opened from somewhere other than game control close that window
 	GUICommon.CloseOtherWindow(None)
-	GemRB.HideGUI ()
 
 	TextScreen.ShowModal (MODAL_SHADOW_NONE)
 
@@ -148,7 +147,6 @@ def EndTextScreen ():
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
 
-	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 3)
 
 	if TableName == "25ecred":

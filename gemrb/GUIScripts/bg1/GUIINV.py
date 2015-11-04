@@ -67,7 +67,6 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		GUICommonWindows.UpdatePortraitWindow ()
 		OldPortraitWindow = None
@@ -75,8 +74,6 @@ def OpenInventoryWindow ():
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-
-	GemRB.HideGUI ()
 
 	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)

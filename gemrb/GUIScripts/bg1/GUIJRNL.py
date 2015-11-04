@@ -52,7 +52,6 @@ def OpenJournalWindow ():
 		
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
@@ -65,8 +64,6 @@ def OpenJournalWindow ():
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
-
-	GemRB.HideGUI ()
 	
 	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)

@@ -161,8 +161,6 @@ def DeathWindowEnd ():
 	Button.SetText (15417)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
 
-	GemRB.HideGUI ()
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

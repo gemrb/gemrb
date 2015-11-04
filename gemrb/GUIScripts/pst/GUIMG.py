@@ -38,17 +38,14 @@ def OpenMageWindow ():
 	global MageWindow
 
 	if GUICommon.CloseOtherWindow (OpenMageWindow):
-		GemRB.HideGUI ()
 		if MageWindow:
 			MageWindow.Unload ()
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		
 		GUICommonWindows.SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.HideGUI ()
 	MageWindow = Window = GemRB.LoadWindow (3, "GUIMG")
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	
@@ -64,7 +61,6 @@ def OpenMageWindow ():
 		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateMageWindow)
-	GemRB.UnhideGUI ()
 	UpdateMageWindow ()
 
 def UpdateMageWindow ():
@@ -158,15 +154,12 @@ def MageNextLevelPress ():
 def OpenMageSpellInfoWindow ():
 	global MageSpellInfoWindow
 
-	GemRB.HideGUI ()
-
 	if MageSpellInfoWindow != None:
 		if MageSpellInfoWindow:
 			MageSpellInfoWindow.Unload ()
 		MageSpellInfoWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	MageSpellInfoWindow = Window = GemRB.LoadWindow (4)
@@ -198,8 +191,6 @@ def OpenMageSpellInfoWindow ():
 	Icon = Window.GetControl (5)
 	Icon.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
-
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
@@ -219,15 +210,12 @@ def OnMageMemorizeSpell ():
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	GemRB.HideGUI ()
-
 	if MageSpellUnmemorizeWindow != None:
 		if MageSpellUnmemorizeWindow:
 			MageSpellUnmemorizeWindow.Unload ()
 		MageSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
@@ -248,7 +236,6 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellUnmemorizeWindow)
 	Button.MakeEscape()
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 

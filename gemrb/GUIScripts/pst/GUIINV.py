@@ -78,10 +78,8 @@ def OpenInventoryWindow ():
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI ()
 		return
 
-	GemRB.HideGUI ()
 	InventoryWindow = Window = GemRB.LoadWindow (3, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
@@ -426,15 +424,12 @@ def DragItemAmount ():
 def OpenItemAmountWindow ():
 	global ItemAmountWindow
 
-	GemRB.HideGUI ()
-
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
@@ -474,7 +469,6 @@ def OpenItemAmountWindow ():
 	# 4 -
 	# 6 text
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def LeftItemScroll ():

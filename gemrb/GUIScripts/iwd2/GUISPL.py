@@ -58,15 +58,13 @@ def OpenSpellBookWindow ():
 
 		SpellBookWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-
-	GemRB.HideGUI ()
 
 	SpellBookWindow = Window = GemRB.LoadWindow (2, "GUISPL")
 	GemRB.SetVar ("OtherWindow", SpellBookWindow.ID)

@@ -85,17 +85,14 @@ def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
 	if GUICommon.CloseOtherWindow(OpenReformPartyWindow):
-		GemRB.HideGUI ()
 		if ReformPartyWindow:
 			ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
 
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.UnhideGUI ()
 		return
 
-	GemRB.HideGUI ()
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -110,8 +107,6 @@ def OpenReformPartyWindow ():
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
 
-	GemRB.UnhideGUI ()
-
 
 last_formation = None
 
@@ -119,7 +114,6 @@ def OpenFormationWindow ():
 	global FormationWindow
 
 	if GUICommon.CloseOtherWindow(OpenFormationWindow):
-		GemRB.HideGUI ()
 		if FormationWindow:
 			FormationWindow.Unload ()
 		FormationWindow = None
@@ -127,10 +121,8 @@ def OpenFormationWindow ():
 		GemRB.GameSetFormation (last_formation, 0)
 		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		return
 
-	GemRB.HideGUI ()
 	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack())
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -164,8 +156,6 @@ def OpenFormationWindow ():
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
 	SelectFormation ()
-
-	GemRB.UnhideGUI ()
 
 def SelectFormation ():
 	global last_formation

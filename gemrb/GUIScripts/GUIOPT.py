@@ -81,7 +81,6 @@ def CloseOptionsWindow ():
 
 	GameOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
 	if not GameCheck.IsBG1():
@@ -104,7 +103,6 @@ def OpenOptionsWindow ():
 	GemRB.GamePause (1, 3)
 
 	CommonWindow.CloseContainerWindow ()
-	GemRB.HideGUI ()
 	if GameCheck.IsBG1():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 

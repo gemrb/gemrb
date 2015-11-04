@@ -40,8 +40,6 @@ def OpenSaveWindow ():
 	global SaveWindow, OptionsWindow, Games, ScrollBar
 
 	if SaveWindow:
-		GemRB.HideGUI ()
-
 		if SaveDetailWindow: OpenSaveDetailWindow ()
 
 		if SaveWindow:
@@ -50,7 +48,6 @@ def OpenSaveWindow ():
 		# FIXME: LOAD GUIOPT?
 		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 
-		GemRB.UnhideGUI ()
 		return
 
 	SaveWindow = Window = GemRB.LoadWindow (0, "GUISAVE")
@@ -201,15 +198,12 @@ def CancelPress():
 def OpenSaveDetailWindow ():
 	global SaveDetailWindow
 
-	GemRB.HideGUI ()
-
 	if SaveDetailWindow != None:
 		if SaveDetailWindow:
 			SaveDetailWindow.Unload ()
 		SaveDetailWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		return
 
 	SaveDetailWindow = Window = GemRB.LoadWindow (1)
@@ -262,7 +256,6 @@ def OpenSaveDetailWindow ():
 
 
 	CheckSaveName ()
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED) # ShowModal will happily reset this..
 

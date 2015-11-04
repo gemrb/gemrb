@@ -70,9 +70,7 @@ def OpenJournalWindow ():
 		if LogWindow: OpenLogWindow()
 		if BeastsWindow: OpenBeastsWindow()
 		if QuestsWindow: OpenQuestsWindow()
-		
-		GemRB.HideGUI ()
-		
+				
 		if JournalWindow:
 			JournalWindow.Unload()
 		#making the portraitwindow visible again
@@ -82,10 +80,8 @@ def OpenJournalWindow ():
 		ActionsWindow = None
 		JournalWindow = None
 
-		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.HideGUI ()
 	JournalWindow = GemRB.LoadWindow (0, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -112,17 +108,13 @@ def OpenJournalWindow ():
 	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
-	#JournalWindow.Focus()
-	GemRB.UnhideGUI()
-	
+	#JournalWindow.Focus()	
 
 
 ###################################################
 def OpenQuestsWindow ():
 	global JournalWindow, QuestsWindow, QuestsList, QuestDesc
-	
-	GemRB.HideGUI()
-	
+		
 	if QuestsWindow:
 		if QuestsWindow:
 			QuestsWindow.Unload()
@@ -130,7 +122,6 @@ def OpenQuestsWindow ():
 		
 		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 		
-		GemRB.UnhideGUI()
 		return
 	
 	QuestsWindow = Window = GemRB.LoadWindow (1)
@@ -168,7 +159,6 @@ def OpenQuestsWindow ():
 	PopulateQuestsList ()
 
 	#QuestsWindow.Focus()
-	GemRB.UnhideGUI()
 	
 
 def OnJournalQuestSelect ():
@@ -286,9 +276,7 @@ def EvaluateAllQuests ():
 
 def OpenBeastsWindow ():
 	global JournalWindow, BeastsWindow, BeastsList, BeastImage, BeastDesc
-	
-	GemRB.HideGUI()
-	
+		
 	if BeastsWindow:
 		if BeastsWindow:
 			BeastsWindow.Unload()
@@ -296,7 +284,6 @@ def OpenBeastsWindow ():
 		
 		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 		
-		GemRB.UnhideGUI()
 		return
 	
 	BeastsWindow = Window = GemRB.LoadWindow (2)
@@ -337,7 +324,6 @@ def OpenBeastsWindow ():
 	EvaluateAllBeasts ()
 	PopulateBeastsList ()
 	
-	GemRB.UnhideGUI()
 	return
 
 def OnJournalBeastSelect ():
@@ -393,9 +379,7 @@ def EvaluateAllBeasts ():
 
 def OpenLogWindow ():
 	global JournalWindow, LogWindow
-	
-	GemRB.HideGUI()
-	
+		
 	if LogWindow:
 		if LogWindow:
 			LogWindow.Unload()
@@ -403,7 +387,6 @@ def OpenLogWindow ():
 		
 		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 		
-		GemRB.UnhideGUI()
 		return
 	
 	LogWindow = Window = GemRB.LoadWindow (3)
@@ -448,7 +431,5 @@ def OpenLogWindow ():
 			
 	Window.Focus()
 	
-	GemRB.UnhideGUI()
-
 ###################################################
 # End of file GUIJRNL.py

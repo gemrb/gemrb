@@ -62,15 +62,12 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-
-	GemRB.HideGUI ()
 
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

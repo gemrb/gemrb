@@ -37,7 +37,6 @@ def OpenMapWindow ():
 	global MapWindow
 
 	if GUICommon.CloseOtherWindow (OpenMapWindow):
-		GemRB.HideGUI ()
 		if WorldMapWindow: OpenWorldMapWindowInside ()
 		
 		if MapWindow:
@@ -45,10 +44,8 @@ def OpenMapWindow ():
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 
-	GemRB.HideGUI ()
 	MapWindow = Window = GemRB.LoadWindow (3, "GUIMA")
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 
@@ -95,8 +92,6 @@ def OpenMapWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
-
-	GemRB.UnhideGUI ()
 
 def LeftDoublePressMap ():
 	OpenMapWindow()
@@ -150,15 +145,12 @@ def OpenWorldMapWindow ():
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow
 
-	GemRB.HideGUI()
-
 	if WorldMapWindow:
 		if WorldMapWindow:
 			WorldMapWindow.Unload ()
 		WorldMapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.UnhideGUI ()
 		return
 
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -184,7 +176,6 @@ def WorldMapWindowCommon (Travel):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
 	else:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	GemRB.UnhideGUI ()
 
 ###################################################
 # End of file GUIMA.py
