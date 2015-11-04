@@ -8,17 +8,23 @@ Tools you will need to build GemRB:
 
 NOTE: g++ 4.3 is known to miscompile gemrb.
 
-Libraries:
+Required dependencies:
   - ZLib
   - Python 2.3 or better, compiled with shared libraries
   - SDL 1.2 or SDL 2.0+
-  - OpenAL (optional, for sound)
-  - SDL_mixer (optional, for fast lower-quality sound)
-  - libpng (optional, for the png importer plugin)
-  - FreeType (optional, for the TTF fonts plugin)
-  - iconv (optional, for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
-  - (lib)VLC 2.0+ (optional, for movies in some mac distributions of the games)
-  - OpenGL drivers and GLew (both optional)
+
+Optional dependencies:
+  - OpenAL (for sound; preferred)
+  - SDL_mixer / SDL2_mixer (for faster, but lower-quality sound)
+  - (lib)PNG (for the png importer plugin)
+  - FreeType (for the TTF fonts plugin)
+  - ICONV (for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
+  - (lib)VLC 2.0+ (for movies in some mac distributions of the games)
+  - OpenGL drivers and GLEW
+
+You can explicitly disable searching (and using) a particular optional dependency by
+specifying -DCMAKE_DISABLE_FIND_PACKAGE_foo=1 flags (cummulative), where "foo" can be
+any name from the above list.
 
 Building GemRB on unix-like systems
 -----------------------------------
