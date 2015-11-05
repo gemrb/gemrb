@@ -797,7 +797,6 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	} else {
 		game->ControlStatus &= ~CS_HIDEGUI;
 	}
-	core->SetEventFlag(EF_CONTROL);
 	// FIXME: reimplement this
 	// core->GetVideoDriver()->SetMouseEnabled(!active);
 }

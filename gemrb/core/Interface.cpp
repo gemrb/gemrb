@@ -3112,7 +3112,6 @@ void Interface::SetCutSceneMode(bool active)
 		} else {
 			game->ControlStatus &= ~CS_HIDEGUI;
 		}
-		SetEventFlag(EF_CONTROL);
 	}
 }
 
