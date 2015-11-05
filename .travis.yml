@@ -1,0 +1,39 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - cmake
+    - libpython2.7
+    - libpython-dev
+    - zlib1g
+    - zlib1g-dev
+    - libsdl1.2debian
+    - libsdl1.2-dev
+    - libopenal1
+    - libopenal-dev
+    - libsdl-mixer1.2
+    - libsdl-mixer1.2-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - libvlc5
+    - libvlc-dev
+    - libvlccore5
+    - libvlccore-dev
+    - libpng12-0
+    - libpng12-dev
+    - libvorbis0a
+    - libvorbis-dev
+
+script: cmake -DINSOURCEBUILD=1 . && make
+
+notifications:
+  email: false
+
+os: linux
