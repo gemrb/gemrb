@@ -435,8 +435,6 @@ these events are pending until conditions are right
 */
 void Interface::HandleEvents()
 {
-	GameControl *gc = GetGameControl();
-
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
 		guiscript->RunFunction( "GUICommonWindows", "SelectionChanged", false);
@@ -465,7 +463,7 @@ void Interface::HandleEvents()
 		}
 	}
 
-	if ((EventFlag&EF_CONTROL) && gc) {
+	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
 		//this is the only value we can use here
@@ -482,7 +480,7 @@ void Interface::HandleEvents()
 		}
 		return;
 	}
-	if ((EventFlag&EF_SHOWMAP) && gc) {
+	if (EventFlag&EF_SHOWMAP) {
 		ieDword tmp = (ieDword) ~0;
 		vars->Lookup( "OtherWindow", tmp );
 		if (tmp == (ieDword) ~0) {
@@ -522,16 +520,16 @@ void Interface::HandleEvents()
 		return;
 	}
 
-	if ((EventFlag&EF_RESETTARGET) && gc) {
+	if ((EventFlag&EF_RESETTARGET) && gamectrl) {
 		EventFlag&=~EF_RESETTARGET;
 		EventFlag|=EF_TARGETMODE;
-		gc->ResetTargetMode();
+		gamectrl->ResetTargetMode();
 		return;
 	}
 
-	if ((EventFlag&EF_TARGETMODE) && gc) {
+	if ((EventFlag&EF_TARGETMODE) && gamectrl) {
 		EventFlag&=~EF_TARGETMODE;
-		gc->UpdateTargetMode();
+		gamectrl->UpdateTargetMode();
 		return;
 	}
 
