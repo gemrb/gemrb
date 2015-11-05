@@ -206,6 +206,13 @@ if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
 #define ABORT_IF_NULL(thing) \
 if (thing == NULL) return NULL;
 
+#define RETURN_BOOL(boolean) \
+if (boolean) { \
+	Py_RETURN_TRUE; \
+} else { \
+	Py_RETURN_FALSE; \
+}
+
 static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
 	if (!attr) {
@@ -3328,12 +3335,10 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if ((unsigned int) value<=game->Expansion) {
-		Py_INCREF( Py_False );
-		return Py_False;
+		Py_RETURN_FALSE;
 	}
 	game->SetExpansion(value);
-	Py_INCREF( Py_True );
-	return Py_True;
+	Py_RETURN_TRUE;
 }
 
 PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
@@ -3993,13 +3998,7 @@ static PyObject* GemRB_ValidTarget(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (actor->ValidTarget(flags, actor)) {
-		Py_INCREF( Py_True );
-		return Py_True;
-	} else {
-		Py_INCREF( Py_False );
-		return Py_False;
-	}
+	RETURN_BOOL(actor->ValidTarget(flags, actor));
 }
 
 
@@ -10091,13 +10090,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	default:
 		ret = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
 	}
-	if (ret) {
-		Py_INCREF( Py_True );
-		return Py_True;
-	} else {
-		Py_INCREF( Py_False );
-		return Py_False;
-	}
+	RETURN_BOOL(ret);
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
@@ -10223,13 +10216,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 
 endofquest:
-	if (ret) {
-		Py_INCREF( Py_True );
-		return Py_True;
-	} else {
-		Py_INCREF( Py_False );
-		return Py_False;
-	}
+	RETURN_BOOL(ret);
 }
 
 PyDoc_STRVAR( GemRB_HasFeat__doc,
@@ -10575,13 +10562,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	int ResType;
 	int silent = 0;
 	PARSE_ARGS( args,  "si|i", &ResRef, &ResType, &silent );
-	if (gamedata->Exists(ResRef, ResType, silent)) {
-		Py_INCREF( Py_True );
-		return Py_True;
-	} else {
-		Py_INCREF( Py_False );
-		return Py_False;
-	}
+	RETURN_BOOL(gamedata->Exists(ResRef, ResType, silent));
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,
