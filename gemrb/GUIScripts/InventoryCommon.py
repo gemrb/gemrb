@@ -478,7 +478,6 @@ def OpenItemAmountWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
 	Button.MakeEscape()
 
-	#GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

@@ -72,7 +72,7 @@ def UpdateControlStatus():
 		Expand = GS_LARGEDIALOG
 
 	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-	hideflag = GemRB.HideGUI()
+	hideflag = IsGameGUIHidden()
 	if Expand == GS_LARGEDIALOG:
 		GemRB.SetVar ("PortraitWindow", -1)
 		TMessageWindow = GemRB.LoadWindow(7)
@@ -112,8 +112,7 @@ def UpdateControlStatus():
 	else:
 		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 		
-	if hideflag:
-		GemRB.UnhideGUI()
+	SetGameGUIHidden(hideflag)
 	return
 
 #upgrade savegame to next version

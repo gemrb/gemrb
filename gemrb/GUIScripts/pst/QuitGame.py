@@ -28,7 +28,7 @@ import GUICommon
 movies = [None,"T1DEATH","T1ABSORB","FINALE"]
 
 def OnLoad ():
-	GemRB.HideGUI ()
+	SetGameGUIHidden(True)
 	which = movies[GemRB.GetVar ("QuitGame1")]
 	if which!=None:
 		GemRB.PlayMovie (which,1)

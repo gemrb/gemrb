@@ -395,73 +395,6 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_UnhideGUI__doc,
-"===== UnhideGUI =====\n\
-\n\
-**Prototype:** GemRB.UnhideGUI ()\n\
-\n\
-**Description:** Shows the Game GUI and redraws windows.\n\
-\n\
-**Parameters:** N/A\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:HideGUI]], [[guiscript:Window_Invalidate]]\n\
-"
-);
-
-static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
-{
-	GET_GAME();
-	RETURN_BOOL(game->SetControlStatus(CS_HIDEGUI, OP_NAND));
-}
-
-PyDoc_STRVAR( GemRB_HideGUI__doc,
-"===== HideGUI =====\n\
-\n\
-**Prototype:** GemRB.HideGUI ()\n\
-\n\
-**Description:**\n\
-Hides the game GUI (all windows except the GameControl window). It is also used\n\
- before a major change is made on a GUI window to avoid flickering. After the\n\
- changes, an UnhideGUI() command should be issued too.\n\
-\n\
-A list of reserved names (variables) and what they hold:\n\
-  * MessageWindow - contains a TextArea for ingame messages/dialogue\n\
-  * OptionsWindow - a series of buttons for Inventory/Spellbook/Journal,etc\n\
-  * PortraitWindow - a series of portrait buttons\n\
-  * ActionsWindow - a series of buttons to Attack/Talk, etc.\n\
-  * TopWindow - unused (might be removed later)\n\
-  * OtherWindow - this window usually covers the GameControl, it is used to display  maps, inventory, journal, etc.\n\
-  * FloatWindow - special window which floats on top of the GameControl\n\
-\n\
-All these windows are associated with a position variable too, these are\n\
- MessagePosition, OptionsPosition, etc.\n\
-The position value tells the engine the window's relative position to the\n\
- GameControl GUI. The engine doesn't make any distinction between these\n\
- windows based on their reference name. The differences come from the\n\
-position value:\n\
-  * -1 - no position (floats over GameControl)\n\
-  * 0  - left\n\
-  * 1  - bottom\n\
-  * 2  - right\n\
-  * 3  - top\n\
-  * 4  - bottom (cummulative)\n\
-\n\
-**Parameters:** N/A\n\
-\n\
-**Return value:** 1 on success\n\
-\n\
-**See also:** [[guiscript:UnhideGUI]], [[guiscript:Window_Invalidate]]\n\
-"
-);
-
-static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
-{
-	GET_GAME();
-	RETURN_BOOL(game->SetControlStatus(CS_HIDEGUI, OP_NAND));
-}
-
 PyDoc_STRVAR( GemRB_GetGameString__doc,
 "===== GetGameString =====\n\
 \n\
@@ -749,8 +682,6 @@ This is mainly a debugging command.\n\
 **Parameters:** N/A\n\
 \n\
 **Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:HideGUI]], [[guiscript:UnhideGUI]]\n\
 "
 );
 
@@ -13096,7 +13027,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
-	METHOD(HideGUI, METH_NOARGS),
 	METHOD(IncreaseReputation, METH_VARARGS),
 	METHOD(IsDraggingItem, METH_NOARGS),
 	METHOD(IsDualWielding, METH_VARARGS),
@@ -13169,7 +13099,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StatComment, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
-	METHOD(UnhideGUI, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),

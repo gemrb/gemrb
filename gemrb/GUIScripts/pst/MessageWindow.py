@@ -91,7 +91,7 @@ def UpdateControlStatus ():
 
 	Expand = GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG)
 
-	hideflags = GemRB.HideGUI ()
+	hideflags = IsGameGUIHidden()
 	if Expand:
 		GemRB.SetVar ("PortraitWindow", -1)
 		GemRB.SetVar ("ActionsWindow", -1)
@@ -107,6 +107,4 @@ def UpdateControlStatus ():
 		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
 		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
-	if hideflags:
-		GemRB.UnhideGUI ()
-
+	SetGameGUIHidden(hideflags)

@@ -40,11 +40,8 @@ def DialogStarted ():
 	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
-	# we need GUI for dialogs
-	GemRB.UnhideGUI()
-
 	# opening control size to maximum, enabling dialog window
-	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
 	MessageWindow.UpdateControlStatus()

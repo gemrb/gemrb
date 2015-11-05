@@ -20,6 +20,13 @@ import GemRB
 import GameCheck
 from GUIDefines import GS_DIALOGMASK, OP_SET
 
+def SetGameGUIHidden(hide):
+	op = OP_OR if hide else OP_NAND
+	GemRB.GameSetScreenFlags(GS_HIDEGUI, op)
+	
+def IsGameGUIHidden():
+	return GemRB.GetGUIFlags() & GS_HIDEGUI
+
 # message window expansion
 def OnIncreaseSize():
 	GSFlags = GemRB.GetGUIFlags()
@@ -166,7 +173,7 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
-	hideflag = GemRB.HideGUI ()
+	hideflag = IsGameGUIHidden()
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack())
 
@@ -268,8 +275,8 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
-	if hideflag:
-		GemRB.UnhideGUI ()
+	
+	SetGameGUIHidden(hideflag)
 
 def CloseContainerWindow ():
 	global ContainerWindow
@@ -277,7 +284,7 @@ def CloseContainerWindow ():
 	if not ContainerWindow:
 		return
 
-	hideflag = GemRB.HideGUI ()
+	hideflag = IsGameGUIHidden()
 
 	ContainerWindow.Unload ()
 
@@ -303,10 +310,7 @@ def CloseContainerWindow ():
 	if tmp!='*':
 		GemRB.PlaySound (tmp)
 
-	#it is enough to close here
-
-	if hideflag:
-		GemRB.UnhideGUI ()
+	SetGameGUIHidden(hideflag)
 
 #doing this way it will inform the core system too, which in turn will call
 #CloseContainerWindow ()

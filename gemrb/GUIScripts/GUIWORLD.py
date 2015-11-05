@@ -50,11 +50,8 @@ def DialogStarted ():
 	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
-	# we need GUI for dialogs
-	GemRB.UnhideGUI()
-
 	# opening control size to maximum, enabling dialog window
-	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
 	if GUICommonWindows.PortraitWindow:
@@ -176,7 +173,7 @@ def UpdateReformWindow ():
 def RemovePlayer ():
 	global ReformPartyWindow
 
-	hideflag = GemRB.HideGUI ()
+	hideflag = IsGameGUIHidden()
 
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
@@ -204,8 +201,7 @@ def RemovePlayer ():
 
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	GemRB.SetVar ("ActionsWindow", -1)
-	if hideflag:
-		GemRB.UnhideGUI ()
+	SetGameGUIHidden(hideflag)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -232,7 +228,7 @@ def OpenReformPartyWindow ():
 	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
-	hideflag = GemRB.HideGUI ()
+	hideflag = IsGameGUIHidden()
 
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
@@ -243,8 +239,8 @@ def OpenReformPartyWindow ():
 		OldActionsWindow = None
 		OldMessageWindow = None
 		ReformPartyWindow = None
-		if hideflag:
-			GemRB.UnhideGUI ()
+		
+		SetGameGUIHidden(hideflag)
 		#re-enabling party size control
 		GemRB.GameSetPartySize (PARTY_SIZE)
 		GUICommonWindows.UpdatePortraitWindow()
@@ -287,13 +283,12 @@ def OpenReformPartyWindow ():
 	# if nobody can be removed, just close the window
 	if not removable_pcs:
 		OpenReformPartyWindow ()
-		if hideflag:
-			GemRB.UnhideGUI ()
+		SetGameGUIHidden(hideflag)
 		return
 
 	UpdateReformWindow ()
-	if hideflag:
-		GemRB.UnhideGUI ()
+	SetGameGUIHidden(hideflag)
+
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -301,7 +296,7 @@ def DeathWindow ():
 	if GameCheck.IsIWD1():
 		#no death movie, but music is changed
 		GemRB.LoadMusicPL ("Theme.mus",1)
-	GemRB.HideGUI ()
+	SetGameGUIHidden(True)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
 

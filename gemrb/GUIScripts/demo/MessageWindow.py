@@ -62,7 +62,7 @@ def UpdateControlStatus():
 	TMessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	TMessageTA = TMessageWindow.GetControl(0)
 
-	hideflag = GemRB.HideGUI()
+	hideflag = IsGameGUIHidden()
 	MessageWindow = GemRB.GetVar("MessageWindow")
 	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
 	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
@@ -76,6 +76,5 @@ def UpdateControlStatus():
 	else:
 		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
-	if hideflag:
-		GemRB.UnhideGUI()
+	SetGameGUIHidden(hideflag)
 

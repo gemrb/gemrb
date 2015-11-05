@@ -1839,10 +1839,6 @@ def UpdateClock ():
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
 
-def HideInterface(): #todo:should really add to pst if possible
-	GemRB.GameSetScreenFlags (GS_HIDEGUI, OP_XOR)
-	return
-
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
 

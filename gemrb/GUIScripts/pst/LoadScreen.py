@@ -35,7 +35,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 
 	# While (un)loading, there are no other windows
 	if screen_type == LS_TYPE_SAVING:
-		GemRB.HideGUI ()
+		SetGameGUIHidden(True)
 		
 	LoadScreen = Window = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
@@ -61,7 +61,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	Skull.SetMOS ("GSKULOFF")
 
 	if screen_type == LS_TYPE_SAVING:
-		GemRB.UnhideGUI ()
+		SetGameGUIHidden(False)
 
 	Window.Focus()
 
