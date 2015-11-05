@@ -31,6 +31,10 @@ addons:
     - libvorbis-dev
     - python-dev
 
+before-script:
+  - cmake --version # too old for MODULE
+  - sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt
+
 script: cmake -DINSOURCEBUILD=1 . && make
 
 notifications:
