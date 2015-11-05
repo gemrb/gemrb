@@ -3107,11 +3107,7 @@ void Interface::SetCutSceneMode(bool active)
 		gc->SetCutSceneMode( active );
 	}
 	if (game) {
-		if (active) {
-			game->ControlStatus |= CS_HIDEGUI;
-		} else {
-			game->ControlStatus &= ~CS_HIDEGUI;
-		}
+		game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
 	}
 }
 

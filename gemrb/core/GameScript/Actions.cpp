@@ -792,11 +792,7 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	int active = parameters->int0Parameter;
 
 	Game *game = core->GetGame();
-	if (active) {
-		game->ControlStatus |= CS_HIDEGUI;
-	} else {
-		game->ControlStatus &= ~CS_HIDEGUI;
-	}
+	game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
 	// FIXME: reimplement this
 	// core->GetVideoDriver()->SetMouseEnabled(!active);
 }
