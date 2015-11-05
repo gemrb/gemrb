@@ -144,7 +144,6 @@ private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
 	void CalculateSelection(const Point &p);
-	void ResizeParentWindowFor(Window* win, int type, WINDOW_RESIZE_OPERATION);
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
@@ -200,7 +199,6 @@ public:
 	void SelectActor(int whom, int type = -1);
 	void SetLastActor(Actor *actor, Actor *prevActor);
 	void SetCutSceneMode(bool active);
-	bool SetGUIHidden(bool hide);
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToCast(Actor *source, const Point &p);
 	void TryToCast(Actor *source, Actor *target);
