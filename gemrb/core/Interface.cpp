@@ -1820,6 +1820,7 @@ int Interface::Init(InterfaceConfig* config)
 	Window* consoleWin = winmgr->MakeWindow(frame);
 	consoleWin->AddSubviewInFrontOfView(console);
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
+	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
