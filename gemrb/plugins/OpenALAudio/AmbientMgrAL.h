@@ -28,6 +28,8 @@
 
 #include <SDL_thread.h>
 
+#include "Region.h"
+
 #ifndef WIN32
 #ifdef __APPLE_CC__
 #include <OpenAL/al.h>

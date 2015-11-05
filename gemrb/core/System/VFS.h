@@ -36,7 +36,6 @@
 #endif
 
 #include "exports.h"
-#include "globals.h"
 #include "Predicates.h"
 
 #include <string>
@@ -67,7 +66,7 @@ enum BundleDirectory {
 	RESOURCES,
 	PLUGINS
 };
-GEM_EXPORT void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir = BUNDLE);
+GEM_EXPORT void CopyBundlePath(char* outPath, unsigned short maxLen, BundleDirectory dir = BUNDLE);
 #endif
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
@@ -116,10 +115,10 @@ GEM_EXPORT char* PathAppend (char* target, const char* name);
 GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
-GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen);
+GEM_EXPORT char* CopyHomePath(char* outPath, unsigned short maxLen);
 
 // default directory housing GUIScripts/Override/Unhardcoded
-GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
+GEM_EXPORT char* CopyGemDataPath(char* outPath, unsigned short maxLen);
 
 class GEM_EXPORT DirectoryIterator {
 public:

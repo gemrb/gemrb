@@ -20,6 +20,7 @@
 
 #include "GUI/EventMgr.h"
 
+#include "globals.h"
 #include "win32def.h"
 
 namespace GemRB {

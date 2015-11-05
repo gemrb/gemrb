@@ -64,6 +64,8 @@
 
 #endif //GLOBALS_ONLY_DEFS
 
+#include "System/Logging.h"
+
 namespace GemRB {
 
 //Global Variables
@@ -223,7 +225,9 @@ inline bool SetBits(T& flag, const T& value, int mode)
 		case OP_SET: flag = value; break;
 		case OP_AND: flag &= value; break;
 		case OP_XOR: flag ^= value; break;
-		default: return false;
+		default:
+			Log(ERROR, "SetBits", "Unrecognized Bit Operation %i", mode);
+			return false;
 	}
 	return true;
 }

@@ -1,10 +1,8 @@
 #include "RNG_SFMT.h"
 #include <climits>
-#include "System/Logging.h"
-
-#ifdef WIN32
 #include <ctime>
-#endif
+
+#include "System/Logging.h"
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.
