@@ -424,7 +424,6 @@ GameControl* Interface::StartGameControl()
 
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
-		gamectrl->SetGUIHidden(false);
 	}
 
 	return gamectrl;
@@ -470,7 +469,17 @@ void Interface::HandleEvents()
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
 		//this is the only value we can use here
-		gc->SetGUIHidden(game->ControlStatus & CS_HIDEGUI);
+		static const ResRef GameWindows[5] = {
+			"OPTWIN", "PORTWIN", "MSGWIN", "ACTWIN", "FLOATWIN"
+		};
+
+		bool visible = !(game->ControlStatus & CS_HIDEGUI);
+		for (size_t i = 0; i < sizeof(GameWindows) / sizeof(GameWindows[0]); ++i) {
+			Window* win = GetWindow(0, GameWindows[i]);
+			if (win) { // not all games have all windows
+				win->SetVisible(visible);
+			}
+		}
 		return;
 	}
 	if ((EventFlag&EF_SHOWMAP) && gc) {

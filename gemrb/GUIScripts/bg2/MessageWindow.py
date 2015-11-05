@@ -47,10 +47,12 @@ def OnLoad():
 	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
+	MessageWindow.AddAlias("MSGWIN")
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 	ActionsWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
+	ActionsWindow.AddAlias("ACTWIN")
 	
 	aFrame = ActionsWindow.GetFrame()
 	mFrame = MessageWindow.GetFrame()
@@ -64,9 +66,11 @@ def OnLoad():
 		
 	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
 	OptionsWindow.SetFlags(WF_BORDERLESS|WF_MOUSE_PASSTHROUGH, OP_OR)
+	OptionsWindow.AddAlias("OPTWIN")
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
+	PortraitWindow.AddAlias("PORTWIN")
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
