@@ -29,8 +29,7 @@ addons:
     - libpng12-dev
     - libvorbis0a
     - libvorbis-dev
-#    - libpython-dev
-    - libpython-all-dev
+    - python-dev
 
 script: cmake -DINSOURCEBUILD=1 . && make
 
