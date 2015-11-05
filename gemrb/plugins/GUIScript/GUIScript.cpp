@@ -412,15 +412,8 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
-	//this is not the usual gc retrieval
-	GameControl* gc = core->GetGameControl();
-	if (!gc) {
-		return RuntimeError("No gamecontrol!");
-	}
-	gc->SetGUIHidden(false);
-	//this enables mouse in dialogs, which is wrong
-	//gc->SetCutSceneMode( false );
-	Py_RETURN_NONE;
+	GET_GAME();
+	RETURN_BOOL(game->SetControlStatus(CS_HIDEGUI, OP_NAND));
 }
 
 PyDoc_STRVAR( GemRB_HideGUI__doc,
@@ -465,14 +458,8 @@ position value:\n\
 
 static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
-	//it is no problem if the gamecontrol couldn't be found here?
-	GameControl* gc = core->GetGameControl();
-	if (!gc) {
-		return PyInt_FromLong( 0 );
-	}
-	int ret = gc->SetGUIHidden(true);
-
-	return PyInt_FromLong( ret );
+	GET_GAME();
+	RETURN_BOOL(game->SetControlStatus(CS_HIDEGUI, OP_NAND));
 }
 
 PyDoc_STRVAR( GemRB_GetGameString__doc,
@@ -2315,18 +2302,9 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 	int Operation = OP_SET;
 	PARSE_ARGS( args, "Oi|i", &self, &Flags, &Operation );
 
-	if (Operation < OP_SET || Operation > OP_NAND) {
-		return RuntimeError("Syntax Error: operation must be 0-4\n");
-	}
-
 	View* view = GetView(self);
 	ABORT_IF_NULL(view);
-
-	if (!view->SetFlags( Flags, Operation )) {
-		return RuntimeError("Flag cannot be set!\n");
-	}
-
-	Py_RETURN_NONE;
+	RETURN_BOOL(view->SetFlags( Flags, Operation ));
 }
 
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
@@ -3362,16 +3340,8 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
 	int Flags, Operation;
 	PARSE_ARGS( args,  "ii", &Flags, &Operation );
-	if (Operation < OP_SET || Operation > OP_NAND) {
-		Log(ERROR, "GUIScript", "Syntax Error: operation must be 0-4");
-		return NULL;
-	}
-
 	GET_GAME();
-
-	game->SetControlStatus( Flags, Operation );
-
-	Py_RETURN_NONE;
+	RETURN_BOOL(game->SetControlStatus( Flags, Operation ));
 }
 
 PyDoc_STRVAR( GemRB_GameControlSetScreenFlags__doc,
@@ -3402,15 +3372,8 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 {
 	int Flags, Operation;
 	PARSE_ARGS( args,  "ii", &Flags, &Operation );
-	if (Operation < OP_SET || Operation > OP_NAND) {
-		return AttributeError("Operation must be 0-4\n");
-	}
-
 	GET_GAMECONTROL();
-
-	gc->SetScreenFlags( Flags, Operation );
-
-	Py_RETURN_NONE;
+	RETURN_BOOL(gc->SetScreenFlags( Flags, Operation ));
 }
 
 
