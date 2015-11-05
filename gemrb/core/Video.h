@@ -75,6 +75,7 @@ public:
 	Point origin;
 
 public:
+	VideoBuffer(Point o) : origin(o) {}
 	virtual ~VideoBuffer() {}
 
 	virtual void Clear() = 0;

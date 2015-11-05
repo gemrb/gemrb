@@ -149,10 +149,11 @@ class SDLSurfaceVideoBuffer : public VideoBuffer {
 	SDL_Surface* buffer;
 
 public:
-	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p) {
+	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p)
+	: VideoBuffer(p)
+	{
 		assert(surf);
 		buffer = surf;
-		origin = p;
 
 		Clear();
 	}
