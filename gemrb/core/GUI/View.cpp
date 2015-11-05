@@ -382,7 +382,10 @@ void View::SetScrollBar(ScrollBar* sb)
 bool View::SetFlags(unsigned int arg_flags, int opcode)
 {
 	MarkDirty();
-	return SetBits(flags, arg_flags, opcode);
+	unsigned int oldflags = flags;
+	bool ret = SetBits(flags, arg_flags, opcode);
+	FlagsChanged(oldflags);
+	return ret;
 }
 
 void View::SetTooltip(const String& string)

@@ -69,6 +69,8 @@ protected:
 	virtual void SubviewRemoved(View* view, View* parent);
 
 	// notifications
+	// TODO: RESIZE_WIDTH, RESIZE_HEIGHT, and RESIZE_SUBVIEWS should all do something on change
+	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void WillDraw() {}
 
