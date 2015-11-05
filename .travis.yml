@@ -31,7 +31,7 @@ addons:
     - libvorbis-dev
     - python-dev
 
-before-script:
+before_script:
   - cmake --version # too old for MODULE
   - sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt
 
