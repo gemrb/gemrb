@@ -185,7 +185,7 @@ public:
 	void UpdateScrolling();
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
-	void SetScreenFlags(unsigned int value, int mode);
+	bool SetScreenFlags(unsigned int value, int mode);
 	void SetDialogueFlags(unsigned int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }

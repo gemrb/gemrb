@@ -1349,10 +1349,13 @@ void Game::SetReputation(ieDword r)
 	}
 }
 
-void Game::SetControlStatus(unsigned int value, int mode)
+bool Game::SetControlStatus(unsigned int value, int mode)
 {
-	SetBits(ControlStatus, value, mode);
-	core->SetEventFlag(EF_CONTROL);
+	if (SetBits(ControlStatus, value, mode)) {
+		core->SetEventFlag(EF_CONTROL);
+		return true;
+	}
+	return false;
 }
 
 void Game::AddGold(ieDword add)

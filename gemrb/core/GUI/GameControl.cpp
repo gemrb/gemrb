@@ -2380,9 +2380,9 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 }
 
-void GameControl::SetScreenFlags(unsigned int value, int mode)
+bool GameControl::SetScreenFlags(unsigned int value, int mode)
 {
-	SetBits(ScreenFlags, value, mode);
+	return SetBits(ScreenFlags, value, mode);
 }
 
 void GameControl::SetDialogueFlags(unsigned int value, int mode)
