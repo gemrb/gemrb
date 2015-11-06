@@ -31,6 +31,10 @@ addons:
     - libvorbis-dev
     - python-dev
 
+before_install:
+# homebrew missing: vlc, iconv
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl python openal-soft freetype sdl_mixer libpng libvorbis; fi
+
 before_script:
   - cmake --version # too old for MODULE
   - sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt
@@ -40,4 +44,6 @@ script: cmake -DINSOURCEBUILD=1 . && make
 notifications:
   email: false
 
-os: linux
+os:
+  - linux
+  - osx
