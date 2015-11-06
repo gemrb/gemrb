@@ -2272,10 +2272,6 @@ bool Condition::Evaluate(Scriptable* Sender)
 /* this may return more than a boolean, in case of Or(x) */
 int Trigger::Evaluate(Scriptable* Sender)
 {
-	if (!this) {
-		Log(ERROR, "GameScript", "Trigger evaluation fails due to NULL trigger.");
-		return 0;
-	}
 	if (triggerID > MAX_TRIGGERS) {
 		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: %d", triggerID);
 		return 0;

@@ -10027,7 +10027,6 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 
 bool Actor::PCInDark() const
 {
-	if (!this) return false;
 	unsigned int level = area->GetLightLevel(Pos);
 	if (level<ref_lightness) {
 		return true;
