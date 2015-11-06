@@ -46,4 +46,4 @@ notifications:
 
 os:
   - linux
-  - osx
+#  - osx
