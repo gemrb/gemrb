@@ -1,3 +1,4 @@
+# TODO: run minimal test, notify on failure, deploy to bintray, sdl_mixer is not found for linux
 language: cpp
 
 compiler:
@@ -32,7 +33,7 @@ addons:
     - python-dev
 
 before_install:
-# homebrew missing: vlc, iconv
+# homebrew missing: vlc
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl python openal-soft freetype sdl_mixer libpng libvorbis; fi
 
 before_script:
