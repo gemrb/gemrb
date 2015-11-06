@@ -37,7 +37,7 @@ before_install:
 
 before_script:
   - cmake --version # too old for MODULE, but only on the linux host
-  - [ $TRAVIS_OS_NAME == osx ] || sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt
+  - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
 
 script: cmake -DINSOURCEBUILD=1 . && make
 
