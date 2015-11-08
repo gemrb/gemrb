@@ -4191,6 +4191,7 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		CtrlIndex = GetControlIndex( WindowIndex, LabelID );
 		Control* lc = win->GetControl( CtrlIndex );
 		if (lc == NULL) {
+			delete map;
 			return RuntimeError("Cannot find label!");
 		}
 		map->LinkedLabel = lc;
