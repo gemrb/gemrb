@@ -42,7 +42,7 @@ before_script:
 
 script:
   - mkdir build && cd build
-  - cmake . && make
+  - cmake .. && make
   - gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample # minimal test
 
 notifications:
