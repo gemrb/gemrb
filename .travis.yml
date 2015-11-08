@@ -41,7 +41,8 @@ before_script:
   - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
 
 script:
-  - cmake -DINSOURCEBUILD=1 . && make
+  - mkdir build && cd build
+  - cmake . && make
   - gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample # minimal test
 
 notifications:
