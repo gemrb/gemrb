@@ -2731,7 +2731,7 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
 	Scriptable *caster = GetCasterObject();
-	if (caster->Type==ST_ACTOR) {
+	if (caster && caster->Type==ST_ACTOR) {
 		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF;
 	}
 
