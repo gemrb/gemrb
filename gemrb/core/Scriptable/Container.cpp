@@ -52,6 +52,7 @@ Container::Container(void)
 	// NULL should be 0 for this
 	memset (groundicons, 0, sizeof(groundicons) );
 	groundiconcover = 0;
+	OpenFail = 0;
 }
 
 void Container::FreeGroundIcons()
