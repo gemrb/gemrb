@@ -40,7 +40,6 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 	renderer = NULL;
 	window = NULL;
-	screenTexture = NULL;
 
 	// touch input
 	ignoreNextFingerUp = 0;
@@ -50,7 +49,6 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
-	SDL_DestroyTexture(screenTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
@@ -94,52 +92,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	// but the window will always be the size of the screen
 	SDL_RenderSetLogicalSize(renderer, width, height);
 
-	SDL_RendererInfo info;
-	SDL_GetRendererInfo(renderer, &info);
-
-	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
-	// TODO: SDL forces SDL_PIXELFORMAT_ABGR8888 on OpenGLES2
-	// if we want to use this driver with other renderers we need to do some
-	// selection such as the commented out code below
-/*
-	for (Uint32 i=0; i<info.num_texture_formats; i++) {
-		// TODO: probably could be more educated about selecting the best format.
-		switch (bpp) {
-			case 16:
-				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED16) {
-					format = info.texture_formats[i];
-					goto doneFormat;
-				}
-				continue;
-			case 32:
-			default:
-				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED32) {
-					format = info.texture_formats[i];
-					goto doneFormat;
-				}
-				continue;
-		}
-	}
-
-doneFormat:
-	if (format == SDL_PIXELFORMAT_UNKNOWN) {
-		format = SDL_GetWindowPixelFormat(window);
-		// bpp will be set by SDL_PixelFormatEnumToMasks
-	}
-*/
-	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
-
-	int access;
-	SDL_QueryTexture(screenTexture,
-                     &format,
-                     &access,
-                     &width,
-                     &height);
-
-	Uint32 r, g, b, a;
-	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
-	a = 0; //force a to 0 or screenshots will be all black!
-
+	SDL_GetRendererOutputSize(renderer, &width, &height);
 	this->bpp = bpp;
 
 	return GEM_OK;
@@ -324,7 +277,6 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	 SDL_UnlockTexture(screenTexture);
 	 */
 
-	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
 }
 

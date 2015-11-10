@@ -47,10 +47,11 @@ private:
 	SDL_TouchFingerEvent firstFingerDown;
 	unsigned long firstFingerDownTime;
 	MultiGesture currentGesture;
+
 protected:
 	SDL_Window* window;
-	SDL_Texture* screenTexture;
 	SDL_Renderer* renderer;
+
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
