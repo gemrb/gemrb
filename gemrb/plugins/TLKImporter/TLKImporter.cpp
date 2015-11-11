@@ -435,7 +435,12 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 
 	if((strref>=STRREF_START) || (strref>=BIO_START && strref<=BIO_END) ) {
 empty:
-		string = override->ResolveAuxString(strref, Length);
+		if (override) {
+			string = override->ResolveAuxString(strref, Length);
+		} else {
+			string = (char *) malloc(1);
+			string[0] = 0;
+		}
 		type = 0;
 		SoundResRef[0]=0;
 	} else {
