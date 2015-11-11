@@ -56,10 +56,10 @@ def OnLoad():
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
 	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if screen_width == 800:
-		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
-	elif screen_width == 1024:
+	if screen_width >= 1024:
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+	elif screen_width >= 800:
+		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
 
 	#if not detected tob, we go right to the main menu
 	if not GameCheck.HasTOB():
