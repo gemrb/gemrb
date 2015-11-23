@@ -392,6 +392,7 @@ def OpenQuitMsgWindow ():
 			QuitMsgWindow.Unload ()
 		QuitMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
+		GemRB.SetVar ("AskAndExit", 0)
 		
 		#GemRB.UnhideGUI ()
 		return
@@ -424,13 +425,16 @@ def OpenQuitMsgWindow ():
 	return
 
 def QuitGame ():
+	OpenQuitMsgWindow ()
 	OpenOptionsWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ('Start')
 
 def SaveGame ():
 	GemRB.SetVar ("QuitAfterSave", 1)
-	OpenOptionsWindow ()
+	OpenQuitMsgWindow ()
+	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
+		OpenOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 
 ###################################################
