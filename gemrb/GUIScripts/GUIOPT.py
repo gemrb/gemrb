@@ -617,7 +617,7 @@ def SaveGamePress ():
 	CloseQuitMsgWindow()
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
-	OpenOptionsWindow()
+	CloseOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 	return
 
