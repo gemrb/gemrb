@@ -254,15 +254,22 @@ static int GetControlIndex(unsigned short wi, unsigned long ControlID)
 static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int Function)
 {
 	if (txt) {
+		ieDword ShowHotkeys = 0;
+		core->GetDictionary()->Lookup("Hotkeys On Tooltips", ShowHotkeys);
 		if (txt[0]) {
-			char *txt2 = (char *) malloc(strlen(txt)+10);
 			if (!Function) {
 				Function = ControlIndex+1;
 			}
-			sprintf(txt2,"F%d - %s",Function,txt);
+			int ret;
+			if (ShowHotkeys) {
+				char *txt2 = (char *) malloc(strlen(txt) + 10);
+				sprintf(txt2, "F%d - %s", Function, txt);
+				ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
+				free(txt2);
+			} else {
+				ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt, Function);
+			}
 			core->FreeString(txt);
-			int ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
-			free (txt2);
 			return ret;
 		}
 		core->FreeString(txt);
