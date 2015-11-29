@@ -1,4 +1,5 @@
-# TODO: deploy to sf, sdl_mixer is not found for linux, vlc for mac
+# TODO: sdl_mixer is not found for linux, vlc for mac
+# TODO: run the minimal test also from the installed gemrb
 language: cpp
 
 compiler:
@@ -43,8 +44,20 @@ before_script:
 
 script:
   - mkdir build && cd build
-  - cmake .. && make
+  - cmake -DCMAKE_INSTALL_PREFIX=iprefix .. && make
   - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
+  - make install
+
+addons:
+  ssh_known_hosts: frs.sourceforge.net
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: testing/travis-deploy.sh
+  on:
+    branch: master
+    condition: $CC == gcc && $TRAVIS_OS_NAME == linux # second one is temporary during testing
 
 notifications:
   email:
