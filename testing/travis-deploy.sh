@@ -3,7 +3,7 @@
 # relies on a separate ssh key for uploading
 # uploads builds versioned by "git describe"
 
-sshid=id_travissfbot
+sshid=../id_travissfbot
 if [[ $TRAVIS_OS_NAME == osx ]]; then
   filepath=Apple/OSX
 elif [[ $TRAVIS_OS_NAME == linux ]]; then
