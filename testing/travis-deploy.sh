@@ -1,8 +1,8 @@
-#!/bin/env bash
+#!/bin/bash
 # script for sourceforge build deployment via travis
 # relies on a separate ssh key for uploading
 # uploads builds versioned by "git describe"
-
+echo starting deployment script ...
 sshid=id_travissfbot
 if [[ $TRAVIS_OS_NAME == osx ]]; then
   filepath=Apple/OSX
