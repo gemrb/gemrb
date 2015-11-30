@@ -48,12 +48,11 @@ script:
   - cmake -DCMAKE_INSTALL_PREFIX=iprefix .. && make
   - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
   - make install
-  - cd ..
 
 deploy:
   skip_cleanup: true
   provider: script
-  script: testing/travis-deploy.sh
+  script: ../testing/travis-deploy.sh
   on:
     branch: master
     condition: $CC == gcc && $TRAVIS_OS_NAME == linux # second one is temporary during testing
