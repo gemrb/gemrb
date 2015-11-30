@@ -42,12 +42,14 @@ before_install:
 before_script:
   - cmake --version # too old for MODULE, but only on the linux host
   - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
+  - ls -l testing/*
 
 script:
   - mkdir build && cd build
   - cmake -DCMAKE_INSTALL_PREFIX=iprefix .. && make
   - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
   - make install
+  - cd ..
 
 deploy:
   skip_cleanup: true
