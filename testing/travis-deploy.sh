@@ -13,7 +13,8 @@ else
   exit 13
 fi
 
-version=$(git describe) || exit 14
+# there are no tags, so improvise
+version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
 file=gemrb-$version.tar.bz2
 tar cjf $file iprefix || exit 15
 
