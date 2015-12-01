@@ -6,9 +6,11 @@
 sshid=../id_travissfbot
 if [[ $TRAVIS_OS_NAME == osx ]]; then
   filepath=Apple/OSX
-  ls; ls iprefix
+  tarpath=/Applications/GemRB.app
+  ssh-keyscan -t rsa,dsa -H frs.sourceforge.net 2>&1 | tee -a $HOME/.ssh/known_hosts
 elif [[ $TRAVIS_OS_NAME == linux ]]; then
   filepath=Linux
+  tarpath=iprefix
 else
   echo "Unknown platform, exiting!"
   exit 13
@@ -17,7 +19,7 @@ fi
 # there are no tags, so improvise
 version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
 file=gemrb-$version.tar.bz2
-tar cjf $file iprefix || exit 15
+tar cjf $file $tarpath || exit 15
 
 filepath="$filepath/$file"
 scp -i $sshid $file \
