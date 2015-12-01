@@ -56,7 +56,7 @@ deploy:
   script: ../testing/travis-deploy.sh
   on:
     branch: master
-    condition: $CC == gcc && $TRAVIS_OS_NAME == linux # second one is temporary during testing
+    condition: $CC == gcc
 
 notifications:
   email:

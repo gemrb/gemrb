@@ -6,6 +6,7 @@
 sshid=../id_travissfbot
 if [[ $TRAVIS_OS_NAME == osx ]]; then
   filepath=Apple/OSX
+  ls; ls iprefix
 elif [[ $TRAVIS_OS_NAME == linux ]]; then
   filepath=Linux
 else
