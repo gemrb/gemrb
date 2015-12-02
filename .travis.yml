@@ -46,7 +46,8 @@ before_script:
 
 script:
   - mkdir build && cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=iprefix .. && make
+  - cmake -DCMAKE_INSTALL_PREFIX=iprefix -DSTATIC_LINK=1 ..
+  - make
   - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
   - make install
 
