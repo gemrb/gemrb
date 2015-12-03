@@ -7,6 +7,7 @@ sshid=../id_travissfbot
 if [[ $TRAVIS_OS_NAME == osx ]]; then
   filepath=Apple/OSX
   tarpath=/Applications/GemRB.app
+  # this can be removed in 2016 (the bug was fixed and just needs to be deployed)
   ssh-keyscan -t rsa,dsa -H frs.sourceforge.net 2>&1 | tee -a $HOME/.ssh/known_hosts
 elif [[ $TRAVIS_OS_NAME == linux ]]; then
   filepath=Linux
