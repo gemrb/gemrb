@@ -5855,7 +5855,11 @@ void Actor::CreateStats()
 
 const char* Actor::GetScript(int ScriptIndex) const
 {
-	return Scripts[ScriptIndex]->GetName();
+	if (Scripts[ScriptIndex]) {
+		return Scripts[ScriptIndex]->GetName();
+	} else {
+		return "NONE\0\0\0\0";
+	}
 }
 
 void Actor::SetModal(ieDword newstate, bool force)
