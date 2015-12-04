@@ -226,6 +226,11 @@ def OpenMapWindow ():
 	else:
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
+	# create a button so we can map it do ESC for quit exiting
+	Button = Window.CreateButton (99, 0, 0, 1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	GUICommonWindows.SetSelectionChangeHandler(None)
 	return
 

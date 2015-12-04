@@ -143,6 +143,11 @@ def OpenInventoryWindow ():
 	Label = Window.GetControl (0x1000003c)
 	Label.SetTooltip (4199)
 
+	# create a button so we can map it do ESC for quit exiting
+	Button = Window.CreateButton (999, 0, 0, 1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	# info label, game paused, etc
 	Label = Window.GetControl (0x1000003d)
 	Label.SetTextColor(255, 255, 255)
