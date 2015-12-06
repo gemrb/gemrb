@@ -439,6 +439,7 @@ empty:
 			string = override->ResolveAuxString(strref, Length);
 		} else {
 			string = (char *) malloc(1);
+			Length = 0;
 			string[0] = 0;
 		}
 		type = 0;
