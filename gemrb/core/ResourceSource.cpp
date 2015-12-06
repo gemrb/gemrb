@@ -24,6 +24,7 @@ namespace GemRB {
 
 ResourceSource::ResourceSource(void)
 {
+	description = NULL;
 }
 
 ResourceSource::~ResourceSource(void)

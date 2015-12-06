@@ -55,6 +55,9 @@ Door::Door(TileOverlay* Overlay)
 	overlay = Overlay;
 	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
+	open_wg_index = open_wg_count = closed_wg_index = closed_wg_count = 0;
+	closedIndex = NameStrRef = hp = ac = 0;
+	DiscoveryDiff = LockDifficulty = 0;
 }
 
 Door::~Door(void)
