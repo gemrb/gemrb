@@ -2552,8 +2552,8 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		for (i=0;i<64;i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
-		stream->WriteResRef( actor->Scripts[SCR_AREA]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RESERVED]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_AREA) );
+		stream->WriteResRef( actor->GetScript(SCR_RESERVED) );
 		//unknowns before feats
 		stream->Write( filling,4);
 		//feats
@@ -2651,11 +2651,11 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		stream->Write( &filling,1);
 		// no kit word order magic for iwd2
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
-		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
+		stream->WriteResRef( actor->GetScript(SCR_CLASS) );
+		stream->WriteResRef( actor->GetScript(SCR_RACE) );
+		stream->WriteResRef( actor->GetScript(SCR_GENERAL) );
+		stream->WriteResRef( actor->GetScript(SCR_DEFAULT) );
 	} else {
 		for (i=0;i<21;i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
@@ -2702,11 +2702,11 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword( &tmpDword );
-		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
+		stream->WriteResRef( actor->GetScript(SCR_CLASS) );
+		stream->WriteResRef( actor->GetScript(SCR_RACE) );
+		stream->WriteResRef( actor->GetScript(SCR_GENERAL) );
+		stream->WriteResRef( actor->GetScript(SCR_DEFAULT) );
 	}
 	//now follows the fuzzy part in separate putactor... functions
 	return 0;

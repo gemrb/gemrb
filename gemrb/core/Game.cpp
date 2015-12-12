@@ -2140,7 +2140,9 @@ void Game::dump() const
 		print("%s", map->GetScriptName());
 	}
 	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
-	buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
+	if (Scripts[0]) {
+		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
+	}
 	int hours = GameTime/AI_UPDATE_TIME/300;
 	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime, hours/24, hours%24);
 	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
