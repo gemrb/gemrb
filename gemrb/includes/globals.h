@@ -161,13 +161,12 @@ namespace GemRB {
 #define  GF_HEAL_ON_100PLUS             71 //bg1, bg2, pst
 #define  GF_IN_PARTY_ALLOWS_DEAD	72 //all except bg2
 #define  GF_ZERO_TIMER_IS_VALID         73 // how, not bg2, other unknown
-#define  GF_SKIPUPDATE_HACK             74 // how, not bg2
+#define  GF_SHOP_RECHARGE               74 // all?
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
 #define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
-#define  GF_SHOP_RECHARGE               77 // all?
 
 //update this or bad things can happen
-#define GF_COUNT 78
+#define GF_COUNT 77
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

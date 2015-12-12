@@ -2196,10 +2196,9 @@ static const char *game_flags[GF_COUNT+1]={
 		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
 		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
 		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
-		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
+		"ShopsRechargeItems", //74GF_SHOP_RECHARGE
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
-		"ShopsRechargeItems", //77GF_SHOP_RECHARGE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

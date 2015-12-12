@@ -524,11 +524,6 @@ ShopsRechargeItems = <bool>
 If set, selling limited-use items to shops will refill their charge counter.
 
 
-SkipUpdateHack = <bool>
-- - - - - - - - - - - -
-Determines how the engine treats a very specific script continuation nuance.
-
-
 SmallFog = <bool>
 - - - - - - - - - - -
 Whether fog-of-war maintained in Map::ExploredBitmap is aligned with
