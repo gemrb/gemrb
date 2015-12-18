@@ -1136,6 +1136,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				if (talkee->InParty) {
 					talkee->SetStance(IE_ANI_READY);
 				}
+				talkee->DialogInterrupt();
 			}
 		}
 	}

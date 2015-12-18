@@ -101,11 +101,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	delete dlg;
 	dlg = NULL;
 
-	if (tgt->Type == ST_ACTOR) {
-		Actor *tar = (Actor *) tgt;
-		tar->DialogInterrupt();
-	}
-
 	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
 		return false;
 	}
