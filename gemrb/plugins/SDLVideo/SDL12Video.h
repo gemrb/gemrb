@@ -43,6 +43,8 @@ public:
 	void HideSoftKeyboard();
 	void SetGamma(int brightness, int contrast);
 
+	bool SupportsBAMSprites() { return true; }
+
 private:
 	void SwapBuffers(VideoBuffers&);
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt);

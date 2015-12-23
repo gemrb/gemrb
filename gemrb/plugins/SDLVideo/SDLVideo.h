@@ -90,8 +90,6 @@ public:
 	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
 
-	virtual bool SupportsBAMSprites() { return true; }
-
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* pal = NULL);
