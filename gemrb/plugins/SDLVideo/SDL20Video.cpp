@@ -53,28 +53,22 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	SDL_DestroyWindow(window);
 }
 
-int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* title)
+int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)
 {
-	fullscreen=fs;
-	width = w, height = h;
+	screenSize = s;
+	this->bpp = bpp;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
-	winFlags |= SDL_WINDOW_RESIZABLE;
+	winFlags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
 	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
 	// don't know if Android makes use of this.
 	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
 #endif
-	if (fullscreen) {
-		winFlags |= SDL_WINDOW_FULLSCREEN;
-		//This is needed to remove the status bar on Android/iOS.
-		//since we are in fullscreen this has no effect outside Android/iOS
-		winFlags |= SDL_WINDOW_BORDERLESS;
-	}
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, winFlags);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
 		return GEM_ERROR;
@@ -90,10 +84,8 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	// we set logical size so that platforms where the window can be a diffrent size then requested
 	// function properly. eg iPhone and Android the requested size may be 640x480,
 	// but the window will always be the size of the screen
-	SDL_RenderSetLogicalSize(renderer, width, height);
-
-	SDL_GetRendererOutputSize(renderer, &width, &height);
-	this->bpp = bpp;
+	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
+	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
 	return GEM_OK;
 }

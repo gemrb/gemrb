@@ -47,17 +47,18 @@ int SDL12VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* title)
+int SDL12VideoDriver::CreateDriverDisplay(const Size& s, int b, const char* title)
 {
-	bpp=b;
-	fullscreen=fs;
+	bpp = b;
+	screenSize = s;
+
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
 	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
-	disp = SDL_SetVideoMode( w, h, bpp, flags );
+	disp = SDL_SetVideoMode( s.w, s.h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
 		Log(ERROR, "SDL 1.2 Driver", "%s", SDL_GetError());
@@ -69,10 +70,6 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
-	width = w;
-	height = h;
-
-	SetScreenClip(NULL);
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating Display Surface...");
 
 	return GEM_OK;
@@ -123,8 +120,8 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 
 Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
 {
-	unsigned int Width = r.w ? r.w : width;
-	unsigned int Height = r.h ? r.h : height;
+	unsigned int Width = r.w ? r.w : screenSize.w;
+	unsigned int Height = r.h ? r.h : screenSize.h;
 
 	void* pixels = malloc( Width * Height * 3 );
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,

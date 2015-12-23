@@ -106,7 +106,8 @@ protected:
 	unsigned long lastTime;
 	EventMgr* EvntManager;
 	Region screenClip;
-	int width,height,bpp;
+	Size screenSize;
+	int bpp;
 	bool fullscreen;
 
 	unsigned char Gamma10toGamma22[256];
@@ -114,7 +115,6 @@ protected:
 
 	Color fadeColor;
 
-protected:
 	typedef std::vector<VideoBuffer*> VideoBuffers;
 
 	// collection of all existing video buffers
@@ -133,13 +133,14 @@ private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
 	virtual void SwapBuffers(VideoBuffers&)=0;
 	virtual int PollEvents() = 0;
+	virtual int CreateDriverDisplay(const Size& s, int bpp, const char* title) = 0;
 
 public:
 	Video(void);
 	virtual ~Video(void);
 
 	virtual int Init(void) = 0;
-	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
+	int CreateDisplay(const Size&, int bpp, bool fullscreen, const char* title);
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
@@ -151,8 +152,8 @@ public:
 	void SetDrawingBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
-	virtual short GetWidth() = 0;
-	virtual short GetHeight() = 0;
+	const Size& GetScreenSize() { return screenSize; }
+
 	/** Displays or hides a virtual (software) keyboard*/
 	virtual void ShowSoftKeyboard() = 0;
 	virtual void HideSoftKeyboard() = 0;

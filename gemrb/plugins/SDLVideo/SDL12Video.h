@@ -33,7 +33,7 @@ public:
 	SDL12VideoDriver(void);
 	
 	int Init(void);
-	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
+	int CreateDriverDisplay(const Size&, int bpp, const char* title);
 	Sprite2D* GetScreenshot( Region r );
 
 	bool SetFullscreenMode(bool set);

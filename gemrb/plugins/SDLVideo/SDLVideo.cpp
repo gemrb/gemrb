@@ -1067,7 +1067,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			int y_bot = iter->y2; // exclusive
 
 			if (y_top < 0) y_top = 0;
-			if (y_bot > height) y_bot = height;
+			if (y_bot > screenSize.h) y_bot = screenSize.h;
 			if (y_top >= y_bot) continue; // clipped
 
 			int ledge = iter->left_edge;
@@ -1080,7 +1080,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 			Pixel* line = (Pixel*)(currentBuf->pixels) + y_top * currentBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
-				int py = y + height;
+				int py = y + screenSize.h;
 
 				// TODO: maybe use a 'real' line drawing algorithm to
 				// compute these values faster.
@@ -1089,7 +1089,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
 
 				if (lt < 0) lt = 0;
-				if (rt > width) rt = width;
+				if (rt > screenSize.w) rt = screenSize.w;
 				if (lt >= rt) { line += currentBuf->pitch; continue; } // clipped
 
 

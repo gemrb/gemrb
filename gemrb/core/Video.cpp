@@ -45,7 +45,7 @@ Video::Video(void)
 	}
 
 	// boring inits just to be extra clean
-	width = height = bpp = 0;
+	bpp = 0;
 	fullscreen = false;
 }
 
@@ -56,6 +56,18 @@ Video::~Video(void)
 	for (; it != buffers.end(); ++it) {
 		delete *it;
 	}
+}
+
+int Video::CreateDisplay(const Size& s, int bpp, bool fs, const char* title)
+{
+	int ret = CreateDriverDisplay(s, bpp, title);
+	if (ret == GEM_OK) {
+		SetScreenClip(NULL);
+		if (fs) {
+			ToggleFullscreenMode();
+		}
+	}
+	return ret;
 }
 
 Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
@@ -107,6 +119,7 @@ int Video::SwapBuffers(int fpscap)
 	SwapBuffers(drawingBuffers);
 	drawingBuffers.clear();
 	drawingBuffer = NULL;
+	SetScreenClip(NULL);
 
 	if (fpscap) {
 		unsigned int lim = fpscap/1000;
@@ -125,7 +138,7 @@ int Video::SwapBuffers(int fpscap)
 
 void Video::SetScreenClip(const Region* clip)
 {
-	screenClip = Region(0,0, width, height);
+	screenClip = Region(Point(), screenSize);
 	if (clip) {
 		screenClip = screenClip.Intersect(*clip);
 	}

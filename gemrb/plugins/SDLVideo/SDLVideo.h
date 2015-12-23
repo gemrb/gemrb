@@ -72,13 +72,9 @@ public:
 	virtual ~SDLVideoDriver(void);
 	int Init(void);
 
-	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
 	virtual bool SetFullscreenMode(bool set)=0;
 
 	virtual bool ToggleGrabInput()=0;
-	short GetWidth() { return width; }
-	short GetHeight() { return height; }
-
 	virtual void ShowSoftKeyboard()=0;
 	virtual void HideSoftKeyboard()=0;
 	

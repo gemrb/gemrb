@@ -56,8 +56,7 @@ WindowManager::WindowManager(Video* vid)
 	eventMgr.RegisterHotKeyCallback(cb, GEM_TAB, 0);
 	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
 
-	screen.w = vid->GetWidth();
-	screen.h = vid->GetHeight();
+	screen = Region(Point(), vid->GetScreenSize());
 	// FIXME: technically we should unset the current video event manager...
 	vid->SetEventMgr(&eventMgr);
 
