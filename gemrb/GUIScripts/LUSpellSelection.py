@@ -462,9 +462,10 @@ def ShowSpells ():
 
 	GemRB.SetToken("number", str(SpellsSelectPointsLeft[SpellLevel]))
 	SpellsTextArea.SetText(17250)
-	LevelLabel = SpellsWindow.GetControl (0x10000000)
-	GemRB.SetToken ("SPELLLEVEL", str(SpellLevel+1))
-	LevelLabel.SetText (10345)
+	if SpellsWindow.HasControl (0x10000000):
+		LevelLabel = SpellsWindow.GetControl (0x10000000)
+		GemRB.SetToken ("SPELLLEVEL", str(SpellLevel+1))
+		LevelLabel.SetText (10345)
 
 	return
 
