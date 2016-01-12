@@ -47,7 +47,6 @@ def OpenSaveWindow ():
 	global num_rows, ctrl_offset, sav_version, strs
 
 	if GUICommon.CloseOtherWindow (OpenSaveWindow):
-		GemRB.SetVar ("OtherWindow", -1)
 		CloseSaveWindow ()
 		return
 
@@ -344,6 +343,7 @@ def CloseSaveWindow ():
 	if SaveWindow:
 		SaveWindow.Unload ()
 		SaveWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()
 		GemRB.SetNextScript ("Start")
