@@ -45,6 +45,7 @@ OldPortraitWindow = None #not in BG1 or PST
 OptionsWindow = None
 OldOptionsWindow = None
 HelpTextArea = None
+PauseState = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
@@ -66,7 +67,7 @@ else:
 
 ###################################################
 def CloseOptionsWindow ():
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global GameOptionsWindow, OptionsWindow, PortraitWindow, PauseState
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GameOptionsWindow == None:
@@ -89,19 +90,21 @@ def CloseOptionsWindow ():
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 
+	GemRB.GamePause (PauseState, 3)
 	return
 
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
 
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global GameOptionsWindow, OptionsWindow, PortraitWindow, PauseState
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
 		CloseOptionsWindow()
 		return
 
+	PauseState = GemRB.GamePause (3, 1)
 	GemRB.GamePause (1, 3)
 
 	CommonWindow.CloseContainerWindow ()
