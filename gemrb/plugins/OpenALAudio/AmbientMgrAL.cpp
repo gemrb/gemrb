@@ -20,8 +20,6 @@
 
 #include "AmbientMgrAL.h"
 
-#include "OpenALAudio.h"
-
 #include "Ambient.h"
 #include "Game.h"
 #include "Interface.h"
@@ -35,7 +33,7 @@
 
 using namespace GemRB;
 
-// TODO: remove last dependencies on OpenAL, and then rename and move it?
+// TODO: no more dependency on OpenAL, rename and move it?
 
 // legal nop if already reset
 void AmbientMgrAL::reset()
