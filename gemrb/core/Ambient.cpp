@@ -26,8 +26,8 @@ Ambient::Ambient()
 {
 	name[0] = 0;
 	radius = height = 0;
-	gain = interval = 0;
-	perset = appearance = flags = 0;
+	gain = gainVariance = interval = intervalVariance = 0;
+	pitchVariance = appearance = flags = 0;
 }
 
 Ambient::~Ambient()
@@ -36,6 +36,26 @@ Ambient::~Ambient()
 	while(i--) {
 		free(sounds[i]);
 	}
+}
+
+ieWord Ambient::getGainFinal() const
+{
+	ieWord g = gain;
+	if (gainVariance != 0) {
+		ieWord var = std::min(gainVariance, (ieWord) (gain/2));
+		g += -var + rand() % (2 * var);
+	}
+	return g;
+}
+
+ieDword Ambient::getIntervalFinal() const
+{
+	ieDword i = interval;
+	if (intervalVariance != 0) {
+		ieWord var = std::min(intervalVariance, (ieDword) (interval/2));
+		i += -var + rand() % (2 * var);
+	}
+	return i;
 }
 
 void Ambient::setActive() { flags |= IE_AMBI_ENABLED; }

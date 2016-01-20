@@ -54,13 +54,11 @@ private:
 		void SetVolume(unsigned short volume);
 	private:
 		int stream;
-		std::vector<const char*> soundrefs;
 		const Ambient* ambient;
 		unsigned int lastticks;
-		int enqueued;
-		bool loaded;
+		unsigned int nextdelay;
+		unsigned int nextref;
 
-		void ensureLoaded();
 		bool isHeard(const Point &listener) const;
 		int enqueue();
 	};

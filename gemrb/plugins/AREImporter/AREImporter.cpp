@@ -1182,7 +1182,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ambi->origin.y = tmpWord;
 		str->ReadWord( &ambi->radius );
 		str->ReadWord( &ambi->height );
-		str->Seek( 6, GEM_CURRENT_POS );
+		str->ReadDword( &ambi->pitchVariance );
+		str->ReadWord( &ambi->gainVariance );
 		str->ReadWord( &ambi->gain );
 		for (j = 0;j < MAX_RESCOUNT; j++) {
 			str->ReadResRef( sounds[j] );
@@ -1190,7 +1191,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &tmpWord );
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->interval );
-		str->ReadDword( &ambi->perset );
+		str->ReadDword( &ambi->intervalVariance );
 		// schedule bits
 		str->ReadDword( &ambi->appearance );
 		str->ReadDword( &ambi->flags );
@@ -2108,7 +2109,8 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );
 		stream->WriteWord( &am->radius );
 		stream->WriteWord( &am->height );
-		stream->Write( filling, 6 );
+		stream->WriteDword( &am->pitchVariance );
+		stream->WriteWord( &am->gainVariance );
 		stream->WriteWord( &am->gain );
 		tmpWord = (ieWord) am->sounds.size();
 		int j;
@@ -2121,7 +2123,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );
 		stream->Write( filling, 2 );
 		stream->WriteDword( &am->interval );
-		stream->WriteDword( &am->perset );
+		stream->WriteDword( &am->intervalVariance );
 		stream->WriteDword( &am->appearance );
 		stream->WriteDword( &am->flags );
 		stream->Write( filling, 64);

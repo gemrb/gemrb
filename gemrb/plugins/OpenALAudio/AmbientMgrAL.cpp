@@ -173,25 +173,8 @@ void AmbientMgrAL::UpdateVolume(unsigned short volume)
 
 
 AmbientMgrAL::AmbientSource::AmbientSource(const Ambient *a)
-: stream(-1), ambient(a), lastticks(0), enqueued(0), loaded(false)
+: stream(-1), ambient(a), lastticks(0), nextdelay(0), nextref(0)
 {
-	// TODO: wait random amount of time before beginning?
-}
-
-void AmbientMgrAL::AmbientSource::ensureLoaded()
-{
-	// TODO: implement this after caching in ACMImp is done
-	if (loaded) return;
-
-	unsigned int i=ambient->sounds.size();
-	soundrefs.reserve(i);
-	while(i--) {
-		// TODO: cache this sound
-		// (and skip it if it turns out to be invalid)
-		soundrefs.push_back(ambient->sounds[i]);
-	}
-
-	loaded = true;
 }
 
 AmbientMgrAL::AmbientSource::~AmbientSource()
@@ -205,12 +188,11 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listener, ieDword timeslice)
 {
 	/* if we are out of sounds do nothing */
-	if(!ambient->sounds.size()) {
+	if (ambient->sounds.empty()) {
 		return UINT_MAX;
 	}
-	if (loaded && soundrefs.empty()) return UINT_MAX;
 
-	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&timeslice)) {
+	if ((!(ambient->getFlags() & IE_AMBI_ENABLED)) || (!ambient->getAppearance() & timeslice)) {
 		// disabled
 
 		if (stream >= 0) {
@@ -221,85 +203,85 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		return UINT_MAX;
 	}
 
-	int delay = ambient->getInterval() * 1000;
-	int left = lastticks - ticks + delay;
-	if (0 < left) // we are still waiting
-		return left;
-	if (enqueued > 0) // we have already played that much
-		enqueued += left;
-	if (enqueued < 0)
-		enqueued = 0;
-
-	lastticks = ticks;
-	if (0 == delay) // it's a non-stop ambient, so in any case wait only a sec
-		delay = 1000;
-
-	if (! (ambient->getFlags() & IE_AMBI_MAIN) && !isHeard( listener )) { // we are out of range
-		if (delay > 500) {
-			// release stream if we're inactive for a while
-			core->GetAudioDrv()->ReleaseStream(stream);
-			stream = -1;
+	ieDword interval = ambient->getInterval();
+	if (lastticks == 0) {
+		// initialize
+		lastticks = ticks;
+		if (ambient->getFlags() & IE_AMBI_RANDOM) {
+			nextref = rand() % ambient->sounds.size();
 		}
-		return delay;
+		if (interval > 0) {
+			nextdelay = ambient->getIntervalFinal() * 1000;
+		}
 	}
 
-	ensureLoaded();
-	if (soundrefs.empty()) return UINT_MAX;
+	int left = lastticks - ticks + nextdelay;
+	if (left > 0) {	// keep waiting
+		return left;
+	}
+
+	lastticks = ticks;
+
+	if (ambient->getFlags() & IE_AMBI_RANDOM) {
+		nextref = rand() % ambient->sounds.size();
+	} else if (++nextref >= ambient->sounds.size()) {
+		nextref = 0;
+	}
+
+	if (interval > 0) {
+		nextdelay = ambient->getIntervalFinal() * 1000;
+	} else {
+		// let's wait a second by default if anything goes wrong
+		nextdelay = 1000;
+	}
+
+	if (!(ambient->getFlags() & IE_AMBI_MAIN) && !isHeard(listener)) { // we are out of range
+		// release stream if we're inactive for a while
+		core->GetAudioDrv()->ReleaseStream(stream);
+		stream = -1;
+		return nextdelay;
+	}
+
+	unsigned int v = 100;
+	core->GetDictionary()->Lookup("Volume Ambients", v);
+	v = v * ambient->getGainFinal() / 100;
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		unsigned int v = 100;
-
-		core->GetDictionary()->Lookup("Volume Ambients", v);
-		v *= ambient->getGain();
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), v/100, (ambient->getFlags() & IE_AMBI_POINT), true);
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), v, !(ambient->getFlags() & IE_AMBI_MAIN), true);
 
 		if (stream == -1) {
 			// no streams available...
 			// Try again later
-			return delay;
+			return nextdelay;
 		}
+	} else if (ambient->gainVariance != 0) {
+		core->GetAudioDrv()->SetAmbientStreamVolume(stream, v);
 	}
 
-
-	/* it seems that the following (commented out) is not the purpose of the perset field, as
-	it leads to ambients playing non-stop and queues overfilled */
-/*	int leftNum = ambient -> getPerset(); */
-	int leftNum = 1;
-	int leftMS = 0;
-	if (0 == ambient->getInterval()) {
-		leftNum = 0;
-		leftMS = 1000 - enqueued; // let's have at least 1 second worth queue
+	// queue at least a second's worth of data
+	int queued = 0;
+	while (queued < 1000) {
+		queued += enqueue();
+	}
+	if (interval == 0) { // continuous ambient
+		nextdelay = queued;
 	}
 
-
-	while (0 < leftNum || 0 < leftMS) {
-		int len = enqueue();
-		if (len < 0) break;
-		--leftNum;
-		leftMS -= len;
-		enqueued += len;
-	}
-
-	return delay;
+	return nextdelay;
 }
 
 /* enqueues a random sound and returns its length */
 int AmbientMgrAL::AmbientSource::enqueue()
 {
-	if (soundrefs.empty()) return -1;
 	if (stream < 0) return -1;
-	int index = rand() % soundrefs.size();
-	//print("Playing ambient %p, %s, %d/%ld on stream %d",(void*)this, soundrefs[index], index, soundrefs.size(), stream);
-	return core->GetAudioDrv()->QueueAmbient(stream, soundrefs[index]);
+	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);
+	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref]);
 }
 
 bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
 {
-	int xdist =listener.x - ambient->getOrigin().x;
-	int ydist =listener.y - ambient->getOrigin().y;
-	int dist = (int) sqrt( (double) (xdist * xdist + ydist * ydist) );
-	return dist < ambient->getRadius();
+	return Distance(listener, ambient->getOrigin()) <= ambient->getRadius();
 }
 
 void AmbientMgrAL::AmbientSource::hardStop()
