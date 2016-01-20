@@ -154,7 +154,7 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 	listener.x = (short) xpos;
 	listener.y = (short) ypos;
 
-	ieDword timeslice = 1<<(((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24);
+	ieDword timeslice = SCHEDULE_MASK(core->GetGame()->GameTime);
 
 	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
 		unsigned int newdelay = (*it)->tick(ticks, listener, timeslice);

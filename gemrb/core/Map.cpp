@@ -3224,8 +3224,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 
 	//check schedule
 	ieDword time = core->GetGame()->GameTime;
-	ieDword bit = 1<<((time/AI_UPDATE_TIME)%7200/300);
-	if (!(spawn->appearance & bit)) {
+	if (!Schedule(spawn->appearance, time)) {
 		return;
 	}
 

@@ -197,6 +197,7 @@ GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
+#define SCHEDULE_MASK(time)	(1 << (((time/AI_UPDATE_TIME)+(300/2))%7200/300))
 
 #ifndef WIN32
 inline unsigned long GetTickCount()
