@@ -3856,8 +3856,8 @@ void Actor::IdleActions(bool nonidle)
 
 	//drop the bored one liner is there was no action for some time
 	if (nonidle || !nextBored || InMove() || Immobile()) {
-		//if not in party or bored timeout is disabled, don't bother to set the new time
-		if (InParty && bored_time) {
+		//if bored timeout is disabled, don't bother to set the new time
+		if (bored_time) {
 			nextBored=time+core->Roll(1,30,bored_time);
 		}
 	} else {
