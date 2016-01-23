@@ -38,7 +38,7 @@ Ambient::~Ambient()
 	}
 }
 
-ieWord Ambient::getGainFinal() const
+ieWord Ambient::getTotalGain() const
 {
 	ieWord g = gain;
 	if (gainVariance != 0) {
@@ -48,7 +48,7 @@ ieWord Ambient::getGainFinal() const
 	return g;
 }
 
-ieDword Ambient::getIntervalFinal() const
+ieDword Ambient::getTotalInterval() const
 {
 	ieDword i = interval;
 	if (intervalVariance != 0) {
@@ -56,6 +56,15 @@ ieDword Ambient::getIntervalFinal() const
 		i += -var + rand() % (2 * var);
 	}
 	return i;
+}
+
+ieDword Ambient::getTotalPitch() const
+{
+	ieDword p = 100;
+	if (pitchVariance != 0) {
+		p += -pitchVariance + rand() % (2 * pitchVariance);
+	}
+	return p;
 }
 
 void Ambient::setActive() { flags |= IE_AMBI_ENABLED; }

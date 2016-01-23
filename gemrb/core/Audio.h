@@ -74,6 +74,7 @@ public:
 				ieWord gain, bool point, bool Ambient) = 0;
 	virtual int QueueAmbient(int stream, const char* sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
+	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory, int size, int samplerate) = 0;
 

@@ -722,6 +722,16 @@ void OpenALAudioDriver::SetAmbientStreamVolume(int stream, int volume)
 	checkALError("Unable to set ambient volume", WARNING);
 }
 
+void OpenALAudioDriver::SetAmbientStreamPitch(int stream, int pitch)
+{
+	if (streams[stream].free || !streams[stream].ambient)
+		return;
+
+	ALuint source = streams[stream].Source;
+	alSourcef( source, AL_PITCH, 0.01f * pitch );
+	checkALError("Unable to set ambient pitch", WARNING);
+}
+
 bool OpenALAudioDriver::evictBuffer()
 {
 	// Note: this function assumes the caller holds bufferMutex

@@ -47,7 +47,7 @@ public:
 	ieWord getRadius() const { return radius; }
 	ieWord getHeight() const { return height; }
 	ieWord getGain() const { return gain; }
-	ieWord getGainFinal() const;
+	ieWord getTotalGain() const;
 	char *getSound(ieDword i) const
 	{
 		if(i<sounds.size()) return sounds[i];
@@ -55,7 +55,8 @@ public:
 	}
 	ieDword getInterval() const { return interval; }
 	ieDword getIntervalVariance() const { return intervalVariance; }
-	ieDword getIntervalFinal() const;
+	ieDword getTotalInterval() const;
+	ieDword getTotalPitch() const;
 	ieDword getAppearance() const { return appearance; }
 	ieDword getFlags() const { return flags; }
 	

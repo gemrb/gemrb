@@ -173,7 +173,7 @@ void AmbientMgrAL::UpdateVolume(unsigned short volume)
 
 
 AmbientMgrAL::AmbientSource::AmbientSource(const Ambient *a)
-: stream(-1), ambient(a), lastticks(0), nextdelay(0), nextref(0)
+: stream(-1), ambient(a), lastticks(0), nextdelay(0), nextref(0), totalgain(0)
 {
 }
 
@@ -211,7 +211,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 			nextref = rand() % ambient->sounds.size();
 		}
 		if (interval > 0) {
-			nextdelay = ambient->getIntervalFinal() * 1000;
+			nextdelay = ambient->getTotalInterval() * 1000;
 		}
 	}
 
@@ -229,7 +229,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 	}
 
 	if (interval > 0) {
-		nextdelay = ambient->getIntervalFinal() * 1000;
+		nextdelay = ambient->getTotalInterval() * 1000;
 	} else {
 		// let's wait a second by default if anything goes wrong
 		nextdelay = 1000;
@@ -244,11 +244,11 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 
 	unsigned int v = 100;
 	core->GetDictionary()->Lookup("Volume Ambients", v);
-	v = v * ambient->getGainFinal() / 100;
+	totalgain = ambient->getTotalGain();
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), v, !(ambient->getFlags() & IE_AMBI_MAIN), true);
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, 0, v * totalgain / 100, !(ambient->getFlags() & IE_AMBI_MAIN), true);
 
 		if (stream == -1) {
 			// no streams available...
@@ -256,16 +256,16 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 			return nextdelay;
 		}
 	} else if (ambient->gainVariance != 0) {
-		core->GetAudioDrv()->SetAmbientStreamVolume(stream, v);
+		SetVolume(v);
+	}
+	if (ambient->pitchVariance != 0) {
+		core->GetAudioDrv()->SetAmbientStreamPitch(stream, ambient->getTotalPitch());
 	}
 
-	// queue at least a second's worth of data
-	int queued = 0;
-	while (queued < 1000) {
-		queued += enqueue();
-	}
+	int length = enqueue();
+
 	if (interval == 0) { // continuous ambient
-		nextdelay = queued;
+		nextdelay = length;
 	}
 
 	return nextdelay;
@@ -295,12 +295,10 @@ void AmbientMgrAL::AmbientSource::hardStop()
 /* sets the overall volume (in percent)
  * the final volume is affected by the specific ambient gain
  */
-void AmbientMgrAL::AmbientSource::SetVolume(unsigned short volume)
+void AmbientMgrAL::AmbientSource::SetVolume(unsigned short vol)
 {
 	if (stream >= 0) {
-		int v = volume;
-		v *= ambient->getGain();
-		v /= 100;
+		int v = vol * totalgain / 100;
 		core->GetAudioDrv()->SetAmbientStreamVolume(stream, v);
 	}
 }
