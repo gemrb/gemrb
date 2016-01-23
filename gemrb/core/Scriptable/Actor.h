@@ -402,6 +402,8 @@ private:
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	void ApplyModal(ieResRef modalSpell);
+	/** for IE_EXISTANCEDELAY */
+	void PlayExistenceSounds();
 public:
 	Actor(void);
 	~Actor(void);

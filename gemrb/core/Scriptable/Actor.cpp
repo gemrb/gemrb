@@ -55,6 +55,7 @@
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
+#include "StringMgr.h"
 
 namespace GemRB {
 
@@ -3821,9 +3822,7 @@ void Actor::CommandActor(Action* action)
 //Generates an idle action (party banter, area comment, bored)
 void Actor::IdleActions(bool nonidle)
 {
-	//only party [N]PCs talk
-	if (!InParty) return;
-	//if they got an area
+	//do we have an area
 	Map *map = GetCurrentArea();
 	if (!map) return;
 	//and not in panic
@@ -3834,11 +3833,18 @@ void Actor::IdleActions(bool nonidle)
 	if (game->CombatCounter) return;
 	//and they are on the current area
 	if (map!=game->GetCurrentArea()) return;
+	//don't mess with cutscenes
+	if (core->InCutSceneMode()) return;
+
+	//only party [N]PCs talk but others might play existence sounds
+	if (!InParty) {
+		PlayExistenceSounds();
+		return;
+	}
 
 	ieDword time = game->GameTime;
-
-	//don't mess with cutscenes, dialogue, or when scripts disabled us
-	if (core->InCutSceneMode() || game->BanterBlockFlag || (game->BanterBlockTime>time) ) {
+	//did scripts disable us
+	if (game->BanterBlockFlag || (game->BanterBlockTime>time) ) {
 		return;
 	}
 
@@ -3866,6 +3872,49 @@ void Actor::IdleActions(bool nonidle)
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
 			VerbalConstant(VB_BORED, 1);
+		}
+	}
+}
+
+void Actor::PlayExistenceSounds()
+{
+	//only non-joinable chars can have existence sounds
+	if (Persistent()) return;
+
+	Game *game = core->GetGame();
+	ieDword time = game->GameTime;
+
+	if (nextComment < time) {
+		ieDword delay = Modified[IE_EXISTANCEDELAY];
+		if (delay != (ieDword) -1) {
+			Audio *audio = core->GetAudioDrv();
+			int xpos, ypos;
+			audio->GetListenerPos(xpos, ypos);
+			Point listener(xpos, ypos);
+			if (nextComment && !Immobile() && Distance(Pos, listener) <= (unsigned int) VOODOO_SHOUT_RANGE) {
+				//setup as an ambient
+				int count = 5;
+				while (count > 0 && GetVerbalConstant(VB_EXISTENCE+count-1) == (ieStrRef) -1) {
+					count--;
+				}
+				if (count > 0) {
+					ieStrRef strref = GetVerbalConstant(VB_EXISTENCE+RAND(0, count-1));
+					if (strref != (ieStrRef) -1) {
+						StringBlock sb = core->strings->GetStringBlock(strref);
+						unsigned int vol = 100;
+						core->GetDictionary()->Lookup("Volume Ambients", vol);
+						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
+						if (stream != -1) {
+							audio->QueueAmbient(stream, sb.Sound);
+							audio->ReleaseStream(stream, false);
+						}
+					}
+				}
+			}
+			if (delay == 0) {
+				delay = 100;
+			}
+			nextComment = time + RAND(delay/2, delay + delay/2) * 10; // timing might be off
 		}
 	}
 }
