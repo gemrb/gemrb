@@ -6567,6 +6567,7 @@ void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)
 //IDS stats.
 //in this version, if a stat is set to 0, it won't change
 //it will alter only the main IDS stats
+// (unused in the originals, but if that changes, make sure all ids files are handled; eg. see iwd2 script.2da)
 void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
