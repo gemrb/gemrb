@@ -156,13 +156,13 @@ def UpdateReformWindow ():
 		if i+1 not in removable_pcs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			continue
 
 	for i in removable_pcs:
-		if i not in PortraitButtons:
+		index = removable_pcs.index(i)
+		if index not in PortraitButtons:
 			continue # for saved games with higher party count than the current setup supports
-		Button = PortraitButtons[removable_pcs.index(i)]
-		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
+		Button = PortraitButtons[index]
+		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
 		pic = GemRB.GetPlayerPortrait (i, 1)
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
