@@ -25,7 +25,7 @@ namespace GemRB {
 Ambient::Ambient()
 {
 	name[0] = 0;
-	radius = height = 0;
+	radius = 0;
 	gain = gainVariance = interval = intervalVariance = 0;
 	pitchVariance = appearance = flags = 0;
 }

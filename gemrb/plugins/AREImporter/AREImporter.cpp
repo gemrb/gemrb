@@ -1175,7 +1175,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &tmpWord );
 		ambi->origin.y = tmpWord;
 		str->ReadWord( &ambi->radius );
-		str->ReadWord( &ambi->height );
+		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->pitchVariance );
 		str->ReadWord( &ambi->gainVariance );
 		str->ReadWord( &ambi->gain );
@@ -2102,7 +2102,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 		tmpWord = (ieWord) am->origin.y;
 		stream->WriteWord( &tmpWord );
 		stream->WriteWord( &am->radius );
-		stream->WriteWord( &am->height );
+		stream->Write( filling, 2 );
 		stream->WriteDword( &am->pitchVariance );
 		stream->WriteWord( &am->gainVariance );
 		stream->WriteWord( &am->gain );

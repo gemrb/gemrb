@@ -45,7 +45,6 @@ public:
 	const char *getName() const { return name; }
 	const Point &getOrigin() const { return origin; }
 	ieWord getRadius() const { return radius; }
-	ieWord getHeight() const { return height; }
 	ieWord getGain() const { return gain; }
 	ieWord getTotalGain() const;
 	char *getSound(ieDword i) const
@@ -68,7 +67,6 @@ public:
 	Point origin;
 	std::vector<char *> sounds;
 	ieWord radius;
-	ieWord height;
 	ieWord gain;	// percent
 	ieWord gainVariance;
 	ieDword interval;	// no pauses if zero
