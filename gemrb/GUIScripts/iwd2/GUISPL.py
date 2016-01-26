@@ -58,10 +58,6 @@ def OpenSpellBookWindow ():
 
 		SpellBookWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return

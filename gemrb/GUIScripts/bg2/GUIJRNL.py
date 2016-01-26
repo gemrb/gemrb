@@ -57,10 +57,6 @@ def OpenJournalWindow ():
 
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 		
@@ -70,13 +66,6 @@ def OpenJournalWindow ():
 
 	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenJournalWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# prev. chapter
 	Button = JournalWindow.GetControl (3)
@@ -132,8 +121,6 @@ def OpenJournalWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
 	
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
 	Window.Focus()
 	return
 

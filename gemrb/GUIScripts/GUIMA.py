@@ -59,10 +59,6 @@ def RevealMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
@@ -91,10 +87,6 @@ def ShowMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 		return
 

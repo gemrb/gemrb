@@ -76,21 +76,11 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")

@@ -62,20 +62,9 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
+
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0, "GUIMG")
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMageWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
 	SetupMageWindow()

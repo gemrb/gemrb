@@ -65,24 +65,12 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.UpdatePortraitWindow ()
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
-	# saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# dual class
 	Button = Window.GetControl (0)

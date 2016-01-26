@@ -53,11 +53,8 @@ def OpenOptionsWindow ():
 	global OptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		if OptionsWindow:
-			OptionsWindow.Unload ()
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
-		OptionsWindow = None
 		
 		return
 

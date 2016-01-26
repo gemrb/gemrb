@@ -74,18 +74,9 @@ def CloseOptionsWindow ():
 
 	if GameOptionsWindow:
 		GameOptionsWindow.Unload ()
-	if OptionsWindow:
-		OptionsWindow.Unload ()
-	if PortraitWindow:
-		PortraitWindow.Unload ()
 
 	GameOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GUICommonWindows.OptionsWindow = OldOptionsWindow
-	OldOptionsWindow = None
-	if not GameCheck.IsBG1():
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
 
 	return
 
@@ -108,17 +99,6 @@ def OpenOptionsWindow ():
 
 	GameOptionsWindow = Window = GemRB.LoadWindow (2, "GUIOPT")
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
-
-	if OldOptionsWindow == None:
-		# OptionsWindow is the leftmost menu bar window present in most of the games
-		OldOptionsWindow = GUICommonWindows.OptionsWindow
-		OptionsWindow = GemRB.LoadWindow (0)
-		GUICommonWindows.MarkMenuButton (OptionsWindow)
-		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
-		if not GameCheck.IsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
-			#saving the original portrait window
-			OldPortraitWindow = GUICommonWindows.PortraitWindow
-			PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# Return to Game
 	Button = Window.GetControl (11)

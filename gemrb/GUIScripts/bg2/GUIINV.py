@@ -81,13 +81,6 @@ def OpenInventoryWindow ():
 	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)

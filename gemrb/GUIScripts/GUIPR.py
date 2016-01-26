@@ -54,23 +54,11 @@ def OpenPriestWindow ():
 
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
 
 		return
 
 	PriestWindow = Window = GemRB.LoadWindow (2, "GUIPR")
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenPriestWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
