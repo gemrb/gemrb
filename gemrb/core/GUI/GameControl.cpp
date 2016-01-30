@@ -619,6 +619,9 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			}
 			break;
 		case GEM_ALT:
+#ifdef ANDROID
+		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
+#endif
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			break;
 		case GEM_TAB:
@@ -681,15 +684,6 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			SelectActor(pc, true);
 			SelectActor(pc+1, true);
 			break;
-#ifdef ANDROID
-		case 'o':
-		case 'p':
-			Control::OnKeyPress(Key, 0);
-			break;
-		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
-			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			break;
-#endif
 		default:
 			if (!core->GetKeyMap()->ResolveKey(Key, 0)) {
 				core->GetGame()->SetHotKey(toupper(Key));
