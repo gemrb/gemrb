@@ -240,7 +240,7 @@ void Window::DispatchMouseOver(View* target, const Point& p)
 
 void Window::DispatchMouseDown(View* target, const Point& p, unsigned short button, unsigned short mod)
 {
-	if (button == GEM_MB_ACTION && !(flags&MousePassthrough)) {
+	if (button == GEM_MB_ACTION) {
 		Focus();
 	}
 
@@ -280,10 +280,6 @@ bool Window::DispatchEvent(const Event& event)
 		}
 
 		View* target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
-
-		if (target == NULL && flags&MousePassthrough) {
-			return false; // do *not* absorb the event, pass it along
-		}
 
 		// special event handling
 		switch (event.type) {

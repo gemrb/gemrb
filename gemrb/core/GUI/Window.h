@@ -57,8 +57,7 @@ public:
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
 		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
-		DestroyOnClose = 4,		// window will be hidden and sent to the back when claosed instead of deleted
-		MousePassthrough = 8,	// window will not block mouse events (tho its controlls still do); would make dragging via mouse impossible
+		DestroyOnClose = 4		// window will be hidden and sent to the back when claosed instead of deleted
 	};
 
 protected:
