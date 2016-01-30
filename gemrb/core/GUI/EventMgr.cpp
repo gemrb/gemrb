@@ -30,19 +30,12 @@ unsigned long EventMgr::RKDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
+EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 EventMgr::EventMgr(void)
 {
 	dc_time = 0;
 	rk_flags = GEM_RK_DISABLE;
-}
-
-EventMgr::~EventMgr()
-{
-	std::vector<EventCallback*>::iterator it = tapsToDelete.begin();
-	for (; it != tapsToDelete.end(); ++it) {
-		delete *it;
-	}
 }
 
 unsigned long EventMgr::GetRKDelay()
@@ -69,33 +62,20 @@ bool EventMgr::MouseDown() const
 	return mouseButtonFlags.any();
 }
 
-void EventMgr::AddEventTap(EventCallback* cb, Event::EventType type)
-{
-	if (type == static_cast<Event::EventType>(-1)) {
-		int t = Event::MouseMove;
-		for (; t <= Event::KeyDown; t++) {
-			taps.insert(std::make_pair(static_cast<Event::EventType>(t), cb));
-		}
-	} else {
-		taps.insert(std::make_pair(type, cb));
-	}
-	tapsToDelete.push_back(cb);
-}
-
 void EventMgr::DispatchEvent(Event& e)
 {
 	// TODO: for mouse events: check double click delay and set if repeat
 	// TODO: for key events: check repeat key delay and set if repeat
 
 	// first check for hot key listeners
-	if (IS_KEY_EVENT(e)) {
+	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
 		int flags = e.mod << 16;
 		flags |= e.keyboard.keycode;
 
 		std::map<int, EventCallback*>::const_iterator hit;
 		hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
-			EventCallback* cb = (*hit).second;
+			EventCallback* cb = hit->second;
 			if ((*cb)(e)) {
 				return;
 			}
@@ -107,14 +87,12 @@ void EventMgr::DispatchEvent(Event& e)
 	}
 
 	// no hot keys or their listeners refused the event...
-	std::pair<EventTaps::iterator, EventTaps::iterator> range;
-	range = taps.equal_range(e.type);
-
-	EventTaps::iterator it = range.first;
-	for (; it != range.second; ++it) {
-		EventCallback* cb = it->second;
-		if ((*cb)(e)) {
-			break; // this handler absorbed the event
+	EventTaps::iterator it = Taps.begin();
+	for (; it != Taps.end(); ++it) {
+		if (it->first & e.EventMaskFromType(e.type)) {
+			// all matching taps get a copy of the event
+			EventCallback* cb = it->second.get();
+			(*cb)(e);
 		}
 	}
 }
@@ -127,6 +105,13 @@ bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short 
 	flags |= key;
 	HotKeys.insert(std::make_pair(flags, cb));
 	return true;
+}
+
+size_t EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)
+{
+	Taps.push_back(std::make_pair(mask, cb));
+	// return the "id" of the inserted tap so it could be unregistered later on
+	return Taps.size() - 1;
 }
 
 inline Event InitializeEvent(int mod)

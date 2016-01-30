@@ -129,6 +129,26 @@ struct GEM_EXPORT Event {
 		// leaving off types for unused events
 	};
 
+	enum EventTypeMask {
+		NoEventsMask = 0U,
+
+		MouseMoveMask = 1 << MouseMove,
+		MouseUpMask = 1 << MouseUp,
+		MouseDownMask = 1 << MouseDown,
+		MouseScrollMask = 1 << MouseScroll,
+
+		AllMouseMask = MouseMoveMask | MouseUpMask | MouseDownMask | MouseScrollMask,
+
+		KeyUpMask = 1 << KeyUp,
+		KeyDownMask = 1 << KeyDown,
+
+		AllKeyMask = KeyUpMask | KeyDownMask,
+
+		AllEventsMask = 0xffffffffU
+	};
+
+	static EventTypeMask EventMaskFromType (EventType type ) { return static_cast<EventTypeMask>(1U << type); };
+
 	union {
 		MouseEvent mouse;
 		//ControllerEvent; unused currently
@@ -142,9 +162,6 @@ struct GEM_EXPORT Event {
 	unsigned short repeat; // number of times this event has been repeated (within the time interval)
 	bool isScreen; // event coresponsds to location on screen
 };
-
-#define IS_KEY_EVENT(e) \
-(e.type == Event::KeyUp || e.type == Event::KeyDown)
 
 /**
  * @class EventMgr
@@ -164,18 +181,17 @@ public:
 	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
 
+	// TODO/FIXME: need to be able to unregister hotkeys/monitors
 	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
-	// TODO/FIXME: need to be able to unregister hotkeys 
+	static size_t RegisterEventMonitor(EventCallback*, Event::EventTypeMask mask = Event::AllEventsMask);
 
 private:
-	typedef std::multimap<Event::EventType, EventCallback*> EventTaps;
-	EventTaps taps;
-	// we may register the same tap multiple times. should only delete once
-	std::vector<EventCallback*> tapsToDelete;
-
 	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
+	typedef std::vector< std::pair<Event::EventTypeMask, Holder<EventCallback> > > EventTaps;
+
+	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
 
 	unsigned long dc_time;
@@ -185,9 +201,7 @@ private:
 
 public:
 	EventMgr(void);
-	~EventMgr(void);
 
-	void AddEventTap(EventCallback* cb, Event::EventType = static_cast<Event::EventType>(-1));
 	void DispatchEvent(Event& e);
 
 	unsigned long GetRKDelay();

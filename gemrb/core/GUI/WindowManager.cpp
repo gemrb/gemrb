@@ -50,7 +50,7 @@ WindowManager::WindowManager(Video* vid)
 	modalWin = NULL;
 
 	modalShadow = ShadowNone;
-	eventMgr.AddEventTap(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
+	eventMgr.RegisterEventMonitor(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 
 	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
 	eventMgr.RegisterHotKeyCallback(cb, GEM_TAB, 0);
