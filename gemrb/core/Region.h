@@ -124,6 +124,18 @@ public:
 		}
 		return bounds;
 	}
+
+	static Region RegionFromPoints(const Point& p1, const Point& p2) {
+		int dx = p2.x - p1.x;
+		int dy = p2.y - p1.y;
+
+		int x = (dx < 0) ? p2.x : p1.x;
+		int y = (dy < 0) ? p2.y : p1.y;
+		int w = (dx < 0) ? -dx : dx;
+		int h = (dy < 0) ? -dy : dy;
+
+		return Region(x, y, w, h);
+	}
 };
 
 typedef std::vector<Region> Regions;
