@@ -74,7 +74,6 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 
 GameControl::GameControl(const Region& frame)
 	: Control(frame),
-	windowGroupCounts(),
 	ClickPoint()
 {
 	ControlType = IE_GUI_GAMECONTROL;
@@ -102,12 +101,11 @@ GameControl::GameControl(const Region& frame)
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	AlwaysRun = false; //make this a game flag if you wish
-	ieDword tmp=0;
 
 	ClearMouseState();
 	ResetTargetMode();
 
-	tmp=0;
+	ieDword tmp=0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;

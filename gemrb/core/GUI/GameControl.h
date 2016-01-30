@@ -79,19 +79,7 @@ static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
  */
 
 class GEM_EXPORT GameControl : public Control {
-	enum WINDOW_GROUP {
-		WINDOW_GROUP_LEFT,
-		WINDOW_GROUP_BOTTOM,
-		WINDOW_GROUP_RIGHT,
-		WINDOW_GROUP_TOP,
-		WINDOW_GROUP_COUNT
-	};
-	enum WINDOW_RESIZE_OPERATION {
-		WINDOW_EXPAND = -1,
-		WINDOW_CONTRACT = 1
-	};
 private:
-	int windowGroupCounts[WINDOW_GROUP_COUNT];
 	ieDword lastActorID;
 	ieDword trackerID;
 	ieDword distance;  //tracking distance
