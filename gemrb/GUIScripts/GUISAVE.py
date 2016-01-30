@@ -195,7 +195,7 @@ def ConfirmedSaveGame():
 	OpenConfirmWindow ()
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
-	CloseSaveWindow ()
+	OpenSaveWindow ()
 	GemRB.HideGUI ()
 
 	if Pos < len(Games):
