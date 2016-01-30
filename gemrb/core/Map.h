@@ -405,6 +405,7 @@ public:
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(const Point &p, int flags);
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
+	int GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags);
 	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
@@ -415,8 +416,7 @@ public:
 	bool HasActor(Actor *actor);
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
-	//returns actors in rect (onlyparty could be more sophisticated)
-	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
+
 	int GetActorCount(bool any) const;
 	//fix actors position if required
 	void JumpActors(bool jump);

@@ -218,7 +218,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen)
 		rgn.y = points[i].y*12;
 		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_ACTOR;
 		if (tmp) {
-			int ac = area->GetActorInRect(ab, rgn, false);
+			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			while(ac--) {
 				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
 					continue;

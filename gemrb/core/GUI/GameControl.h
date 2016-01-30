@@ -34,6 +34,8 @@
 #include "Dialog.h"
 #include "Map.h"
 
+#include <set>
+
 namespace GemRB {
 
 class GameControl;
@@ -83,12 +85,12 @@ private:
 	ieDword lastActorID;
 	ieDword trackerID;
 	ieDword distance;  //tracking distance
-	std::vector< Actor*> highlighted;
-	bool DrawSelectionRect;
-	bool FormationRotation;
-	bool MouseIsDown;
-	bool DoubleClick;
-	Region SelectionRect;
+	std::set<Actor*> highlighted;
+
+	bool isSelectionRect;
+	bool isFormationRotation;
+	bool isDoubleClick;
+
 	Point ClickPoint;
 	// mouse coordinates represented in game coordinates
 	Point gameMousePos;
@@ -131,7 +133,7 @@ public:
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
-	void CalculateSelection(const Point &p);
+	Region SelectionRect();
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
@@ -211,6 +213,7 @@ public:
 	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
+	void MakeSelection(const Region&, bool extend = false);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	Point GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p);
 	/** calls MoveToPoint or RunToPoint */

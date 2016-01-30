@@ -1908,26 +1908,18 @@ Actor* Map::GetActorByScriptName(const char *name)
 	return NULL;
 }
 
-int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
+int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-//use this function only for party?
-		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
+		if (!actor->ValidTarget(excludeFlags))
 			continue;
-		}
-		// this is called by non-selection code..
-		if (onlyparty && !actor->ValidTarget(GA_SELECT))
+		if (!rgn.PointInside(actor->Pos))
 			continue;
-		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
-			continue;
-		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
-			continue;
-		if ((actor->Pos.x>rgn.x+rgn.w) || (actor->Pos.y>rgn.y+rgn.h) )
-			continue;
+
 		actorlist[count++] = actor;
 	}
 	actorlist = ( Actor * * ) realloc( actorlist, count * sizeof( Actor * ) );

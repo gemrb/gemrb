@@ -203,10 +203,9 @@ Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& sr
 
 void GameControl::ClearMouseState()
 {
-	MouseIsDown = false;
-	DrawSelectionRect = false;
-	FormationRotation = false;
-	DoubleClick = false;
+	isSelectionRect = false;
+	isFormationRotation = false;
+	isDoubleClick = false;
 }
 
 // generate an action to do the actual movement
@@ -241,7 +240,7 @@ bool GameControl::ShouldRun(Actor *actor) const
 	if (speed != actor->GetStat(IE_MOVEMENTRATE)) {
 		return false;
 	}
-	return (DoubleClick || AlwaysRun);
+	return (isDoubleClick || AlwaysRun);
 }
 
 GameControl::~GameControl(void)
@@ -505,13 +504,12 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	Video* video = core->GetVideoDriver();
 	// Draw selection rect
-	if (DrawSelectionRect) {
-		CalculateSelection( gameMousePos );
-		video->DrawRect( SelectionRect, ColorGreen, false );
+	if (isSelectionRect) {
+		video->DrawRect( SelectionRect(), ColorGreen, false );
 	}
 
 	// draw reticles
-	if (FormationRotation) {
+	if (isFormationRotation) {
 		Actor *actor;
 		int max = game->GetPartySize(false);
 		// we only care about PCs and not summons for this. the summons will be included in
@@ -1214,13 +1212,11 @@ void GameControl::OnMouseOver(const Point& mp)
 
 	gameMousePos = mp + vpOrigin;
 
-	if (FormationRotation) {
+	if (isFormationRotation) {
 		return;
 	}
-	Game* game = core->GetGame();
-	if (!game) return;
-	Map* area = game->GetCurrentArea( );
-	if (!area) return;
+
+	Map* area = core->GetGame()->GetCurrentArea();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
@@ -1254,7 +1250,7 @@ void GameControl::OnMouseOver(const Point& mp)
 	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
 
-	if (!DrawSelectionRect) {
+	if (!isSelectionRect) {
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
 		}
@@ -1393,6 +1389,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 #undef SCROLL_AREA_WIDTH
 
 	const Point& mp = ConvertPointFromScreen(e.mouse.Pos());
+	gameMousePos = mp + vpOrigin;
 
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
@@ -1802,30 +1799,26 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		} else {
-			FormationRotation = true;
+			isFormationRotation = true;
 		}
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
-		DoubleClick = true;
+		isDoubleClick = true;
 	case GEM_MB_ACTION:
 		// PST uses alt + left click for formation rotation
 		// is there any harm in this being true in all games?
 		if (Mod&GEM_MOD_ALT) {
-			FormationRotation = true;
+			isFormationRotation = true;
 		} else {
-			MouseIsDown = true;
-			SelectionRect.x = ClickPoint.x;
-			SelectionRect.y = ClickPoint.y;
-			SelectionRect.w = 0;
-			SelectionRect.h = 0;
+			isSelectionRect = true;
 		}
 		break;
 	}
 	if (core->GetGame()->selected.size() <= 1
 		|| target_mode != TARGET_MODE_NONE) {
-		FormationRotation = false;
+		isFormationRotation = false;
 	}
-	if (FormationRotation) {
+	if (isFormationRotation) {
 		lastCursor = IE_CURSOR_USE;
 	}
 }
@@ -1833,7 +1826,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 /** Mouse Button Up */
 void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
 {
-	MouseIsDown = false;
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
@@ -1847,27 +1839,15 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	if (!area) return;
 
 	unsigned int i = 0;
-	if (DrawSelectionRect) {
-		Actor** ab;
-		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
-		if (count != 0) {
-			for (i = 0; i < highlighted.size(); i++)
-				highlighted[i]->SetOver( false );
-			highlighted.clear();
-			game->SelectActor( NULL, false, SELECT_NORMAL );
-			for (i = 0; i < count; i++) {
-				// FIXME: should call handler only once
-				game->SelectActor( ab[i], true, SELECT_NORMAL );
-			}
-		}
-		free( ab );
-		DrawSelectionRect = false;
+	if (isSelectionRect) {
+		MakeSelection(SelectionRect());
+		isSelectionRect = false;
 		return;
 	}
 
 	Actor* actor = NULL;
-	bool doMove = FormationRotation;
-	if (!FormationRotation) {
+	bool doMove = isFormationRotation;
+	if (!isFormationRotation) {
 		//hidden actors are not selectable by clicking on them unless they're party members
 		actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
 		if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
@@ -1966,7 +1946,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 		//party formation movement
 		Point src;
-		if (FormationRotation) {
+		if (isFormationRotation) {
 			p = ClickPoint;
 			src = gameMousePos;
 		} else {
@@ -1984,7 +1964,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 			}
 			CreateMovement(actor, move);
 		}
-		if (DoubleClick) MoveViewportTo(p, true);
+		if (isDoubleClick) MoveViewportTo(p, true);
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
@@ -2001,7 +1981,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 		PerformActionOn(actor);
 	}
-	FormationRotation = false;
+	isFormationRotation = false;
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
@@ -2137,54 +2117,39 @@ void GameControl::UpdateTargetMode() {
 	SetTargetMode(target_mode);
 }
 
-void GameControl::CalculateSelection(const Point &p)
+Region GameControl::SelectionRect()
 {
-	unsigned int i;
-
-	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea( );
-	if (DrawSelectionRect) {
-		if (p.x < ClickPoint.x) {
-			SelectionRect.w = ClickPoint.x - p.x;
-			SelectionRect.x = p.x;
-		} else {
-			SelectionRect.x = ClickPoint.x;
-			SelectionRect.w = p.x - ClickPoint.x;
-		}
-		if (p.y < ClickPoint.y) {
-			SelectionRect.h = ClickPoint.y - p.y;
-			SelectionRect.y = p.y;
-		} else {
-			SelectionRect.y = ClickPoint.y;
-			SelectionRect.h = p.y - ClickPoint.y;
-		}
-		Actor** ab;
-		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
-		for (i = 0; i < highlighted.size(); i++)
-			highlighted[i]->SetOver( false );
-		highlighted.clear();
-		if (count != 0) {
-			for (i = 0; i < count; i++) {
-				ab[i]->SetOver( true );
-				highlighted.push_back( ab[i] );
-			}
-		}
-		free( ab );
-	} else {
-		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD | GA_NO_ENEMY);
-		SetLastActor( actor, area->GetActorByGlobalID(lastActorID) );
-/*
-		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		if (lastActor)
-			lastActor->SetOver( false );
-		if (!actor) {
-			lastActorID = 0;
-		} else {
-			lastActorID = actor->globalID;
-			actor->SetOver( true );
-		}
-*/
+	if (isSelectionRect) {
+		return Region::RegionFromPoints(gameMousePos, ClickPoint);
 	}
+	return Region();
+}
+
+void GameControl::MakeSelection(const Region &r, bool extend)
+{
+	Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+
+	if (!extend) {
+		std::set<Actor*>::iterator it = highlighted.begin();
+		for (; it != highlighted.end(); ++it) {
+			Actor* act = *it;
+			act->SetOver(false);
+		}
+
+		highlighted.clear();
+		game->SelectActor( NULL, false, SELECT_NORMAL );
+	}
+
+	Actor** ab;
+	int count = area->GetActorsInRect( ab, r, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY );
+	for (int i = 0; i < count; i++) {
+		if (highlighted.insert( ab[i] ).second == true) {
+			ab[i]->SetOver( true );
+			game->SelectActor( ab[i], true, SELECT_NORMAL );
+		}
+	}
+	free( ab );
 }
 
 void GameControl::SetLastActor(Actor *actor, Actor *prevActor)
