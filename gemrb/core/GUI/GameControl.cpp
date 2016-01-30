@@ -117,6 +117,9 @@ GameControl::GameControl(const Region& frame)
 	DisplayText = NULL;
 	DisplayTextTime = 0;
 	updateVPTimer = true;
+
+	EventMgr::EventCallback* cb = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::OnGlobalMouseMove);
+	EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
 }
 
 //TODO:
@@ -1231,34 +1234,8 @@ void GameControl::OnMouseOver(const Point& mp)
 		return;
 	}
 
-	int mousescrollspd = core->GetMouseScrollSpeed();
-
-#define SCROLL_AREA_WIDTH 5
-	if (mp.x <= SCROLL_AREA_WIDTH)
-		moveX = -mousescrollspd;
-	else {
-		if (mp.x >= ( core->Width - SCROLL_AREA_WIDTH ))
-			moveX = mousescrollspd;
-		else
-			moveX = 0;
-	}
-	if (mp.y <= SCROLL_AREA_WIDTH)
-		moveY = -mousescrollspd;
-	else {
-		if (mp.y >= ( core->Height - SCROLL_AREA_WIDTH ))
-			moveY = mousescrollspd;
-		else
-			moveY = 0;
-	}
-#undef SCROLL_AREA_WIDTH
-
 	gameMousePos = mp + vpOrigin;
 
-	if (MouseIsDown && ( !DrawSelectionRect )) {
-		if (( abs( gameMousePos.x - ClickPoint.x ) > 5 ) || ( abs( gameMousePos.y - ClickPoint.y ) > 5 )) {
-			DrawSelectionRect = true;
-		}
-	}
 	if (FormationRotation) {
 		return;
 	}
@@ -1425,6 +1402,38 @@ end_function:
 	if (lastCursor != nextCursor) {
 		lastCursor = (unsigned char) nextCursor;
 	}
+}
+
+bool GameControl::OnGlobalMouseMove(const Event& e)
+{
+#define SCROLL_AREA_WIDTH 5
+	Region mask = frame;
+	mask.x += SCROLL_AREA_WIDTH;
+	mask.y += SCROLL_AREA_WIDTH;
+	mask.w -= SCROLL_AREA_WIDTH*2;
+	mask.h -= SCROLL_AREA_WIDTH*2;
+#undef SCROLL_AREA_WIDTH
+
+	const Point& mp = ConvertPointFromScreen(e.mouse.Pos());
+
+	int mousescrollspd = core->GetMouseScrollSpeed();
+
+	if (mp.x < mask.x) {
+		moveX = -mousescrollspd;
+	} else if (mp.x > mask.x + mask.w) {
+		moveX = mousescrollspd;
+	} else {
+		moveX = 0;
+	}
+
+	if (mp.y < mask.y) {
+		moveY = -mousescrollspd;
+	} else if (mp.y > mask.y + mask.h) {
+		moveY = mousescrollspd;
+	} else {
+		moveY = 0;
+	}
+	return true;
 }
 
 void GameControl::MoveViewportTo(Point p, bool center, int speed)

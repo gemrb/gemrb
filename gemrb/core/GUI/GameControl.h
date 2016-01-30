@@ -160,6 +160,7 @@ public:
 	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
+	bool OnGlobalMouseMove(const Event&);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
