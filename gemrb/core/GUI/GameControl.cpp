@@ -594,16 +594,15 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
-		return false;
+		TextArea* ta = core->GetMessageTextArea();
+		assert(ta);
+		return ta->OnKeyPress(Key, mod);
 	}
 
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 	if (!game) return false;
-#define GEM_LEFT		0x81
-#define GEM_RIGHT		0x82
-#define GEM_UP			0x83
-#define GEM_DOWN		0x84
+
 	switch (Key) {
 		case GEM_UP:
 		case GEM_DOWN:
@@ -743,34 +742,12 @@ static EffectRef damage_ref = { "Damage", -1 };
 /** Key Release Event */
 bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	unsigned int i;
-	Game* game = core->GetGame();
-
-	if (!game)
-		return false;
-
 	if (DialogueFlags&DF_IN_DIALOG) {
-		if (Mod) return false;
-		switch(Key) {
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				{
-					TextArea *ta = core->GetMessageTextArea();
-					if (ta) {
-						return ta->OnKeyPress(Key,Mod);
-					}
-				}
-				break;
-		}
-		return false;
+		TextArea* ta = core->GetMessageTextArea();
+		assert(ta);
+		return ta->OnKeyRelease(Key, Mod);
 	}
+
 	if (Mod & GEM_MOD_SHIFT) {
 		Key = toupper(Key);
 	}
@@ -780,6 +757,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		if (!core->CheatEnabled()) {
 			return false;
 		}
+		Game* game = core->GetGame();
 		Map* area = game->GetCurrentArea( );
 		if (!area)
 			return false;
@@ -869,7 +847,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 			case 'j': //teleports the selected actors
-				for (i = 0; i < game->selected.size(); i++) {
+				for (size_t i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
 					actor->ClearActions();
 					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, gameMousePos, -1, true);
@@ -994,17 +972,17 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!
-				Effect *newfx;
-				newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
-				Actor *victim;
-				i = area->GetActorCount(0);
+				{
+				Effect *newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
+				int i = area->GetActorCount(0);
 				while(i--) {
-					victim = area->GetActor(i, 0);
+					Actor *victim = area->GetActor(i, 0);
 					if (victim->Modified[IE_EA] == EA_ENEMY) {
 						core->ApplyEffect(newfx, victim, victim);
 					}
 				}
 				delete newfx;
+				}
 				// fallthrough
 			case 'y': //kills actor
 				if (lastActor) {
