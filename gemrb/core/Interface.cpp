@@ -446,19 +446,19 @@ void Interface::HandleEvents()
 	}
 
 	if (EventFlag&EF_PORTRAIT) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "PortraitWindow", tmp );
-		if (tmp != (ieDword) ~0) {
-			EventFlag&=~EF_PORTRAIT;
+		EventFlag&=~EF_PORTRAIT;
+
+		Window* win = GetWindow(0, "PORTWIN");
+		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 		}
 	}
 
 	if (EventFlag&EF_ACTION) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "ActionsWindow", tmp );
-		if (tmp != (ieDword) ~0) {
-			EventFlag&=~EF_ACTION;
+		EventFlag&=~EF_ACTION;
+
+		Window* win = GetWindow(0, "ACTWIN");
+		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdateActionsWindow" );
 		}
 	}
