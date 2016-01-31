@@ -532,6 +532,8 @@ public:
 	void Interact(int type);
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
+	/* returns a random remapped verbal constant strref */
+	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
 	void VerbalConstant(int start, int count, bool force=false) const;
 	/* display string or verbal constant depending on what is available */

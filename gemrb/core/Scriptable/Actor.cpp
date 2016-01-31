@@ -3565,6 +3565,17 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 	return StrRefs[idx];
 }
 
+ieStrRef Actor::GetVerbalConstant(int start, int count) const
+{
+	while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1) {
+		count--;
+	}
+	if (count > 0) {
+		return GetVerbalConstant(start+RAND(0, count-1));
+	}
+	return (ieStrRef) -1;
+}
+
 void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 {
 	if (start!=VB_DIE) {
@@ -3590,11 +3601,9 @@ void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 			}
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
-		while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1 ) {
-			count--;
-		}
-		if (count > 0) {
-			DisplayStringCore((Scriptable *const) this, GetVerbalConstant(start+RAND(0, count-1)), DS_CONSOLE|DS_SPEECH);
+		ieStrRef str = GetVerbalConstant(start, count);
+		if (str != (ieStrRef) -1) {
+			DisplayStringCore((Scriptable *const) this, str, DS_CONSOLE|DS_SPEECH);
 		}
 	}
 }
@@ -3893,14 +3902,10 @@ void Actor::PlayExistenceSounds()
 			Point listener(xpos, ypos);
 			if (nextComment && !Immobile() && Distance(Pos, listener) <= (unsigned int) VOODOO_SHOUT_RANGE) {
 				//setup as an ambient
-				int count = 5;
-				while (count > 0 && GetVerbalConstant(VB_EXISTENCE+count-1) == (ieStrRef) -1) {
-					count--;
-				}
-				if (count > 0) {
-					ieStrRef strref = GetVerbalConstant(VB_EXISTENCE+RAND(0, count-1));
-					if (strref != (ieStrRef) -1) {
-						StringBlock sb = core->strings->GetStringBlock(strref);
+				ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
+				if (strref != (ieStrRef) -1) {
+					StringBlock sb = core->strings->GetStringBlock(strref);
+					if (sb.Sound[0]) {
 						unsigned int vol = 100;
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
 						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
