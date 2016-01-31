@@ -91,9 +91,9 @@ private:
 	bool isFormationRotation;
 	bool isDoubleClick;
 
-	Point ClickPoint;
 	// mouse coordinates represented in game coordinates
-	Point gameMousePos;
+	Point gameClickPoint;
+	Point screenMousePos;
 	Point vpOrigin;
 	bool updateVPTimer;
 
@@ -133,10 +133,11 @@ public:
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
-	Region SelectionRect();
+	Region SelectionRect() const;
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
+	Point GameMousePos() const;
 
 protected:
 	/** Draws the Control on the Output Display */

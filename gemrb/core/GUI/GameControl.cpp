@@ -73,8 +73,7 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 }
 
 GameControl::GameControl(const Region& frame)
-	: Control(frame),
-	ClickPoint()
+	: Control(frame)
 {
 	ControlType = IE_GUI_GAMECONTROL;
 	if (!formations) {
@@ -505,9 +504,13 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	Video* video = core->GetVideoDriver();
 	// Draw selection rect
 	if (isSelectionRect) {
-		video->DrawRect( SelectionRect(), ColorGreen, false );
+		Region r = SelectionRect();
+		r.x -= vpOrigin.x;
+		r.y -= vpOrigin.y;
+		video->DrawRect(r, ColorGreen, false );
 	}
 
+	Point gameMousePos = GameMousePos();
 	// draw reticles
 	if (isFormationRotation) {
 		Actor *actor;
@@ -519,7 +522,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			actor = game->FindPC(idx);
 			if (actor && actor->IsSelected()) {
 				// transform the formation point
-				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, gameMousePos, ClickPoint);
+				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, gameMousePos, gameClickPoint);
 				DrawTargetReticle(p, 4, false);
 			}
 		}
@@ -744,6 +747,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		Key = toupper(Key);
 	}
 
+	Point gameMousePos = GameMousePos();
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {
@@ -1059,7 +1063,7 @@ String GameControl::TooltipText() const {
 	if (area == NULL) {
 		return Control::TooltipText();
 	}
-	Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+	Actor* actor = area->GetActor(GameMousePos(), GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (actor == NULL) {
 		return Control::TooltipText();
 	}
@@ -1198,19 +1202,18 @@ int GameControl::GetDefaultCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const Point& mp)
+void GameControl::OnMouseOver(const Point& /*mp*/)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
-
-	gameMousePos = mp + vpOrigin;
 
 	if (isFormationRotation) {
 		return;
 	}
 
 	Map* area = core->GetGame()->GetCurrentArea();
+	Point gameMousePos = GameMousePos();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
@@ -1372,6 +1375,11 @@ end_function:
 	}
 }
 
+Point GameControl::GameMousePos() const
+{
+	return vpOrigin + ConvertPointFromScreen(screenMousePos);
+}
+
 bool GameControl::OnGlobalMouseMove(const Event& e)
 {
 #define SCROLL_AREA_WIDTH 5
@@ -1382,9 +1390,8 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	mask.h -= SCROLL_AREA_WIDTH*2;
 #undef SCROLL_AREA_WIDTH
 
-	const Point& mp = ConvertPointFromScreen(e.mouse.Pos());
-	gameMousePos = mp + vpOrigin;
-
+	screenMousePos = e.mouse.Pos();
+	Point mp = ConvertPointFromScreen(screenMousePos);
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
 	if (mp.x < mask.x) {
@@ -1779,7 +1786,7 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
-	ClickPoint = p;
+	gameClickPoint = p + vpOrigin;
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
@@ -1941,8 +1948,8 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 		//party formation movement
 		Point src;
 		if (isFormationRotation) {
-			p = ClickPoint;
-			src = gameMousePos;
+			p = gameClickPoint;
+			src = GameMousePos();
 		} else {
 			src = party[0]->Pos;
 		}
@@ -2111,10 +2118,10 @@ void GameControl::UpdateTargetMode() {
 	SetTargetMode(target_mode);
 }
 
-Region GameControl::SelectionRect()
+Region GameControl::SelectionRect() const
 {
 	if (isSelectionRect) {
-		return Region::RegionFromPoints(gameMousePos, ClickPoint);
+		return Region::RegionFromPoints(GameMousePos(), gameClickPoint);
 	}
 	return Region();
 }
