@@ -359,9 +359,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 
 	Game* game = core->GetGame();
-	if (!game)
-		return;
-
 	Map *area = core->GetGame()->GetCurrentArea();
 	if (!area) {
 		return;
@@ -602,7 +599,6 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 
 	unsigned int i, pc;
 	Game* game = core->GetGame();
-	if (!game) return false;
 
 	switch (Key) {
 		case GEM_UP:
@@ -1143,7 +1139,6 @@ int GameControl::GetCursorOverDoor(Door *overDoor) const
 			// most secret doors are in walls, so default to the blocked cursor to not give them away
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
 			Game *game = core->GetGame();
-			if (!game) return IE_CURSOR_BLOCKED;
 			Map *area = game->GetCurrentArea();
 			if (!area) return IE_CURSOR_BLOCKED;
 			return area->GetCursor(overDoor->Pos);
@@ -1835,9 +1830,7 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 	Point p = mp + vpOrigin;
 	Game* game = core->GetGame();
-	if (!game) return;
 	Map* area = game->GetCurrentArea( );
-	if (!area) return;
 
 	unsigned int i = 0;
 	if (isSelectionRect) {
@@ -2197,6 +2190,12 @@ void GameControl::DisplayString(Scriptable* target)
 /** changes displayed map to the currently selected PC */
 void GameControl::ChangeMap(Actor *pc, bool forced)
 {
+	// disable so that events dont get dispatched while there is not an area
+	SetDisabled(true);
+	// TODO: can we just replace SF_CUTSCENE with SetDisabled?
+	// setting SF_CUTSCENE to prevent mouse over events
+	SetScreenFlags(SF_CUTSCENE|SF_DISABLEMOUSE, OP_OR);
+
 	//swap in the area of the actor
 	Game* game = core->GetGame();
 	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
@@ -2217,6 +2216,9 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		MoveViewportTo( pc->Pos, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
+
+	SetDisabled(false);
+	SetScreenFlags(SF_CUTSCENE|SF_DISABLEMOUSE, OP_NAND);
 }
 
 bool GameControl::SetScreenFlags(unsigned int value, int mode)
@@ -2237,9 +2239,6 @@ Actor *GameControl::GetActorByGlobalID(ieDword globalID)
 	if (!globalID)
 		return NULL;
 	Game* game = core->GetGame();
-	if (!game)
-		return NULL;
-
 	Map* area = game->GetCurrentArea( );
 	if (!area)
 		return NULL;
