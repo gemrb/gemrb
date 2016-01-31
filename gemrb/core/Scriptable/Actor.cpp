@@ -3900,7 +3900,7 @@ void Actor::PlayExistenceSounds()
 			int xpos, ypos;
 			audio->GetListenerPos(xpos, ypos);
 			Point listener(xpos, ypos);
-			if (nextComment && !Immobile() && Distance(Pos, listener) <= (unsigned int) VOODOO_SHOUT_RANGE) {
+			if (nextComment && !Immobile() && Distance(Pos, listener) <= VOODOO_SHOUT_RANGE) {
 				//setup as an ambient
 				ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
 				if (strref != (ieStrRef) -1) {
