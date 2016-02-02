@@ -506,6 +506,7 @@ Actor::Actor()
 	RemovalTime = ~0;
 	HomeLocation.x = 0;
 	HomeLocation.y = 0;
+	maxWalkDistance = 0;
 	Spawned = false;
 	version = 0;
 	//these are used only in iwd2 so we have to default them

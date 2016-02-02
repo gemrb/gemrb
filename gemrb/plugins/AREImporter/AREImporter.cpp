@@ -976,7 +976,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule, RemovalTime;
-			ieWord XPos, YPos, XDes, YDes, Spawned;
+			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
 			ieDword Flags;
@@ -995,7 +995,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
-			str->Seek( 4, GEM_CURRENT_POS ); // TODO: movement restriction distance for spawns, random walk http://gibberlings3.net/forums/index.php?showtopic=21724
+			str->ReadWord( &MaxDistance );
+			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused http://gibberlings3.net/forums/index.php?showtopic=21724
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -1042,6 +1043,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->Destination.y = YPos;
 			ab->HomeLocation.x = XDes;
 			ab->HomeLocation.y = YDes;
+			ab->maxWalkDistance = MaxDistance;
 			ab->Spawned = Spawned;
 			ab->appearance = Schedule;
 			//copying the scripting name into the actor
@@ -1983,7 +1985,8 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		tmpWord = 0;
 		stream->WriteWord( &tmpWord); //unknown
 		stream->WriteDword( &ac->RemovalTime);
-		stream->WriteDword( &tmpDword); //more unknowns
+		stream->WriteWord( &ac->maxWalkDistance);
+		stream->WriteWord( &tmpWord); //more unknowns
 		stream->WriteDword( &ac->appearance);
 		stream->WriteDword( &ac->TalkCount);
 		stream->WriteResRef( ac->GetDialog());

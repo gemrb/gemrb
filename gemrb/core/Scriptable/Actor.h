@@ -324,6 +324,7 @@ public:
 	int LastDamage;
 	Point FollowOffset;//follow lastfollowed at this offset
 	Point HomeLocation;//spawnpoint, return here after rest
+	ieWord maxWalkDistance;//maximum random walk distance from home
 	bool Spawned;      //has been created by a spawn point
 
 	ieDword TargetDoor;
