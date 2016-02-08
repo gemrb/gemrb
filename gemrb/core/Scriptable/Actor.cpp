@@ -504,9 +504,6 @@ Actor::Actor()
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
 	RemovalTime = ~0;
-	HomeLocation.x = 0;
-	HomeLocation.y = 0;
-	maxWalkDistance = 0;
 	Spawned = false;
 	version = 0;
 	//these are used only in iwd2 so we have to default them

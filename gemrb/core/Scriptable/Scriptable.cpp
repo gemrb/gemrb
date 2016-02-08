@@ -1984,6 +1984,9 @@ Movable::Movable(ScriptableType type)
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
 	AttackMovements[2] = 0;
+	HomeLocation.x = 0;
+	HomeLocation.y = 0;
+	maxWalkDistance = 0;
 }
 
 Movable::~Movable(void)
@@ -2311,9 +2314,25 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	//p.x+=x;
 	//p.y+=(int) sqrt(100-x*x);
 
-	//selecting points in a square around actor (-24 to +24)
-	p.x+=core->Roll(1,49,-25);
-	p.y+=core->Roll(1,49,-25);
+	//selecting points in a square around actor (by default -25 to +25)
+	short x1 = std::max(p.x - 25, 0);
+	short x2 = std::min(p.x + 25, area->GetWidth() * 16);
+	short y1 = std::max(p.y - 25, 0);
+	short y2 = std::min(p.y + 25, area->GetHeight() * 12);
+	if (maxWalkDistance > 0) {
+		short minx = std::max(HomeLocation.x - maxWalkDistance, 0);
+		short maxx = std::min(HomeLocation.x + maxWalkDistance, area->GetWidth() * 16);
+		short miny = std::max(HomeLocation.y - maxWalkDistance, 0);
+		short maxy = std::min(HomeLocation.y + maxWalkDistance, area->GetHeight() * 12);
+
+		if (x1 < minx) x1 = std::min(p.x, minx);
+		if (x2 > maxx) x2 = std::max(p.x, maxx);
+		if (y1 < miny) y1 = std::min(p.y, miny);
+		if (y2 > maxy) y2 = std::max(p.y, maxy);
+	}
+	p.x += core->Roll(1, x2 - x1 + 1, x1 - p.x - 1);
+	p.y += core->Roll(1, y2 - y1 + 1, y1 - p.y - 1);
+
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
 	path = area->RunAway( Pos, p, size, 50, 1 );
