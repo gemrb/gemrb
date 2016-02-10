@@ -515,6 +515,16 @@ int Game::JoinParty(Actor* actor, int join)
 		actor->ReinitQuickSlots();
 		//set the joining date
 		actor->PCStats->JoinDate = GameTime;
+		//if the protagonist has the same portrait replace it
+		Actor *prot = GetPC(0, false);
+		if (!strcmp(actor->SmallPortrait, prot->SmallPortrait) || !strcmp(actor->LargePortrait, prot->LargePortrait)) {
+			AutoTable ptab("portrait");
+			if (ptab) {
+				CopyResRef(actor->SmallPortrait, ptab->QueryField(actor->SmallPortrait, "REPLACEMENT"));
+				CopyResRef(actor->LargePortrait, ptab->QueryField(actor->LargePortrait, "REPLACEMENT"));
+			}
+		}
+		
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
@@ -530,7 +540,6 @@ int Game::JoinParty(Actor* actor, int join)
 		std::vector< Actor*>::iterator m = NPCs.begin() + slot;
 		NPCs.erase( m );
 	}
-
 
 	PCs.push_back( actor );
 	if (!actor->InParty) {
