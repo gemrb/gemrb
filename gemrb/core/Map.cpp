@@ -3166,7 +3166,7 @@ void Map::LoadIniSpawn()
 	}
 }
 
-bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, int *difficulty, unsigned int *creCount)
+bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, ieWord rwdist, int *difficulty, unsigned int *creCount)
 {
 	bool spawned = false;
 	SpawnGroup *sg = NULL;
@@ -3195,6 +3195,8 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 			if (level >= cpl || sg || first) {
 				AddActor(creature, true);
 				creature->SetPosition(pos, true, radiusx, radiusy);
+				creature->HomeLocation = pos;
+				creature->maxWalkDistance = rwdist;
 				creature->Spawned = true;
 				creature->RefreshEffects(NULL);
 				if (difficulty && !sg) *difficulty -= cpl;
@@ -3241,7 +3243,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
 	unsigned int spawncount = 0, i = RAND(0, spawn->Count-1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
-		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, &difficulty, &spawncount)) {
+		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;
 		}
 		if (++i >= spawn->Count) {
@@ -3311,7 +3313,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 
 			displaymsg->DisplayString( RestHeader.Strref[idx], DMC_GOLD, IE_STR_SOUND );
 			while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
-				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, &spawnamount, &spawncount)) {
+				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, RestHeader.rwdist, &spawnamount, &spawncount)) {
 					break;
 				}
 			}
