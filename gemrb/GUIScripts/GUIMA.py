@@ -347,7 +347,7 @@ def MoveToNewArea ():
 
 	tmp = WorldMapControl.GetDestinationArea (1)
 	hours = tmp["Distance"]
-	CloseWorldMapWindow ()
+	OpenWorldMapWindow ()
 
 	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
@@ -399,8 +399,6 @@ def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 	global OldPortraitWindow, OldOptionsWindow
 
-	assert GUICommon.CloseOtherWindow (CloseWorldMapWindow)
-
 	if WorldMapWindow:
 		WorldMapWindow.Unload ()
 	WorldMapWindow = None
@@ -425,6 +423,7 @@ def WorldMapWindowCommon (Travel):
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
+		CloseWorldMapWindow ()
 		return
 
 	GemRB.HideGUI ()
