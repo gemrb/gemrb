@@ -587,7 +587,7 @@ def GetSavingThrows(pc):
 	stats.append ( (17383, IE_SAVEVSBREATH, 's') )
 	# 17384 Spells
 	stats.append ( (17384, IE_SAVEVSSPELL, 's') )
-	stats.append ("\n")
+	stats.append ("\n\n")
 	return TypeSetStats (stats, pc)
 
 ########################################################################
