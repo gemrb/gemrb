@@ -3528,13 +3528,14 @@ void Actor::Interact(int type)
 {
 	int start;
 	int count;
+	bool queue = false;
 
 	switch(type&0xff) {
 		case I_INSULT: start=VB_INSULT; break;
 		case I_COMPLIMENT: start=VB_COMPLIMENT; break;
 		case I_SPECIAL: start=VB_SPECIAL; break;
-		case I_INSULT_RESP: start=VB_RESP_INS; break;
-		case I_COMPL_RESP: start=VB_RESP_COMP; break;
+		case I_INSULT_RESP: start=VB_RESP_INS; queue=true; break;
+		case I_COMPL_RESP: start=VB_RESP_COMP; queue=true; break;
 		default:
 			return;
 	}
@@ -3546,7 +3547,7 @@ void Actor::Interact(int type)
 		//BG1 style random slots
 		count = 3;
 	}
-	VerbalConstant(start, count);
+	VerbalConstant(start, count, queue);
 }
 
 ieStrRef Actor::GetVerbalConstant(int index) const
@@ -3574,7 +3575,7 @@ ieStrRef Actor::GetVerbalConstant(int start, int count) const
 	return (ieStrRef) -1;
 }
 
-void Actor::VerbalConstant(int start, int count, bool /*force*/) const
+void Actor::VerbalConstant(int start, int count, bool queue) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
@@ -3583,6 +3584,10 @@ void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 
 	if (count < 0) {
 		return;
+	}
+	int flags = DS_CONSOLE|DS_SPEECH;
+	if (queue) {
+		flags |= DS_QUEUE;
 	}
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
@@ -3594,14 +3599,14 @@ void Actor::VerbalConstant(int start, int count, bool /*force*/) const
 			ResolveStringConstant(soundref, start+count);
 			GetSoundFolder(chrsound, 1, soundref);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
-				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), DS_CONSOLE|DS_CONST|DS_SPEECH);
+				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), flags|DS_CONST);
 				break;
 			}
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		ieStrRef str = GetVerbalConstant(start, count);
 		if (str != (ieStrRef) -1) {
-			DisplayStringCore((Scriptable *const) this, str, DS_CONSOLE|DS_SPEECH);
+			DisplayStringCore((Scriptable *const) this, str, flags);
 		}
 	}
 }
