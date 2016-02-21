@@ -1328,17 +1328,31 @@ void Game::PartyMemberDied(Actor *actor)
 	//this could be null, in some extreme cases...
 	Map *area = actor->GetCurrentArea();
 
-	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]==actor) {
+	unsigned int size = PCs.size();
+	Actor *react = NULL;
+	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
+		Actor *pc = PCs[i%size];
+		if (pc == actor) {
 			continue;
 		}
-		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		if (pc->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		if (PCs[i]->GetCurrentArea()!=area) {
+		if (pc->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) {
 			continue;
 		}
-		PCs[i]->ReactToDeath(actor->GetScriptName());
+		if (pc->GetCurrentArea()!=area) {
+			continue;
+		}
+		if (pc->HasSpecialDeathReaction(actor->GetScriptName())) {
+			react = pc;
+			break;
+		} else if (react == NULL) {
+			react = pc;
+		}
+	}
+	if (react != NULL) {
+		react->ReactToDeath(actor->GetScriptName());
 	}
 }
 

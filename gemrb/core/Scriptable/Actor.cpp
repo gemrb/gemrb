@@ -3620,6 +3620,14 @@ void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) cons
 	}
 }
 
+bool Actor::HasSpecialDeathReaction(const char *deadname) const
+{
+	AutoTable tm("death");
+	if (!tm) return false;
+	const char *value = tm->QueryField (scriptName, deadname);
+	return value && value[0] != '0';
+}
+
 void Actor::ReactToDeath(const char * deadname)
 {
 	AutoTable tm("death");
@@ -3631,10 +3639,10 @@ void Actor::ReactToDeath(const char * deadname)
 	const char *value = tm->QueryField (scriptName, deadname);
 	switch (value[0]) {
 	case '0':
-		VerbalConstant(VB_REACT, 1);
+		VerbalConstant(VB_REACT, 1, true);
 		break;
 	case '1':
-		VerbalConstant(VB_REACT_S, 1);
+		VerbalConstant(VB_REACT_S, 1, true);
 		break;
 	default:
 		{

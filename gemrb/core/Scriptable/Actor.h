@@ -540,6 +540,7 @@ public:
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
+	bool HasSpecialDeathReaction(const char *deadname) const;
 	void ReactToDeath(const char *deadname);
 	/* sends trigger_died to everyone in visual range */
 	void SendDiedTrigger();
