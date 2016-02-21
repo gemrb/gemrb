@@ -833,22 +833,15 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
 				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
-					Actor *target;
-					int i = game->GetPartySize(true);
-					if(i<2) break;
-					i=RAND(0, i-1);
-					do
-					{
-						target = game->GetPC(i, true);
-						if(target==lastActor) continue;
-						if(target->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE) continue;
-
-						char Tmp[40];
-						snprintf(Tmp,sizeof(Tmp),"Interact(\"%s\")",target->GetScriptName() );
-						lastActor->AddAction(GenerateAction(Tmp));
+					int size = game->GetPartySize(true);
+					if (size < 2 || game->NpcInParty < 2) break;
+					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
+						Actor *target = game->GetPC(i%size, true);
+						if (target == lastActor) continue;
+						if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; //not NPC
+						lastActor->HandleInteractV1(target);
 						break;
 					}
-					while(i--);
 				}
 				break;
 			case 'j': //teleports the selected actors

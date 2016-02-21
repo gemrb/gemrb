@@ -678,6 +678,8 @@ public:
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
 	int HandleInteract(Actor *target);
+	/* start bg1-style banter dialog */
+	void HandleInteractV1(Actor *target);
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */

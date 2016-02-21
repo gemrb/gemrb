@@ -486,6 +486,11 @@ RedrawTile = <bool>
 Force redraw of some overlay tiles??
 
 
+RandomBanterDialogs = <bool>
+- - - - - - - - - - - - - - -
+Toggles whether banter dialogs are randomly activated (as in BG1)
+rather than explicitly scripted (as in BG2).
+
 RareActionSounds = <bool>
 - - - - - - - - - - - - -
 Toggles whether to use all the available verbal constants or not.

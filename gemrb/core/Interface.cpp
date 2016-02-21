@@ -2199,6 +2199,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ShopsRechargeItems", //74GF_SHOP_RECHARGE
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
+		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

@@ -3680,17 +3680,17 @@ void Actor::GetAreaComment(int areaflag) const
 static int CheckInteract(const char *talker, const char *target)
 {
 	AutoTable interact("interact");
-	if(!interact)
-		return 0;
+	if (!interact)
+		return I_NONE;
 	const char *value = interact->QueryField(talker, target);
-	if(!value)
-		return 0;
+	if (!value)
+		return I_NONE;
 
 	int tmp = 0;
 	int x = 0;
 	int ln = strlen(value);
 
-	if (ln>1) {
+	if (ln>1) { // PST
 		//we round the length up, so the last * will be also chosen
 		x = core->Roll(1,(ln+1)/2,-1)*2;
 		//convert '1', '2' and '3' to 0x100,0x200,0x300 respectively, all the rest becomes 0
@@ -3715,6 +3715,14 @@ static int CheckInteract(const char *talker, const char *target)
 			return tmp+I_COMPL_RESP;
 	}
 	return I_NONE;
+}
+
+void Actor::HandleInteractV1(Actor *target)
+{
+	LastTalker = target->GetGlobalID();
+	char tmp[40];
+	snprintf(tmp, sizeof(tmp), "Interact(\"%s\")", target->GetScriptName());
+	AddAction(GenerateAction(tmp));
 }
 
 int Actor::HandleInteract(Actor *target)
@@ -3743,27 +3751,35 @@ bool Actor::GetPartyComment()
 {
 	Game *game = core->GetGame();
 
+	//not an NPC
+	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
 	//don't even bother
 	if (game->NpcInParty<2) return false;
 	ieDword size = game->GetPartySize(true);
 	//don't even bother, again
 	if (size<2) return false;
 
-	if(core->Roll(1,2,-1)) {
-		return false;
-	}
+	if (core->Roll(1, 2, -1)) return false;
 
-	for(unsigned int i=core->Roll(1,size,0);i<2*size;i++) {
+	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
 		Actor *target = game->GetPC(i%size, true);
 		if (target==this) continue;
 		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
 
+		if (core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) {
+			if (core->Roll(1, 50, 0) == 1) { // TODO: confirm frequency
+				//V1 interact
+				HandleInteractV1(target);
+				return true;
+			}
+		}
+
 		//simplified interact
 		switch(HandleInteract(target)) {
-			case -1: return false;
-			case 1: return true;
-			default:
+		case -1: return false;
+		case 1: return true;
+		default:
 			//V2 interact
 			LastTalker = target->GetGlobalID();
 			Action *action = GenerateActionDirect("Interact([-1])", target);
