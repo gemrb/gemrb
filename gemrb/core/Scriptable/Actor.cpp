@@ -4041,8 +4041,8 @@ void Actor::GetHit(int damage, int spellLevel)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
 		SetStance( IE_ANI_DAMAGE );
+		VerbalConstant(VB_DAMAGE, 1);
 	}
-	VerbalConstant(VB_DAMAGE, 1 );
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
 		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
