@@ -1424,6 +1424,24 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_GetView__doc,
+			 "GetView(Group [, ID]) => GControl\n\n"
+			 "Lookup view from scripting engine\n"
+			 "Returns a view as an object." );
+
+static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
+{
+	char* resref = NULL;
+	ScriptingId id = 0;
+	PARSE_ARGS( args, "s|l", &resref, &id );
+
+	ScriptingRefBase* ref = ScriptEngine::GetScripingRef(resref, id);
+	if (ref) {
+		return gs->ConstructObjectForScriptable(ref);
+	}
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_GetControl__doc,
 			 "GetControl(ControlID, GWindow|Alias) => GControl\n\n"
 			 "Lookup control from either a window or from an alias\n"
@@ -13024,6 +13042,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSystemVariable, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),
+	METHOD(GetView, METH_VARARGS),
 	METHOD(HardEndPL, METH_NOARGS),
 	METHOD(HasFeat, METH_VARARGS),
 	METHOD(HasResource, METH_VARARGS),
