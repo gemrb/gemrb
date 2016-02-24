@@ -30,35 +30,14 @@ from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_CAST
 
-PriestWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 
 def OpenPriestWindow ():
 	import GUICommonWindows
-	global PriestWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenPriestWindow):
-		if PriestWindow:
-			PriestWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		PriestWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-
-		return
-
-	PriestWindow = Window = GemRB.LoadWindow (2, "GUIPR")
-	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
+	
+	Window = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
@@ -91,21 +70,15 @@ def OpenPriestWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
-	UpdatePriestWindow ()
-	
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
-	Window.Focus()
+	UpdatePriestWindow (Window)
 	return
 
-def UpdatePriestWindow ():
+def UpdatePriestWindow (Window):
 	global PriestMemorizedSpellList, PriestKnownSpellList
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
 
-	Window = PriestWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel

@@ -23,13 +23,9 @@
 import GemRB
 from GUIDefines import *
 import GameCheck
-import GUICommon
+import GUICommonWindows
 
 ###################################################
-JournalWindow = None
-PortraitWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 
 global Section
 Section = 1
@@ -40,32 +36,14 @@ StartYear = 0
 
 ###################################################
 def OpenJournalWindow ():
-	import GUICommonWindows
-	global JournalWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
 	global StartTime, StartYear
 	global Chapter
-
-	if GUICommon.CloseOtherWindow (OpenJournalWindow):
-		
-		if JournalWindow:
-			JournalWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		JournalWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
+	
+	JournalWindow = GUICommonWindows.OpenTopWindow(2, "GUIJRNL", UpdateLogWindow)
 		
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
-
-	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
-	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 
 	# prev. chapter
 	Button = JournalWindow.GetControl (3)
@@ -117,11 +95,9 @@ def OpenJournalWindow ():
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter>65535:
 		Chapter=0
+		
+	UpdateLogWindow(JournalWindow)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdateLogWindow)
-	UpdateLogWindow ()
-	
-	Window.Focus()
 	return
 
 def ToggleOrderWindow ():
@@ -134,10 +110,7 @@ def ToggleOrderWindow ():
 	UpdateLogWindow ()
 	return
 
-def UpdateLogWindow ():
-
-	# text area
-	Window = JournalWindow
+def UpdateLogWindow (JournalWindow):
 
 	Section = GemRB.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
@@ -149,7 +122,7 @@ def UpdateLogWindow ():
 	Label.SetText (15873)
 	print "Chapter ", Chapter, "Section ", Section
 
-	Text = Window.GetControl (1)
+	Text = JournalWindow.GetControl (1)
 
 	Text.Clear ()
 	for i in range (GemRB.GetJournalSize (Chapter, Section)):
@@ -175,7 +148,6 @@ def UpdateLogWindow ():
 		Text.Append (JournalTitle + GemRB.GetString(15980))
 		Text.Append (JournalText)
 
-	Window.Focus()
 	return
 
 ###################################################

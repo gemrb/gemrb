@@ -35,10 +35,7 @@ MageWindow = None
 MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
+
 # bg2 stuff for handling triggers and contingencies
 BookType = None
 OtherWindow = None
@@ -49,29 +46,6 @@ SpellType = None
 Level = 1
 
 def OpenMageWindow ():
-	global MageWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenMageWindow):
-		if MageWindow:
-			MageWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MageWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
-	SetupMageWindow()
-	return
-
-def SetupMageWindow ():
-	global MageWindow
 	global BookType
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -81,31 +55,28 @@ def SetupMageWindow ():
 	if GameCheck.IsBG2() and CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
 		BookType = 1
 
-	if MageWindow:
-		MageWindow.Unload()
-		MageWindow = None
-
 	if BookType:
-		MageWindow = Window = GemRB.LoadWindow (8)
+		winid = 8
 	else:
-		MageWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+		winid = 2
+		
+	MageWindow = GUICommonWindows.OpenTopWindow(winid, "GUIMG", UpdateMageWindow)
 
-	Button = Window.GetControl (1)
+	Button = MageWindow.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
 
-	Button = Window.GetControl (2)
+	Button = MageWindow.GetControl (2)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageNextLevelPress)
 
 	#unknown usage
-	Button = Window.GetControl (55)
+	Button = MageWindow.GetControl (55)
 	if Button:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#setup level buttons
 	if GameCheck.IsBG2():
 		for i in range (9):
-			Button = Window.GetControl (56 + i)
+			Button = MageWindow.GetControl (56 + i)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetVarAssoc ("MageSpellLevel", i)
@@ -113,7 +84,7 @@ def SetupMageWindow ():
 	# Setup memorized spells buttons
 	if not BookType:
 		for i in range (12):
-			Button = Window.GetControl (3 + i)
+			Button = MageWindow.GetControl (3 + i)
 			Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
@@ -121,30 +92,25 @@ def SetupMageWindow ():
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
-		Button = Window.GetControl (27 + i)
+		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	UpdateMageWindow ()
-	
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
-	Window.Focus()
+	UpdateMageWindow (MageWindow)
 	return
 
-def UpdateMageWindow ():
+def UpdateMageWindow (MageWindow):
 	global MageMemorizedSpellList, MageKnownSpellList
 
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
 
-	Window = MageWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
 
-	Label = Window.GetControl (0x10000032)
+	Label = MageWindow.GetControl (0x10000032)
 	if GameCheck.IsBG2():
 		GemRB.SetToken ("SPELLLEVEL", str(level + 1))
 		Label.SetText (10345)
@@ -153,7 +119,7 @@ def UpdateMageWindow ():
 		Label.SetText (12137)
 
 	Name = GemRB.GetPlayerName (pc, 0)
-	Label = Window.GetControl (0x10000035)
+	Label = MageWindow.GetControl (0x10000035)
 	Label.SetText (Name)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
@@ -161,7 +127,7 @@ def UpdateMageWindow ():
 	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
 	if not BookType:
 		for i in range (12):
-			Button = Window.GetControl (3 + i)
+			Button = MageWindow.GetControl (3 + i)
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
@@ -190,7 +156,7 @@ def UpdateMageWindow ():
 				Button.SetTooltip ('')
 				Button.EnableBorder (0, 0)
 	else:
-		label = Window.GetControl (0x10000040)
+		label = MageWindow.GetControl (0x10000040)
 		if known_cnt:
 			# we give sorcerers all charges for all the spells, so some extra math is needed
 			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
@@ -198,7 +164,7 @@ def UpdateMageWindow ():
 			label.SetText ("")
 
 	for i in range (GUICommon.GetGUISpellButtonCount()):
-		Button = Window.GetControl (27 + i)
+		Button = MageWindow.GetControl (27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
@@ -219,7 +185,7 @@ def UpdateMageWindow ():
 			Button.EnableBorder (0, 0)
 
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 	return
 
 def MagePrevLevelPress ():

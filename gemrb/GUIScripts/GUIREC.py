@@ -34,12 +34,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
 ###################################################
-RecordsWindow = None
 InformationWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 KitInfoWindow = None
 ColorTable = None
 ColorIndex = None
@@ -48,29 +43,10 @@ SelectedTextArea = None
 
 ###################################################
 def OpenRecordsWindow ():
+	"""Open Records Window"""
+
 	import GUICommonWindows
-
-	global RecordsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-		if InformationWindow: OpenInformationWindow ()
-
-		if RecordsWindow:
-			RecordsWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		RecordsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
-	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
+	Window = GUICommonWindows.OpenTopWindow(2, "GUIREC", UpdateRecordsWindow)
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -107,13 +83,8 @@ def OpenRecordsWindow ():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
-
-	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
-	UpdateRecordsWindow ()
-
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
-	Window.Focus()
+		
+	UpdateRecordsWindow(Window)
 	return
 
 #original returns to game before continuing...
@@ -129,13 +100,8 @@ def Exportable(pc):
 	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
 	return True
 
-def UpdateRecordsWindow ():
+def UpdateRecordsWindow (Window):
 	global alignment_help
-
-	Window = RecordsWindow
-	if not RecordsWindow:
-		print "SelectionChange handler points to non existing window\n"
-		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -826,7 +792,6 @@ def OpenInformationWindow ():
 	return
 
 def CloseInformationWindow ():
-	import GUICommonWindows
 	global InformationWindow
 
 	if InformationWindow:

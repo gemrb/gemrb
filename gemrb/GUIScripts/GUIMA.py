@@ -24,7 +24,6 @@
 
 import GemRB
 import GameCheck
-import GUICommon
 import GUICommonWindows
 from GUIDefines import *
 
@@ -32,10 +31,6 @@ MapWindow = None
 NoteWindow = None
 WorldMapWindow = None
 WorldMapControl = None
-PortraitWindow = None
-OldPortraitWindow = None
-OptionsWindow = None
-OldOptionsWindow = None
 
 if GameCheck.IsIWD2():
 	WIDTH = 800
@@ -46,7 +41,6 @@ else:
 
 def RevealMap ():
 	global MapWindow
-	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (ShowMap):
 		if MapWindow:
@@ -72,9 +66,7 @@ def RevealMap ():
 ###################################################
 def ShowMap ():
 	import GameCheck
-	import GUICommonWindows
-	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
+	global MapWindow
 
 	if GUICommon.CloseOtherWindow (ShowMap):
 		if MapWindow:
@@ -139,37 +131,10 @@ def ShowMap ():
 
 ###################################################
 def OpenMapWindow ():
-	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
 
-	if GUICommon.CloseOtherWindow (OpenMapWindow):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
+	GUICommonWindows.OpenTopWindow(2, "GUIMAP")
 
 	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
-	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -197,15 +162,11 @@ def OpenMapWindow ():
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
 	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
-	OptionsWindow.Focus()
-	PortraitWindow.Focus()
-	Window.Focus()
 	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
 	else:
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
-	GUICommonWindows.SetSelectionChangeHandler(None)
 	return
 
 def HasMapNotes ():

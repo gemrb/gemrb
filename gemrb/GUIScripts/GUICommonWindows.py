@@ -59,7 +59,6 @@ OptionsWindow = None
 ActionsWindow = None
 CurrentWindow = None
 ActionBarControlOffset = 0
-ReturnToGame = None
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 PortraitButtons = None
 
@@ -126,10 +125,9 @@ def InitOptionButton(Window, Index, Action=0,IsPage=1):
 def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
-	global OptionsWindow, ActionBarControlOffset, ReturnToGame
+	global OptionsWindow, ActionBarControlOffset
 
 	OptionsWindow = Window
-	ReturnToGame = CloseWindowCallback
 
 	bg1 = GameCheck.IsBG1()
 	bg2 = GameCheck.IsBG2()
@@ -162,7 +160,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
-		Button = InitOptionButton(Window,'Game', ReturnToGame)
+		Button = InitOptionButton(Window,'Game', CloseTopWindow)
 		Button.MakeEscape()
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
@@ -264,9 +262,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	MarkMenuButton (Window)
-
-	if PortraitWindow:
-		UpdatePortraitWindow ()
 	return
 
 def MarkMenuButton (MenuWindow):
@@ -1236,7 +1231,7 @@ def SetSelectionChangeHandler (handler):
 	# set the first selected PC in walking env as a selected
 	# in nonwalking env
 	#if (not SelectionChangeHandler) and handler:
-	if (not SelectionChangeHandler) and handler and (not GUICommon.NextWindowFn):
+	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
 			sel = 1
@@ -1245,7 +1240,7 @@ def SetSelectionChangeHandler (handler):
 	SelectionChangeHandler = handler
 
 	# redraw selection on change main selection | single selection
-	SelectionChanged ()
+	# SelectionChanged ()
 	return
 
 def SetSelectionChangeMultiHandler (handler):
@@ -1257,6 +1252,48 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 	return
+	
+def CloseTopWindow ():
+	window = GemRB.GetView("WIN_TOP")
+	if window:
+		GemRB.LeaveContainer()
+		if GemRB.IsDraggingItem () == 1:
+			pc = GemRB.GameGetSelectedPCSingle ()
+			#store the item in the inventory before window is closed
+			GemRB.DropDraggedItem (pc, -3)
+			#dropping on ground if cannot store in inventory
+			if GemRB.IsDraggingItem () == 1:
+				GemRB.DropDraggedItem (pc, -2)
+				
+		#don't go back to multi selection mode when going to the store screen
+		if not GemRB.GetVar ("Inventory"):
+			SetSelectionChangeHandler (None)
+		
+		window.Close()
+		return True
+	
+	return False
+		
+def OpenTopWindow (id, pack, selectionHandler = None):
+	# FIXME: is it a problem to "reopen" the window if it is already the top win?
+	# probably just wasteful to close and reopen it...
+	CloseTopWindow ()
+	window = GemRB.LoadWindow (id, pack)
+	if window:
+		SetTopWindow (window, selectionHandler)
+
+	return window
+		
+def SetTopWindow (window, selectionHandler = None):
+	if window:
+		window.AddAlias("WIN_TOP")
+		window.Focus()
+		
+		if selectionHandler:
+			import copy
+			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
+			
+	SetSelectionChangeHandler (selectionHandler)
 
 # returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
@@ -1626,7 +1663,6 @@ def PortraitButtonOnPress (i):
 	else:
 		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
-		RunSelectionChangeHandler ()
 	return
 
 def PortraitButtonOnShiftPress (i):
@@ -1639,7 +1675,6 @@ def PortraitButtonOnShiftPress (i):
 	else:
 		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
-		RunSelectionChangeHandler ()
 	return
 
 def PortraitButtonHPOnPress (i): ##pst hitpoint display
@@ -1662,9 +1697,6 @@ def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 
 	global PortraitWindow, PortraitButtons
-
-	if not PortraitWindow:
-		return
 
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", 0)
@@ -1690,7 +1722,7 @@ def SelectionChanged ():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
-
+	RunSelectionChangeHandler ()
 	return
 
 def ActionStopPressed ():

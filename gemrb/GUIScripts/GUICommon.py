@@ -29,32 +29,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import SLOT_ALL
 
-OtherWindowFn = None
-NextWindowFn = None
-
 CommonTables.Load ()
-
-def CloseOtherWindow (NewWindowFn):
-	global OtherWindowFn,NextWindowFn
-
-	GemRB.LeaveContainer()
-	if OtherWindowFn and OtherWindowFn != NewWindowFn:
-		# allow detection of 'next window'
-		NextWindowFn = NewWindowFn
-		# switching from a window to something else, call old function
-		OtherWindowFn ()
-		OtherWindowFn = NewWindowFn
-		return 0
-	elif OtherWindowFn:
-		# something is calling us with its own function, so
-		# it is closing down, return true
-		OtherWindowFn = None
-		return 1
-	else:
-		# new window, no need to do setup
-		OtherWindowFn = NewWindowFn
-		NextWindowFn = None
-		return 0
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
