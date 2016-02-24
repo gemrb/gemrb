@@ -1409,6 +1409,7 @@ def OpenPortraitWindow (needcontrols=0):
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.iteritems():
+		pcID = i + 1
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetFont ("STATES")
 			# label for status flags (dialog, store, level up)
@@ -1421,10 +1422,10 @@ def OpenPortraitWindow (needcontrols=0):
 		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder(PortraitButtonOnPress, i + 1))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, i))
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, i + 1))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, pcID))
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
 
 		if GameCheck.IsIWD1():
@@ -1445,7 +1446,7 @@ def OpenPortraitWindow (needcontrols=0):
 			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonHPOnPress, i + 1))
+			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonHPOnPress, pcID))
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
 			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
@@ -1465,16 +1466,17 @@ def UpdatePortraitWindow ():
 	Inventory = GemRB.GetVar ("Inventory")
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
-	for portid, Button in PortraitButtons.iteritems():
+	for i, Button in PortraitButtons.iteritems():
+		pcID = i + 1
 		if GameCheck.IsPST():
-			UpdateAnimatedPortrait(Window,portid)
+			UpdateAnimatedPortrait(Window, i)
 			continue
 
-		pic = GemRB.GetPlayerPortrait (portid+1, 1)
-		if Inventory and pc != portid+1:
+		pic = GemRB.GetPlayerPortrait (pcID, 1)
+		if Inventory and pc != pcID:
 			pic = None
 
-		if pic and GemRB.GetPlayerStat(portid+1, IE_STATE_ID) & STATE_DEAD:
+		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
 			import GUISTORE
 			# dead pcs are hidden in all stores but temples
 			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
@@ -1491,13 +1493,13 @@ def UpdatePortraitWindow ():
 						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		if GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, portid + 1))
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
 
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		ratio_str, color = GUICommon.SetupDamageInfo (portid+1, Button, Window)
+		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle
 		talk = store = flag = blank = ' '
@@ -1507,22 +1509,22 @@ def UpdatePortraitWindow ():
 			talk = 154 # dialog icon
 			store = 155 # shopping icon
 
-			if pc==portid+1:
+			if pc == pcID:
 				if GemRB.GetStore()!=None:
 					flag = chr(store)
 			# talk icon
-			if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+			if GemRB.GameGetSelectedPCSingle(1) == pcID:
 				flag = chr(talk)
 
-		if LUCommon.CanLevelUp (portid+1):
+		if LUCommon.CanLevelUp (pcID):
 			flag = flag + blank + chr(255)
 		elif GameCheck.IsIWD1():
-			HPLabel = Window.GetControl (100+portid)
+			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetText (ratio_str)
 			HPLabel.SetTextColor (*color)
 
 		#add effects on the portrait
-		effects = GemRB.GetPlayerStates (portid+1)
+		effects = GemRB.GetPlayerStates (pcID)
 
 		numCols = 4 if GameCheck.IsIWD2() else 3
 		numEffects = len(effects)
@@ -1531,13 +1533,13 @@ def UpdatePortraitWindow ():
 		# calculate the partial row
 		idx = numEffects % numCols
 		states = effects[0:idx]
-
-		for x in range(idx, numEffects): # now do any rows that are full
+		# now do any rows that are full
+		for x in range(idx, numEffects):
 			if (x - idx) % numCols == 0:
 				states = states + "\n"
 			states = states + effects[x]
 
-		FlagLabel = Window.GetControl(200 + portid)
+		FlagLabel = Window.GetControl(200 + i)
 		if flag != blank:
 			FlagLabel.SetText(flag.ljust(3, blank))
 		else:
