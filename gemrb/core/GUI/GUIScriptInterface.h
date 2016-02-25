@@ -41,6 +41,10 @@ public:
 		return ScriptingGroup().CString();
 	};
 
+	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+		return new ViewScriptingRef(this->GetObject(), id, group);
+	}
+
 	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here
 };
 
@@ -54,6 +58,10 @@ public:
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
+
+	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
+	}
 
 	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
@@ -81,6 +89,10 @@ public:
 				return "Control";
 		}
 	};
+
+	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
+	}
 
 	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };

@@ -58,7 +58,7 @@ public:
 	ScriptingRef(T* ref, ScriptingId id)
 	: ScriptingRefBase(id), ref(ref) {}
 
-	T* GetObject() { return ref; }
+	T* GetObject() const { return ref; }
 };
 
 

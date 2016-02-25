@@ -1416,8 +1416,10 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 	ScriptingId controlId = 0;
 	PARSE_ARGS( args, "Os|l", &self, &group, &controlId );
 
-	View* ctrl = GetView(self);
-	ViewScriptingRef* aliasref = new ViewScriptingRef(ctrl, controlId, group);
+	ViewScriptingRef* ref = dynamic_cast<ViewScriptingRef*>(GetScriptingRef(self));
+	assert(ref);
+	ViewScriptingRef* aliasref = ref->Clone(controlId, group);
+	assert(aliasref);
 	ScriptEngine::RegisterScriptingRef(aliasref);
 	Py_RETURN_NONE;
 }
