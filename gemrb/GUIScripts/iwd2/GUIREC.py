@@ -252,9 +252,9 @@ def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
 			return
 		FavouredName = HateRaceTable.GetValue (FavouredIndex, 0)
 		if second == -1:
-			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5)))
+			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5), 0))
 		else:
-			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5-second-1)))
+			RecordsTextArea.Append (DelimitedText(FavouredName, PlusMinusStat((RangerLevel+4)/5-second-1), 0))
 
 def GetFavoredClass (pc, code):
 	if GemRB.GetPlayerStat (pc, IE_SEX)==1:
