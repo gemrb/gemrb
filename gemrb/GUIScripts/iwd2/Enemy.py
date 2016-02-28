@@ -139,8 +139,8 @@ def GenerateHateLists (pc):
 	RacialEnemies[0] = GemRB.GetPlayerStat (pc, IE_HATEDRACE, 1)
 	RacialStats[0] = IE_HATEDRACE
 	for i in range(1, len(RacialEnemies)-1):
-		RacialEnemies[i] = GemRB.GetPlayerStat (pc, IE_HATEDRACE2+i, 1)
-		RacialStats[i] = IE_HATEDRACE2+i
+		RacialStats[i] = IE_HATEDRACE2 + i-1
+		RacialEnemies[i] = GemRB.GetPlayerStat (pc, RacialStats[i], 1)
 
 def RacePress():
 	Race = GemRB.GetVar("HatedRace")
