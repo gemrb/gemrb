@@ -32,7 +32,7 @@ RacialEnemyTable = 0
 RaceCount = 0
 TopIndex = 0
 CharGen = 0
-RacialEnemies = [0] * 9
+RacialEnemies = [255] * 9
 RacialStats = [0] * 9
 
 def DisplayRaces():
@@ -164,7 +164,7 @@ def NextPress(save=1):
 		return
 
 	# find the index past the last set stat
-	last = RacialEnemies.index (0)
+	last = RacialEnemies.index (255)
 	if save:
 		# save, but note that racial enemies are stored in many stats
 		pc = GemRB.GameGetSelectedPCSingle ()
