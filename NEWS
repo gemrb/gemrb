@@ -1,13 +1,11 @@
-GemRB git (b6e18b7):
+GemRB v0.8.4 (2016-02-29):
   New features:
-    - 
     - pst should be roughly completable
     - iwd2 level-up, concealment, hardcoded clabs, tracking
     - ToBEx simplified "concentration" option, spontaneous casting for everyone
-    - bg1 casting sounds
+    - bg1, iwd2, (pst) casting sounds
 
   Improved features:
-    - 
     - iwd2 spells (shapes, songs, crossclass mixing, learning), action bar
     - lots of pst details and annoyances
     - stores, dialogs, scripts, iwd and pst effects
