@@ -140,7 +140,7 @@ def GenerateHateLists (pc):
 	RacialStats[0] = IE_HATEDRACE
 	for i in range(1, len(RacialEnemies)-1):
 		RacialStats[i] = IE_HATEDRACE2 + i-1
-		RacialEnemies[i] = GemRB.GetPlayerStat (pc, RacialStats[i], 1)
+		RacialEnemies[i] = GemRB.GetPlayerStat (pc, RacialStats[i], 1) % 255
 
 def RacePress():
 	Race = GemRB.GetVar("HatedRace")
@@ -164,7 +164,7 @@ def NextPress(save=1):
 		return
 
 	# find the index past the last set stat
-	last = RacialEnemies.index (255)
+	last = RacialEnemies.index (0)
 	if save:
 		# save, but note that racial enemies are stored in many stats
 		pc = GemRB.GameGetSelectedPCSingle ()
