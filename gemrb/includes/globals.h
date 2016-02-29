@@ -34,7 +34,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.8.3-git"
+#define VERSION_GEMRB "0.8.4"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
