@@ -73,3 +73,8 @@ notifications:
 os:
   - linux
   - osx
+
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc # actually just linked to clang
