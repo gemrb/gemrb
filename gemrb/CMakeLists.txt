@@ -47,6 +47,8 @@ IF(APPLE) #application bundle generation
 	)
 
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
+	SET(PRODUCT_NAME "GemRB")
+	
 	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm ../apple/EmptyStringTransformer.m
 					../artwork/gemrb.icns ../apple/defaults.plist
 					${RESOURCE_FILES})
