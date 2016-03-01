@@ -58,7 +58,7 @@ deploy:
   script: ../testing/travis-deploy.sh
   on:
     branch: master
-    condition: $CC == gcc
+    condition: $CC == clang
 
 notifications:
   email:
