@@ -61,8 +61,7 @@ IF(APPLE) #application bundle generation
 					../apple/EmptyStringTransformer.m
 					../artwork/gemrb.icns
 					../apple/defaults.plist
-					${RESOURCE_FILES}
-					${BUNDLE_LIBS})
+					${RESOURCE_FILES})
 					
 	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY_PATH}")
 	FILE(COPY ${SDL_LIBRARY_PATH} DESTINATION "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
