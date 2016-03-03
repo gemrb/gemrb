@@ -53,6 +53,7 @@ IF(APPLE) #application bundle generation
 
 	# dont know if this works, but for non-framework SDL builds ld needs to know to use the included dylib...
 	GET_FILENAME_COMPONENT(SDL_BASENAME SDL_LIBRARY_PATH NAME)
+	GET_FILENAME_COMPONENT(SDL_LIBRARY_PATH ${SDL_LIBRARY_PATH} REALPATH)
 	SET(SDL_LIBRARY "${SDL_LIBRARY} -dylib_file \"${SDL_LIBRARY}:@loader_path/../Frameworks/${SDL_BASENAME}\"")
 	
 	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE
