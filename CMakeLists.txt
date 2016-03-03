@@ -166,6 +166,11 @@ ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
+IF(NOT STATIC_LINK)
+	# prevent static libraries from being selected by FIND_LIBRARY
+	LIST(REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+ENDIF()
+
 # Check for all the required and optional dependencies
 FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
 IF(PYTHONLIBS_FOUND)
