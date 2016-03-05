@@ -517,7 +517,7 @@ int Game::JoinParty(Actor* actor, int join)
 		actor->PCStats->JoinDate = GameTime;
 		//if the protagonist has the same portrait replace it
 		Actor *prot = GetPC(0, false);
-		if (!strcmp(actor->SmallPortrait, prot->SmallPortrait) || !strcmp(actor->LargePortrait, prot->LargePortrait)) {
+		if (prot && (!strcmp(actor->SmallPortrait, prot->SmallPortrait) || !strcmp(actor->LargePortrait, prot->LargePortrait))) {
 			AutoTable ptab("portrait");
 			if (ptab) {
 				CopyResRef(actor->SmallPortrait, ptab->QueryField(actor->SmallPortrait, "REPLACEMENT"));
