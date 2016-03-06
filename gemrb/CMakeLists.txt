@@ -49,13 +49,6 @@ IF(APPLE) #application bundle generation
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
 	SET(PRODUCT_NAME "GemRB") # for info.plist
 	
-	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY_PATH ${SDL_LIBRARY})
-
-	# dont know if this works, but for non-framework SDL builds ld needs to know to use the included dylib...
-	GET_FILENAME_COMPONENT(SDL_BASENAME SDL_LIBRARY_PATH NAME)
-	GET_FILENAME_COMPONENT(SDL_LIBRARY_PATH ${SDL_LIBRARY_PATH} REALPATH)
-	SET(SDL_LIBRARY "${SDL_LIBRARY} -dylib_file \"${SDL_LIBRARY}:@loader_path/../Frameworks/${SDL_BASENAME}\"")
-	
 	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE
 					../apple/CocoaWrapper/mac/CocoaWrapper.mm
 					../apple/AppleLogger.mm
@@ -63,9 +56,17 @@ IF(APPLE) #application bundle generation
 					../artwork/gemrb.icns
 					../apple/defaults.plist
 					${RESOURCE_FILES})
+
+	# we already link to Cocoa and we need to modify this with the ‘dylib_file’ option for non-framework SDL builds
+	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY ${SDL_LIBRARY})
+	GET_FILENAME_COMPONENT(SDL_LIBRARY ${SDL_LIBRARY} REALPATH)
+	SET(BUNDLE_FRAMEWORK_PATH "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
 					
-	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY_PATH}")
-	FILE(COPY ${SDL_LIBRARY_PATH} DESTINATION "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
+	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY}")
+	FILE(COPY ${SDL_LIBRARY} DESTINATION ${BUNDLE_FRAMEWORK_PATH})
+
+	GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
+	SET(SDL_LIBRARY "${BUNDLE_FRAMEWORK_PATH}/${SDL_BASENAME}")
 
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
