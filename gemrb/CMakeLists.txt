@@ -67,6 +67,11 @@ IF(APPLE) #application bundle generation
 
 	GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
 	SET(SDL_LIBRARY "${BUNDLE_FRAMEWORK_PATH}/${SDL_BASENAME}")
+	
+	IF(NOT SDL_BASENAME MATCHES ".framework")
+		# change the "install name" of the copied SDL
+		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIBRARY}")
+	ENDIF()
 
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
