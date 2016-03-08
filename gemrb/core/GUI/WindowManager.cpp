@@ -388,14 +388,12 @@ void WindowManager::DrawWindows() const
 			drawFrame = true;
 		}
 
-		if (win->IsDisabled()) {
-			if (win->NeedsDraw()) {
-				// Important to only draw if the window itself is dirty
-				// controls on greyed out windows shouldnt be updating anyway
-				win->Draw();
-				Color fill = { 0, 0, 0, 128 };
-				video->DrawRect(frame, fill);
-			}
+		if (win->IsDisabled() && win->NeedsDraw()) {
+			// Important to only draw if the window itself is dirty
+			// controls on greyed out windows shouldnt be updating anyway
+			win->Draw();
+			Color fill = { 0, 0, 0, 128 };
+			video->DrawRect(screen, fill);
 		} else {
 			win->Draw();
 		}
