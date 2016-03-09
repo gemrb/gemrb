@@ -561,7 +561,9 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 
 void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
 {
-	SetState( IE_GUI_BUTTON_UNPRESSED );
+	if (State != IE_GUI_BUTTON_SELECTED) {
+		SetState( IE_GUI_BUTTON_UNPRESSED );
+	}
 	if (pulseBorder) {
 		pulseBorder = false;
 		MarkDirty();
