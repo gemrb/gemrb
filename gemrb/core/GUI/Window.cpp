@@ -107,10 +107,8 @@ void Window::SizeChanged(const Size& /*oldSize*/)
 
 void Window::WillDraw()
 {
-	if (!(flags&Invisible)) {
-		backBuffer->origin = frame.Origin();
-		core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
-	}
+	backBuffer->origin = frame.Origin();
+	core->GetVideoDriver()->SetDrawingBuffer(backBuffer);
 }
 
 void Window::Focus()
