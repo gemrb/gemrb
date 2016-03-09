@@ -119,6 +119,7 @@ def InitOptionButton(Window, Index, Action=0,IsPage=1):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Action)
 	if IsPage:
 		Button.SetVarAssoc ("SelectedWindow", OptionControl[Index])
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	return Button
 
 ##these defaults don't seem to break the games other than pst
@@ -140,7 +141,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
 
-		Button = InitOptionButton(Window, 'SpellBook', GUISPL.OpenSpellBookWindow)
+		Button = InitOptionButton(Window, 'SpellBook', GUISPL.OpenSpellBookWindow, True)
 
 		# AI
 		Button = InitOptionButton(Window, 'AI', AIPress)
@@ -160,7 +161,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
-		Button = InitOptionButton(Window,'Game', CloseTopWindow)
+		Button = InitOptionButton(Window,'Game', CloseTopWindow, True)
 		Button.MakeEscape()
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
@@ -180,28 +181,28 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetTooltip (OptionTip['Party'])
 
 	# Map
-	Button = InitOptionButton(Window, 'Map', GUIMA.OpenMapWindow)
+	Button = InitOptionButton(Window, 'Map', GUIMA.OpenMapWindow, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = InitOptionButton(Window, 'Journal', GUIJRNL.OpenJournalWindow)
+	Button = InitOptionButton(Window, 'Journal', GUIJRNL.OpenJournalWindow, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
-	Button = InitOptionButton(Window, 'Inventory', GUIINV.OpenInventoryWindow)
+	Button = InitOptionButton(Window, 'Inventory', GUIINV.OpenInventoryWindow, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = InitOptionButton(Window, 'Stats', GUIREC.OpenRecordsWindow)
+	Button = InitOptionButton(Window, 'Stats', GUIREC.OpenRecordsWindow, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
 	if iwd1:
@@ -209,21 +210,21 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
-		Button = InitOptionButton(Window, 'Mage', GUIMG.OpenMageWindow)
+		Button = InitOptionButton(Window, 'Mage', GUIMG.OpenMageWindow, True)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 		# Priest
-		Button = InitOptionButton(Window, 'Priest', GUIPR.OpenPriestWindow)
+		Button = InitOptionButton(Window, 'Priest', GUIPR.OpenPriestWindow, True)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = InitOptionButton(Window, 'Options', GUIOPT.OpenOptionsWindow)
+	Button = InitOptionButton(Window, 'Options', GUIOPT.OpenOptionsWindow, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if iwd1:
@@ -260,32 +261,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if Button:
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
-
-	MarkMenuButton (Window)
-	return
-
-def MarkMenuButton (MenuWindow):
-	if GameCheck.IsIWD2() or GameCheck.IsPST():
-		return
-
-	Pressed = MenuWindow.GetControl( GemRB.GetVar ("SelectedWindow") )
-
-	for button in range (9):
-		Button = MenuWindow.GetControl (button)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	if Pressed:
-		Button = Pressed
-	else: # highlight return to game
-		Button = MenuWindow.GetControl (0)
-
-	# NOTE: Alternatively, comment out this block or add a feature check, so that
-	#   clicking button the second time closes a window again, which might be preferred
-	if GameCheck.IsIWD1() and GemRB.GetVar ("SelectedWindow") != 0:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		return
-
-	Button.SetState (IE_GUI_BUTTON_SELECTED)
 
 	return
 
