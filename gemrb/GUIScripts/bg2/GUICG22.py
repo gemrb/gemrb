@@ -157,7 +157,7 @@ def RedrawKits():
 				if Kit != "*":
 					EnabledButtons.append(Kit-21)
 			else:
-				if Kit:
+				if Kit and Kit != "*":
 					KitName = CommonTables.KitList.GetValue(Kit, 1)
 				else:
 					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
