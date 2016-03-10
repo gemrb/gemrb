@@ -85,7 +85,7 @@ def OnLoad():
 			KitWindow.CreateButton (15, 18, 250, 271, 20)
 			extrakit = KitWindow.GetControl(15)
 			extrakit.SetState(IE_GUI_BUTTON_DISABLED)
-			extrakit.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+			extrakit.SetFlags(IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_CAPS, OP_OR)
 			extrakit.SetSprites("GUICGBC",0, 0,1,2,3)
 			RowCount = 11
 		if tmpRowCount>11: #create scroll bar
