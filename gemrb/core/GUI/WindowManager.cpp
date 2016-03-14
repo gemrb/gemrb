@@ -340,26 +340,6 @@ void WindowManager::DrawWindows() const
 		return;
 	}
 
-	// TODO: this can probably be done cleaner by drawing to cursorBuf
-	static bool modalShield = false;
-	if (modalWin) {
-		if (!modalShield) {
-			// only draw the shield layer once
-			Color shieldColor = Color(); // clear
-			if (modalShadow == ShadowGray) {
-				shieldColor.a = 128;
-			} else if (modalShadow == ShadowBlack) {
-				shieldColor.a = 0xff;
-			}
-			video->DrawRect( screen, shieldColor );
-			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
-			modalShield = true;
-		}
-		modalWin->Draw();
-		return;
-	}
-	modalShield = false;
-
 	// draw the game window now (beneath everything else); its not part of the windows collection
 	gameWin->Draw();
 
@@ -369,6 +349,10 @@ void WindowManager::DrawWindows() const
 	WindowList::const_reverse_iterator rit = windows.rbegin();
 	for (; rit != windows.rend(); ++rit) {
 		Window* win = *rit;
+
+		if (win == modalWin)
+			continue; // will draw this later
+
 		const Region& frame = win->Frame();
 
 		// FYI... this only checks if the front window obscures... could be covered by another window too
@@ -404,6 +388,19 @@ void WindowManager::DrawWindows() const
 
 	if (drawFrame) {
 		DrawWindowFrame();
+	}
+
+	if (modalWin) {
+		Color shieldColor = Color(); // clear
+		if (modalShadow == ShadowGray) {
+			shieldColor.a = 128;
+		} else if (modalShadow == ShadowBlack) {
+			shieldColor.a = 0xff;
+		}
+		video->DrawRect( screen, shieldColor );
+		modalWin->Draw();
+		// reset the buffer for the cursor
+		video->SetDrawingBuffer(cursorBuf);
 	}
 
 	// tooltips and cursor are always last
