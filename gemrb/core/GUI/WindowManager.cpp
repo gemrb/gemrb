@@ -188,6 +188,10 @@ void WindowManager::CloseWindow(Window* win)
 		modalWin = NULL;
 	}
 
+	if (win == hoverWin) {
+		hoverWin = NULL;
+	}
+
 	bool isFront = it == windows.begin();
 	it = windows.erase(it);
 	if (it != windows.end()) {
@@ -266,7 +270,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 	while (Window* target = NextEventWindow(event, it)) {
 		// disabled windows get no events, but should block them from going to windows below
 		if (target->IsDisabled() || target->DispatchEvent(event)) {
-			if (event.isScreen) {
+			if (event.isScreen && target->IsVisible()) {
 				hoverWin = target;
 			}
 			return true;
