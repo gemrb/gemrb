@@ -195,7 +195,7 @@ class GButton(GControl):
 
   def MakeDefault(self):
 	  # return key
-	  return self.SetHotKey('\r')
+	  return self.SetHotKey(chr(0x86))
 	  
   def MakeEscape(self):
 	  # escape key
