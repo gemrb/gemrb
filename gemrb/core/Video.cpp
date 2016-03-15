@@ -108,9 +108,20 @@ void Video::DestroyBuffer(VideoBuffer* buffer)
 	delete buffer;
 }
 
-void Video::SetDrawingBuffer(VideoBuffer* buf)
+void Video::PushDrawingBuffer(VideoBuffer* buf)
 {
+	assert(buf);
 	drawingBuffers.push_back(buf);
+	drawingBuffer = drawingBuffers.back();
+}
+
+void Video::PopDrawingBuffer()
+{
+	if (drawingBuffers.size() <= 1) {
+		// can't pop last buffer
+		return;
+	}
+	drawingBuffers.pop_back();
 	drawingBuffer = drawingBuffers.back();
 }
 

@@ -61,7 +61,7 @@ void MoviePlayer::Play()
 	isPlaying = true;
 	do {
 		// taking over the application runloop...
-		video->SetDrawingBuffer(vb);
+		video->PushDrawingBuffer(vb);
 		if (DecodeFrame(*vb)) {
 			if (subtitles) {
 				subtitles->Font()->Print(frame, subtitles->SubtitleAtFrame(framePos), subtitles->Palette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);

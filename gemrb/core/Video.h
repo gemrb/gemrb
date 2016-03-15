@@ -33,7 +33,7 @@
 #include "Polygon.h"
 #include "ScriptedAnimation.h"
 
-#include <vector>
+#include <deque>
 
 namespace GemRB {
 
@@ -115,11 +115,11 @@ protected:
 
 	Color fadeColor;
 
-	typedef std::vector<VideoBuffer*> VideoBuffers;
+	typedef std::deque<VideoBuffer*> VideoBuffers;
 
 	// collection of all existing video buffers
 	VideoBuffers buffers;
-	// collection built by calls to SetDrawingBuffer() and cleared after SwapBuffers()
+	// collection built by calls to PushDrawingBuffer() and cleared after SwapBuffers()
 	// the collection is iterated and drawn in order during SwapBuffers()
 	// Note: we can add the same buffer more than once to drawingBuffers!
 	VideoBuffers drawingBuffers;
@@ -149,7 +149,8 @@ public:
 	int SwapBuffers(int fpscap = 30);
 	VideoBuffer* CreateBuffer(const Region&, BufferFormat = DISPLAY);
 	void DestroyBuffer(VideoBuffer*);
-	void SetDrawingBuffer(VideoBuffer*);
+	void PushDrawingBuffer(VideoBuffer*);
+	void PopDrawingBuffer();
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	const Size& GetScreenSize() { return screenSize; }

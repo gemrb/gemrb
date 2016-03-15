@@ -69,7 +69,7 @@ WindowManager::WindowManager(Video* vid)
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
-	vid->SetDrawingBuffer(cursorBuf);
+	vid->PushDrawingBuffer(cursorBuf);
 	video = vid;
 	// TODO: changing screen size should adjust window positions too
 	// TODO: how do we get notified if the Video driver changes size?
@@ -384,7 +384,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	cursorBuf->Clear(); // erase the last frame
-	video->SetDrawingBuffer(cursorBuf);
+	video->PushDrawingBuffer(cursorBuf);
 
 	if (drawFrame) {
 		DrawWindowFrame();
@@ -400,7 +400,7 @@ void WindowManager::DrawWindows() const
 		video->DrawRect( screen, shieldColor );
 		modalWin->Draw();
 		// reset the buffer for the cursor
-		video->SetDrawingBuffer(cursorBuf);
+		video->PushDrawingBuffer(cursorBuf);
 	}
 
 	// tooltips and cursor are always last
