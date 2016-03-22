@@ -623,7 +623,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 		return -1;
 	}
 
-	// Save succesful / Quick-save succesful
+	// Save successful / Quick-save successful
 	if (qsave) {
 		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, DMC_BG2XPGREEN);
 		if (gc) {
@@ -685,7 +685,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		return -1;
 	}
 
-	// Save succesful
+	// Save successful
 	displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
 	if (gc) {
 		gc->SetDisplayText(STR_SAVESUCCEED, 30);

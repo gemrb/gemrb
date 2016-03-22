@@ -4010,7 +4010,7 @@ bool Actor::OverrideActions()
 void Actor::Panic(Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
-		print("Already paniced");
+		print("Already panicked");
 		//already in panic
 		return;
 	}
