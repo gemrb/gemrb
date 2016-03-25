@@ -62,6 +62,8 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	width = w, height = h;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
+    // TODO: scale methods can be nearest or linear, and should be settable in config
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
@@ -360,6 +362,7 @@ int SDL20VideoDriver::SwapBuffers(void)
 	 SDL_RenderFillRect(renderer, &dst);
 	 }
 	 */
+    SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
 	return ret;
