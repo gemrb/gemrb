@@ -62,7 +62,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	width = w, height = h;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
@@ -72,7 +72,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
 #endif
 	if (fullscreen) {
-		winFlags |= SDL_WINDOW_FULLSCREEN;
+		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		//This is needed to remove the status bar on Android/iOS.
 		//since we are in fullscreen this has no effect outside Android/iOS
 		winFlags |= SDL_WINDOW_BORDERLESS;
@@ -772,7 +772,11 @@ void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
-	if (SDL_SetWindowFullscreen(window, (SDL_bool)set) == GEM_OK) {
+    Uint32 flags = 0;
+    if (set) {
+        flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 		fullscreen = set;
 		return true;
 	}
