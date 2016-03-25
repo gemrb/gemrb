@@ -50,8 +50,8 @@ class SDLVideoDriver : public Video {
 protected:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
-    // tmpBuf is here as a truly ugly hack, so we can copy backBuf to tmpBuf before blitting cursors, and then back again after the screen is presented. Only applies for SDL2.
-    SDL_Surface* tmpBuf;
+	// tmpBuf is here as a truly ugly hack, so we can copy backBuf to tmpBuf before blitting cursors, and then back again after the screen is presented. Only applies for SDL2.
+	SDL_Surface* tmpBuf;
 	SDL_Surface* extra;
 	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
 	unsigned long lastTime;
