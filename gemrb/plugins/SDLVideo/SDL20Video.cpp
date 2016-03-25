@@ -150,6 +150,8 @@ doneFormat:
 		width, height, SDL_GetPixelFormatName(format));
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
 									bpp, r, g, b, a );
+    // tmpBuf is here as a truly ugly hack, so we can copy backBuf to tmpBuf before blitting cursors, and then back again after the screen is presented.
+    tmpBuf = SDL_CreateRGBSurface( 0, width, height, bpp, r, g, b, a );
 	this->bpp = bpp;
 
 	if (!backBuf) {
@@ -329,9 +331,12 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 
 int SDL20VideoDriver::SwapBuffers(void)
 {
-	int ret = SDLVideoDriver::SwapBuffers();
+    //this is not pretty. We make a complete copy of the backBuf into tmpBuf, then copy it back after SDLVideoDriver::SwapBuffers has blitted cursors and tooltips, and SDL_UpdateTexture has copied it to the screentexture.
+    SDL_BlitSurface(backBuf, NULL, tmpBuf, NULL);
+    int ret = SDLVideoDriver::SwapBuffers();
 
 	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+    SDL_BlitSurface(tmpBuf, NULL, backBuf, NULL);
 	/*
 	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
 	 Don't know how universal it is yet so leaving this in commented out just in case
