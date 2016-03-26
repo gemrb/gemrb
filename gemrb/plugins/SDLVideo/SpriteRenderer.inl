@@ -393,6 +393,8 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	const int yfactor = yflip ? -1 : 1;
 	const int xfactor = XFLIP ? -1 : 1;
 
+	Uint32 amask = target->format->Amask;
+
 	while (line != end) {
 
 		// Fast-forward through the RLE data until we reach clipstartpix
@@ -451,6 +453,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 							Uint8 a = col[p].a;
 							tint(r, g, b, a, flags);
 							blend(*pix, r, g, b, a >> extra_alpha);
+							*pix |= amask; // color keyed surface is 100% opaque
 						}
 					}
 #ifdef HIGHLIGHTCOVER
