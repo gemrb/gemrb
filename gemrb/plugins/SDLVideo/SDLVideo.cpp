@@ -722,10 +722,11 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 {
 	if (fill) {
+		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
-		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
-			SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+		} else if ( SDL_ALPHA_OPAQUE == color.a || currentBuf->format->Amask) {
+
 			long val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
