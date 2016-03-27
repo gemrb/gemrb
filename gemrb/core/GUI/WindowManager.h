@@ -53,12 +53,12 @@ private:
 	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
 	Window* gameWin;
 	Window* hoverWin;
-	ModalShadow modalShadow;
 
 	EventMgr eventMgr;
 
 	Video* video;
 	VideoBuffer* cursorBuf;// buffer the cursors and tooltips are drawn to (layer 3)
+	VideoBuffer* modalShield;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;

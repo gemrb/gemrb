@@ -49,7 +49,6 @@ WindowManager::WindowManager(Video* vid)
 	hoverWin = NULL;
 	modalWin = NULL;
 
-	modalShadow = ShadowNone;
 	eventMgr.RegisterEventMonitor(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 
 	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
@@ -64,8 +63,9 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFlags(Window::Borderless, OP_OR);
 	gameWin->SetFrame(screen);
 
-	cursorBuf = vid->CreateBuffer(screen);
-	cursorBuf->SetColorKey(ColorGreen);
+	// FIXME: need to recreate these if resolution changes
+	cursorBuf = vid->CreateBuffer(screen, Video::RGBA8888);
+	modalShield = vid->CreateBuffer(screen, Video::RGBA8888);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
@@ -78,6 +78,7 @@ WindowManager::WindowManager(Video* vid)
 WindowManager::~WindowManager()
 {
 	video->DestroyBuffer(cursorBuf);
+	video->DestroyBuffer(modalShield);
 	delete gameWin;
 }
 
@@ -107,7 +108,19 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 	FocusWindow( win );
 	modalWin = win;
 
-	modalShadow = Shadow;
+	modalShield->Clear();
+	if (Shadow != ShadowNone) {
+		Color shieldColor = {0,0,0,0};
+		if (Shadow == ShadowGray) {
+			shieldColor.a = 128;
+		} else {
+			shieldColor.a = 0xff;
+		}
+		video->PushDrawingBuffer(modalShield);
+		video->DrawRect(screen, shieldColor);
+		video->PopDrawingBuffer();
+	}
+
 	if (win->Flags()&Window::Borderless) {
 		core->PlaySound(DS_WINDOW_OPEN);
 	}
@@ -395,13 +408,8 @@ void WindowManager::DrawWindows() const
 	}
 
 	if (modalWin) {
-		Color shieldColor = Color(); // clear
-		if (modalShadow == ShadowGray) {
-			shieldColor.a = 128;
-		} else if (modalShadow == ShadowBlack) {
-			shieldColor.a = 0xff;
-		}
-		video->DrawRect( screen, shieldColor );
+		video->PopDrawingBuffer();
+		video->PushDrawingBuffer(modalShield);
 		modalWin->Draw();
 		// reset the buffer for the cursor
 		video->PushDrawingBuffer(cursorBuf);
