@@ -167,6 +167,9 @@ public:
 
 	String QueryText() const { return Text; }
 	String TooltipText() const;
+
+	// FIXME: button mouse tracking might be conditional...
+	bool TracksMouseDown() const { return true; }
 	Holder<DragOp> DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
