@@ -57,7 +57,7 @@ void MoviePlayer::Play()
 
 	// currently, our MoviePlayer implementation takes over the entire screen
 	// not only that but the Play method blocks until movie is done/stopped.
-	win->DisplayModal(); // we bypass the WindowManager for drawing, but for event handling we need this
+	win->Focus(); // we bypass the WindowManager for drawing, but for event handling we need this
 	isPlaying = true;
 	do {
 		// taking over the application runloop...
