@@ -82,13 +82,6 @@ WindowManager::~WindowManager()
 	delete gameWin;
 }
 
-void WindowManager::RedrawAll() const
-{
-	for (size_t i=0; i < windows.size(); i++) {
-		windows[i]->MarkDirty();
-	}
-}
-
 bool WindowManager::IsOpenWindow(Window* win) const
 {
 	WindowList::const_iterator it = WIN_IT(win);

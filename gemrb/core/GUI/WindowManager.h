@@ -91,7 +91,6 @@ public:
 	bool IsPresentingModalWindow() const;
 
 	void DrawWindows() const;
-	void RedrawAll() const;
 
 	Size ScreenSize() const { return screen.Dimensions(); }
 
