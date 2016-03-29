@@ -71,7 +71,7 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 		return;
 
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
-	if (hasFocus) {
+	if (IsFocused()) {
 		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, frame.w, frame.h ),
 					Text, palette, Alignment );
 		int w = font->StringSize(Text.substr(0, CurPos)).w;
@@ -162,7 +162,7 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 void TextEdit::SetFocus(bool focus)
 {
 	Control::SetFocus(focus);
-	if (hasFocus) {
+	if (IsFocused()) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
 }

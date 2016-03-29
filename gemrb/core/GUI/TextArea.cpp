@@ -658,7 +658,7 @@ void TextArea::ClearText()
 void TextArea::SetFocus(bool focus)
 {
 	Control::SetFocus(focus);
-	if (hasFocus && flags & IE_GUI_TEXTAREA_EDITABLE) {
+	if (IsFocused() && flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
 }

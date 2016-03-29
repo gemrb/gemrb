@@ -38,7 +38,6 @@ namespace GemRB {
 Control::Control(const Region& frame)
 	: View(frame)
 {
-	hasFocus = false;
 	InHandler = false;
 	VarName[0] = 0;
 	Value = 0;
@@ -94,13 +93,13 @@ int Control::RunEventHandler(ControlEventHandler handler)
 
 void Control::SetFocus(bool focus)
 {
-	hasFocus = focus;
+	Owner->SetFocused(this);
 	MarkDirty();
 }
 
-bool Control::isFocused()
+bool Control::IsFocused()
 {
-	return hasFocus;
+	return Owner->FocusedView() == this;
 }
 
 void Control::SetAnimPicture(Sprite2D* newpic)

@@ -64,8 +64,6 @@ class Window;
 
 class GEM_EXPORT Control : public View {
 protected:
-	/** Focused Control */
-	bool hasFocus;
 	/** the value of the control to add to the variable */
 	ieDword Value;
 	/** True if we are currently in an event handler */
@@ -106,7 +104,7 @@ public:
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	virtual void SetFocus(bool focus);
-	bool isFocused();
+	bool IsFocused();
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
 	/** Run specified handler, it may return error code */
