@@ -475,7 +475,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
-		if (ToggleState) {
+		if (buttonImages[BUTTON_IMAGE_SELECTED]) {
 			SetState( IE_GUI_BUTTON_SELECTED );
 		} else {
 			SetState( IE_GUI_BUTTON_UNPRESSED );
