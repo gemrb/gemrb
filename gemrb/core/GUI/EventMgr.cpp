@@ -29,6 +29,11 @@ unsigned long EventMgr::DCDelay = 250;
 unsigned long EventMgr::RKDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
+unsigned long EventMgr::dc_time;
+unsigned long EventMgr::rk_flags;
+std::bitset<16> EventMgr::mouseButtonFlags;
+Point EventMgr::mousePos;
+
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
@@ -52,12 +57,12 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
-bool EventMgr::ButtonState(unsigned short btn) const
+bool EventMgr::ButtonState(unsigned short btn)
 {
-	return mouseButtonFlags.test(btn);
+	return mouseButtonFlags.test(1 >> btn);
 }
 
-bool EventMgr::MouseDown() const
+bool EventMgr::MouseDown()
 {
 	return mouseButtonFlags.any();
 }

@@ -194,22 +194,22 @@ private:
 	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
 
-	unsigned long dc_time;
-	unsigned long rk_flags;
-	std::bitset<16> mouseButtonFlags;
-	Point mousePos;
+	static unsigned long dc_time;
+	static unsigned long rk_flags;
+	static std::bitset<16> mouseButtonFlags;
+	static Point mousePos;
 
 public:
 	EventMgr(void);
 
 	void DispatchEvent(Event& e);
 
-	unsigned long GetRKDelay();
-	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
+	static unsigned long GetRKDelay();
+	static unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 
-	bool ButtonState(unsigned short btn) const;
-	bool MouseDown() const;
-	Point MousePos() const { return mousePos; }
+	static bool ButtonState(unsigned short btn);
+	static bool MouseDown();
+	static Point MousePos() { return mousePos; }
 };
 
 }
