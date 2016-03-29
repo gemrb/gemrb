@@ -65,40 +65,16 @@ else:
 	HEIGHT = 480
 
 ###################################################
-def CloseOptionsWindow ():
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GameOptionsWindow == None:
-		return
-
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-
-	GameOptionsWindow = None
-	GemRB.SetVar ("OtherWindow", -1)
-
-	return
-
-###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
 
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		CloseOptionsWindow()
-		return
 
 	GemRB.GamePause (1, 3)
 
 	CommonWindow.CloseContainerWindow ()
-	if GameCheck.IsBG1():
-		GUICommonWindows.SetSelectionChangeHandler (None)
 
-	GameOptionsWindow = Window = GemRB.LoadWindow (2, "GUIOPT")
-	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
+	Window = GUICommonWindows.OpenTopWindow(2, "GUIOPT")
 
 	# Return to Game
 	Button = Window.GetControl (11)
