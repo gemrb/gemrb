@@ -6186,11 +6186,11 @@ new character you must use FillPlayerInfo().\n\
 
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int slot, which = 0;
-	PARSE_ARGS( args,  "i|i", &slot, &which );
+	int PartyID, which = 0;
+	PARSE_ARGS( args,  "i|i", &PartyID, &which );
 
 	GET_GAME();
-	Actor* actor = game->GetPC( slot, false );
+	Actor* actor = game->FindPC( PartyID );
 	if (actor) {
 		Sprite2D* portrait = actor->CopyPortrait(which);
 		CObject<Sprite2D> obj(portrait);
