@@ -236,6 +236,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MOUSEMOTION:
 			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y));
+			e.mouse.buttonStates = SDL_GetMouseState(NULL, NULL);
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
