@@ -2482,7 +2482,8 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::W
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
-		Window* win = GetWindow(WindowID, ref);
+
+	Window* win = GetWindow(WindowID, ref);
 	if (!win) {
 		win = guifact->GetWindow( WindowID );
 	}
