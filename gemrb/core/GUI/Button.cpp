@@ -334,6 +334,11 @@ void Button::SetState(unsigned char state)
 	if (state > IE_GUI_BUTTON_LOCKED_PRESSED) {// If wrong value inserted
 		return;
 	}
+
+	if (State == state) {
+		return; // avoid redraw
+	}
+
 	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
 	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
 
@@ -558,7 +563,14 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
-	pulseBorder = true;
+	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
+		ButtonBorder *fr = &borders[i];
+		if (fr->enabled) {
+			pulseBorder = true;
+			MarkDirty();
+			break;
+		}
+	}
 
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
 }
