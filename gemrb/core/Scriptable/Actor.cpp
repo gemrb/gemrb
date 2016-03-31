@@ -2200,7 +2200,7 @@ static void InitActorTables()
 
 			//we have to account for dual-swap in the multiclass field
 			ieDword numfound = 1;
-			ieDword tmpbits = core->CountBits (tmpclass);
+			size_t tmpbits = CountBits (tmpclass);
 
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
@@ -4684,7 +4684,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		stats = BaseStats;
 	}
 
-	int clscount = 0;
+	size_t clscount = 0;
 	float average = 0;
 	if (iwd2class) {
 		// iwd2
@@ -4701,11 +4701,11 @@ ieDword Actor::GetXPLevel(int modified) const
 			}
 		}
 		else if (IsMultiClassed()) {
-				//clscount is the number of on bits in the MULTI field
-				clscount = core->CountBits (multiclass);
-				assert(clscount && clscount <= 3);
-				for (int i=1; i<clscount; i++)
-					average += levels[i];
+			//clscount is the number of on bits in the MULTI field
+			clscount = CountBits (multiclass);
+			assert(clscount && clscount <= 3);
+			for (size_t i=1; i<clscount; i++)
+				average += levels[i];
 		} //else single classed
 		average = average / (float) clscount + 0.5;
 	}

@@ -66,6 +66,8 @@
 
 #include "System/Logging.h"
 
+#include <bitset>
+
 namespace GemRB {
 
 //Global Variables
@@ -232,6 +234,16 @@ inline bool SetBits(T& flag, const T& value, int mode)
 			return false;
 	}
 	return true;
+}
+
+template <typename T>
+inline size_t CountBits(T& i)
+{
+	// using a bitset is guaranteed to be portable
+	// it is also usually much faster than a loop over the bits since it is often implemented with a CPU popcount instruction
+	static std::bitset<sizeof(T) * CHAR_BIT> bits;
+	bits = i;
+	return bits.count();
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

@@ -4873,15 +4873,4 @@ void Interface::SanityCheck(const char *ver) {
 	}
 }
 
-/* counts the on bits in a number */
-ieDword Interface::CountBits (ieDword n) const
-{
-	ieDword count = 0;
-	while (n) {
-		count += n & 0x1u;
-		n >>= 1;
-	}
-	return count;
-}
-
 }

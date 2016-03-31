@@ -763,8 +763,6 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	void SetTickHook(EventHandler);
-
-	ieDword CountBits (ieDword n) const;
 };
 
 extern GEM_EXPORT Interface * core;
