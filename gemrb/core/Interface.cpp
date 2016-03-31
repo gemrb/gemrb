@@ -910,13 +910,18 @@ void Interface::Main()
 
 	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
-	const Region fpsRgn( 0, Height - 30, 100, 30 );
+	Region fpsRgn( 0, Height - 30, 80, 30 );
 	wchar_t fpsstring[20] = {L"???.??? fps"};
+	VideoBuffer* fpsBuf = video->CreateBuffer(fpsRgn);
+	// set for printing
+	fpsRgn.x = 5;
+	fpsRgn.y = 0;
 
 	unsigned long frame = 0, time, timebase;
 	timebase = GetTickCount();
 	double frames = 0.0;
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
+
 	do {
 		//don't change script when quitting is pending
 
@@ -940,14 +945,17 @@ void Interface::Main()
 				frame = 0;
 				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
 			}
+			video->PushDrawingBuffer(fpsBuf);
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print( fpsRgn, String(fpsstring), palette,
-					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
+					   IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
 		}
 		if (TickHook)
 			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
+
 	gamedata->FreePalette( palette );
+	video->DestroyBuffer(fpsBuf);
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
