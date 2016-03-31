@@ -603,11 +603,8 @@ bool Button::SetEvent(int eventType, ControlEventHandler handler)
 }
 
 /** Refresh a button from a given radio button group */
-void Button::UpdateState(const char* VariableName, unsigned int Sum)
+void Button::UpdateState(unsigned int Sum)
 {
-	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-		return;
-	}
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		ToggleState = ( Sum == Value );
 	}   	//radio button, exact value

@@ -35,7 +35,7 @@ namespace GemRB {
 
 STOItem::~STOItem(void)
 {
-	if (trigger) trigger->Release();
+	if (triggers) triggers->Release();
 }
 
 Store::Store(void)
@@ -70,9 +70,10 @@ bool Store::IsItemAvailable(unsigned int slot) const
 	//-1    - infinite
 	//other - pst trigger ref
 
-	Trigger *trigger = items[slot]->trigger;
-	if (trigger) {
-		return trigger->Evaluate(game->GetSelectedPCSingle(false)) != 0;
+	Condition *triggers = items[slot]->triggers;
+	if (triggers) {
+		Scriptable *shopper = game->GetSelectedPCSingle(false);
+		return triggers->Evaluate(shopper) != 0;
 	}
 	return true;
 }
@@ -243,15 +244,16 @@ void Store::RechargeItem(CREItem *item)
 	//flag     0   0   1   1
 	//recharge 1   0   0   1
 	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
+		bool feature = core->HasFeature(GF_SHOP_RECHARGE);
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
-				item->Usages[i]=0;
+				item->Usages[i] = 0;
 				continue;
 			}
-			if (h->RechargeFlags&IE_ITEM_RECHARGE) {
+			if ((feature || h->RechargeFlags&IE_ITEM_RECHARGE)
+			    && item->Usages[i] < h->Charges)
 				item->Usages[i] = h->Charges;
-			}
 		}
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, 0);
@@ -315,18 +317,6 @@ void Store::AddItem(CREItem *item)
 	}
 	items.push_back (temp );
 	ItemsCount++;
-}
-
-void Store::RemoveItem( unsigned int idx )
-{
-	if (items.size()!=ItemsCount) {
-		error("Store", "Inconsistent store");
-	}
-	if (ItemsCount<=idx) {
-		return;
-	}
-	items.erase(items.begin()+idx);
-	ItemsCount--;
 }
 
 void Store::RemoveItem( STOItem *itm )

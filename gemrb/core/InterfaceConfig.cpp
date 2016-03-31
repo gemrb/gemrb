@@ -143,6 +143,7 @@ if (config->Open(path) \
 		ATTEMPT_INIT
 #endif
 
+#ifndef ANDROID
 		// Now try ~/.gemrb folder
 		CopyHomePath(datadir, _MAX_PATH);
 		char confpath[_MAX_PATH] = ".";
@@ -150,6 +151,7 @@ if (config->Open(path) \
 		PathJoin(datadir, datadir, confpath, NULL);
 		PathJoinExt( path, datadir, name, "cfg" );
 		ATTEMPT_INIT;
+#endif
 
 		// Don't try with default binary name if we have tried it already
 		if (strcmp( name, PACKAGE ) != 0) {

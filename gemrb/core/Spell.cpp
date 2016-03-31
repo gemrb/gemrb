@@ -73,6 +73,11 @@ void ReleaseMemorySpell()
 SPLExtHeader::SPLExtHeader(void)
 {
 	features = NULL;
+	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
+	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
+	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
+	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
+	MemorisedIcon[0] = 0;
 }
 
 SPLExtHeader::~SPLExtHeader(void)
@@ -88,6 +93,13 @@ Spell::Spell(void)
 		inited = true;
 		InitSpellTables();
 	}
+	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
+	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
+	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
+	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
+	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
+	TimePerLevel = TimeConstant = 0;
+	SpellName = SpellNameIdentified = Flags = SpellType = ExclusionSchool = PriestType = 0;
 }
 
 Spell::~Spell(void)
@@ -221,6 +233,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		if (pst_hostile) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
+		fx->CasterID = self->GetGlobalID(); // needed early for check_type, reset later
 		fx->CasterLevel = level;
 		fx->SpellLevel = SpellLevel;
 

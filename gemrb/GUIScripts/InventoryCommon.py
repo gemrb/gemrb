@@ -336,7 +336,9 @@ def DisplayItem (itemresref, type):
 	elif dialog:
 		Button.SetText (strrefs[5])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
-	elif familiar:
+	elif familiar and not GameCheck.IsPST():
+		# PST earings share a type with familiars, so no
+		# mods that allow familiars would be possible in PST
 		Button.SetText (4373)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReleaseFamiliar)
 	else:

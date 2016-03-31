@@ -400,7 +400,8 @@ static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0x
 static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
-
+static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
+static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -491,6 +492,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_DAYTIME           0x107
 #define STI_EA                0x108
 #define STI_EVASION           0x109
+#define STI_WATERY            0x110
 #define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
@@ -511,6 +513,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	if (val==0xffffffff) {
 		val = value;
 	}
+	ieDword animID; int ret;
 	switch (idx) {
 	case STI_INVALID:
 		return 0;
@@ -553,7 +556,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 	case STI_EVASION:
 		if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
-			// NOTE: no idea if this is used in iwd2 too
+			// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
 			// FIXME: check for evasion itself
 			if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
 				return 0;
@@ -571,6 +574,15 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 			return 1;
 		}
 		return 0;
+	case STI_WATERY:
+		// hardcoded via animation id, so we can't use STI_TWO_ROWS
+		// sahuagin x2, water elementals x2 (and water weirds)
+		animID = target->GetSafeStat(IE_ANIMATION_ID);
+		ret = !val;
+		if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+			ret = val;
+		}
+		return ret;
 	default:
 		{
 			//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
@@ -954,8 +966,8 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	Actor *donor;
 
 	switch(fx->Parameter2) {
-		case 0: receiver = target; donor = owner; break;
-		case 1: receiver = owner; donor = target; break;
+		case 0: receiver = owner; donor = target; break;
+		case 1: receiver = target; donor = owner; break;
 		default:
 			return FX_NOT_APPLIED;
 	}
@@ -1820,8 +1832,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x116 ShroudOfFlame (how)
-//FIXME: maybe it is cheaper to port effsof1/2 to how than having an alternate effect
-int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_shroud_of_flame(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 
@@ -1830,10 +1841,13 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//don't apply it twice in a round
-	if (EXTSTATE_GET(EXTSTATE_SHROUD)) {
-		return FX_APPLIED;
+	// how has special duration applied with a fixed delay (3s): 1 round/2 levels
+	ieDword time = core->GetGame()->GameTime;
+	if (fx->FirstApply) {
+		fx->Duration = time + fx->Parameter1 * core->Time.round_size;
+		fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	}
+
 	EXTSTATE_SET(EXTSTATE_SHROUD);
 	//directly modifying the color of the target
 	if (fx->Parameter2==1) {
@@ -1844,8 +1858,7 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//timing
-	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%6) ) {
+	if ((fx->Parameter4==time) || (time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
@@ -1854,20 +1867,32 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 	ieDword damagetype = DAMAGE_FIRE;
 
+/* how's shroud of flame has this set ...
 	if (fx->Parameter2==1) {
 		damagetype = DAMAGE_COLD;
 	}
+*/
 
-	target->Damage(fx->Parameter1, damagetype, Owner, fx->IsVariable, fx->SavingThrowType);
-	ApplyDamageNearby(Owner, target, fx, damagetype);
+	// shroud of flames does not have the dice fields set
+	if (fx->Parameter1 == 0) {
+		fx->Parameter1 = core->Roll(2, 6, 0);
+	}
+
+	Actor *caster = GetCasterObject();
+	target->Damage(fx->Parameter1, damagetype, caster, fx->IsVariable, fx->SavingThrowType);
+	fx->Parameter1 = core->Roll(1, 4, 0);
+	ApplyDamageNearby(caster, target, fx, damagetype);
+	fx->Parameter1 = 0;
 	return FX_APPLIED;
 }
 
+//apply effsof1 on target
+//apply effsof2 on nearby
 static ieResRef resref_sof1={"effsof1"};
 static ieResRef resref_sof2={"effsof2"};
 
 //0x116 ShroudOfFlame (iwd2)
-int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_shroud_of_flame2(%2d)", fx->Opcode);
 
@@ -1877,31 +1902,36 @@ int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (target->SetSpellState( SS_FLAMESHROUD)) return FX_APPLIED;
+	if (target->fxqueue.HasEffect(fx_shroud_of_flame2_ref)) return FX_APPLIED;
+
 	EXTSTATE_SET(EXTSTATE_SHROUD); //just for compatibility
 
 	if(core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xa0, 0, 0);
 	}
 
-	//apply resource on hitter
-	//actually, this should be a list of triggers
-	if (fx->Resource[0]) {
-		memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
-	} else {
-		memcpy(target->applyWhenBeingHit,resref_sof1,sizeof(ieResRef));
-	}
-
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if ((fx->Parameter4==time) || (time%6) ) {
+	if ((fx->Parameter4==time) || (time%time%core->Time.round_size) ) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
 
-	if (fx->Resource2[0]) {
-		core->ApplySpell(fx->Resource2, target, Owner, fx->Power);
+	//apply resource on owner
+	//actually, this should be a list of triggers
+	ieResRef firedmg;
+	if (fx->Resource[0]) {
+		CopyResRef(firedmg, fx->Resource);
 	} else {
-		core->ApplySpell(resref_sof2, target, Owner, fx->Power);
+		CopyResRef(firedmg, resref_sof1);
+	}
+	Actor *caster = GetCasterObject();
+	core->ApplySpell(firedmg, target, caster, fx->Power);
+
+	if (fx->Resource2[0]) {
+		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
+	} else {
+		core->ApplySpell(resref_sof2, target, caster, fx->Power);
 	}
 	return FX_APPLIED;
 }
@@ -2164,15 +2194,19 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
-	//changed this to the opposite (cure light wounds resisted by undead)
-	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
-		return FX_NOT_APPLIED;
+	// was the opposite for a while (cure light wounds resisted by undead), but that spell uses 0x122 anyway
+	// eg. bard songs check for non-allies and deaf actors to exclude them
+	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+		return FX_ABORT;
 	}
 
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	// don't abort if we passed the check and we're in the same spell
+	if (!strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource))) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
+	// FIXME: should probably return FX_NOT_APPLIED instead
+	Log(DEBUG, "IWDOpcodes", "fx_resist_spell: blatantly resisted spell %s!", fx->Source);
 	return FX_ABORT;
 }
 
@@ -2579,7 +2613,17 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_FIRESHIELD);
 		target->SetOverlay(OV_FIRESHIELD1);
 	}
-	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
+	// create a general CastSpellOnCondition effect (bg2) for the payload
+	// much nicer than iwd's ApplyDamageNearby
+	if (fx->FirstApply) {
+		Effect *fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_ABSOLUTE);
+		assert(fx2);
+		fx2->Duration = fx->Duration;
+		CopyResRef(fx2->Source, fx->Source);
+		CopyResRef(fx2->Resource, fx->Resource);
+		core->ApplyEffect(fx2, target, target);
+		delete fx2;
+	}
 	return FX_APPLIED;
 }
 
@@ -2650,7 +2694,7 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 
 //412 Control2
 
-int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//prot from evil deflects it
 	if (target->fxqueue.HasEffect(fx_protection_from_evil_ref)) return FX_NOT_APPLIED;
@@ -2670,22 +2714,23 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	if(0) print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
-	if (Owner->Type==ST_ACTOR) {
-		enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+	Scriptable *caster = GetCasterObject();
+	if (caster && caster->Type==ST_ACTOR) {
+		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF;
 	}
 
-	switch(fx->Parameter2)
-	{
-	case 0:
-		displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
-		break;
-	case 1:
-		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
-		break;
-	default:
-		displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
-
-		break;
+	if (fx->FirstApply) {
+		switch (fx->Parameter2) {
+		case 0:
+			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
+			break;
+		case 1:
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
+			break;
+		default:
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
+			break;
+		}
 	}
 	STATE_SET( STATE_CHARMED );
 	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
@@ -3293,15 +3338,23 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //same as BG2 OffscreenAIModifier
 
 //440 BarbarianRage
-int fx_barbarian_rage (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+// both normal and greater rage bonuses are handled by the innate itself
+// we use this effect to add the fatigue maluses that follow afterwards
+static ieResRef FatigueRef = {"FATIGUE"};
+int fx_barbarian_rage (Scriptable* /*Owner*/, Actor *target, Effect* fx)
 {
 	if(0) print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
-	// Greater rage is handled by a different spell and spell state, all set externally
-	// Same goes for normal rage boni
-	// TODO: after 5 rounds (expiry) apply the "Fatigued" effect, whereby the barbarian is weakened (at least STR an DEX)
-	// at level 20 they receive Tireless Rage, which makes this effect useless,
-	//  (unless it really adds immunities to all charm, hold, and fear spells)
-	// it does not appear to be a spell though, so it's was likely a hack
+
+	// Tireless rage (no fatigue)
+	if (target->GetBarbarianLevel() >= 20) return FX_NOT_APPLIED;
+
+	// apply a spell with the maluses just as we're about to expire
+	// currently -2 str, -2 dex, fatigue icon
+	if (core->GetGame()->GameTime + 1 == fx->Duration) {
+		Scriptable *caster = GetCasterObject();
+		core->ApplySpell(FatigueRef, target, caster, 0);
+	}
+
 	return FX_APPLIED;
 }
 
@@ -3394,7 +3447,7 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->ToHit.HandleFxBonus(chrmod, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	}
 	STAT_ADD(IE_DAMAGEBONUS, target->GetPaladinLevel());
-	return FX_NOT_APPLIED;
+	return FX_APPLIED;
 }
 
 //447 Restoration

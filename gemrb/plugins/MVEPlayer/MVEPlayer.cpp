@@ -42,6 +42,7 @@ MVEPlay::MVEPlay(void)
 : decoder(this)
 {
 	video = core->GetVideoDriver();
+	validVideo = false;
 }
 
 MVEPlay::~MVEPlay(void)

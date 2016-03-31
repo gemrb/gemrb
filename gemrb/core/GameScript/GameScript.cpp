@@ -931,7 +931,6 @@ static const ActionLink actionnames[] = {
 	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE},
 	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
 	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE},
-	{"spellwait", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
 	{"startcombatcounter", GameScript::StartCombatCounter, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
@@ -2029,12 +2028,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// this one is a bit more complicated, due to possible
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
-						//HoW ar9708, djinni would become visible only if this is not commented out
-						//See: SEDJINNI.BCS
-						//BG2 on the other hand ... (eg. spirit trolls trollsp01 in ar1506)
-						if (core->HasFeature(GF_SKIPUPDATE_HACK)) {
-							if (done) *done = true;
-						}
+						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
 						return false;
 					}
 
@@ -2273,8 +2267,8 @@ bool Condition::Evaluate(Scriptable* Sender)
 /* this may return more than a boolean, in case of Or(x) */
 int Trigger::Evaluate(Scriptable* Sender)
 {
-	if (!this) {
-		Log(ERROR, "GameScript", "Trigger evaluation fails due to NULL trigger.");
+	if (triggerID >= MAX_TRIGGERS) {
+		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: %d", triggerID);
 		return 0;
 	}
 	TriggerFunction func = triggers[triggerID];
@@ -2470,14 +2464,6 @@ Trigger* GenerateTrigger(char* String)
 		negate = TF_NEGATE;
 	}
 	int len = strlench(String,'(')+1; //including (
-	// remove any preceding space (eg. 51379 pst store item trigger strref)
-	if (String[len-2] == ' ') {
-		String[len-2] = String[len-1];
-		int flen = strlen(String);
-		memmove(String+len-1, String+len, flen-len);
-		String[flen-1] = '\0';
-		len--;
-	}
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
@@ -2627,6 +2613,7 @@ void Action::dump(StringBuffer& buffer) const
 	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
+	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
 	for (i=0;i<3;i++) {
 		if (objects[i]) {
 			buffer.appendFormatted( "%d. ",i+1);
@@ -2636,7 +2623,7 @@ void Action::dump(StringBuffer& buffer) const
 		}
 	}
 
-	buffer.appendFormatted("RefCount: %d\n", RefCount);
+	buffer.appendFormatted("RefCount: %d\tactionID: %d\n", RefCount, actionID);
 }
 
 }

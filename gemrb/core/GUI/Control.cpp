@@ -91,6 +91,13 @@ int Control::RunEventHandler(ControlEventHandler handler)
 	return 1;
 }
 
+void Control::UpdateState(const char* varname, unsigned int val)
+{
+	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
+		UpdateState(val);
+	}
+}
+
 void Control::SetFocus(bool focus)
 {
 	Owner->SetFocused(this);

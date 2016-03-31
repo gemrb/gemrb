@@ -22,7 +22,7 @@ import GameCheck
 
 def CreateScrollBar(func):
 	def wrapper(win, control, *args):
-		if len(args) < 6:
+		if len(args) < 5:
 			# append the BAM resref
 			if GameCheck.IsBG2():
 				args += ('GUISCRCW',)

@@ -113,11 +113,8 @@ void Progressbar::SetPosition(unsigned int pos)
 	MarkDirty();
 }
 
-void Progressbar::UpdateState(const char* VariableName, unsigned int Sum)
+void Progressbar::UpdateState(unsigned int Sum)
 {
-	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-		return;
-	}
 	SetPosition(Sum);
 	MarkDirty();
 	if(Value==100)

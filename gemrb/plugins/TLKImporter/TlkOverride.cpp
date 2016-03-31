@@ -315,13 +315,6 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 {
 	char *string;
 
-	if (!this) {
-		Length = 0;
-		string = ( char* ) malloc( 1 );
-		string[0] = 0;
-		return string;
-	}
-
 #ifdef CACHE_TLK_OVERRIDE
 	StringMapType::iterator tmp = stringmap.find(strref);
 	if (tmp!=stringmap.end()) {

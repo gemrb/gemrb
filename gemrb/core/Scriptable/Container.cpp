@@ -52,6 +52,7 @@ Container::Container(void)
 	// NULL should be 0 for this
 	memset (groundicons, 0, sizeof(groundicons) );
 	groundiconcover = 0;
+	OpenFail = 0;
 }
 
 void Container::FreeGroundIcons()
@@ -250,15 +251,17 @@ void Container::TryBashLock(Actor *actor)
 {
 	//Get the strength bonus agains lock difficulty
 	int bonus;
+	unsigned int roll;
 
 	if (core->HasFeature(GF_3ED_RULES)) {
 		bonus = actor->GetAbilityBonus(IE_STR);
+		roll = actor->LuckyRoll(1, 100, bonus, 0);
 	} else {
 		int str = actor->GetStat(IE_STR);
 		int strEx = actor->GetStat(IE_STREXTRA);
 		bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+		roll = actor->LuckyRoll(1, 10, bonus, 0);
 	}
-	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
 	if (core->HasFeature(GF_3ED_RULES)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~

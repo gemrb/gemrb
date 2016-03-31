@@ -820,22 +820,15 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
 				}
 				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
-					Actor *target;
-					int i = game->GetPartySize(true);
-					if(i<2) break;
-					i=RAND(0, i-1);
-					do
-					{
-						target = game->GetPC(i, true);
-						if(target==lastActor) continue;
-						if(target->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE) continue;
-
-						char Tmp[40];
-						snprintf(Tmp,sizeof(Tmp),"Interact(\"%s\")",target->GetScriptName() );
-						lastActor->AddAction(GenerateAction(Tmp));
+					int size = game->GetPartySize(true);
+					if (size < 2 || game->NpcInParty < 2) break;
+					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
+						Actor *target = game->GetPC(i%size, true);
+						if (target == lastActor) continue;
+						if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; //not NPC
+						lastActor->HandleInteractV1(target);
 						break;
 					}
-					while(i--);
 				}
 				break;
 			case 'j': //teleports the selected actors
@@ -1476,6 +1469,7 @@ void GameControl::UpdateScrolling() {
 //generate action code for source actor to try to attack a target
 void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
+	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	source->CommandActor(GenerateActionDirect( "NIDSpecial3()", tgt));
 }
 
@@ -1635,6 +1629,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 //generate action code for source actor to use talk to target actor
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
+	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	//Nidspecial1 is just an unused action existing in all games
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
@@ -1647,6 +1642,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 //generate action code for actor appropriate for the target mode when the target is a container
 void GameControl::HandleContainer(Container *container, Actor *actor)
 {
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	//container is disabled, it should not react
 	if (container->Flags & CONT_DISABLED) {
 		return;
@@ -1681,6 +1677,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is a door
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		Point *p = door->toOpen;
@@ -1715,6 +1712,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
 		TryToCast(actor, p);

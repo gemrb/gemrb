@@ -30,6 +30,7 @@ using namespace GemRB;
 PROImporter::PROImporter(void)
 {
 	str = NULL;
+	version = 0;
 }
 
 PROImporter::~PROImporter(void)

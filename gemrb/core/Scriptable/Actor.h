@@ -272,16 +272,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef applyWhenHittingMelee;  //set melee effect
-	ieResRef applyWhenHittingRanged; //set ranged effect
-	ieResRef applyWhenNearLiving;    //cast spell on condition
-	ieResRef applyWhen50Damage;      //cast spell on condition
-	ieResRef applyWhen90Damage;      //cast spell on condition
-	ieResRef applyWhenEnemySighted;  //cast spell on condition
-	ieResRef applyWhenPoisoned;      //cast spell on condition
-	ieResRef applyWhenHelpless;      //cast spell on condition
-	ieResRef applyWhenAttacked;      //cast spell on condition
-	ieResRef applyWhenBeingHit;      //cast spell on condition
 	ieResRef ModalSpell;             //apply this spell once per round
 	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
@@ -334,7 +324,6 @@ public:
 	int LastDamageType;
 	int LastDamage;
 	Point FollowOffset;//follow lastfollowed at this offset
-	Point HomeLocation;//spawnpoint, return here after rest
 	bool Spawned;      //has been created by a spawn point
 
 	ieDword TargetDoor;
@@ -412,6 +401,9 @@ private:
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
+	void ApplyModal(ieResRef modalSpell);
+	/** for IE_EXISTANCEDELAY */
+	void PlayExistenceSounds();
 public:
 	Actor(void);
 	~Actor(void);
@@ -473,7 +465,8 @@ public:
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset);
-	void GetSoundFolder(char *soundset, int flag) const;
+	/* Use overrideSet to replace PCStats->SoundSet */
+	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
 	const char* GetName(int which) const
 	{
@@ -536,13 +529,16 @@ public:
 	void Interact(int type);
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
+	/* returns a random remapped verbal constant strref */
+	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count, bool force=false) const;
+	void VerbalConstant(int start, int count, bool queue=false) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
+	bool HasSpecialDeathReaction(const char *deadname) const;
 	void ReactToDeath(const char *deadname);
 	/* sends trigger_died to everyone in visual range */
 	void SendDiedTrigger();
@@ -681,6 +677,8 @@ public:
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
 	int HandleInteract(Actor *target);
+	/* start bg1-style banter dialog */
+	void HandleInteractV1(Actor *target);
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */
@@ -891,6 +889,7 @@ public:
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
+	void ChangeSorcererType (ieDword classIdx);
 };
 }
 

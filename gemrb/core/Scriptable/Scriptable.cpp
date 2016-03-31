@@ -45,6 +45,9 @@ namespace GemRB {
 static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
+static bool pst_flags = false;
+static ieResRef UncannyDodgeBonus = {"UNCANNY"};
+static unsigned short ClearActionsID = 133; // same for all games
 
 /***********************
  *  Scriptable Class   *
@@ -123,6 +126,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 	startActive = core->HasFeature(GF_START_ACTIVE);
 	third = core->HasFeature(GF_3ED_RULES);
+	pst_flags = core->HasFeature(GF_PST_STATE_FLAGS);
 }
 
 Scriptable::~Scriptable(void)
@@ -490,13 +494,19 @@ Action* Scriptable::PopNextAction()
 
 void Scriptable::ClearActions()
 {
-	ReleaseCurrentAction();
-	for (unsigned int i = 0; i < actionQueue.size(); i++) {
-		Action* aC = actionQueue.front();
-		actionQueue.pop_front();
-		aC->Release();
+	// pst sometimes uses clearactions in the middle of a cutscene (eg. 1203cd21)
+	// and expect it to clear only the previous actions, not the whole queue
+	if (pst_flags && CurrentAction && CurrentAction->actionID == ClearActionsID) {
+		ReleaseCurrentAction();
+	} else {
+		ReleaseCurrentAction();
+		for (unsigned int i = 0; i < actionQueue.size(); i++) {
+			Action* aC = actionQueue.front();
+			actionQueue.pop_front();
+			aC->Release();
+		}
+		actionQueue.clear();
 	}
-	actionQueue.clear();
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -727,7 +737,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 	}
 
-	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
+	if (pst_flags && (Type == ST_ACTOR)) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			//seriously, wild surges and EE in the same game?
 			//anyway, it would be too many duplications
@@ -1857,6 +1867,18 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
+	// uncanny dodge trap save bonus
+	if (third) {
+		// no info anywhere, but 3ed rules add +1 reflex saves and +1 AC
+		// we approx that by applying this bonus for half a round
+		Actor *victim = core->GetGame()->GetActorByGlobalID(ID);
+		if (victim) {
+			ieDword bonus = victim->GetStat(IE_UNCANNY_DODGE) & 0xff;
+			if (bonus) {
+				core->ApplySpell(UncannyDodgeBonus, victim, this, bonus);
+			}
+		}
+	}
 	if (!TrapResets()) {
 		Trapped = false;
 	}
@@ -1951,6 +1973,9 @@ Movable::Movable(ScriptableType type)
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
 	AttackMovements[2] = 0;
+	HomeLocation.x = 0;
+	HomeLocation.y = 0;
+	maxWalkDistance = 0;
 }
 
 Movable::~Movable(void)
@@ -2278,9 +2303,25 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	//p.x+=x;
 	//p.y+=(int) sqrt(100-x*x);
 
-	//selecting points in a square around actor (-24 to +24)
-	p.x+=core->Roll(1,49,-25);
-	p.y+=core->Roll(1,49,-25);
+	//selecting points in a square around actor (by default -25 to +25)
+	short x1 = std::max(p.x - 25, 0);
+	short x2 = std::min(p.x + 25, area->GetWidth() * 16);
+	short y1 = std::max(p.y - 25, 0);
+	short y2 = std::min(p.y + 25, area->GetHeight() * 12);
+	if (maxWalkDistance > 0) {
+		short minx = std::max(HomeLocation.x - maxWalkDistance, 0);
+		short maxx = std::min(HomeLocation.x + maxWalkDistance, area->GetWidth() * 16);
+		short miny = std::max(HomeLocation.y - maxWalkDistance, 0);
+		short maxy = std::min(HomeLocation.y + maxWalkDistance, area->GetHeight() * 12);
+
+		if (x1 < minx) x1 = std::min(p.x, minx);
+		if (x2 > maxx) x2 = std::max(p.x, maxx);
+		if (y1 < miny) y1 = std::min(p.y, miny);
+		if (y2 > maxy) y2 = std::max(p.y, maxy);
+	}
+	p.x += core->Roll(1, x2 - x1 + 1, x1 - p.x - 1);
+	p.y += core->Roll(1, y2 - y1 + 1, y1 - p.y - 1);
+
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
 	path = area->RunAway( Pos, p, size, 50, 1 );

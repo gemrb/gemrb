@@ -506,7 +506,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 
 void Spellbook::SetBookType(int bt)
 {
-	sorcerer = bt;
+	sorcerer |= bt;
 }
 
 //returns the page group of the spellbook this spelltype belongs to
@@ -534,6 +534,9 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 		//not IWD2
 		if (spell->SpellType<6) {
 			spl->Type = spelltypes[spell->SpellType];
+			if (spell->SpellLevel == 0) { // totemic druid has some broken innates (fixed by fixpack)
+				spell->SpellLevel = 1;
+			}
 			spl->Level = spell->SpellLevel-1;
 		} else {
 			spl->Type = IE_SPELL_TYPE_INNATE;
@@ -568,7 +571,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 	}
 
 	spells[type][level]->known_spells.push_back(spl);
-	if (1<<type == innate || type == IE_IWD2_SPELL_SHAPE) {
+	if (1<<type == innate || 1<<type == 1<<IE_IWD2_SPELL_SONG) {
 		spells[type][level]->SlotCount++;
 		spells[type][level]->SlotCountWithBonus++;
 	}

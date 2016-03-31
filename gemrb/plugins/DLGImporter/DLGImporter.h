@@ -73,6 +73,7 @@ public:
 	~DLGImporter(void);
 	bool Open(DataStream* stream);
 	Dialog* GetDialog() const;
+	Condition* GetCondition(char *string) const;
 private:
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;

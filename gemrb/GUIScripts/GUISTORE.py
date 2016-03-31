@@ -90,7 +90,7 @@ storetips = (14288,14292,14291,12138,15013,14289,14287)
 roomdesc = (17389,17517,17521,17519)
 roomnames = (14294, 14295, 14296, 14297)
 windowIDs = { 'shop' : 2, 'ident' : 4, 'steal' : 6, 'donate' : 9, 'heal' : 5, 'rumour' : 8, 'rent' : 7, 'iteminfo' : 12,  'cureinfo' : 14, 'rentconfirm' : 11, 'error' : 10 }
-strrefs = { 'done' : 11973, 'cancel' : 13727, 'buy' : 13703, 'sell' : 13704, 'identify' : 14133, 'steal' : 14179, 'donate' : 15101, 'heal' : 8786, 'rumors' : 14144, 'rent' : 14293, 'itemnamecost' : 10162, 'restedfor' : 16476, 'rest' : 17199, 'confirmrest' : 15358, 'itemstoocostly' : 11047, 'spelltoocostly' : 11048, 'drinktoocostly' : 11049, 'toodrunk' : 10832, 'idtoocostly' : 11050, 'roomtoocostly' : 11051, 'donorgood' : 10468, 'donorfail' : 10468 }
+strrefs = { 'done' : 11973, 'cancel' : 13727, 'buy' : 13703, 'sell' : 13704, 'identify' : 14133, 'steal' : 14179, 'donate' : 15101, 'heal' : 8786, 'rumors' : 14144, 'rent' : 14293, 'itemnamecost' : 10162, 'restedfor' : 16476, 'rest' : 17199, 'confirmrest' : 15358, 'itemstoocostly' : 11047, 'spelltoocostly' : 11048, 'drinktoocostly' : 11049, 'toodrunk' : 10832, 'idtoocostly' : 11050, 'roomtoocostly' : 11051, 'donorgood' : 10468, 'donorfail' : 10469 }
 store_funcs = None
 StoreButtonCount = 4
 if GameCheck.IsIWD1():
@@ -161,7 +161,8 @@ def OpenStoreWindow ():
 	if GameCheck.IsPST():
 		CureTable = GemRB.LoadTable("speldesc") #additional info not supported by core
 	else:
-		RepModTable = GemRB.LoadTable ("repmodst")
+		if not GameCheck.IsIWD2(): # present from before, resulting in a 10x price increase
+			RepModTable = GemRB.LoadTable ("repmodst")
 		SpellTable = GemRB.LoadTable ("storespl", 1)
 
 	#these are function pointers, not strings
@@ -207,6 +208,9 @@ def OpenStoreWindow ():
 		Buttons[i] = Button = Window.GetControl (i+1)
 		Action = store_buttons[i]
 		Button.SetVarAssoc ("Action", i)
+		# iwd2 has no steal window
+		if GameCheck.IsIWD2() and Action == 2:
+			Action = -1
 		if Action>=0:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
@@ -447,7 +451,6 @@ def OpenStoreIdentifyWindow ():
 
 	TextArea = Window.GetControl ('IDTA')
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
-	TextArea.AttachScrollBar (ScrollBar) # for pst
 
 	# Identify
 	LeftButton = Button = Window.GetControl ('IDLBTN')
@@ -462,7 +465,6 @@ def OpenStoreIdentifyWindow ():
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+8)
-		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
@@ -1056,6 +1058,7 @@ def OpenItemAmountWindow ():
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
+	GemRB.SetRepeatClickFlags (GEM_RK_QUADRUPLESPEED, OP_OR)
 	Index = GemRB.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Amount = Slot['Purchased']
@@ -1834,6 +1837,7 @@ def GulpDrink ():
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
 	text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
 	TextArea.Append (text)
+	if text > -1: TextArea.Append ("\n\n")
 	GemRB.PlaySound (DEF_DRUNK)
 	UpdateStoreRumourWindow ()
 	return

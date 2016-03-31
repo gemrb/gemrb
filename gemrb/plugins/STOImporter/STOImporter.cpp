@@ -22,9 +22,11 @@
 
 #include "win32def.h"
 
+#include "DialogMgr.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Inventory.h"
+#include "PluginMgr.h"
 #include "GameScript/GameScript.h"
 
 using namespace GemRB;
@@ -140,8 +142,12 @@ Store* STOImporter::GetStore(Store *s)
 		GetItem(item, s);
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
-			char *TriggerCode = core->GetCString( ieStrRef(item->InfiniteSupply) );
-			item->trigger = GenerateTrigger(TriggerCode);
+			char *TriggerCode = core->GetCString( (ieStrRef) item->InfiniteSupply );
+			// there can be multiple triggers, so we use a Condition to handle them
+			// all and avoid the need for custom parsing
+			PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
+			item->triggers = dm->GetCondition(TriggerCode);
+
 			core->FreeString(TriggerCode);
 
 			//if there are no triggers, GetRealStockSize is simpler

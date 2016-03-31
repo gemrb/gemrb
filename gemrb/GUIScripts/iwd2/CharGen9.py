@@ -194,16 +194,12 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 
-	#setting feats
-	TmpTable = GemRB.LoadTable ("featreq")
-	FeatCount = TmpTable.GetRowCount ()
-	for i in range (FeatCount):
-		GemRB.SetFeat (MyChar, i, GemRB.GetVar ("Feat "+str(i) ) )
+	# feats are set already in the Feats step
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
-	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait, 1)
 	GemRB.SetNextScript ("SPPartyFormation")
 
 	# apply class/kit abilities

@@ -445,7 +445,7 @@ Actor *Projectile::GetTarget()
 		if (!effects) {
 			return target;
 		}
-		if (original==target) {
+		if (original == target && !effects->HasHostileEffects()) {
 			effects->SetOwner(target);
 			return target;
 		}

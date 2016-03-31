@@ -95,8 +95,9 @@ public:
 	/** Returns the selected text */
 	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(const char* VariableName, unsigned int optIdx);
+	void UpdateState(unsigned int optIdx);
 	void SetScrollBar(ScrollBar* sb);
+
 private: // Private attributes
 	// dialog and listbox handling
 	typedef std::pair<int, TextContainer*> OptionSpan;

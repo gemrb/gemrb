@@ -3,7 +3,8 @@
 # TODO: figure out, what exactly openal needs or try sdl-mixer2
 
 GEMRB_GIT_PATH=$1
-ENVROOT=${2:-$1/android}
+APILEVEL=${2:-17}
+ENVROOT=${3:-$1/android}
 GEMRB_VERSION=""
 
 function get_sources {
@@ -209,13 +210,12 @@ function move_and_edit_projectfiles {
 
   # add the neccessary libraries to the base activity
   echo -en "Performing neccessary edits...\n" &&
-  sed -i -e '/System.loadLibrary("SDL2")/ a\
-          System.loadLibrary("ogg"); \
-          System.loadLibrary("vorbis"); \
-          System.loadLibrary("openal"); \
-          System.loadLibrary("python");' "$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java" &&
+  app="$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java"
+  if ! grep -q python <<< "$app"; then
+    sed -i 's/"SDL2_image",/&\n "ogg", "vorbis", "openal", "python2.6",/' "$app"
+  fi &&
 
-  sed -i -e 's,sdlFormat = 0x8,sdlFormat = 0x1,g' "$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java" &&
+  sed -i -e 's,sdlFormat = 0x8,sdlFormat = 0x1,g' "$app" &&
 
   sed -i -e 's,SDL_app,GemRB,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.c" &&
   sed -i -e 's,//exit,exit,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.c" &&
@@ -266,7 +266,7 @@ setup_dir_struct &&
 move_and_edit_projectfiles &&
 build_deps &&
 move_libraries &&
-android update project -t android-17 -p "$ENVROOT/build/gemrb" &&
+android update project -t android-$APILEVEL -p "$ENVROOT/build/gemrb" &&
 finished || {
   echo 'Building failed!'
   exit 2

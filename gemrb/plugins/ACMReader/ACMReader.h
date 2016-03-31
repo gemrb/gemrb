@@ -47,7 +47,7 @@ private:
 	int make_new_samples();
 public:
 	ACMReader()
-		: samples_left( 0 ), block( NULL ), values( NULL ),
+		: samples_left(0), levels(0), subblocks(0), block_size(0), block(NULL), values(NULL),
 		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
 	{
 	}

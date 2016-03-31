@@ -20,14 +20,12 @@ FOREACH(RESOURCE_DIR_NAME ${RESOURCE_LIST})
 					PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${RESOURCE_DIR_NAME}/${CHILD}
 				)
 				SET(RESOURCE_FILES ${RESOURCE_FILES} ${RESOURCE_DIR_FILES})
-			ELSE()
-				IF (NOT ${CHILD} MATCHES "\\.DS_Store|.*\\.am")
-					SET_SOURCE_FILES_PROPERTIES(
-						"${RESOURCE_DIR}/${CHILD}"
-						PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${RESOURCE_DIR_NAME}
-					)
-					SET(RESOURCE_FILES ${RESOURCE_FILES} "${RESOURCE_DIR_NAME}/${CHILD}")
-				ENDIF()
+			ELSEIF(NOT ${CHILD} MATCHES "\\.DS_Store|.*\\.am")
+				SET_SOURCE_FILES_PROPERTIES(
+					"${RESOURCE_DIR}/${CHILD}"
+					PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${RESOURCE_DIR_NAME}
+				)
+				SET(RESOURCE_FILES ${RESOURCE_FILES} "${RESOURCE_DIR_NAME}/${CHILD}")
 			ENDIF()
 		ENDFOREACH()
 	ELSE (APPLE)
@@ -49,9 +47,32 @@ IF(APPLE) #application bundle generation
 	)
 
 	SET(MACOSX_BUNDLE_ICON_FILE gemrb)
-	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE ../apple/CocoaWrapper/mac/CocoaWrapper.mm ../apple/AppleLogger.mm ../apple/EmptyStringTransformer.m
-					../artwork/gemrb.icns ../apple/defaults.plist
+	SET(PRODUCT_NAME "GemRB") # for info.plist
+	
+	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE
+					../apple/CocoaWrapper/mac/CocoaWrapper.mm
+					../apple/AppleLogger.mm
+					../apple/EmptyStringTransformer.m
+					../artwork/gemrb.icns
+					../apple/defaults.plist
 					${RESOURCE_FILES})
+
+	# we already link to Cocoa and we need to modify this with the ‘dylib_file’ option for non-framework SDL builds
+	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY ${SDL_LIBRARY})
+	GET_FILENAME_COMPONENT(SDL_LIBRARY ${SDL_LIBRARY} REALPATH)
+	SET(BUNDLE_FRAMEWORK_PATH "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
+					
+	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY}")
+	FILE(COPY ${SDL_LIBRARY} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
+
+	GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
+	SET(SDL_LIBRARY "${BUNDLE_FRAMEWORK_PATH}/${SDL_BASENAME}")
+	
+	IF(NOT SDL_BASENAME MATCHES ".framework")
+		# change the "install name" of the copied SDL
+		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIBRARY}")
+	ENDIF()
+
 	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
 ELSE(APPLE)
@@ -79,7 +100,7 @@ ELSE(WIN32)
 	ADD_CUSTOM_COMMAND (TARGET gemrb POST_BUILD 
                       COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text 
                               --compile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources/GemRB.nib 
-                            ../../apple/CocoaWrapper/mac/nibs/GemRB.xib
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../apple/CocoaWrapper/mac/nibs/GemRB.xib
                       COMMENT "Compiling GemRB.xib")
 
 	if (STATIC_LINK)

@@ -1209,7 +1209,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("FogOfWar", FogOfWar = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
-	int MaxPartySize = 6;
+	MaxPartySize = 6;
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
@@ -2120,9 +2120,10 @@ static const char *game_flags[GF_COUNT+1]={
 		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
 		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
 		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
-		"SkipUpdateHack",     //74GF_SKIPUPDATE_HACK
+		"ShopsRechargeItems", //74GF_SHOP_RECHARGE
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
+		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2431,7 +2432,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 
 		// mark the summon, but only if they don't have a special sex already
-		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA) {
+		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA && ab->BaseStats[IE_SEX] != SEX_ILLUSION) {
 			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
@@ -4870,6 +4871,17 @@ void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB)) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
+}
+
+/* counts the on bits in a number */
+ieDword Interface::CountBits (ieDword n) const
+{
+	ieDword count = 0;
+	while (n) {
+		count += n & 0x1u;
+		n >>= 1;
+	}
+	return count;
 }
 
 }

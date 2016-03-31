@@ -155,6 +155,10 @@ def UpdatePriestWindow (Window):
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	#bringing window front
+	Window.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PriestPrevLevelPress ():

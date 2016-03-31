@@ -272,7 +272,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 	tm = tmm->GetTileMap(tm);
 	if (!tm) {
-		print("[AREImporter]: No Tile Map Available.");
+		Log(ERROR, "AREImporter", "No tile map available.");
 		return false;
 	}
 
@@ -297,7 +297,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
-		print("[AREImporter]: No lightmap available.");
+		Log(ERROR, "AREImporter", "No lightmap available.");
 		return false;
 	}
 
@@ -343,8 +343,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		day_or_night = true;
 
 	Map* map = new Map();
-	if(!map) {
-		error("AREImporter", "Can't allocate map (out of memory).\n");
+	if (!map) {
+		Log(ERROR, "AREImporter", "Can't allocate map (out of memory).");
+		return NULL;
 	}
 	if (core->SaveAsOriginal) {
 		map->version = bigheader;
@@ -373,7 +374,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
-		print("[AREImporter]: No Tile Map Manager Available.");
+		Log(ERROR, "AREImporter", "No tile map manager available.");
 		delete map;
 		return NULL;
 	}
@@ -392,7 +393,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	//there was no tilemap set yet, so lets just send a NULL
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
-		print("[AREImporter]: No Tile Map Available.");
+		Log(ERROR, "AREImporter", "No tile map available.");
 		delete map;
 		return NULL;
 	}
@@ -425,7 +426,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
-		print("[AREImporter]: No lightmap available.");
+		Log(ERROR, "AREImporter", "No lightmap available.");
 		return NULL;
 	}
 
@@ -433,7 +434,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
-		print("[AREImporter]: No searchmap available.");
+		Log(ERROR, "AREImporter", "No searchmap available.");
 		return NULL;
 	}
 
@@ -441,7 +442,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {
-		print("[AREImporter]: No heightmap available.");
+		Log(ERROR, "AREImporter", "No heightmap available.");
 		return NULL;
 	}
 
@@ -472,7 +473,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
-	print("Loading regions");
+	Log(DEBUG, "AREImporter", "Loading regions");
 	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (i = 0; i < InfoPointsCount; i++) {
@@ -598,8 +599,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
-	print("Loading containers");
-	//Loading Containers
+	Log(DEBUG, "AREImporter", "Loading containers");
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
 		ieVariable Name;
@@ -705,8 +705,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		c->OpenFail = OpenFail;
 	}
 
-	print("Loading doors");
-	//Loading Doors
+	Log(DEBUG, "AREImporter", "Loading doors");
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
 		int count;
@@ -912,8 +911,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		door->SetDialog(Dialog);
 	}
 
-	print("Loading spawnpoints");
-	//Loading SpawnPoints
+	Log(DEBUG, "AREImporter", "Loading spawnpoints");
 	for (i = 0; i < SpawnCount; i++) {
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		ieVariable Name;
@@ -967,11 +965,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	core->LoadProgress(75);
-	print("Loading actors");
-	//Loading Actors
+	Log(DEBUG, "AREImporter", "Loading actors");
 	str->Seek( ActorOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_CRE_CLASS_ID )) {
-		print("[AREImporter]: No Actor Manager Available, skipping actors");
+		Log(WARNING, "AREImporter", "No Actor Manager Available, skipping actors");
 	} else {
 		PluginHolder<ActorMgr> actmgr(IE_CRE_CLASS_ID);
 		for (i = 0; i < ActorCount; i++) {
@@ -979,7 +976,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule, RemovalTime;
-			ieWord XPos, YPos, XDes, YDes, Spawned;
+			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
 			ieDword Flags;
@@ -998,7 +995,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
-			str->Seek( 4, GEM_CURRENT_POS ); // TODO: movement restriction distance for spawns, random walk http://gibberlings3.net/forums/index.php?showtopic=21724
+			str->ReadWord( &MaxDistance );
+			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused http://gibberlings3.net/forums/index.php?showtopic=21724
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -1032,7 +1030,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
 			if(!actmgr->Open(crefile)) {
-				print("Couldn't read actor: %s!", CreResRef);
+				Log(ERROR, "AREImporter", "Couldn't read actor: %s!", CreResRef);
 				continue;
 			}
 			ab = actmgr->GetActor(0);
@@ -1045,6 +1043,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->Destination.y = YPos;
 			ab->HomeLocation.x = XDes;
 			ab->HomeLocation.y = YDes;
+			ab->maxWalkDistance = MaxDistance;
 			ab->Spawned = Spawned;
 			ab->appearance = Schedule;
 			//copying the scripting name into the actor
@@ -1094,11 +1093,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	core->LoadProgress(90);
-	print("Loading animations");
-	//Loading Animations
+	Log(DEBUG, "AREImporter", "Loading animations");
 	str->Seek( AnimOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		print("[AREImporter]: No Animation Manager Available, skipping animations");
+		Log(WARNING, "AREImporter", "No Animation Manager Available, skipping animations");
 	} else {
 		for (i = 0; i < AnimCount; i++) {
 			AreaAnimation* anim = new AreaAnimation();
@@ -1137,8 +1135,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
-	print("Loading entrances");
-	//Loading Entrances
+	Log(DEBUG, "AREImporter", "Loading entrances");
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (i = 0; i < EntrancesCount; i++) {
 		ieVariable Name;
@@ -1152,9 +1149,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddEntrance( Name, XPos, YPos, Face );
 	}
 
-	print("Loading variables");
+	Log(DEBUG, "AREImporter", "Loading variables");
 	map->locals->LoadInitialValues(ResRef);
-	//Loading Variables
 	str->Seek( VariablesOffset, GEM_STREAM_START );
 	for (i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
@@ -1167,7 +1163,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->locals->SetAt( Name, Value );
 	}
 
-	print("Loading ambients");
+	Log(DEBUG, "AREImporter", "Loading ambients");
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
 		int j;
@@ -1181,8 +1177,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &tmpWord );
 		ambi->origin.y = tmpWord;
 		str->ReadWord( &ambi->radius );
-		str->ReadWord( &ambi->height );
-		str->Seek( 6, GEM_CURRENT_POS );
+		str->Seek( 2, GEM_CURRENT_POS );
+		str->ReadDword( &ambi->pitchVariance );
+		str->ReadWord( &ambi->gainVariance );
 		str->ReadWord( &ambi->gain );
 		for (j = 0;j < MAX_RESCOUNT; j++) {
 			str->ReadResRef( sounds[j] );
@@ -1190,7 +1187,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &tmpWord );
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->interval );
-		str->ReadDword( &ambi->perset );
+		str->ReadDword( &ambi->intervalVariance );
 		// schedule bits
 		str->ReadDword( &ambi->appearance );
 		str->ReadDword( &ambi->flags );
@@ -1207,7 +1204,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddAmbient(ambi);
 	}
 
-	print("Loading automap notes");
+	Log(DEBUG, "AREImporter", "Loading automap notes");
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
@@ -1272,7 +1269,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
-	print("Loading traps");
+	Log(DEBUG, "AREImporter", "Loading traps");
 	for (i = 0; i < TrapCount; i++) {
 		ieResRef TrapResRef;
 		ieDword TrapEffOffset;
@@ -1321,7 +1318,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddProjectile( pro, pos, pos);
 	}
 
-	print("Loading tiles");
+	Log(DEBUG, "AREImporter", "Loading tiles");
 	//Loading Tiled objects (if any)
 	str->Seek( TileOffset, GEM_STREAM_START );
 	for (i = 0; i < TileCount; i++) {
@@ -1357,7 +1354,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );
 	}
 
-	print("Loading explored bitmap");
+	Log(DEBUG, "AREImporter", "Loading explored bitmap");
 	i = map->GetExploredMapSize();
 	if (ExploredBitmapSize==i) {
 		map->ExploredBitmap = (ieByte *) malloc(i);
@@ -1374,7 +1371,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 	map->VisibleBitmap = (ieByte *) calloc(i, 1);
 
-	print("Loading wallgroups");
+	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups( tmm->GetPolygonsCount(),tmm->GetWallGroups() );
 	//setting up doors
 	for (i=0;i<DoorsCount;i++) {
@@ -1988,7 +1985,8 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		tmpWord = 0;
 		stream->WriteWord( &tmpWord); //unknown
 		stream->WriteDword( &ac->RemovalTime);
-		stream->WriteDword( &tmpDword); //more unknowns
+		stream->WriteWord( &ac->maxWalkDistance);
+		stream->WriteWord( &tmpWord); //more unknowns
 		stream->WriteDword( &ac->appearance);
 		stream->WriteDword( &ac->TalkCount);
 		stream->WriteResRef( ac->GetDialog());
@@ -2107,8 +2105,9 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 		tmpWord = (ieWord) am->origin.y;
 		stream->WriteWord( &tmpWord );
 		stream->WriteWord( &am->radius );
-		stream->WriteWord( &am->height );
-		stream->Write( filling, 6 );
+		stream->Write( filling, 2 );
+		stream->WriteDword( &am->pitchVariance );
+		stream->WriteWord( &am->gainVariance );
 		stream->WriteWord( &am->gain );
 		tmpWord = (ieWord) am->sounds.size();
 		int j;
@@ -2121,7 +2120,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );
 		stream->Write( filling, 2 );
 		stream->WriteDword( &am->interval );
-		stream->WriteDword( &am->perset );
+		stream->WriteDword( &am->intervalVariance );
 		stream->WriteDword( &am->appearance );
 		stream->WriteDword( &am->flags );
 		stream->Write( filling, 64);

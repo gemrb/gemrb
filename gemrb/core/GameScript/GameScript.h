@@ -58,6 +58,7 @@ class StringBuffer;
 #define DS_SILENT  32
 #define DS_SPEECH  64
 #define DS_AREA    128
+#define DS_QUEUE   256
 
 //verbal constant (bg2), we have a lookup table (vcremap) for other games
 #define VB_INITIALMEET 0
@@ -87,7 +88,10 @@ class StringBuffer;
 #define VB_TIMMUNE   67
 #define VB_INVENTORY 68
 #define VB_PP_SUCC   69
+#define VB_EXISTENCE 69
+#define VB_HIDE      70
 #define VB_SPELL_DISRUPTED 71
+#define VB_TRAP_SET  72
 #define VB_BIO       74
 
 //diffmode (iwd2)

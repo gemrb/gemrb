@@ -26,7 +26,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import LoadScreen
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
 SaveWindow = None
@@ -47,11 +47,8 @@ def OpenSaveWindow ():
 	global num_rows, ctrl_offset, sav_version, strs
 
 	if GUICommon.CloseOtherWindow (OpenSaveWindow):
-		GemRB.SetVar ("OtherWindow", -1)
 		CloseSaveWindow ()
 		return
-
-	GemRB.GamePause (1, 3)
 
 	if GameCheck.IsIWD2():
 		num_rows = 5
@@ -92,8 +89,8 @@ def OpenSaveWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 		# PC portraits
-		for j in range(min(6, PARTY_SIZE)):
-			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
+		for j in range(min(6, MAX_PARTY_SIZE)):
+			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -148,8 +145,8 @@ def ScrollBarPress():
 		else:
 			Button.SetPicture ("")
 
-		for j in range(min(6, PARTY_SIZE)):
-			Button = Window.GetControl (ctrl_offset[2] + i*min(6, PARTY_SIZE) + j)
+		for j in range(min(6, MAX_PARTY_SIZE)):
+			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
@@ -193,7 +190,8 @@ def ConfirmedSaveGame():
 	OpenConfirmWindow ()
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
-	CloseSaveWindow ()
+
+	OpenSaveWindow ()
 
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname, sav_version)
@@ -247,7 +245,7 @@ def OpenConfirmWindow ():
 			Button.SetPicture("")
 
 		# PC portraits
-		for j in range(min(6, PARTY_SIZE)):
+		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = ConfirmWindow.GetControl (ctrl_offset[9]+j)
 			if Pos<len(Games):
 				Button.SetSprite2D(Games[Pos].GetPortrait(j))
@@ -339,6 +337,7 @@ def CloseSaveWindow ():
 	if SaveWindow:
 		SaveWindow.Unload ()
 		SaveWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()
 		GemRB.SetNextScript ("Start")

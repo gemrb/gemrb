@@ -116,7 +116,7 @@ int SpellEntry::FindSpell(unsigned int kit) const
 			return levels[i].level;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 static int FindSpell(ieResRef spellref, SpellEntry* list, int listsize)
@@ -200,8 +200,10 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<splcount;i++) {
 		if (domlist[i].Equals(name) ) {
-			level = domlist[i].FindSpell(kit);
-				return i;
+			int lev = domlist[i].FindSpell(kit);
+			if (lev == -1) return -1;
+			level = lev;
+			return i;
 		}
 	}
 	return -1;
@@ -218,6 +220,18 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }*/
 
+// just returns the integer part of the log
+// perfect for deducing kit values, since they are bitfields and we don't care about any noise
+static int log2(int value)
+{
+	int pow = -1;
+	while (value) {
+		value = value>>1;
+		pow++;
+	}
+	return pow;
+}
+
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
 	level = 0;
@@ -229,20 +243,31 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 // on the wizard page
 //	if (IsSpecial(name, level, kit)>=0) return IE_IWD2_SPELL_WIZARD;
 
+	// strict domain spell check, so we don't steal the spells from other books
+	// still needs to happen first or the laxer check below can misclassify
+	// first translate the actual kit to a column index to make them comparable
+	// luckily they are in order
+	int kit2 = log2(kit/0x8000); // 0x8000 is the first cleric kit
+	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
+
 	// try harder for the rest
 	for (int i = 0;i<splcount;i++) {
 		if (spllist[i].Equals(name) ) {
 			// iterate over table columns ("kits" - book types)
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 				if (clsmsk & (1<<type)) {
-					level = spllist[i].FindSpell(type);
+					int level2 = spllist[i].FindSpell(type);
+					if (level2 == -1) {
+						Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name, type);
+						level2 = 0; // internal 0-indexed level
+					}
+					level = level2;
 					// FIXME: returning the first will misplace spells for multiclasses
 					return type;
 				}
 			}
 		}
 	}
-	if (IsDomain(name, level, kit)>=0) return IE_IWD2_SPELL_DOMAIN;
 
 	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
 	// pseudorandom fallback
@@ -287,18 +312,6 @@ static int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 		}
 	}
 	return -1;
-}
-
-// just returns the integer part of the log
-// perfect for deducing kit values, since they are bitfields and we don't care about any noise
-static int log2(int value)
-{
-	int pow = -1;
-	while (value) {
-		value = value>>1;
-		pow++;
-	}
-	return pow;
 }
 
 //input: index, level, type, kit
@@ -368,7 +381,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		Log(ERROR, "CREImporter", "Spell (%d of type %d) found at unexpected level (%d)!", index, type, level);
 		int level2 = spllist[index].FindSpell(type);
 		// grrr, some rows have no levels set - they're all 0, but with a valid resref, so just return that
-		if (!level2) {
+		if (level2 == -1) {
 			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
 			return spllist[index].GetSpell();
 		}
@@ -464,8 +477,8 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 	if (!tab)
 		return 0;
 
-	int column = tab->GetColumnCount()-1;
-	if (column<1) {
+	int lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
+	if (lastCol < 1) {
 		return 0;
 	}
 
@@ -485,7 +498,7 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 		} else {
 			// find the correct index in listspll.2da
 			ieResRef spellref;
-			strnlwrcpy(spellref, tab->QueryField(i, column), 8);
+			strnlwrcpy(spellref, tab->QueryField(i, lastCol), 8);
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
 			if (spellref[0] == '*') {
 				continue;
@@ -493,8 +506,8 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 			index = FindSpell(spellref, spllist, splcount);
 			assert (index != -1);
 		}
-		reslist[index].SetSpell(tab->QueryField(i, column));
-		for(int col=0;col<column;col++) {
+		reslist[index].SetSpell(tab->QueryField(i, lastCol));
+		for(int col=0; col < lastCol; col++) {
 			reslist[index].AddLevel(atoi(tab->QueryField(i, col)), col);
 		}
 	}
@@ -2539,8 +2552,8 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		for (i=0;i<64;i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
-		stream->WriteResRef( actor->Scripts[SCR_AREA]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RESERVED]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_AREA) );
+		stream->WriteResRef( actor->GetScript(SCR_RESERVED) );
 		//unknowns before feats
 		stream->Write( filling,4);
 		//feats
@@ -2638,11 +2651,11 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		stream->Write( &filling,1);
 		// no kit word order magic for iwd2
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
-		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
+		stream->WriteResRef( actor->GetScript(SCR_CLASS) );
+		stream->WriteResRef( actor->GetScript(SCR_RACE) );
+		stream->WriteResRef( actor->GetScript(SCR_GENERAL) );
+		stream->WriteResRef( actor->GetScript(SCR_DEFAULT) );
 	} else {
 		for (i=0;i<21;i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
@@ -2689,11 +2702,11 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword( &tmpDword );
-		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
-		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
+		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
+		stream->WriteResRef( actor->GetScript(SCR_CLASS) );
+		stream->WriteResRef( actor->GetScript(SCR_RACE) );
+		stream->WriteResRef( actor->GetScript(SCR_GENERAL) );
+		stream->WriteResRef( actor->GetScript(SCR_DEFAULT) );
 	}
 	//now follows the fuzzy part in separate putactor... functions
 	return 0;

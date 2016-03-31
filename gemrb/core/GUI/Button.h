@@ -188,7 +188,7 @@ public:
 	bool SetEvent(int eventType, ControlEventHandler handler);
 
 	/** Refreshes the button from a radio group */
-	void UpdateState(const char* VariableName, unsigned int Sum);
+	void UpdateState(unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */

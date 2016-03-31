@@ -32,30 +32,30 @@
 namespace GemRB {
 
 #define IE_AMBI_ENABLED 1
-#define IE_AMBI_POINT   2
-#define IE_AMBI_MAIN    4
-#define IE_AMBI_AREA    8
+#define IE_AMBI_LOOPING 2
+#define IE_AMBI_MAIN    4	/* ignore origin/radius */
+#define IE_AMBI_RANDOM  8	/* random selection instead of sequential */
+#define IE_AMBI_HIMEM	16	/* skip on low-mem systems */
 
 class GEM_EXPORT Ambient {
 public:
 	Ambient();
 	~Ambient();
 	
-	/* there is a good reason to have these in the header:
-	 * they are automatically inlined, so we have
-	 * no roundtrips and no overhead for accessors --Divide */
 	const char *getName() const { return name; }
 	const Point &getOrigin() const { return origin; }
 	ieWord getRadius() const { return radius; }
-	ieWord getHeight() const { return height; }
 	ieWord getGain() const { return gain; }
+	ieWord getTotalGain() const;
 	char *getSound(ieDword i) const
 	{
 		if(i<sounds.size()) return sounds[i];
 		return NULL;
 	}
 	ieDword getInterval() const { return interval; }
-	ieDword getPerset() const { return perset; }
+	ieDword getIntervalVariance() const { return intervalVariance; }
+	ieDword getTotalInterval() const;
+	ieDword getTotalPitch() const;
 	ieDword getAppearance() const { return appearance; }
 	ieDword getFlags() const { return flags; }
 	
@@ -65,15 +65,15 @@ public:
 public:
 	char name[32];
 	Point origin;
-	ieWord radius;
-	ieWord height;
-	ieWord gain;	// percent
 	std::vector<char *> sounds;
+	ieWord radius;
+	ieWord gain;	// percent
+	ieWord gainVariance;
 	ieDword interval;	// no pauses if zero
-	ieDword perset;
+	ieDword intervalVariance;
+	ieDword pitchVariance;
 	ieDword appearance;
 	ieDword flags;
-
 };
 
 }

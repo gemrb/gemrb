@@ -426,6 +426,7 @@ int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e ChangeWeather
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
+int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -762,6 +763,7 @@ static EffectDesc effectnames[] = {
 	{ "TrackingModifier", fx_tracking_modifier, 0, -1 },
 	{ "TransparencyModifier", fx_transparency_modifier, 0, -1 },
 	{ "TurnUndead", fx_turn_undead, 0, -1 },
+	{ "UncannyDodge", fx_uncanny_dodge, 0, -1 },
 	{ "Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 },
 	{ "Unlock", fx_knock, EFFECT_NO_ACTOR, -1 }, //open doors/containers
 	{ "UnsummonCreature", fx_unsummon_creature, 0, -1 },
@@ -830,6 +832,7 @@ static EffectRef fx_pst_jumble_curse_ref = { "JumbleCurse", -1 };  //PST specifi
 static EffectRef fx_deaf_state_iwd2_ref = { "State:DeafnessIWD2", -1 }; //iwd2
 static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
+static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 
 static void Cleanup()
 {
@@ -1671,16 +1674,16 @@ int fx_lore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_lore_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	ieDword mode = fx->Parameter1, value = fx->Parameter2;
+	ieDword mode = fx->Parameter2, value = fx->Parameter1;
 	if (mode == 2) {
 		//guaranteed identification
 		mode = MOD_ABSOLUTE;
 		value = 100;
 	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		target->NewBase(IE_LORE, mode, value);
+		target->NewBase(IE_LORE, value, mode);
 	} else {
-		target->NewStat(IE_LORE, mode, value);
+		target->NewStat(IE_LORE, value, mode);
 	}
 	return FX_PERMANENT;
 }
@@ -3155,6 +3158,13 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	}
 
+	// different in iwd2 only?
+	// x hp per 1 round
+	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
+		damage = fx->Parameter1;
+		fx->Parameter3 = gameTime + core->Time.round_sec*AI_UPDATE_TIME;
+	}
+
 	if (fx->FirstApply) {
 		//don't add hp in the first occasion, so it cannot be used for cheat heals
 		return FX_APPLIED;
@@ -3718,22 +3728,20 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
-	//the only addition to the original engine is that fx->Resource can be
-	//used to specify a 2da (if parameter2 is >= 10)
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
 	ieResRef table;
 	int level = fx->Parameter1;
 
-	if (fx->Parameter2>=FX_MS) {
-		if (fx->Resource[0]) {
-			strnuprcpy(table, fx->Resource, 8);
-		} else {
-			strnuprcpy(table, "ANISUM03", 8);
-		}
+	if (fx->Resource[0]) {
+		strnuprcpy(table, fx->Resource, 8);
 	} else {
-		strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+		if (fx->Parameter2 >= FX_MS) {
+			strnuprcpy(table, "ANISUM03", 8);
+		} else {
+			strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+		}
 	}
 	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
@@ -4656,6 +4664,13 @@ int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 int fx_magic_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_magic_resistance_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	// iwd2 monk's Diamond soul
+	// for some silly reason the +1/level was not handled as a clab
+	// our clab adds the 10 and sets Special to the rate per level
+	if (core->HasFeature(GF_3ED_RULES) && fx->FirstApply) {
+		fx->Parameter1 += target->GetMonkLevel() * fx->IsVariable;
+	}
 
 	STAT_MOD( IE_RESISTMAGIC );
 	return FX_APPLIED;
@@ -6333,6 +6348,15 @@ int fx_damageluck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
+	// remove any previous song effects, as they are used with permanent timing
+	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1, NULL);
+	unsigned int songCount = target->spellbook.GetSpellInfoSize(1<<IE_IWD2_SPELL_SONG);
+	if (count > 0 && songCount > 0) {
+		for (unsigned int i=0; i<songCount; i++) {
+			if (i == fx->Parameter2) continue;
+			target->fxqueue.RemoveAllEffectsWithParam(fx_change_bardsong_ref, i);
+		}
+	}
 	memcpy(target->BardSong, fx->Resource, 8);
 	return FX_APPLIED;
 }
@@ -6690,7 +6714,7 @@ Since the repeating effects are stored in a list inside those stats, they are be
 The repeating effect itself internally uses a counter to store how often it has been called. And when this counter equals the period it fires of the effect. When the list is being recreated all those counters are lost.
 */
 // 0x110 ApplyEffectRepeat
-int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword i; //moved here because msvc6 cannot handle it otherwise
 
@@ -6709,29 +6733,30 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	Scriptable *caster = GetCasterObject();
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
 			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
-				core->ApplyEffect(newfx, target, Owner);
+				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 2://param1 times every second
 			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
 				for (i=0;i<fx->Parameter1;i++) {
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
-				core->ApplyEffect(newfx, target, Owner);
+				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter3;i++) {
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
@@ -7359,6 +7384,33 @@ int fx_set_concealment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_ADD(IE_ETHEREALNESS, concealment<<8);
 	}
 
+	return FX_APPLIED;
+}
+
+// 459 UncannyDodge
+// sets/modifies uncanny dodge type
+// 0 - none, reset
+// 1..0xff - bonus for saves against traps
+// two special values are treated as bits:
+// 0x100 - keep dex bonus if attacked by invisibles (like with blind fighting feat)
+// 0x200 - can't be flanked (sneak attacked) unless the assailant is 4+ levels higher
+int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	print("fx_uncanny_dodge(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	ieDword mask = 0xff;
+	ieDword stat = target->GetSafeStat(IE_UNCANNY_DODGE);
+	ieDword high = stat >> 8; // the "bitsy" part
+	ieDword val = fx->Parameter1;
+
+	if ((signed)val < 0) {
+		Log(ERROR, "FXOPCodes", "fx_uncanny_dodge does not support negative modifiers!");
+	} else if (val == 0) {
+		STAT_SET(IE_UNCANNY_DODGE, 0);
+	} else if (val <= mask) {
+		STAT_SET(IE_UNCANNY_DODGE, val|high);
+	} else if (val > mask) {
+		STAT_SET(IE_UNCANNY_DODGE, val|stat);
+	}
 	return FX_APPLIED;
 }
 

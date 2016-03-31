@@ -55,6 +55,7 @@ public:
 	int QueueAmbient(int stream, const char* sound);
 	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);
+	void SetAmbientStreamPitch(int stream, int pitch);
 	void QueueBuffer(int stream, unsigned short bits, int channels,
 				short* memory, int size, int samplerate);
 

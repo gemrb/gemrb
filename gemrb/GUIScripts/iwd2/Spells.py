@@ -34,13 +34,17 @@ def SetupSpellsWindow(chargen=0):
 		MyChar = GemRB.GetVar ("Slot")
 		Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 		ClassName = GUICommon.GetClassRowName (Class, "class")
-		Level = LevelDiff = 1
+		Level = 0
+		LevelDiff = 1
+		KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	else:
 		MyChar = GemRB.GameGetSelectedPCSingle ()
 		ClassIndex = GemRB.GetVar ("LUClass")
 		ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
 		LevelDiff = GemRB.GetVar ("LevelDiff")
-		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)#FIXME +1?
+		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)
+		# this is only used for detecting specialists!
+		KitValue = GemRB.GetVar ("LUKit")
 
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
@@ -51,6 +55,10 @@ def SetupSpellsWindow(chargen=0):
 		SpellTableName = "SPLSRCKN"
 	elif SpellTableName == "MXSPLBRD":
 		SpellTableName = "SPLBRDKN"
+
+	# charbase has domain slots reserved, so nuke them
+	if chargen:
+		Spellbook.UnsetupSpellLevels (MyChar, "MXSPLCLR", IE_IWD2_SPELL_DOMAIN, 1)
 
 	# learn priest spells if any and setup spell levels
 	# but first nullify any previous spells
@@ -63,8 +71,10 @@ def SetupSpellsWindow(chargen=0):
 		Spellbook.RemoveKnownSpells (MyChar, IE_IWD2_SPELL_DOMAIN, 1,9, 0)
 	IDLUCommon.LearnAnySpells (MyChar, ClassName, chargen)
 
-	# make sure we have a correct table
-	if SpellTableName == "*":
+	# make sure we have a correct table and that we're eligible
+	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
+	canLearn = chargen or (BookType & 2) # bard / sorcerer
+	if SpellTableName == "*" or not canLearn:
 		if chargen:
 			GemRB.SetNextScript ("CharGen7")
 		else:
@@ -72,14 +82,5 @@ def SetupSpellsWindow(chargen=0):
 			GUIREC.FinishLevelUp ()
 		return
 
-	# FIXME: this way will only work for chargen, where there aren't any multikits
-	# extract LUClass kit if any and use that IFF it is a mage kit
-	# this value is only used for detecting specialists!
-	KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "SPLTYPE")
-
-	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level, LevelDiff, KitValue, chargen, True, SpellBookType)
-
-	if not chargen:
-		import GUIREC
-		GUIREC.FinishLevelUp ()
+	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)

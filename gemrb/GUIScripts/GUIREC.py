@@ -254,24 +254,50 @@ def GSNN (pc, stat):
 	else:
 		return 0
 
+# shorthand wrappers for Modified/Base stat and ability bonus
+def GS (pc, stat):
+	return GemRB.GetPlayerStat (pc, stat)
+
+def GB (pc, stat):
+	return GemRB.GetPlayerStat (pc, stat, 1)
+
+def GA (pc, stat, col):
+	return GemRB.GetAbilityBonus (stat, col, GS (pc, stat))
+
+# Basic full stat printout function for record sheet
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
-	StateTable = GemRB.LoadTable ("statdesc")
+	cdet = GemRB.GetCombatDetails (pc, 0)
 
-	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
-	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
-	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
+	outputtext = GetClassTitles (pc,LevelDiff)
+	outputtext+= GetEffectIcons (pc,LevelDiff)
+	outputtext+= GetProficiencies (pc, cdet)
+	outputtext+= GetLore (pc)
+	outputtext+= GetMagicResistance (pc)
+	outputtext+= GetPartyReputation (pc)
+	outputtext+= GetSkills (pc)
+	outputtext+= GetActiveAIscript (pc)
+	outputtext+= GetSavingThrows (pc)
+	outputtext+= GetWeaponProficiencies (pc)
+	outputtext+= GetACBonuses (pc)
+	outputtext+= GetAbilityBonuses (pc)
+	outputtext+= GetBonusSpells (pc)
+	outputtext+= GetResistances (pc)
+	outputtext+= GetWeaponStyleBonuses (pc, cdet)
 
-	stats = []
-	cdet = GemRB.GetCombatDetails(pc, 0)
-	tohit = cdet["ToHitStats"]
+	return outputtext
 
+########################################################################
+# The following functions have been split into categories,
+# so that they can be used for eg mouse over events  if desired
+########################################################################
+def GetClassTitles (pc,LevelDiff):
 	# class levels
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
-
+	stats = []
 	# collecting tokens for stat overview
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	GemRB.SetToken ("CLASS", ClassTitle)
@@ -279,9 +305,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	Dual = GUICommon.IsDualClassed (pc, 1)
 	Multi = GUICommon.IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
-	LevelDrain = GS (IE_LEVELDRAIN)
+	LevelDrain = GS (pc, IE_LEVELDRAIN)
 
-	if GS (IE_STATE_ID) & STATE_DEAD:
+	if GS (pc, IE_STATE_ID) & STATE_DEAD:
 		stats.append ( (11829,1,'c') ) # DEAD
 		stats.append ("\n")
 
@@ -374,6 +400,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stats.append ( (16480,1,'c') )
 		stats.append ("\n")
 		print "\t\tClass (Level):",Class,"(",Level,")"
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetEffectIcons(pc,LevelDiff):
+
+	StateTable = GemRB.LoadTable ("statdesc")
+	stats = []
 
 	# effect icons
 	# but don't display them in levelup stat view
@@ -383,6 +417,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			for c in effects:
 				tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
 				stats.append ( (tmp,c,'a') )
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetProficiencies(pc, cdet):
+
+	stats = []
+	tohit = cdet["ToHitStats"]
 
 	#proficiencies
 	stats.append ( (8442,1,'c') )
@@ -405,18 +447,42 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
-	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
-	if GameCheck.IsBG1() or GameCheck.IsIWD1():
-		stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetLore(pc):
+	stats = []
+	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetMagicResistance(pc):
+	stats = []
+
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
+		stats.append ( (19224, GS (pc, IE_RESISTMAGIC), '') )
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetPartyReputation(pc):
+	stats = []
 	# party's reputation
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetSkills(pc):
+	stats = []
 	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
 	stats.append ( (9462, GSNN (pc, IE_TRAPS), '') )
 	stats.append ( (9463, GSNN (pc, IE_PICKPOCKET), '') )
 	stats.append ( (9461, GSNN (pc, IE_STEALTH), '') )
-	HatedRace = GS (IE_HATEDRACE)
+	HatedRace = GS (pc, IE_HATEDRACE)
 	if HatedRace:
 		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
@@ -429,19 +495,29 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
 		stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
 		stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
-	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
-	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
+	stats.append ( (12128, GS (pc, IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
+	stats.append ( (12126, GS (pc, IE_TURNUNDEADLEVEL), '') )
 
 	#this hack only displays LOH if we know the spell
 	#TODO: the core should just not set LOH if the paladin can't learn it
 	if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
-		stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
+		stats.append ( (12127, GS (pc, IE_LAYONHANDSAMOUNT), '') )
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetActiveAIscript(pc):
 	#script
+	stats = []
 	aiscript = GemRB.GetPlayerScript (pc )
 	stats.append ( (2078, aiscript, '') )
 	stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetSavingThrows(pc):
+	stats = []
 	# 17379 Saving throws
 	stats.append (17379)
 	# 17380 Paralyze/Poison/Death
@@ -454,8 +530,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (17383, IE_SAVEVSBREATH, 's') )
 	# 17384 Spells
 	stats.append ( (17384, IE_SAVEVSSPELL, 's') )
-	stats.append ("\n")
+	stats.append ("\n\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetWeaponProficiencies(pc):
+	stats = []
 	# 9466 Weapon proficiencies
 	stats.append (9466)
 	table = GemRB.LoadTable ("weapprof")
@@ -466,31 +547,40 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		offset = 0
 	for i in range (offset, RowCount):
-		# iwd displays capitalised strings
-		# FIXME: ignore it and do the capitalisation manually, so it works for everyone
+		# iwd has separate field for capitalised strings
 		if GameCheck.IsIWD1():
 			text = table.GetValue (i, 3)
 		else:
 			text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		if not offset and not GameCheck.IsIWD1(): # TODO: fishy, recheck
+		if GameCheck.IsBG1():
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
 		if text < 0x20000:
-			stats.append ( (text, GS (stat)&0x07, '+') )
+			stats.append ( (text, GS (pc, stat)&0x07, '+') )
 	stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetACBonuses(pc):
+	stats = []
 	# 11766 AC Bonuses
 	stats.append (11766)
 	# 11770 AC vs. Crushing
-	stats.append ((11770, GS (IE_ACCRUSHINGMOD), 'p'))
+	stats.append ((11770, GS (pc, IE_ACCRUSHINGMOD), 'p'))
 	# 11767 AC vs. Missile
-	stats.append ((11767, GS (IE_ACMISSILEMOD), 'p'))
+	stats.append ((11767, GS (pc, IE_ACMISSILEMOD), 'p'))
 	# 11769 AC vs. Piercing
-	stats.append ((11769, GS (IE_ACPIERCINGMOD), 'p'))
+	stats.append ((11769, GS (pc, IE_ACPIERCINGMOD), 'p'))
 	# 11768 AC vs. Slashing
-	stats.append ((11768, GS (IE_ACSLASHINGMOD), 'p'))
+	stats.append ((11768, GS (pc, IE_ACSLASHINGMOD), 'p'))
 	stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetAbilityBonuses(pc):
+	stats = []
 	# 10315 Ability bonuses
 	stats.append (10315)
 	value = GemRB.GetPlayerStat (pc, IE_STR)
@@ -504,26 +594,31 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10338 weight allowance
 	stats.append ( (10338, GemRB.GetAbilityBonus (IE_STR,3,value,ex), '0') )
 	# 10339 AC
-	stats.append ( (10339, GA (IE_DEX,2), '0') )
+	stats.append ( (10339, GA (pc, IE_DEX, 2), '0') )
 	# 10340 Missile adjustment
-	stats.append ( (10340, GA (IE_DEX,1), 'p') )
+	stats.append ( (10340, GA (pc, IE_DEX, 1), 'p') )
 	# 10341 Reaction adjustment
-	stats.append ( (10341, GA (IE_DEX,0), 'p') )
+	stats.append ( (10341, GA (pc, IE_DEX, 0), 'p') )
 	# 10342 CON HP Bonus/Level
 	# dual-classed chars get no bonus while the primary class is inactive
 	# and the new class' bonus afterwards
 	# single- and multi-classed chars are straightforward - the highest class bonus counts
 	if GUICommon.IsWarrior (pc):
-		stats.append ( (10342, GA (IE_CON, 1), 'p') )
+		stats.append ( (10342, GA (pc, IE_CON, 1), 'p') )
 	else:
-		stats.append ( (10342, GA (IE_CON, 0), 'p') )
+		stats.append ( (10342, GA (pc, IE_CON, 0), 'p') )
 	# 10343 Chance To Learn spell
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
-		stats.append ( (10343, GA (IE_INT,0), '%' ) )
+		stats.append ( (10343, GA (pc, IE_INT, 0), '%' ) )
 	# 10347 Reaction
-	stats.append ( (10347, GA (IE_REPUTATION,0), '0') )
+	stats.append ( (10347, GA (pc, IE_REPUTATION, 0), '0') )
 	stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetBonusSpells(pc):
+	stats = []
 	# 10344 Bonus Priest spells
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
 		stats.append (10344)
@@ -535,7 +630,12 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
 				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
 		stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+########################################################################
+
+def GetResistances(pc):
+	stats = []
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
 	if GameCheck.IsBG2():
@@ -547,50 +647,57 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 32214 Normal Cold
 	# 32223 Magic Cold
 	if GameCheck.IsBG2():
-		stats.append ((32213, GS (IE_RESISTFIRE), '%'))
-		stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
-		stats.append ((32214, GS (IE_RESISTCOLD), '%'))
-		stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+		stats.append ((32213, GS (pc, IE_RESISTFIRE), '%'))
+		stats.append ((32222, GS (pc, IE_RESISTMAGICFIRE), '%'))
+		stats.append ((32214, GS (pc, IE_RESISTCOLD), '%'))
+		stats.append ((32223, GS (pc, IE_RESISTMAGICCOLD), '%'))
 	elif GameCheck.IsBG1():
-		stats.append ((14012, GS (IE_RESISTFIRE), '%'))
-		stats.append ((14077, GS (IE_RESISTMAGICFIRE), '%'))
-		stats.append ((14014, GS (IE_RESISTCOLD), '%'))
-		stats.append ((14078, GS (IE_RESISTMAGICCOLD), '%'))
+		stats.append ((14012, GS (pc, IE_RESISTFIRE), '%'))
+		stats.append ((14077, GS (pc, IE_RESISTMAGICFIRE), '%'))
+		stats.append ((14014, GS (pc, IE_RESISTCOLD), '%'))
+		stats.append ((14078, GS (pc, IE_RESISTMAGICCOLD), '%'))
 	else:
-		stats.append ((15545, GS (IE_RESISTFIRE), '%'))
-		stats.append ((15579, GS (IE_RESISTMAGICFIRE), '%'))
-		stats.append ((15546, GS (IE_RESISTCOLD), '%'))
-		stats.append ((15580, GS (IE_RESISTMAGICCOLD), '%'))
+		stats.append ((15545, GS (pc, IE_RESISTFIRE), '%'))
+		stats.append ((15579, GS (pc, IE_RESISTMAGICFIRE), '%'))
+		stats.append ((15546, GS (pc, IE_RESISTCOLD), '%'))
+		stats.append ((15580, GS (pc, IE_RESISTMAGICCOLD), '%'))
 	# 32220 Electricity
 	if GameCheck.IsBG1() or GameCheck.IsIWD1():
-		stats.append ((14013, GS (IE_RESISTELECTRICITY), '%'))
+		stats.append ((14013, GS (pc, IE_RESISTELECTRICITY), '%'))
 	else:
-		stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
+		stats.append ((32220, GS (pc, IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
 	if GameCheck.IsBG1() or GameCheck.IsIWD1():
-		stats.append ((14015, GS (IE_RESISTACID), '%'))
+		stats.append ((14015, GS (pc, IE_RESISTACID), '%'))
 	else:
-		stats.append ((32221, GS (IE_RESISTACID), '%'))
+		stats.append ((32221, GS (pc, IE_RESISTACID), '%'))
 	if GameCheck.IsBG2():
 		# Magic (others show it higher up)
-		stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
+		stats.append ((62146, GS (pc, IE_RESISTMAGIC), '%'))
 	# Magic Damage
 	if GameCheck.IsIWD2():
-		stats.append ((40319, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+		stats.append ((40319, GS (pc, IE_MAGICDAMAGERESISTANCE), '%'))
 	else: # bg2
-		stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+		stats.append ((32233, GS (pc, IE_MAGICDAMAGERESISTANCE), '%'))
 	# Missile
-	stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
+	stats.append ((11767, GS (pc, IE_RESISTMISSILE), '%'))
 	# Slashing
-	stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
+	stats.append ((11768, GS (pc, IE_RESISTSLASHING), '%'))
 	# Piercing
-	stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
+	stats.append ((11769, GS (pc, IE_RESISTPIERCING), '%'))
 	# Crushing
-	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
+	stats.append ((11770, GS (pc, IE_RESISTCRUSHING), '%'))
 	# Poison
-	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
+	stats.append ((14017, GS (pc, IE_RESISTPOISON), '%'))
 	stats.append ("\n")
 
+	return TypeSetStats (stats, pc)
+
+########################################################################
+
+def GetWeaponStyleBonuses(pc, cdet):
+
+	stats = []
 	if GameCheck.IsBG2():
 		# Weapon Style bonuses
 		stats.append (32131)
@@ -604,7 +711,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				value = WStyleTable.GetValue (profcount, col)
 				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
 		stats.append ("\n")
+	return TypeSetStats (stats, pc)
 
+def TypeSetStats(stats, pc=0):
 	# everyone but bg1 has it somewhere
 	if GameCheck.IsBG2():
 		str_None = GemRB.GetString (61560)
@@ -616,6 +725,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		str_None = GemRB.GetString (17093)
 
 	res = []
+	noP = False
 	for s in stats:
 		try:
 			strref, val, type = s
@@ -636,8 +746,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				else:
 					res.append (strref + ' ' + str (val) )
 			elif type == 's': #both base and (modified) stat, but only if they differ
-				base = GB (val)
-				stat = GS (val)
+				base = GB (pc, val)
+				stat = GS (pc, val)
 				base_str = GemRB.GetString (strref) + ': ' + str(stat)
 				if base == stat:
 					res.append (base_str)
@@ -648,6 +758,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			elif type == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
 				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				noP = True
 			elif type == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
 			elif type == 'c': #normal string
@@ -662,15 +773,18 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if isinstance(s, basestring):
 				if s == len(s) * "\n": # check if the string is all newlines
 					# avoid "double" newlines (we use join later so we would get one more newline than is in s!)
-					res[-1] += s
+					if res:
+						res[-1] += s
 				else:
 					res.append (s);
 			else:
-				res.append (GemRB.GetString (s) )				
+				res.append (GemRB.GetString (s))
 
-	# wrap the first part in a tag to prevent status icon drop cap
-	res[0] = "[p]" + res[0] + "[/p]"
-	return "\n".join (res)
+	# effects only need a bump at the end
+	if noP:
+		return "\n".join (res) + "[p] [/p]"
+	else:
+		return "[p]" + "\n".join (res) + "[/p]"
 
 def GetReputation (repvalue):
 	table = GemRB.LoadTable ("reptxt")

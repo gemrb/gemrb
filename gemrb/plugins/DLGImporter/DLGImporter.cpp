@@ -167,7 +167,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 
 static char** GetStrings(char* string, unsigned int& count);
 
-static Condition* GetCondition(char* string)
+Condition* DLGImporter::GetCondition(char* string) const
 {
 	unsigned int count;
 	char **lines = GetStrings( string, count );
@@ -187,7 +187,8 @@ static Condition* GetCondition(char* string)
 
 Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 {
-	if (index >= StateTriggersCount && (signed)index != -1) {
+	if ((signed)index == -1) index = 0;
+	if (index >= StateTriggersCount) {
 		return NULL;
 	}
 	//8 = sizeof(VarOffset)

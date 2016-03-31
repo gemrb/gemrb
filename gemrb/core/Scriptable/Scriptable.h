@@ -463,6 +463,8 @@ public:
 	Point Destination;
 	Sprite2D* lastFrame;
 	ieResRef Area;
+	Point HomeLocation;//spawnpoint, return here after rest
+	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
 	PathNode *GetNextStep(int x);
 	int GetPathLength();

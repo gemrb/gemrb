@@ -1,6 +1,0 @@
-IF
-  Global("TestCutsceneRunning", "GLOBAL", 1)
-THEN
-  RESPONSE #100
-    SetGlobal("CSNotFreezingOther", "GLOBAL", 1)
-END

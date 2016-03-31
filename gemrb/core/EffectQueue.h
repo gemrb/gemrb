@@ -105,7 +105,8 @@ class StringBuffer;
 #define DICE_ROLL(adjustment) (core->Roll( fx->DiceThrown, fx->DiceSides, adjustment) )
 
 // You will need to get GameTime somehow to use this macro
-#define	PrepareDuration(fx) fx->Duration = (fx->Duration*AI_UPDATE_TIME + GameTime)
+// we add +1 so we can handle effects with 0 duration (apply once only)
+#define	PrepareDuration(fx) fx->Duration = ((fx->Duration? fx->Duration*AI_UPDATE_TIME : 1) + GameTime)
 
 //return the caster object
 #define GetCasterObject()  (core->GetGame()->GetActorByGlobalID(fx->CasterID))
@@ -309,6 +310,7 @@ public:
 	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance=1) const;
 	/** just checks if it is a particularly stupid effect that needs its target reset */
 	static bool OverrideTarget(Effect *fx);
+	bool HasHostileEffects() const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;

@@ -22,26 +22,12 @@
 #define AMBIENTMGRAL_H
 
 #include "AmbientMgr.h"
+#include "Region.h"
 
 #include <vector>
 #include <string>
 
 #include <SDL_thread.h>
-
-#include "Region.h"
-
-#ifndef WIN32
-#ifdef __APPLE_CC__
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#else
-#include <AL/al.h>
-#include <AL/alc.h>
-#endif 
-#else
-#include <al.h>
-#include <alc.h>
-#endif
 
 namespace GemRB {
 
@@ -69,13 +55,12 @@ private:
 		void SetVolume(unsigned short volume);
 	private:
 		int stream;
-		std::vector<const char*> soundrefs;
 		const Ambient* ambient;
 		unsigned int lastticks;
-		int enqueued;
-		bool loaded;
+		unsigned int nextdelay;
+		unsigned int nextref;
+		unsigned int totalgain;
 
-		void ensureLoaded();
 		bool isHeard(const Point &listener) const;
 		int enqueue();
 	};

@@ -357,6 +357,7 @@ def OpenQuitMsgWindow ():
 			QuitMsgWindow.Unload ()
 		QuitMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
+		GemRB.SetVar ("AskAndExit", 0)
 		
 		return
 		
@@ -387,13 +388,16 @@ def OpenQuitMsgWindow ():
 	return
 
 def QuitGame ():
+	OpenQuitMsgWindow ()
 	OpenOptionsWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ('Start')
 
 def SaveGame ():
 	GemRB.SetVar ("QuitAfterSave", 1)
-	OpenOptionsWindow ()
+	OpenQuitMsgWindow ()
+	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
+		OpenOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 
 ###################################################
@@ -540,10 +544,8 @@ def OpenMoviesWindow ():
 
 	# movie list
 	List = Window.GetControl (0)
-	List.SetVarAssoc ('SelectedMovie', -1)
-
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
-	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())])
+	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())], 'SelectedMovie', -1)
 
 	Window.ShowModal (MODAL_SHADOW_BLACK)
 

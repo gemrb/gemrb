@@ -183,7 +183,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()
 
 	# check if we're dealing with a temporary spellbook
-	if GemRB.GetVar("ActionLevel") == 11:
+	if GemRB.GetVar("ActionLevel") == UAW_2DASPELLS:
 		allSpells = GetSpellinfoSpells (actor, BookType)
 	else:
 		# construct the spellbook of usable (not depleted) memorized spells
@@ -260,7 +260,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# disable spells that should be cast from the inventory or can't be cast while silenced or ...
 		# see splspec.2da for all the reasons; silence is handled elsewhere
 		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
-		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == 5)
+		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == UAW_ALLMAGE)
 		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x20000: # SF_IGNORES_SILENCE
 			specialSpell ^= SP_SILENCE
 		if specialSpell or (disabled_spellcasting&spellType):
@@ -297,35 +297,81 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 #################################################################
 # routines used during character generation and levelup
 #################################################################
-def GetMageSpells (Kit, Alignment, Level):
+
+# Used for bards (level-up), sorcerers and mages (cg and level-up).
+# Used for rangers and paladins (level-up) and clerics and druids (both).
+# While iwd2 still has spells.2da, it is actually unused and gives
+# some wrong spells. We need to iterate the whole listspll.2da,
+# looking at our class column and matching on (target) level
+def GetIWD2Spells (kit, usability, level, baseClass = -1):
+	spells = []
+	if baseClass == -1:
+		print "Error, didn't pass a base class in iwd2!"
+		return spells
+	# to use baseClass as a column index, we first need to convert it,
+	# since only casters are in the table. But only casters have spell stats too
+	rowName = CommonTables.Classes.GetRowName (baseClass-1)
+	baseClass = CommonTables.ClassSkills.GetValue (rowName, "SPLTYPE", GTV_INT)
+
+	# iwd2 has only per-kit exclusion, spells can't override it
+	badSchools = 0
+	if rowName == "WIZARD":
+		exclusionTable = GemRB.LoadTable ("magesch")
+		kitRow = exclusionTable.FindValue ("KIT", kit)
+		kitRow = exclusionTable.GetRowName (kitRow)
+		badSchools = exclusionTable.GetValue (kitRow, "EXCLUSION", GTV_INT)
+		if badSchools == -1:
+			badSchools = 0
+	else:
+		# only wizards have alignment and school restrictions
+		kit = usability = 0
+
+	spellsTable = GemRB.LoadTable ("listspll")
+	spellCount = spellsTable.GetRowCount ()
+	for i in range(spellCount):
+		# at which level is the spell given to the actor?
+		atLevel = spellsTable.GetValue (i, baseClass)
+		if atLevel != level:
+			continue
+
+		spellRow = spellsTable.GetRowName (i)
+		spellName = spellsTable.GetValue (spellRow, "SPELL_RES_REF")
+		ms = GemRB.GetSpell (spellName, 1)
+		if ms == None:
+			continue
+		# ms['SpellDivine'] is unused in iwd2, since it has separate types for all caster classes
+
+		if usability & ms['SpellExclusion']:
+			spellType = 0
+		elif badSchools & (1<<ms['SpellSchool']+5):
+			spellType = 0
+		else:
+			spellType = 1
+			if kit & (1 << ms['SpellSchool']+5): # of matching specialist school
+				spellType = 2
+
+		spells.append([spellName, spellType])
+
+	return spells
+
+def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 	MageSpells = []
 	SpellType = 99
 	v = CommonTables.Aligns.FindValue (3, Alignment)
 	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
-	HokeyPokey = "MAGE"
 	WildMages = True
-	BadSchools = 0
+
 	if GameCheck.IsIWD2():
-		HokeyPokey = "WIZARD"
-		WildMages = False
-		# iwd2 has only per-kit exclusion, spells can't override it
-		ExclusionTable = GemRB.LoadTable ("magesch")
-		KitRow = ExclusionTable.FindValue ("KIT", Kit)
-		KitRow = ExclusionTable.GetRowName (KitRow)
-		BadSchools = ExclusionTable.GetValue (KitRow, "EXCLUSION")
-		if BadSchools == -1:
-			BadSchools = 0
+		return GetIWD2Spells (Kit, Usability, Level, baseClass)
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HokeyPokey, str(Level), GTV_INT)):
+	for i in range(SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
 			continue
 
 		if Usability & ms['SpellExclusion']:
-			SpellType = 0
-		elif BadSchools & (1<<ms['SpellSchool']+5):
 			SpellType = 0
 		else:
 			SpellType = 1
@@ -349,15 +395,16 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 			Learnable.append (Spell[0])
 	return Learnable
 
-def GetLearnableDomainSpells (pc, Level):
+def GetLearnableDomainSpells (pc, Level, baseClassName = -1):
 	import GUICommon
 	import GUICommonWindows
 	Learnable =[]
 
 	# only clerics have domains due to listdom.2da restrictions
 	# no need to double check, as we only call this for IE_IWD2_SPELL_CLERIC
-	BaseClassName = GUICommon.GetClassRowName (pc)
-	BaseClassIndex = CommonTables.Classes.GetRowIndex (BaseClassName)
+	if baseClassName == -1:
+		baseClassName = GUICommon.GetClassRowName (pc)
+	BaseClassIndex = CommonTables.Classes.GetRowIndex (baseClassName)
 	# columns correspond to kits in the same order
 	KitIndex = GUICommonWindows.GetKitIndex (pc, BaseClassIndex)
 	if KitIndex == -1:
@@ -382,14 +429,17 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability = CommonTables.Aligns.GetValue(v, 5)
-	HolyMoly = "PRIEST"
 	SpellListTable = None
 	if GameCheck.IsIWD2():
-		HolyMoly = "CLERIC"
-		SpellListTable = GemRB.LoadTable ("listspll")
+		row = CommonTables.ClassSkills.FindValue ("SPLTYPE", booktype)
+		rowName = CommonTables.ClassSkills.GetRowName (row)
+		Class = CommonTables.Classes.GetValue (rowName, "ID", GTV_INT)
+		spells = GetIWD2Spells (0, Usability, Level, Class)
+		spells = map(lambda e: e[0], spells) # ignore the second member
+		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue (HolyMoly, str (Level), GTV_INT)):
+	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
@@ -398,11 +448,6 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 			continue
 		if Usability & ms['SpellExclusion']:
 			continue
-		if SpellListTable:
-			idx = SpellListTable.FindValue ("SPELL_RES_REF", SpellName)
-			# columns are in the same order as booktypes
-			if SpellListTable.GetValue (idx, booktype) <= 0:
-				continue
 		Learnable.append (SpellName)
 	return Learnable
 
@@ -510,7 +555,7 @@ def CannotLearnSlotSpell ():
 
 	return 0
 
-def LearnPriestSpells (pc, level, mask):
+def LearnPriestSpells (pc, level, mask, baseClassName = -1):
 	"""Learns all the priest spells through the given spell level.
 
 	Mask distinguishes clerical and druidic spells."""
@@ -528,7 +573,7 @@ def LearnPriestSpells (pc, level, mask):
 	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
 	for i in range (level):
 		if booktype == IE_IWD2_SPELL_DOMAIN:
-			learnable = GetLearnableDomainSpells (pc, i+1)
+			learnable = GetLearnableDomainSpells (pc, i+1, baseClassName)
 		else:
 			learnable = GetLearnablePriestSpells (mask, alignment, i+1, booktype)
 
@@ -628,7 +673,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 	SpellIndex = HasSpell (pc, booktype, level, spellref)
 	if SpellIndex < 0:
-		ret = GemRB.LearnSpell (pc, spellref, flags)
+		ret = GemRB.LearnSpell (pc, spellref, flags, booktype)
 		if ret != LSR_OK and ret != LSR_KNOWN:
 			raise RuntimeError, "Failed learning spell: %s !" %(spellref)
 			return

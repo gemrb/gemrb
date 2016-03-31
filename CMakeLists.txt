@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.6)
 if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 	cmake_policy(SET CMP0005 NEW)
@@ -166,6 +166,11 @@ ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
+IF(NOT STATIC_LINK)
+	# prevent static libraries from being selected by FIND_LIBRARY
+	LIST(REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+ENDIF()
+
 # Check for all the required and optional dependencies
 FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
 IF(PYTHONLIBS_FOUND)
@@ -246,14 +251,14 @@ ELSE()
 ENDIF()
 
 IF(SDL2_FOUND)
-	INCLUDE(FindSDL2_mixer)
+	FIND_PACKAGE(SDL2_mixer MODULE)
 	# unify variables, so we don't have to differentiate later
 	SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
 	SET(SDL_MIXER_LIBRARIES ${SDL2_MIXER_LIBRARIES})
 	SET(SDL_MIXER_VERSION_STRING ${SDL2_MIXER_VERSION_STRING})
 	SET(SDL_MIXER_FOUND ${SDL2_MIXER_FOUND})
 ELSE()
-	INCLUDE(FindSDL_mixer)
+	FIND_PACKAGE(SDL_mixer MODULE)
 ENDIF()
 IF(SDL_MIXER_FOUND)
 	MESSAGE(STATUS "Looking for SDL_mixer: found")
@@ -263,7 +268,7 @@ ELSE()
 	MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
 ENDIF()
 
-INCLUDE(FindLIBVLC)
+FIND_PACKAGE(LIBVLC MODULE)
 IF(LIBVLC_FOUND)
 	MESSAGE(STATUS "Looking for VLC: found")
 ELSE()

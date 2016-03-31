@@ -864,30 +864,27 @@ static int check_type(Actor* actor, Effect* fx)
 
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
-	//immunity checks
-/*opcode immunity is in the per opcode checks
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		return 0;
-	}
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		return 0;
-	}
-*/
 	//spell level immunity
+	// but ignore it if we're casting beneficial stuff on ourselves
 	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
-		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
-		return 0;
+		Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		if (caster != actor || (fx->SourceFlags & SF_HOSTILE)) {
+			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
+			return 0;
+		}
 	}
 
 	//source immunity (spell name)
 	//if source is unspecified, don't resist it
 	if( fx->Source[0]) {
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity");
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->Source);
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity2");
+			if (strnicmp(fx->Source, "detect", 6)) { // our secret door pervasive effect
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->Source);
+			}
 			return 0;
 		}
 	}
@@ -1068,8 +1065,7 @@ static inline int check_magic_res(Actor *actor, Effect *fx, Actor *caster)
 
 	if (iwd2fx) {
 		// 3ed style check
-		// TODO: check if luck really affects it (i doubt it does)
-		int roll = actor->LuckyRoll(1, 20, 0);
+		int roll = core->Roll(1, 20, 0);
 		ieDword check = fx->CasterLevel + roll;
 		int penetration = 0;
 		// +2/+4 level bonus from the (greater) spell penetration feat
@@ -1120,13 +1116,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		return true;
 	}
 
-/* opcode bouncing isn't implemented?
-	//opcode bouncing
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_bounce_ref, fx->Opcode) ) {
-		return false;
-	}
-*/
-
 	//not resistable (but check saves - for chromatic orb instakill)
 	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
 		int magic = check_magic_res(actor, fx, caster);
@@ -1163,10 +1152,22 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 	if( saved) {
 		if( fx->IsSaveForHalfDamage) {
-			fx->Parameter1/=2;
+			// if we have evasion, we take no damage
+			// sadly there's no feat or stat for it
+			if (iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
+				fx->Parameter1 = 0;
+				return true;
+			} else {
+				fx->Parameter1 /= 2;
+			}
 		} else {
 			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 			return true;
+		}
+	} else {
+		// improved evasion: take only half damage even though we failed the save
+		if (iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(FEAT_IMPROVED_EVASION)) {
+			fx->Parameter1 /= 2;
 		}
 	}
 	return false;
@@ -2204,6 +2205,22 @@ bool EffectQueue::OverrideTarget(Effect *fx)
 {
 	if (!fx) return false;
 	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);
+}
+
+bool EffectQueue::HasHostileEffects() const
+{
+	bool hostile = false;
+
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		Effect* fx = *f;
+		if (fx->SourceFlags&SF_HOSTILE) {
+			hostile = true;
+			break;
+		}
+	}
+
+	return hostile;
 }
 
 }

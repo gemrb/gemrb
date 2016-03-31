@@ -22,8 +22,8 @@ Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
 AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
 HasSpecificDamageBonus (mod required), SimplifiedDisruption,
-HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes, StealIsAttack
- and TeamMovement.
+HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes,
+ShopsRechargeItems, StealIsAttack and TeamMovement.
 
 [FIXME: eventually, this file could be searched for in user's config directory too]
 
@@ -486,6 +486,11 @@ RedrawTile = <bool>
 Force redraw of some overlay tiles??
 
 
+RandomBanterDialogs = <bool>
+- - - - - - - - - - - - - - -
+Toggles whether banter dialogs are randomly activated (as in BG1)
+rather than explicitly scripted (as in BG2).
+
 RareActionSounds = <bool>
 - - - - - - - - - - - - -
 Toggles whether to use all the available verbal constants or not.
@@ -519,9 +524,9 @@ Use the ToBEx simplified "concentration" checks, ie. damage only disrupts
 casting if enough was made ([1D20 + luck] < [spell level + damage taken]).
 
 
-SkipUpdateHack = <bool>
-- - - - - - - - - - - -
-Determines how the engine treats a very specific script continuation nuance.
+ShopsRechargeItems = <bool>
+- - - - - - - - - - - - - -
+If set, selling limited-use items to shops will refill their charge counter.
 
 
 SmallFog = <bool>

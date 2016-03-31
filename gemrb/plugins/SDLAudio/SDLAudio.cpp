@@ -342,6 +342,11 @@ void SDLAudio::SetAmbientStreamVolume(int, int)
 	// TODO: ambient sounds
 }
 
+void SDLAudio::SetAmbientStreamPitch(int, int)
+{
+	// TODO: ambient sounds
+}
+
 void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 			int channels, short* memory, int size, int samplerate)
 {

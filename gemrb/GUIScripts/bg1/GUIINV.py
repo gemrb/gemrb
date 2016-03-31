@@ -161,6 +161,11 @@ def OpenInventoryWindow ():
 			Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
 			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
 
+	# create a button so we can map it do ESC for quit exiting
+	Button = Window.CreateButton (999, 0, 0, 1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()

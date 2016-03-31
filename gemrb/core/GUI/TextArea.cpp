@@ -50,6 +50,13 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps != ftext) ? caps : ftext;
 
+	// in case a bad or missing font was specified, use an obvious fallback
+	if (!finit) {
+		Log(ERROR, "TextArea", "Tried to use missing font, resorting to a fallback!");
+		finit = core->GetTextFont();
+		ftext = finit;
+	}
+
 	if (finit->Baseline < ftext->LineHeight) {
 		// FIXME: initcolor is only used for *some* initial fonts
 		// this is a hack to workaround the INITIALS font getting its palette set
@@ -385,7 +392,7 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 	unsigned int lookupIdx = Key - '1';
 	if (lookupIdx < OptSpans.size()) {
-		UpdateState(VarName, lookupIdx);
+		UpdateState(lookupIdx);
 	}
 	return true;
 }
@@ -489,7 +496,7 @@ void TextArea::OnMouseUp(const Point& p, unsigned short Button, unsigned short M
 			}
 			optIdx++;
 		}
-		UpdateState(VarName, optIdx);
+		UpdateState(optIdx);
 	}
 }
 
@@ -498,9 +505,9 @@ void TextArea::OnMouseLeave(const Point&, const DragOp*)
 	ClearHover();
 }
 
-void TextArea::UpdateState(const char* VariableName, unsigned int optIdx)
+void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VariableName[0] || optIdx >= OptSpans.size()) {
+	if (!VarName[0] || optIdx >= OptSpans.size()) {
 		return;
 	}
 	if (!selectOptions) {

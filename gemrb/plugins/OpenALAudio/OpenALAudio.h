@@ -122,6 +122,7 @@ public:
 					ieWord gain, bool point, bool Ambient );
 	int QueueAmbient(int stream, const char* sound);
 	void SetAmbientStreamVolume(int stream, int volume);
+	void SetAmbientStreamPitch(int stream, int pitch);
 	void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
 				int size, int samplerate);

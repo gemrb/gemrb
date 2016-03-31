@@ -224,7 +224,7 @@ Item* ITMImporter::GetItem(Item *s)
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->EquippingFeatureCount; i++) {
-		GetFeature(s->equipping_features+i);
+		GetFeature(s->equipping_features+i, s);
 	}
 
 
@@ -317,15 +317,16 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	eh->features = new Effect[eh->FeatureCount];
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(eh->features+i);
+		GetFeature(eh->features+i, s);
 	}
 }
 
-void ITMImporter::GetFeature(Effect *fx)
+void ITMImporter::GetFeature(Effect *fx, Item *s)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
+	CopyResRef(fx->Source, s->Name);
 }
 
 #include "plugindef.h"

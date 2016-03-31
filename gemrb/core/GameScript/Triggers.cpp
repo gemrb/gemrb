@@ -1551,6 +1551,7 @@ int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 
 //in pst this is a point
 //in iwd2 this is not a point
+//  and -2,-2 is treated specially in iwd2 (Jorun in Targos)
 int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1558,8 +1559,13 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (parameters->pointParameter.isnull()) {
-		Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-		int distance = PersonalDistance(p, scr);
+		int distance;
+		if (parameters->int0Parameter < 0) { // use Sender's position
+			distance = PersonalDistance(Sender, scr);
+		} else {
+			Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+			distance = PersonalDistance(p, scr);
+		}
 		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
 			return 1;
 		}
@@ -1735,18 +1741,29 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	Actor* actor = ( Actor* ) target;
+	// make sure to discout unscheduled actors - count them as dead
+	// alternatively we could set their death vars when disabling them wrt AreaDifficulty
+	//if (!actor->ValidTarget(GA_NO_UNSCHEDULED)) also avoids hidden (avatar removal)!
+	Game *game = core->GetGame();
+	if (game && !Schedule(game->GameTime, true)) {
+		return 1;
+	}
 	if (actor->GetStat( IE_STATE_ID ) & STATE_DEAD) {
 		return 1;
 	}
 	return 0;
 }
 
-int GameScript::CreatureHidden(Scriptable* Sender, Trigger* /*parameters*/)
+int GameScript::CreatureHidden(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target) {
 		return 0;
 	}
-	Actor *act=(Actor *) Sender;
+	if (target->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *act = (Actor *) target;
 
 	//this stuff is not completely clear, but HoW has a flag for this
 	//and GemRB uses the avatarremoval stat for it.

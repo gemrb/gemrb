@@ -157,10 +157,14 @@ class GTextArea(GControl):
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'Clear': _GemRB.TextArea_Clear,
-    'SetOptions': _GemRB.TextArea_SetOptions,
     'ListResources': _GemRB.TextArea_ListResources
   }
   __slots__ = ['DefaultText']
+  
+  def SetOptions(self, optList, varname=None, val=0):
+    _GemRB.TextArea_SetOptions(self.WinID, self.ID, optList)
+    if varname:
+    	self.SetVarAssoc(varname, val)
 
 class GTextEdit(GControl):
   methods = {

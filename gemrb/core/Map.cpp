@@ -362,6 +362,12 @@ Map::Map(void)
 	Background = NULL;
 	BgDuration = 0;
 	LastGoCloser = 0;
+	AreaFlags = AreaType = AreaDifficulty = 0;
+	Rain = Snow = Fog = Lightning = DayNight = 0;
+	trackString = trackFlag = trackDiff = 0;
+	Width = Height = 0;
+	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
+	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
 }
 
 Map::~Map(void)
@@ -2364,8 +2370,8 @@ void Map::dump(bool show_actors) const
 		buffer.append("\n");
 		i = actors.size();
 		while (i--) {
-			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				buffer.appendFormatted("Actor: %s (%d) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->Pos.x, actors[i]->Pos.y);
+			if (actors[i]->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->GetScriptName(), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
@@ -3144,7 +3150,7 @@ void Map::LoadIniSpawn()
 	}
 }
 
-bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, int *difficulty, unsigned int *creCount)
+bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, ieWord rwdist, int *difficulty, unsigned int *creCount)
 {
 	bool spawned = false;
 	SpawnGroup *sg = NULL;
@@ -3173,6 +3179,8 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 			if (level >= cpl || sg || first) {
 				AddActor(creature, true);
 				creature->SetPosition(pos, true, radiusx, radiusy);
+				creature->HomeLocation = pos;
+				creature->maxWalkDistance = rwdist;
 				creature->Spawned = true;
 				creature->RefreshEffects(NULL);
 				if (difficulty && !sg) *difficulty -= cpl;
@@ -3202,8 +3210,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 
 	//check schedule
 	ieDword time = core->GetGame()->GameTime;
-	ieDword bit = 1<<((time/AI_UPDATE_TIME)%7200/300);
-	if (!(spawn->appearance & bit)) {
+	if (!Schedule(spawn->appearance, time)) {
 		return;
 	}
 
@@ -3220,7 +3227,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
 	unsigned int spawncount = 0, i = RAND(0, spawn->Count-1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
-		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, &difficulty, &spawncount)) {
+		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;
 		}
 		if (++i >= spawn->Count) {
@@ -3290,7 +3297,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 
 			displaymsg->DisplayString( RestHeader.Strref[idx], DMC_GOLD, IE_STR_SOUND );
 			while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
-				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, &spawnamount, &spawncount)) {
+				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, RestHeader.rwdist, &spawnamount, &spawncount)) {
 					break;
 				}
 			}
@@ -3779,8 +3786,16 @@ bool Map::DisplayTrackString(Actor *target)
 	// according to the HoW manual the chance of success is:
 	// +5% for every three levels and +5% per point of wisdom
 	int skill = target->GetStat(IE_TRACKING);
-	skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
-	if (core->Roll(1, 100, trackDiff) > skill) {
+	int success;
+	if (core->HasFeature(GF_3ED_RULES)) {
+		// ~Wilderness Lore check. Wilderness Lore (skill + D20 roll + WIS modifier) =  %d vs. ((Area difficulty pct / 5) + 10) = %d ( Skill + WIS MOD = %d ).~
+		skill += target->LuckyRoll(1, 20, 0) + target->GetAbilityBonus(IE_WIS);
+		success = skill > (trackDiff/5 + 10);
+	} else {
+		skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
+		success = core->Roll(1, 100, trackDiff) > skill;
+	}
+	if (!success) {
 		displaymsg->DisplayConstantStringName(STR_TRACKINGFAILED, DMC_LIGHTGREY, target);
 		return true;
 	}

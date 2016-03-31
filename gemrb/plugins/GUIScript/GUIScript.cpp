@@ -254,6 +254,8 @@ static void SetFunctionTooltip(Control* ctrl, char *txt, int Function)
 	if (!ctrl) return;
 
 	if (txt) {
+		ieDword ShowHotkeys = 0;
+		core->GetDictionary()->Lookup("Hotkeys On Tooltips", ShowHotkeys);
 		if (txt[0]) {
 			char *txt2 = (char *) malloc(strlen(txt)+10);
 			sprintf(txt2,"F%d - %s",Function,txt);
@@ -5052,11 +5054,12 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	int Limit = core->GetReputationMod(8);
-	if (Limit<=Donation) {
-		Increase = core->GetReputationMod(4);
-		if (Increase) {
-			game->SetReputation( game->Reputation + Increase );
-		}
+	if (Limit > Donation) {
+		return PyInt_FromLong (0);
+	}
+	Increase = core->GetReputationMod(4);
+	if (Increase) {
+		game->SetReputation( game->Reputation + Increase );
 	}
 	return PyInt_FromLong ( Increase );
 }
@@ -6397,7 +6400,7 @@ static PyObject* GemRB_SetPlayerDialog(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
 "===== FillPlayerInfo =====\n\
 \n\
-**Prototype:** GemRB.FillPlayerInfo (globalID[, Portrait1, Portrait2])\n\
+**Prototype:** GemRB.FillPlayerInfo (globalID[, Portrait1, Portrait2, clear=0])\n\
 \n\
 **Description:** Fills basic character info that is not stored in stats. \n\
 This command will generate an AnimationID for the character based on the \n\
@@ -6411,6 +6414,7 @@ must be called once after a character was created and before EnterGame().\n\
   * globalID - party ID or global ID of the actor to use\n\
   * Portrait1 - medium (or large) portrait\n\
   * Portrait2 - small portrait\n\
+  * clear - clear all the quickslot/spell/item fields?\n\
 \n\
 avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
 \n\
@@ -6446,9 +6450,10 @@ Based on the avatar's stat (201 == race) the animationID (0x6000) will be increa
 
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
-	int globalID;
+	int globalID, clear = 0;
 	const char *Portrait1=NULL, *Portrait2=NULL;
-	PARSE_ARGS( args,  "i|ss", &globalID, &Portrait1, &Portrait2);
+	PARSE_ARGS( args,  "i|ssi", &globalID, &Portrait1, &Portrait2, &clear);
+
 	// here comes some code to transfer icon/name to the PC sheet
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -6465,6 +6470,12 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	case -1: return RuntimeError("avprefix table contains no entries." );
 	case -2: return RuntimeError("Couldn't load avprefix table.");
 	case -3: return RuntimeError("Couldn't load an avprefix subtable.");
+	}
+
+	// clear several fields (only useful for cg; currently needed only in iwd2, but that will change if its system is ported to the rest)
+	// fixes random action bar mess, kill stats, join time ...
+	if (clear) {
+		actor->PCStats->Init(false);
 	}
 
 	actor->SetOver( false );
@@ -7424,7 +7435,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 		} else {
-			store->RemoveItem( Slot );
+			store->RemoveItem(si);
 			delete si;
 		}
 		//keep encumbrance labels up to date
@@ -9857,10 +9868,10 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	if (PosX!=-1 && PosY!=-1) {
-		map->SpawnCreature(Point(PosX, PosY), CreResRef, 0);
+		map->SpawnCreature(Point(PosX, PosY), CreResRef);
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, CreResRef, 10);
+		map->SpawnCreature(actor->Pos, CreResRef, 10, 10);
 	}
 	Py_RETURN_NONE;
 }
@@ -10803,6 +10814,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 				type = 1<<IE_IWD2_SPELL_SONG;
 				if (!actor->spellbook.GetSpellInfoSize(type)) {
 					state = IE_GUI_BUTTON_DISABLED;
+				} else if (modalstate == MS_BATTLESONG) {
+					state = IE_GUI_BUTTON_SELECTED;
 				}
 			} else {
 				if (modalstate==MS_BATTLESONG) {

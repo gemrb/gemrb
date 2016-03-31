@@ -127,7 +127,7 @@ struct ModalStatesStruct {
 	unsigned int entering_str;
 	unsigned int leaving_str;
 	unsigned int failed_str;
-	bool aoe_spell;
+	unsigned int aoe_spell;
 };
 
 struct TimeStruct {
@@ -763,6 +763,8 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	void SetTickHook(EventHandler);
+
+	ieDword CountBits (ieDword n) const;
 };
 
 extern GEM_EXPORT Interface * core;

@@ -28,7 +28,7 @@ import GUICommonWindows
 import CommonWindow
 import GUIClasses
 import CommonTables
-from GameCheck import PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
 
@@ -40,7 +40,7 @@ TMessageTA = 0 # for dialog code
 def OnLoad():
 	global PortraitWindow, OptionsWindow, MessageWindow
 
-	GemRB.GameSetPartySize(PARTY_SIZE)
+	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 	
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls

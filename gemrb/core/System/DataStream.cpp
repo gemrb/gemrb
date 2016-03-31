@@ -33,7 +33,7 @@ bool DataStream::IsBigEndian = ((char *)&endiantest)[1] == 1;
 
 DataStream::DataStream(void)
 {
-	Pos = 0;
+	Pos = size = 0;
 	Encrypted = false;
 }
 

@@ -218,8 +218,7 @@ int EARelation(Scriptable* Owner, Actor* target)
 // time from 0030 to 0129, bit 1 from 0130 to 0229 etc.
 bool Schedule(ieDword schedule, ieDword time)
 {
-	ieDword hour = 1 << (((time/AI_UPDATE_TIME)+(300/2))%7200/300);
-	return (schedule & hour) != 0;
+	return (schedule & SCHEDULE_MASK(time)) != 0;
 }
 
 // safely copies a ResRef (ie. nulls out the unused buffer size)

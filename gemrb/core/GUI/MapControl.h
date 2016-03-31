@@ -77,7 +77,7 @@ public:
 	~MapControl(void);
 
 	/** Refreshes the control after its associated variable has changed */
-	void UpdateState(const char *VariableName, unsigned int Sum);
+	void UpdateState(unsigned int Sum);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
 

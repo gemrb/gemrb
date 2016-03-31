@@ -25,6 +25,7 @@ import CommonTables
 import GUICommon
 import Spellbook
 from ie_stats import *
+from ie_feats import FEAT_EXTRA_SHAPESHIFTING
 from GUIDefines import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -123,10 +124,6 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		# set our memorizable counts
 		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
-		# charbase seems to have domain slots reserved, so nuke them
-		if level == 1:
-			Spellbook.UnsetupSpellLevels (pc, table, IE_IWD2_SPELL_DOMAIN, level)
-
 		if table == MageTable:
 			continue
 
@@ -142,14 +139,24 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		if idx != -1:
 			GemRB.MemorizeSpell (pc, booktype, 0, idx, 1)
 
+		# set up shapes for druids
+		if not chargen and booktype == IE_IWD2_SPELL_DRUID:
+			ShapeTable = GemRB.LoadTable ("mxdrdshp")
+			newUses = ShapeTable.GetValue (str(level), "USES_PER_DAY")
+			booktype = IE_IWD2_SPELL_SHAPE
+			extras = GemRB.HasFeat (pc, FEAT_EXTRA_SHAPESHIFTING)
+			GemRB.SetMemorizableSpellsCount (pc, newUses+extras, booktype, 0)
+
+		if booktype != IE_IWD2_SPELL_CLERIC:
+			return
+
 		# learn any domain spells too
-		if booktype == IE_IWD2_SPELL_CLERIC:
-			booktype = IE_IWD2_SPELL_DOMAIN
-			Spellbook.SetupSpellLevels (pc, table, booktype, level)
+		booktype = IE_IWD2_SPELL_DOMAIN
+		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
 		for slevel in range (9):
 			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
 			if GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus) <= 0:
 				# actually checks level+1 (runs if level-1 has memorizations)
-				Spellbook.LearnPriestSpells (pc, slevel, booktype)
+				Spellbook.LearnPriestSpells (pc, slevel, booktype, BaseClassName)
 				break

@@ -133,8 +133,7 @@ int GetReaction(Actor *target, Scriptable *Sender)
 	if (target->GetStat(IE_EA) == EA_PC) {
 		rep = core->GetGame()->Reputation/10-1;
 	} else {
-		//FIXME: shouldn't this be divided by 10?
-		rep = target->GetStat(IE_REPUTATION)-1;
+		rep = target->GetStat(IE_REPUTATION)/10-1;
 	}
 	if (rep<0) rep = 0;
 	else if (rep>=MAX_REP_COLUMN) rep=MAX_REP_COLUMN-1;
@@ -287,7 +286,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 		if (si->AmountInStock > count) {
 			si->AmountInStock -= count;
 		} else {
-			store->RemoveItem(idx);
+			store->RemoveItem(si);
 		}
 		//store changed, save it
 		gamedata->SaveStore(store);
@@ -490,6 +489,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	if (Sound[0] && !(flags&DS_SILENT) ) {
 		ieDword speech = GEM_SND_RELATIVE; //disable position
 		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
+		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
 		core->GetAudioDrv()->Play( Sound,0,0,speech,&len );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
@@ -1115,6 +1115,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				if (talkee->InParty) {
 					talkee->SetStance(IE_ANI_READY);
 				}
+				if (!core->InCutSceneMode()) {
+					talkee->DialogInterrupt();
+				}
 			}
 		}
 	}
@@ -1321,7 +1324,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	WeaponInfo wi;
 	bool leftorright = false;
-	ITMExtHeader *header = actor->GetWeapon(wi, leftorright && actor->IsDualWielding());
+	ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
 	//will return false on any errors (eg, unusable weapon)
 	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
 		actor->StopAttack();

@@ -2345,6 +2345,11 @@ void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_DOOR) {
 		return;
 	}
+	// two dialog states in pst (and nothing else) use "FALSE" (yes, quoted)
+	// they're on a critical path so we have to handle this data bug ourselves
+	if (parameters->int0Parameter == -1) {
+		parameters->int0Parameter = 0;
+	}
 	Door* door = ( Door* ) tar;
 	door->SetDoorLocked( parameters->int0Parameter!=0, false);
 }
@@ -3308,7 +3313,7 @@ void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 	//just a best guess at how the two parameters are changed, and could
 	//well be more complex; the original usage of this function is currently
 	//not well understood (relates to hardcoded alignment changes)
-	SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, 1 );
 
 	value = CheckVariable( Sender, parameters->string1Parameter );
 	SetVariable( Sender, parameters->string1Parameter,
@@ -5172,7 +5177,9 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
 	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
-	if (((Actor *)Sender)->InParty == 0) flags |= REST_NOAREA;
+	if (Sender->Type != ST_ACTOR || ((Actor *)Sender)->InParty == 0) {
+		flags |= REST_NOAREA;
+	}
 	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
@@ -6558,6 +6565,7 @@ void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)
 //IDS stats.
 //in this version, if a stat is set to 0, it won't change
 //it will alter only the main IDS stats
+// (unused in the originals, but if that changes, make sure all ids files are handled; eg. see iwd2 script.2da)
 void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -6817,16 +6825,19 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	const char* string = pcs->GetRowName(parameters->int0Parameter);
-	int pos = gamedata->LoadCreature(string,0,false);
-	if (pos<0) {
-		return;
-	}
-	Actor *actor = core->GetGame()->GetNPC(pos);
+	char name[32];
+	strnlwrcpy(name, string, 32);
+	Actor *actor = core->GetGame()->FindNPC(string);
 	if (!actor) {
 		return;
 	}
+	if (!actor->GetCurrentArea()) {
+		core->GetGame()->GetCurrentArea()->AddActor(actor, true);
+	}
 	actor->SetOrientation(parameters->int1Parameter, false);
 	actor->MoveTo(parameters->pointParameter);
+	actor->Die(NULL);
+	actor->SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 }
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)

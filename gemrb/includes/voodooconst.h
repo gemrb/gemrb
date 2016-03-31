@@ -58,7 +58,7 @@ static const unsigned int ___MOD = MAX_OPERATING_DISTANCE; // just to silence va
 
 // used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
 // while it looks too big, it is needed this big in at least pst (help())
-static const int VOODOO_SHOUT_RANGE = 400;
+static const unsigned int VOODOO_SHOUT_RANGE = 400;
 
 // NearLocation range multiplier (currently the same for pst and iwd2/how)
 // arbitrary, started as 20 and has no effect for callers that want exact position

@@ -23,6 +23,7 @@ import CommonTables
 import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
+from ie_feats import FEAT_POWER_ATTACK, FEAT_IMPROVED_EVASION
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -36,23 +37,12 @@ FeatsClassColumn = 0
 PointsLeft = 0
 CharGen = 0
 ButtonCount = 0
+LUStat = 0
 
 # returns the number of feat levels (for example cleave can be taken twice)
 def MultiLevelFeat(feat):
 	global FeatReqTable
 	return FeatReqTable.GetValue(feat, "MAX_LEVEL")
-
-# FIXME: CheckFeatCondition doesn't check for higher level prerequisites
-# (eg. cleave2 needs +4 BAB and weapon specialisation needs 4 fighter levels)
-
-# NOTE: cleave formula is now:
-# HITBONUS>=4 OR FEAT_CLEAVE<1
-#
-# specialisation formulas:
-# FIGHTERLEVEL>=4 OR FEAT_*<2
-# The default operator was set to 4 (greater or equal), so the majority of the formulas
-# don't need any more change
-# Avenger
 
 def IsFeatUsable(feat):
 	global FeatReqTable
@@ -80,6 +70,21 @@ def IsFeatUsable(feat):
 	else:
 		slot = GemRB.GameGetSelectedPCSingle ()
 
+	# feint a level increase
+	if LUStat > 0:
+		stats = [ a_stat, b_stat, c_stat, d_stat ]
+		vals = [ a_value, b_value, c_value, d_value ]
+		for i in range(len(stats)):
+			if stats[i] == LUStat:
+				vals[i] -= GemRB.GetVar ("LevelDiff")
+				vals[i] = max(0, vals[i])
+				# there must be a better way (using append() to construct the list (same id) is not enough)!?
+				a_value = vals[0]
+				b_value = vals[1]
+				c_value = vals[2]
+				d_value = vals[3]
+				break
+
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
@@ -87,16 +92,17 @@ def IsFeatUsable(feat):
 def GetBaseValue(feat):
 	global FeatsClassColumn, RaceColumn, KitName
 
-	if not CharGen:
-		pc = GemRB.GameGetSelectedPCSingle ()
-		return GemRB.HasFeat (pc, feat) # actually returns count
-
-	Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
-	Val2 = FeatTable.GetValue(feat, RaceColumn)
-	if Val2 < Val1:
-		Val = Val1
+	Val = 0
+	if CharGen:
+		Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
+		Val2 = FeatTable.GetValue(feat, RaceColumn)
+		if Val2 < Val1:
+			Val = Val1
+		else:
+			Val = Val2
 	else:
-		Val = Val2
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Val = GemRB.HasFeat (pc, feat) # actually returns count
 
 	Val3 = 0
 	# only cleric kits have feat bonuses in the original, but the column names are shortened
@@ -143,14 +149,13 @@ def RedrawFeats():
 				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
 				Label.SetTextColor(150, 150, 150)
 		else:
+			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
+			Label.SetTextColor(150, 150, 150)
 			# check for maximum if there are more feat levels
-			# FIXME also verify that the next level of the feat is usable
-			if MultiLevelFeat(FeatName) > FeatValue:
+			if MultiLevelFeat(FeatName) > FeatValue and IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
 				Label.SetTextColor(255, 255, 255)
-			else:
-				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-				Label.SetTextColor(150, 150, 150)
+
 			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 			if FeatValue > BaseValue:
 				ButtonMinus.SetState(IE_GUI_BUTTON_ENABLED)
@@ -201,7 +206,7 @@ def OpenFeatsWindow(chargen=0):
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable, FeatReqTable
 	global KitName, PointsLeft, ButtonCount, CharGen
-	global KitColumn, RaceColumn, FeatsClassColumn
+	global KitColumn, RaceColumn, FeatsClassColumn, LUStat
 
 	CharGen = chargen
 
@@ -211,16 +216,28 @@ def OpenFeatsWindow(chargen=0):
 		ClassIndex = GemRB.GetVar ("Class") - 1
 		Level = LevelDiff = 1
 		ButtonCount = 10
+		LUStat = 0
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Race = IDLUCommon.GetRace (pc)
-		# TODO: instead of the base class, lookup its kit if any
+		# instead of the base class, lookup its kit if any
 		# luckily you can only have one kit per class
-		# something like a *Common.GetBaseClassKit (pc) -> kit name/id
 		ClassIndex = GemRB.GetVar ("LUClass")
+		KitID = GemRB.GetVar ("LUKit")
+		if KitID != 0:
+			KitIndex = CommonTables.Classes.FindValue ("ID", KitID)
+			ClassIndex = KitIndex
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		ButtonCount = 9
+		# fake having leveled up already, so the level checks work
+		LUStat = IDLUCommon.Levels[ClassIndex]
+		# give monks their free improved evasion at level 9, so we don't have to add a feat granting opcode
+		# just check for monk tohit table, so we get the kits too
+		monkName = CommonTables.Classes.GetRowName (ClassIndex)
+		if CommonTables.Classes.GetValue(monkName, "TOHIT") == "BAATMKU":
+			if Level <= 9 and Level+LevelDiff >= 9:
+				GemRB.SetFeat (pc, FEAT_IMPROVED_EVASION, 1)
 
 	RaceColumn = CommonTables.Races.FindValue(3, Race)
 	RaceName = CommonTables.Races.GetRowName(RaceColumn)
@@ -242,8 +259,12 @@ def OpenFeatsWindow(chargen=0):
 	FeatReqTable = GemRB.LoadTable("featreq")
 
 	for i in range(RowCount):
-		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
-		GemRB.SetVar("BaseFeatValue " + str(i), GetBaseValue(i))
+		featBase = GetBaseValue(i)
+		GemRB.SetVar ("Feat " + str(i), featBase)
+		GemRB.SetVar ("BaseFeatValue " + str(i), featBase)
+		# nullify feats whenever we load the window (in case people go back)
+		if chargen:
+			GemRB.SetFeat (pc, i, 0)
 
 	FeatLevelTable = GemRB.LoadTable("featlvl")
 	FeatClassTable = GemRB.LoadTable("featclas")
@@ -365,6 +386,7 @@ def LeftPress():
 def BackPress():
 	if FeatWindow:
 		FeatWindow.Unload()
+
 	for i in range(FeatTable.GetRowCount()):
 		GemRB.SetVar("Feat "+str(i),0)
 	GemRB.SetNextScript("Skills")
@@ -374,20 +396,23 @@ def NextPress(save=1):
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
-	if CharGen:
-		GemRB.SetNextScript("Spells")
-		return
 
 	if save:
 		# resave the feats
 		featCount = FeatReqTable.GetRowCount ()
-		pc = GemRB.GameGetSelectedPCSingle ()
+		if CharGen:
+			pc = GemRB.GetVar ("Slot")
+		else:
+			pc = GemRB.GameGetSelectedPCSingle ()
 		for i in range (featCount):
 			GemRB.SetFeat (pc, i, GemRB.GetVar ("Feat "+str(i)))
 
-	# open up the next levelup window
-	import Spells
-	Spells.SetupSpellsWindow (0)
+	if CharGen:
+		GemRB.SetNextScript("Spells")
+	else:
+		# open up the next levelup window
+		import Spells
+		Spells.SetupSpellsWindow (0)
 	return
 
 #Custom feat check functions
@@ -439,3 +464,20 @@ def Check_MaximizedAttacks(pl, a, ass, *garbage):
 			SpecializationCount += 1
 
 	return SpecializationCount >= 2
+
+# cleave needs special handling for level 1 vs level 2 (great cleave)
+def Check_Cleave(pl, *garbage):
+	cleave = GemRB.GetPlayerStat (pl, IE_FEAT_CLEAVE, 1)
+	# also check if it was selected for learning just now
+	selectedCleave = GemRB.GetVar ("Feat 8")
+	if cleave == 0 and not selectedCleave:
+		# lvl1: strength 13+, power attack
+		if GemRB.GetPlayerStat (pl, IE_STR, 1) < 13:
+			return False
+
+		learned = GemRB.HasFeat (pl, FEAT_POWER_ATTACK)
+		selected = GemRB.GetVar ("Feat 47")
+		return (learned or selected)
+	else:
+		# lvl2: bab 4+
+		return GemRB.GetPlayerStat (pl, IE_TOHIT, 1) >= 4

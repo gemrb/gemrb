@@ -96,15 +96,10 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
+bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref, ieDword si)
 {
 	delete dlg;
 	dlg = NULL;
-
-	if (tgt->Type == ST_ACTOR) {
-		Actor *tar = (Actor *) tgt;
-		tar->DialogInterrupt();
-	}
 
 	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
 		return false;
@@ -143,8 +138,24 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
-	initialState = dlg->FindFirstState( tgt );
+	// iwd2 ignores conditions when following external references and
+	// also just goes directly for the referenced state
+	// look at 41cmolb1 and 41cmolb2 for an example
+	// Actually bg2 is the same, misca vs imoenj (freeing minsc)
+	if (initialState == -1) {
+		initialState = dlg->FindFirstState(tgt);
+	} else {
+		if (originalTargetID == targetID) {
+			initialState = dlg->FindFirstState(tgt);
+			if (initialState < 0) {
+				initialState = si;
+			}
+		} else {
+			initialState = si;
+		}
+	}
 	if (initialState < 0) {
+		Log(DEBUG, "DialogHandler", "Could not find a proper state");
 		return false;
 	}
 
@@ -402,7 +413,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
-			if (!InitDialog( speaker, target, tmpresref)) {
+			if (!InitDialog(speaker, target, tmpresref, si)) {
 				// error was displayed by InitDialog
 				EndDialog();
 				return false;

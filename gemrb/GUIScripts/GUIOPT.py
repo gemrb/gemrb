@@ -70,8 +70,6 @@ def OpenOptionsWindow ():
 
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 
-	GemRB.GamePause (1, 3)
-
 	CommonWindow.CloseContainerWindow ()
 
 	Window = GUICommonWindows.OpenTopWindow(2, "GUIOPT")
@@ -363,7 +361,7 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptSlider (18043, 18024, HelpTextArea2, Window, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
 	GUIOPTControls.OptSlider (18043, 18025, HelpTextArea2, Window, 9, 31, 17769, 'Locator Feedback Level')
 
-	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Rolls')
+	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Extra Feedback')
 	GUIOPTControls.OptCheckbox (18043, 18027, HelpTextArea2, Window, 11, 33, 17150, 'Combat Info')
 	GUIOPTControls.OptCheckbox (18043, 18028, HelpTextArea2, Window, 12, 34, 17151, 'Actions')
 	GUIOPTControls.OptCheckbox (18043, 18029, HelpTextArea2, Window, 13, 35, 17152, 'State Changes')
@@ -452,8 +450,7 @@ def OpenMovieWindow ():
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
-	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(0, MoviesTable.GetRowCount())])
-	TextAreaControl.SetVarAssoc("MovieIndex",0)
+	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(0, MoviesTable.GetRowCount())],"MovieIndex",0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
@@ -557,7 +554,7 @@ def SaveGamePress ():
 	CloseQuitMsgWindow()
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
-	OpenOptionsWindow()
+	CloseOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 	return
 
