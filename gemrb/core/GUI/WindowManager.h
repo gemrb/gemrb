@@ -57,8 +57,8 @@ private:
 	EventMgr eventMgr;
 
 	Video* video;
-	VideoBuffer* cursorBuf;// buffer the cursors and tooltips are drawn to (layer 3)
-	VideoBuffer* modalShield;
+	VideoBuffer* cursorBuf;
+	VideoBuffer* winFrameBuf;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;
@@ -67,8 +67,8 @@ private:
 	bool IsOpenWindow(Window* win) const;
 	Sprite2D* WinFrameEdge(int edge) const;
 
-	inline void DrawCursor() const;
-	inline void DrawTooltip() const;
+	inline void DrawCursor(const Point& pos) const;
+	inline void DrawTooltip(const Point& pos) const;
 	inline void DrawWindowFrame() const;
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
@@ -94,10 +94,9 @@ public:
 	 Drawing is done in layers:
 	 1. Game Window is drawn
 	 2. Normal Windows are drawn (in order)
-	 3. the window frame is drawn (if applicable)
-	 4. modalShield is drawn (if applicable)
-	 5. modalWindow is drawn (if applicable)
-	 6. cursor and tooltip are drawn (if applicable)
+	 3. the window frame and modalShield is drawn (if applicable)
+	 4. modalWindow is drawn (if applicable)
+	 5. cursor and tooltip are drawn (if applicable)
 	*/
 	void DrawWindows() const;
 

@@ -64,8 +64,9 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFrame(screen);
 
 	// FIXME: need to recreate these if resolution changes
-	cursorBuf = vid->CreateBuffer(screen, Video::RGBA8888);
-	modalShield = vid->CreateBuffer(screen, Video::RGBA8888);
+	// FIXME: this cursor buffer size is arbitrary. We should measure the size of the tooltip area.
+	cursorBuf = vid->CreateBuffer(Region(0,0,128,64), Video::RGBA8888);
+	winFrameBuf = vid->CreateBuffer(screen, Video::RGBA8888);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
@@ -78,7 +79,7 @@ WindowManager::WindowManager(Video* vid)
 WindowManager::~WindowManager()
 {
 	video->DestroyBuffer(cursorBuf);
-	video->DestroyBuffer(modalShield);
+	video->DestroyBuffer(winFrameBuf);
 	delete gameWin;
 }
 
@@ -101,7 +102,7 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 	FocusWindow( win );
 	modalWin = win;
 
-	modalShield->Clear();
+	winFrameBuf->Clear();
 	if (Shadow != ShadowNone) {
 		Color shieldColor = {0,0,0,0};
 		if (Shadow == ShadowGray) {
@@ -109,7 +110,7 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 		} else {
 			shieldColor.a = 0xff;
 		}
-		video->PushDrawingBuffer(modalShield);
+		video->PushDrawingBuffer(winFrameBuf);
 		video->DrawRect(screen, shieldColor);
 		video->PopDrawingBuffer();
 	}
@@ -288,7 +289,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 #undef HIT_TEST
 
-void WindowManager::DrawCursor() const
+void WindowManager::DrawCursor(const Point& pos) const
 {
 	Holder<Sprite2D> cur(NULL);
 	if (hoverWin) {
@@ -301,7 +302,6 @@ void WindowManager::DrawCursor() const
 	}
 	assert(cur); // must have a cursor
 
-	Point pos = eventMgr.MousePos();
 	if (hoverWin && hoverWin->IsDisabled()) {
 		// draw greayed cursor
 		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, NULL);
@@ -311,10 +311,9 @@ void WindowManager::DrawCursor() const
 	}
 }
 
-void WindowManager::DrawTooltip() const
+void WindowManager::DrawTooltip(const Point& pos) const
 {
 	if (hoverWin && hoverWin->TooltipText().length() && TooltipTime && GetTickCount() >= TooltipTime + ToolTipDelay) {
-		Point pos = eventMgr.MousePos();
 		// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
 		core->DrawTooltip(hoverWin->TooltipText(), pos);
 	}
@@ -393,24 +392,26 @@ void WindowManager::DrawWindows() const
 		}
 	}
 
-	cursorBuf->Clear(); // erase the last frame
-	video->PushDrawingBuffer(cursorBuf);
-
-	if (drawFrame) {
-		DrawWindowFrame();
-	}
-
-	if (modalWin) {
-		video->PopDrawingBuffer();
-		video->PushDrawingBuffer(modalShield);
-		modalWin->Draw();
-		// reset the buffer for the cursor
-		video->PushDrawingBuffer(cursorBuf);
+	if (modalWin || drawFrame) {
+		// winFrameBuf is has been filled with the modal shield color
+		video->PushDrawingBuffer(winFrameBuf);
+		if (drawFrame) {
+			DrawWindowFrame();
+		}
+		if (modalWin) {
+			modalWin->Draw();
+		}
 	}
 
 	// tooltips and cursor are always last
-	DrawCursor();
-	DrawTooltip();
+	// the buffer dimensions are optimized for faster blitting
+	// this means we position the buffer during compositing and always draw at the origin
+	cursorBuf->Clear(); // erase the last frame
+	video->PushDrawingBuffer(cursorBuf);
+	cursorBuf->origin = eventMgr.MousePos();
+	static Point pos; // always at 0,0
+	DrawCursor(pos);
+	DrawTooltip(pos);
 }
 
 //copies a screenshot into a sprite
