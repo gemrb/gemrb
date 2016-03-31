@@ -100,7 +100,7 @@ void Control::UpdateState(const char* varname, unsigned int val)
 
 void Control::SetFocus(bool focus)
 {
-	Owner->SetFocused(this);
+	Owner->SetFocused((focus) ? this : NULL);
 	MarkDirty();
 }
 
