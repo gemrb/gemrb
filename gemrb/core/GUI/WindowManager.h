@@ -90,6 +90,15 @@ public:
 	bool MakeModal(Window* win, ModalShadow Shadow = ShadowNone);
 	bool IsPresentingModalWindow() const;
 
+	/*
+	 Drawing is done in layers:
+	 1. Game Window is drawn
+	 2. Normal Windows are drawn (in order)
+	 3. the window frame is drawn (if applicable)
+	 4. modalShield is drawn (if applicable)
+	 5. modalWindow is drawn (if applicable)
+	 6. cursor and tooltip are drawn (if applicable)
+	*/
 	void DrawWindows() const;
 
 	Size ScreenSize() const { return screen.Dimensions(); }
