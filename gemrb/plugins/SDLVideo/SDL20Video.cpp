@@ -384,7 +384,7 @@ int SDL20VideoDriver::PollEvents()
 
 				BeginMultiGesture(GESTURE_FORMATION_ROTATION);
 			} else {
-				EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
+				EvntManager->MouseUp(x, y, GEM_MB_MENU, GetModState());
 				ignoreNextFingerUp = 1;
 			}
 		}
@@ -424,7 +424,7 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 			// we assume this means the gesture doesnt want an up event
 			EvntManager->MouseUp(currentGesture.endPoint.x,
 								 currentGesture.endPoint.y,
-								 currentGesture.endButton, GetModState(SDL_GetModState()) );
+								 currentGesture.endButton, GetModState());
 		}
 	}
 	if (currentGesture.type) {
@@ -451,7 +451,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
 
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
-								mouseButton, GetModState(SDL_GetModState()) );
+								mouseButton, GetModState() );
 
 		ClearFirstTouch();
 		ignoreNextFingerUp--;
@@ -611,7 +611,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
 											 ScaleCoordinateVertical(event.tfinger.y),
-											 mouseButton, GetModState(SDL_GetModState()) );
+											 mouseButton, GetModState());
 					} else {
 						focusCtrl = EvntManager->GetMouseFocusedControl();
 						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)

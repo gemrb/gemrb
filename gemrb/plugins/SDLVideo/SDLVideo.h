@@ -46,6 +46,11 @@ inline int GetModState(int modstate)
 	return value;
 }
 
+inline int GetModState()
+{
+	return GetModState(SDL_GetModState());
+}
+
 class SDLVideoDriver : public Video {
 protected:
 	SDL_Surface* disp;

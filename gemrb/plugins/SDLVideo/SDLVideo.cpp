@@ -155,7 +155,7 @@ int SDLVideoDriver::PollEvents()
 		GetMousePos(x, y);
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
 		if (!core->ConsolePopped) {
-			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState(SDL_GetModState()) );
+			EvntManager->MouseUp( x, y, GEM_MB_ACTION, GetModState() );
 			Control* ctl = EvntManager->GetMouseFocusedControl();
 			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
 				// these are repeat events so the control should stay pressed
@@ -339,7 +339,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
 			if (!core->ConsolePopped)
-				EvntManager->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
+				EvntManager->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 			break;
 		case SDL_MOUSEBUTTONUP:
 			if (CursorIndex != VID_CUR_DRAG)
@@ -347,7 +347,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (!core->ConsolePopped)
-				EvntManager->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
+				EvntManager->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 			break;
 	}
 	return GEM_OK;
