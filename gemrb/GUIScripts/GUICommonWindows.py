@@ -508,7 +508,7 @@ def SelectQuiverSlot():
 	return
 
 #this doubles up as an ammo selector (not yet used in pst)
-def SetupItemAbilities(pc, slot):
+def SetupItemAbilities(pc, slot, only):
 	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
 		# CHIV: Could configure empty quickslots from the game screen ala spells heres
@@ -708,8 +708,8 @@ def UpdateActionsWindow ():
 			type = 1<<IE_SPELL_TYPE_INNATE
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == UAW_QWEAPONS: #quick weapon/item ability selection
-		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
+	elif level == UAW_QWEAPONS or level == UAW_QITEMS: #quick weapon or quick item ability selection
+		SetupItemAbilities(pc, GemRB.GetVar("Slot"), level)
 	elif level == UAW_ALLMAGE: #all known mage spells
 		GemRB.SetVar ("Type", -1)
 		Spellbook.SetupSpellIcons(CurrentWindow, -1, TopIndex, ActionBarControlOffset)
@@ -766,7 +766,12 @@ def ActionQWeaponPressed (which):
 
 # TODO: implement full weapon set switching instead
 def ActionQWeaponRightPressed (action):
-	ActionQItemRightPressed (action)
+	"""Selects the used ability of the quick weapon."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetVar ("Slot", action)
+	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	UpdateActionsWindow ()
+	return
 
 ###############################################
 # quick icons for spells, innates, songs, shapes
@@ -1017,7 +1022,7 @@ def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
-	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
 	UpdateActionsWindow ()
 	return
 
