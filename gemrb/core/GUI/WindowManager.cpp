@@ -367,12 +367,10 @@ void WindowManager::DrawWindows() const
 		// FYI... this only checks if the front window obscures... could be covered by another window too
 		if (win != windows.front() && win->NeedsDraw()) {
 			Region intersect = frontWinFrame.Intersect(frame);
-			if (!intersect.Dimensions().IsEmpty()) {
-				if (intersect == frame) {
-					// this window is completely obscured by the front window
-					// we dont have to bother drawing it because IE has no concept of translucent windows
-					continue;
-				}
+			if (intersect == frame) {
+				// this window is completely obscured by the front window
+				// we dont have to bother drawing it because IE has no concept of translucent windows
+				continue;
 			}
 		}
 
