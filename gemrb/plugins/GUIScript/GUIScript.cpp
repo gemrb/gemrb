@@ -10982,6 +10982,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
   * 'LoreToID'           - the required lore to identify the item\n\
   * 'MaxCharge'          - the maximum amount of charges\n\
   * 'Tooltips'           - the item tooltips\n\
+  * 'Locations'          - the item extended header's ability locations\n\
   * 'Spell'              - the spell's strref if the item is a copyable scroll\n\
   * 'Function'           - returns special function\n\
     * 0 - no special function\n\
@@ -11044,13 +11045,16 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	int ehc = item->ExtHeaderCount;
 
 	PyObject* tooltiptuple = PyTuple_New(ehc);
+	PyObject* locationtuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
 		ITMExtHeader *eh = item->ext_headers+i;
 		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
+		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(eh->Charges) );
 	}
 
 	PyDict_SetItemString(dict, "Tooltips", tooltiptuple);
+	PyDict_SetItemString(dict, "Locations", locationtuple);
 
 	int function=0;
 
