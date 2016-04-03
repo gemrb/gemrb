@@ -551,7 +551,8 @@ def SetupItemAbilities(pc, slot):
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
 					Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectQuiverSlot)
 					Button.SetVarAssoc ("Slot", ammoslots[i])
-					Button.SetTooltip ("%s" % (GemRB.GetString (Tips[0])))
+					if Tips[0] != -1:
+						Button.SetTooltip (Tips[0])
 					print currentammo, i+1, ammoslots[i]
 					if currentammo == ammoslots[i]: # this check is ok, but the results are unreliable?!
 						Button.SetState (IE_GUI_BUTTON_SELECTED)
