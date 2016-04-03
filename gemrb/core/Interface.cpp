@@ -4190,11 +4190,12 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-void Interface::PlaySound(int index)
+Holder<SoundHandle> Interface::PlaySound(int index)
 {
 	if (index<=DSCount) {
-		AudioDriver->Play(DefSound[index]);
+		return AudioDriver->Play(DefSound[index]);
 	}
+	return NULL;
 }
 
 Actor *Interface::GetFirstSelectedPC(bool forced)

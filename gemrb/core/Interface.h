@@ -579,7 +579,7 @@ public:
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
 	/** plays stock gui sound referenced by index */
-	void PlaySound(int idx);
+	Holder<SoundHandle> PlaySound(int idx);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
