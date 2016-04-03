@@ -473,7 +473,7 @@ Actor::Actor()
 	modalTime = 0;
 	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
-	nextComment = 0;
+	nextComment = 100 + RAND(0, 350); // 7-30s delay
 	nextBored = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
@@ -3919,6 +3919,9 @@ void Actor::PlayExistenceSounds()
 
 	Game *game = core->GetGame();
 	ieDword time = game->GameTime;
+	if (time/nextComment > 1) { // first run, not adjusted for game time yet
+		nextComment += time;
+	}
 
 	if (nextComment < time) {
 		ieDword delay = Modified[IE_EXISTANCEDELAY];
