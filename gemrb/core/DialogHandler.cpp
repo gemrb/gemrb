@@ -297,7 +297,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		// executing actions directly does not work, because dialog
 		// needs to end before final actions are executed due to
 		// actions making new dialogs!
-		target->Stop();
+		if (!(target->GetInternalFlag() & IF_NOINT)) {
+			target->Stop();
+		}
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
 			return false;
