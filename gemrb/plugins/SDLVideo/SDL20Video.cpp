@@ -62,7 +62,9 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	width = w, height = h;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+	// TODO: scale methods can be nearest or linear, and should be settable in config
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
@@ -72,7 +74,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
 #endif
 	if (fullscreen) {
-		winFlags |= SDL_WINDOW_FULLSCREEN;
+		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		//This is needed to remove the status bar on Android/iOS.
 		//since we are in fullscreen this has no effect outside Android/iOS
 		winFlags |= SDL_WINDOW_BORDERLESS;
@@ -148,6 +150,8 @@ doneFormat:
 		width, height, SDL_GetPixelFormatName(format));
 	backBuf = SDL_CreateRGBSurface( 0, width, height,
 									bpp, r, g, b, a );
+	// tmpBuf is here as a truly ugly hack, so we can copy backBuf to tmpBuf before blitting cursors, and then back again after the screen is presented.
+	tmpBuf = SDL_CreateRGBSurface( 0, width, height, bpp, r, g, b, a );
 	this->bpp = bpp;
 
 	if (!backBuf) {
@@ -327,9 +331,16 @@ void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 
 int SDL20VideoDriver::SwapBuffers(void)
 {
+	//this is not pretty. We make a complete copy of the backBuf into tmpBuf, then copy it back after SDLVideoDriver::SwapBuffers has blitted cursors and tooltips, and SDL_UpdateTexture has copied it to the screentexture.
+	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
+		SDL_BlitSurface(backBuf, NULL, tmpBuf, NULL);
+	}
 	int ret = SDLVideoDriver::SwapBuffers();
 
 	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
+	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
+		SDL_BlitSurface(tmpBuf, NULL, backBuf, NULL);
+	}
 	/*
 	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
 	 Don't know how universal it is yet so leaving this in commented out just in case
@@ -360,6 +371,7 @@ int SDL20VideoDriver::SwapBuffers(void)
 	 SDL_RenderFillRect(renderer, &dst);
 	 }
 	 */
+	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
 	return ret;
@@ -772,7 +784,11 @@ void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
-	if (SDL_SetWindowFullscreen(window, (SDL_bool)set) == GEM_OK) {
+	Uint32 flags = 0;
+	if (set) {
+	flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	}
+	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 		fullscreen = set;
 		return true;
 	}
