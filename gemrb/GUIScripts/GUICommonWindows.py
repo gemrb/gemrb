@@ -516,6 +516,7 @@ def SetupItemAbilities(pc, slot, only):
 
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
+	Locations = item["Locations"]
 
 	# clear buttons here
 	EmptyControls()
@@ -529,7 +530,6 @@ def SetupItemAbilities(pc, slot, only):
 	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("SLING"):
 		ammotype = CommonTables.ItemType.GetRowIndex ("BULLET")
 
-	# FIXME: ammo does not preclude the item from also having abilities (eg. bg2:bow19)
 	ammoSlotCount = 0
 	if ammotype:
 		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
@@ -563,11 +563,42 @@ def SetupItemAbilities(pc, slot, only):
 
 	# reset back to the main action bar if there are no extra headers or quivers
 	reset = not ammoSlotCount
-	# check for item abilities and skip the first that crops up (main header - nothing special)
-	if (len(Tips) > 1):
+
+	# check for item abilities and skip irrelevant headers
+	# for quick weapons only show weapon headers
+	# for quick items only show the opposite
+	# for scrolls only show the first (second header is for learning)
+	# So depending on the context Staff of Magi will have none or 2
+	if item["Type"] == CommonTables.ItemType.GetRowIndex ("SCROLL"):
+		Tips = ()
+
+	# skip launchers - handled above
+	# gesen bow (bg2:bow19) has just a projectile header (not bow) for its special attack
+	# TODO: we should append it to the list of ammo as a usability improvement
+	if only == UAW_QWEAPONS and ammoSlotCount > 1:
+		Tips = ()
+
+	if len(Tips) > 0:
 		reset = False
-		rmax = min(len(Tips) - 1, 12-ammoSlotCount)
+		rmax = min(len(Tips), 12-ammoSlotCount)
+
+		# for mixed items, only show headers if there is more than one appropriate one
+		weaps = sum(map(lambda i: i==ITEM_LOC_WEAPON, Locations))
+		if only == UAW_QWEAPONS and weaps == 1 and ammoSlotCount <= 1:
+			rmax = 0
+			reset = True
+		abils = sum(map(lambda i: i==ITEM_LOC_EQUIPMENT, Locations))
+		if only == UAW_QITEMS and abils == 1:
+			rmax = 0
+			reset = True
+
 		for i in range (rmax):
+			if only == UAW_QITEMS:
+				if Locations[i] != ITEM_LOC_EQUIPMENT:
+					continue
+			elif only == UAW_QWEAPONS:
+				if Locations[i] != ITEM_LOC_WEAPON:
+					continue
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
 			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
@@ -577,7 +608,8 @@ def SetupItemAbilities(pc, slot, only):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i])) )
+			if Tips[i] != -1:
+				Button.SetTooltip ("F%d - %s" %(i, GemRB.GetString (Tips[i])))
 
 	if reset:
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
