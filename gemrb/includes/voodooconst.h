@@ -28,6 +28,8 @@
 #ifndef VOODOO_H
 #define VOODOO_H
 
+#include "exports.h"
+
 namespace GemRB {
 
 // Constant to convert from points to (feet) for spell distance calculation
@@ -53,8 +55,7 @@ static const int VOODOO_FINDTRAP_RANGE = 10;
 // test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
 // it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
 // The distance of operating a trigger, container, dialog buffer etc.
-static unsigned int MAX_OPERATING_DISTANCE = 40; //a search square is 16x12 (diagonal of 20), so that's about two
-static const unsigned int ___MOD = MAX_OPERATING_DISTANCE; // just to silence var-unused errors
+static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square is 16x12 (diagonal of 20), so that's about two
 
 // used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
 // while it looks too big, it is needed this big in at least pst (help())

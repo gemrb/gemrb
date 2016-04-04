@@ -186,7 +186,7 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 
 #define GEMRB_PLUGIN(id, desc)	\
 	namespace { using namespace GemRB;			\
-		bool doRegisterPlugin = (
+		bool doRegisterPlugin IGNORE_UNUSED = (
 
 #define PLUGIN_CLASS(id, cls)					\
 		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func ),
