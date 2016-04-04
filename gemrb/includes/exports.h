@@ -82,4 +82,11 @@
 #	error GemRB must be dynamically linked with runtime libraries on win32.
 #endif
 
+/// Silence some persistent unused warnings (supported since gcc 2.4)
+#ifdef __GNUC__
+#	define IGNORE_UNUSED __attribute__ ((unused))
+#else
+#	define IGNORE_UNUSED
+#endif
+
 #endif
