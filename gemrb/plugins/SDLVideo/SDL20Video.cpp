@@ -651,7 +651,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					case GESTURE_FORMATION_ROTATION:
 					{
 						SDL_Finger* secondFinger = SDL_GetTouchFinger(event.mgesture.touchId, 1);
-						if (secondFinger && gc->GetTargetMode() == TARGET_MODE_NONE) {
+						if (secondFinger && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
 							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
 							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
 							gc->OnMouseOver(x, y);
