@@ -13620,7 +13620,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	core->FreeString(tmp);
 	print("Target: %d", spelldata.Target);
 	print("Range: %d", spelldata.Range);
-	if(! (1<<spelldata.type) & type) {
+	if(!((1<<spelldata.type) & type)) {
 		return RuntimeError( "Wrong type of spell!");
 	}
 
