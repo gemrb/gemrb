@@ -921,7 +921,8 @@ def AbilitiesItemWindow ():
 	GemRB.SetVar ("Ability", slot_item["Header"])
 	for i in range(3):
 		Button = Window.GetControl (i+1)
-		Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
+		if GameCheck.IsBG2(): # TODO: check pst
+			Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("Ability",i)
 		Text = Window.GetControl (i+0x10000003)
