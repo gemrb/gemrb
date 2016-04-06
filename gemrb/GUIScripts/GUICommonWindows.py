@@ -546,7 +546,7 @@ def SetupItemAbilities(pc, slot, only):
 				if ammoitem['Type'] == ammotype and st["Type"] == SLOT_QUIVER:
 					ammoSlotCount += 1
 					Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
-					Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+					Button.SetSprites ("GUIBTBUT", 0, 0,1,3,5)
 					Button.SetItemIcon (ammoslot['ItemResRef'])
 					Button.SetText (str(ammoslot["Usages0"]))
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
