@@ -534,6 +534,7 @@ def SetupItemAbilities(pc, slot, only):
 	if ammotype:
 		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
 		currentammo = GemRB.GetEquippedAmmunition (pc)
+		currentbutton = None
 		for i in range (12):
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 			if i < len(ammoslots):
@@ -553,9 +554,11 @@ def SetupItemAbilities(pc, slot, only):
 					Button.SetVarAssoc ("Slot", ammoslots[i])
 					if Tips[0] != -1:
 						Button.SetTooltip (Tips[0])
-					print currentammo, i+1, ammoslots[i]
-					if currentammo == ammoslots[i]: # this check is ok, but the results are unreliable?!
-						Button.SetState (IE_GUI_BUTTON_SELECTED)
+					if currentammo == ammoslots[i]:
+						currentbutton = Button
+
+		if currentbutton:
+			currentbutton.SetState (IE_GUI_BUTTON_SELECTED)
 
 	# skip when there is only one choice
 	if ammoSlotCount == 1:
