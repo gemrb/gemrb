@@ -604,7 +604,7 @@ def SetupItemAbilities(pc, slot, only):
 					continue
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
-			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetText ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
