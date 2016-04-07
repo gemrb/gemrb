@@ -150,6 +150,11 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
 	if (it == windows.end() || it2 == windows.end()) return false;
 
+	Window* frontWin = windows.front();
+	if ((front && frontWin == win2) || win == frontWin) {
+		TooltipTime = GetTickCount();
+	}
+
 	windows.erase(it);
 	// it2 may have become invalid after erase
 	it2 = WIN_IT(win2);
