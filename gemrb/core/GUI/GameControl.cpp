@@ -1432,9 +1432,9 @@ end_function:
 /** Global Mouse Move Event */
 #if TARGET_OS_IPHONE
 // iOS will never have a mouse.
-void GameControl::OnGlobalMouseMove(unsigned short /*x*/, unsigned short /*y*/) {}
+void GameControl::OnGlobalMouseMove(short /*x*/, short /*y*/) {}
 #else
-void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
+void GameControl::OnGlobalMouseMove(short x, short y)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;

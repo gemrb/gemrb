@@ -151,7 +151,7 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Global Mouse Move Event */
-	void OnGlobalMouseMove(unsigned short x, unsigned short y);
+	void OnGlobalMouseMove(short x, short y);
 	/** Mouse Button Down */
 	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
