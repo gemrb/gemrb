@@ -2046,6 +2046,7 @@ int fx_set_slowed_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// halve apr and speed
 		STAT_MUL(IE_NUMBEROFATTACKS, 50);
 		STAT_MUL(IE_MOVEMENTRATE, 50);
+		STAT_SUB(IE_MENTALSPEED, 2);
 	}
 	return FX_PERMANENT;
 }
