@@ -224,7 +224,17 @@ IF(USE_OPENGL)
 		ENDIF()
 	ELSE()
 		# use GLES instead of regular GL
-		# TODO: check for all the stuff GLES needs
+		SET(GLEW_LIBRARIES "")
+		find_path(GLES2_H gl2.h PATH_SUFFIXES GLES2)
+		IF(APPLE)
+			find_path(GLES2_H gl.h PATH_SUFFIXES OpenGLES/ES2)
+		ENDIF()
+		IF(GLES2_H)
+			MESSAGE(STATUS "Looking for GLES2: found")
+		ELSE()
+			MESSAGE(SEND_ERROR "Looking for GLES2: not found!")
+			MESSAGE(FATAL_ERROR "Please install the GLES2 library and headers first!")
+		ENDIF()
 	ENDIF()
 ENDIF()
 
