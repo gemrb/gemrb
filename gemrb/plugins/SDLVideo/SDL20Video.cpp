@@ -806,7 +806,10 @@ bool SDL20VideoDriver::ToggleGrabInput()
 
 bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
 {
-	bool ret = SDL_SetSurfaceAlphaMod(surface, alpha);
+	bool ret = SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
+	if (ret == GEM_OK) {
+		ret = SDL_SetSurfaceAlphaMod(surface, alpha);
+	}
 	if (ret == GEM_OK) {
 		SDL_SetSurfaceRLE(surface, SDL_TRUE);
 	}
