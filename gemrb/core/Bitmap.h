@@ -49,6 +49,7 @@ public:
 	{
 		return width;
 	}
+	void dump() const;
 private:
 	unsigned int height, width;
 	unsigned char *data;
