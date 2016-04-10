@@ -100,10 +100,7 @@ def OpenLevelUpWindow():
 	if GameCheck.IsBG1() or GameCheck.IsIWD1():
 		# armorclass
 		Label = LevelUpWindow.GetControl (0x10000057)
-		ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-		#This is a temporary solution, the core engine should set the stat correctly!
-		ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
-		Label.SetText (str (ac))
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
 		Label.SetTooltip (17183)
 
 		# hp now
