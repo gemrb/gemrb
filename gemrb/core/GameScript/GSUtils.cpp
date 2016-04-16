@@ -983,13 +983,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		//DialogueRange is set in IWD
-		ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
 		//making sure speaker is the protagonist, player, actor
-		if ( target->InParty == 1) swap = true;
-		else if ( speaker->InParty !=1 && target->InParty) swap = true;
+		Actor *protagonist = core->GetGame()->GetPC(0, false);
+		if (target == protagonist) swap = true;
+		else if (speaker != protagonist && target->InParty) swap = true;
 		//CHECKDIST works only for mobile scriptables
 		if (Flags&BD_CHECKDIST) {
+			//DialogueRange is set in IWD
+			ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
 			if ( scr->GetCurrentArea()!=target->GetCurrentArea() ||
 				PersonalDistance(scr, target)>range) {
 				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
