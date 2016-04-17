@@ -70,19 +70,9 @@ int SlicedStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
-int SlicedStream::Write(const void* src, unsigned int length)
+int SlicedStream::Write(const void* /*src*/, unsigned int /*length*/)
 {
-	//str->Seek(startpos + Pos, GEM_STREAM_START);
-	unsigned int c = (unsigned int) Write(src, length);
-	if (c != length) {
-		return GEM_ERROR;
-	}
-	Pos += c;
-	//this is needed only if you want to Seek in a written file
-	if (Pos>size) {
-		size = Pos;
-	}
-	return c;
+	error("SlicedStream", "Attempted to use unimplemented SlicedStream::Write method!");
 }
 
 int SlicedStream::Seek(int newpos, int type)
