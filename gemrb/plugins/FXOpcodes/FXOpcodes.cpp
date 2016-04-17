@@ -1755,6 +1755,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	ieDword damage = 0;
 	int tmp = fx->Parameter1;
+	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	HandlePercentageDamage(fx, target);
 	Scriptable *caster = GetCasterObject();
@@ -1808,7 +1809,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	// all damage is at most per-second
-	tmp *= AI_UPDATE_TIME;
+	tmp *= timeStep;
 	if (tmp && (core->GetGame()->GameTime%tmp)) {
 		return FX_APPLIED;
 	}
@@ -3125,6 +3126,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
+	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	if (fx->FirstApply) {
 		//ensure we prepare Parameter3 now
@@ -3145,16 +3147,16 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= core->Time.round_sec;
 		//fall
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = gameTime + tmp*AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + tmp*timeStep;
 		damage = 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + timeStep;
 		break;
 	default:
-		fx->Parameter3 = gameTime + AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + timeStep;
 		damage = 1;
 		break;
 	}
@@ -3163,7 +3165,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// x hp per 1 round
 	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + core->Time.round_sec*AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + core->Time.round_sec*timeStep;
 	}
 
 	if (fx->FirstApply) {
