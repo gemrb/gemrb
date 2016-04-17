@@ -330,6 +330,8 @@ std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 static int ReverseToHit=true;
 static int CheckAbilities=false;
 
+static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
+static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 };
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 static EffectRef fx_cleave_ref = { "Cleave", -1 };
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
@@ -10471,6 +10473,20 @@ bool Actor::WasClass(ieDword oldClassID) const
 
 	int OldIsClassID = levelslotsbg[oldClassID];
 	return mcwasflags[OldIsClassID] == mcWas;
+}
+
+// account for haste/slow affecting the metabolism (regeneration etc.)
+// handled by AdjustedTicks in the original
+unsigned int Actor::GetAdjustedTime(unsigned int time) const
+{
+	// haste mode 2 (walk speed) has no effect and we have to check the opcode indirectly
+	// otherwise it wouldn't work if the haste/slow effect is later in the queue
+	if (fxqueue.HasEffectWithParam(fx_set_haste_state_ref, 0) || fxqueue.HasEffectWithParam(fx_set_haste_state_ref, 1)) {
+		time /= 2;
+	} else if (fxqueue.HasEffect(fx_set_slow_state_ref)) {
+		time *= 2;
+	}
+	return time;
 }
 
 }
