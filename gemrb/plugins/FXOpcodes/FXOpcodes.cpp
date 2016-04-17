@@ -5956,8 +5956,17 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (per_round) {
 		// This is a 4xxx trigger which is only checked every round.
-		if (Owner->AdjustedTicks % core->Time.round_size)
-			condition = false;
+		// NOTE: some people consider checking against AdjustedTicks to be a bug in the original
+		if (Owner->Type != ST_ACTOR) {
+			if (Owner->AdjustedTicks % core->Time.round_size) {
+				condition = false;
+			}
+		} else {
+			Actor *act = (Actor *) Owner;
+			if (Owner->Ticks % act->GetAdjustedTime(core->Time.round_size)) {
+				condition = false;
+			}
+		}
 	} else {
 		// This is a normal trigger which gets a single opportunity every frame.
 		condition = (entry != NULL);
