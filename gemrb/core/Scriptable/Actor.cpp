@@ -7160,7 +7160,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		return;
 	}
 
-	int roundFraction = (gameTime-roundTime) % core->Time.round_size;
+	int roundFraction = (gameTime-roundTime) % GetAdjustedTime(core->Time.round_size);
 
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
