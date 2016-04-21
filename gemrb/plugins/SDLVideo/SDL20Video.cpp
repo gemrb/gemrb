@@ -734,10 +734,23 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				break;
 			}
 		case SDL_KEYDOWN:
+			{
+				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
+				if ((key == SDLK_SPACE) && SDL_GetModState() & KMOD_CTRL) {
+					core->PopupConsole();
+					break;
+				}
+				if ((key == SDLK_f) && SDL_GetModState() & KMOD_CTRL) {
+					// slight delay so one does not immediately re-toggle fullscreen
+					SDL_Delay(200);
+					ToggleFullscreenMode();
+					break;
+				}
+			}
 		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if ((key >= 32 && key < 127) || key == 1073742053) {
+				if ((key >= 32 && key < 127) || key & (KMOD_SHIFT|KMOD_CTRL)) {
 					// ignore keys that generate text. handeled by SDL_TEXTINPUT
 					break;
 				}
