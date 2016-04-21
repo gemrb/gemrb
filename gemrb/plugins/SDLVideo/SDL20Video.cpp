@@ -737,7 +737,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if (key > 32 && key < 127) {
+				if ((key >= 32 && key < 127) || key == 1073742053) {
 					// ignore keys that generate text. handeled by SDL_TEXTINPUT
 					break;
 				}
