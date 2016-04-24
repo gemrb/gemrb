@@ -736,25 +736,17 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYDOWN:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if ((key == SDLK_SPACE) && SDL_GetModState() & KMOD_CTRL) {
-					core->PopupConsole();
+				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
+					// if key is literally just ctrl or shift -- skip it.
 					break;
 				}
-				if ((key == SDLK_f) && SDL_GetModState() & KMOD_CTRL) {
-					// slight delay so one does not immediately re-toggle fullscreen
-					SDL_Delay(200);
-					ToggleFullscreenMode();
-					break;
-				}
-			}
-		case SDL_KEYUP:
-			{
-				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if ((key >= 32 && key < 127) || key & (KMOD_SHIFT|KMOD_CTRL)) {
-					// ignore keys that generate text. handeled by SDL_TEXTINPUT
+				if (key >= 32 && key < 127 && !(SDL_GetModState() & KMOD_CTRL)) {
+					// ignore keys that generate text (these handeled by SDL_TEXTINPUT) as long as ctrl is not pressed.
+					// The ctrl clause is to permit hotkeys that use ctrl to pass through to default below.
 					break;
 				}
 			}
+		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
