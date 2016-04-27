@@ -15968,11 +15968,13 @@ void GUIScript::ExecString(const char* string, bool feedback)
 
 		//Get error message
 		String* error = StringFromCString(PyString_AsString(pvalue));
-		displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+		if (error) {
+			displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+		}
 		PyErr_Print();
 		Py_DECREF(ptype);
 		Py_DECREF(pvalue);
-		Py_DECREF(ptraceback);
+		if (ptraceback) Py_DECREF(ptraceback);
 		delete error;
 	}
 	PyErr_Clear();
