@@ -303,6 +303,18 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
 	map->ChangeTileMap(lm->GetImage(), sm?sm->GetSprite2D():NULL);
+
+	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
+	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
+		Door* door = tm->GetDoor(i);
+		bool baseClosed, oldOpen = door->IsOpen();
+		int count;
+		unsigned short *indices = tmm->GetDoorIndices(door->ID, &count, baseClosed);
+		door->SetTiles(indices, count);
+		// reset open state to the one in the old wed
+		door->SetDoorOpen(oldOpen, true, 0);
+	}
+
 	return true;
 }
 
