@@ -745,7 +745,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// if key is literally just ctrl or shift -- skip it.
 					break;
 				}
-				if (SDL_GetModState() & KMOD_NUM && key >= 1073741908 && key <= 1073741927 && key != SDLK_KP_ENTER) {
+				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
 					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Always ignore numpad enter.
 					break;
 				}
