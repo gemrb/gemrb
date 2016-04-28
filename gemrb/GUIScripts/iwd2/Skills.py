@@ -99,8 +99,11 @@ def RedrawSkills():
 def ScrollBarPress():
 	global TopIndex
 
-	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills()
+	newTopIndex = GemRB.GetVar("TopIndex")
+	if newTopIndex + ButtonCount <= len(StatLowerLimit):
+		TopIndex = newTopIndex
+		RedrawSkills()
+
 	return
 
 def OnLoad():
