@@ -746,7 +746,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					break;
 				}
 				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
-					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Always ignore numpad enter.
+					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Never ignore numpad enter.
 					break;
 				}
 				if (key >= 32 && key < 127) {
