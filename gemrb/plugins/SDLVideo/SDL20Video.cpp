@@ -734,14 +734,27 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				break;
 			}
 		case SDL_KEYDOWN:
-		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if (key > 32 && key < 127) {
-					// ignore keys that generate text. handeled by SDL_TEXTINPUT
+				if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
+					// special treatment: console popping is the only KEYDOWN event in SDLVideoDriver::ProcessEvent that uses a standard key (and therefore will never be hit). Therefore, implement this here also.
+					core->PopupConsole();
+					break;
+				}
+				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
+					// if key is literally just ctrl or shift -- skip it.
+					break;
+				}
+				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
+					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Never ignore numpad enter.
+					break;
+				}
+				if (key >= 32 && key < 127) {
+					// ignore keys that generate text (these are handeled by SDL_TEXTINPUT).
 					break;
 				}
 			}
+		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
