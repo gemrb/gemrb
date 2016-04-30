@@ -166,7 +166,7 @@ void ScrollBar::DrawInternal(Region& drawFrame)
 	int upMy = GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED);
 	int doMy = GetFrameHeight(IE_GUI_SCROLLBAR_DOWN_UNPRESSED);
 	unsigned int domy = (Height - doMy);
-	
+
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
 		video->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED], drawFrame.x, drawFrame.y, true, &drawFrame );
