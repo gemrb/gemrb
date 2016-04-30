@@ -327,7 +327,10 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
-	focusLock = NULL;
+	if((Button & GEM_MB_ONGOING_ACTION) == GEM_MB_ACTION) {
+		focusLock = NULL;
+	}
+
 	MButtons &= ~Button;
 	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
 	if (last_ctrl_mousefocused == NULL) return;
