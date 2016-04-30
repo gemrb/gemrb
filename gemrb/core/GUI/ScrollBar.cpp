@@ -242,13 +242,15 @@ void ScrollBar::OnMouseDown(unsigned short /*x*/, unsigned short y,
 
 /** Mouse Button Up */
 void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-			unsigned short /*Button*/, unsigned short /*Mod*/)
+			unsigned short Button, unsigned short /*Mod*/)
 {
-	MarkDirty();
-	State = 0;
-	Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
-	// refresh the cursor/hover selection
-	core->GetEventMgr()->FakeMouseMove();
+	if((Button & GEM_MB_ONGOING_ACTION) == GEM_MB_ACTION) {
+		MarkDirty();
+		State = 0;
+		Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
+		// refresh the cursor/hover selection
+		core->GetEventMgr()->FakeMouseMove();
+	}
 }
 
 /** Mousewheel scroll */
