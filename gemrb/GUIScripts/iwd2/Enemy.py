@@ -163,9 +163,10 @@ def NextPress(save=1):
 		GemRB.SetNextScript("Skills")
 		return
 
-	# find the index past the last set stat
-	last = RacialEnemies.index (0)
 	if save:
+		# find the index past the last set stat
+		last = RacialEnemies.index (0)
+
 		# save, but note that racial enemies are stored in many stats
 		pc = GemRB.GameGetSelectedPCSingle ()
 		newHated = GemRB.GetVar ("HatedRace")
