@@ -109,10 +109,12 @@ String* StringFromCString(const char* string)
 
 char* MBCStringFromString(const String& string)
 {
-	char* cStr = (char*)malloc(string.length()+1);
+	size_t allocatedBytes = string.length() * sizeof(String::value_type);
+	char *cStr = (char*)malloc(allocatedBytes);
+
 	// FIXME: depends on locale setting
 	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
-	size_t newlen = wcstombs(cStr, string.c_str(), string.length());
+	size_t newlen = wcstombs(cStr, string.c_str(), allocatedBytes);
 	if (newlen == static_cast<size_t>(-1)) {
 		// invalid multibyte sequence
 		free(cStr);
