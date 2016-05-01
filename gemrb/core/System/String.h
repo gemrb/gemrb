@@ -38,6 +38,8 @@
 
 namespace GemRB {
 
+struct EncodingStruct;
+
 //typedef std::basic_string<ieWord> String;
 typedef std::wstring String;
 // String creators
@@ -58,6 +60,14 @@ GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 GEM_EXPORT int strlench(const char* string, char ch);
+
+struct EncodingStruct
+{
+	std::string encoding;
+	bool widechar;
+	bool multibyte;
+	bool zerospace;
+};
 
 }
 

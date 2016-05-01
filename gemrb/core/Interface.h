@@ -140,14 +140,6 @@ struct TimeStruct {
 	unsigned int attack_round_size;
 };
 
-struct EncodingStruct
-{
-	std::string encoding;
-	bool widechar;
-	bool multibyte;
-	bool zerospace;
-};
-
 struct SpellDescType {
 	ieResRef resref;
 	ieStrRef value;
