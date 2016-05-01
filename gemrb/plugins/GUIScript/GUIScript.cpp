@@ -1998,7 +1998,7 @@ textarea.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
-	* flags - Set to 1 if querying a text from a ListResource source\n\
+  * flags - Set to 1 if querying a text from a ListResource source\n\
 \n\
 **Return value:** string, may be empty\n\
 \n\
