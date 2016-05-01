@@ -8344,12 +8344,19 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 	}
 }
 
-void Actor::SetSoundFolder(const char *soundset)
+void Actor::SetSoundFolder(const char *soundset, bool mbStringPath)
 {
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		char filepath[_MAX_PATH];
+		bool useMbPath = mbStringPath && core->FSPathEncoding.multibyte;
 
-		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
+		if(useMbPath) {
+			memset(PCStats->SoundFolder, 0, SOUNDFOLDERSIZE);
+			memcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE - 1);
+		} else {
+			strnlwrcpy(PCStats->SoundFolder, soundset, 32);
+		}
+
 		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
 		char file[_MAX_PATH];
 
@@ -8363,7 +8370,12 @@ void Actor::SetSoundFolder(const char *soundset)
 		} else {
 			return;
 		}
-		strnlwrcpy(PCStats->SoundSet, file, 8);
+
+		if(useMbPath) {
+			memcpy(PCStats->SoundSet, file, 8);
+		} else {
+			strnlwrcpy(PCStats->SoundSet, file, 8);
+		}
 	} else {
 		strnlwrcpy(PCStats->SoundSet, soundset, 8);
 		PCStats->SoundFolder[0]=0;
