@@ -37,7 +37,7 @@ StatLowerLimit = [0] * 16
 ButtonCount = 0
 
 def RedrawSkills():
-	global CostTable, TopIndex
+	global CostTable, TopIndex, CharGen
 
 	SumLabel = SkillWindow.GetControl(0x1000000c)
 	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
@@ -80,7 +80,7 @@ def RedrawSkills():
 		else:
 			if ActPoint * Cost >= maxSkill or PointsLeft < 1:
 				Btn1State = IE_GUI_BUTTON_DISABLED
-			if ActPoint == StatLowerLimit[Pos]:
+			if CharGen and ActPoint == 0 or not CharGen and ActPoint == StatLowerLimit[Pos]:
 				Btn2State = IE_GUI_BUTTON_DISABLED
 		Button1.SetState(Btn1State)
 		Button2.SetState(Btn2State)
@@ -161,19 +161,25 @@ def OpenSkillsWindow(chargen, level=0):
 		PointsLeft *= LevelDiff
 
 	PointsLeft += IntBonus * LevelDiff
-
 	PointsLeft += GemRB.GetPlayerStat (pc, IE_UNUSED_SKILLPTS)
 
 	SkillTable = GemRB.LoadTable("skills")
 	RowCount = SkillTable.GetRowCount()
-
 	CostTable = GemRB.LoadTable("skilcost")
-
+	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
 	TmpTable = GemRB.LoadTable ("skillsta")
+
 	for i in range(RowCount):
-		# Racial/Class bonuses don't factor in char-gen or leveling, so can be safely ignored
 		StatID = TmpTable.GetValue (i, 0, GTV_STAT)
 		StatLowerLimit[i] = GemRB.GetPlayerStat (pc, StatID, 1)
+		if chargen:
+			# TODO: Instead of always subtracting in CG, we should do this only
+			#       if have already been to this step in GC.
+			RacialBonus = SkillTable.GetValue (i, RaceColumn)
+			if StatLowerLimit[i] >= RacialBonus:
+				StatLowerLimit[i] -= RacialBonus
+			Cost = CostTable.GetValue(i, ClassColumn)
+			PointsLeft -= StatLowerLimit[i] * Cost
 		GemRB.SetVar ("Skill "+str(i), StatLowerLimit[i])
 
 	GemRB.SetToken("number",str(PointsLeft) )
@@ -237,7 +243,7 @@ def JustPress():
 	return
 
 def RightPress():
-	global PointsLeft
+	global PointsLeft, CharGen
 
 	Pos = GemRB.GetVar("Skill")+TopIndex
 	Cost = CostTable.GetValue(Pos, ClassColumn)
@@ -246,7 +252,7 @@ def RightPress():
 
 	TextAreaControl.SetText(SkillTable.GetValue(Pos,2) )
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint <= StatLowerLimit[Pos]:
+	if CharGen and ActPoint == 0 or not CharGen and ActPoint <= StatLowerLimit[Pos]:
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + Cost
