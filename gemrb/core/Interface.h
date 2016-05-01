@@ -397,6 +397,7 @@ private:
 	std::string Encoding;
 public:
 	EncodingStruct TLKEncoding;
+	EncodingStruct FSPathEncoding;
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;

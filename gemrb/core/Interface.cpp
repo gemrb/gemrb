@@ -254,6 +254,10 @@ Interface::Interface()
 	TLKEncoding.widechar = false;
 	TLKEncoding.multibyte = false;
 	TLKEncoding.zerospace = false;
+	FSPathEncoding.encoding = "UTF-8";
+	FSPathEncoding.widechar = false;
+	FSPathEncoding.multibyte = true;
+	FSPathEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 
 	gamedata = new GameData();
