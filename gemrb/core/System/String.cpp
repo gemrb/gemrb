@@ -107,6 +107,10 @@ String* StringFromCString(const char* string)
 	return StringFromEncodedData((ieByte*)string, core->TLKEncoding);
 }
 
+String* StringFromCString(const char* string, const EncodingStruct& encoding) {
+	return StringFromEncodedData((ieByte*)string, encoding);
+}
+
 char* MBCStringFromString(const String& string)
 {
 	size_t allocatedBytes = string.length() * sizeof(String::value_type);
@@ -124,6 +128,20 @@ char* MBCStringFromString(const String& string)
 	cStr = (char*)realloc(cStr, newlen+1);
 	cStr[newlen] = '\0';
 	return cStr;
+}
+
+char* MBCStringFromString(const String& string, const EncodingStruct& encoding) {
+	char *currentLocale = std::setlocale(LC_CTYPE, "");
+	size_t currentLocaleLength = strlen(currentLocale);
+	char *previousLocale = (char*)calloc(currentLocaleLength + 1, 1);
+	memcpy(previousLocale, currentLocale, currentLocaleLength);
+
+	std::setlocale(LC_CTYPE, encoding.encoding.c_str());
+	char *result = MBCStringFromString(string);
+	std::setlocale(LC_CTYPE, previousLocale);
+	free(previousLocale);
+
+	return result;
 }
 
 unsigned char pl_uppercase[256];

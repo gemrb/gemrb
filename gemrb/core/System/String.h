@@ -24,6 +24,7 @@
 
 #include <cstring>
 #include <string>
+#include <locale>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -44,7 +45,9 @@ struct EncodingStruct;
 typedef std::wstring String;
 // String creators
 GEM_EXPORT String* StringFromCString(const char* string);
+GEM_EXPORT String* StringFromCString(const char* string, const EncodingStruct&);
 GEM_EXPORT char* MBCStringFromString(const String& string);
+GEM_EXPORT char* MBCStringFromString(const String& string, const EncodingStruct&);
 
 // String manipulators
 GEM_EXPORT void StringToLower(String& string);
