@@ -6652,7 +6652,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			String* string = StringFromCString(name);
+			String* string = StringFromCString(name, core->FSPathEncoding);
 			if (dirs == false) {
 				size_t pos = string->find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
