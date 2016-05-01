@@ -69,7 +69,7 @@ def BackPress():
 	return
 
 def NextPress():
-	GemRB.SetToken("VoiceSet", TextAreaControl.QueryText())
+	GemRB.SetToken("VoiceSet", TextAreaControl.QueryText(1))
 	if SoundWindow:
 		SoundWindow.Unload()
 	GemRB.SetNextScript("CharGen8") #name
@@ -82,10 +82,10 @@ def SelectSound():
 def PlayPress():
 	global SoundIndex
 
-	CharSound = TextAreaControl.QueryText()
+	CharSound = TextAreaControl.QueryText(1)
 	MyChar = GemRB.GetVar ("Slot")
 
-	GemRB.SetPlayerSound (MyChar, CharSound)
+	GemRB.SetPlayerSound (MyChar, CharSound, 1)
 	# play sound as sound slot
 	GemRB.VerbalConstant (MyChar, int(VerbalConstants[SoundIndex]))
 
