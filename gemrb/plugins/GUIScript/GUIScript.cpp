@@ -1998,6 +1998,7 @@ textarea.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
+	* flags - Set to 1 if querying a text from a ListResource source\n\
 \n\
 **Return value:** string, may be empty\n\
 \n\
@@ -2015,8 +2016,9 @@ The above example sets the VoiceSet token to the value of the selected string in
 static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
+	int flag = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
+	if (!PyArg_ParseTuple( args, "ii|i", &wi, &ci, &flag )) {
 		return AttributeError( GemRB_Control_QueryText__doc );
 	}
 
@@ -2024,7 +2026,14 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 	if (!ctrl) {
 		return NULL;
 	}
-	char* cStr = MBCStringFromString(ctrl->QueryText());
+	char* cStr = NULL;
+
+	if(flag) {
+		cStr = MBCStringFromString(ctrl->QueryText(), core->FSPathEncoding);
+	} else {
+		cStr = MBCStringFromString(ctrl->QueryText());
+	}
+
 	if (cStr) {
 		PyObject* pyStr = PyString_FromString(cStr);
 		free(cStr);
@@ -7547,6 +7556,7 @@ PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
 **Parameters:**\n\
   * Slot        - numeric, the character's slot\n\
   * SoundFolder - string, a folder in Sounds (iwd2 style), or a filename (bg2 style)\n\
+  * flag - set to 1 if SoundFolder is a potential multibyte name\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -7557,14 +7567,16 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
 	const char *Sound=NULL;
 	int globalID;
+	int flag = 0;
 
-	if (!PyArg_ParseTuple( args, "is", &globalID, &Sound )) {
+	if (!PyArg_ParseTuple( args, "is|i", &globalID, &Sound, &flag )) {
 		return AttributeError( GemRB_SetPlayerSound__doc );
 	}
+
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->SetSoundFolder(Sound);
+	actor->SetSoundFolder(Sound, flag);
 	Py_RETURN_NONE;
 }
 
