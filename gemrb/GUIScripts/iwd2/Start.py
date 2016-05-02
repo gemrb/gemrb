@@ -21,6 +21,7 @@
 import GemRB
 import LoadScreen
 from GUIDefines import *
+from datetime import datetime
 
 StartWindow = 0
 ProtocolWindow = 0
@@ -38,6 +39,17 @@ def OnLoad():
 #main window
 	StartWindow = GemRB.LoadWindow(0)
 	StartWindow.SetFrame ()
+	time = datetime.now()
+
+	# IWD2 has some nice background for the night
+	if time.hour >= 18 or time.hour <= 6:
+		StartWindow.SetPicture("STARTN");
+		StartWindow.CreateButton(0xfff0001, 57, 333, 100, 100);
+		AnimButton = StartWindow.GetControl(0xfff0001)
+		AnimButton.SetAnimation("MMTRCHB")
+		AnimButton.SetState(IE_GUI_BUTTON_LOCKED)
+		AnimButton.SetFlags(IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)
 	LoadGameButton = StartWindow.GetControl(0x07)
