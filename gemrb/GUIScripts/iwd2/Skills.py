@@ -173,6 +173,8 @@ def OpenSkillsWindow(chargen, level=0):
 	for i in range(RowCount):
 		# Racial/Class bonuses don't factor in char-gen or leveling, so can be safely ignored
 		StatID = TmpTable.GetValue (i, 0, GTV_STAT)
+		if CharGen:
+			GemRB.SetPlayerStat (pc, StatID, 0)
 		StatLowerLimit[i] = GemRB.GetPlayerStat (pc, StatID, 1)
 		GemRB.SetVar ("Skill "+str(i), StatLowerLimit[i])
 
