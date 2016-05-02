@@ -524,7 +524,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			return;
 	}
 
-	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
+	if (Button & GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress)
 			RunEventHandler( ButtonOnShiftPress );
 		else

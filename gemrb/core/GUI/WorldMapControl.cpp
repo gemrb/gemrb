@@ -57,7 +57,7 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	}
 
 	//if there is no trivial area, look harder
-	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) && 
+	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) &&
 		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
 		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
@@ -67,7 +67,7 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 
 	//this also updates visible locations
 	worldmap->CalculateDistances(currentArea, Value);
-	
+
 	// alpha bit is unfortunately ignored
 	if (font[0]) {
 		ftext = core->GetFont(font);
@@ -161,7 +161,7 @@ void WorldMapControl::DrawInternal(Region& rgn)
 			continue;
 
 		Palette* text_pal = pal_normal;
-		
+
 		if (Area == m) {
 			text_pal = pal_selected;
 		} else {
@@ -309,7 +309,7 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned short Button, unsigned short /*Mod*/)
 {
-	if (Button != GEM_MB_ACTION) {
+	if (!(Button & GEM_MB_ACTION)) {
 		return;
 	}
 	MouseIsDown = false;
@@ -323,7 +323,7 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 {
 	ScrollX += x;
 	ScrollY += y;
-	
+
 	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
 	if (ScrollX > MapMOS->Width - Width)

@@ -58,7 +58,7 @@ Color colors[]={
 
 #define MAP_TO_SCREENX(x) (XWin + XCenter - ScrollX + (x))
 #define MAP_TO_SCREENY(y) (YWin + YCenter - ScrollY + (y))
-// Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
+// Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is
 //   already relative to control [XY]Pos there
 #define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
 #define SCREEN_TO_MAPY(y) ((y) - YCenter + ScrollY)
@@ -424,7 +424,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 			return;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
-			if (Button == GEM_MB_ACTION) {
+			if (Button & GEM_MB_ACTION) {
 				ViewHandle(x,y);
 			}
 			ClickHandle(Button);
