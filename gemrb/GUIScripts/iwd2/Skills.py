@@ -139,6 +139,8 @@ def OpenSkillsWindow(chargen, level=0):
 	if PointsLeft < 1:
 		PointsLeft = 1
 
+	PointsLeft *= LevelDiff
+
 	# TODO:
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
@@ -154,12 +156,6 @@ def OpenSkillsWindow(chargen, level=0):
 		else: PointsLeft += 1
 
 	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
-
-	if chargen:
-		PointsLeft *= 2
-	else:
-		PointsLeft *= LevelDiff
-
 	PointsLeft += IntBonus * LevelDiff
 
 	PointsLeft += GemRB.GetPlayerStat (pc, IE_UNUSED_SKILLPTS)
