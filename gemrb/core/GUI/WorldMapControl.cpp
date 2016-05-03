@@ -309,7 +309,7 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned short Button, unsigned short /*Mod*/)
 {
-	if (Button != GEM_MB_ACTION) {
+	if (!(Button & GEM_MB_ACTION)) {
 		return;
 	}
 	MouseIsDown = false;
