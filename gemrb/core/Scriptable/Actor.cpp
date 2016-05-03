@@ -8392,7 +8392,13 @@ void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 	}
 
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
-		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
+		if(core->FSPathEncoding.multibyte) {
+			memset(soundset, 0, SOUNDFOLDERSIZE);
+			memcpy(soundset, PCStats->SoundFolder, SOUNDFOLDERSIZE - 1);
+		} else {
+			strnlwrcpy(soundset, PCStats->SoundFolder, 32);
+		}
+
 		if (full) {
 			strcat(soundset,"/");
 			strncat(soundset, set, 8);
