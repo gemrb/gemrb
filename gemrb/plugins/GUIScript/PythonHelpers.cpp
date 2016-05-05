@@ -112,7 +112,7 @@ bool PythonObjectCallback<WindowKeyPress>::operator() (WindowKeyPress *wkp) {
 	return result > 0;
 }
 
-PyObject* CallPythonObject(PyObject *Function, PyObject *args) {
+static PyObject* CallPythonObject(PyObject *Function, PyObject *args) {
 	if (!Function) {
 		return NULL;
 	}
