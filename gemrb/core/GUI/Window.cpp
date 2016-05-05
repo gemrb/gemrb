@@ -50,6 +50,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	DefaultControl[1] = -1;
 	ScrollControl = -1;
 	FunctionBar = false;
+	keyPressHandler = NULL;
 }
 
 Window::~Window()
@@ -335,6 +336,10 @@ Control* Window::GetScrollControl() const
 	return GetControl( (ieWord) ScrollControl );
 }
 
+void Window::SetKeyPressEvent(WindowKeyPressHandler handler) {
+	keyPressHandler = handler;
+}
+
 void Window::release(void)
 {
 	Visible = WINDOW_INVALID;
@@ -446,6 +451,19 @@ void Window::OnMouseOver(unsigned short x, unsigned short y)
 		cy = 0;
 	}
 	lastOver->OnMouseOver(cx, cy);
+}
+
+bool Window::OnKeyPress(unsigned char key, unsigned short mod) {
+	if(keyPressHandler) {
+		WindowKeyPress wkp;
+		wkp.windowID = this->WindowID;
+		wkp.key = key;
+		wkp.mod = mod;
+
+		return keyPressHandler(&wkp);
+	} else {
+		return false;
+	}
 }
 
 }
