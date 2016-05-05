@@ -32,6 +32,7 @@
 #include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
+#include "GUI/Tooltip.h"
 #include "GUI/Window.h"
 #include "Holder.h"
 #include "InterfaceConfig.h"
@@ -341,10 +342,9 @@ private:
 	ResRef TextFontResRef;
 	ResRef TooltipFontResRef;
 
-	ResRef TooltipBackResRef;
+	TooltipBackground* TooltipBG;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
-	int TooltipMargin;
 
 	Image * pal256;
 	Image * pal32;
@@ -394,7 +394,6 @@ public:
 	int CursorCount;
 	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
 	Sprite2D *FogSprites[32];
-	Sprite2D **TooltipBack;
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
@@ -443,8 +442,7 @@ public:
 
 	/** Set the Tooltip text of a Control */
 	void SetTooltip(Control*, const char * string);
-	/** Actually draws tooltip on the screen. */
-	void DrawTooltip(const String&, Point p);
+	Tooltip CreateTooltip(const String&);
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
@@ -715,7 +713,6 @@ public:
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
 	int Width, Height, Bpp, ForceStereo;
-	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, DrawFPS;

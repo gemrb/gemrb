@@ -21,6 +21,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "ImageMgr.h"
+#include "Tooltip.h"
 #include "Window.h"
 
 #include "defsounds.h"
@@ -40,6 +41,11 @@ WindowManager& WindowManager::DefaultWindowManager()
 {
 	static WindowManager wm(core->GetVideoDriver());
 	return wm;
+}
+
+void WindowManager::SetTooltipDelay(int delay)
+{
+	ToolTipDelay = delay;
 }
 
 WindowManager::WindowManager(Video* vid)
@@ -295,6 +301,31 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 #undef HIT_TEST
 
+void WindowManager::DrawMouse() const
+{
+	Point pos = eventMgr.MousePos();
+	Size bufSize = cursorBuf->Size();
+
+	// clamp to screen
+	pos.x = std::max<int>(0, pos.x - bufSize.w / 2);
+	pos.x = std::min<int>((screen.w - bufSize.w), pos.x);
+	// TODO: clamp Y coordinate; the tooltip can still overflow vertically.
+
+	cursorBuf->Clear();
+	video->PushDrawingBuffer(cursorBuf);
+	video->DrawRect(Region(0,0,128,64), ColorBlack);
+
+	// cursor is buffer midpoint, but offset by distance to edge
+	Point mid = eventMgr.MousePos() - pos;
+	cursorBuf->origin = pos;
+	DrawCursor(mid);
+	// tooltip is *always* midpoint to the buffer
+	// this will ensure the entire tooltip is visible
+	mid.x = bufSize.w / 2;
+	// FIXME: center vertically (and clamp Y cord); the tooltip can still overflow vertically.
+	DrawTooltip(mid);
+}
+
 void WindowManager::DrawCursor(const Point& pos) const
 {
 	Holder<Sprite2D> cur(NULL);
@@ -317,11 +348,34 @@ void WindowManager::DrawCursor(const Point& pos) const
 	}
 }
 
-void WindowManager::DrawTooltip(const Point& pos) const
+void WindowManager::DrawTooltip(const Point& mid) const
 {
-	if (hoverWin && hoverWin->TooltipText().length() && TooltipTime && GetTickCount() >= TooltipTime + ToolTipDelay) {
-		// TODO: Interface::DrawTooltip logic should be relocated to here (and possibly a Tooltip class)
-		core->DrawTooltip(hoverWin->TooltipText(), pos);
+	static Tooltip tt = core->CreateTooltip(L"");
+	static unsigned long time = 0;
+	static Holder<SoundHandle> tooltip_sound = NULL;
+	static bool reset = false;
+
+	if (time != TooltipTime + ToolTipDelay) {
+		time = TooltipTime + ToolTipDelay;
+		reset = true;
+	}
+
+	if (hoverWin && TooltipTime && GetTickCount() >= time) {
+		if (reset) {
+			// reset the tooltip and restart the sound
+			const String& text = hoverWin->TooltipText();
+			tt.SetText(text);
+			if (tooltip_sound) {
+				tooltip_sound->Stop();
+				tooltip_sound.release();
+			}
+			if (text.length()) {
+				tooltip_sound = core->PlaySound(DS_TOOLTIP);
+			}
+			reset = false;
+		}
+
+		tt.Draw(mid);
 	}
 }
 
@@ -329,7 +383,7 @@ void WindowManager::DrawWindowFrame() const
 {
 	// the window buffers dont have room for the frame
 	// we also only need to draw the frame *once* (even if it applies to multiple windows)
-	// therefore, draw the frame on the cursor buffer (above everything else)
+	// therefore, draw the frame on its own buffer (above everything else)
 	// ... I'm not 100% certain this works for all use cases.
 	// if it doesnt... i think it might be better to just forget about the window frames once the game is loaded
 
@@ -407,15 +461,7 @@ void WindowManager::DrawWindows() const
 		}
 	}
 
-	// tooltips and cursor are always last
-	// the buffer dimensions are optimized for faster blitting
-	// this means we position the buffer during compositing and always draw at the origin
-	cursorBuf->Clear(); // erase the last frame
-	video->PushDrawingBuffer(cursorBuf);
-	cursorBuf->origin = eventMgr.MousePos();
-	static Point pos; // always at 0,0
-	DrawCursor(pos);
-	DrawTooltip(pos);
+	DrawMouse();
 }
 
 //copies a screenshot into a sprite

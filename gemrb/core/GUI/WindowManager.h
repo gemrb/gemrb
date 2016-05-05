@@ -67,9 +67,11 @@ private:
 	bool IsOpenWindow(Window* win) const;
 	Sprite2D* WinFrameEdge(int edge) const;
 
+	inline void DrawWindowFrame() const;
+	inline void DrawMouse() const;
+	// DrawMouse simply calls the following with some position calculations and buffer context changes
 	inline void DrawCursor(const Point& pos) const;
 	inline void DrawTooltip(const Point& pos) const;
-	inline void DrawWindowFrame() const;
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);
@@ -106,6 +108,7 @@ public:
 	Window* GetGameWindow() const { return gameWin; }
 
 	static WindowManager& DefaultWindowManager();
+	static void SetTooltipDelay(int);
 };
 
 

@@ -11681,7 +11681,7 @@ static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
 	int tooltipDelay;
 	PARSE_ARGS(args, "i", &tooltipDelay);
-	core->TooltipDelay = tooltipDelay;
+	// FIXME: reimplement this
 	Py_RETURN_NONE;
 }
 

@@ -142,6 +142,9 @@
 		A265ECEF13A8669700C6DF12 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
+		A27217031CAE2678005F3976 /* Tooltip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27217011CAE2678005F3976 /* Tooltip.cpp */; };
+		A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27217011CAE2678005F3976 /* Tooltip.cpp */; };
+		A27217051CAE2678005F3976 /* Tooltip.h in Headers */ = {isa = PBXBuildFile; fileRef = A27217021CAE2678005F3976 /* Tooltip.h */; };
 		A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A276B46D13A28A5000D41A8A /* PNGImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A27368D11A338E7800A8EEB8 /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27368CF1A338E7200A8EEB8 /* mem.cpp */; };
 		A27368D21A338E7A00A8EEB8 /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27368CF1A338E7200A8EEB8 /* mem.cpp */; };
@@ -1277,6 +1280,8 @@
 		A265ECEA13A8669700C6DF12 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../gemrb/core/System/Logging.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEC13A8669700C6DF12 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../gemrb/core/System/String.cpp; sourceTree = SOURCE_ROOT; };
+		A27217011CAE2678005F3976 /* Tooltip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tooltip.cpp; sourceTree = "<group>"; };
+		A27217021CAE2678005F3976 /* Tooltip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tooltip.h; sourceTree = "<group>"; };
 		A27368CF1A338E7200A8EEB8 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		A273DC7B14856755000DA299 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		A276B3CA13A2867900D41A8A /* BIFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BIFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3245,6 +3250,8 @@
 				A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */,
 				A2D672DF1B30F40C00264D16 /* WindowManager.cpp */,
 				A2D672E01B30F40C00264D16 /* WindowManager.h */,
+				A27217011CAE2678005F3976 /* Tooltip.cpp */,
+				A27217021CAE2678005F3976 /* Tooltip.h */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
@@ -3521,6 +3528,7 @@
 				A2E66409139E885A00310FC8 /* Actor.h in Headers */,
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
+				A27217051CAE2678005F3976 /* Tooltip.h in Headers */,
 				A2E6640F139E885A00310FC8 /* InfoPoint.h in Headers */,
 				A27E5D6218106384009434E5 /* VEFObject.h in Headers */,
 				A2E66411139E885A00310FC8 /* PCStatStruct.h in Headers */,
@@ -5193,6 +5201,7 @@
 				A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */,
 				A265ECEF13A8669700C6DF12 /* String.cpp in Sources */,
 				A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */,
+				A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */,
 				A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */,
 				A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */,
 				A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */,
@@ -5274,6 +5283,7 @@
 				A2E6636D139E883100310FC8 /* Core.cpp in Sources */,
 				A2E6636F139E883100310FC8 /* DataFileMgr.cpp in Sources */,
 				A2E66371139E883100310FC8 /* Dialog.cpp in Sources */,
+				A27217031CAE2678005F3976 /* Tooltip.cpp in Sources */,
 				A2E66373139E883100310FC8 /* DialogHandler.cpp in Sources */,
 				A2E66375139E883100310FC8 /* DialogMgr.cpp in Sources */,
 				A2E66377139E883100310FC8 /* DisplayMessage.cpp in Sources */,

@@ -174,7 +174,6 @@ Interface::Interface()
 	NumFingKboard = 3;
 	NumFingScroll = 2;
 	MouseFeedback = 0;
-	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
 	GUIScriptsPath[0] = 0;
@@ -205,9 +204,7 @@ Interface::Interface()
 		GroundCircleScale[size] = 0;
 	}
 
-	TooltipMargin = 10;
-
-	TooltipBack = NULL;
+	TooltipBG = NULL;
 	DraggedItem = NULL;
 	DefSound = NULL;
 	DSCount = -1;
@@ -357,6 +354,7 @@ Interface::~Interface(void)
 
 	delete timer;
 	delete displaymsg;
+	delete TooltipBG;
 
 	if (video) {
 
@@ -370,13 +368,6 @@ Interface::~Interface(void)
 			}
 		}
 
-		if (TooltipBack) {
-			for(i=0;i<3;i++) {
-				//freesprite checks for null pointer
-				Sprite2D::FreeSprite(TooltipBack[i]);
-			}
-			delete[] TooltipBack;
-		}
 		if (InfoTextPalette) {
 			gamedata->FreePalette(InfoTextPalette);
 		}
@@ -903,10 +894,6 @@ void Interface::Main()
 
 	vars->Lookup("Mouse Scroll Speed", speed);
 	SetMouseScrollSpeed((int) speed);
-	if (vars->Lookup("Tooltips", TooltipDelay)) {
-		// the games store the slider position*10, not the actual delay
-		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
-	}
 
 	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
@@ -1110,21 +1097,6 @@ int Interface::LoadSprites()
 		}
 	}
 
-	if (!TooltipBackResRef.IsEmpty()) {
-		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
-		Log(MESSAGE, "Core", "Initializing Tooltips...");
-		if (!anim) {
-			Log(ERROR, "Core", "Failed to initialize tooltips.");
-			return GEM_ERROR;
-		}
-		TooltipBack = new Sprite2D * [3];
-		for (int i = 0; i < 3; i++) {
-			TooltipBack[i] = anim->GetFrame( 0, (ieByte) i );
-			TooltipBack[i]->XPos = 0;
-			TooltipBack[i]->YPos = 0;
-		}
-	}
-
 	return GEM_OK;
 }
 
@@ -1224,7 +1196,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("RepeatKeyDelay", EventMgr::RKDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
-	CONFIG_INT("TooltipDelay", TooltipDelay = );
+	CONFIG_INT("TooltipDelay", WindowManager::SetTooltipDelay);
 	CONFIG_INT("Width", Width = );
 	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
 	CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
@@ -2153,6 +2125,7 @@ bool Interface::LoadGemRBINI()
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
+	ResRef tooltipBG;
 	const char *s;
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
@@ -2164,7 +2137,7 @@ bool Interface::LoadGemRBINI()
 	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
 	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
 	ASSIGN_RESREF(MovieFontResRef, "MovieFont");
-	ASSIGN_RESREF(TooltipBackResRef, "TooltipBack");
+	ASSIGN_RESREF(tooltipBG, "TooltipBack");
 	ASSIGN_RESREF(TextFontResRef, "TextFont");
 	ASSIGN_RESREF(Palette16, "Palette16");
 	ASSIGN_RESREF(Palette32, "Palette32");
@@ -2175,7 +2148,18 @@ bool Interface::LoadGemRBINI()
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
 
-	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
+	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
+
+	if (!tooltipBG.IsEmpty()) {
+		AnimationFactory* anim = (AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
+		Log(MESSAGE, "Core", "Initializing Tooltips...");
+		if (anim) {
+			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
+			// FIXME: this is an arbitrary huristic and speed
+			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 5 : 0);
+			TooltipBG->SetMargin(ttMargin);
+		}
+	}
 
 	// The format of GroundCircle can be:
 	// GroundCircleBAM1 = wmpickl/3
@@ -2617,100 +2601,9 @@ void Interface::HandleGUIBehaviour(void)
 	}
 }
 
-void Interface::DrawTooltip (const String& string, Point p)
+Tooltip Interface::CreateTooltip(const String& text)
 {
-	if (string.empty())
-		return;
-
-	Font* fnt = GetFont( TooltipFontResRef );
-	if (!fnt) {
-		return;
-	}
-
-	static int tooltip_currtextw = 0;
-	static Point oldP;
-	if (oldP != p) {
-		static Holder<SoundHandle> tooltip_sound = NULL;
-		// use a sound handle so we can stop previous unroll sounds
-		if (tooltip_sound) {
-			tooltip_sound->Stop();
-			tooltip_sound.release();
-		}
-		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
-		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP]);
-		oldP = p;
-		tooltip_currtextw = 0;
-	}
-
-	int w1 = 0;
-	int w2 = 0;
-	int strw = fnt->StringSize( string ).w + 8;
-	int w = strw;
-	int h = fnt->LineHeight;
-
-	if (TooltipBack) {
-		// animate BG tooltips
-		// TODO: make tooltip animation an option instead
-		// of following hard-coded check!
-		if (TooltipMargin == 5) {
-			// TODO: make speed an option
-			int tooltip_anim_speed = 15;
-			if (tooltip_currtextw < strw) {
-				tooltip_currtextw += tooltip_anim_speed;
-			}
-			if (tooltip_currtextw > strw) {
-				tooltip_currtextw = strw;
-			}
-			w = tooltip_currtextw;
-		}
-
-		h = TooltipBack[0]->Height;
-		w1 = TooltipBack[1]->Width;
-		w2 = TooltipBack[2]->Width;
-		int margins = TooltipMargin*2;
-		w += margins;
-		strw += margins;
-		int strwmax = TooltipBack[0]->Width - margins;
-		//multiline in case of too much text
-		if (w > TooltipBack[0]->Width) {
-			w = TooltipBack[0]->Width;
-			strw = strwmax;
-		} else if (strw > strwmax)
-			strw = strwmax;
-	}
-
-	int strx = p.x - strw / 2;
-	int y = p.y - h / 2;
-	// Ensure placement within the screen
-	if (strx < 0) strx = 0;
-	else if (strx + strw + w1 + w2 > Width)
-		strx = Width - strw - w1 - w2;
-	if (y < 0) y = 0;
-	else if (y + h > Height)
-		y = Height - h;
-
-	int x = strx + ((strw - w) / 2);
-
-	Region clip = Region( x, y, w, h );
-	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, &clip );
-		video->BlitSprite( TooltipBack[1], x, y );
-		video->BlitSprite( TooltipBack[2], x + w, y );
-	}
-
-	if (TooltipBack) {
-		clip.x += TooltipBack[1]->Width;
-		clip.w -= TooltipBack[2]->Width;
-		strx += TooltipMargin;
-	}
-	Region textr = Region( strx, y, strw, h );
-
-	// clip drawing to the control bounds, then restore after drawing
-	Region oldclip = video->GetScreenClip();
-	video->SetScreenClip(&clip);
-	fnt->Print( textr, string, NULL,
-			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
-	video->SetScreenClip(&oldclip);
+	return Tooltip(text, GetFont( TooltipFontResRef ), TooltipBG);
 }
 
 /** Get the Sound Manager */
