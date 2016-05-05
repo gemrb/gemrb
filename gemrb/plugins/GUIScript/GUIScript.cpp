@@ -1709,8 +1709,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 {
 	PyObject* str;
 	char* string;
-	int function = 0;
-	PARSE_ARGS( args, "OO|i", &self, &str, &function);
+	PARSE_ARGS( args, "OO", &self, &str);
 
 	Control* ctrl = GetView<Control>(self);
 	if (!ctrl) {
@@ -1719,26 +1718,12 @@ static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
 		string = PyString_AsString( str );
-		if (string == NULL) {
-			return RuntimeError("Null string received");
-		}
-		if (function) {
-			SetFunctionTooltip(ctrl, string, function);
-		} else {
-			core->SetTooltip(ctrl, string );
-	}
+		ctrl->SetTooltip(string);
 	} else {
 		ieStrRef StrRef = ieStrRef(PyInt_AsLong( str ));
-		if (StrRef != ieStrRef(-1)) {
-			char* str = core->GetCString( StrRef );
-
-			if (function) {
-				SetFunctionTooltip(ctrl, str, function );
-	} else {
-				core->SetTooltip( ctrl, str );
-				core->FreeString( str );
-			}
-	}
+		string = core->GetCString( StrRef );
+		ctrl->SetTooltip(string);
+		free(string);
 	}
 
 	Py_RETURN_NONE;
