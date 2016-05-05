@@ -38,7 +38,7 @@ EventMgr::EventMgr(void)
 	// Function bar window (for function keys)
 	function_bar = NULL;
 	// Last window focused for keyboard events
-	last_win_focused = NULL;	
+	last_win_focused = NULL;
 	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
 	last_win_mousefocused = NULL;
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
@@ -363,7 +363,8 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 	Control *ctrl = last_win_focused->GetFocus();
 	if (!ctrl || !ctrl->OnKeyPress( Key, Mod )) {
 		// FIXME: need a better way to determine when to call ResolveKey/SetHotKey
-		if (core->GetGameControl()
+		if (!last_win_focused->OnKeyPress(Key, Mod)
+			&& core->GetGameControl()
 			&& !MButtons // checking for drag actions
 			&& !core->IsPresentingModalWindow()
 			&& !core->InCutSceneMode()
