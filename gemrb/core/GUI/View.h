@@ -154,6 +154,7 @@ public:
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(short x, short y);
 
+	void SetTooltip(const char* string);
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
