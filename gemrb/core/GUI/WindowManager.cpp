@@ -141,6 +141,7 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
+	TooltipTime = GetTickCount(); // reset tooltip time
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
