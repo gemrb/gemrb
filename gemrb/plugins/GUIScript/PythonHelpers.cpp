@@ -19,25 +19,9 @@
  */
 
 #include "PythonHelpers.h"
+#include "GUI/Window.h"
 
 using namespace GemRB;
-
-static bool CallPython(PyObject *Function, PyObject *args = NULL)
-{
-	if (!Function) {
-		return false;
-	}
-	PyObject *ret = PyObject_CallObject(Function, args);
-	Py_XDECREF( args );
-	if (ret == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(ret);
-	return true;
-}
 
 PythonCallback::PythonCallback(PyObject *Function)
 	: Function(Function)
@@ -64,30 +48,10 @@ bool PythonCallback::operator() ()
 	return CallPython(Function);
 }
 
+namespace GemRB {
 
-PythonControlCallback::PythonControlCallback(PyObject *Function)
-: Function(Function)
-{
-	if (Function && PyCallable_Check(Function)) {
-		Py_INCREF(Function);
-	} else {
-		Function = NULL;
-	}
-}
-
-PythonControlCallback::~PythonControlCallback()
-{
-	if (Py_IsInitialized()) {
-		Py_XDECREF(Function);
-	}
-}
-
-bool PythonControlCallback::operator() ()
-{
-	return (*this)(NULL);
-}
-
-bool PythonControlCallback::operator() (Control* ctrl)
+template <>
+bool PythonObjectCallback<Control>::operator() (Control* ctrl)
 {
 	if (!Function || !Py_IsInitialized()) {
 		return false;
@@ -132,4 +96,63 @@ bool PythonControlCallback::operator() (Control* ctrl)
 	Py_DECREF(func_code);
 	Py_DECREF(co_argcount);
 	return CallPython(Function, args);
+}
+
+template <>
+bool PythonObjectCallback<WindowKeyPress>::operator() (WindowKeyPress *wkp) {
+	if (!Function || !Py_IsInitialized()) {
+		return false;
+	}
+
+	PyObject *args = PyTuple_Pack(3, PyInt_FromLong(wkp->windowID),
+																	 PyInt_FromLong(wkp->key),
+																	 PyInt_FromLong(wkp->mod));
+	long result = CallPythonWithReturn(Function, args);
+
+	return result > 0;
+}
+
+PyObject* CallPythonObject(PyObject *Function, PyObject *args) {
+	if (!Function) {
+		return NULL;
+	}
+
+	PyObject *ret = PyObject_CallObject(Function, args);
+	Py_XDECREF( args );
+	if (ret == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+		return NULL;
+	}
+
+	return ret;
+}
+
+bool CallPython(PyObject *Function, PyObject *args)
+{
+	PyObject *ret = CallPythonObject(Function, args);
+
+	if(ret) {
+		Py_DECREF(ret);
+
+		return true;
+	} else {
+		return false;
+	}
+}
+
+long CallPythonWithReturn(PyObject *Function, PyObject *args) {
+	PyObject *ret = CallPythonObject(Function, args);
+
+	if(ret) {
+		long value = PyInt_AsLong(ret);
+		Py_DECREF(ret);
+
+		return value;
+	}
+
+	return -1;
+}
+
 }
