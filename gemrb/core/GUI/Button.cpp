@@ -387,7 +387,10 @@ void Button::SetFont(Font* newfont)
 
 String Button::TooltipText() const
 {
-	if (hotKey) {
+	ieDword showHotkeys = 0;
+	core->GetDictionary()->Lookup("Hotkeys On Tooltips", showHotkeys);
+
+	if (showHotkeys && hotKey) {
 		String s;
 		switch (hotKey) {
 			// FIXME: these arent localized...
