@@ -20,6 +20,7 @@
 import GemRB
 import GameCheck
 import GUICommon
+import GUICommonWindows
 import Spellbook
 from GUIDefines import *
 from ie_stats import *
@@ -949,5 +950,19 @@ def AbilitiesItemWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
+
+def HookKeyPresses():
+	Window = GUIINV.InventoryWindow
+	Window.SetKeyPressEvent(SwitchPC)
+	return
+
+def SwitchPC(wIdx, key, mod):
+	if key >= 49 and key <= 54:
+		GemRB.GameSelectPCSingle(key - 48)
+		GUICommonWindows.SelectionChanged()
+		GUIINV.UpdateInventoryWindow ()
+		return 1
+
+	return 0
 
 import GUIINV
