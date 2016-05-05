@@ -406,7 +406,7 @@ String Button::TooltipText() const
 				break;
 		}
 		s += L": ";
-		return s += ((tooltip.length()) ? View::TooltipText() : QueryText());
+		return s += ((tooltip.length()) ? tooltip : QueryText());
 	}
 	return Control::TooltipText();
 }
