@@ -164,9 +164,6 @@ public:
 	void AssignScriptingRef(ViewScriptingRef* ref);
 	ViewScriptingRef* GetScriptingRef() { return scriptingRef; }
 	void DeleteScriptingRef();
-
-	// static methods
-	static void SetTooltipDelay(int);
 };
 
 }
