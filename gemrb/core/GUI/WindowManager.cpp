@@ -340,12 +340,17 @@ void WindowManager::DrawCursor(const Point& pos) const
 	}
 	assert(cur); // must have a cursor
 
+	// FIXME: shouldn't have to actually clip the drawing should we?
+	// seems that the BAM blitter will wrap the sprite if it overhangs
+	// not sure if that is intended behavior for some other purpose, or just a case that has neever come up
+	Region clip(0,0, 128,64);
+
 	if (hoverWin && hoverWin->IsDisabled()) {
 		// draw greayed cursor
-		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, NULL);
+		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY, ColorGray, NULL, NULL, &clip);
 	} else {
 		// draw normal cursor
-		video->BlitSprite(cur.get(), pos.x, pos.y);
+		video->BlitSprite(cur.get(), pos.x, pos.y, &clip);
 	}
 }
 
