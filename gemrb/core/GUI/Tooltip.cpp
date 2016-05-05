@@ -66,9 +66,10 @@ Size TooltipBackground::MaxTextSize() const
 
 void TooltipBackground::Draw(const Region& rgn) const
 {
-	Point dp = rgn.Origin() + Point(margin, margin);
+	Point dp = rgn.Origin();
 	dp.x += (rgn.w / 2);
 	dp.x -= (animationPos / 2);
+	dp.y += margin;
 
 	Video* video = core->GetVideoDriver();
 
@@ -77,14 +78,15 @@ void TooltipBackground::Draw(const Region& rgn) const
 
 	// calculate the unrolled region
 	Region bgclip(dp, Size(animationPos, background->Height));
-	bgclip.y -= margin;
+	bgclip.y -= background->YPos;
 
 	// draw unrolled paper
-	video->BlitSprite( background, rgn.x, rgn.y, &bgclip );
+	int mid = (rgn.w / 2) - (background->Width / 2) + rgn.x - background->XPos;
+	video->BlitSprite( background, -mid, dp.y, &bgclip );
 
 	// draw right paper curl
 	dp.x += animationPos;
-	video->BlitSprite( rightbg, dp.x, dp.y );
+	video->BlitSprite( rightbg, dp.x + leftbg->Width, dp.y );
 
 	// clip the tooltip text to the background
 	video->SetScreenClip(&bgclip);
