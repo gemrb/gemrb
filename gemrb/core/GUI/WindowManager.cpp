@@ -310,11 +310,11 @@ void WindowManager::DrawMouse() const
 	// clamp to screen
 	pos.x = std::max<int>(0, pos.x - bufSize.w / 2);
 	pos.x = std::min<int>((screen.w - bufSize.w), pos.x);
-	// TODO: clamp Y coordinate; the tooltip can still overflow vertically.
+	pos.y = std::max<int>(0, pos.y - bufSize.h / 2);
+	pos.y = std::min<int>((screen.h - bufSize.h), pos.y);
 
 	cursorBuf->Clear();
 	video->PushDrawingBuffer(cursorBuf);
-	video->DrawRect(Region(0,0,128,64), ColorBlack);
 
 	// cursor is buffer midpoint, but offset by distance to edge
 	Point mid = eventMgr.MousePos() - pos;
@@ -323,7 +323,7 @@ void WindowManager::DrawMouse() const
 	// tooltip is *always* midpoint to the buffer
 	// this will ensure the entire tooltip is visible
 	mid.x = bufSize.w / 2;
-	// FIXME: center vertically (and clamp Y cord); the tooltip can still overflow vertically.
+	mid.y = bufSize.h / 2;
 	DrawTooltip(mid);
 }
 
