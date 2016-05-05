@@ -80,6 +80,7 @@ def OpenInventoryWindow ():
 
 	GemRB.LoadWindowPack ("GUIINV", 800, 600)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
+	InventoryCommon.HookKeyPresses()
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	#TODO: Setup the MessageLabel here if needed
 	#saving the original portrait window
