@@ -2502,18 +2502,6 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, ch
 	return win;
 }
 
-/** Set the Tooltip text of a Control */
-void Interface::SetTooltip(Control* ctrl, const char* cstring)
-{
-	if (!ctrl) return;
-
-	String* string = StringFromCString(cstring);
-	if (string) {
-		ctrl->SetTooltip( *string );
-		delete string;
-	}
-}
-
 bool Interface::IsFreezed()
 {
 	return !update_scripts;

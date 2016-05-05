@@ -248,27 +248,6 @@ static Holder<TableMgr> GetTable(PyObject* obj) {
 	return tm;
 }
 
-//sets tooltip with Fx key prepended
-static void SetFunctionTooltip(Control* ctrl, char *txt, int Function)
-{
-	if (!ctrl) return;
-
-	if (txt) {
-		ieDword ShowHotkeys = 0;
-		core->GetDictionary()->Lookup("Hotkeys On Tooltips", ShowHotkeys);
-		if (txt[0]) {
-			char *txt2 = (char *) malloc(strlen(txt)+10);
-			sprintf(txt2,"F%d - %s",Function,txt);
-			core->FreeString(txt);
-			core->SetTooltip(ctrl, txt2);
-			free (txt2);
-			return;
-		}
-		core->FreeString(txt);
-	}
-	core->SetTooltip(ctrl, "");
-}
-
 static void ReadItemSounds()
 {
 	int table = gamedata->LoadTable( "itemsnd" );
@@ -6542,8 +6521,10 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 		btn->SetImage( BUTTON_IMAGE_DISABLED, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
-		char *str = core->GetCString(spell->SpellName,0);
-		SetFunctionTooltip(btn, str, Function); //will free str
+		char* str = core->GetCString(spell->SpellName,0);
+		btn->SetTooltip(str);
+		btn->SetHotKey(Function);
+		free(str);
 	}
 	gamedata->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
@@ -6687,9 +6668,10 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 		btn->SetPicture( Picture );
 	if (tooltip) {
 		//later getitemname could also return tooltip stuff
-		char *str = core->GetCString(item->GetItemName(tooltip==2),0);
-		//this will free str, no need of freeing it
-		SetFunctionTooltip(btn, str, Function);
+		char* str = core->GetCString(item->GetItemName(tooltip==2),0);
+		btn->SetTooltip(str);
+		btn->SetHotKey(Function);
+		free(str);
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -10429,8 +10411,9 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	if (GUITooltip[Index] != (ieDword) -1) {
 		txt = core->GetCString( GUITooltip[Index] );
 	}
-	//will free txt
-	SetFunctionTooltip(btn, txt, Function);
+	btn->SetTooltip(txt);
+	btn->SetHotKey(Function);
+	free(txt);
 
 	//no incref
 	return Py_None;
