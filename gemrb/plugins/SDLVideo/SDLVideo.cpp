@@ -227,7 +227,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				case SDLK_F12:
 					//assuming they come sequentially,
 					//also, there is no need to ever produce more than 12
-					key = GEM_FUNCTION1 + sym-SDLK_F1;
+					key = GEM_FUNCTIONX(1) + sym-SDLK_F1;
 					break;
 				default: break;
 			}

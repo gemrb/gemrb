@@ -57,8 +57,10 @@ class Window;
 #define GEM_PGUP		0x8d
 #define GEM_PGDOWN		0x8e
 #define GEM_GRAB		0x8f
-#define GEM_FUNCTION1           0x90     //don't use anything between these two and keep a round number
-#define GEM_FUNCTION16          0x9f
+
+// 0x90 - 0x9f reserved for function keys (1-16)
+#define GEM_FUNCTIONX(x) \
+	(0x8F + x)
 
 #define GEM_MOD_SHIFT           1
 #define GEM_MOD_CTRL            2
