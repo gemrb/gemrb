@@ -72,7 +72,9 @@ int Video::CreateDisplay(const Size& s, int bpp, bool fs, const char* title)
 
 Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 {
-	Region r = target.Intersect(screenClip);
+	// clip to both screen and the target buffer
+	Region bufRgn(Point(), drawingBuffer->Size());
+	Region r = target.Intersect(screenClip).Intersect(bufRgn);
 	if (clip) {
 		// Intersect clip with both screen and target rectangle
 		r = clip->Intersect(r);
