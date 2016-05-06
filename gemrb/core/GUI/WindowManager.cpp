@@ -306,6 +306,7 @@ void WindowManager::DrawMouse() const
 {
 	Point pos = eventMgr.MousePos();
 	Size bufSize = cursorBuf->Size();
+	pos.y += 10; // the cursor needs to be slightly above the buffer midpoint to completely fit.
 
 	// clamp to screen
 	pos.x = std::max<int>(0, pos.x - bufSize.w / 2);
