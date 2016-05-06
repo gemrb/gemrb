@@ -483,8 +483,10 @@ def OpenItemAmountWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def UpdateSlot (Window, pc, slot):
+def UpdateSlot (pc, slot):
 	"""Updates a specific slot."""
+
+	Window = GemRB.GetView("WIN_INV")
 
 	SlotType = GemRB.GetSlotType (slot+1, pc)
 	ControlID = SlotType["ID"]
