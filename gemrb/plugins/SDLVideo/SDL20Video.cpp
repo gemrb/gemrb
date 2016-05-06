@@ -725,13 +725,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// discard them if they are produced by touch events
 		// do NOT discard mouse wheel events
 		case SDL_MOUSEMOTION:
-			if (event.motion.which == SDL_TOUCH_MOUSEID) {
-				break;
-			}
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
 				break;
+			}
+			else {
+				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
+				return SDLVideoDriver::ProcessEvent(event);
 			}
 		case SDL_KEYDOWN:
 			{
