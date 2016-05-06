@@ -401,8 +401,18 @@ String Button::TooltipText() const
 				s += L"Ret";
 				break;
 			default:
-				// FIXME: plenty of other keys that should be translated
-				s.push_back(hotKey);
+				// TODO: check if there are more possible keys
+				if (hotKey >= GEM_FUNCTIONX(1) && hotKey <= GEM_FUNCTIONX(16)) {
+					s.push_back(L'F');
+					int offset = hotKey - GEM_FUNCTIONX(0);
+					if (hotKey > GEM_FUNCTIONX(9)) {
+						s.push_back(L'1');
+						offset -= 10;
+					}
+					s.push_back(L'0' + offset);
+				} else {
+					s.push_back(hotKey);
+				}
 				break;
 		}
 		s += L": ";
