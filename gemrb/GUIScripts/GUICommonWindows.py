@@ -397,7 +397,9 @@ def GroupControls ():
 		Button.SetVarAssoc ("Formation", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
-		Button.SetTooltip (4935, 8+i)
+		Button.SetTooltip (4935)
+		# 0x90 = F1 key
+		Button.SetHotKey (chr(7+i+0x90))
 	return
 
 def OpenActionsWindowControls (Window):
