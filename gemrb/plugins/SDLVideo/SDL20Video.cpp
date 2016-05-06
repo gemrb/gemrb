@@ -733,7 +733,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			else {
 				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
 				return SDLVideoDriver::ProcessEvent(event);
-				break;
 			}
 		case SDL_KEYDOWN:
 			{
