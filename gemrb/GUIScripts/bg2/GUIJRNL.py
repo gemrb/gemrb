@@ -39,7 +39,8 @@ def OpenJournalWindow ():
 	global StartTime, StartYear
 	global Chapter
 	
-	JournalWindow = GUICommonWindows.OpenTopWindow(2, "GUIJRNL", UpdateLogWindow)
+	JournalWindow = GUICommonWindows.OpenTopWindow(2, "GUIJRNL", InitLogWindow)
+	JournalWindow.AddAlias("WIN_JRNL")
 		
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
@@ -96,9 +97,13 @@ def OpenJournalWindow ():
 	if Chapter>65535:
 		Chapter=0
 		
-	UpdateLogWindow(JournalWindow)
+	UpdateLogWindow()
 
 	return
+	
+def InitLogWindow(Window):
+	UpdateLogWindow()
+
 
 def ToggleOrderWindow ():
 	global Order
@@ -110,7 +115,9 @@ def ToggleOrderWindow ():
 	UpdateLogWindow ()
 	return
 
-def UpdateLogWindow (JournalWindow):
+def UpdateLogWindow ():
+
+	JournalWindow = GemRB.GetView("WIN_JRNL")
 
 	Section = GemRB.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
