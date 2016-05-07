@@ -109,7 +109,6 @@ bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
 	FocusWindow( win );
 	modalWin = win;
 
-	winFrameBuf->Clear();
 	if (Shadow != ShadowNone) {
 		Color shieldColor = {0,0,0,0};
 		if (Shadow == ShadowGray) {
@@ -206,6 +205,7 @@ void WindowManager::CloseWindow(Window* win)
 		}
 
 		modalWin = NULL;
+		winFrameBuf->Clear();
 	}
 
 	if (win == hoverWin) {
