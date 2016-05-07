@@ -40,7 +40,7 @@ def OpenInventoryWindow ():
 	"""Opens the inventory window."""
 
 	import GUICommonWindows
-	Window = GUICommonWindows.OpenTopWindow (2, "GUIINV", UpdateInventoryWindow)
+	Window = GUICommonWindows.OpenTopWindow (2, "GUIINV", InitInventoryWindow)
 	Window.AddAlias("WIN_INV")
 
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
@@ -114,12 +114,19 @@ def OpenInventoryWindow ():
 
 	GemRB.SetVar ("TopIndex", 0)
 	
-	UpdateInventoryWindow(Window)
+	UpdateInventoryWindow()
 	return
 
-def UpdateInventoryWindow (Window):
+
+def InitInventoryWindow (Window):
+	UpdateInventoryWindow ()
+
+
+def UpdateInventoryWindow ():
 	"""Redraws the inventory window and resets TopIndex."""
 
+	Window = GemRB.GetView("WIN_INV")
+	
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
