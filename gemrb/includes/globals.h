@@ -56,6 +56,7 @@
 #include "System/DataStream.h"
 #include "System/String.h"
 
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #ifndef WIN32
