@@ -100,6 +100,10 @@ void Window::SizeChanged(const Size& /*oldSize*/)
 	video->DestroyBuffer(backBuffer);
 
 	backBuffer = video->CreateBuffer(frame);
+	// TODO: maybe this should be a flag... only non rectangular windows need a color key
+	// otherwise they would have black background instead of transparancy
+	backBuffer->SetColorKey(ColorGreen);
+	backBuffer->Clear();
 	// the entire window must be invalidated, because the new buffer is blank
 	// TODO: we *could* optimize this to instead blit the old buffer to the new one
 	MarkDirty();
