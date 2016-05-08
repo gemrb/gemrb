@@ -139,6 +139,15 @@ private:
 	void DrawArrowMarker(Point p, const Color& color);
 	Point GameMousePos() const;
 
+	//containers
+	int GetCursorOverContainer(Container *overContainer) const;
+	void HandleContainer(Container *container, Actor *actor);
+	//doors
+	int GetCursorOverDoor(Door *overDoor) const;
+	void HandleDoor(Door *door, Actor *actor);
+	//infopoints
+	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
+
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
@@ -204,14 +213,6 @@ public:
 
 	// returns the default cursor fitting the targeting mode 
 	int GetDefaultCursor() const;
-	//containers
-	int GetCursorOverContainer(Container *overContainer) const;
-	void HandleContainer(Container *container, Actor *actor);
-	//doors
-	int GetCursorOverDoor(Door *overDoor) const;
-	void HandleDoor(Door *door, Actor *actor);
-	//infopoints
-	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	void MakeSelection(const Region&, bool extend = false);
