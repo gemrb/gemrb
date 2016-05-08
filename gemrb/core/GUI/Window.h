@@ -57,13 +57,15 @@ public:
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
 		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
-		DestroyOnClose = 4		// window will be hidden and sent to the back when claosed instead of deleted
+		DestroyOnClose = 4,		// window will be hidden and sent to the back when closed instead of deleted
+		AlphaChannel = 8		// Create window with RGBA buffer suitable for creating non rectangular windows
 	};
 
 protected:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
+	void FlagsChanged(unsigned int /*oldflags*/);
 	void SizeChanged(const Size&);
 	void WillDraw();
 
@@ -102,6 +104,9 @@ public:
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void OnMouseLeave(const Point&, const DragOp*);
+
+private:
+	void RecreateBuffer();
 
 private: // Private attributes
 	/** Controls Array */

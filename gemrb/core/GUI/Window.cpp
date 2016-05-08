@@ -96,14 +96,24 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 
 void Window::SizeChanged(const Size& /*oldSize*/)
 {
+	RecreateBuffer();
+}
+
+void Window::FlagsChanged(unsigned int oldflags)
+{
+	if ((flags&AlphaChannel) != (oldflags&AlphaChannel)) {
+		RecreateBuffer();
+	}
+}
+
+void Window::RecreateBuffer()
+{
 	Video* video = core->GetVideoDriver();
 	video->DestroyBuffer(backBuffer);
 
-	backBuffer = video->CreateBuffer(frame);
-	// TODO: maybe this should be a flag... only non rectangular windows need a color key
-	// otherwise they would have black background instead of transparancy
-	backBuffer->SetColorKey(ColorGreen);
-	backBuffer->Clear();
+	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::RGBA8888 : Video::DISPLAY;
+	backBuffer = video->CreateBuffer(frame, fmt);
+	
 	// the entire window must be invalidated, because the new buffer is blank
 	// TODO: we *could* optimize this to instead blit the old buffer to the new one
 	MarkDirty();
