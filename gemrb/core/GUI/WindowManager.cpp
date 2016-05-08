@@ -524,7 +524,7 @@ Sprite2D* WindowManager::WinFrameEdge(int edge) const
 		}
 		frames.insert(std::make_pair(ref, frame));
 	}
-	
+
 	return frame;
 }
 

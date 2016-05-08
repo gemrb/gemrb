@@ -91,7 +91,7 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #define PRINT_DLERROR Log(MESSAGE, "PluginLoader", "Error: %s", dlerror() )
 #endif
 
-bool LoadPlugin(const char* pluginpath)
+static bool LoadPlugin(const char* pluginpath)
 {
 	// Try to load the Module
 #ifdef WIN32

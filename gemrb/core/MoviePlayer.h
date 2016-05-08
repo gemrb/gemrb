@@ -60,8 +60,8 @@ public:
 
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
 
-		const Font* Font() const { return font; }
-		Palette* Palette() const {
+		const Font* getFont() const { return font; }
+		Palette* getPalette() const {
 			if (!palette) {
 				class Palette* pal = font->GetPalette();
 				pal->release();

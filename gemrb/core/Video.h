@@ -34,6 +34,7 @@
 #include "ScriptedAnimation.h"
 
 #include <deque>
+#include <algorithm>
 
 namespace GemRB {
 
@@ -81,7 +82,7 @@ public:
 	virtual void Clear() = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
 	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) = 0;
-	virtual Size Size() = 0;
+	virtual ::GemRB::Size Size() = 0;
 	virtual void SetColorKey(const Color&) = 0;
 };
 
@@ -99,7 +100,7 @@ public:
 		RGBPAL8,	// 8 bit palettized
 		RGB565, // 16 bit RGB (truecolor)
 		RGBA8888, // Standard 8 bits per channel with alpha
-		YV12,    // YUV format for BIK videos
+		YV12    // YUV format for BIK videos
 	};
 
 protected:

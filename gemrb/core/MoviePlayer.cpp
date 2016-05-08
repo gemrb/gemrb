@@ -64,7 +64,7 @@ void MoviePlayer::Play()
 		video->PushDrawingBuffer(vb);
 		if (DecodeFrame(*vb)) {
 			if (subtitles) {
-				subtitles->Font()->Print(frame, subtitles->SubtitleAtFrame(framePos), subtitles->Palette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+				subtitles->getFont()->Print(frame, subtitles->SubtitleAtFrame(framePos), subtitles->getPalette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
 			}
 			// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
 			// However, since we completely block the normal game loop we will bypass WindowManager drawing

@@ -561,7 +561,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (! parameters->int0Parameter) {
 		flags |= GA_NO_HIDDEN;
 	}
-	
+
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {

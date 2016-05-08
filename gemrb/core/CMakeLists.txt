@@ -118,8 +118,10 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/TextSystem/Font.cpp
 	GUI/TextSystem/GemMarkup.cpp
 	GUI/TextSystem/TextContainer.cpp
+	GUI/Tooltip.cpp
 	GUI/View.cpp
 	GUI/Window.cpp
+	GUI/WindowManager.cpp
 	GUI/WorldMapControl.cpp
 	RNG/RNG_SFMT.cpp
 	RNG/sfmt/SFMT.c

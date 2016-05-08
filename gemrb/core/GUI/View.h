@@ -33,7 +33,7 @@ class ScrollBar;
 class Sprite2D;
 class ViewScriptingRef;
 
-class View {
+class GEM_EXPORT View {
 private:
 	Sprite2D* background;
 	Sprite2D* cursor;
