@@ -212,7 +212,7 @@ public:
 	void UpdateTargetMode();
 
 	// returns the default cursor fitting the targeting mode 
-	int GetDefaultCursor() const;
+	Sprite2D* GetTargetActionCursor() const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	void MakeSelection(const Region&, bool extend = false);

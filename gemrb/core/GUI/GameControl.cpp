@@ -1172,21 +1172,27 @@ int GameControl::GetCursorOverContainer(Container *overContainer) const
 	return IE_CURSOR_TAKE;
 }
 
-int GameControl::GetDefaultCursor() const
+Sprite2D* GameControl::GetTargetActionCursor() const
 {
+	int curIdx = IE_CURSOR_NORMAL;
 	switch(target_mode) {
-	case TARGET_MODE_TALK:
-			return IE_CURSOR_TALK;
+		case TARGET_MODE_TALK:
+			curIdx = IE_CURSOR_TALK;
+			break;
 		case TARGET_MODE_ATTACK:
-			return IE_CURSOR_ATTACK;
+			curIdx = IE_CURSOR_ATTACK;
+			break;
 		case TARGET_MODE_CAST:
-			return IE_CURSOR_CAST;
+			curIdx = IE_CURSOR_CAST;
+			break;
 		case TARGET_MODE_DEFEND:
-			return IE_CURSOR_DEFEND;
+			curIdx = IE_CURSOR_DEFEND;
+			break;
 		case TARGET_MODE_PICK:
-			return IE_CURSOR_PICK;
-		}
-	return IE_CURSOR_NORMAL;
+			curIdx = IE_CURSOR_PICK;
+			break;
+	}
+	return core->Cursors[curIdx];
 }
 
 /** Mouse Over Event */

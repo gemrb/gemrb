@@ -184,6 +184,8 @@ public:
 	/** Mouse Button Up */
 	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
 
+	Sprite2D* Cursor() const;
+
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 

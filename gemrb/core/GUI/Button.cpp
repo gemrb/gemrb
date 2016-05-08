@@ -421,6 +421,17 @@ String Button::TooltipText() const
 	return Control::TooltipText();
 }
 
+Sprite2D* Button::Cursor() const
+{
+	if ((flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+		GameControl* gc = core->GetGameControl();
+		if (gc) {
+			return gc->GetTargetActionCursor();
+		}
+	}
+	return Control::Cursor();
+}
+
 Holder<Button::DragOp> Button::DragOperation()
 {
 	if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
