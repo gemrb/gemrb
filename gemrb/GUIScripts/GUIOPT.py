@@ -579,6 +579,7 @@ def OpenQuitMsgWindow ():
 		return
 
 	QuitMsgWindow = Window = GemRB.LoadWindow (5)
+	QuitMsgWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	# Save
 	Button = Window.GetControl (0)
