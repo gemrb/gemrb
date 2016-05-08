@@ -192,7 +192,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		return UINT_MAX;
 	}
 
-	if ((!(ambient->getFlags() & IE_AMBI_ENABLED)) || (!ambient->getAppearance() & timeslice)) {
+	if (!(ambient->getFlags() & IE_AMBI_ENABLED) || !(ambient->getAppearance() & timeslice)) {
 		// disabled
 
 		if (stream >= 0) {

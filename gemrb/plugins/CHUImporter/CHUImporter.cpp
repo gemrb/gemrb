@@ -377,7 +377,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 
 				if (SBID != 0xffff) {
-					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
+					ScrollBar* sb = dynamic_cast<ScrollBar*>(GetControl(SBID, win));
 					if (sb) {
 						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
 					}

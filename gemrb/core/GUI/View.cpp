@@ -456,7 +456,7 @@ void View::AssignScriptingRef(ViewScriptingRef* ref)
 	scriptingRef = ref;
 }
 
-inline void View::DeleteScriptingRef()
+void View::DeleteScriptingRef()
 {
 	ScriptEngine::UnregisterScriptingRef(scriptingRef);
 	AssignScriptingRef(NULL);

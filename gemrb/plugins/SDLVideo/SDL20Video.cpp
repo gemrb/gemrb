@@ -272,7 +272,7 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	SDL_RenderPresent( renderer );
 }
 
-Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
+Sprite2D* SDL20VideoDriver::GetScreenshot( Region /*r*/ )
 {
 	return NULL;
 }
@@ -355,7 +355,7 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 	currentGesture.endPoint.empty();
 }
 
-bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
+bool SDL20VideoDriver::ProcessFirstTouch( int /*mouseButton*/ )
 {
 	/*
 	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
@@ -379,7 +379,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
 	static int numFingers = 0;
-	static bool continuingGesture = false; // resets when numFingers changes
+	// static bool continuingGesture = false; // resets when numFingers changes
 
 	// beware that this may be removed before all events it created are processed!
 	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
@@ -401,7 +401,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			if (currentGesture.type) {
-				continuingGesture = false;
+				// continuingGesture = false;
 				break; // finger motion has no further power over multigestures
 			}
 			if (numFingers > 1) {
@@ -469,7 +469,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
-			continuingGesture = false;
+			// continuingGesture = false;
 
 			if (numFingers == 1
 				// this test is for when multiple fingers begin the first touch
@@ -510,8 +510,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (numFingers) numFingers--;
 
 				// we need to get mouseButton before calling ProcessFirstTouch
-				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
-				continuingGesture = false;
+				// int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
+				// continuingGesture = false;
 				EndMultiGesture(true);
 				/*
 				if (numFingers == 0) { // this event was the last finger that was in contact
@@ -573,10 +573,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			 TODO: need a preference for inverting these
 			 sdl 2.0.4 autodetects (SDL_MOUSEWHEEL_FLIPPED in SDL_MouseWheelEvent)
 			 */
-			short scrollX;
+			/*short scrollX;
 			scrollX= event.wheel.x * -1;
 			short scrollY;
-			scrollY= event.wheel.y * -1;
+			scrollY= event.wheel.y * -1;*/
 			//EvntManager->MouseWheelScroll( scrollX, scrollY );
 			break;
 		/* not user input events */
@@ -707,44 +707,46 @@ bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alph
 	return ret;
 }
 
-float SDL20VideoDriver::ScaleCoordinateHorizontal(float x)
+float SDL20VideoDriver::ScaleCoordinateHorizontal(float /*x*/)
 {
 	float scaleX;
 	SDL_RenderGetScale(renderer, &scaleX, NULL);
 
 	int winW, winH;
-	float xoffset = 0.0;
+	// float xoffset = 0.0;
 	SDL_GetWindowSize(window, &winW, &winH);
-	float winWf = winW, winHf = winH;
+	// float winWf = winW, winHf = winH;
 	// only need to scale if they do not have the same ratio
-	if ((winWf / winHf) != ((float)width / height)) {
+	/*if ((winWf / winHf) != ((float)width / height)) {
 		xoffset = ((winWf - (width * scaleX)) / 2) / winWf;
 		return ((x - xoffset) * (winWf / scaleX));
-	}
-	return x * width;
+	}*/
+	return winW; //x * width;
 }
 
-float SDL20VideoDriver::ScaleCoordinateVertical(float y)
+float SDL20VideoDriver::ScaleCoordinateVertical(float /*y*/)
 {
 	float scaleY;
 	SDL_RenderGetScale(renderer, NULL, &scaleY);
 
 	int winW, winH;
-	float yoffset = 0.0;
+	// float yoffset = 0.0;
 	SDL_GetWindowSize(window, &winW, &winH);
-	float winWf = winW, winHf = winH;
+	// float winWf = winW, winHf = winH;
 	// only need to scale if they do not have the same ratio
-	if ((winWf / winHf) != ((float)width / height)) {
+	/* if ((winWf / winHf) != ((float)width / height)) {
 		yoffset = ((winHf - (height * scaleY)) / 2) / winHf;
 		return ((y - yoffset) * (winHf / scaleY));
-	}
-	return y * height;
+	}*/
+	return winH; //y * height;
 }
 
 #ifndef USE_OPENGL
 #include "plugindef.h"
 
+
 GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
+
 #endif

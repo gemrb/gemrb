@@ -87,9 +87,10 @@ int VLCPlayer::Play()
 			bool done = false;
 			while (!done && libvlc_media_player_is_playing(mediaPlayer)) {
 				ctx->Lock();
-				done = video->PollMovieEvents();
+				done = true; // video->PollEvents();
 
 				if (ctx->isYUV()) {
+					/*
 					unsigned int strides[3];
 					strides[0] = ctx->GetStride(0);
 					strides[1] = ctx->GetStride(1);
@@ -99,17 +100,22 @@ int VLCPlayer::Play()
 					planes[0] = ctx->GetPlane(0);
 					planes[1] = ctx->GetPlane(1);
 					planes[2] = ctx->GetPlane(2);
+					*/
 
 					// TODO: center the video on the player.
-					video->showYUVFrame((unsigned char**)planes, strides, 
+					/* TODO: API update
+					video->showYUVFrame((unsigned char**)planes, strides,
 										ctx->Width(), ctx->Height(),
 										ctx->Width(), ctx->Height(),
 										0, 0, 0);
+					*/
 				} else {
+					/* TODO: API update
 					video->showFrame((unsigned char*)ctx->GetPlane(0),
 									 ctx->Width(), ctx->Height(), 0, 0,
 									 ctx->Width(), ctx->Height(), 0, 0,
 									 true, NULL, 0);
+					*/
 				}
 				ctx->Unlock();
 			}
@@ -145,8 +151,9 @@ void VLCPlayer::cleanup(void *opaque)
 	VideoContext* context = *(VideoContext**)opaque;
 	delete context;
 	context = NULL;
-
+	/* TODO: API update
 	core->GetVideoDriver()->DestroyMovieScreen();
+	*/
 }
 
 unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)
@@ -157,14 +164,14 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 	/*
 	 other player plugins assume video is made specifically for IE games (dimensions and chroma).
 	 we won't assume this here because this player is mostly for modders to use their own videos.
-	 
+
 	 we will need to make sure the video is scaled down if it is larger than the window and we will
 	 need to convert the chroma to one of the 2 formats the video driver is coded for.
-	 
+
 	 currently the video drivers expect RGB555 or IYUV, but the SDL 2.0 driver can actually handle ARGB as well.
 	 infact the texture is natively ARGB8888, and we are converting RGB555 data to ARGB which means here we may be
 	 converting like this ARGB -> RGB555 -> ARGB which is quite dumb :)
-	 
+
 	 TODO: figure out a way to support ARGB when using SDL 2
 	 */
 
@@ -178,7 +185,9 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 
 	int w = *width;
 	int h = *height;
+	/* TODO: API update
 	video->InitMovieScreen(w, h, yuv); // may alter w and h
+	*/
 
 	// TODO: proportionally scale the video to fit the player window
 	// for now we'll use the video native width and height.
@@ -203,9 +212,26 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 
 #include "plugindef.h"
 
+#if 1
+struct VLCPlayerDummy : public Resource {
+	bool Open(DataStream*) { return false; }
+
+	static const TypeID ID;
+};
+
+const TypeID VLCPlayerDummy::ID = { "VLC Dummy" };
+
+GEMRB_PLUGIN(0x218963DD, "VLC Video Player")
+PLUGIN_RESOURCE(VLCPlayerDummy, "mov")
+END_PLUGIN()
+
+#else
+
 GEMRB_PLUGIN(0x218963DD, "VLC Video Player")
 // TODO: VLC is quite capable of playing various movie formats
 // it seems silly to hardcode a single value or add formats piecemeal.
 // it would be a shame to force modders or new content creators to use a specific format
 PLUGIN_RESOURCE(VLCPlayer, "mov") // at least some mac ports used Quicktime MOV format
 END_PLUGIN()
+
+#endif

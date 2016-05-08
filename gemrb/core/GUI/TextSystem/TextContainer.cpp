@@ -289,7 +289,7 @@ ContentContainer::~ContentContainer()
 	}
 }
 
-void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 #if DEBUG_TEXT
 	core->GetVideoDriver()->DrawRect(clip, ColorGreen, true);

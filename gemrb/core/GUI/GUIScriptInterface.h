@@ -98,18 +98,18 @@ public:
 };
 
 
-View* GetView(ScriptingRefBase* base);
 Window* GetWindow(ScriptingId id, ResRef pack);
-Control* GetControl(ScriptingId id, Window* win);
+WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
+
+GEM_EXPORT View* GetView(ScriptingRefBase* base);
+GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
+GEM_EXPORT ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
+GEM_EXPORT ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
 
 template <class T>
 T* GetControl(ScriptingId id, Window* win) {
 	return dynamic_cast<T*>(GetControl(id, win));
 }
-
-ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
-ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
-WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
 
 }
 

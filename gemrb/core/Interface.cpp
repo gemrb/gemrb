@@ -3214,7 +3214,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
 		}
 	}
-	
+
 	delete worldmap;
 	worldmap = new_worldmap;
 	CopyResRef(WorldMapName[0], wmResRef);
@@ -3723,7 +3723,7 @@ void Interface::ReleaseDraggedItem()
 	DraggedItem=NULL; //shouldn't free this
 }
 
-void Interface::DragItem(CREItem *item, const ieResRef Picture)
+void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 {
 	//We should drop the dragged item and pick this up,
 	//we shouldn't have a valid DraggedItem at this point.
