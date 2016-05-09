@@ -303,8 +303,7 @@ def NextPress():
 	if CharGen:
 		GemRB.SetNextScript("Feats") #feats
 	else:
-		if PointsLeft > 0:
-			GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
+		GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
 		# open up the next levelup window
 		import Feats
 		Feats.OpenFeatsWindow ()
