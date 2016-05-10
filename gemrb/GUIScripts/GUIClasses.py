@@ -162,7 +162,7 @@ class GTextArea(GControl):
   __slots__ = ['DefaultText']
   
   def SetOptions(self, optList, varname=None, val=0):
-    _GemRB.TextArea_SetOptions(self.WinID, self.ID, optList)
+    _GemRB.TextArea_SetOptions(self, optList)
     if varname:
     	self.SetVarAssoc(varname, val)
 
