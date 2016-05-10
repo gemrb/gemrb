@@ -4470,7 +4470,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int ret = MIC_NOITEM;
 	if ((RandomNumValue&3) || (scr->GetStat(IE_GOLD)<=0) ) {
 		int slot = scr->inventory.FindStealableItem();
-		if (slot) {
+		if (slot != -1) {
 			CREItem *item = scr->inventory.RemoveItem(slot);
 			ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
 			if (ret!=ASI_SUCCESS) {

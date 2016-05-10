@@ -334,7 +334,7 @@ public:
 	/** returns the strref for the reason why the item cannot be equipped */
 	int WhyCantEquip(int slot, int twohanded) const;
 	/** returns a slot that has a stealable item */
-	unsigned int FindStealableItem();
+	int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */
 	bool ProvidesCriticalAversion();
 	/** tries to merge the passed item with the one in the passed slot */
