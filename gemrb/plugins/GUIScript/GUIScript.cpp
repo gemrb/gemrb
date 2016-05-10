@@ -1716,6 +1716,15 @@ static PyObject* GemRB_TextArea_Clear(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+static inline void SetViewTooltipFromRef(View* view, ieStrRef ref)
+{
+	String* string = core->GetString(ref);
+	if (string && view) {
+		view->SetTooltip(*string);
+	}
+	delete string;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
 "===== Control_SetTooltip =====\n\
 \n\
@@ -1744,7 +1753,6 @@ The tooltip's visual properties must be set in the gemrb.ini file:\n\
 static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 {
 	PyObject* str;
-	char* string;
 	PARSE_ARGS2( args, "OO", &self, &str);
 
 	Control* ctrl = GetView<Control>(self);
@@ -1753,13 +1761,15 @@ static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
-		string = PyString_AsString( str );
-		ctrl->SetTooltip(string);
+		char* cstring = PyString_AsString( str );
+		String* string = StringFromCString(cstring);
+		if (string) {
+			ctrl->SetTooltip(*string);
+			delete string;
+		}
 	} else {
 		ieStrRef StrRef = ieStrRef(PyInt_AsLong( str ));
-		string = core->GetCString( StrRef );
-		ctrl->SetTooltip(string);
-		free(string);
+		SetViewTooltipFromRef(ctrl, StrRef);
 	}
 
 	Py_RETURN_NONE;
@@ -6580,10 +6590,8 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 		btn->SetImage( BUTTON_IMAGE_DISABLED, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
-		char* str = core->GetCString(spell->SpellName,0);
-		btn->SetTooltip(str);
+		SetViewTooltipFromRef(btn, spell->SpellName);
 		btn->SetHotKey(Function);
-		free(str);
 	}
 	gamedata->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
@@ -6727,10 +6735,8 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 		btn->SetPicture( Picture );
 	if (tooltip) {
 		//later getitemname could also return tooltip stuff
-		char* str = core->GetCString(item->GetItemName(tooltip==2),0);
-		btn->SetTooltip(str);
+		SetViewTooltipFromRef(btn, item->GetItemName(tooltip==2));
 		btn->SetHotKey(Function);
-		free(str);
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -10466,13 +10472,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonControlCallback(func2) );
 
 	//cannot make this const, because it will be freed
-	char *txt = NULL;
 	if (GUITooltip[Index] != (ieDword) -1) {
-		txt = core->GetCString( GUITooltip[Index] );
+		SetViewTooltipFromRef(btn, GUITooltip[Index]);
 	}
-	btn->SetTooltip(txt);
+
 	btn->SetHotKey(Function);
-	free(txt);
 
 	//no incref
 	return Py_None;
@@ -10611,11 +10615,8 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
-			String* tip = core->GetString(item->Tooltip, 0);
-			if (tip) {
-				btn->SetTooltip(*tip);
-				delete tip;
-			}
+
+			SetViewTooltipFromRef(btn, item->Tooltip);
 
 			if (item->Charges && (item->Charges!=0xffff) ) {
 				SetItemText(btn, item->Charges, false);

@@ -388,18 +388,6 @@ bool View::SetFlags(unsigned int arg_flags, int opcode)
 	return ret;
 }
 
-void View::SetTooltip(const char* cstring)
-{
-	String* string = StringFromCString(cstring);
-	if (string) {
-		SetTooltip( *string );
-		delete string;
-	} else {
-		SetTooltip(L"");
-	}
-
-}
-
 void View::SetTooltip(const String& string)
 {
 	tooltip = string;
