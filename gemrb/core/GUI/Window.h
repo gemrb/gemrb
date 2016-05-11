@@ -69,8 +69,6 @@ protected:
 	void SizeChanged(const Size&);
 	void WillDraw();
 
-	void DrawSelf(Region drawFrame, const Region& clip);
-
 	bool TrySetFocus(View*);
 
 	inline void DispatchMouseOver(View*, const Point&);

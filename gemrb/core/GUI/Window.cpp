@@ -178,13 +178,6 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::DrawSelf(Region /*drawFrame*/, const Region& /*clip*/)
-{
-	// window doesnt actually have anything to draw (subviews only)
-	// frame is handled by the window manager (so it is only ever drawn once)
-	// background is handled by supercalss
-}
-
 Control* Window::GetFocus() const
 {
 	return dynamic_cast<Control*>(FocusedView());

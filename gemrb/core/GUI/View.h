@@ -61,7 +61,7 @@ private:
 	void DrawSubviews(bool drawBg);
 
 protected:
-	virtual void DrawSelf(Region drawFrame, const Region& clip)=0;
+	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 
 	virtual void AddedToView(View*) {}
 	virtual void RemovedFromView(View*) {}
