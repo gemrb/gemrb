@@ -345,7 +345,6 @@ def OpenStoreShoppingWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
 		if GameCheck.IsBG2():
@@ -360,7 +359,6 @@ def OpenStoreShoppingWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.AttachScrollBar (ScrollBarRight)
 
 	UnselectNoRedraw ()
 
@@ -478,7 +476,6 @@ def OpenStoreIdentifyWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.AttachScrollBar (ScrollBar)
 
 	UnselectNoRedraw ()
 
@@ -533,7 +530,6 @@ def OpenStoreStealWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
 		if GameCheck.IsBG2():
@@ -545,7 +541,6 @@ def OpenStoreStealWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.AttachScrollBar (ScrollBarRight)
 
 	UnselectNoRedraw ()
 

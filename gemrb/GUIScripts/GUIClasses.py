@@ -132,7 +132,6 @@ class GWindow(GView):
 
 class GControl(GView):
   methods = {
-	'AttachScrollBar': _GemRB.Control_AttachScrollBar,
     'HasAnimation': _GemRB.Control_HasAnimation,
     'SetVarAssoc': _GemRB.Control_SetVarAssoc,
     'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,

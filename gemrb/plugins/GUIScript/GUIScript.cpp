@@ -2085,44 +2085,6 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_AttachScrollBar__doc,
-"===== Control_AttachScrollBar =====\n\
-\n\
-**Prototype:** GemRB.AttachScrollBar (WindowIndex, ControlIndex, ScrollBarControlIndex)\n\
-\n\
-**Metaclass Prototype:** AttachScrollBar (ScrollBarControlIndex)\n\
-\n\
-**Description:** Attaches a ScrollBar to another control. If the control \n\
-receives mousewheel events, it will be relayed to the ScrollBar. TextArea \n\
-controls will also be synchronised with the scrollbar. If there is a \n\
-single ScrollBar on the window, or the ScrollBar was set with \n\
-SetDefaultScrollBar, this command is not needed.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
-  * ScrollBarControlIndex - the scrollbar's index on the same window\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:ScrollBar_SetDefaultScrollBar]]"
-);
-
-static PyObject* GemRB_Control_AttachScrollBar(PyObject* self, PyObject* args)
-{
-	int ScbControlId;
-	PARSE_ARGS2( args, "Oi", &self, &ScbControlId );
-
-	Control *ctrl = GetView<Control>(self);
-	ABORT_IF_NULL(ctrl);
-
-	ScrollBar* scb = GetControl<ScrollBar>(ScbControlId, ctrl->Owner);
-	ABORT_IF_NULL(scb);
-
-	ctrl->SetScrollBar( scb );
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 "===== Control_SetVarAssoc =====\n\
 \n\
@@ -13191,7 +13153,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
-	METHOD(Control_AttachScrollBar, METH_VARARGS),
 	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
