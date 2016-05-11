@@ -108,6 +108,7 @@ private: // Private attributes
 	TextContainer* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
+	ScrollBar* scrollbar; // temporary; will be superceeded by ScrollView
 
 	struct AnimationPoint {
 		// TODO: we cant currently scroll the x axis

@@ -3063,11 +3063,7 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* ar
 	substitute->SetFrame(target->Frame());
 
 	substitute->ControlID = target->ControlID;
-	//ieDword sbid = (target->sb) ? target->sb->ControlID : -1;
-	const ScrollBar* sb = target->Scrollbar();
-	if (sb != NULL) {
-		substitute->SetScrollBar((ScrollBar*)target->RemoveSubview(sb));
-	}
+
 	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
 
 	return gs->ConstructObjectForScriptable( substitute->GetScriptingRef() );

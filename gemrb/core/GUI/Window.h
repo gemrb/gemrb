@@ -28,7 +28,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "View.h"
+#include "ScrollView.h"
 #include "WindowManager.h"
 
 namespace GemRB {
@@ -96,6 +96,9 @@ public:
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
+	void AddSubviewInFrontOfView(View*, const View* = NULL);
+	View* RemoveSubview(const View*);
+
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
 
@@ -107,6 +110,8 @@ private:
 	void RecreateBuffer();
 
 private: // Private attributes
+	ScrollView contentView;
+
 	/** Controls Array */
 	std::vector< Control*> Controls;
 	std::map<KeyboardKey, EventMgr::EventCallback*> HotKeys;

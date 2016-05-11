@@ -112,6 +112,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/MapControl.cpp
 	GUI/Progressbar.cpp
 	GUI/ScrollBar.cpp
+	GUI/ScrollView.cpp
 	GUI/Slider.cpp
 	GUI/TextArea.cpp
 	GUI/TextEdit.cpp

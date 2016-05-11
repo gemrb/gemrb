@@ -39,7 +39,6 @@ View::View(const Region& frame)
 	: frame(frame)
 {
 	scriptingRef = NULL;
-	scrollbar = NULL;
 	background = NULL;
 	cursor = NULL;
 	superView = NULL;
@@ -272,12 +271,6 @@ View* View::RemoveSubview(const View* view)
 	assert(it != subViews.end());
 
 	View* subView = *it;
-	if (scrollbar && subView == scrollbar) {
-		Size s = Dimensions();
-		s.w -= scrollbar->Dimensions().w;
-		SetFrameSize(s);
-		scrollbar = NULL;
-	}
 	subViews.erase(it);
 	if (background)
 		dirtyBGRects.push_back(subView->Frame());
@@ -364,21 +357,6 @@ void View::SetFrameSize(const Size& s)
 	MarkDirty();
 }
 
-void View::SetScrollBar(ScrollBar* sb)
-{
-	delete RemoveSubview(scrollbar);
-	if (sb) {
-		Size sbSize = sb->Dimensions();
-		Point origin = ConvertPointFromSuper(sb->Origin());
-		sb->SetFrame(Region(origin, sbSize));
-		AddSubviewInFrontOfView(sb);
-		scrollbar = sb;
-		Size s = Dimensions();
-		s.w += sbSize.w;
-		SetFrameSize(s);
-	}
-}
-
 bool View::SetFlags(unsigned int arg_flags, int opcode)
 {
 	MarkDirty();
@@ -404,10 +382,7 @@ void View::OnMouseOver(const Point& p)
 
 void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
-	if (scrollbar && (button == GEM_MB_SCRLUP || button == GEM_MB_SCRLDOWN)) {
-		// forward to scrollbar
-		scrollbar->OnMouseDown(scrollbar->ConvertPointFromSuper(p), button, mod);
-	} else if (superView) {
+	if (superView) {
 		superView->OnMouseDown(ConvertPointToSuper(p), button, mod);
 	}
 }
@@ -421,21 +396,9 @@ void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
 
 void View::OnMouseWheelScroll(short x, short y)
 {
-	if (scrollbar) {
-		scrollbar->OnMouseWheelScroll( x, y );
-	}
 	if (superView) {
 		superView->OnMouseWheelScroll( x, y );
 	}
-}
-
-bool View::OnKeyPress(unsigned char key, unsigned short mod)
-{
-	if (scrollbar && (key == GEM_UP || key == GEM_DOWN)) {
-		return scrollbar->OnKeyPress(key, mod);
-	}
-
-	return false;
 }
 
 void View::AssignScriptingRef(ViewScriptingRef* ref)

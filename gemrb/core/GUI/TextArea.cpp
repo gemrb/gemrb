@@ -82,6 +82,7 @@ void TextArea::Init()
 
 	selectOptions = NULL;
 	textContainer = NULL;
+	scrollbar = NULL;
 
 	// initialize the Text containers
 	SetScrollBar(NULL);
@@ -148,16 +149,10 @@ void TextArea::UpdateTextLayout()
 		tf.x += AnimPicture->Width;
 		tf.w -= frame.x;
 	}
-	if (scrollbar) {
-		// if we have a scrollbar we should grow as much as needed vertically
-		// pad only on left edge
-		tf.w -= EDGE_PADDING;
-		tf.h = 0;
-	} else {
-		// otherwise limit the text to our frame
-		// pad on both edges
-		tf.w -= EDGE_PADDING * 2;
-	}
+
+	// pad on both edges
+	tf.w -= EDGE_PADDING * 2;
+
 	if (textContainer) {
 		textContainer->SetFrame(tf);
 	}
@@ -207,12 +202,21 @@ void TextArea::UpdateScrollbar()
 	}
 }
 
-void TextArea::SetScrollBar(ScrollBar* bar)
+void TextArea::SetScrollBar(ScrollBar* sb)
 {
-	View::SetScrollBar(bar);
-	if (bar) {
-		bar->textarea = this;
-		bar->SetScrollAmount(GetRowHeight());
+	delete RemoveSubview(scrollbar);
+	if (sb) {
+		Size sbSize = sb->Dimensions();
+		Point origin = ConvertPointFromSuper(sb->Origin());
+		sb->SetFrame(Region(origin, sbSize));
+		AddSubviewInFrontOfView(sb);
+		scrollbar = sb;
+		Size s = Dimensions();
+		s.w += sbSize.w;
+		SetFrameSize(s);
+
+		sb->textarea = this;
+		sb->SetScrollAmount(GetRowHeight());
 	}
 
 	// we need to update the ScrollBar position based around TextYPos

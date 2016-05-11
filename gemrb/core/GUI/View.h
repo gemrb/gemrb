@@ -29,7 +29,6 @@
 
 namespace GemRB {
 
-class ScrollBar;
 class Sprite2D;
 class ViewScriptingRef;
 
@@ -49,7 +48,6 @@ private:
 protected:
 	View* superView;
 	Region frame;
-	ScrollBar* scrollbar;
 	std::list<View*> subViews;
 	String tooltip;
 
@@ -122,10 +120,7 @@ public:
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
-
 	void SetBackground(Sprite2D*);
-	void SetScrollBar(ScrollBar*);
-	const ScrollBar* Scrollbar() const { return scrollbar; }
 
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
@@ -146,7 +141,7 @@ public:
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
-	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual void OnMouseEnter(const Point&, const DragOp*) {};
 	virtual void OnMouseLeave(const Point&, const DragOp*) {};

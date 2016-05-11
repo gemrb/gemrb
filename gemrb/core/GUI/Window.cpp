@@ -26,7 +26,7 @@
 namespace GemRB {
 
 Window::Window(const Region& frame, WindowManager& mgr)
-	: View(frame), manager(mgr)
+	: View(frame), contentView(Region(Point(), frame.Dimensions())), manager(mgr)
 {
 	isDragging = false;
 	focusView = NULL;
@@ -35,6 +35,7 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	backBuffer = NULL;
 	lastMouseMoveTime = GetTickCount();
 
+	View::AddSubviewInFrontOfView(&contentView);
 	SetFlags(DestroyOnClose, OP_OR);
 	SizeChanged(frame.Dimensions());
 }
@@ -48,6 +49,7 @@ Window::~Window()
 	for (; it != HotKeys.end(); ++it) {
 		delete it->second;
 	}
+	View::RemoveSubview(&contentView); // no delete
 }
 
 void Window::Close()
@@ -66,16 +68,23 @@ bool Window::DisplayModal(WindowManager::ModalShadow shadow)
 	return manager.MakeModal(this, shadow);
 }
 
+void Window::AddSubviewInFrontOfView(View* front, const View* back)
+{
+	contentView.AddSubviewInFrontOfView(front, back);
+}
+
+View* Window::RemoveSubview(const View* view)
+{
+	return contentView.RemoveSubview(view);
+}
+
 /** Add a Control in the Window */
-void Window::SubviewAdded(View* view, View* parent)
+void Window::SubviewAdded(View* view, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {
 		if (ctrl->Owner == this) return; // already added!
 		ctrl->Owner = this;
-		if (ctrl->ControlType == IE_GUI_SCROLLBAR && parent == this) {
-			scrollbar = static_cast<ScrollBar*>(ctrl);
-		}
 		Controls.push_back( ctrl );
 	}
 }

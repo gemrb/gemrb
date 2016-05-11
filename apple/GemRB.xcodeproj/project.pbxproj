@@ -423,6 +423,9 @@
 		A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
 		A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
 		A2CB5AC515000A0D00B5C154 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CB5AC215000A0D00B5C154 /* File.h */; };
+		A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */; };
+		A2CD07B21CE2E0AB008CE1D0 /* ScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */; };
+		A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */; };
 		A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
@@ -1730,6 +1733,8 @@
 		A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyStringTransformer.m; sourceTree = "<group>"; };
 		A2CB5AC115000A0D00B5C154 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
 		A2CB5AC215000A0D00B5C154 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
+		A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScrollView.cpp; sourceTree = "<group>"; };
+		A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollView.h; sourceTree = "<group>"; };
 		A2CE96891B70596100E189C4 /* FileFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileFilters.h; sourceTree = "<group>"; };
 		A2D0505014D0B06C00D8CD77 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
 		A2D4C51E13A978110086BCC4 /* defsounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defsounds.h; sourceTree = "<group>"; };
@@ -3208,9 +3213,6 @@
 		A2BF9FD41395FF62006ADC12 /* GUI */ = {
 			isa = PBXGroup;
 			children = (
-				A2D672DB1B30F24400264D16 /* GUIFactory.cpp */,
-				A2D672DC1B30F24400264D16 /* GUIFactory.h */,
-				A232B0FA1A15B6E600E5342E /* TextSystem */,
 				A2BF9FD51395FF62006ADC12 /* Button.cpp */,
 				A2BF9FD61395FF62006ADC12 /* Button.h */,
 				A2BF9FD71395FF62006ADC12 /* Console.cpp */,
@@ -3222,6 +3224,10 @@
 				A265ECD813A8661600C6DF12 /* FileCache.cpp */,
 				A2BF9FDD1395FF62006ADC12 /* GameControl.cpp */,
 				A2BF9FDE1395FF62006ADC12 /* GameControl.h */,
+				A2D672DB1B30F24400264D16 /* GUIFactory.cpp */,
+				A2D672DC1B30F24400264D16 /* GUIFactory.h */,
+				A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */,
+				A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */,
 				A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */,
 				A265ECDA13A8661600C6DF12 /* KeyMap.cpp */,
 				A2BF9FDF1395FF62006ADC12 /* Label.cpp */,
@@ -3233,6 +3239,8 @@
 				A2BF9FE41395FF62006ADC12 /* Progressbar.h */,
 				A2BF9FE51395FF62006ADC12 /* ScrollBar.cpp */,
 				A2BF9FE61395FF62006ADC12 /* ScrollBar.h */,
+				A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */,
+				A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */,
 				A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */,
 				A2BF9FE71395FF62006ADC12 /* Slider.cpp */,
 				A2BF9FE81395FF62006ADC12 /* Slider.h */,
@@ -3240,18 +3248,17 @@
 				A2BF9FEA1395FF62006ADC12 /* TextArea.h */,
 				A2BF9FEB1395FF62006ADC12 /* TextEdit.cpp */,
 				A2BF9FEC1395FF62006ADC12 /* TextEdit.h */,
-				A2BF9FED1395FF62006ADC12 /* Window.cpp */,
-				A2BF9FEE1395FF62006ADC12 /* Window.h */,
-				A2BF9FEF1395FF62006ADC12 /* WorldMapControl.cpp */,
-				A2BF9FF01395FF62006ADC12 /* WorldMapControl.h */,
-				A20A27891A71E3200077077C /* View.cpp */,
-				A20A278A1A71E3200077077C /* View.h */,
-				A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */,
-				A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */,
-				A2D672DF1B30F40C00264D16 /* WindowManager.cpp */,
-				A2D672E01B30F40C00264D16 /* WindowManager.h */,
+				A232B0FA1A15B6E600E5342E /* TextSystem */,
 				A27217011CAE2678005F3976 /* Tooltip.cpp */,
 				A27217021CAE2678005F3976 /* Tooltip.h */,
+				A20A27891A71E3200077077C /* View.cpp */,
+				A20A278A1A71E3200077077C /* View.h */,
+				A2BF9FED1395FF62006ADC12 /* Window.cpp */,
+				A2BF9FEE1395FF62006ADC12 /* Window.h */,
+				A2D672DF1B30F40C00264D16 /* WindowManager.cpp */,
+				A2D672E01B30F40C00264D16 /* WindowManager.h */,
+				A2BF9FEF1395FF62006ADC12 /* WorldMapControl.cpp */,
+				A2BF9FF01395FF62006ADC12 /* WorldMapControl.h */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
@@ -3475,6 +3482,7 @@
 				A2E663AD139E883E00310FC8 /* PathFinder.h in Headers */,
 				A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */,
 				A2E663AF139E883E00310FC8 /* Plugin.h in Headers */,
+				A2CD07B21CE2E0AB008CE1D0 /* ScrollView.h in Headers */,
 				A2E663B1139E883E00310FC8 /* PluginMgr.h in Headers */,
 				A2E663B3139E883E00310FC8 /* Polygon.h in Headers */,
 				A2E663B4139E883E00310FC8 /* PolymorphCache.h in Headers */,
@@ -5078,6 +5086,7 @@
 				A29BF8D613A04A6F00C812DD /* Region.cpp in Sources */,
 				A29BF8D713A04A6F00C812DD /* Resource.cpp in Sources */,
 				A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,
+				A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */,
 				A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */,
 				A29BF8D913A04A6F00C812DD /* ResourceManager.cpp in Sources */,
 				A29BF8DA13A04A6F00C812DD /* ResourceSource.cpp in Sources */,
@@ -5271,6 +5280,7 @@
 				A2E66354139E882900310FC8 /* Animation.cpp in Sources */,
 				A2E66356139E882900310FC8 /* AnimationFactory.cpp in Sources */,
 				A2E66358139E883100310FC8 /* AnimationMgr.cpp in Sources */,
+				A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */,
 				A2E6635B139E883100310FC8 /* ArchiveImporter.cpp in Sources */,
 				A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
