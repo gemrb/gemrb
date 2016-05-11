@@ -349,7 +349,7 @@ def AcceptPress():
 			ClassFlag = 0x4000
 		else:
 			ClassFlag = 0
-		#todo: set up ALL spell levels not just level 1
+
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
 		PriestMemorized = GemRB.GetVar ("PriestMemorized")
@@ -381,7 +381,7 @@ def AcceptPress():
 	c = TmpTable.GetValue (ClassName, "MODIFIER") #adjustment
 	d = TmpTable.GetValue (ClassName, "MULTIPLIER") #external multiplier
 	e = TmpTable.GetValue (ClassName, "BONUS_PER_LEVEL") #level bonus rate (iwd only!)
-	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL) #FIXME: calculate multiclass average
+	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL)
 	if t>1:
 		e=e*(t-1)
 	else:
