@@ -123,7 +123,7 @@ def OpenSkillsWindow(chargen, level=0):
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
 		Level = level
-		LevelDiff = 4 # start with 4x as many skills points initially
+		LevelDiff = 1
 		Class = GemRB.GetVar ("Class") - 1
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
 	else:
@@ -139,12 +139,16 @@ def OpenSkillsWindow(chargen, level=0):
 	if PointsLeft < 1:
 		PointsLeft = 1
 
+	# start with 4x as many skills points initially
+	if chargen:
+		PointsLeft *= 4
+
 	PointsLeft *= LevelDiff
 
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	RaceBonusTable = GemRB.LoadTable ("racskill")
 	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
-	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS")
+	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS") * LevelDiff
 	if Level < 2:
 		PointsLeft += RaceBonusTable.GetValue (RaceName, "LEVEL1_BONUS")
 
