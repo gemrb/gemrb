@@ -22,15 +22,33 @@
 namespace GemRB {
 
 ScrollView::ScrollView(const Region& frame)
-: View(frame), contentView(frame)
+: View(frame), contentView(Region(Point(), frame.Dimensions()))
 {
 	hscroll = NULL;
 	vscroll = NULL;
+
+	View::AddSubviewInFrontOfView(&contentView);
+	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
+}
+
+ScrollView::~ScrollView()
+{
+	View::RemoveSubview(&contentView); // no delete
 }
 
 void ScrollView::SizeChanged(const Size&)
 {
 
+}
+
+void ScrollView::AddSubviewInFrontOfView(View* front, const View* back)
+{
+	contentView.AddSubviewInFrontOfView(front, back);
+}
+
+View* ScrollView::RemoveSubview(const View* view)
+{
+	return contentView.RemoveSubview(view);
 }
 
 void ScrollView::Scroll(Size /*s*/)

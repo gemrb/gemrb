@@ -23,7 +23,7 @@
 #include "GUI/ScrollBar.h"
 
 namespace GemRB {
-	class GEM_EXPORT ScrollView : public View  {
+	class GEM_EXPORT ScrollView : public View {
 		ScrollBar* hscroll;
 		ScrollBar* vscroll;
 
@@ -34,8 +34,12 @@ namespace GemRB {
 
 	public:
 		ScrollView(const Region& frame);
+		~ScrollView();
 
 		void SizeChanged(const Size&);
+
+		void AddSubviewInFrontOfView(View*, const View* = NULL);
+		View* RemoveSubview(const View*);
 
 		bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
 		void OnMouseWheelScroll(short x, short y);
