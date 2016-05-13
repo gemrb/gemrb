@@ -51,22 +51,33 @@ View* ScrollView::RemoveSubview(const View* view)
 	return contentView.RemoveSubview(view);
 }
 
-void ScrollView::Scroll(Size /*s*/)
+void ScrollView::Scroll(const Point& p)
 {
-	// TODO: implement scrolling behavior
+	Point newOrigin = p + contentView.Origin();
+	contentView.SetFrameOrigin(newOrigin);
 }
 
 bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
 {
-	if (vscroll && (key == GEM_UP || key == GEM_DOWN)) {
-		// TODO: get the scroll value from settings
-		Scroll(Size(0, 10));
-		return true;
+	// TODO: get scroll amount from settings
+	int amount = 10;
+	Point scroll;
+	switch (key) {
+		case GEM_UP:
+			scroll.y = -amount;
+			break;
+		case GEM_DOWN:
+			scroll.y = amount;
+			break;
+		case GEM_LEFT:
+			scroll.x = -amount;
+			break;
+		case GEM_RIGHT:
+			scroll.x = amount;
+			break;
 	}
-	if (vscroll && (key == GEM_RIGHT || key == GEM_LEFT)) {
-		// TODO: get the scroll value from settings
-		Scroll(Size(10, 0));
-		return true;
+	if (!scroll.isnull()) {
+		Scroll(scroll);
 	}
 
 	return false;
@@ -74,7 +85,7 @@ bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
 
 void ScrollView::OnMouseWheelScroll(short x, short y)
 {
-	Scroll(Size(x, y));
+	Scroll(Point(x, y));
 }
 
 }

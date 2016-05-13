@@ -24,13 +24,20 @@
 
 namespace GemRB {
 	class GEM_EXPORT ScrollView : public View {
+
+		class ContentView : public View {
+			public:
+			ContentView(const Region& frame) : View(frame) {}
+			bool CanLockFocus() const { return false; }
+		};
+
 		ScrollBar* hscroll;
 		ScrollBar* vscroll;
 
-		View contentView;
+		ContentView contentView;
 
 	private:
-		void Scroll(Size s);
+		void Scroll(const Point& s);
 
 	public:
 		ScrollView(const Region& frame);

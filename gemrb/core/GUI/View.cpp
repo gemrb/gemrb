@@ -158,7 +158,7 @@ void View::Draw()
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
-	// clip drawing to the control bounds, then restore after drawing
+	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
