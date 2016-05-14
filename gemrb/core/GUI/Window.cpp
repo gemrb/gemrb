@@ -142,7 +142,7 @@ String Window::TooltipText() const
 	if (hoverView) {
 		return hoverView->TooltipText();
 	}
-	return View::TooltipText();
+	return ScrollView::TooltipText();
 }
 
 Sprite2D* Window::Cursor() const
@@ -150,7 +150,15 @@ Sprite2D* Window::Cursor() const
 	if (hoverView) {
 		return hoverView->Cursor();
 	}
-	return View::Cursor();
+	return ScrollView::Cursor();
+}
+
+bool Window::IsDisabledCursor() const
+{
+	if (hoverView) {
+		return hoverView->IsDisabledCursor();
+	}
+	return ScrollView::IsDisabledCursor();
 }
 
 void Window::SetPosition(WindowPosition pos)

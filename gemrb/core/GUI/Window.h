@@ -92,6 +92,7 @@ public:
 	View* FocusedView() const { return focusView; }
 	String TooltipText() const;
 	Sprite2D* Cursor() const;
+	bool IsDisabledCursor() const;
 
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
