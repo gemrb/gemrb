@@ -65,16 +65,16 @@ bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
 	Point scroll;
 	switch (key) {
 		case GEM_UP:
-			scroll.y = -amount;
-			break;
-		case GEM_DOWN:
 			scroll.y = amount;
 			break;
+		case GEM_DOWN:
+			scroll.y = -amount;
+			break;
 		case GEM_LEFT:
-			scroll.x = -amount;
+			scroll.x = amount;
 			break;
 		case GEM_RIGHT:
-			scroll.x = amount;
+			scroll.x = -amount;
 			break;
 	}
 	if (!scroll.isnull()) {
