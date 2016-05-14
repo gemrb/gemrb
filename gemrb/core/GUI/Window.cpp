@@ -331,6 +331,7 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	} else {
 		// key events
+		// FIXME: doesnt do key release! (look like it does double keypress)
 		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
 			return (*it->second)(event);

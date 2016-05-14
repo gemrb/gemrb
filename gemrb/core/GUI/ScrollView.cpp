@@ -53,6 +53,7 @@ View* ScrollView::RemoveSubview(const View* view)
 
 void ScrollView::Scroll(const Point& p)
 {
+	// FIXME: this needs to be limited. Need to implement the resize flags...
 	Point newOrigin = p + contentView.Origin();
 	contentView.SetFrameOrigin(newOrigin);
 }
