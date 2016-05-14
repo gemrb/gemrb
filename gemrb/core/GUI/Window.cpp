@@ -334,11 +334,11 @@ bool Window::DispatchEvent(const Event& event)
 		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
 			return (*it->second)(event);
-		} else if (event.keyboard.keycode == GEM_ESCAPE) {
-			Close();
-			return true;
 		}
-		return (focusView && focusView->OnKeyPress(event.keyboard.character, event.mod) );
+		if (focusView) {
+			return focusView->OnKeyPress(event.keyboard.keycode, event.mod);
+		}
+		return this->OnKeyPress(event.keyboard.keycode, event.mod);
 	}
 	return false;
 }
@@ -358,6 +358,16 @@ void Window::OnMouseOver(const Point& p)
 		SetFrameOrigin(newOrigin);
 		dragOrigin = dragOrigin + delta;
 	}
+}
+
+bool Window::OnKeyPress(unsigned char key, unsigned short mod)
+{
+	switch (key) {
+		case GEM_ESCAPE:
+			Close();
+			return true;
+	}
+	return ScrollView::OnKeyPress(key, mod);
 }
 
 void Window::OnMouseLeave(const Point&, const DragOp*)

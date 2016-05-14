@@ -100,6 +100,8 @@ public:
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
 
+	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	void OnMouseLeave(const Point&, const DragOp*);
