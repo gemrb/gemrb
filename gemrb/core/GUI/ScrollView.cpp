@@ -79,6 +79,7 @@ bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
 	}
 	if (!scroll.isnull()) {
 		Scroll(scroll);
+		return true;
 	}
 
 	return false;
