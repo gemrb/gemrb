@@ -610,10 +610,10 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 				core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 				if (Key >= GEM_UP) {
 					int v = (Key == GEM_UP) ? -1 : 1;
-					OnMouseWheelScroll(0, keyScrollSpd * v);
+					Scroll( Point(0, keyScrollSpd * v) );
 				} else {
 					int v = (Key == GEM_LEFT) ? -1 : 1;
-					OnMouseWheelScroll(keyScrollSpd * v, 0);
+					Scroll( Point(keyScrollSpd * v, 0) );
 				}
 			}
 			break;
@@ -1974,12 +1974,16 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 
 void GameControl::OnMouseWheelScroll(short x, short y)
 {
+	Scroll(Point(x, y));
+}
+
+void GameControl::Scroll(const Point& amt)
+{
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
 	} else {
-		Point p(x, y);
-		MoveViewportTo( vpOrigin + p, false);
+		MoveViewportTo( vpOrigin + amt, false);
 	}
 }
 
