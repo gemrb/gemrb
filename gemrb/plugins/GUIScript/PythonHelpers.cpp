@@ -52,7 +52,7 @@ void PythonCallback::operator() () const
 namespace GemRB {
 
 template <>
-bool PythonObjectCallback<Control>::operator() (Control* ctrl)
+void PythonObjectCallback<Control*, void>::operator() (Control* ctrl) const
 {
 	if (!ctrl || !Function || !Py_IsInitialized()) {
 		return;
@@ -77,14 +77,13 @@ bool PythonObjectCallback<Control>::operator() (Control* ctrl)
 }
 
 template <>
-bool PythonObjectCallback<WindowKeyPress>::operator() (WindowKeyPress *wkp) {
+bool PythonObjectCallback<WindowKeyPress&, bool>::operator() (WindowKeyPress &wkp) const {
 	if (!Function || !Py_IsInitialized()) {
 		return false;
 	}
 
-	PyObject *args = PyTuple_Pack(3, PyInt_FromLong(wkp->windowID),
-																	 PyInt_FromLong(wkp->key),
-																	 PyInt_FromLong(wkp->mod));
+	PyObject *args = PyTuple_Pack(2, PyInt_FromLong(wkp.key),
+																	 PyInt_FromLong(wkp.mod));
 	long result = CallPythonWithReturn(Function, args);
 
 	return result > 0;

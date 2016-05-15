@@ -38,17 +38,16 @@ class Sprite2D;
 
 
 struct WindowKeyPress {
-	unsigned short windowID;
 	unsigned short key;
 	unsigned short mod;
 };
 
-class WindowKeyPressHandler : public Holder< Callback<WindowKeyPress*> > {
+class WindowKeyPressHandler : public Holder< Callback<WindowKeyPress&, bool> > {
 public:
-	WindowKeyPressHandler(Callback<WindowKeyPress*>* ptr = NULL)
-	: Holder< Callback<WindowKeyPress*> >(ptr) {}
+	WindowKeyPressHandler(Callback<WindowKeyPress&, bool>* ptr = NULL)
+	: Holder< Callback<WindowKeyPress&, bool> >(ptr) {}
 
-	bool operator()(WindowKeyPress *wkp) {
+	bool operator()(WindowKeyPress &wkp) {
 		return (*ptr)(wkp);
 	}
 };

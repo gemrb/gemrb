@@ -46,19 +46,19 @@ private:
 	PyObject *Function;
 };
 
-template <class T>
-struct PythonObjectCallback : public Callback<T*> {
+template <class T, class R>
+struct PythonObjectCallback : public Callback<T, R> {
 public:
 	PythonObjectCallback(PyObject*);
 	~PythonObjectCallback();
 
 	void operator()() const;
-	bool operator()(T*) const;
+	R operator()(T) const;
 private:
 	PyObject *Function;
 };
 
-typedef PythonObjectCallback<Control> PythonControlCallback;
+typedef PythonObjectCallback<Control*, void> PythonControlCallback;
 
 template <typename T>
 class CObject : public Holder<T> {
@@ -129,18 +129,19 @@ PyObject* MakePyList(const Container &source)
 	return list;
 }
 
-template <class T>
-bool PythonObjectCallback<T>::operator() ()
+template <class T, class R>
+void PythonObjectCallback<T, R>::operator() () const
 {
 	if (!Function || !Py_IsInitialized()) {
-		return false;
+		return;
 	}
-	return CallPython(Function);
+
+	CallPython(Function);
 }
 
 
-template <class T>
-PythonObjectCallback<T>::PythonObjectCallback(PyObject *Function)
+template <class T, class R>
+PythonObjectCallback<T, R>::PythonObjectCallback(PyObject *Function)
 	: Function(Function)
 {
 	if (Function && PyCallable_Check(Function)) {
@@ -150,17 +151,12 @@ PythonObjectCallback<T>::PythonObjectCallback(PyObject *Function)
 	}
 }
 
-template <class T>
-PythonObjectCallback<T>::~PythonObjectCallback()
+template <class T, class R>
+PythonObjectCallback<T, R>::~PythonObjectCallback()
 {
 	if (Py_IsInitialized()) {
 		Py_XDECREF(Function);
 	}
-}
-
-template <class T>
-bool PythonObjectCallback<T>::operator() (T*) {
-	return false;
 }
 
 }

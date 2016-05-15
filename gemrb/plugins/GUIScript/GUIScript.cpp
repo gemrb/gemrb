@@ -1659,23 +1659,18 @@ PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
 "
 );
 
-static PyObject* GemRB_Window_SetKeyPressEvent(PyObject* /*self*/, PyObject *args) {
-	int windowIndex;
+static PyObject* GemRB_Window_SetKeyPressEvent(PyObject *self, PyObject *args) {
 	PyObject *fn;
 
-	if(!PyArg_ParseTuple(args, "iO", &windowIndex, &fn)) {
-		return AttributeError(GemRB_Window_SetKeyPressEvent__doc);
-	}
+	PARSE_ARGS2(args, "OO", &self, &fn);
 
 	WindowKeyPressHandler handler = NULL;
 	if(fn != Py_None && PyCallable_Check(fn)) {
-		handler = new PythonObjectCallback<WindowKeyPress>(fn);
+		handler = new PythonObjectCallback<WindowKeyPress&, bool>(fn);
 	}
 
-	Window *window = core->GetWindow(windowIndex);
-	if(window) {
-		window->SetKeyPressEvent(handler);
-	}
+	Window *window = GetView<Window>(self);
+	window->SetKeyPressEvent(handler);
 
 	Py_RETURN_NONE;
 }

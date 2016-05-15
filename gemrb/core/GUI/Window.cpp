@@ -372,7 +372,16 @@ bool Window::OnKeyPress(unsigned char key, unsigned short mod)
 			Close();
 			return true;
 	}
-	return ScrollView::OnKeyPress(key, mod);
+
+	if(keyPressHandler) {
+		WindowKeyPress wkp;
+		wkp.key = key;
+		wkp.mod = mod;
+
+		return keyPressHandler(wkp);
+	} else {
+		return ScrollView::OnKeyPress(key, mod);
+	}
 }
 
 void Window::OnMouseLeave(const Point&, const DragOp*)
@@ -394,19 +403,6 @@ void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short m
 		default:
 			View::OnMouseDown(p, button, mod);
 			break;
-	}
-}
-
-bool Window::OnKeyPress(unsigned char key, unsigned short mod) {
-	if(keyPressHandler) {
-		WindowKeyPress wkp;
-		wkp.windowID = this->WindowID;
-		wkp.key = key;
-		wkp.mod = mod;
-
-		return keyPressHandler(&wkp);
-	} else {
-		return false;
 	}
 }
 

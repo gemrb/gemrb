@@ -121,9 +121,9 @@ public:
 };
 
 
-class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {
+class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
 public:
-	ControlEventHandler(Callback<Control*>* ptr = NULL)
+	ControlEventHandler(Callback<Control*, void>* ptr = NULL)
 	: Holder< Callback<Control*, void> >(ptr) {}
 
 	void operator()(Control* ctrl) {

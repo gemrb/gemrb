@@ -41,12 +41,7 @@ using namespace GemRB;
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	lastTime = 0;
-	backBuf=NULL;
-	extra=NULL;
 	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
-	subtitlestrref = 0;
-	subtitletext = NULL;
-	disp = tmpBuf =  NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -100,6 +95,7 @@ int SDLVideoDriver::PollEvents()
 				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
 		}
 	}
+	*/
 	return ret;
 }
 

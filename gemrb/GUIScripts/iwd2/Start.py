@@ -33,7 +33,6 @@ def OnLoad():
 
 #main window
 	StartWindow = GemRB.LoadWindow(0, "GUICONN")
-	StartWindow.SetFrame ()
 	time = datetime.now()
 
 	# IWD2 has some nice background for the night
