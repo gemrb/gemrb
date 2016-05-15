@@ -134,6 +134,8 @@ def OpenRecordsWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)

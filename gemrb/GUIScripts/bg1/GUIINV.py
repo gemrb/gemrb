@@ -181,6 +181,8 @@ def OpenInventoryWindow ():
 	Window.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	# force unpause the game
 	GemRB.GamePause(0, 0)
 	return
