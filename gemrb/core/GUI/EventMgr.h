@@ -66,8 +66,6 @@ class Window;
 #define GEM_MOD_CTRL            2
 #define GEM_MOD_ALT             4
 
-#define GEM_MOUSEOUT	128
-
 // Mouse buttons
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4

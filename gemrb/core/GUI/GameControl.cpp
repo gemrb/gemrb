@@ -631,10 +631,6 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 				pc->DisplayHeadHPRatio();
 			}
 			break;
-		case GEM_MOUSEOUT:
-			moveX = 0;
-			moveY = 0;
-			break;
 		case GEM_ESCAPE:
 			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
