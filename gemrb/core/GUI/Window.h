@@ -53,6 +53,23 @@ class Sprite2D;
 #define WINDOW_SCALE         0x08
 #define WINDOW_BOUNDED       0x10
 
+struct WindowKeyPress {
+	unsigned short windowID;
+	unsigned short key;
+	unsigned short mod;
+};
+
+class WindowKeyPressHandler : public Holder< Callback<WindowKeyPress*> > {
+public:
+	WindowKeyPressHandler(Callback<WindowKeyPress*>* ptr = NULL)
+	: Holder< Callback<WindowKeyPress*> >(ptr) {}
+
+	bool operator()(WindowKeyPress *wkp) {
+		return (*ptr)(wkp);
+	}
+};
+
+
 /**
  * @class Window
  * Class serving as a container for Control/widget objects 
@@ -95,6 +112,8 @@ public:
 	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
+	/** Sets callback on catching a key press event. */
+	void SetKeyPressEvent(WindowKeyPressHandler handler);
 	/** Sets 'ctrl' as currently under mouse */
 	void SetOver(Control* ctrl);
 	/** Returns last control under mouse */
@@ -119,6 +138,8 @@ public:
 	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse is over the current control */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Key has been pressed */
+	bool OnKeyPress(unsigned char key, unsigned short mod);
 public: //Public attributes
 	/** WinPack */
 	char WindowPack[10];
@@ -140,6 +161,8 @@ public: //Public attributes
 	int DefaultControl[2]; //default enter and cancel
 	int ScrollControl;
 	bool FunctionBar;
+
+	WindowKeyPressHandler keyPressHandler;
 private: // Private attributes
 	/** BackGround Image. No BackGround if this variable is NULL. */
 	Sprite2D* BackGround;

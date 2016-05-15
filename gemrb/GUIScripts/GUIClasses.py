@@ -67,6 +67,7 @@ class GWindow:
     'ReassignControls': _GemRB.Window_ReassignControls,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
+    'SetKeyPressEvent': _GemRB.Window_SetKeyPressEvent,
     'SetVisible': _GemRB.Window_SetVisible,
     'ShowModal': _GemRB.Window_ShowModal,
     'Invalidate': _GemRB.Window_Invalidate,
