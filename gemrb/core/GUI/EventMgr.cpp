@@ -165,7 +165,17 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 	e.type = (down) ? Event::KeyDown : Event::KeyUp;
 	e.keyboard.keycode = key;
 	e.isScreen = false;
-	// TODO: need to translate the keycode for e.keyboard.character
+
+	KeyboardKey character = 0;
+	if (key >= 0x20) {
+		// FIXME: need to translate the keycode for e.keyboard.character
+		// probably need to lookup what encoding we are currently using
+		character = key;
+		if (mod & GEM_MOD_SHIFT) {
+			character = toupper(character);
+		}
+	}
+	e.keyboard.character = character;
 	return e;
 }
 
