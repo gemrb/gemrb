@@ -283,12 +283,6 @@ void WorldMapControl::OnMouseDown(const Point& p, unsigned short Button, unsigne
 		MouseIsDown = true;
 		LastMousePos = p;
 		break;
-	case GEM_MB_SCRLUP:
-		OnKeyPress(GEM_UP, 0);
-		break;
-	case GEM_MB_SCRLDOWN:
-		OnKeyPress(GEM_DOWN, 0);
-		break;
 	}
 }
 /** Mouse Button Up */

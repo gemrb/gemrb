@@ -150,6 +150,15 @@ Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
 	return e;
 }
 
+Event EventMgr::CreateMouseWheelEvent(const Point& vec, int mod)
+{
+	Event e = CreateMouseBtnEvent(MousePos(), 0, mod);
+	e.type = Event::MouseScroll;
+	e.mouse.deltaX = vec.x;
+	e.mouse.deltaY = vec.y;
+	return e;
+}
+
 Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 {
 	Event e = InitializeEvent(mod);

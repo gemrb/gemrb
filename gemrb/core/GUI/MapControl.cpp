@@ -354,12 +354,6 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
-		case GEM_MB_SCRLUP:
-			OnKeyPress(GEM_UP, 0);
-			return Control::OnMouseDown(p, Button, Mod);
-		case GEM_MB_SCRLDOWN:
-			OnKeyPress(GEM_DOWN, 0);
-			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_ACTION:
 			if (Button & GEM_MB_DOUBLECLICK) {
 				ClickHandle(Button);

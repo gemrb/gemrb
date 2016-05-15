@@ -1785,12 +1785,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
-	case GEM_MB_SCRLUP:
-		OnKeyPress(GEM_UP, 0);
-		break;
-	case GEM_MB_SCRLDOWN:
-		OnKeyPress(GEM_DOWN, 0);
-		break;
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);

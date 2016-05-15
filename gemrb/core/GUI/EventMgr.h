@@ -69,8 +69,6 @@ class Window;
 // Mouse buttons
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4
-#define GEM_MB_SCRLUP           8
-#define GEM_MB_SCRLDOWN         16
 
 #define GEM_MB_NORMAL           255
 #define GEM_MB_DOUBLECLICK      256
@@ -179,6 +177,7 @@ public:
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
 	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
+	static Event CreateMouseWheelEvent(const Point& vec, int mod = 0);
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
 
 	// TODO/FIXME: need to be able to unregister hotkeys/monitors

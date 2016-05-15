@@ -163,6 +163,17 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 		return GEM_OK;
 	}
 
+	bool isMouseEvent = (SDL_EVENTMASK(event.type) & (SDL_MOUSEBUTTONDOWNMASK | SDL_MOUSEBUTTONUPMASK));
+	int button = event.button.button;
+	if (isMouseEvent && (button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_WHEELDOWN)) {
+		// remap these to mousewheel events
+		int speed = core->GetMouseScrollSpeed();
+		speed *= (button == SDL_BUTTON_WHEELUP) ? 1 : -1;
+		EventMgr::CreateMouseWheelEvent(Point(0, speed));
+
+		return GEM_OK;
+	}
+
 	return SDLVideoDriver::ProcessEvent(event);
 }
 
