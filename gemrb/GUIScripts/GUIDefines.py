@@ -353,3 +353,8 @@ UAW_QSONGS = 9
 UAW_BOOK = 10
 UAW_2DASPELLS = 11
 UAW_SPELLS_DIRECT = 12
+UAW_QITEMS = 13
+
+# item extended header location field
+ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection
+ITEM_LOC_EQUIPMENT = 3 # show on quick item ability selection

@@ -211,7 +211,7 @@ public:
 	void ResetTargetMode();
 	void UpdateTargetMode();
 
-	// returns the default cursor fitting the targeting mode 
+	// returns the default cursor fitting the targeting mode
 	Sprite2D* GetTargetActionCursor() const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 

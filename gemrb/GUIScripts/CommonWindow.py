@@ -296,12 +296,10 @@ def CloseContainerWindow ():
 			GUICommonWindows.ActionsWindow.Focus()
 		
 
-	# FIXME: iwd2 bug or just bad naming?
-	if GameCheck.IsIWD2():
-		GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
-	else:
+	GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
+	# iwd2 has no separate action window
+	if not GameCheck.IsIWD2():
 		GemRB.SetVar ("ActionsWindow", GUIWORLD.OldActionsWindow.ID)
-		GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']

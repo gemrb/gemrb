@@ -1638,6 +1638,48 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
+"===== Window_SetKeyPressEvent =====\n\
+\n\
+**Prototype:** _GemRB.Window_SetKeyPressEvent (callback)\n\
+\n\
+**Description:** Sets a callback function to handle key press event on window scopes. \n\
+\n\
+**Parameters:**\n\
+  * callback - Python function that accepts (windowIndex, key, mod) arguments and returns\n\
+	* 					 1 indicating succesful key press consumption or 0 otherwise. \n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Example:**\n\
+    Window.SetKeyPressEvent (KeyPressCallback)\n\
+    return\n\
+\n\
+**See also:** [[guiscript:QuitGame]]\n\
+"
+);
+
+static PyObject* GemRB_Window_SetKeyPressEvent(PyObject* /*self*/, PyObject *args) {
+	int windowIndex;
+	PyObject *fn;
+
+	if(!PyArg_ParseTuple(args, "iO", &windowIndex, &fn)) {
+		return AttributeError(GemRB_Window_SetKeyPressEvent__doc);
+	}
+
+	WindowKeyPressHandler handler = NULL;
+	if(fn != Py_None && PyCallable_Check(fn)) {
+		handler = new PythonObjectCallback<WindowKeyPress>(fn);
+	}
+
+	Window *window = core->GetWindow(windowIndex);
+	if(window) {
+		window->SetKeyPressEvent(handler);
+	}
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
 "===== TextArea_Append =====\n\
 \n\
@@ -8931,6 +8973,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
   * 'LoreToID'           - the required lore to identify the item\n\
   * 'MaxCharge'          - the maximum amount of charges\n\
   * 'Tooltips'           - the item tooltips\n\
+  * 'Locations'          - the item extended header's ability locations\n\
   * 'Spell'              - the spell's strref if the item is a copyable scroll\n\
   * 'Function'           - returns special function\n\
     * 0 - no special function\n\
@@ -8989,13 +9032,16 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	int ehc = item->ExtHeaderCount;
 
 	PyObject* tooltiptuple = PyTuple_New(ehc);
+	PyObject* locationtuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
 		ITMExtHeader *eh = item->ext_headers+i;
 		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
+		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(eh->Charges) );
 	}
 
 	PyDict_SetItemString(dict, "Tooltips", tooltiptuple);
+	PyDict_SetItemString(dict, "Locations", locationtuple);
 
 	int function=0;
 
@@ -13195,6 +13241,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
+	METHOD(Window_SetKeyPressEvent, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
@@ -13602,11 +13649,13 @@ void GUIScript::ExecString(const char* string, bool feedback)
 
 		//Get error message
 		String* error = StringFromCString(PyString_AsString(pvalue));
-		displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+		if (error) {
+			displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+		}
 		PyErr_Print();
 		Py_DECREF(ptype);
 		Py_DECREF(pvalue);
-		Py_DECREF(ptraceback);
+		if (ptraceback) Py_DECREF(ptraceback);
 		delete error;
 	}
 	PyErr_Clear();

@@ -56,9 +56,10 @@ KOBOLD     WAL_26     0x8200     0x82ff     4
 IWD        WAL_09     0x9000     0x9fff     4
 WYVERN     WAL_17     0xa000     0xa0ff     2
 CARRION    WAL_13     0xa100     0xa1ff     4
-DEFAULT    SOUND      0xc000     0xcfff     4
+RODENTS    *          0xc000     0xc5ff     0
 BEGGAR     WAL_24     0xc600     0xc6ff     4
 CHILDREN   WAL_24     0xc700     0xc7ff     4
+DEFAULT    SOUND      0xc800     0xcfff     4
 SLAVE      WAL_24     0xcb00     0xcbff     4
 IWD        WAL_09     0xe000     0xefff     4
 GOBLIN     WAL_26     0xe400     0xe4ff     2

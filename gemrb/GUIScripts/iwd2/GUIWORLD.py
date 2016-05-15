@@ -34,11 +34,10 @@ FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
 ReformPartyWindow = None
-OldActionsWindow = None
 OldMessageWindow = None
 
 def DialogStarted ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)
@@ -53,7 +52,7 @@ def DialogStarted ():
 	ContinueWindow = Window = GemRB.LoadWindow (9, GUICommon.GetWindowPack())
 
 def DialogEnded ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
 	# TODO: why is this being called at game start?!
 	if not ContinueWindow:
@@ -61,7 +60,6 @@ def DialogEnded ():
 
 	ContinueWindow.Unload ()
 	ContinueWindow = None
-	OldActionsWindow = None
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open

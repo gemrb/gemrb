@@ -59,7 +59,9 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	this->bpp = bpp;
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+	// TODO: scale methods can be nearest or linear, and should be settable in config
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
@@ -68,6 +70,12 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	// don't know if Android makes use of this.
 	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
 #endif
+	if (fullscreen) {
+		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		//This is needed to remove the status bar on Android/iOS.
+		//since we are in fullscreen this has no effect outside Android/iOS
+		winFlags |= SDL_WINDOW_BORDERLESS;
+	}
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
@@ -297,7 +305,7 @@ int SDL20VideoDriver::PollEvents()
 
 				BeginMultiGesture(GESTURE_FORMATION_ROTATION);
 			} else {
-				EvntManager->MouseUp( x, y, GEM_MB_MENU, GetModState(SDL_GetModState()));
+				EvntManager->MouseUp(x, y, GEM_MB_MENU, GetModState());
 				ignoreNextFingerUp = 1;
 			}
 			*/
@@ -365,7 +373,7 @@ bool SDL20VideoDriver::ProcessFirstTouch( int /*mouseButton*/ )
 
 		// no need to scale these coordinates. they were scaled previously for us.
 		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
-								mouseButton, GetModState(SDL_GetModState()) );
+								mouseButton, GetModState() );
 
 		ClearFirstTouch();
 		ignoreNextFingerUp--;
@@ -525,7 +533,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
 											 ScaleCoordinateVertical(event.tfinger.y),
-											 mouseButton, GetModState(SDL_GetModState()) );
+											 mouseButton, GetModState());
 					} else {
 						focusCtrl = EvntManager->GetFocusedControl();
 						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)
@@ -554,7 +562,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					case GESTURE_FORMATION_ROTATION:
 					{
 						SDL_Finger* secondFinger = SDL_GetTouchFinger(event.mgesture.touchId, 1);
-						if (secondFinger && gc->GetTargetMode() == TARGET_MODE_NONE) {
+						if (secondFinger && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
 							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
 							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
 							//gc->OnMouseOver(x, y);
@@ -625,23 +633,37 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// discard them if they are produced by touch events
 		// do NOT discard mouse wheel events
 		case SDL_MOUSEMOTION:
-			if (event.motion.which == SDL_TOUCH_MOUSEID) {
-				break;
-			}
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
 				break;
 			}
+			else {
+				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
+				return SDLVideoDriver::ProcessEvent(event);
+			}
 		case SDL_KEYDOWN:
-		case SDL_KEYUP:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if (key > 32 && key < 127) {
-					// ignore keys that generate text. handeled by SDL_TEXTINPUT
+				if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
+					// special treatment: console popping is the only KEYDOWN event in SDLVideoDriver::ProcessEvent that uses a standard key (and therefore will never be hit). Therefore, implement this here also.
+					core->PopupConsole();
+					break;
+				}
+				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
+					// if key is literally just ctrl or shift -- skip it.
+					break;
+				}
+				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
+					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Never ignore numpad enter.
+					break;
+				}
+				if (key >= 32 && key < 127) {
+					// ignore keys that generate text (these are handeled by SDL_TEXTINPUT).
 					break;
 				}
 			}
+		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
@@ -682,7 +704,11 @@ void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
-	if (SDL_SetWindowFullscreen(window, (SDL_bool)set) == GEM_OK) {
+	Uint32 flags = 0;
+	if (set) {
+	flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	}
+	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 		fullscreen = set;
 		return true;
 	}
@@ -700,7 +726,10 @@ bool SDL20VideoDriver::ToggleGrabInput()
 
 bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
 {
-	bool ret = SDL_SetSurfaceAlphaMod(surface, alpha);
+	bool ret = SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
+	if (ret == GEM_OK) {
+		ret = SDL_SetSurfaceAlphaMod(surface, alpha);
+	}
 	if (ret == GEM_OK) {
 		SDL_SetSurfaceRLE(surface, SDL_TRUE);
 	}

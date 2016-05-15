@@ -34,6 +34,8 @@ BMPImporter::BMPImporter(void)
 {
 	Palette = NULL;
 	pixels = NULL;
+	Size = Width = Height = Compression = ImageSize = Planes = 0;
+	BitCount = PaddedRowLength = NumColors = 0;
 }
 
 BMPImporter::~BMPImporter(void)

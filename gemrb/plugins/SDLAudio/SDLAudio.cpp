@@ -64,7 +64,11 @@ bool SDLAudio::Init(void)
 		return false;
 	}
 	OurMutex = SDL_CreateMutex();
+#ifdef RPI
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
+#else
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 8192) < 0) {
+#endif
 		return false;
 	}
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);

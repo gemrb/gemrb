@@ -1,9 +1,12 @@
-GemRB git (7558b91):
+GemRB git (c812b0bae):
   New features:
     - 
+    - SDL2 resolution-independent window scaling
+    - portrait.2da handling, time dilation
 
   Improved features:
     - 
+    - ambients, verbal constants, random walk
     - bugfixes
 
 GemRB v0.8.4 (2016-02-29):

@@ -31,6 +31,9 @@
 
 namespace GemRB {
 
+bool CallPython(PyObject*, PyObject* args = NULL);
+long CallPythonWithReturn(PyObject*, PyObject* args = NULL);
+
 // could use an adapter pattern to reduce code duplication
 // for the 2 callback types
 
@@ -43,17 +46,19 @@ private:
 	PyObject *Function;
 };
 
-
-struct PythonControlCallback : public Callback<Control*> {
+template <class T>
+struct PythonObjectCallback : public Callback<T*> {
 public:
-	PythonControlCallback(PyObject *Function);
-	~PythonControlCallback();
+	PythonObjectCallback(PyObject*);
+	~PythonObjectCallback();
 
 	void operator()() const;
-	void operator()(Control*) const;
+	bool operator()(T*) const;
 private:
 	PyObject *Function;
 };
+
+typedef PythonObjectCallback<Control> PythonControlCallback;
 
 template <typename T>
 class CObject : public Holder<T> {
@@ -122,6 +127,40 @@ PyObject* MakePyList(const Container &source)
 		PyList_SetItem(list, i, CObject<T>(source[i]));
 	}
 	return list;
+}
+
+template <class T>
+bool PythonObjectCallback<T>::operator() ()
+{
+	if (!Function || !Py_IsInitialized()) {
+		return false;
+	}
+	return CallPython(Function);
+}
+
+
+template <class T>
+PythonObjectCallback<T>::PythonObjectCallback(PyObject *Function)
+	: Function(Function)
+{
+	if (Function && PyCallable_Check(Function)) {
+		Py_INCREF(Function);
+	} else {
+		Function = NULL;
+	}
+}
+
+template <class T>
+PythonObjectCallback<T>::~PythonObjectCallback()
+{
+	if (Py_IsInitialized()) {
+		Py_XDECREF(Function);
+	}
+}
+
+template <class T>
+bool PythonObjectCallback<T>::operator() (T*) {
+	return false;
 }
 
 }

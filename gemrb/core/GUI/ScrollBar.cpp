@@ -241,6 +241,7 @@ void ScrollBar::OnMouseUp(const Point&, unsigned short /*Button*/, unsigned shor
 	MarkDirty();
 	State = 0;
 	Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
+
 }
 
 /** Mousewheel scroll */
