@@ -190,9 +190,9 @@ void Console::HistoryAdd(bool force)
 	}
 }
 
-void Console::SetFocus(bool focus)
+void Console::SetFocus()
 {
-	Control::SetFocus(focus);
+	Control::SetFocus();
 	if (IsFocused()) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}

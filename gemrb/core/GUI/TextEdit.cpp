@@ -159,9 +159,9 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 	return true;
 }
 
-void TextEdit::SetFocus(bool focus)
+void TextEdit::SetFocus()
 {
-	Control::SetFocus(focus);
+	Control::SetFocus();
 	if (IsFocused()) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}

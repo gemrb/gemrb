@@ -76,7 +76,7 @@ public: //Events
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 
-	void SetFocus(bool focus);
+	void SetFocus();
 	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	void HistoryBack();

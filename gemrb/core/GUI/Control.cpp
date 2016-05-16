@@ -98,9 +98,9 @@ void Control::UpdateState(const char* varname, unsigned int val)
 	}
 }
 
-void Control::SetFocus(bool focus)
+void Control::SetFocus()
 {
-	Owner->SetFocused((focus) ? this : NULL);
+	Owner->SetFocused(this);
 	MarkDirty();
 }
 

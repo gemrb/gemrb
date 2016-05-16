@@ -666,9 +666,9 @@ void TextArea::ClearText()
 	UpdateScrollbar();
 }
 
-void TextArea::SetFocus(bool focus)
+void TextArea::SetFocus()
 {
-	Control::SetFocus(focus);
+	Control::SetFocus();
 	if (IsFocused() && flags & IE_GUI_TEXTAREA_EDITABLE) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}

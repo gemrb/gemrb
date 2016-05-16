@@ -105,7 +105,7 @@ public:
 
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
-	virtual void SetFocus(bool focus);
+	virtual void SetFocus();
 	bool IsFocused();
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;

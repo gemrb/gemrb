@@ -170,7 +170,7 @@ public: //Events
 	void OnMouseLeave(const Point&, const DragOp*);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
+	void SetFocus();
 
 	void ClearSelectOptions();
 };

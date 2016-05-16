@@ -96,7 +96,7 @@ public: //Events
 
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
+	void SetFocus();
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler EditOnChange;
 	ControlEventHandler EditOnDone;
