@@ -92,7 +92,7 @@ public:
 	/** Mouse Wheel Event */
 	void OnMouseWheelScroll(short x, short y);
 
-	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 private:
 	//font for printing area names

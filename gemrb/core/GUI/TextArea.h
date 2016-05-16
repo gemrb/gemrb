@@ -160,7 +160,7 @@ private: //internal functions
 
 public: //Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
 	void OnMouseWheelScroll(short x, short y);
 	/** Mouse Over Event */

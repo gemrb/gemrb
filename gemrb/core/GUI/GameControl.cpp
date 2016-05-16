@@ -589,7 +589,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 }
 
 /** Key Press Event */
-bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
+bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		TextArea* ta = core->GetMessageTextArea();
@@ -600,7 +600,8 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 
-	switch (Key) {
+	KeyboardKey keycode = Key.keycode;
+	switch (keycode) {
 		case GEM_UP:
 		case GEM_DOWN:
 		case GEM_LEFT:
@@ -608,11 +609,11 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			{
 				ieDword keyScrollSpd = 64;
 				core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-				if (Key >= GEM_UP) {
-					int v = (Key == GEM_UP) ? -1 : 1;
+				if (keycode >= GEM_UP) {
+					int v = (keycode == GEM_UP) ? -1 : 1;
 					Scroll( Point(0, keyScrollSpd * v) );
 				} else {
-					int v = (Key == GEM_LEFT) ? -1 : 1;
+					int v = (keycode == GEM_LEFT) ? -1 : 1;
 					Scroll( Point(keyScrollSpd * v, 0) );
 				}
 			}
@@ -664,14 +665,14 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 		case '4':
 		case '5':
 		case '6':
-			SelectActor(Key-'0');
+			SelectActor(keycode-'0');
 			break;
 		case '7': // 1 & 2
 		case '8': // 3 & 4
 		case '9': // 5 & 6
 			game->SelectActor( NULL, false, SELECT_NORMAL );
 			i = game->GetPartySize(false);
-			pc = 2*(Key - '6')-1;
+			pc = 2*(keycode - '6')-1;
 			if (pc >= i) {
 				SelectActor(i, true);
 				break;
@@ -680,8 +681,8 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			SelectActor(pc+1, true);
 			break;
 		default:
-			if (!core->GetKeyMap()->ResolveKey(Key, 0)) {
-				core->GetGame()->SetHotKey(toupper(Key));
+			if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
+				core->GetGame()->SetHotKey(toupper(Key.character));
 				return Control::OnKeyPress(Key, mod);
 			}
 			break;
@@ -727,16 +728,12 @@ static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
 
 /** Key Release Event */
-bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
+bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		TextArea* ta = core->GetMessageTextArea();
 		assert(ta);
 		return ta->OnKeyRelease(Key, Mod);
-	}
-
-	if (Mod & GEM_MOD_SHIFT) {
-		Key = toupper(Key);
 	}
 
 	Point gameMousePos = GameMousePos();
@@ -750,7 +747,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		if (!area)
 			return false;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		switch (Key) {
+		switch (Key.keycode) {
 			case 'a': //switches through the avatar animations
 				if (lastActor) {
 					lastActor->GetNextAnimation();
@@ -1021,7 +1018,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		}
 		return true; //return from cheatkeys
 	}
-	switch (Key) {
+	switch (Key.keycode) {
 //FIXME: move these to guiscript
 		case 'h': //hard pause
 			core->SetPause(PAUSE_ON);

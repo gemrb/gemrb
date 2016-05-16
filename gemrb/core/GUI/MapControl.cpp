@@ -404,11 +404,11 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 }
 
 /** Special Key Press */
-bool MapControl::OnKeyPress(unsigned char Key, unsigned short mod)
+bool MapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_LEFT:
 			ScrollX -= keyScrollSpd;
 			break;

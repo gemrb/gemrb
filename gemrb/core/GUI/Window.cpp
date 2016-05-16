@@ -337,9 +337,9 @@ bool Window::DispatchEvent(const Event& event)
 			return (*it->second)(event);
 		}
 		if (focusView) {
-			return focusView->OnKeyPress(event.keyboard.keycode, event.mod);
+			return focusView->OnKeyPress(event.keyboard, event.mod);
 		}
-		return this->OnKeyPress(event.keyboard.keycode, event.mod);
+		return this->OnKeyPress(event.keyboard, event.mod);
 	}
 	return false;
 }
@@ -361,9 +361,9 @@ void Window::OnMouseOver(const Point& p)
 	}
 }
 
-bool Window::OnKeyPress(unsigned char key, unsigned short mod)
+bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	switch (key) {
+	switch (key.keycode) {
 		case GEM_ESCAPE:
 			Close();
 			return true;

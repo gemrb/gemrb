@@ -326,14 +326,14 @@ int TextArea::InsertText(const char* text, int pos)
 }
 */
 /** Key Press Event */
-bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool TextArea::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
 	if (flags & IE_GUI_TEXTAREA_EDITABLE) {
-		if (Key >= 0x20) {
+		if (Key.character) {
 			MarkDirty();
 			// TODO: implement this! currently does nothing
 			size_t CurPos = 0, len = 0;
-			switch (Key) {
+			switch (Key.keycode) {
 				case GEM_HOME:
 					CurPos = 0;
 					break;
@@ -389,12 +389,12 @@ bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		return true;
 	}
 
-	if (( Key < '1' ) || ( Key > '9' ))
+	if (( Key.character < '1' ) || ( Key.character > '9' ))
 		return false;
 
 	MarkDirty();
 
-	unsigned int lookupIdx = Key - '1';
+	unsigned int lookupIdx = Key.character - '1';
 	if (lookupIdx < OptSpans.size()) {
 		UpdateState(lookupIdx);
 	}

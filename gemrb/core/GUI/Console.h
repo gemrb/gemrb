@@ -74,7 +74,7 @@ private:
 
 public: //Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 
 	void SetFocus(bool focus);
 	bool SetEvent(int eventType, ControlEventHandler handler);

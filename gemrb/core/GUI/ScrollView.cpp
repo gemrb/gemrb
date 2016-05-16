@@ -58,12 +58,12 @@ void ScrollView::Scroll(const Point& p)
 	contentView.SetFrameOrigin(newOrigin);
 }
 
-bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
+bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
 {
 	// TODO: get scroll amount from settings
 	int amount = 10;
 	Point scroll;
-	switch (key) {
+	switch (key.keycode) {
 		case GEM_UP:
 			scroll.y = amount;
 			break;

@@ -314,11 +314,11 @@ void WorldMapControl::OnMouseWheelScroll(short x, short y)
 		ScrollY = 0;
 }
 
-bool WorldMapControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_LEFT:
 			OnMouseWheelScroll(keyScrollSpd * -1, 0);
 			break;

@@ -141,8 +141,8 @@ public:
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
-	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
+	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
+	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual void OnMouseEnter(const Point&, const DragOp*) {};
 	virtual void OnMouseLeave(const Point&, const DragOp*) {};
 	virtual void OnMouseOver(const Point&);

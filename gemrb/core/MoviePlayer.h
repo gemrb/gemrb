@@ -108,7 +108,7 @@ public:
 	MoviePlayerControls(MoviePlayer& player)
 	: View(Region(Point(), player.Dimensions())), player(player) {}
 
-	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) {
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) {
 		player.Stop();
 		return true;
 	}

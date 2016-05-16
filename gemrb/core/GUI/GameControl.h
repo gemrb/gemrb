@@ -169,9 +169,9 @@ public:
 
 	//Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Key Release Event */
-	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
+	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
 
