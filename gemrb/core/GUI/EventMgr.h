@@ -74,8 +74,6 @@ class Window;
 #define GEM_MB_SCRLUP           8
 #define GEM_MB_SCRLDOWN         16
 
-#define GEM_MB_ONGOING_ACTION   33
-
 #define GEM_MB_NORMAL           255
 #define GEM_MB_DOUBLECLICK      256
 
