@@ -1011,9 +1011,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
 				Log(MESSAGE, "GameControl", "Show searchmap %s", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
-			default:
-				Log(MESSAGE, "GameControl", "KeyRelease:%d - %d", Key, Mod );
-				break;
 		}
 		return true; //return from cheatkeys
 	}
