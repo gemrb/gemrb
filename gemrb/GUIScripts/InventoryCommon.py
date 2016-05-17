@@ -200,7 +200,7 @@ def MouseLeaveSlot ():
 	return
 
 def MouseEnterGround ():
-	Window = GUIINV.InventoryWindow
+	Window = GemRB.GetView("WIN_INV")
 
 	if GameCheck.IsPST():
 		offset = 47
@@ -214,7 +214,7 @@ def MouseEnterGround ():
 	return
 
 def MouseLeaveGround ():
-	Window = GUIINV.InventoryWindow
+	Window = GemRB.GetView("WIN_INV")
 
 	if GameCheck.IsPST():
 		offset = 47
