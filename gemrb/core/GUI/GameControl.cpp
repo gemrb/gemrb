@@ -665,6 +665,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case '4':
 		case '5':
 		case '6':
+			game->SelectPCSingle(keycode-'0');
 			SelectActor(keycode-'0');
 			break;
 		case '7': // 1 & 2
