@@ -37,7 +37,7 @@ def OnLoad():
 
 	# IWD2 has some nice background for the night
 	if time.hour >= 18 or time.hour <= 6:
-		StartWindow.SetPicture ("STARTN");
+		StartWindow.SetBackground ("STARTN");
 		StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
 		AnimButton = StartWindow.GetControl (0xfff0001)
 		AnimButton.SetAnimation ("MMTRCHB")
