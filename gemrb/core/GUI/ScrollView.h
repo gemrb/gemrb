@@ -37,7 +37,7 @@ namespace GemRB {
 		ContentView contentView;
 
 	private:
-		void Scroll(const Point& s);
+		void Scroll(const Point& p);
 
 	public:
 		ScrollView(const Region& frame);
