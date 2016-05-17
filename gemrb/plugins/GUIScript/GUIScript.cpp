@@ -1646,7 +1646,7 @@ PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
 **Description:** Sets a callback function to handle key press event on window scopes. \n\
 \n\
 **Parameters:**\n\
-  * callback - Python function that accepts (windowIndex, key, mod) arguments and returns\n\
+  * callback - Python function that accepts (key, mod) arguments and returns\n\
 	* 					 1 indicating succesful key press consumption or 0 otherwise. \n\
 \n\
 **Return value:** N/A\n\
