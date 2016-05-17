@@ -711,7 +711,6 @@ void GameControl::SelectActor(int whom, int type)
 	}
 	if (type==1) {
 		game->SelectActor( actor, true, SELECT_NORMAL );
-		actor->PlaySelectionSound();
 		return;
 	}
 
@@ -720,7 +719,6 @@ void GameControl::SelectActor(int whom, int type)
 		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
 			ScreenFlags |= SF_CENTERONACTOR;
 		}
-		actor->PlaySelectionSound();
 	}
 }
 
