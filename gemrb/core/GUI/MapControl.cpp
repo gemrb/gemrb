@@ -351,7 +351,7 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
+void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
 		case GEM_MB_ACTION:
