@@ -590,6 +590,8 @@ bool Game::SelectPCSingle(int index)
 		return false;
 
 	SelectedSingle = index;
+	core->SetEventFlag(EF_SELECTION);
+
 	return true;
 }
 
