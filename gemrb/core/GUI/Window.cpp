@@ -282,6 +282,8 @@ void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button
 
 bool Window::DispatchEvent(const Event& event)
 {
+	View* target = NULL;
+
 	if (event.isScreen) {
 		Point screenPos = event.mouse.Pos();
 		if (!frame.PointInside(screenPos)) {
@@ -291,7 +293,7 @@ bool Window::DispatchEvent(const Event& event)
 			return true;
 		}
 
-		View* target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
 
 		// special event handling
 		switch (event.type) {
@@ -329,17 +331,20 @@ bool Window::DispatchEvent(const Event& event)
 		}
 		// absorb other screen events i guess
 		return true;
-	} else {
-		// key events
-		// FIXME: doesnt do key release! (look like it does double keypress)
+	} else { // key events
+		// hotkeys first
 		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
 			return (*it->second)(event);
 		}
-		if (focusView) {
-			return focusView->OnKeyPress(event.keyboard, event.mod);
+
+		target = (focusView) ? focusView : this;
+
+		if (event.type == Event::KeyDown) {
+			return target->OnKeyPress(event.keyboard, event.mod);
+		} else {
+			return target->OnKeyRelease(event.keyboard, event.mod);
 		}
-		return this->OnKeyPress(event.keyboard, event.mod);
 	}
 	return false;
 }

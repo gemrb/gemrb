@@ -750,9 +750,13 @@ bool Button::SetHotKey(KeyboardKey key)
 	return false;
 }
 
-bool Button::HandleHotKey(const Event&)
+bool Button::HandleHotKey(const Event& e)
 {
-	return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+	if (e.type == Event::KeyDown) {
+		// only run once on keypress (or should it be KeyRelease?)
+		return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+	}
+	return false;
 }
 
 }
