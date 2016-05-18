@@ -1347,6 +1347,10 @@ def SetTopWindow (window, selectionHandler = None):
 # Mode determines arrangment direction, horizontal being for party reform and potentially save/load
 def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
+	
+	if not Window:
+		return pairs
+
 	oldSlotCount = 6 + ExtraSlots
 
 	for i in range(min(oldSlotCount, MAX_PARTY_SIZE)): # the default chu/game limit or less

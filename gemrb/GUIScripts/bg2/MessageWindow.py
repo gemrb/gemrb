@@ -32,10 +32,10 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
 
-MessageWindow = 0
-PortraitWindow = 0
-OptionsWindow = 0
-TMessageTA = 0 # for dialog code
+MessageWindow = None
+PortraitWindow = None
+OptionsWindow = None
+TMessageTA = None # for dialog code
 
 def OnLoad():
 	global PortraitWindow, OptionsWindow, MessageWindow
@@ -95,6 +95,9 @@ def MaximizePortraits():
 
 def UpdateControlStatus():
 	global MessageWindow, TMessageTA
+	
+	if MessageWindow is None:
+		return
 	
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
