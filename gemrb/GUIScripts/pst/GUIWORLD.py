@@ -34,7 +34,7 @@ FormationWindow = None
 ReformPartyWindow = None
 
 def DialogStarted ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)

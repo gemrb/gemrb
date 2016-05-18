@@ -1800,18 +1800,11 @@ def MinimizePortraits(): #bg2
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
 def DisableAnimatedWindows (): #pst
-	global ActionsWindow, OptionsWindow
-	GemRB.SetVar ("PortraitWindow", -1)
-	ActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-	GemRB.SetVar ("ActionsWindow", -1)
-	OptionsWindow = GUIClasses.GWindow( GemRB.GetVar ("OptionsWindow") )
-	GemRB.SetVar ("OptionsWindow", -1)
+	# FIXME: this is just pausing the game. what is the actual intent here?
 	GemRB.GamePause (1,3)
 
 def EnableAnimatedWindows (): #pst
-	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
-	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
+	# FIXME: this is just unpausing the game. what is the actual intent here?
 	GemRB.GamePause (0,3)
 
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
