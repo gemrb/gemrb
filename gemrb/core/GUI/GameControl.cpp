@@ -1185,7 +1185,7 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const Point& /*mp*/)
+void GameControl::OnMouseOver(const Point& mp)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -1229,6 +1229,13 @@ void GameControl::OnMouseOver(const Point& /*mp*/)
 
 	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
+
+	if (!isSelectionRect && EventMgr::ButtonState(GEM_MB_ACTION)) {
+		Point delta = (gameClickPoint - vpOrigin) - mp;
+		if (abs(delta.x) > 5 || abs(delta.y) > 5) {
+			isSelectionRect = true;
+		}
+	}
 
 	if (!isSelectionRect) {
 		if (overDoor) {
@@ -1792,8 +1799,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 		// is there any harm in this being true in all games?
 		if (Mod&GEM_MOD_ALT) {
 			isFormationRotation = true;
-		} else {
-			isSelectionRect = true;
 		}
 		break;
 	}
