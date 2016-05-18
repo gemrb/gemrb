@@ -234,7 +234,8 @@ def DCMainDonePress ():
 	# close our window
 	if DCMainWindow:
 		DCMainWindow.Unload ()
-	GUIREC.UpdateRecordsWindow()
+	# FIXME: we need a generic way to refresh to top window
+	# GUIREC.UpdateRecordsWindow()
 	return
 
 def DCMainCancelPress ():
