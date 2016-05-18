@@ -341,10 +341,7 @@ def EmptyControls ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetPicture ("")
-		Button.SetText ("")
-		Button.SetActionIcon (globals(), -1)
+		Button.SetVisible (False)
 	return
 
 def SelectFormationPreset ():
