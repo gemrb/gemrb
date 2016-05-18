@@ -1335,6 +1335,7 @@ def OpenTopWindow (id, pack, selectionHandler = None):
 def SetTopWindow (window, selectionHandler = None):
 	if window:
 		window.AddAlias("WIN_TOP")
+		window.SetFlags(WF_BORDERLESS)
 		window.Focus()
 		
 		if selectionHandler:
