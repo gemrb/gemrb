@@ -139,6 +139,11 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 	e.mouse.button = btn;
 	e.mouse.x = pos.x;
 	e.mouse.y = pos.y;
+
+	Point delta = MousePos() - pos;
+	e.mouse.deltaX = delta.x;
+	e.mouse.deltaY = delta.y;
+
 	e.isScreen = true;
 	return e;
 }
