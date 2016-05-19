@@ -56,7 +56,7 @@ protected:
 
 private:
 	void DrawBackground(const Region*) const;
-	void DrawSubviews(bool drawBg);
+	void DrawSubviews();
 
 protected:
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};

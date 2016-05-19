@@ -84,11 +84,17 @@ void View::SetCursor(Sprite2D* c)
 
 void View::MarkDirty()
 {
-	dirty = true;
+	if (dirty == false) {
+		dirty = true;
+		if (superView && !IsOpaque())
+			superView->dirtyBGRects.push_back(frame);
+	}
+
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		(*it)->MarkDirty();
 	}
+
 }
 
 bool View::NeedsDraw() const
@@ -109,16 +115,11 @@ bool View::IsVisible() const
 	return !(flags&Invisible);
 }
 
-void View::DrawSubviews(bool drawBg)
+void View::DrawSubviews()
 {
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* v = *it;
-		if (drawBg && !v->IsOpaque() && v->NeedsDraw()) {
-			const Region& fromClip = v->Frame();
-			DrawBackground(&fromClip);
-		}
-		v->Draw();
+		(*it)->Draw();
 	}
 }
 
@@ -163,16 +164,13 @@ void View::Draw()
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
 
-	bool drawBg = (background != NULL) || !IsOpaque();
 	if (NeedsDraw()) {
 		if (background) {
 			DrawBackground(NULL);
-			drawBg = false;
 		}
 		DrawSelf(drawFrame, intersect);
 		dirty = false;
 	} else {
-		// these are from removed controls
 		Regions::iterator it = dirtyBGRects.begin();
 		while (it != dirtyBGRects.end()) {
 			DrawBackground(&(*it));
@@ -180,8 +178,9 @@ void View::Draw()
 		}
 	}
 
+	dirtyBGRects.clear();
 	// always call draw on subviews because they can be dirty without us
-	DrawSubviews(drawBg);
+	DrawSubviews();
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }
@@ -272,8 +271,7 @@ View* View::RemoveSubview(const View* view)
 
 	View* subView = *it;
 	subViews.erase(it);
-	if (background)
-		dirtyBGRects.push_back(subView->Frame());
+	dirtyBGRects.push_back(subView->Frame());
 
 	subView->superView = NULL;
 	SubviewRemoved(subView, this);
