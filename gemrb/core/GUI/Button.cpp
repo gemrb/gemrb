@@ -601,7 +601,7 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 
 void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
 {
-	if (State == IE_GUI_BUTTON_PRESSED) {
+	if (State == IE_GUI_BUTTON_PRESSED && !(flags & IE_GUI_BUTTON_RADIOBUTTON)) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
 	}
 	if (pulseBorder) {
