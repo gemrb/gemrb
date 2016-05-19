@@ -66,7 +66,7 @@ View::~View()
 
 void View::SetBackground(Sprite2D* bg)
 {
-	bg->acquire();
+	if (bg) bg->acquire();
 	if (background) background->release();
 	background = bg;
 
