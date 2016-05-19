@@ -359,10 +359,14 @@ void View::SetFrameSize(const Size& s)
 
 bool View::SetFlags(unsigned int arg_flags, int opcode)
 {
-	MarkDirty();
 	unsigned int oldflags = flags;
 	bool ret = SetBits(flags, arg_flags, opcode);
-	FlagsChanged(oldflags);
+
+	if (flags != oldflags) {
+		FlagsChanged(oldflags);
+		MarkDirty();
+	}
+
 	return ret;
 }
 
