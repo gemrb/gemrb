@@ -546,7 +546,6 @@ TextContainer::TextContainer(const Region& frame, Font* fnt, Palette* pal)
 		pal->acquire();
 		palette = pal;
 	}
-	SizeChanged(frame.Dimensions());
 }
 
 TextContainer::~TextContainer()

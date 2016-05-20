@@ -39,11 +39,11 @@ namespace GemRB {
 	private:
 		void Scroll(const Point& p);
 
+		void SizeChanged(const Size&);
+
 	public:
 		ScrollView(const Region& frame);
 		~ScrollView();
-
-		void SizeChanged(const Size&);
 
 		void AddSubviewInFrontOfView(View*, const View* = NULL);
 		View* RemoveSubview(const View*);

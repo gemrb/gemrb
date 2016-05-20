@@ -45,7 +45,7 @@ namespace GemRB {
  */
 
 class GEM_EXPORT Progressbar : public Control  {
-protected:
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 

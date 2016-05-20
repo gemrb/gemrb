@@ -150,7 +150,6 @@ private:
 	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
 	bool OnGlobalMouseMove(const Event&);
 
-protected:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	// GameControl always needs to redraw

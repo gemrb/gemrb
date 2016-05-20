@@ -100,7 +100,7 @@ public:
 class MoviePlayerControls : public View {
 	MoviePlayer& player;
 
-protected:
+private:
 	// currently dont have any real controls
 	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {}
 

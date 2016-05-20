@@ -52,8 +52,6 @@ public:
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
-	/** Draws the Console on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
 
 private:
 	/** Text Editing Cursor Sprite */
@@ -83,6 +81,9 @@ private:
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
 	bool HandleHotKey(const Event& e);
+
+	/** Draws the Console on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
 };
 
 }

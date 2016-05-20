@@ -61,7 +61,7 @@ public:
 		AlphaChannel = 8		// Create window with RGBA buffer suitable for creating non rectangular windows
 	};
 
-protected:
+private:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
