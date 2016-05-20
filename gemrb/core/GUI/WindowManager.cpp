@@ -102,11 +102,13 @@ bool WindowManager::IsPresentingModalWindow() const
 }
 
 /** Show a Window in Modal Mode */
-bool WindowManager::MakeModal(Window* win, ModalShadow Shadow)
+bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 {
-	if (!IsOpenWindow(win) || IsPresentingModalWindow()) return false;
+	if (!IsOpenWindow( win )) return false;
 
-	FocusWindow( win );
+	OrderFront(win);
+	win->SetDisabled(false);
+	win->SetFlags(Window::Modal, OP_OR);
 	modalWin = win;
 
 	if (Shadow != ShadowNone) {
@@ -151,6 +153,8 @@ bool WindowManager::OrderBack(Window* win)
 
 bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
+	// FIXME: this should probably account for modal windows
+	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
 	if (windows.size() < 2 || win == win2) return false;
 
 	WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
@@ -204,8 +208,18 @@ void WindowManager::CloseWindow(Window* win)
 			core->PlaySound(DS_WINDOW_CLOSE);
 		}
 
+		WindowList::iterator mit = it;
+		win->SetFlags(Window::Modal, OP_NAND);
+		// find the next modal window
 		modalWin = NULL;
-		winFrameBuf->Clear();
+		while (++mit != windows.end()) {
+			if ((*mit)->Flags() & Window::Modal) {
+				modalWin = *mit;
+				break;
+			}
+		}
+		if (modalWin == NULL)
+			winFrameBuf->Clear();
 	}
 
 	if (win == hoverWin) {

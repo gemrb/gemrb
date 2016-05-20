@@ -63,7 +63,7 @@ void Window::Close()
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
 {
-	return manager.MakeModal(this, shadow);
+	return manager.PresentModalWindow(this, shadow);
 }
 
 /** Add a Control in the Window */
