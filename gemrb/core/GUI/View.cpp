@@ -88,13 +88,13 @@ void View::MarkDirty()
 		dirty = true;
 		if (superView && !IsOpaque())
 			superView->dirtyBGRects.push_back(frame);
-	}
 
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		(*it)->MarkDirty();
-	}
 
+		std::list<View*>::iterator it;
+		for (it = subViews.begin(); it != subViews.end(); ++it) {
+			(*it)->MarkDirty();
+		}
+	}
 }
 
 bool View::NeedsDraw() const
