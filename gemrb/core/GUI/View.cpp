@@ -86,9 +86,10 @@ void View::MarkDirty()
 {
 	if (dirty == false) {
 		dirty = true;
-		if (superView && !IsOpaque())
-			superView->dirtyBGRects.push_back(frame);
 
+		if (superView && !IsOpaque()) {
+			superView->DirtyBGRect(frame);
+		}
 
 		std::list<View*>::iterator it;
 		for (it = subViews.begin(); it != subViews.end(); ++it) {
@@ -115,9 +116,21 @@ bool View::IsVisible() const
 	return !(flags&Invisible);
 }
 
-void View::DrawSubviews()
+void View::DirtyBGRect(const Region& r)
 {
-	std::list<View*>::iterator it;
+	// if we are going to draw the entire BG, no need to compute and store this
+	if (NeedsDraw())
+		return;
+
+	// do we want to intersect this too?
+	//Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
+	Region clip(Point(), Dimensions());
+	dirtyBGRects.push_back( r.Intersect(clip) );
+}
+
+void View::DrawSubviews() const
+{
+	std::list<View*>::const_iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		(*it)->Draw();
 	}
@@ -258,7 +271,6 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
 	SubviewAdded(front, this);
-	// FIXME: we probably shouldnt allow things in front of the scrollbar
 }
 
 View* View::RemoveSubview(const View* view)
@@ -273,7 +285,7 @@ View* View::RemoveSubview(const View* view)
 
 	View* subView = *it;
 	subViews.erase(it);
-	dirtyBGRects.push_back(subView->Frame());
+	DirtyBGRect(subView->Frame());
 
 	subView->superView = NULL;
 	SubviewRemoved(subView, this);

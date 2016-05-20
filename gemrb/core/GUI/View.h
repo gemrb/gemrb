@@ -55,8 +55,9 @@ protected:
 	unsigned int flags;
 
 private:
+	void DirtyBGRect(const Region&);
 	void DrawBackground(const Region*) const;
-	void DrawSubviews();
+	void DrawSubviews() const;
 
 protected:
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
