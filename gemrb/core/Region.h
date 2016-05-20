@@ -101,6 +101,8 @@ public:
 	bool operator!=(const Region& rgn);
 
 	bool PointInside(const Point &p) const;
+	bool RectInside(const Region& r) const;
+
 	bool IntersectsRegion(const Region& rgn) const;
 	Region Intersect(const Region& rgn) const;
 
