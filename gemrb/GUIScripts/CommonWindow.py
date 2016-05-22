@@ -182,14 +182,6 @@ def OpenContainerWindow ():
 		GUIWORLD.OldPortraitWindow = GUIClasses.GWindow( GemRB.GetVar ("PortraitWindow") )
 		GUICommonWindows.DisableAnimatedWindows ()
 
-	if GameCheck.IsIWD2():
-		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("MessageWindow", Window.ID)
-	else:
-		GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("ActionsWindow", Window.ID)
-
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
@@ -289,17 +281,11 @@ def CloseContainerWindow ():
 	ContainerWindow.Unload ()
 
 	if GameCheck.IsPST():
-		GemRB.SetVar ("PortraitWindow", GUIWORLD.OldPortraitWindow.ID)
 		GUICommonWindows.EnableAnimatedWindows ()
 		 #PST needs a reminder to redraw the  clock for some reason
 		if GUICommonWindows.ActionsWindow:
 			GUICommonWindows.ActionsWindow.Focus()
 		
-
-	GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
-	# iwd2 has no separate action window
-	if not GameCheck.IsIWD2():
-		GemRB.SetVar ("ActionsWindow", GUIWORLD.OldActionsWindow.ID)
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']

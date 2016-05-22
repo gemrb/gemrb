@@ -34,14 +34,14 @@ FormationWindow = None
 ReformPartyWindow = None
 
 def DialogStarted ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
-	SetGameGUIHidden(False)
+	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
 	MessageWindow.UpdateControlStatus()

@@ -351,15 +351,9 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
+void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
 {
 	switch((unsigned char) Button & GEM_MB_NORMAL) {
-		case GEM_MB_SCRLUP:
-			OnKeyPress(GEM_UP, 0);
-			return Control::OnMouseDown(p, Button, Mod);
-		case GEM_MB_SCRLDOWN:
-			OnKeyPress(GEM_DOWN, 0);
-			return Control::OnMouseDown(p, Button, Mod);
 		case GEM_MB_ACTION:
 			if (Button & GEM_MB_DOUBLECLICK) {
 				ClickHandle(Button);
@@ -410,11 +404,11 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 }
 
 /** Special Key Press */
-bool MapControl::OnKeyPress(unsigned char Key, unsigned short mod)
+bool MapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_LEFT:
 			ScrollX -= keyScrollSpd;
 			break;

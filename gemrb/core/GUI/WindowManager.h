@@ -50,7 +50,7 @@ private:
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
 	Region screen; // only a Region for convinience. we dont use x,y
-	Window* modalWin; // FIXME: is a single pointer sufficient? can't we open another window from within a modal window?
+	Window* modalWin;
 	Window* gameWin;
 	Window* hoverWin;
 
@@ -89,8 +89,8 @@ public:
 	bool OrderRelativeTo(Window* win, Window* win2, bool front);
 
 	bool FocusWindow(Window* win);
-	bool MakeModal(Window* win, ModalShadow Shadow = ShadowNone);
 	bool IsPresentingModalWindow() const;
+	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
 
 	/*
 	 Drawing is done in layers:

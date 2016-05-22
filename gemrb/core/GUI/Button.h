@@ -203,10 +203,6 @@ public:
 	bool SetHotKey(KeyboardKey key);
 	KeyboardKey HotKey() { return hotKey; }
 
-protected:
-	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
-
 private: // Private attributes
 	String Text;
 	bool hasText;
@@ -239,6 +235,9 @@ private: // Private attributes
 	bool HandleHotKey(const Event&);
 	bool EventHit (const Point&) const;
 	void CloseUpColor();
+
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
 };
 
 }

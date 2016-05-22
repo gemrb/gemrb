@@ -44,7 +44,7 @@ def DialogStarted ():
 	CommonWindow.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
-	SetGameGUIHidden(False)
+	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
 	MessageWindow.UpdateControlStatus()
@@ -93,7 +93,7 @@ def OpenContinueMessageWindow ():
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	hideflag = IsGameGUIHidden()
+	hideflag = CommonWindow.IsGameGUIHidden()
 
 	if ReformPartyWindow:
 		if ReformPartyWindow:
@@ -101,7 +101,7 @@ def OpenReformPartyWindow ():
 		ReformPartyWindow = None
 
 		GemRB.SetVar ("OtherWindow", -1)
-		SetGameGUIHidden(hideflag)
+		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
@@ -117,12 +117,12 @@ def OpenReformPartyWindow ():
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
 	
-	SetGameGUIHidden(hideflag)
+	CommonWindow.SetGameGUIHidden(hideflag)
 
 def DeathWindowPlot():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
-	SetGameGUIHidden(True)
+	CommonWindow.SetGameGUIHidden(True)
 	GemRB.SetVar("QuitGame1", 32848)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
@@ -130,7 +130,7 @@ def DeathWindowPlot():
 def DeathWindow():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
-	SetGameGUIHidden(True)
+	CommonWindow.SetGameGUIHidden(True)
 	GemRB.SetVar("QuitGame1", 16498)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return

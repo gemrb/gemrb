@@ -57,9 +57,10 @@ class WorldMapControl;
 #define IE_GUI_WORLDMAP_ON_PRESS   0x08000000
 
 class GEM_EXPORT WorldMapControl : public Control {
-protected:
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region&);
+
 public:
 	WorldMapControl(const Region& frame, const char *fontname, int direction);
 	~WorldMapControl(void);
@@ -92,7 +93,7 @@ public:
 	/** Mouse Wheel Event */
 	void OnMouseWheelScroll(short x, short y);
 
-	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 private:
 	//font for printing area names

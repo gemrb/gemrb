@@ -101,9 +101,9 @@ void Console::SetText(const String& string)
 	Buffer = string;
 }
 /** Key Press Event */
-bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool Console::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_BACKSP:
 			if (CurPos != 0) {
 				Buffer.erase(--CurPos, 1);
@@ -148,9 +148,9 @@ bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			}
 			break;
 		default:
-			if (Key >= 0x20) {
+			if (Key.character) {
 				if (Buffer.length() < max) {
-					Buffer.insert(CurPos++, 1, Key);
+					Buffer.insert(CurPos++, 1, Key.character);
 				}
 				return true;
 			}
@@ -190,9 +190,9 @@ void Console::HistoryAdd(bool force)
 	}
 }
 
-void Console::SetFocus(bool focus)
+void Console::SetFocus()
 {
-	Control::SetFocus(focus);
+	Control::SetFocus();
 	if (IsFocused()) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}

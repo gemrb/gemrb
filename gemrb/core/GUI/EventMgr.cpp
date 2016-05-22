@@ -139,6 +139,11 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 	e.mouse.button = btn;
 	e.mouse.x = pos.x;
 	e.mouse.y = pos.y;
+
+	Point delta = MousePos() - pos;
+	e.mouse.deltaX = delta.x;
+	e.mouse.deltaY = delta.y;
+
 	e.isScreen = true;
 	return e;
 }
@@ -150,13 +155,32 @@ Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
 	return e;
 }
 
+Event EventMgr::CreateMouseWheelEvent(const Point& vec, int mod)
+{
+	Event e = CreateMouseBtnEvent(MousePos(), 0, mod);
+	e.type = Event::MouseScroll;
+	e.mouse.deltaX = vec.x;
+	e.mouse.deltaY = vec.y;
+	return e;
+}
+
 Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 {
 	Event e = InitializeEvent(mod);
 	e.type = (down) ? Event::KeyDown : Event::KeyUp;
 	e.keyboard.keycode = key;
 	e.isScreen = false;
-	// TODO: need to translate the keycode for e.keyboard.character
+
+	KeyboardKey character = 0;
+	if (key >= 0x20) {
+		// FIXME: need to translate the keycode for e.keyboard.character
+		// probably need to lookup what encoding we are currently using
+		character = key;
+		if (mod & GEM_MOD_SHIFT) {
+			character = toupper(character);
+		}
+	}
+	e.keyboard.character = character;
 	return e;
 }
 

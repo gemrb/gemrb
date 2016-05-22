@@ -150,19 +150,31 @@ bool SDL12VideoDriver::ToggleGrabInput()
 	}
 }
 
-int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
+int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 {
-	switch (event.type) {
-		case SDL_ACTIVEEVENT:
-			if (event.active.state == SDL_APPMOUSEFOCUS && !event.active.gain) {
-				Event e = EvntManager->CreateKeyEvent(GEM_MOUSEOUT, true);
-				EvntManager->DispatchEvent(e);
-			}
-			break;
-		default:
-			return SDLVideoDriver::ProcessEvent(event);
+	if (event.type == SDL_ACTIVEEVENT) {
+		if (event.active.state == SDL_APPMOUSEFOCUS) {
+			// TODO: notify something (EventManager?) that we have lost focus
+			// focus = event.active.gain;
+		} else if (event.active.state == SDL_APPINPUTFOCUS) {
+			// TODO: notify something (EventManager?) that we have lost focus
+			// focus = event.active.gain;
+		}
+		return GEM_OK;
 	}
-	return GEM_OK;
+
+	bool isMouseEvent = (SDL_EVENTMASK(event.type) & (SDL_MOUSEBUTTONDOWNMASK | SDL_MOUSEBUTTONUPMASK));
+	int button = event.button.button;
+	if (isMouseEvent && (button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_WHEELDOWN)) {
+		// remap these to mousewheel events
+		int speed = core->GetMouseScrollSpeed();
+		speed *= (button == SDL_BUTTON_WHEELUP) ? 1 : -1;
+		EventMgr::CreateMouseWheelEvent(Point(0, speed));
+
+		return GEM_OK;
+	}
+
+	return SDLVideoDriver::ProcessEvent(event);
 }
 
 void SDL12VideoDriver::ShowSoftKeyboard()

@@ -53,17 +53,27 @@ View* ScrollView::RemoveSubview(const View* view)
 
 void ScrollView::Scroll(const Point& p)
 {
-	// FIXME: this needs to be limited. Need to implement the resize flags...
-	Point newOrigin = p + contentView.Origin();
-	contentView.SetFrameOrigin(newOrigin);
+	Point newP = p + contentView.Origin();
+
+	short maxx = frame.w - contentView.Dimensions().w;
+	short maxy = frame.h - contentView.Dimensions().h;
+	assert(maxx <= 0 && maxy <= 0);
+
+	// clamp values so we dont scroll beyond the content
+	newP.x = std::max<short>(newP.x, maxx);
+	newP.y = std::max<short>(newP.y, maxy);
+	newP.x = std::min<short>(newP.x, 0);
+	newP.y = std::min<short>(newP.y, 0);
+
+	contentView.SetFrameOrigin(newP);
 }
 
-bool ScrollView::OnKeyPress(unsigned char key, unsigned short /*mod*/)
+bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
 {
 	// TODO: get scroll amount from settings
 	int amount = 10;
 	Point scroll;
-	switch (key) {
+	switch (key.keycode) {
 		case GEM_UP:
 			scroll.y = amount;
 			break;

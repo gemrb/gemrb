@@ -46,10 +46,6 @@ def OpenSaveWindow ():
 	global SaveWindow, Games, ScrollBar
 	global num_rows, ctrl_offset, sav_version, strs
 
-	if GUICommon.CloseOtherWindow (OpenSaveWindow):
-		CloseSaveWindow ()
-		return
-
 	if GameCheck.IsIWD2():
 		num_rows = 5
 		ctrl_offset = (55, 60, 25, 0x10000005, 0x1000000a, 23, 22, 3, 0x10000004, 40, 7, 8, 2)
@@ -60,8 +56,6 @@ def OpenSaveWindow ():
 			strs = { 'cancel' : 4196, 'save' : 28645, 'delete' : 28640, 'empty' : 28647, 'overwrite' : 28644, 'yousure' : 28639 }
 
 	SaveWindow = Window = GemRB.LoadWindow (0, "GUISAVE")
-	Window.SetFrame ()
-	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
 	# Cancel button
 	CancelButton = Window.GetControl (ctrl_offset[6])
@@ -143,14 +137,14 @@ def ScrollBarPress():
 		if ActPos < len(Games):
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
-			Button.SetPicture ("")
+			Button.SetPicture (None)
 
 		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
-				Button.SetPicture ("")
+				Button.SetPicture (None)
 	return
 
 def QuickSavePressed():

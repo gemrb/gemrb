@@ -138,7 +138,8 @@ def CloseCustomizeWindow ():
 	if CustomizeWindow:
 		CustomizeWindow.Unload ()
 		CustomizeWindow = None
-		GUIREC.UpdateRecordsWindow ()
+		# FIXME: we need a generic way to refresh to top window
+		# GUIREC.UpdateRecordsWindow ()
 	return
 
 def OpenPortraitSelectWindow ():

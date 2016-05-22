@@ -46,9 +46,10 @@ class Palette;
  */
 
 class GEM_EXPORT Label : public Control {
-protected:
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+
 public: 
 	Label(const Region& frame, Font* font, const String& string);
 	~Label();

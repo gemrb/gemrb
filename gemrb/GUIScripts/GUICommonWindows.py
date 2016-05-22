@@ -341,10 +341,7 @@ def EmptyControls ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetPicture ("")
-		Button.SetText ("")
-		Button.SetActionIcon (globals(), -1)
+		Button.SetVisible (False)
 	return
 
 def SelectFormationPreset ():
@@ -1376,6 +1373,7 @@ def OpenTopWindow (id, pack, selectionHandler = None):
 def SetTopWindow (window, selectionHandler = None):
 	if window:
 		window.AddAlias("WIN_TOP")
+		window.SetFlags(WF_BORDERLESS)
 		window.Focus()
 		
 		if selectionHandler:
@@ -1390,6 +1388,10 @@ def SetTopWindow (window, selectionHandler = None):
 # Mode determines arrangment direction, horizontal being for party reform and potentially save/load
 def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
+	
+	if not Window:
+		return pairs
+
 	oldSlotCount = 6 + ExtraSlots
 
 	for i in range(min(oldSlotCount, MAX_PARTY_SIZE)): # the default chu/game limit or less
@@ -1840,18 +1842,11 @@ def MinimizePortraits(): #bg2
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
 def DisableAnimatedWindows (): #pst
-	global ActionsWindow, OptionsWindow
-	GemRB.SetVar ("PortraitWindow", -1)
-	ActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-	GemRB.SetVar ("ActionsWindow", -1)
-	OptionsWindow = GUIClasses.GWindow( GemRB.GetVar ("OptionsWindow") )
-	GemRB.SetVar ("OptionsWindow", -1)
+	# FIXME: this is just pausing the game. what is the actual intent here?
 	GemRB.GamePause (1,3)
 
 def EnableAnimatedWindows (): #pst
-	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
-	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
+	# FIXME: this is just unpausing the game. what is the actual intent here?
 	GemRB.GamePause (0,3)
 
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers

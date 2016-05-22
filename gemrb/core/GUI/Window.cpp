@@ -63,7 +63,7 @@ void Window::Close()
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
 {
-	return manager.MakeModal(this, shadow);
+	return manager.PresentModalWindow(this, shadow);
 }
 
 /** Add a Control in the Window */
@@ -286,6 +286,8 @@ void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button
 
 bool Window::DispatchEvent(const Event& event)
 {
+	View* target = NULL;
+
 	if (event.isScreen) {
 		Point screenPos = event.mouse.Pos();
 		if (!frame.PointInside(screenPos)) {
@@ -295,7 +297,7 @@ bool Window::DispatchEvent(const Event& event)
 			return true;
 		}
 
-		View* target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
 
 		// special event handling
 		switch (event.type) {
@@ -333,17 +335,20 @@ bool Window::DispatchEvent(const Event& event)
 		}
 		// absorb other screen events i guess
 		return true;
-	} else {
-		// key events
-		// FIXME: doesnt do key release! (look like it does double keypress)
+	} else { // key events
+		// hotkeys first
 		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
 		if (it != HotKeys.end()) {
 			return (*it->second)(event);
 		}
-		if (focusView) {
-			return focusView->OnKeyPress(event.keyboard.keycode, event.mod);
+
+		target = (focusView) ? focusView : this;
+
+		if (event.type == Event::KeyDown) {
+			return target->OnKeyPress(event.keyboard, event.mod);
+		} else {
+			return target->OnKeyRelease(event.keyboard, event.mod);
 		}
-		return this->OnKeyPress(event.keyboard.keycode, event.mod);
 	}
 	return false;
 }
@@ -365,9 +370,9 @@ void Window::OnMouseOver(const Point& p)
 	}
 }
 
-bool Window::OnKeyPress(unsigned char key, unsigned short mod)
+bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	switch (key) {
+	switch (key.keycode) {
 		case GEM_ESCAPE:
 			Close();
 			return true;

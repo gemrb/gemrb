@@ -153,15 +153,17 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
 
-	void DrawSelf(Region drawFrame, const Region& clip);
-
 protected:
 	void SubviewAdded(View* view, View* parent);
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
 	const Layout& LayoutForContent(const Content*) const;
+
+private:
 	void SizeChanged(const Size& oldSize);
+
+	void DrawSelf(Region drawFrame, const Region& clip);
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans

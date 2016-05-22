@@ -2243,8 +2243,8 @@ static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetBackground__doc,
-			 "GetRect(WindowIndex, ControlID)\n\n"
-			 "Creates and adds a new Label to a Window." );
+			 "SetBackground(GView, ResRef)\n\n"
+			 "Set the background image for the view to the image obtained by the ResRef." );
 
 static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 {
@@ -5983,9 +5983,6 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	}
 
 	game->SelectActor( actor, (bool) Select, Flags );
-	if (actor && (bool) Select && !(Flags&SELECT_QUIET)) {
-		actor->PlaySelectionSound();
-	}
 
 	Py_RETURN_NONE;
 }

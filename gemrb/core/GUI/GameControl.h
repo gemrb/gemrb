@@ -138,6 +138,7 @@ private:
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
 	Point GameMousePos() const;
+	void Scroll(const Point& amt);
 
 	//containers
 	int GetCursorOverContainer(Container *overContainer) const;
@@ -147,8 +148,8 @@ private:
 	void HandleDoor(Door *door, Actor *actor);
 	//infopoints
 	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
+	bool OnGlobalMouseMove(const Event&);
 
-protected:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	// GameControl always needs to redraw
@@ -167,12 +168,12 @@ public:
 
 	//Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Key Release Event */
-	bool OnKeyRelease(unsigned char Key, unsigned short Mod);
+	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
-	bool OnGlobalMouseMove(const Event&);
+
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */

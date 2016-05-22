@@ -589,7 +589,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 }
 
 /** Key Press Event */
-bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
+bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		TextArea* ta = core->GetMessageTextArea();
@@ -600,7 +600,8 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 
-	switch (Key) {
+	KeyboardKey keycode = Key.keycode;
+	switch (keycode) {
 		case GEM_UP:
 		case GEM_DOWN:
 		case GEM_LEFT:
@@ -608,12 +609,12 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			{
 				ieDword keyScrollSpd = 64;
 				core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-				if (Key >= GEM_UP) {
-					int v = (Key == GEM_UP) ? -1 : 1;
-					OnMouseWheelScroll(0, keyScrollSpd * v);
+				if (keycode >= GEM_UP) {
+					int v = (keycode == GEM_UP) ? -1 : 1;
+					Scroll( Point(0, keyScrollSpd * v) );
 				} else {
-					int v = (Key == GEM_LEFT) ? -1 : 1;
-					OnMouseWheelScroll(keyScrollSpd * v, 0);
+					int v = (keycode == GEM_LEFT) ? -1 : 1;
+					Scroll( Point(keyScrollSpd * v, 0) );
 				}
 			}
 			break;
@@ -630,10 +631,6 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 				if (!pc) continue;
 				pc->DisplayHeadHPRatio();
 			}
-			break;
-		case GEM_MOUSEOUT:
-			moveX = 0;
-			moveY = 0;
 			break;
 		case GEM_ESCAPE:
 			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
@@ -668,14 +665,15 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 		case '4':
 		case '5':
 		case '6':
-			SelectActor(Key-'0');
+			game->SelectPCSingle(keycode-'0');
+			SelectActor(keycode-'0');
 			break;
 		case '7': // 1 & 2
 		case '8': // 3 & 4
 		case '9': // 5 & 6
 			game->SelectActor( NULL, false, SELECT_NORMAL );
 			i = game->GetPartySize(false);
-			pc = 2*(Key - '6')-1;
+			pc = 2*(keycode - '6')-1;
 			if (pc >= i) {
 				SelectActor(i, true);
 				break;
@@ -684,8 +682,8 @@ bool GameControl::OnKeyPress(unsigned char Key, unsigned short mod)
 			SelectActor(pc+1, true);
 			break;
 		default:
-			if (!core->GetKeyMap()->ResolveKey(Key, 0)) {
-				core->GetGame()->SetHotKey(toupper(Key));
+			if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
+				core->GetGame()->SetHotKey(toupper(Key.character));
 				return Control::OnKeyPress(Key, mod);
 			}
 			break;
@@ -713,7 +711,6 @@ void GameControl::SelectActor(int whom, int type)
 	}
 	if (type==1) {
 		game->SelectActor( actor, true, SELECT_NORMAL );
-		actor->PlaySelectionSound();
 		return;
 	}
 
@@ -722,7 +719,6 @@ void GameControl::SelectActor(int whom, int type)
 		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
 			ScreenFlags |= SF_CENTERONACTOR;
 		}
-		actor->PlaySelectionSound();
 	}
 }
 
@@ -731,16 +727,12 @@ static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
 
 /** Key Release Event */
-bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
+bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
 		TextArea* ta = core->GetMessageTextArea();
 		assert(ta);
 		return ta->OnKeyRelease(Key, Mod);
-	}
-
-	if (Mod & GEM_MOD_SHIFT) {
-		Key = toupper(Key);
 	}
 
 	Point gameMousePos = GameMousePos();
@@ -754,7 +746,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		if (!area)
 			return false;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		switch (Key) {
+		switch (Key.keycode) {
 			case 'a': //switches through the avatar animations
 				if (lastActor) {
 					lastActor->GetNextAnimation();
@@ -1019,13 +1011,10 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
 				Log(MESSAGE, "GameControl", "Show searchmap %s", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
-			default:
-				Log(MESSAGE, "GameControl", "KeyRelease:%d - %d", Key, Mod );
-				break;
 		}
 		return true; //return from cheatkeys
 	}
-	switch (Key) {
+	switch (Key.keycode) {
 //FIXME: move these to guiscript
 		case 'h': //hard pause
 			core->SetPause(PAUSE_ON);
@@ -1196,7 +1185,7 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const Point& /*mp*/)
+void GameControl::OnMouseOver(const Point& mp)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -1240,6 +1229,13 @@ void GameControl::OnMouseOver(const Point& /*mp*/)
 
 	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
+
+	if (!isSelectionRect && EventMgr::ButtonState(GEM_MB_ACTION)) {
+		Point delta = (gameClickPoint - vpOrigin) - mp;
+		if (abs(delta.x) > 5 || abs(delta.y) > 5) {
+			isSelectionRect = true;
+		}
+	}
 
 	if (!isSelectionRect) {
 		if (overDoor) {
@@ -1789,12 +1785,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
-	case GEM_MB_SCRLUP:
-		OnKeyPress(GEM_UP, 0);
-		break;
-	case GEM_MB_SCRLDOWN:
-		OnKeyPress(GEM_DOWN, 0);
-		break;
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
@@ -1809,8 +1799,6 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 		// is there any harm in this being true in all games?
 		if (Mod&GEM_MOD_ALT) {
 			isFormationRotation = true;
-		} else {
-			isSelectionRect = true;
 		}
 		break;
 	}
@@ -1983,12 +1971,16 @@ formation_handling:
 
 void GameControl::OnMouseWheelScroll(short x, short y)
 {
+	Scroll(Point(x, y));
+}
+
+void GameControl::Scroll(const Point& amt)
+{
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
 	} else {
-		Point p(x, y);
-		MoveViewportTo( vpOrigin + p, false);
+		MoveViewportTo( vpOrigin + amt, false);
 	}
 }
 

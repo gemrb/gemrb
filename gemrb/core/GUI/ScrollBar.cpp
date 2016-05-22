@@ -205,14 +205,6 @@ void ScrollBar::OnMouseDown(const Point& p, unsigned short Button, unsigned shor
 	//removing the double click flag, use a more sophisticated method
 	//if it is needed later
 	Button&=GEM_MB_NORMAL;
-	if (Button==GEM_MB_SCRLUP) {
-		ScrollUp();
-		return;
-	}
-	if (Button==GEM_MB_SCRLDOWN) {
-		ScrollDown();
-		return;
-	}
 	if (p.y <= GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
 		ScrollUp();

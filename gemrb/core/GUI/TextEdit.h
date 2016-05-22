@@ -51,7 +51,7 @@ class Palette;
  */
 
 class GEM_EXPORT TextEdit : public Control {
-protected:
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 
@@ -92,11 +92,11 @@ private:
 	Palette* palette;
 public: //Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
+	void SetFocus();
 	/** OnChange Scripted Event Function Name */
 	ControlEventHandler EditOnChange;
 	ControlEventHandler EditOnDone;

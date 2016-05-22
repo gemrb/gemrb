@@ -112,10 +112,10 @@ void TextEdit::SetCursor(Sprite2D* cur)
 }
 
 /** Key Press Event */
-bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
 	MarkDirty();
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_HOME:
 			CurPos = 0;
 			break;
@@ -145,11 +145,11 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			RunEventHandler( EditOnDone );
 			break;
 		default:
-			if (Key >= 0x20) {
-				if (Value && ( (Key<'0') || (Key>'9') ) )
+			if (Key.character) {
+				if (Value && ( (Key.character<'0') || (Key.character>'9') ) )
 					return false;
 				if (Text.length() < max) {
-					Text.insert(CurPos++, 1, Key);
+					Text.insert(CurPos++, 1, Key.character);
 				}
 				break;
 			}
@@ -159,9 +159,9 @@ bool TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	return true;
 }
 
-void TextEdit::SetFocus(bool focus)
+void TextEdit::SetFocus()
 {
-	Control::SetFocus(focus);
+	Control::SetFocus();
 	if (IsFocused()) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}

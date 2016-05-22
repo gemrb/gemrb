@@ -73,11 +73,12 @@ public:
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
 		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
-		DestroyOnClose = 4,		// window will be hidden and sent to the back when closed instead of deleted
-		AlphaChannel = 8		// Create window with RGBA buffer suitable for creating non rectangular windows
+		DestroyOnClose = 4,		// window will be deleted on close rather then hidden and sent to the back
+		AlphaChannel = 8,		// Create window with RGBA buffer suitable for creating non rectangular windows
+		Modal = 16
 	};
 
-protected:
+private:
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
@@ -118,7 +119,7 @@ public:
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
 
-	bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 	void OnMouseOver(const Point&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);

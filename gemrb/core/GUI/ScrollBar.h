@@ -62,7 +62,7 @@ enum IE_SCROLLBAR_IMAGE_TYPE {
  * Widget displaying scrollbars for paging in long text windows
  */
 class GEM_EXPORT ScrollBar : public Control {
-protected:
+private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:

@@ -66,7 +66,7 @@ View::~View()
 
 void View::SetBackground(Sprite2D* bg)
 {
-	bg->acquire();
+	if (bg) bg->acquire();
 	if (background) background->release();
 	background = bg;
 
@@ -84,10 +84,17 @@ void View::SetCursor(Sprite2D* c)
 
 void View::MarkDirty()
 {
-	dirty = true;
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		(*it)->MarkDirty();
+	if (dirty == false) {
+		dirty = true;
+
+		if (superView && !IsOpaque()) {
+			superView->DirtyBGRect(frame);
+		}
+
+		std::list<View*>::iterator it;
+		for (it = subViews.begin(); it != subViews.end(); ++it) {
+			(*it)->MarkDirty();
+		}
 	}
 }
 
@@ -109,16 +116,23 @@ bool View::IsVisible() const
 	return !(flags&Invisible);
 }
 
-void View::DrawSubviews(bool drawBg)
+void View::DirtyBGRect(const Region& r)
 {
-	std::list<View*>::iterator it;
+	// if we are going to draw the entire BG, no need to compute and store this
+	if (NeedsDraw())
+		return;
+
+	// do we want to intersect this too?
+	//Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
+	Region clip(Point(), Dimensions());
+	dirtyBGRects.push_back( r.Intersect(clip) );
+}
+
+void View::DrawSubviews() const
+{
+	std::list<View*>::const_iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* v = *it;
-		if (drawBg && !v->IsOpaque() && v->NeedsDraw()) {
-			const Region& fromClip = v->Frame();
-			DrawBackground(&fromClip);
-		}
-		v->Draw();
+		(*it)->Draw();
 	}
 }
 
@@ -133,6 +147,9 @@ void View::DrawBackground(const Region* rgn) const
 			superView->DrawBackground(&frame);
 		}
 	}
+	// FIXME: technically its possible for the BG to be smaller than the view
+	// if this were to happen then the areas outside the BG woulndt get redrawn
+	// we should probably draw black in those areas...
 	if (background) {
 		Video* video = core->GetVideoDriver();
 		if (rgn) {
@@ -163,25 +180,22 @@ void View::Draw()
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
 
-	bool drawBg = (background != NULL) || !IsOpaque();
 	if (NeedsDraw()) {
 		if (background) {
 			DrawBackground(NULL);
-			drawBg = false;
 		}
 		DrawSelf(drawFrame, intersect);
 		dirty = false;
 	} else {
-		// these are from removed controls
 		Regions::iterator it = dirtyBGRects.begin();
 		while (it != dirtyBGRects.end()) {
-			DrawBackground(&(*it));
-			it = dirtyBGRects.erase(it);
+			DrawBackground(&(*it++));
 		}
 	}
 
+	dirtyBGRects.clear();
 	// always call draw on subviews because they can be dirty without us
-	DrawSubviews(drawBg);
+	DrawSubviews();
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }
@@ -257,7 +271,6 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
 	SubviewAdded(front, this);
-	// FIXME: we probably shouldnt allow things in front of the scrollbar
 }
 
 View* View::RemoveSubview(const View* view)
@@ -272,8 +285,7 @@ View* View::RemoveSubview(const View* view)
 
 	View* subView = *it;
 	subViews.erase(it);
-	if (background)
-		dirtyBGRects.push_back(subView->Frame());
+	DirtyBGRect(subView->Frame());
 
 	subView->superView = NULL;
 	SubviewRemoved(subView, this);
@@ -359,10 +371,14 @@ void View::SetFrameSize(const Size& s)
 
 bool View::SetFlags(unsigned int arg_flags, int opcode)
 {
-	MarkDirty();
 	unsigned int oldflags = flags;
 	bool ret = SetBits(flags, arg_flags, opcode);
-	FlagsChanged(oldflags);
+
+	if (flags != oldflags) {
+		FlagsChanged(oldflags);
+		MarkDirty();
+	}
+
 	return ret;
 }
 

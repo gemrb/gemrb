@@ -54,7 +54,7 @@ typedef std::pair<int, String> SelectOption;
  */
 
 class GEM_EXPORT TextArea : public Control {
-protected:
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void SizeChanged(const Size& /*oldSize*/);
@@ -160,7 +160,7 @@ private: //internal functions
 
 public: //Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
 	void OnMouseWheelScroll(short x, short y);
 	/** Mouse Over Event */
@@ -170,7 +170,7 @@ public: //Events
 	void OnMouseLeave(const Point&, const DragOp*);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
+	void SetFocus();
 
 	void ClearSelectOptions();
 };

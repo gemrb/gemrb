@@ -52,8 +52,6 @@ public:
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
-	/** Draws the Console on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
 
 private:
 	/** Text Editing Cursor Sprite */
@@ -74,15 +72,18 @@ private:
 
 public: //Events
 	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 
-	void SetFocus(bool focus);
+	void SetFocus();
 	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
 	bool HandleHotKey(const Event& e);
+
+	/** Draws the Console on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
 };
 
 }

@@ -150,6 +150,11 @@ bool Region::PointInside(const Point &p) const
 	return true;
 }
 
+bool Region::RectInside(const Region& r) const
+{
+	return Intersect(r) == r;
+}
+
 bool Region::IntersectsRegion(const Region& rgn) const
 {
 	if (x >= ( rgn.x + rgn.w )) {

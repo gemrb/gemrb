@@ -590,6 +590,7 @@ bool Game::SelectPCSingle(int index)
 	if (!actor)
 		return false;
 
+	core->SetEventFlag(EF_SELECTION);
 	SelectedSingle = index;
 	return true;
 }
@@ -674,6 +675,10 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		actor->Select( true );
 		assert(actor->IsSelected());
 		selected.push_back( actor );
+
+		if (!(flags&SELECT_QUIET)) {
+			actor->PlaySelectionSound();
+		}
 	} else {
 		if (!actor->IsSelected()) {
 			// already not selected
