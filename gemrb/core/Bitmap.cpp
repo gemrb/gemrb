@@ -17,6 +17,8 @@
  */
 
 #include "Bitmap.h"
+#include "System/Logging.h"
+#include "System/StringBuffer.h"
 
 namespace GemRB {
 
@@ -28,6 +30,19 @@ Bitmap::Bitmap(unsigned int w, unsigned int h)
 Bitmap::~Bitmap()
 {
 	delete[] data;
+}
+
+void Bitmap::dump() const
+{
+	StringBuffer lines;
+	lines.appendFormatted("height: %d, width: %d\n", height, width);
+	for (unsigned int y=0; y<height; y++) {
+		for (unsigned int x=0; x<width; x++) {
+			lines.appendFormatted("%d ", data[width*y+x]);
+		}
+		lines.append("\n");
+	}
+	Log(DEBUG, "Bitmap", lines);
 }
 
 }

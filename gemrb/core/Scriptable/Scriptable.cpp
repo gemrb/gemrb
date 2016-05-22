@@ -2314,10 +2314,10 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		short miny = std::max(HomeLocation.y - maxWalkDistance, 0);
 		short maxy = std::min(HomeLocation.y + maxWalkDistance, area->GetHeight() * 12);
 
-		if (x1 < minx) x1 = std::min(p.x, minx);
-		if (x2 > maxx) x2 = std::max(p.x, maxx);
-		if (y1 < miny) y1 = std::min(p.y, miny);
-		if (y2 > maxy) y2 = std::max(p.y, maxy);
+		if (p.x <= minx) x2 = p.x;
+		else if (p.x >= maxx) x1 = p.x;
+		if (p.y <= miny) y2 = p.y;
+		else if (p.y >= maxy) y1 = p.y;
 	}
 	p.x += core->Roll(1, x2 - x1 + 1, x1 - p.x - 1);
 	p.y += core->Roll(1, y2 - y1 + 1, y1 - p.y - 1);

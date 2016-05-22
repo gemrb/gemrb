@@ -546,7 +546,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		return;
 	}
 
-	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
+	if (Button & GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS])
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS] );
 		else

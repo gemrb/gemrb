@@ -890,6 +890,7 @@ public:
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
+	unsigned int GetAdjustedTime(unsigned int time) const;
 };
 }
 

@@ -20,7 +20,7 @@
 
 /**
  * @file Window.h
- * Declares Window, class serving as a container for Control/widget objects 
+ * Declares Window, class serving as a container for Control/widget objects
  * and displaying windows in GUI
  * @author The GemRB Project
  */
@@ -36,9 +36,25 @@ namespace GemRB {
 class Control;
 class Sprite2D;
 
+
+struct WindowKeyPress {
+	unsigned short key;
+	unsigned short mod;
+};
+
+class WindowKeyPressHandler : public Holder< Callback<WindowKeyPress&, bool> > {
+public:
+	WindowKeyPressHandler(Callback<WindowKeyPress&, bool>* ptr = NULL)
+	: Holder< Callback<WindowKeyPress&, bool> >(ptr) {}
+
+	bool operator()(WindowKeyPress &wkp) {
+		return (*ptr)(wkp);
+	}
+};
+
 /**
  * @class Window
- * Class serving as a container for Control/widget objects 
+ * Class serving as a container for Control/widget objects
  * and displaying windows in GUI.
  */
 
@@ -84,6 +100,8 @@ public:
 	void Focus();
 	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
 
+
+	void SetKeyPressEvent(WindowKeyPressHandler handler);
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	void SetPosition(WindowPosition);
@@ -110,6 +128,7 @@ public:
 private:
 	void RecreateBuffer();
 
+	WindowKeyPressHandler keyPressHandler;
 private: // Private attributes
 	/** Controls Array */
 	std::vector< Control*> Controls;

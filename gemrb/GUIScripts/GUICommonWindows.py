@@ -476,7 +476,7 @@ def SelectQuiverSlot():
 	return
 
 #this doubles up as an ammo selector (not yet used in pst)
-def SetupItemAbilities(pc, slot):
+def SetupItemAbilities(pc, slot, only):
 	slot_item = GemRB.GetSlotItem(pc, slot)
 	if not slot_item:
 		# CHIV: Could configure empty quickslots from the game screen ala spells heres
@@ -484,6 +484,7 @@ def SetupItemAbilities(pc, slot):
 
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
+	Locations = item["Locations"]
 
 	# clear buttons here
 	EmptyControls()
@@ -497,11 +498,11 @@ def SetupItemAbilities(pc, slot):
 	elif item["Type"] == CommonTables.ItemType.GetRowIndex ("SLING"):
 		ammotype = CommonTables.ItemType.GetRowIndex ("BULLET")
 
-	# FIXME: ammo does not preclude the item from also having abilities (eg. bg2:bow19)
 	ammoSlotCount = 0
 	if ammotype:
 		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
 		currentammo = GemRB.GetEquippedAmmunition (pc)
+		currentbutton = None
 		for i in range (12):
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 			if i < len(ammoslots):
@@ -513,16 +514,19 @@ def SetupItemAbilities(pc, slot):
 				if ammoitem['Type'] == ammotype and st["Type"] == SLOT_QUIVER:
 					ammoSlotCount += 1
 					Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
-					Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+					Button.SetSprites ("GUIBTBUT", 0, 0,1,3,5)
 					Button.SetItemIcon (ammoslot['ItemResRef'])
 					Button.SetText (str(ammoslot["Usages0"]))
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
 					Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectQuiverSlot)
 					Button.SetVarAssoc ("Slot", ammoslots[i])
-					Button.SetTooltip ("%s" % (GemRB.GetString (Tips[0])))
-					print currentammo, i+1, ammoslots[i]
-					if currentammo == ammoslots[i]: # this check is ok, but the results are unreliable?!
-						Button.SetState (IE_GUI_BUTTON_SELECTED)
+					if Tips[0] != -1:
+						Button.SetTooltip (Tips[0])
+					if currentammo == ammoslots[i]:
+						currentbutton = Button
+
+		if currentbutton:
+			currentbutton.SetState (IE_GUI_BUTTON_SELECTED)
 
 	# skip when there is only one choice
 	if ammoSlotCount == 1:
@@ -530,21 +534,53 @@ def SetupItemAbilities(pc, slot):
 
 	# reset back to the main action bar if there are no extra headers or quivers
 	reset = not ammoSlotCount
-	# check for item abilities and skip the first that crops up (main header - nothing special)
-	if (len(Tips) > 1):
+
+	# check for item abilities and skip irrelevant headers
+	# for quick weapons only show weapon headers
+	# for quick items only show the opposite
+	# for scrolls only show the first (second header is for learning)
+	# So depending on the context Staff of Magi will have none or 2
+	if item["Type"] == CommonTables.ItemType.GetRowIndex ("SCROLL"):
+		Tips = ()
+
+	# skip launchers - handled above
+	# gesen bow (bg2:bow19) has just a projectile header (not bow) for its special attack
+	# TODO: we should append it to the list of ammo as a usability improvement
+	if only == UAW_QWEAPONS and ammoSlotCount > 1:
+		Tips = ()
+
+	if len(Tips) > 0:
 		reset = False
-		rmax = min(len(Tips) - 1, 12-ammoSlotCount)
+		rmax = min(len(Tips), 12-ammoSlotCount)
+
+		# for mixed items, only show headers if there is more than one appropriate one
+		weaps = sum(map(lambda i: i==ITEM_LOC_WEAPON, Locations))
+		if only == UAW_QWEAPONS and weaps == 1 and ammoSlotCount <= 1:
+			rmax = 0
+			reset = True
+		abils = sum(map(lambda i: i==ITEM_LOC_EQUIPMENT, Locations))
+		if only == UAW_QITEMS and abils == 1:
+			rmax = 0
+			reset = True
+
 		for i in range (rmax):
+			if only == UAW_QITEMS:
+				if Locations[i] != ITEM_LOC_EQUIPMENT:
+					continue
+			elif only == UAW_QWEAPONS:
+				if Locations[i] != ITEM_LOC_WEAPON:
+					continue
 			Button = CurrentWindow.GetControl (i+ActionBarControlOffset+ammoSlotCount)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
-			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetText ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetTooltip ("F%d - %s"%(i,GemRB.GetString(Tips[i])) )
+			if Tips[i] != -1:
+				Button.SetTooltip ("F%d - %s" %(i, GemRB.GetString (Tips[i])))
 
 	if reset:
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
@@ -670,8 +706,8 @@ def UpdateActionsWindow ():
 			type = 1<<IE_SPELL_TYPE_INNATE
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
-	elif level == UAW_QWEAPONS: #quick weapon/item ability selection
-		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
+	elif level == UAW_QWEAPONS or level == UAW_QITEMS: #quick weapon or quick item ability selection
+		SetupItemAbilities(pc, GemRB.GetVar("Slot"), level)
 	elif level == UAW_ALLMAGE: #all known mage spells
 		GemRB.SetVar ("Type", -1)
 		Spellbook.SetupSpellIcons(CurrentWindow, -1, TopIndex, ActionBarControlOffset)
@@ -728,7 +764,12 @@ def ActionQWeaponPressed (which):
 
 # TODO: implement full weapon set switching instead
 def ActionQWeaponRightPressed (action):
-	ActionQItemRightPressed (action)
+	"""Selects the used ability of the quick weapon."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetVar ("Slot", action)
+	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	UpdateActionsWindow ()
+	return
 
 ###############################################
 # quick icons for spells, innates, songs, shapes
@@ -979,7 +1020,7 @@ def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
-	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
 	UpdateActionsWindow ()
 	return
 

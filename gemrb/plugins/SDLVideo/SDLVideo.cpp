@@ -41,7 +41,7 @@ using namespace GemRB;
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	lastTime = 0;
-	lastMouseDownTime = GetTickCount();
+	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -84,13 +84,16 @@ int SDLVideoDriver::PollEvents()
 
 		Point p = GetMousePos();
 		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
-		Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
-		EvntManager->DispatchEvent(e);
 
-		Control* ctl = EvntManager->GetFocusedControl();
-		if (ctl && ctl->ControlType == IE_GUI_BUTTON)
-			// these are repeat events so the control should stay pressed
-			((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
+		if (!core->ConsolePopped) {
+			Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
+			EvntManager->DispatchEvent(e);
+
+			Control* ctl = EvntManager->GetMouseFocusedControl();
+			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
+				// these are repeat events so the control should stay pressed
+				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
+		}
 	}
 	*/
 	return ret;
@@ -253,7 +256,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), SDL_BUTTON(event.button.button), false, GetModState(SDL_GetModState()));
 			e.mouse.buttonStates = SDL_GetMouseState(NULL, NULL);
 			EvntManager->DispatchEvent(e);
-			break;			
+			break;
 	}
 	return GEM_OK;
 }
@@ -445,7 +448,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 								   (spr->renderFlags&BLIT_MIRRORY), dst,
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
-		
+
 		SDL_UnlockSurface(currentBuf);
 	}
 }

@@ -963,7 +963,7 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 	data = (ieResRef *) calloc( count, sizeof(ieResRef) );
 	for (int i = 0; i < count; i++) {
 		strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
-		//* marks an empty resource
+		// * marks an empty resource
 		if (data[i][0]=='*') {
 			data[i][0]=0;
 		}
@@ -1450,7 +1450,7 @@ int Interface::Init(InterfaceConfig* config)
 		PathJoin( path, GamePath, GameDataPath, NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		// accomodating silly installers that create a data/Data/* structure
+		// accomodating silly installers that create a data/Data/.* structure
 		PathJoin( path, GamePath, GameDataPath, "Data", NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 

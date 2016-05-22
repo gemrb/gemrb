@@ -85,6 +85,7 @@ class GWindow(GView):
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
     'Focus': _GemRB.Window_Focus,
+    'SetKeyPressEvent': _GemRB.Window_SetKeyPressEvent,
     'ShowModal': _GemRB.Window_ShowModal,
   }
 
@@ -115,7 +116,7 @@ class GWindow(GView):
   	return self.CreateControl(control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator
-  def CreateButton(self, control, IE_GUI_BUTTON, *args):
+  def CreateButton(self, control, *args):
     return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
 
   @CreateControlDecorator

@@ -110,7 +110,7 @@ void Window::RecreateBuffer()
 
 	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::RGBA8888 : Video::DISPLAY;
 	backBuffer = video->CreateBuffer(frame, fmt);
-	
+
 	// the entire window must be invalidated, because the new buffer is blank
 	// TODO: we *could* optimize this to instead blit the old buffer to the new one
 	MarkDirty();
@@ -262,6 +262,10 @@ void Window::DispatchMouseDown(View* target, const Point& p, unsigned short butt
 	trackingView = target; // all views track the mouse within their bounds
 }
 
+void Window::SetKeyPressEvent(WindowKeyPressHandler handler) {
+	keyPressHandler = handler;
+}
+
 void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button, unsigned short mod)
 {
 	if (isDragging) {
@@ -373,7 +377,16 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			Close();
 			return true;
 	}
-	return ScrollView::OnKeyPress(key, mod);
+
+	if(keyPressHandler) {
+		WindowKeyPress wkp;
+		wkp.key = key;
+		wkp.mod = mod;
+
+		return keyPressHandler(wkp);
+	} else {
+		return ScrollView::OnKeyPress(key, mod);
+	}
 }
 
 void Window::OnMouseLeave(const Point&, const DragOp*)

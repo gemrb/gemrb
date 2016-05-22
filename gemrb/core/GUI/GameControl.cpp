@@ -1841,74 +1841,73 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 				actor = NULL;
 			}
 		}
-		switch (Button) {
-			case GEM_MB_ACTION:
-				if (!actor) {
-					Actor *pc = core->GetFirstSelectedPC(false);
-					if (!pc) {
-						//this could be a non-PC
-						pc = game->selected[0];
-					}
-					//add a check if you don't want some random monster handle doors and such
-					if (overDoor) {
-						HandleDoor(overDoor, pc);
-						break;
-					}
-					if (overContainer) {
-						HandleContainer(overContainer, pc);
-						break;
-					}
-					if (overInfoPoint) {
-						if (overInfoPoint->Type==ST_TRAVEL) {
-							ieDword exitID = overInfoPoint->GetGlobalID();
-							if (core->HasFeature(GF_TEAM_MOVEMENT)) {
-								// pst forces everyone to travel (eg. ar0201 outside_portal)
-								int i = game->GetPartySize(false);
-								while(i--) {
-									game->GetPC(i, false)->UseExit(exitID);
-								}
-							} else {
-								int i = game->selected.size();
-								while(i--) {
-									game->selected[i]->UseExit(exitID);
-								}
+
+		if (Button & GEM_MB_ACTION) {
+			if (!actor) {
+				Actor *pc = core->GetFirstSelectedPC(false);
+				if (!pc) {
+					//this could be a non-PC
+					pc = game->selected[0];
+				}
+				//add a check if you don't want some random monster handle doors and such
+				if (overDoor) {
+					HandleDoor(overDoor, pc);
+					goto formation_handling;
+				}
+				if (overContainer) {
+					HandleContainer(overContainer, pc);
+					goto formation_handling;
+				}
+				if (overInfoPoint) {
+					if (overInfoPoint->Type==ST_TRAVEL) {
+						ieDword exitID = overInfoPoint->GetGlobalID();
+						if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+							// pst forces everyone to travel (eg. ar0201 outside_portal)
+							int i = game->GetPartySize(false);
+							while(i--) {
+								game->GetPC(i, false)->UseExit(exitID);
+							}
+						} else {
+							int i = game->selected.size();
+							while(i--) {
+								game->selected[i]->UseExit(exitID);
 							}
 						}
-						if (HandleActiveRegion(overInfoPoint, pc, p)) {
-							core->SetEventFlag(EF_RESETTARGET);
-							break;
-						}
 					}
-					//just a single actor, no formation
-					if (game->selected.size()==1
-						&& target_mode == TARGET_MODE_CAST
-						&& spellCount
-						&& (target_types&GA_POINT)) {
-						//the player is using an item or spell on the ground
-						TryToCast(pc, p);
-						break;
+					if (HandleActiveRegion(overInfoPoint, pc, p)) {
+						core->SetEventFlag(EF_RESETTARGET);
+						goto formation_handling;
 					}
 				}
-				doMove = (!actor && target_mode == TARGET_MODE_NONE);
-				break;
-			case GEM_MB_MENU:
-				// we used to check mod in this case,
-				// but it doesnt make sense to initiate an action based on a mod on mouse down
-				// then cancel that action because the mod disapeared before mouse up
-				if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
-					SetTargetMode(TARGET_MODE_NONE);
+				//just a single actor, no formation
+				if (game->selected.size()==1
+					&& target_mode == TARGET_MODE_CAST
+					&& spellCount
+					&& (target_types&GA_POINT)) {
+					//the player is using an item or spell on the ground
+					TryToCast(pc, p);
+					goto formation_handling;
 				}
-				if (!actor) {
-					// reset the action bar
-					core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-					core->SetEventFlag(EF_ACTION);
-				}
-				break;
-			default:
-				return; // we dont handle any other buttons beyond this point
+			}
+			doMove = (!actor && target_mode == TARGET_MODE_NONE);
+		} else if (Button & GEM_MB_MENU) {
+			// we used to check mod in this case,
+			// but it doesnt make sense to initiate an action based on a mod on mouse down
+			// then cancel that action because the mod disapeared before mouse up
+			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+				SetTargetMode(TARGET_MODE_NONE);
+			}
+			if (!actor) {
+				// reset the action bar
+				core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+				core->SetEventFlag(EF_ACTION);
+			}
+		} else {
+			return; // we dont handle any other buttons beyond this point
 		}
 	}
 
+formation_handling:
 	if (doMove && game->selected.size() > 0) {
 		// construct a sorted party
 		// TODO: this is still ugly, help?

@@ -99,8 +99,11 @@ def RedrawSkills():
 def ScrollBarPress():
 	global TopIndex
 
-	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills()
+	newTopIndex = GemRB.GetVar("TopIndex")
+	if newTopIndex + ButtonCount <= len(StatLowerLimit):
+		TopIndex = newTopIndex
+		RedrawSkills()
+
 	return
 
 def OnLoad():
@@ -120,7 +123,7 @@ def OpenSkillsWindow(chargen, level=0):
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
 		Level = level
-		LevelDiff = 4 # start with 4x as many skills points initially
+		LevelDiff = 1
 		Class = GemRB.GetVar ("Class") - 1
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
 	else:
@@ -131,28 +134,27 @@ def OpenSkillsWindow(chargen, level=0):
 		ClassColumn = BaseClass
 
 	PointsLeft = SkillPtsTable.GetValue (0, ClassColumn)
-	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
-	PointsLeft += IntBonus
+
 	# at least 1 skillpoint / level advanced
 	if PointsLeft < 1:
 		PointsLeft = 1
 
-	# TODO:
-	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
-	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
-	### Example code for implementation of SKILRACE.2da
-	# TmpTable = GemRB.LoadTable('skilrace')
-	# PointsLeft += TmpTable.GetValue(str(Level), RaceName)
-	###
-	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+	# start with 4x as many skills points initially
+	if chargen:
+		PointsLeft *= 4
 
-	### Human skill bonus hack (ignores intelligence modifier):
-	if RaceName == 'HUMAN':
-		if Level < 2: PointsLeft += 2
-		else: PointsLeft += 1
-
-	# now multiply them for all the gained levels (or the cg special)
 	PointsLeft *= LevelDiff
+
+	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
+	RaceBonusTable = GemRB.LoadTable ("racskill")
+	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS") * LevelDiff
+	if Level < 2:
+		PointsLeft += RaceBonusTable.GetValue (RaceName, "LEVEL1_BONUS")
+
+	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
+	PointsLeft += IntBonus * LevelDiff
+
 	PointsLeft += GemRB.GetPlayerStat (pc, IE_UNUSED_SKILLPTS)
 
 	SkillTable = GemRB.LoadTable("skills")
@@ -164,6 +166,8 @@ def OpenSkillsWindow(chargen, level=0):
 	for i in range(RowCount):
 		# Racial/Class bonuses don't factor in char-gen or leveling, so can be safely ignored
 		StatID = TmpTable.GetValue (i, 0, GTV_STAT)
+		if CharGen:
+			GemRB.SetPlayerStat (pc, StatID, 0)
 		StatLowerLimit[i] = GemRB.GetPlayerStat (pc, StatID, 1)
 		GemRB.SetVar ("Skill "+str(i), StatLowerLimit[i])
 
@@ -303,8 +307,7 @@ def NextPress():
 	if CharGen:
 		GemRB.SetNextScript("Feats") #feats
 	else:
-		if PointsLeft > 0:
-			GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
+		GemRB.SetPlayerStat (MyChar, IE_UNUSED_SKILLPTS, PointsLeft)
 		# open up the next levelup window
 		import Feats
 		Feats.OpenFeatsWindow ()

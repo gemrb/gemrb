@@ -16,6 +16,9 @@ CHECK_FUNCTION_EXISTS("setenv" HAVE_SETENV)
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES("unistd.h" HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES("malloc.h" HAVE_MALLOC_H)
+IF(UNIX)
+	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+ENDIF()
 
 #Unneeded on windows
 IF(NOT WIN32)
