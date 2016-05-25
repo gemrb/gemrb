@@ -56,7 +56,7 @@ private:
 
 	EventMgr eventMgr;
 
-	Video* video;
+	Holder<Video> video;
 	VideoBuffer* cursorBuf;
 	VideoBuffer* winFrameBuf;
 

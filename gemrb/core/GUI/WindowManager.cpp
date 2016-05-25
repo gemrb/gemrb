@@ -87,6 +87,7 @@ WindowManager::~WindowManager()
 {
 	video->DestroyBuffer(cursorBuf);
 	video->DestroyBuffer(winFrameBuf);
+	video.release();
 	delete gameWin;
 }
 
