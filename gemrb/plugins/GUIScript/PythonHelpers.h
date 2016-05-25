@@ -35,7 +35,7 @@ namespace GemRB {
 template <typename R>
 R noop(PyObject*) {
 	return R();
-};
+}
 
 template <typename R, R (*F)(PyObject*)>
 bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
