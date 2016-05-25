@@ -36,6 +36,7 @@ class TooltipBackground {
 
 public:
 	TooltipBackground(Sprite2D* bg, Sprite2D* left = NULL, Sprite2D* right = NULL);
+	TooltipBackground(const TooltipBackground&);
 	~TooltipBackground();
 
 	void Draw(const Region& rgn) const;

@@ -2592,7 +2592,11 @@ void Interface::HandleGUIBehaviour(void)
 
 Tooltip Interface::CreateTooltip(const String& text)
 {
-	return Tooltip(text, GetFont( TooltipFontResRef ), TooltipBG);
+	TooltipBackground* bg = NULL;
+	if (TooltipBG) {
+		bg = new TooltipBackground(*TooltipBG);
+	}
+	return Tooltip(text, GetFont( TooltipFontResRef ), bg);
 }
 
 /** Get the Sound Manager */

@@ -37,6 +37,22 @@ TooltipBackground::TooltipBackground(Sprite2D* bg, Sprite2D* left, Sprite2D* rig
 	Reset();
 }
 
+TooltipBackground::TooltipBackground(const TooltipBackground& bg)
+{
+	animationSpeed = bg.animationSpeed;
+	margin = bg.margin;
+
+	background = bg.background;
+	leftbg = bg.leftbg;
+	rightbg = bg.rightbg;
+
+	if (background) background->acquire();
+	if (leftbg) leftbg->acquire();
+	if (rightbg) rightbg->acquire();
+
+	Reset();
+}
+
 TooltipBackground::~TooltipBackground()
 {
 	Sprite2D::FreeSprite(background);
