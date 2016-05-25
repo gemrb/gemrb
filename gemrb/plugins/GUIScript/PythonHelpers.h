@@ -32,12 +32,12 @@
 
 namespace GemRB {
 
-template <typename R=void>
-struct noop {
-	R operator()(PyObject*) const { return R(); }
+template <typename R>
+R noop(PyObject*) {
+	return R();
 };
 
-template <typename R=void, typename F=noop<R>()>
+template <typename R, R (*F)(PyObject*)>
 bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 {
 	if (!function) {
@@ -54,18 +54,17 @@ bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 	}
 
 	if (retVal) {
-		//*retVal = F(ret);
+		*retVal = F(ret);
 	}
 	Py_DECREF(ret);
 
 	return true;
 }
 
-template <>
-bool CallPython<void>(PyObject* function, PyObject* args, void* /*retVal*/)
+bool CallPython(PyObject* function, PyObject* args = NULL)
 {
 	int ret(-1);
-	return CallPython(function, args, &ret);
+	return CallPython<int, noop<int> >(function, args, &ret);
 }
 
 template <class P=void*, class R=void>

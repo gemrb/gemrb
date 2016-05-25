@@ -1373,7 +1373,6 @@
 		A27B86F1139F0A7D0002DC13 /* GAMImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAMImporter.h; sourceTree = "<group>"; };
 		A27B86F5139F0A7D0002DC13 /* GUIScript.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScript.cpp; sourceTree = "<group>"; };
 		A27B86F6139F0A7D0002DC13 /* GUIScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScript.h; sourceTree = "<group>"; };
-		A27B86F8139F0A7D0002DC13 /* PythonHelpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PythonHelpers.cpp; sourceTree = "<group>"; };
 		A27B86F9139F0A7D0002DC13 /* PythonHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PythonHelpers.h; sourceTree = "<group>"; };
 		A27B86FC139F0A7D0002DC13 /* IDSImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IDSImporter.cpp; sourceTree = "<group>"; };
 		A27B86FD139F0A7D0002DC13 /* IDSImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDSImporter.h; sourceTree = "<group>"; };
@@ -2662,7 +2661,6 @@
 			children = (
 				A27B86F5139F0A7D0002DC13 /* GUIScript.cpp */,
 				A27B86F6139F0A7D0002DC13 /* GUIScript.h */,
-				A27B86F8139F0A7D0002DC13 /* PythonHelpers.cpp */,
 				A27B86F9139F0A7D0002DC13 /* PythonHelpers.h */,
 			);
 			path = GUIScript;
