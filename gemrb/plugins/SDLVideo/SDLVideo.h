@@ -63,15 +63,8 @@ inline int GetModState(int modstate)
 	return value;
 }
 
-inline int GetModState()
-{
-	return GetModState(SDL_GetModState());
-}
-
 class SDLVideoDriver : public Video {
 protected:
-	unsigned long lastTime;
-	unsigned long lastMouseMoveTime;
 	unsigned long lastMouseDownTime;
 
 public:
@@ -84,7 +77,7 @@ public:
 	virtual bool ToggleGrabInput()=0;
 	virtual void ShowSoftKeyboard()=0;
 	virtual void HideSoftKeyboard()=0;
-
+	
 	void InitSpriteCover(SpriteCover* sc, int flags);
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);

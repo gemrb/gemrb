@@ -20,7 +20,6 @@
 
 #include "GUI/GUIScriptInterface.h"
 #include "PythonHelpers.h"
-#include "GUI/Window.h"
 
 using namespace GemRB;
 
@@ -74,19 +73,6 @@ void PythonObjectCallback<Control*, void>::operator() (Control* ctrl) const
 	Py_DECREF(func_code);
 	Py_DECREF(co_argcount);
 	CallPython(Function, args);
-}
-
-template <>
-bool PythonObjectCallback<WindowKeyPress&, bool>::operator() (WindowKeyPress &wkp) const {
-	if (!Function || !Py_IsInitialized()) {
-		return false;
-	}
-
-	PyObject *args = PyTuple_Pack(2, PyInt_FromLong(wkp.key),
-																	 PyInt_FromLong(wkp.mod));
-	long result = CallPythonWithReturn(Function, args);
-
-	return result > 0;
 }
 
 static PyObject* CallPythonObject(PyObject *Function, PyObject *args) {

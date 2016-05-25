@@ -41,7 +41,7 @@ using namespace GemRB;
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	lastTime = 0;
-	lastMouseDownTime = lastMouseMoveTime = GetTickCount();
+	lastMouseDownTime = GetTickCount();
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)

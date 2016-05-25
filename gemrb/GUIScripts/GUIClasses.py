@@ -85,7 +85,6 @@ class GWindow(GView):
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
     'Focus': _GemRB.Window_Focus,
-    'SetKeyPressEvent': _GemRB.Window_SetKeyPressEvent,
     'ShowModal': _GemRB.Window_ShowModal,
   }
 

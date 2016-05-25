@@ -393,7 +393,7 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 			return;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
-			if (Button & GEM_MB_ACTION) {
+			if (Button == GEM_MB_ACTION) {
 				ViewHandle(p.x, p.y);
 			}
 			ClickHandle(Button);

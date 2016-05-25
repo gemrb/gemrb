@@ -1638,43 +1638,6 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
-"===== Window_SetKeyPressEvent =====\n\
-\n\
-**Prototype:** _GemRB.Window_SetKeyPressEvent (callback)\n\
-\n\
-**Description:** Sets a callback function to handle key press event on window scopes. \n\
-\n\
-**Parameters:**\n\
-  * callback - Python function that accepts (key, mod) arguments and returns\n\
-	* 					 1 indicating succesful key press consumption or 0 otherwise. \n\
-\n\
-**Return value:** N/A\n\
-\n\
-**Example:**\n\
-    Window.SetKeyPressEvent (KeyPressCallback)\n\
-    return\n\
-\n\
-**See also:** [[guiscript:QuitGame]]\n\
-"
-);
-
-static PyObject* GemRB_Window_SetKeyPressEvent(PyObject *self, PyObject *args) {
-	PyObject *fn;
-
-	PARSE_ARGS2(args, "OO", &self, &fn);
-
-	WindowKeyPressHandler handler = NULL;
-	if(fn != Py_None && PyCallable_Check(fn)) {
-		handler = new PythonObjectCallback<WindowKeyPress&, bool>(fn);
-	}
-
-	Window *window = GetView<Window>(self);
-	window->SetKeyPressEvent(handler);
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
 "===== TextArea_Append =====\n\
 \n\
@@ -13233,7 +13196,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_Close, METH_VARARGS),
 	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
-	METHOD(Window_SetKeyPressEvent, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
