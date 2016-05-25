@@ -55,7 +55,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/IDSImporter/IDSImporter.cpp \
 		    main/gemrb/plugins/ZLibManager/ZLibManager.cpp \
 		    main/gemrb/plugins/DLGImporter/DLGImporter.cpp \
-		    main/gemrb/plugins/GUIScript/PythonHelpers.cpp \
 		    main/gemrb/plugins/GUIScript/GUIScript.cpp \
 		    main/gemrb/plugins/WAVReader/WAVReader.cpp \
 		    main/gemrb/plugins/STOImporter/STOImporter.cpp \

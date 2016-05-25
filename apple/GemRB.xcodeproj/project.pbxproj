@@ -82,7 +82,6 @@
 		A226F42813A11A2C009CE75E /* FXOpcodes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86EC139F0A7D0002DC13 /* FXOpcodes.cpp */; };
 		A226F42913A11A31009CE75E /* GAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F0139F0A7D0002DC13 /* GAMImporter.cpp */; };
 		A226F42A13A11A39009CE75E /* GUIScript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F5139F0A7D0002DC13 /* GUIScript.cpp */; };
-		A226F42B13A11A39009CE75E /* PythonHelpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F8139F0A7D0002DC13 /* PythonHelpers.cpp */; };
 		A226F42C13A11A3F009CE75E /* IDSImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86FC139F0A7D0002DC13 /* IDSImporter.cpp */; };
 		A226F42D13A11A44009CE75E /* INIImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8702139F0A7D0002DC13 /* INIImporter.cpp */; };
 		A226F42E13A11A49009CE75E /* ITMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8707139F0A7D0002DC13 /* ITMImporter.cpp */; };
@@ -166,7 +165,6 @@
 		A276B4D413A28B5000D41A8A /* FXOpcodes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86EC139F0A7D0002DC13 /* FXOpcodes.cpp */; };
 		A276B4D513A28B5600D41A8A /* GAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F0139F0A7D0002DC13 /* GAMImporter.cpp */; };
 		A276B4D613A28B5E00D41A8A /* GUIScript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F5139F0A7D0002DC13 /* GUIScript.cpp */; };
-		A276B4D713A28B5E00D41A8A /* PythonHelpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86F8139F0A7D0002DC13 /* PythonHelpers.cpp */; };
 		A276B4D813A28B6600D41A8A /* IDSImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86FC139F0A7D0002DC13 /* IDSImporter.cpp */; };
 		A276B4D913A28B6B00D41A8A /* INIImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8702139F0A7D0002DC13 /* INIImporter.cpp */; };
 		A276B4DA13A28B7200D41A8A /* ITMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8707139F0A7D0002DC13 /* ITMImporter.cpp */; };
@@ -4769,7 +4767,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A276B4D613A28B5E00D41A8A /* GUIScript.cpp in Sources */,
-				A276B4D713A28B5E00D41A8A /* PythonHelpers.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5173,7 +5170,6 @@
 				A226F42813A11A2C009CE75E /* FXOpcodes.cpp in Sources */,
 				A226F42913A11A31009CE75E /* GAMImporter.cpp in Sources */,
 				A226F42A13A11A39009CE75E /* GUIScript.cpp in Sources */,
-				A226F42B13A11A39009CE75E /* PythonHelpers.cpp in Sources */,
 				A226F42C13A11A3F009CE75E /* IDSImporter.cpp in Sources */,
 				A226F42D13A11A44009CE75E /* INIImporter.cpp in Sources */,
 				A226F42E13A11A49009CE75E /* ITMImporter.cpp in Sources */,

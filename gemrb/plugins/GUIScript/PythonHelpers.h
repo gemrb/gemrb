@@ -28,37 +28,108 @@
 #include "Interface.h"
 
 #include "GUI/Control.h"
+#include "GUI/GUIScriptInterface.h"
 
 namespace GemRB {
 
-bool CallPython(PyObject*, PyObject* args = NULL);
-long CallPythonWithReturn(PyObject*, PyObject* args = NULL);
+template <typename R=void>
+struct noop {
+	R operator()(PyObject*) const { return R(); }
+};
 
-// could use an adapter pattern to reduce code duplication
-// for the 2 callback types
+template <typename R=void, typename F=noop<R>()>
+bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
+{
+	if (!function) {
+		return false;
+	}
 
-struct PythonCallback : public VoidCallback {
-public:
-	PythonCallback(PyObject *Function);
-	~PythonCallback();
-	void operator()() const;
-private:
+	PyObject *ret = PyObject_CallObject(function, args);
+	Py_XDECREF( args );
+	if (ret == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+		return false;
+	}
+
+	if (retVal) {
+		//*retVal = F(ret);
+	}
+	Py_DECREF(ret);
+
+	return true;
+}
+
+template <>
+bool CallPython<void>(PyObject* function, PyObject* args, void* /*retVal*/)
+{
+	int ret(-1);
+	return CallPython(function, args, &ret);
+}
+
+template <class P=void*, class R=void>
+struct PythonCallbackBase : public Callback<P, R> {
+	PythonCallbackBase(PyObject* fn)
+	: Function(fn)
+	{
+		assert(Py_IsInitialized());
+		if (Function && PyCallable_Check(Function)) {
+			Py_INCREF(Function);
+		} else {
+			Function = NULL;
+		}
+	}
+
+	virtual ~PythonCallbackBase() {
+		Py_XDECREF(Function);
+	}
+
+	virtual void operator()() const {
+		CallPython(Function);
+	}
+
+protected:
 	PyObject *Function;
 };
 
-template <class T, class R>
-struct PythonObjectCallback : public Callback<T, R> {
-public:
-	PythonObjectCallback(PyObject*);
-	~PythonObjectCallback();
+template <class P, class R>
+struct PythonComplexCallback : public PythonCallbackBase<P, R> {
+	PythonComplexCallback(PyObject* fn) : PythonCallbackBase<P, R>(fn) {}
 
-	void operator()() const;
-	R operator()(T) const;
-private:
-	PyObject *Function;
+	 virtual R operator()(P arg) const {
+		// meant to be overridden by specializations
+		return PythonCallbackBase<P, R>::operator()(arg);
+	 }
 };
 
-typedef PythonObjectCallback<Control*, void> PythonControlCallback;
+typedef PythonCallbackBase<void, void> PythonCallback;
+typedef PythonComplexCallback<Control*, void> PythonControlCallback;
+
+template <>
+void PythonControlCallback::operator() (Control* ctrl) const
+{
+	if (!ctrl || !Function) {
+		return;
+	}
+
+	PyObject *args = NULL;
+	PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
+	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
+	const long count = PyInt_AsLong(co_argcount);
+	if (count) {
+		assert(count <= 2);
+		PyObject* obj = gs->ConstructObjectForScriptable(ctrl->GetScriptingRef());
+		if (count > 1) {
+			args = Py_BuildValue("(Ni)", obj, ctrl->GetValue());
+		} else {
+			args = Py_BuildValue("(N)", obj);
+		}
+	}
+	Py_DECREF(func_code);
+	Py_DECREF(co_argcount);
+	CallPython(Function, args);
+}
 
 template <typename T>
 class CObject : public Holder<T> {
@@ -98,7 +169,7 @@ public:
 		Py_XDECREF(id);
 	}
 	CObject(const Holder<T>& ptr)
-		: Holder<T>(ptr)
+	: Holder<T>(ptr)
 	{
 	}
 	// This is here because of lookup order issues.
@@ -128,37 +199,7 @@ PyObject* MakePyList(const Container &source)
 	}
 	return list;
 }
-
-template <class T, class R>
-void PythonObjectCallback<T, R>::operator() () const
-{
-	if (!Function || !Py_IsInitialized()) {
-		return;
-	}
-
-	CallPython(Function);
-}
-
-
-template <class T, class R>
-PythonObjectCallback<T, R>::PythonObjectCallback(PyObject *Function)
-	: Function(Function)
-{
-	if (Function && PyCallable_Check(Function)) {
-		Py_INCREF(Function);
-	} else {
-		Function = NULL;
-	}
-}
-
-template <class T, class R>
-PythonObjectCallback<T, R>::~PythonObjectCallback()
-{
-	if (Py_IsInitialized()) {
-		Py_XDECREF(Function);
-	}
-}
-
+	
 }
 
 #endif
