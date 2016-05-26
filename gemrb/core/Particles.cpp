@@ -37,21 +37,22 @@ static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
 
 static void TranslateColor(const char *value, Color &color)
 {
-	int r = 0;
-	int g = 0;
-	int b = 0;
 	//if not RGB then try to interpret it as a dword
 	if (strnicmp(value,"RGB(",4)) {
-		r = strtol(value,NULL,0);
-		color.r = r&0xff;
-		color.g = (r>>8)&0xff;
-		color.b = (r>>16)&0xff;
-		color.a = (r>>24)&0xff;
+		long c = strtol(value,NULL,0);
+		color.r = c&0xff;
+		color.g = (c>>8)&0xff;
+		color.b = (c>>16)&0xff;
+		color.a = (c>>24)&0xff;
+	} else {
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
+		color.r=r;
+		color.g=g;
+		color.b=b;
 	}
-	sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
-	color.r=r;
-	color.g=g;
-	color.b=b;
 }
 
 static void InitSparks()
