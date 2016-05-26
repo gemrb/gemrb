@@ -33,6 +33,10 @@ addons:
     - libvorbis-dev
     - openssh-client
     - python-dev
+    
+    # not needed for building
+    - gdb
+
   ssh_known_hosts: frs.sourceforge.net
 
 before_install:
@@ -44,6 +48,10 @@ before_install:
 before_script:
   - cmake --version # too old for MODULE, but only on the linux host
   - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
+  
+after_failure:
+  - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
+  - if [$TRAVIS_OS_NAME != osx && [ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 script:
   - mkdir build && cd build
