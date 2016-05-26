@@ -200,11 +200,10 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 }
 
 /** Mouse Button Down */
-void ScrollBar::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void ScrollBar::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	//removing the double click flag, use a more sophisticated method
 	//if it is needed later
-	Button&=GEM_MB_NORMAL;
 	if (p.y <= GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
 		ScrollUp();

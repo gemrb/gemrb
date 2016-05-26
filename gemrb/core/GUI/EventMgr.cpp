@@ -129,6 +129,8 @@ inline Event InitializeEvent(int mod)
 
 Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)
 {
+	assert(btn);
+
 	Event e = InitializeEvent(mod);
 	if (down) {
 		e.type = Event::MouseDown;

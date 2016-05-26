@@ -157,8 +157,9 @@ void TextArea::UpdateTextLayout()
 		textContainer->SetFrame(tf);
 	}
 	if (selectOptions) {
-		tf.y = textContainer->Dimensions().h;
-		selectOptions->SetFrame(tf);
+		// FIXME: implement this
+		//tf.y = textContainer->Dimensions().h;
+		//selectOptions->SetFrame(tf);
 	}
 }
 
