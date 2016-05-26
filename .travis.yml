@@ -50,7 +50,7 @@ before_script:
   - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
   
 after_failure:
-  - COREFILE=$(find ./gemrb -maxdepth 1 -name "core*" | head -n 1) # find core file
+  - COREFILE=$(find . -maxdepth 2 -name "core*" | head -n 1) # find core file
   - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 script:
