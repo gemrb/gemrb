@@ -79,8 +79,9 @@ WindowManager::WindowManager(Video* vid)
 
 WindowManager::~WindowManager()
 {
-	DestroyWindows(windows);
+	// Deleting the regular windows will add them to closedWindows. don't double delete.
 	DestroyWindows(closedWindows);
+	DestroyWindows(windows);
 
 	video->DestroyBuffer(cursorBuf);
 	video->DestroyBuffer(winFrameBuf);
