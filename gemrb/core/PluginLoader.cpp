@@ -149,11 +149,9 @@ void LoadPlugins(const char* pluginpath)
 {
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
 
-	char path[_MAX_PATH];
-	strcpy( path, pluginpath );
-	DirectoryIterator dirIt(path);
+	DirectoryIterator dirIt(pluginpath);
 	if (!dirIt) {
-		Log(ERROR, "PluginMgr", "Plugin Directory (%s) does not exist!", path);
+		Log(ERROR, "PluginMgr", "Plugin Directory (%s) does not exist!", pluginpath);
 		return;
 	}
 
@@ -168,6 +166,8 @@ void LoadPlugins(const char* pluginpath)
 	typedef std::set<std::string> PathSet;
 	PathSet delayedPlugins;
 	dirIt.SetFlags(DirectoryIterator::Files);
+
+	char path[_MAX_PATH];
 	do {
 		const char *name = dirIt.GetName();
 		ieDword flags = 0;
@@ -175,20 +175,19 @@ void LoadPlugins(const char* pluginpath)
 
 		// module is sent to the back
 		if (flags == PLF_DELAY) {
-			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", path);
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", name);
 			delayedPlugins.insert( name );
 			continue;
 		}
 
 		// module is skipped
 		if (flags == PLF_SKIP) {
-			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", path);
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", name);
 			continue;
 		}
 
 		PathJoin( path, pluginpath, name, NULL );
 		LoadPlugin(path);
-
 	} while (++dirIt);
 
 	PathSet::iterator it = delayedPlugins.begin();
