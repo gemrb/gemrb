@@ -91,7 +91,7 @@ public:
 	virtual ~MoviePlayer(void);
 
 	Size Dimensions() { return movieSize; }
-	void Play();
+	void Play(Window* win);
 	virtual void Stop();
 
 	void SetSubtitles(const SubtitleSet& subs);

@@ -2808,8 +2808,10 @@ int Interface::PlayMovie(const char* resref)
 	// clear whatever is currently on screen
 	winmgr->DrawWindows(); // FIXME: relying on sideeffect of this for clearing screen
 	video->DrawRect(Region(0,0,Width,Height), ColorBlack);
+	Window* win = winmgr->MakeWindow(Region(Point(), mp->Dimensions()));
 
-	mp->Play();
+	mp->Play(win);
+	win->Close();
 	if (sound_override) {
 		sound_override->Stop();
 		sound_override.release();

@@ -43,15 +43,15 @@ void MoviePlayer::SetSubtitles(const SubtitleSet& subs)
 	subtitles = &subs;
 }
 
-void MoviePlayer::Play()
+void MoviePlayer::Play(Window* win)
 {
+	assert(win);
 	Video* video = core->GetVideoDriver();
 
-	Region frame(Point(), movieSize);
-	Window* win = WindowManager::DefaultWindowManager().MakeWindow(frame);
 	win->SetFlags(Window::Borderless, OP_OR);
 	win->SetPosition(Window::PosCentered);
-	win->AddSubviewInFrontOfView(new MoviePlayerControls(*this));
+	MoviePlayerControls* mpc = new MoviePlayerControls(*this);
+	win->AddSubviewInFrontOfView(mpc);
 
 	VideoBuffer* vb = video->CreateBuffer(win->Frame(), movieFormat);
 
@@ -64,7 +64,7 @@ void MoviePlayer::Play()
 		video->PushDrawingBuffer(vb);
 		if (DecodeFrame(*vb)) {
 			if (subtitles) {
-				subtitles->getFont()->Print(frame, subtitles->SubtitleAtFrame(framePos), subtitles->getPalette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+				subtitles->getFont()->Print(win->Frame(), subtitles->SubtitleAtFrame(framePos), subtitles->getPalette(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
 			}
 			// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
 			// However, since we completely block the normal game loop we will bypass WindowManager drawing
@@ -77,7 +77,7 @@ void MoviePlayer::Play()
 		// TODO: pass movie fps (and remove the cap from within the movie decoders)
 	} while (isPlaying && (video->SwapBuffers(0) == GEM_OK));
 
-	win->Close();
+	delete win->View::RemoveSubview(mpc);
 	video->DestroyBuffer(vb);
 }
 
