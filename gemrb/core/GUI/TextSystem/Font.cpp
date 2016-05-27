@@ -113,8 +113,7 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 {
 	if (!pal) {
-		pal = font->GetPalette();
-		pal->release();
+		pal = font->GetPalette().get();
 	}
 
 	// ensure that we have a sprite!
@@ -665,10 +664,8 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	return Size(w, (LineHeight * lines));
 }
 
-Palette* Font::GetPalette() const
+Holder<Palette> Font::GetPalette() const
 {
-	assert(palette);
-	palette->acquire();
 	return palette;
 }
 

@@ -35,7 +35,7 @@ namespace GemRB {
 TextArea::TextArea(const Region& frame, Font* text)
 	: Control(frame), ftext(text), palettes()
 {
-	palette = text->GetPalette();
+	palette = text->GetPalette().get();
 	finit = ftext;
 	Init();
 }
@@ -63,7 +63,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
 		SetPalette(&initcolor, PALETTE_INITIALS);
 	} else {
-		palettes[PALETTE_INITIALS] = finit->GetPalette();
+		palettes[PALETTE_INITIALS] = finit->GetPalette().get();
 	}
 
 	parser.ResetAttributes(text, palette, finit, palettes[PALETTE_INITIALS]);

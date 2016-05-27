@@ -85,9 +85,7 @@ void Palette::Brighten()
 
 Palette* Palette::Copy()
 {
-	Palette* pal = new Palette(col, alpha);
-	release();
-	return pal;
+	return new Palette(col, alpha);
 }
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)

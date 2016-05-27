@@ -63,9 +63,7 @@ public:
 		const Font* getFont() const { return font; }
 		Palette* getPalette() const {
 			if (!palette) {
-				class Palette* pal = font->GetPalette();
-				pal->release();
-				return pal;
+				return font->GetPalette().get();
 			}
 			return palette;
 		}

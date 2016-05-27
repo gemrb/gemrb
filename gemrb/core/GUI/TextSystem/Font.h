@@ -179,7 +179,7 @@ public:
 	//allow reading but not setting glyphs
 	virtual const Glyph& GetGlyph(ieWord chr) const;
 
-	Palette* GetPalette() const;
+	Holder<Palette> GetPalette() const;
 	void SetPalette(Palette* pal);
 
 	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};

@@ -541,7 +541,7 @@ TextContainer::TextContainer(const Region& frame, Font* fnt, Palette* pal)
 	: ContentContainer(frame), font(fnt)
 {
 	if (!pal) {
-		palette = font->GetPalette();
+		palette = font->GetPalette().get();
 	} else {
 		pal->acquire();
 		palette = pal;
@@ -568,7 +568,7 @@ void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
 void TextContainer::SetPalette(Palette* pal)
 {
 	if (!pal) {
-		pal = font->GetPalette();
+		pal = font->GetPalette().get();
 	} else {
 		pal->acquire();
 	}

@@ -115,9 +115,7 @@ private:
 			if (palette) {
 				return palette;
 			}
-			Palette* pal = TextFont->GetPalette();
-			pal->release();
-			return pal;
+			return TextFont->GetPalette().get();
 		}
 	};
 
