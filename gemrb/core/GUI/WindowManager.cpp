@@ -442,6 +442,9 @@ void WindowManager::DrawWindows() const
 	for (; rit != windows.rend(); ++rit) {
 		Window* win = *rit;
 
+		if (!win->IsVisible())
+			continue;
+
 		if (win == modalWin)
 			continue; // will draw this later
 
