@@ -274,6 +274,8 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 Interface::~Interface(void)
 {
+	delete winmgr;
+
 	DragItem(NULL,NULL);
 	delete AreaAliasTable;
 
@@ -1397,7 +1399,7 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	winmgr = &WindowManager::DefaultWindowManager();
+	winmgr = new WindowManager(video.get());
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);

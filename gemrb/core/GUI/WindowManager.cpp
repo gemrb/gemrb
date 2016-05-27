@@ -37,12 +37,6 @@ unsigned long WindowManager::TooltipTime = 0;
 Holder<Sprite2D> WindowManager::CursorMouseUp;
 Holder<Sprite2D> WindowManager::CursorMouseDown;
 
-WindowManager& WindowManager::DefaultWindowManager()
-{
-	static WindowManager wm(core->GetVideoDriver());
-	return wm;
-}
-
 void WindowManager::SetTooltipDelay(int delay)
 {
 	ToolTipDelay = delay;

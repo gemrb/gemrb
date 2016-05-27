@@ -107,7 +107,6 @@ public:
 	Sprite2D* GetScreenshot(Window* win) const;
 	Window* GetGameWindow() const { return gameWin; }
 
-	static WindowManager& DefaultWindowManager();
 	static void SetTooltipDelay(int);
 };
 
