@@ -61,7 +61,7 @@ bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 	return true;
 }
 
-bool CallPython(PyObject* function, PyObject* args = NULL)
+inline bool CallPython(PyObject* function, PyObject* args = NULL)
 {
 	int ret(-1);
 	return CallPython<int, noop<int> >(function, args, &ret);
