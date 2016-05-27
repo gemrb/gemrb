@@ -239,10 +239,11 @@ void WindowManager::CloseWindow(Window* win)
 	bool isFront = it == windows.begin();
 	it = windows.erase(it);
 	if (it != windows.end()) {
+		Window* newFrontWin = *it;
 		// the window beneath this must get redrawn
-		(*it)->MarkDirty();
-		if (isFront)
-			(*it)->Focus();
+		newFrontWin->MarkDirty();
+		if (isFront && newFrontWin->IsVisible())
+			newFrontWin->Focus();
 	}
 	closedWindows.push_back(win);
 
