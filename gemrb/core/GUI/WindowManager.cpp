@@ -149,7 +149,7 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
-	TooltipTime = GetTickCount(); // reset tooltip time
+	win->SetVisible(true);
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
@@ -162,20 +162,23 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
 	// FIXME: this should probably account for modal windows
 	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
-	if (windows.size() < 2 || win == win2) return false;
 
-	WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
-	if (it == windows.end() || it2 == windows.end()) return false;
+	// if we only have one window, or the 2 windows are the same it is an automatic success
+	if (windows.size() > 1 && win != win2) {
+		WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
+		if (it == windows.end() || it2 == windows.end()) return false;
+
+		windows.erase(it);
+		// it2 may have become invalid after erase
+		it2 = WIN_IT(win2);
+		windows.insert((front) ? it2 : ++it2, win);
+	}
 
 	Window* frontWin = windows.front();
 	if ((front && frontWin == win2) || win == frontWin) {
 		TooltipTime = GetTickCount();
 	}
 
-	windows.erase(it);
-	// it2 may have become invalid after erase
-	it2 = WIN_IT(win2);
-	windows.insert((front) ? it2 : ++it2, win);
 	return true;
 }
 
