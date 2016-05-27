@@ -131,7 +131,9 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 {
 	assert(btn);
 
-	Event e = InitializeEvent(mod);
+	Event e = CreateMouseMotionEvent(pos, mod);
+
+
 	if (down) {
 		e.type = Event::MouseDown;
 		e.mouse.buttonStates |= 1 << (btn-1);
@@ -139,6 +141,15 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 		e.type = Event::MouseUp;
 	}
 	e.mouse.button = btn;
+
+	return e;
+}
+
+Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
+{
+	Event e = InitializeEvent(mod);
+	e.type = Event::MouseMove;
+
 	e.mouse.x = pos.x;
 	e.mouse.y = pos.y;
 
@@ -147,19 +158,13 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 	e.mouse.deltaY = delta.y;
 
 	e.isScreen = true;
-	return e;
-}
 
-Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
-{
-	Event e = CreateMouseBtnEvent(pos, 0, mod);
-	e.type = Event::MouseMove;
 	return e;
 }
 
 Event EventMgr::CreateMouseWheelEvent(const Point& vec, int mod)
 {
-	Event e = CreateMouseBtnEvent(MousePos(), 0, mod);
+	Event e = CreateMouseMotionEvent(MousePos(), mod);
 	e.type = Event::MouseScroll;
 	e.mouse.deltaX = vec.x;
 	e.mouse.deltaY = vec.y;
