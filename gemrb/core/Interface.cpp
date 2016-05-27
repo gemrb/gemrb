@@ -129,6 +129,7 @@ Interface::Interface()
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
+	winmgr = NULL;
 	gamectrl = NULL;
 	projserv = NULL;
 	VideoDriverName = "sdl";
