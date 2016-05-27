@@ -38,9 +38,10 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 	palCol.g = g;
 	palCol.b = b;
 	Palette* pal = new Palette(palCol, ColorBlack);
-	PalCache.insert(std::make_pair(colorString, pal));
+	// stifle clang analyzer about pal (falsely) being deleted by release()
+	Palette* ret = PalCache.insert(std::make_pair(colorString, pal)).first->second.get();
 	pal->release();
-	return pal;
+	return ret;
 }
 
 GemMarkupParser::GemMarkupParser()
