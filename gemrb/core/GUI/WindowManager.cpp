@@ -79,10 +79,22 @@ WindowManager::WindowManager(Video* vid)
 
 WindowManager::~WindowManager()
 {
+	DestroyWindows(windows);
+	DestroyWindows(closedWindows);
+
 	video->DestroyBuffer(cursorBuf);
 	video->DestroyBuffer(winFrameBuf);
 	video.release();
 	delete gameWin;
+}
+
+void WindowManager::DestroyWindows(WindowList& list)
+{
+	WindowList::iterator it = list.begin();
+	for (; it != list.end(); ++it) {
+		Window* win = *it;
+		delete win;
+	}
 }
 
 bool WindowManager::IsOpenWindow(Window* win) const

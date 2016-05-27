@@ -77,6 +77,8 @@ private:
 	bool DispatchEvent(const Event&);
 	bool HotKey(const Event&);
 
+	inline void DestroyWindows(WindowList& list);
+
 public:
 	WindowManager(Video* vid);
 	~WindowManager();
