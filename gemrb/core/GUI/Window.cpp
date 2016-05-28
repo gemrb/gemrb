@@ -28,7 +28,6 @@ namespace GemRB {
 Window::Window(const Region& frame, WindowManager& mgr)
 	: ScrollView(frame), manager(mgr)
 {
-	isDragging = false;
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
@@ -212,8 +211,8 @@ bool Window::TrySetFocus(View* target)
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
-	if (isDragging) {
-		OnMouseOver(me);
+	if ((flags&Draggable) && (me.buttonStates&GEM_MB_ACTION)) {
+		OnMouseDrag(me);
 		return;
 	}
 
@@ -243,7 +242,8 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 	}
 	if (trackingView) {
 		// tracking will eat this event
-		trackingView->OnMouseOver(me);
+		assert(me.buttonStates);
+		trackingView->OnMouseDrag(me);
 	} else if (target) {
 		target->OnMouseOver(me);
 	}
@@ -264,10 +264,6 @@ void Window::DispatchMouseDown(View* target, const Point& p, unsigned short butt
 
 void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button, unsigned short mod)
 {
-	if (isDragging) {
-		isDragging = false;
-		return;
-	}
 	if (trackingView) {
 		Point subP = trackingView->ConvertPointFromScreen(p);
 		trackingView->OnMouseUp(subP, button, mod);
@@ -356,13 +352,13 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	return true;
 }
 
-void Window::OnMouseOver(const MouseEvent& me)
+void Window::OnMouseDrag(const MouseEvent& me)
 {
-	if (isDragging) {
-		Point delta = dragOrigin - me.Pos();
-		Point newOrigin = frame.Origin() - delta;
+	if (flags&Draggable) {
+		Point newOrigin = frame.Origin() - me.Delta();
 		SetFrameOrigin(newOrigin);
-		dragOrigin = dragOrigin + delta;
+	} else {
+		ScrollView::OnMouseDrag(me);
 	}
 }
 
@@ -374,28 +370,6 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			return true;
 	}
 	return ScrollView::OnKeyPress(key, mod);
-}
-
-void Window::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
-{
-	// not sure this can happen... maybe in a low fps scenario?
-	isDragging = false;
-}
-
-void Window::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
-{
-	switch (button) {
-		case GEM_MB_ACTION:
-			if (flags&Draggable) {
-				isDragging = true;
-				dragOrigin = p;
-				break;
-			}
-			// fallthrough
-		default:
-			View::OnMouseDown(p, button, mod);
-			break;
-	}
 }
 
 }

@@ -103,9 +103,7 @@ public:
 
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
-	void OnMouseOver(const MouseEvent&);
-	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void OnMouseLeave(const MouseEvent&, const DragOp*);
+	void OnMouseDrag(const MouseEvent&);
 
 private:
 	void RecreateBuffer();
@@ -120,8 +118,7 @@ private: // Private attributes
 	View* hoverView; // view the mouse was last over
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
-	Point dragOrigin;
-	bool isDragging;
+
 	VideoBuffer* backBuffer;
 	WindowManager& manager;
 };
