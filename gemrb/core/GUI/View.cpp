@@ -389,10 +389,10 @@ void View::SetTooltip(const String& string)
 }
 
 // View simpler either forwards events to concrete subclasses, or to its attached scrollbar
-void View::OnMouseOver(const Point& p)
+void View::OnMouseOver(const MouseEvent& me)
 {
 	if (superView) {
-		superView->OnMouseOver(ConvertPointToSuper(p));
+		superView->OnMouseOver(me);
 	}
 }
 

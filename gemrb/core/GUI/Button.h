@@ -174,11 +174,11 @@ public:
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
 	/** Mouse Enter */
-	void OnMouseEnter(const Point&, const DragOp*);
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
 	/** Mouse Leave */
-	void OnMouseLeave(const Point&, const DragOp*);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	/** Mouse Over */
-	void OnMouseOver(const Point&);
+	void OnMouseOver(const MouseEvent&);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */

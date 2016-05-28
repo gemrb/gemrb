@@ -556,7 +556,7 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 	}
 }
 
-void Button::OnMouseOver(const Point& p)
+void Button::OnMouseOver(const MouseEvent& me)
 {
 	if ( RunEventHandler( eventHandlers[IE_GUI_MOUSE_OVER_BUTTON] )<0) {
 		//event handler destructed this object
@@ -570,7 +570,7 @@ void Button::OnMouseOver(const Point& p)
 	if ((flags & IE_GUI_BUTTON_DRAGGABLE) &&
 			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 
-		Point sp = ConvertPointToScreen(p) - drag_start;
+		Point sp = me.Pos() - drag_start;
 		core->GetDictionary()->SetAt( "DragX", sp.x );
 		core->GetDictionary()->SetAt( "DragY", sp.y );
 		// We use absolute screen position here, so drag_start
@@ -581,7 +581,7 @@ void Button::OnMouseOver(const Point& p)
 	}
 }
 
-void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
+void Button::OnMouseEnter(const MouseEvent& /*me*/, const DragOp* /*dop*/)
 {
 	if (IsFocused() && EventMgr::ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
@@ -599,7 +599,7 @@ void Button::OnMouseEnter(const Point&, const DragOp* /*dop*/)
 	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
 }
 
-void Button::OnMouseLeave(const Point&, const DragOp* /*dop*/)
+void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_PRESSED && !(flags & IE_GUI_BUTTON_RADIOBUTTON)) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );

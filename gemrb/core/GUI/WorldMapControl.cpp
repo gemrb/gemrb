@@ -206,10 +206,11 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 }
 
 /** Mouse Over Event */
-void WorldMapControl::OnMouseOver(const Point& p)
+void WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	lastCursor = IE_CURSOR_GRAB;
+	Point p = ConvertPointFromScreen(me.Pos());
 
 	if (MouseIsDown) {
 		AdjustScrolling(LastMousePos.x - p.x, LastMousePos.y - p.y);
@@ -270,7 +271,7 @@ void WorldMapControl::OnMouseOver(const Point& p)
 }
 
 /** Mouse Leave Event */
-void WorldMapControl::OnMouseLeave(const Point& /*p*/, const DragOp*)
+void WorldMapControl::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 {
 	Area = NULL;
 }

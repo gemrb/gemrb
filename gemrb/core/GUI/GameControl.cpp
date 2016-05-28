@@ -1185,7 +1185,7 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const Point& mp)
+void GameControl::OnMouseOver(const MouseEvent& me)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -1231,7 +1231,7 @@ void GameControl::OnMouseOver(const Point& mp)
 	overContainer = area->TMap->GetContainer( gameMousePos );
 
 	if (!isSelectionRect && EventMgr::ButtonState(GEM_MB_ACTION)) {
-		Point delta = (gameClickPoint - vpOrigin) - mp;
+		Point delta = (gameClickPoint - vpOrigin) - me.Pos();
 		if (abs(delta.x) > 5 || abs(delta.y) > 5) {
 			isSelectionRect = true;
 		}

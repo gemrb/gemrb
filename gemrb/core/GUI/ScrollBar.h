@@ -109,7 +109,7 @@ public: // Public Events
 	/** Mouse Button Up */
 	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
 	/** Mouse Over Event */
-	void OnMouseOver(const Point&);
+	void OnMouseOver(const MouseEvent&);
 	/** Mouse Wheel Scroll Event */
 	void OnMouseWheelScroll(const Point& delta);
 	/** Set handler for specified event */

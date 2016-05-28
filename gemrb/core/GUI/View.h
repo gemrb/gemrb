@@ -143,9 +143,9 @@ public:
 
 	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual void OnMouseEnter(const Point&, const DragOp*) {};
-	virtual void OnMouseLeave(const Point&, const DragOp*) {};
-	virtual void OnMouseOver(const Point&);
+	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {};
+	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {};
+	virtual void OnMouseOver(const MouseEvent& /*me*/);
 	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(const Point&);

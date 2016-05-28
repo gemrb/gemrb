@@ -210,10 +210,10 @@ bool Window::TrySetFocus(View* target)
 	return true;
 }
 
-void Window::DispatchMouseOver(View* target, const Point& p)
+void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
 	if (isDragging) {
-		OnMouseOver(ConvertPointFromScreen(p));
+		OnMouseOver(me);
 		return;
 	}
 
@@ -221,13 +221,13 @@ void Window::DispatchMouseOver(View* target, const Point& p)
 	if (target) {
 		if (target != hoverView) {
 			if (hoverView) {
-				hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(p), drag.get());
+				hoverView->OnMouseLeave(me, drag.get());
 				left = true;
 			}
-			target->OnMouseEnter(target->ConvertPointFromScreen(p), drag.get());
+			target->OnMouseEnter(me, drag.get());
 		}
 	} else if (hoverView) {
-		hoverView->OnMouseLeave(hoverView->ConvertPointFromScreen(p), drag.get());
+		hoverView->OnMouseLeave(me, drag.get());
 		left = true;
 	}
 	if (left) {
@@ -243,9 +243,9 @@ void Window::DispatchMouseOver(View* target, const Point& p)
 	}
 	if (trackingView) {
 		// tracking will eat this event
-		trackingView->OnMouseOver(trackingView->ConvertPointFromScreen(p));
+		trackingView->OnMouseOver(me);
 	} else if (target) {
-		target->OnMouseOver(target->ConvertPointFromScreen(p));
+		target->OnMouseOver(me);
 	}
 	hoverView = target;
 }
@@ -307,7 +307,7 @@ bool Window::DispatchEvent(const Event& event)
 				return true;
 			case Event::MouseMove:
 				// allows NULL and disabled targets
-				DispatchMouseOver(target, screenPos);
+				DispatchMouseMotion(target, event.mouse);
 				return true;
 			default:
 				if (target == NULL) {
@@ -356,10 +356,10 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	return true;
 }
 
-void Window::OnMouseOver(const Point& p)
+void Window::OnMouseOver(const MouseEvent& me)
 {
 	if (isDragging) {
-		Point delta = dragOrigin - p;
+		Point delta = dragOrigin - me.Pos();
 		Point newOrigin = frame.Origin() - delta;
 		SetFrameOrigin(newOrigin);
 		dragOrigin = dragOrigin + delta;
@@ -376,7 +376,7 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	return ScrollView::OnKeyPress(key, mod);
 }
 
-void Window::OnMouseLeave(const Point&, const DragOp*)
+void Window::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 {
 	// not sure this can happen... maybe in a low fps scenario?
 	isDragging = false;

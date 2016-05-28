@@ -172,7 +172,7 @@ public:
 	/** Key Release Event */
 	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mouse Over Event */
-	void OnMouseOver(const Point&);
+	void OnMouseOver(const MouseEvent&);
 
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);

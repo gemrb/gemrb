@@ -81,9 +81,9 @@ public:
 	bool SetEvent(int eventType, ControlEventHandler handler);
 
 	/** Mouse Over Event */
-	void OnMouseOver(const Point& p);
+	void OnMouseOver(const MouseEvent& /*me*/);
 	/** Mouse Leave Event */
-	void OnMouseLeave(const Point& p, const DragOp*);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	/** Mouse Button Down */
 	void OnMouseDown(const Point& p, unsigned short Button,
 					 unsigned short Mod);

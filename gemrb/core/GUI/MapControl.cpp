@@ -248,8 +248,9 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 }
 
 /** Mouse Over Event */
-void MapControl::OnMouseOver(const Point& p)
+void MapControl::OnMouseOver(const MouseEvent& me)
 {
+	Point p = ConvertPointFromScreen(me.Pos());
 	if (mouseIsDown) {
 		MarkDirty();
 		ScrollX -= p.x - lastMouseX;

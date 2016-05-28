@@ -462,11 +462,12 @@ void TextArea::OnMouseWheelScroll(const Point& delta)
 }
 
 /** Mouse Over Event */
-void TextArea::OnMouseOver(const Point& p)
+void TextArea::OnMouseOver(const MouseEvent& me)
 {
 	if (!selectOptions)
 		return;
 
+	Point p = ConvertPointFromScreen(me.Pos());
 	TextContainer* span = NULL;
 	if (selectOptions) {
 		Point subp = p;
@@ -505,7 +506,7 @@ void TextArea::OnMouseUp(const Point& p, unsigned short Button, unsigned short M
 	}
 }
 
-void TextArea::OnMouseLeave(const Point&, const DragOp*)
+void TextArea::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 {
 	ClearHover();
 }

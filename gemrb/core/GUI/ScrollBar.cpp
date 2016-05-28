@@ -246,10 +246,10 @@ void ScrollBar::OnMouseWheelScroll(const Point& delta)
 }
 
 /** Mouse Over Event */
-void ScrollBar::OnMouseOver(const Point& p)
+void ScrollBar::OnMouseOver(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
-		SetPosForY(p.y - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
+		SetPosForY(me.y - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
 	}
 }
 

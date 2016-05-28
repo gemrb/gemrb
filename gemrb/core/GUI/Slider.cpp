@@ -217,14 +217,14 @@ void Slider::OnMouseUp(const Point& /*p*/, unsigned short /*Button*/, unsigned s
 }
 
 /** Mouse Over Event */
-void Slider::OnMouseOver(const Point& p)
+void Slider::OnMouseOver(const MouseEvent& me)
 {
 	MarkDirty();
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
 		int mx = KnobXPos;
-		int xmx = p.x - mx;
-		if (p.x < mx) {
+		int xmx = me.x - mx;
+		if (me.x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
 				RunEventHandler( SliderOnChange );

@@ -72,7 +72,7 @@ private:
 
 	bool TrySetFocus(View*);
 
-	inline void DispatchMouseOver(View*, const Point&);
+	inline void DispatchMouseMotion(View*, const MouseEvent&);
 	inline void DispatchMouseDown(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	inline void DispatchMouseUp(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 
@@ -103,9 +103,9 @@ public:
 
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
-	void OnMouseOver(const Point&);
+	void OnMouseOver(const MouseEvent&);
 	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	void OnMouseLeave(const Point&, const DragOp*);
+	void OnMouseLeave(const MouseEvent&, const DragOp*);
 
 private:
 	void RecreateBuffer();
