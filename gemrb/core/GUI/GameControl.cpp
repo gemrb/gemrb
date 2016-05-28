@@ -1185,13 +1185,9 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const MouseEvent& me)
+void GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return;
-	}
-
-	if (isFormationRotation) {
 		return;
 	}
 
@@ -1230,138 +1226,159 @@ void GameControl::OnMouseOver(const MouseEvent& me)
 	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
 
-	if (!isSelectionRect && EventMgr::ButtonState(GEM_MB_ACTION)) {
-		Point delta = (gameClickPoint - vpOrigin) - me.Pos();
-		if (abs(delta.x) > 5 || abs(delta.y) > 5) {
-			isSelectionRect = true;
+	if (overDoor) {
+		nextCursor = GetCursorOverDoor(overDoor);
+	}
+
+	if (overContainer) {
+		nextCursor = GetCursorOverContainer(overContainer);
+	}
+	// recheck in case the positioon was different, resulting in a new isVisible check
+	// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
+	if (nextCursor == IE_CURSOR_INVALID) {
+		//Owner->Cursor = IE_CURSOR_BLOCKED;
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
+
+	// let us target party members even if they are invisible
+	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+	if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
+		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
+			lastActor = NULL;
 		}
 	}
 
-	if (!isSelectionRect) {
-		if (overDoor) {
-			nextCursor = GetCursorOverDoor(overDoor);
+	if ((target_types & GA_NO_SELF) && lastActor ) {
+		if (lastActor == core->GetFirstSelectedActor()) {
+			lastActor=NULL;
 		}
+	}
 
-		if (overContainer) {
-			nextCursor = GetCursorOverContainer(overContainer);
-		}
-		// recheck in case the positioon was different, resulting in a new isVisible check
-		// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
-		if (nextCursor == IE_CURSOR_INVALID) {
-			//Owner->Cursor = IE_CURSOR_BLOCKED;
-			lastCursor = IE_CURSOR_BLOCKED;
-			return;
-		}
-
-		// let us target party members even if they are invisible
-		lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-		if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
-			if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
-				lastActor = NULL;
-			}
-		}
-
-		if ((target_types & GA_NO_SELF) && lastActor ) {
-			if (lastActor == core->GetFirstSelectedActor()) {
-				lastActor=NULL;
-			}
-		}
-
-		if (lastActor) {
-			lastActorID = lastActor->GetGlobalID();
-			lastActor->SetOver( true );
-			ieDword type = lastActor->GetStat(IE_EA);
-			if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
-				nextCursor = IE_CURSOR_ATTACK;
-			} else if ( type > EA_CHARMED ) {
-				nextCursor = IE_CURSOR_TALK;
-				//don't let the pc to talk to frozen/stoned creatures
-				ieDword state = lastActor->GetStat(IE_STATE_ID);
-				if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
-					nextCursor |= IE_CURSOR_GRAY;
-				}
-			} else {
-				nextCursor = IE_CURSOR_NORMAL;
+	if (lastActor) {
+		lastActorID = lastActor->GetGlobalID();
+		lastActor->SetOver( true );
+		ieDword type = lastActor->GetStat(IE_EA);
+		if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
+			nextCursor = IE_CURSOR_ATTACK;
+		} else if ( type > EA_CHARMED ) {
+			nextCursor = IE_CURSOR_TALK;
+			//don't let the pc to talk to frozen/stoned creatures
+			ieDword state = lastActor->GetStat(IE_STATE_ID);
+			if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
+				nextCursor |= IE_CURSOR_GRAY;
 			}
 		} else {
-			lastActorID = 0;
+			nextCursor = IE_CURSOR_NORMAL;
 		}
+	} else {
+		lastActorID = 0;
+	}
 
-		if (target_mode == TARGET_MODE_TALK) {
-			nextCursor = IE_CURSOR_TALK;
-			if (!lastActor) {
-				nextCursor |= IE_CURSOR_GRAY;
-			} else {
-				//don't let the pc to talk to frozen/stoned creatures
-				ieDword state = lastActor->GetStat(IE_STATE_ID);
-				if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
-					nextCursor |= IE_CURSOR_GRAY;
-				}
-			}
-		} else if (target_mode == TARGET_MODE_ATTACK) {
-			nextCursor = IE_CURSOR_ATTACK;
-			if (overDoor) {
-				if (!overDoor->Visible()) {
-					nextCursor |= IE_CURSOR_GRAY;
-				}
-			} else if (!lastActor && !overContainer) {
+	if (target_mode == TARGET_MODE_TALK) {
+		nextCursor = IE_CURSOR_TALK;
+		if (!lastActor) {
+			nextCursor |= IE_CURSOR_GRAY;
+		} else {
+			//don't let the pc to talk to frozen/stoned creatures
+			ieDword state = lastActor->GetStat(IE_STATE_ID);
+			if (state & (STATE_CANTMOVE^STATE_SLEEP)) {
 				nextCursor |= IE_CURSOR_GRAY;
 			}
-		} else if (target_mode == TARGET_MODE_CAST) {
-			nextCursor = IE_CURSOR_CAST;
-			//point is always valid
-			if (!(target_types & GA_POINT)) {
-				if(!lastActor) {
-					nextCursor |= IE_CURSOR_GRAY;
-				}
+		}
+	} else if (target_mode == TARGET_MODE_ATTACK) {
+		nextCursor = IE_CURSOR_ATTACK;
+		if (overDoor) {
+			if (!overDoor->Visible()) {
+				nextCursor |= IE_CURSOR_GRAY;
 			}
-		} else if (target_mode == TARGET_MODE_DEFEND) {
-			nextCursor = IE_CURSOR_DEFEND;
+		} else if (!lastActor && !overContainer) {
+			nextCursor |= IE_CURSOR_GRAY;
+		}
+	} else if (target_mode == TARGET_MODE_CAST) {
+		nextCursor = IE_CURSOR_CAST;
+		//point is always valid
+		if (!(target_types & GA_POINT)) {
 			if(!lastActor) {
 				nextCursor |= IE_CURSOR_GRAY;
 			}
-		} else if (target_mode == TARGET_MODE_PICK) {
-			if (lastActor) {
-				nextCursor = IE_CURSOR_PICK;
-			} else {
-				if (!overContainer && !overDoor && !overInfoPoint) {
-					nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-				}
-			}
-			goto end_function;
 		}
-
+	} else if (target_mode == TARGET_MODE_DEFEND) {
+		nextCursor = IE_CURSOR_DEFEND;
+		if(!lastActor) {
+			nextCursor |= IE_CURSOR_GRAY;
+		}
+	} else if (target_mode == TARGET_MODE_PICK) {
 		if (lastActor) {
-			switch (lastActor->GetStat(IE_EA)) {
-				case EA_EVILCUTOFF:
-				case EA_GOODCUTOFF:
-					break;
-
-				case EA_PC:
-				case EA_FAMILIAR:
-				case EA_ALLY:
-				case EA_CONTROLLED:
-				case EA_CHARMED:
-				case EA_EVILBUTGREEN:
-					if (target_types & GA_NO_ENEMY)
-						nextCursor^=1;
-					break;
-
-				case EA_ENEMY:
-				case EA_GOODBUTRED:
-					if (target_types & GA_NO_ALLY)
-						nextCursor^=1;
-					break;
-				default:
-					if (!(target_types & GA_NO_NEUTRAL))
-						nextCursor^=1;
-					break;
+			nextCursor = IE_CURSOR_PICK;
+		} else {
+			if (!overContainer && !overDoor && !overInfoPoint) {
+				nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 			}
+		}
+		goto end_function;
+	}
+
+	if (lastActor) {
+		switch (lastActor->GetStat(IE_EA)) {
+			case EA_EVILCUTOFF:
+			case EA_GOODCUTOFF:
+				break;
+
+			case EA_PC:
+			case EA_FAMILIAR:
+			case EA_ALLY:
+			case EA_CONTROLLED:
+			case EA_CHARMED:
+			case EA_EVILBUTGREEN:
+				if (target_types & GA_NO_ENEMY)
+					nextCursor^=1;
+				break;
+
+			case EA_ENEMY:
+			case EA_GOODBUTRED:
+				if (target_types & GA_NO_ALLY)
+					nextCursor^=1;
+				break;
+			default:
+				if (!(target_types & GA_NO_NEUTRAL))
+					nextCursor^=1;
+				break;
 		}
 	}
 end_function:
 	if (lastCursor != nextCursor) {
 		lastCursor = (unsigned char) nextCursor;
+	}
+}
+
+void GameControl::OnMouseDrag(const MouseEvent& me)
+{
+	if (target_mode != TARGET_MODE_NONE) {
+		// we are in a target mode; nothing here applies
+		return;
+	}
+
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		// PST uses alt + left click for formation rotation
+		// is there any harm in this being true in all games?
+		if (EventMgr::ModState(GEM_MOD_ALT)) {
+			isFormationRotation = true;
+		} else {
+			isSelectionRect = true;
+		}
+	}
+
+	if (me.ButtonState(GEM_MB_MENU)) {
+		isFormationRotation = true;
+	}
+
+	if (core->GetGame()->selected.size() <= 1) {
+		isFormationRotation = false;
+	}
+
+	if (isFormationRotation) {
+		lastCursor = IE_CURSOR_USE;
 	}
 }
 
@@ -1783,191 +1800,173 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 
 	gameClickPoint = p + vpOrigin;
 
-	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
-		} else {
-			isFormationRotation = true;
 		}
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		isDoubleClick = true;
-	case GEM_MB_ACTION:
-		// PST uses alt + left click for formation rotation
-		// is there any harm in this being true in all games?
-		if (Mod&GEM_MOD_ALT) {
-			isFormationRotation = true;
-		}
 		break;
-	}
-	if (core->GetGame()->selected.size() <= 1
-		|| target_mode != TARGET_MODE_NONE) {
-		isFormationRotation = false;
-	}
-	if (isFormationRotation) {
-		lastCursor = IE_CURSOR_USE;
 	}
 }
 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
 {
-	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return;
-	}
-	//heh, i found no better place
-	core->CloseCurrentContainer();
+	if (!(ScreenFlags & SF_DISABLEMOUSE)) {
+		//heh, i found no better place
+		core->CloseCurrentContainer();
 
-	Point p = mp + vpOrigin;
-	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea( );
+		Point p = mp + vpOrigin;
+		Game* game = core->GetGame();
+		Map* area = game->GetCurrentArea( );
 
-	unsigned int i = 0;
-	if (isSelectionRect) {
-		MakeSelection(SelectionRect());
-		isSelectionRect = false;
-		return;
-	}
-
-	Actor* actor = NULL;
-	bool doMove = isFormationRotation;
-	if (!isFormationRotation) {
-		//hidden actors are not selectable by clicking on them unless they're party members
-		actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
-		if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
-			if (!actor->ValidTarget(GA_NO_HIDDEN)) {
-				actor = NULL;
-			}
+		unsigned int i = 0;
+		if (isSelectionRect) {
+			MakeSelection(SelectionRect());
 		}
-		switch (Button) {
-			case GEM_MB_ACTION:
-				if (!actor) {
-					Actor *pc = core->GetFirstSelectedPC(false);
-					if (!pc) {
-						//this could be a non-PC
-						pc = game->selected[0];
-					}
-					//add a check if you don't want some random monster handle doors and such
-					if (overDoor) {
-						HandleDoor(overDoor, pc);
-						break;
-					}
-					if (overContainer) {
-						HandleContainer(overContainer, pc);
-						break;
-					}
-					if (overInfoPoint) {
-						if (overInfoPoint->Type==ST_TRAVEL) {
-							ieDword exitID = overInfoPoint->GetGlobalID();
-							if (core->HasFeature(GF_TEAM_MOVEMENT)) {
-								// pst forces everyone to travel (eg. ar0201 outside_portal)
-								int i = game->GetPartySize(false);
-								while(i--) {
-									game->GetPC(i, false)->UseExit(exitID);
-								}
-							} else {
-								int i = game->selected.size();
-								while(i--) {
-									game->selected[i]->UseExit(exitID);
+
+		Actor* actor = NULL;
+		bool doMove = isFormationRotation;
+		if (!isFormationRotation) {
+			//hidden actors are not selectable by clicking on them unless they're party members
+			actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
+			if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
+				if (!actor->ValidTarget(GA_NO_HIDDEN)) {
+					actor = NULL;
+				}
+			}
+			switch (Button) {
+				case GEM_MB_ACTION:
+					if (!actor) {
+						Actor *pc = core->GetFirstSelectedPC(false);
+						if (!pc) {
+							//this could be a non-PC
+							pc = game->selected[0];
+						}
+						//add a check if you don't want some random monster handle doors and such
+						if (overDoor) {
+							HandleDoor(overDoor, pc);
+							break;
+						}
+						if (overContainer) {
+							HandleContainer(overContainer, pc);
+							break;
+						}
+						if (overInfoPoint) {
+							if (overInfoPoint->Type==ST_TRAVEL) {
+								ieDword exitID = overInfoPoint->GetGlobalID();
+								if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+									// pst forces everyone to travel (eg. ar0201 outside_portal)
+									int i = game->GetPartySize(false);
+									while(i--) {
+										game->GetPC(i, false)->UseExit(exitID);
+									}
+								} else {
+									int i = game->selected.size();
+									while(i--) {
+										game->selected[i]->UseExit(exitID);
+									}
 								}
 							}
+							if (HandleActiveRegion(overInfoPoint, pc, p)) {
+								core->SetEventFlag(EF_RESETTARGET);
+								break;
+							}
 						}
-						if (HandleActiveRegion(overInfoPoint, pc, p)) {
-							core->SetEventFlag(EF_RESETTARGET);
+						//just a single actor, no formation
+						if (game->selected.size()==1
+							&& target_mode == TARGET_MODE_CAST
+							&& spellCount
+							&& (target_types&GA_POINT)) {
+							//the player is using an item or spell on the ground
+							TryToCast(pc, p);
 							break;
 						}
 					}
-					//just a single actor, no formation
-					if (game->selected.size()==1
-						&& target_mode == TARGET_MODE_CAST
-						&& spellCount
-						&& (target_types&GA_POINT)) {
-						//the player is using an item or spell on the ground
-						TryToCast(pc, p);
-						break;
+					doMove = (!actor && target_mode == TARGET_MODE_NONE);
+					break;
+				case GEM_MB_MENU:
+					// we used to check mod in this case,
+					// but it doesnt make sense to initiate an action based on a mod on mouse down
+					// then cancel that action because the mod disapeared before mouse up
+					if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+						SetTargetMode(TARGET_MODE_NONE);
 					}
+					if (!actor) {
+						// reset the action bar
+						core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
+						core->SetEventFlag(EF_ACTION);
+					}
+					break;
+				default:
+					return; // we dont handle any other buttons beyond this point
+			}
+		}
+
+		if (doMove && game->selected.size() > 0) {
+			// construct a sorted party
+			// TODO: this is still ugly, help?
+			std::vector<Actor *> party;
+			// first, from the actual party
+			int max = game->GetPartySize(false);
+			for(int idx = 1; idx<=max; idx++) {
+				Actor *act = game->FindPC(idx);
+				if(act->IsSelected()) {
+					party.push_back(act);
 				}
-				doMove = (!actor && target_mode == TARGET_MODE_NONE);
-				break;
-			case GEM_MB_MENU:
-				// we used to check mod in this case,
-				// but it doesnt make sense to initiate an action based on a mod on mouse down
-				// then cancel that action because the mod disapeared before mouse up
-				if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
-					SetTargetMode(TARGET_MODE_NONE);
+			}
+
+			//summons etc
+			for (i = 0; i < game->selected.size(); i++) {
+				Actor *act = game->selected[i];
+				if (!act->InParty) {
+					party.push_back(act);
 				}
-				if (!actor) {
-					// reset the action bar
-					core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
-					core->SetEventFlag(EF_ACTION);
+			}
+
+			//party formation movement
+			Point src;
+			if (isFormationRotation) {
+				p = gameClickPoint;
+				src = GameMousePos();
+			} else {
+				src = party[0]->Pos;
+			}
+			Point move = p;
+
+			for(i = 0; i < party.size(); i++) {
+				actor = party[i];
+				actor->Stop();
+
+				if (i || party.size() > 1) {
+					Map* map = actor->GetCurrentArea();
+					move = GetFormationPoint(map, i, src, p);
 				}
-				break;
-			default:
-				return; // we dont handle any other buttons beyond this point
+				CreateMovement(actor, move);
+			}
+			if (isDoubleClick) MoveViewportTo(p, true);
+
+			//p is a searchmap travel region
+			if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+				char Tmp[256];
+				sprintf( Tmp, "NIDSpecial2()" );
+				party[0]->AddAction( GenerateAction( Tmp) );
+			}
+		} else if (actor) {
+			if (actor->GetStat(IE_EA)<EA_CHARMED
+				&& target_mode == TARGET_MODE_NONE) {
+				// we are selecting a party member
+				actor->PlaySelectionSound();
+			}
+
+			PerformActionOn(actor);
 		}
 	}
 
-	if (doMove && game->selected.size() > 0) {
-		// construct a sorted party
-		// TODO: this is still ugly, help?
-		std::vector<Actor *> party;
-		// first, from the actual party
-		int max = game->GetPartySize(false);
-		for(int idx = 1; idx<=max; idx++) {
-			Actor *act = game->FindPC(idx);
-			if(act->IsSelected()) {
-				party.push_back(act);
-			}
-		}
-
-		//summons etc
-		for (i = 0; i < game->selected.size(); i++) {
-			Actor *act = game->selected[i];
-			if (!act->InParty) {
-				party.push_back(act);
-			}
-		}
-
-		//party formation movement
-		Point src;
-		if (isFormationRotation) {
-			p = gameClickPoint;
-			src = GameMousePos();
-		} else {
-			src = party[0]->Pos;
-		}
-		Point move = p;
-
-		for(i = 0; i < party.size(); i++) {
-			actor = party[i];
-			actor->Stop();
-
-			if (i || party.size() > 1) {
-				Map* map = actor->GetCurrentArea();
-				move = GetFormationPoint(map, i, src, p);
-			}
-			CreateMovement(actor, move);
-		}
-		if (isDoubleClick) MoveViewportTo(p, true);
-
-		//p is a searchmap travel region
-		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
-			char Tmp[256];
-			sprintf( Tmp, "NIDSpecial2()" );
-			party[0]->AddAction( GenerateAction( Tmp) );
-		}
-	} else if (actor) {
-		if (actor->GetStat(IE_EA)<EA_CHARMED
-			&& target_mode == TARGET_MODE_NONE) {
-			// we are selecting a party member
-			actor->PlaySelectionSound();
-		}
-
-		PerformActionOn(actor);
-	}
-	isFormationRotation = false;
+	ClearMouseState();
 }
 
 void GameControl::OnMouseWheelScroll(const Point& delta)

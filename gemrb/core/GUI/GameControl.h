@@ -173,6 +173,7 @@ public:
 	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent&);
+	void OnMouseDrag(const MouseEvent& /*me*/);
 
 	/** Mouse Button Down */
 	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
