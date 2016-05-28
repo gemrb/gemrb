@@ -271,6 +271,9 @@ void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button
 		if (target->AcceptsDragOperation(*drag)) {
 			target->CompleteDragOperation(*drag);
 		}
+	} else if (target) {
+		Point subP = target->ConvertPointFromScreen(p);
+		target->OnMouseUp(subP, button, mod);
 	}
 	drag = NULL;
 	trackingView = NULL;
