@@ -111,7 +111,7 @@ public: // Public Events
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
 	/** Mouse Wheel Scroll Event */
-	void OnMouseWheelScroll(short x, short y);
+	void OnMouseWheelScroll(const Point& delta);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** OnChange Scripted Event Function Name */

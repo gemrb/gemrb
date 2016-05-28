@@ -1970,9 +1970,9 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	isFormationRotation = false;
 }
 
-void GameControl::OnMouseWheelScroll(short x, short y)
+void GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	Scroll(Point(x, y));
+	Scroll(delta);
 }
 
 void GameControl::Scroll(const Point& amt)

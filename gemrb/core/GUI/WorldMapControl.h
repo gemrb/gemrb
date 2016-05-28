@@ -91,7 +91,7 @@ public:
 	void OnMouseUp(const Point& p, unsigned short Button,
 				   unsigned short Mod);
 	/** Mouse Wheel Event */
-	void OnMouseWheelScroll(short x, short y);
+	void OnMouseWheelScroll(const Point& delta);
 
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 

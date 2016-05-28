@@ -297,10 +297,10 @@ void WorldMapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned 
 }
 
 /** Mouse wheel scroll */
-void WorldMapControl::OnMouseWheelScroll(short x, short y)
+void WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
-	ScrollX += x;
-	ScrollY += y;
+	ScrollX += delta.x;
+	ScrollY += delta.y;
 
 	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
@@ -320,16 +320,16 @@ bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 	switch (Key.keycode) {
 		case GEM_LEFT:
-			OnMouseWheelScroll(keyScrollSpd * -1, 0);
+			OnMouseWheelScroll(Point(keyScrollSpd * -1, 0));
 			break;
 		case GEM_UP:
-			OnMouseWheelScroll(0, keyScrollSpd * -1);
+			OnMouseWheelScroll(Point(0, keyScrollSpd * -1));
 			break;
 		case GEM_RIGHT:
-			OnMouseWheelScroll(keyScrollSpd, 0);
+			OnMouseWheelScroll(Point(keyScrollSpd, 0));
 			break;
 		case GEM_DOWN:
-			OnMouseWheelScroll(0, keyScrollSpd);
+			OnMouseWheelScroll(Point(0, keyScrollSpd));
 			break;
 		default:
 			return false;

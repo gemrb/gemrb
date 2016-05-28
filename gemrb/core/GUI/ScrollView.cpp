@@ -95,9 +95,9 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
 	return false;
 }
 
-void ScrollView::OnMouseWheelScroll(short x, short y)
+void ScrollView::OnMouseWheelScroll(const Point& delta)
 {
-	Scroll(Point(x, y));
+	Scroll(delta);
 }
 
 }

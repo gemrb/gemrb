@@ -410,10 +410,10 @@ void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
 	}
 }
 
-void View::OnMouseWheelScroll(short x, short y)
+void View::OnMouseWheelScroll(const Point& delta)
 {
 	if (superView) {
-		superView->OnMouseWheelScroll( x, y );
+		superView->OnMouseWheelScroll(delta);
 	}
 }
 

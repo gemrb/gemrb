@@ -49,7 +49,7 @@ namespace GemRB {
 		View* RemoveSubview(const View*);
 
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-		void OnMouseWheelScroll(short x, short y);
+		void OnMouseWheelScroll(const Point& delta);
 	};
 }
 #endif /* __GemRB__ScrollView__ */

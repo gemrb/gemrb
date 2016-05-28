@@ -162,7 +162,7 @@ public: //Events
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
-	void OnMouseWheelScroll(short x, short y);
+	void OnMouseWheelScroll(const Point& delta);
 	/** Mouse Over Event */
 	void OnMouseOver(const Point&);
 	/** Mouse Button Up */

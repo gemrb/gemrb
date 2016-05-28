@@ -449,14 +449,14 @@ void TextArea::SetRow(int row)
 
 /** Mousewheel scroll */
 /** This method is key to touchscreen scrolling */
-void TextArea::OnMouseWheelScroll(short /*x*/, short y)
+void TextArea::OnMouseWheelScroll(const Point& delta)
 {
 	// we allow scrolling to cancel the animation only if there is a scrollbar
 	// otherwise it is "Chapter Text" behavior
 	if (!animationEnd || scrollbar){
 		unsigned long fauxY = TextYPos;
-		if ((long)fauxY + y <= 0) fauxY = 0;
-		else fauxY += y;
+		if ((long)fauxY + delta.y <= 0) fauxY = 0;
+		else fauxY += delta.y;
 		ScrollToY((int)fauxY);
 	}
 }

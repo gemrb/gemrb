@@ -300,9 +300,9 @@ bool Window::DispatchEvent(const Event& event)
 			case Event::MouseScroll:
 				// retarget if NULL or disabled
 				if (target == NULL || target->IsDisabled()) {
-					OnMouseWheelScroll( event.mouse.deltaX, event.mouse.deltaY );
+					OnMouseWheelScroll( event.mouse.Delta() );
 				} else {
-					target->OnMouseWheelScroll( event.mouse.deltaX, event.mouse.deltaY );
+					target->OnMouseWheelScroll( event.mouse.Delta() );
 				}
 				return true;
 			case Event::MouseMove:

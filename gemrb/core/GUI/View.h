@@ -148,7 +148,7 @@ public:
 	virtual void OnMouseOver(const Point&);
 	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
 	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	virtual void OnMouseWheelScroll(short x, short y);
+	virtual void OnMouseWheelScroll(const Point&);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
