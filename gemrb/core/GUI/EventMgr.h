@@ -87,6 +87,7 @@ struct ScreenEvent {
 	int deltaX, deltaY; // the vector of motion/scroll
 
 	Point Pos() const { return Point(x,y); }
+	Point Delta() const { return Point(deltaX, deltaY); }
 };
 
 struct GEM_EXPORT MouseEvent : public ScreenEvent {
