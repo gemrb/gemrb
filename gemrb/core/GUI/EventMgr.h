@@ -93,6 +93,10 @@ struct ScreenEvent {
 struct GEM_EXPORT MouseEvent : public ScreenEvent {
 	ButtonMask buttonStates;
 	EventButton button;
+
+	bool ButtonState(unsigned short btn) const {
+		return (btn) ? buttonStates & (1 >> (btn-1)) : false;
+	}
 };
 
 struct GEM_EXPORT KeyboardEvent {

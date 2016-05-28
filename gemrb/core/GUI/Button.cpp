@@ -581,9 +581,9 @@ void Button::OnMouseOver(const MouseEvent& me)
 	}
 }
 
-void Button::OnMouseEnter(const MouseEvent& /*me*/, const DragOp* /*dop*/)
+void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 {
-	if (IsFocused() && EventMgr::ButtonState(GEM_MB_ACTION)) {
+	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 

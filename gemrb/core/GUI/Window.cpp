@@ -211,7 +211,7 @@ bool Window::TrySetFocus(View* target)
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
-	if ((flags&Draggable) && (me.buttonStates&GEM_MB_ACTION)) {
+	if ((flags&Draggable) && me.ButtonState(GEM_MB_ACTION)) {
 		OnMouseDrag(me);
 		return;
 	}
