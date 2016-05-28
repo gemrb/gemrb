@@ -196,7 +196,8 @@ private:
 
 	static unsigned long dc_time;
 	static unsigned long rk_flags;
-	static std::bitset<16> mouseButtonFlags;
+	static std::bitset<sizeof(short)> mouseButtonFlags;
+	static std::bitset<sizeof(short)> modKeys;
 	static Point mousePos;
 
 public:
@@ -207,6 +208,7 @@ public:
 	static unsigned long GetRKDelay();
 	static unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 
+	static bool ModState(unsigned short mod);
 	static bool ButtonState(unsigned short btn);
 	static bool MouseDown();
 	static Point MousePos() { return mousePos; }

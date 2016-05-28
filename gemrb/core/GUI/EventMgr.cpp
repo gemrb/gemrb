@@ -31,7 +31,8 @@ bool EventMgr::TouchInputEnabled = true;
 
 unsigned long EventMgr::dc_time;
 unsigned long EventMgr::rk_flags;
-std::bitset<16> EventMgr::mouseButtonFlags;
+std::bitset<sizeof(short)> EventMgr::mouseButtonFlags;
+std::bitset<sizeof(short)> EventMgr::modKeys;
 Point EventMgr::mousePos;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
@@ -57,6 +58,11 @@ unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 	return rk_flags;
 }
 
+bool EventMgr::ModState(unsigned short mod)
+{
+	return modKeys.test(1 >> mod);
+}
+
 bool EventMgr::ButtonState(unsigned short btn)
 {
 	return mouseButtonFlags.test(1 >> btn);
@@ -76,6 +82,7 @@ void EventMgr::DispatchEvent(Event& e)
 	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
 		int flags = e.mod << 16;
 		flags |= e.keyboard.keycode;
+		modKeys = e.mod;
 
 		std::map<int, EventCallback*>::const_iterator hit;
 		hit = HotKeys.find(flags);
