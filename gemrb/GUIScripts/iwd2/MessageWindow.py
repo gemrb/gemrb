@@ -23,10 +23,11 @@ import GUICommonWindows
 import GUIClasses
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
+import CommonWindow
 
-MessageWindow = 0
-PortraitWindow = 0
-TMessageTA = 0 # for dialog code
+MessageWindow = None
+PortraitWindow = None
+TMessageTA = None # for dialog code
 
 def OnLoad():
 	global MessageWindow, PortraitWindow
@@ -38,8 +39,6 @@ def OnLoad():
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	ActionsWindow = PortraitWindow = GUICommonWindows.OpenPortraitWindow()
 
-	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", 12345) # dummy so the EF_ACTION callback works
 	GemRB.SetVar ("TopWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
@@ -58,10 +57,10 @@ def OnLoad():
 	return
 
 def UpdateControlStatus():
-	global MessageWindow,TMessageTA
+	global MessageWindow, TMessageTA
 
-	TMessageWindow = 0
-	TMessageTA = 0
+	TMessageWindow = None
+	TMessageTA = None
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
@@ -71,29 +70,27 @@ def UpdateControlStatus():
 	if Override:
 		Expand = GS_LARGEDIALOG
 
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-	hideflag = IsGameGUIHidden()
+	MessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
+	hideflag = CommonWindow.IsGameGUIHidden()
+
 	if Expand == GS_LARGEDIALOG:
-		GemRB.SetVar ("PortraitWindow", -1)
 		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl (1)
 	else:
-		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-		TMessageWindow = GemRB.LoadWindow(0)
+		TMessageWindow = MessageWindow
 		# cheat code editbox; only causes redraw issues if you click on the lower left
 		TMessageWindow.DeleteControl (3)
 		TMessageTA = TMessageWindow.GetControl (1)
 		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
 
-	MessageWindow = GemRB.GetVar ("MessageWindow")
-	MessageTA = GUIClasses.GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
-	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
+	MessageTA = MessageWindow.GetControl(1)
+
+	if MessageWindow > 0 and MessageWindow.ID != TMessageWindow.ID:
 		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
 		GUIClasses.GWindow(MessageWindow).Unload()
 		
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
-	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 
 	if Override:
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
@@ -109,10 +106,8 @@ def UpdateControlStatus():
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
-	else:
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 		
-	SetGameGUIHidden(hideflag)
+	CommonWindow.SetGameGUIHidden(hideflag)
 	return
 
 #upgrade savegame to next version
