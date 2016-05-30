@@ -633,7 +633,6 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 			}
 			break;
 		case GEM_ESCAPE:
-			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			break;
 		case GEM_PGUP:
@@ -1897,7 +1896,6 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 					}
 					if (!actor) {
 						// reset the action bar
-						core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 						core->SetEventFlag(EF_ACTION);
 					}
 					break;
