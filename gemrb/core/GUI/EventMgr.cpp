@@ -140,12 +140,12 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 
 	Event e = CreateMouseMotionEvent(pos, mod);
 
-
 	if (down) {
 		e.type = Event::MouseDown;
 		e.mouse.buttonStates |= 1 << (btn-1);
 	} else {
 		e.type = Event::MouseUp;
+		e.mouse.buttonStates &= ~(1 << (btn-1));
 	}
 	e.mouse.button = btn;
 
@@ -156,6 +156,7 @@ Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
 {
 	Event e = InitializeEvent(mod);
 	e.type = Event::MouseMove;
+	e.mouse.buttonStates = mouseButtonFlags.to_ulong();
 
 	e.mouse.x = pos.x;
 	e.mouse.y = pos.y;
