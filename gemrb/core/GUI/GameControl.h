@@ -114,10 +114,11 @@ private:
 	bool AlwaysRun;
 	Actor *user; //the user of item or spell
 
-public:
 	Door* overDoor;
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
+
+public:
 	DialogHandler *dialoghandler;
 	//the name of the spell to cast
 	ieResRef spellName;
