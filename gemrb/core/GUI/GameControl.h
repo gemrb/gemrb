@@ -147,6 +147,10 @@ private:
 	//doors
 	int GetCursorOverDoor(Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
+
+	void PerformSelectedAction(const Point& p);
+	void CommandSelectedMovement(const Point& p);
+
 	//infopoints
 	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
 	bool OnGlobalMouseMove(const Event&);
@@ -216,7 +220,7 @@ public:
 
 	// returns the default cursor fitting the targeting mode
 	Sprite2D* GetTargetActionCursor() const;
-	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
+	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 
 	void MakeSelection(const Region&, bool extend = false);
 	Point GetFormationOffset(ieDword formation, ieDword pos);

@@ -1728,7 +1728,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
-bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
+bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point& p)
 {
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
@@ -1814,157 +1814,151 @@ void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned sh
 /** Mouse Button Up */
 void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
 {
-	if (!(ScreenFlags & SF_DISABLEMOUSE)) {
-		//heh, i found no better place
-		core->CloseCurrentContainer();
+	if (ScreenFlags & SF_DISABLEMOUSE) {
+		return ClearMouseState();
+	}
 
-		Point p = mp + vpOrigin;
-		Game* game = core->GetGame();
-		Map* area = game->GetCurrentArea( );
+	//heh, i found no better place
+	core->CloseCurrentContainer();
 
-		unsigned int i = 0;
-		if (isSelectionRect) {
-			MakeSelection(SelectionRect());
+	Point p = mp + vpOrigin;
+	Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+
+	// right click
+	if (Button == GEM_MB_MENU) {
+		if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+			SetTargetMode(TARGET_MODE_NONE);
 		}
+		// update the action bar
+		core->SetEventFlag(EF_ACTION);
+		return ClearMouseState();
+	}
 
-		Actor* actor = NULL;
-		bool doMove = isFormationRotation;
-		if (!isFormationRotation) {
-			//hidden actors are not selectable by clicking on them unless they're party members
-			actor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
-			if (actor && actor->Modified[IE_EA]>=EA_CONTROLLED) {
-				if (!actor->ValidTarget(GA_NO_HIDDEN)) {
-					actor = NULL;
+	// any other button behaves as left click (scrollwhell buttons are mosue wheel events now)
+	if (isDoubleClick) MoveViewportTo(p, true);
+
+	// handle actions
+	if (target_mode != TARGET_MODE_NONE) {
+		PerformSelectedAction(p);
+		return ClearMouseState();
+	}
+
+	// handle selections
+	Actor* targetActor = area->GetActor(p, target_types);
+	if (isSelectionRect) {
+		MakeSelection(SelectionRect());
+		return ClearMouseState();
+	} else if (targetActor) {
+		game->SelectActor( targetActor, true, SELECT_NORMAL );
+		return ClearMouseState();
+	}
+
+	// handle movement/travel
+	CommandSelectedMovement(p);
+
+	ClearMouseState();
+}
+
+void GameControl::PerformSelectedAction(const Point& p)
+{
+	// TODO: consolidate the 'over' members into a single Scriptable*
+	// then we simply switch on its type
+
+	Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
+
+	Actor* selectedActor = core->GetFirstSelectedPC(false);
+	if (!selectedActor) {
+		//this could be a non-PC
+		selectedActor = game->selected[0];
+	}
+
+	//add a check if you don't want some random monster handle doors and such
+	if (overDoor) {
+		HandleDoor(overDoor, selectedActor);
+	} else if (overContainer) {
+		HandleContainer(overContainer, selectedActor);
+	} else if (overInfoPoint) {
+		if (overInfoPoint->Type==ST_TRAVEL) {
+			ieDword exitID = overInfoPoint->GetGlobalID();
+			if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+				// pst forces everyone to travel (eg. ar0201 outside_portal)
+				int i = game->GetPartySize(false);
+				while(i--) {
+					game->GetPC(i, false)->UseExit(exitID);
 				}
-			}
-			switch (Button) {
-				case GEM_MB_ACTION:
-					if (!actor) {
-						Actor *pc = core->GetFirstSelectedPC(false);
-						if (!pc) {
-							//this could be a non-PC
-							pc = game->selected[0];
-						}
-						//add a check if you don't want some random monster handle doors and such
-						if (overDoor) {
-							HandleDoor(overDoor, pc);
-							break;
-						}
-						if (overContainer) {
-							HandleContainer(overContainer, pc);
-							break;
-						}
-						if (overInfoPoint) {
-							if (overInfoPoint->Type==ST_TRAVEL) {
-								ieDword exitID = overInfoPoint->GetGlobalID();
-								if (core->HasFeature(GF_TEAM_MOVEMENT)) {
-									// pst forces everyone to travel (eg. ar0201 outside_portal)
-									int i = game->GetPartySize(false);
-									while(i--) {
-										game->GetPC(i, false)->UseExit(exitID);
-									}
-								} else {
-									int i = game->selected.size();
-									while(i--) {
-										game->selected[i]->UseExit(exitID);
-									}
-								}
-							}
-							if (HandleActiveRegion(overInfoPoint, pc, p)) {
-								core->SetEventFlag(EF_RESETTARGET);
-								break;
-							}
-						}
-						//just a single actor, no formation
-						if (game->selected.size()==1
-							&& target_mode == TARGET_MODE_CAST
-							&& spellCount
-							&& (target_types&GA_POINT)) {
-							//the player is using an item or spell on the ground
-							TryToCast(pc, p);
-							break;
-						}
-					}
-					doMove = (!actor && target_mode == TARGET_MODE_NONE);
-					break;
-				case GEM_MB_MENU:
-					// we used to check mod in this case,
-					// but it doesnt make sense to initiate an action based on a mod on mouse down
-					// then cancel that action because the mod disapeared before mouse up
-					if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
-						SetTargetMode(TARGET_MODE_NONE);
-					}
-					if (!actor) {
-						// reset the action bar
-						core->SetEventFlag(EF_ACTION);
-					}
-					break;
-				default:
-					return; // we dont handle any other buttons beyond this point
-			}
-		}
-
-		if (doMove && game->selected.size() > 0) {
-			// construct a sorted party
-			// TODO: this is still ugly, help?
-			std::vector<Actor *> party;
-			// first, from the actual party
-			int max = game->GetPartySize(false);
-			for(int idx = 1; idx<=max; idx++) {
-				Actor *act = game->FindPC(idx);
-				if(act->IsSelected()) {
-					party.push_back(act);
-				}
-			}
-
-			//summons etc
-			for (i = 0; i < game->selected.size(); i++) {
-				Actor *act = game->selected[i];
-				if (!act->InParty) {
-					party.push_back(act);
-				}
-			}
-
-			//party formation movement
-			Point src;
-			if (isFormationRotation) {
-				p = gameClickPoint;
-				src = GameMousePos();
 			} else {
-				src = party[0]->Pos;
-			}
-			Point move = p;
-
-			for(i = 0; i < party.size(); i++) {
-				actor = party[i];
-				actor->Stop();
-
-				if (i || party.size() > 1) {
-					Map* map = actor->GetCurrentArea();
-					move = GetFormationPoint(map, i, src, p);
+				size_t i = game->selected.size();
+				while(i--) {
+					game->selected[i]->UseExit(exitID);
 				}
-				CreateMovement(actor, move);
 			}
-			if (isDoubleClick) MoveViewportTo(p, true);
+		}
+		if (HandleActiveRegion(overInfoPoint, selectedActor, p)) {
+			core->SetEventFlag(EF_RESETTARGET);
+		}
+	} else if (targetActor) {
+		PerformActionOn(targetActor);
+	} else if (target_mode == TARGET_MODE_CAST) {
+		//the player is using an item or spell on the ground
+		TryToCast(selectedActor, p);
+	}
+}
 
-			//p is a searchmap travel region
-			if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
-				char Tmp[256];
-				sprintf( Tmp, "NIDSpecial2()" );
-				party[0]->AddAction( GenerateAction( Tmp) );
-			}
-		} else if (actor) {
-			if (actor->GetStat(IE_EA)<EA_CHARMED
-				&& target_mode == TARGET_MODE_NONE) {
-				// we are selecting a party member
-				actor->PlaySelectionSound();
-			}
+void GameControl::CommandSelectedMovement(const Point& p)
+{
+	Game* game = core->GetGame();
 
-			PerformActionOn(actor);
+	// construct a sorted party
+	// TODO: this is still ugly, help?
+	std::vector<Actor *> party;
+	// first, from the actual party
+	int max = game->GetPartySize(false);
+	for(int idx = 1; idx<=max; idx++) {
+		Actor *act = game->FindPC(idx);
+		if(act->IsSelected()) {
+			party.push_back(act);
 		}
 	}
 
-	ClearMouseState();
+	//summons etc
+	for (size_t i = 0; i < game->selected.size(); i++) {
+		Actor *act = game->selected[i];
+		if (!act->InParty) {
+			party.push_back(act);
+		}
+	}
+
+	//party formation movement
+	Point src;
+	Point move = p;
+	if (isFormationRotation) {
+		move = gameClickPoint;
+		src = GameMousePos();
+	} else {
+		src = party[0]->Pos;
+	}
+
+	for(unsigned int i = 0; i < party.size(); i++) {
+		Actor* actor = party[i];
+		actor->Stop();
+
+		if (i || party.size() > 1) {
+			Map* map = actor->GetCurrentArea();
+			move = GetFormationPoint(map, i, src, p);
+		}
+		CreateMovement(actor, move);
+	}
+
+	// handle travel
+	//p is a searchmap travel region
+	if (game->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+		char Tmp[256];
+		sprintf( Tmp, "NIDSpecial2()" );
+		party[0]->AddAction( GenerateAction( Tmp) );
+	}
 }
 
 void GameControl::OnMouseWheelScroll(const Point& delta)
