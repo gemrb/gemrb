@@ -100,4 +100,11 @@ void ScrollView::OnMouseWheelScroll(const Point& delta)
 	Scroll(delta);
 }
 
+void ScrollView::OnMouseDrag(const MouseEvent& me)
+{
+	if (EventMgr::ButtonState(GEM_MB_ACTION)) {
+		Scroll(me.Delta());
+	}
+}
+
 }

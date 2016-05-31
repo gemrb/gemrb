@@ -396,6 +396,13 @@ void View::OnMouseOver(const MouseEvent& me)
 	}
 }
 
+void View::OnMouseDrag(const MouseEvent& me)
+{
+	if (superView) {
+		superView->OnMouseDrag(me);
+	}
+}
+
 void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
 {
 	if (superView) {
