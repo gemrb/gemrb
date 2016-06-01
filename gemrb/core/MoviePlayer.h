@@ -111,7 +111,7 @@ public:
 		return true;
 	}
 
-	void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/) {
+	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) {
 		player.Stop();
 	}
 };

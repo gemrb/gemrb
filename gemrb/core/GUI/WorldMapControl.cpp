@@ -277,23 +277,22 @@ void WorldMapControl::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 }
 
 /** Mouse Button Down */
-void WorldMapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	switch(Button) {
-	case GEM_MB_ACTION:
+	if (me.button == GEM_MB_ACTION) {
 		MouseIsDown = true;
-		LastMousePos = p;
-		break;
+		LastMousePos = ConvertPointFromScreen(me.Pos());
 	}
 }
+
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
+void WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	MouseIsDown = false;
-	if (Button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
+	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
 		RunEventHandler( WorldMapControlOnPress );
 	} else {
-		Control::OnMouseUp(p, Button, Mod);
+		Control::OnMouseUp(me, Mod);
 	}
 }
 

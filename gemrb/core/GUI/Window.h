@@ -73,8 +73,8 @@ private:
 	bool TrySetFocus(View*);
 
 	inline void DispatchMouseMotion(View*, const MouseEvent&);
-	inline void DispatchMouseDown(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	inline void DispatchMouseUp(View*, const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	inline void DispatchMouseDown(View*, const MouseEvent& me, unsigned short /*Mod*/);
+	inline void DispatchMouseUp(View*, const MouseEvent& me, unsigned short /*Mod*/);
 
 public:
 	Window(const Region& frame, WindowManager& mgr);

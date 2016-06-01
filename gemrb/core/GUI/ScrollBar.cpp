@@ -200,8 +200,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 }
 
 /** Mouse Button Down */
-void ScrollBar::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
+void ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
+	Point p = ConvertPointFromScreen(me.Pos());
 	//removing the double click flag, use a more sophisticated method
 	//if it is needed later
 	if (p.y <= GetFrameHeight(IE_GUI_SCROLLBAR_UP_UNPRESSED) ) {
@@ -227,7 +228,7 @@ void ScrollBar::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned 
 }
 
 /** Mouse Button Up */
-void ScrollBar::OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/)
+void ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	State = 0;

@@ -463,18 +463,16 @@ void Button::CompleteDragOperation(const DragOp& dop)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
+void Button::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
 	if ((core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])) {
-		return Control::OnMouseDown(p, Button, Mod);
+		return Control::OnMouseDown(me, Mod);
 	}
 
-	//Button == 1 means Left Mouse Button
-	switch(Button&GEM_MB_NORMAL) {
-	case GEM_MB_ACTION:
+	if (me.button == GEM_MB_ACTION) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		drag_start = ConvertPointToScreen(p);
+		drag_start = me.Pos();
 
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
@@ -484,23 +482,22 @@ void Button::OnMouseDown(const Point& p, unsigned short Button, unsigned short M
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
-		if ((Button & GEM_MB_DOUBLECLICK)) {
+		if (me.repeats == 2) {
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DOUBLE_PRESS] );
 		}
-		break;
-		default:
-			return Control::OnMouseDown(p, Button, Mod);
+	} else {
+		Control::OnMouseDown(me, Mod);
 	}
 }
 
 /** Mouse Button Up */
-void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
+void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	bool drag = core->GetDraggedItem () != NULL;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
 	if (drag && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
-		return Control::OnMouseUp(p, Button, Mod);
+		return Control::OnMouseUp(me, Mod);
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
@@ -546,12 +543,12 @@ void Button::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod
 		return;
 	}
 
-	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
+	if (me.button == GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS])
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS] );
 		else
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
-	} else if (Button == GEM_MB_MENU) {
+	} else if (me.button == GEM_MB_MENU) {
 		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_RIGHT_PRESS] );
 	}
 }

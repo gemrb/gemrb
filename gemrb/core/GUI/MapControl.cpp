@@ -321,7 +321,7 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& /*p*/, unsigned short /*Button*/, unsigned short /*Mod*/)
+void MapControl::OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	mouseIsDown = true;
 	/*
@@ -335,13 +335,13 @@ void MapControl::OnMouseDown(const Point& /*p*/, unsigned short /*Button*/, unsi
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(const Point& /*p*/, unsigned short Button, unsigned short /*Mod*/)
+void MapControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (!mouseIsDown) {
 		return;
 	}
 
-	if (Button&GEM_MB_ACTION&GEM_MB_DOUBLECLICK) {
+	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
 		Owner->Close();
 	}
 
@@ -365,7 +365,7 @@ void MapControl::OnMouseUp(const Point& /*p*/, unsigned short Button, unsigned s
 			ClickHandle(Button);
 			return;
 		default:
-			return Control::OnMouseUp(p, Button, Mod);
+			return Control::OnMouseUp(me, Mod);
 	}
 	*/
 }

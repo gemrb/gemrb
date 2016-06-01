@@ -1792,27 +1792,28 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 	return false;
 }
 /** Mouse Button Down */
-void GameControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short Mod)
+void GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
+	Point p = ConvertPointFromScreen(me.Pos());
 	gameClickPoint = p + vpOrigin;
 
-	switch(Button) {
+	switch(me.button) {
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		}
 		break;
-	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
-		isDoubleClick = true;
+	case GEM_MB_ACTION:
+		isDoubleClick = me.repeats == 2;
 		break;
 	}
 }
 
 /** Mouse Button Up */
-void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned short /*Mod*/)
+void GameControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return ClearMouseState();
@@ -1821,12 +1822,12 @@ void GameControl::OnMouseUp(const Point& mp, unsigned short Button, unsigned sho
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
-	Point p = mp + vpOrigin;
+	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea();
 
 	// right click
-	if (Button == GEM_MB_MENU) {
+	if (me.button == GEM_MB_MENU) {
 		if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
 			SetTargetMode(TARGET_MODE_NONE);
 		}

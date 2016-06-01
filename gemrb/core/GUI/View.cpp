@@ -403,17 +403,17 @@ void View::OnMouseDrag(const MouseEvent& me)
 	}
 }
 
-void View::OnMouseDown(const Point& p, unsigned short button, unsigned short mod)
+void View::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	if (superView) {
-		superView->OnMouseDown(ConvertPointToSuper(p), button, mod);
+		superView->OnMouseDown(me, mod);
 	}
 }
 
-void View::OnMouseUp(const Point& p, unsigned short button, unsigned short mod)
+void View::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	if (superView) {
-		superView->OnMouseUp(ConvertPointToSuper(p), button, mod);
+		superView->OnMouseUp(me, mod);
 	}
 }
 

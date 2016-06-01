@@ -166,7 +166,7 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent& /*me*/);
 	/** Mouse Button Up */
-	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
+	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, ControlEventHandler handler);

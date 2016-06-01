@@ -100,7 +100,7 @@ void Label::SetAlignment(unsigned char Alignment)
 	MarkDirty();
 }
 
-void Label::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
+void Label::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
@@ -108,7 +108,7 @@ void Label::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
 	if (LabelOnPress) {
 		RunEventHandler( LabelOnPress );
 	}
-	View::OnMouseUp(p, Button, Mod);
+	View::OnMouseUp(me, Mod);
 }
 
 bool Label::SetEvent(int eventType, ControlEventHandler handler)

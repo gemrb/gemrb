@@ -7019,12 +7019,14 @@ void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_ACTION, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_ACTION, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -7034,12 +7036,14 @@ void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_MENU, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_MENU, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters)
@@ -7049,12 +7053,16 @@ void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_ACTION, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_ACTION, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -7064,12 +7072,16 @@ void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_MENU, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_MENU, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 //Picks 5 lines from wish.2da

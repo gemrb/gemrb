@@ -181,9 +181,9 @@ public:
 	void OnMouseDrag(const MouseEvent& /*me*/);
 
 	/** Mouse Button Down */
-	void OnMouseDown(const Point&, unsigned short Button, unsigned short Mod);
+	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(const Point&, unsigned short Button, unsigned short Mod);
+	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	void OnMouseWheelScroll(const Point& delta);
 
 	void DrawTooltip(const Point& p) const;

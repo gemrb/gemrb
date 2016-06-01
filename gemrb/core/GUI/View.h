@@ -147,8 +147,8 @@ public:
 	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {};
 	virtual void OnMouseOver(const MouseEvent& /*me*/);
 	virtual void OnMouseDrag(const MouseEvent& /*me*/);
-	virtual void OnMouseDown(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
-	virtual void OnMouseUp(const Point&, unsigned short /*Button*/, unsigned short /*Mod*/);
+	virtual void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	virtual void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	virtual void OnMouseWheelScroll(const Point&);
 
 	void SetTooltip(const String& string);

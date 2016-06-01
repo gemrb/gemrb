@@ -294,20 +294,21 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 	return true;
 }
 
-void ClickCore(Scriptable *Sender, const Point& point, int type, int speed)
+void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 {
+	Point mp = me.Pos();
 	Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Point p=map->TMap->GetMapSize();
-	if (!p.PointInside(point)) {
+	if (p != mp) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	GlobalTimer *timer = core->timer;
-	timer->SetMoveViewPort( point, speed, true );
+	timer->SetMoveViewPort( mp, speed, true );
 	timer->DoStep(0);
 	if (timer->ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->GetCurrentAction() );
@@ -317,8 +318,8 @@ void ClickCore(Scriptable *Sender, const Point& point, int type, int speed)
 	}
 
 	GameControl* gc = core->GetGameControl();
-	gc->OnMouseDown(point, type, 0);
-	gc->OnMouseUp(point, type, 0);
+	gc->OnMouseDown(me, 0);
+	gc->OnMouseUp(me, 0);
 
 	Sender->ReleaseCurrentAction();
 }

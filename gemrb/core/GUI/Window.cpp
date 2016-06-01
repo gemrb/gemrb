@@ -250,30 +250,27 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 	hoverView = target;
 }
 
-void Window::DispatchMouseDown(View* target, const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned short mod)
 {
-	if (button == GEM_MB_ACTION) {
+	if (me.button == GEM_MB_ACTION) {
 		Focus();
 	}
 
 	TrySetFocus(target);
-	Point subP = target->ConvertPointFromScreen(p);
-	target->OnMouseDown(subP, button, mod);
+	target->OnMouseDown(me, mod);
 	trackingView = target; // all views track the mouse within their bounds
 }
 
-void Window::DispatchMouseUp(View* target, const Point& p, unsigned short button, unsigned short mod)
+void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short mod)
 {
 	if (trackingView) {
-		Point subP = trackingView->ConvertPointFromScreen(p);
-		trackingView->OnMouseUp(subP, button, mod);
+		trackingView->OnMouseUp(me, mod);
 	} else if (drag) {
 		if (target->AcceptsDragOperation(*drag)) {
 			target->CompleteDragOperation(*drag);
 		}
 	} else if (target) {
-		Point subP = target->ConvertPointFromScreen(p);
-		target->OnMouseUp(subP, button, mod);
+		target->OnMouseUp(me, mod);
 	}
 	drag = NULL;
 	trackingView = NULL;
@@ -321,10 +318,10 @@ bool Window::DispatchEvent(const Event& event)
 		// basic event handling
 		switch (event.type) {
 			case Event::MouseDown:
-				DispatchMouseDown(target, screenPos, event.mouse.button, event.mod);
+				DispatchMouseDown(target, event.mouse, event.mod);
 				break;
 			case Event::MouseUp:
-				DispatchMouseUp(target, screenPos, event.mouse.button, event.mod);
+				DispatchMouseUp(target, event.mouse, event.mod);
 				break;
 			default: return false; // we dont handle touch events yet...
 		}

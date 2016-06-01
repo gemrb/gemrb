@@ -136,7 +136,7 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 }
 
 /** Mouse Button Down */
-void Slider::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
+void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	unsigned int oldPos = Pos;
@@ -144,6 +144,8 @@ void Slider::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned sho
 	int my = (KnobYPos - Knob->YPos);
 	int Mx = (mx + Knob->Width);
 	int My = (my + Knob->Height);
+
+	Point p = ConvertPointFromScreen(me.Pos());
 
 	if (( p.x >= mx ) && ( p.y >= my )) {
 		if (( p.x <= Mx ) && ( p.y <= My )) {
@@ -208,7 +210,7 @@ void Slider::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned sho
 }
 
 /** Mouse Button Up */
-void Slider::OnMouseUp(const Point& /*p*/, unsigned short /*Button*/, unsigned short /*Mod*/)
+void Slider::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
 		MarkDirty();
