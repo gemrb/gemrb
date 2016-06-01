@@ -65,7 +65,6 @@ def RevealMap ():
 # for farsight effect
 ###################################################
 def ShowMap ():
-	import GameCheck
 	global MapWindow
 
 	if GUICommon.CloseOtherWindow (ShowMap):
@@ -113,6 +112,7 @@ def ShowMap ():
 	if HasMapNotes ():
 		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
+
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
 	Window.Focus()
 	OptionsWindow.SetDisabled (True)
@@ -132,9 +132,7 @@ def ShowMap ():
 ###################################################
 def OpenMapWindow ():
 
-	GUICommonWindows.OpenTopWindow(2, "GUIMAP")
-
-	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
+	MapWindow = Window = GUICommonWindows.OpenTopWindow(2, "GUIMAP")
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -160,8 +158,6 @@ def OpenMapWindow ():
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
-
-	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
 	else:
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
