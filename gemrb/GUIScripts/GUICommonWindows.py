@@ -1665,11 +1665,13 @@ def UpdatePortraitWindow ():
 				states = states + "\n"
 			states = states + effects[x]
 
-		FlagLabel = Window.GetControl(200 + portid)
-		if flag != blank:
-			FlagLabel.SetText(flag.ljust(3, blank))
-		else:
-			FlagLabel.SetText("")
+		# FIXME: hack, check shouldn't be needed
+		if Window.HasControl (200 + portid):
+			FlagLabel = Window.GetControl (200 + portid)
+			if flag != blank:
+				FlagLabel.SetText (flag.ljust(3, blank))
+			else:
+				FlagLabel.SetText ("")
 		Button.SetText(states)
 	return
 
