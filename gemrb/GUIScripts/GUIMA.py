@@ -160,7 +160,6 @@ def OpenMapWindow ():
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
-	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
 	if HasMapNotes ():
 		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
@@ -171,11 +170,6 @@ def OpenMapWindow ():
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
-
-def LeftDoublePressMap ():
-	#close the map on doubleclick
-	OpenMapWindow()
-	return
 
 def CloseNoteWindow ():
 	if NoteWindow:

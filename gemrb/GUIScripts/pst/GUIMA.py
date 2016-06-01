@@ -74,7 +74,6 @@ def OpenMapWindow ():
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
-	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -92,10 +91,6 @@ def OpenMapWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.MakeEscape()
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
-
-def LeftDoublePressMap ():
-	OpenMapWindow()
-	return
 
 def NoteChanged ():
 	#shift focus to the static label

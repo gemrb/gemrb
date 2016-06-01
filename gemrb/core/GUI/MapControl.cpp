@@ -97,7 +97,6 @@ MapControl::MapControl(const Region& frame)
 	VarName[0] = 0;
 	ResetEventHandler( MapControlOnPress );
 	ResetEventHandler( MapControlOnRightPress );
-	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	if (MyMap && MyMap->SmallMap) {
@@ -320,18 +319,12 @@ void MapControl::ClickHandle(unsigned short Button)
 {
 	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
 	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	switch(Button&GEM_MB_NORMAL) {
+	switch(Button) {
 		case GEM_MB_ACTION:
-			if (Button&GEM_MB_DOUBLECLICK) {
-				RunEventHandler( MapControlOnDoublePress );
-			} else {
-				RunEventHandler( MapControlOnPress );
-			}
+			RunEventHandler( MapControlOnPress );
 			break;
 		case GEM_MB_MENU:
 			RunEventHandler( MapControlOnRightPress );
-			break;
-		default:
 			break;
 	}
 }
@@ -352,18 +345,8 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& p, unsigned short Button, unsigned short /*Mod*/)
+void MapControl::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
-	switch((unsigned char) Button & GEM_MB_NORMAL) {
-		case GEM_MB_ACTION:
-			if (Button & GEM_MB_DOUBLECLICK) {
-				ClickHandle(Button);
-			}
-			break;
-		default:
-			break;
-	}
-
 	mouseIsDown = true;
 	Region vp = core->GetGameControl()->Viewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
@@ -380,7 +363,10 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 		return;
 	}
 
-	MarkDirty();
+	if (Button&GEM_MB_ACTION&GEM_MB_DOUBLECLICK) {
+		Owner->Close();
+	}
+
 	mouseIsDown = false;
 	switch(Value) {
 		case MAP_REVEAL:
@@ -446,9 +432,6 @@ bool MapControl::SetEvent(int eventType, ControlEventHandler handler)
 			break;
 		case IE_GUI_MAP_ON_RIGHT_PRESS:
 			MapControlOnRightPress = handler;
-			break;
-		case IE_GUI_MAP_ON_DOUBLE_PRESS:
-			MapControlOnDoublePress = handler;
 			break;
 		default:
 			return false;
