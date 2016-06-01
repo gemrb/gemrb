@@ -81,7 +81,11 @@ typedef unsigned char EventButton;
 typedef unsigned short KeyboardKey;
 typedef unsigned short ButtonMask;
 
-struct ScreenEvent {
+struct EventBase {
+	unsigned short repeats; // number of times this event has been repeated (within the repeat time interval)
+};
+
+struct ScreenEvent : public EventBase {
 	// cant use Point due to non trival constructor
 	int x,y; // mouse position at time of event
 	int deltaX, deltaY; // the vector of motion/scroll
@@ -99,13 +103,13 @@ struct GEM_EXPORT MouseEvent : public ScreenEvent {
 	}
 };
 
-struct GEM_EXPORT KeyboardEvent {
+struct GEM_EXPORT KeyboardEvent : public EventBase {
 	KeyboardKey keycode; // raw keycode
 	KeyboardKey character; // the translated character
 };
 
 // TODO: Unused event type...
-struct GEM_EXPORT ControllerEvent {
+struct GEM_EXPORT ControllerEvent : public EventBase {
 	ButtonMask buttonStates;
 	EventButton button;
 };
@@ -162,7 +166,6 @@ struct GEM_EXPORT Event {
 	EventType type;
 	unsigned long time;
 	short mod; // modifier keys held during the event
-	unsigned short repeat; // number of times this event has been repeated (within the time interval)
 	bool isScreen; // event coresponsds to location on screen
 };
 
