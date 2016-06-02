@@ -77,6 +77,7 @@ void EventMgr::DispatchEvent(Event& e)
 {
 	// TODO: for mouse events: check double click delay and set if repeat
 	// TODO: for key events: check repeat key delay and set if repeat
+	e.time = GetTickCount();
 
 	// first check for hot key listeners
 	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
@@ -126,14 +127,6 @@ size_t EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask ma
 	return Taps.size() - 1;
 }
 
-inline Event InitializeEvent(int mod)
-{
-	Event e;
-	e.mod = mod;
-	e.time = GetTickCount();
-	return e;
-}
-
 Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)
 {
 	assert(btn);
@@ -154,7 +147,8 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 
 Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
 {
-	Event e = InitializeEvent(mod);
+	Event e = {}; // initialize all members to 0
+	e.mod = mod;
 	e.type = Event::MouseMove;
 	e.mouse.buttonStates = mouseButtonFlags.to_ulong();
 
@@ -181,7 +175,8 @@ Event EventMgr::CreateMouseWheelEvent(const Point& vec, int mod)
 
 Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 {
-	Event e = InitializeEvent(mod);
+	Event e = {}; // initialize all members to 0
+	e.mod = mod;
 	e.type = (down) ? Event::KeyDown : Event::KeyUp;
 	e.keyboard.keycode = key;
 	e.isScreen = false;
