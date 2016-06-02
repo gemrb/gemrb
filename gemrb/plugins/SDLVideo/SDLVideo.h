@@ -64,9 +64,6 @@ inline int GetModState(int modstate)
 }
 
 class SDLVideoDriver : public Video {
-protected:
-	unsigned long lastMouseDownTime;
-
 public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);

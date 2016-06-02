@@ -41,7 +41,6 @@ using namespace GemRB;
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	lastTime = 0;
-	lastMouseDownTime = GetTickCount();
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -73,29 +72,6 @@ int SDLVideoDriver::PollEvents()
 		ret = ProcessEvent(currentEvent);
 	}
 
-	/*
-	TODO: move this logic to Event/Window manager
-	if (ret == GEM_OK && !(MouseFlags & (MOUSE_DISABLED | MOUSE_GRAYED))
-		&& lastTime>lastMouseDownTime
-		&& SDL_GetMouseState(NULL, NULL)==SDL_BUTTON(SDL_BUTTON_LEFT))
-	{
-		// get our internal mouse coordinates instead of system coordinates
-		// this is important for SDL2 (Android, iOS currently)
-
-		Point p = GetMousePos();
-		lastMouseDownTime=lastTime + EvntManager->GetRKDelay();
-
-		if (!core->ConsolePopped) {
-			Event e = EvntManager->CreateMouseBtnEvent(p, GEM_MB_ACTION, false, GetModState(SDL_GetModState()));
-			EvntManager->DispatchEvent(e);
-
-			Control* ctl = EvntManager->GetMouseFocusedControl();
-			if (ctl && ctl->ControlType == IE_GUI_BUTTON)
-				// these are repeat events so the control should stay pressed
-				((Button*)ctl)->SetState(IE_GUI_BUTTON_PRESSED);
-		}
-	}
-	*/
 	return ret;
 }
 
@@ -242,16 +218,12 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			lastMouseDownTime=EvntManager->GetRKDelay();
-			if (lastMouseDownTime != (unsigned long) ~0) {
-				lastMouseDownTime += lastMouseDownTime+lastTime;
-			}
-
-			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), SDL_BUTTON(event.button.button), true, GetModState(SDL_GetModState()));
-			EvntManager->DispatchEvent(e);
-			break;
 		case SDL_MOUSEBUTTONUP:
-			e = EvntManager->CreateMouseBtnEvent(Point(event.button.x, event.button.y), SDL_BUTTON(event.button.button), false, GetModState(SDL_GetModState()));
+			bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
+			Point p(event.button.x, event.button.y);
+			EventButton btn = SDL_BUTTON(event.button.button);
+			int mod =  GetModState(SDL_GetModState());
+			e = EvntManager->CreateMouseBtnEvent(p, btn, down, mod);
 			EvntManager->DispatchEvent(e);
 			break;
 	}
