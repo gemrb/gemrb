@@ -70,9 +70,6 @@ class Window;
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4
 
-#define GEM_MB_NORMAL           255
-#define GEM_MB_DOUBLECLICK      256
-
 #define GEM_RK_DOUBLESPEED      1
 #define GEM_RK_DISABLE          2
 #define GEM_RK_QUADRUPLESPEED   4

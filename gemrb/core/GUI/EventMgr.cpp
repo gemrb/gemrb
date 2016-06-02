@@ -75,12 +75,12 @@ bool EventMgr::MouseDown()
 
 void EventMgr::DispatchEvent(Event& e)
 {
-	// TODO: for mouse events: check double click delay and set if repeat
-	// TODO: for key events: check repeat key delay and set if repeat
 	e.time = GetTickCount();
 
 	// first check for hot key listeners
 	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
+		// TODO: for key events: check repeat key delay and set if repeat
+
 		int flags = e.mod << 16;
 		flags |= e.keyboard.keycode;
 		modKeys = e.mod;
@@ -93,10 +93,32 @@ void EventMgr::DispatchEvent(Event& e)
 				return;
 			}
 		}
-	} else {
+	} else if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
+		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask)) {
+			static unsigned long lastMouseDown = 0;
+			static uint8_t repeatCount = 0;
+			static EventButton repeatButton = 0;
+
+			if (e.type == Event::MouseDown) {
+				if (e.mouse.button == repeatButton
+					&& e.time <= lastMouseDown + DCDelay
+				) {
+					repeatCount++;
+				} else {
+					repeatCount = 1;
+				}
+				repeatButton = e.mouse.button;
+				lastMouseDown = GetTickCount();
+			}
+
+			e.mouse.repeats = repeatCount;
+		}
+
 		// set/clear the appropriate buttons
 		mouseButtonFlags = e.mouse.buttonStates;
 		mousePos = e.mouse.Pos();
+	} else {
+		// TODO: implement touch events and controller events
 	}
 
 	// no hot keys or their listeners refused the event...
