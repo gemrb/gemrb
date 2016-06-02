@@ -75,17 +75,6 @@ bool Point::isempty() const
 	return (x == -1) && (y == -1);
 }
 
-bool Point::PointInside(const Point &p) const
-{
-	if (( p.x < 0 ) || ( p.x > x )) {
-		return false;
-	}
-	if (( p.y < 0 ) || ( p.y > y )) {
-		return false;
-	}
-	return true;
-}
-
 Size::Size()
 {
 	w = h = 0;
