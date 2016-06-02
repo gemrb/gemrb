@@ -36,11 +36,6 @@ namespace GemRB {
 #define MAP_SET_NOTE   2
 #define MAP_REVEAL     3
 
-// Ratio between pixel sizes of an Area (Big map) and a Small map
-
-static int MAP_DIV   = 3;
-static int MAP_MULT  = 32;
-
 typedef enum {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen} colorcode;
 
 Color colors[]={
@@ -55,30 +50,10 @@ Color colors[]={
  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-#define MAP_TO_SCREENX(x) (XWin + XCenter - ScrollX + (x))
-#define MAP_TO_SCREENY(y) (YWin + YCenter - ScrollY + (y))
-// Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is
-//   already relative to control [XY]Pos there
-#define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
-#define SCREEN_TO_MAPY(y) ((y) - YCenter + ScrollY)
-
-#define GAME_TO_SCREENX(x) MAP_TO_SCREENX((int)((x) * MAP_DIV / MAP_MULT))
-#define GAME_TO_SCREENY(y) MAP_TO_SCREENY((int)((y) * MAP_DIV / MAP_MULT))
-
-#define SCREEN_TO_GAMEX(x) (SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV)
-#define SCREEN_TO_GAMEY(y) (SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV)
-
 MapControl::MapControl(const Region& frame)
 	: Control(frame)
 {
 	ControlType = IE_GUI_MAP;
-	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
-		MAP_DIV=4;
-		MAP_MULT=32;
-	} else {
-		MAP_DIV=3;
-		MAP_MULT=32;
-	}
 
 	LinkedLabel = NULL;
 	ScrollX = 0;
@@ -89,7 +64,6 @@ MapControl::MapControl(const Region& frame)
 	XCenter = YCenter = 0;
 	lastMouseX = lastMouseY = 0;
 	mouseIsDown = false;
-	MarkDirty();
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
@@ -119,11 +93,11 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(const Region& rgn)
+void MapControl::DrawFog(const Region& /*rgn*/)
 {
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
+/*
 	Video *video = core->GetVideoDriver();
+	Point p = rgn.Origin();
 
 	// FIXME: this is ugly, the knowledge of Map and ExploredMask
 	//   sizes should be in Map.cpp
@@ -132,19 +106,22 @@ void MapControl::DrawFog(const Region& rgn)
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			Point p( (short) (MAP_MULT * x), (short) (MAP_MULT * y) );
+			p.x = (MAP_MULT * x), p.y = (MAP_MULT * y);
 			bool visible = MyMap->IsVisible( p, true );
-			if (! visible) {
-				Region rgn = Region ( MAP_TO_SCREENX(MAP_DIV * x), MAP_TO_SCREENY(MAP_DIV * y), MAP_DIV, MAP_DIV );
+			if (!visible) {
+				p.x = (MAP_DIV * x), p.y = (MAP_DIV * y);
+				Region rgn = Region ( ConvertPointToScreen(p), Size(MAP_DIV, MAP_DIV) );
 				video->DrawRect( rgn, colors[black] );
 			}
 		}
 	}
+*/
 }
 
 // To be called after changes in control's or screen geometry
 void MapControl::Realize()
 {
+	/*
 	// FIXME: ugly!! How to get area size in pixels?
 	//Map *map = core->GetGame()->GetCurrentMap();
 	//MapWidth = map->GetWidth();
@@ -166,6 +143,7 @@ void MapControl::Realize()
 	YCenter = (short) (frame.h - MapHeight ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
+	*/
 }
 
 void MapControl::UpdateState(unsigned int Sum)
@@ -177,31 +155,26 @@ void MapControl::UpdateState(unsigned int Sum)
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
-
 	Realize();
 
 	Video* video = core->GetVideoDriver();
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), &rgn );
+		video->BlitSprite( MapMOS, 0, 0, &rgn );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(rgn);
 
 	Region vp = core->GetGameControl()->Viewport();
-
-	vp.x = GAME_TO_SCREENX(vp.x);
-	vp.y = GAME_TO_SCREENY(vp.y);
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
+	/*
 	if ((vp.x + vp.w) >= MAP_TO_SCREENX( frame.w ))
 		vp.w = MAP_TO_SCREENX( frame.w ) - vp.x;
 	if ((vp.y + vp.h) >= MAP_TO_SCREENY( frame.h ))
 		vp.h = MAP_TO_SCREENY( frame.h ) - vp.y;
-
+*/
 	video->DrawRect( vp, colors[green], false );
 
 	// Draw PCs' ellipses
@@ -210,7 +183,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
-			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
+			video->DrawEllipse( actor->Pos.x, actor->Pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -222,6 +195,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			const MapNote& mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn.color&7];
 			Point pos = mn.Pos;
+			/*
 			if (convertToGame) {
 				vp.x = GAME_TO_SCREENX(mn.Pos.x);
 				vp.y = GAME_TO_SCREENY(mn.Pos.y);
@@ -231,6 +205,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 				pos.x = pos.x * MAP_MULT / MAP_DIV;
 				pos.y = pos.y * MAP_MULT / MAP_DIV;
 			}
+			 */
 
 			//Skip unexplored map notes
 			bool visible = MyMap->IsVisible( pos, true );
@@ -284,8 +259,8 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 
 	if (Value == MAP_VIEW_NOTES || Value == MAP_SET_NOTE || Value == MAP_REVEAL) {
 		Point mp;
+		/*
 		unsigned int dist;
-
 		if (convertToGame) {
 			mp.x = (short) SCREEN_TO_GAMEX(p.x);
 			mp.y = (short) SCREEN_TO_GAMEY(p.y);
@@ -307,6 +282,7 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 				return;
 			}
 		}
+		*/
 		NotePosX = mp.x;
 		NotePosY = mp.y;
 	}
@@ -331,8 +307,8 @@ void MapControl::ClickHandle(unsigned short Button)
 
 void MapControl::ViewHandle(unsigned short x, unsigned short y)
 {
-	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
-	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
+	short xp = (short) (x - ViewWidth / 2);
+	short yp = (short) (y - ViewHeight / 2);
 
 	if (xp + ViewWidth > MapWidth) xp = MapWidth - ViewWidth;
 	if (yp + ViewHeight > MapHeight) yp = MapHeight - ViewHeight;
@@ -340,24 +316,26 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 	if (yp < 0) yp = 0;
 
 	// clear any previously scheduled moves and then do it asap, so it works while paused
-	Point p(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
+	Point p;//(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
 	core->timer->SetMoveViewPort( p, 0, false );
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const Point& p, unsigned short /*Button*/, unsigned short /*Mod*/)
+void MapControl::OnMouseDown(const Point& /*p*/, unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	mouseIsDown = true;
+	/*
 	Region vp = core->GetGameControl()->Viewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
 	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
 	ViewHandle(p.x, p.y);
 	lastMouseX = p.x;
 	lastMouseY = p.y;
+	*/
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short Mod)
+void MapControl::OnMouseUp(const Point& /*p*/, unsigned short Button, unsigned short /*Mod*/)
 {
 	if (!mouseIsDown) {
 		return;
@@ -368,6 +346,7 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 	}
 
 	mouseIsDown = false;
+	/*
 	switch(Value) {
 		case MAP_REVEAL:
 			ViewHandle(p.x, p.y);
@@ -388,6 +367,7 @@ void MapControl::OnMouseUp(const Point& p, unsigned short Button, unsigned short
 		default:
 			return Control::OnMouseUp(p, Button, Mod);
 	}
+	*/
 }
 
 /** Special Key Press */
