@@ -231,7 +231,7 @@ private: // Private attributes
 	KeyboardKey hotKey;
 
 	bool HandleHotKey(const Event&);
-	bool EventHit (const Point&) const;
+	bool HitTest (const Point&) const;
 	void CloseUpColor();
 
 	/** Draws the Control on the Output Display */

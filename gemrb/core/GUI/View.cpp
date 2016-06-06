@@ -306,7 +306,7 @@ void View::SubviewRemoved(View* view, View* parent)
 	}
 }
 
-bool View::EventHit(const Point& p) const
+bool View::HitTest(const Point& p) const
 {
 	if (!IsOpaque() && background) {
 		return !background->IsPixelTransparent(p.x, p.y);
@@ -322,7 +322,7 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 		View* v = *it;
 		const Region& viewFrame = v->Frame();
 		Point subP = v->ConvertPointFromSuper(p);
-		if (viewFrame.PointInside(p) && (ignoreTransparency || v->EventHit(subP))) {
+		if (viewFrame.PointInside(p) && (ignoreTransparency || v->HitTest(subP))) {
 			if (recursive) {
 				View* subV = v->SubviewAt(subP, ignoreTransparency, recursive);
 				v = (subV) ? subV : v;

@@ -103,7 +103,7 @@ public:
 
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }
-	virtual bool EventHit(const Point& p) const;
+	virtual bool HitTest(const Point& p) const;
 
 	bool SetFlags(unsigned int arg_flags, int opcode);
 	inline unsigned int Flags() { return flags; }
