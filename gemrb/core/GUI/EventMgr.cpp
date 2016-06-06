@@ -160,10 +160,10 @@ Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down
 
 	if (down) {
 		e.type = Event::MouseDown;
-		e.mouse.buttonStates |= 1 << (btn-1);
+		e.mouse.buttonStates |= btn;
 	} else {
 		e.type = Event::MouseUp;
-		e.mouse.buttonStates &= ~(1 << (btn-1));
+		e.mouse.buttonStates &= ~btn;
 	}
 	e.mouse.button = btn;
 
