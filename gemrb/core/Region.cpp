@@ -75,6 +75,12 @@ bool Point::isempty() const
 	return (x == -1) && (y == -1);
 }
 
+bool Point::isWithinRadius(int r, const Point& p)
+{
+	Point diff = operator-(p);
+	return (diff.x >= -r && diff.x <= r) && (diff.y >= -r && diff.y <= r);
+}
+
 Size::Size()
 {
 	w = h = 0;

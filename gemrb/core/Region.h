@@ -64,6 +64,9 @@ public:
 		y=0;
 	}
 
+	// true if delta x & y of p <= r (non circular)
+	bool isWithinRadius(int r, const Point& p);
+
 	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
 	void fromDword(ieDword val); // extract coordinates from uint32
 
