@@ -47,6 +47,7 @@ namespace GemRB {
 
 		void AddSubviewInFrontOfView(View*, const View* = NULL);
 		View* RemoveSubview(const View*);
+		View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 		void OnMouseWheelScroll(const Point& delta);

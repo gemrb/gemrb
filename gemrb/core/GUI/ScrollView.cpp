@@ -51,6 +51,12 @@ View* ScrollView::RemoveSubview(const View* view)
 	return contentView.RemoveSubview(view);
 }
 
+View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
+{
+	View* v = View::SubviewAt(p, ignoreTransparency, recursive);
+	return (v == &contentView) ? NULL : v;
+}
+
 void ScrollView::Scroll(const Point& p)
 {
 	Point newP = p + contentView.Origin();
