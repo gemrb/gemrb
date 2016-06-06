@@ -2057,7 +2057,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 		return RuntimeError( "Control is not found." );
 	}
 	if (status&IE_GUI_CONTROL_FOCUSED) {
-		ctrl->Owner->Focus();
+		ctrl->SetFocus();
 	}
 
 	//check if the status parameter was intended to use with this control
