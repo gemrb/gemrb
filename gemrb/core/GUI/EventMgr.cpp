@@ -31,8 +31,8 @@ bool EventMgr::TouchInputEnabled = true;
 
 unsigned long EventMgr::dc_time;
 unsigned long EventMgr::rk_flags;
-std::bitset<sizeof(short)> EventMgr::mouseButtonFlags;
-std::bitset<sizeof(short)> EventMgr::modKeys;
+std::bitset<sizeof(short) * CHAR_BIT> EventMgr::mouseButtonFlags;
+std::bitset<sizeof(short) * CHAR_BIT> EventMgr::modKeys;
 Point EventMgr::mousePos;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();

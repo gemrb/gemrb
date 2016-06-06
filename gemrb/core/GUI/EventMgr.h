@@ -200,8 +200,8 @@ private:
 
 	static unsigned long dc_time;
 	static unsigned long rk_flags;
-	static std::bitset<sizeof(short)> mouseButtonFlags;
-	static std::bitset<sizeof(short)> modKeys;
+	static std::bitset<sizeof(short) * CHAR_BIT> mouseButtonFlags;
+	static std::bitset<sizeof(short) * CHAR_BIT> modKeys;
 	static Point mousePos;
 
 public:
