@@ -98,15 +98,18 @@ void EventMgr::DispatchEvent(Event& e)
 			static unsigned long lastMouseDown = 0;
 			static uint8_t repeatCount = 0;
 			static EventButton repeatButton = 0;
+			static Point repeatPos;
 
 			if (e.type == Event::MouseDown) {
 				if (e.mouse.button == repeatButton
 					&& e.time <= lastMouseDown + DCDelay
+					&& repeatPos.isWithinRadius(5, e.mouse.Pos())
 				) {
 					repeatCount++;
 				} else {
 					repeatCount = 1;
 				}
+				repeatPos = e.mouse.Pos();
 				repeatButton = e.mouse.button;
 				lastMouseDown = GetTickCount();
 			}
