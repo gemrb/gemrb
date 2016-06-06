@@ -279,6 +279,14 @@ bool Window::DispatchEvent(const Event& event)
 	View* target = NULL;
 
 	if (event.isScreen) {
+		// FIXME: this will be for touch events too. poor name for that!
+		// also using a mask will be more suitable for mixed event types
+		if (!isMouseDown && event.type != Event::MouseDown) {
+			// window is not the origin of the down event
+			// we then ignore this
+			return false;
+		}
+
 		Point screenPos = event.mouse.Pos();
 		if (!frame.PointInside(screenPos)) {
 			// this can hapen if the window is modal since it will absorb all events
