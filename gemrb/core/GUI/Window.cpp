@@ -28,6 +28,7 @@ namespace GemRB {
 Window::Window(const Region& frame, WindowManager& mgr)
 	: ScrollView(frame), manager(mgr)
 {
+	isMouseDown = false;
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
@@ -211,11 +212,6 @@ bool Window::TrySetFocus(View* target)
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
-	if ((flags&Draggable) && me.ButtonState(GEM_MB_ACTION)) {
-		OnMouseDrag(me);
-		return;
-	}
-
 	bool left = false;
 	if (target) {
 		if (target != hoverView) {
@@ -252,6 +248,7 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 
 void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned short mod)
 {
+	isMouseDown = true;
 	if (me.button == GEM_MB_ACTION) {
 		Focus();
 	}
@@ -274,6 +271,7 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 	}
 	drag = NULL;
 	trackingView = NULL;
+	isMouseDown = false;
 }
 
 bool Window::DispatchEvent(const Event& event)
@@ -354,7 +352,7 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 
 void Window::OnMouseDrag(const MouseEvent& me)
 {
-	if (flags&Draggable) {
+	if ((flags&Draggable) && isMouseDown && trackingView == this) {
 		Point newOrigin = frame.Origin() - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {
