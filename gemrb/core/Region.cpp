@@ -171,22 +171,4 @@ Region Region::Intersect(const Region& rgn) const
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
-void Region::Normalize()
-{
-	if (x > w) {
-		int tmp = x;
-		x = w;
-		w = tmp - x;
-	} else {
-		w -= x;
-	}
-	if (y > h) {
-		int tmp = y;
-		y = h;
-		h = tmp - y;
-	} else {
-		h -= y;
-	}
-}
-
 }

@@ -105,7 +105,6 @@ public:
 	bool IntersectsRegion(const Region& rgn) const;
 	Region Intersect(const Region& rgn) const;
 
-	void Normalize();
 	Point Origin() const { return Point(x, y); }
 	Size Dimensions() const { return Size(w, h); }
 
