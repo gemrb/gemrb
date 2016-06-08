@@ -77,8 +77,9 @@ bool Point::isempty() const
 
 bool Point::isWithinRadius(int r, const Point& p)
 {
-	Point diff = operator-(p);
-	return (diff.x >= -r && diff.x <= r) && (diff.y >= -r && diff.y <= r);
+	Point d = operator-(p);
+	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
+	return (d.x * d.x) + (d.y * d.y) <= r * r;
 }
 
 Size::Size()
