@@ -1350,7 +1350,8 @@ def AbilitiesCalcLimits(Index):
 	global AbilitiesRaceReqTable, AbilitiesRaceAddTable, AbilitiesClassReqTable
 	global AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
 
-	RaceName = CommonTables.Races.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
+	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE))
+	RaceName = CommonTables.Races.GetRowName (Race)
 	Race = AbilitiesRaceReqTable.GetRowIndex (RaceName)
 	AbilitiesMinimum = AbilitiesRaceReqTable.GetValue (Race, Index * 2)
 	AbilitiesMaximum = AbilitiesRaceReqTable.GetValue (Race, Index * 2 + 1)
