@@ -12476,24 +12476,26 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 	return PyString_FromString(splname);
 }
 
-PyDoc_STRVAR( GemRB_SetTickHook__doc,
-"===== SetTickHook =====\n\
+PyDoc_STRVAR( GemRB_SetTimer__doc,
+"===== SetTimer =====\n\
 \n\
-**Prototype:** GemRB.SetTickHook (callback)\n\
+**Prototype:** GemRB.SetTimer (callback[, interval])\n\
 \n\
-**Description:** Set callback to be called every main loop iteration. \n\
+**Description:** Set callback to be called repeatedly at given interval. \n\
 This is useful for things like running a twisted reactor.\n\
 \n\
 **Parameters:**\n\
-  * callback - pyton function to run\
+  * callback - pyton function to run\n\
+  * interval - time interval in ticks\n\
 \n\
 **Return value:** N/A"
 );
 
-static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 {
+	Timer::TimeInterval interval = 0;
 	PyObject* function;
-	PARSE_ARGS1(args, "O", &function);
+	PARSE_ARGS2(args, "O|i", &function, &interval);
 
 	EventHandler handler = NULL;
 	if (function != Py_None && PyCallable_Check(function)) {
@@ -12504,7 +12506,7 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 		return RuntimeError(buf);
 	}
 
-	core->SetTickHook(handler);
+	core->SetTimer(handler, interval);
 
 	Py_RETURN_NONE;
 }
@@ -13109,7 +13111,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(SetRepeatClickFlags, METH_VARARGS),
-	METHOD(SetTickHook, METH_VARARGS),
+	METHOD(SetTimer, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),

@@ -37,6 +37,7 @@
 #include "Holder.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
+#include "Timer.h"
 
 #include <map>
 #include <string>
@@ -370,8 +371,8 @@ private:
 	bool update_scripts;
 	/** Next Script Name */
 	char NextScript[64];
-	/** Function to call every main loop iteration */
-	EventHandler TickHook;
+
+	std::vector<Timer> timers;
 	int SpecialSpellsCount;
 	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;
@@ -757,7 +758,7 @@ public:
 
 	Audio* GetAudioDrv(void) const;
 
-	void SetTickHook(EventHandler);
+	Timer& SetTimer(EventHandler, unsigned long interval);
 };
 
 extern GEM_EXPORT Interface * core;

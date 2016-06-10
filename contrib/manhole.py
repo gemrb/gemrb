@@ -12,7 +12,7 @@ import GemRB
 from twisted.internet import reactor
 
 reactor.startRunning()
-GemRB.SetTickHook(lambda: reactor.iterate())
+GemRB.SetTimer(lambda: reactor.iterate())
 
 from twisted.conch import manhole, manhole_ssh
 from twisted.conch.insults import insults

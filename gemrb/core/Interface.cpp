@@ -914,8 +914,16 @@ void Interface::Main()
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 
 	do {
-		//don't change script when quitting is pending
+		std::vector<Timer>::iterator it;
+		for (it = timers.begin(); it != timers.end(); ++it) {
+			if (it->IsRunning()) {
+				it->Update();
+			} else {
+				it = timers.erase(it);
+			}
+		}
 
+		//don't change script when quitting is pending
 		while (QuitFlag && QuitFlag != QF_KILL) {
 			HandleFlags();
 		}
@@ -941,8 +949,6 @@ void Interface::Main()
 			fps->Print( fpsRgn, String(fpsstring), palette,
 					   IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
 		}
-		if (TickHook)
-			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 
 	gamedata->FreePalette( palette );
@@ -4756,9 +4762,10 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-void Interface::SetTickHook(EventHandler hook)
+Timer& Interface::SetTimer(EventHandler handler, unsigned long interval)
 {
-	TickHook = hook;
+	timers.push_back(Timer(interval, handler));
+	return timers.back();
 }
 
 void Interface::SetNextScript(const char *script)

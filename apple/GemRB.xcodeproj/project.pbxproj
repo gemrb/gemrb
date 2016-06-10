@@ -54,6 +54,7 @@
 		A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */; };
 		A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
 		A20E4AE3197344BD00A6BC96 /* SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD9197344BD00A6BC96 /* SFMT.h */; };
+		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
@@ -1246,6 +1247,7 @@
 		A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params19937.h"; sourceTree = "<group>"; };
 		A20E4AD8197344BD00A6BC96 /* SFMT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SFMT.c; sourceTree = "<group>"; };
 		A20E4AD9197344BD00A6BC96 /* SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMT.h; sourceTree = "<group>"; };
+		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
@@ -3173,6 +3175,7 @@
 				A2BFA0711395FF62006ADC12 /* TileOverlay.h */,
 				A2BFA0721395FF62006ADC12 /* TileSetMgr.cpp */,
 				A2BFA0731395FF62006ADC12 /* TileSetMgr.h */,
+				A2111CC81D0A49650044939E /* Timer.h */,
 				A2BFA0741395FF62006ADC12 /* TypeID.h */,
 				A2BFA0751395FF62006ADC12 /* Variables.cpp */,
 				A2BFA0761395FF62006ADC12 /* Variables.h */,
@@ -3445,6 +3448,7 @@
 				A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */,
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
+				A2111CCA1D0A49650044939E /* Timer.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,
 				A2E6637B139E883100310FC8 /* EffectMgr.h in Headers */,
 				A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */,
