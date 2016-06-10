@@ -49,13 +49,24 @@
 
 #include "Callback.h"
 #include "GUI/View.h"
+#include "Timer.h"
 
 namespace GemRB {
 
 class ControlAnimation;
-class ControlEventHandler;
+class Control;
 class Sprite2D;
 class Window;
+
+class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
+public:
+	ControlEventHandler(Callback<Control*, void>* ptr = NULL)
+	: Holder< Callback<Control*, void> >(ptr) {}
+
+	void operator()(Control* ctrl) const {
+		return (*ptr)(ctrl);
+	}
+};
 
 /**
  * @class Control
@@ -63,6 +74,19 @@ class Window;
  */
 
 class GEM_EXPORT Control : public View {
+private:
+	// if the mouse is held: fires the action at the interval specified by ActionRepeatDelay
+	// otherwise action fires on mouse up only
+	bool isContinuous;
+	unsigned int repeatDelay;
+	ControlEventHandler action;
+	Timer* actionTimer;
+
+private:
+	inline Timer::TimeInterval ActionRepeatInterval() {
+		return (repeatDelay) ? repeatDelay : ActionRepeatDelay;
+	}
+
 protected:
 	/** the value of the control to add to the variable */
 	ieDword Value;
@@ -98,6 +122,8 @@ public: // Public attributes
 	/** Owner Window */
 	Window* Owner;
 
+	static unsigned int ActionRepeatDelay;
+
 public:
 	//Events
 	/** Reset/init event handler */
@@ -109,8 +135,11 @@ public:
 	bool IsFocused();
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
+	void SetAction(ControlEventHandler handler);
+	void SetActionInterval(unsigned int interval);
+	void SetContinuous(bool);
 	/** Run specified handler, it may return error code */
-	int RunEventHandler(ControlEventHandler handler);
+	int RunEventHandler(const ControlEventHandler& handler);
 
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
@@ -118,18 +147,11 @@ public:
 
 	ieDword GetValue() const { return Value; }
 	void SetValue(ieDword val) { Value = val; }
+
+	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 };
 
-
-class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
-public:
-	ControlEventHandler(Callback<Control*, void>* ptr = NULL)
-	: Holder< Callback<Control*, void> >(ptr) {}
-
-	void operator()(Control* ctrl) {
-		return (*ptr)(ctrl);
-	}
-};
 
 }
 

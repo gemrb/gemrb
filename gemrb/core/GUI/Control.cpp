@@ -24,6 +24,7 @@
 #include "win32def.h"
 
 #include "ControlAnimation.h"
+#include "Interface.h"
 #include "Sprite2D.h"
 
 #ifdef ANDROID
@@ -35,8 +36,10 @@
 
 namespace GemRB {
 
+unsigned int Control::ActionRepeatDelay = 250;
+
 Control::Control(const Region& frame)
-	: View(frame)
+: View(frame)
 {
 	InHandler = false;
 	VarName[0] = 0;
@@ -46,10 +49,18 @@ Control::Control(const Region& frame)
 	animation = NULL;
 	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;
+
+	actionTimer = NULL;
+	action = NULL;
+	repeatDelay = 0;
+	isContinuous = false;
 }
 
 Control::~Control()
 {
+	if (actionTimer)
+		actionTimer->Invalidate();
+
 	if (InHandler) {
 		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
 	}
@@ -63,6 +74,21 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
+void Control::SetAction(ControlEventHandler handler)
+{
+	action = handler;
+}
+
+void Control::SetActionInterval(unsigned int interval)
+{
+	repeatDelay = interval;
+}
+
+void Control::SetContinuous(bool continuous)
+{
+	isContinuous = continuous;
+}
+
 void Control::ResetEventHandler(ControlEventHandler &handler)
 {
 	handler = NULL;
@@ -71,7 +97,7 @@ void Control::ResetEventHandler(ControlEventHandler &handler)
 //return -1 if there is an error
 //return 1 if there is no handler (not an error)
 //return 0 if the handler ran as intended
-int Control::RunEventHandler(ControlEventHandler handler)
+int Control::RunEventHandler(const ControlEventHandler& handler)
 {
 	if (InHandler) {
 		Log(WARNING, "Control", "Nested event handlers are not supported!");
@@ -114,6 +140,35 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	MarkDirty();
+}
+
+void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
+{
+	if (me.button == GEM_MB_ACTION) {
+		RunEventHandler(action);
+		if (actionTimer) {
+			actionTimer->Invalidate();
+			actionTimer = NULL;
+		}
+	}
+}
+
+void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	if (me.button == GEM_MB_ACTION && isContinuous && action) {
+		class RepeatControlEventHandler : public Callback<void, void> {
+			const ControlEventHandler action;
+			Control* ctrl;
+
+			public:
+			RepeatControlEventHandler(const ControlEventHandler& handler, Control* c)
+			: action(handler), ctrl(c) {}
+
+			 void operator()() const { return action(ctrl); }
+		};
+
+		actionTimer = &core->SetTimer(new RepeatControlEventHandler(action, this), ActionRepeatInterval());
+	}
 }
 
 }
