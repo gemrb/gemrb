@@ -61,7 +61,6 @@ def OpenLUStatsWindow(Type = 1):
 	global TotLabel, AcLabel, HpLabel
 	global TextArea, Stats, StatLabels, StatLowerLimit, StatLimit, LevelUp
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
 	LevelUp = Type
 	if LevelUp:
 		import GUICommonWindows

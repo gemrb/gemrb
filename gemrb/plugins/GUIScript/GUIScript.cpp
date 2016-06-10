@@ -12109,36 +12109,6 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
-"===== SetRepeatClickFlags =====\n\
-\n\
-**Prototype:** GemRB.SetRepeatClickFlags (value, op)\n\
-\n\
-**Description:** Sets the mode repeat clicks are handled.\n\
-\n\
-**Parameters:** \n\
-  * value - speed, see the GEM_RK* flags in GUIDefines.py\n\
-  * op - bit operation to perform\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:bit_operation]]\n\
-"
-);
-
-static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
-{
-	int value, op;
-	unsigned long ret = 0;
-
-	if (!PyArg_ParseTuple( args, "ii", &value, &op)) {
-		return AttributeError( GemRB_SetRepeatClickFlags__doc );
-	}
-	// TODO: implement this
-	//ret = ?->SetRKFlags(value, op);
-	return PyInt_FromLong( ret );
-}
-
 PyDoc_STRVAR( GemRB_DisplayString__doc,
 "===== DisplayString =====\n\
 \n\
@@ -13110,7 +13080,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerString, METH_VARARGS),
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
-	METHOD(SetRepeatClickFlags, METH_VARARGS),
 	METHOD(SetTimer, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),

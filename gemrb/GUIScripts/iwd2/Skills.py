@@ -117,8 +117,6 @@ def OpenSkillsWindow(chargen, level=0):
 
 	CharGen = chargen
 
-	#enable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	SkillPtsTable = GemRB.LoadTable ("skillpts")
 	if chargen:
 		pc = GemRB.GetVar ("Slot")

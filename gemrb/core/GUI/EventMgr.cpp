@@ -26,35 +26,14 @@
 namespace GemRB {
 
 unsigned long EventMgr::DCDelay = 250;
-unsigned long EventMgr::RKDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
-unsigned long EventMgr::rk_flags;
 std::bitset<sizeof(short) * CHAR_BIT> EventMgr::mouseButtonFlags;
 std::bitset<sizeof(short) * CHAR_BIT> EventMgr::modKeys;
 Point EventMgr::mousePos;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
-
-EventMgr::EventMgr(void)
-{
-	rk_flags = GEM_RK_DISABLE;
-}
-
-unsigned long EventMgr::GetRKDelay()
-{
-	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;
-	if (rk_flags&GEM_RK_DOUBLESPEED) return RKDelay/2;
-	if (rk_flags&GEM_RK_QUADRUPLESPEED) return RKDelay/4;
-	return RKDelay;
-}
-
-unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
-{
-	SetBits(rk_flags, arg, op);
-	return rk_flags;
-}
 
 bool EventMgr::ModState(unsigned short mod)
 {

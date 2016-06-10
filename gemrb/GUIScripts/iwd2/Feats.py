@@ -393,7 +393,6 @@ def BackPress():
 	return
 
 def NextPress(save=1):
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
 

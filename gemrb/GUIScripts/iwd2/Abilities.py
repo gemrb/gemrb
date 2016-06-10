@@ -117,8 +117,6 @@ def OpenAbilitiesWindow(chargen, points):
 	CharGen = chargen
 	PointsLeft = points
 
-	#enable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	AbilityTable = GemRB.LoadTable ("ability")
 	if chargen:
 		Kit = GemRB.GetVar("Class Kit")

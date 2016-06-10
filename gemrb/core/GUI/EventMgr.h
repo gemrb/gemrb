@@ -70,10 +70,6 @@ class Window;
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4
 
-#define GEM_RK_DOUBLESPEED      1
-#define GEM_RK_DISABLE          2
-#define GEM_RK_QUADRUPLESPEED   4
-
 typedef unsigned char EventButton;
 typedef unsigned short KeyboardKey;
 typedef unsigned short ButtonMask;
@@ -177,7 +173,6 @@ public:
 	typedef Callback<const Event&, bool> EventCallback;
 
 	static unsigned long DCDelay;
-	static unsigned long RKDelay;
 	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
@@ -198,18 +193,12 @@ private:
 	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
 
-	static unsigned long rk_flags;
 	static std::bitset<sizeof(short) * CHAR_BIT> mouseButtonFlags;
 	static std::bitset<sizeof(short) * CHAR_BIT> modKeys;
 	static Point mousePos;
 
 public:
-	EventMgr(void);
-
 	void DispatchEvent(Event& e);
-
-	static unsigned long GetRKDelay();
-	static unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 
 	static bool ModState(unsigned short mod);
 	static bool ButtonState(unsigned short btn);

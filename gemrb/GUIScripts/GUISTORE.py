@@ -1053,7 +1053,6 @@ def OpenItemAmountWindow ():
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
-	GemRB.SetRepeatClickFlags (GEM_RK_QUADRUPLESPEED, OP_OR)
 	Index = GemRB.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Amount = Slot['Purchased']
@@ -1093,7 +1092,6 @@ def OpenItemAmountWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelItemAmount)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -1136,7 +1134,6 @@ def ConfirmItemAmount ():
 
 	ItemAmountWindow.Unload ()
 	ItemAmountWindow = None
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	UpdateStoreShoppingWindow ()
 	return
 
@@ -1145,7 +1142,6 @@ def CancelItemAmount ():
 
 	ItemAmountWindow.Unload ()
 	ItemAmountWindow = None
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	UpdateStoreShoppingWindow ()
 	return
 
