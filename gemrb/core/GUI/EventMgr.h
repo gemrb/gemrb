@@ -198,7 +198,6 @@ private:
 	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
 
-	static unsigned long dc_time;
 	static unsigned long rk_flags;
 	static std::bitset<sizeof(short) * CHAR_BIT> mouseButtonFlags;
 	static std::bitset<sizeof(short) * CHAR_BIT> modKeys;

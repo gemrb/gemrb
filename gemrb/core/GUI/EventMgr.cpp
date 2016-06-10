@@ -29,7 +29,6 @@ unsigned long EventMgr::DCDelay = 250;
 unsigned long EventMgr::RKDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
-unsigned long EventMgr::dc_time;
 unsigned long EventMgr::rk_flags;
 std::bitset<sizeof(short) * CHAR_BIT> EventMgr::mouseButtonFlags;
 std::bitset<sizeof(short) * CHAR_BIT> EventMgr::modKeys;
@@ -40,7 +39,6 @@ EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 EventMgr::EventMgr(void)
 {
-	dc_time = 0;
 	rk_flags = GEM_RK_DISABLE;
 }
 
