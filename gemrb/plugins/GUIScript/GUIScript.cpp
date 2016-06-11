@@ -1976,6 +1976,38 @@ static PyObject* GemRB_Control_SetEvent(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Control_SetActionInterval__doc,
+"===== Control_SetActionInterval =====\n\
+\n\
+**Prototype:** _GemRB.Control_SetActionInterval (GControl [,interval])\n\
+\n\
+**Metaclass Prototype:** SetActionInterval ([interval])\n\
+\n\
+**Description:** Sets the tick interval between repeating actions such as a held down mouse button\
+\n\
+**Parameters:** \n\
+* interval - the number of ticks between firing actions, default is Control::ActionRepeatDelay\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:**\n\
+Button.SetActionInterval (50)\n\
+**See also:** [[guiscript:Control_SetEvent]]"
+);
+
+static PyObject* GemRB_Control_SetActionInterval(PyObject* self, PyObject* args)
+{
+	int interval = Control::ActionRepeatDelay;
+	PARSE_ARGS2(args, "O|i", &self, &interval);
+
+	Control* ctrl = GetView<Control>(self);
+	assert(ctrl);
+
+	ctrl->SetActionInterval(interval);
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_SetNextScript__doc,
 "===== SetNextScript =====\n\
 \n\
@@ -13126,6 +13158,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetActionInterval, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetTooltip, METH_VARARGS),

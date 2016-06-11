@@ -140,6 +140,7 @@ class GControl(GView):
     'SetText': _GemRB.Control_SetText,
     'SetTooltip': _GemRB.Control_SetTooltip,
     'SetEvent': _GemRB.Control_SetEvent,
+    'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
