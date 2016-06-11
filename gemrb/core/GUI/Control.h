@@ -132,6 +132,8 @@ public:
 	Window *GetOwner() const { return Owner; }
 	virtual void SetFocus();
 	bool IsFocused();
+	bool TracksMouseDown() const { return bool(actionTimer); }
+
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetAction(ControlEventHandler handler, unsigned int flags);
