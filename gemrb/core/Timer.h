@@ -51,6 +51,11 @@ public:
 		NextFireDate();
 	}
 
+	void SetInverval(TimeInterval i) {
+		fireDate += (i - interval);
+		interval = i;
+	}
+
 	void Update() {
 		TimeInterval now = GetTickCount();
 		if (fireDate <= now) {
