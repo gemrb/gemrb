@@ -915,9 +915,10 @@ void Interface::Main()
 
 	do {
 		std::vector<Timer>::iterator it;
-		for (it = timers.begin(); it != timers.end(); ++it) {
+		for (it = timers.begin(); it != timers.end();) {
 			if (it->IsRunning()) {
 				it->Update();
+				++it;
 			} else {
 				it = timers.erase(it);
 			}
@@ -4762,7 +4763,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-Timer& Interface::SetTimer(EventHandler handler, unsigned long interval)
+Timer& Interface::SetTimer(const EventHandler& handler, unsigned long interval)
 {
 	timers.push_back(Timer(interval, handler));
 	return timers.back();
