@@ -88,6 +88,7 @@ private:
 	inline Timer::TimeInterval ActionRepeatInterval() {
 		return (repeatDelay) ? repeatDelay : ActionRepeatDelay;
 	}
+	Timer* StartActionTimer(const ControlEventHandler& action);
 
 protected:
 	/** the value of the control to add to the variable */

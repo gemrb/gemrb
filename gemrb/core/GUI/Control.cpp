@@ -141,6 +141,23 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	MarkDirty();
 }
 
+Timer* Control::StartActionTimer(const ControlEventHandler& action)
+{
+	class RepeatControlEventHandler : public Callback<void, void> {
+		const ControlEventHandler action;
+		Control* ctrl;
+
+	public:
+		RepeatControlEventHandler(const ControlEventHandler& handler, Control* c)
+		: action(handler), ctrl(c) {}
+
+		void operator()() const { return action(ctrl); }
+	};
+
+	EventHandler h = new RepeatControlEventHandler(action, this);
+	return &core->SetTimer(h, repeatDelay);
+}
+
 void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 {
 	if (actions.count(me.button)) {
@@ -155,19 +172,7 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (isContinuous && actions.count(me.button)) {
-		class RepeatControlEventHandler : public Callback<void, void> {
-			const ControlEventHandler action;
-			Control* ctrl;
-
-			public:
-			RepeatControlEventHandler(const ControlEventHandler& handler, Control* c)
-			: action(handler), ctrl(c) {}
-
-			 void operator()() const { return action(ctrl); }
-		};
-
-		EventHandler h = new RepeatControlEventHandler(actions[me.buttonStates], this);
-		actionTimer = &core->SetTimer(h, ActionRepeatInterval());
+		actionTimer = StartActionTimer(actions[me.button]);
 	}
 }
 
