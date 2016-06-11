@@ -19,6 +19,8 @@
 #character generation, name (GUICG5)
 import GemRB
 
+import CharGenCommon
+
 NameWindow = 0
 NameField = 0
 DoneButton = 0
@@ -27,6 +29,7 @@ def OnLoad():
 	global NameWindow, NameField, DoneButton
 	
 	NameWindow = GemRB.LoadWindow(5, "GUICG")
+	CharGenCommon.PositionCharGenWin(NameWindow)
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)

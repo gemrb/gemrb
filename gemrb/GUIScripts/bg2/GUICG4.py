@@ -24,6 +24,8 @@ from ie_stats import *
 from GUIDefines import *
 from ie_restype import RES_2DA
 
+import CharGenCommon
+
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -140,6 +142,7 @@ def OnLoad():
 
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
+	CharGenCommon.PositionCharGenWin(AbilityWindow)
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)

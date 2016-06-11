@@ -25,6 +25,8 @@ import LUCommon
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -34,6 +36,7 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, MyChar
 	
 	ClassWindow = GemRB.LoadWindow(2, "GUICG")
+	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )

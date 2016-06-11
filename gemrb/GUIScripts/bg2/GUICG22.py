@@ -23,6 +23,8 @@ import CommonTables
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 KitWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -56,6 +58,8 @@ def OnLoad():
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
 	KitWindow = GemRB.LoadWindow(22, "GUICG")
+	CharGenCommon.PositionCharGenWin(KitWindow)
+	
 	if ClassName == "MAGE":
 		Label = KitWindow.GetControl(0xfffffff)
 		Label.SetText(595)

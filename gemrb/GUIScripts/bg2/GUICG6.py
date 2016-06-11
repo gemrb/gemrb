@@ -22,6 +22,8 @@ import LUSkillsSelection
 from GUIDefines import *
 from ie_stats import *
 
+import CharGenCommon
+
 SkillWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -39,6 +41,8 @@ def OnLoad():
 	global SkillWindow, DoneButton, MyChar
 	
 	SkillWindow = GemRB.LoadWindow(6, "GUICG")
+	CharGenCommon.PositionCharGenWin(SkillWindow)
+	
 	MyChar = GemRB.GetVar ("Slot")
 
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \

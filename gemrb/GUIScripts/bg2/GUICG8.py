@@ -22,6 +22,8 @@ import CommonTables
 from ie_stats import IE_RACE
 from GUIDefines import *
 
+import CharGenCommon
+
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -31,6 +33,7 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton, MyChar
 	
 	RaceWindow = GemRB.LoadWindow(8, "GUICG")
+	CharGenCommon.PositionCharGenWin(RaceWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	RaceCount = CommonTables.Races.GetRowCount()

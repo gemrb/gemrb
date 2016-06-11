@@ -23,6 +23,8 @@ import CommonTables
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -44,6 +46,7 @@ def OnLoad():
 
 	CommonTables.Aligns = CommonTables.Aligns
 	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
+	CharGenCommon.PositionCharGenWin(AlignmentWindow)
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
