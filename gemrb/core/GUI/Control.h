@@ -51,6 +51,8 @@
 #include "GUI/View.h"
 #include "Timer.h"
 
+#include <map>
+
 namespace GemRB {
 
 class ControlAnimation;
@@ -79,7 +81,7 @@ private:
 	// otherwise action fires on mouse up only
 	bool isContinuous;
 	unsigned int repeatDelay;
-	ControlEventHandler action;
+	std::map<unsigned int, ControlEventHandler> actions;
 	Timer* actionTimer;
 
 private:
@@ -135,7 +137,8 @@ public:
 	bool IsFocused();
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
-	void SetAction(ControlEventHandler handler);
+
+	void SetAction(ControlEventHandler handler, unsigned int flags);
 	void SetActionInterval(unsigned int interval);
 	void SetContinuous(bool);
 	/** Run specified handler, it may return error code */

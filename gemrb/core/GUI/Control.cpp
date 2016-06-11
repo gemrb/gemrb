@@ -51,7 +51,6 @@ Control::Control(const Region& frame)
 	ControlType = IE_GUI_INVALID;
 
 	actionTimer = NULL;
-	action = NULL;
 	repeatDelay = 0;
 	isContinuous = false;
 }
@@ -74,9 +73,9 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-void Control::SetAction(ControlEventHandler handler)
+void Control::SetAction(ControlEventHandler handler, unsigned int flags)
 {
-	action = handler;
+	actions[flags] = handler;
 }
 
 void Control::SetActionInterval(unsigned int interval)
@@ -144,8 +143,8 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 
 void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 {
-	if (me.button == GEM_MB_ACTION) {
-		RunEventHandler(action);
+	if (actions.count(me.button)) {
+		RunEventHandler(actions[me.button]);
 		if (actionTimer) {
 			actionTimer->Invalidate();
 			actionTimer = NULL;
@@ -155,7 +154,7 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 
 void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	if (me.button == GEM_MB_ACTION && isContinuous && action) {
+	if (isContinuous && actions.count(me.button)) {
 		class RepeatControlEventHandler : public Callback<void, void> {
 			const ControlEventHandler action;
 			Control* ctrl;
@@ -167,7 +166,8 @@ void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 			 void operator()() const { return action(ctrl); }
 		};
 
-		actionTimer = &core->SetTimer(new RepeatControlEventHandler(action, this), ActionRepeatInterval());
+		EventHandler h = new RepeatControlEventHandler(actions[me.buttonStates], this);
+		actionTimer = &core->SetTimer(h, ActionRepeatInterval());
 	}
 }
 
