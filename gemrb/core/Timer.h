@@ -38,7 +38,7 @@ private:
 	EventHandler action;
 
 private:
-	void UpdateFireDate() {
+	void NextFireDate() {
 		fireDate = GetTickCount() + interval;
 	}
 
@@ -48,14 +48,14 @@ public:
 	{
 		valid = true;
 		interval = i;
-		UpdateFireDate();
+		NextFireDate();
 	}
 
 	void Update() {
 		TimeInterval now = GetTickCount();
 		if (fireDate <= now) {
 			action();
-			UpdateFireDate();
+			NextFireDate();
 		}
 	}
 
