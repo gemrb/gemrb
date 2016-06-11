@@ -52,7 +52,6 @@ Control::Control(const Region& frame)
 
 	actionTimer = NULL;
 	repeatDelay = 0;
-	isContinuous = false;
 }
 
 Control::~Control()
@@ -81,11 +80,9 @@ void Control::SetAction(ControlEventHandler handler, unsigned int flags)
 void Control::SetActionInterval(unsigned int interval)
 {
 	repeatDelay = interval;
-}
-
-void Control::SetContinuous(bool continuous)
-{
-	isContinuous = continuous;
+	if (actionTimer) {
+		actionTimer->SetInverval(repeatDelay);
+	}
 }
 
 void Control::ResetEventHandler(ControlEventHandler &handler)
@@ -171,7 +168,7 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 
 void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	if (isContinuous && actions.count(me.button)) {
+	if (repeatDelay && actions.count(me.button)) {
 		actionTimer = StartActionTimer(actions[me.button]);
 	}
 }

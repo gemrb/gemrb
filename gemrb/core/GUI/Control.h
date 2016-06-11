@@ -79,15 +79,11 @@ class GEM_EXPORT Control : public View {
 private:
 	// if the mouse is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on mouse up only
-	bool isContinuous;
 	unsigned int repeatDelay;
 	std::map<unsigned int, ControlEventHandler> actions;
 	Timer* actionTimer;
 
 private:
-	inline Timer::TimeInterval ActionRepeatInterval() {
-		return (repeatDelay) ? repeatDelay : ActionRepeatDelay;
-	}
 	Timer* StartActionTimer(const ControlEventHandler& action);
 
 protected:
@@ -140,8 +136,7 @@ public:
 	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
 
 	void SetAction(ControlEventHandler handler, unsigned int flags);
-	void SetActionInterval(unsigned int interval);
-	void SetContinuous(bool);
+	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(const ControlEventHandler& handler);
 
