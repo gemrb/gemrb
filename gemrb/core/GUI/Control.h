@@ -133,8 +133,7 @@ public:
 	virtual void SetFocus();
 	bool IsFocused();
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
-
+	virtual bool SetEvent(int eventType, ControlEventHandler handler);
 	void SetAction(ControlEventHandler handler, unsigned int flags);
 	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
 	/** Run specified handler, it may return error code */

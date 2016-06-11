@@ -72,6 +72,12 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
+bool Control::SetEvent(int eventType, ControlEventHandler handler)
+{
+	SetAction(handler, eventType);
+	return true;
+}
+
 void Control::SetAction(ControlEventHandler handler, unsigned int flags)
 {
 	actions[flags] = handler;

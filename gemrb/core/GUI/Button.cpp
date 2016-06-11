@@ -484,10 +484,10 @@ void Button::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 		}
 		if (me.repeats == 2) {
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DOUBLE_PRESS] );
+			return;
 		}
-	} else {
-		Control::OnMouseDown(me, Mod);
 	}
+	Control::OnMouseDown(me, Mod);
 }
 
 /** Mouse Button Up */
@@ -547,7 +547,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		if ((Mod & GEM_MOD_SHIFT) && eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS])
 			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS] );
 		else
-			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+			Control::OnMouseUp(me, Mod);
 	} else if (me.button == GEM_MB_MENU) {
 		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_RIGHT_PRESS] );
 	}
@@ -628,11 +628,11 @@ void Button::SetText(const String& string)
 /** Set Event Handler */
 bool Button::SetEvent(int eventType, ControlEventHandler handler)
 {
-	if ( eventType >= 0 && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
+	if ( eventType >= IE_GUI_MOUSE_OVER_BUTTON && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
 		eventHandlers[eventType] = handler;
 		return true;
 	}
-	return false;
+	return Control::SetEvent(GEM_MB_ACTION, handler);
 }
 
 /** Refresh a button from a given radio button group */
