@@ -20,6 +20,8 @@
 import GemRB
 from ie_restype import RES_BMP
 
+import CharGenCommon
+
 AppearanceWindow = 0
 CustomWindow = 0
 PortraitButton = 0
@@ -41,6 +43,7 @@ def OnLoad():
 	Gender=GemRB.GetVar ("Gender")
 
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
+	CharGenCommon.PositionCharGenWin(AppearanceWindow)
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable ("PICTURES")

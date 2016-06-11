@@ -28,6 +28,14 @@ CharGenWindow = 0
 TextAreaControl = 0
 PortraitName = ""
 
+def PositionCharGenWin(window):
+	global CharGenWindow
+	
+	CGFrame = CharGenWindow.GetFrame()
+	WFrame = window.GetFrame()
+	window.SetPos(CGFrame['x'], CGFrame['y']+(CGFrame['h'] - WFrame['h']))
+
+
 def DisplayOverview(step):
 	"""Sets up the primary character generation window."""
 
@@ -346,10 +354,6 @@ def BackPress():
 
 def NextPress():
 	"""Moves to the next step."""
-
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
 
 	step = GemRB.GetVar ("Step")
 	if step == 1:
