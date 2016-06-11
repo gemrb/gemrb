@@ -501,7 +501,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
-		if (buttonImages[BUTTON_IMAGE_SELECTED]) {
+		if (ToggleState) {
 			SetState( IE_GUI_BUTTON_SELECTED );
 		} else {
 			SetState( IE_GUI_BUTTON_UNPRESSED );
