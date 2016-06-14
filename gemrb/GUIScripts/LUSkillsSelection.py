@@ -261,12 +261,12 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillLeftPress)
-		Button.SetActionInterval();
+		Button.SetActionInterval(20);
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillRightPress)
-		Button.SetActionInterval();
+		Button.SetActionInterval(20);
 	
 	SkillsRedraw ()
 	return
@@ -327,8 +327,6 @@ def SkillJustPress():
 def SkillRightPress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	# increase velocity for the repeat event 
-	btn.SetActionInterval(20);
 	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
@@ -349,8 +347,6 @@ def SkillRightPress(btn, val):
 def SkillLeftPress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	# increase velocity for the repeat event 
-	btn.SetActionInterval(20);
 	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	if SkillPointsLeft == 0:

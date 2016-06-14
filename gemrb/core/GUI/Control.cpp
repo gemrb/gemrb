@@ -154,11 +154,17 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 		RepeatControlEventHandler(const ControlEventHandler& handler, Control* c)
 		: action(handler), ctrl(c) {}
 
-		void operator()() const { return action(ctrl); }
+		void operator()() const {
+			// update the timer to use the actual repeatDelay
+			ctrl->SetActionInterval(ctrl->repeatDelay);
+			return action(ctrl);
+		}
 	};
 
 	EventHandler h = new RepeatControlEventHandler(action, this);
-	return &core->SetTimer(h, repeatDelay);
+	// always start the timer with ActionRepeatDelay
+	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
+	return &core->SetTimer(h, ActionRepeatDelay);
 }
 
 void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
