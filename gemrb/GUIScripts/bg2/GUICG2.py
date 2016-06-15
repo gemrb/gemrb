@@ -138,12 +138,16 @@ def SetClass():
 	#assign the correct XP
 	if ClassName == "BARBARIAN":
 		ClassName = "FIGHTER"
-	if GameCheck.HasBGT() or GameCheck.HasTutu():
-		GemRB.SetPlayerStat (MyChar, IE_XP, 0)
-	elif GameCheck.IsTOB():
+
+	# bgt does this substitution for starting a game: soa->bg1, tutorial->soa, (tob->tob)
+	if GameCheck.IsTOB():
 		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2"))
 	else:
-		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
+		if (GameCheck.HasBGT() or GameCheck.HasTutu()) and GemRB.GetVar ("PlayMode") != 1:
+			# not tutorial (=soa->bg1, tob would be caught before)
+			GemRB.SetPlayerStat (MyChar, IE_XP, 0)
+		else:
+			GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 
 	#create an array to get all the classes from
 	NumClasses = 1
