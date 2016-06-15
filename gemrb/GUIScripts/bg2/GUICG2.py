@@ -138,10 +138,10 @@ def SetClass():
 	#assign the correct XP
 	if ClassName == "BARBARIAN":
 		ClassName = "FIGHTER"
-	if GameCheck.IsTOB():
-		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2"))
-	elif GameCheck.HasBGT() or GameCheck.HasTutu():
+	if GameCheck.HasBGT() or GameCheck.HasTutu():
 		GemRB.SetPlayerStat (MyChar, IE_XP, 0)
+	elif GameCheck.IsTOB():
+		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2"))
 	else:
 		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 
