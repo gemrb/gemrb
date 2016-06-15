@@ -510,10 +510,12 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	# not found
 	return -1
 
-def HasSorcererBook (pc):
+def HasSorcererBook (pc, cls=-1):
 	import GUICommon
 
 	ClassName = GUICommon.GetClassRowName (pc)
+	if cls != -1:
+		ClassName = GUICommon.GetClassRowName (cls, "class")
 	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
 	return SorcererBook
 
