@@ -236,7 +236,7 @@ def OpenConfirmWindow ():
 		if Pos<len(Games):
 			Button.SetSprite2D(Games[Pos].GetPreview())
 		else:
-			Button.SetPicture("")
+			Button.SetPicture(None)
 
 		# PC portraits
 		for j in range(min(6, MAX_PARTY_SIZE)):
@@ -244,7 +244,7 @@ def OpenConfirmWindow ():
 			if Pos<len(Games):
 				Button.SetSprite2D(Games[Pos].GetPortrait(j))
 			else:
-				Button.SetPicture("")
+				Button.SetPicture(None)
 
 	# Save/Overwrite
 	SaveButton = ConfirmWindow.GetControl (ctrl_offset[10])
