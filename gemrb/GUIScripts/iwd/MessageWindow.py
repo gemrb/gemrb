@@ -118,8 +118,6 @@ def UpdateControlStatus ():
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 	if Override:
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	else:
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	SetGameGUIHidden(hideflag)
 	return

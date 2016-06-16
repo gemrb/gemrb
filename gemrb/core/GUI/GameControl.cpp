@@ -73,9 +73,8 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 }
 
 GameControl::GameControl(const Region& frame)
-	: Control(frame)
+: View(frame)
 {
-	ControlType = IE_GUI_GAMECONTROL;
 	if (!formations) {
 		ReadFormations();
 	}
@@ -683,7 +682,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		default:
 			if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
 				core->GetGame()->SetHotKey(toupper(Key.character));
-				return Control::OnKeyPress(Key, mod);
+				return View::OnKeyPress(Key, mod);
 			}
 			break;
 	}
@@ -1038,11 +1037,11 @@ String GameControl::TooltipText() const {
 	// then something is horribly broken elsewhere. by definition we cant have a GameControl without these things.
 	Map* area = core->GetGame()->GetCurrentArea();
 	if (area == NULL) {
-		return Control::TooltipText();
+		return View::TooltipText();
 	}
 	Actor* actor = area->GetActor(GameMousePos(), GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (actor == NULL) {
-		return Control::TooltipText();
+		return View::TooltipText();
 	}
 
 	static String tip; // only one game control and we return a const& so cant be temporary.
@@ -2275,12 +2274,6 @@ void GameControl::SetupCasting(ieResRef spellname, int type, int level, int idx,
 	SetTargetMode(TARGET_MODE_CAST);
 	target_types = targettype;
 	spellCount = cnt;
-}
-
-//another method inherited from Control which has no use here
-bool GameControl::SetEvent(int /*eventType*/, ControlEventHandler /*handler*/)
-{
-	return false;
 }
 
 void GameControl::SetDisplayText(String* text, unsigned int time)

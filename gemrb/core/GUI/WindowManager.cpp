@@ -143,6 +143,10 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 bool WindowManager::FocusWindow(Window* win)
 {
 	if (!IsPresentingModalWindow() && OrderFront(win)) {
+        if (gameWin == win) {
+            core->SetEventFlag(EF_CONTROL);
+        }
+        
 		win->SetDisabled(false);
 		return true;
 	}

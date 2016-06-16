@@ -105,6 +105,5 @@ def UpdateControlStatus ():
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	SetGameGUIHidden(hideflags)

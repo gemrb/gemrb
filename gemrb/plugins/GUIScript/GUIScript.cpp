@@ -1786,11 +1786,6 @@ static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 	Window* win = GetView<Window>(self);
 	win->Focus();
 
-	GameControl *gc = core->GetGameControl();
-	if (gc && gc->Owner == win) {
-		core->SetEventFlag(EF_CONTROL);
-	}
-
 	Py_RETURN_NONE;
 }
 

@@ -80,7 +80,7 @@ static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
  * It's always assigned Control index 0.
  */
 
-class GEM_EXPORT GameControl : public Control {
+class GEM_EXPORT GameControl : public View {
 private:
 	ieDword lastActorID;
 	ieDword trackerID;
@@ -240,7 +240,6 @@ public:
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
 	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
-	bool SetEvent(int eventType, ControlEventHandler handler);
 	void ToggleAlwaysRun();
 };
 

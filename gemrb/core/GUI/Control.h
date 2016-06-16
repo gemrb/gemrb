@@ -35,7 +35,6 @@
 #define IE_GUI_SCROLLBAR	7
 #define IE_GUI_WORLDMAP         8 // gemrb extension
 #define IE_GUI_MAP              9 // gemrb extension
-#define IE_GUI_GAMECONTROL	128
 #define IE_GUI_INVALID          255
 
 #define IE_GUI_CONTROL_FOCUSED  0x80

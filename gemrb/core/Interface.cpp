@@ -411,9 +411,8 @@ GameControl* Interface::StartGameControl()
 	gamectrl = new GameControl(screen);
 	Window* gamewin = winmgr->GetGameWindow();
 	gamewin->AddSubviewInFrontOfView(gamectrl);
-	ControlScriptingRef* gcref = new ControlScriptingRef(gamectrl, 0, "GC");
+	ViewScriptingRef* gcref = new ViewScriptingRef(gamectrl, 0, "GC");
 	gamectrl->AssignScriptingRef(gcref);
-	gamectrl->SetFocus();
 	ScriptEngine::RegisterScriptingRef(gcref);
 	RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 
