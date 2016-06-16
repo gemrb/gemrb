@@ -129,14 +129,14 @@ def ScrollBarPress():
 		if ActPos < len(Games):
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
-			Button.SetPicture ("")
+			Button.SetPicture (None)
 
 		for j in range (6):
 			Button = Window.GetControl (22 + i*6 + j)
 			if ActPos < len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
-				Button.SetPicture ("")
+				Button.SetPicture (None)
 
 
 def SaveGamePress ():

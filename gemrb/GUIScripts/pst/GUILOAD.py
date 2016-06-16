@@ -114,7 +114,7 @@ def ScrollBarPress ():
 		if ActPos<len(Games):
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
-			Button.SetPicture ("")
+			Button.SetPicture (None)
 		for j in range (MAX_PARTY_SIZE):
 			if not LoadWindow.HasControl (22+i*MAX_PARTY_SIZE+j):
 				continue
@@ -122,7 +122,7 @@ def ScrollBarPress ():
 			if ActPos<len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
-				Button.SetPicture ("")
+				Button.SetPicture (None)
 	return
 
 def LoadGamePress ():
@@ -176,7 +176,7 @@ def DeleteGamePress ():
 	CancelButton.MakeEscape()
 	ConfirmWindow.Focus()
 	return
-	
+
 def CancelPress ():
 	if LoadWindow:
 		LoadWindow.Unload ()
