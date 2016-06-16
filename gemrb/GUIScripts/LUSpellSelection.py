@@ -187,7 +187,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 		# chargen character seem to get more spells per level (this is kinda dirty hack)
 		# except sorcerers
-		if chargen and Class != 19 and not IWD2:
+		if chargen and not IWD2 and not Spellbook.HasSorcererBook (pc, Class):
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level
