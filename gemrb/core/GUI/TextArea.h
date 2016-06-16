@@ -60,9 +60,10 @@ private:
 	void SizeChanged(const Size& /*oldSize*/);
 
 public:
-	TextArea(const Region& frame, Font* text);
+	TextArea(const Region& frame, Font* text, Window* win = NULL);
 	TextArea(const Region& frame, Font* text, Font* caps,
-			 Color hitextcolor, Color initcolor, Color lowtextcolor);
+			 Color hitextcolor, Color initcolor, Color lowtextcolor,
+             Window* win = NULL);
 	~TextArea(void);
 
 	bool IsAnimated() const { return animationEnd; }

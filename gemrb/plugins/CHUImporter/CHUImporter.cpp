@@ -141,7 +141,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_BUTTON:
 			{
 				//Button
-				Button* btn = new Button(ctrlFrame);
+				Button* btn = new Button(ctrlFrame, win);
 				ctrl = btn;
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
@@ -232,7 +232,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
+				Progressbar* pbar = new Progressbar(ctrlFrame, win, KnobStepsCount, true );
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -281,7 +281,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
-				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
+				Slider* sldr = new Slider( ctrlFrame, win, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -374,7 +374,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
-				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
+				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back, win );
 
 				if (SBID != 0xffff) {
 					ScrollBar* sb = dynamic_cast<ScrollBar*>(GetControl(SBID, win));
@@ -400,7 +400,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &back, 4 );
 				str->ReadWord( &alignment );
 				String* str = core->GetString( StrRef );
-				Label* lab = new Label( ctrlFrame, fnt, *str );
+				Label* lab = new Label( ctrlFrame, fnt, *str, win );
 				delete str;
 
 				if (alignment & 1) {
@@ -466,7 +466,7 @@ endalign:
 				}
 				str->ReadWord( &TAID );
 
-				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
+				ScrollBar* sbar = new ScrollBar(ctrlFrame, images, win);
 				/*
 				if (TAID != 0xffff) {
 					TextArea* ta = GetControl<TextArea>(TAID);
@@ -484,7 +484,6 @@ endalign:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
 		if (ctrl) {
-			win->AddSubviewInFrontOfView( ctrl );
 			RegisterScriptableControl(ctrl, ControlID);
 		}
 	}

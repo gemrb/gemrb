@@ -31,12 +31,12 @@
 
 namespace GemRB {
 
-ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT])
-	: Control(frame)
+ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT],
+                     Window* win)
+: Control(frame, win)
 {
 	ControlType = IE_GUI_SCROLLBAR;
 	Pos = 0;
-	Value = 0;
 	State = 0;
 	SliderYPos = 0;
 	ScrollDelta = 1;

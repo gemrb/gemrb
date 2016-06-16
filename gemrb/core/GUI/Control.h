@@ -75,24 +75,41 @@ public:
  */
 
 class GEM_EXPORT Control : public View {
+protected:
+    Window* window;
+    
+    /** the value of the control to add to the variable */
+    ieDword Value;
+    
 private:
 	// if the mouse is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on mouse up only
 	unsigned int repeatDelay;
 	std::map<unsigned int, ControlEventHandler> actions;
 	Timer* actionTimer;
+    
+    /** True if we are currently in an event handler */
+    bool InHandler;
 
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
-
-protected:
-	/** the value of the control to add to the variable */
-	ieDword Value;
-	/** True if we are currently in an event handler */
-	bool InHandler;
+    
+public: // Public attributes
+    /** Variable length is 40-1 (zero terminator) */
+    char VarName[MAX_VARIABLE_LENGTH];
+    
+    ControlAnimation* animation;
+    Sprite2D* AnimPicture;
+    
+    /** Defines the Control ID Number used for GUI Scripting */
+    ieDword ControlID;
+    /** Type of control */
+    ieByte ControlType;
+    
+    static unsigned int ActionRepeatDelay;
 
 public:
-	Control(const Region& frame);
+	Control(const Region& frame, Window* win = NULL);
 	virtual ~Control();
 
 	virtual bool IsAnimated() const { return animation; }
@@ -106,31 +123,17 @@ public:
 	void UpdateState(const char*, unsigned int);
 	virtual void UpdateState(unsigned int) {}
 
-	/** Variable length is 40-1 (zero terminator) */
-	char VarName[MAX_VARIABLE_LENGTH];
-
-	ControlAnimation* animation;
-	Sprite2D* AnimPicture;
-
-public: // Public attributes
-	/** Defines the Control ID Number used for GUI Scripting */
-	ieDword ControlID;
-	/** Type of control */
-	ieByte ControlType;
-	/** Owner Window */
-	Window* Owner;
-
-	static unsigned int ActionRepeatDelay;
-
-public:
 	//Events
 	/** Reset/init event handler */
 	void ResetEventHandler(ControlEventHandler &handler);
 
 	/** Returns the Owner */
-	Window *GetOwner() const { return Owner; }
 	virtual void SetFocus();
 	bool IsFocused();
+    
+	Window* GetWindow() const { return window; }
+    void SetWindow(Window* win);
+
 	bool TracksMouseDown() const { return bool(actionTimer); }
 
 	/** Set handler for specified event. Override in child classes */

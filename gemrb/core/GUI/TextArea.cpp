@@ -32,8 +32,8 @@
 
 namespace GemRB {
 
-TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), ftext(text), palettes()
+TextArea::TextArea(const Region& frame, Font* text, Window* win)
+	: Control(frame, win), ftext(text), palettes()
 {
 	palette = text->GetPalette().get();
 	finit = ftext;
@@ -41,8 +41,9 @@ TextArea::TextArea(const Region& frame, Font* text)
 }
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), ftext(text), palettes()
+				   Color textcolor, Color initcolor, Color lowtextcolor,
+                   Window* win)
+	: Control(frame, win), ftext(text), palettes()
 {
 	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
 	palette = palettes[PALETTE_NORMAL];

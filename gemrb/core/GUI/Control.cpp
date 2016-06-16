@@ -38,13 +38,12 @@ namespace GemRB {
 
 unsigned int Control::ActionRepeatDelay = 250;
 
-Control::Control(const Region& frame)
+Control::Control(const Region& frame, Window* win)
 : View(frame)
 {
 	InHandler = false;
 	VarName[0] = 0;
 	Value = 0;
-	Owner = NULL;
 
 	animation = NULL;
 	AnimPicture = NULL;
@@ -52,6 +51,8 @@ Control::Control(const Region& frame)
 
 	actionTimer = NULL;
 	repeatDelay = 0;
+    
+    SetWindow(win);
 }
 
 Control::~Control()
@@ -65,6 +66,26 @@ Control::~Control()
 	delete animation;
 
 	Sprite2D::FreeSprite(AnimPicture);
+}
+    
+void Control::SetWindow(Window* win)
+{
+    if (win == window) {
+        return;
+    }
+    if (window) {
+        window->RemoveSubview(this);
+		window = NULL;
+    }
+	
+	static Window* recursiveWin = NULL;
+    if (win && win != recursiveWin) {
+		// avoid infinite recursion
+		recursiveWin = win;
+        win->AddSubviewInFrontOfView(this);
+		recursiveWin = NULL;
+    }
+	window = win;
 }
 
 void Control::SetText(const String* string)
@@ -106,8 +127,7 @@ int Control::RunEventHandler(const ControlEventHandler& handler)
 		return -1;
 	}
 	if (handler) {
-		Window *wnd = Owner;
-		if (!wnd) {
+		if (!window) {
 			return -1;
 		}
 		InHandler = true;
@@ -128,13 +148,13 @@ void Control::UpdateState(const char* varname, unsigned int val)
 
 void Control::SetFocus()
 {
-	Owner->SetFocused(this);
+	window->SetFocused(this);
 	MarkDirty();
 }
 
 bool Control::IsFocused()
 {
-	return Owner->FocusedView() == this;
+	return window->FocusedView() == this;
 }
 
 void Control::SetAnimPicture(Sprite2D* newpic)

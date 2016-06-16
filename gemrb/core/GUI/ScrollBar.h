@@ -66,7 +66,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
-	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
+	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT], Window* win = NULL);
 	~ScrollBar(void);
 
 	bool IsOpaque() const;

@@ -71,8 +71,8 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {
-		if (ctrl->Owner == this) return; // already added!
-		ctrl->Owner = this;
+		if (ctrl->GetWindow() == this) return; // already added!
+		ctrl->SetWindow(this);
 		Controls.push_back( ctrl );
 	}
 }
@@ -81,7 +81,7 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
-		ctrl->Owner = NULL;
+		ctrl->SetWindow(NULL);
 		std::vector< Control*>::iterator it = std::find(Controls.begin(), Controls.end(), ctrl);
 		if (it != Controls.end())
 			Controls.erase(it);

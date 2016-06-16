@@ -34,8 +34,8 @@
 
 namespace GemRB {
 
-Button::Button(Region& frame)
-	: Control(frame),
+Button::Button(Region& frame, Window* win)
+	: Control(frame, win),
 	buttonImages()
 {
 	ControlType = IE_GUI_BUTTON;
@@ -524,7 +524,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			core->GetDictionary()->Lookup( VarName, tmp );
 			tmp ^= Value;
 			core->GetDictionary()->SetAt( VarName, tmp );
-			Owner->RedrawControls( VarName, tmp );
+			window->RedrawControls( VarName, tmp );
 		}
 	} else {
 		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
@@ -534,7 +534,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		}
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
-			Owner->RedrawControls( VarName, Value );
+			window->RedrawControls( VarName, Value );
 		}
 	}
 
@@ -739,7 +739,7 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 bool Button::SetHotKey(KeyboardKey key)
 {
 	EventMgr::EventCallback* cb = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
-	if (Owner->RegisterHotKeyCallback(cb, key)) {
+	if (window->RegisterHotKeyCallback(cb, key)) {
 		hotKey = key;
 		return true;
 	}

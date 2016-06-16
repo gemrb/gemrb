@@ -56,7 +56,9 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
-	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
+	Slider(const Region& frame, Window* win,
+           short KnobXPos, short KnobYPos, short KnobStep,
+           unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
 
 	/** Returns the actual Slider Position */

@@ -1812,10 +1812,10 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
 	Region frame(0, 0, 640, 25);
-	Console* console = new Console(frame);
-	console->SetCursor(GetCursorSprite());
+	
 	Window* consoleWin = winmgr->MakeWindow(frame);
-	consoleWin->AddSubviewInFrontOfView(console);
+    Console* console = new Console(frame, consoleWin);
+    console->SetCursor(GetCursorSprite());
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);

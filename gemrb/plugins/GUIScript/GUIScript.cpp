@@ -1287,7 +1287,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 	if (!win) { // control view
 		Control* ctrl = dynamic_cast<Control*>(superview);
 		assert(ctrl);
-		win = ctrl->Owner;
+		win = ctrl->GetWindow();
 	}
 
 	Control* ctrl = NULL;
@@ -2152,7 +2152,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	/** it is possible to set up a default value, if Lookup returns false, use it */
 	ieDword curVal = 0;
 	core->GetDictionary()->Lookup( VarName, curVal );
-	ctrl->Owner->RedrawControls(VarName, curVal);
+	ctrl->GetWindow()->RedrawControls(VarName, curVal);
 
 	Py_RETURN_NONE;
 }
@@ -3084,9 +3084,9 @@ static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* ar
 	if (!substitute || !target) {
 		return RuntimeError("Cannot find control!");
 	}
-	Window* subWin = substitute->Owner;
+	Window* subWin = substitute->GetWindow();
 	subWin->RemoveSubview(substitute);
-	Window* targetWin = target->Owner;
+	Window* targetWin = target->GetWindow();
 	substitute->SetFrame(target->Frame());
 
 	substitute->ControlID = target->ControlID;

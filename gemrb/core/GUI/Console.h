@@ -45,7 +45,7 @@ class Palette;
 
 class Console : public Control {
 public:
-	Console(const Region& frame);
+	Console(const Region& frame, Window* win);
 	~Console(void);
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);

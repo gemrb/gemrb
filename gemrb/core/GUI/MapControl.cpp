@@ -50,8 +50,8 @@ Color colors[]={
  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-MapControl::MapControl(const Region& frame)
-	: Control(frame)
+MapControl::MapControl(const Region& frame, Window* win)
+	: Control(frame, win)
 {
 	ControlType = IE_GUI_MAP;
 
@@ -67,8 +67,6 @@ MapControl::MapControl(const Region& frame)
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
-	// initialize var and event callback to no-ops
-	VarName[0] = 0;
 	ResetEventHandler( MapControlOnPress );
 	ResetEventHandler( MapControlOnRightPress );
 
@@ -342,7 +340,7 @@ void MapControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 	}
 
 	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
-		Owner->Close();
+		window->Close();
 	}
 
 	mouseIsDown = false;

@@ -71,7 +71,7 @@ public:
 	ControlEventHandler MapControlOnPress;
 	ControlEventHandler MapControlOnRightPress;
 
-	MapControl(const Region& frame);
+	MapControl(const Region& frame, Window* win = NULL);
 	~MapControl(void);
 
 	/** Refreshes the control after its associated variable has changed */

@@ -73,8 +73,9 @@ ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
 	assert(ctrl->GetScriptingRef() == NULL);
 
 	ResRef group = "Control";
-	if (ctrl->Owner) {
-		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(ctrl->Owner->GetScriptingRef());
+    Window* win = ctrl->GetWindow();
+	if (win) {
+		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(win->GetScriptingRef());
 		if (winref) {
 			id = ModifiedCtrlIdForWin(id, winref);
 			group = winref->ScriptingGroup();

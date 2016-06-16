@@ -32,8 +32,8 @@
 
 namespace GemRB {
 
-Console::Console(const Region& frame)
-	: Control(frame), History(5)
+Console::Console(const Region& frame, Window* win)
+	: Control(frame, win), History(5)
 {
 	Cursor = NULL;
 	max = 128;
@@ -59,9 +59,9 @@ bool Console::HandleHotKey(const Event& e)
 	if (e.type != Event::KeyDown) return false;
 
 	// the only hot key console registers is for hiding / showing itself
-	Owner->SetVisible(!IsVisible());
+	window->SetVisible(!IsVisible());
 	if (IsVisible()) {
-		Owner->Focus();
+		window->Focus();
 	}
 	return true;
 }

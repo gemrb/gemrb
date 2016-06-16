@@ -50,7 +50,8 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public: 
-	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
+	Progressbar(const Region& frame, Window* win,
+                unsigned short KnobStepsCount, bool Clear = false);
 	~Progressbar();
 
 	bool IsOpaque() const { return BackGround; }
