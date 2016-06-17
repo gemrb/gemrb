@@ -573,8 +573,6 @@ void Button::OnMouseOver(const MouseEvent& me)
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		drag_start = drag_start + sp;
-
-		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG] );
 	}
 }
 
