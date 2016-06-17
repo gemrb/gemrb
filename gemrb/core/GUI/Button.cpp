@@ -555,11 +555,6 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 void Button::OnMouseOver(const MouseEvent& me)
 {
-	if ( RunEventHandler( eventHandlers[IE_GUI_MOUSE_OVER_BUTTON] )<0) {
-		//event handler destructed this object
-		return;
-	}
-
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
@@ -626,7 +621,7 @@ void Button::SetText(const String& string)
 /** Set Event Handler */
 bool Button::SetEvent(int eventType, ControlEventHandler handler)
 {
-	if ( eventType >= IE_GUI_MOUSE_OVER_BUTTON && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
+	if ( eventType >= IE_GUI_MOUSE_ENTER_BUTTON && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
 		eventHandlers[eventType] = handler;
 		return true;
 	}

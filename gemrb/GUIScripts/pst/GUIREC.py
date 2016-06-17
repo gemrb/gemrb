@@ -85,17 +85,17 @@ def OpenRecordsWindow ():
 	global StatTable
 
 	StatTable = GemRB.LoadTable("abcomm")
-	
+
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
-		
+
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
-		return	
+		return
 
 	RecordsWindow = Window = GemRB.LoadWindow (3, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
@@ -105,7 +105,7 @@ def OpenRecordsWindow ():
 	Button = Window.GetControl (7)
 	Button.SetText (4245)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
-	
+
 	# Reform Party
 	Button = Window.GetControl (8)
 	Button.SetText (4244)
@@ -123,7 +123,7 @@ def OpenRecordsWindow ():
 		Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetSprites("", 0, 0, 0, 0, 0)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, statevents[i])
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
 
 	# AC button
@@ -131,7 +131,7 @@ def OpenRecordsWindow ():
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, OnRecordsHelpArmorClass)
+	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpArmorClass)
 	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
 
 
@@ -140,7 +140,7 @@ def OpenRecordsWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites ("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, OnRecordsHelpHitPoints)
+	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpHitPoints)
 	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
 
 
@@ -155,14 +155,14 @@ avatar_header = {'PrimClass': "", 'SecoClass': "", 'PrimLevel': 0, 'SecoLevel': 
 
 def UpdateRecordsWindow ():
 	global stats_overview, faction_help, alignment_help
-	
+
 	Window = RecordsWindow
 	if not RecordsWindow:
 		print "SelectionChange handler points to non existing window\n"
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	
+
 	# Setting up the character information
 	GetCharacterHeader (pc)
 
@@ -243,7 +243,7 @@ def UpdateRecordsWindow ():
 	race = GemRB.GetPlayerStat (pc, IE_SPECIES) - 1
 
 	text = CommonTables.Races.GetValue (race, 0)
-	
+
 	Label = Window.GetControl (0x10000014)
 	Label.SetText (text)
 
@@ -251,7 +251,7 @@ def UpdateRecordsWindow ():
 	# sex
 	GenderTable = GemRB.LoadTable ("GENDERS")
 	text = GenderTable.GetValue (GemRB.GetPlayerStat (pc, IE_SEX) - 1, GTV_STR)
-	
+
 	Label = Window.GetControl (0x10000015)
 	Label.SetText (text)
 
@@ -270,11 +270,11 @@ def UpdateRecordsWindow ():
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	alignment_help = AlignmentTable.GetValue (sym, 'DESC_REF', GTV_REF)
 	frame = (3 * int (align / 16) + align % 16) - 4
-	
+
 	Button = Window.GetControl (5)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STALIGN', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, OnRecordsHelpAlignment)
+	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpAlignment)
 	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
 
 
@@ -283,13 +283,13 @@ def UpdateRecordsWindow ():
 	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = FactionTable.GetValue (faction, 0, GTV_REF)
 	frame = FactionTable.GetValue (faction, 1)
-	
+
 	Button = Window.GetControl (6)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STFCTION', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, OnRecordsHelpFaction)
+	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpFaction)
 	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
-	
+
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = Window.GetControl (0)
@@ -494,7 +494,7 @@ def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
 	woff = "[/color]"
 	str_None = GemRB.GetString (41275)
-	
+
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
@@ -539,7 +539,7 @@ def GetStatOverview (pc):
 	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
 	stats.append (None)
 
-	
+
 	# 67208 Resistances
 	stats.append (67208)
 	#   67209 Normal Fire
@@ -614,7 +614,7 @@ def GetStatOverview (pc):
 	#   4226 Spells
 	stats.append ((4226, GS (IE_SAVEVSSPELL), ''))
 	stats.append (None)
-	
+
 	# 4227 Weapon Proficiencies
 	stats.append (4227)
 	#   55011 Unused Slots
@@ -632,7 +632,7 @@ def GetStatOverview (pc):
 	#   33655 Bow
 	stats.append ((33655, GS (IE_PROFICIENCYKATANA), '+'))
 	stats.append (None)
-	
+
 	# 4228 Ability Bonuses
 	stats.append (4228)
 	#   4229 To Hit
@@ -651,7 +651,7 @@ def GetStatOverview (pc):
 	#   4239 Bonus Priest Spells
 	stats.append ((4239, GS (IE_CASTINGLEVELBONUSCLERIC), ''))
 	stats.append (None)
-	
+
 	# 4237 Chance to learn spell
 	#SpellLearnChance = won + GemRB.GetString (4237) + woff
 
@@ -672,7 +672,7 @@ def GetStatOverview (pc):
 				res.append (GemRB.GetString (strref) + ': x' + str (val))
 			else:
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
-			
+
 			lines = 1
 		except:
 			if s != None:
@@ -690,7 +690,7 @@ def GetStatOverview (pc):
 
 def OpenInformationWindow ():
 	global InformationWindow
-		
+
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
@@ -698,7 +698,7 @@ def OpenInformationWindow ():
 			InformationWindow.Unload ()
 		InformationWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (5)
@@ -800,13 +800,13 @@ def OpenInformationWindow ():
 
 def OpenBiographyWindow ():
 	global BiographyWindow
-	
+
 	if BiographyWindow != None:
 		if BiographyWindow:
 			BiographyWindow.Unload ()
 		BiographyWindow = None
 		GemRB.SetVar ("FloatWindow", InformationWindow.ID)
-		
+
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
@@ -823,15 +823,15 @@ def OpenBiographyWindow ():
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (BioText)
 
-	
+
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
 	Button.MakeEscape()
-	
+
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	
+
 
 def AcceptLevelUp():
 	OpenLevelUpWindow()
@@ -1034,7 +1034,7 @@ def OpenLevelUpWindow ():
 			# new ones are better than current. The smaller the number, the better.
 			# We need to substract one from the NextLevel, so that we get right values.
 			# We also need to check if NextLevel is larger than 21, since after that point
-			# the table runs out, and the throws remain the same 
+			# the table runs out, and the throws remain the same
 			if NextLevel < 22:
 				for i in range (5):
 					Throw = SavThrTable.GetValue (i, NextLevel-1)
@@ -1096,7 +1096,7 @@ def OpenLevelUpWindow ():
 			# avatar is Fighter/Thief (Annah)
 			Class = "THIEF"
 			SavThrTable = GemRB.LoadTable ("SAVEROG")
-		
+
 		SecoNextLevel = avatar_header['SecoLevel']
 		while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, Class):
 			SecoNextLevel = SecoNextLevel + 1

@@ -79,7 +79,7 @@ def OpenLUStatsWindow(Type = 1):
 
 	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindow(0)
-	
+
 	if LevelUp:
 		Str = GemRB.GetPlayerStat(1, IE_STR, 1)
 		Dex = GemRB.GetPlayerStat(1, IE_DEX, 1)
@@ -95,7 +95,7 @@ def OpenLUStatsWindow(Type = 1):
 		Str = Dex = Con = Wis = Int = Cha = 9
 		TotPoints = 21
 		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
-	
+
 	# stat label controls
 	for i in range(len(Stats)):
 		StatLabels[i] = NewLifeWindow.GetControl(0x10000018 + i)
@@ -104,74 +104,74 @@ def OpenLUStatsWindow(Type = 1):
 	for i in range(len(Stats)):
 		Button = NewLifeWindow.GetControl (i+2)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 
 	Button = NewLifeWindow.GetControl(8)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5025)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, AcPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, AcPress)
 
 	Button = NewLifeWindow.GetControl(9)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5026)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, HpPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, HpPress)
 
 	Button = NewLifeWindow.GetControl(10)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5027)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, PointPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, PointPress)
 
 	# stat +/- buttons
 	for i in range(len(StatPress)):
 		Button = NewLifeWindow.GetControl (11+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
-	
+
 		Button = NewLifeWindow.GetControl (12+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
-	
+
 	NewLifeLabel = NewLifeWindow.GetControl(0x10000023)
 	NewLifeLabel.SetText(1899)
-	
+
 	TextArea = NewLifeWindow.GetControl(23)
 	TextArea.SetText(18495)
-	
+
 	TotLabel = NewLifeWindow.GetControl(0x10000020)
 	AcLabel = NewLifeWindow.GetControl(0x1000001E)
 	HpLabel = NewLifeWindow.GetControl(0x1000001F)
 
 	Label = NewLifeWindow.GetControl(0x10000021)
 	Label.SetText(254)
-	
+
 	PhotoButton = NewLifeWindow.GetControl(35)
 	PhotoButton.SetState(IE_GUI_BUTTON_LOCKED)
 	PhotoButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	PhotoButton.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, OverPhoto)
+	PhotoButton.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, OverPhoto)
 	PhotoButton.SetPicture("STPNOC")
-	
+
 	AcceptButton = NewLifeWindow.GetControl(0)
 	AcceptButton.SetText(4192)
 	AcceptButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AcceptPress)
 	AcceptButton.MakeDefault()
-	
+
 	CancelButton = NewLifeWindow.GetControl(1)
-	CancelButton.SetText(4196)	
+	CancelButton.SetText(4196)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	
+
 	UpdateLabels()
-	
+
 	NewLifeWindow.Focus()
 	return
-	
+
 def UpdateLabels():
 	global AcPoints, HpPoints
 
@@ -205,7 +205,7 @@ def UpdateLabels():
 	AcLabel.SetText(str(AcPoints))
 	HpLabel.SetText(str(HpPoints))
 	return
-	
+
 
 def OkButton():
 	QuitWindow.SetVisible(False)
