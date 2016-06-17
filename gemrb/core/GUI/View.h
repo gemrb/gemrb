@@ -34,8 +34,8 @@ class ViewScriptingRef;
 
 class GEM_EXPORT View {
 private:
-	Sprite2D* background;
-	Sprite2D* cursor;
+	Holder<Sprite2D> background;
+	Holder<Sprite2D> cursor;
 	ViewScriptingRef* scriptingRef;
 
 	mutable bool dirty;

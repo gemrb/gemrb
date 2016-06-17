@@ -59,15 +59,10 @@ View::~View()
 		view->superView = NULL;
 		delete view;
 	}
-
-	Sprite2D::FreeSprite(background);
-	Sprite2D::FreeSprite(cursor);
 }
 
 void View::SetBackground(Sprite2D* bg)
 {
-	if (bg) bg->acquire();
-	if (background) background->release();
 	background = bg;
 
 	MarkDirty();
@@ -75,10 +70,6 @@ void View::SetBackground(Sprite2D* bg)
 
 void View::SetCursor(Sprite2D* c)
 {
-	if (c) {
-		c->acquire();
-	}
-	Sprite2D::FreeSprite(cursor);
 	cursor = c;
 }
 
@@ -147,6 +138,7 @@ void View::DrawBackground(const Region* rgn) const
 			superView->DrawBackground(&frame);
 		}
 	}
+
 	// FIXME: technically its possible for the BG to be smaller than the view
 	// if this were to happen then the areas outside the BG woulndt get redrawn
 	// we should probably draw black in those areas...
