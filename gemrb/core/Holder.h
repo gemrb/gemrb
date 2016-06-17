@@ -83,9 +83,10 @@ public:
 	T* operator->() const { return ptr; }
 
 	bool operator!() const { return !ptr; }
-#include "operatorbool.h"
 
-	OPERATOR_BOOL(Holder<T>,T,ptr)
+	operator T*() const { return ptr; }
+	operator bool() const { return bool(ptr); }
+	
 	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
