@@ -224,14 +224,14 @@ def OpenFeatsWindow(chargen=0):
 		# luckily you can only have one kit per class
 		ClassIndex = GemRB.GetVar ("LUClass")
 		KitID = GemRB.GetVar ("LUKit")
+		# for faking having leveled up already, so the level checks work
+		LUStat = IDLUCommon.Levels[ClassIndex]
 		if KitID != 0:
 			KitIndex = CommonTables.Classes.FindValue ("ID", KitID)
 			ClassIndex = KitIndex
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		ButtonCount = 9
-		# fake having leveled up already, so the level checks work
-		LUStat = IDLUCommon.Levels[ClassIndex]
 		# give monks their free improved evasion at level 9, so we don't have to add a feat granting opcode
 		# just check for monk tohit table, so we get the kits too
 		monkName = CommonTables.Classes.GetRowName (ClassIndex)
