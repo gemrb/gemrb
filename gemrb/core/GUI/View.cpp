@@ -39,8 +39,6 @@ View::View(const Region& frame)
 	: frame(frame)
 {
 	scriptingRef = NULL;
-	background = NULL;
-	cursor = NULL;
 	superView = NULL;
 
 	dirty = true;
