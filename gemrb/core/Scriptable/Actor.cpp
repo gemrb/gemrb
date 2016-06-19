@@ -825,19 +825,19 @@ static int GetIWD2KitIndex (ieDword kit, const char *resref="classes", ieDword b
 {
 	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref));
 	int idx = -1;
-	if (tm) {
-		int offset = tm->FindTableValue("CLASS", baseclass);
-		int i = 0;
-		const char *classname = tm->GetRowName(offset+i);
-		while (atoi(tm->QueryField(classname, "CLASS")) == (signed)baseclass) {
-			ieDword akit = strtol(tm->QueryField(classname, "ID"), NULL, 16);
-			if (kit & akit) {
-				idx = offset+i;
-				break;
-			}
-			i++;
-			classname = tm->GetRowName(offset+i);
+	if (!tm) return idx;
+
+	int offset = tm->FindTableValue("CLASS", baseclass);
+	int i = 0;
+	const char *classname = tm->GetRowName(offset+i);
+	while (atoi(tm->QueryField(classname, "CLASS")) == (signed)baseclass) {
+		ieDword akit = strtol(tm->QueryField(classname, "ID"), NULL, 16);
+		if (kit & akit) {
+			idx = offset+i;
+			break;
 		}
+		i++;
+		classname = tm->GetRowName(offset+i);
 	}
 	return idx;
 }
