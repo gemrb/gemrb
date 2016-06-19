@@ -9112,6 +9112,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 int Actor::CheckUsability(Item *item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
+	int kitignore = 0;
 
 	for (int i=0;i<usecount;i++) {
 		ieDword itemvalue = itembits[itemuse[i].which];
@@ -9124,10 +9125,42 @@ int Actor::CheckUsability(Item *item) const
 				mcol = 0xff;
 			} else {
 				//iwd2 doesn't need translation from kit to usability, the kit value IS usability
+				// But it's more complicated: check the comments below.
+				// Skip undesired kits
+				stat &= ~kitignore;
 				goto no_resolve;
 			}
 		}
-		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+
+		if (iwd2class && itemuse[i].stat == IE_CLASS) {
+			// in iwd2 any class mixin can enable the use, but the stat only holds the first class;
+			// it also means we shouldn't check all kits (which we do last)!
+			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
+			// but the kit check would fail, since paladins and their kits aren't.
+			stat = GetClassMask();
+			if (stat & ~itemvalue) {
+				if (Modified[IE_KIT] == 0) continue;
+			} else {
+				return STR_CANNOT_USE_ITEM;
+			}
+
+			// classes checked out, but we're kitted ...
+			// ignore kits from "unusable" classes
+			for (int j=0; j < ISCLASSES; j++) {
+				if (Modified[levelslotsiwd2[j]] == 0) continue;
+				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
+
+				std::vector<int> kits = iwd2kits[classesiwd2[j]];
+				std::vector<int>::iterator it = kits.begin();
+				for ( ; it != kits.end(); it++) {
+					kitignore |= *it;
+				}
+			}
+			continue;
+		} else {
+			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+		}
+
 no_resolve:
 		if (stat&itemvalue) {
 			//print("failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
