@@ -84,7 +84,10 @@ public:
 
 	bool operator!() const { return !ptr; }
 
+	// declare 2 converters to make any call to delete fail with ambiguity error
+	operator T*() { return ptr; }
 	operator T*() const { return ptr; }
+	
 	operator bool() const { return bool(ptr); }
 	
 	T* get() const { return ptr; }
