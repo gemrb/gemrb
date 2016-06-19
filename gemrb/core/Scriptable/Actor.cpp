@@ -154,8 +154,6 @@ struct ItemUseType {
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
-//static ieDword *kituse = NULL;
-//static int kitcount = -1;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
@@ -198,6 +196,10 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 //this map could probably be auto-generated (isClass -> IWD2 class ID)
 //autogenerating for non IWD2 now!!!
 static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
+
+// classis -> kits map
+static std::map<int, std::vector<int> > iwd2kits;
+
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
  IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
@@ -414,12 +416,7 @@ void ReleaseMemoryActor()
 		delete [] itemuse;
 		itemuse = NULL;
 	}
-/*
-	if (kituse) {
-		delete [] kituse;
-		kituse = NULL;
-	}
-*/
+
 	if (itemanim) {
 		delete [] itemanim;
 		itemanim = NULL;
@@ -2075,18 +2072,22 @@ static void InitActorTables()
 		error("Actor", "Missing classes.2da!");
 	}
 	if (iwd2class) {
-		//kitcount = 0;
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
-		for (i=0; i<classcount; i++) {
+		for (i=0; i<(int)tm->GetRowCount(); i++) {
 			const char *classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
 			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
 			if (classcol) {
-				//kitcount++;
+				// kit ids are in hex
+				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
+				iwd2kits[classcol].push_back(classID);
 				continue;
+			} else if (i >= classcount) {
+				// new class out of order
+				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
 			xpcap[classis] = atoi(xpcapt->QueryField(classname, "VALUE"));
@@ -2126,18 +2127,6 @@ static void InitActorTables()
 			//TODO: generate classesiwd2 here, so it can be unhardcoded
 			Log(DEBUG, "Actor", buffer);
 		}
-		/*
-		//pass two: iwd2 kit usabilities
-		kituse = (ieDword *) calloc(kitcount, sizeof(ieDword) );
-		int idx = 0;
-		for(i=0;i<classcount;i++) {
-			const char *classname = tm->GetRowName(i);
-			ieDword classcol = atoi(tm->QueryField(classname, "CLASS") );
-			ieDword usability = strtoul(tm->QueryField(classname, "USABILITY"), NULL, 0 );
-			if (!classcol) continue;
-			kituse[j++]=usability;
-		}
-		*/
 	} else {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
