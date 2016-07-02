@@ -198,7 +198,11 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
 
 // classis -> kits map
-static std::map<int, std::vector<int> > iwd2kits;
+struct ClassKits {
+	std::vector<int> indices;
+	std::vector<int> ids;
+};
+static std::map<int, ClassKits> iwd2kits;
 
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
@@ -2083,7 +2087,8 @@ static void InitActorTables()
 			if (classcol) {
 				// kit ids are in hex
 				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
-				iwd2kits[classcol].push_back(classID);
+				iwd2kits[classcol].indices.push_back(i);
+				iwd2kits[classcol].ids.push_back(classID);
 				continue;
 			} else if (i >= classcount) {
 				// new class out of order
@@ -9150,7 +9155,7 @@ int Actor::CheckUsability(Item *item) const
 				if (Modified[levelslotsiwd2[j]] == 0) continue;
 				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
 
-				std::vector<int> kits = iwd2kits[classesiwd2[j]];
+				std::vector<int> kits = iwd2kits[classesiwd2[j]].ids;
 				std::vector<int>::iterator it = kits.begin();
 				for ( ; it != kits.end(); it++) {
 					kitignore |= *it;
