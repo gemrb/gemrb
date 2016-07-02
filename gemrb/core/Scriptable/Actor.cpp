@@ -824,26 +824,16 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define KIT_SWASHBUCKLER 0x100000
 #define KIT_BARBARIAN 0x40000000
 
-// iwd2 supports multiple kits, but sanely only one kit per class
-static int GetIWD2KitIndex (ieDword kit, const char *resref="classes", ieDword baseclass=0)
+// iwd2 supports multiple kits per actor, but sanely only one kit per class
+static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 {
-	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref));
-	int idx = -1;
-	if (!tm) return idx;
-
-	int offset = tm->FindTableValue("CLASS", baseclass);
-	int i = 0;
-	const char *classname = tm->GetRowName(offset+i);
-	while (atoi(tm->QueryField(classname, "CLASS")) == (signed)baseclass) {
-		ieDword akit = strtol(tm->QueryField(classname, "ID"), NULL, 16);
-		if (kit & akit) {
-			idx = offset+i;
-			break;
-		}
-		i++;
-		classname = tm->GetRowName(offset+i);
+	std::vector<int> kits = iwd2kits[classesiwd2[baseclass]].indices;
+	std::vector<int>::iterator it = kits.begin();
+	for ( ; it != kits.end(); it++) {
+		if (kit & (*it)) return *it;
 	}
-	return idx;
+
+	return -1;
 }
 
 //TODO: make kitlist column 6 stored internally
@@ -852,7 +842,7 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword b
 	int kitindex = 0;
 
 	if (iwd2class) {
-		return GetIWD2KitIndex(kit, "classes", baseclass);
+		return GetIWD2KitIndex(kit, baseclass);
 	}
 
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
