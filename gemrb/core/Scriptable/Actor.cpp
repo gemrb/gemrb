@@ -10506,5 +10506,9 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 	return time;
 }
 
+ieDword Actor::GetClassID (const ieDword isclass) {
+	return classesiwd2[isclass];
+}
+
 }
 
