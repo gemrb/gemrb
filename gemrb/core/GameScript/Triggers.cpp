@@ -2573,11 +2573,16 @@ int GameScript::Level(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	// FIXME: what about multiclasses or dualclasses?
-	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int0Parameter;
+	// NOTE: which level to check is handled in GetXPLevel. The only user outside of iwd2
+	// is the bg2 druid grove challenge. Fighter/druid is the only applicable multiclass,
+	// but the dialog checks for level 14, which both classes reach at the same xp.
+	// However, checking the gt/lt variants in gorodr1.d (wk start) it becomes clear
+	// that multiclasses check against their rounded average, like elsewhere:
+	// f/d levels (8/10: 9 < 10, 8/11: 9.5 >= 10 )
+	return actor->GetXPLevel(true) == (unsigned) parameters->int0Parameter;
 }
 
-//this is just a hack, actually multiclass should be available
+// works intuitively only with single-classed characters — the way the originals use it
 int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2617,10 +2622,9 @@ int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int0Parameter;
+	return actor->GetXPLevel(true) > (unsigned) parameters->int0Parameter;
 }
 
-//this is just a hack, actually multiclass should be available
 int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2657,7 +2661,7 @@ int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int0Parameter;
+	return actor->GetXPLevel(true) < (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
