@@ -193,9 +193,8 @@ static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LE
 static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
 	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK,
 	ISCLASS12, ISCLASS13};
-//this map could probably be auto-generated (isClass -> IWD2 class ID)
-//autogenerating for non IWD2 now!!!
-static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
+// map isClass -> (IWD2) class ID
+static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // classis -> kits map
 struct ClassKits {
@@ -2076,7 +2075,12 @@ static void InitActorTables()
 				iwd2kits[classcol].indices.push_back(i);
 				iwd2kits[classcol].ids.push_back(classID);
 				continue;
-			} else if (i >= classcount) {
+			} else if (i < classcount) {
+				// populate classesiwd2
+				// we need the id of the isclass name, not the current one
+				ieDword cid = atoi(tm->QueryField(isclassnames[i], "ID"));
+				classesiwd2[i] = cid;
+			} else {
 				// new class out of order
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
@@ -2115,7 +2119,6 @@ static void InitActorTables()
 			buffer.appendFormatted("ToHit: %s ", tohit);
 			buffer.appendFormatted("XPCap: %d", xpcap[classis]);
 
-			//TODO: generate classesiwd2 here, so it can be unhardcoded
 			Log(DEBUG, "Actor", buffer);
 		}
 	} else {
@@ -2130,7 +2133,6 @@ static void InitActorTables()
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
 
-		memset(classesiwd2, 0 , sizeof(classesiwd2) );
 		for (i=0; i<classcount; i++) {
 			const char* classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
