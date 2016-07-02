@@ -20,6 +20,7 @@
 
 import GemRB
 import GUICommon
+import Spellbook
 import CommonTables
 from ie_stats import *
 from GUIDefines import *
@@ -37,7 +38,7 @@ def OnLoad():
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG6")
 		return
-	if BookType&2:
+	if Spellbook.IsSorcererBook (BookType):
 		# sorcerers need their known not max table or they would progress too slowly
 		TableName = "SPLSRCKN"
 

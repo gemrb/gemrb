@@ -34,7 +34,7 @@ def OnLoad():
 	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
 	# make sure we have a correct table
-	if BookType&2:
+	if Spellbook.IsSorcererBook (BookType):
 		# sorcerers need their known not max table or they would progress too slowly
 		TableName = "SPLSRCKN"
 

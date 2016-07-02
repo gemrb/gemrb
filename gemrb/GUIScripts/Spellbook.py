@@ -510,14 +510,18 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	# not found
 	return -1
 
+# is this a sorcerer-style learning/memo spellbook?
+def IsSorcererBook (bookmode):
+	return bookmode & 2
+
 def HasSorcererBook (pc, cls=-1):
 	import GUICommon
 
 	ClassName = GUICommon.GetClassRowName (pc)
 	if cls != -1:
 		ClassName = GUICommon.GetClassRowName (cls, "class")
-	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") & 2
-	return SorcererBook
+	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
+	return IsSorcererBook (SorcererBook)
 
 def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
