@@ -1698,15 +1698,6 @@ void Actor::ReleaseMemory()
 /* returns the ISCLASS for the class based on name */
 static int IsClassFromName (const char* name)
 {
-	//TODO: convert this mess to a std::map
-	// iwd2 has some different names
-	if (third) {
-		if (strcmp(name, "ROGUE") == 0) {
-			return ISTHIEF;
-		} else if (strcmp(name, "WIZARD") == 0) {
-			return ISMAGE;
-		}
-	}
 	for (int i=0; i<ISCLASSES; i++) {
 		if (strcmp(name, isclassnames[i]) == 0)
 			return i;
@@ -1750,6 +1741,11 @@ static void InitActorTables()
 	third = !!core->HasFeature(GF_3ED_RULES);
 	raresnd = !!core->HasFeature(GF_RARE_ACTION_VB);
 	iwd2class = !!core->HasFeature(GF_LEVELSLOT_PER_CLASS);
+	// iwd2 has some different base class names
+	if (iwd2class) {
+		isclassnames[ISTHIEF] = "ROGUE";
+		isclassnames[ISMAGE] = "WIZARD";
+	}
 
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
