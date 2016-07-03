@@ -199,7 +199,7 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 // classis -> kits map
 struct ClassKits {
 	std::vector<int> indices;
-	std::vector<int> ids;
+	std::vector<ieDword> ids;
 };
 static std::map<int, ClassKits> iwd2kits;
 
@@ -9132,8 +9132,8 @@ int Actor::CheckUsability(Item *item) const
 				if (Modified[levelslotsiwd2[j]] == 0) continue;
 				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
 
-				std::vector<int> kits = iwd2kits[classesiwd2[j]].ids;
-				std::vector<int>::iterator it = kits.begin();
+				std::vector<ieDword> kits = iwd2kits[classesiwd2[j]].ids;
+				std::vector<ieDword>::iterator it = kits.begin();
 				for ( ; it != kits.end(); it++) {
 					kitignore |= *it;
 				}
