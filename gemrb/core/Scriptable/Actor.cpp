@@ -4304,7 +4304,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	return damage;
 }
 
-//TODO: handle pst
 void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter)
 {
 	bool detailed = false;
@@ -4344,7 +4343,10 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 				displaymsg->DisplayConstantStringName(STR_DAMAGE1, DMC_WHITE, this);
 			}
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
-			if(0) print("TODO: pst floating text");
+			//TODO: handle pst properly (decay, queueing, color)
+			wchar_t dmg[10];
+			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L"%d", damage);
+			SetOverheadText(dmg, true);
 		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
