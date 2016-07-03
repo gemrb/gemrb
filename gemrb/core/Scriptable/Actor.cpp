@@ -4100,12 +4100,6 @@ bool Actor::AttackIsStunning(int damagetype) const {
 		return true;
 	}
 
-	//cheese to avoid one shotting newbie player
-/* FIXME: decode exact conditions
-	if ( InParty && (Modified[IE_MAXHITPOINTS]<20) && (damage>Modified[IE_MAXHITPOINTS]) ) {
-		return true;
-	}
-*/
 	return false;
 }
 
@@ -4131,7 +4125,7 @@ void Actor::CheckCleave()
 			core->ApplyEffect(fx, this, this);
 			delete fx;
 			// ~Cleave feat adds another level %d attack.~
-			// FIXME: probably uses the same tohit as the previous attack
+			// uses the max tohit bonus (tested), but game always displayed "level 1"
 			displaymsg->DisplayRollStringName(39846, DMC_LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
@@ -5164,7 +5158,6 @@ void Actor::Die(Scriptable *killer)
 			Holder<SymbolMgr> race = core->GetSymbol(racetable);
 			const char *raceName = race->GetValue(Modified[IE_RACE]);
 			if (raceName) {
-				// todo: should probably not set this for humans in iwd?
 				snprintf(varname, 32, "KILL_%s_CNT", raceName);
 				game->locals->Lookup(varname, value);
 				game->locals->SetAt(varname, value+1, nocreate);
@@ -6354,12 +6347,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	int prof = 0;
-	if (wi.wflags&WEAPON_BYPASS) {
-		//FIXME:this type of weapon ignores all armor, -4 is for balance?
-		//or i just got lost a negation somewhere
-		prof += -4;
-	}
-
 	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
 	// but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
