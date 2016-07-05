@@ -154,7 +154,7 @@ public:
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
-	virtual Sprite2D* Cursor() const { return cursor; }
+	virtual Sprite2D* Cursor() const { return cursor.get(); }
 	void SetCursor(Sprite2D* c);
 
 	// GUIScripting

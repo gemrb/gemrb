@@ -147,10 +147,10 @@ void View::DrawBackground(const Region* rgn) const
 			Region intersect = rgn->Intersect(bgRgn);
 			Point screenPt = ConvertPointToWindow(intersect.Origin());
 			Region toClip(screenPt, intersect.Dimensions());
-			video->BlitSprite( background, intersect, toClip);
+			video->BlitSprite( background.get(), intersect, toClip);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->XPos, background->YPos));
-			video->BlitSprite( background, dp.x, dp.y );
+			video->BlitSprite( background.get(), dp.x, dp.y );
 		}
 	}
 }
