@@ -58,8 +58,7 @@ private:
 public:
 	Slider(const Region& frame, Window* win,
            short KnobXPos, short KnobYPos, short KnobStep,
-           unsigned short KnobStepsCount, bool Clear = false);
-	~Slider();
+           unsigned short KnobStepsCount);
 
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
@@ -74,9 +73,9 @@ public:
 
 private: // Private attributes
 	/** Knob Image */
-	Sprite2D * Knob;
+	Holder<Sprite2D> Knob;
 	/** Grabbed Knob Image */
-	Sprite2D * GrabbedKnob;
+	Holder<Sprite2D> GrabbedKnob;
 	/** Knob Starting X Position */
 	short KnobXPos;
 	/** Knob Starting Y Position */
@@ -85,8 +84,7 @@ private: // Private attributes
 	short KnobStep;
 	/** Knob Steps Count */
 	unsigned short KnobStepsCount;
-	/** If true, on deletion the Slider will destroy the associated images */
-	bool Clear;
+
 	/** Actual Knob Status */
 	unsigned char State;
 	/** Slider Position Value */

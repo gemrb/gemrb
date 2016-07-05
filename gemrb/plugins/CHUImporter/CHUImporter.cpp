@@ -281,7 +281,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
-				Slider* sldr = new Slider( ctrlFrame, win, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
+				Slider* sldr = new Slider( ctrlFrame, win, KnobXPos, KnobYPos, KnobStep, KnobStepsCount );
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);

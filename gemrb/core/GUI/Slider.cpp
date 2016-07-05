@@ -32,7 +32,7 @@ namespace GemRB {
 
 Slider::Slider(const Region& frame, Window* win,
                short KnobXPos, short KnobYPos, short KnobStep,
-               unsigned short KnobStepsCount, bool Clear)
+               unsigned short KnobStepsCount)
 : Control(frame, win)
 {
 	ControlType = IE_GUI_SLIDER;
@@ -42,24 +42,10 @@ Slider::Slider(const Region& frame, Window* win,
 	this->KnobStepsCount = KnobStepsCount;
 	Knob = NULL;
 	GrabbedKnob = NULL;
-	this->Clear = Clear;
 	ResetEventHandler( SliderOnChange );
 	State = IE_GUI_SLIDER_KNOB;
 	Pos = 0;
 	Value = 1;
-}
-
-Slider::~Slider()
-{
-	if (!Clear) {
-		return;
-	}
-	if (Knob) {
-		Sprite2D::FreeSprite( Knob );
-	}
-	if (GrabbedKnob) {
-		Sprite2D::FreeSprite( GrabbedKnob );
-	}
 }
 
 /** Draws the Control on the Output Display */
@@ -67,13 +53,13 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
-			core->GetVideoDriver()->BlitSprite( Knob,
+			core->GetVideoDriver()->BlitSprite( Knob.get(),
 				rgn.x + KnobXPos + ( Pos * KnobStep ),
 				rgn.y + KnobYPos );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			core->GetVideoDriver()->BlitSprite( GrabbedKnob,
+			core->GetVideoDriver()->BlitSprite( GrabbedKnob.get(),
 				rgn.x + KnobXPos + ( Pos * KnobStep ),
 				rgn.y + KnobYPos );
 			break;
@@ -118,14 +104,10 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 {
 	switch (type) {
 		case IE_GUI_SLIDER_KNOB:
-			if (Knob && Clear)
-				Sprite2D::FreeSprite( Knob );
 			Knob = img;
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			if (GrabbedKnob && Clear)
-				Sprite2D::FreeSprite( GrabbedKnob );
 			GrabbedKnob = img;
 			break;
 
