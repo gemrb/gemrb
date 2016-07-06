@@ -41,7 +41,7 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	MouseIsDown = false;
 	lastCursor = 0;
 	Area = NULL;
-	Value = direction;
+	SetValue(direction);
 	OverrideIconPalette = false;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
@@ -62,7 +62,7 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	}
 
 	//this also updates visible locations
-	worldmap->CalculateDistances(currentArea, Value);
+	worldmap->CalculateDistances(currentArea, direction);
 
 	// alpha bit is unfortunately ignored
 	if (font[0]) {
@@ -218,7 +218,7 @@ void WorldMapControl::OnMouseOver(const MouseEvent& me)
 
 	LastMousePos = p;
 
-	if (Value!=(ieDword) -1) {
+	if (GetValue()!=(ieDword) -1) {
 		Point mapOff = p + Point(ScrollX, ScrollY);
 
 		WMPAreaEntry *oldArea = Area;

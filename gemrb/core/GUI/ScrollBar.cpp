@@ -36,7 +36,6 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 : Control(frame, win)
 {
 	ControlType = IE_GUI_SCROLLBAR;
-	Pos = 0;
 	State = 0;
 	SliderYPos = 0;
 	ScrollDelta = 1;
@@ -72,34 +71,27 @@ int ScrollBar::GetFrameHeight(int frame) const
 double ScrollBar::GetStep()
 {
 	double stepPx = 0.0;
-	if (Value){
-		stepPx = (double)SliderRange / (double)Value;
+	ieDword val = GetValue();
+	if (val){
+		stepPx = (double)SliderRange / (double)val;
 	}
 	return stepPx;
 }
 
 /** Sets a new position, relays the change to an associated textarea and calls
 	any existing GUI OnChange callback */
-void ScrollBar::SetPos(ieDword NewPos)
+void ScrollBar::SetValue(ieDword NewPos)
 {
-	if (NewPos > Value) NewPos = Value;
+	Control::SetValue(NewPos);
 
 	if (( State & SLIDER_GRAB ) == 0){
 		// set the slider to the exact y for NewPos.
 		// if the slider is grabbed dont set position! otherwise you will get a flicker as it bounces between exact positioning and arbitrary
 		SliderYPos = (unsigned short) (NewPos * GetStep());
 	}
-	if (Pos && ( Pos == NewPos )) {
-		return;
-	}
 
-	MarkDirty();
-	Pos = (ieWord) NewPos;
 	if (textarea) {
-		textarea->SetRow( Pos );
-	}
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Pos );
+		textarea->SetRow( GetValue() );
 	}
 	RunEventHandler( ScrollBarOnChange );
 }
@@ -108,22 +100,24 @@ void ScrollBar::SetPos(ieDword NewPos)
 void ScrollBar::SetPosForY(short y)
 {
 	double stepPx = GetStep();
-	if (y && stepPx && Value > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
+	ValueRange range = GetValueRange();
+	if (y && stepPx && range.second > 0) {// if the value is 0 we are simultaneously at both the top and bottom so there is nothing to do
 		// clamp the value
 		y -= (frame.h - SliderRange) / 2;
 		if (y < 0) y = 0;
 		else if (y > SliderRange) y = SliderRange;
 
-		unsigned short NewPos = (unsigned short)(y / stepPx);
-		if (Pos != NewPos) {
-			SetPos(NewPos);
+		ieDword NewPos = (y / stepPx);
+		ieDword val = GetValue();
+		if (val != NewPos) {
+			SetValue(NewPos);
 		} else {
 			MarkDirty();
 		}
 		SliderYPos = y;
 	} else {
 		// top is our default position
-		SetPos(0);
+		SetValue(0);
 		SliderYPos = 0;
 	}
 }
@@ -131,19 +125,21 @@ void ScrollBar::SetPosForY(short y)
 /** Refreshes the ScrollBar according to a guiscript variable */
 void ScrollBar::UpdateState(unsigned int Sum)
 {
-	SetPos( Sum );
+	SetValue( Sum );
 }
 
 /** SDL < 1.3 Mousewheel support */
 void ScrollBar::ScrollUp()
 {
-	SetPos(Pos >= ScrollDelta ? Pos - ScrollDelta : 0);
+	ieDword val = GetValue();
+	SetValue(++val);
 }
 
 /** SDL < 1.3 Mousewheel support */
 void ScrollBar::ScrollDown()
 {
-	SetPos(Pos + ScrollDelta);
+	ieDword val = GetValue();
+	SetValue(--val);
 }
 
 bool ScrollBar::IsOpaque() const
@@ -251,17 +247,6 @@ void ScrollBar::OnMouseOver(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
 		SetPosForY(me.y - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
-	}
-}
-
-/** Sets the Maximum Value of the ScrollBar */
-void ScrollBar::SetMax(unsigned short Max)
-{
-	Value = Max;
-	if (Max == 0) {
-		SetPos( 0 );
-	} else if (Pos > Max){
-		SetPos( Max );
 	}
 }
 

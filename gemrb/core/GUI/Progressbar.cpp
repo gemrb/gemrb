@@ -43,6 +43,8 @@ Progressbar::Progressbar(const Region& frame, Window* win,
 	KnobXPos = KnobYPos = 0;
 	CapXPos = CapYPos = 0;
 	ResetEventHandler( EndReached );
+
+	SetValueRange(0, 100);
 }
 
 Progressbar::~Progressbar()
@@ -60,8 +62,9 @@ Progressbar::~Progressbar()
 void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Sprite2D *bcksprite;
+	ieDword val = GetValue();
 
-	if((Value >= 100) && KnobStepsCount && BackGround2) {
+	if((val >= 100) && KnobStepsCount && BackGround2) {
 		bcksprite=BackGround2; //animated progbar end stage
 	}
 	else {
@@ -81,7 +84,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		int w = BackGround2->Width;
 		int h = BackGround2->Height;
 		//this is the PST/IWD specific part
-		Count = Value*w/100;
+		Count = val*w/100;
 		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, r.x, r.y, &r );
 
@@ -91,35 +94,19 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	//animated progressbar (bg2)
-	Count=Value*KnobStepsCount/100;
+	Count=val*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
 		core->GetVideoDriver()->BlitSprite( Knob, 0, 0 );
 	}
 }
 
-/** Returns the actual Progressbar Position */
-unsigned int Progressbar::GetPosition()
-{
-	return Value;
-}
-
-/** Sets the actual Progressbar Position trimming to the Max and Min Values */
-void Progressbar::SetPosition(unsigned int pos)
-{
-	if(pos>100) pos=100;
-	if (Value == pos)
-		return;
-	Value = pos;
-	MarkDirty();
-}
-
 void Progressbar::UpdateState(unsigned int Sum)
 {
-	SetPosition(Sum);
-	MarkDirty();
-	if(Value==100)
+	SetValue(Sum);
+    if(GetValue() == 100) {
 		RunEventHandler( EndReached );
+    }
 }
 
 /** Sets the selected image */

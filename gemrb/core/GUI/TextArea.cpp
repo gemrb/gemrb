@@ -194,7 +194,7 @@ void TextArea::UpdateScrollbar()
 		UpdateRowCount(textHeight);
 		ieWord visibleRows = (frame.h / GetRowHeight());
 		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
-		scrollbar->SetMax(sbMax);
+		scrollbar->SetValueRange(0, sbMax);
 	}
 
 	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL
@@ -426,7 +426,7 @@ void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
 	}
 
 	if (scrollbar && sender != scrollbar) {
-		scrollbar->SetPos(y);
+		scrollbar->SetValue(y);
 		// sb->SetPos will recall this method so we dont need to do more... yet.
 	} else if (scrollbar) {
 		// our scrollbar has set position for us
@@ -526,7 +526,7 @@ void TextArea::UpdateState(unsigned int optIdx)
 
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
-	Value = OptSpans[optIdx].first;
+	SetValue( OptSpans[optIdx].first );
 
 	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
 	TextContainer* optspan = OptSpans[optIdx].second;
@@ -538,7 +538,6 @@ void TextArea::UpdateState(unsigned int optIdx)
 	selectedSpan = optspan;
 	selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
 
-	core->GetDictionary()->SetAt( VarName, Value );
 	RunEventHandler(TextAreaOnSelect);
 }
 
@@ -589,8 +588,7 @@ void TextArea::ClearSelectOptions()
 	selectOptions = NULL;
 	selectedSpan = NULL;
 	hoverSpan = NULL;
-	// also set the value to "none"
-	Value = -1;
+
 	UpdateScrollbar();
 }
 

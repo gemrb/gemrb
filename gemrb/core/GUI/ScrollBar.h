@@ -71,16 +71,14 @@ public:
 
 	bool IsOpaque() const;
 	/**sets position, updates associated stuff */
-	void SetPos(ieDword NewPos);
-	ieWord GetPos() const { return Pos; };
+	void SetValue(ieDword NewPos);
 
 	void ScrollUp();
 	void ScrollDown();
 	double GetStep();
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(unsigned int Sum);
-	/** Sets the Maximum Value of the ScrollBar */
-	void SetMax(unsigned short Max);
+
 	void SetScrollAmount(unsigned short amount) { ScrollDelta = amount; }
 private: //Private attributes
 	/** safe method to get the height of a frame */
@@ -92,8 +90,6 @@ private: //Private attributes
 	int SliderRange;
 	/** a pixel position between 0 and SliderRange*/
 	unsigned short SliderYPos;
-	/** Item Index */
-	ieWord Pos;
 	/** Scroll Bar Status */
 	unsigned short State;
 	/** amount by which value should change on scrolling */

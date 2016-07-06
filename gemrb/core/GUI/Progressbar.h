@@ -55,10 +55,7 @@ public:
 	~Progressbar();
 
 	bool IsOpaque() const { return BackGround; }
-	/** Returns the actual Progressbar Position */
-	unsigned int GetPosition();
-	/** Sets the actual Progressbar Position trimming to the Max and Min Values */
-	void SetPosition(unsigned int pos);
+
 	/** Sets the background images */
 	void SetImage(Sprite2D * img, Sprite2D * img2);
 	/** Sets a bam resource for progressbar */

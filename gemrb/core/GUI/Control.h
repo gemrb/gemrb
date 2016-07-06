@@ -50,6 +50,7 @@
 #include "GUI/View.h"
 #include "Timer.h"
 
+#include <limits>
 #include <map>
 
 namespace GemRB {
@@ -77,9 +78,6 @@ public:
 class GEM_EXPORT Control : public View {
 protected:
     Window* window;
-    
-    /** the value of the control to add to the variable */
-    ieDword Value;
     
 private:
 	// if the mouse is held: fires the action at the interval specified by ActionRepeatDelay
@@ -147,11 +145,21 @@ public:
 	/** Sets the animation picture ref */
 	virtual void SetAnimPicture(Sprite2D* Picture);
 
+	typedef std::pair<ieDword, ieDword> ValueRange;
+	const static ValueRange MaxValueRange;
 	ieDword GetValue() const { return Value; }
-	void SetValue(ieDword val) { Value = val; }
+	ValueRange GetValueRange() const { return range; }
+	void SetValue(ieDword val);
+	void SetValueRange(ValueRange range = MaxValueRange);
+	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
 
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+private:
+	/** the value of the control to add to the variable */
+	ieDword Value;
+	ValueRange range;
+
 };
 
 

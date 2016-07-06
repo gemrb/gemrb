@@ -146,8 +146,7 @@ void MapControl::Realize()
 
 void MapControl::UpdateState(unsigned int Sum)
 {
-	Value = Sum;
-	MarkDirty();
+	SetValue(Sum);
 }
 
 /** Draws the Control on the Output Display */
@@ -187,7 +186,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	// Draw Map notes, could be turned off in bg2
 	// we use the common control value to handle it, because then we
 	// don't need another interface
-	if (Value!=MAP_NO_NOTES) {
+	if (GetValue()!=MAP_NO_NOTES) {
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
@@ -242,8 +241,9 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	lastMouseX = p.x;
 	lastMouseY = p.y;
 
+	ieDword val = GetValue();
 	// FIXME: implement cursor changing
-	switch (Value) {
+	switch (val) {
 		case MAP_REVEAL: //for farsee effect
 			//Owner->Cursor = IE_CURSOR_CAST;
 			break;
@@ -255,7 +255,7 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 			break;
 	}
 
-	if (Value == MAP_VIEW_NOTES || Value == MAP_SET_NOTE || Value == MAP_REVEAL) {
+	if (val) {
 		Point mp;
 		/*
 		unsigned int dist;

@@ -26,10 +26,7 @@
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-
-#ifdef ANDROID
 #include "Variables.h"
-#endif
 
 #include <cstdio>
 #include <cstring>
@@ -38,12 +35,15 @@ namespace GemRB {
 
 unsigned int Control::ActionRepeatDelay = 250;
 
+const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
+
 Control::Control(const Region& frame, Window* win)
 : View(frame)
 {
 	InHandler = false;
 	VarName[0] = 0;
 	Value = 0;
+	SetValueRange(MaxValueRange);
 
 	animation = NULL;
 	AnimPicture = NULL;
@@ -155,6 +155,29 @@ void Control::SetFocus()
 bool Control::IsFocused()
 {
 	return window->FocusedView() == this;
+}
+
+void Control::SetValue(ieDword val)
+{
+	Value = std::max(val, range.first);
+	Value = std::min(val, range.second);
+
+	if (VarName[0] != 0) {
+		core->GetDictionary()->SetAt( VarName, Value );
+	}
+
+	MarkDirty();
+}
+
+void Control::SetValueRange(ValueRange r)
+{
+	range = r;
+	SetValue(Value); // update the value if it falls outside the range
+}
+
+void Control::SetValueRange(ieDword min, ieDword max)
+{
+	SetValueRange(ValueRange(min, max));
 }
 
 void Control::SetAnimPicture(Sprite2D* newpic)

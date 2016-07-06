@@ -102,9 +102,6 @@ void Label::SetAlignment(unsigned char Alignment)
 
 void Label::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
-	}
 	if (LabelOnPress) {
 		RunEventHandler( LabelOnPress );
 	}

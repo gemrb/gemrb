@@ -146,8 +146,6 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 			break;
 		default:
 			if (Key.character) {
-				if (Value && ( (Key.character<'0') || (Key.character>'9') ) )
-					return false;
 				if (Text.length() < max) {
 					Text.insert(CurPos++, 1, Key.character);
 				}

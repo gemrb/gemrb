@@ -522,7 +522,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		if (VarName[0] != 0) {
 			ieDword tmp = 0;
 			core->GetDictionary()->Lookup( VarName, tmp );
-			tmp ^= Value;
+			tmp ^= GetValue();
 			core->GetDictionary()->SetAt( VarName, tmp );
 			window->RedrawControls( VarName, tmp );
 		}
@@ -533,8 +533,9 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			SetState( IE_GUI_BUTTON_SELECTED );
 		}
 		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
-			window->RedrawControls( VarName, Value );
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt( VarName, val );
+			window->RedrawControls( VarName, val );
 		}
 	}
 
@@ -632,10 +633,10 @@ bool Button::SetEvent(int eventType, ControlEventHandler handler)
 void Button::UpdateState(unsigned int Sum)
 {
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
-		ToggleState = ( Sum == Value );
+		ToggleState = ( Sum == GetValue() );
 	}   	//radio button, exact value
 	else if (flags & IE_GUI_BUTTON_CHECKBOX) {
-		ToggleState = !!( Sum & Value );
+		ToggleState = !!( Sum & GetValue() );
 	} //checkbox, bitvalue
 	else {
 		return;

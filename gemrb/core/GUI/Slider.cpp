@@ -45,7 +45,7 @@ Slider::Slider(const Region& frame, Window* win,
 	ResetEventHandler( SliderOnChange );
 	State = IE_GUI_SLIDER_KNOB;
 	Pos = 0;
-	Value = 1;
+	SetValueRange(1);
 }
 
 /** Draws the Control on the Output Display */
@@ -79,9 +79,7 @@ void Slider::SetPosition(unsigned int pos)
 		Pos = pos;
 	}
 	if (VarName[0] != 0) {
-		if (!Value)
-			Value = 1;
-		core->GetDictionary()->SetAt( VarName, pos * Value );
+		core->GetDictionary()->SetAt( VarName, pos * GetValue() );
 	}
 	MarkDirty();
 }
@@ -89,10 +87,7 @@ void Slider::SetPosition(unsigned int pos)
 /** Refreshes a slider which is associated with VariableName */
 void Slider::UpdateState(unsigned int Sum)
 {
-	if (!Value) {
-		Value = 1;
-	}
-	Sum /= Value;
+	Sum /= GetValue();
 	if (Sum <= KnobStepsCount) {
 		Pos = Sum;
 	}
