@@ -30,13 +30,11 @@
 namespace GemRB {
 
 Progressbar::Progressbar(const Region& frame, Window* win,
-                         unsigned short KnobStepsCount, bool Clear)
+                         unsigned short KnobStepsCount)
 : Control(frame, win)
 {
 	ControlType = IE_GUI_PROGRESSBAR;
-	BackGround = NULL;
-	BackGround2 = NULL;
-	this->Clear = Clear;
+
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
 	PBarCap = NULL;
@@ -49,32 +47,20 @@ Progressbar::Progressbar(const Region& frame, Window* win,
 
 Progressbar::~Progressbar()
 {
-	if (!Clear) {
-		return;
-	}
-	Sprite2D::FreeSprite( BackGround );
-	Sprite2D::FreeSprite( BackGround2 );
 	delete PBarAnim;
-	Sprite2D::FreeSprite( PBarCap );
 }
 
 /** Draws the Control on the Output Display */
 void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	Sprite2D *bcksprite;
 	ieDword val = GetValue();
 
 	if((val >= 100) && KnobStepsCount && BackGround2) {
-		bcksprite=BackGround2; //animated progbar end stage
-	}
-	else {
-		bcksprite=BackGround;
-	}
-	if (bcksprite) {
-		core->GetVideoDriver()->BlitSprite( bcksprite, rgn.x, rgn.y, &rgn );
-		if( bcksprite==BackGround2) {
-			return; //done for animated progbar
-		}
+		//animated progbar end stage
+		core->GetVideoDriver()->BlitSprite( BackGround2.get(), rgn.x, rgn.y, &rgn );
+		return; //done for animated progbar
+	} else if (BackGround) {
+		core->GetVideoDriver()->BlitSprite( BackGround.get(), rgn.x, rgn.y, &rgn );
 	}
 
 	unsigned int Count;
@@ -86,9 +72,9 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		//this is the PST/IWD specific part
 		Count = val*w/100;
 		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
-		core->GetVideoDriver()->BlitSprite( BackGround2, r.x, r.y, &r );
+		core->GetVideoDriver()->BlitSprite( BackGround2.get(), r.x, r.y, &r );
 
-		core->GetVideoDriver()->BlitSprite( PBarCap,
+		core->GetVideoDriver()->BlitSprite( PBarCap.get(),
 			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos );
 		return;
 	}
@@ -112,18 +98,13 @@ void Progressbar::UpdateState(unsigned int Sum)
 /** Sets the selected image */
 void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 {
-	if (BackGround && Clear)
-		Sprite2D::FreeSprite( BackGround );
 	BackGround = img;
-	if (BackGround2 && Clear)
-		Sprite2D::FreeSprite( BackGround2 );
 	BackGround2 = img2;
 	MarkDirty();
 }
 
 void Progressbar::SetBarCap(Sprite2D* img3)
 {
-	Sprite2D::FreeSprite( PBarCap );
 	PBarCap = img3;
 }
 

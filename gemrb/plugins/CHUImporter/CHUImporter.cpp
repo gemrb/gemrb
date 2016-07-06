@@ -232,7 +232,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(ctrlFrame, win, KnobStepsCount, true );
+				Progressbar* pbar = new Progressbar(ctrlFrame, win, KnobStepsCount );
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;

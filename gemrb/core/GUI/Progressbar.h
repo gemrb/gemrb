@@ -51,7 +51,7 @@ private:
 
 public: 
 	Progressbar(const Region& frame, Window* win,
-                unsigned short KnobStepsCount, bool Clear = false);
+                unsigned short KnobStepsCount);
 	~Progressbar();
 
 	bool IsOpaque() const { return BackGround; }
@@ -71,18 +71,17 @@ public:
 
 private: // Private attributes
 	/** BackGround Images. If smaller than the Control Size, the image will be tiled. */
-	Sprite2D * BackGround;
-	Sprite2D * BackGround2; //mos resource for the filling of the bar 
+	Holder<Sprite2D> BackGround;
+	Holder<Sprite2D> BackGround2; //mos resource for the filling of the bar
 	/** Knob Steps Count */
 	unsigned int KnobStepsCount;
 	int KnobXPos, KnobYPos; //relative coordinates for Background2
 	int CapXPos, CapYPos; //relative coordinates for PBarCap
-	/** If true, on deletion the Progressbar will destroy the associated images */
-	bool Clear;
+
+	/** The mos for the progressbar cap (linear progressbar) */
+	Holder<Sprite2D> PBarCap;
 	/** The bam cycle whose frames work as a progressbar (animated progressbar) */
 	Animation *PBarAnim;
-	/** The most for the progressbar cap (linear progressbar) */
-	Sprite2D *PBarCap;
 public:
 	/** EndReached Scripted Event Function Name */
 	ControlEventHandler EndReached;
