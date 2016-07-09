@@ -669,7 +669,7 @@ static EffectDesc effectnames[] = {
 	{ "Protection:String", fx_generic_effect, 0, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, 0, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, 0, -1 },
-	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR, -1 },
+	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR|EFFECT_REINIT_ON_LOAD, -1 },
 	{ "PuppetMarker", fx_puppet_marker, 0, -1 },
 	{ "ProjectImage", fx_puppet_master, 0, -1 },
 	{ "Reveal:Area", fx_reveal_area, EFFECT_NO_ACTOR, -1 },
