@@ -52,7 +52,7 @@ Control::Control(const Region& frame, Window* win)
 	actionTimer = NULL;
 	repeatDelay = 0;
     
-    SetWindow(win);
+	SetWindow(win);
 }
 
 Control::~Control()
@@ -67,24 +67,24 @@ Control::~Control()
 
 	Sprite2D::FreeSprite(AnimPicture);
 }
-    
+
 void Control::SetWindow(Window* win)
 {
-    if (win == window) {
-        return;
-    }
-    if (window) {
-        window->RemoveSubview(this);
+	if (win == window) {
+		return;
+	}
+	if (window) {
+		window->RemoveSubview(this);
 		window = NULL;
-    }
-	
+	}
+
 	static Window* recursiveWin = NULL;
-    if (win && win != recursiveWin) {
+	if (win && win != recursiveWin) {
 		// avoid infinite recursion
 		recursiveWin = win;
-        win->AddSubviewInFrontOfView(this);
+		win->AddSubviewInFrontOfView(this);
 		recursiveWin = NULL;
-    }
+	}
 	window = win;
 }
 

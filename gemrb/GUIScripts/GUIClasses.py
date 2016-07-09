@@ -52,7 +52,7 @@ class GSymbol:
     'GetValue': _GemRB.Symbol_GetValue,
     'Unload': _GemRB.Symbol_Unload
   }
-  
+
 class GView:
 	__metaclass__ = metaIDWrapper
 	methods = {
@@ -64,7 +64,7 @@ class GView:
     'SetFlags': _GemRB.View_SetFlags,
 	}
 	__slots__ = ['SCRIPT_GROUP']
-	
+
 	def SetSize(self, w, h):
 		r = self.GetFrame()
 		self.SetFrame(r['x'], r['y'], w, h);
@@ -72,13 +72,13 @@ class GView:
 	def SetPos(self, x, y):
 		r = self.GetFrame()
 		self.SetFrame(x, y, r['w'], r['h']);
-		
+
 	def SetVisible(self, visible):
 		self.SetFlags(IE_GUI_VIEW_INVISIBLE, OP_NAND if visible else OP_OR)
-		
+
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
-	
+
 class GWindow(GView):
   methods = {
     'DeleteControl': _GemRB.Window_DeleteControl,
@@ -90,15 +90,15 @@ class GWindow(GView):
 
   def __nonzero__(self):
     return self.ID != -1
- 
+
   def Unload(self): # backwards compatibility
 	  self.Close()
- 
+
   def Close(self):
     if self.ID != -1:
       _GemRB.Window_Close(self)
       self.ID = -1
-      
+
   def GetControl(self, id):
 	  return GetControl(id, self)
 
@@ -125,10 +125,10 @@ class GWindow(GView):
   @CreateControlDecorator
   def CreateTextArea(self, control, *args):
     return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
-  
+
   @CreateControlDecorator
   def CreateTextEdit(self, control, *args):
-    return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:]) 
+    return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
 
 class GControl(GView):
   methods = {
@@ -160,7 +160,7 @@ class GTextArea(GControl):
     'ListResources': _GemRB.TextArea_ListResources
   }
   __slots__ = ['DefaultText']
-  
+
   def SetOptions(self, optList, varname=None, val=0):
     _GemRB.TextArea_SetOptions(self, optList)
     if varname:
@@ -200,14 +200,14 @@ class GButton(GControl):
   def MakeDefault(self):
 	  # return key
 	  return self.SetHotKey(chr(0x86))
-	  
+
   def MakeEscape(self):
 	  # escape key
 	  return self.SetHotKey(chr(0x8c))
 
   def SetMOS(self, mos):
 	  self.SetPicture(mos) # backwards compatibility
-  
+
   def SetSprite2D(self, spr):
 	  self.SetPicture(spr) # backwards compatibility
 

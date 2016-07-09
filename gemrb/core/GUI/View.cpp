@@ -138,7 +138,7 @@ void View::DrawBackground(const Region* rgn) const
 	}
 
 	// FIXME: technically its possible for the BG to be smaller than the view
-	// if this were to happen then the areas outside the BG woulndt get redrawn
+	// if this were to happen then the areas outside the BG wouldnt get redrawn
 	// we should probably draw black in those areas...
 	if (background) {
 		Video* video = core->GetVideoDriver();
