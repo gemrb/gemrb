@@ -1324,6 +1324,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
+	if (!changed) return;
 	for (int i=0; i<OVERLAY_COUNT; i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
