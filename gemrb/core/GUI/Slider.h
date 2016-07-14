@@ -54,6 +54,9 @@ class GEM_EXPORT Slider : public Control  {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	
+	// set postion pased on a point expressed in local (frame) coordinates
+	void SetPosition(const Point& p);
 
 public:
 	Slider(const Region& frame, Window* win,

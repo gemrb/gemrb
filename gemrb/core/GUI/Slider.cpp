@@ -83,6 +83,34 @@ void Slider::SetPosition(unsigned int pos)
 	}
 	MarkDirty();
 }
+    
+void Slider::SetPosition(const Point& p)
+{
+    int mx = KnobXPos;
+    int xmx = p.x - mx;
+	unsigned int oldPos = Pos;
+	
+    if (p.x < mx) {
+        SetPosition( 0 );
+    } else {
+        int befst = xmx / KnobStep;
+        if (befst >= KnobStepsCount) {
+            SetPosition( KnobStepsCount - 1 );
+        } else {
+            short aftst = befst + KnobStep;
+            if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
+                SetPosition( befst );
+            } else {
+                SetPosition( aftst );
+            }
+            
+        }
+    }
+
+	if (oldPos != Pos) {
+		RunEventHandler( SliderOnChange );
+	}
+}
 
 /** Refreshes a slider which is associated with VariableName */
 void Slider::UpdateState(unsigned int Sum)
@@ -117,7 +145,6 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
-	unsigned int oldPos = Pos;
 	int mx = (KnobXPos + ( Pos * KnobStep ) - Knob->XPos);
 	int my = (KnobYPos - Knob->YPos);
 	int Mx = (mx + Knob->Width);
@@ -128,63 +155,11 @@ void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (( p.x >= mx ) && ( p.y >= my )) {
 		if (( p.x <= Mx ) && ( p.y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
-		} else {
-			int mx = KnobXPos;
-			int xmx = p.x - mx;
-			if (p.x < mx) {
-				SetPosition( 0 );
-				if (oldPos != Pos) {
-					RunEventHandler( SliderOnChange );
-				}
-				return;
-			}
-			int befst = xmx / KnobStep;
-			if (befst >= KnobStepsCount) {
-				SetPosition( KnobStepsCount - 1 );
-				if (oldPos != Pos) {
-					RunEventHandler( SliderOnChange );
-				}
-				return;
-			}
-			int aftst = befst + KnobStep;
-			if (( xmx - ( befst * KnobStep ) ) <
-				( ( aftst * KnobStep ) - xmx )) {
-				SetPosition( befst );
-			} else {
-				SetPosition( aftst );
-			}
-			if (oldPos != Pos) {
-				RunEventHandler( SliderOnChange );
-			}
-		}
-	} else {
-		int mx = KnobXPos;
-		int xmx = p.x - mx;
-		if (p.x < mx) {
-			SetPosition( 0 );
-			if (oldPos != Pos) {
-				RunEventHandler( SliderOnChange );
-			}
-			return;
-		}
-		int befst = xmx / KnobStep;
-		if (befst >= KnobStepsCount) {
-			SetPosition( KnobStepsCount - 1 );
-			if (oldPos != Pos) {
-				RunEventHandler( SliderOnChange );
-			}
-			return;
-		}
-		int aftst = befst + KnobStep;
-		if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
-			SetPosition( befst );
-		} else {
-			SetPosition( aftst );
-		}
-		if (oldPos != Pos) {
-			RunEventHandler( SliderOnChange );
+            return;
 		}
 	}
+
+	SetPosition(ConvertPointFromScreen(me.Pos()));
 }
 
 /** Mouse Button Up */
@@ -202,32 +177,11 @@ void Slider::OnMouseOver(const MouseEvent& me)
 	MarkDirty();
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
-		int mx = KnobXPos;
-		int xmx = me.x - mx;
-		if (me.x < mx) {
-			SetPosition( 0 );
-			if (oldPos != Pos) {
-				RunEventHandler( SliderOnChange );
-			}
-			return;
-		}
-		int befst = xmx / KnobStep;
-		if (befst >= KnobStepsCount) {
-			SetPosition( KnobStepsCount - 1 );
-			if (oldPos != Pos) {
-				RunEventHandler( SliderOnChange );
-			}
-			return;
-		}
-		short aftst = befst + KnobStep;
-		if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
-			SetPosition( befst );
-		} else {
-			SetPosition( aftst );
-		}
-		if (oldPos != Pos) {
-			RunEventHandler( SliderOnChange );
-		}
+        SetPosition(ConvertPointFromScreen(me.Pos()));
+
+        if (oldPos != Pos) {
+            Control::OnMouseOver(me);
+        }
 	}
 }
 
