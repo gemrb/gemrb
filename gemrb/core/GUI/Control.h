@@ -87,7 +87,6 @@ public:
 class GEM_EXPORT Control : public View {
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
-    int RunEventHandler(const ControlEventHandler&);
     
 public: // Public attributes
 	enum Action {
@@ -209,7 +208,7 @@ private:
 	Timer* actionTimer;
 	
 	/** True if we are currently in an event handler */
-	bool InHandler;
+	int InHandler;
 
 	/** the value of the control to add to the variable */
 	ieDword Value;

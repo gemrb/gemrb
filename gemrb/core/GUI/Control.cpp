@@ -40,7 +40,7 @@ const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeri
 Control::Control(const Region& frame, Window* win)
 : View(frame)
 {
-	InHandler = false;
+	InHandler = 0;
 	VarName[0] = 0;
 	Value = 0;
 	SetValueRange(MaxValueRange);
@@ -136,31 +136,24 @@ bool Control::PerformAction(const ActionKey& key)
 {
 	ActionIterator it = actions.find(key);
 	if (it != actions.end()) {
-		return RunEventHandler(it->second) == 0;
+		if (InHandler) {
+			Log(ERROR, "Control", "Executing nested event handler. This is undefined behavior and may blow up.");
+		}
+
+		if (!window) {
+			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");
+		}
+
+		++InHandler;
+		// TODO: detect caller errors, trap them???
+		// TODO: add support for callbacks that return a bool?
+		(it->second)(this);
+		--InHandler;
+		assert(InHandler >= 0);
+
+		return true;
 	}
 	return false;
-}
-
-//return -1 if there is an error
-//return 1 if there is no handler (not an error)
-//return 0 if the handler ran as intended
-int Control::RunEventHandler(const ControlEventHandler& handler)
-{
-	if (InHandler) {
-		Log(WARNING, "Control", "Nested event handlers are not supported!");
-		return -1;
-	}
-	if (handler) {
-		if (!window) {
-			return -1;
-		}
-		InHandler = true;
-		//TODO: detect caller errors, trap them???
-		handler(this);
-		InHandler = false;
-		return 0;
-	}
-	return 1;
 }
 
 void Control::UpdateState(const char* varname, unsigned int val)
