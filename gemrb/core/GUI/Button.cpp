@@ -60,7 +60,6 @@ Button::Button(Region& frame, Window* win)
 	memset(&DestRGB,0,sizeof(DestRGB));
 	memset( borders, 0, sizeof( borders ));
 	starttime = 0;
-	Anchor.null();
 	PushOffset = Point(2, 2);
 }
 
