@@ -155,10 +155,12 @@ struct GEM_EXPORT Event {
 		KeyboardEvent keyboard;
 		//TouchEvent touch; unused currently
 	};
+    
+    typedef unsigned short EventMods;
 
 	EventType type;
 	unsigned long time;
-	short mod; // modifier keys held during the event
+	EventMods mod; // modifier keys held during the event
 	bool isScreen; // event coresponsds to location on screen
 };
 

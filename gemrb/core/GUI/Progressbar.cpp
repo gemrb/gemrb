@@ -40,7 +40,6 @@ Progressbar::Progressbar(const Region& frame, Window* win,
 	PBarCap = NULL;
 	KnobXPos = KnobYPos = 0;
 	CapXPos = CapYPos = 0;
-	ResetEventHandler( EndReached );
 
 	SetValueRange(0, 100);
 }
@@ -91,7 +90,7 @@ void Progressbar::UpdateState(unsigned int Sum)
 {
 	SetValue(Sum);
     if(GetValue() == 100) {
-		RunEventHandler( EndReached );
+        PerformAction(Action::EndReached);
     }
 }
 
@@ -120,19 +119,6 @@ void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
 	KnobYPos=y;
 	CapXPos=x2;
 	CapYPos=y2;
-}
-
-bool Progressbar::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_PROGRESS_END_REACHED:
-		EndReached = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 }

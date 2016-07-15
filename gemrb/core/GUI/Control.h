@@ -59,6 +59,15 @@ class ControlAnimation;
 class Control;
 class Sprite2D;
 class Window;
+    
+#define ACTION_CAST(a) \
+static_cast<Control::Action>(a)
+	
+#define ACTION_IS_SCREEN(a) \
+(a <= Control::Action::MouseLeave)
+    
+#define ACTION_DEFAULT ActionKey(Control::Action::Click, 0, GEM_MB_ACTION)
+#define ACTION_CUSTOM(x)  ACTION_CAST(Control::Action::CustomAction + x)
 
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
 public:
@@ -76,23 +85,30 @@ public:
  */
 
 class GEM_EXPORT Control : public View {
-protected:
-    Window* window;
-    
-private:
-	// if the mouse is held: fires the action at the interval specified by ActionRepeatDelay
-	// otherwise action fires on mouse up only
-	unsigned int repeatDelay;
-	std::map<unsigned int, ControlEventHandler> actions;
-	Timer* actionTimer;
-    
-    /** True if we are currently in an event handler */
-    bool InHandler;
-
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
+    int RunEventHandler(const ControlEventHandler&);
     
 public: // Public attributes
+	enum Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		// screen events, send coords to callback
+		Click,
+		// avoid Drag and Hover if you can (will fire frequently). or throttle using SetActionInterval
+		Drag,
+		// "mouse" over, enter, leave
+		Hover,
+		HoverBegin,
+		HoverEnd,
+		
+		// other events
+		ValueChange, // many times we only care that the value has changed, not about the event that changed it
+		
+		// TODO: probably others will be needed
+		
+		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
+	};
+
     /** Variable length is 40-1 (zero terminator) */
     char VarName[MAX_VARIABLE_LENGTH];
     
@@ -121,10 +137,6 @@ public:
 	void UpdateState(const char*, unsigned int);
 	virtual void UpdateState(unsigned int) {}
 
-	//Events
-	/** Reset/init event handler */
-	void ResetEventHandler(ControlEventHandler &handler);
-
 	/** Returns the Owner */
 	virtual void SetFocus();
 	bool IsFocused();
@@ -134,12 +146,15 @@ public:
 
 	bool TracksMouseDown() const { return bool(actionTimer); }
 
-	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetAction(ControlEventHandler handler, unsigned int flags);
+    //Events
+    void SetAction(ControlEventHandler handler); // default action (left mouse button up)
+	void SetAction(ControlEventHandler handler, Action type, EventButton button = 0,
+                   Event::EventMods mod = 0, short count = 0);
 	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
-	/** Run specified handler, it may return error code */
-	int RunEventHandler(const ControlEventHandler& handler);
+    /** Run specified handler, it may return error code */
+    bool PerformAction(); // perform default action (left mouse button up)
+	bool PerformAction(Action action);
+	bool SupportsAction(Action action);
 
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
@@ -155,7 +170,47 @@ public:
 
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+    // TODO: implement generic handlers for the other types of event actions
+	
+protected:
+	struct ActionKey {
+		uint32_t key;
+		
+		ActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
+			// pack the parameters into the 32 bit key...
+			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
+			key = 0;
+			uint32_t mask = 0xFF;
+			key |= type & mask;
+			mask <<= 8u;
+			key |= (mod << 8) & mask;
+			mask <<= 8u;
+			key |= (button << 16) & mask;
+			mask <<= 8u;
+			key |= (count << 24) & mask;
+		}
+		
+		bool operator< (const ActionKey& ak) const {
+			return key < ak.key;
+		}
+	};
+	
+	Window* window;
+	
+	bool SupportsAction(const ActionKey&);
+	bool PerformAction(const ActionKey&);
+
 private:
+	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
+	// otherwise action fires on input release up only
+	unsigned int repeatDelay;
+	typedef std::map<ActionKey, ControlEventHandler>::const_iterator ActionIterator;
+	std::map<ActionKey, ControlEventHandler> actions;
+	Timer* actionTimer;
+	
+	/** True if we are currently in an event handler */
+	bool InHandler;
+
 	/** the value of the control to add to the variable */
 	ieDword Value;
 	ValueRange range;

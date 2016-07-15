@@ -41,9 +41,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short
 	Cursor = NULL;
 	CurPos = 0;
 	Text.reserve(max);
-	ResetEventHandler( EditOnChange );
-	ResetEventHandler( EditOnDone );
-	ResetEventHandler( EditOnCancel );
+
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
 	palette = new Palette( ColorWhite, ColorBlack );
@@ -142,7 +140,9 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 			}
 			break;
 		case GEM_RETURN:
-			RunEventHandler( EditOnDone );
+            {
+				PerformAction(Action::Done);
+            }
 			break;
 		default:
 			if (Key.character) {
@@ -153,7 +153,7 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 			}
 			return false;
 	}
-	RunEventHandler( EditOnChange );
+	PerformAction(Action::Change);
 	return true;
 }
 
@@ -187,25 +187,6 @@ void TextEdit::SetBufferLength(ieWord buflen)
 String TextEdit::QueryText() const
 {
 	return Text;
-}
-
-bool TextEdit::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_EDIT_ON_CHANGE:
-		EditOnChange = handler;
-		break;
-	case IE_GUI_EDIT_ON_DONE:
-		EditOnDone = handler;
-		break;
-	case IE_GUI_EDIT_ON_CANCEL:
-		EditOnCancel = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 }

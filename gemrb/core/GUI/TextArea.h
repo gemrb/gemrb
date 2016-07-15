@@ -34,11 +34,6 @@
 
 namespace GemRB {
 
-// Keep these synchronized with GUIDefines.py
-// 0x05 is the control type of TextArea
-#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000 // text change event (keyboard, etc)
-#define IE_GUI_TEXTAREA_ON_SELECT	0x05000001 // selection event such as dialog or a listbox
-
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
 #define IE_GUI_TEXTAREA_AUTOSCROLL   1
@@ -133,10 +128,6 @@ private: // Private attributes
 	Font* finit, * ftext;
 	GemMarkupParser parser;
 
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler TextAreaOnChange;
-	ControlEventHandler TextAreaOnSelect;
-
 	enum PALETTE_TYPE {
 		PALETTE_NORMAL = 0,	// standard text color
 		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
@@ -160,6 +151,12 @@ private: //internal functions
 	int ContentHeight() const;
 
 public: //Events
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action Change = ACTION_CUSTOM(0); // text change event (keyboard, etc)
+		static const Control::Action Select = ACTION_CUSTOM(1); // selection event such as dialog or a listbox
+	};
+
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
@@ -169,8 +166,7 @@ public: //Events
 	/** Mouse Button Up */
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
+
 	void SetFocus();
 
 	void ClearSelectOptions();

@@ -139,11 +139,37 @@ class GControl(GView):
     'QueryText': _GemRB.Control_QueryText,
     'SetText': _GemRB.Control_SetText,
     'SetTooltip': _GemRB.Control_SetTooltip,
-    'SetEvent': _GemRB.Control_SetEvent,
+    'SetAction': _GemRB.Control_SetAction,
     'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus,
     'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
+
+  # backwards compatibility
+  # map old event identifiers to new action system
+  EventMap = { IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 1),
+  			   IE_GUI_MOUSE_ENTER_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_ENTER),
+  			   IE_GUI_MOUSE_LEAVE_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_LEAVE),
+  			   IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 1, 1),
+  			   IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 2, 0, 1),
+  			   IE_GUI_BUTTON_ON_DRAG_DROP: lambda control, handler: control.SetAction(handler, IE_GUI_BUTTON_ON_DRAG_DROP),
+  			   IE_GUI_BUTTON_ON_DOUBLE_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 2),
+  			   IE_GUI_PROGRESS_END_REACHED: lambda control, handler: control.SetAction(handler, IE_GUI_PROGRESS_END_REACHED),
+  			   IE_GUI_SLIDER_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
+  			   IE_GUI_EDIT_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
+  			   IE_GUI_EDIT_ON_DONE: lambda control, handler: control.SetAction(handler, IE_GUI_EDIT_ON_DONE),
+  			   IE_GUI_EDIT_ON_CANCEL: lambda control, handler: control.SetAction(handler, IE_GUI_EDIT_ON_CANCEL),
+  			   IE_GUI_TEXTAREA_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
+  			   IE_GUI_TEXTAREA_ON_SELECT: lambda control, handler: control.SetAction(handler, IE_GUI_TEXTAREA_ON_SELECT),
+  			   IE_GUI_LABEL_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 1),
+  			   IE_GUI_SCROLLBAR_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
+  			   IE_GUI_WORLDMAP_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 1),
+  			   IE_GUI_MAP_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 1),
+  			   IE_GUI_MAP_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 2, 0, 1)
+  			 }
+
+  def SetEvent(self, event, handler):
+    GControl.EventMap[event](self, handler)
 
 class GLabel(GControl):
   methods = {

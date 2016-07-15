@@ -42,7 +42,6 @@ Slider::Slider(const Region& frame, Window* win,
 	this->KnobStepsCount = KnobStepsCount;
 	Knob = NULL;
 	GrabbedKnob = NULL;
-	ResetEventHandler( SliderOnChange );
 	State = IE_GUI_SLIDER_KNOB;
 	Pos = 0;
 	SetValueRange(1);
@@ -108,7 +107,7 @@ void Slider::SetPosition(const Point& p)
     }
 
 	if (oldPos != Pos) {
-		RunEventHandler( SliderOnChange );
+		PerformAction(Control::Action::ValueChange);
 	}
 }
 
@@ -183,20 +182,6 @@ void Slider::OnMouseOver(const MouseEvent& me)
             Control::OnMouseOver(me);
         }
 	}
-}
-
-/** Sets the slider change event */
-bool Slider::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_SLIDER_ON_CHANGE:
-		SliderOnChange = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 }

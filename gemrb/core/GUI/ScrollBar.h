@@ -37,9 +37,6 @@ namespace GemRB {
 class Sprite2D;
 class TextArea;
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000
-
 #define IE_GUI_SCROLLBAR_DEFAULT      0x00000040   // mousewheel triggers it
 
 enum IE_SCROLLBAR_IMAGE_TYPE {
@@ -108,10 +105,6 @@ public: // Public Events
 	void OnMouseOver(const MouseEvent&);
 	/** Mouse Wheel Scroll Event */
 	void OnMouseWheelScroll(const Point& delta);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler ScrollBarOnChange;
 };
 
 }

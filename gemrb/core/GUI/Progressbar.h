@@ -35,10 +35,6 @@
 
 namespace GemRB {
 
-// !!! Keep in sync with GUIDefines.py !!!
-#define IE_GUI_PROGRESS_END_REACHED  0x01000000
-
-
 /**
  * @class Progressbar
  * Widget for displaying progressbars, mainly on loading/saving screens
@@ -49,7 +45,12 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 
-public: 
+public:
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action EndReached = ACTION_CUSTOM(0); // progress bar reaches 100%
+	};
+
 	Progressbar(const Region& frame, Window* win,
                 unsigned short KnobStepsCount);
 	~Progressbar();
@@ -66,8 +67,6 @@ public:
 	void SetSliderPos(int x, int y, int x2, int y2);
 	/** Refreshes a progressbar which is associated with VariableName */
 	void UpdateState(unsigned int Sum);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
 
 private: // Private attributes
 	/** BackGround Images. If smaller than the Control Size, the image will be tiled. */
@@ -82,9 +81,7 @@ private: // Private attributes
 	Holder<Sprite2D> PBarCap;
 	/** The bam cycle whose frames work as a progressbar (animated progressbar) */
 	Animation *PBarAnim;
-public:
-	/** EndReached Scripted Event Function Name */
-	ControlEventHandler EndReached;
+
 };
 
 }

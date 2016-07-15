@@ -85,19 +85,6 @@ class Palette;
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 #define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
 
-enum IE_GUI_BUTTON_EVENTS {
-	// !!! Keep these synchronized with GUIDefines.py !!!
-	IE_GUI_BUTTON_ON_PRESS,
-	IE_GUI_MOUSE_ENTER_BUTTON,
-	IE_GUI_MOUSE_LEAVE_BUTTON,
-	IE_GUI_BUTTON_ON_SHIFT_PRESS,
-	IE_GUI_BUTTON_ON_RIGHT_PRESS,
-	IE_GUI_BUTTON_ON_DRAG_DROP,
-	IE_GUI_BUTTON_ON_DOUBLE_PRESS,
-
-	IE_GUI_BUTTON_EVENTS_COUNT
-};
-
 /** Border/frame settings for a button */
 struct ButtonBorder {
 	int dx1;
@@ -128,6 +115,11 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action DragDrop = ACTION_CUSTOM(0); // drag and drop complete
+	};
+
 	struct PortraitDragOp : public DragOp {
 		const ieDword PC;
 
@@ -182,9 +174,6 @@ public:
 
 	Sprite2D* Cursor() const;
 
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-
 	/** Refreshes the button from a radio group */
 	void UpdateState(unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
@@ -208,7 +197,6 @@ private: // Private attributes
 	Palette* normal_palette;
 	Palette* disabled_palette;
 	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
-	ControlEventHandler eventHandlers[IE_GUI_BUTTON_EVENTS_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */

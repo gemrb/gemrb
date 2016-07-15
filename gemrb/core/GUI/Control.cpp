@@ -93,15 +93,15 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-bool Control::SetEvent(int eventType, ControlEventHandler handler)
+void Control::SetAction(ControlEventHandler handler)
 {
-	SetAction(handler, eventType);
-	return true;
+	actions[ACTION_DEFAULT] = handler;
 }
 
-void Control::SetAction(ControlEventHandler handler, unsigned int flags)
+void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
+						Event::EventMods mod, short count)
 {
-	actions[flags] = handler;
+	actions[ActionKey(type, mod, button, count)] = handler;
 }
 
 void Control::SetActionInterval(unsigned int interval)
@@ -112,9 +112,33 @@ void Control::SetActionInterval(unsigned int interval)
 	}
 }
 
-void Control::ResetEventHandler(ControlEventHandler &handler)
+bool Control::SupportsAction(Action action)
 {
-	handler = NULL;
+	return SupportsAction(ActionKey(action));
+}
+
+bool Control::SupportsAction(const ActionKey& key)
+{
+	return actions.count(key);
+}
+
+bool Control::PerformAction()
+{
+	return PerformAction(ACTION_DEFAULT);
+}
+
+bool Control::PerformAction(Action action)
+{
+	return PerformAction(ActionKey(action));
+}
+
+bool Control::PerformAction(const ActionKey& key)
+{
+	ActionIterator it = actions.find(key);
+	if (it != actions.end()) {
+		return RunEventHandler(it->second) == 0;
+	}
+	return false;
 }
 
 //return -1 if there is an error
@@ -166,6 +190,7 @@ void Control::SetValue(ieDword val)
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
 
+	PerformAction(Action::ValueChange);
 	MarkDirty();
 }
 
@@ -210,10 +235,11 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 	return &core->SetTimer(h, ActionRepeatDelay);
 }
 
-void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
+void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	if (actions.count(me.button)) {
-		RunEventHandler(actions[me.button]);
+	ActionKey key(Action::Click, mod, me.button, me.repeats);
+	if (SupportsAction(key)) {
+		PerformAction(key);
 		if (actionTimer) {
 			actionTimer->Invalidate();
 			actionTimer = NULL;
@@ -221,10 +247,11 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short /*mod*/)
 	}
 }
 
-void Control::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+void Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	if (repeatDelay && actions.count(me.button)) {
-		actionTimer = StartActionTimer(actions[me.button]);
+	ActionKey key(Action::Click, mod, me.button, me.repeats);
+	if (repeatDelay && SupportsAction(key)) {
+		actionTimer = StartActionTimer(actions[key]);
 	}
 }
 

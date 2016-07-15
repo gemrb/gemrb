@@ -479,7 +479,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	std::reverse(dialogOptions.begin(), dialogOptions.end());
 	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
 	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
-	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
+	ta->SetAction(handler, TextArea::Action::Select);
 
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {

@@ -1903,57 +1903,46 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
-"===== Control_SetEvent =====\n\
+PyDoc_STRVAR( GemRB_Control_SetAction__doc,
+"===== Control_SetAction =====\n\
 \n\
-**Prototype:** _GemRB.Control_SetEvent (WindowIndex, ControlIndex, EventMask, PythonFunction)\n\
+**Prototype:** _GemRB.Control_SetEvent (GControl, PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
-**Metaclass Prototype:** SetEvent (EventMask, PythonFunction)\n\
+**Metaclass Prototype:** SetEvent (PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
 **Description:** Ties an event of a control to a python function\
 \n\
 **Parameters:** \n\
-  * EventMask - a dword describing the event. Its high byte is actually the control's type.\n\
-    * IE_GUI_BUTTON_ON_PRESS    = 0x00000000, the user pressed the button.\n\
-    * IE_GUI_MOUSE_OVER_BUTTON  = 0x00000001, the user hovered the mouse over the button.\n\
-    * IE_GUI_MOUSE_ENTER_BUTTON = 0x00000002, the user just moved the mouse onto the button.\n\
-    * IE_GUI_MOUSE_LEAVE_BUTTON = 0x00000003, the mouse just left the button\n\
-    * IE_GUI_BUTTON_ON_SHIFT_PRESS = 0x00000004, the button was pressed along with the shift key.\n\
-    * IE_GUI_BUTTON_ON_RIGHT_PRESS = 0x00000005, the button was right clicked\n\
-    * IE_GUI_BUTTON_ON_DRAG_DROP   = 0x00000006, the button was clicked during a drag&drop action.\n\
-    * IE_GUI_PROGRESS_END_REACHED = 0x01000000, the progressbar received a 100 percent value.\n\
-    * IE_GUI_SLIDER_ON_CHANGE   = 0x02000000, the slider's knob position has changed.\n\
-    * IE_GUI_EDIT_ON_CHANGE     = 0x03000000, the text in the editbox has changed.\n\
-    * IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000, the text in the textarea has changed.\n\
-    * IE_GUI_LABEL_ON_PRESS     = 0x06000000, the label was pressed.\n\
-    * IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000, the scrollbar's knob position has changed.\n\
-    * ... See GUIDefines.py for all event types\n\
-  * PythonFunction - the callback function\
+  * PythonFunction - a callback for when the event occurs.\n\
+  * EventType - the event type to bind to.\n\
+  * Button - the button of the EventType.\n\
+  * Mod - the modifier keys (flags).\n\
+  * Count - the repeat count of the event.\n\
 \n\
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-    Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)\n\
+    Bar.SetAction (EndLoadScreen, IE_GUI_PROGRESS_END_REACHED)\n\
     ...\n\
   def EndLoadScreen ():\n\
     Skull = LoadScreen.GetControl (1)\n\
     Skull.SetMOS ('GSKULON')\n\
 The above example changes the image on the loadscreen when the progressbar reaches the end.\n\
 \n\
-  Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Buttons.YesButton)\n\
-The above example sets up the 'YesButton' function from the Buttons module to be called when the button is pressed.\n\
-\n\
-  Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, ChaPress)\n\
-The above example shows how to implement 'context sensitive help'. The 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.\n\
+  Button.SetAction (Buttons.YesButton, IE_GUI_MOUSE_PRESS, 1, 0, 1)\n\
+The above example sets up the 'YesButton' function from the Buttons module to be called when the button is pressed with the left mouse button one time.\n\
 \n\
 **See also:** [[guiscript:Window_GetControl]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetTimedEvent]], [[guiscript:accessing_gui_controls]]"
 );
 
-static PyObject* GemRB_Control_SetEvent(PyObject* self, PyObject* args)
+static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 {
-	int event;
+    Control::Action type = Control::Action::Click;
+    EventButton button = 0;
+    Event::EventMods mod = 0;
+    short count = 0;
 	PyObject* func;
-	PARSE_ARGS3(args, "OiO", &self, &event, &func);
+	PARSE_ARGS6(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
 
 	Control* ctrl = GetView<Control>(self);
 	assert(ctrl);
@@ -1962,11 +1951,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject* self, PyObject* args)
 	if (func != Py_None && PyCallable_Check(func)) {
 		handler = new PythonControlCallback(func);
 	}
-	if (!ctrl->SetEvent(event, handler)) {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "Can't set event handler %s!", PyEval_GetFuncName(func));
-		return RuntimeError(buf);
-	}
+    ctrl->SetAction(handler, type, button, mod, count);
 
 	Py_RETURN_NONE;
 }
@@ -10420,8 +10405,8 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 
 	if (Index<0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
-		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
-		btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, NULL );
+		btn->SetAction(NULL, Control::Action::Click, GEM_MB_ACTION, 0, 1);
+        btn->SetAction(NULL, Control::Action::Click, GEM_MB_MENU, 0, 1);
 		btn->SetTooltip(L"");
 		//no incref
 		return Py_None;
@@ -10451,11 +10436,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
-	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(func) );
+    btn->SetAction(new PythonControlCallback(func), Control::Action::Click, GEM_MB_ACTION, 0, 1);
 
 	PyObject *Event2 = PyString_FromFormat("Action%sRightPressed", GUIEvent[Index]);
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
-	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonControlCallback(func2) );
+    btn->SetAction(new PythonControlCallback(func2), Control::Action::Click, GEM_MB_MENU, 0, 1);
 
 	//cannot make this const, because it will be freed
 	if (GUITooltip[Index] != (ieDword) -1) {
@@ -10574,7 +10559,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			continue;
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonControlCallback(Function));
+        btn->SetAction(new PythonControlCallback(Function), Control::Action::Click, GEM_MB_ACTION, 0, 1);
 		strcpy(btn->VarName,"Equipment");
 		btn->SetValue( Start+i );
 
@@ -13152,7 +13137,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
-	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetAction, METH_VARARGS),
 	METHOD(Control_SetActionInterval, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),

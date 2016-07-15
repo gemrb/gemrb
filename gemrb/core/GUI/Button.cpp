@@ -56,7 +56,6 @@ Button::Button(Region& frame, Window* win)
 	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
-	memset(eventHandlers, 0, sizeof(eventHandlers));
 	memset(&SourceRGB,0,sizeof(SourceRGB));
 	memset(&DestRGB,0,sizeof(DestRGB));
 	memset( borders, 0, sizeof( borders ));
@@ -64,6 +63,7 @@ Button::Button(Region& frame, Window* win)
 	Anchor.null();
 	PushOffset = Point(2, 2);
 }
+
 Button::~Button()
 {
 	SetImage(BUTTON_IMAGE_NONE, NULL);
@@ -463,12 +463,13 @@ void Button::CompleteDragOperation(const DragOp& dop)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(const MouseEvent& me, unsigned short Mod)
+void Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	if ((core->GetDraggedItem () && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])) {
-		return Control::OnMouseDown(me, Mod);
-	}
-
+	ActionKey key(Action::DragDrop);
+    if (core->GetDraggedItem() && !SupportsAction(key)) {
+        return;
+    }
+    
 	if (me.button == GEM_MB_ACTION) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
@@ -482,22 +483,24 @@ void Button::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
-		if (me.repeats == 2) {
-			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DOUBLE_PRESS] );
-			return;
-		}
 	}
-	Control::OnMouseDown(me, Mod);
+	Control::OnMouseDown(me, mod);
 }
 
 /** Mouse Button Up */
-void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
+void Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	bool drag = core->GetDraggedItem () != NULL;
 
-	//if something was dropped, but it isn't handled here: it didn't happen
-	if (drag && !eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP])
-		return Control::OnMouseUp(me, Mod);
+    if (drag) {
+        ActionKey key(Action::DragDrop);
+        if (SupportsAction(key)) {
+            PerformAction(key);
+        } else {
+            //if something was dropped, but it isn't handled here: it didn't happen
+            return;
+        }
+    }
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
@@ -538,20 +541,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			window->RedrawControls( VarName, val );
 		}
 	}
-
-	if (drag) {
-		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_DRAG_DROP] );
-		return;
-	}
-
-	if (me.button == GEM_MB_ACTION) {
-		if ((Mod & GEM_MOD_SHIFT) && eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS])
-			RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_SHIFT_PRESS] );
-		else
-			Control::OnMouseUp(me, Mod);
-	} else if (me.button == GEM_MB_MENU) {
-		RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_RIGHT_PRESS] );
-	}
+    Control::OnMouseUp(me, mod);
 }
 
 void Button::OnMouseOver(const MouseEvent& me)
@@ -569,10 +559,12 @@ void Button::OnMouseOver(const MouseEvent& me)
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		drag_start = drag_start + sp;
-	}
+    } else {
+        Control::OnMouseOver(me);
+    }
 }
 
-void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
+void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 {
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
@@ -587,10 +579,10 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 		}
 	}
 
-	RunEventHandler( eventHandlers[IE_GUI_MOUSE_ENTER_BUTTON] );
+    Control::OnMouseEnter(me, dop);
 }
 
-void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* /*dop*/)
+void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	if (State == IE_GUI_BUTTON_PRESSED && !(flags & IE_GUI_BUTTON_RADIOBUTTON) && !TracksMouseDown()) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
@@ -600,7 +592,7 @@ void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* /*dop*/)
 		MarkDirty();
 	}
 
-	RunEventHandler( eventHandlers[IE_GUI_MOUSE_LEAVE_BUTTON] );
+    Control::OnMouseLeave(me, dop);
 }
 
 /** Sets the Text of the current control */
@@ -617,16 +609,6 @@ void Button::SetText(const String& string)
 		hasText = false;
 	}
 	MarkDirty();
-}
-
-/** Set Event Handler */
-bool Button::SetEvent(int eventType, ControlEventHandler handler)
-{
-	if ( eventType >= IE_GUI_MOUSE_ENTER_BUTTON && eventType < IE_GUI_BUTTON_EVENTS_COUNT ) {
-		eventHandlers[eventType] = handler;
-		return true;
-	}
-	return Control::SetEvent(GEM_MB_ACTION, handler);
 }
 
 /** Refresh a button from a given radio button group */
@@ -745,7 +727,8 @@ bool Button::HandleHotKey(const Event& e)
 {
 	if (e.type == Event::KeyDown) {
 		// only run once on keypress (or should it be KeyRelease?)
-		return RunEventHandler( eventHandlers[IE_GUI_BUTTON_ON_PRESS] );
+        // we could support both; key down = left mouse down, key up = left mouse up
+        return PerformAction();
 	}
 	return false;
 }

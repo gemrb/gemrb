@@ -39,7 +39,6 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 	State = 0;
 	SliderYPos = 0;
 	ScrollDelta = 1;
-	ResetEventHandler( ScrollBarOnChange );
 	textarea = NULL;
 
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
@@ -93,7 +92,6 @@ void ScrollBar::SetValue(ieDword NewPos)
 	if (textarea) {
 		textarea->SetRow( GetValue() );
 	}
-	RunEventHandler( ScrollBarOnChange );
 }
 
 /** Sets the Pos for a given y pixel coordinate (control coordinates) */
@@ -248,20 +246,6 @@ void ScrollBar::OnMouseOver(const MouseEvent& me)
 	if (State&SLIDER_GRAB) {
 		SetPosForY(me.y - Frames[IE_GUI_SCROLLBAR_SLIDER]->YPos);
 	}
-}
-
-/** Sets the ScrollBarOnChange event (guiscript callback) */
-bool ScrollBar::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_SCROLLBAR_ON_CHANGE:
-		ScrollBarOnChange = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 }

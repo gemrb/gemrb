@@ -36,7 +36,6 @@ Label::Label(const Region& frame, Font* font, const String& string, Window* win)
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
 	useRGB = false;
-	ResetEventHandler( LabelOnPress );
 	palette = NULL;
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
@@ -98,27 +97,6 @@ void Label::SetAlignment(unsigned char Alignment)
 		}
 	}
 	MarkDirty();
-}
-
-void Label::OnMouseUp(const MouseEvent& me, unsigned short Mod)
-{
-	if (LabelOnPress) {
-		RunEventHandler( LabelOnPress );
-	}
-	View::OnMouseUp(me, Mod);
-}
-
-bool Label::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_LABEL_ON_PRESS:
-		LabelOnPress = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 /** Simply returns the pointer to the text, don't modify it! */

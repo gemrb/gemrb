@@ -54,7 +54,7 @@ class WorldMapControl;
  * allowing travelling between areas.
  */
 
-#define IE_GUI_WORLDMAP_ON_PRESS   0x08000000
+#define IE_GUI_WORLDMAP_ON_PRESS   IE_GUI_CUSTOMEVENT
 
 class GEM_EXPORT WorldMapControl : public Control {
 private:
@@ -77,8 +77,6 @@ public:
 	bool MouseIsDown;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
 
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent& /*me*/);
@@ -108,8 +106,7 @@ private:
 	Palette *pal_selected;
 	/** Label color of a not yet visited area */
 	Palette *pal_notvisited;
-	/** guiscript Event when button pressed */
-	ControlEventHandler WorldMapControlOnPress;
+
 };
 
 }

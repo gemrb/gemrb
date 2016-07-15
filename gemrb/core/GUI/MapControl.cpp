@@ -67,9 +67,6 @@ MapControl::MapControl(const Region& frame, Window* win)
 	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
-	ResetEventHandler( MapControlOnPress );
-	ResetEventHandler( MapControlOnRightPress );
-
 	MyMap = core->GetGame()->GetCurrentArea();
 	if (MyMap && MyMap->SmallMap) {
 		MapMOS = MyMap->SmallMap;
@@ -289,18 +286,10 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	}
 }
 
-void MapControl::ClickHandle(unsigned short Button)
+void MapControl::ClickHandle()
 {
 	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
 	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	switch(Button) {
-		case GEM_MB_ACTION:
-			RunEventHandler( MapControlOnPress );
-			break;
-		case GEM_MB_MENU:
-			RunEventHandler( MapControlOnRightPress );
-			break;
-	}
 }
 
 void MapControl::ViewHandle(unsigned short x, unsigned short y)
@@ -399,22 +388,6 @@ bool MapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 	if (ScrollY < 0)
 		ScrollY = 0;
 	MarkDirty();
-	return true;
-}
-
-bool MapControl::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-		case IE_GUI_MAP_ON_PRESS:
-			MapControlOnPress = handler;
-			break;
-		case IE_GUI_MAP_ON_RIGHT_PRESS:
-			MapControlOnRightPress = handler;
-			break;
-		default:
-			return false;
-	}
-
 	return true;
 }
 

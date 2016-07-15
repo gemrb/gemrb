@@ -82,9 +82,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	pal_normal = new Palette ( normal, black );
 	pal_selected = new Palette ( selected, black );
 	pal_notvisited = new Palette ( notvisited, black );
-
-
-	ResetEventHandler( WorldMapControlOnPress );
 }
 
 WorldMapControl::~WorldMapControl(void)
@@ -290,9 +287,7 @@ void WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	MouseIsDown = false;
 	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
-		RunEventHandler( WorldMapControlOnPress );
-	} else {
-		Control::OnMouseUp(me, Mod);
+        Control::OnMouseUp(me, Mod);
 	}
 }
 
@@ -335,17 +330,6 @@ bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*
 			return false;
 	}
 	return true;
-}
-
-bool WorldMapControl::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_WORLDMAP_ON_PRESS:
-		WorldMapControlOnPress = handler;
-		return true;
-	}
-
-	return false;
 }
 
 void WorldMapControl::SetColor(int which, Color color)

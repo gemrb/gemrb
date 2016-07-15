@@ -67,14 +67,9 @@ public:
 	/** Simply returns the pointer to the text, don't modify it! */
 	String QueryText() const;
 
-	/** Mouse Button Down */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
 	/** Use the RGB Color for the Font */
 	bool useRGB;
-	/** OnPress Scripted Event Function Name */
-	ControlEventHandler LabelOnPress;
+
 private: // Private attributes
 	/** Text String Buffer */
 	String Text;

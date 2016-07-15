@@ -37,7 +37,7 @@
 namespace GemRB {
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_SLIDER_ON_CHANGE    0x02000000
+#define IE_GUI_SLIDER_ON_CHANGE    IE_GUI_CUSTOMEVENT
 
 
 #define IE_GUI_SLIDER_KNOB        0
@@ -99,10 +99,6 @@ public: // Public Events
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent&);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler SliderOnChange;
 };
 
 }

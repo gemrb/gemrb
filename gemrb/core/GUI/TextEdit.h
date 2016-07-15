@@ -37,11 +37,6 @@ namespace GemRB {
 
 class Palette;
 
-// !!! Keep these synchronized with GUIDefines.py
-#define IE_GUI_EDIT_ON_CHANGE      0x03000000
-#define IE_GUI_EDIT_ON_DONE        0x03000001
-#define IE_GUI_EDIT_ON_CANCEL      0x03000002
-
 //this is stored in 'Value' of Control class
 #define IE_GUI_EDIT_NUMBER         1
 
@@ -52,10 +47,35 @@ class Palette;
 
 class GEM_EXPORT TextEdit : public Control {
 private:
+    /** Text Editing Cursor Sprite */
+    Sprite2D* Cursor;
+    /** Text Font */
+    Font* font;
+    unsigned char Alignment;
+    
+    /** Max Edit Text Length */
+    unsigned short max;
+    /** Client area position */
+    unsigned short FontPosX, FontPosY;
+    /** Text Buffer */
+    String Text;
+    /** Cursor Position */
+    unsigned short CurPos;
+    /** Color Palette */
+    Palette* palette;
+
+private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public:
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action Change = ACTION_CUSTOM(0); // text change event (keyboard, etc)
+		static const Control::Action Done = ACTION_CUSTOM(1);
+		static const Control::Action Cancel = ACTION_CUSTOM(2);
+	};
+
 	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
 
@@ -73,34 +93,11 @@ public:
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
-private:
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-	/** Text Font */
-	Font* font;
-	unsigned char Alignment;
-
-	/** Max Edit Text Length */
-	unsigned short max;
-	/** Client area position */
-	unsigned short FontPosX, FontPosY;
-	/** Text Buffer */
-	String Text;
-	/** Cursor Position */
-	unsigned short CurPos;
-	/** Color Palette */
-	Palette* palette;
-public: //Events
-	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
-
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus();
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler EditOnChange;
-	ControlEventHandler EditOnDone;
-	ControlEventHandler EditOnCancel;
+    
+    /** Key Press Event */
+    bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+    
+    void SetFocus();
 };
 
 }

@@ -68,8 +68,6 @@ public:
 	// Size of area viewport. FIXME: hack!
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
-	ControlEventHandler MapControlOnPress;
-	ControlEventHandler MapControlOnRightPress;
 
 	MapControl(const Region& frame, Window* win = NULL);
 	~MapControl(void);
@@ -87,11 +85,10 @@ public:
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
+
 private:
 	/** Call event handler on click */
-	void ClickHandle(unsigned short Button);
+	void ClickHandle();
 	/** Move viewport */
 	void ViewHandle(unsigned short x, unsigned short y);
 };

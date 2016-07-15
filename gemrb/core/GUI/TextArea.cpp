@@ -78,9 +78,6 @@ void TextArea::Init()
 	TextYPos = 0;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
-	ResetEventHandler( TextAreaOnChange );
-	ResetEventHandler( TextAreaOnSelect );
-
 	selectOptions = NULL;
 	textContainer = NULL;
 	scrollbar = NULL;
@@ -386,7 +383,7 @@ bool TextArea::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 					break;
 			}
 
-			RunEventHandler( TextAreaOnChange );
+			PerformAction(Action::Change);
 		}
 		return true;
 	}
@@ -538,7 +535,7 @@ void TextArea::UpdateState(unsigned int optIdx)
 	selectedSpan = optspan;
 	selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
 
-	RunEventHandler(TextAreaOnSelect);
+	PerformAction(Action::Select);
 }
 
 int TextArea::ContentHeight() const
@@ -562,22 +559,6 @@ String TextArea::QueryText() const
 		return options;
 	}
 	return textContainer->Text();
-}
-
-bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_TEXTAREA_ON_CHANGE:
-		TextAreaOnChange = handler;
-		break;
-	case IE_GUI_TEXTAREA_ON_SELECT:
-		TextAreaOnSelect = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 void TextArea::ClearSelectOptions()
