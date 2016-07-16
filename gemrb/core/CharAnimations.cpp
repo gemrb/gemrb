@@ -1669,8 +1669,9 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=(char) (Part+'1');
-	ResRef[7]=0;
+	size_t last = strnlen(ResRef, 6);
+	ResRef[last] = (char) (Part+'1');
+	ResRef[last+1] = 0;
 }
 
 void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
@@ -1732,7 +1733,9 @@ void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=(char) (Part+'1');
+	size_t last = strnlen(ResRef, 6);
+	ResRef[last] = (char) (Part+'1');
+	ResRef[last+1] = 0;
 }
 
 void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
