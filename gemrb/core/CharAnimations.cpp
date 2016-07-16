@@ -402,7 +402,11 @@ void CharAnimations::SetupColors(PaletteType type)
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
 				snprintf(PaletteResRef[type],9,"%.4s_%-.2s%c",ResRef, (char *) &PType, '1'+type);
 			} else {
-				snprintf(PaletteResRef[type],9,"%.4s_%-.2s",ResRef, (char *) &PType);
+				if (!stricmp(ResRef, "MFIE")) { // hack for magic golems
+					snprintf(PaletteResRef[type],9,"%.4s%-.2sB", ResRef, (char *) &PType);
+				} else {
+					snprintf(PaletteResRef[type],9,"%.4s_%-.2s", ResRef, (char *) &PType);
+				}
 			}
 			strlwr(PaletteResRef[type]);
 			Palette *tmppal = gamedata->GetPalette(PaletteResRef[type]);
