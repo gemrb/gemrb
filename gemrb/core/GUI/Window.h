@@ -31,6 +31,8 @@
 #include "ScrollView.h"
 #include "WindowManager.h"
 
+#include <set>
+
 namespace GemRB {
 
 class Control;
@@ -109,8 +111,7 @@ private:
 	void RecreateBuffer();
 
 private: // Private attributes
-	/** Controls Array */
-	std::vector< Control*> Controls;
+	std::set<Control*> Controls;
 	std::map<KeyboardKey, EventMgr::EventCallback*> HotKeys;
 
 	View* focusView; // keyboard focus

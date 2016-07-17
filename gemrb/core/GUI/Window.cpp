@@ -73,7 +73,7 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 	if (ctrl) {
 		if (ctrl->GetWindow() == this) return; // already added!
 		ctrl->SetWindow(this);
-		Controls.push_back( ctrl );
+		Controls.insert(ctrl);
 	}
 }
 
@@ -82,9 +82,7 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
 		ctrl->SetWindow(NULL);
-		std::vector< Control*>::iterator it = std::find(Controls.begin(), Controls.end(), ctrl);
-		if (it != Controls.end())
-			Controls.erase(it);
+		Controls.erase(ctrl);
 	}
 	if (focusView == ctrl) {
 		focusView = NULL;
@@ -133,7 +131,8 @@ void Window::SetFocused(Control* ctrl)
 		TrySetFocus(ctrl);
 	} else if (Controls.size()) {
 		// set a default focus, something should always be focused
-		TrySetFocus(Controls[0]);
+		// FIXME: this should probably be better defined
+		TrySetFocus(*Controls.begin());
 	}
 }
 
@@ -190,7 +189,7 @@ Control* Window::GetFocus() const
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		Control* ctrl = *c;
 		ctrl->UpdateState( VarName, Sum);
 	}
