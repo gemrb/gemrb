@@ -35,7 +35,6 @@
 namespace GemRB {
 
 class Sprite2D;
-class TextArea;
 
 #define IE_GUI_SCROLLBAR_DEFAULT      0x00000040   // mousewheel triggers it
 
@@ -91,9 +90,6 @@ private: //Private attributes
 	unsigned short State;
 	/** amount by which value should change on scrolling */
 	unsigned short ScrollDelta;
-
-public:
-	TextArea* textarea;
 
 public: // Public Events
 	bool TracksMouseDown() const { return true; }

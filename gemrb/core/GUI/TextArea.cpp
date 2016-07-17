@@ -214,7 +214,6 @@ void TextArea::SetScrollBar(ScrollBar* sb)
 		s.w += sbSize.w;
 		SetFrameSize(s);
 
-		sb->textarea = this;
 		sb->SetScrollAmount(GetRowHeight());
 	}
 

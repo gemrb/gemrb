@@ -39,7 +39,6 @@ ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_CO
 	State = 0;
 	SliderYPos = 0;
 	ScrollDelta = 1;
-	textarea = NULL;
 
 	for(int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
 		Frames[i] = images[i];
@@ -87,10 +86,6 @@ void ScrollBar::SetValue(ieDword NewPos)
 		// set the slider to the exact y for NewPos.
 		// if the slider is grabbed dont set position! otherwise you will get a flicker as it bounces between exact positioning and arbitrary
 		SliderYPos = (unsigned short) (NewPos * GetStep());
-	}
-
-	if (textarea) {
-		textarea->SetRow( GetValue() );
 	}
 }
 
