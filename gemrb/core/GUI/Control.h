@@ -58,7 +58,6 @@ namespace GemRB {
 class ControlAnimation;
 class Control;
 class Sprite2D;
-class Window;
     
 #define ACTION_CAST(a) \
 static_cast<Control::Action>(a)
@@ -87,6 +86,8 @@ public:
 class GEM_EXPORT Control : public View {
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
+	void AddedToView(View* view);
+	void RemovedFromView(View*);
     
 public: // Public attributes
 	enum Action {
@@ -122,7 +123,7 @@ public: // Public attributes
     static unsigned int ActionRepeatDelay;
 
 public:
-	Control(const Region& frame, Window* win = NULL);
+	Control(const Region& frame, View* superview = NULL);
 	virtual ~Control();
 
 	virtual bool IsAnimated() const { return animation; }
@@ -140,9 +141,6 @@ public:
 	virtual void SetFocus();
 	bool IsFocused();
     
-	Window* GetWindow() const { return window; }
-    void SetWindow(Window* win);
-
 	bool TracksMouseDown() const { return bool(actionTimer); }
 
     //Events
@@ -193,7 +191,9 @@ protected:
 			return key < ak.key;
 		}
 	};
-	
+
+	// for convenience because we need to get this so much
+	// all it is is a saved pointer returned from View::GetWindow and is updated in an override for AddedToView
 	Window* window;
 	
 	bool SupportsAction(const ActionKey&);

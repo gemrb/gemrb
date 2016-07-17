@@ -232,7 +232,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(ctrlFrame, win, KnobStepsCount );
+				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, win );
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
 				Sprite2D* img = NULL;
@@ -281,7 +281,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
-				Slider* sldr = new Slider( ctrlFrame, win, KnobXPos, KnobYPos, KnobStep, KnobStepsCount );
+				Slider* sldr = new Slider( ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount, win );
 				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
@@ -350,7 +350,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					img = mos->GetSprite2D();
 				}
 
-				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
+				TextEdit* te = new TextEdit( ctrlFrame, maxInput, Point(PosX, PosY), win );
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackground( img );

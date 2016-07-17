@@ -56,7 +56,7 @@ private:
     /** Max Edit Text Length */
     unsigned short max;
     /** Client area position */
-    unsigned short FontPosX, FontPosY;
+    Point FontPos;
     /** Text Buffer */
     String Text;
     /** Cursor Position */
@@ -76,7 +76,7 @@ public:
 		static const Control::Action Cancel = ACTION_CUSTOM(2);
 	};
 
-	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
+	TextEdit(const Region& frame, unsigned short maxLength, Point p, View* superview = NULL);
 	~TextEdit(void);
 
 	/** Set Font */

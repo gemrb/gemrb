@@ -71,8 +71,6 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {
-		if (ctrl->GetWindow() == this) return; // already added!
-		ctrl->SetWindow(this);
 		Controls.insert(ctrl);
 	}
 }
@@ -81,7 +79,6 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 {
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
-		ctrl->SetWindow(NULL);
 		Controls.erase(ctrl);
 	}
 	if (focusView == ctrl) {

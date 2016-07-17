@@ -29,13 +29,11 @@
 
 namespace GemRB {
 
-TextEdit::TextEdit(const Region& frame, unsigned short maxLength, unsigned short px, unsigned short py)
-	: Control(frame)
+TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p, View* superview)
+	: Control(frame, superview), FontPos(p)
 {
 	ControlType = IE_GUI_EDIT;
 	max = maxLength;
-	FontPosX = px;
-	FontPosY = py;
 	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
 	font = NULL;
 	Cursor = NULL;
@@ -62,7 +60,7 @@ void TextEdit::SetAlignment(unsigned char Alignment)
 /** Draws the Control on the Output Display */
 void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	ieWord yOff = FontPosY;
+	ieWord yOff = FontPos.y;
 	Video* video = core->GetVideoDriver();
 
 	if (!font)
@@ -70,7 +68,7 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (IsFocused()) {
-		font->Print( Region( rgn.x + FontPosX, rgn.y + FontPosY, frame.w, frame.h ),
+		font->Print( Region( rgn.Origin() + FontPos, frame.Dimensions() ),
 					Text, palette, Alignment );
 		int w = font->StringSize(Text.substr(0, CurPos)).w;
 		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
@@ -79,9 +77,9 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 			vcenter += rows * font->LineHeight;
 			w = w - (rgn.w * rows);
 		}
-		video->BlitSprite(Cursor, w + rgn.x + FontPosX, FontPosY + vcenter + rgn.y);
+		video->BlitSprite(Cursor, w + rgn.x + FontPos.x, yOff + vcenter + rgn.y);
 	} else {
-		font->Print( Region( rgn.x + FontPosX, rgn.y - yOff, rgn.w, rgn.h ), Text,
+		font->Print( Region( rgn.x + FontPos.x, rgn.y - yOff, rgn.w, rgn.h ), Text,
 				palette, Alignment );
 	}
 }

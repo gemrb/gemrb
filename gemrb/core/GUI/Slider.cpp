@@ -30,14 +30,12 @@
 
 namespace GemRB {
 
-Slider::Slider(const Region& frame, Window* win,
-               short KnobXPos, short KnobYPos, short KnobStep,
-               unsigned short KnobStepsCount)
-: Control(frame, win)
+Slider::Slider(const Region& frame, Point pos,
+			   short KnobStep, unsigned short KnobStepsCount,
+			   View* superview)
+: Control(frame, superview), KnobPos(pos)
 {
 	ControlType = IE_GUI_SLIDER;
-	this->KnobXPos = KnobXPos;
-	this->KnobYPos = KnobYPos;
 	this->KnobStep = KnobStep;
 	this->KnobStepsCount = KnobStepsCount;
 	Knob = NULL;
@@ -53,14 +51,14 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
 			core->GetVideoDriver()->BlitSprite( Knob.get(),
-				rgn.x + KnobXPos + ( Pos * KnobStep ),
-				rgn.y + KnobYPos );
+				rgn.x + KnobPos.x + ( Pos * KnobStep ),
+				rgn.y + KnobPos.y );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
 			core->GetVideoDriver()->BlitSprite( GrabbedKnob.get(),
-				rgn.x + KnobXPos + ( Pos * KnobStep ),
-				rgn.y + KnobYPos );
+				rgn.x + KnobPos.x + ( Pos * KnobStep ),
+				rgn.y + KnobPos.y );
 			break;
 	}
 }
@@ -85,7 +83,7 @@ void Slider::SetPosition(unsigned int pos)
     
 void Slider::SetPosition(const Point& p)
 {
-    int mx = KnobXPos;
+    int mx = KnobPos.x;
     int xmx = p.x - mx;
 	unsigned int oldPos = Pos;
 	
@@ -144,8 +142,8 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
-	int mx = (KnobXPos + ( Pos * KnobStep ) - Knob->XPos);
-	int my = (KnobYPos - Knob->YPos);
+	int mx = (KnobPos.x + ( Pos * KnobStep ) - Knob->XPos);
+	int my = (KnobPos.y - Knob->YPos);
 	int Mx = (mx + Knob->Width);
 	int My = (my + Knob->Height);
 

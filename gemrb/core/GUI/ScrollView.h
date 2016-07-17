@@ -42,7 +42,7 @@ namespace GemRB {
 		void SizeChanged(const Size&);
 
 	public:
-		ScrollView(const Region& frame);
+		ScrollView(const Region& frame, View* superview = NULL);
 		~ScrollView();
 
 		void AddSubviewInFrontOfView(View*, const View* = NULL);

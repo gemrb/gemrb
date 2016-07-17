@@ -31,6 +31,7 @@ namespace GemRB {
 
 class Sprite2D;
 class ViewScriptingRef;
+class Window;
 
 class GEM_EXPORT View {
 private:
@@ -93,7 +94,7 @@ public:
 		Disabled = 1 << 27
 	};
 
-	View(const Region& frame);
+	View(const Region& frame, View* superview = NULL);
 	virtual ~View();
 
 	void Draw();
@@ -125,6 +126,7 @@ public:
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
 	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
+	Window* GetWindow() const;
 
 	Point ConvertPointToSuper(const Point&) const;
 	Point ConvertPointFromSuper(const Point&) const;

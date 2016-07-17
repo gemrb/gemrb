@@ -59,9 +59,9 @@ private:
 	void SetPosition(const Point& p);
 
 public:
-	Slider(const Region& frame, Window* win,
-           short KnobXPos, short KnobYPos, short KnobStep,
-           unsigned short KnobStepsCount);
+	Slider(const Region& frame, Point KnobPos,
+		   short KnobStep, unsigned short KnobStepsCount,
+		   View* superview = NULL);
 
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
@@ -79,10 +79,8 @@ private: // Private attributes
 	Holder<Sprite2D> Knob;
 	/** Grabbed Knob Image */
 	Holder<Sprite2D> GrabbedKnob;
-	/** Knob Starting X Position */
-	short KnobXPos;
-	/** Knob Starting Y Position */
-	short KnobYPos;
+	/** Knob Starting Position */
+	Point KnobPos;
 	/** Knob Step Size */
 	short KnobStep;
 	/** Knob Steps Count */

@@ -51,7 +51,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 
 public: 
-	Label(const Region& frame, Font* font, const String& string, Window* win = NULL);
+	Label(const Region& frame, Font* font, const String& string, View* superview = NULL);
 	~Label();
 
 	bool IsOpaque() const { return AnimPicture; } // FIXME: this isnt really true, but the clock breaks with out this.

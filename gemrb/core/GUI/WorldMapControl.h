@@ -62,7 +62,8 @@ private:
 	void DrawSelf(Region drawFrame, const Region&);
 
 public:
-	WorldMapControl(const Region& frame, const char *fontname, int direction);
+	WorldMapControl(const Region& frame, const char *fontname, int direction,
+					View* superview = NULL);
 	~WorldMapControl(void);
 
 	/** Allows modification of the scrolling factor from outside */

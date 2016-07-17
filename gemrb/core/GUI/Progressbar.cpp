@@ -29,9 +29,9 @@
 
 namespace GemRB {
 
-Progressbar::Progressbar(const Region& frame, Window* win,
-                         unsigned short KnobStepsCount)
-: Control(frame, win)
+Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount,
+						 View* superview)
+: Control(frame, superview)
 {
 	ControlType = IE_GUI_PROGRESSBAR;
 

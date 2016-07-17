@@ -32,8 +32,8 @@
 namespace GemRB {
 
 ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT],
-                     Window* win)
-: Control(frame, win)
+                     View* superview)
+: Control(frame, superview)
 {
 	ControlType = IE_GUI_SCROLLBAR;
 	State = 0;

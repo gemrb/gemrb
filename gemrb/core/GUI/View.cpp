@@ -35,7 +35,7 @@ View::DragOp::~DragOp() {
 	dragView->CompleteDragOperation(*this);
 }
 
-View::View(const Region& frame)
+View::View(const Region& frame, View* superview)
 	: frame(frame)
 {
 	scriptingRef = NULL;
@@ -43,6 +43,9 @@ View::View(const Region& frame)
 
 	dirty = true;
 	flags = 0;
+
+	if (superview)
+		superview->AddSubviewInFrontOfView(this);
 }
 
 View::~View()
@@ -261,6 +264,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
 	SubviewAdded(front, this);
+	front->AddedToView(this);
 }
 
 View* View::RemoveSubview(const View* view)
@@ -279,6 +283,7 @@ View* View::RemoveSubview(const View* view)
 
 	subView->superView = NULL;
 	SubviewRemoved(subView, this);
+	subView->RemovedFromView(this);
 	return subView;
 }
 
@@ -319,6 +324,15 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 			}
 			return v;
 		}
+	}
+	return NULL;
+}
+
+Window* View::GetWindow() const
+{
+	if (superView) {
+		Window* win = dynamic_cast<Window*>(superView);
+		return (win) ? win : superView->GetWindow();
 	}
 	return NULL;
 }

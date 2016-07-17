@@ -37,8 +37,8 @@ unsigned int Control::ActionRepeatDelay = 250;
 
 const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
 
-Control::Control(const Region& frame, Window* win)
-: View(frame)
+Control::Control(const Region& frame, View* superview)
+: View(frame) // dont pass superview to View constructor
 {
 	InHandler = 0;
 	VarName[0] = 0;
@@ -51,8 +51,13 @@ Control::Control(const Region& frame, Window* win)
 
 	actionTimer = NULL;
 	repeatDelay = 0;
-    
-	SetWindow(win);
+
+	if (superview) {
+		// View constructor can handle adding the view.
+		// However, in C++ this control doesnt exist until the View constructer is *complete*
+		// Therefore we must call AddSubviewInFrontOfView ourseleves here
+		superview->AddSubviewInFrontOfView(this);
+	}
 }
 
 Control::~Control()
@@ -68,24 +73,17 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
-void Control::SetWindow(Window* win)
+void Control::AddedToView(View* view)
 {
-	if (win == window) {
-		return;
-	}
-	if (window) {
-		window->RemoveSubview(this);
-		window = NULL;
-	}
-
-	static Window* recursiveWin = NULL;
-	if (win && win != recursiveWin) {
-		// avoid infinite recursion
-		recursiveWin = win;
-		win->AddSubviewInFrontOfView(this);
-		recursiveWin = NULL;
-	}
+	Window* win = view->GetWindow();
+	if (win == NULL)
+		win = dynamic_cast<Window*>(view);
 	window = win;
+}
+
+void Control::RemovedFromView(View*)
+{
+	window = NULL;
 }
 
 void Control::SetText(const String* string)

@@ -21,8 +21,8 @@
 
 namespace GemRB {
 
-ScrollView::ScrollView(const Region& frame)
-: View(frame), contentView(Region(Point(), frame.Dimensions()))
+ScrollView::ScrollView(const Region& frame, View* superview)
+: View(frame, superview), contentView(Region(Point(), frame.Dimensions()))
 {
 	hscroll = NULL;
 	vscroll = NULL;

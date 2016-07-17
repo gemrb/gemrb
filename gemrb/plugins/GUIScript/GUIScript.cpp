@@ -1297,13 +1297,12 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				char *font, *cstr;
 				PARSE_ARGS2( constructArgs, "ss", &font, &cstr );
 
-				TextEdit* edit = new TextEdit(rgn, 500, 0, 0);
+				TextEdit* edit = new TextEdit(rgn, 500, Point(), superview);
 				edit->SetFont( core->GetFont( font ) );
 				edit->ControlID = ControlID;
 				String* text = StringFromCString(cstr);
 				edit->Control::SetText( text );
 				delete text;
-				win->AddSubviewInFrontOfView( edit );
 
 				Sprite2D* spr = core->GetCursorSprite();
 				edit->SetCursor( spr );
@@ -1314,7 +1313,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 			{
 				char *font;
 				PARSE_ARGS1( constructArgs, "s", &font );
-				ctrl = new TextArea(rgn, core->GetFont( font ));
+				ctrl = new TextArea(rgn, core->GetFont( font ), superview);
 			}
 			break;
 		case IE_GUI_LABEL:
@@ -1325,7 +1324,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 						   "ssi", &font, &text, &align );
 
 				String* string = StringFromCString(text);
-				Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
+				Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"", superview );
 				delete string;
 
 				lbl->SetAlignment( align );
@@ -1358,7 +1357,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 				images[IE_GUI_SCROLLBAR_TROUGH] = af->GetFrame( trough, cycle );
 				images[IE_GUI_SCROLLBAR_SLIDER] = af->GetFrame( slider, cycle );
 
-				ctrl = new ScrollBar(rgn, images);
+				ctrl = new ScrollBar(rgn, images, superview);
 			}
 			break;
 		case IE_GUI_MAP:
@@ -1382,7 +1381,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					//win->DelControl( CtrlIndex );
 				}
 
-				MapControl* map = new MapControl(rgn);
+				MapControl* map = new MapControl(rgn, superview);
 				if (Flag2) { //pst flavour
 					map->convertToGame = false;
 					Control *lc = GetControl(LabelID, win);
@@ -1424,20 +1423,19 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					delete win->RemoveSubview( ctrl );
 				}
 
-				ctrl = new WorldMapControl(rgn, font?font:"", direction );
+				ctrl = new WorldMapControl(rgn, font?font:"", direction, superview );
 			}
 			break;
 		default:
 			switch (type) {
 				case IE_GUI_BUTTON:
-					ctrl = new Button(rgn);
+					ctrl = new Button(rgn, superview);
 					break;
 			}
 			break;
 	}
 
 	assert(ctrl);
-	superview->AddSubviewInFrontOfView( ctrl );
 	RegisterScriptableControl(ctrl, ControlID);
 	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef() );
 }

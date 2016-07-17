@@ -128,7 +128,7 @@ public:
 	};
 
 public:
-	Button(Region& frame, Window* win = NULL);
+	Button(Region& frame, View* superview = NULL);
 	~Button();
 
 	bool IsAnimated() const;
