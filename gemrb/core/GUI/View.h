@@ -48,6 +48,10 @@ private:
 
 protected:
 	View* superView;
+	// for convenience because we need to get this so much
+	// all it is is a saved pointer returned from View::GetWindow and is updated in AddedToView
+	Window* window;
+
 	Region frame;
 	std::list<View*> subViews;
 	String tooltip;
@@ -62,8 +66,8 @@ private:
 
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 
-	virtual void AddedToView(View*) {}
-	virtual void RemovedFromView(View*) {}
+	void AddedToView(View*);
+	void RemovedFromView(View*);
 	virtual void SubviewAdded(View* view, View* parent);
 	virtual void SubviewRemoved(View* view, View* parent);
 

@@ -40,6 +40,7 @@ View::View(const Region& frame, View* superview)
 {
 	scriptingRef = NULL;
 	superView = NULL;
+	window = NULL;
 
 	dirty = true;
 	flags = 0;
@@ -301,6 +302,19 @@ void View::SubviewRemoved(View* view, View* parent)
 	}
 }
 
+void View::AddedToView(View* view)
+{
+	Window* win = view->GetWindow();
+	if (win == NULL)
+		win = dynamic_cast<Window*>(view);
+	window = win;
+}
+
+void View::RemovedFromView(View*)
+{
+	window = NULL;
+}
+
 bool View::HitTest(const Point& p) const
 {
 	if (!IsOpaque() && background) {
@@ -330,6 +344,9 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 
 Window* View::GetWindow() const
 {
+	if (window)
+		return window;
+
 	if (superView) {
 		Window* win = dynamic_cast<Window*>(superView);
 		return (win) ? win : superView->GetWindow();

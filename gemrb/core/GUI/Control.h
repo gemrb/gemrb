@@ -86,8 +86,6 @@ public:
 class GEM_EXPORT Control : public View {
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
-	void AddedToView(View* view);
-	void RemovedFromView(View*);
     
 public: // Public attributes
 	enum Action {
@@ -191,10 +189,6 @@ protected:
 			return key < ak.key;
 		}
 	};
-
-	// for convenience because we need to get this so much
-	// all it is is a saved pointer returned from View::GetWindow and is updated in an override for AddedToView
-	Window* window;
 	
 	bool SupportsAction(const ActionKey&);
 	bool PerformAction(const ActionKey&);

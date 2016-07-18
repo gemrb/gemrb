@@ -73,19 +73,6 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
-void Control::AddedToView(View* view)
-{
-	Window* win = view->GetWindow();
-	if (win == NULL)
-		win = dynamic_cast<Window*>(view);
-	window = win;
-}
-
-void Control::RemovedFromView(View*)
-{
-	window = NULL;
-}
-
 void Control::SetText(const String* string)
 {
 	SetText((string) ? *string : L"");
