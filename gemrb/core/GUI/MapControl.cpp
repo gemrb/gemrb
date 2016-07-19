@@ -50,8 +50,8 @@ Color colors[]={
  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-MapControl::MapControl(const Region& frame, View* superview)
-	: Control(frame, superview)
+MapControl::MapControl(const Region& frame)
+	: Control(frame)
 {
 	ControlType = IE_GUI_MAP;
 

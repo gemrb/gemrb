@@ -98,7 +98,7 @@ public:
 		Disabled = 1 << 27
 	};
 
-	View(const Region& frame, View* superview = NULL);
+	View(const Region& frame);
 	virtual ~View();
 
 	void Draw();

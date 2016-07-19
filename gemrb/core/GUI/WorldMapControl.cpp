@@ -32,8 +32,8 @@
 
 namespace GemRB {
 
-WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction, View* superview)
-	: Control(frame, superview)
+WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
+	: Control(frame)
 {
 	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;

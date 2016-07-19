@@ -31,9 +31,8 @@
 namespace GemRB {
 
 Slider::Slider(const Region& frame, Point pos,
-			   short KnobStep, unsigned short KnobStepsCount,
-			   View* superview)
-: Control(frame, superview), KnobPos(pos)
+			   short KnobStep, unsigned short KnobStepsCount)
+: Control(frame), KnobPos(pos)
 {
 	ControlType = IE_GUI_SLIDER;
 	this->KnobStep = KnobStep;

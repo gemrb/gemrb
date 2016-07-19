@@ -37,7 +37,7 @@ unsigned int Control::ActionRepeatDelay = 250;
 
 const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
 
-Control::Control(const Region& frame, View* superview)
+Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
 	InHandler = 0;
@@ -51,13 +51,6 @@ Control::Control(const Region& frame, View* superview)
 
 	actionTimer = NULL;
 	repeatDelay = 0;
-
-	if (superview) {
-		// View constructor can handle adding the view.
-		// However, in C++ this control doesnt exist until the View constructer is *complete*
-		// Therefore we must call AddSubviewInFrontOfView ourseleves here
-		superview->AddSubviewInFrontOfView(this);
-	}
 }
 
 Control::~Control()

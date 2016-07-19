@@ -32,8 +32,8 @@
 
 namespace GemRB {
 
-Console::Console(const Region& frame, View* superview)
-	: Control(frame, superview), History(5)
+Console::Console(const Region& frame)
+	: Control(frame), History(5)
 {
 	Cursor = NULL;
 	max = 128;

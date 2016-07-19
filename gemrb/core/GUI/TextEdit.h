@@ -76,7 +76,7 @@ public:
 		static const Control::Action Cancel = ACTION_CUSTOM(2);
 	};
 
-	TextEdit(const Region& frame, unsigned short maxLength, Point p, View* superview = NULL);
+	TextEdit(const Region& frame, unsigned short maxLength, Point p);
 	~TextEdit(void);
 
 	/** Set Font */

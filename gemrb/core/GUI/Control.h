@@ -121,7 +121,7 @@ public: // Public attributes
     static unsigned int ActionRepeatDelay;
 
 public:
-	Control(const Region& frame, View* superview = NULL);
+	Control(const Region& frame);
 	virtual ~Control();
 
 	virtual bool IsAnimated() const { return animation; }

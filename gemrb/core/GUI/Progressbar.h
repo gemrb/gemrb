@@ -51,7 +51,7 @@ public:
 		static const Control::Action EndReached = ACTION_CUSTOM(0); // progress bar reaches 100%
 	};
 
-	Progressbar(const Region& frame, unsigned short KnobStepsCount, View* superview = NULL);
+	Progressbar(const Region& frame, unsigned short KnobStepsCount);
 	~Progressbar();
 
 	bool IsOpaque() const { return BackGround; }

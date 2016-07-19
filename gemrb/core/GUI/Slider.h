@@ -60,8 +60,7 @@ private:
 
 public:
 	Slider(const Region& frame, Point KnobPos,
-		   short KnobStep, unsigned short KnobStepsCount,
-		   View* superview = NULL);
+		   short KnobStep, unsigned short KnobStepsCount);
 
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();

@@ -29,8 +29,8 @@
 
 namespace GemRB {
 
-TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p, View* superview)
-	: Control(frame, superview), FontPos(p)
+TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
+	: Control(frame), FontPos(p)
 {
 	ControlType = IE_GUI_EDIT;
 	max = maxLength;

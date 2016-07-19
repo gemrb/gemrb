@@ -35,7 +35,7 @@ View::DragOp::~DragOp() {
 	dragView->CompleteDragOperation(*this);
 }
 
-View::View(const Region& frame, View* superview)
+View::View(const Region& frame)
 	: frame(frame)
 {
 	scriptingRef = NULL;
@@ -44,9 +44,6 @@ View::View(const Region& frame, View* superview)
 
 	dirty = true;
 	flags = 0;
-
-	if (superview)
-		superview->AddSubviewInFrontOfView(this);
 }
 
 View::~View()

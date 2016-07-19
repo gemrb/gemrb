@@ -69,7 +69,7 @@ public:
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
 
-	MapControl(const Region& frame, View* superview = NULL);
+	MapControl(const Region& frame);
 	~MapControl(void);
 
 	/** Refreshes the control after its associated variable has changed */

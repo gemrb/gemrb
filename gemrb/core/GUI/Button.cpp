@@ -34,8 +34,8 @@
 
 namespace GemRB {
 
-Button::Button(Region& frame, View* superview)
-	: Control(frame, superview),
+Button::Button(Region& frame)
+	: Control(frame),
 	buttonImages()
 {
 	ControlType = IE_GUI_BUTTON;
