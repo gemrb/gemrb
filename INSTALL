@@ -23,8 +23,11 @@ Optional dependencies:
   - (lib)VLC 2.0+ (for movies in some mac distributions of the games)
   - OpenGL drivers and GLEW
 
-You can explicitly disable searching (and using) a particular optional dependency by
-specifying -DCMAKE_DISABLE_FIND_PACKAGE_foo=1 flags (cummulative), where "foo" can be
+When choosing SDL 1.2 or SDL 2.0.x, pass -DSDL_BACKEND=SDL (for 1.2) or
+-DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation.
+
+You can explicitly disable searching (and using) a particular optional
+dependency by specifying -DUSE_foo=OFF flags (cummulative), where "foo" can be
 any name from the above list.
 
 Building GemRB on unix-like systems
@@ -33,7 +36,7 @@ Building GemRB on unix-like systems
 The following commands will try to configure, make and install GemRB.
   mkdir build
   cd build
-  cmake ..
+  cmake .. [some options]
   make
   make install
 
@@ -52,8 +55,9 @@ also pass -DDISABLE_WERROR=1, so warnings won't impede you. This option is
 also suggested if you're making a source package.
 
 If you want to build the OpenGL driver, first ensure you have a working SDL2
-install. Then, if you want the standard driver, pass -DUSE_OPENGL=1 and if
-you want the OpenGL ES driver, pass -DUSE_OPENGL=2 .
+install and using SDL2 backend. Then, if you want the standard driver, pass
+-DOPENGL_BACKEND=OpenGL and if you want the OpenGL ES driver, pass 
+-DOPENGL_BACKEND=GLES .
 
 Please let us know if you encounter any problems while building.
 
