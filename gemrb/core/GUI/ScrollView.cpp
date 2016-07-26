@@ -66,10 +66,8 @@ void ScrollView::Scroll(const Point& p)
 	assert(maxx <= 0 && maxy <= 0);
 
 	// clamp values so we dont scroll beyond the content
-	newP.x = std::max<short>(newP.x, maxx);
-	newP.y = std::max<short>(newP.y, maxy);
-	newP.x = std::min<short>(newP.x, 0);
-	newP.y = std::min<short>(newP.y, 0);
+	newP.x = Clamp<short>(newP.x, 0, maxx);
+	newP.y = Clamp<short>(newP.y, 0, maxy);
 
 	contentView.SetFrameOrigin(newP);
 }
