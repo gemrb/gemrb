@@ -247,6 +247,12 @@ inline size_t CountBits(const T& i)
 	return bits.count();
 }
 
+template <typename T>
+inline T Clamp(const T& n, const T& lower, const T& upper)
+{
+	return std::max(lower, std::min(n, upper));
+}
+
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40

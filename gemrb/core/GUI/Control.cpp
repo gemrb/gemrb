@@ -154,8 +154,7 @@ bool Control::IsFocused()
 
 void Control::SetValue(ieDword val)
 {
-	Value = std::max(val, range.first);
-	Value = std::min(Value, range.second);
+	Value = Clamp(val, range.first, range.second);
 
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
