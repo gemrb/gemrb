@@ -13240,26 +13240,6 @@ GUIScript::~GUIScript(void)
 	GUIAction[0]=UNINIT_IEDWORD;
 }
 
-/**
- * Quote path for use in python strings.
- * On windows also convert backslashes to forward slashes.
- */
-static char* QuotePath(char* tgt, const char* src)
-{
-	char *p = tgt;
-	char c;
-
-	do {
-		c = *src++;
-#ifdef WIN32
-		if (c == '\\') c = '/';
-#endif
-		if (c == '"' || c == '\\') *p++ = '\\';
-	} while (0 != (*p++ = c));
-	return tgt;
-}
-
-
 PyDoc_STRVAR( GemRB__doc,
 "Module exposing GemRB data and engine internals\n\n"
 "This module exposes to python GUIScripts GemRB engine data and internals. "
@@ -13294,34 +13274,23 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
-	char string[256];
-
-	sprintf( string, "import sys" );
-	if (PyRun_SimpleString( string ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string);
-		return false;
-	}
-
-	// 2.6+ only, so we ignore failures
-	sprintf( string, "sys.dont_write_bytecode = True");
-	PyRun_SimpleString( string );
-
 	char path[_MAX_PATH];
-	char path2[_MAX_PATH];
-	char quoted[_MAX_PATH];
-
 	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
 
-	// Add generic script path early, so GameType detection works
-	sprintf( string, "sys.path.append(\"%s\")", QuotePath( quoted, path ));
-	if (PyRun_SimpleString( string ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string);
+	char string[256] = "path";
+	PyObject* sysPath = PySys_GetObject(string);
+	if (sysPath == NULL) {
+		Log(ERROR, "GUIScripts", "Unable to set 'sys.path'.");
 		return false;
 	}
 
-	sprintf( string, "import GemRB\n");
-	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string);
+	// Add generic script path early, so GameType detection works
+	PyList_Append(sysPath, PyString_FromString(path));
+
+	char main[_MAX_PATH];
+	PathJoin(main, path, "Main.py", NULL);
+	if (!ExecFile(main)) {
+		Log(ERROR, "GUIScript", "Failed to execute %s", main);
 		return false;
 	}
 
@@ -13331,6 +13300,7 @@ bool GUIScript::Init(void)
 	}
 
 	// use the iwd guiscripts for how, but leave its override
+	char path2[_MAX_PATH];
 	if (stricmp( core->GameType, "how" ) == 0) {
 		PathJoin(path2, path, "iwd", NULL);
 	} else {
@@ -13339,38 +13309,13 @@ bool GUIScript::Init(void)
 
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
-	sprintf( string, "sys.path.insert(-1, \"%s\")", QuotePath( quoted, path2 ));
-	if (PyRun_SimpleString( string ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string );
-		return false;
-	}
-	sprintf( string, "GemRB.GameType = \"%s\"", core->GameType);
-	if (PyRun_SimpleString( string ) == -1) {
-		Log(ERROR, "GUIScript", "Error running: %s", string );
-		return false;
-	}
+	PyList_Insert(sysPath, -1, PyString_FromString(path2));
+	PyModule_AddStringConstant(pGemRB, "GameType", core->GameType);
 
-#if PY_MAJOR_VERSION == 2
-#if PY_MINOR_VERSION > 5
+#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION > 5
 	// warn about python stuff that will go away in 3.0
 	Py_Py3kWarningFlag = true;
 #endif
-#endif
-
-	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
-		Log(ERROR, "GUIScript", "Check if %s/GUIDefines.py exists!", path);
-		return false;
-	}
-
-	if (PyRun_SimpleString( "from GUIClasses import *" ) == -1) {
-		Log(ERROR, "GUIScript", "Check if %s/GUIClasses.py exists!", path);
-		return false;
-	}
-
-	if (PyRun_SimpleString( "from GemRB import *" ) == -1) {
-		Log(ERROR, "GUIScript", "builtin GemRB module failed to load!!!");
-		return false;
-	}
 
 	// TODO: Put this file somewhere user editable
 	// TODO: Search multiple places for this file
@@ -13382,6 +13327,12 @@ bool GUIScript::Init(void)
 	/* pClassesMod is a borrowed reference */
 	pGUIClasses = PyModule_GetDict( pClassesMod );
 	/* pGUIClasses is a borrowed reference */
+
+	PyObject *pFunc = PyDict_GetItemString(pMainDic, "Init");
+	if (PyObject_CallObject( pFunc, NULL ) == NULL) {
+		Log(ERROR, "GUIScript", "Failed to execute Init() in %s", main);
+		return false;
+	}
 
 	return true;
 }
