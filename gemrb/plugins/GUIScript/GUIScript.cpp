@@ -13375,7 +13375,7 @@ bool GUIScript::Init(void)
 	// TODO: Put this file somewhere user editable
 	// TODO: Search multiple places for this file
 	char include[_MAX_PATH];
-	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
+	PathJoin(include, core->GUIScriptsPath, "GUIScripts/Console.py", NULL);
 	ExecFile(include);
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
