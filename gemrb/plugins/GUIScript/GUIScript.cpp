@@ -1351,7 +1351,7 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 
 				Sprite2D* images[ScrollBar::IMAGE_COUNT];
 				images[ScrollBar::IMAGE_UP_UNPRESSED] = af->GetFrame( up, cycle );
-				images[ScrollBar::ScrollBar::IMAGE_UP_PRESSED] = af->GetFrame( upPr, cycle );
+				images[ScrollBar::IMAGE_UP_PRESSED] = af->GetFrame( upPr, cycle );
 				images[ScrollBar::IMAGE_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
 				images[ScrollBar::IMAGE_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
 				images[ScrollBar::IMAGE_TROUGH] = af->GetFrame( trough, cycle );
