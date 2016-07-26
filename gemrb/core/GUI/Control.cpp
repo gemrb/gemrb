@@ -154,14 +154,16 @@ bool Control::IsFocused()
 
 void Control::SetValue(ieDword val)
 {
+	ieDword oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
+	if (oldVal != Value) {
+		if (VarName[0] != 0) {
+			core->GetDictionary()->SetAt( VarName, Value );
+		}
+		PerformAction(Action::ValueChange);
+		MarkDirty();
 	}
-
-	PerformAction(Action::ValueChange);
-	MarkDirty();
 }
 
 void Control::SetValueRange(ValueRange r)
