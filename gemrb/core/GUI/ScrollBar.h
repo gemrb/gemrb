@@ -36,19 +36,6 @@ namespace GemRB {
 
 class Sprite2D;
 
-#define IE_GUI_SCROLLBAR_DEFAULT      0x00000040   // mousewheel triggers it
-
-enum IE_SCROLLBAR_IMAGE_TYPE {
-	IE_GUI_SCROLLBAR_UP_UNPRESSED = 0,
-	IE_GUI_SCROLLBAR_UP_PRESSED,
-	IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
-	IE_GUI_SCROLLBAR_DOWN_PRESSED,
-	IE_GUI_SCROLLBAR_TROUGH,
-	IE_GUI_SCROLLBAR_SLIDER,
-
-	IE_SCROLLBAR_IMAGE_COUNT
-};
-
 #define UP_PRESS	 0x0001
 #define DOWN_PRESS   0x0010
 #define SLIDER_GRAB  0x0100
@@ -58,49 +45,56 @@ enum IE_SCROLLBAR_IMAGE_TYPE {
  * Widget displaying scrollbars for paging in long text windows
  */
 class GEM_EXPORT ScrollBar : public Control {
-private:
-	void DrawSelf(Region drawFrame, const Region& clip);
-
 public:
-	ScrollBar(const Region& frame, Sprite2D*[IE_SCROLLBAR_IMAGE_COUNT]);
+	enum IMAGE_TYPE {
+		IMAGE_UP_UNPRESSED = 0,
+		IMAGE_UP_PRESSED,
+		IMAGE_DOWN_UNPRESSED,
+		IMAGE_DOWN_PRESSED,
+		IMAGE_TROUGH,
+		IMAGE_SLIDER,
+
+		IMAGE_COUNT
+	};
+
+	unsigned int StepIncrement;
+
+	ScrollBar(const Region& frame, Sprite2D*[IMAGE_COUNT]);
+	ScrollBar(const ScrollBar& sb);
 	~ScrollBar(void);
 
 	bool IsOpaque() const;
-	/**sets position, updates associated stuff */
-	void SetValue(ieDword NewPos);
 
 	void ScrollUp();
 	void ScrollDown();
-	double GetStep();
+	void ScrollBySteps(int steps);
+
 	/** refreshes scrollbar if associated with VarName */
 	void UpdateState(unsigned int Sum);
-
-	void SetScrollAmount(unsigned short amount) { ScrollDelta = amount; }
-private: //Private attributes
-	/** safe method to get the height of a frame */
-	int GetFrameHeight(int frame) const;
-	void SetPosForY(short y);
-	/** Images for drawing the Scroll Bar */
-	Sprite2D* Frames[IE_SCROLLBAR_IMAGE_COUNT];
-	/** Range of the slider in pixels. The height - buttons - slider */
-	int SliderRange;
-	/** a pixel position between 0 and SliderRange*/
-	unsigned short SliderYPos;
-	/** Scroll Bar Status */
-	unsigned short State;
-	/** amount by which value should change on scrolling */
-	unsigned short ScrollDelta;
-
-public: // Public Events
 	bool TracksMouseDown() const { return true; }
+
 	/** Mouse Button Down */
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent&);
+	/** Mouse Drag Event */
+	void OnMouseDrag(const MouseEvent&);
 	/** Mouse Wheel Scroll Event */
 	void OnMouseWheelScroll(const Point& delta);
+
+private: //Private attributes
+	/** Images for drawing the Scroll Bar */
+	Sprite2D* Frames[IMAGE_COUNT];
+	/** Range of the slider in pixels. The height - buttons - slider */
+	int SliderPxRange;
+	/** Scroll Bar Status */
+	unsigned short State;
+
+private:
+	void DrawSelf(Region drawFrame, const Region& clip);
+	void SetPosForY(int y);
+	int YPosFromValue();
+	int GetFrameHeight(int frame) const;
 };
 
 }

@@ -213,7 +213,7 @@ void TextArea::SetScrollBar(ScrollBar* sb)
 		s.w += sbSize.w;
 		SetFrameSize(s);
 
-		sb->SetScrollAmount(GetRowHeight());
+		sb->StepIncrement = GetRowHeight();
 	}
 
 	// we need to update the ScrollBar position based around TextYPos

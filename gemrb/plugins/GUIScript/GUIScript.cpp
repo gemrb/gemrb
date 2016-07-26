@@ -1349,13 +1349,13 @@ static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
 					return RuntimeError( tmpstr );
 				}
 
-				Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
-				images[IE_GUI_SCROLLBAR_UP_UNPRESSED] = af->GetFrame( up, cycle );
-				images[IE_GUI_SCROLLBAR_UP_PRESSED] = af->GetFrame( upPr, cycle );
-				images[IE_GUI_SCROLLBAR_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
-				images[IE_GUI_SCROLLBAR_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
-				images[IE_GUI_SCROLLBAR_TROUGH] = af->GetFrame( trough, cycle );
-				images[IE_GUI_SCROLLBAR_SLIDER] = af->GetFrame( slider, cycle );
+				Sprite2D* images[ScrollBar::IMAGE_COUNT];
+				images[ScrollBar::IMAGE_UP_UNPRESSED] = af->GetFrame( up, cycle );
+				images[ScrollBar::ScrollBar::IMAGE_UP_PRESSED] = af->GetFrame( upPr, cycle );
+				images[ScrollBar::IMAGE_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
+				images[ScrollBar::IMAGE_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
+				images[ScrollBar::IMAGE_TROUGH] = af->GetFrame( trough, cycle );
+				images[ScrollBar::IMAGE_SLIDER] = af->GetFrame( slider, cycle );
 
 				ctrl = new ScrollBar(rgn, images);
 			}
@@ -3443,7 +3443,7 @@ static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject* self, PyObject* a
 	ScrollBar* sb = GetView<ScrollBar>(self);
 	ABORT_IF_NULL(sb);
 
-	sb->SetFlags((IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, OP_OR);
+	sb->SetFlags(IE_GUI_SCROLLBAR<<24, OP_OR);
 
 	Py_RETURN_NONE;
 }
