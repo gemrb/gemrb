@@ -111,6 +111,15 @@ T* GetControl(ScriptingId id, Window* win) {
 	return dynamic_cast<T*>(GetControl(id, win));
 }
 
+template <class T>
+T* GetControl(ResRef group, ScriptingId id) {
+	ControlScriptingRef* ref = static_cast<ControlScriptingRef*>(ScriptEngine::GetScripingRef(group, id));
+	if (ref) {
+		return dynamic_cast<T*>(ref->GetObject());
+	}
+	return NULL;
+}
+
 }
 
 #endif

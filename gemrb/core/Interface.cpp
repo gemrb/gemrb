@@ -3600,20 +3600,12 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 Label* Interface::GetMessageLabel() const
 {
-	ControlScriptingRef* ref = static_cast<ControlScriptingRef*>(ScriptEngine::GetScripingRef("MsgSys", 1));
-	if (ref) {
-		return dynamic_cast<Label*>(ref->GetObject());
-	}
-	return NULL;
+	return GetControl<Label>("MsgSys", 1);
 }
 
 TextArea* Interface::GetMessageTextArea() const
 {
-	ControlScriptingRef* ref = static_cast<ControlScriptingRef*>(ScriptEngine::GetScripingRef("MsgSys", 0));
-	if (ref) {
-		return dynamic_cast<TextArea*>(ref->GetObject());
-	}
-	return NULL;
+	return GetControl<TextArea>("MsgSys", 0);
 }
 
 static const char *saved_extensions[]={".are",".sto",0};
