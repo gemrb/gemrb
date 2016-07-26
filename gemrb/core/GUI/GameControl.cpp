@@ -40,7 +40,6 @@
 #include "opcode_params.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/EventMgr.h"
-#include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/Container.h"
