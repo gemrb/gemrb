@@ -238,7 +238,7 @@ inline bool SetBits(T& flag, const T& value, int mode)
 }
 
 template <typename T>
-inline size_t CountBits(T& i)
+inline size_t CountBits(const T& i)
 {
 	// using a bitset is guaranteed to be portable
 	// it is also usually much faster than a loop over the bits since it is often implemented with a CPU popcount instruction
