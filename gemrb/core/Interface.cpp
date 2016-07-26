@@ -1506,7 +1506,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to initialize GUI Script.");
 		return GEM_ERROR;
 	}
-	strcpy( NextScript, "Start" );
 
 	{
 		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
