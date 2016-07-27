@@ -29,13 +29,18 @@ ENDIF(DEFINED CMAKE_BUILD_TYPE)
 PROJECT(gemrb)
 
 # Options list
+SET(SDL_BACKEND "SDL" CACHE STRING "libSDL version (possible values: SDL or SDL2)")
+SET_PROPERTY(CACHE SDL_BACKEND PROPERTY STRINGS SDL SDL2)
+
+SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible values: None, OpenGL, GLES)")
+SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
+
 OPTION(USE_SDLMIXER "Enable SDL_mixer support" ON)
 OPTION(USE_OPENAL "Enable OpenAL support" ON)
 OPTION(USE_LIBVLC "Enable LibVLC support" ON)
 OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enabe Vorbis support" ON)
-
 
 # try to extract the version from the source
 FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
@@ -190,32 +195,51 @@ ELSE()
 	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
 ENDIF()
 
-INCLUDE(FindSDL)
-IF(SDL_FOUND)
-	MESSAGE(STATUS "Looking for SDL1: found")
-ELSE()
-	MESSAGE(WARNING "Looking for SDL1: not found!")
-ENDIF()
-
-# look for sdl2 if sdl1 was not found or a preference was stated
-IF(USE_SDL2 OR NOT SDL_FOUND)
-	INCLUDE(FindSDL2)
-ENDIF()
-IF(SDL2_FOUND)
-	MESSAGE(STATUS "Looking for SDL2: found")
-	# unify SDL variables, so we don't have to differentiate later
-	SET(SDL_INCLUDE_DIR ${SDL2_INCLUDE_DIR})
-	SET(SDL_LIBRARY ${SDL2_LIBRARY})
-	# skip SDL_FOUND for later use
-ELSE()
-	MESSAGE(WARNING "Looking for SDL2: not found!")
-	IF(NOT SDL_FOUND)
-		MESSAGE(FATAL_ERROR "Please get SDL from www.libsdl.org")
+IF(SDL_BACKEND STREQUAL "SDL")
+	INCLUDE(FindSDL)
+	IF(USE_SDLMIXER)
+		FIND_PACKAGE(SDL_mixer MODULE)
 	ENDIF()
 ENDIF()
 
-IF(USE_OPENGL)
-	IF(NOT SDL2_FOUND)
+# FIXME: Compatibility - remove USE_SDL2 in the future
+IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
+	INCLUDE(FindSDL2)
+	# unify SDL variables, so we don't have to differentiate later
+	SET(SDL_INCLUDE_DIR ${SDL2_INCLUDE_DIR})
+	SET(SDL_LIBRARY ${SDL2_LIBRARY})
+	SET(SDL_FOUND ${SDL2_FOUND})
+
+	IF(USE_SDLMIXER)
+		FIND_PACKAGE(SDL2_mixer MODULE)
+		# unify variables, so we don't have to differentiate later
+		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
+		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
+		SET(SDL_MIXER_VERSION_STRING ${SDL2_MIXER_VERSION_STRING})
+		SET(SDL_MIXER_FOUND ${SDL2_MIXER_FOUND})
+	ENDIF()
+ENDIF()
+
+IF(SDL_FOUND)
+	MESSAGE(STATUS "Looking for SDL: found")
+	# unify SDL variables, so we don't have to differentiate later
+	MESSAGE(STATUS "Looking for libSDL: found")
+ELSE()
+	MESSAGE(WARNING "Looking for SDL: not found!")
+	MESSAGE(FATAL_ERROR "Please get SDL from www.libsdl.org")
+ENDIF()
+
+IF(SDL_MIXER_FOUND)
+	MESSAGE(STATUS "Looking for SDL_mixer: found")
+ELSE()
+	MESSAGE(WARNING "Looking for SDL_mixer: not found!")
+	MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
+	MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
+ENDIF()
+
+# FIXME: Compatibility - Remove USE_OPENGL in the future
+IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
+	IF(SDL_BACKEND STREQUAL "SDL")
 		MESSAGE(FATAL_ERROR "SDL2 is required for the OpenGL driver!")
 	ENDIF()
 	INCLUDE(FindOpenGL)
@@ -223,8 +247,11 @@ IF(USE_OPENGL)
 		MESSAGE(FATAL_ERROR "OpenGL library not found!")
 	ENDIF()
 
-	IF(USE_OPENGL EQUAL 1)
+	# FIXME: Compatibility - Remove USE_OPENGL in the future
+	IF((OPENGL_BACKEND STREQUAL "OpenGL") OR (USE_OPENGL EQUAL 1))
 		ADD_DEFINITIONS("-DUSE_GL")
+		# Don't delete this - there is code that relies on -DUSE_OPENGL=1
+		SET(USE_OPENGL 1)
 		INCLUDE(FindGLEW)
 		IF(GLEW_FOUND)
 			MESSAGE(STATUS "Looking for Glew: found")
@@ -232,7 +259,12 @@ IF(USE_OPENGL)
 			MESSAGE(SEND_ERROR "Looking for Glew: not found!")
 			MESSAGE(FATAL_ERROR "Please install the Glew library and headers first!")
 		ENDIF()
-	ELSE()
+	ENDIF()
+
+	# FIXME: Compatibility - Remove USE_OPENGL in the future
+	IF((OPENGL_BACKEND STREQUAL "GLES") OR (USE_OPENGL EQUAL 2))
+		# Don't delete this - there is code that relies on -DUSE_OPENGL=2
+		SET(USE_OPENGL 2)
 		# use GLES instead of regular GL
 		SET(GLEW_LIBRARIES "")
 		find_path(GLES2_H gl2.h PATH_SUFFIXES GLES2)
@@ -269,26 +301,6 @@ IF(USE_OPENAL)
 		MESSAGE(WARNING "Looking for OpenAL: not found!")
 		MESSAGE(WARNING "If you want to build the OpenAL plugin, get OpenAL from www.openal.org.")
 		MESSAGE(WARNING "If it just wasn't found, try setting the OPENALDIR environment variable.")
-	ENDIF()
-ENDIF()
-
-IF(USE_SDLMIXER)
-	IF(SDL2_FOUND)
-		FIND_PACKAGE(SDL2_mixer MODULE)
-		# unify variables, so we don't have to differentiate later
-		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
-		SET(SDL_MIXER_LIBRARIES ${SDL2_MIXER_LIBRARIES})
-		SET(SDL_MIXER_VERSION_STRING ${SDL2_MIXER_VERSION_STRING})
-		SET(SDL_MIXER_FOUND ${SDL2_MIXER_FOUND})
-	ELSE()
-		FIND_PACKAGE(SDL_mixer MODULE)
-	ENDIF()
-	IF(SDL_MIXER_FOUND)
-		MESSAGE(STATUS "Looking for SDL_mixer: found")
-	ELSE()
-		MESSAGE(WARNING "Looking for SDL_mixer: not found!")
-		MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
-		MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
 	ENDIF()
 ENDIF()
 
@@ -502,8 +514,8 @@ PRINT_OPTION(STATIC_LINK)
 PRINT_OPTION(INSOURCEBUILD)
 PRINT_OPTION(DISABLE_WERROR)
 PRINT_OPTION(WIN32_USE_STDIO)
-PRINT_OPTION(USE_SDL2)
-PRINT_OPTION(USE_OPENGL)
+PRINT_OPTION(SDL_BACKEND)
+PRINT_OPTION(OPENGL_BACKEND)
 message(STATUS "")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "")
