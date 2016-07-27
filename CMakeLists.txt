@@ -195,7 +195,8 @@ ELSE()
 	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
 ENDIF()
 
-IF(SDL_BACKEND STREQUAL "SDL")
+# FIXME: Compatibility - remove USE_SDL2 in the future
+IF((SDL_BACKEND STREQUAL "SDL") AND NOT USE_SDL2)
 	INCLUDE(FindSDL)
 	IF(USE_SDLMIXER)
 		FIND_PACKAGE(SDL_mixer MODULE)
