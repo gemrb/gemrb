@@ -13594,7 +13594,7 @@ bool GUIScript::ExecString(const char* string, bool feedback)
 		PyErr_Print();
 		Py_DECREF(ptype);
 		Py_DECREF(pvalue);
-		if (ptraceback) Py_DECREF(ptraceback);
+		Py_XDECREF(ptraceback);
 		delete error;
 	}
 	PyErr_Clear();
