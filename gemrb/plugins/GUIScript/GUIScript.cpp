@@ -13533,32 +13533,33 @@ bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bo
 	return true;
 }
 
-void GUIScript::ExecFile(const char* file)
+bool GUIScript::ExecFile(const char* file)
 {
 	FileStream fs;
 	if (!fs.Open(file))
-		return;
+		return false;
 
-	int len = fs.Remains();
+	size_t len = fs.Remains();
 	if (len <= 0)
-		return;
+		return false;
 
 	char* buffer = (char *) malloc(len+1);
 	if (!buffer)
-		return;
+		return false;
 
 	if (fs.Read(buffer, len) == GEM_ERROR) {
 		free(buffer);
-		return;
+		return false;
 	}
 	buffer[len] = 0;
 
-	ExecString(buffer);
+	bool ret = ExecString(buffer);
 	free(buffer);
+	return ret;
 }
 
 /** Exec a single String */
-void GUIScript::ExecString(const char* string, bool feedback)
+bool GUIScript::ExecString(const char* string, bool feedback)
 {
 	PyObject* run = PyRun_String(string, Py_file_input, pMainDic, pMainDic);
 
@@ -13579,6 +13580,7 @@ void GUIScript::ExecString(const char* string, bool feedback)
 			}
 		}
 		Py_DECREF(run);
+		return true;
 	} else {
 		// failure
 		PyObject *ptype, *pvalue, *ptraceback;
@@ -13596,6 +13598,7 @@ void GUIScript::ExecString(const char* string, bool feedback)
 		delete error;
 	}
 	PyErr_Clear();
+	return false;
 }
 
 PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
