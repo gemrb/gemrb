@@ -138,8 +138,9 @@ bool Console::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 		case GEM_RETURN:
 			{
 				char* cBuf = MBCStringFromString(Buffer);
-				// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
-				core->GetGUIScriptEngine()->ExecString(cBuf, true);
+				ScriptEngine::FunctionParameters params;
+				params.push_back(ScriptEngine::Parameter(cBuf));
+				core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
 				free(cBuf);
 				HistoryAdd();
 				Buffer.erase();

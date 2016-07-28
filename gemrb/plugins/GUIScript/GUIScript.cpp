@@ -13317,12 +13317,6 @@ bool GUIScript::Init(void)
 	Py_Py3kWarningFlag = true;
 #endif
 
-	// TODO: Put this file somewhere user editable
-	// TODO: Search multiple places for this file
-	char include[_MAX_PATH];
-	PathJoin(include, core->GUIScriptsPath, "GUIScripts/Console.py", NULL);
-	ExecFile(include);
-
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
 	/* pClassesMod is a borrowed reference */
 	pGUIClasses = PyModule_GetDict( pClassesMod );

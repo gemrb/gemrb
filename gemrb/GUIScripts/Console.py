@@ -1,7 +1,7 @@
 
-# this file is executed at gemrb startup, for the Console
 from ie_stats import *
 from GUIDefines import *
+import GemRB
 
 # /handy/ shorthand forms
 def gps(stat, base=0):
@@ -24,3 +24,7 @@ def ci(item, slot=-1, c0=1, c1=0, c2=0):
 
 def cv(var, context="GLOBAL"):
 	GemRB.CheckVar(var, context)
+
+# the actual function that the GemRB::Console calls
+def Exec(cmd):
+	return eval(cmd)
