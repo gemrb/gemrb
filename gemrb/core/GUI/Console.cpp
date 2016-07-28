@@ -153,10 +153,11 @@ bool Console::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 				if (Buffer.length() < max) {
 					Buffer.insert(CurPos++, 1, Key.character);
 				}
-				return true;
+				break;
 			}
 			return false;
 	}
+	MarkDirty();
 	return true;
 }
 
