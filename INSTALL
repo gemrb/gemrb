@@ -24,7 +24,9 @@ Optional dependencies:
   - OpenGL drivers and GLEW
 
 When choosing SDL 1.2 or SDL 2.0.x, pass -DSDL_BACKEND=SDL (for 1.2) or
--DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation.
+-DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation. You can also invoke cmake
+with -DSDL_BACKEND=Auto (default) or even without defining specific backend
+for autodetection.
 
 You can explicitly disable searching (and using) a particular optional
 dependency by specifying -DUSE_foo=OFF flags (cummulative), where "foo" can be

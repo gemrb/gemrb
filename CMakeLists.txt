@@ -29,8 +29,8 @@ ENDIF(DEFINED CMAKE_BUILD_TYPE)
 PROJECT(gemrb)
 
 # Options list
-SET(SDL_BACKEND "SDL" CACHE STRING "libSDL version (possible values: SDL or SDL2)")
-SET_PROPERTY(CACHE SDL_BACKEND PROPERTY STRINGS SDL SDL2)
+SET(SDL_BACKEND "Auto" CACHE STRING "libSDL version (possible values: Auto, SDL or SDL2)")
+SET_PROPERTY(CACHE SDL_BACKEND PROPERTY STRINGS Auto SDL SDL2)
 
 SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible values: None, OpenGL, GLES)")
 SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
@@ -193,6 +193,27 @@ IF(PYTHONLIBS_FOUND)
 ELSE()
 	MESSAGE(SEND_ERROR "Looking for Python libraries and headers: not found!")
 	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
+ENDIF()
+
+# Autodetection mechanism
+# Default priority to SDL
+# If found both backends and USE_SDL2 is active, switching to SDL2
+IF(SDL_BACKEND STREQUAL "Auto")
+	MESSAGE(STATUS "Autodetecting SDL backend...")
+	INCLUDE(FindSDL)
+	INCLUDE(FindSDL2)
+	IF(SDL_FOUND)
+		MESSAGE(STATUS "Found SDL 1.2, switching to SDL backend.")
+		SET(SDL_BACKEND "SDL")
+	ENDIF()
+	IF((NOT SDL_FOUND AND SDL2_FOUND) OR (SDL_FOUND AND SDL2_FOUND AND USE_SDL2))
+		MESSAGE(STATUS "Found SDL 2.0, switching to SDL2 backend.")
+		SET(SDL_BACKEND "SDL2")
+	ENDIF()
+	IF(NOT (SDL_FOUND OR SDL2_FOUND))
+		MESSAGE(WARNING "No SDL or SDL2 libraries found.")
+		MESSAGE(FATAL_ERROR "Please get SDL from www.libsdl.org")
+	ENDIF()
 ENDIF()
 
 # FIXME: Compatibility - remove USE_SDL2 in the future
