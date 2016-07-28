@@ -58,13 +58,14 @@ public:
 	/** Load Script */
 	bool LoadScript(const char* filename);
 	/** Run Function */
+	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true);
+	// TODO: eleminate these RunFunction variants.
 	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1);
 	bool RunFunction(const char *module, const char* fname, bool report_error, Point param);
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
 	bool ExecString(const char* string, bool feedback=false);
-	/** lets hope this one can be here without screwing up the general interface */
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(ScriptingRefBase*);

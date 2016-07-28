@@ -13410,6 +13410,31 @@ bool GUIScript::LoadScript(const char* filename)
 	return true;
 }
 
+bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+{
+	size_t size = params.size();
+	PyObject* pyParams = PyTuple_New(size);
+
+	for (size_t i = 0; i < size; ++i) {
+		const Parameter& p = params[i];
+		const std::type_info& type = p.Type();
+		PyObject* pyParam = NULL; // a "stolen" reference for PyTuple_SetItem
+
+		// FIXME: we can have any type of parameter, not just char*
+		if (type == typeid(char*)) {
+			char* cstring = params[i].Value<char*>();
+			pyParam = PyString_FromString(cstring);
+		} else {
+			Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
+			// need to insert a None placeholder so remaining parameters are correct
+			pyParam = Py_None;
+			Py_IncRef(pyParam);
+		}
+		PyTuple_SetItem(pyParams, i, pyParam);
+	}
+	return RunFunction(Modulename, FunctionName, pyParams, report_error);
+}
+
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
 PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
 {
