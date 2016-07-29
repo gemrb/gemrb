@@ -137,15 +137,18 @@ bool Console::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 			break;			
 		case GEM_RETURN:
 			{
-				char* cBuf = MBCStringFromString(Buffer);
-				ScriptEngine::FunctionParameters params;
-				params.push_back(ScriptEngine::Parameter(cBuf));
-				core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
-				free(cBuf);
-				HistoryAdd();
-				Buffer.erase();
-				CurPos = 0;
-				HistPos = 0;
+				if (Buffer.length()) {
+					char* cBuf = MBCStringFromString(Buffer);
+					assert(cBuf);
+					ScriptEngine::FunctionParameters params;
+					params.push_back(ScriptEngine::Parameter(cBuf));
+					core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+					free(cBuf);
+					HistoryAdd();
+					Buffer.erase();
+					CurPos = 0;
+					HistPos = 0;
+				}
 			}
 			break;
 		default:

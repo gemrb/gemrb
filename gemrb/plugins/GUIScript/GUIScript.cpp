@@ -13416,8 +13416,8 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 
 		// FIXME: we can have any type of parameter, not just char*
 		if (type == typeid(char*)) {
-			char* cstring = params[i].Value<char*>();
-			pyParam = PyString_FromString(cstring);
+			char* cstring = p.Value<char*>();
+			pyParam = PyString_FromStringAndSize(cstring, strlen(cstring));
 		} else {
 			Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
 			// need to insert a None placeholder so remaining parameters are correct
