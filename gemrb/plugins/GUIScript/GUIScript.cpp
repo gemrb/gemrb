@@ -13426,7 +13426,9 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 		}
 		PyTuple_SetItem(pyParams, i, pyParam);
 	}
-	return RunFunction(Modulename, FunctionName, pyParams, report_error);
+	bool ret = RunFunction(Modulename, FunctionName, pyParams, report_error);
+	Py_DecRef(pyParams);
+	return ret;
 }
 
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
