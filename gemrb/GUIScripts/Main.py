@@ -5,8 +5,7 @@ import sys
 # 2.6+ only, so we ignore failures
 sys.dont_write_bytecode = True
 
-import GemRB
-
+from GemRB import *
 from GUIDefines import *
 from GUIClasses import *
 
