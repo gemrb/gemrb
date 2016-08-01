@@ -533,7 +533,7 @@ static int CanSave()
 	}
 
 	Point pc1 =  game->GetPC(0, true)->Pos;
-	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*4);
+	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
 	i = 0;
 	while (nearActors[i]) {
 		Actor *actor = nearActors[i];
