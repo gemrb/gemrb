@@ -513,8 +513,9 @@ static int CanSave()
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		//TODO: can't save while (party) actors are in helpless states
-		if (actor->GetStat(IE_STATE_ID) & STATE_NOSAVE) {
+		// can't save while (party) actors are in helpless or dead states
+		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
+		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {
 			//some actor is in nosave state
 			displaymsg->DisplayConstantString(STR_CANTSAVENOCTRL, DMC_BG2XPGREEN);
 			return 5;
