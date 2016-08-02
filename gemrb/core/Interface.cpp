@@ -1497,6 +1497,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
+	SetNextScript("Start"); // Start is the first script executed
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == NULL) {
 		Log(FATAL, "Core", "Missing GUI Script Engine.");
@@ -3076,8 +3077,7 @@ void Interface::QuitGame(int BackToMain)
 		worldmap=NULL;
 	}
 	if (BackToMain) {
-		strcpy(NextScript, "Start");
-		QuitFlag |= QF_CHANGESCRIPT;
+		SetNextScript("Start");
 	}
 	GSUpdate(true);
 }

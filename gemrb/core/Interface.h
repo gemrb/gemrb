@@ -370,7 +370,7 @@ private:
 	int mousescrollspd;
 	bool update_scripts;
 	/** Next Script Name */
-	char NextScript[64] = "Start"; // Start is the first script executed
+	char NextScript[64];
 
 	std::vector<Timer> timers;
 	int SpecialSpellsCount;
