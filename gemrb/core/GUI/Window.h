@@ -65,6 +65,8 @@ public:
 	};
 
 private:
+	void RecreateBuffer();
+
 	void SubviewAdded(View* view, View* parent);
 	void SubviewRemoved(View* view, View* parent);
 
@@ -86,13 +88,11 @@ public:
 	void Focus();
 	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
 
-	/** Sets 'ctrl' as Focused */
-	void SetFocused(Control* ctrl);
-	void SetPosition(WindowPosition);
-
-	/** Returns last focused control */
-	Control* GetFocus() const;
+	/** Sets 'view' as Focused */
+	void SetFocused(View* view);
 	View* FocusedView() const { return focusView; }
+
+	void SetPosition(WindowPosition);
 	String TooltipText() const;
 	Sprite2D* Cursor() const;
 	bool IsDisabledCursor() const;
@@ -106,9 +106,6 @@ public:
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 	void OnMouseDrag(const MouseEvent&);
-
-private:
-	void RecreateBuffer();
 
 private: // Private attributes
 	std::set<Control*> Controls;

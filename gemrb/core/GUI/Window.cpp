@@ -73,6 +73,9 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 	if (ctrl) {
 		Controls.insert(ctrl);
 	}
+	if (focusView == NULL) {
+		TrySetFocus(view);
+	}
 }
 
 void Window::SubviewRemoved(View* subview, View* /*parent*/)
@@ -83,6 +86,12 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 	}
 	if (focusView == ctrl) {
 		focusView = NULL;
+		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+			Control* ctrl = *c;
+			if (TrySetFocus(ctrl)) {
+				break;
+			}
+		}
 	}
 }
 
@@ -122,15 +131,9 @@ void Window::Focus()
 	manager.FocusWindow(this);
 }
 
-void Window::SetFocused(Control* ctrl)
+void Window::SetFocused(View* ctrl)
 {
-	if (ctrl) {
-		TrySetFocus(ctrl);
-	} else if (Controls.size()) {
-		// set a default focus, something should always be focused
-		// FIXME: this should probably be better defined
-		TrySetFocus(*Controls.begin());
-	}
+	TrySetFocus(ctrl);
 }
 
 String Window::TooltipText() const
@@ -177,11 +180,6 @@ void Window::SetPosition(WindowPosition pos)
 		newFrame.y = screen.h - newFrame.h;
 	}
 	SetFrame(newFrame);
-}
-
-Control* Window::GetFocus() const
-{
-	return dynamic_cast<Control*>(FocusedView());
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
