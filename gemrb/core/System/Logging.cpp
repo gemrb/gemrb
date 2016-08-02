@@ -76,7 +76,9 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 	const size_t len = 4095;
 #else
 	va_list ap_copy;
-	va_copy(ap_copy, ap);
+	// __va_copy should always be defined
+	// va_copy is only defined by C99 (C++11 and up)
+	__va_copy(ap_copy, ap);
 	const size_t len = vsnprintf(NULL, 0, message, ap_copy);
 	va_end(ap_copy);
 #endif

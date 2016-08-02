@@ -161,7 +161,7 @@ void Control::SetValue(ieDword val)
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
 		}
-		PerformAction(Action::ValueChange);
+		PerformAction(ValueChange);
 		MarkDirty();
 	}
 }
