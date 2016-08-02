@@ -63,10 +63,10 @@ class Sprite2D;
 static_cast<Control::Action>(a)
 	
 #define ACTION_IS_SCREEN(a) \
-(a <= Control::Action::MouseLeave)
+(a <= Control::MouseLeave)
     
-#define ACTION_DEFAULT ActionKey(Control::Action::Click, 0, GEM_MB_ACTION)
-#define ACTION_CUSTOM(x)  ACTION_CAST(Control::Action::CustomAction + int(x))
+#define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION)
+#define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
 public:

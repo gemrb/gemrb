@@ -104,7 +104,7 @@ void Slider::SetPosition(const Point& p)
     }
 
 	if (oldPos != Pos) {
-		PerformAction(Control::Action::ValueChange);
+		PerformAction(Control::ValueChange);
 	}
 }
 
