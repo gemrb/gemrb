@@ -5,9 +5,13 @@ import sys
 # 2.6+ only, so we ignore failures
 sys.dont_write_bytecode = True
 
-from GemRB import *
+# these imports may not be used here
+# we include them to ensure they exist when the GUIScript engine initializes
+# we also want anything executed using ExecString to have access to the symbols
 from GUIDefines import *
 from GUIClasses import *
+
+import GemRB
 
 def Init():
 	# this function is run after the game type is set
