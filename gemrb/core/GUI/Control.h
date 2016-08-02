@@ -66,7 +66,7 @@ static_cast<Control::Action>(a)
 (a <= Control::Action::MouseLeave)
     
 #define ACTION_DEFAULT ActionKey(Control::Action::Click, 0, GEM_MB_ACTION)
-#define ACTION_CUSTOM(x)  ACTION_CAST(Control::Action::CustomAction + x)
+#define ACTION_CUSTOM(x)  ACTION_CAST(Control::Action::CustomAction + int(x))
 
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
 public:
