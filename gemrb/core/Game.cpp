@@ -972,7 +972,7 @@ bool Game::CheckForReplacementActor(int i)
 		for (it = npclevels.begin(); it != npclevels.end(); it++) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				// the tables have entries only up to level 24
-				ieDword safeLevel = npclevels[0].size() - 1;
+				ieDword safeLevel = npclevels[0].size();
 				if (level < safeLevel) {
 					safeLevel = level;
 				}
