@@ -68,6 +68,8 @@
 //	4251 disables the annoying warning about missing dll interface in templates
 #	pragma warning( disable: 4251 521 )
 #	pragma warning( disable: 4275 )
+// _CRT_SECURE_NO_WARNINGS on use of various strcpy/printf variants
+#	pragma warning( disable: 4996 )
 //	disables annoying warning caused by STL:Map in msvc 6.0
 #	if _MSC_VER < 7000
 #		pragma warning(disable:4786)
