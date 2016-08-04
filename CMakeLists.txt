@@ -196,9 +196,13 @@ IF(WIN32)
 		${APPVEYOR_DEP_DIR}/include/ogg
 		${APPVEYOR_DEP_DIR}/include/vorbis
 		${APPVEYOR_DEP_DIR}/include
-		${APPVEYOR_DEP_DIR}/libs
+		${APPVEYOR_DEP_DIR}/lib
+		${APPVEYOR_DEP_DIR}
 	)
 	set(CMAKE_PREFIX_PATH ${APPVEYOR_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
+	message("SDLDIR: $ENV{SDLDIR}")
+	message("APPVEYOR env: ${APPVEYOR_DEP_DIR}")
+	message("APPVEYOR paths: ${APPVEYOR_DEP_SEARCH_PATH}")
 ENDIF()
 
 # Check for all the required and optional dependencies
