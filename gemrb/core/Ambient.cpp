@@ -20,6 +20,8 @@
  
 #include "Ambient.h"
 
+#include <algorithm>
+
 namespace GemRB {
 
 Ambient::Ambient()
