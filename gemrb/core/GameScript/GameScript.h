@@ -33,7 +33,7 @@
 
 // absent from msvc6
 #ifdef _MSC_VER
-#ifndef __FUNCTION
+#ifndef __FUNCTION__
 #define __FUNCTION__ "no message"
 #endif
 #endif
