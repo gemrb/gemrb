@@ -235,7 +235,6 @@ IF(SDL_BACKEND STREQUAL "Auto")
 	ENDIF()
 ENDIF()
 
-# FIXME: Compatibility - remove USE_SDL2 in the future
 IF((SDL_BACKEND STREQUAL "SDL") AND NOT USE_SDL2)
 	INCLUDE(FindSDL)
 	IF(USE_SDLMIXER)
@@ -243,7 +242,6 @@ IF((SDL_BACKEND STREQUAL "SDL") AND NOT USE_SDL2)
 	ENDIF()
 ENDIF()
 
-# FIXME: Compatibility - remove USE_SDL2 in the future
 IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 	INCLUDE(FindSDL2)
 	# unify SDL variables, so we don't have to differentiate later
@@ -259,6 +257,14 @@ IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 		SET(SDL_MIXER_VERSION_STRING ${SDL2_MIXER_VERSION_STRING})
 		SET(SDL_MIXER_FOUND ${SDL2_MIXER_FOUND})
 	ENDIF()
+ENDIF()
+
+# backward compatibility notice - remove USE_SDL2 and OPENGL_BACKEND in the future (added mid 2016)
+IF(USE_SDL2)
+	MESSAGE(WARNING "USE_SDL2 has been deprecated, use SDL_BACKEND instead: Auto, SDL, SDL2.")
+ENDIF()
+IF(USE_OPENGL)
+	MESSAGE(WARNING "USE_OPENGL has been deprecated, use OPENGL_BACKEND instead: None, OpenGL, GLES.")
 ENDIF()
 
 IF(SDL_FOUND)
@@ -278,7 +284,6 @@ ELSE()
 	MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
 ENDIF()
 
-# FIXME: Compatibility - Remove USE_OPENGL in the future
 IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
 	IF(SDL_BACKEND STREQUAL "SDL")
 		MESSAGE(FATAL_ERROR "SDL2 is required for the OpenGL driver!")
@@ -288,7 +293,6 @@ IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
 		MESSAGE(FATAL_ERROR "OpenGL library not found!")
 	ENDIF()
 
-	# FIXME: Compatibility - Remove USE_OPENGL in the future
 	IF((OPENGL_BACKEND STREQUAL "OpenGL") OR (USE_OPENGL EQUAL 1))
 		ADD_DEFINITIONS("-DUSE_GL")
 		# Don't delete this - there is code that relies on -DUSE_OPENGL=1
@@ -302,7 +306,6 @@ IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
 		ENDIF()
 	ENDIF()
 
-	# FIXME: Compatibility - Remove USE_OPENGL in the future
 	IF((OPENGL_BACKEND STREQUAL "GLES") OR (USE_OPENGL EQUAL 2))
 		# Don't delete this - there is code that relies on -DUSE_OPENGL=2
 		SET(USE_OPENGL 2)
