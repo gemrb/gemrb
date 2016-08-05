@@ -29,6 +29,7 @@
 #include "Interface.h"
 
 #include "GUI/Control.h"
+#include "GUI/Window.h"
 
 namespace GemRB {
 
@@ -164,6 +165,11 @@ template <class T>
 bool PythonObjectCallback<T>::operator() (T*) {
 	return false;
 }
+
+template <>
+bool PythonObjectCallback<Control>::operator() (Control *);
+template <>
+bool PythonObjectCallback<WindowKeyPress>::operator() (WindowKeyPress *);
 
 }
 
