@@ -142,7 +142,7 @@ if(RC STREQUAL "")
 else()
 	set (GIT_VERSION 1)
 endif()
-MESSAGE("Git version bool: ${GIT_VERSION}")
+MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
@@ -200,9 +200,9 @@ IF(WIN32)
 		${APPVEYOR_DEP_DIR}
 	)
 	set(CMAKE_PREFIX_PATH ${APPVEYOR_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
-	message("SDLDIR: $ENV{SDLDIR}")
-	message("APPVEYOR env: ${APPVEYOR_DEP_DIR}")
-	message("APPVEYOR paths: ${APPVEYOR_DEP_SEARCH_PATH}")
+	message(STATUS "SDLDIR: $ENV{SDLDIR}")
+	message(STATUS "APPVEYOR env: ${APPVEYOR_DEP_DIR}")
+	message(STATUS "APPVEYOR paths: ${APPVEYOR_DEP_SEARCH_PATH}")
 ENDIF()
 
 # Check for all the required and optional dependencies
