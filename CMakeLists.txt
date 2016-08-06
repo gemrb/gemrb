@@ -50,7 +50,7 @@ STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GE
 if(GEMRB_VERSION STREQUAL "") # lookup failed
 	set(GEMRB_VERSION "unknown")
 endif()
-message("Detected version: ${GEMRB_VERSION}")
+message(STATUS "Detected version: ${GEMRB_VERSION}")
 unset(GLOBALS)
 
 IF(PREFIX)
