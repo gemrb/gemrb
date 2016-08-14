@@ -103,6 +103,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	str->ReadResRef( MosFile );
 	str->ReadWord( &FirstControl );
 
+	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
 	Sprite2D* bg = NULL;
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
@@ -110,7 +111,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			bg = mos->GetSprite2D();
 		}
 	}
-	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height), bg);
+	win->SetBackground(bg);
 
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");

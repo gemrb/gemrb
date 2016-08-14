@@ -58,7 +58,7 @@ public:
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	virtual bool LoadWindowPack(const ResRef&) = 0;
 	/** Creates a Window in the Window Manager */
-	Window* CreateWindow(ScriptingId winId, const Region& rgn, Sprite2D* bg) const;
+	Window* CreateWindow(ScriptingId winId, const Region& rgn) const;
 
 };
 

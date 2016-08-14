@@ -2515,17 +2515,11 @@ Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::W
 }
 
 /** Creates a Window in the Window Manager */
-Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame, char* Background)
+Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
 {
-	Sprite2D* bg = NULL;
-	if (Background[0]) {
-		ResourceHolder<ImageMgr> mos(Background);
-		if (mos != NULL) {
-			bg = mos->GetSprite2D();
-		}
-	}
-	Window* win = guifact->CreateWindow(WindowID, frame, bg);
-	return win;
+	// FIXME: this will create a window under the current "window pack"
+	// obviously its possible the id can conflict with an existing window
+	return guifact->CreateWindow(WindowID, frame);
 }
 
 bool Interface::IsFreezed()

@@ -2177,10 +2177,9 @@ PyDoc_STRVAR( GemRB_CreateWindow__doc,
 static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowID, x, y, w, h;
-	char* Background;
-	PARSE_ARGS6( args,  "iiiiis", &WindowID, &x, &y, &w, &h, &Background );
+	PARSE_ARGS5( args,  "iiiiis", &WindowID, &x, &y, &w, &h );
 
-	Window* win = core->CreateWindow( WindowID, Region(x, y, w, h), Background );
+	Window* win = core->CreateWindow( WindowID, Region(x, y, w, h) );
 	assert(win);
 
 	return gs->ConstructObjectForScriptable(win->GetScriptingRef());

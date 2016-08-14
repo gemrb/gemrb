@@ -22,12 +22,11 @@
 
 namespace GemRB {
 
-Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame, Sprite2D* bg) const
+Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame) const
 {
 	assert(winmgr);
 	Window* win = winmgr->MakeWindow(frame);
 	RegisterScriptableWindow(win, winPack, winId);
-	win->SetBackground(bg);
 	return win;
 }
 
