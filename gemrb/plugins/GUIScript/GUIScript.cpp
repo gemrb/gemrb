@@ -13456,7 +13456,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 
 	PyObject *pFunc = PyDict_GetItemString(dict, functionName);
 	/* pFunc: Borrowed reference */
-	if (!pFunc || !PyCallable_Check(pFunc)) {
+	if (!PyCallable_Check(pFunc)) {
 		if (report_error) {
 			Log(ERROR, "GUIScript", "Missing function: %s from %s", functionName, moduleName);
 		}

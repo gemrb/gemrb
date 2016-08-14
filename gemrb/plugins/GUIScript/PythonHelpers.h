@@ -73,7 +73,7 @@ struct PythonCallbackBase : public Callback<P, R> {
 	: Function(fn)
 	{
 		assert(Py_IsInitialized());
-		if (Function && PyCallable_Check(Function)) {
+		if (PyCallable_Check(Function)) {
 			Py_INCREF(Function);
 		} else {
 			Function = NULL;
@@ -145,8 +145,7 @@ public:
 			Py_DECREF(kwargs);
 			return ret;
 		} else {
-			Py_INCREF( Py_None );
-			return Py_None;
+			Py_RETURN_NONE;
 		}
 	}
 	CObject(PyObject *obj)
