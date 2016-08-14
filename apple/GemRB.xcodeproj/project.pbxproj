@@ -27,6 +27,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		71593CF91D61118300410AD3 /* PythonErrors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BA4BF61D5C177000889EE2 /* PythonErrors.cpp */; };
+		71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BA4BF71D5C177000889EE2 /* PythonErrors.h */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2042A7919DB4A6800011F05 /* TTFImporter.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A29504771609721300BB22AA /* TTFImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -1231,6 +1233,8 @@
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		71BA4BF61D5C177000889EE2 /* PythonErrors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PythonErrors.cpp; sourceTree = "<group>"; };
+		71BA4BF71D5C177000889EE2 /* PythonErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PythonErrors.h; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = osx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20574F719994857007FF22C /* libGLEW.1.10.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.1.10.0.dylib; path = /opt/local/lib/libGLEW.1.10.0.dylib; sourceTree = "<absolute>"; };
@@ -2661,6 +2665,8 @@
 		A27B86F3139F0A7D0002DC13 /* GUIScript */ = {
 			isa = PBXGroup;
 			children = (
+				71BA4BF61D5C177000889EE2 /* PythonErrors.cpp */,
+				71BA4BF71D5C177000889EE2 /* PythonErrors.h */,
 				A27B86F5139F0A7D0002DC13 /* GUIScript.cpp */,
 				A27B86F6139F0A7D0002DC13 /* GUIScript.h */,
 				A27B86F9139F0A7D0002DC13 /* PythonHelpers.h */,
@@ -3517,6 +3523,7 @@
 				A2E663E7139E884B00310FC8 /* TileMap.h in Headers */,
 				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
 				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
+				71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
 				A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */,
 				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
@@ -4768,6 +4775,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71593CF91D61118300410AD3 /* PythonErrors.cpp in Sources */,
 				A276B4D613A28B5E00D41A8A /* GUIScript.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

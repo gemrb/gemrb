@@ -21,6 +21,7 @@
 #include "GUIScript.h"
 
 #include "PythonCallbacks.h"
+#include "PythonErrors.h"
 
 #include "Audio.h"
 #include "CharAnimations.h"
@@ -121,8 +122,6 @@ static ieDword GUIAction[MAX_ACT_COUNT]={UNINIT_IEDWORD};
 static ieDword GUITooltip[MAX_ACT_COUNT]={UNINIT_IEDWORD};
 static ieResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
-static bool QuitOnError = false;
-
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
 // Like PyString_FromString(), but for ResRef
@@ -137,36 +136,6 @@ inline PyObject* PyString_FromAnimID(const char* AnimID)
 {
 	unsigned int i = strnlen(AnimID,2);
 	return PyString_FromStringAndSize( AnimID, i );
-}
-
-static PyObject* PyError(PyObject* err, const char* msg)
-{
-	PyErr_Print();
-	PyErr_SetString( err, msg );
-	if (QuitOnError) {
-		core->ExitGemRB();
-	}
-	return NULL; // must return NULL
-}
-
-/* Sets RuntimeError exception and returns NULL, so this function
- * can be called in `return'.
- */
-static PyObject* RuntimeError(const char* msg)
-{
-	Log(ERROR, "GUIScript", "Runtime Error:");
-	return PyError(PyExc_RuntimeError, msg);
-}
-
-/* Prints error msg for invalid function parameters and also the function's
- * doc string (given as an argument). Then returns NULL, so this function
- * can be called in `return'. The exception should be set by previous
- * call to e.g. PyArg_ParseTuple()
- */
-static PyObject* AttributeError(const char* doc_string)
-{
-	Log(ERROR, "GUIScript", "Syntax Error:");
-	return PyError(PyExc_AttributeError, doc_string);
 }
 
 #define GET_GAME() \
