@@ -20,7 +20,7 @@
 
 #include "GUIScript.h"
 
-#include "PythonHelpers.h"
+#include "PythonCallbacks.h"
 
 #include "Audio.h"
 #include "CharAnimations.h"
