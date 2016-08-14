@@ -21,15 +21,7 @@
 #ifndef GUISCRIPT_H
 #define GUISCRIPT_H
 
-// NOTE: Python.h has to be included first.
-
-#if defined(WIN32) && defined(_DEBUG)
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
+#include "GemPython.h"
 
 #include "ScriptEngine.h"
 
