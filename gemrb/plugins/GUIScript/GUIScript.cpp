@@ -21,6 +21,7 @@
 #include "GUIScript.h"
 
 #include "PythonCallbacks.h"
+#include "PythonConversions.h"
 #include "PythonErrors.h"
 
 #include "Audio.h"
@@ -43,7 +44,6 @@
 #include "ResourceDesc.h"
 #include "SaveGameIterator.h"
 #include "Spell.h"
-#include "TableMgr.h"
 #include "TileMap.h"
 #include "Video.h"
 #include "WorldMap.h"
@@ -124,19 +124,6 @@ static ieResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
-// Like PyString_FromString(), but for ResRef
-inline PyObject* PyString_FromResRef(char* ResRef)
-{
-	size_t i = strnlen(ResRef,sizeof(ieResRef));
-	return PyString_FromStringAndSize( ResRef, i );
-}
-
-// Like PyString_FromString(), but for ResRef
-inline PyObject* PyString_FromAnimID(const char* AnimID)
-{
-	unsigned int i = strnlen(AnimID,2);
-	return PyString_FromStringAndSize( AnimID, i );
-}
 
 #define GET_GAME() \
 	Game *game = core->GetGame(); \
@@ -260,18 +247,6 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 template <class RETURN>
 static RETURN* GetView(PyObject* obj) {
 	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
-}
-
-static Holder<TableMgr> GetTable(PyObject* obj) {
-	Holder<TableMgr> tm;
-
-	PyObject* attr = PyObject_GetAttrString(obj, "ID");
-	if (!attr) {
-		RuntimeError("Invalid Table reference, no ID attribute.");
-	} else {
-		tm = gamedata->GetTable( PyInt_AsLong( attr ) );
-	}
-	return tm;
 }
 
 static void ReadItemSounds()
