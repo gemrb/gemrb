@@ -11635,6 +11635,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
     * SV_WIDTH = 1 - screen width\n\
     * SV_HEIGHT = 2 - screen height\n\
     * SV_GAMEPATH = 3 - game path\n\
+    * SV_TOUCH = 4 - are we using touch input mode?\n\
 \n\
 **Return value:** This function returns -1 if the index is invalid.\n\
 \n\
@@ -11655,6 +11656,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_WIDTH: value = core->Width; break;
 		case SV_HEIGHT: value = core->Height; break;
 		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
+		case SV_TOUCH: value = core->GetVideoDriver()->TouchInputEnabled(); break;
 		default: value = -1; break;
 	}
 	if (path[0]) {
