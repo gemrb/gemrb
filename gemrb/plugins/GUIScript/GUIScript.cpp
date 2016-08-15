@@ -369,11 +369,10 @@ Sets the color of floating messages in GameControl. Floating messages are\n\
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
-	int r, g, b, a;
-	PARSE_ARGS4( args, "iii|i", &r, &g, &b, &a);
-
-	const Color c = {(ieByte) r,(ieByte) g,(ieByte) b,(ieByte) a};
-	core->SetInfoTextColor( c );
+	PyObject* pyColor = NULL;
+	if (PyArg_ParseTuple( args, "O", &pyColor)) {
+		core->SetInfoTextColor( ColorFromPy(pyColor) );
+	}
 	Py_RETURN_NONE;
 }
 
@@ -2149,14 +2148,16 @@ PyDoc_STRVAR( GemRB_View_SetFrame__doc,
 
 static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 {
-	int x, y, w, h;
-	PARSE_ARGS5( args,  "Oiiii", &self, &x, &y, &w, &h);
+	PyObject* pyRect = NULL;
+	PyArg_ParseTuple( args,  "OO", &self, &pyRect);
 
 	View* view = GetView<View>(self);
-	ABORT_IF_NULL(view);
+	if (view) {
+		view->SetFrame(RectFromPy(pyRect));
+		Py_RETURN_NONE;
+	}
 
-	view->SetFrame(Region(x, y, w, h));
-	Py_RETURN_NONE;
+	return AttributeError("Invalid view");
 }
 
 PyDoc_STRVAR( GemRB_View_SetBackground__doc,
@@ -2325,16 +2326,15 @@ values to the second.\n\
 static PyObject* GemRB_Button_SetOverlay(PyObject* self, PyObject* args)
 {
 	double Clipping;
-	int r1,g1,b1,a1;
-	int r2,g2,b2,a2;
-	PARSE_ARGS10( args,  "Odiiiiiiii", &self,
-		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2);
+	PyObject *pyColorSrc, *pyColorDest;
+	PARSE_ARGS4( args,  "OdOO", &self,
+		&Clipping, &pyColorSrc, &pyColorDest);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
 
-	const Color src = { (ieByte) r1, (ieByte) g1, (ieByte) b1, (ieByte) a1 };
-	const Color dest = { (ieByte) r2, (ieByte) g2, (ieByte) b2, (ieByte) a2 };
+	const Color src = ColorFromPy(pyColorSrc);
+	const Color dest = ColorFromPy(pyColorDest);
 
 	if (Clipping<0.0) Clipping = 0.0;
 	else if (Clipping>1.0) Clipping = 1.0;
@@ -2539,13 +2539,13 @@ for fonts with swapped background and text colors.\n\
 static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
 {
 	int swap = 0;
-	int r, g, b;
-	PARSE_ARGS5( args,  "Oiii|i", &self, &r, &g, &b, &swap );
+	PyObject* pyColor;
+	PARSE_ARGS3( args,  "OO|i", &self, &pyColor, &swap );
 
 	Button* but = GetView<Button>(self);
 	ABORT_IF_NULL(but);
 
-	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0}, back = {0, 0, 0, 0};
+	const Color fore = ColorFromPy(pyColor), back = {0, 0, 0, 0};
 
 	// FIXME: swap is a hack for fonts which apparently have swapped f & B
 	// colors. Maybe it depends on need_palette?
@@ -2969,13 +2969,13 @@ selects the color affected.\n\
 static PyObject* GemRB_WorldMap_SetTextColor(PyObject* self, PyObject* args)
 {
 	int which;
-	int r, g, b, a;
-	PARSE_ARGS6( args,  "Oiiiii", &self, &which, &r, &g, &b, &a );
+	PyObject* pyColor;
+	PARSE_ARGS3( args,  "OiO", &self, &which, &pyColor );
 
 	WorldMapControl* wmap = GetView<WorldMapControl>(self);
 	ABORT_IF_NULL(wmap);
 
-	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a};
+	const Color color = ColorFromPy(pyColor);
 	wmap->SetColor( which, color );
 
 	Py_RETURN_NONE;

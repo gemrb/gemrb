@@ -16,6 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+
 import GemRB
 import GameCheck
 from GUIDefines import GS_DIALOGMASK, OP_SET
@@ -23,7 +24,7 @@ from GUIDefines import GS_DIALOGMASK, OP_SET
 def SetGameGUIHidden(hide):
 	op = OP_OR if hide else OP_NAND
 	GemRB.GameSetScreenFlags(GS_HIDEGUI, op)
-	
+
 def IsGameGUIHidden():
 	return GemRB.GetGUIFlags() & GS_HIDEGUI
 
@@ -34,11 +35,12 @@ def OnIncreaseSize():
 	GSFlags = GSFlags-Expand
 	if Expand>2:
 		return
-		
+
 	global TMessageTA
 	frame = TMessageTA.GetFrame()
-	MessageWindow.SetFrame(frame['x'], frame['y'], frame['w'], frame['h'] + 100)
-	
+	frame['h'] += 100
+	MessageWindow.SetFrame(frame)
+
 	Expand = (Expand + 1)*2
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
@@ -49,10 +51,11 @@ def OnDecreaseSize():
 	GSFlags = GSFlags-Expand
 	if Expand<2:
 		return
-		
+
 	global TMessageTA
 	frame = TMessageTA.GetFrame()
-	MessageWindow.SetFrame(frame['x'], frame['y'], frame['w'], frame['h'] - 100)
+	frame['h'] -= 100
+	MessageWindow.SetFrame(frame)
 
 	Expand = Expand/2 - 1 # 6->2, 2->0
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
@@ -267,7 +270,7 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
-	
+
 	SetGameGUIHidden(hideflag)
 
 def CloseContainerWindow ():
@@ -285,7 +288,7 @@ def CloseContainerWindow ():
 		 #PST needs a reminder to redraw the  clock for some reason
 		if GUICommonWindows.ActionsWindow:
 			GUICommonWindows.ActionsWindow.Focus()
-		
+
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']

@@ -60,7 +60,7 @@ def GetWindowPack():
 
 	# fallback to the smallest resolution
 	return default
-	
+
 def AliasControls (win, map):
 	for alias, cid in map.iteritems():
 		win.GetControl(cid).AddAlias(alias)
@@ -211,7 +211,7 @@ def MakeSpellCount (pc, spell, count):
 	import Spellbook
 	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count-have, LS_MEMO)
 	return
-	
+
 # remove all class abilities up to the given level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
@@ -315,7 +315,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 
 	Control = Window.GetControl (ControlID)
 	if GameCheck.IsPST():
-		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it 
+		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it
 		Control.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
 		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
 	elif GameCheck.IsIWD2() and not Control2ID:
@@ -356,7 +356,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 			Control.SetFont ("NUMBER2");
 		else:
 			Control.SetFont ("NUMBER");
-		
+
 	return
 
 def GetActorClassTitle (actor):
@@ -713,7 +713,8 @@ def SetupDamageInfo (pc, Button, Window):
 		ratio = (hp+0.0) / hp_max
 
 	if hp < 1 or (state & STATE_DEAD):
-		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
+		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 200}
+		Button.SetOverlay (0, c, c)
 
 	if ratio == 1:
 		band = 0
@@ -734,7 +735,9 @@ def SetupDamageInfo (pc, Button, Window):
 	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
 		# draw the blood overlay
 		if hp >= 1 and not (state & STATE_DEAD):
-			Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
+			c1 = {'r' : 160, 'g' : 0, 'b' : 0, 'a' : 200}
+			c2 = {'r' : 60, 'g' : 0, 'b' : 0, 'a' : 190}
+			Button.SetOverlay (ratio, c1, c2)
 	else:
 		# scale the hp bar under the portraits and recolor it
 		# GUIHITPT has 5 frames with different severity colors
@@ -785,7 +788,7 @@ def UsingTouchInput ():
 	return GemRB.GetSystemVariable (SV_TOUCH)
 
 # return ceil(n/d)
-# 
+#
 def ceildiv (n, d):
 	if d == 0:
 		raise ZeroDivisionError("ceildiv by zero")

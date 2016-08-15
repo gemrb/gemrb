@@ -23,6 +23,54 @@
 
 namespace GemRB {
 
+/*
+ If we ever move to C++11 we can simpy use a variadic template for these...
+*/
+
+Color ColorFromPy(PyObject* obj) {
+	if (PyDict_Check(obj)) {
+		Color c;
+		PyObject* pyVal = PyDict_GetItemString(obj, "r");
+		c.r = PyInt_AsLong(pyVal);
+		pyVal = PyDict_GetItemString(obj, "g");
+		c.g = PyInt_AsLong(pyVal);
+		pyVal = PyDict_GetItemString(obj, "b");
+		c.b = PyInt_AsLong(pyVal);
+		pyVal = PyDict_GetItemString(obj, "a");
+		c.a = PyInt_AsLong(pyVal);
+		return c;
+	}
+	return Color();
+}
+
+Point PointFromPy(PyObject* obj) {
+	if (PyDict_Check(obj)) {
+		Point p;
+		PyObject* pyVal = PyDict_GetItemString(obj, "x");
+		p.x = PyInt_AsLong(pyVal);
+		pyVal = PyDict_GetItemString(obj, "y");
+		p.y = PyInt_AsLong(pyVal);
+		return p;
+	}
+	return Point();
+}
+
+Region RectFromPy(PyObject* obj) {
+	if (PyDict_Check(obj)) {
+		Region r;
+		PyObject* pyVal = PyDict_GetItemString(obj, "x");
+		r.x = int(PyInt_AsLong(pyVal));
+		pyVal = PyDict_GetItemString(obj, "y");
+		r.y = int(PyInt_AsLong(pyVal));
+		pyVal = PyDict_GetItemString(obj, "w");
+		r.w = int(PyInt_AsLong(pyVal));
+		pyVal = PyDict_GetItemString(obj, "h");
+		r.h = int(PyInt_AsLong(pyVal));
+		return r;
+	}
+	return Region();
+}
+
 Holder<TableMgr> GetTable(PyObject* obj) {
 	Holder<TableMgr> tm;
 

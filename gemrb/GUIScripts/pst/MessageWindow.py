@@ -42,7 +42,7 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(0)
-	GemRB.SetInfoTextColor(0,255,0,255)
+	GemRB.SetInfoTextColor({'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255})
 	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)

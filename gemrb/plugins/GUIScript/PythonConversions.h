@@ -23,6 +23,8 @@
 
 #include "GUIScript.h"
 
+#include "Region.h"
+#include "RGBAColor.h"
 #include "TableMgr.h"
 
 namespace GemRB {
@@ -84,6 +86,12 @@ private:
 /*
  Conversions from PyObject
 */
+
+Color ColorFromPy(PyObject* obj);
+
+Point PointFromPy(PyObject* obj);
+
+Region RectFromPy(PyObject* obj);
 
 Holder<TableMgr> GetTable(PyObject* obj);
 

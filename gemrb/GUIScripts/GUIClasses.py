@@ -67,11 +67,15 @@ class GView:
 
 	def SetSize(self, w, h):
 		r = self.GetFrame()
-		self.SetFrame(r['x'], r['y'], w, h);
+		r['w'] = w
+		r['h'] = h
+		self.SetFrame(r);
 
 	def SetPos(self, x, y):
 		r = self.GetFrame()
-		self.SetFrame(x, y, r['w'], r['h']);
+		r['x'] = x
+		r['y'] = y
+		self.SetFrame(r);
 
 	def SetVisible(self, visible):
 		self.SetFlags(IE_GUI_VIEW_INVISIBLE, OP_NAND if visible else OP_OR)
