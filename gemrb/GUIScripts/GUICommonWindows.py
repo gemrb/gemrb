@@ -1384,7 +1384,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
 	oldSlotCount = 6 + ExtraSlots
 
-	for i in range(min(oldSlotCount, MAX_PARTY_SIZE)): # the default chu/game limit or less
+	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
 		pairs[i] = Window.GetControl (i)
 
 	# nothing left to do
