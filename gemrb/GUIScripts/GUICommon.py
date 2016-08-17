@@ -807,6 +807,9 @@ def AdjustWindowVisibility (Window, pc, additionalCheck):
 		Window.SetVisible (WINDOW_GRAYED)
 	return
 
+def UsingTouchInput ():
+	return GemRB.GetSystemVariable (SV_TOUCH)
+
 # return ceil(n/d)
 # 
 def ceildiv (n, d):

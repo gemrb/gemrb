@@ -520,7 +520,11 @@ def FloatMenuSelectDialog ():
 	float_menu_index = 0
 	float_menu_selected = None
 	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
-	UpdateFloatMenuWindow ()
+	# close it immediately for touch users, since it's hard for them rightclick to close
+	if GUICommon.UsingTouchInput ():
+		OpenFloatMenuWindow ()
+	else:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectWeapons ():
@@ -529,7 +533,10 @@ def FloatMenuSelectWeapons ():
 	float_menu_index = 0
 	float_menu_selected = None
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
-	UpdateFloatMenuWindow ()
+	if GUICommon.UsingTouchInput ():
+		OpenFloatMenuWindow ()
+	else:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectItems ():
@@ -537,7 +544,10 @@ def FloatMenuSelectItems ():
 	float_menu_mode = MENU_MODE_ITEMS
 	float_menu_index = 0
 	float_menu_selected = None
-	UpdateFloatMenuWindow ()
+	if GUICommon.UsingTouchInput ():
+		OpenFloatMenuWindow ()
+	else:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectSpells ():
@@ -550,7 +560,10 @@ def FloatMenuSelectSpells ():
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
 	float_menu_selected = None
-	UpdateFloatMenuWindow ()
+	if GUICommon.UsingTouchInput ():
+		OpenFloatMenuWindow ()
+	else:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectAbilities ():
@@ -558,7 +571,10 @@ def FloatMenuSelectAbilities ():
 	float_menu_mode = MENU_MODE_ABILITIES
 	float_menu_index = 0
 	float_menu_selected = None
-	UpdateFloatMenuWindow ()
+	if GUICommon.UsingTouchInput ():
+		OpenFloatMenuWindow ()
+	else:
+		UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuPreviousItem ():
