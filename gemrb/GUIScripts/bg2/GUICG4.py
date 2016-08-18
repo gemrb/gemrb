@@ -91,22 +91,28 @@ def RollPress():
 	else:
 		e = 0
 	GemRB.SetVar("StrExtra", e)
-	for i in range(6):
-		dice = 3
-		size = 5
-		CalcLimits(i)
-		v = GemRB.Roll(dice, size, Add+3)
-		if v<Minimum:
-			v = Minimum
-		if v>Maximum:
-			v = Maximum
-		GemRB.SetVar("Ability "+str(i), v )
-		Label = AbilityWindow.GetControl(0x10000003+i)
-		if i==0 and v==18 and HasStrExtra:
-			Label.SetText("18/"+str(e) )
-		else:
-			Label.SetText(str(v) )
-		Label.SetUseRGB(1)
+
+	Total = 0
+	while (Total < 75):
+		Total = 0
+		for i in range(6):
+			dice = 3
+			size = 5
+			CalcLimits(i)
+			v = GemRB.Roll(dice, size, Add+3)
+			if v<Minimum:
+				v = Minimum
+			if v>Maximum:
+				v = Maximum
+			GemRB.SetVar("Ability "+str(i), v )
+			Total += v
+
+			Label = AbilityWindow.GetControl(0x10000003+i)
+			if i==0 and v==18 and HasStrExtra:
+				Label.SetText("18/"+str(e) )
+			else:
+				Label.SetText(str(v) )
+			Label.SetUseRGB(1)
 	return
 
 def OnLoad():
