@@ -113,6 +113,10 @@ def RollPress():
 			else:
 				Label.SetText(str(v) )
 			Label.SetUseRGB(1)
+
+	# add a counter to the title
+	SumLabel = AbilityWindow.GetControl (0x10000000)
+	SumLabel.SetText(GemRB.GetString(11976) + ": " + str(Total))
 	return
 
 def OnLoad():
