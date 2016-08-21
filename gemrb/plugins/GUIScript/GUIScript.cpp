@@ -2346,47 +2346,44 @@ static PyObject* GemRB_Button_SetOverlay(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetBorder__doc,
 "===== Button_SetBorder =====\n\
 \n\
-**Prototype:** GemRB.SetButtonBorder (WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])\n\
+**Prototype:** GemRB.SetButtonBorder (GButton, BorderIndex, Color, [enabled=0, filled=0, Rect=None])\n\
 \n\
-**Metaclass Prototype:** SetBorder (BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])\n\
+**Metaclass Prototype:** SetBorder (BorderIndex, Color, [enabled=0, filled=0, Rect=None])\n\
 \n\
 **Description:** Sets border/frame/overlay parameters for a button. This \n\
 command can be used for drawing a border around a button, or to overlay \n\
 it with a tint (like with unusable or unidentified item's icons).\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - the control's reference\n\
+  * GButton - the control's reference\n\
   * BorderIndex - 0, 1 or 2\n\
-  * dx1,dy1 - Upper left corner\n\
-  * dx2,dy2 - Offset from the lower right corner\n\
   * RGBA - red,green,blue,opacity components of the border colour\n\
   * enabled - 1 means enable it immediately\n\
   * filled - 1 means draw it filled (overlays)\n\
+  * Rect - the border rectangle (the button frame if None)\n\
 \n\
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-  GemRB.SetButtonBorder (Window, Icon, 0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)\n\
+  GemRB.SetButtonBorder (Icon, 0, color,  0, 1, rect)\n\
 Not known spells are drawn darkened (the whole button will be overlaid).\n\
-\n\
-  Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)\n\
-This will draw a green frame around the portrait.\n\
 \n\
 **See also:** [[guiscript:Button_EnableBorder]]"
 );
 
 static PyObject* GemRB_Button_SetBorder(PyObject* self, PyObject* args)
 {
-	int BorderIndex, dx1, dy1, dx2, dy2, enabled = 0, filled = 0;
-	int r, g, b, a;
-	PARSE_ARGS12( args, "Oiiiiiiiii|ii", &self,
-			   &BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled);
+	int BorderIndex, enabled = 0, filled = 0;
+	PyObject* pyColor, *pyRect = Py_None;
+	PARSE_ARGS6( args, "OiO|iiO", &self,
+			   &BorderIndex, &pyColor, &enabled, &filled, &pyRect);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
 
-	const Color color = { (ieByte) r, (ieByte) g, (ieByte) b, (ieByte) a };
-	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, color, (bool)enabled, (bool)filled );
+	Color color = ColorFromPy(pyColor);
+	Region rgn = (pyRect == Py_None) ? btn->Frame() : RectFromPy(pyRect);
+	btn->SetBorder( BorderIndex, rgn, color, enabled, filled );
 
 	Py_RETURN_NONE;
 }

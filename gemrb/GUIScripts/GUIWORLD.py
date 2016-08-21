@@ -217,7 +217,7 @@ def OpenReformPartyWindow ():
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
-		
+
 		CommonWindow.SetGameGUIHidden(hideflag)
 		#re-enabling party size control
 		GemRB.GameSetPartySize (MAX_PARTY_SIZE)
@@ -238,7 +238,8 @@ def OpenReformPartyWindow ():
 		Button = PortraitButtons[j]
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
-		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
+		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
+		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,4,4))
 		if j < len(removable_pcs):
 			Button.SetVarAssoc ("Selected", removable_pcs[j])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)

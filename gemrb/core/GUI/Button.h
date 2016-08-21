@@ -87,10 +87,7 @@ class Palette;
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
-	int dx1;
-	int dy1;
-	int dx2;
-	int dy2;
+	Region rect;
 	Color color;
 	bool filled;
 	bool enabled;
@@ -147,7 +144,7 @@ public:
 	/** Add picture to the end of the list of Pictures */
 	void StackPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
-	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled = false, bool filled = false);
+	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
 	void SetHorizontalOverlay(double clip, const Color &src, const Color &dest);
 	/** Sets font used for drawing button label */

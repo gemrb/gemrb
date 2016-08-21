@@ -90,8 +90,12 @@ def OpenInventoryWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.SetFont ("NUMBER")
 		Button.SetVarAssoc ("ItemButton", i)
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,0,0,0,0,255,128,128,64,0,1)
+
+		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+		Button.SetBorder (0,color,0,1)
+		color['r'], color['b'] = color['b'], color['r']
+		Button.SetBorde (1,color,0,1)
+
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
 
@@ -101,8 +105,12 @@ def OpenInventoryWindow ():
 		Button.SetVarAssoc ("GroundItemButton", i)
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.SetFont ("NUMBER")
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,0,0,0,0,255,128,128,64,0,1)
+
+		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+		Button.SetBorder (0,color,0,1)
+		color['r'], color['b'] = color['b'], color['r']
+		Button.SetBorder (1,color,0,1)
+
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 

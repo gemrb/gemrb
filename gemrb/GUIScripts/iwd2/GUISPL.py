@@ -87,7 +87,8 @@ def OpenSpellBookWindow ():
 	# Setup memorized spells buttons
 	for i in range (24):
 		Button = Window.GetControl (6 + i)
-		Button.SetBorder (0,0,0,0,0,0,0,0,160,0,1)
+		color = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 160}
+		Button.SetBorder (0,color,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
@@ -107,11 +108,11 @@ def OpenSpellBookWindow ():
 def SelectedNewPlayer ():
 	global ActiveSpellBooks
 	global BookTopIndex, BookCount, SelectedBook
-	
+
 	Window = SpellBookWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ActiveSpellBooks=[]
-	
+
 	for i in range(8):
 		if GemRB.GetMemorizableSpellsCount (pc, i, 0) > 0:
 			ActiveSpellBooks+=[i]
@@ -153,7 +154,7 @@ def UpdateSpellBookWindow ():
 
 	for i in range(4):
 		Button = Window.GetControl(88+i)
-		
+
 		if len(ActiveSpellBooks)>BookTopIndex+i:
 			type = ActiveSpellBooks[BookTopIndex+i]
 			Button.SetText (BookNames[type])
@@ -352,7 +353,7 @@ def OnSpellBookMemorizeSpell ():
 	level = SpellBookSpellLevel
 	type = SelectedBook
 	Window = SpellBookWindow
-	
+
 	index = GemRB.GetVar ("SpellButton") - 100
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 	if GemRB.MemorizeSpell (pc, type, level, index):

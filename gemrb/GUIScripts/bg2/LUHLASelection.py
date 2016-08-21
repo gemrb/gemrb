@@ -48,7 +48,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
 		EnhanceGUI = 1
 
-	# save our variables 
+	# save our variables
 	pc = actor
 	NumClasses = numclasses
 	Classes = classes
@@ -180,12 +180,13 @@ def HLAShowAbilities ():
 		if HLAAbilities[i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
-			SpellButton.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
+			color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
+			SpellButton.SetBorder (0, color, 1,1)
 		else:
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
-			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+			SpellButton.SetBorder (0, {}, 0,0)
 
 	# show which spells are selected
 	HLAShowSelectedAbilities ()
@@ -332,7 +333,7 @@ def GetHLAs ():
 			# make sure we have an ability here
 			if HLARef == "*":
 				print "\t\tEnd of HLAs"
-				break	
+				break
 
 			# [ref to hla, memorizable?, num memorized, pre-req ref, excluded ref]
 			SaveArray = [\
@@ -347,7 +348,7 @@ def GetHLAs ():
 				print "\t\tNot within parameters"
 				HLAAbilities.append(SaveArray)
 				continue
-		
+
 			# see if we're alignment restricted (we never get them)
 			HLAAlign = HLAClassTable.GetValue (j, 8, GTV_STR)
 			if HLAAlign == "ALL_EVIL" and GemRB.GetPlayerStat (pc, IE_ALIGNMENT) < 6:

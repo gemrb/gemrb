@@ -98,9 +98,14 @@ def OpenInventoryWindow ():
 		#This IS different from BG2
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 		Button.SetFont ("NUMBER")
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-		Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
+
+		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+		Button.SetBorder (0, color, 0, 1)
+		color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
+		Button.SetBorder (1, color, 0, 0, Button.GetInsetFrame(2))
+		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+		Button.SetBorder (2, color, 0, 1)
+
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#major & minor clothing color
@@ -157,14 +162,19 @@ def OpenInventoryWindow ():
 			#This IS different from BG2
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 			Button.SetFont ("NUMBER")
-			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-			Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
+
+			rect = Button.GetFrame()
+			color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+			Button.SetBorder (0, color, 0, 1)
+			color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+			Button.SetBorder (2, color, 0, 1)
+			color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
+			Button.SetBorder (1, color, 0, 0, Button.GetInsetFrame(2))
 
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
-	
+
 	PortraitWindow.SetVisible(True)
 	OptionsWindow.SetVisible(True)
 	Window.Focus()

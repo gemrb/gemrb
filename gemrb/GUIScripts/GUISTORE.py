@@ -269,29 +269,29 @@ def OpenStoreShoppingWindow ():
 		aliases = { 'STOLBTN' : 0, 'STORBTN' : 1, 'STODONAT' : 7,
 					'STOTEDIT' : 8, 'STOPLUS' : 9, 'STOMINUS' : 10,
 					'???' : 11, 'STOSBARR' : 16, 'STOSBARL' : 110,
-						
+
 					'PRICEB' : 0x10000003, 'PRICES' : 0x10000004,
 					'STOTITLE' : 0x10000001, 'STONAME' : 0x10000005, 'STOGOLD' : 0x10000002,
 					}
-		
+
 		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+17 for x in range(ItemButtonCount)} )
 		GUICommon.AliasControls (Window,  {'RLBL' + str(x) : x+0x10000014 for x in range(ItemButtonCount)} )
 		GUICommon.AliasControls (Window,  {'LLBL' + str(x) : x+0x1000000b for x in range(ItemButtonCount)} )
-		
+
 	else:
 		aliases = { 'STOLBTN' : 2, 'STORBTN' : 3, 'STODONAT' : 110,
 					'STOTEDIT' : 7, 'STOPLUS' : 5, 'STOMINUS' : 6,
 					'???' : 8, 'STOSBARR' : 12, 'STOSBARL' : 11,
-						
+
 					'PRICEB' : 0x1000002b, 'PRICES' : 0x1000002c,
 					'STOTITLE' : 0x10000003, 'STONAME' : 0x1000002e, 'STOGOLD' : 0x1000002a,
 					}
-					
+
 		GUICommon.AliasControls (Window,  {'RBTN' + str(x) : x+13 for x in range(ItemButtonCount)} )
 		GUICommon.AliasControls (Window,  {'RLBL' + str(x) : x+0x1000001e for x in range(ItemButtonCount)} )
 		GUICommon.AliasControls (Window,  {'LLBL' + str(x) : x+0x10000012 for x in range(ItemButtonCount)} )
 
-	
+
 	GUICommon.AliasControls (Window, aliases)
 
 	# left scrollbar
@@ -333,13 +333,15 @@ def OpenStoreShoppingWindow ():
 		Label.SetText ("0")
 
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+5)
 		if GameCheck.IsBG2():
-			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 		elif GameCheck.IsPST():
-			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
+			color = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
 		else:
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
+
+		Button = Window.GetControl (i+5)
+		Button.SetBorder (0,color,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
@@ -348,12 +350,9 @@ def OpenStoreShoppingWindow ():
 
 		Button = Window.GetControl (i+13)
 		if GameCheck.IsBG2():
-			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
-		elif GameCheck.IsPST():
-			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
-		else:
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+
+		Button.SetBorder (0,color,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
@@ -436,7 +435,7 @@ def OpenStoreIdentifyWindow ():
 		newIDs = tuple(map(lambda x: 11-x, range(ItemButtonCount)))
 		newIDs += (7, 5, 23, 0x10000003, 0x10000001, 0x10000000, 0x10000005)
 		Window.ReassignControls (oldIDs, newIDs)
-		
+
 		GUICommon.AliasControls (Window,  { 'IDSBAR' : 5, 'IDLBTN' : 4, 'IDTA' : 14,
 											'IDPRICE' : 0x10000001, '' : 0x10000000,
 											'' : 0x0fffffff, '' : 0x10000002
@@ -462,16 +461,18 @@ def OpenStoreIdentifyWindow ():
 
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+8)
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
 		elif GameCheck.IsBG1():
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
 		elif GameCheck.IsPST():
-			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
+			color = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
 		else:
-			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
+
+		Button = Window.GetControl (i+8)
+		Button.SetBorder (0, color, 0, 1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectID)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
@@ -520,24 +521,21 @@ def OpenStoreStealWindow ():
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
 	for i in range (ItemButtonCount):
-		Button = Window.GetControl (i+4)
 		if GameCheck.IsBG2():
-			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 		elif GameCheck.IsPST():
-			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
+			color = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
 		else:
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
+
+		Button = Window.GetControl (i+4)
+		Button.SetBorder (0,color,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 		Button = Window.GetControl (i+11)
-		if GameCheck.IsBG2():
-			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
-		elif GameCheck.IsPST():
-			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
-		else:
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		Button.SetBorder (0,color,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -1685,10 +1683,11 @@ def UpdateStoreHealWindow ():
 					(not dead and Spell["SpellTargetType"] == 3)):
 				# locked and shaded
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
-				Button.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
+				color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
+				Button.SetBorder (0, color, 1,1)
 			else:
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
-				Button.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+				Button.SetBorder (0, {}, 0,0)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
 			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
@@ -1697,7 +1696,7 @@ def UpdateStoreHealWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+			Button.SetBorder (0, {}, 0,0)
 			Label.SetText ("")
 
 		if TopIndex+i==Index:

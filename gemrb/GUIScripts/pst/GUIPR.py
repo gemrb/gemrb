@@ -44,10 +44,10 @@ def OpenPriestWindow ():
 			PriestWindow.Unload ()
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
+
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-		
+
 	PriestWindow = Window = GemRB.LoadWindow (3, "GUIPR")
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 
@@ -60,8 +60,8 @@ def OpenPriestWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
-
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0,  color,  0, 1)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
@@ -90,7 +90,8 @@ def UpdatePriestWindow ():
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0, color,  0, 1)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Icon.SetSpellIcon (ms['SpellResRef'])
@@ -161,15 +162,15 @@ def PriestNextLevelPress ():
 
 def OpenPriestSpellInfoWindow ():
 	global PriestSpellInfoWindow
-	
+
 	if PriestSpellInfoWindow != None:
 		if PriestSpellInfoWindow:
 			PriestSpellInfoWindow.Unload ()
 		PriestSpellInfoWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		return
-		
+
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow.ID)
 
@@ -195,7 +196,7 @@ def OpenPriestSpellInfoWindow ():
 	Text.SetText (spell['SpellDesc'])
 
 	IconResRef = 'SPL' + spell['SpellbookIcon'][2:]
-	
+
 	Icon = Window.GetControl (5)
 	Icon.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
@@ -217,15 +218,15 @@ def OnPriestMemorizeSpell ():
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
-		
+
 	if PriestSpellUnmemorizeWindow != None:
 		if PriestSpellUnmemorizeWindow:
 			PriestSpellUnmemorizeWindow.Unload ()
 		PriestSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		return
-		
+
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow.ID)
 

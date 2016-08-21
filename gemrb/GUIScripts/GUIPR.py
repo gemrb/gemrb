@@ -36,7 +36,7 @@ PriestSpellUnmemorizeWindow = None
 
 def OpenPriestWindow ():
 	import GUICommonWindows
-	
+
 	Window = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
 
 	Button = Window.GetControl (1)
@@ -59,7 +59,8 @@ def OpenPriestWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
-		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 64}
+		Button.SetBorder (0,color,0,1)
 		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)

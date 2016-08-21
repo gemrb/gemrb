@@ -309,7 +309,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			ButtonBorder *fr = &borders[i];
 			if (! fr->enabled) continue;
 
-			Region r = Region( rgn.x + fr->dx1, rgn.y + fr->dy1, rgn.w - (fr->dx1 + fr->dx2 + 1), rgn.h - (fr->dy1 + fr->dy2 + 1) );
+			const Region& frRect = fr->rect;
+			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
 			if (pulseBorder) {
 				Color mix;
 				unsigned long step = GetTickCount();
@@ -352,16 +353,13 @@ bool Button::IsAnimated() const
 	return (pulseBorder) ? true : Control::IsAnimated();
 }
 
-void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
+void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
 		return;
 
 	ButtonBorder *fr = &borders[index];
-	fr->dx1 = dx1;
-	fr->dy1 = dy1;
-	fr->dx2 = dx2;
-	fr->dy2 = dy2;
+	fr->rect = rgn;
 	fr->color = color;
 	fr->enabled = enabled;
 	fr->filled = filled;

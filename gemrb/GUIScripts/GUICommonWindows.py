@@ -100,7 +100,7 @@ else: # Baldurs Gate, Icewind Dale
 	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'AI' : 1, 'Game' : 16313, 'Party' : 16312
 	}
 	OptionControl = {
-	'Inventory' : 3, 'Map' : 1, 'Mage': 5, 'Priest': 6, 'Stats': 4, 'Journal': 2, 
+	'Inventory' : 3, 'Map' : 1, 'Mage': 5, 'Priest': 6, 'Stats': 4, 'Journal': 2,
 	'Options' : 7, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 6,
 	'Game': 0, 'Party' : 8, 'Time': 9 #not in pst
 	}
@@ -662,8 +662,11 @@ def UpdateActionsWindow ():
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		if GameCheck.IsBG1():
-			Button.SetBorder (0,6,6,4,4,0,254,0,255)
-		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+			color = {'r' : 0, 'g' : 254, 'b' :0, 'a' : 255}
+			Button.SetBorder (0, color, 0, 0, Button.GetInsetFrame(6,6,8,8))
+
+		color = {'r' : 50, 'g' : 30, 'b' :10, 'a' : 120}
+		Button.SetBorder (1, color, 0, 1)
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 		Button.SetTooltip("")
@@ -1338,7 +1341,7 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 	return
-	
+
 def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
 	if window:
@@ -1350,16 +1353,16 @@ def CloseTopWindow ():
 			#dropping on ground if cannot store in inventory
 			if GemRB.IsDraggingItem () == 1:
 				GemRB.DropDraggedItem (pc, -2)
-				
+
 		#don't go back to multi selection mode when going to the store screen
 		if not GemRB.GetVar ("Inventory"):
 			SetSelectionChangeHandler (None)
-		
+
 		window.Close()
 		return True
-	
+
 	return False
-		
+
 def OpenTopWindow (id, pack, selectionHandler = None):
 	# FIXME: is it a problem to "reopen" the window if it is already the top win?
 	# probably just wasteful to close and reopen it...
@@ -1369,17 +1372,17 @@ def OpenTopWindow (id, pack, selectionHandler = None):
 		SetTopWindow (window, selectionHandler)
 
 	return window
-		
+
 def SetTopWindow (window, selectionHandler = None):
 	if window:
 		window.AddAlias("WIN_TOP")
 		window.SetFlags(WF_BORDERLESS)
 		window.Focus()
-		
+
 		if selectionHandler:
 			import copy
 			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
-			
+
 	SetSelectionChangeHandler (selectionHandler)
 
 # returns buttons and a numerical index
@@ -1388,7 +1391,7 @@ def SetTopWindow (window, selectionHandler = None):
 # Mode determines arrangment direction, horizontal being for party reform and potentially save/load
 def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
-	
+
 	if not Window:
 		return pairs
 
@@ -1489,7 +1492,7 @@ def OpenPortraitWindow (needcontrols=0):
 		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
 	else:
 		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
-		
+
 	PortraitWindow.SetFlags(WF_BORDERLESS)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst
@@ -1571,18 +1574,20 @@ def OpenPortraitWindow (needcontrols=0):
 		# unlike other buttons, this one lacks extra frames for a selection effect
 		# so we create it and shift it to cover the grooves of the image
 		# except iwd2's second frame already has it incorporated (but we miscolor it)
+		yellow = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 255}
+		green = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
 		if GameCheck.IsIWD2():
-			Button.SetBorder (FRAME_PC_SELECTED, 0, 0, 0, 0, 0, 255, 0, 255)
-			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_SELECTED, green)
+			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
 		elif GameCheck.IsPST():
-			Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-			Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(1,1,2,2))
+			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(3,3,4,4))
 			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
 			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonHPOnPress, pcID))
 		else:
-			Button.SetBorder (FRAME_PC_SELECTED, 4, 3, 4, 3, 0, 255, 0, 255)
-			Button.SetBorder (FRAME_PC_TARGET, 2, 2, 3, 3, 255, 255, 0, 255)
+			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(4,3,4,3))
+			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
 
 	UpdatePortraitWindow ()
 	SelectionChanged ()
@@ -1742,7 +1747,7 @@ def UpdateAnimatedPortrait (Window,i):
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
 	return
-	
+
 def ButtonIndexBinder (fn, idx):
 	# returned function must take no parameters
 	return lambda: fn(idx)

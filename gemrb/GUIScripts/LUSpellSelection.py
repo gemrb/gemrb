@@ -88,7 +88,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	if kit == 0:
 		KitMask = 0x4000
 	else: # need to implement this if converted to CharGen
-		KitMask = kit 
+		KitMask = kit
 
 	if IWD2:
 		# save the spellbook type (class) that corresponds to our table
@@ -168,7 +168,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsDonePress)
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
-		
+
 	AlreadyShown = 0
 	for i in range (9):
 		# make sure we always have a value to minus (bards)
@@ -358,7 +358,7 @@ def ShowKnownSpells ():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
-		SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+		SpellButton.SetBorder (0, {}, 0,0)
 
 		SpellButton.SetSpellIcon(Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -449,15 +449,17 @@ def ShowSpells ():
 		if Spells[SpellLevel][i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
-			SpellButton.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
+			color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
+			SpellButton.SetBorder (0, color, 1, 1)
 		elif Spells[SpellLevel][i+j][1] == 1: # learnable
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
-			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+			SpellButton.SetBorder (0, {}, 0,0)
 		else: # specialist (for iwd2 which has no green frames)
 			# use the green border state for matching specialist spells
-			SpellButton.SetBorder (0, 0,0, 0,0, 0,200,0,100, 1,0)
+			color = {'r' : 0, 'g' : 200, 'b' : 0, 'a' : 100}
+			SpellButton.SetBorder (0, color, 1,0)
 			SpellButton.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	# show which spells are selected
@@ -553,7 +555,7 @@ def ShowSelectedSpells ():
 			MarkButton (j+k, 1)
 		else: # not selected
 			MarkButton (j+k, 0)
-	
+
 	# show how many spell picks are left
 	SpellPointsLeftLabel.SetText (str (SpellsSelectPointsLeft[SpellLevel]))
 	return
@@ -619,7 +621,7 @@ def SpellsPickPress ():
 	# if we don't have any points left, we can enable the done button
 	if not SpellsSelectPointsLeft[SpellLevel]:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-				
+
 	return
 
 def HasSpecialistSpell ():

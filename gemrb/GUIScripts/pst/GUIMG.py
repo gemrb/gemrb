@@ -42,13 +42,13 @@ def OpenMageWindow ():
 			MageWindow.Unload ()
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
+
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
-		
+
 	MageWindow = Window = GemRB.LoadWindow (3, "GUIMG")
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
-	
+
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
 
@@ -58,7 +58,8 @@ def OpenMageWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0,  color,  0, 1)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
@@ -85,7 +86,8 @@ def UpdateMageWindow ():
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0, color,  0, 1)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Icon.SetSpellIcon (ms['SpellResRef'])
