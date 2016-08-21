@@ -395,8 +395,8 @@ PyDoc_STRVAR( GemRB_GetGameString__doc,
 
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
-	int Index;
-	PARSE_ARGS1( args, "i", &Index );
+	int Index = -1;
+	PyArg_ParseTuple( args, "i", &Index );
 
 	switch(Index&0xf0) {
 	case 0: //game strings
@@ -444,13 +444,14 @@ The game won't be loaded before the current GUIScript function returns!\n\
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
-	PyObject *obj;
+	PyObject *obj = NULL;
 	int VersionOverride = 0;
-	PARSE_ARGS2( args, "O|i", &obj, &VersionOverride );
-
-	CObject<SaveGame> save(obj);
-	core->SetupLoadGame(save, VersionOverride);
-	Py_RETURN_NONE;
+	if (PyArg_ParseTuple( args, "O|i", &obj, &VersionOverride )) {
+		CObject<SaveGame> save(obj);
+		core->SetupLoadGame(save, VersionOverride);
+		Py_RETURN_NONE;
+	}
+	return NULL;
 }
 
 PyDoc_STRVAR( GemRB_EnterGame__doc,
@@ -530,23 +531,25 @@ to beyond the top.\n\
 static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 {
 	char* text = NULL;
-	PARSE_ARGS2( args, "Os", &self, &text);
+	PyArg_ParseTuple( args, "Os", &self, &text);
 
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
-	// insert enough newlines to push the text offscreen
-	int rowHeight = ta->GetRowHeight();
-	size_t lines = ta->Dimensions().h / rowHeight;
-	ta->AppendText(String(lines, L'\n'));
 	String* chapText = StringFromCString(text);
-	ta->AppendText(*chapText);
-	// add instead of set, because we also scroll to be out of sight so keep the newline count
-	lines += ta->RowCount();
-	delete chapText;
-	// animate the scroll: duration = 2500 * lines of text
-	ta->ScrollToY(int(rowHeight * lines), NULL, ieDword(lines * 2500));
+	if (chapText) {
+		// insert enough newlines to push the text offscreen
+		int rowHeight = ta->GetRowHeight();
+		size_t lines = ta->Dimensions().h / rowHeight;
+		ta->AppendText(String(lines, L'\n'));
+		ta->AppendText(*chapText);
+		// add instead of set, because we also scroll to be out of sight so keep the newline count
+		lines += ta->RowCount();
+		delete chapText;
+		// animate the scroll: duration = 2500 * lines of text
+		ta->ScrollToY(int(rowHeight * lines), NULL, ieDword(lines * 2500));
+	}
 	Py_RETURN_NONE;
 }
 
@@ -639,14 +642,13 @@ The above example will display 'Level: 1' in the addressed label.\n\
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
-	ieStrRef strref;
+	ieStrRef strref = -1;
 	int flags = 0;
-	PyObject* ret;
-	PARSE_ARGS2( args, "i|i", &strref, &flags );
+	PyArg_ParseTuple( args, "i|i", &strref, &flags );
 
 	char *text = core->GetCString( strref, flags );
-	ret=PyString_FromString( text );
-	core->FreeString( text );
+	PyObject* ret = (text) ? PyString_FromString( text ) : NULL;
+	free( text );
 	return ret;
 }
 
@@ -691,19 +693,19 @@ then moved by (screen size - winpack size) / 2\n\
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 {
-	int WindowID;
+	int WindowID = -1;
 	Window::WindowPosition pos = Window::PosCentered;
 	char* ref = NULL;
-	PARSE_ARGS3( args, "i|si", &WindowID, &ref, &pos );
+	PyArg_ParseTuple( args, "i|si", &WindowID, &ref, &pos );
 
 	Window* win = core->LoadWindow( WindowID, ref, pos );
-	if (!win) {
-		char buf[256];
-		snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
-		return RuntimeError(buf);
+	if (win) {
+		return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
 	}
 
-	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
+	char buf[256];
+	snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
+	return RuntimeError(buf);
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -723,8 +725,8 @@ They are currently turned on by default.\n\
 
 static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 {
-	int Flag;
-	PARSE_ARGS1( args, "i", &Flag );
+	int Flag = core->CheatEnabled();
+	PyArg_ParseTuple( args, "i", &Flag );
 	core->EnableCheatKeys( Flag );
 	Py_RETURN_NONE;
 }
@@ -1831,7 +1833,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS2( args, "Oi", &function, &rounds );
 
 	EventHandler handler = NULL;
-	if (function != Py_None && PyCallable_Check(function)) {
+	if (PyCallable_Check(function)) {
 		handler = new PythonCallback(function);
 	} else {
 		char buf[256];
@@ -1883,19 +1885,21 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
     EventButton button = 0;
     Event::EventMods mod = 0;
     short count = 0;
-	PyObject* func;
-	PARSE_ARGS6(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
+	PyObject* func = NULL;
+	PyArg_ParseTuple(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
 
 	Control* ctrl = GetView<Control>(self);
-	assert(ctrl);
+	if (ctrl) {
+		ControlEventHandler handler = NULL;
+		if (PyCallable_Check(func)) {
+			handler = new PythonControlCallback(func);
+		}
+		ctrl->SetAction(handler, type, button, mod, count);
 
-	ControlEventHandler handler = NULL;
-	if (func != Py_None && PyCallable_Check(func)) {
-		handler = new PythonControlCallback(func);
+		Py_RETURN_NONE;
 	}
-    ctrl->SetAction(handler, type, button, mod, count);
 
-	Py_RETURN_NONE;
+	return AttributeError("Invalid Control");
 }
 
 PyDoc_STRVAR( GemRB_Control_SetActionInterval__doc,
@@ -2269,36 +2273,39 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 {
 	int cycle, unpressed, pressed, selected, disabled;
 	char *ResRef;
-	PARSE_ARGS7( args, "Osiiiii", &self,
-			   &ResRef, &cycle, &unpressed, &pressed, &selected, &disabled );
+	if (PyArg_ParseTuple( args, "Osiiiii", &self,
+						  &ResRef, &cycle, &unpressed,
+						  &pressed, &selected, &disabled )
+	) {
+		Button* btn = GetView<Button>(self);
+		ABORT_IF_NULL(btn);
 
-	Button* btn = GetView<Button>(self);
-	ABORT_IF_NULL(btn);
+		if (ResRef[0] == 0) {
+			btn->SetImage( BUTTON_IMAGE_NONE, NULL );
+			Py_RETURN_NONE;
+		}
 
-	if (ResRef[0] == 0) {
-		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
+		AnimationFactory* af = ( AnimationFactory* )
+			gamedata->GetFactoryResource( ResRef,
+					IE_BAM_CLASS_ID, IE_NORMAL );
+		if (!af) {
+			char tmpstr[24];
+
+			snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
+			return RuntimeError( tmpstr );
+		}
+		Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
+		btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
+		tspr = af->GetFrame( pressed, (unsigned char) cycle);
+		btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
+		tspr = af->GetFrame( selected, (unsigned char) cycle);
+		btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
+		tspr = af->GetFrame( disabled, (unsigned char) cycle);
+		btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
+
 		Py_RETURN_NONE;
 	}
-
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( ResRef,
-				IE_BAM_CLASS_ID, IE_NORMAL );
-	if (!af) {
-		char tmpstr[24];
-
-		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
-		return RuntimeError( tmpstr );
-	}
-	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
-	btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
-	tspr = af->GetFrame( pressed, (unsigned char) cycle);
-	btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-	tspr = af->GetFrame( selected, (unsigned char) cycle);
-	btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-	tspr = af->GetFrame( disabled, (unsigned char) cycle);
-	btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
-
-	Py_RETURN_NONE;
+	return AttributeError("Unable to parse arguments.");
 }
 
 PyDoc_STRVAR( GemRB_Button_SetOverlay__doc,
@@ -11621,7 +11628,7 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
 	int tooltipDelay;
-	PARSE_ARGS1(args, "i", &tooltipDelay);
+	PyArg_ParseTuple(args, "i", &tooltipDelay);
 	// FIXME: reimplement this
 	Py_RETURN_NONE;
 }
@@ -11898,9 +11905,12 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref2 = NULL;
 	const char *resref3 = NULL;
 	const char *source = NULL;
-	PARSE_ARGS9( args, "isii|ssssi",
+	if (!PyArg_ParseTuple( args, "isii|ssssi",
 			   &globalID, &opcodename, &param1, &param2,
-			   &resref1, &resref2, &resref3, &source, &timing);
+			   &resref1, &resref2, &resref3, &source, &timing)
+	) {
+		return NULL;
+	}
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -12418,21 +12428,18 @@ This is useful for things like running a twisted reactor.\n\
 static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 {
 	Timer::TimeInterval interval = 0;
-	PyObject* function;
-	PARSE_ARGS2(args, "O|i", &function, &interval);
+	PyObject* function = NULL;
+	PyArg_Parse(args, "O|i", &function, &interval);
 
-	EventHandler handler = NULL;
-	if (function != Py_None && PyCallable_Check(function)) {
-		handler = new PythonCallback(function);
+	if (PyCallable_Check(function)) {
+		EventHandler handler = new PythonCallback(function);
+		core->SetTimer(handler, interval);
+		Py_RETURN_NONE;
 	} else {
 		char buf[256];
 		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
 		return RuntimeError(buf);
 	}
-
-	core->SetTimer(handler, interval);
-
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_SetupMaze__doc,
