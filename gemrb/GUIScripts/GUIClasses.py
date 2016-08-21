@@ -77,6 +77,14 @@ class GView:
 		r['y'] = y
 		self.SetFrame(r);
 
+	def GetInsetFrame(self, x, y = None, w = None, h = None):
+		frame = self.GetFrame()
+		frame['x'] += x
+		frame['y'] += x if y is None else y
+		frame['w'] -= x*2 if w is None else w*2
+		frame['h'] -= x*2 if h is None else h*2
+		return frame
+
 	def SetVisible(self, visible):
 		self.SetFlags(IE_GUI_VIEW_INVISIBLE, OP_NAND if visible else OP_OR)
 
