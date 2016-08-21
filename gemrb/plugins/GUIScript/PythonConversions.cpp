@@ -30,14 +30,15 @@ namespace GemRB {
 Color ColorFromPy(PyObject* obj) {
 	if (PyDict_Check(obj)) {
 		Color c;
+		// use _signed_ version of Clamp because PyInt_AsLong may return -1 on error and we would like this to = 0
 		PyObject* pyVal = PyDict_GetItemString(obj, "r");
-		c.r = PyInt_AsLong(pyVal);
+		c.r = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
 		pyVal = PyDict_GetItemString(obj, "g");
-		c.g = PyInt_AsLong(pyVal);
+		c.g = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
 		pyVal = PyDict_GetItemString(obj, "b");
-		c.b = PyInt_AsLong(pyVal);
+		c.b = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
 		pyVal = PyDict_GetItemString(obj, "a");
-		c.a = PyInt_AsLong(pyVal);
+		c.a = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
 		return c;
 	}
 	return Color();
