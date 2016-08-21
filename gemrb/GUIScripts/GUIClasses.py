@@ -22,7 +22,7 @@ import CreateControlDecorators
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper
-from GemRB import GetControl
+from GemRB import GetView, CreateView, RemoveView
 
 def CreateControlDecorator(func):
 	wrapper = getattr(CreateControlDecorators, func.__name__, None)
@@ -57,7 +57,7 @@ class GView:
 	__metaclass__ = metaIDWrapper
 	methods = {
 	'AddAlias': _GemRB.View_AddAlias,
-    'CreateControl': _GemRB.View_CreateControl,
+	'AddSubview': _GemRB.View_AddSubview,
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
@@ -91,9 +91,20 @@ class GView:
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
 
+	def CreateControl(self, id, type, x, y, w, h, *args): # backwards compatibility
+		frame = {"x" : x, "y" : y, "w" : w, "h" : h}
+		return self.CreateSubview(id, type, frame, *args)
+
+	def CreateSubview(self, id, type, frame, *args):
+		view = CreateView(id, type, frame, *args)
+		self.AddSubview(view)
+		return view
+
+	def RemoveSubview(self, view):
+		RemoveView(view, False)
+
 class GWindow(GView):
   methods = {
-    'DeleteControl': _GemRB.Window_DeleteControl,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
     'Focus': _GemRB.Window_Focus,
@@ -103,16 +114,19 @@ class GWindow(GView):
   def __nonzero__(self):
     return self.ID != -1
 
+  def DeleteControl(self, view): # backwards compatibility
+	RemoveView(view, True)
+
+  def GetControl(self, id): # backwards compatibility
+	return GetView(self, id)
+
   def Unload(self): # backwards compatibility
-	  self.Close()
+	self.Close()
 
   def Close(self):
-    if self.ID != -1:
-      _GemRB.Window_Close(self)
-      self.ID = -1
-
-  def GetControl(self, id):
-	  return GetControl(id, self)
+	if self.ID != -1:
+		RemoveView(self, False)
+		self.ID = -1
 
   @CreateControlDecorator
   def CreateWorldMapControl(self, control, *args):

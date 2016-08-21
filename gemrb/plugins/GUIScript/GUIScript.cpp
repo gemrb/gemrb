@@ -244,7 +244,7 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 	return gs->GetScripingRef(group, id);
 }
 
-template <class RETURN>
+template <class RETURN=View>
 static RETURN* GetView(PyObject* obj) {
 	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
 }
@@ -1214,176 +1214,28 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 	return NULL;
 }
 
-PyDoc_STRVAR( GemRB_View_CreateControl__doc,
-			 "CreateControl(Superview, ControlType, ControlType[, params]) => GControl\n\n"
-			 "Returns the control as an object." );
+PyDoc_STRVAR( GemRB_View_AddSubview__doc,
+			 "CreateControl(superview, subview [,siblingView=None])\n\n"
+			 "Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any)." );
 
-static PyObject* GemRB_View_CreateControl(PyObject* self, PyObject* args)
+static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 {
-	int type = -1, ControlID = -1;
-	Region rgn;
-	PyObject* constructArgs = NULL;
-	PARSE_ARGS8(args, "Oiiiiii|O",
-			   &self, &ControlID, &type,
-			   &rgn.x, &rgn.y, &rgn.w, &rgn.h, &constructArgs);
+	PyObject* pySubview = NULL;
+	PyObject* pySiblingView = Py_None;
+	PyArg_ParseTuple(args, "OO|O", &self, &pySubview, &pySiblingView);
 
-	View* superview = GetView<View>(self);
-	Window* win = dynamic_cast<Window*>(superview);
-	if (!win) { // control view
-		Control* ctrl = dynamic_cast<Control*>(superview);
-		assert(ctrl);
-		win = ctrl->GetWindow();
+	View* superView = GetView(self);
+	View* subView = GetView(pySubview);
+	View* siblingView = GetView(pySiblingView);
+	if (superView && subView) {
+		superView->AddSubviewInFrontOfView(subView, siblingView);
+		// FIXME?: Should we also reassign the scripting ref?
+		// we don't have a need to right now,
+		// but it could be confusing if we start moving controls between windows
+		Py_RETURN_NONE;
 	}
 
-	Control* ctrl = NULL;
-	switch (type) {
-		case IE_GUI_EDIT:
-			{
-				char *font, *cstr;
-				PARSE_ARGS2( constructArgs, "ss", &font, &cstr );
-
-				TextEdit* edit = new TextEdit(rgn, 500, Point());
-				edit->SetFont( core->GetFont( font ) );
-				edit->ControlID = ControlID;
-				String* text = StringFromCString(cstr);
-				edit->Control::SetText( text );
-				delete text;
-
-				Sprite2D* spr = core->GetCursorSprite();
-				edit->SetCursor( spr );
-				ctrl = edit;
-			}
-			break;
-		case IE_GUI_TEXTAREA:
-			{
-				char *font;
-				PARSE_ARGS1( constructArgs, "s", &font );
-				ctrl = new TextArea(rgn, core->GetFont( font ));
-			}
-			break;
-		case IE_GUI_LABEL:
-			{
-				int align;
-				char *font, *text;
-				PARSE_ARGS3( constructArgs,
-						   "ssi", &font, &text, &align );
-
-				String* string = StringFromCString(text);
-				Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
-				delete string;
-
-				lbl->SetAlignment( align );
-				ctrl = lbl;
-			}
-			break;
-		case IE_GUI_SCROLLBAR:
-			{
-				char* resRef;
-
-				// hidden parameters from CreateScrollBar decorator
-				int cycle, up, upPr, down, downPr, trough, slider;
-				PARSE_ARGS8( constructArgs, "siiiiiii",
-								 &resRef, &cycle, &up, &upPr, &down, &downPr, &trough, &slider );
-
-				AnimationFactory* af = ( AnimationFactory* )
-				gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
-				if (!af) {
-					char tmpstr[24];
-
-					snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
-					return RuntimeError( tmpstr );
-				}
-
-				Sprite2D* images[ScrollBar::IMAGE_COUNT];
-				images[ScrollBar::IMAGE_UP_UNPRESSED] = af->GetFrame( up, cycle );
-				images[ScrollBar::IMAGE_UP_PRESSED] = af->GetFrame( upPr, cycle );
-				images[ScrollBar::IMAGE_DOWN_UNPRESSED] = af->GetFrame( down, cycle );
-				images[ScrollBar::IMAGE_DOWN_PRESSED] = af->GetFrame( downPr, cycle );
-				images[ScrollBar::IMAGE_TROUGH] = af->GetFrame( trough, cycle );
-				images[ScrollBar::IMAGE_SLIDER] = af->GetFrame( slider, cycle );
-
-				ctrl = new ScrollBar(rgn, images);
-			}
-			break;
-		case IE_GUI_MAP:
-			{
-				int LabelID;
-				char *Flag = NULL;
-				char *Flag2 = NULL;
-
-				if (!PyArg_ParseTuple( constructArgs, "Invalid parameters for Map",
-									  "is|s", &LabelID, &Flag, &Flag2))
-				{
-					Flag = NULL;
-					PyErr_Clear(); //clearing the exception
-				}
-
-				Control* c = GetControl(ControlID, win);
-				if (c) {
-					rgn = c->Frame();
-					// do *not* delete the existing control, we want to replace
-					// it in the sort order!
-					//win->DelControl( CtrlIndex );
-				}
-
-				MapControl* map = new MapControl(rgn);
-				if (Flag2) { //pst flavour
-					map->convertToGame = false;
-					Control *lc = GetControl(LabelID, win);
-					map->LinkedLabel = lc;
-					ResourceHolder<ImageMgr> anim(Flag);
-					if (anim) {
-						map->Flag[0] = anim->GetSprite2D();
-					}
-					ResourceHolder<ImageMgr> anim2(Flag2);
-					if (anim2) {
-						map->Flag[1] = anim2->GetSprite2D();
-					}
-				} else if (Flag) {
-					Control *lc = GetControl(LabelID, win);
-					map->LinkedLabel = lc;
-					AnimationFactory* af = ( AnimationFactory* )
-					gamedata->GetFactoryResource( Flag, IE_BAM_CLASS_ID, IE_NORMAL );
-					if (af) {
-						for (int i=0;i<8;i++) {
-							map->Flag[i] = af->GetFrame(0,i);
-						}
-
-					}
-				}
-				ctrl = map;
-			}
-			break;
-		case IE_GUI_WORLDMAP:
-			{
-				int direction, recolor = 0;
-				char *font = NULL;
-				PARSE_ARGS3( constructArgs,
-						   "i|si", &direction, &font, &recolor );
-
-				ctrl = GetControl(ControlID, win);
-				if (ctrl) {
-					rgn = ctrl->Frame();
-					//flags = ctrl->Value;
-					delete win->RemoveSubview( ctrl );
-				}
-
-				ctrl = new WorldMapControl(rgn, font?font:"", direction );
-			}
-			break;
-		default:
-			switch (type) {
-				case IE_GUI_BUTTON:
-					ctrl = new Button(rgn);
-					break;
-			}
-			break;
-	}
-
-	assert(ctrl);
-	superview->AddSubviewInFrontOfView( ctrl );
-	RegisterScriptableControl(ctrl, ControlID);
-	return gs->ConstructObjectForScriptable( ctrl->GetScriptingRef() );
+	return AttributeError("Invalid view parameters.");
 }
 
 PyDoc_STRVAR( GemRB_View_AddAlias__doc,
@@ -1407,46 +1259,25 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetView__doc,
-			 "GetView(Group [, ID]) => GControl\n\n"
-			 "Lookup view from scripting engine\n"
+			 "GetView(GWindow|Alias, ID) => GView\n\n"
+			 "Lookup view from either a window or from an alias\n"
 			 "Returns a view as an object." );
 
 static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 {
-	char* resref = NULL;
+	// for convinience we allow an alias to default to the lowest valid id
+	// the typical use case is typically wanting to specify a string name for a single control
 	ScriptingId id = 0;
-	PARSE_ARGS2( args, "s|l", &resref, &id );
-
-	ScriptingRefBase* ref = ScriptEngine::GetScripingRef(resref, id);
-	if (ref) {
-		return gs->ConstructObjectForScriptable(ref);
-	}
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_GetControl__doc,
-			 "GetControl(ControlID, GWindow|Alias) => GControl\n\n"
-			 "Lookup control from either a window or from an alias\n"
-			 "Returns a control as an object." );
-
-static PyObject* GemRB_GetControl(PyObject* /*self*/, PyObject* args)
-{
-	ScriptingId controlId = ScriptEngine::InvalidId;
 	PyObject* lookup = NULL;
-	PARSE_ARGS2( args, "lO", &controlId, &lookup );
+	PARSE_ARGS2( args, "O|l", &lookup, &id );
 
 	ScriptingRefBase* ref = NULL;
 	if (PyString_Check(lookup)) {
-		if (controlId == ScriptEngine::InvalidId) {
-			// for convinience we allow an alias to default to the lowest valid id
-			// the typical use case is typically wanting to specify a string name for a single control
-			controlId = 0;
-		}
-		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), controlId);
+		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), id);
 	} else {
 		Window* win = GetView<Window>(lookup);
 		assert(win);
-		ref = GetControlRef(controlId, win);
+		ref = GetControlRef(id, win);
 	}
 
 	if (ref) {
@@ -2088,48 +1919,201 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_Close__doc,
-"CloseWindow(GWindow)\n\n"
-"Closes a window." );
+PyDoc_STRVAR( GemRB_RemoveView__doc,
+"RemoveView(GView [,delete])\n\n"
+"Remove a view from its superview and optionally delete it." );
 
-static PyObject* GemRB_Window_Close(PyObject* self, PyObject* args)
+static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 {
-	PARSE_ARGS1(args, "O", &self);
-	Window* win = GetView<Window>(self);
-	if (win) {
-		win->Close();
+	int del = true;
+	PyObject* pyView = NULL;
+	PyArg_ParseTuple(args, "O|i", &pyView, &del);
+
+	View* view = GetView(pyView);
+	if (view) {
+		if (view->RemoveFromSuperview() == NULL) {
+			// might be a window
+			Window* win = dynamic_cast<Window*>(view);
+			if (win) {
+				win->Close();
+				view = NULL; // so that delete has no effect, window manager will dispose of it
+			}
+		}
+		if (del) {
+			delete view;
+		}
+		Py_RETURN_NONE;
 	}
-	// dont bother erroring out if the window didnt exist; makes GUIScripts simpler
-	Py_RETURN_NONE;
+	return AttributeError("Invalid view");
 }
 
-PyDoc_STRVAR( GemRB_CreateWindow__doc,
-"===== CreateWindow =====\n\
-\n\
-**Prototype:** GemRB.CreateWindow (WindowID, X, Y, Width, Height, MosResRef)\n\
-\n\
-**Description:** Creates a new empty window and returns its index.\n\
-\n\
-**Parameters:** \n\
-  * WindowID - the window's ID\n\
-  * X, Y - the window's position\n\
-  * Width, Height - the window's dimensions\n\
-  * MosResRef - the background image (.mos image)\n\
-\n\
-**Return value:** a window index\n\
-\n\
-**See also:**"
-);
+PyDoc_STRVAR( GemRB_CreateView__doc,
+ "===== CreateView =====\n\
+ \n\
+ **Prototype:** GemRB.CreateWindow (WindowID, Rect)\n\
+ \n\
+ **Description:** Creates a new empty view and returns it.\n\
+ \n\
+ **Parameters:** \n\
+ * WindowID - the window's ID\n\
+ * Rect - the view's frame\n\
+ \n\
+ **Return value:** GView\n\
+ \n\
+ **See also:**"
+ );
 
-static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 {
-	int WindowID, x, y, w, h;
-	PARSE_ARGS5( args,  "iiiiis", &WindowID, &x, &y, &w, &h );
+	int type = -1, id = -1;
+	PyObject* pyRect;
+	PyObject* constructArgs = NULL;
+	PARSE_ARGS4(args, "iiO|O",
+				&id, &type,
+				&pyRect, &constructArgs);
 
-	Window* win = core->CreateWindow( WindowID, Region(x, y, w, h) );
-	assert(win);
+	Region rgn = RectFromPy(pyRect);
+	View* view = NULL;
+	switch (type) {
+		case IE_GUI_EDIT:
+		{
+			char *font, *cstr;
+			PARSE_ARGS2( constructArgs, "ss", &font, &cstr );
 
-	return gs->ConstructObjectForScriptable(win->GetScriptingRef());
+			TextEdit* edit = new TextEdit(rgn, 500, Point());
+			edit->SetFont( core->GetFont( font ) );
+			String* text = StringFromCString(cstr);
+			edit->Control::SetText( text );
+			delete text;
+
+			Sprite2D* spr = core->GetCursorSprite();
+			edit->SetCursor( spr );
+			view = edit;
+		}
+			break;
+		case IE_GUI_TEXTAREA:
+		{
+			char *font;
+			PARSE_ARGS1( constructArgs, "s", &font );
+			view = new TextArea(rgn, core->GetFont( font ));
+		}
+			break;
+		case IE_GUI_LABEL:
+		{
+			int align;
+			char *font, *text;
+			PARSE_ARGS3( constructArgs,
+						"ssi", &font, &text, &align );
+
+			String* string = StringFromCString(text);
+			Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
+			delete string;
+
+			lbl->SetAlignment( align );
+			view = lbl;
+		}
+			break;
+		case IE_GUI_SCROLLBAR:
+		{
+			char* resRef;
+
+			// hidden parameters from CreateScrollBar decorator
+			int cycle = 0;
+			PyObject* pyImgList = NULL;
+			PARSE_ARGS3( constructArgs, "siO",
+						&resRef, &cycle, &pyImgList );
+
+			AnimationFactory* af = ( AnimationFactory* )
+			gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
+			if (!af) {
+				char tmpstr[24];
+
+				snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
+				return RuntimeError( tmpstr );
+			}
+
+			Sprite2D* images[ScrollBar::IMAGE_COUNT];
+			for(int i=0; i < ScrollBar::IMAGE_COUNT; i++) {
+				long frame = PyInt_AsLong( PyList_GetItem(pyImgList, i));
+				if (PyErr_Occurred()) {
+					PyErr_Print();
+					return AttributeError("Error retrieving image from list");
+				}
+				images[i] = af->GetFrame( frame, cycle );
+			}
+
+			view = new ScrollBar(rgn, images);
+		}
+			break;
+		case IE_GUI_MAP:
+		{
+			int LabelID;
+			char *Flag = NULL;
+			char *Flag2 = NULL;
+
+			if (!PyArg_ParseTuple( constructArgs, "Invalid parameters for Map",
+								  "is|s", &LabelID, &Flag, &Flag2))
+			{
+				Flag = NULL;
+				PyErr_Clear(); //clearing the exception
+			}
+
+			MapControl* map = new MapControl(rgn);
+			if (Flag2) { //pst flavour
+				map->convertToGame = false;
+
+				ResourceHolder<ImageMgr> anim(Flag);
+				if (anim) {
+					map->Flag[0] = anim->GetSprite2D();
+				}
+				ResourceHolder<ImageMgr> anim2(Flag2);
+				if (anim2) {
+					map->Flag[1] = anim2->GetSprite2D();
+				}
+			} else if (Flag) {
+				AnimationFactory* af = ( AnimationFactory* )
+				gamedata->GetFactoryResource( Flag, IE_BAM_CLASS_ID, IE_NORMAL );
+				if (af) {
+					for (int i=0;i<8;i++) {
+						map->Flag[i] = af->GetFrame(0,i);
+					}
+
+				}
+			}
+			view = map;
+		}
+			break;
+		case IE_GUI_WORLDMAP:
+		{
+			int direction, recolor = 0;
+			char *font = NULL;
+			PARSE_ARGS3( constructArgs, "i|si", &direction, &font, &recolor );
+
+			view = new WorldMapControl(rgn, font?font:"", direction );
+		}
+			break;
+		case IE_GUI_BUTTON:
+			switch (type) {
+				case IE_GUI_BUTTON:
+					view = new Button(rgn);
+					break;
+			}
+			break;
+		case IE_GUI_INVALID:
+			view = core->CreateWindow(id, rgn);
+		default:
+			view = new View(rgn);
+			break;
+	}
+
+	assert(view);
+
+	if (type < IE_GUI_INVALID) {
+		// this is a control
+		RegisterScriptableControl(static_cast<Control*>(view), id);
+	}
+
+	return gs->ConstructObjectForScriptable(view->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
@@ -2558,40 +2542,6 @@ static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
 	else
 		but->SetTextColor( back, fore );
 
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Window_DeleteControl__doc,
-"===== Window_DeleteControl =====\n\
-\n\
-**Prototype:** GemRB.DeleteControl (WindowIndex, ControlID)\n\
-\n\
-**Metaclass Prototype:** DeleteControl (ControlID)\n\
-\n\
-**Description:** Deletes a control from a Window.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex - the return value of a previous LoadWindow call.\n\
-  * ControlID   - a control ID, see the .chu file specification\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Window_GetControl]]"
-);
-
-static PyObject* GemRB_Window_DeleteControl(PyObject* self, PyObject* args)
-{
-	int ControlID;
-	PARSE_ARGS2(args, "Oi", &self, &ControlID);
-
-	Window* win = GetView<Window>(self);
-	assert(win);
-
-	Control* ctrl = GetControl(ControlID, win);
-	if (ctrl) {
-		delete win->RemoveSubview(ctrl);
-	}
 
 	Py_RETURN_NONE;
 }
@@ -12873,7 +12823,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateMovement, METH_VARARGS),
 	METHOD(CreatePlayer, METH_VARARGS),
 	METHOD(CreateString, METH_VARARGS),
-	METHOD(CreateWindow, METH_VARARGS),
+	METHOD(CreateView, METH_VARARGS),
+	METHOD(RemoveView, METH_VARARGS),
 	METHOD(DeleteSaveGame, METH_VARARGS),
 	METHOD(DispelEffect, METH_VARARGS),
 	METHOD(DisplayString, METH_VARARGS),
@@ -12916,7 +12867,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GetAvatarsValue, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
-	METHOD(GetControl, METH_VARARGS),
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
@@ -13121,13 +13071,11 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),
 	METHOD(View_AddAlias, METH_VARARGS),
+	METHOD(View_AddSubview, METH_VARARGS),
 	METHOD(View_GetFrame, METH_VARARGS),
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
-	METHOD(View_CreateControl, METH_VARARGS),
-	METHOD(Window_Close, METH_VARARGS),
-	METHOD(Window_DeleteControl, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
