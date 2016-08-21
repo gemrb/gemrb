@@ -285,6 +285,15 @@ View* View::RemoveSubview(const View* view)
 	return subView;
 }
 
+View* View::RemoveFromSuperview()
+{
+	View* super = superView;
+	if (super) {
+		super->RemoveSubview(this);
+	}
+	return super;
+}
+
 void View::SubviewAdded(View* view, View* parent)
 {
 	if (superView) {

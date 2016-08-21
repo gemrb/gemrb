@@ -129,6 +129,7 @@ public:
 
 	void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
+	View* RemoveFromSuperview();
 	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 	Window* GetWindow() const;
 
