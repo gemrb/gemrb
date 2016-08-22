@@ -374,8 +374,9 @@ def OpenLevelUpWindow():
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
-	if Spellbook.HasSorcererBook (pc, Classes[0]) and DeltaWSpells > 0:
-		LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
+	for c in range(len(Classes)):
+		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
+			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
 
 def HideSkills(i):
 	"""Hides the given skill label from view."""
