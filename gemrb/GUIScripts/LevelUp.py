@@ -245,6 +245,10 @@ def OpenLevelUpWindow():
 			Specialist = 0
 			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
+
+			if Spellbook.HasSorcererBook (pc, Classes[i]):
+				MageTable = "SPLSRCKN"
+
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
 			for j in range (MageTable.GetColumnCount ()):
