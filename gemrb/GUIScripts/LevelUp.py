@@ -246,7 +246,7 @@ def OpenLevelUpWindow():
 			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
 
-			if Spellbook.HasSorcererBook (pc, Classes[0]):
+			if Spellbook.HasSorcererBook (pc, Classes[i]):
 				MageTable = "SPLSRCKN"
 
 			MageTable = GemRB.LoadTable (MageTable)
