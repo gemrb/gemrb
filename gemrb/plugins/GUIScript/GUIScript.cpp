@@ -5301,12 +5301,12 @@ PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
 \n\
 **Prototype:** GemRB.SetButtonBAM (WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\
 \n\
-**Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex, col1)\n\
+**Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex[, col1])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a BAM file. If \n\
-the supplied color gradient value is -1, then no palette change, if it is \n\
->=0, then it changes the 4-16 palette entries of the bam. Since it uses 12 \n\
-colors palette, it has issues in PST.\n\
+the supplied color gradient value is the default -1, then no palette change, \n\
+if it is >=0, then it changes the 4-16 palette entries of the bam. Since it \n\
+uses 12 colors palette, it has issues in PST.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
