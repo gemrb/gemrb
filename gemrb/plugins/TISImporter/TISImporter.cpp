@@ -52,7 +52,7 @@ bool TISImporter::Open(DataStream* stream)
 	headerShift = 0;
 	if (Signature[0] == 'T' && Signature[1] == 'I' && Signature[2] == 'S') {
 		if (strncmp( Signature, "TIS V1  ", 8 ) != 0) {
-			print("[TISImporter]: Not a Valid TIS File.");
+			Log(ERROR, "TISImporter", "Not a Valid TIS file!");
 			return false;
 		}
 		str->ReadDword( &TilesCount );
