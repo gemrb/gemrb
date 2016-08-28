@@ -5204,9 +5204,9 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPLT__doc,
 "===== Button_SetPLT =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8, type)\n\
+**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
 \n\
-**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8, type)\n\
+**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a PLT file. \n\
 Sets up the palette based on the eight given gradient colors.\n\
