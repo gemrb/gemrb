@@ -3845,7 +3845,9 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 
 	//do this once
-	target->fxqueue.RemoveAllEffects(fx_bane_ref);
+	if (fx->FirstApply) {
+		target->fxqueue.RemoveAllEffects(fx_bane_ref);
+	}
 
 	STATE_SET( STATE_BLESS );
 	target->SetSpellState(SS_BLESS);
