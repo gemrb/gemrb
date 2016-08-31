@@ -400,7 +400,6 @@ private:
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
-	void ApplyModal(ieResRef modalSpell);
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
 public:
@@ -620,6 +619,8 @@ public:
 	void SetModal(ieDword newstate, bool force=1);
 	/* Sets the modal spell after checks */
 	void SetModalSpell(ieDword state, const char *spell);
+	/* casts the modal spell if any */
+	void ApplyModal(ieResRef modalSpell);
 	/* returns current attack style */
 	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
