@@ -2072,3 +2072,11 @@ def RestPress ():
 def RealRestPress ():
 	GemRB.RestParty(0, 0, 1)
 	return
+
+def SwitchPCByKey (wIdx, key, mod):
+	if key >= 49 and key <= 54:
+		GemRB.GameSelectPCSingle(key - 48)
+		RunSelectionChangeHandler ()
+		return 1
+	return 0
+

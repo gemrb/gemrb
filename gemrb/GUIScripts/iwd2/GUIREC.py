@@ -99,6 +99,8 @@ def OpenRecordsWindow ():
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 	Window.SetFrame ()
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
 	if not HateRaceTable:

@@ -90,6 +90,8 @@ def OpenInventoryWindow ():
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
 	Window.SetFrame ()
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
