@@ -121,6 +121,11 @@ bool BAMImporter::Open(DataStream* stream)
 		palette->col[i].b = rc.b;
 		palette->col[i].a = rc.a;
 	}
+	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
+	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
+		palette->col[1].r = palette->col[1].g = palette->col[1].b = 35;
+		palette->col[1].a = 200;
+	}
 
 	return true;
 }
