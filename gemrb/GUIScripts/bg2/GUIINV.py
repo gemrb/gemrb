@@ -176,6 +176,7 @@ def OpenInventoryWindow ():
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
 	return
 
 def UpdateInventoryWindow ():
