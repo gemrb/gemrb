@@ -63,6 +63,7 @@ bool PLTImporter::Open(DataStream* str)
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "PLT V1  ", 8 ) != 0) {
 		Log(WARNING, "PLTImporter", "Not a valid PLT File.");
+		core->UseCorruptedHack = true;
 		return false;
 	}
 

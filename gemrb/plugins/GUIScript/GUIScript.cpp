@@ -5254,7 +5254,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	ResourceHolder<PalettedImageMgr> im(ResRef);
+	ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )

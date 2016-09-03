@@ -63,7 +63,7 @@ public:
 	/** Returns stream associated to given resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;
 	/** Returns Resource object associated to given resource */
-	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false) const;
+	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
 private:
 	std::vector<Holder<ResourceSource> > searchPath;

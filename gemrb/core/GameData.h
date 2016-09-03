@@ -131,8 +131,8 @@ public:
 	ResourceHolder()
 	{
 	}
-	ResourceHolder(const char* resname, bool silent = false)
-		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent)))
+	ResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
+		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)))
 	{
 	}
 	ResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)

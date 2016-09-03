@@ -175,6 +175,7 @@ Interface::Interface()
 	pal256 = NULL;
 
 	GUIEnhancements = 0;
+	UseCorruptedHack = false;
 
 	CursorCount = 0;
 	Cursors = NULL;
