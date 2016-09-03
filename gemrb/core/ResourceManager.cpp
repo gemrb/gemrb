@@ -144,6 +144,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 				core->UseCorruptedHack = false;
 				return NULL;
 			}
+			core->UseCorruptedHack = false;
 			if (str) {
 				Resource *res = types[j].Create(str);
 				if (res) {
