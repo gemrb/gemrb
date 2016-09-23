@@ -370,6 +370,10 @@ def ShowKnownSpells ():
 	GemRB.SetToken("number", str(SpellsSelectPointsLeft[SpellLevel]))
 	SpellsTextArea.SetText(17253)
 
+	if SpellsPickButton == 0:
+		# no recommendations at all
+		return
+
 	if Memorization == 1:
 		SpellsPickButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
