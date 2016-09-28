@@ -142,8 +142,10 @@ void LoadPlugins(char* pluginpath)
 	strcpy( path, pluginpath );
 
 	std::list< char * > files;
-	if (! FindFiles( path, files ))
+	if (! FindFiles( path, files )) {
+		Log(ERROR, "PluginLoader", "Cannot find any plugins!");
 		return;
+	}
 
 	//Iterate through all the available modules to load
 	int file_count = files.size (); // keeps track of first-pass files
