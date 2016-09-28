@@ -32,6 +32,7 @@
 
 #ifdef WIN32
 #include <io.h>
+#include <string.h>
 #include <windows.h>
 #else
 #include <sys/types.h>
@@ -102,8 +103,13 @@ static bool FindFiles( char* path, std::list<char*> &files )
 	struct _finddata_t c_file;
 	long hFile;
 	strcat( path, "*.dll" );
-	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) //If there is no file matching our search
+	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
+		//If there is no file matching our search
+		char buffer[80];
+		_strerror_s(buffer, sizeof(buffer));
+		Log(ERROR, "PluginLoader", "Error looking up dlls: %s", buffer);
 		return false;
+	}
 
 	do {
 		files.push_back( strdup( c_file.name ));
