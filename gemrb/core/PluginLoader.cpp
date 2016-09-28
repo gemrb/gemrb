@@ -106,7 +106,7 @@ static bool FindFiles( char* path, std::list<char*> &files )
 	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
 		//If there is no file matching our search
 		char buffer[80];
-		_strerror_s(buffer, sizeof(buffer));
+		_strerror_s(buffer, NULL);
 		Log(ERROR, "PluginLoader", "Error looking up dlls: %s", buffer);
 		return false;
 	}
