@@ -6219,7 +6219,8 @@ void Actor::InitRound(ieDword gameTime)
 	attackcount >>= 1;
 
 	//make sure we always get at least 1apr
-	if (attackcount < 1) {
+	// but only if it wasn't 0 from the start, like rats in Candlekeep
+	if (attackcount < 1 && BaseStats[IE_NUMBEROFATTACKS] != 0) {
 		attackcount = 1;
 	}
 
