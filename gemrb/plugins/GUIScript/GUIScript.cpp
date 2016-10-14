@@ -6262,8 +6262,8 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 	GET_GAME();
 
-	SaveGameIterator *sgi = core->GetSaveGameIterator();
-	if (!sgi) {
+	SaveGameIterator *sgip = core->GetSaveGameIterator();
+	if (!sgip) {
 		return RuntimeError("No savegame iterator");
 	}
 
@@ -6273,9 +6273,9 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (slot == -1) {
 		CObject<SaveGame> save(obj);
 
-		return PyInt_FromLong(sgi->CreateSaveGame(save, folder) );
+		return PyInt_FromLong(sgip->CreateSaveGame(save, folder) );
 	} else {
-		return PyInt_FromLong(sgi->CreateSaveGame(slot, core->MultipleQuickSaves) );
+		return PyInt_FromLong(sgip->CreateSaveGame(slot, core->MultipleQuickSaves) );
 	}
 }
 
