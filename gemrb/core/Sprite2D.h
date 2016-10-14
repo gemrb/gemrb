@@ -129,8 +129,9 @@ public:
 	}
 
 	void Draw(KeyType key, const Region& dest) const {
-		if (RegionMap.find(key) != RegionMap.end()) {
-			core->GetVideoDriver()->BlitSprite(Sheet, RegionMap.at(key), dest);
+		typename std::map<KeyType, Region>::const_iterator i = RegionMap.find(key);
+		if (i != RegionMap.end()) {
+			core->GetVideoDriver()->BlitSprite(Sheet, i->second, dest);
 		}
 	}
 };

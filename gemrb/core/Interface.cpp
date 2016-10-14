@@ -2382,8 +2382,9 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 /** Returns a preloaded Font */
 Font* Interface::GetFont(const ResRef& ResRef) const
 {
-	if (fonts.find(ResRef) != fonts.end()) {
-		return fonts.at(ResRef);
+	std::map<GemRB::ResRef,Font *>::const_iterator i = fonts.find(ResRef);
+	if (i != fonts.end()) {
+		return i->second;
 	}
 	return NULL;
 }
