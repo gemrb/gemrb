@@ -51,6 +51,8 @@ extern "C" {
   #include <inttypes.h>
   #if defined(__GNUC__)
     #define inline __inline__
+  #elif defined(__sgi)
+    #define inline __inline
   #endif
 #endif
 

@@ -24,6 +24,10 @@
 #include <cassert>
 #include <cstddef>
 
+#if defined(sgi)
+#include <iostream>
+#endif
+
 namespace GemRB {
 
 template <class T>

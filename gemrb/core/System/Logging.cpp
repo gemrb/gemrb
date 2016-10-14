@@ -21,7 +21,11 @@
 #include "System/Logger.h"
 #include "System/StringBuffer.h"
 
-#include <cstdarg>
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
 #include <vector>
 
 namespace GemRB {
@@ -69,7 +73,7 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 		return;
 
 	// Copied from System/StringBuffer.cpp
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__sgi)
 	// Don't try to be smart.
 	// Assume this is long enough. If not, message will be truncated.
 	// MSVC6 has old vsnprintf that doesn't give length

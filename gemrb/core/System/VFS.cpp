@@ -31,7 +31,12 @@
 #include <unistd.h>
 #endif
 
-#include <cstdarg>
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
+
 #include <cstring>
 #include <cerrno>
 

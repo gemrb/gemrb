@@ -34,7 +34,14 @@
 #include "GUI/Console.h"
 #include "GUI/Window.h"
 
-#include <cmath>
+#if defined(__sgi)
+#  include <math.h>
+#  ifdef __cplusplus
+extern "C" double round(double);
+#  endif
+#else
+#  include <cmath>
+#endif
 
 using namespace GemRB;
 
