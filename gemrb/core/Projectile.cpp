@@ -1161,7 +1161,7 @@ void Projectile::SecondaryTarget()
 			//int width = (*poi)->GetAnims()->GetCircleSize();
 
 			if (ydiff) {
-				deg = (int) (atan(xdiff/ydiff)*180/M_PI);
+				deg = (int) (std::atan(xdiff/ydiff)*180/M_PI);
 				if(ydiff>0) deg+=180;
 			} else {
 				if (xdiff<0) deg=90;
@@ -1504,8 +1504,8 @@ void Projectile::DrawExplosion(const Region &screen)
 			}
 			max=core->Roll(1,max,add);
 			double degree=max*M_PI/180;
-			newdest.x = (int) -(rad * sin(degree) );
-			newdest.y = (int) (rad * cos(degree) );
+			newdest.x = (int) -(rad * std::sin(degree) );
+			newdest.y = (int) (rad * std::cos(degree) );
 			
 			//these fields and flags are always inherited by all children
 			pro->Speed = Speed;
@@ -1672,7 +1672,7 @@ void Projectile::DrawTravel(const Region &screen)
 		// (this could use travelled and a larger constant multiplier,
 		// to make the arc size fixed rather than relative to the total
 		// distance to travel)
-		double length_of_normal = travelled_distance * sin(arc_angle) * 0.3 * ((bend / 2) + 1);
+		double length_of_normal = travelled_distance * std::sin(arc_angle) * 0.3 * ((bend / 2) + 1);
 		if (bend % 2) length_of_normal = -length_of_normal;
 
 		// adjust the to-be-rendered point by that distance

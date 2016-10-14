@@ -76,7 +76,7 @@ unsigned int Distance(Point p, Point q)
 {
 	long x = ( p.x - q.x );
 	long y = ( p.y - q.y );
-	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
 /** Calculates distance squared from a point to a scriptable */
@@ -92,14 +92,14 @@ unsigned int Distance(Point p, Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
-	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
 unsigned int PersonalDistance(Point p, Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
-	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
+	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
 	if (b->Type==ST_ACTOR) {
 		ret-=((Actor *)b)->size*10;
 	}
@@ -132,7 +132,7 @@ unsigned int Distance(Scriptable *a, Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
-	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
 /** Calculates distance squared between 2 scriptables */
@@ -148,7 +148,7 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
-	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
+	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
 	if (a->Type==ST_ACTOR) {
 		ret-=((Actor *)a)->size*10;
 	}
