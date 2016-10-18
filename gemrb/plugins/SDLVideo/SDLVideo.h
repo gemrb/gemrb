@@ -148,6 +148,7 @@ public:
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
 
+	virtual bool TouchInputEnabled() const = 0;
 	virtual void InitMovieScreen(int &w, int &h, bool yuv=false)=0;
 	virtual void DestroyMovieScreen() = 0;
 	virtual void showFrame(unsigned char* buf, unsigned int bufw,

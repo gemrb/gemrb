@@ -59,6 +59,7 @@ public:
 	int SwapBuffers(void);
 	int PollEvents();
 
+	bool TouchInputEnabled() const;
 	void InitMovieScreen(int &w, int &h, bool yuv);
 	virtual void DestroyMovieScreen();
 

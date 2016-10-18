@@ -206,6 +206,8 @@ public:
 	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
+	/** is a touchscreen available or being used? */
+	virtual bool TouchInputEnabled() const = 0;
 	/** initializes the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
 	/** called when a video player is done. clean up any video specific resources.  */
@@ -230,7 +232,6 @@ public:
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
-	bool TouchInputEnabled() const;
 	bool GetFullscreenMode() const;
 	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
 	void SetCursor(Sprite2D* cur, enum CursorType curIdx);

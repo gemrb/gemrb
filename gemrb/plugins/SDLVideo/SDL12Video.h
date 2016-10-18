@@ -37,6 +37,7 @@ public:
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	int SwapBuffers(void);
 
+	bool TouchInputEnabled() const;
 	void InitMovieScreen(int &w, int &h, bool yuv);
 	virtual void DestroyMovieScreen();
 	void showFrame(unsigned char* buf, unsigned int bufw,
