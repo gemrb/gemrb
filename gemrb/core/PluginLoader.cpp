@@ -88,15 +88,20 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #ifdef WIN32
 #define FREE_PLUGIN( handle )  FreeLibrary( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
-#define PRINT_DLERROR
 #else
 #define FREE_PLUGIN( handle )  dlclose( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
-#define PRINT_DLERROR Log(MESSAGE, "PluginLoader", "Error: %s", dlerror() )
 #endif
 
 /** Return names of all *.so or *.dll files in the given directory */
 #ifdef WIN32
+static void PrintDLError()
+{
+	char buffer[_MAX_PATH*2];
+	_strerror_s(buffer, NULL);
+	Log(DEBUG, "PluginLoader", "Error: %s", buffer);
+}
+
 static bool FindFiles( char* path, std::list<char*> &files )
 {
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
@@ -120,6 +125,11 @@ static bool FindFiles( char* path, std::list<char*> &files )
 }
 
 #else // ! WIN32
+
+static void PrintDLError()
+{
+	Log(DEBUG, "PluginLoader", "Error: %s", dlerror());
+}
 
 bool static FindFiles( char* path, std::list<char*> &files )
 {
@@ -192,7 +202,7 @@ void LoadPlugins(char* pluginpath)
 #endif
 		if (hMod == NULL) {
 			Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", path);
-			PRINT_DLERROR;
+			PrintDLError();
 			continue;
 		}
 
