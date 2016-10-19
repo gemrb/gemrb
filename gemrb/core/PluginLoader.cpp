@@ -95,11 +95,11 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 
 /** Return names of all *.so or *.dll files in the given directory */
 #ifdef WIN32
-static void PrintDLError()
+static void PrintDLError(const char *msg=NULL)
 {
 	char buffer[_MAX_PATH*2];
 	_strerror_s(buffer, NULL);
-	Log(DEBUG, "PluginLoader", "Error: %s", buffer);
+	Log(DEBUG, "PluginLoader", msg ? msg : "Error: %s", buffer);
 }
 
 static bool FindFiles( char* path, std::list<char*> &files )
@@ -110,9 +110,7 @@ static bool FindFiles( char* path, std::list<char*> &files )
 	strcat( path, "*.dll" );
 	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
 		//If there is no file matching our search
-		char buffer[80];
-		_strerror_s(buffer, NULL);
-		Log(ERROR, "PluginLoader", "Error looking up dlls: %s", buffer);
+		PrintDLError("Error looking up dlls: %s");
 		return false;
 	}
 
