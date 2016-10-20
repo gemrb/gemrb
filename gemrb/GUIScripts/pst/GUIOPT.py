@@ -241,7 +241,7 @@ def OpenGameplayOptionsWindow ():
 
 	GUIOPTControls.OptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
 	GUIOPTControls.OptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
-	GUIOPTControls.OptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run")
+	GUIOPTControls.OptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run", GUICommonWindows.ToggleAlwaysRun)
 
 	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
 	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
