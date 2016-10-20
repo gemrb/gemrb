@@ -102,8 +102,10 @@ GameControl::GameControl(const Region& frame)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
-	AlwaysRun = false; //make this a game flag if you wish
+
 	ieDword tmp=0;
+	core->GetDictionary()->Lookup("Always Run", tmp);
+	AlwaysRun = !!tmp;
 
 	ClearMouseState();
 	ResetTargetMode();
