@@ -2680,6 +2680,7 @@ void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 void GameControl::ToggleAlwaysRun()
 {
 	AlwaysRun = !AlwaysRun;
+	core->GetDictionary()->SetAt("Always Run", AlwaysRun);
 }
 
 }
