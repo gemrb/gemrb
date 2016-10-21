@@ -245,6 +245,10 @@ def OpenLevelUpWindow():
 			Specialist = 0
 			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
+
+			if Spellbook.HasSorcererBook (pc, Classes[i]):
+				MageTable = "SPLSRCKN"
+
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
 			for j in range (MageTable.GetColumnCount ()):
@@ -373,8 +377,9 @@ def OpenLevelUpWindow():
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
-	if (Classes[0] == 19) and (DeltaWSpells > 0): # open our sorc spell selection window
-		LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
+	for c in range(len(Classes)):
+		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
+			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
 
 def HideSkills(i):
 	"""Hides the given skill label from view."""

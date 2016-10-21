@@ -2546,7 +2546,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 		unsigned int y = pos & 0xffff;
 		long tx = (long) x - goal.x;
 		long ty = (long) y - goal.y;
-		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
+		unsigned int distance = (unsigned int) std::sqrt( ( double ) ( tx* tx + ty* ty ) );
 		if (dist<distance) {
 			best.x=(ieWord) x;
 			best.y=(ieWord) y;
@@ -2681,7 +2681,7 @@ PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 		yoff = -1.0 + (Orientation - 8) / 4.0;
 	}
 
-	mult = 1.0 / (fabs(xoff) > fabs(yoff) ? fabs(xoff) : fabs(yoff));
+	mult = 1.0 / (std::fabs(xoff) > std::fabs(yoff) ? std::fabs(xoff) : std::fabs(yoff));
 
 	dest.x += Steps * mult * xoff + 0.5;
 	dest.y += Steps * mult * yoff + 0.5;
@@ -3023,7 +3023,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d)
 	// we want to move along the larger axis, to make sure we don't miss anything
 	if (abs( diffx ) >= abs( diffy )) {
 		// (sX - startX)/elevationy = (sX - startX)/fabs(diffx) * diffy
-		double elevationy = fabs((double)diffx ) / diffy;
+		double elevationy = std::fabs((double)diffx ) / diffy;
 		if (sX > dX) {
 			// right to left
 			for (int startx = sX; startx >= dX; startx--) {
@@ -3043,7 +3043,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d)
 		}
 	} else {
 		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
-		double elevationx = fabs((double)diffy ) / diffx;
+		double elevationx = std::fabs((double)diffy ) / diffx;
 		if (sY > dY) {
 			// bottom to top
 			for (int starty = sY; starty >= dY; starty--) {

@@ -49,8 +49,9 @@ def SetupSpellsWindow(chargen=0):
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
 
-	# sorcerer types need this hack to not get too many spells
+	# sorcerer types need this change to not get too many spells
 	# for them the castable and known count progress differently
+	# TODO: create an extra clsskills column to hold this data
 	if SpellTableName == "MXSPLSOR":
 		SpellTableName = "SPLSRCKN"
 	elif SpellTableName == "MXSPLBRD":
@@ -73,7 +74,7 @@ def SetupSpellsWindow(chargen=0):
 
 	# make sure we have a correct table and that we're eligible
 	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
-	canLearn = chargen or (BookType & 2) # bard / sorcerer
+	canLearn = chargen or Spellbook.IsSorcererBook (BookType) # bard / sorcerer
 	if SpellTableName == "*" or not canLearn:
 		if chargen:
 			GemRB.SetNextScript ("CharGen7")

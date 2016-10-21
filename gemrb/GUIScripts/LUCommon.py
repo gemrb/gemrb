@@ -146,8 +146,8 @@ def SetupSavingThrows (pc, Level=None):
 	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1
 		RaceSaveTable = GemRB.LoadTable (RaceSaveTableName)
-		if Con >= RaceSaveTable.GetRowCount ():
-			Con = RaceSaveTable.GetRowCount ()-1
+		if Con >= RaceSaveTable.GetColumnCount ():
+			Con = RaceSaveTable.GetColumnCount () - 1
 
 	#preload our tables to limit multi-classed lookups
 	SaveTables = []

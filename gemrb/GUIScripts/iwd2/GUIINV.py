@@ -82,6 +82,8 @@ def OpenInventoryWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)

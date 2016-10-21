@@ -156,8 +156,6 @@ struct ItemUseType {
 static ieResRef featspells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
-//static ieDword *kituse = NULL;
-//static int kitcount = -1;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
@@ -197,9 +195,16 @@ static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LE
 static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
 	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK,
 	ISCLASS12, ISCLASS13};
-//this map could probably be auto-generated (isClass -> IWD2 class ID)
-//autogenerating for non IWD2 now!!!
-static unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10, 12, 13};
+// map isClass -> (IWD2) class ID
+static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// classis -> kits map
+struct ClassKits {
+	std::vector<int> indices;
+	std::vector<ieDword> ids;
+};
+static std::map<int, ClassKits> iwd2kits;
+
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
  IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
@@ -416,12 +421,7 @@ void ReleaseMemoryActor()
 		delete [] itemuse;
 		itemuse = NULL;
 	}
-/*
-	if (kituse) {
-		delete [] kituse;
-		kituse = NULL;
-	}
-*/
+
 	if (itemanim) {
 		delete [] itemanim;
 		itemanim = NULL;
@@ -817,26 +817,16 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define KIT_SWASHBUCKLER 0x100000
 #define KIT_BARBARIAN 0x40000000
 
-// iwd2 supports multiple kits, but sanely only one kit per class
-static int GetIWD2KitIndex (ieDword kit, const char *resref="classes", ieDword baseclass=0)
+// iwd2 supports multiple kits per actor, but sanely only one kit per class
+static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 {
-	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref));
-	int idx = -1;
-	if (tm) {
-		int offset = tm->FindTableValue("CLASS", baseclass);
-		int i = 0;
-		const char *classname = tm->GetRowName(offset+i);
-		while (atoi(tm->QueryField(classname, "CLASS")) == (signed)baseclass) {
-			ieDword akit = strtol(tm->QueryField(classname, "ID"), NULL, 16);
-			if (kit & akit) {
-				idx = offset+i;
-				break;
-			}
-			i++;
-			classname = tm->GetRowName(offset+i);
-		}
+	std::vector<int> kits = iwd2kits[classesiwd2[baseclass]].indices;
+	std::vector<int>::iterator it = kits.begin();
+	for ( ; it != kits.end(); it++) {
+		if (kit & (*it)) return *it;
 	}
-	return idx;
+
+	return -1;
 }
 
 //TODO: make kitlist column 6 stored internally
@@ -845,7 +835,7 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword b
 	int kitindex = 0;
 
 	if (iwd2class) {
-		return GetIWD2KitIndex(kit, "classes", baseclass);
+		return GetIWD2KitIndex(kit, baseclass);
 	}
 
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
@@ -1328,6 +1318,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
 	ieDword mask = 1;
+	if (!changed) return;
 	for (int i=0; i<OVERLAY_COUNT; i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
@@ -1437,7 +1428,7 @@ static unsigned int maximum_values[MAX_STATS]={
 200,200,200,200,200,100,100,100,100,100,255,255,255,255,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
 200,255,200,100,100,200,200,25,5,100,1,1,255,1,1,0,//3f
-511,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,200,200,255,1,20,20,25,//4f
+1023,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,200,200,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//7f
@@ -1701,15 +1692,6 @@ void Actor::ReleaseMemory()
 /* returns the ISCLASS for the class based on name */
 static int IsClassFromName (const char* name)
 {
-	//TODO: convert this mess to a std::map
-	// iwd2 has some different names
-	if (third) {
-		if (strcmp(name, "ROGUE") == 0) {
-			return ISTHIEF;
-		} else if (strcmp(name, "WIZARD") == 0) {
-			return ISMAGE;
-		}
-	}
 	for (int i=0; i<ISCLASSES; i++) {
 		if (strcmp(name, isclassnames[i]) == 0)
 			return i;
@@ -1753,6 +1735,11 @@ static void InitActorTables()
 	third = !!core->HasFeature(GF_3ED_RULES);
 	raresnd = !!core->HasFeature(GF_RARE_ACTION_VB);
 	iwd2class = !!core->HasFeature(GF_LEVELSLOT_PER_CLASS);
+	// iwd2 has some different base class names
+	if (iwd2class) {
+		isclassnames[ISTHIEF] = "ROGUE";
+		isclassnames[ISMAGE] = "WIZARD";
+	}
 
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
@@ -2069,18 +2056,28 @@ static void InitActorTables()
 		error("Actor", "Missing classes.2da!");
 	}
 	if (iwd2class) {
-		//kitcount = 0;
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
-		for (i=0; i<classcount; i++) {
+		for (i=0; i<(int)tm->GetRowCount(); i++) {
 			const char *classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
 			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
 			if (classcol) {
-				//kitcount++;
+				// kit ids are in hex
+				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
+				iwd2kits[classcol].indices.push_back(i);
+				iwd2kits[classcol].ids.push_back(classID);
 				continue;
+			} else if (i < classcount) {
+				// populate classesiwd2
+				// we need the id of the isclass name, not the current one
+				ieDword cid = atoi(tm->QueryField(isclassnames[i], "ID"));
+				classesiwd2[i] = cid;
+			} else {
+				// new class out of order
+				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
 			xpcap[classis] = atoi(xpcapt->QueryField(classname, "VALUE"));
@@ -2117,21 +2114,8 @@ static void InitActorTables()
 			buffer.appendFormatted("ToHit: %s ", tohit);
 			buffer.appendFormatted("XPCap: %d", xpcap[classis]);
 
-			//TODO: generate classesiwd2 here, so it can be unhardcoded
 			Log(DEBUG, "Actor", buffer);
 		}
-		/*
-		//pass two: iwd2 kit usabilities
-		kituse = (ieDword *) calloc(kitcount, sizeof(ieDword) );
-		int idx = 0;
-		for(i=0;i<classcount;i++) {
-			const char *classname = tm->GetRowName(i);
-			ieDword classcol = atoi(tm->QueryField(classname, "CLASS") );
-			ieDword usability = strtoul(tm->QueryField(classname, "USABILITY"), NULL, 0 );
-			if (!classcol) continue;
-			kituse[j++]=usability;
-		}
-		*/
 	} else {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
@@ -2144,7 +2128,6 @@ static void InitActorTables()
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
 
-		memset(classesiwd2, 0 , sizeof(classesiwd2) );
 		for (i=0; i<classcount; i++) {
 			const char* classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
@@ -4112,12 +4095,6 @@ bool Actor::AttackIsStunning(int damagetype) const {
 		return true;
 	}
 
-	//cheese to avoid one shotting newbie player
-/* FIXME: decode exact conditions
-	if ( InParty && (Modified[IE_MAXHITPOINTS]<20) && (damage>Modified[IE_MAXHITPOINTS]) ) {
-		return true;
-	}
-*/
 	return false;
 }
 
@@ -4143,7 +4120,7 @@ void Actor::CheckCleave()
 			core->ApplyEffect(fx, this, this);
 			delete fx;
 			// ~Cleave feat adds another level %d attack.~
-			// FIXME: probably uses the same tohit as the previous attack
+			// uses the max tohit bonus (tested), but game always displayed "level 1"
 			displaymsg->DisplayRollStringName(39846, DMC_LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
@@ -4316,7 +4293,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	return damage;
 }
 
-//TODO: handle pst
 void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter)
 {
 	bool detailed = false;
@@ -4356,7 +4332,10 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 				displaymsg->DisplayConstantStringName(STR_DAMAGE1, DMC_WHITE, this);
 			}
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
-			if(0) print("TODO: pst floating text");
+			//TODO: handle pst properly (decay, queueing, color)
+			wchar_t dmg[10];
+			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L"%d", damage);
+			SetOverheadText(dmg, true);
 		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
@@ -5174,7 +5153,6 @@ void Actor::Die(Scriptable *killer)
 			Holder<SymbolMgr> race = core->GetSymbol(racetable);
 			const char *raceName = race->GetValue(Modified[IE_RACE]);
 			if (raceName) {
-				// todo: should probably not set this for humans in iwd?
 				snprintf(varname, 32, "KILL_%s_CNT", raceName);
 				game->locals->Lookup(varname, value);
 				game->locals->SetAt(varname, value+1, nocreate);
@@ -6241,7 +6219,8 @@ void Actor::InitRound(ieDword gameTime)
 	attackcount >>= 1;
 
 	//make sure we always get at least 1apr
-	if (attackcount < 1) {
+	// but only if it wasn't 0 from the start, like rats in Candlekeep
+	if (attackcount < 1 && BaseStats[IE_NUMBEROFATTACKS] != 0) {
 		attackcount = 1;
 	}
 
@@ -6370,12 +6349,6 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	int prof = 0;
-	if (wi.wflags&WEAPON_BYPASS) {
-		//FIXME:this type of weapon ignores all armor, -4 is for balance?
-		//or i just got lost a negation somewhere
-		prof += -4;
-	}
-
 	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
 	// but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
@@ -9122,6 +9095,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 int Actor::CheckUsability(Item *item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
+	int kitignore = 0;
 
 	for (int i=0;i<usecount;i++) {
 		ieDword itemvalue = itembits[itemuse[i].which];
@@ -9134,10 +9108,42 @@ int Actor::CheckUsability(Item *item) const
 				mcol = 0xff;
 			} else {
 				//iwd2 doesn't need translation from kit to usability, the kit value IS usability
+				// But it's more complicated: check the comments below.
+				// Skip undesired kits
+				stat &= ~kitignore;
 				goto no_resolve;
 			}
 		}
-		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+
+		if (iwd2class && itemuse[i].stat == IE_CLASS) {
+			// in iwd2 any class mixin can enable the use, but the stat only holds the first class;
+			// it also means we shouldn't check all kits (which we do last)!
+			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
+			// but the kit check would fail, since paladins and their kits aren't.
+			stat = GetClassMask();
+			if (stat & ~itemvalue) {
+				if (Modified[IE_KIT] == 0) continue;
+			} else {
+				return STR_CANNOT_USE_ITEM;
+			}
+
+			// classes checked out, but we're kitted ...
+			// ignore kits from "unusable" classes
+			for (int j=0; j < ISCLASSES; j++) {
+				if (Modified[levelslotsiwd2[j]] == 0) continue;
+				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
+
+				std::vector<ieDword> kits = iwd2kits[classesiwd2[j]].ids;
+				std::vector<ieDword>::iterator it = kits.begin();
+				for ( ; it != kits.end(); it++) {
+					kitignore |= *it;
+				}
+			}
+			continue;
+		} else {
+			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+		}
+
 no_resolve:
 		if (stat&itemvalue) {
 			//print("failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
@@ -10486,6 +10492,10 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 		time *= 2;
 	}
 	return time;
+}
+
+ieDword Actor::GetClassID (const ieDword isclass) {
+	return classesiwd2[isclass];
 }
 
 }

@@ -98,6 +98,8 @@ def OpenSpellBookWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellIndex", i)
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	GUICommonWindows.SetSelectionChangeHandler (SelectedNewPlayer)
 	SelectedNewPlayer ()
 	return

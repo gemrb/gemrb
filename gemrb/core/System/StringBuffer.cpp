@@ -21,7 +21,11 @@
 #include "win32def.h"
 
 #include <cstdio>
-#include <cstdarg>
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
 
 namespace GemRB {
 
@@ -35,7 +39,7 @@ void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__sgi)
 	// Don't try to be smart.
 	// Assume this is long enough. If not, message will be truncated.
 	// MSVC6 has old vsnprintf that doesn't give length

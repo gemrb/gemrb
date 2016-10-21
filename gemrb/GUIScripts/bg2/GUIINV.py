@@ -113,7 +113,14 @@ def OpenInventoryWindow ():
 			Button.SetSprites ("STONSLOT",0,0,2,4,3)
 
 	GemRB.SetVar ("TopIndex", 0)
-	
+
+	# create a button so we can map it do ESC for quit exiting
+	Button = Window.CreateButton (999, 0, 0, 1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	UpdateInventoryWindow()
 	return
 

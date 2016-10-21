@@ -770,6 +770,12 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float /*y*/)
 	return winH; //y * height;
 }
 
+// note from upstream: on some platforms a device may become seen only after use
+bool SDL20VideoDriver::TouchInputEnabled() const
+{
+	return SDL_GetNumTouchDevices() > 0;
+}
+
 #ifndef USE_OPENGL
 #include "plugindef.h"
 

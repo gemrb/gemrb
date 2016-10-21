@@ -104,7 +104,7 @@ bool SPLImporter::Open(DataStream* stream)
 	} else if (strncmp( Signature, "SPL V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		print("[SPLImporter]: This file is not a valid SPL File");
+		Log(WARNING, "SPLImporter", "This file is not a valid SPL file!");
 		return false;
 	}
 

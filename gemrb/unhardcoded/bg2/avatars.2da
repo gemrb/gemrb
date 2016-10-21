@@ -142,6 +142,8 @@
 0x7302     MEAE       MEAE       MEAE       MEAE       4          2          SH         *
 0x7310     MFIE       MFIE       MFIE       MFIE       4          2          1          *
 0x7311     MFIS       MFIS       MFIS       MFIS       4          2          1          *
+0x7312     MFIE       MFIE       MFIE       MFIE       4          2          G1         *
+0x7313     MFIS       MFIS       MFIS       MFIS       4          2          G1         *
 0x7320     MAIR       MAIR       MAIR       MAIR       4          2          1          *
 0x7321     MAIS       MAIS       MAIS       MAIS       4          2          1          *
 0x7400     MDOG       MDOG       MDOG       MDOG       14         2          WI         *

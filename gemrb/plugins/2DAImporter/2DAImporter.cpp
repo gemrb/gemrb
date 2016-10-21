@@ -27,7 +27,7 @@
 
 using namespace GemRB;
 
-#define MAXLENGTH 4096      //if a 2da has longer lines, change this
+#define MAXLENGTH 8192      //if a 2da has longer lines, change this
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this
 
 p2DAImporter::p2DAImporter(void)

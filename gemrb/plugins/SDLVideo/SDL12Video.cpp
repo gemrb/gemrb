@@ -191,6 +191,12 @@ void SDL12VideoDriver::HideSoftKeyboard()
 	}
 }
 
+bool SDL12VideoDriver::TouchInputEnabled() const
+{
+	// fallback for lack of better options
+	return MouseFlags & (MOUSE_GRAYED|MOUSE_DISABLED);
+}
+
 // Private methods
 
 bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)

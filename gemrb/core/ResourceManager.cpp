@@ -128,7 +128,7 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 	return NULL;
 }
 
-Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, bool silent) const
+Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, bool silent, bool useCorrupt) const
 {
 	if (ResRef[0] == '\0')
 		return NULL;
@@ -139,6 +139,12 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 	for (size_t j = 0; j < types.size(); j++) {
 		for (size_t i = 0; i < searchPath.size(); i++) {
 			DataStream *str = searchPath[i]->GetResource(ResRef, types[j]);
+			if (!str && useCorrupt && core->UseCorruptedHack) {
+				// don't look at other paths if requested
+				core->UseCorruptedHack = false;
+				return NULL;
+			}
+			core->UseCorruptedHack = false;
 			if (str) {
 				Resource *res = types[j].Create(str);
 				if (res) {

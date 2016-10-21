@@ -3940,7 +3940,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->ApplyKit(true);
+	act->ApplyKit(true, act->GetClassID(ISPALADIN));
 	act->SetMCFlag(MC_FALLEN_PALADIN, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
@@ -3951,7 +3951,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->ApplyKit(true);
+	act->ApplyKit(true, act->GetClassID(ISRANGER));
 	act->SetMCFlag(MC_FALLEN_RANGER, OP_OR);
 	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
@@ -3963,7 +3963,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_PALADIN, OP_NAND);
-	act->ApplyKit(false);
+	act->ApplyKit(false, act->GetClassID(ISPALADIN));
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -3973,7 +3973,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_RANGER, OP_NAND);
-	act->ApplyKit(false);
+	act->ApplyKit(false, act->GetClassID(ISRANGER));
 }
 
 //transfering item from Sender to target, target must be an actor

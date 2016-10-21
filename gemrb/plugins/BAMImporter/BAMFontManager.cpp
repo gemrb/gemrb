@@ -109,6 +109,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	spr->release();
 
 	std::map<Sprite2D*, ieWord> tmp;
+	std::map<Sprite2D*, ieWord>::const_iterator i;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
 			spr = af->GetFrame(frame, cycle);
@@ -120,12 +121,12 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 			} else {
 				chr = ((frame << 8) | (cycle&0x00ff)) + 1;
 			}
-
-			if (tmp.find(spr) != tmp.end()) {
+			i = tmp.find(spr);
+			if (i != tmp.end()) {
 				// opimization for when glyphs are shared between cycles
 				// just alias the existing character
 				// this is very useful for chopping out huge chunks of unused character ranges
-				fnt->CreateAliasForChar(tmp.at(spr), chr);
+				fnt->CreateAliasForChar(i->second, chr);
 			} else {
 				fnt->CreateGlyphForCharSprite(chr, spr);
 				tmp[spr] = chr;

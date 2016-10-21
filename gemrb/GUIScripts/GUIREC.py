@@ -83,7 +83,14 @@ def OpenRecordsWindow ():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
-		
+
+	# create a button so we can map it do ESC for quit exiting
+	Button = Window.CreateButton (99, 0, 0, 1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenRecordsWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	UpdateRecordsWindow(Window)
 	return
 

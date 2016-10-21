@@ -174,6 +174,8 @@ def OpenInventoryWindow ():
 	OptionsWindow.SetVisible(True)
 	Window.Focus()
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	# force unpause the game
 	GemRB.GamePause(0, 0)
 	return

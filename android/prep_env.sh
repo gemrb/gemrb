@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TODO: figure out, what exactly openal needs or try sdl-mixer2
+# TODO: sdl-mixer2 support
 
 GEMRB_GIT_PATH=$1
 APILEVEL=${2:-17}
@@ -78,9 +78,11 @@ function setup_dir_struct {
   pushd "$ENVROOT" &&
   if [[ -d SDL ]]; then
     cd SDL
-    hg update; rc=$?
+    if ! hg pull -u; then
+      cd -
+      return 1
+    fi
     cd -
-    (exit $rc) # hack to reset the hg return value
   else
     hg clone http://hg.libsdl.org/SDL
   fi &&

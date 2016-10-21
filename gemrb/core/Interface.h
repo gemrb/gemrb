@@ -721,6 +721,7 @@ public:
 	int MaxPartySize;
 	bool KeepCache;
 	bool MultipleQuickSaves;
+	bool UseCorruptedHack;
 
 	Variables *plugin_flags;
 	/** The Main program loop */
