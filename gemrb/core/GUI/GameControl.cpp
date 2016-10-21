@@ -359,7 +359,10 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 
 	Game* game = core->GetGame();
-	Map *area = core->GetGame()->GetCurrentArea();
+	if (!game) {
+		return;
+	}
+	Map *area = game->GetCurrentArea();
 	if (!area) {
 		return;
 	}
