@@ -79,7 +79,7 @@ public:
 	void RenderOnDisplay(SDL_Surface* /*display*/) {
 		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
 
-		SDL_Rect dest = {origin.x, origin.y, overlay->w, overlay->h};
+		SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
 		SDL_DisplayYUVOverlay(overlay, &dest);
 	}
 
