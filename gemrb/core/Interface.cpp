@@ -93,6 +93,7 @@
 #endif
 
 #include <vector>
+#include <SDL/SDL_version.h> // for SDL_VERSION_ATLEAST
 
 namespace GemRB {
 
@@ -1192,6 +1193,17 @@ int Interface::Init(InterfaceConfig* config)
 			var ( atoi( value ) ); \
 		value = NULL;
 
+	CONFIG_INT("MouseFeedback", MouseFeedback = );
+
+// guess a good default
+// TODO: add cfg option for an override (for hybrid devices)
+#if SDL_VERSION_ATLEAST(2,0,0)
+	// note from upstream: on some platforms a device may become seen only after use
+	EventMgr::TouchInputEnabled = SDL_GetNumTouchDevices() > 0;
+#else
+	EventMgr::TouchInputEnabled = MouseFeedback > 0;
+#endif
+
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
 	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
@@ -1215,7 +1227,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingScroll", NumFingScroll = );
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
-	CONFIG_INT("MouseFeedback", MouseFeedback = );
 
 #undef CONFIG_INT
 

@@ -9533,7 +9533,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_WIDTH: value = core->Width; break;
 		case SV_HEIGHT: value = core->Height; break;
 		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
-		case SV_TOUCH: value = core->GetVideoDriver()->TouchInputEnabled(); break;
+		case SV_TOUCH: value = EventMgr::TouchInputEnabled; break;
 		default: value = -1; break;
 	}
 	if (path[0]) {
