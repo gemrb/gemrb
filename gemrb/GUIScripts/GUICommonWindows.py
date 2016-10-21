@@ -1673,8 +1673,8 @@ def UpdatePortraitWindow ():
 			states = states + effects[x]
 
 		# FIXME: hack, check shouldn't be needed
-		if Window.HasControl (200 + i):
-			FlagLabel = Window.GetControl (200 + i)
+		FlagLabel = Window.GetControl (200 + i)
+		if FlagLabel:
 			if flag != blank:
 				FlagLabel.SetText (flag.ljust(3, blank))
 			else:

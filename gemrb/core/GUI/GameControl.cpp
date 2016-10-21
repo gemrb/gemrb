@@ -105,7 +105,6 @@ GameControl::GameControl(const Region& frame)
 	ClearMouseState();
 	ResetTargetMode();
 
-	ieDword tmp=0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
