@@ -6336,7 +6336,7 @@ void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *target = (Actor *) tar;
-		target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter);
+	target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter * AI_UPDATE_TIME);
 }
 
 void GameScript::SetInterrupt(Scriptable* Sender, Action* parameters)

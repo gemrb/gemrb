@@ -1524,10 +1524,11 @@ void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_referen
 void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 {
 	ieDword GameTime = core->GetGame()->GameTime;
-	if( GameTime+futuretime*AI_UPDATE_TIME<GameTime) {
+	// prevent overflows, since we pass the max futuretime for guaranteed expiry
+	if (GameTime + futuretime < GameTime) {
 		GameTime=0xffffffff;
 	} else {
-		GameTime+=futuretime*AI_UPDATE_TIME;
+		GameTime += futuretime;
 	}
 
 	std::list< Effect* >::const_iterator f;
