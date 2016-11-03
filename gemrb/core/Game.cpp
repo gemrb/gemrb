@@ -431,7 +431,10 @@ int Game::LeaveParty (Actor* actor)
 	NPCs.push_back( actor );
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
-		actor->SetScript( "", SCR_DEFAULT );
+		// we must reset various existing scripts
+		actor->SetScript("", SCR_CLASS, false);
+		actor->SetScript("", SCR_RACE, false);
+		actor->SetScript("WTASIGHT", SCR_GENERAL, false);
 		if (actor->GetBase(IE_MC_FLAGS) & MC_EXPORTABLE) {
 			actor->SetDialog("MULTIJ");
 		}
