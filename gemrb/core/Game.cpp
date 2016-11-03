@@ -1412,6 +1412,8 @@ void Game::AddGold(ieDword add)
 	}
 }
 
+EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
+
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add, bool fatigue)
 {
@@ -1423,6 +1425,27 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//update clock display
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
 	}
+
+	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
+	// but only if we skip for at least an hour
+	if (add >= 300*AI_UPDATE_TIME) {
+		for (unsigned int i=0; i<PCs.size(); i++) {
+			Actor *pc = PCs[i];
+			int conHealRate = pc->GetConHealAmount();;
+			// 1. regeneration as an effect
+			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
+			// However the effect does its own timekeeping, so we can't easily check the duration,
+			// so we treat all regeneration as permanent - the most common kind (eg. from rings)
+			if (pc->fxqueue.HasEffect(fx_set_regenerating_state_ref)) {
+				pc->Heal(0);
+			} else if (conHealRate) {
+				// 2. regeneration from high constitution / TNO
+				// some of the speeds are very slow, so calculate the accurate amount
+				pc->Heal(add / conHealRate);
+			}
+		}
+	}
+
 	Ticks+=add*interval;
 	if (!fatigue) {
 		// update everyone in party, so they think no time has passed
