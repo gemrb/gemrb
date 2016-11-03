@@ -3314,19 +3314,16 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
 
 	// regenerate actors with high enough constitution
-	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
-		int rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
-		if (rate && !(game->GameTime % rate)) {
+	int rate = GetConHealAmount();
+	if (rate && !(game->GameTime % rate)) {
+		if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 				String text = *core->GetString(28895) + L"1"; // FIXME
 				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
 			}
-		}
-	} else {
-		int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-		if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
+		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 		}
 	}
@@ -3344,6 +3341,21 @@ void Actor::RefreshPCStats() {
 	}
 	Modified[IE_STEALTH] += GetSkillBonus(4);
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
+}
+
+int Actor::GetConHealAmount() const
+{
+	int rate = 0;
+	Game *game = core->GetGame();
+	if (!game) return rate;
+
+	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
+		rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
+	} else {
+		rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
+		rate *= AI_UPDATE_TIME;
+	}
+	return rate;
 }
 
 // add fatigue every 4 hours since resting and check if the actor is penalised for it

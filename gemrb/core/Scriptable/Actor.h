@@ -737,6 +737,7 @@ public:
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
+	int GetConHealAmount() const;
 	/* returns the portrait icons list */
 	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
