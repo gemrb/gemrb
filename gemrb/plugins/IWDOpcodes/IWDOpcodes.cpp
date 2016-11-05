@@ -1331,7 +1331,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
-	fx->Duration=core->GetGame()->GameTime+7*AI_UPDATE_TIME;
+	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
 	//build effects to apply
 	Effect * newfx1, *newfx2;
@@ -1390,7 +1390,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
-	fx->Duration=core->GetGame()->GameTime+7*AI_UPDATE_TIME;
+	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
 	//build effects to apply
 	Effect * newfx1, *newfx2;
@@ -1602,7 +1602,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing
 	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration=core->GetGame()->GameTime+70*AI_UPDATE_TIME;
+	fx->Duration = core->GetGame()->GameTime + 10*core->Time.round_size;
 	fx->Parameter1--;
 
 	//iwd2 style
@@ -1633,7 +1633,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing (set up next fire)
 	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration=core->GetGame()->GameTime+3*AI_UPDATE_TIME;
+	fx->Duration = core->GetGame()->GameTime + 3*AI_UPDATE_TIME; // not rounds, that's the total duration!
 	fx->Parameter1--;
 
 	//iwd2 style
@@ -3568,7 +3568,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//timing
 	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration=core->GetGame()->GameTime+70*AI_UPDATE_TIME;
+	fx->Duration = core->GetGame()->GameTime + 10*core->Time.round_size;
 	fx->Parameter1--;
 
 	//calculate victim (an opponent of target)
