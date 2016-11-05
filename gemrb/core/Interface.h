@@ -138,6 +138,10 @@ struct TimeStruct {
 	unsigned int round_size; // in ticks
 	unsigned int rounds_per_turn;
 	unsigned int attack_round_size;
+	unsigned int hour_sec;
+	unsigned int hour_size;
+	unsigned int day_sec;
+	unsigned int day_size;
 };
 
 struct EncodingStruct

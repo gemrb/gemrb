@@ -763,6 +763,10 @@ bool Interface::ReadGameTimeTable()
 	Time.round_size = Time.round_sec * AI_UPDATE_TIME;
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
 	Time.attack_round_size = atoi(table->QueryField("ATTACK_ROUND", "DURATION"));
+	Time.hour_sec = 300; // move to table if pst turns out to be different
+	Time.hour_size = Time.hour_sec * AI_UPDATE_TIME;
+	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
+	Time.day_size = Time.day_sec * AI_UPDATE_TIME;
 
 	return true;
 }
