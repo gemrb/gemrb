@@ -6661,9 +6661,12 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
+	char suffix = 'S';
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
-			dirit.SetFilterPredicate(new LastCharFilter((flags) ? 'S' : 'M'), true);
+			if (flags&1) suffix = 'M';
+			if (flags&2) suffix = 'L';
+			dirit.SetFilterPredicate(new LastCharFilter(suffix), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			if (core->HasFeature( GF_SOUNDFOLDERS )) {
