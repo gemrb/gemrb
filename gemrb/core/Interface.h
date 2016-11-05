@@ -142,6 +142,8 @@ struct TimeStruct {
 	unsigned int hour_size;
 	unsigned int day_sec;
 	unsigned int day_size;
+
+	int GetHour(unsigned int time) { return (time/AI_UPDATE_TIME)%day_sec/hour_sec; }
 };
 
 struct EncodingStruct
