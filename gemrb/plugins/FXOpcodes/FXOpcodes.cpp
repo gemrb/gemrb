@@ -5924,7 +5924,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case COND_TIMEOFDAY:
 		// BGEE: Night Club
 		if (actor != target) break;
-		timeOfDay = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
+		// FIXME: needs to take offsets into account to match time.ids / timeoday.ids
+		// just use GameScript::TimeOfDay parameters->int0Parameter == TIMEOFDAY_NIGHT
+		timeOfDay = core->Time.GetHour(core->GetGame()->GameTime)/4;
 		condition = timeOfDay == fx->IsVariable;
 		break;
 	default:

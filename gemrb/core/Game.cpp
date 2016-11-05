@@ -1754,7 +1754,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600);
+		// TODO: should take time of day into account (GameScript::TimeOfDay)
+		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, core->Time.GetHour(GameTime)/12);
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {
@@ -2028,7 +2029,7 @@ const Color *Game::GetGlobalTint() const
 	}
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
 		//get daytime colour
-		ieDword daynight = ((GameTime/AI_UPDATE_TIME)%7200/300);
+		ieDword daynight = core->Time.GetHour(GameTime);
 		if (daynight<2 || daynight>22) {
 			return &NightTint;
 		}
@@ -2051,7 +2052,7 @@ const Color *Game::GetGlobalTint() const
 
 bool Game::IsDay()
 {
-	ieDword daynight = ((GameTime/AI_UPDATE_TIME)%7200/300);
+	ieDword daynight = core->Time.GetHour(GameTime);
 	if(daynight<4 || daynight>20) {
 		return false;
 	}
@@ -2069,7 +2070,8 @@ void Game::ChangeSong(bool always, bool force)
 		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
-		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
+		// TODO: should this take time of day into account?
+		Song = core->Time.GetHour(GameTime)/12;
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)

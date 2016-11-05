@@ -521,7 +521,8 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		return DiffCore(EARelation(Owner, target), val, rel);
 	case STI_DAYTIME:
 		{
-			ieDword timeofday = core->GetGame()->GameTime%7200/3600;
+			// TODO: recheck, most of the code computes this differently (checking time of day)
+			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime)/12;
 			return timeofday>= val && timeofday<= rel;
 		}
 	case STI_AREATYPE:

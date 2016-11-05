@@ -5165,11 +5165,12 @@ void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 {
 	// first, calculate the current number of hours.
-	int padding = ((core->GetGame()->GameTime / AI_UPDATE_TIME) % 7200) / 300;
+	int padding = core->Time.GetHour(core->GetGame()->GameTime);
 	// then, calculate the offset (in hours) required to take us to the desired hour.
-	padding = (24 + parameters->int0Parameter - padding) % 24;
-	// then, advance one day (7200), plus the desired number of hours.
-	core->GetGame()->AdvanceTime(AI_UPDATE_TIME*(7200 + padding*300), false);
+	int hoursInADay = core->Time.day_sec/core->Time.hour_sec;
+	padding = (hoursInADay + parameters->int0Parameter - padding) % hoursInADay;
+	// then, advance one day, plus the desired number of hours.
+	core->GetGame()->AdvanceTime(core->Time.day_size + padding*core->Time.hour_size, false);
 }
 
 //implement pst style parameters:

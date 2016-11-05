@@ -3836,7 +3836,7 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int hour = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300;
+	int hour = core->Time.GetHour(core->GetGame()->GameTime);
 
 	if ((parameters->int0Parameter == TIMEOFDAY_DAY && hour >= 7 && hour < 21)
 		|| (parameters->int0Parameter == TIMEOFDAY_DUSK && hour == 21)
