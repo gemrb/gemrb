@@ -5305,7 +5305,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
-	RemovalTime = time + (7200 * AI_UPDATE_TIME); // keep corpse around for a day
+	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
 	if (LastDamageType&DAMAGE_CHUNKING) {

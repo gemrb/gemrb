@@ -954,9 +954,8 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->GetNextStance();
 				}
 				break;
-			case 't'://advances time
-				// 7200 (one day) /24 (hours) == 300
-				game->AdvanceTime(300*AI_UPDATE_TIME);
+			case 't': // advances time by 1 hour
+				game->AdvanceTime(core->Time.hour_size);
 				//refresh gui here once we got it
 				break;
 			// u

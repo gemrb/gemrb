@@ -1417,9 +1417,9 @@ EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add, bool fatigue)
 {
-	ieDword h = GameTime/(300*AI_UPDATE_TIME);
+	ieDword h = GameTime/core->Time.hour_size;
 	GameTime+=add;
-	if (h!=GameTime/(300*AI_UPDATE_TIME)) {
+	if (h!=GameTime/core->Time.hour_size) {
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 		//update clock display
@@ -1428,7 +1428,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
 	// but only if we skip for at least an hour
-	if (add >= 300*AI_UPDATE_TIME) {
+	if (add >= core->Time.hour_size) {
 		for (unsigned int i=0; i<PCs.size(); i++) {
 			Actor *pc = PCs[i];
 			int conHealRate = pc->GetConHealAmount();;
@@ -1771,7 +1771,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			}
 		}
 	} else {
-		AdvanceTime(hours*300*AI_UPDATE_TIME);
+		AdvanceTime(hours * core->Time.hour_size);
 	}
 
 	int i = GetPartySize(true); // party size, only alive
@@ -2194,7 +2194,7 @@ void Game::dump() const
 	if (Scripts[0]) {
 		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
 	}
-	int hours = GameTime/AI_UPDATE_TIME/300;
+	int hours = GameTime/core->Time.hour_size;
 	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime, hours/24, hours%24);
 	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
 

@@ -4091,7 +4091,7 @@ int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day == parameters->int0Parameter) {
 		return 1;
 	}
@@ -4100,7 +4100,7 @@ int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day > parameters->int0Parameter) {
 		return 1;
 	}
@@ -4109,7 +4109,7 @@ int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day < parameters->int0Parameter) {
 		return 1;
 	}
