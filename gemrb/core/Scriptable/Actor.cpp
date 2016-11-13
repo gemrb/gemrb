@@ -3373,7 +3373,7 @@ void Actor::UpdateFatigue()
 		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
 	}
 
-	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / 18000; // 18000 == 4 hours
+	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size);
 	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
 	// pst has TNO regeneration stored there
 	if (core->HasFeature(GF_AREA_OVERRIDE)) FatigueBonus = 0;
@@ -3391,7 +3391,7 @@ void Actor::UpdateFatigue()
 		}
 	} else if (!TicksLastRested) {
 		//if someone changed FatigueLevel, or loading a game, reset
-		TicksLastRested = game->GameTime - 18000 * BaseStats[IE_FATIGUE];
+		TicksLastRested = game->GameTime - (4*core->Time.hour_size) * BaseStats[IE_FATIGUE];
 		if (LuckMod < 0) {
 			VerbalConstant(VB_TIRED, 1);
 		}
