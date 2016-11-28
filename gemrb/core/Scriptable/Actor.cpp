@@ -10240,12 +10240,6 @@ int Actor::GetArmorSkillPenalty(int profcheck) const
 
 // Returns the armor check penalty.
 // used for mapping the iwd2 armor feat to the equipped armor's weight class
-// the armor weight class is perfectly deduced from the penalty as following:
-// 0,   none: none, robes
-// 1-3, light: leather, studded
-// 4-6, medium: hide, chain, scale
-// 7-,  heavy: splint, plate, full plate
-// the values are taken from our dehardcoded itemdata.2da
 // magical shields and armors get a +1 bonus
 int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 {
@@ -10253,15 +10247,7 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 
 	ieWord armorType = inventory.GetArmorItemType();
 	int penalty = core->GetArmorPenalty(armorType);
-	int weightClass = 0;
-
-	if (penalty >= 1 && penalty < 4) {
-		weightClass = 1;
-	} else if (penalty >= 4 && penalty < 7) {
-		weightClass = 2;
-	} else if (penalty >= 7) {
-		weightClass = 3;
-	}
+	int weightClass = GetArmorWeightClass(armorType);
 
 	// ignore the penalty if we are proficient
 	if (profcheck && GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
@@ -10310,6 +10296,29 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 	shield = shieldPenalty;
 
 	return -penalty;
+}
+
+// the armor weight class is perfectly deduced from the penalty as following:
+// 0,   none: none, robes
+// 1-3, light: leather, studded
+// 4-6, medium: hide, chain, scale
+// 7-,  heavy: splint, plate, full plate
+// the values are taken from our dehardcoded itemdata.2da
+int Actor::GetArmorWeightClass(ieWord armorType) const
+{
+	if (!third) return 0;
+
+	int penalty = core->GetArmorPenalty(armorType);
+	int weightClass = 0;
+
+	if (penalty >= 1 && penalty < 4) {
+		weightClass = 1;
+	} else if (penalty >= 4 && penalty < 7) {
+		weightClass = 2;
+	} else if (penalty >= 7) {
+		weightClass = 3;
+	}
+	return weightClass;
 }
 
 int Actor::GetTotalArmorFailure() const

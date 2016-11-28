@@ -872,6 +872,7 @@ public:
 	/* returns the armor check penalty */
 	int GetArmorSkillPenalty(int profcheck=1) const;
 	int GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const;
+	int GetArmorWeightClass(ieWord armorType) const;
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
