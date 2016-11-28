@@ -6492,20 +6492,32 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 			attacknum--; // remove 1, since it is for the other hand (otherwise we would never use the max tohit for this hand)
 		}
 		if (third) {
+			// rangers wearing light or no armor gain ambidexterity and
+			//  two-weapon-fighting feats for free
+			bool ambidextrous = HasFeat(FEAT_AMBIDEXTERITY);
+			bool twoWeaponFighting = HasFeat(FEAT_TWO_WEAPON_FIGHTING);
+			if (GetRangerLevel()) {
+				ieWord armorType = inventory.GetArmorItemType();
+				if (GetArmorWeightClass(armorType) <= 1) {
+					ambidextrous = true;
+					twoWeaponFighting = true;
+				}
+			}
+
 			// FIXME: externalise
 			// penalites and boni for both hands:
 			// -6 main, -10 off with no adjustments
 			//  0 main, +4 off with ambidexterity
 			// +2 main, +2 off with two weapon fighting
 			// +2 main, +2 off with a simple weapons in the off hand (handled in GetCombatDetails)
-			if (HasFeat(FEAT_TWO_WEAPON_FIGHTING)) {
+			if (twoWeaponFighting) {
 				prof += 2;
 			}
 			if (Flags&WEAPON_LEFTHAND) {
 				prof -= 6;
 			} else {
 				prof -= 10;
-				if (HasFeat(FEAT_AMBIDEXTERITY)) {
+				if (ambidextrous) {
 					prof += 4;
 				}
 			}
