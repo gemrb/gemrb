@@ -42,8 +42,7 @@ before_install:
   - chmod 0600 id_travissfbot
 
 before_script:
-  - cmake --version # too old for MODULE, but only on the linux host
-  - if [ $TRAVIS_OS_NAME != osx ]; then sed -i 's,\(FIND_PACKAGE.*\) MODULE,\1,' CMakeLists.txt; fi
+  - cmake --version
 
 script:
   - mkdir build && cd build
