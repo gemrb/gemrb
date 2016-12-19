@@ -40,7 +40,8 @@
 #include <string>
 #include <vector>
 
-#ifdef _MSC_VER // No SFINAE
+// No SFINAE
+#if defined(_MSC_VER) || defined(__sgi)
 #include "DataFileMgr.h"
 #include "MusicMgr.h"
 #include "SaveGame.h"
@@ -89,8 +90,10 @@ class Spell;
 class Sprite2D;
 class Store;
 class StringMgr;
+#ifndef __sgi
 class SymbolMgr;
 class TableMgr;
+#endif
 class TextArea;
 class Variables;
 class Video;
