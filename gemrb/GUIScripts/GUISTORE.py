@@ -760,7 +760,11 @@ def UpdateStoreCommon (Window, title, name, gold):
 
 	if Store['StoreName'] != -1:
 		Label = Window.GetControl (title)
-		Label.SetText (GemRB.GetString (Store['StoreName']).upper ())
+		if GameCheck.IsIWD2():
+			# targos store is a good test - wouldn't fit as uppercase either
+			Label.SetText (Store['StoreName'])
+		else:
+			Label.SetText (GemRB.GetString (Store['StoreName']).upper ())
 
 	if name:
 		pc = GemRB.GameGetSelectedPCSingle ()
