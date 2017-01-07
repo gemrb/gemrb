@@ -116,7 +116,6 @@ typedef struct SFMT_T sfmt_t;
 void sfmt_fill_array32(sfmt_t * sfmt, uint32_t * array, int size);
 void sfmt_fill_array64(sfmt_t * sfmt, uint64_t * array, int size);
 void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed);
-void sfmt_init_by_array(sfmt_t * sfmt, uint32_t * init_key, int key_length);
 const char * sfmt_get_idstring(sfmt_t * sfmt);
 int sfmt_get_min_array_size32(sfmt_t * sfmt);
 int sfmt_get_min_array_size64(sfmt_t * sfmt);
