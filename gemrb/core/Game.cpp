@@ -86,6 +86,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
 	partysize = 6;
 	Ticks = 0;
+	GameTime = RealTime = 0;
 	version = 0;
 	Expansion = 0;
 	LoadMos[0] = 0;
@@ -113,6 +114,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
+	WhichFormation = 0;
+	NpcInParty = 0;
+	CurrentLink = 0;
+	PartyAttack = false;
 
 	//loading master areas
 	AutoTable table;
