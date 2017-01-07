@@ -2064,6 +2064,8 @@ void Game::ChangeSong(bool always, bool force)
 	int Song;
 	static int BattleSong = 0;
 
+	if (!area) return;
+
 	if (CombatCounter) {
 		//battlesong
 		Song = SONG_BATTLE;
