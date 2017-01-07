@@ -130,6 +130,15 @@ static int GetTrackString(const ieResRef areaName)
 
 AREImporter::AREImporter(void)
 {
+	EntrancesOffset = ContainersOffset = InfoPointsOffset = SpawnOffset = 0;
+	EntrancesCount = ContainersCount = InfoPointsCount = SpawnCount = 0;
+	ItemsOffset = VariablesOffset = AmbiOffset = TileOffset = TrapOffset = 0;
+	ItemsCount = VariablesCount = AmbiCount = TileCount = TrapCount = 0;
+	ActorCount = VerticesCount = NoteCount = 0;
+	ActorOffset = VerticesOffset = NoteOffset = EffectOffset = 0;
+	AreaDifficulty = 0;
+	SongHeader = RestHeader = 0;
+
 	str = NULL;
 	if (Sounds[0][0] == UNINITIALIZED_BYTE) {
 		memset( Sounds, 0, sizeof( Sounds ) );
