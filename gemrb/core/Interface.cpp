@@ -2550,6 +2550,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				if (newfx) {
 					newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
+					delete newfx;
 				}
 			}
 		}
