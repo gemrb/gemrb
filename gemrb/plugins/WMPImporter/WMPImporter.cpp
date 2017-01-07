@@ -260,15 +260,13 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 
 int WMPImporter::PutWorldMap(DataStream *stream1, DataStream *stream2, WorldMapArray *wmap)
 {
-	if (! (stream1 || stream2) || !wmap) {
+	if (!stream1 || !wmap) {
 		return -1;
 	}
 
-	if (stream1) {
-		stream1->Write( "WMAPV1.0", 8);
-		stream1->WriteDword( &WorldMapsCount1);
-		stream1->WriteDword( &WorldMapsOffset1);
-	}
+	stream1->Write( "WMAPV1.0", 8);
+	stream1->WriteDword( &WorldMapsCount1);
+	stream1->WriteDword( &WorldMapsOffset1);
 
 	if (stream2 && !wmap->IsSingle()) {
 		stream2->Write( "WMAPV1.0", 8);
