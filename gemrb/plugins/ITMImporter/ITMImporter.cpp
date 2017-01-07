@@ -99,7 +99,7 @@ bool ITMImporter::Open(DataStream* stream)
 	} else if (strncmp( Signature, "ITM V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		Log(WARNING, "ITMImporter", "This file is not a valid ITM file!");
+		Log(WARNING, "ITMImporter", "This file is not a valid ITM file! Actual signature: %s", Signature);
 		return false;
 	}
 

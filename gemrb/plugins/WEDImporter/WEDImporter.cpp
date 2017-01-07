@@ -72,7 +72,7 @@ bool WEDImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "WED V1.3", 8 ) != 0) {
-		Log(ERROR, "WEDImporter", "This file is not a valid WED File");
+		Log(ERROR, "WEDImporter", "This file is not a valid WED File! Actual signature: %s", Signature);
 		return false;
 	}
 	str->ReadDword( &OverlaysCount );

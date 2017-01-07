@@ -61,7 +61,7 @@ bool STOImporter::Open(DataStream* stream)
 		//GemRB's internal version with all known fields supported
 		version = 0;
 	} else {
-		Log(WARNING, "STOImporter", "This file is not a valid STO file!");
+		Log(WARNING, "STOImporter", "This file is not a valid STO file! Actual signature: %s", Signature);
 		return false;
 	}
 

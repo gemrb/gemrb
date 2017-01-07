@@ -100,7 +100,7 @@ bool GAMImporter::Open(DataStream* stream)
 			version=GAM_VER_BG;
 		}
 	} else {
-		Log(ERROR, "GAMImporter", "This file is not a valid GAM File");
+		Log(ERROR, "GAMImporter", "This file is not a valid GAM File! Actual signature: %s", Signature);
 		return false;
 	}
 
