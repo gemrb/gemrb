@@ -66,6 +66,9 @@
 #include <algorithm>
 #include <cstdio>
 
+// MIPSPro fix for IRIX
+size_t strlcpy(char *, const char *, size_t);
+
 using namespace GemRB;
 
 GUIScript *GemRB::gs = NULL;
