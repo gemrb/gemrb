@@ -153,7 +153,7 @@ void LoadPlugins(char* pluginpath)
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
 
 	char path[_MAX_PATH];
-	strcpy( path, pluginpath );
+	strlcpy(path, pluginpath, _MAX_PATH);
 
 	std::list< char * > files;
 	if (! FindFiles( path, files )) {

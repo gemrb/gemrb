@@ -4373,7 +4373,10 @@ void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 bool Interface::StupidityDetector(const char* Pt)
 {
 	char Path[_MAX_PATH];
-	strcpy( Path, Pt );
+	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "Interface", "Trying to check too long path: %s!", Pt);
+		return true;
+	}
 	DirectoryIterator dir(Path);
 	if (!dir) {
 		print("\n**cannot open**");
@@ -4405,7 +4408,10 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 	char Path[_MAX_PATH];
 
 	if (!Pt[0]) return; //Don't delete the root filesystem :)
-	strcpy( Path, Pt );
+	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "Interface", "Trying to delete too long path: %s!", Pt);
+		return;
+	}
 	DirectoryIterator dir(Path);
 	if (!dir) {
 		return;

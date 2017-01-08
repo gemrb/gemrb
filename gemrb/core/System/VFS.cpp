@@ -208,6 +208,7 @@ static bool FindInDir(const char* Dir, char *Filename)
 	// First test if there's a Filename with exactly same name
 	// and if yes, return it and do not search in the Dir
 	char TempFilePath[_MAX_PATH];
+	assert(strnlen(Dir, _MAX_PATH/2) < _MAX_PATH/2);
 	strcpy(TempFilePath, Dir);
 	PathAppend( TempFilePath, Filename );
 
@@ -260,7 +261,7 @@ bool PathJoin (char *target, const char *base, ...)
 			} else if (slash) {
 				strncat(filename, source, slash-source);
 			} else {
-				strcpy(filename, source);
+				strlcpy(filename, source, _MAX_PATH/4);
 			}
 			if (!FindInDir(target, filename)) {
 				PathAppend(target, source);
@@ -285,7 +286,11 @@ finish:
 bool PathJoinExt (char* target, const char* dir, const char* base, const char* ext)
 {
 	char file[_MAX_PATH];
-	strcpy(file, base);
+	assert(strnlen(ext, 5) < 5);
+	if (strlcpy(file, base, _MAX_PATH-5) >= _MAX_PATH-5) {
+		Log(ERROR, "VFS", "Too long base path: %s!", base);
+		return false;
+	}
 	strcat(file, ".");
 	strcat(file, ext);
 	return PathJoin(target, dir, file, NULL);
@@ -362,7 +367,10 @@ void ResolveFilePath(char* FilePath)
 	if (core && !core->CaseSensitive) {
 		return;
 	}
-	strcpy(TempFilePath, FilePath);
+	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
+		Log(ERROR, "VFS", "Too long path to resolve: %s!", FilePath);
+		return;
+	}
 	PathJoin(FilePath, TempFilePath[0]==PathDelimiter?SPathDelimiter:"", TempFilePath, NULL);
 }
 
@@ -402,6 +410,7 @@ bool MakeDirectories(const char* path)
 {
 	char TempFilePath[_MAX_PATH] = "";
 	char Tokenized[_MAX_PATH];
+	assert(strnlen(path, _MAX_PATH/2) < _MAX_PATH/2);
 	strcpy(Tokenized, path);
 
 	char* Token = strtok(Tokenized, &PathDelimiter);
@@ -411,6 +420,7 @@ bool MakeDirectories(const char* path)
 				TempFilePath[0] = PathDelimiter;
 				TempFilePath[1] = 0;
 			}
+			assert(strnlen(Token, _MAX_PATH/2) < _MAX_PATH/2);
 			strcat(TempFilePath, Token);
 		} else
 			PathJoin(TempFilePath, TempFilePath, Token, NULL);

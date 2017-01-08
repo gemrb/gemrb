@@ -125,7 +125,7 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 			appName = argv[0];
 		}
 
-		strcpy( name, appName );
+		strlcpy(name, appName, _MAX_PATH);
 		assert(name[0]);
 
 #if TARGET_OS_MAC
