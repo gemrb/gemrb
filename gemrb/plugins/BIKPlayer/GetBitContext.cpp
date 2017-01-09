@@ -188,7 +188,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 
 	table_size = 1 << table_nb_bits;
 	table_index = alloc_table(table_size);
-	if (table_index < 0)
+	if (table_index < 0 || table_nb_bits > 30)
 	    return -1;
 	p_table = &table[table_index];
 
