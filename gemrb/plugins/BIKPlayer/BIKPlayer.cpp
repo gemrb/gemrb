@@ -71,6 +71,16 @@ BIKPlayer::BIKPlayer(void)
 	//force initialisation of static tables
 	memset(bink_trees, 0, sizeof(bink_trees));
 	memset(table, 0, sizeof(table));
+
+	memset(&v_timebase, 0, sizeof(v_timebase));
+	memset(&c_scantable, 0, sizeof(c_scantable));
+	memset(&c_bundle, 0, sizeof(c_bundle));
+	memset(&c_col_high, 0, sizeof(c_col_high));
+	memset(&c_pic, 0, sizeof(c_pic));
+	memset(&c_last, 0, sizeof(c_last));
+	timer_last_sec = timer_last_usec = frame_wait = c_col_lastval = 0;
+	outputwidth = outputheight = video_frameskip = video_skippedframes = 0;
+	video_rendered_frame = done = false;
 }
 
 BIKPlayer::~BIKPlayer(void)
