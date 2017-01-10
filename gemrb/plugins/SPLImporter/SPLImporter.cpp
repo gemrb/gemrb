@@ -83,6 +83,7 @@ static int GetCGSound(ieDword CastingGraphics)
 SPLImporter::SPLImporter(void)
 {
 	str = NULL;
+	version = 0;
 }
 
 SPLImporter::~SPLImporter(void)
