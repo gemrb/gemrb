@@ -92,6 +92,7 @@ public:
 	int index;
 	int size_in_bits;
 public:
+	GetBitContext() : buffer(NULL), buffer_end(NULL), index(0), size_in_bits(0) {};
 	void debug(const char *prefix);
 	float get_float();
 	void skip_bits(int x) { index+=x; }
