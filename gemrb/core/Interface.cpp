@@ -246,6 +246,7 @@ Interface::Interface()
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
+	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
 	SpecialSpellsCount = -1;
@@ -256,6 +257,12 @@ Interface::Interface()
 	TLKEncoding.multibyte = false;
 	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
+	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
+	MultipleQuickSaves = false;
+	MaxPartySize = 6;
+
+	//once GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
 
 	gamedata = new GameData();
 }
@@ -1256,9 +1263,6 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	//once GemRB own format is working well, this might be set to 0
-	SaveAsOriginal = 1;
-
 	plugin_flags = new Variables();
 	plugin_flags->SetType( GEM_VARIABLES_INT );
 
@@ -1302,7 +1306,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
-	MaxPartySize = 6;
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
