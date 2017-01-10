@@ -41,6 +41,7 @@ using namespace GemRB;
 CHUImporter::CHUImporter()
 {
 	str = NULL;
+	WindowCount = CTOffset = WEOffset = 0;
 }
 
 CHUImporter::~CHUImporter()
