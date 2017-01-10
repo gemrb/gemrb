@@ -806,7 +806,7 @@ public:
 	char GamePath[_MAX_PATH];
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
-	int Width, Height, Bpp, ForceStereo;
+	int Width, Height, Bpp;
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;

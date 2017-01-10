@@ -2285,8 +2285,6 @@ bool Interface::LoadGemRBINI()
 		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
-	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
-
 	return true;
 }
 
