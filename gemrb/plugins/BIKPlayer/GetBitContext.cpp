@@ -208,7 +208,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	    /* if code matches the prefix, it is in the table */
 	    n -= n_prefix;
 	    if(flags & INIT_VLC_LE)
-	        code_prefix2= code & (n_prefix>=32 ? 0xffffffff : (1 << n_prefix)-1);
+	        code_prefix2= code & ((1 << n_prefix)-1);
 	    else
 	        code_prefix2= code >> n;
 	    if (n > 0 && code_prefix2 == code_prefix) {
