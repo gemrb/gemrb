@@ -78,9 +78,14 @@ BIKPlayer::BIKPlayer(void)
 	memset(&c_col_high, 0, sizeof(c_col_high));
 	memset(&c_pic, 0, sizeof(c_pic));
 	memset(&c_last, 0, sizeof(c_last));
+	memset(&header, 0, sizeof(header));
+	memset(s_coeffs_ptr, 0, sizeof(s_coeffs_ptr));
 	timer_last_sec = timer_last_usec = frame_wait = c_col_lastval = 0;
 	outputwidth = outputheight = video_frameskip = video_skippedframes = 0;
-	video_rendered_frame = done = false;
+	s_frame_len = s_overlap_len = s_num_bands = s_block_size = 0;
+	video_rendered_frame = done = validVideo = s_audio = false;
+	s_channels = s_first = s_stream = s_root = 0;
+	s_bands = NULL;
 }
 
 BIKPlayer::~BIKPlayer(void)
