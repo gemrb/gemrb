@@ -184,6 +184,8 @@ public:
 	{
 		Weight=-1; //invalid weight
 		MaxStackAmount=0;
+		Flags = 0;
+		Expired = 0;
 	}
 };
 
