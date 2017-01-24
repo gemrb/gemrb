@@ -34,6 +34,10 @@ namespace GemRB {
 ITMExtHeader::ITMExtHeader(void)
 {
 	features = NULL;
+	Location = Range = Speed = unknown1 = RechargeFlags = IDReq = 0;
+	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
+	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
+	ProjectileAnimation = ProjectileQualifier = FeatureCount = FeatureOffset = 0;
 }
 
 ITMExtHeader::~ITMExtHeader(void)
