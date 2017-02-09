@@ -49,6 +49,15 @@ Item::Item(void)
 {
 	ext_headers = NULL;
 	equipping_features = NULL;
+	MinStrength = MinStrengthBonus = Weight = MaxStackAmount = 0;
+	MinIntelligence = MinDexterity = MinWisdom = MinConstitution = MinCharisma = 0;
+	WeaProf = WieldColor = Enchantment = KitUsability = 0;
+	Price = LoreToID = ItemDesc = ItemDescIdentified = 0;
+	ExtHeaderOffset = ExtHeaderCount = FeatureBlockOffset = 0;
+	EquippingFeatureOffset = EquippingFeatureCount = 0;
+	unknown2 = unknown3 = 0;
+	ItemExcl = false;
+	DialogName = 0;
 }
 
 Item::~Item(void)
