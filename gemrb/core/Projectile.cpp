@@ -78,9 +78,9 @@ Projectile::Projectile()
 	drawSpark = 0;
 	ZPos = 0;
 	extension_delay = 0;
-	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = 0;
-	IDSType = IDSValue = IDSType2 = IDSValue2 = 0;
-	LightX = LightY = LightZ = Aim = type = 0;
+	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = Speed = SFlags = ExtFlags = 0;
+	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
+	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
 	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
 	extension_explosioncount = extension_targetcount = 0;
 	memset(&tint, 0, sizeof(tint));
