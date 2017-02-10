@@ -1812,6 +1812,32 @@ int EffectQueue::BonusForParam2(EffectRef &effect_reference, ieDword param2) con
 	return BonusForParam2(effect_reference.opcode, param2);
 }
 
+int EffectQueue::MaxParam1(ieDword opcode, bool positive) const
+{
+	int max = 0;
+	ieDwordSigned param1 = 0;
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+
+		param1 = signed((*f)->Parameter1);
+		if ((positive && param1 > max) || (!positive && param1 < max)) {
+			max = param1;
+		}
+	}
+	return max;
+}
+
+int EffectQueue::MaxParam1(EffectRef &effect_reference, bool positive) const
+{
+	ResolveEffectRef(effect_reference);
+	if( effect_reference.opcode<0) {
+		return 0;
+	}
+	return MaxParam1(effect_reference.opcode, positive);
+}
+
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
 {
 	std::list< Effect* >::const_iterator f;
