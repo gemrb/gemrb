@@ -831,6 +831,13 @@ static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 
+static EffectRef fx_str_ref = { "StrengthModifier", -1 };
+static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
+static EffectRef fx_wis_ref = { "WisdomModifier", -1 };
+static EffectRef fx_dex_ref = { "DexterityModifier", -1 };
+static EffectRef fx_con_ref = { "ConstitutionModifier", -1 };
+static EffectRef fx_chr_ref = { "CharismaModifier", -1 };
+
 static void Cleanup()
 {
 	core->FreeResRefTable(casting_glows, cgcount);
@@ -878,6 +885,48 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	} else {
 		STAT_ADD( stat, mod );
 	}
+}
+
+// ignoring strextra, since it won't be used
+EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_dex_ref, fx_con_ref, fx_chr_ref };
+
+// handle 3ed's effect exclusion for main stats, where only the highest bonus counts
+// NOTE: handles only additive bonuses, since others aren't present and would only muddy matters
+static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
+{
+	int bonus = fx->Parameter1;
+	if (!core->HasFeature(GF_3ED_RULES) || fx->Parameter2 != MOD_ADDITIVE) return;
+
+	if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+		// don't touch it, so eg. potion of holy transference still works 00POTN89
+		return;
+	}
+
+	// restore initial value in case we anulled it the previous tick
+	if (!bonus && fx->Parameter3 != 0) {
+		bonus = fx->Parameter3;
+		fx->Parameter3 = 0;
+	}
+	if (!bonus) return;
+
+	// get lowest and highest current bonus, if any
+	EffectRef &eff_ref = mainStatRefs[stat-IE_STR];
+
+	// maybe it's the only effect
+	if (target->fxqueue.CountEffects(eff_ref, fx->Parameter1, fx->Parameter2, NULL) == 1) {
+		return;
+	}
+
+	int maxMalus = target->fxqueue.MaxParam1(eff_ref, false);
+	int maxBonus = target->fxqueue.MaxParam1(eff_ref, true);
+	if (bonus > 0 && bonus > maxBonus) {
+		return;
+	} else if (bonus < 0 && bonus < maxMalus) {
+		return;
+	}
+	fx->Parameter1 = 0;
+	fx->Parameter3 = bonus;
+	return;
 }
 
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
@@ -1183,6 +1232,9 @@ int fx_charisma_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply == 1 && fx->Parameter1 == 0 && fx->Parameter2 == 0) {
 		fx->Parameter1 = DICE_ROLL(0);
 	}
+
+	HandleMainStatBonus(target, IE_CHR, fx);
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_CHR );
 	} else {
@@ -1254,6 +1306,8 @@ int fx_set_color_pulse_rgb_global (Scriptable* /*Owner*/, Actor* target, Effect*
 int fx_constitution_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_constitution_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	HandleMainStatBonus(target, IE_CON, fx);
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_CON );
@@ -1437,6 +1491,8 @@ int fx_dexterity_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter2 = 0;
 	}
 
+	HandleMainStatBonus(target, IE_DEX, fx);
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_DEX );
 	} else {
@@ -1611,6 +1667,8 @@ int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_intelligence_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_intelligence_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	HandleMainStatBonus(target, IE_INT, fx);
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_INT );
@@ -2119,6 +2177,8 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter2 = 0;
 	}
 
+	HandleMainStatBonus(target, IE_STR, fx);
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_STR );
 	} else {
@@ -2219,6 +2279,8 @@ int fx_cure_silenced_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_wisdom_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_wisdom_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	HandleMainStatBonus(target, IE_WIS, fx);
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_WIS );
