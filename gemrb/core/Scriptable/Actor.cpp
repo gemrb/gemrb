@@ -337,6 +337,7 @@ static int CheckAbilities=false;
 
 // from FXOpcodes
 #define PI_DRUNK   5
+#define PI_FATIGUE 39
 #define PI_PROJIMAGE  77
 
 static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
@@ -3379,9 +3380,9 @@ void Actor::UpdateFatigue()
 	// do icons here, so they persist for more than a tick
 	int LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
 	if (LuckMod) {
-		AddPortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+		AddPortraitIcon(PI_FATIGUE);
 	} else {
-		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+		DisablePortraitIcon(PI_FATIGUE);
 	}
 
 	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size);
