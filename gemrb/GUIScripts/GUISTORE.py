@@ -1811,7 +1811,6 @@ def GulpDrink ():
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
-	intox = 0
 	if intox > 80:
 		TextArea.Append (strrefs["toodrunk"])
 		return
