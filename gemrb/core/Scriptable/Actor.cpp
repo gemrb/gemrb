@@ -335,6 +335,10 @@ std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 static int ReverseToHit=true;
 static int CheckAbilities=false;
 
+// from FXOpcodes
+#define PI_DRUNK   5
+#define PI_PROJIMAGE  77
+
 static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
 static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 };
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
@@ -2919,8 +2923,6 @@ ieDword Actor::GetCGGender()
 	return gender;
 }
 
-#define PI_PROJIMAGE  77
-
 void Actor::CheckPuppet(Actor *puppet, ieDword type)
 {
 	if (!puppet) return;
@@ -3253,6 +3255,15 @@ void Actor::RefreshPCStats() {
 				NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 			}
 		}
+	}
+
+	// handle intoxication
+	// the cutoff is at half of max, coinciding with where the intoxmod penalties start
+	// TODO: intoxmod, intoxcon
+	if (BaseStats[IE_INTOXICATION] >= 50) {
+		AddPortraitIcon(PI_DRUNK);
+	} else {
+		DisablePortraitIcon(PI_DRUNK);
 	}
 
 	//get the wspattack bonuses for proficiencies

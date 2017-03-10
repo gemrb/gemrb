@@ -54,6 +54,7 @@ using namespace GemRB;
 #define PI_RIGID     2
 #define PI_CONFUSED  3
 #define PI_BERSERK   4
+#define PI_DRUNK     5
 #define PI_POISONED  6
 #define PI_DISEASED  7
 #define PI_BLIND     8
@@ -76,6 +77,7 @@ using namespace GemRB;
 
 #define PI_CONTINGENCY 75
 #define PI_BLOODRAGE 76 //iwd2
+#define PI_PROJIMAGE 77
 #define PI_MAZE     78
 #define PI_PRISON   79
 #define PI_STONESKIN 80
