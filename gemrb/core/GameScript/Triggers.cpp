@@ -319,7 +319,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (core->GetGameControl()->dialoghandler->IsSpeaker(Sender))
+	if (core->GetGameControl()->dialoghandler->IsSpeaker(scr))
 		return 1;
 	return 0;
 }
