@@ -891,6 +891,7 @@ public:
 	void ReleaseCurrentAction();
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
+	int GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;
