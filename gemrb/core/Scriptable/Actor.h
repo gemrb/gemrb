@@ -366,7 +366,7 @@ private:
 	char AttackStance;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
-	int TicksLastRested;
+	ieDword TicksLastRested;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -891,7 +891,7 @@ public:
 	void ReleaseCurrentAction();
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
-	int GetLastRested() { return TicksLastRested; }
+	ieDword GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;

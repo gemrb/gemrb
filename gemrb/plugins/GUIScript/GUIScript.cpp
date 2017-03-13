@@ -14016,7 +14016,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 				GameScript* restscript = new GameScript(resref, tar, 0, 0);
 				restscript->Update();
 				delete restscript;
-				if ((unsigned)tar->GetLastRested() == core->GetGame()->GameTime) {
+				if (tar->GetLastRested() == core->GetGame()->GameTime) {
 					dreamed = 1;
 				}
 			}
