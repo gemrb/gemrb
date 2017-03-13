@@ -2065,9 +2065,11 @@ def ToggleAlwaysRun():
 
 def RestPress ():
 	GUICommon.CloseOtherWindow(None)
-	GemRB.RunRestScripts ()
-	# ensure the scripts run before the actual rest
-	GemRB.SetTimedEvent (RealRestPress, 2)
+	# only rest if the dream scripts haven't already
+	# bg2 completely offloaded resting to them - if there's a talk, it has to call Rest(Party) itself
+	if not GemRB.RunRestScripts ():
+		# ensure the scripts run before the actual rest
+		GemRB.SetTimedEvent (RealRestPress, 2)
 
 def RealRestPress ():
 	GemRB.RestParty(0, 0, 1)
