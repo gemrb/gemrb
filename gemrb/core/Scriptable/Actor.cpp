@@ -3893,6 +3893,10 @@ void Actor::IdleActions(bool nonidle)
 		return;
 	}
 
+	if (time/nextComment > 1) { // first run, not adjusted for game time yet
+		nextComment += time;
+	}
+
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
