@@ -338,6 +338,7 @@ public:
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored
+	int FatigueComplaintDelay;   // stagger tired messages
 	ieDword lastInit;
 	int speed;
 	//how many attacks left in this round, must be public for cleave opcode

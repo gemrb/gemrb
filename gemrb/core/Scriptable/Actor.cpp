@@ -482,6 +482,7 @@ Actor::Actor()
 	panicMode = PANIC_NONE;
 	nextComment = 100 + RAND(0, 350); // 7-30s delay
 	nextBored = 0;
+	FatigueComplaintDelay = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 
@@ -3399,12 +3400,21 @@ void Actor::UpdateFatigue()
 		LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
 		BaseStats[IE_LUCK] += LuckMod-OldLuckMod;
 		if (LuckMod < 0) {
-			VerbalConstant(VB_TIRED, 1);
+			// stagger the complaint, so long travels don't cause a fatigue choir
+			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else if (!TicksLastRested) {
 		//if someone changed FatigueLevel, or loading a game, reset
 		TicksLastRested = game->GameTime - (4*core->Time.hour_size) * BaseStats[IE_FATIGUE];
+		FatigueComplaintDelay = 0;
 		if (LuckMod < 0) {
+			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
+		}
+	}
+
+	if (FatigueComplaintDelay) {
+		FatigueComplaintDelay--;
+		if (!FatigueComplaintDelay) {
 			VerbalConstant(VB_TIRED, 1);
 		}
 	}
