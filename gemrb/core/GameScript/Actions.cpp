@@ -5157,6 +5157,7 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->AdvanceTime(parameters->int0Parameter*AI_UPDATE_TIME);
+	core->GetGame()->ResetPartyCommentTimes();
 }
 
 //advance at least one day, then stop at next day/dusk/night/morning
