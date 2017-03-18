@@ -4782,10 +4782,11 @@ int fx_damage_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xab Spell:Add
+// param2 handling is a gemrb extension
 int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_add_innate(%2d): Resource: %s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	target->LearnSpell(fx->Resource, fx->Parameter2);
+	target->LearnSpell(fx->Resource, fx->Parameter2|LS_MEMO);
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }
