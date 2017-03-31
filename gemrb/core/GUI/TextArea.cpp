@@ -165,6 +165,9 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
 		frame.w -= offset;
 	}
+	if (frame.w < 0) {
+		frame.w = 0;
+	}
 	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
 	textContainer->SetFrame(Region(Point(), frame));
 	contentWrapper.SetFrame(Region(Point(), frame));
