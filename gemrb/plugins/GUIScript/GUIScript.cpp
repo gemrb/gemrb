@@ -6566,9 +6566,9 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Window_CreateTextArea__doc,
 "===== Window_CreateTextArea =====\n\
 \n\
-**Prototype:** GemRB.CreateTextArea (WindowIndex, ControlID, x, y, w, h, font)\n\
+**Prototype:** GemRB.CreateTextArea (WindowIndex, ControlID, x, y, w, h, font, alignment)\n\
 \n\
-**Metaclass Prototype:** CreateTextArea (ControlID, x, y, w, h, font)\n\
+**Metaclass Prototype:** CreateTextArea (ControlID, x, y, w, h, font, alignment)\n\
 \n\
 **Description:** Creates and adds a new TextArea to a Window. Used \n\
 in PST MapNote editor. The maximum length of the edit field is 500 characters.\n\
@@ -6578,6 +6578,7 @@ in PST MapNote editor. The maximum length of the edit field is 500 characters.\n
   * ControlID   - the new control will be available via this controlID\n\
   * x,y,w,h     - X position, Y position, Width and Height of the control\n\
   * font        - font BAM ResRef\n\
+  * alignment   - text alignment\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -6587,11 +6588,12 @@ in PST MapNote editor. The maximum length of the edit field is 500 characters.\n
 static PyObject* GemRB_Window_CreateTextArea(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
+	int alignment; // TODO: currently unused
 	Region rgn;
 	char *font;
 
-	if (!PyArg_ParseTuple( args, "iiiiiis", &WindowIndex, &ControlID, &rgn.x,
-						  &rgn.y, &rgn.w, &rgn.h, &font )) {
+	if (!PyArg_ParseTuple( args, "iiiiiisi", &WindowIndex, &ControlID, &rgn.x,
+						  &rgn.y, &rgn.w, &rgn.h, &font, &alignment )) {
 		return AttributeError( GemRB_Window_CreateTextArea__doc );
 	}
 
