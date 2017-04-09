@@ -78,6 +78,9 @@ namespace GemRB {
 #define IE_STR_STRREFOFF  256
 #define IE_STR_REMOVE_NEWLINE  0x1000 // gemrb extension: remove extraneus ending newline
 
+// checked against the strref itself
+#define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
+
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define OP_SET  0 //gemrb extension
