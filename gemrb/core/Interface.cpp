@@ -98,9 +98,6 @@ namespace GemRB {
 
 GEM_EXPORT Interface* core = NULL;
 
-//use DialogF.tlk if the protagonist is female, that's why we leave space
-static const char dialogtlk[] = "dialog.tlk\0";
-
 static int MaximumAbility = 25;
 static ieWordSigned *strmod = NULL;
 static ieWordSigned *strmodex = NULL;
@@ -1660,13 +1657,29 @@ int Interface::Init(InterfaceConfig* config)
 	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
-	PathJoin( strpath, GamePath, dialogtlk, NULL );
+	PathJoin(strpath, GamePath, "dialog.tlk", NULL);
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
 		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
 		return GEM_ERROR;
 	}
 	strings->Open(fs);
+
+	// does the language use an extra tlk?
+	if (strings->HasAltTLK()) {
+		strings2 = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
+		char strpath[_MAX_PATH];
+		PathJoin(strpath, GamePath, "dialogf.tlk", NULL);
+		FileStream* fs = FileStream::OpenFile(strpath);
+		if (!fs) {
+			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
+			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
+			strings2 = strings;
+		} else {
+			strings2->Open(fs);
+		}
+	}
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");

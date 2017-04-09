@@ -415,6 +415,7 @@ private:
 public:
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
+	Holder<StringMgr> strings2;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
