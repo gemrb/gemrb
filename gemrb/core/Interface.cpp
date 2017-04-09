@@ -2115,7 +2115,11 @@ char* Interface::GetCString(ieStrRef strref, ieDword options) const
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
-	return strings->GetCString( strref, flags | options );
+	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+		return strings2->GetCString(strref, flags | options);
+	} else {
+		return strings->GetCString(strref, flags | options);
+	}
 }
 
 String* Interface::GetString(ieStrRef strref, ieDword options) const
@@ -2125,7 +2129,12 @@ String* Interface::GetString(ieStrRef strref, ieDword options) const
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
-	return strings->GetString( strref, flags | options );
+
+	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+		return strings2->GetString(strref, flags | options);
+	} else {
+		return strings->GetString(strref, flags | options);
+	}
 }
 
 void Interface::SetFeature(int flag, int position)
