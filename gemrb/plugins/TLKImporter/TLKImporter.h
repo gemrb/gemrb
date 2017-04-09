@@ -32,6 +32,7 @@ private:
 	DataStream* str;
 
 	//Data
+	ieWord Language;
 	ieDword StrRefCount, Offset;
 	CTlkOverride *override;
 

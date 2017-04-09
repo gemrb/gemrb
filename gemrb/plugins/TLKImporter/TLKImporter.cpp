@@ -124,7 +124,7 @@ bool TLKImporter::Open(DataStream* stream)
 		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->ReadWord( &Language ); // English is 0
 	str->ReadDword( &StrRefCount );
 	str->ReadDword( &Offset );
 	return true;
