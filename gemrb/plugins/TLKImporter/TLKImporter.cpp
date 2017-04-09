@@ -510,6 +510,12 @@ empty:
 	return string;
 }
 
+bool TLKImporter::HasAltTLK() const
+{
+	// only English (language id 0) has no alt files
+	return Language;
+}
+
 StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
 	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
