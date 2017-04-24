@@ -62,7 +62,6 @@ DraggedPortrait = None
 ActionBarControlOffset = 0
 ReturnToGame = None
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
-PortraitButtons = None
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -1471,7 +1470,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 
 def OpenPortraitWindow (needcontrols=0):
-	global PortraitWindow, PortraitButtons
+	global PortraitWindow
 
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
@@ -1583,8 +1582,6 @@ def OpenPortraitWindow (needcontrols=0):
 
 def UpdatePortraitWindow ():
 	"""Updates all of the portraits."""
-
-	global PortraitButtons
 
 	Window = PortraitWindow
 
@@ -1803,7 +1800,7 @@ def PortraitButtonHPOnPress (): ##pst hitpoint display
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 
-	global PortraitWindow, PortraitButtons
+	global PortraitWindow
 
 	if not PortraitWindow:
 		return
@@ -1860,6 +1857,7 @@ def PortraitButtonOnMouseEnter ():
 		return
 
 	if GemRB.IsDraggingItem ():
+		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
 		Button = PortraitButtons[i-1]
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
@@ -1888,6 +1886,7 @@ def PortraitButtonOnMouseLeave ():
 	if not i:
 		return
 
+	PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
 	Button = PortraitButtons[i-1]
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	GemRB.SetVar ("PressedPortrait", 0)
