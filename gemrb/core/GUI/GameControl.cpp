@@ -1483,15 +1483,17 @@ void GameControl::MoveViewportTo(int x, int y, bool center) {
 		x -= vp.w/2;
 		y -= vp.h/2;
 	}
+	if (x + vp.w >= mapsize.x) {
+		x = mapsize.x - vp.w - 1;
+	}
 	if (x < 0) {
 		x = 0;
-	} else if (x + vp.w >= mapsize.x) {
-		x = mapsize.x - vp.w - 1;
+	}
+	if (y + vp.h >= mapsize.y) {
+		y = mapsize.y - vp.h - 1;
 	}
 	if (y < 0) {
 		y = 0;
-	} else if (y + vp.h >= mapsize.y) {
-		y = mapsize.y - vp.h - 1;
 	}
 
 	// override any existing viewport moves which may be in progress
