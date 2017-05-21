@@ -50,9 +50,10 @@ public:
 	Palette(const Color &color, const Color &back);
 
 	Palette(const Color* colours, bool alpha_=false) {
-		for (int i = 0; i < 256; ++i) {
-			col[i] = colours[i];
-		}
+		if(colours)
+			for (int i = 0; i < 256; ++i) {
+					col[i] = colours[i];
+			}
 		alpha = alpha_;
 		refcount = 1;
 		named = false;

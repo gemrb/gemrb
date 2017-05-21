@@ -242,7 +242,7 @@ Sprite2D* GLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixel
 
 Sprite2D* GLVideoDriver::CreateSprite8(int w, int h, void* pixels, Palette* palette, bool cK, int index)
 {
-	return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
+	return CreatePalettedSprite(w, h, 8, pixels, palette ? palette->col : NULL, cK, index);
 }
 
 void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, Palette* attachedPal,
