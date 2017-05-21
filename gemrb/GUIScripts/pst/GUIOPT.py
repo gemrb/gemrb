@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2012 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -17,10 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-
-# GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
-
-# GUIOPT:
+# GUIOPT.py - scripts to control options windows mostly from the GUIOPT winpack:
 # 0 - Main options window (peacock tail)
 # 1 - Video options window
 # 2 - msg win with 1 button
@@ -33,9 +30,11 @@
 
 ###################################################
 import CommonWindow
+import GameCheck
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GemOptions
 import GUISAVE
 import GUIOPTControls
 from GUIDefines import *
@@ -46,6 +45,9 @@ SubOptionsWindow = None
 SubSubOptionsWindow = None
 LoadMsgWindow = None
 QuitMsgWindow = None
+
+GemOptionsWindow = None
+
 
 ###################################################
 def OpenOptionsWindow ():
@@ -99,6 +101,24 @@ def OpenOptionsWindow ():
 	# Gameplay Options
 	ConfigOptButton(Window.GetControl (6), 29722, OpenGameplayOptionsWindow)
 
+	# game version, e.g. v1.1.0000
+	VersionLabel = Window.GetControl (0x10000007)
+	VersionLabel.SetText (GEMRB_VERSION)
+
+	# Gemrb enhancement options panel
+	gmo = VersionLabel.GetRect()
+	bgfx = "TOGGLE", 0,3,1,3,4
+	if GameCheck.IsPST():
+		VersionLabel.SetSize(130, 25)
+		gmo = VersionLabel.GetRect()
+		bgfx = "GPERBUT4", 0,3,2,3,0
+	if not Window.HasControl(84):
+		Button = Window.CreateButton(84, gmo['X']+gmo['Width']+5, gmo['Y'], gmo['Height'] , gmo['Height']) #proportionally sized and placed
+		Button.SetSprites(bgfx[0],bgfx[1],bgfx[2],bgfx[3],bgfx[4],bgfx[5])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemOptions.ToggleGemRBOptionsWindow)
+
+	GemRB.UnhideGUI ()
+
 	# Keyboard Mappings
 	ConfigOptButton(Window.GetControl (7), 29723, OpenKeyboardMappingsWindow)
 
@@ -114,8 +134,6 @@ def OpenOptionsWindow ():
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
 		print "ARGH, could not write config to disk!!"
-
-###################################################
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
