@@ -104,7 +104,7 @@ def OpenSaveWindow ():
 	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
 	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBar.SetDefaultScrollBar ()
 	ScrollBarPress ()
 	Window.SetVisible (WINDOW_VISIBLE)
