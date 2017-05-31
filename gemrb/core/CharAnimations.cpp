@@ -402,7 +402,11 @@ void CharAnimations::SetupColors(PaletteType type)
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
 				snprintf(PaletteResRef[type],9,"%.4s_%-.2s%c",ResRef, (char *) &PType, '1'+type);
 			} else {
-				snprintf(PaletteResRef[type],9,"%.4s_%-.2s",ResRef, (char *) &PType);
+				if (!stricmp(ResRef, "MFIE")) { // hack for magic golems
+					snprintf(PaletteResRef[type],9,"%.4s%-.2sB", ResRef, (char *) &PType);
+				} else {
+					snprintf(PaletteResRef[type],9,"%.4s_%-.2s", ResRef, (char *) &PType);
+				}
 			}
 			strlwr(PaletteResRef[type]);
 			Palette *tmppal = gamedata->GetPalette(PaletteResRef[type]);
@@ -1665,8 +1669,9 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=(char) (Part+'1');
-	ResRef[7]=0;
+	size_t last = strnlen(ResRef, 6);
+	ResRef[last] = (char) (Part+'1');
+	ResRef[last+1] = 0;
 }
 
 void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
@@ -1728,7 +1733,9 @@ void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=(char) (Part+'1');
+	size_t last = strnlen(ResRef, 6);
+	ResRef[last] = (char) (Part+'1');
+	ResRef[last+1] = 0;
 }
 
 void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,

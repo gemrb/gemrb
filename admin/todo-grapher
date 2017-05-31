@@ -28,12 +28,12 @@ function counter() {
   echo $counts | awk "{ printf(\"%s %f %f %f\\n\", \$1, \$3/\$2*$m, \$4/\$2*$m, \$5/\$2*$m) }"
 }
 
-trap cleanup INT EXIT
-
-if git commit -a -q --dry-run --short > /dev/null; then
+if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
   echo "Bailing out, you were in the middle of something"
   exit 1
 fi
+
+trap cleanup INT EXIT
 
 > "$output"
 echo "Started counting..."

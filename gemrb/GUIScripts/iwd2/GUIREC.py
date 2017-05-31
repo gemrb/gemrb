@@ -82,6 +82,8 @@ def OpenRecordsWindow ():
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
 	if not HateRaceTable:
@@ -1256,7 +1258,6 @@ def OpenLevelUpWindow ():
 	Button = Window.GetControl (27)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_NONE)
 

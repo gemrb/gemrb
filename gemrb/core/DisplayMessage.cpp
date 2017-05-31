@@ -26,7 +26,11 @@
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
 
-#include <cstdarg>
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
 
 namespace GemRB {
 
@@ -121,6 +125,9 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 		return 0;
 	}
 	String* string = NULL;
+	// NOTE: name color was hardcoded to a limited list in the originals;
+	// the 1PP mod tackled this restriction by altering the exe to use a bigger list.
+	// We just generate a colour by looking at the existing palette instead.
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			string = StringFromCString(speaker->GetName(-1));

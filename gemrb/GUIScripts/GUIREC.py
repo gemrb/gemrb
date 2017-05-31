@@ -83,7 +83,9 @@ def OpenRecordsWindow ():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
-		
+
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	UpdateRecordsWindow(Window)
 	return
 

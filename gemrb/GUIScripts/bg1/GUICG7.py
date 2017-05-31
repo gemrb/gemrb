@@ -31,9 +31,10 @@ def OnLoad():
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
+	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
 	# make sure we have a correct table
-	if Class == 19:
+	if Spellbook.IsSorcererBook (BookType):
 		# sorcerers need their known not max table or they would progress too slowly
 		TableName = "SPLSRCKN"
 

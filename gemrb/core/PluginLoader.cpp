@@ -31,9 +31,9 @@
 #include <set>
 
 #ifdef WIN32
+#include <string.h>
 #include <windows.h>
 #else
-
 #include <dlfcn.h>
 #endif
 
@@ -84,11 +84,23 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #ifdef WIN32
 #define FREE_PLUGIN( handle )  FreeLibrary( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
-#define PRINT_DLERROR
 #else
 #define FREE_PLUGIN( handle )  dlclose( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
-#define PRINT_DLERROR Log(MESSAGE, "PluginLoader", "Error: %s", dlerror() )
+#endif
+
+#ifdef WIN32
+static void PrintDLError(const char *msg=NULL)
+{
+	char buffer[_MAX_PATH*2];
+	_strerror_s(buffer, NULL);
+	Log(DEBUG, "PluginLoader", msg ? msg : "Error: %s", buffer);
+}
+#else
+static void PrintDLError()
+{
+	Log(DEBUG, "PluginLoader", "Error: %s", dlerror());
+}
 #endif
 
 static bool LoadPlugin(const char* pluginpath)
@@ -104,7 +116,7 @@ static bool LoadPlugin(const char* pluginpath)
 #endif
 	if (hMod == NULL) {
 		Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", pluginpath);
-		PRINT_DLERROR;
+		PrintDLError();
 		return false;
 	}
 

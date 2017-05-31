@@ -99,7 +99,7 @@ bool ITMImporter::Open(DataStream* stream)
 	} else if (strncmp( Signature, "ITM V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		print("[ITMImporter]: This file is not a valid ITM File");
+		Log(WARNING, "ITMImporter", "This file is not a valid ITM file!");
 		return false;
 	}
 
@@ -229,7 +229,7 @@ Item* ITMImporter::GetItem(Item *s)
 
 
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		print("[ITMImporter]: No BAM Importer Available.");
+		Log(ERROR, "ITMImporter", "No BAM Importer available!");
 		return NULL;
 	}
 	return s;

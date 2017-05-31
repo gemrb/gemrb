@@ -41,6 +41,7 @@ class Control;
 #define SV_WIDTH 1
 #define SV_HEIGHT 2
 #define SV_GAMEPATH 3
+#define SV_TOUCH 4
 
 class GUIScript : public ScriptEngine {
 private:

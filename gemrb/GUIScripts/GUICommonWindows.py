@@ -1394,7 +1394,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	oldSlotCount = 6 + ExtraSlots
 
-	for i in range(min(oldSlotCount, MAX_PARTY_SIZE)): # the default chu/game limit or less
+	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
 		pairs[i] = Window.GetControl (i)
 
 	# nothing left to do
@@ -1672,11 +1672,13 @@ def UpdatePortraitWindow ():
 				states = states + "\n"
 			states = states + effects[x]
 
-		FlagLabel = Window.GetControl(200 + i)
-		if flag != blank:
-			FlagLabel.SetText(flag.ljust(3, blank))
-		else:
-			FlagLabel.SetText("")
+		# FIXME: hack, check shouldn't be needed
+		FlagLabel = Window.GetControl (200 + i)
+		if FlagLabel:
+			if flag != blank:
+				FlagLabel.SetText (flag.ljust(3, blank))
+			else:
+				FlagLabel.SetText ("")
 		Button.SetText(states)
 	return
 
@@ -1974,3 +1976,11 @@ def RestPress ():
 def RealRestPress ():
 	GemRB.RestParty(0, 0, 1)
 	return
+
+def SwitchPCByKey (wIdx, key, mod):
+	if key >= 49 and key <= 54:
+		GemRB.GameSelectPCSingle(key - 48)
+		RunSelectionChangeHandler ()
+		return 1
+	return 0
+

@@ -97,12 +97,14 @@ GameControl::GameControl(const Region& frame)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
-	AlwaysRun = false; //make this a game flag if you wish
+
+	ieDword tmp=0;
+	core->GetDictionary()->Lookup("Always Run", tmp);
+	AlwaysRun = !!tmp;
 
 	ClearMouseState();
 	ResetTargetMode();
 
-	ieDword tmp=0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
@@ -172,13 +174,13 @@ Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& sr
 			angle = -M_PI_2;
 		}
 	} else {
-		angle = atan(xdiff/ydiff);
+		angle = std::atan(xdiff/ydiff);
 		if (ydiff < 0) angle += M_PI;
 	}
 
 	// calculate new coordinates by rotating formation around (0,0)
-	double newx = -formations[formation][pos].x * cos(angle) + formations[formation][pos].y * sin(angle);
-	double newy = formations[formation][pos].x * sin(angle) + formations[formation][pos].y * cos(angle);
+	double newx = -formations[formation][pos].x * std::cos(angle) + formations[formation][pos].y * std::sin(angle);
+	double newy = formations[formation][pos].x * std::sin(angle) + formations[formation][pos].y * std::cos(angle);
 	p.x += (int)newx;
 	p.y += (int)newy;
 
@@ -2290,6 +2292,7 @@ void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 void GameControl::ToggleAlwaysRun()
 {
 	AlwaysRun = !AlwaysRun;
+	core->GetDictionary()->SetAt("Always Run", AlwaysRun);
 }
 
 }

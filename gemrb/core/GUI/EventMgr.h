@@ -34,6 +34,7 @@
 #include "Region.h"
 
 #include <bitset>
+#include <climits>
 #include <map>
 #include <vector>
 

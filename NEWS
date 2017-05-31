@@ -1,4 +1,4 @@
-GemRB git (c812b0bae):
+GemRB git (db20aef41):
   New features:
     - 
     - SDL2 resolution-independent window scaling
@@ -6,6 +6,9 @@ GemRB git (c812b0bae):
 
   Improved features:
     - 
+    - better compatibility with bgt, 10pp, ia, kelsey
+    - sdl2 input, mouse scrolling
+    - iwd2 cg&lu, item (un)usability, avatar sizes
     - ambients, verbal constants, random walk
     - bugfixes
 

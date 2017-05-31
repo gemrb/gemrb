@@ -121,13 +121,14 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 							               NULL, flags );
 						} else {
 							Sprite2D* mask = 0;
-							if (tile->anim[1])
+							if (tile->anim[1]) {
 								mask = tile->anim[1]->NextFrame();
 								vid->BlitTile( ovtile->anim[0]->NextFrame(),
 						                   mask,
 							               ( x * 64 ) - viewport.x,
 							               ( y * 64 ) - viewport.y,
 							               NULL, TILE_HALFTRANS | flags );
+							}
 						}
 					}
 				}

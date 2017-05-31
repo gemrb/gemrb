@@ -172,7 +172,7 @@ public:
 	}
 
 	virtual void RenderOnDisplay(SDL_Surface* display) {
-		SDL_Rect dst = { origin.x, origin.y, buffer->w, buffer->h };
+		SDL_Rect dst = { origin.x, origin.y, (unsigned short) buffer->w, (unsigned short) buffer->h };
 		SDL_BlitSurface( buffer, NULL, display, &dst );
 	}
 

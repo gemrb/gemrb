@@ -183,7 +183,6 @@ int fx_cure_feebleminded_state (Scriptable* Owner, Actor* target, Effect* fx);//
 int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect*fx);//4e
 int fx_cure_diseased_state (Scriptable* Owner, Actor* target, Effect* fx);//4f
 int fx_set_deaf_state (Scriptable* Owner, Actor* target, Effect* fx); //50
-int fx_set_deaf_state_iwd2 (Scriptable* Owner, Actor* target, Effect* fx); //50
 int fx_cure_deaf_state (Scriptable* Owner, Actor* target, Effect* fx);//51
 int fx_set_ai_script (Scriptable* Owner, Actor* target, Effect*fx);//52
 int fx_protection_from_projectile (Scriptable* Owner, Actor* target, Effect*fx);//53
@@ -669,7 +668,7 @@ static EffectDesc effectnames[] = {
 	{ "Protection:String", fx_generic_effect, 0, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, 0, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, 0, -1 },
-	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR, -1 },
+	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR|EFFECT_REINIT_ON_LOAD, -1 },
 	{ "PuppetMarker", fx_puppet_marker, 0, -1 },
 	{ "ProjectImage", fx_puppet_master, 0, -1 },
 	{ "Reveal:Area", fx_reveal_area, EFFECT_NO_ACTOR, -1 },
@@ -722,7 +721,6 @@ static EffectDesc effectnames[] = {
 	{ "State:Charmed", fx_set_charmed_state, EFFECT_NO_LEVEL_CHECK, -1 }, //0x05
 	{ "State:Confused", fx_set_confused_state, 0, -1 },
 	{ "State:Deafness", fx_set_deaf_state, 0, -1 },
-	{ "State:DeafnessIWD2", fx_set_deaf_state_iwd2, 0, -1 }, //this is a modified version
 	{ "State:Diseased", fx_set_diseased_state, 0, -1 },
 	{ "State:Feeblemind", fx_set_feebleminded_state, 0, -1 },
 	{ "State:Hasted", fx_set_hasted_state, 0, -1 },
@@ -829,7 +827,6 @@ static EffectRef fx_death_ward_ref = { "DeathWard", -1 };  //iwd2 specific
 static EffectRef fx_death_magic_ref = { "Death2", -1 };    //iwd2 specific
 static EffectRef fx_apply_effect_curse_ref = { "ApplyEffectCurse", -1 }; //0x11b
 static EffectRef fx_pst_jumble_curse_ref = { "JumbleCurse", -1 };  //PST specific
-static EffectRef fx_deaf_state_iwd2_ref = { "State:DeafnessIWD2", -1 }; //iwd2
 static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
@@ -2892,27 +2889,6 @@ int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-int fx_set_deaf_state_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if(0) print("fx_set_deaf_state_iwd2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
-	//gemrb fix
-	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
-
-	if (!fx->Parameter1) {
-		//this is a bad hack
-		fx->Parameter1 = 20;
-	}
-	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
-	if (!fx->Parameter2) {
-		fx->Parameter2 = 20;
-	}
-	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
-	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
-	target->AddPortraitIcon(PI_DEAFNESS); //iwd2 specific
-	return FX_APPLIED;
-}
-
 // 0x51 Cure:Deafness
 //removes the deafness effect
 int fx_cure_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -2920,7 +2896,6 @@ int fx_cure_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_cure_deaf_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	target->fxqueue.RemoveAllEffects(fx_deaf_state_ref);
-	target->fxqueue.RemoveAllEffects(fx_deaf_state_iwd2_ref);
 	return FX_NOT_APPLIED;
 }
 
@@ -3845,7 +3820,9 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 
 	//do this once
-	target->fxqueue.RemoveAllEffects(fx_bane_ref);
+	if (fx->FirstApply) {
+		target->fxqueue.RemoveAllEffects(fx_bane_ref);
+	}
 
 	STATE_SET( STATE_BLESS );
 	target->SetSpellState(SS_BLESS);

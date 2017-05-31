@@ -82,6 +82,8 @@ def OpenInventoryWindow ():
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
 
+	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
@@ -168,11 +170,6 @@ def OpenInventoryWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		#Why they mess up .chu's i don't know
 		Button.SetSprites("INVBUT3", i, 0, 1, 2, 3)
-
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (999, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 

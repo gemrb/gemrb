@@ -3591,9 +3591,9 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPLT__doc,
 "===== Button_SetPLT =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8, type)\n\
+**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
 \n\
-**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8, type)\n\
+**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a PLT file. \n\
 Sets up the palette based on the eight given gradient colors.\n\
@@ -3638,7 +3638,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	ResourceHolder<PalettedImageMgr> im(ResRef);
+	ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
@@ -3685,12 +3685,12 @@ PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
 \n\
 **Prototype:** GemRB.SetButtonBAM (WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\
 \n\
-**Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex, col1)\n\
+**Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex[, col1])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a BAM file. If \n\
-the supplied color gradient value is -1, then no palette change, if it is \n\
->=0, then it changes the 4-16 palette entries of the bam. Since it uses 12 \n\
-colors palette, it has issues in PST.\n\
+the supplied color gradient value is the default -1, then no palette change, \n\
+if it is >=0, then it changes the 4-16 palette entries of the bam. Since it \n\
+uses 12 colors palette, it has issues in PST.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
@@ -4557,8 +4557,8 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 	GET_GAME();
 
-	SaveGameIterator *sgi = core->GetSaveGameIterator();
-	if (!sgi) {
+	SaveGameIterator *sgip = core->GetSaveGameIterator();
+	if (!sgip) {
 		return RuntimeError("No savegame iterator");
 	}
 
@@ -4568,9 +4568,9 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (slot == -1) {
 		CObject<SaveGame> save(obj);
 
-		return PyInt_FromLong(sgi->CreateSaveGame(save, folder) );
+		return PyInt_FromLong(sgip->CreateSaveGame(save, folder) );
 	} else {
-		return PyInt_FromLong(sgi->CreateSaveGame(slot, core->MultipleQuickSaves) );
+		return PyInt_FromLong(sgip->CreateSaveGame(slot, core->MultipleQuickSaves) );
 	}
 }
 
@@ -9515,6 +9515,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
     * SV_WIDTH = 1 - screen width\n\
     * SV_HEIGHT = 2 - screen height\n\
     * SV_GAMEPATH = 3 - game path\n\
+    * SV_TOUCH = 4 - are we using touch input mode?\n\
 \n\
 **Return value:** This function returns -1 if the index is invalid.\n\
 \n\
@@ -9532,6 +9533,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_WIDTH: value = core->Width; break;
 		case SV_HEIGHT: value = core->Height; break;
 		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
+		case SV_TOUCH: value = EventMgr::TouchInputEnabled; break;
 		default: value = -1; break;
 	}
 	if (path[0]) {
@@ -11317,6 +11319,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
+	actor->ApplyModal(actor->ModalSpell); // force immediate effect
 
 	Py_RETURN_NONE;
 }
