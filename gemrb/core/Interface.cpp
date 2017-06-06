@@ -292,7 +292,8 @@ Interface::~Interface(void)
 		if (ambim) ambim->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
-	delete gamectrl;
+	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
+	// delete gamectrl;
 	delete game;
 	delete calendar;
 	delete worldmap;
