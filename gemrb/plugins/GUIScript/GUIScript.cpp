@@ -1215,7 +1215,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_AddSubview__doc,
-			 "CreateControl(superview, subview [,siblingView=None])\n\n"
+			 "AddSubview(superview, subview [,siblingView=None])\n\n"
 			 "Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any)." );
 
 static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
@@ -1228,10 +1228,19 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	View* subView = GetView(pySubview);
 	View* siblingView = GetView(pySiblingView);
 	if (superView && subView) {
+        bool registerRef = (subView->GetWindow() == NULL);
 		superView->AddSubviewInFrontOfView(subView, siblingView);
-		// FIXME?: Should we also reassign the scripting ref?
-		// we don't have a need to right now,
-		// but it could be confusing if we start moving controls between windows
+
+        if (registerRef) {
+            // FIXME: This will break if we have a named ref to the subview (doesnt happen yet)
+            // we ought to always reassign the scripting ref and update the named refs.
+            // However, ATM, we can lookup a ref by name, but can't match a ref to a set of names yet
+            // so any named references to "subView" are currently lost here
+
+            ScriptingId id = subView->GetScriptingRef()->Id;
+            subView->DeleteScriptingRef();
+            RegisterScriptableControl(static_cast<Control*>(subView), id);
+        }
 		Py_RETURN_NONE;
 	}
 
