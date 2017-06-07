@@ -47,8 +47,6 @@
 		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
-		A20E4ADA197344BD00A6BC96 /* DialogResponder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */; };
-		A20E4ADB197344BD00A6BC96 /* DialogResponder.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACE197344BD00A6BC96 /* DialogResponder.h */; };
 		A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACF197344BD00A6BC96 /* FileCache.h */; };
 		A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
 		A20E4ADE197344BD00A6BC96 /* RNG_SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */; };
@@ -1244,8 +1242,6 @@
 		A20574F919994967007FF22C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		A20A27891A71E3200077077C /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View.cpp; sourceTree = "<group>"; };
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
-		A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogResponder.cpp; sourceTree = "<group>"; };
-		A20E4ACE197344BD00A6BC96 /* DialogResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogResponder.h; sourceTree = "<group>"; };
 		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
 		A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG_SFMT.cpp; sourceTree = "<group>"; };
 		A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG_SFMT.h; sourceTree = "<group>"; };
@@ -3055,8 +3051,6 @@
 				A2BF9FB41395FF61006ADC12 /* DialogHandler.h */,
 				A2BF9FB51395FF61006ADC12 /* DialogMgr.cpp */,
 				A2BF9FB61395FF61006ADC12 /* DialogMgr.h */,
-				A20E4ACD197344BD00A6BC96 /* DialogResponder.cpp */,
-				A20E4ACE197344BD00A6BC96 /* DialogResponder.h */,
 				A2BF9FB71395FF61006ADC12 /* DisplayMessage.cpp */,
 				A2BF9FB81395FF61006ADC12 /* DisplayMessage.h */,
 				A2BF9FB91395FF61006ADC12 /* Effect.h */,
@@ -3577,7 +3571,6 @@
 				A2E6642A139E886100310FC8 /* TextArea.h in Headers */,
 				A2E6642C139E886100310FC8 /* TextEdit.h in Headers */,
 				A2E6642E139E886100310FC8 /* Window.h in Headers */,
-				A20E4ADB197344BD00A6BC96 /* DialogResponder.h in Headers */,
 				A2E66430139E886100310FC8 /* WorldMapControl.h in Headers */,
 				A2E66433139E886700310FC8 /* GameScript.h in Headers */,
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
@@ -5354,7 +5347,6 @@
 				A2E663B5139E883E00310FC8 /* Projectile.cpp in Sources */,
 				A2E663B7139E883E00310FC8 /* ProjectileMgr.cpp in Sources */,
 				A2E663B9139E883E00310FC8 /* ProjectileServer.cpp in Sources */,
-				A20E4ADA197344BD00A6BC96 /* DialogResponder.cpp in Sources */,
 				A2E663BB139E883E00310FC8 /* Region.cpp in Sources */,
 				A2E663BD139E883E00310FC8 /* Resource.cpp in Sources */,
 				A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */,
