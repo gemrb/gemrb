@@ -30,15 +30,15 @@ namespace GemRB {
 Color ColorFromPy(PyObject* obj) {
 	if (PyDict_Check(obj)) {
 		Color c;
-		// use _signed_ version of Clamp because PyInt_AsLong may return -1 on error and we would like this to = 0
-		PyObject* pyVal = PyDict_GetItemString(obj, "r");
-		c.r = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
-		pyVal = PyDict_GetItemString(obj, "g");
-		c.g = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
-		pyVal = PyDict_GetItemString(obj, "b");
-		c.b = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
-		pyVal = PyDict_GetItemString(obj, "a");
-		c.a = Clamp<char>(PyInt_AsLong(pyVal), 0, 255);
+		// PyInt_AsLong may return -1 on error and we would like this to = 0
+		long pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "r"));
+		c.r = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
+		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "g"));
+		c.g = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
+		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "b"));
+		c.b = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
+		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "a"));
+		c.a = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
 		return c;
 	}
 	return Color();
