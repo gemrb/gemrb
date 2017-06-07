@@ -73,7 +73,7 @@ void EventMgr::DispatchEvent(Event& e)
 	} else if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
 		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask)) {
 			static unsigned long lastMouseDown = 0;
-			static uint8_t repeatCount = 0;
+			static unsigned char repeatCount = 0;
 			static EventButton repeatButton = 0;
 			static Point repeatPos;
 
