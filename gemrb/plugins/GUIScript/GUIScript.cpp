@@ -227,6 +227,10 @@ if (boolean) { \
 }
 
 static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
+    if (obj == Py_None) {
+        return NULL;
+    }
+
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
 	if (!attr) {
 		RuntimeError("Invalid Scripting reference, must have ID attribute.");
