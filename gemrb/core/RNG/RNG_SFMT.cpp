@@ -6,7 +6,8 @@
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.
-#ifndef UINT64_MAX
+#if __cplusplus <= 199711L
+#undef UINT64_MAX
 #define UINT64_MAX (~(uint64_t)0)
 #endif
 
