@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>${GEMRB_VERSION}</string>
+	<string> ${GEMRB_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>GMRB</string>
 	<key>CFBundleVersion</key>
-	<string>${GEMRB_VERSION}</string>
+	<string> ${GEMRB_VERSION}</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.role-playing-games</string>
 	<key>NSPrincipalClass</key>

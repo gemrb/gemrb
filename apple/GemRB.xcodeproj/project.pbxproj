@@ -264,7 +264,6 @@
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A29504701609721300BB22AA /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
-		A29504721609721300BB22AA /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AAC14615C1C2F500D27766 /* FreeType.framework */; };
 		A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */; };
 		A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */; };
@@ -740,6 +739,7 @@
 		A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8066146056B40033754A /* CoreGraphics.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
 		A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 		A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 		A2FE2C7D16F2316400DDC6C7 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -1812,6 +1812,7 @@
 		A2EC8064146056900033754A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		A2EC8066146056B40033754A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2FCD5FB13A0366100271997 /* ACMReader.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ACMReader.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
 		A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NullSource.cpp; sourceTree = "<group>"; };
@@ -2151,8 +2152,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */,
 				A2A2EA4716A76AE90092B903 /* libiconv.dylib in Frameworks */,
-				A29504721609721300BB22AA /* FreeType.framework in Frameworks */,
 				A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2352,6 +2353,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				A29BF91C13A04B3900C812DD /* Resources-iOS */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				A2FA1E051EE788C600E51C25 /* Frameworks */,
 			);
 			name = GemRB_OSX;
 			sourceTree = "<group>";
@@ -3411,6 +3413,14 @@
 				A273DC7B14856755000DA299 /* libz.dylib */,
 			);
 			name = dylibs;
+			sourceTree = "<group>";
+		};
+		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A2FE2C7516F2313400DDC6C7 /* NullSource */ = {
@@ -6913,9 +6923,13 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
-					/Library/Frameworks/FreeType.framework/Headers,
+					/opt/X11/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/X11/lib,
+				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
@@ -6932,9 +6946,13 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
-					/Library/Frameworks/FreeType.framework/Headers,
+					/opt/X11/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/X11/lib,
+				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
