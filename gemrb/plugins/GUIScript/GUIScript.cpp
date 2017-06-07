@@ -248,7 +248,7 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 	return gs->GetScripingRef(group, id);
 }
 
-template <class RETURN=View>
+template <class RETURN>
 static RETURN* GetView(PyObject* obj) {
 	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
 }
