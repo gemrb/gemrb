@@ -1228,9 +1228,9 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	PyObject* pySiblingView = Py_None;
 	PyArg_ParseTuple(args, "OO|O", &self, &pySubview, &pySiblingView);
 
-	View* superView = GetView(self);
-	View* subView = GetView(pySubview);
-	View* siblingView = GetView(pySiblingView);
+	View* superView = GetView<View>(self);
+	View* subView = GetView<View>(pySubview);
+	View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
         bool registerRef = (subView->GetWindow() == NULL);
 		superView->AddSubviewInFrontOfView(subView, siblingView);
@@ -1942,7 +1942,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 	PyObject* pyView = NULL;
 	PyArg_ParseTuple(args, "O|i", &pyView, &del);
 
-	View* view = GetView(pyView);
+	View* view = GetView<View>(pyView);
 	if (view) {
 		if (view->RemoveFromSuperview() == NULL) {
 			// might be a window
