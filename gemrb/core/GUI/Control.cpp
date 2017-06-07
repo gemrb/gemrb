@@ -209,7 +209,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 
 void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Action::Click, mod, me.button, me.repeats);
+	ActionKey key(Click, mod, me.button, me.repeats);
 	if (SupportsAction(key)) {
 		PerformAction(key);
 		if (actionTimer) {
@@ -221,7 +221,7 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 void Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Action::Click, mod, me.button, me.repeats);
+	ActionKey key(Click, mod, me.button, me.repeats);
 	if (repeatDelay && SupportsAction(key)) {
 		actionTimer = StartActionTimer(actions[key]);
 	}
