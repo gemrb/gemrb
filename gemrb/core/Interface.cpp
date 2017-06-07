@@ -4613,6 +4613,12 @@ void Interface::SanitizeItem(CREItem *item) const
 	//this is to fix buggy saves so TakeItemNum works
 	//the equipped bit is also reset
 	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
+
+	//this is for converting IWD items magic flag
+	if (MagicBit && (item->Flags & IE_INV_ITEM_UNDROPPABLE)) {
+		item->Flags |= IE_INV_ITEM_MAGICAL;
+		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
+	}
 	if (core->HasFeature(GF_NO_UNDROPPABLE)) {
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
@@ -4656,13 +4662,6 @@ void Interface::SanitizeItem(CREItem *item) const
 		//some slot flags might be affected by the item flags
 		if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
 			item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-		}
-		//this is for converting IWD items magic flag
-		if (MagicBit) {
-			if (item->Flags&IE_INV_ITEM_UNDROPPABLE) {
-				item->Flags|=IE_INV_ITEM_MAGICAL;
-				item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
-			}
 		}
 
 		// pst has no stolen flag, but "steel" in its place
