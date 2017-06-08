@@ -31,15 +31,12 @@ class BAMSprite2D : public Sprite2D {
 private:
 	Palette* pal;
 	ieByte colorkey;
-	// The AnimationFactory in which the data for this sprite is stored.
-	// (Used for refcounting of the data.)
-	AnimationFactory* source;
+
 public:
 	// all BAMs have a palette and colorkey so force them at construction
 	// for BAMs the actual colorkey is always green (RGB(0,255,0)) so use colorkey to store the transparency index
 	BAMSprite2D(int Width, int Height, const void* pixels,
-				bool rle, AnimationFactory* datasrc,
-				Palette* palette, ieDword colorkey);
+				bool rle, Palette* palette, ieDword colorkey);
 	BAMSprite2D(const BAMSprite2D &obj);
 	BAMSprite2D* copy() const;
 	~BAMSprite2D();

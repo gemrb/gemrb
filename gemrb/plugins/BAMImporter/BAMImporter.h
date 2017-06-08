@@ -51,8 +51,7 @@ private:
 	unsigned long DataStart;
 private:
 	Sprite2D* GetFrameInternal(unsigned short findex, unsigned char mode,
-							   bool BAMsprite, const unsigned char* data,
-							   AnimationFactory* datasrc);
+							   bool BAMsprite, const unsigned char* data);
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:

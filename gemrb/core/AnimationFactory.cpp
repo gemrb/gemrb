@@ -32,7 +32,6 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 {
 	FLTable = NULL;
 	FrameData = NULL;
-	datarefcount = 0;
 }
 
 AnimationFactory::~AnimationFactory(void)
@@ -43,11 +42,6 @@ AnimationFactory::~AnimationFactory(void)
 	if (FLTable)
 		free( FLTable);
 
-	// FIXME: track down where sprites are being leaked
-	if (datarefcount) {
-		Log(ERROR, "AnimationFactory", "AnimationFactory %s has refcount %d", ResRef, datarefcount);
-		//assert(datarefcount == 0);
-	}
 	if (FrameData)
 		free( FrameData);
 }
@@ -152,17 +146,6 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	spr->YPos = frames[0]->YPos;
 
 	return spr;
-}
-
-void AnimationFactory::IncDataRefCount()
-{
-	++datarefcount;
-}
-
-void AnimationFactory::DecDataRefCount()
-{
-	assert(datarefcount > 0);
-	--datarefcount;
 }
 
 }

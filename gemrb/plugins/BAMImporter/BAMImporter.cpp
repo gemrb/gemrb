@@ -139,8 +139,7 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-			bool BAMsprite, const unsigned char* data,
-			AnimationFactory* datasrc)
+			bool BAMsprite, const unsigned char* data)
 {
 	Sprite2D* spr = 0;
 
@@ -154,7 +153,6 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 							   frames[findex].Height,
 							   framedata,
 							   RLECompressed,
-							   datasrc,
 							   palette,
 							   CompressedColorIndex);
 	} else {
@@ -273,7 +271,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		Sprite2D* frame = GetFrameInternal(i, mode, allowCompression, data, af);
+		Sprite2D* frame = GetFrameInternal(i, mode, allowCompression, data);
 		assert(!allowCompression || frame->BAM);
 		af->AddFrame(frame);
 	}

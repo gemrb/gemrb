@@ -26,34 +26,29 @@
 namespace GemRB {
 
 BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
-						 bool rle, AnimationFactory* datasrc,
-						 Palette* palette, ieDword ck)
+						 bool rle, Palette* palette, ieDword ck)
 	: Sprite2D(Width, Height, 8, pixels)
 {
 	palette->acquire();
 	pal = palette;
 	colorkey = ck;
 	RLE = rle;
-	source = datasrc;
-	datasrc->IncDataRefCount();
 	BAM = true;
-	freePixels = false; // managed by datasrc
+	freePixels = false; // managed by AnimationFactory
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	: Sprite2D(obj)
 {
 	assert(obj.pal);
-	assert(obj.source);
 
 	pal = obj.pal;
 	pal->acquire();
 	colorkey = obj.GetColorKey();
 	RLE = obj.RLE;
-	source = obj.source;
-	source->IncDataRefCount();
+
 	BAM = true;
-	freePixels = false; // managed by datasrc
+	freePixels = false; // managed by AnimationFactory
 }
 
 BAMSprite2D* BAMSprite2D::copy() const
@@ -64,7 +59,6 @@ BAMSprite2D* BAMSprite2D::copy() const
 BAMSprite2D::~BAMSprite2D()
 {
 	pal->release();
-	source->DecDataRefCount();
 }
 
 /** Get the Palette of a Sprite */
