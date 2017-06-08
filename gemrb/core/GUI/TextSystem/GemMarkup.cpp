@@ -31,7 +31,7 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 		return (it->second).get();
 	}
 
-	Color palCol = { 0, 0, 0, 0 };
+	Color palCol;
 	unsigned int r, g, b;
 	swscanf(colorString.c_str(), L"%02X%02X%02X", &r, &g, &b);
 	palCol.r = r;

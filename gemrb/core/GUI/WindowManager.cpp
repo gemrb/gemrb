@@ -119,7 +119,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	modalWin = win;
 
 	if (Shadow != ShadowNone) {
-		Color shieldColor = {0,0,0,0};
+		Color shieldColor;
 		if (Shadow == ShadowGray) {
 			shieldColor.a = 128;
 		} else {
@@ -477,7 +477,7 @@ void WindowManager::DrawWindows() const
 			// Important to only draw if the window itself is dirty
 			// controls on greyed out windows shouldnt be updating anyway
 			win->Draw();
-			Color fill = { 0, 0, 0, 128 };
+			static const Color fill(0, 0, 0, 128);
 			video->DrawRect(screen, fill);
 		} else {
 			win->Draw();

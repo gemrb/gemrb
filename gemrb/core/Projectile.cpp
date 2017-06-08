@@ -83,7 +83,6 @@ Projectile::Projectile()
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
 	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
 	extension_explosioncount = extension_targetcount = 0;
-	memset(&tint, 0, sizeof(tint));
 	if (!server)
 		server = core->GetProjectileServer();
 }

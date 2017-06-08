@@ -305,8 +305,7 @@ Image* BMPImporter::GetImage()
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				unsigned int col = *p++;
-				Color c = { (unsigned char)col, (unsigned char)(col >> 8),
-				            (unsigned char)(col >> 16), 0xFF };
+				Color c(col, (col >> 8), (col >> 16), 0xFF);
 				data->SetPixel(x,y,c);
 			}
 		}

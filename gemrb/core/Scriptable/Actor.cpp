@@ -64,25 +64,6 @@ namespace GemRB {
 //configurable?
 ieDword ref_lightness = 43;
 
-static const Color white = {
-	0xff, 0xff, 0xff, 0xff
-};
-static const Color green = {
-	0x00, 0xff, 0x00, 0xff
-};
-static const Color red = {
-	0xff, 0x00, 0x00, 0xff
-};
-static const Color yellow = {
-	0xff, 0xff, 0x00, 0xff
-};
-static const Color cyan = {
-	0x00, 0xff, 0xff, 0xff
-};
-static const Color magenta = {
-	0xff, 0x00, 0xff, 0xff
-};
-
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
 static int extraslots = -1;
@@ -708,7 +689,7 @@ ieDword Actor::GetSafeStat(unsigned int StatIndex) const
 
 void Actor::SetCircleSize()
 {
-	const Color *color;
+	Color color;
 	int color_index;
 
 	if (!anims)
@@ -716,16 +697,16 @@ void Actor::SetCircleSize()
 
 	GameControl *gc = core->GetGameControl();
 	if (UnselectableTimer) {
-		color = &magenta;
+		color = ColorMagenta;
 		color_index = 4;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
-		color = &yellow;
+		color = ColorYellow;
 		color_index = 5;
 	} else if (Modified[IE_CHECKFORBERSERK]) {
-		color = &yellow;
+		color = ColorYellow;
 		color_index = 5;
 	} else if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
-		color = &white;
+		color = ColorWhite;
 		color_index = 3; //?? made up
 	} else {
 		switch (Modified[IE_EA]) {
@@ -736,21 +717,21 @@ void Actor::SetCircleSize()
 			case EA_CHARMED:
 			case EA_EVILBUTGREEN:
 			case EA_GOODCUTOFF:
-				color = &green;
+				color = ColorGreen;
 				color_index = 0;
 				break;
 			case EA_EVILCUTOFF:
-				color = &yellow;
+				color = ColorYellow;
 				color_index = 5;
 				break;
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
 			case EA_CHARMEDPC:
-				color = &red;
+				color = ColorRed;
 				color_index = 1;
 				break;
 			default:
-				color = &cyan;
+				color = ColorCyan;
 				color_index = 2;
 				break;
 		}
@@ -760,7 +741,7 @@ void Actor::SetCircleSize()
 	if (csize >= MAX_CIRCLE_SIZE)
 		csize = MAX_CIRCLE_SIZE - 1;
 
-	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+	SetCircle( anims->GetCircleSize(), color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove)

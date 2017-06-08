@@ -258,7 +258,7 @@ void Scriptable::DrawOverheadText()
 		time = (MAX_DELAY-time)/10;
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
-			const Color overHeadColor = {time2,time2,time2,time2};
+			const Color overHeadColor(time2, time2, time2, time2);
 			palette = new Palette(overHeadColor, ColorBlack);
 		}
 	}

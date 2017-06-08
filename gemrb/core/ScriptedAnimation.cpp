@@ -76,7 +76,6 @@ void ScriptedAnimation::Init()
 	sounds[0][0] = 0;
 	sounds[1][0] = 0;
 	sounds[2][0] = 0;
-	memset(&Tint,0,sizeof(Tint));
 	Transparency = 0;
 	Fade = 0;
 	SequenceFlags = 0;

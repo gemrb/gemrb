@@ -81,7 +81,7 @@ void BAMSprite2D::SetPalette(Palette* palette)
 
 Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
-	Color c = { 0, 0, 0, 0 };
+	Color c;
 	if (x >= Width || y >= Height) return c;
 
 	if (renderFlags&BLIT_MIRRORY)

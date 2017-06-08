@@ -2218,7 +2218,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
 	Label* lab = GetView<Label>(self);
 	ABORT_IF_NULL(lab);
 
-	const Color fore = { (ieByte) r, (ieByte) g, (ieByte) b, 0};
+	const Color fore(r, g, b, 0);
 	lab->SetColor( fore, ColorBlack );
 
 	Py_RETURN_NONE;
@@ -2528,7 +2528,7 @@ static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
 	Button* but = GetView<Button>(self);
 	ABORT_IF_NULL(but);
 
-	const Color fore = ColorFromPy(pyColor), back = {0, 0, 0, 0};
+	const Color fore = ColorFromPy(pyColor), back;
 
 	// FIXME: swap is a hack for fonts which apparently have swapped f & B
 	// colors. Maybe it depends on need_palette?
@@ -4696,8 +4696,8 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 }
 
 // FIXME: probably could use a better home, and probably vary from game to game;
-static const Color Hover = {255, 180, 0, 0};
-static const Color Selected = {255, 100, 0, 0};
+static const Color Hover(255, 180, 0, 0);
+static const Color Selected(55, 100, 0, 0);
 
 PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
 "===== TextArea_ListResources =====\n\

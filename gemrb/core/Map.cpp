@@ -1291,9 +1291,9 @@ void Map::DrawMap(const Region& viewport)
 
 void Map::DrawSearchMap(const Region &vp)
 {
-	Color inaccessible = { 128, 128, 128, 128 };
-	Color impassible = { 128, 64, 64, 128 }; // red-ish
-	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
+	Color inaccessible(128, 128, 128, 128);
+	Color impassible(128, 64, 64, 128); // red-ish
+	Color sidewall(64, 64, 128, 128); // blue-ish
 	Video *vid=core->GetVideoDriver();
 	Region block;
 
@@ -3969,7 +3969,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 	//always draw the animation tinted because tint is also used for
 	//transparency
 	ieByte inverseTransparency = 255-transparency;
-	Color tint = {255,255,255,inverseTransparency};
+	Color tint(255, 255, 255, inverseTransparency);
 	if ((Flags&A_ANI_NO_SHADOW)) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;

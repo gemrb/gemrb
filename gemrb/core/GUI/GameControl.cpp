@@ -394,6 +394,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			i->outlineColor = ColorRed; // traps
 		} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 			i->outlineColor = ColorBlue; // debug infopoints
+			i->outlineColor.a = 0x80;
 		} else {
 			continue;
 		}

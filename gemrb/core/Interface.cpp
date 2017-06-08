@@ -1425,7 +1425,7 @@ int Interface::Init(InterfaceConfig* config)
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
 
-	Color defcolor={255,255,255,200};
+	Color defcolor(255, 255, 255, 200);
 	SetInfoTextColor(defcolor);
 
 	{
@@ -2827,8 +2827,8 @@ int Interface::PlayMovie(const char* resref)
 			int b = atoi(sttable->QueryField("blue", "frame"));
 			Palette* pal = NULL;
 			if (r || g || b) {
-				Color fore = { ieByte(r), ieByte(g), ieByte(b), 0x00 };
-				Color back = { 0x00, 0x00, 0x00, 0x00 };
+				Color fore(ieByte(r), ieByte(g), ieByte(b), 0x00);
+				Color back;
 				pal = new Palette( fore, back );
 			}
 

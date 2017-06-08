@@ -56,16 +56,11 @@ public:
 		alpha = alpha_;
 		refcount = 1;
 		named = false;
-		memset(&front, 0, sizeof(front));
-		memset(&back, 0, sizeof(back));
 	}
 	Palette() {
 		alpha = false;
 		refcount = 1;
 		named = false;
-		memset(&col, 0, sizeof(col));
-		memset(&front, 0, sizeof(front));
-		memset(&back, 0, sizeof(back));
 	}
 
 	Color col[256]; //< RGB or RGBA 8 bit palette

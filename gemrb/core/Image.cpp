@@ -36,7 +36,7 @@ Image::~Image()
 Sprite2D* Image::GetSprite2D()
 {
 	union {
-		Color color;
+		unsigned char color[sizeof(ieDword)];
 		ieDword Mask;
 	} r = {{ 0xFF, 0x00, 0x00, 0x00 }},
 	  g = {{ 0x00, 0xFF, 0x00, 0x00 }},

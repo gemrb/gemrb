@@ -56,8 +56,7 @@ Button::Button(Region& frame)
 	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
-	memset(&SourceRGB,0,sizeof(SourceRGB));
-	memset(&DestRGB,0,sizeof(DestRGB));
+
 	memset( borders, 0, sizeof( borders ));
 	starttime = 0;
 	PushOffset = Point(2, 2);

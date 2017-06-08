@@ -176,7 +176,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 
 	Label *l = core->GetMessageLabel();
 	if (l) {
-		const Color fore = { (ieByte)((color >> 16) & 0xFF), (ieByte)((color >> 8) & 0xFF), (ieByte)(color & 0xFF), (ieByte)((color >> 24) & 0xFF)};
+		const Color fore(ieByte((color >> 16) & 0xFF), ieByte((color >> 8) & 0xFF), ieByte(color & 0xFF), ieByte((color >> 24) & 0xFF));
 		l->SetColor( fore, ColorBlack );
 		l->SetText(text);
 	}

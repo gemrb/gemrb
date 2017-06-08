@@ -296,7 +296,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	}
 
 	bool tint = false;
-	Color tintcol = {255,255,255,0};
+	Color tintcol(255, 255, 255, 0);
 
 	if (core->GetGame()) {
 		const Color* totint = core->GetGame()->GetGlobalTint();

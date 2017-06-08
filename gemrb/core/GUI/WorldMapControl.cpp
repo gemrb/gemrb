@@ -74,10 +74,10 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	// initialize label colors
 	// NOTE: it would be better to initialize these colors from
 	//   some 2da file
-	Color normal = { 0xf0, 0xf0, 0xf0, 0xff };
-	Color selected = { 0xf0, 0x80, 0x80, 0xff };
-	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
-	Color black = { 0x00, 0x00, 0x00, 0x00 };
+	Color normal(0xf0, 0xf0, 0xf0, 0xff);
+	Color selected(0xf0, 0x80, 0x80, 0xff);
+	Color notvisited(0x80, 0x80, 0xf0, 0xff);
+	Color black;
 
 	pal_normal = new Palette ( normal, black );
 	pal_selected = new Palette ( selected, black );

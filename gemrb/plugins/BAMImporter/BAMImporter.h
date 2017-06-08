@@ -73,10 +73,7 @@ public:
 	/** Gets a Pixel from the Image, unused */
 	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
 	{
-		Color null = {
-			0x00, 0x00, 0x00, 0x00
-		};
-		return null;
+		return Color();
 	}
 public:
 	int GetCycleCount()
