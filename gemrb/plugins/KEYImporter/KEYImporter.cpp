@@ -45,6 +45,7 @@ KEYImporter::~KEYImporter(void)
 
 static char* AddCBF(char *file)
 {
+	assert(strnlen(file, _MAX_PATH/2) < _MAX_PATH/2);
 	// This is safe in single-threaded, since the
 	// return value is passed straight to PathJoin.
 	static char cbf[_MAX_PATH];

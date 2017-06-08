@@ -44,14 +44,20 @@ bool DirectoryImporter::Open(const char *dir, const char *desc)
 
 	free(description);
 	description = strdup(desc);
-	strcpy(path, dir);
+	if (strlcpy(path, dir, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "DirectoryImporter", "Directory with too long path: %s!", dir);
+		return false;
+	}
 	return true;
 }
 
 static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strcpy(f, ResRef);
+	if (strlcpy(f, ResRef, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "DirectoryImporter", "Too long filename: %s!", ResRef);
+		return false;
+	}
 	strlwr(f);
 
 	return PathJoinExt(p, Path, f, Type);
@@ -60,7 +66,10 @@ static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strcpy(f, ResRef);
+	if (strlcpy(f, ResRef, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "DirectoryImporter", "Too long filename2: %s!", ResRef);
+		return NULL;
+	}
 	strlwr(f);
 
 	if (!PathJoinExt(p, Path, f, Type))
@@ -140,7 +149,8 @@ void CachedDirectoryImporter::Refresh()
 static const char *ConstructFilename(const char* resname, const char* ext)
 {
 	static char buf[_MAX_PATH];
-	strnlwrcpy(buf, resname, _MAX_PATH-4, false);
+	assert(strnlen(ext, 5) < 5);
+	strnlwrcpy(buf, resname, _MAX_PATH-6, false);
 	strcat(buf, ".");
 	strcat(buf, ext);
 	return buf;

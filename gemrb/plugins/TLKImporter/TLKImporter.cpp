@@ -124,7 +124,7 @@ bool TLKImporter::Open(DataStream* stream)
 		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->ReadWord( &Language ); // English is 0
 	str->ReadDword( &StrRefCount );
 	str->ReadDword( &Offset );
 	return true;
@@ -504,6 +504,12 @@ empty:
 		return string2;
 	}
 	return string;
+}
+
+bool TLKImporter::HasAltTLK() const
+{
+	// only English (language id 0) has no alt files
+	return Language;
 }
 
 StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)

@@ -67,6 +67,11 @@ MVEPlayer::MVEPlayer(class MVEPlay *file) {
 	audio_stream = -1;
 
 	playsound = core->GetAudioDrv()->CanPlay();
+
+	buffersize = chunk_size = chunk_offset = timer_last_usec = 0;
+	outputwidth = outputheight = video_width = video_height = 0;
+	audio_num_channels = audio_sample_rate = audio_sample_size = 0;
+	truecolour = video_rendered_frame = audio_compressed = false;
 }
 
 MVEPlayer::~MVEPlayer() {

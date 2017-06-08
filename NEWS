@@ -1,7 +1,8 @@
-GemRB git (db20aef41):
+GemRB git (120e2640):
   New features:
     - 
-    - SDL2 resolution-independent window scaling
+    - SDL2 resolution-independent window scaling, IRIX compatibility
+    - regeneration during sleep, iwd2 ability stacking
     - portrait.2da handling, time dilation
 
   Improved features:

@@ -242,13 +242,6 @@ ForceAreaScript = <bool>
 Toggle always running area scripts, even in dialog.
 
 
-ForceStereo = <bool>
-- - - - - - - - - - -
-If set to 1, all acm files will be player as if they are stereo. 
-Some early .ACM files (PST, IWD1) were encoded with a faulty channel
-number, this option overrides the channel number.
-
-
 FlexibleWorldmap = <bool>
 - - - - - - - - - - - - -
 Toggles whether the game supports worldmap extensions.

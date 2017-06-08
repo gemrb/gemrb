@@ -1858,17 +1858,15 @@ void Inventory::ChargeAllItems(int hours)
 }
 
 #define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE | IE_INV_ITEM_EQUIPPED) //0x442
-unsigned int Inventory::FindStealableItem()
+int Inventory::FindStealableItem()
 {
-	unsigned int slot;
-	int inc;
+	unsigned int slotcnt = Slots.size();
+	unsigned int start = core->Roll(1, slotcnt, -1);
+	int inc = start & 1 ? 1 : -1;
 
-	slot = core->Roll(1, Slots.size(),-1);
-	inc = slot&1?1:-1;
-
-	print("Start Slot: %d, increment: %d", slot, inc);
-	//as the unsigned value underflows, it will be greater than Slots.size()
-	for(;slot<Slots.size(); slot+=inc) {
+	Log(DEBUG, "Inventory", "Start Slot: %d, increment: %d", start, inc);
+	for (unsigned int i = 0; i < slotcnt; ++i) {
+		int slot = (slotcnt - 1 + start + i * inc) % slotcnt;
 		CREItem *item = Slots[slot];
 		//can't steal empty slot
 		if (!item) continue;
@@ -1882,7 +1880,7 @@ unsigned int Inventory::FindStealableItem()
 		if ((item->Flags & ITM_STEALING) != IE_INV_ITEM_MOVABLE) continue;
 		return slot;
 	}
-	return 0;
+	return -1;
 }
 
 // extension to allow more or less than head gear to avert critical hits:

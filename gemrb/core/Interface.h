@@ -43,7 +43,8 @@
 #include <string>
 #include <vector>
 
-#ifdef _MSC_VER // No SFINAE
+// No SFINAE
+#if defined(_MSC_VER) || defined(__sgi)
 #include "DataFileMgr.h"
 #include "MusicMgr.h"
 #include "SaveGame.h"
@@ -90,8 +91,10 @@ class Spell;
 class Sprite2D;
 class Store;
 class StringMgr;
+#ifndef __sgi
 class SymbolMgr;
 class TableMgr;
+#endif
 class TextArea;
 class Variables;
 class Video;
@@ -138,6 +141,12 @@ struct TimeStruct {
 	unsigned int round_size; // in ticks
 	unsigned int rounds_per_turn;
 	unsigned int attack_round_size;
+	unsigned int hour_sec;
+	unsigned int hour_size;
+	unsigned int day_sec;
+	unsigned int day_size;
+
+	int GetHour(unsigned int time) { return (time/AI_UPDATE_TIME)%day_sec/hour_sec; }
 };
 
 struct EncodingStruct
@@ -380,6 +389,7 @@ private:
 public:
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
+	Holder<StringMgr> strings2;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
@@ -711,7 +721,7 @@ public:
 	char GamePath[_MAX_PATH];
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
-	int Width, Height, Bpp, ForceStereo;
+	int Width, Height, Bpp;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, DrawFPS;

@@ -193,7 +193,7 @@ def DisplayHelpContrast ():
 def SetGfxCorrection ():
 	Brightness = GemRB.GetVar("Brightness Correction")
 	Gamma = GemRB.GetVar("Gamma Correction")
-	if GameCheck.IsIWD2(): # 10/11 ticks
+	if GameCheck.IsHOW() or GameCheck.IsIWD2(): # 10/11 ticks
 		Gamma /= 2
 
 	GemRB.SetGamma (Brightness, Gamma)
@@ -545,7 +545,8 @@ def LoadGamePress ():
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
 	GemRB.QuitGame ()
-	OpenOptionsWindow()
+	GemRB.SetVar ("SelectedWindow", 0)
+	OpenOptionsWindow ()
 	GemRB.SetNextScript ("GUILOAD")
 	return
 

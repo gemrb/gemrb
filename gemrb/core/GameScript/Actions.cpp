@@ -4466,7 +4466,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int ret = MIC_NOITEM;
 	if ((RandomNumValue&3) || (scr->GetStat(IE_GOLD)<=0) ) {
 		int slot = scr->inventory.FindStealableItem();
-		if (slot) {
+		if (slot != -1) {
 			CREItem *item = scr->inventory.RemoveItem(slot);
 			ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
 			if (ret!=ASI_SUCCESS) {
@@ -5153,6 +5153,7 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->AdvanceTime(parameters->int0Parameter*AI_UPDATE_TIME);
+	core->GetGame()->ResetPartyCommentTimes();
 }
 
 //advance at least one day, then stop at next day/dusk/night/morning
@@ -5161,11 +5162,12 @@ void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 {
 	// first, calculate the current number of hours.
-	int padding = ((core->GetGame()->GameTime / AI_UPDATE_TIME) % 7200) / 300;
+	int padding = core->Time.GetHour(core->GetGame()->GameTime);
 	// then, calculate the offset (in hours) required to take us to the desired hour.
-	padding = (24 + parameters->int0Parameter - padding) % 24;
-	// then, advance one day (7200), plus the desired number of hours.
-	core->GetGame()->AdvanceTime(AI_UPDATE_TIME*(7200 + padding*300), false);
+	int hoursInADay = core->Time.day_sec/core->Time.hour_sec;
+	padding = (hoursInADay + parameters->int0Parameter - padding) % hoursInADay;
+	// then, advance one day, plus the desired number of hours.
+	core->GetGame()->AdvanceTime(core->Time.day_size + padding*core->Time.hour_size, false);
 }
 
 //implement pst style parameters:
@@ -6334,7 +6336,7 @@ void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *target = (Actor *) tar;
-		target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter);
+	target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter * AI_UPDATE_TIME);
 }
 
 void GameScript::SetInterrupt(Scriptable* Sender, Action* parameters)

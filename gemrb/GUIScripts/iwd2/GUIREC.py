@@ -825,7 +825,7 @@ def DisplaySkills (pc, SkillsArea):
 		items = []
 		for i in range(rows):
 			item = itemTab.GetValue (i, 0, GTV_STAT)
-			name = nameTab.GetValue (i, 1)
+			name = nameTab.GetValue (i, 1, GTV_REF)
 
 			if feats and GemRB.HasFeat(pc, i):
 				value = (name,) if not item else (name, GemRB.GetPlayerStat (pc, item),)
@@ -845,9 +845,9 @@ def DisplaySkills (pc, SkillsArea):
 		items.sort()
 		for item in items:
 			if len(item) > 1:
-				SkillsArea.Append (DelimitedText(item[0], item[1], 0))
+				SkillsArea.Append ("[p]" + item[0] + ": " + str(item[1]) + "[/p]")
 			else:
-				SkillsArea.Append ("[p]" + GemRB.GetString(item[0]) + "[/p]")
+				SkillsArea.Append ("[p]" + item[0] + "[/p]")
 		return
 
 	PrintStatTable (GemRB.GetString(11983), "skills")

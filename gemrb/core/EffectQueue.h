@@ -282,6 +282,7 @@ public:
 	int DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const;
 	//int SpecificDamageBonus(ieDword damage_type) const;
 	int BonusForParam2(EffectRef &effect_reference, ieDword param2) const;
+	int MaxParam1(EffectRef &effect_reference, bool positive) const;
 	bool HasAnyDispellableEffect() const;
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
@@ -330,6 +331,7 @@ private:
 	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
 	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const;
 	int BonusForParam2(ieDword opcode, ieDword param2) const;
+	int MaxParam1(ieDword opcode, bool positive) const;
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };

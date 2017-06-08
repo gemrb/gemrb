@@ -32,6 +32,7 @@ private:
 	DataStream* str;
 
 	//Data
+	ieWord Language;
 	ieDword StrRefCount, Offset;
 	CTlkOverride *override;
 
@@ -50,6 +51,7 @@ public:
 	char* GetCString(ieStrRef strref, ieDword flags = 0);
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
 	void FreeString(char *str);
+	bool HasAltTLK() const;
 private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);

@@ -367,6 +367,11 @@ ipvideo_decode_0x8 (const GstMveDemuxStream * s, unsigned char *frame,
 	return 0;
 }
 
+#define UPDATE_FLAGS flags = ((unsigned long)(B[3]) << 24) | \
+                             ((unsigned long)(B[2]) << 16) | \
+                             ((unsigned long)(B[1]) << 8) | \
+                              (unsigned long)(B[0])
+
 static int
 ipvideo_decode_0x9 (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
@@ -410,7 +415,7 @@ ipvideo_decode_0x9 (const GstMveDemuxStream * s, unsigned char *frame,
 		B[2] = (*data)[2];
 		B[3] = (*data)[3];
 		(*data) += 4;
-		flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+		UPDATE_FLAGS;
 		shifter = 0;
 
 		for (y = 0; y < 8; y += 2) {
@@ -437,7 +442,7 @@ ipvideo_decode_0x9 (const GstMveDemuxStream * s, unsigned char *frame,
 				B[2] = (*data)[2];
 				B[3] = (*data)[3];
 				(*data) += 4;
-				flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+				UPDATE_FLAGS;
 				shifter = 0;
 			}
 			for (x = 0; x < 8; x += 2, shifter += 2) {
@@ -461,7 +466,7 @@ ipvideo_decode_0x9 (const GstMveDemuxStream * s, unsigned char *frame,
 				B[2] = (*data)[2];
 				B[3] = (*data)[3];
 				(*data) += 4;
-				flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+				UPDATE_FLAGS;
 				shifter = 0;
 			}
 			for (x = 0; x < 8; ++x, shifter += 2) {

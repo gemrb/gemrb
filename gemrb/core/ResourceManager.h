@@ -28,7 +28,7 @@
 
 #include <vector>
 
-#ifdef _MSC_VER // No SFINAE
+#if defined(_MSC_VER) || defined(__sgi) // No SFINAE
 #include "ResourceSource.h"
 #endif
 
@@ -38,7 +38,9 @@ namespace GemRB {
 
 class DataStream;
 class Resource;
+#ifndef __sgi
 class ResourceSource;
+#endif
 class TypeID;
 
 class GEM_EXPORT ResourceManager {

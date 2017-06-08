@@ -158,6 +158,9 @@ void TextArea::UpdateTextLayout()
 		//tf.y = textContainer->Dimensions().h;
 		//selectOptions->SetFrame(tf);
 	}
+	if (frame.w < 0) {
+		frame.w = 0;
+	}
 }
 
 void TextArea::UpdateRowCount(int h)
