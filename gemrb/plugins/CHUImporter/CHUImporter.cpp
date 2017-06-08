@@ -393,30 +393,31 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				//Label
 				ieResRef FontResRef;
 				ieStrRef StrRef;
-				RevColor fore, back;
 				ieWord alignment;
 				str->ReadDword( &StrRef );
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
-				str->Read( &fore, 4 );
-				str->Read( &back, 4 );
+
+				// bgra format
+				Color f, b;
+				str->Read( &f.b, 1 );
+				str->Read( &f.g, 1 );
+				str->Read( &f.r, 1 );
+				str->Read( &f.a, 1 ); // FIXME: seek 1 instead? previously alpha was 0
+
+				str->Read( &b.b, 1 );
+				str->Read( &b.g, 1 );
+				str->Read( &b.r, 1 );
+				str->Read( &b.a, 1 ); // FIXME: seek 1 instead? previously alpha was 0
+
 				str->ReadWord( &alignment );
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label( ctrlFrame, fnt, *str );
 				delete str;
+				lab->SetColor( f, b );
 
 				if (alignment & 1) {
 					lab->useRGB = true;
-					Color f, b;
-					f.r = fore.b;
-					f.g = fore.g;
-					f.b = fore.r;
-					f.a = 0;
-					b.r = back.b;
-					b.g = back.g;
-					b.b = back.r;
-					b.a = 0;
-					lab->SetColor( f, b );
 				}
 				int align = IE_FONT_ALIGN_CENTER;
 				if (( alignment & 0x10 ) != 0) {

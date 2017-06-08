@@ -75,7 +75,7 @@ bool MOSImporter::Open(DataStream* stream)
 
 Sprite2D* MOSImporter::GetSprite2D()
 {
-	RevColor RevCol[256];
+	Color Col[256];
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * blockpixels = ( unsigned char * )
 		malloc( BlockSize * BlockSize );
@@ -90,7 +90,7 @@ Sprite2D* MOSImporter::GetSprite2D()
 				64;
 			str->Seek( PalOffset + ( y * Cols * 1024 ) +
 				( x * 1024 ), GEM_STREAM_START );
-			str->Read( &RevCol[0], 1024 );
+			str->Read( &Col[0], 1024 );
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( y * Cols * 4 ) + ( x * 4 ),
 				GEM_STREAM_START );
@@ -105,13 +105,13 @@ Sprite2D* MOSImporter::GetSprite2D()
 				( 4 * x * 64 );
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
-					*startpixel = RevCol[*bp].b;
+					*startpixel = Col[*bp].r;
 					startpixel++;
-					*startpixel = RevCol[*bp].g;
+					*startpixel = Col[*bp].g;
 					startpixel++;
-					*startpixel = RevCol[*bp].r;
+					*startpixel = Col[*bp].b;
 					startpixel++;
-					*startpixel = RevCol[*bp].a;
+					*startpixel = Col[*bp].a;
 					startpixel++;
 					bp++;
 				}

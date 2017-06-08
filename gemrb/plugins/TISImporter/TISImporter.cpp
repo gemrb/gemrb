@@ -88,7 +88,7 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 
 Sprite2D* TISImporter::GetTile(int index)
 {
-	RevColor RevCol[256];
+	Color Col[256];
 	Color Palette[256];
 	void* pixels = malloc( 4096 );
 	unsigned long pos = index *(1024+4096) + headerShift;
@@ -113,14 +113,15 @@ Sprite2D* TISImporter::GetTile(int index)
 		return spr;
 	}
 	str->Seek( pos, GEM_STREAM_START );
-	str->Read( &RevCol, 1024 );
+	str->Read( &Col, 1024 );
 	int transindex = 0;
 	bool transparent = false;
 	for (int i = 0; i < 256; i++) {
-		Palette[i].r = RevCol[i].r;
-		Palette[i].g = RevCol[i].g;
-		Palette[i].b = RevCol[i].b;
-		Palette[i].a = RevCol[i].a;
+		// bgra format
+		Palette[i].r = Col[i].b;
+		Palette[i].g = Col[i].g;
+		Palette[i].b = Col[i].r;
+		Palette[i].a = Col[i].a;
 		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
 			if (transparent) {
 				Log(ERROR, "TISImporter", "Tile has two green (transparent) palette entries");

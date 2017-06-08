@@ -22,10 +22,6 @@
 
 namespace GemRB {
 
-struct RevColor {
-	unsigned char b,g,r,a;
-};
-
 struct Color {
 	unsigned char r,g,b,a;
 

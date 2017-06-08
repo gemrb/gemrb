@@ -114,12 +114,11 @@ bool BAMImporter::Open(DataStream* stream)
 	palette = new Palette();
 	// no need to switch this
 	for (i = 0; i < 256; i++) {
-		RevColor rc;
-		str->Read( &rc, 4 );
-		palette->col[i].r = rc.r;
-		palette->col[i].g = rc.g;
-		palette->col[i].b = rc.b;
-		palette->col[i].a = rc.a;
+		// bgra format
+		str->Read( &palette->col[i].b, 1 );
+		str->Read( &palette->col[i].g, 1 );
+		str->Read( &palette->col[i].r, 1 );
+		str->Read( &palette->col[i].a, 1 );
 	}
 	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
 	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
