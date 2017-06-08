@@ -88,7 +88,7 @@ void Window::SubviewRemoved(View* subview, View* /*parent*/)
 		focusView = NULL;
 		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 			Control* ctrl = *c;
-			if (TrySetFocus(ctrl)) {
+			if (TrySetFocus(ctrl) == ctrl) {
 				break;
 			}
 		}
@@ -190,18 +190,18 @@ void Window::RedrawControls(const char* VarName, unsigned int Sum)
 	}
 }
 
-bool Window::TrySetFocus(View* target)
+View* Window::TrySetFocus(View* target)
 {
+	View* newFocus = focusView;
 	if (target && !target->CanLockFocus()) {
 		// target wont accept focus so dont bother unfocusing current
-		return false;
-	}
-	if (focusView && !focusView->CanUnlockFocus()) {
+	} else if (focusView && !focusView->CanUnlockFocus()) {
 		// current focus unwilling to reliquish
-		return false;
+	} else {
+		newFocus = target;
 	}
-	focusView = target;
-	return true;
+	focusView = newFocus;
+	return newFocus;
 }
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
