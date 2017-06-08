@@ -79,10 +79,8 @@ WindowManager::WindowManager(Video* vid)
 
 WindowManager::~WindowManager()
 {
-	// Deleting the regular windows will add them to closedWindows. don't double delete.
 	DestroyWindows(closedWindows);
 	DestroyWindows(windows);
-	closedWindows.clear(); // previous call may add new dangling members
 
 	video->DestroyBuffer(cursorBuf);
 	video->DestroyBuffer(winFrameBuf);
@@ -93,13 +91,10 @@ WindowManager::~WindowManager()
 void WindowManager::DestroyWindows(WindowList& list)
 {
 	while (!list.empty()) {
-		Window* win = list.back();
-		// mark them all for destruction, so they free all their memory
-		win->SetFlags(Window::DestroyOnClose, OP_OR);
-		// for the windows list, the Window destructor will pop them off itself
-		delete win;
-		if (list == closedWindows) list.pop_back();
+        delete list.back();
+		list.pop_back();
 	}
+    list.clear();
 }
 
 bool WindowManager::IsOpenWindow(Window* win) const

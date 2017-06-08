@@ -41,7 +41,7 @@ Window::Window(const Region& frame, WindowManager& mgr)
 
 Window::~Window()
 {
-	Close();
+	// Dont Close() the window. WindowManager owns the window, so it will be deleting it
 	core->GetVideoDriver()->DestroyBuffer(backBuffer);
 
 	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.begin();
