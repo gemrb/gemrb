@@ -13471,15 +13471,20 @@ bool GUIScript::ExecString(const char* string, bool feedback)
 		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
 
 		//Get error message
-		String* error = StringFromCString(PyString_AsString(pvalue));
-		if (error) {
-			displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+		const char* errorString = PyString_AsString(pvalue);
+		if (errorString) {
+			if (displaymsg) {
+				String* error = StringFromCString(errorString);
+				displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
+				delete error;
+			} else {
+				Log(ERROR, "GUIScript", "%s", errorString);
+			}
 		}
-		PyErr_Print();
+
 		Py_DECREF(ptype);
 		Py_DECREF(pvalue);
 		Py_XDECREF(ptraceback);
-		delete error;
 	}
 	PyErr_Clear();
 	return false;
