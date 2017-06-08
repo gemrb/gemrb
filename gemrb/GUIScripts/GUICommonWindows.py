@@ -1825,8 +1825,6 @@ def SelectionChanged ():
 	RunSelectionChangeHandler ()
 	return
 
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-	PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
 def ActionStopPressed ():
 	for i in GemRB.GetSelectedActors():
 		GemRB.ClearActions (i)

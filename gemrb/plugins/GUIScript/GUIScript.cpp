@@ -4694,8 +4694,6 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
-  * alignment   - text alignment\n\
-	int alignment; // TODO: currently unused
 // FIXME: probably could use a better home, and probably vary from game to game;
 static const Color Hover = {255, 180, 0, 0};
 static const Color Selected = {255, 100, 0, 0};
@@ -4727,11 +4725,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
-	char suffix = 'S';
+	const char *suffix = "S";
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
-			if (flags&1) suffix = 'M';
-			if (flags&2) suffix = 'L';
+			if (flags&1) suffix = "M";
+			if (flags&2) suffix = "L";
 			dirit.SetFilterPredicate(new EndsWithFilter(suffix), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:

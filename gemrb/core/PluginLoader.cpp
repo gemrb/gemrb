@@ -105,7 +105,6 @@ static void PrintDLError()
 
 static bool LoadPlugin(const char* pluginpath)
 {
-	strlcpy(path, pluginpath, _MAX_PATH);
 	// Try to load the Module
 #ifdef WIN32
 	HMODULE hMod = LoadLibrary( pluginpath );
