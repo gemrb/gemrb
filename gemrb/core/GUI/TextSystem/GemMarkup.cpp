@@ -114,7 +114,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						continue;
 					case '[': // wasn't actually a tag after all
 						state = TEXT;
-						token.insert(0, 1, L'[');
+						token.insert((String::size_type) 0, 1, L'[');
 						it--; // rewind so the TEXT node is created
 						continue;
 				}

@@ -38,6 +38,8 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 	cycle = Cycle;
 	frame = 0;
 	anim_phase = 0;
+	has_palette = false;
+	is_blended = false;
 
 	bam = ( AnimationFactory* ) gamedata->GetFactoryResource( ResRef,
 		IE_BAM_CLASS_ID, IE_NORMAL );
@@ -47,8 +49,6 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 
 	control = ctl;
 	control->animation = this;
-	has_palette = false;
-	is_blended = false;
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm

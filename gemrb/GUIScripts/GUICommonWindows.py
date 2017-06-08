@@ -60,7 +60,6 @@ ActionsWindow = None
 CurrentWindow = None
 ActionBarControlOffset = 0
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
-PortraitButtons = None
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -1485,7 +1484,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 
 def OpenPortraitWindow (needcontrols=0):
-	global PortraitWindow, PortraitButtons
+	global PortraitWindow
 
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
@@ -1595,8 +1594,6 @@ def OpenPortraitWindow (needcontrols=0):
 
 def UpdatePortraitWindow ():
 	"""Updates all of the portraits."""
-
-	global PortraitButtons
 
 	Window = PortraitWindow
 
@@ -1799,7 +1796,7 @@ def PortraitButtonHPOnPress (i): ##pst hitpoint display
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 
-	global PortraitWindow, PortraitButtons
+	global PortraitWindow
 
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
@@ -1974,9 +1971,11 @@ def ToggleAlwaysRun():
 
 def RestPress ():
 	GUICommon.CloseOtherWindow(None)
-	GemRB.RunRestScripts ()
-	# ensure the scripts run before the actual rest
-	GemRB.SetTimedEvent (RealRestPress, 2)
+	# only rest if the dream scripts haven't already
+	# bg2 completely offloaded resting to them - if there's a talk, it has to call Rest(Party) itself
+	if not GemRB.RunRestScripts ():
+		# ensure the scripts run before the actual rest
+		GemRB.SetTimedEvent (RealRestPress, 2)
 
 def RealRestPress ():
 	GemRB.RestParty(0, 0, 1)

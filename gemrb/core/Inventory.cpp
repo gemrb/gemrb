@@ -105,10 +105,8 @@ Inventory::Inventory()
 Inventory::~Inventory()
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
-		if (Slots[i]) {
-			delete( Slots[i] );
-			Slots[i] = NULL;
-		}
+		delete Slots[i];
+		Slots[i] = NULL;
 	}
 }
 
@@ -153,6 +151,7 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	}
 	CREItem *item = Slots[slot];
 	Slots.erase(Slots.begin()+slot);
+	Changed = true;
 	return item;
 }
 
@@ -160,6 +159,7 @@ void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
+	Changed = true;
 }
 
 void Inventory::CalculateWeight() const
@@ -349,6 +349,7 @@ void Inventory::KillSlot(unsigned int index)
 	}
 
 	Slots[index] = NULL;
+	Changed = true;
 	int effect = core->QuerySlotEffects( index );
 	if (!effect) {
 		return;
@@ -479,7 +480,6 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 			KillSlot( (unsigned int) slot);
 		}
 		delete item;
-		Changed = true;
 		destructed+=removed;
 		if (count && (destructed>=count) )
 			break;
@@ -497,18 +497,13 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 		InvalidSlot(slot);
 		return NULL;
 	}
-	Changed = true;
 	item = Slots[slot];
 
 	if (!item) {
 		return NULL;
 	}
 
-	if (!count || !(item->Flags&IE_INV_ITEM_STACKED) ) {
-		KillSlot(slot);
-		return item;
-	}
-	if (count >= item->Usages[0]) {
+	if (!count || !(item->Flags & IE_INV_ITEM_STACKED) || (count >= item->Usages[0])) {
 		KillSlot(slot);
 		return item;
 	}
@@ -516,6 +511,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	CREItem *returned = new CREItem(*item);
 	item->Usages[0]-=count;
 	returned->Usages[0]=(ieWord) count;
+	Changed = true;
 	return returned;
 }
 
@@ -557,10 +553,8 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		return;
 	}
 	Changed = true;
-	if (Slots[slot]) {
-		delete Slots[slot];
-	}
 
+	delete Slots[slot];
 	Slots[slot] = item;
 
 	//update the action bar next time
@@ -593,12 +587,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		return MergeItems(slot, item);
 	}
 
-	bool which;
-	if (slot==SLOT_AUTOEQUIP) {
-		which=true;
-	} else {
-		which=false;
-	}
+	bool which = (slot == SLOT_AUTOEQUIP);
 	int res = ASI_FAILED;
 	int max = (int) Slots.size();
 	for (int i = 0;i<max;i++) {
@@ -788,7 +777,6 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 		return false;
 	}
 	map->AddItemToLocation(loc, item);
-	Changed = true;
 	KillSlot(slot);
 	return true;
 }
@@ -822,7 +810,6 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		// mark it as unequipped, so it doesn't cause problems in stores
 		item->Flags &= ~ IE_INV_ITEM_EQUIPPED;
 		map->AddItemToLocation(loc, item);
-		Changed = true;
 		dropped = true;
 		KillSlot((unsigned int) i);
 		//if it isn't all items then we stop here
@@ -1858,17 +1845,15 @@ void Inventory::ChargeAllItems(int hours)
 }
 
 #define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE | IE_INV_ITEM_EQUIPPED) //0x442
-unsigned int Inventory::FindStealableItem()
+int Inventory::FindStealableItem()
 {
-	unsigned int slot;
-	int inc;
+	unsigned int slotcnt = Slots.size();
+	unsigned int start = core->Roll(1, slotcnt, -1);
+	int inc = start & 1 ? 1 : -1;
 
-	slot = core->Roll(1, Slots.size(),-1);
-	inc = slot&1?1:-1;
-
-	print("Start Slot: %d, increment: %d", slot, inc);
-	//as the unsigned value underflows, it will be greater than Slots.size()
-	for(;slot<Slots.size(); slot+=inc) {
+	Log(DEBUG, "Inventory", "Start Slot: %d, increment: %d", start, inc);
+	for (unsigned int i = 0; i < slotcnt; ++i) {
+		int slot = (slotcnt - 1 + start + i * inc) % slotcnt;
 		CREItem *item = Slots[slot];
 		//can't steal empty slot
 		if (!item) continue;
@@ -1882,7 +1867,7 @@ unsigned int Inventory::FindStealableItem()
 		if ((item->Flags & ITM_STEALING) != IE_INV_ITEM_MOVABLE) continue;
 		return slot;
 	}
-	return 0;
+	return -1;
 }
 
 // extension to allow more or less than head gear to avert critical hits:

@@ -339,6 +339,7 @@ public:
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored
+	int FatigueComplaintDelay;   // stagger tired messages
 	ieDword lastInit;
 	int speed;
 	//how many attacks left in this round, must be public for cleave opcode
@@ -367,7 +368,7 @@ private:
 	char AttackStance;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
-	int TicksLastRested;
+	ieDword TicksLastRested;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -735,6 +736,7 @@ public:
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
+	int GetConHealAmount() const;
 	/* returns the portrait icons list */
 	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
@@ -869,6 +871,7 @@ public:
 	/* returns the armor check penalty */
 	int GetArmorSkillPenalty(int profcheck=1) const;
 	int GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const;
+	int GetArmorWeightClass(ieWord armorType) const;
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
@@ -887,6 +890,7 @@ public:
 	void ReleaseCurrentAction();
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
+	ieDword GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;

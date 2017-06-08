@@ -794,7 +794,12 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 	if (vvc) {
 		vvc->XPos +=position.x;
 		vvc->YPos +=position.y;
-		Sender->GetCurrentArea( )->AddVVCell( new VEFObject(vvc) );
+		Map *area = Sender->GetCurrentArea();
+		if (area) {
+			area->AddVVCell(new VEFObject(vvc));
+		} else {
+			Log(WARNING, "GSUtils", "Skipping visual effect positioning due to missing area!");
+		}
 	}
 }
 

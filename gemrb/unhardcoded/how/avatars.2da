@@ -255,7 +255,7 @@
 0xD200    AVULG1    AVULG1     AVULG1     AVULG1     7          0          1          *
 0xD300    ABIRG1    ABIRG1     ABIRG1     ABIRG1     7          0          1          *
 0xD400    ABIRG1    ABIRG1     ABIRG1     ABIRG1     7          0          1          *
-0xE000    MBET      MBET       MBET       MBET       9          2          1          *
+0xE000    MBET      MBET       MBET       MBET       16         2          1          *
 0xE010    MBBM      MBBM       MBBM       MBBM       16         2          1          *
 0xE020    MBBR      MBBR       MBBR       MBBR       9          2          1          *
 0xE030    MBFI      MBFI       MBFI       MBFI       9          2          1          *

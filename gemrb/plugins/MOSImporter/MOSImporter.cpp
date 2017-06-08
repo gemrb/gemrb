@@ -35,6 +35,7 @@ static ieDword blue_mask = 0x000000ff;
 
 MOSImporter::MOSImporter(void)
 {
+	Width = Height = Cols = Rows = BlockSize = PalOffset = 0;
 	if (DataStream::BigEndian()) {
 		red_mask = 0x0000ff00;
 		green_mask = 0x00ff0000;

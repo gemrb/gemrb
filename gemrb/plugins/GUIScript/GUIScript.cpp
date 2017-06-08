@@ -67,6 +67,9 @@
 #include <algorithm>
 #include <cstdio>
 
+// MIPSPro fix for IRIX
+size_t strlcpy(char *, const char *, size_t);
+
 using namespace GemRB;
 
 GUIScript *GemRB::gs = NULL;
@@ -4722,9 +4725,12 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
+	const char *suffix = "S";
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
-			dirit.SetFilterPredicate(new EndsWithFilter((flags) ? "S" : "M"), true);
+			if (flags&1) suffix = "M";
+			if (flags&2) suffix = "L";
+			dirit.SetFilterPredicate(new EndsWithFilter(suffix), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			if (core->HasFeature( GF_SOUNDFOLDERS )) {
@@ -11608,12 +11614,13 @@ PyDoc_STRVAR( GemRB_RunRestScripts__doc,
 \n\
 **Description:** Executes the party pre-rest scripts if any.\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** bool, true if a dream script ran Rest or RestParty.\n\
 "
 );
 
 static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 {
+	int dreamed = 0;
 	GET_GAME();
 
 	// check if anyone wants to banter first (bg2)
@@ -11639,11 +11646,14 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 				GameScript* restscript = new GameScript(resref, tar, 0, 0);
 				restscript->Update();
 				delete restscript;
+				if (tar->GetLastRested() == core->GetGame()->GameTime) {
+					dreamed = 1;
+				}
 			}
 		}
 	}
 
-	Py_RETURN_NONE;
+	return PyInt_FromLong(dreamed);
 }
 
 PyDoc_STRVAR( GemRB_RestParty__doc,

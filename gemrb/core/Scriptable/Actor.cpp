@@ -337,6 +337,11 @@ std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 static int ReverseToHit=true;
 static int CheckAbilities=false;
 
+// from FXOpcodes
+#define PI_DRUNK   5
+#define PI_FATIGUE 39
+#define PI_PROJIMAGE  77
+
 static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
 static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 };
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
@@ -479,6 +484,7 @@ Actor::Actor()
 	panicMode = PANIC_NONE;
 	nextComment = 100 + RAND(0, 350); // 7-30s delay
 	nextBored = 0;
+	FatigueComplaintDelay = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 
@@ -2913,8 +2919,6 @@ ieDword Actor::GetCGGender()
 	return gender;
 }
 
-#define PI_PROJIMAGE  77
-
 void Actor::CheckPuppet(Actor *puppet, ieDword type)
 {
 	if (!puppet) return;
@@ -3249,6 +3253,15 @@ void Actor::RefreshPCStats() {
 		}
 	}
 
+	// handle intoxication
+	// the cutoff is at half of max, coinciding with where the intoxmod penalties start
+	// TODO: intoxmod, intoxcon
+	if (BaseStats[IE_INTOXICATION] >= 50) {
+		AddPortraitIcon(PI_DRUNK);
+	} else {
+		DisablePortraitIcon(PI_DRUNK);
+	}
+
 	//get the wspattack bonuses for proficiencies
 	WeaponInfo wi;
 	ITMExtHeader *header = GetWeapon(wi, false);
@@ -3308,19 +3321,16 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
 
 	// regenerate actors with high enough constitution
-	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
-		int rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
-		if (rate && !(game->GameTime % rate)) {
+	int rate = GetConHealAmount();
+	if (rate && !(game->GameTime % rate)) {
+		if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 				String text = *core->GetString(28895) + L"1"; // FIXME
 				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
 			}
-		}
-	} else {
-		int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-		if (rate && !(game->GameTime % (rate*AI_UPDATE_TIME))) {
+		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 		}
 	}
@@ -3340,6 +3350,21 @@ void Actor::RefreshPCStats() {
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
 }
 
+int Actor::GetConHealAmount() const
+{
+	int rate = 0;
+	Game *game = core->GetGame();
+	if (!game) return rate;
+
+	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
+		rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
+	} else {
+		rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
+		rate *= AI_UPDATE_TIME;
+	}
+	return rate;
+}
+
 // add fatigue every 4 hours since resting and check if the actor is penalised for it
 void Actor::UpdateFatigue()
 {
@@ -3350,12 +3375,12 @@ void Actor::UpdateFatigue()
 	// do icons here, so they persist for more than a tick
 	int LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
 	if (LuckMod) {
-		AddPortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+		AddPortraitIcon(PI_FATIGUE);
 	} else {
-		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+		DisablePortraitIcon(PI_FATIGUE);
 	}
 
-	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / 18000; // 18000 == 4 hours
+	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size);
 	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
 	// pst has TNO regeneration stored there
 	if (core->HasFeature(GF_AREA_OVERRIDE)) FatigueBonus = 0;
@@ -3369,12 +3394,21 @@ void Actor::UpdateFatigue()
 		LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
 		BaseStats[IE_LUCK] += LuckMod-OldLuckMod;
 		if (LuckMod < 0) {
-			VerbalConstant(VB_TIRED, 1);
+			// stagger the complaint, so long travels don't cause a fatigue choir
+			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else if (!TicksLastRested) {
 		//if someone changed FatigueLevel, or loading a game, reset
-		TicksLastRested = game->GameTime - 18000 * BaseStats[IE_FATIGUE];
+		TicksLastRested = game->GameTime - (4*core->Time.hour_size) * BaseStats[IE_FATIGUE];
+		FatigueComplaintDelay = 0;
 		if (LuckMod < 0) {
+			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
+		}
+	}
+
+	if (FatigueComplaintDelay) {
+		FatigueComplaintDelay--;
+		if (!FatigueComplaintDelay) {
 			VerbalConstant(VB_TIRED, 1);
 		}
 	}
@@ -3861,6 +3895,10 @@ void Actor::IdleActions(bool nonidle)
 	//did scripts disable us
 	if (game->BanterBlockFlag || (game->BanterBlockTime>time) ) {
 		return;
+	}
+
+	if (time/nextComment > 1) { // first run, not adjusted for game time yet
+		nextComment += time;
 	}
 
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
@@ -4789,12 +4827,13 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 int Actor::CalculateSpeed(bool feedback)
 {
 	int speed = GetStat(IE_MOVEMENTRATE);
+	inventory.CalculateWeight();
+
 	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
 		// cheating bastards (drow in ar2401 for example)
 		return speed;
 	}
 
-	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
 	int maxweight = GetMaxEncumbrance();
@@ -5287,7 +5326,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
-	RemovalTime = time + (7200 * AI_UPDATE_TIME); // keep corpse around for a day
+	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
 	if (LastDamageType&DAMAGE_CHUNKING) {
@@ -6480,20 +6519,32 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 			attacknum--; // remove 1, since it is for the other hand (otherwise we would never use the max tohit for this hand)
 		}
 		if (third) {
+			// rangers wearing light or no armor gain ambidexterity and
+			//  two-weapon-fighting feats for free
+			bool ambidextrous = HasFeat(FEAT_AMBIDEXTERITY);
+			bool twoWeaponFighting = HasFeat(FEAT_TWO_WEAPON_FIGHTING);
+			if (GetRangerLevel()) {
+				ieWord armorType = inventory.GetArmorItemType();
+				if (GetArmorWeightClass(armorType) <= 1) {
+					ambidextrous = true;
+					twoWeaponFighting = true;
+				}
+			}
+
 			// FIXME: externalise
 			// penalites and boni for both hands:
 			// -6 main, -10 off with no adjustments
 			//  0 main, +4 off with ambidexterity
 			// +2 main, +2 off with two weapon fighting
 			// +2 main, +2 off with a simple weapons in the off hand (handled in GetCombatDetails)
-			if (HasFeat(FEAT_TWO_WEAPON_FIGHTING)) {
+			if (twoWeaponFighting) {
 				prof += 2;
 			}
 			if (Flags&WEAPON_LEFTHAND) {
 				prof -= 6;
 			} else {
 				prof -= 10;
-				if (HasFeat(FEAT_AMBIDEXTERITY)) {
+				if (ambidextrous) {
 					prof += 4;
 				}
 			}
@@ -10227,12 +10278,6 @@ int Actor::GetArmorSkillPenalty(int profcheck) const
 
 // Returns the armor check penalty.
 // used for mapping the iwd2 armor feat to the equipped armor's weight class
-// the armor weight class is perfectly deduced from the penalty as following:
-// 0,   none: none, robes
-// 1-3, light: leather, studded
-// 4-6, medium: hide, chain, scale
-// 7-,  heavy: splint, plate, full plate
-// the values are taken from our dehardcoded itemdata.2da
 // magical shields and armors get a +1 bonus
 int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 {
@@ -10240,15 +10285,7 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 
 	ieWord armorType = inventory.GetArmorItemType();
 	int penalty = core->GetArmorPenalty(armorType);
-	int weightClass = 0;
-
-	if (penalty >= 1 && penalty < 4) {
-		weightClass = 1;
-	} else if (penalty >= 4 && penalty < 7) {
-		weightClass = 2;
-	} else if (penalty >= 7) {
-		weightClass = 3;
-	}
+	int weightClass = GetArmorWeightClass(armorType);
 
 	// ignore the penalty if we are proficient
 	if (profcheck && GetFeat(FEAT_ARMOUR_PROFICIENCY) >= weightClass) {
@@ -10297,6 +10334,29 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 	shield = shieldPenalty;
 
 	return -penalty;
+}
+
+// the armor weight class is perfectly deduced from the penalty as following:
+// 0,   none: none, robes
+// 1-3, light: leather, studded
+// 4-6, medium: hide, chain, scale
+// 7-,  heavy: splint, plate, full plate
+// the values are taken from our dehardcoded itemdata.2da
+int Actor::GetArmorWeightClass(ieWord armorType) const
+{
+	if (!third) return 0;
+
+	int penalty = core->GetArmorPenalty(armorType);
+	int weightClass = 0;
+
+	if (penalty >= 1 && penalty < 4) {
+		weightClass = 1;
+	} else if (penalty >= 4 && penalty < 7) {
+		weightClass = 2;
+	} else if (penalty >= 7) {
+		weightClass = 3;
+	}
+	return weightClass;
 }
 
 int Actor::GetTotalArmorFailure() const

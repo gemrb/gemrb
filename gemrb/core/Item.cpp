@@ -34,6 +34,10 @@ namespace GemRB {
 ITMExtHeader::ITMExtHeader(void)
 {
 	features = NULL;
+	Location = Range = Speed = unknown1 = RechargeFlags = IDReq = 0;
+	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
+	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
+	ProjectileAnimation = ProjectileQualifier = FeatureCount = FeatureOffset = 0;
 }
 
 ITMExtHeader::~ITMExtHeader(void)
@@ -45,6 +49,15 @@ Item::Item(void)
 {
 	ext_headers = NULL;
 	equipping_features = NULL;
+	MinStrength = MinStrengthBonus = MinLevel = Weight = MaxStackAmount = ItemType = 0;
+	MinIntelligence = MinDexterity = MinWisdom = MinConstitution = MinCharisma = 0;
+	WeaProf = WieldColor = Enchantment = KitUsability = Flags = UsabilityBitmask = 0;
+	Price = LoreToID = ItemDesc = ItemDescIdentified = ItemNameIdentified = ItemName = 0;
+	ExtHeaderOffset = ExtHeaderCount = FeatureBlockOffset = 0;
+	EquippingFeatureOffset = EquippingFeatureCount = 0;
+	unknown1 = unknown2 = unknown3 = 0;
+	ItemExcl = false;
+	DialogName = 0;
 }
 
 Item::~Item(void)

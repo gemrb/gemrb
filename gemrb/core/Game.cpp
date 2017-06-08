@@ -87,6 +87,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
 	partysize = 6;
 	Ticks = 0;
+	GameTime = RealTime = 0;
 	version = 0;
 	Expansion = 0;
 	LoadMos[0] = 0;
@@ -114,6 +115,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
+	WhichFormation = 0;
+	NpcInParty = 0;
+	CurrentLink = 0;
+	PartyAttack = false;
 
 	//loading master areas
 	AutoTable table;
@@ -432,7 +437,10 @@ int Game::LeaveParty (Actor* actor)
 	NPCs.push_back( actor );
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
-		actor->SetScript( "", SCR_DEFAULT );
+		// we must reset various existing scripts
+		actor->SetScript("", SCR_CLASS, false);
+		actor->SetScript("", SCR_RACE, false);
+		actor->SetScript("WTASIGHT", SCR_GENERAL, false);
 		if (actor->GetBase(IE_MC_FLAGS) & MC_EXPORTABLE) {
 			actor->SetDialog("MULTIJ");
 		}
@@ -1404,17 +1412,40 @@ void Game::AddGold(ieDword add)
 	}
 }
 
+EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
+
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add, bool fatigue)
 {
-	ieDword h = GameTime/(300*AI_UPDATE_TIME);
+	ieDword h = GameTime/core->Time.hour_size;
 	GameTime+=add;
-	if (h!=GameTime/(300*AI_UPDATE_TIME)) {
+	if (h!=GameTime/core->Time.hour_size) {
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 		//update clock display
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
 	}
+
+	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
+	// but only if we skip for at least an hour
+	if (add >= core->Time.hour_size) {
+		for (unsigned int i=0; i<PCs.size(); i++) {
+			Actor *pc = PCs[i];
+			int conHealRate = pc->GetConHealAmount();;
+			// 1. regeneration as an effect
+			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
+			// However the effect does its own timekeeping, so we can't easily check the duration,
+			// so we treat all regeneration as permanent - the most common kind (eg. from rings)
+			if (pc->fxqueue.HasEffect(fx_set_regenerating_state_ref)) {
+				pc->Heal(0);
+			} else if (conHealRate) {
+				// 2. regeneration from high constitution / TNO
+				// some of the speeds are very slow, so calculate the accurate amount
+				pc->Heal(add / conHealRate);
+			}
+		}
+	}
+
 	Ticks+=add*interval;
 	if (!fatigue) {
 		// update everyone in party, so they think no time has passed
@@ -1723,7 +1754,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 		}
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, (GameTime/AI_UPDATE_TIME)%7200/3600);
+		// TODO: should take time of day into account (GameScript::TimeOfDay)
+		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, core->Time.GetHour(GameTime)/12);
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {
@@ -1740,7 +1772,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			}
 		}
 	} else {
-		AdvanceTime(hours*300*AI_UPDATE_TIME);
+		AdvanceTime(hours * core->Time.hour_size);
 	}
 
 	int i = GetPartySize(true); // party size, only alive
@@ -1997,7 +2029,7 @@ const Color *Game::GetGlobalTint() const
 	}
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
 		//get daytime colour
-		ieDword daynight = ((GameTime/AI_UPDATE_TIME)%7200/300);
+		ieDword daynight = core->Time.GetHour(GameTime);
 		if (daynight<2 || daynight>22) {
 			return &NightTint;
 		}
@@ -2020,7 +2052,7 @@ const Color *Game::GetGlobalTint() const
 
 bool Game::IsDay()
 {
-	ieDword daynight = ((GameTime/AI_UPDATE_TIME)%7200/300);
+	ieDword daynight = core->Time.GetHour(GameTime);
 	if(daynight<4 || daynight>20) {
 		return false;
 	}
@@ -2032,13 +2064,16 @@ void Game::ChangeSong(bool always, bool force)
 	int Song;
 	static int BattleSong = 0;
 
+	if (!area) return;
+
 	if (CombatCounter) {
 		//battlesong
 		Song = SONG_BATTLE;
 		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
-		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
+		// TODO: should this take time of day into account?
+		Song = core->Time.GetHour(GameTime)/12;
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
@@ -2164,7 +2199,7 @@ void Game::dump() const
 	if (Scripts[0]) {
 		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
 	}
-	int hours = GameTime/AI_UPDATE_TIME/300;
+	int hours = GameTime/core->Time.hour_size;
 	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime, hours/24, hours%24);
 	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
 

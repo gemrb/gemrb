@@ -98,9 +98,6 @@ namespace GemRB {
 
 GEM_EXPORT Interface* core = NULL;
 
-//use DialogF.tlk if the protagonist is female, that's why we leave space
-static const char dialogtlk[] = "dialog.tlk\0";
-
 static int MaximumAbility = 25;
 static ieWordSigned *strmod = NULL;
 static ieWordSigned *strmodex = NULL;
@@ -216,6 +213,7 @@ Interface::Interface()
 	//GameFeatures2 = 0;
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
+	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
 	SpecialSpellsCount = -1;
@@ -226,6 +224,12 @@ Interface::Interface()
 	TLKEncoding.multibyte = false;
 	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
+	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
+	MultipleQuickSaves = false;
+	MaxPartySize = 6;
+
+	//once GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
 
 	gamedata = new GameData();
 
@@ -700,6 +704,10 @@ bool Interface::ReadGameTimeTable()
 	Time.round_size = Time.round_sec * AI_UPDATE_TIME;
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
 	Time.attack_round_size = atoi(table->QueryField("ATTACK_ROUND", "DURATION"));
+	Time.hour_sec = 300; // move to table if pst turns out to be different
+	Time.hour_size = Time.hour_sec * AI_UPDATE_TIME;
+	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
+	Time.day_size = Time.day_sec * AI_UPDATE_TIME;
 
 	return true;
 }
@@ -1207,7 +1215,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("FogOfWar", FogOfWar = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
-	MaxPartySize = 6;
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
@@ -1585,13 +1592,29 @@ int Interface::Init(InterfaceConfig* config)
 	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
-	PathJoin( strpath, GamePath, dialogtlk, NULL );
+	PathJoin(strpath, GamePath, "dialog.tlk", NULL);
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
 		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
 		return GEM_ERROR;
 	}
 	strings->Open(fs);
+
+	// does the language use an extra tlk?
+	if (strings->HasAltTLK()) {
+		strings2 = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
+		char strpath[_MAX_PATH];
+		PathJoin(strpath, GamePath, "dialogf.tlk", NULL);
+		FileStream* fs = FileStream::OpenFile(strpath);
+		if (!fs) {
+			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
+			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
+			strings2 = strings;
+		} else {
+			strings2->Open(fs);
+		}
+	}
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
@@ -2016,7 +2039,11 @@ char* Interface::GetCString(ieStrRef strref, ieDword options) const
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
-	return strings->GetCString( strref, flags | options );
+	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+		return strings2->GetCString(strref, flags | options);
+	} else {
+		return strings->GetCString(strref, flags | options);
+	}
 }
 
 String* Interface::GetString(ieStrRef strref, ieDword options) const
@@ -2026,7 +2053,12 @@ String* Interface::GetString(ieStrRef strref, ieDword options) const
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
-	return strings->GetString( strref, flags | options );
+
+	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+		return strings2->GetString(strref, flags | options);
+	} else {
+		return strings->GetString(strref, flags | options);
+	}
 }
 
 void Interface::SetFeature(int flag, int position)
@@ -2213,8 +2245,6 @@ bool Interface::LoadGemRBINI()
 		//printMessage("Option", "", GREEN);
 		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
-
-	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	return true;
 }
@@ -2467,6 +2497,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				if (newfx) {
 					newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
+					delete newfx;
 				}
 			}
 		}
@@ -3662,7 +3693,10 @@ void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 bool Interface::StupidityDetector(const char* Pt)
 {
 	char Path[_MAX_PATH];
-	strcpy( Path, Pt );
+	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "Interface", "Trying to check too long path: %s!", Pt);
+		return true;
+	}
 	DirectoryIterator dir(Path);
 	// scan everything
 	dir.SetFlags(DirectoryIterator::All, true);
@@ -3697,7 +3731,10 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 	char Path[_MAX_PATH];
 
 	if (!Pt[0]) return; //Don't delete the root filesystem :)
-	strcpy( Path, Pt );
+	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
+		Log(ERROR, "Interface", "Trying to delete too long path: %s!", Pt);
+		return;
+	}
 	DirectoryIterator dir(Path);
 	dir.SetFlags(DirectoryIterator::Files);
 	if (!dir) {
@@ -3854,6 +3891,12 @@ void Interface::SanitizeItem(CREItem *item) const
 	//this is to fix buggy saves so TakeItemNum works
 	//the equipped bit is also reset
 	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
+
+	//this is for converting IWD items magic flag
+	if (MagicBit && (item->Flags & IE_INV_ITEM_UNDROPPABLE)) {
+		item->Flags |= IE_INV_ITEM_MAGICAL;
+		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
+	}
 	if (core->HasFeature(GF_NO_UNDROPPABLE)) {
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
@@ -3897,13 +3940,6 @@ void Interface::SanitizeItem(CREItem *item) const
 		//some slot flags might be affected by the item flags
 		if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
 			item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-		}
-		//this is for converting IWD items magic flag
-		if (MagicBit) {
-			if (item->Flags&IE_INV_ITEM_UNDROPPABLE) {
-				item->Flags|=IE_INV_ITEM_MAGICAL;
-				item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
-			}
 		}
 
 		// pst has no stolen flag, but "steel" in its place

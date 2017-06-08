@@ -319,7 +319,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (core->GetGameControl()->dialoghandler->IsSpeaker(Sender))
+	if (core->GetGameControl()->dialoghandler->IsSpeaker(scr))
 		return 1;
 	return 0;
 }
@@ -3836,7 +3836,7 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int hour = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300;
+	int hour = core->Time.GetHour(core->GetGame()->GameTime);
 
 	if ((parameters->int0Parameter == TIMEOFDAY_DAY && hour >= 7 && hour < 21)
 		|| (parameters->int0Parameter == TIMEOFDAY_DUSK && hour == 21)
@@ -4091,7 +4091,7 @@ int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day == parameters->int0Parameter) {
 		return 1;
 	}
@@ -4100,7 +4100,7 @@ int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day > parameters->int0Parameter) {
 		return 1;
 	}
@@ -4109,7 +4109,7 @@ int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/core->Time.day_size);
 	if(day < parameters->int0Parameter) {
 		return 1;
 	}

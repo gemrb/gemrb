@@ -21,7 +21,12 @@
 #ifndef STRINGMAP_H
 #define STRINGMAP_H
 
-#include <string>
+// glibc doesn't care, but other systems may
+#ifdef __sgi
+# include <strings.h>
+#else
+# include <string>
+#endif
 
 #include "ie_types.h"
 

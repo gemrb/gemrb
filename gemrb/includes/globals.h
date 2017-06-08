@@ -82,6 +82,9 @@ namespace GemRB {
 #define IE_STR_ALLOW_ZERO 8     //0 strref is allowed
 #define IE_STR_STRREFOFF  256
 
+// checked against the strref itself
+#define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
+
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define OP_SET  0 //gemrb extension
@@ -202,7 +205,7 @@ GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
-#define SCHEDULE_MASK(time)	(1 << (((time/AI_UPDATE_TIME)+(300/2))%7200/300))
+#define SCHEDULE_MASK(time)	(1 << core->Time.GetHour(time + core->Time.hour_size/2))
 
 #ifndef WIN32
 inline unsigned long GetTickCount()

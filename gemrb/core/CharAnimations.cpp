@@ -1636,6 +1636,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_HEAD_TURN: //could be wrong
+		case IE_ANI_HIDE: //could be wrong
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g2" );
 			break;
@@ -1771,17 +1772,17 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			strcat( ResRef, SlashPrefix[WeaponType] );
-			strcpy( EquipData->Suffix, SlashPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, SlashPrefix[WeaponType], sizeof(EquipData->Suffix));
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, BackPrefix[WeaponType] );
-			strcpy( EquipData->Suffix, BackPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, BackPrefix[WeaponType], sizeof(EquipData->Suffix));
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			strcat( ResRef, JabPrefix[WeaponType] );
-			strcpy( EquipData->Suffix, JabPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, JabPrefix[WeaponType], sizeof(EquipData->Suffix));
 			break;
 
 		case IE_ANI_AWAKE:
@@ -1850,7 +1851,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			strcat( ResRef, RangedPrefix[RangedType] );
-			strcpy( EquipData->Suffix, RangedPrefix[RangedType] );
+			strlcpy(EquipData->Suffix, RangedPrefix[RangedType], sizeof(EquipData->Suffix));
 			break;
 
 		case IE_ANI_SLEEP:
@@ -1916,6 +1917,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
+		case IE_ANI_CAST: //could be wrong
 		case IE_ANI_CONJURE:
 			strcat( ResRef, "g2" );
 			Cycle = 0 + Orient;
@@ -2017,19 +2019,19 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			strcat (ResRef, SlashPrefix[WeaponType]);
-			strcpy( EquipData->Suffix, SlashPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, SlashPrefix[WeaponType], sizeof(EquipData->Suffix));
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat (ResRef, BackPrefix[WeaponType]);
-			strcpy( EquipData->Suffix, BackPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, BackPrefix[WeaponType], sizeof(EquipData->Suffix));
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			strcat (ResRef, JabPrefix[WeaponType]);
-			strcpy( EquipData->Suffix, JabPrefix[WeaponType] );
+			strlcpy(EquipData->Suffix, JabPrefix[WeaponType], sizeof(EquipData->Suffix));
 			Cycle = Orient;
 			break;
 
@@ -2096,7 +2098,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			strcat (ResRef, RangedPrefixOld[RangedType]);
-			strcpy( EquipData->Suffix, RangedPrefixOld[RangedType] );
+			strlcpy(EquipData->Suffix, RangedPrefixOld[RangedType], sizeof(EquipData->Suffix));
 			Cycle = Orient;
 			break;
 

@@ -58,6 +58,8 @@ PNGImporter::PNGImporter(void)
 	inf->png_ptr = 0;
 	inf->info_ptr = 0;
 	inf->end_info = 0;
+	Width = Height = 0;
+	hasPalette = false;
 }
 
 PNGImporter::~PNGImporter(void)

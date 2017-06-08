@@ -64,7 +64,7 @@ static void ParseGameDate(DataStream *ds, char *Date)
 		return;
 	}
 
-	int hours = ((int)GameTime)/300;
+	int hours = ((int)GameTime)/core->Time.hour_sec;
 	int days = hours/24;
 	hours -= days*24;
 	char *a=NULL,*b=NULL,*c=NULL;
