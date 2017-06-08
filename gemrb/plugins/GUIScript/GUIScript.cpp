@@ -192,8 +192,6 @@ if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f)) { \
 	return NULL; \
 }
 
-#endif
-
 #define ABORT_IF_NULL(thing) \
 if (thing == NULL) return NULL;
 
