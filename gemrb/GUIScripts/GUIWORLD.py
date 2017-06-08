@@ -239,7 +239,7 @@ def OpenReformPartyWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
-		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,4,4))
+		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,2,2))
 		if j < len(removable_pcs):
 			Button.SetVarAssoc ("Selected", removable_pcs[j])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)

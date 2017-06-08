@@ -77,12 +77,16 @@ class GView:
 		r['y'] = y
 		self.SetFrame(r);
 
-	def GetInsetFrame(self, x, y = None, w = None, h = None):
+	def GetInsetFrame(self, l = 0, r = None, t = None, b = None):
+		b = b if b is not None else l
+		r = r if r is not None else l
+		t = t if t is not None else b
+        
 		frame = self.GetFrame()
-		frame['x'] += x
-		frame['y'] += x if y is None else y
-		frame['w'] -= x*2 if w is None else w*2
-		frame['h'] -= x*2 if h is None else h*2
+		frame['x'] += l
+		frame['y'] += b
+		frame['w'] -= (l + r)
+		frame['h'] -= (b + t)
 		return frame
 
 	def SetVisible(self, visible):
