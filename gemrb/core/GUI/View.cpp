@@ -48,7 +48,7 @@ View::View(const Region& frame)
 
 View::~View()
 {
-	DeleteScriptingRef();
+	AssignScriptingRef(NULL);
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -453,14 +453,9 @@ void View::OnMouseWheelScroll(const Point& delta)
 
 void View::AssignScriptingRef(ViewScriptingRef* ref)
 {
+	ScriptEngine::UnregisterScriptingRef(scriptingRef);
 	delete scriptingRef;
 	scriptingRef = ref;
-}
-
-void View::DeleteScriptingRef()
-{
-	ScriptEngine::UnregisterScriptingRef(scriptingRef);
-	AssignScriptingRef(NULL);
 }
 
 }

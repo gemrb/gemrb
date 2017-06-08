@@ -1242,9 +1242,10 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
             // so any named references to "subView" are currently lost here
 
             ScriptingId id = subView->GetScriptingRef()->Id;
-            subView->DeleteScriptingRef();
+            // FIXME: no promise that subView is a control (could be a plain view)
             RegisterScriptableControl(static_cast<Control*>(subView), id);
         }
+
 		Py_RETURN_NONE;
 	}
 
