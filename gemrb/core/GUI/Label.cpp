@@ -37,6 +37,7 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	this->font = font;
 	useRGB = false;
 	palette = NULL;
+	SetColor(ColorWhite, ColorBlack);
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
 	SetText(string);
@@ -68,9 +69,6 @@ void Label::SetText(const String& string)
 	if (Alignment == IE_FONT_ALIGN_CENTER
 		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
 		StringToLower(Text);
-	}
-	if (!palette) {
-		SetColor(ColorWhite, ColorBlack);
 	}
 	MarkDirty();
 }
