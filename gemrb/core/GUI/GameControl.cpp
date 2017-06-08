@@ -1437,14 +1437,14 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 			p.x -= frame.w/2;
 			p.y -= frame.h/2;
 		}
-	if (p.x + frame.w >= mapsize.x) {
-		p.x = mapsize.x - frame.w - 1;
-	}
-	if (p.x < 0) {
-		p.x = 0;
-	}
-	if (p.y + frame.h >= mapsize.y) {
-		p.y = mapsize.y - frame.h - 1;
+		if (p.x + frame.w >= mapsize.x) {
+			p.x = mapsize.x - frame.w - 1;
+		}
+		if (p.x < 0) {
+			p.x = 0;
+		}
+		if (p.y + frame.h >= mapsize.y) {
+			p.y = mapsize.y - frame.h - 1;
 		}
 		if (p.y < 0) {
 			p.y = 0;
