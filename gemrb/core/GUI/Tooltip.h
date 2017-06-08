@@ -30,14 +30,13 @@ class TooltipBackground {
 	mutable int animationPos;
 	int margin;
 
-	Sprite2D* background;
-	Sprite2D* leftbg;
-	Sprite2D* rightbg;
+	Holder<Sprite2D> background;
+	Holder<Sprite2D> leftbg;
+	Holder<Sprite2D> rightbg;
 
 public:
-	TooltipBackground(Sprite2D* bg, Sprite2D* left = NULL, Sprite2D* right = NULL);
+	TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = NULL, Holder<Sprite2D> right = NULL);
 	TooltipBackground(const TooltipBackground&);
-	~TooltipBackground();
 
 	void Draw(const Region& rgn) const;
 

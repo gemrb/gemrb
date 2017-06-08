@@ -24,7 +24,7 @@
 
 namespace GemRB {
 
-TooltipBackground::TooltipBackground(Sprite2D* bg, Sprite2D* left, Sprite2D* right)
+TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left, Holder<Sprite2D> right)
 : background(bg), leftbg(left), rightbg(right)
 {
 	assert(background);
@@ -46,18 +46,7 @@ TooltipBackground::TooltipBackground(const TooltipBackground& bg)
 	leftbg = bg.leftbg;
 	rightbg = bg.rightbg;
 
-	if (background) background->acquire();
-	if (leftbg) leftbg->acquire();
-	if (rightbg) rightbg->acquire();
-
 	Reset();
-}
-
-TooltipBackground::~TooltipBackground()
-{
-	Sprite2D::FreeSprite(background);
-	Sprite2D::FreeSprite(leftbg);
-	Sprite2D::FreeSprite(rightbg);
 }
 
 void TooltipBackground::Reset()
@@ -90,7 +79,7 @@ void TooltipBackground::Draw(const Region& rgn) const
 	Video* video = core->GetVideoDriver();
 
 	// draw left paper curl
-	video->BlitSprite( leftbg, dp.x - leftbg->Width, dp.y );
+	video->BlitSprite( leftbg.get(), dp.x - leftbg->Width, dp.y );
 
 	// calculate the unrolled region
 	Region bgclip(dp, Size(animationPos, background->Height));
@@ -98,11 +87,11 @@ void TooltipBackground::Draw(const Region& rgn) const
 
 	// draw unrolled paper
 	int mid = (rgn.w / 2) - (background->Width / 2) + rgn.x - background->XPos;
-	video->BlitSprite( background, -mid, dp.y, &bgclip );
+	video->BlitSprite( background.get(), -mid, dp.y, &bgclip );
 
 	// draw right paper curl
 	dp.x += animationPos;
-	video->BlitSprite( rightbg, dp.x + leftbg->Width, dp.y );
+	video->BlitSprite( rightbg.get(), dp.x + leftbg->Width, dp.y );
 
 	// clip the tooltip text to the background
 	video->SetScreenClip(&bgclip);
