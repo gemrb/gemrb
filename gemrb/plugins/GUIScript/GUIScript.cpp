@@ -181,6 +181,7 @@ if (!PyArg_ParseTuple( args, fmt, a, b, c, d)) { \
 	return NULL; \
 }
 
+
 #define PARSE_ARGS5(args, fmt, a, b, c, d, e)\
 if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e)) { \
 	return NULL; \
@@ -191,30 +192,7 @@ if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f)) { \
 	return NULL; \
 }
 
-#define PARSE_ARGS7(args, fmt, a, b, c, d, e, f, g)\
-if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f, g)) { \
-	return NULL; \
-}
-
-#define PARSE_ARGS8(args, fmt, a, b, c, d, e, f, g, h)\
-if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f, g, h)) { \
-	return NULL; \
-}
-
-#define PARSE_ARGS9(args, fmt, a, b, c, d, e, f, g, h, i)\
-if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f, g, h, i)) { \
-	return NULL; \
-}
-
-#define PARSE_ARGS10(args, fmt, a, b, c, d, e, f, g, h, i, j)\
-if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f, g, h, i, j)) { \
-	return NULL; \
-}
-
-#define PARSE_ARGS12(args, fmt, a, b, c, d, e, f, g, h, i, j, k, l)\
-if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f, g, h, i, j, k, l)) { \
-	return NULL; \
-}
+#endif
 
 #define ABORT_IF_NULL(thing) \
 if (thing == NULL) return NULL;
