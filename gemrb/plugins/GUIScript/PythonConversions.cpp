@@ -72,6 +72,13 @@ Region RectFromPy(PyObject* obj) {
 	return Region();
 }
 
+ResRef ResRefFromPy(PyObject* obj) {
+	if (PyString_Check(obj)) {
+		return ResRef(PyString_AsString(obj));
+	}
+	return ResRef();
+}
+
 Holder<TableMgr> GetTable(PyObject* obj) {
 	Holder<TableMgr> tm;
 

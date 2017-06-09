@@ -222,7 +222,7 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
 		return NULL;
 	}
-	ResRef group = PyString_AsString(attr);
+	ResRef group = ResRefFromPy(attr);
 
 	return gs->GetScripingRef(group, id);
 }

@@ -93,6 +93,8 @@ Point PointFromPy(PyObject* obj);
 
 Region RectFromPy(PyObject* obj);
 
+ResRef ResRefFromPy(PyObject* obj);
+
 Holder<TableMgr> GetTable(PyObject* obj);
 
 /*
