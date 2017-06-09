@@ -101,8 +101,7 @@ class GView:
 
 	def CreateSubview(self, id, type, frame, *args):
 		view = CreateView(id, type, frame, *args)
-		self.AddSubview(view)
-		return view
+		return self.AddSubview(view)
 
 	def RemoveSubview(self, view):
 		RemoveView(view, False)
@@ -268,8 +267,8 @@ class GButton(GControl):
 	  self.SetPicture(spr) # backwards compatibility
 
   def CreateLabel(self, labelid, *args):
-    frame = self.GetFrame()
-    return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
+	  frame = self.GetFrame()
+	  return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
 
 class GWorldMap(GControl):
   methods = {

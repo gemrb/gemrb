@@ -1226,7 +1226,8 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
             RegisterScriptableControl(static_cast<Control*>(subView), id);
         }
 
-		Py_RETURN_NONE;
+        // since we may reassign the ref, we must return the object representing the new one
+		return gs->ConstructObjectForScriptable(subView->GetScriptingRef());
 	}
 
 	return AttributeError("Invalid view parameters.");
