@@ -237,6 +237,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		if how: # how doesn't have this in the right place
 			pos = ScreenHeight - 71
 			Window.CreateButton (OptionControl['Time'], 6, pos, 64, 71)
+
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
 			Label = Button.CreateLabel (0x10000009, "NORMAL", "", IE_FONT_SINGLE_LINE)
@@ -1462,6 +1463,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		else:
 			# vertical
 			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
+
 		button = Window.GetControl (nextID)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 
@@ -1509,8 +1511,7 @@ def OpenPortraitWindow (needcontrols=0):
 			if GameCheck.HasHOW():
 				# Rest (how)
 				pos = ScreenHeight - 37
-				Window.CreateButton (8, 6, pos, 55, 37)
-				Button = Window.GetControl (8)
+				Button = Window.CreateButton (8, 6, pos, 55, 37)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
@@ -1527,8 +1528,7 @@ def OpenPortraitWindow (needcontrols=0):
 
 		#Select All
 		if GameCheck.HasHOW():
-			Window.CreateButton (7, 33, pos, 27, 36)
-			Button = Window.GetControl (7)
+			Button = Window.CreateButton (7, 33, pos, 27, 36)
 			Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
 		else:
 			Button = Window.GetControl (7)

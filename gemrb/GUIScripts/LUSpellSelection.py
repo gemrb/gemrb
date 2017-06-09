@@ -151,6 +151,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			HideUnhideScrollBar(1)
 			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
+
 		SpellStart = 0
 
 	# setup our variables

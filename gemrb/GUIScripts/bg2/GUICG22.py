@@ -85,18 +85,18 @@ def OnLoad():
 	if EnhanceGUI:
 		tmpRowCount = RowCount
 		if RowCount>10: #create 11 kit button
-			KitWindow.CreateButton (15, 18, 250, 271, 20)
-			extrakit = KitWindow.GetControl(15)
+			extrakit = KitWindow.CreateButton (15, 18, 250, 271, 20)
 			extrakit.SetState(IE_GUI_BUTTON_DISABLED)
 			extrakit.SetFlags(IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_CAPS, OP_OR)
 			extrakit.SetSprites("GUICGBC",0, 0,1,2,3)
 			RowCount = 11
+
 		if tmpRowCount>11: #create scroll bar
-			KitWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
-			ScrollBar = KitWindow.GetControl (1000)
+			ScrollBar = KitWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
 			ScrollBar.SetVarAssoc("TopIndex",tmpRowCount-10)
 			ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawKits)
 			ScrollBar.SetDefaultScrollBar()
+
 	elif not EnhanceGUI and RowCount>10:
 		RowCount = 10
 

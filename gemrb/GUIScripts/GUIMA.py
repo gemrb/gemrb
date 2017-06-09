@@ -108,6 +108,7 @@ def ShowMap ():
 		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	else:
 		Window.CreateMapControl (2, 0, 0, 0, 0)
+
 	Map = Window.GetControl (2)
 	if HasMapNotes ():
 		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
@@ -154,6 +155,7 @@ def OpenMapWindow ():
 		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	else:
 		Window.CreateMapControl (2, 0, 0, 0, 0)
+
 	Map = Window.GetControl (2)
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)

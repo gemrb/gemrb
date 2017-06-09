@@ -63,8 +63,7 @@ def OnLoad():
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitWindow.Focus)
 	ExitButton.MakeEscape()
 
-	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	Label=StartWindow.GetControl(0x0fff0000)
+	Label = StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GEMRB_VERSION)
 	
 	StartWindow.Focus()

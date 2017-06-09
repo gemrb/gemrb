@@ -53,16 +53,14 @@ def OnLoad():
 	ButtonCount = 10
 	if len(MCRowIndices) > 10:
 		# add another button, there's another slot left
-		ClassWindow.CreateButton (15, 18, 250, 271, 20)
-		extramc = ClassWindow.GetControl(15)
+		extramc = ClassWindow.CreateButton (15, 18, 250, 271, 20)
 		extramc.SetState(IE_GUI_BUTTON_DISABLED)
 		extramc.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		extramc.SetSprites("GUICGBC",0, 0,1,2,3)
 		ButtonCount = 11
 	if len(MCRowIndices) > 11:
 		# bah, also add a scrollbar
-		ClassWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
-		ScrollBar = ClassWindow.GetControl (1000)
+		ScrollBar = ClassWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
 		ScrollBar.SetVarAssoc("TopIndex", len(MCRowIndices)-10)
 		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawMCs)
 		ScrollBar.SetDefaultScrollBar()

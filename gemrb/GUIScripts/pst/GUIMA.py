@@ -68,8 +68,7 @@ def OpenMapWindow ():
 	# Map Control
 	# ronote and usernote are the pins for the notes
 	# 4 is the Label's control ID
-	Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE", "RONOTE")
-	Map = Window.GetControl (3)
+	Map = Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE", "RONOTE")
 	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
@@ -153,8 +152,7 @@ def WorldMapWindowCommon (Travel):
 	MapWindow = None
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
 
-	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "FONTDLG")
-	WMap = Window.GetControl (4)
+	WMap = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0x84, 0x4a, 0x2c, 0x00)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, 0x20, 0x20, 0x00, 0xff)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)

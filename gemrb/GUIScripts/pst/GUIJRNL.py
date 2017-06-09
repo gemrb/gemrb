@@ -315,8 +315,7 @@ def OpenBeastsWindow ():
 	List.SetVarAssoc ('SelectedBeast', -1)
 	List.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, OnJournalBeastSelect)
 
-	Window.CreateButton (8, 19, 19, 281, 441)
-	BeastImage = Window.GetControl (8)
+	BeastImage = Window.CreateButton (8, 19, 19, 281, 441)
 	BeastImage.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	BeastDesc = Window.GetControl (2)
