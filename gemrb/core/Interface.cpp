@@ -3160,7 +3160,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
 		wmp_str1 = sg->GetWmap(0);
-		if (WorldMapName[1][0]) {
+		if (!WorldMapName[1].IsEmpty()) {
 			wmp_str2 = sg->GetWmap(1);
 			if (!wmp_str2) {
 				//upgrade an IWD game to HOW

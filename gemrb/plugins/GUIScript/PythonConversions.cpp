@@ -73,7 +73,7 @@ Region RectFromPy(PyObject* obj) {
 }
 
 ResRef ResRefFromPy(PyObject* obj) {
-	if (PyString_Check(obj)) {
+	if (obj && PyString_Check(obj)) {
 		return ResRef(PyString_AsString(obj));
 	}
 	return ResRef();
