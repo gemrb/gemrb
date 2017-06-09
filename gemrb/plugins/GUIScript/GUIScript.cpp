@@ -250,9 +250,9 @@ static void ReadItemSounds()
 	gamedata->DelTable( table );
 }
 
-static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+static void GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
-	Sound[0]=0;
+	Sound = ResRef();
 	if (Col>1) {
 		return;
 	}
@@ -270,7 +270,7 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDw
 	if (ItemType>=(ieDword) ItemSoundsCount) {
 		return;
 	}
-	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
+	Sound = ItemSounds[ItemType][Col];
 }
 
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
@@ -6886,11 +6886,10 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 
-	ieResRef Sound;
+	ResRef Sound;
 	CREItem *si;
 	int res;
 
-	Sound[0]=0;
 	if (action) { //get stuff from container
 		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
 			return RuntimeError("Invalid Container slot!");
@@ -6921,7 +6920,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
+				Sound = item->ReplacementItem;
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
@@ -6951,7 +6950,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
-				memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
+				Sound = item->DescriptionIcon;
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
@@ -9096,7 +9095,7 @@ anything. If Slot is negative, drag the actor's party portrait instead.\n\
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
-	ieResRef Sound = {};
+	ResRef Sound;
 	int globalID, Slot, Count = 0, Type = 0;
 	const char *ResRef;
 	PARSE_ARGS5( args,  "iis|ii", &globalID, &Slot, &ResRef, &Count, &Type);
@@ -9153,7 +9152,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	Item *item = gamedata->GetItem(si->ItemResRef);
 	if (item) {
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
-			memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
+			Sound = item->DescriptionIcon;
 		} else {
 			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
@@ -9203,7 +9202,7 @@ slot fitting for the item.\n\
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
-	ieResRef Sound;
+	ResRef Sound;
 	int globalID, Slot;
 	PARSE_ARGS2( args,  "ii", &globalID, &Slot);
 
@@ -9237,7 +9236,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
+				Sound = item->ReplacementItem;
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
@@ -9326,7 +9325,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//resolve the equipping sound, it needs to be resolved before
 	//the item is freed
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-		memcpy(Sound, item->ReplacementItem, 9);
+		Sound = item->ReplacementItem;
 	} else {
 		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
