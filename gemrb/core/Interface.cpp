@@ -195,9 +195,8 @@ Interface::Interface()
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 
-	CopyResRef( GlobalScript, "BALDUR" );
-	CopyResRef( WorldMapName[0], "WORLDMAP" );
-	CopyResRef( WorldMapName[1], "" );
+	GlobalScript = "BALDUR";
+	WorldMapName[0] = "WORLDMAP";
 
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		CopyResRef(GroundCircleBam[size], "");
@@ -3239,13 +3238,13 @@ cleanup:
 }
 
 /* replace the current world map but sync areas available in old and new */
-void Interface::UpdateWorldMap(ieResRef wmResRef)
+void Interface::UpdateWorldMap(ResRef wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
-		Log(ERROR, "Core", "Could not update world map %s", wmResRef);
+		Log(ERROR, "Core", "Could not update world map %s", wmResRef.CString());
 		return;
 	}
 
@@ -3266,7 +3265,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 
 	delete worldmap;
 	worldmap = new_worldmap;
-	CopyResRef(WorldMapName[0], wmResRef);
+	WorldMapName[0] = wmResRef;
 }
 
 /* swapping out old resources */

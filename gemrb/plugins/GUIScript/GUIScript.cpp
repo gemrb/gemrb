@@ -1582,18 +1582,14 @@ PyDoc_STRVAR( GemRB_SetMasterScript__doc,
 
 static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
-	char* script;
-	char* worldmap1;
-	char* worldmap2 = NULL;
-	PARSE_ARGS3( args, "ss|s", &script, &worldmap1, &worldmap2 );
+	PyObject* script = NULL;
+	PyObject* worldmap1 = NULL;
+	PyObject* worldmap2 = NULL;
+	PARSE_ARGS3( args, "OO|O", &script, &worldmap1, &worldmap2 );
 
-	strnlwrcpy( core->GlobalScript, script, 8 );
-	strnlwrcpy( core->WorldMapName[0], worldmap1, 8 );
-	if (!worldmap2) {
-		memset(core->WorldMapName[1], 0, 8);
-	} else {
-		strnlwrcpy( core->WorldMapName[1], worldmap2, 8 );
-	}
+	core->GlobalScript = ResRefFromPy(script);
+	core->WorldMapName[0] = ResRefFromPy(worldmap1);
+	core->WorldMapName[1] = ResRefFromPy(worldmap2);
 	core->UpdateMasterScript();
 	Py_RETURN_NONE;
 }

@@ -398,8 +398,8 @@ public:
 	Holder<SaveGame> LoadGameIndex;
 	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
-	ieResRef GlobalScript;
-	ieResRef WorldMapName[2];
+	ResRef GlobalScript;
+	ResRef WorldMapName[2];
 	Variables * AreaAliasTable;
 	Sprite2D **Cursors;
 	int CursorCount;
@@ -529,7 +529,7 @@ public:
 	to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
 	/** reloads the world map from a resource file */
-	void UpdateWorldMap(ieResRef wmResRef);
+	void UpdateWorldMap(ResRef wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
