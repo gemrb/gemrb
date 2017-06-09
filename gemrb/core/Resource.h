@@ -33,6 +33,10 @@
 namespace GemRB {
 
 /** Resource reference */
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!
+ This type is deprecated
+ Use the ResRef class wrapper
+!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 typedef char ieResRef[9];
 
 class DataStream;
