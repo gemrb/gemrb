@@ -77,6 +77,7 @@ public:
 		}
 	}
 
+	// Case insensitive
 	bool operator<(const ResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
 	};

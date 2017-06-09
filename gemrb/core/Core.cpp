@@ -229,6 +229,7 @@ bool Schedule(ieDword schedule, ieDword time)
 // safely copies a ResRef (ie. nulls out the unused buffer size)
 void CopyResRef(ieResRef d, const ieResRef s)
 {
+	// FIXME: should this be strnlwrcpy, or strncpy
 	strncpy(d, s, sizeof(ieResRef) - 1);
 	d[sizeof(ieResRef) - 1] = '\0';
 }
