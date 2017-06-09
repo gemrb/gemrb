@@ -80,7 +80,10 @@ public:
 		if (str == NULL) {
 			Clear();
 		} else {
-			strncpy(ref, str, sizeof(ref)-1 );
+			// using strnlwrcpy: this wrapper is case insensitive,
+			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
+			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
+			strnlwrcpy(ref, str, sizeof(ref)-1 );
 			ref[sizeof(ref)-1] = '\0';
 		}
 	}
