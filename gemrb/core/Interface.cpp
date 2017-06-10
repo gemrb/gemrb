@@ -3153,7 +3153,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
 		wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
-		if (WorldMapName[1][0]) {
+		if (!WorldMapName[1].IsEmpty()) {
 			wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
 		}
 	} else {
@@ -4389,7 +4389,7 @@ int Interface::WriteWorldMap(const char *folder)
 		return -1;
 	}
 
-	if (WorldMapName[1][0]) {
+	if (!WorldMapName[1].IsEmpty()) {
 		worldmap->SetSingle(false);
 	}
 
