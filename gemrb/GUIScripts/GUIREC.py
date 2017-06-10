@@ -912,7 +912,6 @@ def CloseInformationWindow ():
 		InformationWindow.Unload ()
 	InformationWindow = None
 
-	OptionsWindow.SetVisible(True)
 	PortraitWindow.SetVisible(True)
 	RecordsWindow.Focus()
 	return
