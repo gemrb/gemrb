@@ -101,7 +101,7 @@ def UpdateControlStatus():
 		TMessageTA = TMessageWindow.GetControl(3)		
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
-		ScrollBar = TMessageWindow.CreateScrollBar (1000, 467,10, 11,29)
+		ScrollBar = TMessageWindow.CreateScrollBar (1000, {'x' : 467, 'y' : 10, 'w' : 11, 'h' : 29})
 		ScrollBar.SetDefaultScrollBar()
 
 	hideflag = IsGameGUIHidden()

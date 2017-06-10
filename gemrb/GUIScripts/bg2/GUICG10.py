@@ -60,7 +60,7 @@ def OnLoad():
 		ButtonCount = 11
 	if len(MCRowIndices) > 11:
 		# bah, also add a scrollbar
-		ScrollBar = ClassWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
+		ScrollBar = ClassWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
 		ScrollBar.SetVarAssoc("TopIndex", len(MCRowIndices)-10)
 		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawMCs)
 		ScrollBar.SetDefaultScrollBar()

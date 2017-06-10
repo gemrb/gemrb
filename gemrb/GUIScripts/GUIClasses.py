@@ -111,8 +111,18 @@ class GView:
 	def CreateButton(self, control, *args):
 		return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
   
-	def CreateScrollBar(self, control, *args):
-		return self.CreateControl(control, IE_GUI_SCROLLBAR, args[0], args[1], args[2], args[3], args[4:])
+	def CreateScrollBar(self, control, frame, bam):
+		bamframes = list(range(6))
+		
+		if GameCheck.IsBG2():
+			bam = bam if bam else 'GUISCRCW'
+			bamframes = [0,1,2,3,5,4]
+		elif GameCheck.IsPST():
+			bam = bam if bam else 'CGSCRL1'
+		else:
+			bam = bam if bam else 'GUIWSBR'
+
+		return self.CreateControl(control, IE_GUI_SCROLLBAR, frame, bam, bamframes)
   
 	def CreateTextArea(self, control, *args):
 		return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])

@@ -2008,11 +2008,8 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		{
 			char* resRef;
 
-			// hidden parameters from CreateScrollBar decorator
-			int cycle = 0;
 			PyObject* pyImgList = NULL;
-			PARSE_ARGS3( constructArgs, "siO",
-						&resRef, &cycle, &pyImgList );
+			PARSE_ARGS2( constructArgs, "sO", &resRef, &pyImgList );
 
 			AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( resRef, IE_BAM_CLASS_ID, IE_NORMAL );
@@ -2030,7 +2027,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 					PyErr_Print();
 					return AttributeError("Error retrieving image from list");
 				}
-				images[i] = af->GetFrame( frame, cycle );
+				images[i] = af->GetFrame( frame, 0 );
 			}
 
 			view = new ScrollBar(rgn, images);
