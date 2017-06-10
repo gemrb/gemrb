@@ -280,6 +280,12 @@ void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) 
 	r.y += offset.y;
 	core->GetVideoDriver()->BlitSprite(image, r.x, r.y, &r);
 }
+	
+ContentContainer::ContentContainer(const Region& frame)
+: View(frame)
+{
+	SizeChanged(Size());
+}
 
 ContentContainer::~ContentContainer()
 {
@@ -309,7 +315,7 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 void ContentContainer::AppendContent(Content* content)
 {
 	if (contents.empty())
-		InsertContentAfter(content, 0);
+		InsertContentAfter(content, NULL);
 	else
 		InsertContentAfter(content, *(--contents.end()));
 }

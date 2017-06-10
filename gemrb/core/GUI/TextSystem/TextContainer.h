@@ -135,7 +135,7 @@ protected:
 	Point layoutPoint;
 
 public:
-	ContentContainer(const Region& frame) : View(frame) {};
+	ContentContainer(const Region& frame);
 	virtual ~ContentContainer();
 
 	// append a container to the end of the container. The container takes ownership of the span.
