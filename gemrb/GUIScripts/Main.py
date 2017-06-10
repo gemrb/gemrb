@@ -16,4 +16,8 @@ import GemRB
 def Init():
 	# this function is run after the game type is set
 	# this is where we would run initializations (even on a per-game type basis)
-	pass
+	
+	# create a global scrollbar for the ScrollView to clone from
+	frame = {'x' : 0, 'y' : 0, 'w' : 0, 'h' : 0}
+	sb = GemRB.CreateView(1000, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs())
+	sb.AddAlias("SBGLOB")
