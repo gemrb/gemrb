@@ -35,7 +35,7 @@ addons:
     - libvorbis-dev
     - openssh-client
     - python-dev
-    - g++-4.9
+    - g++-5
     
     # not needed for building
     - gdb
@@ -43,7 +43,7 @@ addons:
   ssh_known_hosts: frs.sourceforge.net
 
 before_install:
-  - if [[ $CC == gcc ]]; then CC=gcc-4.9 && CXX=g++-4.9; fi
+  - if [[ $CC == gcc ]]; then CC=gcc-5 && CXX=g++-5; fi
   - export CC CXX
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl openal-soft freetype sdl_mixer libpng libvorbis; fi
   - touch id_travissfbot
