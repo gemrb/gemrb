@@ -1429,7 +1429,9 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 	} else {
 		updateVPTimer = true;
 
-		Map *area = core->GetGame()->GetCurrentArea();
+		Game *game = core->GetGame();
+		if (!game) return;
+		Map *area = game->GetCurrentArea();
 		if (!area) return;
 
 		Point mapsize = area->TMap->GetMapSize();
