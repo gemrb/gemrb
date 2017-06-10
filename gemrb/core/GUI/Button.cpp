@@ -357,11 +357,9 @@ void Button::SetBorder(int index, const Region& rgn, const Color &color, bool en
 	if (index >= MAX_NUM_BORDERS)
 		return;
 
-	ButtonBorder *fr = &borders[index];
-	fr->rect = rgn;
-	fr->color = color;
-	fr->enabled = enabled;
-	fr->filled = filled;
+	ButtonBorder fr = { rgn, color, filled, enabled };
+	borders[index] = fr;
+
 	MarkDirty();
 }
 

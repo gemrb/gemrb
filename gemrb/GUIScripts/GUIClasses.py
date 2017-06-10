@@ -71,13 +71,13 @@ class GView:
 		self.SetFrame(r);
 
 	def GetInsetFrame(self, l = 0, r = None, t = None, b = None):
-		b = b if b is not None else l
 		r = r if r is not None else l
-		t = t if t is not None else b
+		t = t if t is not None else l
+		b = b if b is not None else t
         
 		frame = self.GetFrame()
-		frame['x'] += l
-		frame['y'] += b
+		frame['x'] = l
+		frame['y'] = b
 		frame['w'] -= (l + r)
 		frame['h'] -= (b + t)
 		return frame

@@ -2361,7 +2361,7 @@ static PyObject* GemRB_Button_SetBorder(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(btn);
 
 	Color color = ColorFromPy(pyColor);
-	Region rgn = (pyRect == Py_None) ? btn->Frame() : RectFromPy(pyRect);
+	Region rgn = (pyRect == Py_None) ? Region(Point(), btn->Dimensions()) : RectFromPy(pyRect);
 	btn->SetBorder( BorderIndex, rgn, color, enabled, filled );
 
 	Py_RETURN_NONE;
