@@ -74,6 +74,7 @@ void ScrollBar::SetPosForY(int y)
 int ScrollBar::YPosFromValue()
 {
 	const ValueRange& range = GetValueRange();
+	if (range.second == range.first) return 0;
 	return (SliderPxRange / (range.second - range.first)) * GetValue();
 }
 
