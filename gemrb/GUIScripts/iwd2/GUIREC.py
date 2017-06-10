@@ -82,8 +82,6 @@ def OpenRecordsWindow ():
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
-
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
 	if not HateRaceTable:

@@ -152,7 +152,6 @@ def OpenInventoryWindow ():
 
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
 	UpdateInventoryWindow ()
 
 	PortraitWindow.SetVisible(True)

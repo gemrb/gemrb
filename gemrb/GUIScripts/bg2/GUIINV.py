@@ -114,8 +114,6 @@ def OpenInventoryWindow ():
 
 	GemRB.SetVar ("TopIndex", 0)
 
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
-
 	UpdateInventoryWindow()
 	return
 
