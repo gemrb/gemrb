@@ -18,17 +18,10 @@
 
 
 import _GemRB
-import CreateControlDecorators
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper
 from GemRB import GetView, CreateView, RemoveView
-
-def CreateControlDecorator(func):
-	wrapper = getattr(CreateControlDecorators, func.__name__, None)
-	if wrapper:
-		return wrapper(func)
-	return func # unchanged, no wrapper exists
 
 class GTable:
   __metaclass__ = metaIDWrapper
@@ -106,6 +99,27 @@ class GView:
 	def RemoveSubview(self, view):
 		RemoveView(view, False)
 
+	def CreateWorldMapControl(self, control, *args):
+		return self.CreateControl(control, IE_GUI_WORLDMAP, args[0], args[1], args[2], args[3], args[4:])
+	
+	def CreateMapControl(self, control, *args):
+		return self.CreateControl(control, IE_GUI_MAP, args[0], args[1], args[2], args[3], args[4:])
+  
+	def CreateLabel(self, control, *args):
+		return self.CreateControl(control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
+  
+	def CreateButton(self, control, *args):
+		return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
+  
+	def CreateScrollBar(self, control, *args):
+		return self.CreateControl(control, IE_GUI_SCROLLBAR, args[0], args[1], args[2], args[3], args[4:])
+  
+	def CreateTextArea(self, control, *args):
+		return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
+  
+	def CreateTextEdit(self, control, *args):
+		return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
+
 class GWindow(GView):
   methods = {
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
@@ -130,34 +144,6 @@ class GWindow(GView):
 	if self.ID != -1:
 		RemoveView(self, False)
 		self.ID = -1
-
-  @CreateControlDecorator
-  def CreateWorldMapControl(self, control, *args):
-  	return self.CreateControl(control, IE_GUI_WORLDMAP, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateMapControl(self, control, *args):
-    return self.CreateControl(control, IE_GUI_MAP, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateLabel(self, control, *args):
-  	return self.CreateControl(control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateButton(self, control, *args):
-    return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateScrollBar(self, control, *args):
-    return self.CreateControl(control, IE_GUI_SCROLLBAR, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateTextArea(self, control, *args):
-    return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
-
-  @CreateControlDecorator
-  def CreateTextEdit(self, control, *args):
-    return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
 
 class GControl(GView):
   methods = {
