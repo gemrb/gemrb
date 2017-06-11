@@ -77,6 +77,8 @@ def OpenOptionsWindow ():
 	# Return to Game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.MakeEscape()
 
 	# Quit Game
 	Button = Window.GetControl (10)
