@@ -1313,6 +1313,7 @@ static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 	PARSE_ARGS1(args, "O", &self);
 	Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
+	// FIXME: handle non-ascii chars or prevent their input
 	char* cStr = MBCStringFromString(ctrl->QueryText());
 	if (cStr) {
 		PyObject* pyStr = PyString_FromString(cStr);
