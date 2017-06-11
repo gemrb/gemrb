@@ -334,13 +334,20 @@ bool Window::DispatchEvent(const Event& event)
 			return (*it->second)(event);
 		}
 
-		target = (focusView) ? focusView : this;
-
-		if (event.type == Event::KeyDown) {
-			return target->OnKeyPress(event.keyboard, event.mod);
-		} else {
-			return target->OnKeyRelease(event.keyboard, event.mod);
+		// try the focused view first, if it fails have the window itself try
+		bool handled = false;
+		if (focusView) {
+			handled = (event.type == Event::KeyDown)
+			? focusView->OnKeyPress(event.keyboard, event.mod)
+			: focusView->OnKeyRelease(event.keyboard, event.mod);
 		}
+		
+		if (!handled) {
+			handled = (event.type == Event::KeyDown)
+			? OnKeyPress(event.keyboard, event.mod)
+			: OnKeyRelease(event.keyboard, event.mod);
+		}
+		return handled;
 	}
 	return false;
 }
