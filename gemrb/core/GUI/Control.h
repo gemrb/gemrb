@@ -39,9 +39,6 @@
 
 #define IE_GUI_CONTROL_FOCUSED  0x80
 
-//this is in the control ID
-#define IGNORE_CONTROL 0x10000000
-
 #include "RGBAColor.h"
 #include "exports.h"
 #include "win32def.h"
@@ -65,7 +62,7 @@ static_cast<Control::Action>(a)
 #define ACTION_IS_SCREEN(a) \
 (a <= Control::MouseLeave)
     
-#define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION)
+#define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
 class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
