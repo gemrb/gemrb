@@ -71,7 +71,7 @@ private:
 public:
 	struct Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
-		static const Control::Action Change = ACTION_CUSTOM(0); // text change event (keyboard, etc)
+		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
 		static const Control::Action Done = ACTION_CUSTOM(1);
 		static const Control::Action Cancel = ACTION_CUSTOM(2);
 	};
