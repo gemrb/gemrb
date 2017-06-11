@@ -241,7 +241,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
 		const Font* printFont = font;
-		Palette* printPalette = palette;
+		Holder<Palette> printPalette = palette;
 		TextContainer* container = dynamic_cast<TextContainer*>(parent);
 		if (printFont == NULL && container) {
 			printFont = container->TextFont();
@@ -257,7 +257,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		assert(charsPrinted < text.length());
 		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
 #endif
-		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
+		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette.get(), IE_FONT_ALIGN_LEFT);
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 #endif

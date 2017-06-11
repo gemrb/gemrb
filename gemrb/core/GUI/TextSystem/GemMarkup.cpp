@@ -141,7 +141,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
-							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette(), &frame));
+							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette().get(), &frame));
 						}
 						token.clear();
 						if (*++it == '/')

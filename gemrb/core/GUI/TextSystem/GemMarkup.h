@@ -52,8 +52,8 @@ public:
 private:
 	class TextAttributes {
 		private:
-		Palette* palette;
-		Palette* swapPalette;
+		Holder<Palette> palette;
+		Holder<Palette> swapPalette;
 
 		public:
 		const Font* TextFont;
@@ -66,12 +66,6 @@ private:
 			TextFont = text;
 			SwapFont = (init) ? init : TextFont;
 			assert(TextFont);
-			if (textPal) {
-				textPal->acquire();
-			}
-			if (initPal) {
-				initPal->acquire();
-			}
 
 			palette = textPal;
 			swapPalette = initPal;
@@ -93,13 +87,6 @@ private:
 			return *this;
 		}
 
-		~TextAttributes() {
-			if (palette)
-				palette->release();
-			if (swapPalette)
-				swapPalette->release();
-		}
-
 		void SwapFonts() {
 			std::swap(TextFont, SwapFont);
 			std::swap(palette, swapPalette);
@@ -111,11 +98,11 @@ private:
 			palette = pal;
 		}
 
-		Palette* TextPalette() const {
+		Holder<Palette> TextPalette() const {
 			if (palette) {
 				return palette;
 			}
-			return TextFont->GetPalette().get();
+			return TextFont->GetPalette();
 		}
 	};
 

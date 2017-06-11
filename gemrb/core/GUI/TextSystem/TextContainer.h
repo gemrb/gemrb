@@ -182,7 +182,7 @@ public:
 	String Text() const;
 
 	void SetPalette(Palette* pal);
-	Palette* TextPalette() const { return palette; }
+	Holder<Palette> TextPalette() const { return palette; }
 	const Font* TextFont() const { return font; }
 };
 
