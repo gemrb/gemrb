@@ -62,13 +62,12 @@ class TextSpan : public Content
 private:
 	String text;
 	const Font* font;
-	Palette* palette;
+	Holder<Palette> palette;
 
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(const String& string, const Font* font, Palette* pal = NULL, const Size* = NULL);
-	~TextSpan();
+	TextSpan(const String& string, const Font* font, Holder<Palette> pal = NULL, const Size* = NULL);
 
 	const String& Text() const { return text; };
 
@@ -171,11 +170,10 @@ class TextContainer : public ContentContainer {
 private:
 	// default font/palette for adding plain text
 	Font* font;
-	Palette* palette;
+	Holder<Palette> palette;
 
 public:
 	TextContainer(const Region& frame, Font* font, Palette*);
-	~TextContainer();
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, Font* fnt, Palette* pal);
