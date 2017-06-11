@@ -37,7 +37,6 @@ def OnLoad():
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	NameField = NameWindow.GetControl(2)
@@ -69,6 +68,8 @@ def EditChange():
 	Name = NameField.QueryText()
 	if len(Name)==0:
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		# TODO: unset makedefault
 	else:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.MakeDefault()
 	return
