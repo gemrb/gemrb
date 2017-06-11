@@ -1672,9 +1672,9 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_SetAction__doc,
 "===== Control_SetAction =====\n\
 \n\
-**Prototype:** _GemRB.Control_SetEvent (GControl, PythonFunction, EventType[, Button, Mod, Count])\n\
+**Prototype:** _GemRB.Control_SetAction (GControl, PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
-**Metaclass Prototype:** SetEvent (PythonFunction, EventType[, Button, Mod, Count])\n\
+**Metaclass Prototype:** SetAction (PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
 **Description:** Ties an event of a control to a python function\
 \n\
