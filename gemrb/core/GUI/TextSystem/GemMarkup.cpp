@@ -24,7 +24,7 @@ namespace GemRB {
 
 GemMarkupParser::PaletteCache GemMarkupParser::PalCache;
 
-Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
+Holder<Palette> GemMarkupParser::GetSharedPalette(const String& colorString)
 {
 	PaletteCache::const_iterator it = PalCache.find(colorString);
 	if (it != PalCache.end()) {
@@ -39,7 +39,7 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 	palCol.b = b;
 	Palette* pal = new Palette(palCol, ColorBlack);
 	// stifle clang analyzer about pal (falsely) being deleted by release()
-	Palette* ret = PalCache.insert(std::make_pair(colorString, pal)).first->second.get();
+	Holder<Palette> ret = PalCache.insert(std::make_pair(colorString, pal)).first->second;
 	pal->release();
 	return ret;
 }
@@ -141,7 +141,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
-							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette().get(), &frame));
+							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette(), &frame));
 						}
 						token.clear();
 						if (*++it == '/')
@@ -156,7 +156,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						Palette* pal = GetSharedPalette(token);
+						Holder<Palette> pal = GetSharedPalette(token);
 						context.push(TextAttributes(attributes));
 						context.top().SetTextPalette(pal);
 						state = TEXT;

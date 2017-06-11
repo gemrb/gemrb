@@ -60,7 +60,7 @@ private:
 		const Font* SwapFont;
 
 		public:
-		TextAttributes(const Font* text, Palette* textPal = NULL,
+		TextAttributes(const Font* text, Holder<Palette> textPal = NULL,
 					   const Font* init = NULL, Palette* initPal = NULL)
 		{
 			TextFont = text;
@@ -92,9 +92,7 @@ private:
 			std::swap(palette, swapPalette);
 		}
 
-		void SetTextPalette(Palette* pal) {
-			if (pal) pal->acquire();
-			if (palette) palette->release();
+		void SetTextPalette(Holder<Palette> pal) {
 			palette = pal;
 		}
 
@@ -106,7 +104,7 @@ private:
 		}
 	};
 
-	static Palette* GetSharedPalette(const String& colorString);
+	static Holder<Palette> GetSharedPalette(const String& colorString);
 
 	typedef std::map<String, Holder<Palette> > PaletteCache;
 	static PaletteCache PalCache;
