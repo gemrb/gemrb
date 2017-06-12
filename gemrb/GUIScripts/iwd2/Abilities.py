@@ -145,10 +145,12 @@ def OpenAbilitiesWindow(chargen, points):
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval(20);
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval(20);
 
 	if chargen:
 		BackButton = AbilityWindow.GetControl (36)
@@ -173,10 +175,9 @@ def OpenAbilitiesWindow(chargen, points):
 		AbilityWindow.Focus()
 	return
 
-def RightPress():
+def RightPress(btn, Abidx):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
@@ -205,8 +206,7 @@ def RightPress():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
-def JustPress():
-	Abidx = GemRB.GetVar("Ability")
+def JustPress(btn, Abidx):
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
@@ -215,10 +215,9 @@ def JustPress():
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
-def LeftPress():
+def LeftPress(btn, Abidx):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )

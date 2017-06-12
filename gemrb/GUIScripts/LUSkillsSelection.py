@@ -319,8 +319,8 @@ def SkillsRedraw (direction=0):
 	SkillsClickCount = 0
 	return
 
-def SkillJustPress():
-	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
+def SkillJustPress(btn, val):
+	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
