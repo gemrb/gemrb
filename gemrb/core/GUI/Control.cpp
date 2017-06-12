@@ -112,6 +112,10 @@ bool Control::PerformAction(Action action)
 
 bool Control::PerformAction(const ActionKey& key)
 {
+	if (IsDisabled()) {
+		return false;
+	}
+	
 	ActionIterator it = actions.find(key);
 	if (it != actions.end()) {
 		if (InHandler) {
