@@ -184,7 +184,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 	e.isScreen = false;
 
 	KeyboardKey character = 0;
-	if (key >= 0x20) {
+	if (key >= ' ' && key < GEM_LEFT) { // if printable
 		// FIXME: need to translate the keycode for e.keyboard.character
 		// probably need to lookup what encoding we are currently using
 		character = key;

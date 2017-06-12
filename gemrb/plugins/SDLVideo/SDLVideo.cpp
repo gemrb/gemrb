@@ -218,7 +218,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				default: break;
 			}
 			e = EvntManager->CreateKeyEvent(key, true, modstate);
-			e.keyboard.character = event.key.keysym.unicode; // FIXME: invalid in SDL2
+			if (e.keyboard.character) {
+				e.keyboard.character = event.key.keysym.unicode; // FIXME: invalid in SDL2
+			}
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:
