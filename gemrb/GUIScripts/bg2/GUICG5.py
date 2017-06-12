@@ -32,6 +32,7 @@ def OnLoad():
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: NameWindow.Close())
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
