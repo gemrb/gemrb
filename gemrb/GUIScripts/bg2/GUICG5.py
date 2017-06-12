@@ -29,11 +29,9 @@ def OnLoad():
 	global NameWindow, NameField, DoneButton
 	
 	NameWindow = GemRB.LoadWindow(5, "GUICG")
-	CharGenCommon.PositionCharGenWin(NameWindow)
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
-	BackButton.MakeEscape()
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
@@ -43,16 +41,10 @@ def OnLoad():
 	NameField = NameWindow.GetControl(2)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
-	NameWindow.Focus()
-	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
-	return
 
-def BackPress():
-	if NameWindow:
-		NameWindow.Unload()
-	GemRB.SetNextScript("CharGen8")
+	NameWindow.ShowModal (MODAL_SHADOW_GRAY)
+	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return
 
 def NextPress():
