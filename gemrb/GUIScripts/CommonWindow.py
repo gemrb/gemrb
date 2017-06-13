@@ -36,10 +36,10 @@ def OnIncreaseSize():
 	if Expand>2:
 		return
 
-	global TMessageTA
-	frame = TMessageTA.GetFrame()
+	import MessageWindow
+	frame = MessageWindow.TMessageTA.GetFrame()
 	frame['h'] += 100
-	MessageWindow.SetFrame(frame)
+	MessageWindow.MessageWindow.SetFrame(frame)
 
 	Expand = (Expand + 1)*2
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
@@ -52,10 +52,10 @@ def OnDecreaseSize():
 	if Expand<2:
 		return
 
-	global TMessageTA
-	frame = TMessageTA.GetFrame()
+	import MessageWindow
+	frame = MessageWindow.TMessageTA.GetFrame()
 	frame['h'] -= 100
-	MessageWindow.SetFrame(frame)
+	MessageWindow.MessageWindow.SetFrame(frame)
 
 	Expand = Expand/2 - 1 # 6->2, 2->0
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
