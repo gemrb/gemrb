@@ -145,12 +145,12 @@ def OpenAbilitiesWindow(chargen, points):
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
-		Button.SetActionInterval(20);
+		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
-		Button.SetActionInterval(20);
+		Button.SetActionInterval (200)
 
 	if chargen:
 		BackButton = AbilityWindow.GetControl (36)

@@ -305,12 +305,12 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		Button=ProfsWindow.GetControl(cid)
 		Button.SetVarAssoc("Prof", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsLeftPress)
-		Button.SetActionInterval(20);
+		Button.SetActionInterval (200)
 
 		Button=ProfsWindow.GetControl(cid+1)
 		Button.SetVarAssoc("Prof", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsRightPress)
-		Button.SetActionInterval(20);
+		Button.SetActionInterval (200)
 
 	if(ProfsScrollBar):
 		# proficiencies scrollbar
