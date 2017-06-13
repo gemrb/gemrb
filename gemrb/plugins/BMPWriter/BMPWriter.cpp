@@ -68,8 +68,6 @@ void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
 		}
 		output->Write( filling, stuff);
 	}
-
-	Sprite2D::FreeSprite(spr);
 }
 
 #include "plugindef.h"
