@@ -185,10 +185,12 @@ def OpenSkillsWindow(chargen, level=0):
 		Button = SkillWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.SetActionInterval (200)
 
 		Button = SkillWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.SetActionInterval (200)
 
 	if chargen:
 		BackButton = SkillWindow.GetControl (105)

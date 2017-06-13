@@ -1289,11 +1289,13 @@ def AbilitiesPress():
 		AbilitiesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesPlusPress)
 		AbilitiesPlusButton.SetVarAssoc ("AbilityIndex", i + 1)
+		AbilitiesPlusButton.SetActionInterval (200)
 
 		AbilitiesMinusButton = AbilitiesWindow.GetControl (17 + i * 2)
 		AbilitiesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesMinusPress)
 		AbilitiesMinusButton.SetVarAssoc ("AbilityIndex", i + 1)
+		AbilitiesMinusButton.SetActionInterval (200)
 
 		AbilityLabel = AbilitiesWindow.GetControl (0x10000003 + i)
 		AbilityLabel.SetUseRGB (1)
@@ -1780,6 +1782,7 @@ def ProficienciesSelect():
 			ProficienciesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		ProficienciesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesPlusPress)
 		ProficienciesPlusButton.SetVarAssoc ("ProficienciesIndex", i + 1)
+		ProficienciesPlusButton.SetActionInterval (200)
 
 		ProficienciesMinusButton = ProficienciesWindow.GetControl (12 + i * 2)
 		if Allowed == 0:
@@ -1789,6 +1792,7 @@ def ProficienciesSelect():
 			ProficienciesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		ProficienciesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesMinusPress)
 		ProficienciesMinusButton.SetVarAssoc ("ProficienciesIndex", i + 1)
+		ProficienciesMinusButton.SetActionInterval (200)
 
 	for i in range (7):
 		ProficienciesLabel = ProficienciesWindow.GetControl (85 + i)
@@ -1812,6 +1816,7 @@ def ProficienciesSelect():
 			ProficienciesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		ProficienciesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesPlusPress)
 		ProficienciesPlusButton.SetVarAssoc ("ProficienciesIndex", i + 9)
+		ProficienciesPlusButton.SetActionInterval (200)
 
 		ProficienciesMinusButton = ProficienciesWindow.GetControl (128 + i * 2)
 		if Allowed == 0:
@@ -1821,6 +1826,7 @@ def ProficienciesSelect():
 			ProficienciesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		ProficienciesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesMinusPress)
 		ProficienciesMinusButton.SetVarAssoc ("ProficienciesIndex", i + 9)
+		ProficienciesMinusButton.SetActionInterval (200)
 
 	for i in range (15):
 		GemRB.SetVar ("Proficiency" + str(i), 0)

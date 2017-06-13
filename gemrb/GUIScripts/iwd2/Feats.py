@@ -308,10 +308,12 @@ def OpenFeatsWindow(chargen=0):
 		Button = FeatWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Feat",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.SetActionInterval (200)
 
 		Button = FeatWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Feat",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.SetActionInterval (200)
 		for j in range(5):
 			Star=FeatWindow.GetControl(i*5+j+36)
 			Star.SetState(IE_GUI_BUTTON_DISABLED)

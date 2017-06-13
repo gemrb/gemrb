@@ -133,11 +133,13 @@ def OpenLUStatsWindow(Type = 1):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreasePress)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
+		Button.SetActionInterval (200)
 
 		Button = NewLifeWindow.GetControl (12+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreasePress)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
+		Button.SetActionInterval (200)
 
 	NewLifeLabel = NewLifeWindow.GetControl(0x10000023)
 	NewLifeLabel.SetText(1899)
