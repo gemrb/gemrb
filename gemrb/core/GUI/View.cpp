@@ -378,8 +378,8 @@ void View::SetFrameSize(const Size& s)
 	Size oldSize = frame.Dimensions();
 	if (oldSize == s) return;
 
-	frame.w = s.w;
-	frame.h = s.h;
+	frame.w = std::max(0, s.w);
+	frame.h = std::max(0, s.h);
 
 	SizeChanged(oldSize);
 
