@@ -87,6 +87,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 	Size frame;
 	String token;
 
+	assert(tagPos < text.length());
 	String::const_iterator it = text.begin() + tagPos;
 	for (; it != text.end(); it++) {
 		assert(context.size());
@@ -168,6 +169,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				state = TEXT;
 				break;
 		}
+		assert(it >= text.begin() && it < text.end());
 		token += *it;
 	}
 
