@@ -13476,6 +13476,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
 	if (!ref) return NULL;
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
+	if (!obj) return NULL;
 	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	return obj;
