@@ -30,6 +30,8 @@
 
 #include "GUI/Control.h"
 
+#include "Sprite2D.h"
+
 #include "exports.h"
 
 namespace GemRB {
@@ -94,13 +96,16 @@ private:
 		ControlType = IE_GUI_SCROLLBAR;
 		State = 0;
 		StepIncrement = 1;
+		Size s = frame.Dimensions();
 
 		for(int i=0; i < IMAGE_COUNT; i++) {
 			Frames[i] = images[i];
 			assert(Frames[i]);
+			s.w = std::max(s.w, Frames[i]->Width);
 		}
 
 		SetValueRange(0, SliderPxRange());
+		SetFrameSize(s);
 	}
 
 	void DrawSelf(Region drawFrame, const Region& clip);
