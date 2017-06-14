@@ -58,7 +58,6 @@ public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
-	~TextArea(void);
 
 	bool IsAnimated() const { return animationEnd; }
 	bool IsOpaque() const { return false; }
@@ -136,8 +135,7 @@ private: // Private attributes
 
 		PALETTE_TYPE_COUNT
 	};
-	Palette* palettes[PALETTE_TYPE_COUNT];
-	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
+	Holder<Palette> palettes[PALETTE_TYPE_COUNT];
 
 private: //internal functions
 	void Init();

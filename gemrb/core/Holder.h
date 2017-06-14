@@ -21,6 +21,7 @@
 #ifndef HOLDER_H
 #define HOLDER_H
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 
@@ -74,15 +75,13 @@ public:
 		if (ptr)
 			ptr->acquire();
 	}
-	Holder& operator=(const Holder& rhs)
+	
+	Holder& operator=(Holder rhs)
 	{
-		if (rhs.ptr)
-			rhs.ptr->acquire();
-		if (ptr)
-			ptr->release();
-		ptr = rhs.ptr;
+		std::swap(rhs.ptr, ptr);
 		return *this;
 	}
+
 	T& operator*() const { return *ptr; }
 	T* operator->() const { return ptr; }
 

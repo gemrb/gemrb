@@ -22,7 +22,6 @@
 
 #include "win32def.h"
 
-#include "GameData.h"
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"
@@ -35,7 +34,7 @@ namespace GemRB {
 TextArea::TextArea(const Region& frame, Font* text)
 	: Control(frame), ftext(text), palettes()
 {
-	palette = text->GetPalette().get();
+	palettes[PALETTE_NORMAL] = text->GetPalette();
 	finit = ftext;
 	Init();
 }
@@ -45,7 +44,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	: Control(frame), ftext(text), palettes()
 {
 	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
-	palette = palettes[PALETTE_NORMAL];
 
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps != ftext) ? caps : ftext;
@@ -63,10 +61,10 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
 		SetPalette(&initcolor, PALETTE_INITIALS);
 	} else {
-		palettes[PALETTE_INITIALS] = finit->GetPalette().get();
+		palettes[PALETTE_INITIALS] = finit->GetPalette();
 	}
 
-	parser.ResetAttributes(text, palette, finit, palettes[PALETTE_INITIALS]);
+	parser.ResetAttributes(text, palettes[PALETTE_NORMAL], finit, palettes[PALETTE_INITIALS]);
 	Init();
 }
 
@@ -86,13 +84,6 @@ void TextArea::Init()
 	ClearSelectOptions();
 	ClearText();
 	SetAnimPicture(NULL);
-}
-
-TextArea::~TextArea(void)
-{
-	for (int i=0; i < PALETTE_TYPE_COUNT; i++) {
-		gamedata->FreePalette( palettes[i] );
-	}
 }
 
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
@@ -243,13 +234,11 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 {
 	assert(idx < PALETTE_TYPE_COUNT);
 	if (color) {
-		gamedata->FreePalette(palettes[idx]);
 		palettes[idx] = new Palette( *color, ColorBlack );
+		palettes[idx]->release();
 	} else if (idx > PALETTE_NORMAL) {
 		// default to normal
-		gamedata->FreePalette(palettes[idx]);
 		palettes[idx] = palettes[PALETTE_NORMAL];
-		palettes[idx]->acquire();
 	}
 }
 
@@ -641,7 +630,7 @@ void TextArea::ClearText()
 	delete RemoveSubview(textContainer);
 
 	parser.Reset(); // reset in case any tags were left open from before
-	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palette);
+	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palettes[PALETTE_NORMAL]);
 	AddSubviewInFrontOfView(textContainer);
 
 	UpdateTextLayout();

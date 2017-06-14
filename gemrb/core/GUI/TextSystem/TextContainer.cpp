@@ -47,10 +47,8 @@ Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Holder<Palette> pal, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt)
-{
-	palette = pal;
-}
+	: Content((frame) ? *frame : Size()), text(string), font(fnt), palette(pal)
+{}
 
 inline const Font* TextSpan::LayoutFont() const
 {
@@ -535,7 +533,7 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 }
 
 
-TextContainer::TextContainer(const Region& frame, Font* fnt, Palette* pal)
+TextContainer::TextContainer(const Region& frame, Font* fnt, Holder<Palette> pal)
 	: ContentContainer(frame), font(fnt)
 {
 	SetPalette(pal);
@@ -546,14 +544,14 @@ void TextContainer::AppendText(const String& text)
 	AppendText(text, NULL, NULL);
 }
 
-void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
+void TextContainer::AppendText(const String& text, Font* fnt, Holder<Palette> pal)
 {
 	if (text.length()) {
 		AppendContent(new TextSpan(text, fnt, pal));
 	}
 }
 
-void TextContainer::SetPalette(Palette* pal)
+void TextContainer::SetPalette(Holder<Palette> pal)
 {
 	palette = (pal) ? pal : font->GetPalette();
 }

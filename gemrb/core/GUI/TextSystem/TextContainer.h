@@ -173,13 +173,13 @@ private:
 	Holder<Palette> palette;
 
 public:
-	TextContainer(const Region& frame, Font* font, Palette*);
+	TextContainer(const Region& frame, Font* font, Holder<Palette>);
 
 	void AppendText(const String& text);
-	void AppendText(const String& text, Font* fnt, Palette* pal);
+	void AppendText(const String& text, Font* fnt, Holder<Palette> pal);
 	String Text() const;
 
-	void SetPalette(Palette* pal);
+	void SetPalette(Holder<Palette> pal);
 	Holder<Palette> TextPalette() const { return palette; }
 	const Font* TextFont() const { return font; }
 };

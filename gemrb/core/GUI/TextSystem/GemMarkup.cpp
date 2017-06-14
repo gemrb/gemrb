@@ -18,8 +18,6 @@
 
 #include "GemMarkup.h"
 
-#include "GameData.h"
-
 namespace GemRB {
 
 GemMarkupParser::PaletteCache GemMarkupParser::PalCache;
@@ -28,7 +26,7 @@ Holder<Palette> GemMarkupParser::GetSharedPalette(const String& colorString)
 {
 	PaletteCache::const_iterator it = PalCache.find(colorString);
 	if (it != PalCache.end()) {
-		return (it->second).get();
+		return it->second;
 	}
 
 	Color palCol;
@@ -55,7 +53,7 @@ GemMarkupParser::GemMarkupParser(const Font* ftext, Palette* textPal, const Font
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
-void GemMarkupParser::ResetAttributes(const Font* ftext, Palette* textPal, const Font* finit, Palette* initPal)
+void GemMarkupParser::ResetAttributes(const Font* ftext, Holder<Palette> textPal, const Font* finit, Holder<Palette> initPal)
 {
 	while(context.size()) context.pop();
 	context.push(TextAttributes(ftext, textPal, finit, initPal));

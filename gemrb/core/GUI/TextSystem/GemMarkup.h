@@ -41,8 +41,8 @@ public:
 					const Font* finit = NULL, Palette* initPal = NULL);
 	~GemMarkupParser() {};
 
-	void ResetAttributes(const Font* ftext = NULL, Palette* textPal = NULL,
-						 const Font* finit = NULL, Palette* initPal = NULL);
+	void ResetAttributes(const Font* ftext = NULL, Holder<Palette> textPal = NULL,
+						 const Font* finit = NULL, Holder<Palette> initPal = NULL);
 
 	void Reset();
 
@@ -61,29 +61,28 @@ private:
 
 		public:
 		TextAttributes(const Font* text, Holder<Palette> textPal = NULL,
-					   const Font* init = NULL, Palette* initPal = NULL)
+					   const Font* init = NULL, Holder<Palette> initPal = NULL)
+		: palette(textPal), swapPalette(initPal)
 		{
 			TextFont = text;
 			SwapFont = (init) ? init : TextFont;
 			assert(TextFont);
-
-			palette = textPal;
-			swapPalette = initPal;
 		}
 
-		TextAttributes(const TextAttributes& ta) {
-			this->operator=(ta);
+		TextAttributes(const TextAttributes& ta)
+		: palette(ta.palette), swapPalette(ta.swapPalette)
+		{
+			TextFont = ta.TextFont;
+			SwapFont = ta.SwapFont;
 		}
 
 		TextAttributes& operator=(const TextAttributes& ta) {
-			TextFont = ta.TextFont;
-			SwapFont = ta.SwapFont;
-			palette = ta.palette;
-			swapPalette = ta.swapPalette;
-			if (palette)
-				palette->acquire();
-			if (swapPalette)
-				swapPalette->acquire();
+			if (&ta != this) {
+				TextFont = ta.TextFont;
+				SwapFont = ta.SwapFont;
+				palette = ta.palette;
+				swapPalette = ta.swapPalette;
+			}
 			return *this;
 		}
 
