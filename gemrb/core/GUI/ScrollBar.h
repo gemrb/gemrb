@@ -61,7 +61,7 @@ public:
 
 	ScrollBar(const Region& frame, Sprite2D*[IMAGE_COUNT]);
 	ScrollBar(const ScrollBar& sb);
-	~ScrollBar(void);
+	ScrollBar& operator=(const ScrollBar& sb);
 
 	bool IsOpaque() const;
 
@@ -84,17 +84,31 @@ public:
 
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
-	Sprite2D* Frames[IMAGE_COUNT];
-	/** Range of the slider in pixels. The height - buttons - slider */
-	int SliderPxRange;
+	Holder<Sprite2D> Frames[IMAGE_COUNT];
 	/** Scroll Bar Status */
 	unsigned short State;
 
 private:
+	template <typename T>
+	void Init(T images) {
+		ControlType = IE_GUI_SCROLLBAR;
+		State = 0;
+		StepIncrement = 1;
+
+		for(int i=0; i < IMAGE_COUNT; i++) {
+			Frames[i] = images[i];
+			assert(Frames[i]);
+		}
+
+		SetValueRange(0, SliderPxRange());
+	}
+
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void SetPosForY(int y);
-	int YPosFromValue();
+	int YPosFromValue() const;
 	int GetFrameHeight(int frame) const;
+	/** Range of the slider in pixels. The height - buttons - slider */
+	int SliderPxRange() const;
 };
 
 }
