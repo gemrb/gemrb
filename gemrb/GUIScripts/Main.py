@@ -19,5 +19,5 @@ def Init():
 	
 	# create a global scrollbar for the ScrollView to clone from
 	frame = {'x' : 0, 'y' : 0, 'w' : 0, 'h' : 0}
-	sb = GemRB.CreateView(1000, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs())
+	sb = GemRB.CreateView(-1, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs())
 	sb.AddAlias("SBGLOB")

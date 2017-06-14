@@ -20,14 +20,24 @@
 #ifndef __GemRB__ScrollView__
 #define __GemRB__ScrollView__
 
-#include "GUI/ScrollBar.h"
+#include "GUI/View.h"
 
 namespace GemRB {
+	class ScrollBar;
+
 	class GEM_EXPORT ScrollView : public View {
 
 		class ContentView : public View {
+			private:
+			void SizeChanged(const Size& /* oldsize */) {
+				// considering it an error for a ContentView to exist outside of a ScrollView
+				assert(superView);
+				static_cast<ScrollView*>(superView)->ContentSizeChanged(Frame().Dimensions());
+			}
+
 			public:
-			ContentView(const Region& frame) : View(frame) {}
+			ContentView(const Region& frame)
+			: View(frame) {}
 			bool CanLockFocus() const { return false; }
 		};
 
@@ -37,9 +47,11 @@ namespace GemRB {
 		ContentView contentView;
 
 	private:
-		void Scroll(const Point& p);
+		void ScrollDelta(const Point& p);
+		void ScrollTo(Point p);
 
-		void SizeChanged(const Size&);
+		void ContentSizeChanged(const Size&);
+		void ScrollbarValueChange(ScrollBar*);
 
 	public:
 		ScrollView(const Region& frame);
