@@ -2025,7 +2025,6 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			for(int i=0; i < ScrollBar::IMAGE_COUNT; i++) {
 				long frame = PyInt_AsLong( PyList_GetItem(pyImgList, i));
 				if (PyErr_Occurred()) {
-					PyErr_Print();
 					return AttributeError("Error retrieving image from list");
 				}
 				images[i] = af->GetFrame( frame, 0 );
@@ -13218,6 +13217,7 @@ bool GUIScript::Init(void)
 	PyObject *pFunc = PyDict_GetItemString(pMainDic, "Init");
 	if (PyObject_CallObject( pFunc, NULL ) == NULL) {
 		Log(ERROR, "GUIScript", "Failed to execute Init() in %s", main);
+		PyErr_Print();
 		return false;
 	}
 
@@ -13515,7 +13515,6 @@ PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, P
 	PyObject* ret = PyObject_Call(cobj, pArgs, kwArgs);
 	Py_DECREF(pArgs);
 	if (!ret) {
-		PyErr_Print();
 		return RuntimeError("Failed to call constructor");
 	}
 	return ret;
