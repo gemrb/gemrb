@@ -1725,7 +1725,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 			snprintf(Variable,sizeof(ieVariable),"%s_DEAD",parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			snprintf( Variable, 32, core->GetDeathVarFormat(), parameters->string0Parameter );
+			snprintf( Variable, sizeof(ieVariable), core->GetDeathVarFormat(), parameters->string0Parameter );
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (value>0) {
