@@ -15735,7 +15735,7 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
-	char string[256];
+	char string[_MAX_PATH+20];
 
 	sprintf( string, "import sys" );
 	if (PyRun_SimpleString( string ) == -1) {

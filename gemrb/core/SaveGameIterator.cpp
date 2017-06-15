@@ -370,8 +370,8 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 
 void SaveGameIterator::PruneQuickSave(const char *folder)
 {
-	char from[_MAX_PATH];
-	char to[_MAX_PATH];
+	char from[_MAX_PATH+20];
+	char to[_MAX_PATH+20];
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;

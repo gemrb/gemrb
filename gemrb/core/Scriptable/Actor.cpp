@@ -3747,7 +3747,7 @@ static int CheckInteract(const char *talker, const char *target)
 void Actor::HandleInteractV1(Actor *target)
 {
 	LastTalker = target->GetGlobalID();
-	char tmp[40];
+	char tmp[50];
 	snprintf(tmp, sizeof(tmp), "Interact(\"%s\")", target->GetScriptName());
 	AddAction(GenerateAction(tmp));
 }
@@ -4947,7 +4947,10 @@ void Actor::Resurrect()
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
 		ieVariable DeathVar;
 
-		snprintf(DeathVar,sizeof(ieVariable),"%s_DEAD",scriptName);
+		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName);
+		if (len > sizeof(ieVariable)) {
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
+		}
 		ieDword value=0;
 
 		game->kaputz->Lookup(DeathVar, value);
@@ -5116,10 +5119,14 @@ void Actor::Die(Scriptable *killer)
 		//don't use the raw killVar here (except when the flags explicitly ask for it)
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHTYPE) {
+				size_t len;
 				if (AppearanceFlags&APP_ADDKILL) {
-					snprintf(varname, 32, "KILL_%s", KillVar);
+					len = snprintf(varname, 32, "KILL_%s", KillVar);
 				} else {
-					snprintf(varname, 32, "%s", KillVar);
+					len = snprintf(varname, 32, "%s", KillVar);
+				}
+				if (len > 32) {
+					Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", KillVar, LongName);
 				}
 				game->kaputz->Lookup(varname, value);
 				game->kaputz->SetAt(varname, value+1, nocreate);
@@ -5134,10 +5141,14 @@ void Actor::Die(Scriptable *killer)
 		value = 0;
 		const char *tmp = GetVarName("faction", BaseStats[IE_FACTION]);
 		if (tmp && tmp[0]) {
+			size_t len;
 			if (AppearanceFlags&APP_ADDKILL) {
-				snprintf(varname, 32, "KILL_%s", tmp);
+				len = snprintf(varname, 32, "KILL_%s", tmp);
 			} else {
-				snprintf(varname, 32, "%s", tmp);
+				len = snprintf(varname, 32, "%s", tmp);
+			}
+			if (len > 32) {
+				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", tmp, LongName);
 			}
 			game->kaputz->Lookup(varname, value);
 			game->kaputz->SetAt(varname, value+1, nocreate);
@@ -5147,10 +5158,14 @@ void Actor::Die(Scriptable *killer)
 		value = 0;
 		const char *tmp = GetVarName("team", BaseStats[IE_TEAM]);
 		if (tmp && tmp[0]) {
+			size_t len;
 			if (AppearanceFlags&APP_ADDKILL) {
-				snprintf(varname, 32, "KILL_%s", tmp);
+				len = snprintf(varname, 32, "KILL_%s", tmp);
 			} else {
-				snprintf(varname, 32, "%s", tmp);
+				len = snprintf(varname, 32, "%s", tmp);
+			}
+			if (len > 32) {
+				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", tmp, LongName);
 			}
 			game->kaputz->Lookup(varname, value);
 			game->kaputz->SetAt(varname, value+1, nocreate);
@@ -5165,28 +5180,36 @@ void Actor::Die(Scriptable *killer)
 
 	if (scriptName[0]) {
 		value = 0;
+		size_t len = 0;
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHVAR) {
-				snprintf(varname, 32, "%s_DEAD", scriptName);
+				len = snprintf(varname, 32, "%s_DEAD", scriptName);
 				game->kaputz->Lookup(varname, value);
 				game->kaputz->SetAt(varname, value+1, nocreate);
 			}
 		} else {
-			snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
+			len = snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
 			game->locals->Lookup(varname, value);
 			game->locals->SetAt(varname, value+1, nocreate);
+		}
+		if (len > 32) {
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
 		}
 
 		if (SetDeathVar) {
 			value = 0;
-			snprintf(varname, 32, "%s_DEAD", scriptName);
+			len = snprintf(varname, 32, "%s_DEAD", scriptName);
 			game->locals->Lookup(varname, value);
 			game->locals->SetAt(varname, 1, nocreate);
 			if (value) {
-				snprintf(varname, 32, "%s_KILL_CNT", scriptName);
+				// possibly overwrite len, but this one will always be longer anyway
+				len = snprintf(varname, 32, "%s_KILL_CNT", scriptName);
 				value = 1;
 				game->locals->Lookup(varname, value);
 				game->locals->SetAt(varname, value + 1, nocreate);
+			}
+			if (len > 32) {
+				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
 			}
 		}
 	}
@@ -8214,12 +8237,15 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
 {
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
+		size_t len;
 		if (csound[index]) {
-			snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+			len = snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+			if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 			return;
 		}
 		//icewind style
-		snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
+		len = snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
+		if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 		return;
 	}
 
