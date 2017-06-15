@@ -87,6 +87,7 @@ int MemoryStream::Seek(int newpos, int type)
 
 		case GEM_STREAM_END:
 			Pos = size - newpos;
+			break;
 
 		default:
 			return GEM_ERROR;
