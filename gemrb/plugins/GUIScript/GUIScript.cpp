@@ -12179,6 +12179,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	case 0:
 	case 1:
 		core->SetPause((PauseSetting)pause, quiet);
+		// fall through
 	default:
 		ret = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
 	}
@@ -13165,6 +13166,8 @@ jump_label2:
 				tmp = (i+1)%3;
 				goto jump_label;
 			}
+			// fall through as a synonym
+			// should eventually get replaced with proper +0-9 recognition
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;

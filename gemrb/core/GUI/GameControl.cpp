@@ -1876,6 +1876,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		DoubleClick = true;
+		// intentional fallthrough
 	case GEM_MB_ACTION:
 		// PST uses alt + left click for formation rotation
 		// is there any harm in this being true in all games?

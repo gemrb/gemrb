@@ -3861,6 +3861,7 @@ void Actor::CommandActor(Action* action)
 		case 1:
 			if (playedCommandSound) return;
 			playedCommandSound = true;
+			// intentional fallthrough
 		case 2:
 			//PST has 4 states and rare sounds
 			if (raresnd) {
