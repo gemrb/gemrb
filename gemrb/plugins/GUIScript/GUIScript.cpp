@@ -13169,7 +13169,6 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
-	char string[_MAX_PATH+20];
 	char path[_MAX_PATH];
 	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
 
