@@ -1,6 +1,7 @@
 
 from ie_stats import *
 from GUIDefines import *
+import GemRB
 from GemRB import * # we dont want to have to type 'GemRB.Command' instead of simply 'Command'
 
 # /handy/ shorthand forms
