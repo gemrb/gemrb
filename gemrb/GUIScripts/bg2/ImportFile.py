@@ -61,9 +61,10 @@ def DonePress():
 	if ImportWindow:
 		ImportWindow.Unload()
 	# the medium portrait isn't available, so we copy the original hack
-	MediumPortrait = GemRB.GetPlayerPortrait (Slot, 1)[0:-1] + "M"
-	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
-	GemRB.SetToken("LargePortrait", MediumPortrait )
+	SmallPortrait = GemRB.GetPlayerPortrait (Slot, 1)["ResRef"]
+	MediumPortrait = SmallPortrait[0:-1] + "M"
+	GemRB.SetToken ("SmallPortrait", SmallPortrait)
+	GemRB.SetToken ("LargePortrait", MediumPortrait)
 	GemRB.SetNextScript("CharGen7")
 	return
 	

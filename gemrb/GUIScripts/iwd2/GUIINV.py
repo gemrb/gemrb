@@ -228,7 +228,7 @@ def RefreshInventoryWindow ():
 
 	# portrait
 	Button = Window.GetControl (84)
-	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
+	Button.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"])
 
 	# encumbrance
 	GUICommon.SetEncumbranceLabels (Window, 0x10000042, None, pc)

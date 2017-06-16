@@ -146,7 +146,7 @@ def UpdateReformWindow ():
 			continue # for saved games with higher party count than the current setup supports
 		Button = PortraitButtons[index]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
-		pic = GemRB.GetPlayerPortrait (i, 1)
+		pic = GemRB.GetPlayerPortrait (i, 1)["Sprite"]
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)

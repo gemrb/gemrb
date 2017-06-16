@@ -941,7 +941,7 @@ def UpdateRecordsWindow ():
 
 	#portrait
 	Button = Window.GetControl (2)
-	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
+	Button.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"])
 
 	# armorclass
 	Label = Window.GetControl (0x10000028)

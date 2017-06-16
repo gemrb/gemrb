@@ -116,7 +116,7 @@ def DualClassWindow ():
 	DCMainPictureButton = DCMainWindow.GetControl (6)
 	DCMainPictureButton.SetState (IE_GUI_BUTTON_LOCKED)
 	DCMainPictureButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	DCMainPictureButton.SetPicture (GemRB.GetPlayerPortrait (pc, 0), "NOPORTMD")
+	DCMainPictureButton.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"], "NOPORTMD")
 
 	# text area warning
 	DCTextArea = DCMainWindow.GetControl (7)

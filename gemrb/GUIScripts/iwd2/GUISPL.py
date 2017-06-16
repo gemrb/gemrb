@@ -175,7 +175,7 @@ def UpdateSpellBookWindow ():
 	Label.SetText (Name)
 
 	Button = Window.GetControl (1)
-	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
+	Button.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"])
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	mem_cnt = GetMemorizedSpellsCount () # count of unique memorized spells

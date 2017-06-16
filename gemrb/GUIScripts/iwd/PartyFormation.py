@@ -60,7 +60,7 @@ def OnLoad ():
 		#removing this label, it just disturbs us
 		Label.SetSize (0, 0)
 		Button = PartyFormationWindow.GetControl (i-12)
-		ResRef = GemRB.GetPlayerPortrait (i-17, 1)
+		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
 		if ResRef == "":
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:

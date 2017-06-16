@@ -90,7 +90,7 @@ def SelectFile():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
-	Portrait = GemRB.GetPlayerPortrait (Slot,0)
+	Portrait = GemRB.GetPlayerPortrait (Slot, 0)["Sprite"]
 	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
 	ImportWindow.Focus() #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)

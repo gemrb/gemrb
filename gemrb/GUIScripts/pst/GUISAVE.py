@@ -252,7 +252,7 @@ def OpenSaveDetailWindow ():
 	# PC portraits
 	for j in range (PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
-		Button.SetSprite2D(GemRB.GetPlayerPortrait(j))
+		Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
 
 
 	CheckSaveName ()

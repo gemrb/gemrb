@@ -178,7 +178,7 @@ def OpenPortraitSelectWindow ():
 
 	# get players gender and portrait
 	Pc = GemRB.GameGetSelectedPCSingle ()
-	PcPortrait = GemRB.GetPlayerPortrait(Pc,0)
+	PcPortrait = GemRB.GetPlayerPortrait (Pc, 0)["ResRef"]
 
 	# initialize and set portrait
 	Portrait.Init (Gender)

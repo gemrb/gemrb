@@ -2704,10 +2704,10 @@ def ImportDonePress():
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
 
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (MyChar) )
-	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1) )
-	PortraitName = GemRB.GetPlayerPortrait (MyChar, 0)
-	GemRB.SetToken ("LargePortrait", PortraitName )
-	PortraitButton.SetPicture (PortraitName)
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1)["ResRef"])
+	Portrait = GemRB.GetPlayerPortrait (MyChar, 0)
+	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
+	PortraitButton.SetPicture (Portrait["Sprite"])
 	Portrait = -1
 
 	ImportedChar = 1
