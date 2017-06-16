@@ -663,6 +663,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					break;
 				}
 			}
+			// fall through
 		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
 		default:
 			return SDLVideoDriver::ProcessEvent(event);

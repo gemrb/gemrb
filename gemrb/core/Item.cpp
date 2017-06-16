@@ -56,8 +56,7 @@ Item::Item(void)
 	ExtHeaderOffset = ExtHeaderCount = FeatureBlockOffset = 0;
 	EquippingFeatureOffset = EquippingFeatureCount = 0;
 	unknown1 = unknown2 = unknown3 = 0;
-	ItemExcl = false;
-	DialogName = 0;
+	ItemExcl = DialogName = 0;
 }
 
 Item::~Item(void)

@@ -1085,6 +1085,7 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case 1: //always berserk
 		target->SetSpellState(SS_BERSERK);
+		// intentional fallthrough
 	default:
 		target->AddPortraitIcon(PI_BERSERK);
 		break;
@@ -1169,12 +1170,14 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1001:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
@@ -1184,12 +1187,14 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1003:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
@@ -1199,6 +1204,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1004:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
@@ -1209,6 +1215,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->FirstApply) {
 			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_WHITE, target);
 		}
+		// intentional fallthrough
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
 		STAT_SET(IE_THRULLCHARM, 1);
@@ -2466,16 +2473,19 @@ int fx_miscast_magic_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 3:
 		STAT_SET( IE_DEADMAGIC, 1);
+		// intentional fallthrough
 	case 0:
 		STAT_SET( IE_SPELLFAILUREMAGE, fx->Parameter1);
 		break;
 	case 4:
 		STAT_SET( IE_DEADMAGIC, 1);
+		// intentional fallthrough
 	case 1:
 		STAT_SET( IE_SPELLFAILUREPRIEST, fx->Parameter1);
 		break;
 	case 5:
 		STAT_SET( IE_DEADMAGIC, 1);
+		// intentional fallthrough
 	case 2:
 		STAT_SET( IE_SPELLFAILUREINNATE, fx->Parameter1);
 		break;
@@ -2886,7 +2896,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_SUB(IE_STR, 2);
 		STAT_SUB(IE_DEX, 2);
 		STAT_SUB(IE_CHR, 2);
-		//falling through
+		//fall through
 	case RPD_SLOW: //slow
 		//TODO: in iwd2
 		//-2 AC, BaB, reflex, damage
@@ -3181,10 +3191,10 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_TURNS:		//restore param3 hp every param1 turns
 		tmp *= core->Time.rounds_per_turn;
-		//fall
+		// fall through
 	case RPD_ROUNDS:	//restore param3 hp every param1 rounds
 		tmp *= core->Time.round_sec;
-		//fall
+		// fall through
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
 		fx->Parameter3 = gameTime + tmp*timeStep;
 		damage = 1;
@@ -3619,6 +3629,7 @@ int fx_immune_to_weapon (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		break;
 	case 12:
 		mask = fx->Parameter1;
+		//fallthrough
 	case 13:
 		value = fx->Parameter1;
 		break;

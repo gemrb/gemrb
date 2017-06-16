@@ -1720,13 +1720,17 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	if (parameters->string0Parameter[0]) {
 		ieDword value;
 		ieVariable Variable;
+		size_t len;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			snprintf(Variable,sizeof(ieVariable),"%s_DEAD",parameters->string0Parameter);
+			len = snprintf(Variable,sizeof(ieVariable),"%s_DEAD",parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			snprintf( Variable, 32, core->GetDeathVarFormat(), parameters->string0Parameter );
+			len = snprintf(Variable, sizeof(ieVariable), core->GetDeathVarFormat(), parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
+		}
+		if (len > sizeof(ieVariable)) {
+			Log(ERROR, "GameScript", "Scriptname %s (sender: %s) is too long for generating death globals!", parameters->string0Parameter, Sender->GetScriptName());
 		}
 		if (value>0) {
 			return 1;

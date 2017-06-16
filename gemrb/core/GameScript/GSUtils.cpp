@@ -717,10 +717,10 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			pnt.y = vp.y+vp.h/2;
 			break;
 			}
-			//falling through
+			//fall through
 		case CC_OBJECT://use object + offset
 			if (tmp) Sender=tmp;
-			//falling through
+			//fall through
 		case CC_OFFSET://use sender + offset
 			pnt.x = parameters->pointParameter.x+Sender->Pos.x;
 			pnt.y = parameters->pointParameter.y+Sender->Pos.y;
@@ -900,6 +900,7 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 				position=((InfoPoint *) scr)->UsePoint;
 				break;
 			}
+		// intentional fallthrough
 		case ST_DOOR: case ST_CONTAINER:
 			position=((Highlightable *) scr)->TrapLaunch;
 	}

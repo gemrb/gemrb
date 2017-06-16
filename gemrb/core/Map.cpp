@@ -1464,7 +1464,10 @@ void Map::InitActor(Actor *actor)
 	}
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
-		snprintf(key, sizeof(key),"%s_visited", scriptName);
+		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName);
+		if (len > sizeof(key)) {
+			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName);
+		}
 		core->GetGame()->locals->SetAt(key, 1);
 	}
 }

@@ -2079,6 +2079,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			fx->Parameter1=core->Roll(1,500,500);
 		}
+		// fall through
 	case 2:
 		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
 			ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);

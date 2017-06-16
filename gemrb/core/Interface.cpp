@@ -1548,9 +1548,9 @@ int Interface::Init(InterfaceConfig* config)
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
-	char ini_path[_MAX_PATH] = { '\0' };
-	char gemrbINI[_MAX_PATH] = { '\0' };
-	char tmp[_MAX_PATH] = { '\0' };
+	char ini_path[_MAX_PATH+4] = { '\0' };
+	char gemrbINI[_MAX_PATH+4] = { '\0' };
+	char tmp[_MAX_PATH+4] = { '\0' };
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	PathJoin(ini_path, SavePath, gemrbINI, NULL);
 	if (!file_exists(ini_path)) {
@@ -3007,7 +3007,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 bool Interface::SaveConfig()
 {
 	char ini_path[_MAX_PATH] = { '\0' };
-	char gemrbINI[_MAX_PATH] = { '\0' };
+	char gemrbINI[_MAX_PATH+4] = { '\0' };
 	if (strncmp(INIConfig, "gem-", 4)) {
 		snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	}

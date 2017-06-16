@@ -200,9 +200,9 @@ Item* ITMImporter::GetItem(Item *s)
 
 	if (exclusionTable) {
 		int row = exclusionTable->GetRowIndex(s->Name);
-		s->ItemExcl = (bool)atoi(exclusionTable->QueryField(row, 0));
+		s->ItemExcl = atoi(exclusionTable->QueryField(row, 0));
 	} else {
-		s->ItemExcl = false;
+		s->ItemExcl = 0;
 	}
 
 	s->ext_headers = new ITMExtHeader[s->ExtHeaderCount];

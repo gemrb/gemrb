@@ -267,7 +267,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	if (day_or_night) {
 		memcpy( TmpResRef, map->WEDResRef, 9);
 	} else {
-		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.7sN", map->WEDResRef);
 	}
 	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
@@ -303,9 +303,9 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//get the lightmap name
 	if (day_or_night) {
-		snprintf( TmpResRef, 9, "%sLM", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLM", map->WEDResRef);
 	} else {
-		snprintf( TmpResRef, 9, "%sLN", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLN", map->WEDResRef);
 	}
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
@@ -408,7 +408,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (day_or_night) {
 		memcpy( TmpResRef, WEDResRef, 9);
 	} else {
-		snprintf( TmpResRef, 9, "%sN", WEDResRef);
+		snprintf( TmpResRef, 9, "%.7sN", WEDResRef);
 	}
 
 	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
@@ -444,9 +444,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	if (day_or_night) {
-		snprintf( TmpResRef, 9, "%sLM", WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLM", WEDResRef);
 	} else {
-		snprintf( TmpResRef, 9, "%sLN", WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLN", WEDResRef);
 	}
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
@@ -455,7 +455,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		return NULL;
 	}
 
-	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
+	snprintf( TmpResRef, 9, "%.6sSR", WEDResRef);
 
 	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
@@ -463,7 +463,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		return NULL;
 	}
 
-	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
+	snprintf( TmpResRef, 9, "%.6sHT", WEDResRef);
 
 	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {

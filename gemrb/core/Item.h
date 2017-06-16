@@ -222,7 +222,7 @@ public:
 	// PST and IWD2 only
 	char unknown[26];
 	// flag items to mutually exclusive to equip
-	bool ItemExcl;
+	ieDword ItemExcl;
 public:
 	ieStrRef GetItemName(bool identified) const
 	{
