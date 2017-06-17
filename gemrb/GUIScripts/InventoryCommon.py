@@ -405,6 +405,11 @@ def OpenGroundItemInfoWindow ():
 	DisplayItem(slot_item["ItemResRef"], value)
 	return
 
+# TODO: implement
+def OpenGroundItemAmountWindow ():
+	pass
+
+# TODO: can the GUISTORE be consolidate with this one?
 def OpenItemAmountWindow ():
 	"""Open the split window."""
 
