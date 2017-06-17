@@ -1077,10 +1077,12 @@ def OpenItemAmountWindow ():
 	# Decrease
 	Button = Window.GetControl (4)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseItemAmount)
+	Button.SetActionInterval (200)
 
 	# Increase
 	Button = Window.GetControl (3)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseItemAmount)
+	Button.SetActionInterval (200)
 
 	# Done
 	Button = Window.GetControl (2)
