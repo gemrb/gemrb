@@ -1970,7 +1970,7 @@ def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
 
 def RestPress ():
-	GUICommon.CloseOtherWindow(None)
+	CloseTopWindow ()
 	# only rest if the dream scripts haven't already
 	# bg2 completely offloaded resting to them - if there's a talk, it has to call Rest(Party) itself
 	if not GemRB.RunRestScripts ():
