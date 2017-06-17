@@ -10,6 +10,7 @@ sys.dont_write_bytecode = True
 # we also want anything executed using ExecString to have access to the symbols
 from GUIDefines import *
 from GUIClasses import *
+from ie_restype import RES_BAM
 
 import GemRB
 
@@ -18,6 +19,9 @@ def Init():
 	# this is where we would run initializations (even on a per-game type basis)
 	
 	# create a global scrollbar for the ScrollView to clone from
-	frame = {'x' : 0, 'y' : 0, 'w' : 0, 'h' : 0}
-	sb = GemRB.CreateView(-1, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs())
-	sb.AddAlias("SBGLOB")
+	# but only if we can (would fail in tests)
+	SBArgs = CreateScrollbarARGs ()
+	if GemRB.HasResource (SBArgs[0], RES_BAM):
+		frame = {'x' : 0, 'y' : 0, 'w' : 0, 'h' : 0}
+		sb = GemRB.CreateView (-1, IE_GUI_SCROLLBAR, frame, SBArgs)
+		sb.AddAlias ("SBGLOB")
