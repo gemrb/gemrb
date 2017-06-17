@@ -1813,7 +1813,6 @@ void GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		}
 		break;
-		// intentional fallthrough
 	case GEM_MB_ACTION:
 		isDoubleClick = me.repeats == 2;
 		break;
