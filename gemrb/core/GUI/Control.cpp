@@ -220,6 +220,12 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			actionTimer->Invalidate();
 			actionTimer = NULL;
 		}
+	} else if (me.repeats > 1) {
+		// also try a single-click in case there is no doubleclick handler
+		// and there is never a triple+ click handler
+		MouseEvent me2(me);
+		me2.repeats = 1;
+		OnMouseUp(me2, mod);
 	}
 }
 
