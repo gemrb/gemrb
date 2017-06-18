@@ -564,7 +564,8 @@ def UpdateSlot (pc, slot):
 def CancelColor():
 	if ColorPicker:
 		ColorPicker.Unload ()
-	GUIINV.InventoryWindow.Focus()
+	InventoryWindow = GemRB.GetView ("WIN_INV")
+	InventoryWindow.Focus ()
 	return
 
 def ColorDonePress():
@@ -632,7 +633,8 @@ def GetColor():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTable ("clowncol")
-	GUIINV.InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
+	InventoryWindow = GemRB.GetView ("WIN_INV")
+	InventoryWindow.SetDisabled (True) #darken it
 	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
 	if GameCheck.IsIWD2():
