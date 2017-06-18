@@ -65,10 +65,10 @@ def OpenLUStatsWindow(Type = 1):
 	if LevelUp:
 		import GUICommonWindows
 		import GUIREC
-		GUICommonWindows.OptionsWindow.SetVisible (WINDOW_INVISIBLE)
-		GUICommonWindows.PortraitWindow.SetVisible (WINDOW_INVISIBLE)
-		GUICommonWindows.ActionsWindow.SetVisible (WINDOW_INVISIBLE)
-		GUIREC.RecordsWindow.SetVisible (WINDOW_INVISIBLE)
+		GUICommonWindows.OptionsWindow.SetVisible (False)
+		GUICommonWindows.PortraitWindow.SetVisible (False)
+		GUICommonWindows.ActionsWindow.SetVisible (False)
+		GUIREC.RecordsWindow.SetVisible (False)
 	else:
 		GemRB.LoadGame(None)  #loading the base game
 
@@ -228,7 +228,7 @@ def AcceptPress():
 		Button.SetText(46783)
 		Button.MakeDefault()
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
-		NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
+		NewLifeWindow.SetDisabled (True) #go dark
 		QuitWindow.Focus()
 		return
 
