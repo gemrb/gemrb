@@ -21,7 +21,6 @@
 import GemRB
 from ie_restype import RES_2DA
 from GUIDefines import *
-import GUICommon
 import GameCheck
 
 TextScreen = None

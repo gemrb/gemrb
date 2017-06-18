@@ -19,8 +19,6 @@
 #character generation, name (GUICG5)
 import GemRB
 
-import CharGenCommon
-
 NameWindow = 0
 NameField = 0
 DoneButton = 0

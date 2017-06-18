@@ -32,7 +32,6 @@
 import CommonWindow
 import GameCheck
 import GemRB
-import GUICommon
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
