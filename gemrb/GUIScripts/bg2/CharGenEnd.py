@@ -115,6 +115,8 @@ def OnLoad():
 		if GemRB.GetVar("GUIEnhancements"):
 			GemRB.SaveCharacter ( MyChar, "gembak" )
 		#LETS PLAY!!
+		import CharGenCommon
+		CharGenCommon.CharGenWindow.Close ()
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 	else:

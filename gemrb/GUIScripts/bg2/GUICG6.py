@@ -51,7 +51,10 @@ def OnLoad():
 	LUSkillsSelection.SetupSkillsWindow (MyChar, \
 		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
 
+	# can't be moved earlier as this var will be set in the setup call above
 	if not GemRB.GetVar ("SkillPointsLeft"): #skipping
+		if SkillWindow:
+			SkillWindow.Unload ()
 		GemRB.SetNextScript("GUICG9")
 		return
 	
