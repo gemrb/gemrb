@@ -186,6 +186,29 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	return true;
 }
 
+void WindowManager::HideAllWindows()
+{
+	WindowList::iterator it = windows.begin();
+	for (; it != windows.end(); ++it) {
+		Window* win = *it;
+		win->SetVisible(false);
+	}
+
+	// we don't ever hide the gamewindow, however, we will cover it in black
+	// this way the screen can be cleared for anything that wants to take over drawing (videos)
+	// otherwise the next draw cycle will simply redraw the gamewindow
+	video->DrawRect(Region(0,0,screen.w,screen.h), ColorBlack);
+}
+
+void WindowManager::ShowAllWindows()
+{
+	WindowList::iterator it = windows.begin();
+	for (; it != windows.end(); ++it) {
+		Window* win = *it;
+		win->SetVisible(true);
+	}
+}
+
 Window* WindowManager::MakeWindow(const Region& rgn)
 {
 	Window* win = new Window(rgn, *this);

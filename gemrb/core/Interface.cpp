@@ -472,6 +472,7 @@ void Interface::HandleEvents()
 			"OPTWIN", "PORTWIN", "MSGWIN", "ACTWIN", "FLOATWIN"
 		};
 
+		// should this just call winmgr->ShowAllWindows()/HideAllWindows() ?
 		bool visible = !(game->ControlStatus & CS_HIDEGUI);
 		for (size_t i = 0; i < sizeof(GameWindows) / sizeof(GameWindows[0]); ++i) {
 			Window* win = GetWindow(0, GameWindows[i]);
@@ -2855,12 +2856,12 @@ int Interface::PlayMovie(const char* resref)
 	}
 
 	// clear whatever is currently on screen
-	winmgr->DrawWindows(); // FIXME: relying on sideeffect of this for clearing screen
-	video->DrawRect(Region(0,0,Width,Height), ColorBlack);
+	winmgr->HideAllWindows();
 	Window* win = winmgr->MakeWindow(Region(Point(), mp->Dimensions()));
 
 	mp->Play(win);
 	win->Close();
+	winmgr->ShowAllWindows();
 	if (sound_override) {
 		sound_override->Stop();
 		sound_override.release();
@@ -3061,6 +3062,7 @@ void Interface::SetCutSceneMode(bool active)
 		gc->SetCutSceneMode( active );
 	}
 	if (game) {
+		// should this just call winmgr->ShowAllWindows()/HideAllWindows() ?
 		game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
 	}
 }
