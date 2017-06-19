@@ -1820,7 +1820,7 @@ void GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 }
 
 /** Mouse Button Up */
-void GameControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
+void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return ClearMouseState();
@@ -1858,7 +1858,11 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 		MakeSelection(SelectionRect());
 		return ClearMouseState();
 	} else if (targetActor) {
-		game->SelectActor( targetActor, true, SELECT_NORMAL );
+		if (Mod & GEM_MOD_SHIFT) {
+			game->SelectActor(targetActor, true, SELECT_NORMAL);
+		} else {
+			game->SelectActor(targetActor, true, SELECT_REPLACE);
+		}
 		return ClearMouseState();
 	}
 
