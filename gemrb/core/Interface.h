@@ -450,6 +450,8 @@ public:
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&);
+	void HideGUI();
+	void ShowGUI();
 
 	Tooltip CreateTooltip(const String&);
 	/** returns the label which should receive game messages (overrides messagetextarea) */
