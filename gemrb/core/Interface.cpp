@@ -467,15 +467,6 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
-		
-		if (game->ControlStatus & CS_HIDEGUI) {
-			winmgr->HideAllWindows();
-		} else {
-			winmgr->ShowAllWindows();
-			// console stays hidden when unhiding the GUI
-			Window* conwin = GetWindow(0, "WIN_CON");
-			conwin->SetVisible(false);
-		}
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
@@ -3065,6 +3056,15 @@ void Interface::SetCutSceneMode(bool active)
 	
 	if (game) {
 		game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
+	}
+	
+	if (active) {
+		winmgr->HideAllWindows();
+	} else {
+		winmgr->ShowAllWindows();
+		// console stays hidden when unhiding the GUI
+		Window* conwin = GetWindow(0, "WIN_CON");
+		conwin->SetVisible(false);
 	}
 }
 
