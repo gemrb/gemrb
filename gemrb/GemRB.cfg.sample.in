@@ -312,6 +312,9 @@ CachePath=./Cache2/
 # default is 0
 #MouseFeedback=0
 
+# force enable touch input (in case autodetection fails or for hybrids)
+#TouchInput=1
+
 #####################################################
 #  Touch Gesture Input Parameters                   #
 #  Requires SDL 1.3 or later			    #
