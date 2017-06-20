@@ -469,12 +469,12 @@ void Interface::HandleEvents()
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
 		
 		if (game->ControlStatus & CS_HIDEGUI) {
+			winmgr->HideAllWindows();
+		} else {
 			winmgr->ShowAllWindows();
 			// console stays hidden when unhiding the GUI
 			Window* conwin = GetWindow(0, "WIN_CON");
 			conwin->SetVisible(false);
-		} else {
-			winmgr->HideAllWindows();
 		}
 		return;
 	}
@@ -1854,9 +1854,10 @@ int Interface::Init(InterfaceConfig* config)
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
 	
-	ViewScriptingRef* ref = consoleWin->GetScriptingRef();
-	ViewScriptingRef* aliasref = ref->Clone(0, "WIN_CON");
-	ScriptEngine::RegisterScriptingRef(aliasref);
+	ViewScriptingRef* ref = new ViewScriptingRef(gamectrl, 0, "CONSOLE");
+	console->AssignScriptingRef(ref);
+	ScriptEngine::RegisterScriptingRef(ref);
+	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
