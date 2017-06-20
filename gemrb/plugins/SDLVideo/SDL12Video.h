@@ -41,6 +41,7 @@ public:
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
+	bool TouchInputEnabled();
 	void SetGamma(int brightness, int contrast);
 
 	bool SupportsBAMSprites() { return true; }

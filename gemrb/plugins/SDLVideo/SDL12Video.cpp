@@ -191,6 +191,11 @@ void SDL12VideoDriver::HideSoftKeyboard()
 	}
 }
 
+bool SDL12VideoDriver::TouchInputEnabled()
+{
+    return core->MouseFeedback > 0;
+}
+
 // Private methods
 
 bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)

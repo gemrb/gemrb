@@ -696,6 +696,12 @@ void SDL20VideoDriver::ShowSoftKeyboard()
 	*/
 }
 
+bool SDL20VideoDriver::TouchInputEnabled()
+{
+	// note from upstream: on some platforms a device may become seen only after use
+	return SDL_GetNumTouchDevices() > 0;
+}
+
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
 	// FIXME: hardcoded hack. in in Interface our default brigtness value is 10
