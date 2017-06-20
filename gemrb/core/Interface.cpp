@@ -2848,12 +2848,12 @@ int Interface::PlayMovie(const char* resref)
 	}
 
 	// clear whatever is currently on screen
-	winmgr->HideAllWindows();
+	SetCutSceneMode(true);
 	Window* win = winmgr->MakeWindow(Region(Point(), mp->Dimensions()));
 
 	mp->Play(win);
 	win->Close();
-	winmgr->ShowAllWindows();
+	SetCutSceneMode(false);
 	if (sound_override) {
 		sound_override->Stop();
 		sound_override.release();
