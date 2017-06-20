@@ -57,18 +57,14 @@ def PlayPress ():
 		if GemRB.GetVar(t)==1:
 			if s==0:
 				s = MoviesTable.GetRowName (i)
-				MovieWindow.SetVisible(False)
 				GemRB.PlayMovie (s, 1)
-				MovieWindow.Focus()
 				return
 
 			s = s - 1
 
 
 def CreditsPress ():
-	MovieWindow.SetVisible(False)
 	GemRB.PlayMovie ("CREDITS", 1)
-	MovieWindow.Focus()
 
 
 def DonePress ():

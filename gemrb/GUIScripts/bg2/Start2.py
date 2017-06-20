@@ -41,7 +41,6 @@ def OnLoad():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
 	
 	StartWindow = GemRB.LoadWindow (0, "START")
-	StartWindow.SetVisible (False)
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
 		if GameCheck.HasTOB():
