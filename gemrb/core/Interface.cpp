@@ -467,18 +467,14 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
-		//this is the only value we can use here
-		static const ResRef GameWindows[5] = {
-			"OPTWIN", "PORTWIN", "MSGWIN", "ACTWIN", "FLOATWIN"
-		};
-
-		// should this just call winmgr->ShowAllWindows()/HideAllWindows() ?
-		bool visible = !(game->ControlStatus & CS_HIDEGUI);
-		for (size_t i = 0; i < sizeof(GameWindows) / sizeof(GameWindows[0]); ++i) {
-			Window* win = GetWindow(0, GameWindows[i]);
-			if (win) { // not all games have all windows
-				win->SetVisible(visible);
-			}
+		
+		if (game->ControlStatus & CS_HIDEGUI) {
+			winmgr->ShowAllWindows();
+			// console stays hidden when unhiding the GUI
+			Window* conwin = GetWindow(0, "WIN_CON");
+			conwin->SetVisible(false);
+		} else {
+			winmgr->HideAllWindows();
 		}
 		return;
 	}
@@ -1857,6 +1853,10 @@ int Interface::Init(InterfaceConfig* config)
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
+	
+	ViewScriptingRef* ref = consoleWin->GetScriptingRef();
+	ViewScriptingRef* aliasref = ref->Clone(0, "WIN_CON");
+	ScriptEngine::RegisterScriptingRef(aliasref);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
@@ -3061,8 +3061,8 @@ void Interface::SetCutSceneMode(bool active)
 
 		gc->SetCutSceneMode( active );
 	}
+	
 	if (game) {
-		// should this just call winmgr->ShowAllWindows()/HideAllWindows() ?
 		game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
 	}
 }
