@@ -465,8 +465,17 @@ void Interface::HandleEvents()
 	}
 
 	if (EventFlag&EF_CONTROL) {
+		// handle this before clearing EF_CONTROL
+		// otherwise we do this every frame
+		if (game->ControlStatus & CS_HIDEGUI) {
+			HideGUI();
+		} else {
+			ShowGUI();
+		}
+		
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
+		
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
@@ -2544,6 +2553,27 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
 	// obviously its possible the id can conflict with an existing window
 	return guifact->CreateWindow(WindowID, frame);
 }
+	
+void Interface::HideGUI()
+{
+	if (game) {
+		game->SetControlStatus(CS_HIDEGUI, OP_OR );
+	}
+	
+	winmgr->HideAllWindows();
+}
+	
+void Interface::ShowGUI()
+{
+	if (game) {
+		game->SetControlStatus(CS_HIDEGUI, OP_NAND );
+	}
+	
+	winmgr->ShowAllWindows();
+	// console stays hidden when unhiding the GUI
+	Window* conwin = GetWindow(0, "WIN_CON");
+	conwin->SetVisible(false);
+}
 
 bool Interface::IsFreezed()
 {
@@ -3045,26 +3075,14 @@ bool Interface::SaveConfig()
 void Interface::SetCutSceneMode(bool active)
 {
 	GameControl *gc = GetGameControl();
-
 	if (gc) {
-		// don't mess with controls/etc if we're already in a cutscene
-		if (active == (bool)(gc->GetScreenFlags()&SF_CUTSCENE))
-			return;
-
 		gc->SetCutSceneMode( active );
 	}
 	
-	if (game) {
-		game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
-	}
-	
 	if (active) {
-		winmgr->HideAllWindows();
+		HideGUI();
 	} else {
-		winmgr->ShowAllWindows();
-		// console stays hidden when unhiding the GUI
-		Window* conwin = GetWindow(0, "WIN_CON");
-		conwin->SetVisible(false);
+		ShowGUI();
 	}
 }
 
