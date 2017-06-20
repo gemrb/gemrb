@@ -175,6 +175,7 @@ Interface::Interface()
 	NumFingKboard = 3;
 	NumFingScroll = 2;
 	MouseFeedback = 0;
+	TouchInput = -1;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
 	GUIScriptsPath[0] = 0;
@@ -1208,6 +1209,7 @@ int Interface::Init(InterfaceConfig* config)
 #else
 	EventMgr::TouchInputEnabled = MouseFeedback > 0;
 #endif
+	CONFIG_INT("TouchInput", TouchInput =);
 
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);

@@ -730,6 +730,7 @@ public:
 	bool UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
+	int TouchInput;
 	int MaxPartySize;
 	bool KeepCache;
 	bool MultipleQuickSaves;
