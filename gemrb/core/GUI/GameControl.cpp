@@ -1855,7 +1855,7 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	// handle selections
 	Actor* targetActor = area->GetActor(p, target_types);
 	if (isSelectionRect) {
-		MakeSelection(SelectionRect());
+		MakeSelection(SelectionRect(), Mod&GEM_MOD_SHIFT);
 		return ClearMouseState();
 	} else if (targetActor) {
 		if (Mod & GEM_MOD_SHIFT) {
