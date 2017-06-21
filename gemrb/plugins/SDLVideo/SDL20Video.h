@@ -67,6 +67,7 @@ public:
 	bool ToggleGrabInput();
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
+	bool TouchInputEnabled();
 
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);

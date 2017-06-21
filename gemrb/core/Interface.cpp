@@ -93,7 +93,6 @@
 #endif
 
 #include <vector>
-#include <SDL/SDL_version.h> // for SDL_VERSION_ATLEAST
 
 namespace GemRB {
 
@@ -175,6 +174,7 @@ Interface::Interface()
 	NumFingKboard = 3;
 	NumFingScroll = 2;
 	MouseFeedback = 0;
+	TouchInput = -1;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
 	GUIScriptsPath[0] = 0;
@@ -1199,15 +1199,7 @@ int Interface::Init(InterfaceConfig* config)
 		value = NULL;
 
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
-
-// guess a good default
-// TODO: add cfg option for an override (for hybrid devices)
-#if SDL_VERSION_ATLEAST(2,0,0)
-	// note from upstream: on some platforms a device may become seen only after use
-	EventMgr::TouchInputEnabled = SDL_GetNumTouchDevices() > 0;
-#else
-	EventMgr::TouchInputEnabled = MouseFeedback > 0;
-#endif
+	CONFIG_INT("TouchInput", TouchInput =);
 
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
@@ -1413,6 +1405,9 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	ieDword brightness = 10;
 	ieDword contrast = 5;
+
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
 
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format

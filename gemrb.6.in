@@ -370,6 +370,13 @@ Bitfield with reserved bits for disabling the mouse.
   Hide tooltips       = 2
   Hide mouse+tooltips = 3
 
+.TP
+.BR TouchInput =(0-1)
+Override setting for when autodetection does not have satisfactory results.
+  Autodetect         = -1 (default)
+  Force disable      = 0
+  Enable             = 1
+
 .\"###################################################
 .SH Development parameters:
 

@@ -160,6 +160,8 @@ public:
 	virtual void ShowSoftKeyboard() = 0;
 	virtual void HideSoftKeyboard() = 0;
 
+	virtual bool TouchInputEnabled() = 0;
+
 	void InitSpriteCover(SpriteCover* sc, int flags);
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);
