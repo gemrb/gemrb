@@ -2089,6 +2089,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_GUI_INVALID:
 			view = core->CreateWindow(id, rgn);
+			break;
 		default:
 			view = new View(rgn);
 			break;

@@ -484,10 +484,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// commented out because we dont care right now, but if we need it i want it documented
 				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
 				) {
-				lastMouseDownTime = EvntManager->GetRKDelay();
+				/*lastMouseDownTime = EvntManager->GetRKDelay();
 				if (ignoreNextFingerUp <= 0 && lastMouseDownTime != (unsigned long) ~0) {
 					lastMouseDownTime += lastMouseDownTime + lastTime;
-				}
+				}*/
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
 				firstFingerDownTime = GetTickCount();
@@ -507,7 +507,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					//EvntManager->OnSpecialKeyPress( GEM_ALT );
 				}
 				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
-					&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
+					/*&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL*/) {
 					// scrolling cancels previous action
 					((GameControl*)focusCtrl)->ClearMouseState();
 				}
@@ -645,11 +645,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYDOWN:
 			{
 				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
+				/*if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
 					// special treatment: console popping is the only KEYDOWN event in SDLVideoDriver::ProcessEvent that uses a standard key (and therefore will never be hit). Therefore, implement this here also.
 					core->PopupConsole();
 					break;
-				}
+				}*/
 				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
 					// if key is literally just ctrl or shift -- skip it.
 					break;
