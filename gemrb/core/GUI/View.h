@@ -95,7 +95,8 @@ public:
 
 	enum ViewFlags {
 		Invisible = 1 << 28,
-		Disabled = 1 << 27
+		Disabled = 1 << 27,
+		IgnoreEvents = 1 << 26
 	};
 
 	View(const Region& frame);

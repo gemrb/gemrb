@@ -26,7 +26,8 @@ IE_GUI_VIEW_RESIZE_HEIGHT 	= 1 << 30	# resize the view vertically if vertical co
 IE_GUI_VIEW_RESIZE_WIDTH 	= 1 << 29	# resize the view horizontally if horizontal content exceeds width
 
 IE_GUI_VIEW_INVISIBLE		= 1 << 28
-IE_GUI_VIEW_DISABLED	= 1 << 27
+IE_GUI_VIEW_DISABLED		= 1 << 27
+IE_GUI_VIEW_IGNORE_EVENTS	= 1 << 26
 
 #button flags
 IE_GUI_BUTTON_NORMAL     = 0x00000004   #default button, doesn't stick

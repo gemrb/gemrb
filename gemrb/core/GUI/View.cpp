@@ -323,6 +323,10 @@ void View::RemovedFromView(View*)
 
 bool View::HitTest(const Point& p) const
 {
+	if (flags & IgnoreEvents) {
+		return false;
+	}
+
 	if (!IsOpaque() && background) {
 		return !background->IsPixelTransparent(p.x, p.y);
 	}
