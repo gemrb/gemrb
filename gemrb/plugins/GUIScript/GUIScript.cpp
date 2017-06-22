@@ -13166,6 +13166,7 @@ bool GUIScript::Init(void)
 		Log(ERROR, "GUIScript", "Failed to execute %s", main);
 		return false;
 	}
+	PyRun_SimpleString( "GEMRB_VERSION = '" GEMRB_STRING "'" );
 
 	// Detect GameType if it was set to auto
 	if (stricmp( core->GameType, "auto" ) == 0) {
