@@ -1545,14 +1545,17 @@ def OpenPortraitWindow (needcontrols=0):
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.iteritems():
 		pcID = i + 1
-		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			Button.SetFont ("STATES")
+		
+		if not GameCheck.IsPST():
+			fontref = "STATES2"
+			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+				fontref = "STATES"
+			
+			Button.SetFont (fontref)
 			# label for status flags (dialog, store, level up)
-			Button.CreateLabel(200 + i, "STATES", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
-		elif not GameCheck.IsPST():
-			Button.SetFont ("STATES2")
-			# label for status flags (dialog, store, level up)
-			Button.CreateLabel(200 + i, "STATES2", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE) #level up icon is on the right
+			align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
+			label = Button.CreateLabel(200 + i, fontref, "", align) #level up icon is on the right
+			label.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
