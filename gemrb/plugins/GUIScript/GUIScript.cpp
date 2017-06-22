@@ -1460,33 +1460,6 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_TextArea_Clear__doc,
-"===== TextArea_Clear =====\n\
-\n\
-**Prototype:** GemRB.TextAreaClear (WindowIndex, ControlIndex)\n\
-\n\
-**Metaclass Prototype:** Clear ()\n\
-\n\
-**Description:** Clears the Text from the TextArea Control in the Window.\n\
-\n\
-**Parameters:** WindowIndex, ControlIndex - the control's reference\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:TextArea_Append]]"
-);
-
-static PyObject* GemRB_TextArea_Clear(PyObject* self, PyObject* args)
-{
-	PARSE_ARGS1(args, "O", &self);
-
-	TextArea* ta = GetView<TextArea>(self);
-	ABORT_IF_NULL(ta);
-	ta->ClearText();
-
-	Py_RETURN_NONE;
-}
-
 static inline void SetViewTooltipFromRef(View* view, ieStrRef ref)
 {
 	String* string = core->GetString(ref);
@@ -13068,7 +13041,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Table_GetValue, METH_VARARGS),
 	METHOD(Table_Unload, METH_VARARGS),
 	METHOD(TextArea_Append, METH_VARARGS),
-	METHOD(TextArea_Clear, METH_VARARGS),
 	METHOD(TextArea_ListResources, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_SetChapterText, METH_VARARGS),

@@ -211,10 +211,12 @@ class GTextArea(GControl):
   methods = {
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
-    'Clear': _GemRB.TextArea_Clear,
     'ListResources': _GemRB.TextArea_ListResources
   }
   __slots__ = ['DefaultText']
+
+  def Clear(self):
+    self.SetText("")
 
   def SetOptions(self, optList, varname=None, val=0):
     _GemRB.TextArea_SetOptions(self, optList)
