@@ -187,6 +187,7 @@ void View::Draw()
 	dirtyBGRects.clear();
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
+	DidDraw(); // notify subclasses that drawing finished
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }

@@ -76,6 +76,7 @@ private:
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void WillDraw() {}
+	virtual void DidDraw() {}
 
 public:
 	// using Held so we can have polymorphic drag operations
