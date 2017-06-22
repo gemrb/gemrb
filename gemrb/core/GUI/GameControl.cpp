@@ -2190,10 +2190,8 @@ void GameControl::DisplayString(Scriptable* target)
 void GameControl::ChangeMap(Actor *pc, bool forced)
 {
 	// disable so that events dont get dispatched while there is not an area
-	SetDisabled(true);
-	// TODO: can we just replace SF_CUTSCENE with SetDisabled?
-	// setting SF_CUTSCENE to prevent mouse over events
-	SetScreenFlags(SF_CUTSCENE|SF_DISABLEMOUSE, OP_OR);
+	SetFlags(View::IgnoreEvents, OP_OR);
+	ClearMouseState();
 
 	//swap in the area of the actor
 	Game* game = core->GetGame();
@@ -2216,8 +2214,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 
-	SetDisabled(false);
-	SetScreenFlags(SF_CUTSCENE|SF_DISABLEMOUSE, OP_NAND);
+	SetFlags(View::IgnoreEvents, OP_NAND);
 }
 
 bool GameControl::SetScreenFlags(unsigned int value, int mode)
