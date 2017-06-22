@@ -57,9 +57,8 @@ class DialogHandler;
 #define SF_DISABLEMOUSE  1  //no mouse cursor
 #define SF_CENTERONACTOR 2  //
 #define SF_ALWAYSCENTER  4
-#define SF_GUIENABLED    8  //
-#define SF_LOCKSCROLL    16 //don't scroll
-#define SF_CUTSCENE      32 //don't push new actions onto the action queue
+#define SF_LOCKSCROLL    8 //don't scroll
+#define SF_CUTSCENE      16 //don't push new actions onto the action queue
 
 // target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!

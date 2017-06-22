@@ -186,8 +186,7 @@ GS_MAPNOTE           = 128
 SF_DISABLEMOUSE      = 1
 SF_CENTERONACTOR     = 2
 SF_ALWAYSCENTER      = 4
-SF_GUIENABLED        = 8
-SF_LOCKSCROLL        = 16
+SF_LOCKSCROLL        = 8
 
 # GameControltarget modes
 # !!! Keep these synchronized with GameControl.h !!!
