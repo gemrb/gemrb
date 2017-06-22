@@ -1062,7 +1062,7 @@ String GameControl::TooltipText() const {
 	if (actor->InParty) {
 		wchar_t hpstring[10];
 		swprintf(hpstring, 10, L"%d/%d", hp, maxhp);
-		if (/* DISABLES CODE */ (false)) { // FIXME: this should be for PST (how to check?)
+		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
 			tip += L": ";
 		} else {
 			tip += L"\n";
