@@ -31,8 +31,8 @@ from ie_stats import *
 from ie_slots import *
 from ie_spells import *
 
-def OpenInventoryWindowClick (btn):
-	GemRB.GameSelectPC (btn.ID + 1, True, SELECT_REPLACE)
+def OpenInventoryWindowClick (pcID):
+	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
 	return
 
