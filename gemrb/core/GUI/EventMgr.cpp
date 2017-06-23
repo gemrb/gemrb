@@ -56,7 +56,23 @@ void EventMgr::DispatchEvent(Event& e)
 
 	// first check for hot key listeners
 	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
-		// TODO: for key events: check repeat key delay and set if repeat
+		static unsigned long lastKeyDown = 0;
+		static unsigned char repeatCount = 0;
+		static KeyboardKey repeatKey = 0;
+		
+		if (e.type == Event::KeyDown) {
+			if (e.keyboard.keycode == repeatKey
+				&& e.time <= lastKeyDown + DCDelay // FIXME: DCDelay is mouse double click, need a keyboard repeat variable
+			) {
+				repeatCount++;
+			} else {
+				repeatCount = 1;
+			}
+			repeatKey = e.keyboard.keycode;
+			lastKeyDown = GetTickCount();
+		}
+		
+		e.keyboard.repeats = repeatCount;
 
 		int flags = e.mod << 16;
 		flags |= e.keyboard.keycode;
