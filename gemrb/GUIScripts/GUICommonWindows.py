@@ -1555,6 +1555,7 @@ def OpenPortraitWindow (needcontrols=0):
 			# label for status flags (dialog, store, level up)
 			align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
 			label = Button.CreateLabel(200 + i, fontref, "", align) #level up icon is on the right
+			label.SetFrame(Button.GetInsetFrame(4))
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
