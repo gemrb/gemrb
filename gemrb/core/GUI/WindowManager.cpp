@@ -282,10 +282,12 @@ void WindowManager::CloseWindow(Window* win)
 
 bool WindowManager::HotKey(const Event& event)
 {
-	if (event.type == Event::KeyDown) {
+	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
 		switch (event.keyboard.keycode) {
 			case GEM_TAB:
-				TooltipTime -= ToolTipDelay;
+				if (TooltipTime + ToolTipDelay > GetTickCount()) {
+					TooltipTime -= ToolTipDelay;
+				}
 				return bool(hoverWin);
 			case 'f':
 				video->ToggleFullscreenMode();
