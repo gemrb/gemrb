@@ -176,13 +176,13 @@ class GControl(GView):
 
   # backwards compatibility
   # map old event identifiers to new action system
-  EventMap = { IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 1),
+  EventMap = { IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
   			   IE_GUI_MOUSE_ENTER_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_ENTER),
   			   IE_GUI_MOUSE_LEAVE_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_LEAVE),
-  			   IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 1, 1),
-  			   IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 2, 0, 1),
+			   IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1),
+			   IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1),
   			   IE_GUI_BUTTON_ON_DRAG_DROP: lambda control, handler: control.SetAction(handler, IE_GUI_BUTTON_ON_DRAG_DROP),
-  			   IE_GUI_BUTTON_ON_DOUBLE_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, 1, 0, 2),
+			   IE_GUI_BUTTON_ON_DOUBLE_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2),
   			   IE_GUI_PROGRESS_END_REACHED: lambda control, handler: control.SetAction(handler, IE_GUI_PROGRESS_END_REACHED),
   			   IE_GUI_SLIDER_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
   			   IE_GUI_EDIT_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
