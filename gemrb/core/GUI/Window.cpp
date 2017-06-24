@@ -342,7 +342,7 @@ bool Window::DispatchEvent(const Event& event)
 			: focusView->OnKeyRelease(event.keyboard, event.mod);
 		}
 		
-		if (!handled) {
+		if (!handled && !(Flags() & View::IgnoreEvents)) {
 			handled = (event.type == Event::KeyDown)
 			? OnKeyPress(event.keyboard, event.mod)
 			: OnKeyRelease(event.keyboard, event.mod);

@@ -1376,7 +1376,7 @@ def OpenTopWindow (id, pack, selectionHandler = None):
 def SetTopWindow (window, selectionHandler = None):
 	if window:
 		window.AddAlias("WIN_TOP")
-		window.SetFlags(WF_BORDERLESS)
+		window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
 
 		if selectionHandler:
@@ -1494,7 +1494,7 @@ def OpenPortraitWindow (needcontrols=0):
 	else:
 		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
 
-	PortraitWindow.SetFlags(WF_BORDERLESS)
+	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst
 		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
