@@ -243,7 +243,9 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned short mod)
 {
 	isMouseDown = true;
-	if (me.button == GEM_MB_ACTION) {
+	if (me.button == GEM_MB_ACTION
+		&& !(Flags() & View::IgnoreEvents)
+	) {
 		Focus();
 	}
 
