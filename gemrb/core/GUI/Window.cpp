@@ -342,7 +342,7 @@ bool Window::DispatchEvent(const Event& event)
 			: focusView->OnKeyRelease(event.keyboard, event.mod);
 		}
 		
-		if (!handled && !(Flags() & View::IgnoreEvents)) {
+		if (!handled) {
 			handled = (event.type == Event::KeyDown)
 			? OnKeyPress(event.keyboard, event.mod)
 			: OnKeyRelease(event.keyboard, event.mod);
@@ -371,6 +371,9 @@ void Window::OnMouseDrag(const MouseEvent& me)
 
 bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
+	if (Flags() & View::IgnoreEvents) {
+		return false;
+	}
 	switch (key.keycode) {
 		case GEM_ESCAPE:
 			Close();
