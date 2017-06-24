@@ -65,7 +65,7 @@ WindowManager::WindowManager(Video* vid)
 
 	// FIXME: need to recreate these if resolution changes
 	// FIXME: this cursor buffer size is arbitrary. We should measure the size of the tooltip area.
-	cursorBuf = vid->CreateBuffer(Region(0,0,128,64));
+	cursorBuf = vid->CreateBuffer(Region(0,0,134,64));
 	cursorBuf->SetColorKey(ColorGreen);
 	winFrameBuf = vid->CreateBuffer(screen, Video::RGBA8888);
 

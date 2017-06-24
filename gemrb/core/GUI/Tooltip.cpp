@@ -82,11 +82,11 @@ void TooltipBackground::Draw(const Region& rgn) const
 	video->BlitSprite( leftbg.get(), dp.x - leftbg->Width, dp.y );
 
 	// calculate the unrolled region
-	Region bgclip(dp, Size(animationPos, background->Height));
+	Region bgclip(dp, Size(animationPos + 1, background->Height));
 	bgclip.y -= background->YPos;
 
 	// draw unrolled paper
-	int mid = (rgn.w / 2) - (background->Width / 2) + rgn.x - background->XPos;
+	int mid = (rgn.w / 2) - (background->Width / 2) + dp.x - background->XPos;
 	video->BlitSprite( background.get(), -mid, dp.y, &bgclip );
 
 	// draw right paper curl
@@ -149,6 +149,9 @@ void Tooltip::Draw(const Point& pos) const
 	if (background) {
 		background->Draw(textr);
 	}
+	
+	textr.y -= (font->LineHeight / 2) + 2;
+	textr.h = font->LineHeight * 2;
 
 	font->Print( textr, text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
 }
