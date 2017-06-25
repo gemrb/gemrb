@@ -685,7 +685,10 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 			SelectActor(pc+1, true);
 			break;
 		default:
-			if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
+			// the random bitshift is to skip checking hotkeys with mods
+			// eg. ctrl-j should be ignored for keymap.ini handling and
+			// passed straight on
+			if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
 				core->GetGame()->SetHotKey(toupper(Key.character));
 				return View::OnKeyPress(Key, mod);
 			}
