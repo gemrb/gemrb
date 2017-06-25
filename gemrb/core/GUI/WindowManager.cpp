@@ -280,6 +280,15 @@ void WindowManager::CloseWindow(Window* win)
 	win->SetDisabled(true);
 }
 
+void WindowManager::CloseAllWindows()
+{
+	WindowList::iterator it = windows.begin();
+	for (; it != windows.end(); ++it) {
+		Window* win = *it;
+		win->Close();
+	}
+}
+
 bool WindowManager::HotKey(const Event& event)
 {
 	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
