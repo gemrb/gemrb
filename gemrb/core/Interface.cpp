@@ -415,6 +415,7 @@ GameControl* Interface::StartGameControl()
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
+	winmgr->CloseAllWindows();
 	gamectrl = new GameControl(screen);
 	Window* gamewin = winmgr->GetGameWindow();
 	gamewin->AddSubviewInFrontOfView(gamectrl);
