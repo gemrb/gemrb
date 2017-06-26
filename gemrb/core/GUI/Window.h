@@ -80,6 +80,8 @@ private:
 	inline void DispatchMouseMotion(View*, const MouseEvent&);
 	inline void DispatchMouseDown(View*, const MouseEvent& me, unsigned short /*Mod*/);
 	inline void DispatchMouseUp(View*, const MouseEvent& me, unsigned short /*Mod*/);
+	
+	inline bool DispatchKey(View*, const Event&);
 
 public:
 	Window(const Region& frame, WindowManager& mgr);

@@ -269,6 +269,30 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 	trackingView = NULL;
 	isMouseDown = false;
 }
+	
+bool Window::DispatchKey(View* keyView, const Event& event)
+{
+	// hotkeys first
+	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
+	if (it != HotKeys.end()) {
+		return (*it->second)(event);
+	}
+
+	// try the keyView view first, if it fails have the window itself try
+	bool handled = false;
+	if (keyView) {
+		handled = (event.type == Event::KeyDown)
+		? keyView->OnKeyPress(event.keyboard, event.mod)
+		: keyView->OnKeyRelease(event.keyboard, event.mod);
+	}
+	
+	if (!handled) {
+		handled = (event.type == Event::KeyDown)
+		? OnKeyPress(event.keyboard, event.mod)
+		: OnKeyRelease(event.keyboard, event.mod);
+	}
+	return handled;
+}
 
 bool Window::DispatchEvent(const Event& event)
 {
@@ -330,26 +354,7 @@ bool Window::DispatchEvent(const Event& event)
 		// absorb other screen events i guess
 		return true;
 	} else { // key events
-		// hotkeys first
-		std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
-		if (it != HotKeys.end()) {
-			return (*it->second)(event);
-		}
-
-		// try the focused view first, if it fails have the window itself try
-		bool handled = false;
-		if (focusView) {
-			handled = (event.type == Event::KeyDown)
-			? focusView->OnKeyPress(event.keyboard, event.mod)
-			: focusView->OnKeyRelease(event.keyboard, event.mod);
-		}
-		
-		if (!handled) {
-			handled = (event.type == Event::KeyDown)
-			? OnKeyPress(event.keyboard, event.mod)
-			: OnKeyRelease(event.keyboard, event.mod);
-		}
-		return handled;
+		return DispatchKey(focusView, event);
 	}
 	return false;
 }
