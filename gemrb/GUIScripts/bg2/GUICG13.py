@@ -44,6 +44,8 @@ def OnLoad():
 	global HairColor, SkinColor, MajorColor, MinorColor
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	import CharGenCommon
+	CharGenCommon.PositionCharGenWin (ColorWindow)
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
