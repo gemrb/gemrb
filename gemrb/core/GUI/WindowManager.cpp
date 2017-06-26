@@ -390,6 +390,7 @@ void WindowManager::DrawMouse() const
 	// this will ensure the entire tooltip is visible
 	mid.x = bufSize.w / 2;
 	mid.y = bufSize.h / 2;
+	// FIXME: github issue #8: need to calculate the size prior to drawing and offset mid.x by bufSize.w - ttsize.w
 	DrawTooltip(mid);
 }
 
