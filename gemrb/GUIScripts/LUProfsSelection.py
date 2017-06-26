@@ -99,6 +99,9 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsTextArea.SetText (9588)
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (78)
+		# TODO subviews: recheck if all luprof modes need this
+		import CharGenCommon
+		CharGenCommon.PositionCharGenWin (ProfsWindow)
 	elif type == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG1(): #chargen
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
