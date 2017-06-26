@@ -64,8 +64,9 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFrame(screen);
 
 	// FIXME: need to recreate these if resolution changes
-	// FIXME: this cursor buffer size is arbitrary. We should measure the size of the tooltip area.
-	cursorBuf = vid->CreateBuffer(Region(0,0,134,64));
+	// NOTE: TT width is 138 = 128px (bg) + 10px (right curl) for BG2
+	// FIXME?: update this to the widest width needed for all games (if different)
+	cursorBuf = vid->CreateBuffer(Region(0,0,138,64));
 	cursorBuf->SetColorKey(ColorGreen);
 	winFrameBuf = vid->CreateBuffer(screen, Video::RGBA8888);
 

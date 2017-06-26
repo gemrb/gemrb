@@ -73,31 +73,30 @@ void TooltipBackground::Draw(const Region& rgn) const
 {
 	Point dp = rgn.Origin();
 	dp.x += (rgn.w / 2);
-	dp.x -= (animationPos / 2);
+	dp.x -= (animationPos / 2); // start @ left curl pos
 	dp.y += margin;
 
 	Video* video = core->GetVideoDriver();
 
-	// draw left paper curl
-	video->BlitSprite( leftbg.get(), dp.x - leftbg->Width, dp.y );
-
 	// calculate the unrolled region
-	Region bgclip(dp, Size(animationPos + 1, background->Height));
-	bgclip.y -= background->YPos;
+	Region bgclip(dp + Point(leftbg->Width, -background->YPos), Size(animationPos, background->Height));
+	bgclip.w -= leftbg->Width + rightbg->Width;
 
-	// draw unrolled paper
-	int mid = (rgn.w / 2) - (background->Width / 2) + dp.x - background->XPos;
-	video->BlitSprite( background.get(), -mid, dp.y, &bgclip );
-
-	// draw right paper curl
-	dp.x += animationPos;
-	video->BlitSprite( rightbg.get(), dp.x + leftbg->Width, dp.y );
+	// draw unrolled paper (left @ left curl origin because of bg transparencies)
+	// note that there is transparency at the edges... this will get covered uo by the right curl's Xpos offset
+	video->BlitSprite( background.get(), dp.x + background->XPos + 7, dp.y, &bgclip );
+	
+	// draw left paper curl
+	video->BlitSprite( leftbg.get(), dp.x, dp.y );
+	
+	// draw right paper curl (note it has a non 0 xpos)
+	video->BlitSprite( rightbg.get(), dp.x + animationPos - 2, dp.y );
 
 	// clip the tooltip text to the background
 	video->SetScreenClip(&bgclip);
 
 	// advance the animation
-	int maxw = rgn.w + (margin * 2);
+	int maxw = rgn.w + leftbg->Width + rightbg->Width;
 	if (animationPos < maxw ) {
 		animationPos += animationSpeed;
 	} else {
