@@ -53,9 +53,6 @@ def OnLoad():
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetText (CommonTables.Aligns.GetValue (i,0))
-
-	for i in range(9):
-		Button = AlignmentWindow.GetControl(i+2)
 		if AlignmentOk.GetValue(KitName, CommonTables.Aligns.GetValue (i, 4)) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
