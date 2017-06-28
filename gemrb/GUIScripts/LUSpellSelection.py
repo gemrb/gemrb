@@ -424,7 +424,8 @@ def ShowSpells ():
 	j = RowIndex()
 
 	# we have a grid of 24 spells
-	for i in range (ButtonCount + ExtraSpellButtons()):
+	extraButtons = ExtraSpellButtons ()
+	for i in range (ButtonCount + extraButtons):
 		# ensure we can learn this many spells
 		SpellButton = SpellsWindow.GetControl (i+SpellStart)
 		if i + j >= len (Spells[SpellLevel]):
