@@ -361,7 +361,7 @@ def ShowKnownSpells ():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
-		SpellButton.SetBorder (0, {}, 0,0)
+		SpellButton.SetBorder (0, None, 0,0)
 
 		SpellButton.SetSpellIcon(Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -459,7 +459,7 @@ def ShowSpells ():
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
-			SpellButton.SetBorder (0, {}, 0,0)
+			SpellButton.SetBorder (0, None, 0,0)
 		else: # specialist (for iwd2 which has no green frames)
 			# use the green border state for matching specialist spells
 			color = {'r' : 0, 'g' : 200, 'b' : 0, 'a' : 100}

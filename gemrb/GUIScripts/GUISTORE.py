@@ -1693,7 +1693,7 @@ def UpdateStoreHealWindow ():
 				Button.SetBorder (0, color, 1,1)
 			else:
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
-				Button.SetBorder (0, {}, 0,0)
+				Button.SetBorder (0, None, 0,0)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
 			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
@@ -1702,7 +1702,7 @@ def UpdateStoreHealWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetBorder (0, {}, 0,0)
+			Button.SetBorder (0, None, 0,0)
 			Label.SetText ("")
 
 		if TopIndex+i==Index:

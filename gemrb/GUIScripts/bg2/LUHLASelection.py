@@ -185,7 +185,7 @@ def HLAShowAbilities ():
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
-			SpellButton.SetBorder (0, {}, 0,0)
+			SpellButton.SetBorder (0, None, 0,0)
 
 	# show which spells are selected
 	HLAShowSelectedAbilities ()
