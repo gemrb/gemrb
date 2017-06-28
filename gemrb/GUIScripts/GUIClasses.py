@@ -126,7 +126,8 @@ class GView:
 		return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
   
 	def CreateScrollBar(self, control, frame, bam=None):
-		return self.CreateControl(control, IE_GUI_SCROLLBAR, frame["x"], frame["y"], frame["w"], frame["h"], *CreateScrollbarARGs(bam))
+		view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))
+		return self.AddSubview (view)
   
 	def CreateTextArea(self, control, *args):
 		return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
