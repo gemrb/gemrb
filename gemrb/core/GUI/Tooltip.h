@@ -38,7 +38,7 @@ public:
 	TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = NULL, Holder<Sprite2D> right = NULL);
 	TooltipBackground(const TooltipBackground&);
 
-	void Draw(const Region& rgn) const;
+	void Draw(Region rgn) const;
 
 	void SetMargin(int);
 	void SetAnimationSpeed(int);

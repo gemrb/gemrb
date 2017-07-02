@@ -51,7 +51,8 @@ TooltipBackground::TooltipBackground(const TooltipBackground& bg)
 
 void TooltipBackground::Reset()
 {
-	animationPos = 0;
+	// the animation starts with the curls side by side
+	animationPos = leftbg->Width + rightbg->Width;
 }
 
 void TooltipBackground::SetMargin(int m)
@@ -66,37 +67,39 @@ void TooltipBackground::SetAnimationSpeed(int s)
 
 Size TooltipBackground::MaxTextSize() const
 {
-	return Size(background->Width, background->Height);
+	return Size(background->Width - (margin * 2), background->Height);
 }
 
-void TooltipBackground::Draw(const Region& rgn) const
+void TooltipBackground::Draw(Region rgn) const
 {
+	rgn.w += margin * 2;
+	rgn.x -= margin;
+
 	Point dp = rgn.Origin();
 	dp.x += (rgn.w / 2);
 	dp.x -= (animationPos / 2); // start @ left curl pos
-	dp.y += margin;
 
 	Video* video = core->GetVideoDriver();
 
 	// calculate the unrolled region
-	Region bgclip(dp + Point(leftbg->Width, -background->YPos), Size(animationPos, background->Height));
+	Region bgclip(dp + Point(leftbg->Width, -background->YPos), Size(animationPos+1, background->Height));
 	bgclip.w -= leftbg->Width + rightbg->Width;
 
-	// draw unrolled paper (left @ left curl origin because of bg transparencies)
-	// note that there is transparency at the edges... this will get covered uo by the right curl's Xpos offset
-	video->BlitSprite( background.get(), dp.x + background->XPos + 7, dp.y, &bgclip );
+	// draw unrolled paper
+	// note that there is transparency at the edges... this will get covered up by the right curl's Xpos offset
+	video->BlitSprite( background.get(), dp.x + background->XPos+3, dp.y, &bgclip );
 	
 	// draw left paper curl
 	video->BlitSprite( leftbg.get(), dp.x, dp.y );
 	
-	// draw right paper curl (note it has a non 0 xpos)
-	video->BlitSprite( rightbg.get(), dp.x + animationPos - 2, dp.y );
+	// draw right paper curl (note it's sprite has a non 0 xpos)
+	video->BlitSprite( rightbg.get(), dp.x + animationPos - 1, dp.y );
 
 	// clip the tooltip text to the background
 	video->SetScreenClip(&bgclip);
 
 	// advance the animation
-	int maxw = rgn.w + leftbg->Width + rightbg->Width;
+	int maxw = std::min(MaxTextSize().w, rgn.w) + leftbg->Width + rightbg->Width;
 	if (animationPos < maxw ) {
 		animationPos += animationSpeed;
 	} else {
@@ -141,17 +144,18 @@ void Tooltip::Draw(const Point& pos) const
 	}
 
 	Region textr(pos, textSize);
+	Region textr2 = textr;
 	// the tooltip is centered at pos
 	textr.x -= textr.w/2;
-	textr.y -= textr.h/2;
 
 	if (background) {
+		const Size& maxs = background->MaxTextSize();
+		
 		background->Draw(textr);
+		textr.h = maxs.h;
+		textr.y = pos.y - textr.h/2;
 	}
 	
-	textr.y -= (font->LineHeight / 2) + 2;
-	textr.h = font->LineHeight * 2;
-
 	font->Print( textr, text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
 }
 
