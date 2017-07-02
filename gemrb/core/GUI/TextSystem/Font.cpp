@@ -590,7 +590,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 
 #define APPEND_TO_LINE(val) \
 	lineW += val; charCount = i + 1; val = 0;
-
+	
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
 	bool newline = false, eos = false, ws = false, forceBreak = false;
@@ -632,9 +632,17 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		}
 
 		if (newline || eos) {
-			w = (lineW > w) ? lineW : w;
-			if (stop && stop->h && (LineHeight * (lines + 1)) > stop->h ) {
-				break;
+			w = std::max(w, lineW);
+			if (stop) {
+				if (eos && stop->w && wordW < stop->w ) {
+					// its possible the last word of string is longer than any of the previous lines
+					w = std::max(w, wordW);
+				}
+				if (stop->h && (LineHeight * (lines + 1)) > stop->h ) {
+					break;
+				}
+			} else {
+				w = std::max(w, wordW);
 			}
 			if (newline) {
 				newline = false;
