@@ -144,7 +144,6 @@ void Tooltip::Draw(const Point& pos) const
 	}
 
 	Region textr(pos, textSize);
-	Region textr2 = textr;
 	// the tooltip is centered at pos
 	textr.x -= textr.w/2;
 
