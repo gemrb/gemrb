@@ -274,7 +274,8 @@ void Scriptable::DrawOverheadText()
 	}
 
 	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
-	Region rgn( p - Point(100, cs), Size(200, 400) );
+	Region vp = core->GetGameControl()->Viewport();
+	Region rgn(p - Point(100, cs) - vp.Origin(), Size(200, 400));
 	core->GetTextFont()->Print( rgn, OverheadText, palette,
 							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 
