@@ -127,6 +127,8 @@
 		A238174B14B781F00058BFF4 /* GemRB.cfg.newinstall in Resources */ = {isa = PBXBuildFile; fileRef = A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */; };
 		A239390B145F8677007895B3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A239390A145F8677007895B3 /* UIKit.framework */; };
 		A23EBFFA141979D500CC049E /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
+		A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A244547F1F09BFF8008D5B5E /* GUIAnimation.cpp */; };
+		A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = A24454801F09BFF8008D5B5E /* GUIAnimation.h */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
@@ -1272,6 +1274,8 @@
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
 		A239390A145F8677007895B3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A23A9EB418CD4C4B0047420C /* Predicates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Predicates.h; sourceTree = "<group>"; };
+		A244547F1F09BFF8008D5B5E /* GUIAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIAnimation.cpp; sourceTree = "<group>"; };
+		A24454801F09BFF8008D5B5E /* GUIAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIAnimation.h; sourceTree = "<group>"; };
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -3219,6 +3223,8 @@
 		A2BF9FD41395FF62006ADC12 /* GUI */ = {
 			isa = PBXGroup;
 			children = (
+				A244547F1F09BFF8008D5B5E /* GUIAnimation.cpp */,
+				A24454801F09BFF8008D5B5E /* GUIAnimation.h */,
 				A2BF9FD51395FF62006ADC12 /* Button.cpp */,
 				A2BF9FD61395FF62006ADC12 /* Button.h */,
 				A2BF9FD71395FF62006ADC12 /* Console.cpp */,
@@ -3559,6 +3565,7 @@
 				A27E5D5F18106384009434E5 /* KeyMap.h in Headers */,
 				A2E66413139E885A00310FC8 /* Scriptable.h in Headers */,
 				A2E66415139E886100310FC8 /* Button.h in Headers */,
+				A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */,
 				A2E66417139E886100310FC8 /* Console.h in Headers */,
 				A2E6641A139E886100310FC8 /* Control.h in Headers */,
 				A2E6641C139E886100310FC8 /* EventMgr.h in Headers */,
@@ -5368,6 +5375,7 @@
 				A2E663E0139E884500310FC8 /* SymbolMgr.cpp in Sources */,
 				A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */,
 				A2E663E4139E884B00310FC8 /* Tile.cpp in Sources */,
+				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
 				A2E663E8139E884B00310FC8 /* TileMapMgr.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,
