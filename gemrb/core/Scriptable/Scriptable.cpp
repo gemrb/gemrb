@@ -223,7 +223,7 @@ void Scriptable::SetOverheadText(const String& text, bool display)
 
 bool Scriptable::DisplayOverheadText(bool show)
 {
-	if (show && !overheadTextDisplaying) {
+	if (show) {
 		overheadTextDisplaying = true;
 		timeStartDisplaying = core->GetGame()->Ticks;
 		return true;
