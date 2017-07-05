@@ -119,6 +119,8 @@ GameControl::GameControl(const Region& frame)
 
 	EventMgr::EventCallback* cb = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::OnGlobalMouseMove);
 	EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
+	EventMgr::EventCallback *cb2 = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::DispatchEvent);
+	EventMgr::RegisterEventMonitor(cb2, Event::KeyDownMask);
 }
 
 //TODO:
@@ -592,6 +594,24 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	}
 }
 
+// this existly only so tab can be handled
+// it's used both for tooltips everywhere and hp display on game control
+bool GameControl::DispatchEvent(const Event& event)
+{
+	if (event.keyboard.keycode == GEM_TAB) {
+		Game *game = core->GetGame();
+		if (!game) return false;
+		// show partymember hp/maxhp as overhead text
+		for (int pm=0; pm < game->GetPartySize(false); pm++) {
+			Actor *pc = game->GetPC(pm, true);
+			if (!pc) continue;
+			pc->DisplayHeadHPRatio();
+		}
+		return true;
+	}
+	return false;
+}
+
 /** Key Press Event */
 bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
@@ -630,11 +650,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 			break;
 		case GEM_TAB:
 			// show partymember hp/maxhp as overhead text
-			for (int pm=0; pm < game->GetPartySize(false); pm++) {
-				Actor *pc = game->GetPC(pm, true);
-				if (!pc) continue;
-				pc->DisplayHeadHPRatio();
-			}
+			// this is handled in DispatchEvent due to tab having two functions
 			break;
 		case GEM_ESCAPE:
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);

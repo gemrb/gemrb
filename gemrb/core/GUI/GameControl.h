@@ -178,6 +178,8 @@ public:
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent&);
 	void OnMouseDrag(const MouseEvent& /*me*/);
+	/** Currently only deals with the GEM_TAB exception */
+	bool DispatchEvent(const Event& event);
 
 	/** Mouse Button Down */
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
