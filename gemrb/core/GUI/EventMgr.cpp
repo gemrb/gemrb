@@ -26,6 +26,7 @@
 namespace GemRB {
 
 unsigned long EventMgr::DCDelay = 250;
+unsigned long EventMgr::DPDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
 std::bitset<sizeof(short) * CHAR_BIT> EventMgr::mouseButtonFlags;
@@ -61,9 +62,7 @@ void EventMgr::DispatchEvent(Event& e)
 		static KeyboardKey repeatKey = 0;
 		
 		if (e.type == Event::KeyDown) {
-			if (e.keyboard.keycode == repeatKey
-				&& e.time <= lastKeyDown + DCDelay // FIXME: DCDelay is mouse double click, need a keyboard repeat variable
-			) {
+			if (e.keyboard.keycode == repeatKey && e.time <= lastKeyDown + DPDelay) {
 				repeatCount++;
 			} else {
 				repeatCount = 1;

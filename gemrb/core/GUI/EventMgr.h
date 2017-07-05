@@ -176,6 +176,7 @@ public:
 	typedef Callback<const Event&, bool> EventCallback;
 
 	static unsigned long DCDelay;
+	static unsigned long DPDelay;
 	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
