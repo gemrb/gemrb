@@ -95,7 +95,7 @@ void WindowManager::DestroyWindows(WindowList& list)
         delete list.back();
 		list.pop_back();
 	}
-    list.clear();
+	list.clear();
 }
 
 bool WindowManager::IsOpenWindow(Window* win) const
