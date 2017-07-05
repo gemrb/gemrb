@@ -721,8 +721,8 @@ bool Button::HandleHotKey(const Event& e)
 {
 	if (e.type == Event::KeyDown) {
 		// only run once on keypress (or should it be KeyRelease?)
-        // we could support both; key down = left mouse down, key up = left mouse up
-        return PerformAction();
+		// we could support both; key down = left mouse down, key up = left mouse up
+		return PerformAction();
 	}
 	return false;
 }
