@@ -52,7 +52,6 @@ WindowManager::WindowManager(Video* vid)
 	eventMgr.RegisterEventMonitor(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 
 	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
-	eventMgr.RegisterHotKeyCallback(cb, GEM_TAB, 0);
 	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
 
 	screen = Region(Point(), vid->GetScreenSize());
@@ -294,11 +293,6 @@ bool WindowManager::HotKey(const Event& event)
 {
 	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
 		switch (event.keyboard.keycode) {
-			case GEM_TAB:
-				if (TooltipTime + ToolTipDelay > GetTickCount()) {
-					TooltipTime -= ToolTipDelay;
-				}
-				return bool(hoverWin);
 			case 'f':
 				video->ToggleFullscreenMode();
 				return true;
@@ -349,6 +343,11 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 	if (event.type == Event::MouseMove) {
 		TooltipTime = GetTickCount();
+	// handled here instead of as a hotkey, so also gamecontrol can do its thing
+	} else if (event.type == Event::KeyDown && event.keyboard.keycode == GEM_TAB) {
+		if (TooltipTime + ToolTipDelay > GetTickCount()) {
+			TooltipTime -= ToolTipDelay;
+		}
 	}
 
 	WindowList::const_iterator it = windows.begin();
