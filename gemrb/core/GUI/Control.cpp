@@ -79,7 +79,16 @@ void Control::SetAction(ControlEventHandler handler)
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
 						Event::EventMods mod, short count)
 {
-	actions[ActionKey(type, mod, button, count)] = handler;
+	ActionKey key(type, mod, button, count);
+	if (handler) {
+		actions[key] = handler;
+	} else {
+		// delete the entry if there is one instead of setting it to NULL
+		ActionIterator it = actions.find(key);
+		if (it != actions.end()) {
+			actions.erase(it);
+		}
+	}
 }
 
 void Control::SetActionInterval(unsigned int interval)
