@@ -10274,7 +10274,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	if (Index<0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		btn->SetAction(NULL, Control::Click, GEM_MB_ACTION, 0, 1);
-        btn->SetAction(NULL, Control::Click, GEM_MB_MENU, 0, 1);
+		btn->SetAction(NULL, Control::Click, GEM_MB_MENU, 0, 1);
 		btn->SetTooltip(L"");
 		//no incref
 		return Py_None;
@@ -10304,11 +10304,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
-    btn->SetAction(new PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
+	btn->SetAction(new PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
 
 	PyObject *Event2 = PyString_FromFormat("Action%sRightPressed", GUIEvent[Index]);
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
-    btn->SetAction(new PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
+	btn->SetAction(new PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
 
 	//cannot make this const, because it will be freed
 	if (GUITooltip[Index] != (ieDword) -1) {
@@ -10427,7 +10427,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			continue;
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
-        btn->SetAction(new PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
+		btn->SetAction(new PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
 		strcpy(btn->VarName,"Equipment");
 		btn->SetValue( Start+i );
 
