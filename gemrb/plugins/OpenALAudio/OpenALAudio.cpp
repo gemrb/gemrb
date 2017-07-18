@@ -819,7 +819,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			switch (state) {
 				default:
 					Log(ERROR, "OpenAL", "Unhandled Music state '%d'.", state);
-				//no break
+				//no break, fall through intentionally
 				case AL_PAUSED:
 					driver->MusicPlaying = false;
 					return -1;
