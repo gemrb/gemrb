@@ -3970,10 +3970,11 @@ void Actor::PlayExistenceSounds()
 					}
 				}
 			}
+			// default in the original is around 30s, which roughly corresponds to a 400 delay (skellytz)
 			if (delay == 0) {
-				delay = 100;
+				delay = 400;
 			}
-			nextComment = time + RAND(delay/2, delay + delay/2) * 10; // timing might be off
+			nextComment = time + RAND(delay*1/4, delay*7/4);
 		}
 	}
 }
