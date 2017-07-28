@@ -85,7 +85,7 @@ void Label::SetColor(Color col, Color bac)
 
 void Label::SetAlignment(unsigned char Alignment)
 {
-	if (Height <= font->LineHeight) {
+	if (!font || Height <= font->LineHeight) {
 		// FIXME: is this a poor way of determinine if we are single line?
 		Alignment |= IE_FONT_SINGLE_LINE;
 	} else if (Height < font->LineHeight * 2) {
