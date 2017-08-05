@@ -445,6 +445,8 @@ public:
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
 	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
+	/** Get the Window Manager */
+	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
 	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
