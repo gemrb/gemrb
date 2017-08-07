@@ -346,8 +346,6 @@ void GlobalTimer::ClearAnimations()
 void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
 	unsigned long Count)
 {
-	// FIXME: should this only happen if it occurs inside the viewport?
-	//gc->Viewport().PointInside(Pos)
 	this->shakeX = shakeX;
 	this->shakeY = shakeY;
 	shakeCounter = Count+1;
