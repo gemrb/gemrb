@@ -46,7 +46,7 @@ SpellType = None
 Level = 1
 
 def OpenMageWindow ():
-	global BookType
+	global MageWindow, BookType
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
@@ -100,8 +100,10 @@ def OpenMageWindow ():
 	UpdateMageWindow (MageWindow)
 	return
 
-def UpdateMageWindow (MageWindow):
-	global MageMemorizedSpellList, MageKnownSpellList
+def UpdateMageWindow (window):
+	global MageMemorizedSpellList, MageKnownSpellList, MageWindow
+
+	MageWindow = window
 
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
@@ -194,7 +196,7 @@ def MagePrevLevelPress ():
 
 	if MageSpellLevel > 0:
 		MageSpellLevel = MageSpellLevel - 1
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 	return
 
 def MageNextLevelPress ():
@@ -202,14 +204,14 @@ def MageNextLevelPress ():
 
 	if MageSpellLevel < 8:
 		MageSpellLevel = MageSpellLevel + 1
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 	return
 
 def RefreshMageLevel ():
 	global MageSpellLevel
 
 	MageSpellLevel = GemRB.GetVar ("MageSpellLevel")
-	UpdateMageWindow ()
+	UpdateMageWindow (MageWindow)
 	return
 
 def OpenMageSpellInfoWindow ():
@@ -268,7 +270,7 @@ def OnMageMemorizeSpell ():
 		blend = 0
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH", 0, blend)
@@ -355,7 +357,7 @@ def OnMageUnmemorizeSpell ():
 		blend = 0
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
 		Button.SetAnimation ("FLASH", 0, blend)
@@ -373,7 +375,7 @@ def OnMageRemoveSpell ():
 
 	#remove spell from book
 	GemRB.RemoveSpell (pc, type, level, index)
-	UpdateMageWindow ()
+	UpdateMageWindow (MageWindow)
 	return
 
 def LoadCondition ():
