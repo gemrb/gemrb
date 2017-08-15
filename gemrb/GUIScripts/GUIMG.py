@@ -27,6 +27,7 @@ import GameCheck
 import GUICommon
 import CommonTables
 import GUICommonWindows
+import Spellbook
 from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
@@ -94,10 +95,9 @@ def SetupMageWindow ():
 	global BookType
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	ClassName = GUICommon.GetClassRowName (pc)
 	BookType = 0
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
-	if GameCheck.IsBG2() and CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE") == 2:
+	if GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc):
 		BookType = 1
 
 	if MageWindow:
