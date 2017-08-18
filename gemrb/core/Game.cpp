@@ -40,6 +40,7 @@
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
+#include "Video.h"
 
 #include <algorithm>
 #include <iterator>
@@ -532,7 +533,7 @@ int Game::JoinParty(Actor* actor, int join)
 				CopyResRef(actor->LargePortrait, ptab->QueryField(actor->LargePortrait, "REPLACEMENT"));
 			}
 		}
-		
+
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
