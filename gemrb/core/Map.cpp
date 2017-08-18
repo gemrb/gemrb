@@ -3968,6 +3968,7 @@ int AreaAnimation::GetHeight() const
 void AreaAnimation::Draw(const Region& viewport, Map *area)
 {
 	Video* video = core->GetVideoDriver();
+	Game *game = core->GetGame();
 
 	//always draw the animation tinted because tint is also used for
 	//transparency
@@ -3977,6 +3978,8 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}
+	ieDword flags = BLIT_TINTED;
+	if (game) game->ApplyGlobalTint(tint, flags);
 	bool covered = true;
 
 	// TODO: This needs more testing. The HOW ar9101 roast seems to need it.
@@ -3991,7 +3994,6 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
 	}
 
-
 	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
@@ -4003,8 +4005,9 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
 			}
 		}
+
 		video->BlitGameSprite( frame, Pos.x - viewport.x, Pos.y - viewport.y,
-							  BLIT_TINTED, tint, covers?covers[ac]:0, palette );
+							  flags, tint, covers?covers[ac]:0, palette );
 	}
 }
 

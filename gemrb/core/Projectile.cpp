@@ -1613,8 +1613,11 @@ void Projectile::SetupWall()
 void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
 	Video *video = core->GetVideoDriver();
+	Game *game = core->GetGame();
 	PathNode *iter = path;
 	Sprite2D *frame = travel[face]->NextFrame();
+	Color tint2 = tint;
+	if (game) game->ApplyGlobalTint(tint2, flag);
 	while(iter) {
 		Point pos(iter->x - vp.x, iter->y - vp.y);
 
@@ -1622,7 +1625,7 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 			pos.y-=FLY_HEIGHT;
 		}
 
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
+		video->BlitGameSprite(frame, pos.x, pos.y, flag, tint2, NULL, palette);
 		iter = iter->Next;
 	}
 }
@@ -1630,6 +1633,7 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 void Projectile::DrawTravel(const Region& viewport)
 {
 	Video *video = core->GetVideoDriver();
+	Game *game = core->GetGame();
 	ieDword flag;
 
 	if(ExtFlags&PEF_HALFTRANS) {
@@ -1683,8 +1687,13 @@ void Projectile::DrawTravel(const Region& viewport)
 		pos = newpos;
 	}
 
+	// set up the tint for the rest of the blits, but don't overwrite the saved one
+	Color tint2 = tint;
+	ieDword flags = flag;
+	if (game) game->ApplyGlobalTint(tint2, flags);
+
 	if (light) {
-		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL);
+		video->BlitGameSprite(light, pos.x, pos.y, flags^flag, tint2, NULL, NULL);
 	}
 
 	if (ExtFlags&PEF_POP) {
@@ -1705,8 +1714,8 @@ void Projectile::DrawTravel(const Region& viewport)
 					frame = shadow[0]->NextFrame();
 				}
 			}
-			
-			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
+
+			video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette);
 			return;
 	}
 	
@@ -1717,7 +1726,7 @@ void Projectile::DrawTravel(const Region& viewport)
 	
 	if (shadow[face]) {
 		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
+		video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette);
 	}
 
 	pos.y-=GetZPos();
@@ -1727,14 +1736,14 @@ void Projectile::DrawTravel(const Region& viewport)
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {
 				Sprite2D *frame = travel[i]->NextFrame();
-				video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
+				video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette);
 				pos.y-=frame->YPos;
 			}
 		}
 	} else {
 		if (travel[face]) {
 			Sprite2D *frame = travel[face]->NextFrame();
-			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette);
+			video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette);
 		}
 	}
 

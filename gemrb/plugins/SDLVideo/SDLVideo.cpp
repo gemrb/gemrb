@@ -455,26 +455,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		}
 	}
 
-	// global tint
-	// FIXME: this has no business being here. it isnt the video drivers responsibility to know about game context
-	// reimplement this as some function called MultiplyTint(Color&, Const Color*) for the BLIT_TINTED case
-	// then rewrite the callers to either pass the result of MultiplyTint, or the global tint itself
-/*
-	if (!anchor && core->GetGame()) {
-		const Color *totint = core->GetGame()->GetGlobalTint();
-		if (totint) {
-			if (flags & BLIT_TINTED) {
-				tint.r = (tint.r * totint->r) >> 8;
-				tint.g = (tint.g * totint->g) >> 8;
-				tint.b = (tint.b * totint->b) >> 8;
-			} else {
-				flags |= BLIT_TINTED;
-				tint = *totint;
-				tint.a = 255;
-			}
-		}
-	}
-*/
+	// global tint is handled by the callers
 
 	// implicit flags:
 	const unsigned int blit_TINTALPHA =    0x40000000U;

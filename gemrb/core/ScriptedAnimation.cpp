@@ -648,6 +648,7 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	}
 
 	Video *video = core->GetVideoDriver();
+	Game *game = core->GetGame();
 
 	Sprite2D* frame;
 
@@ -689,6 +690,8 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
 		tint = p_tint;
 	}
+	ieDword flags = flag;
+	if (game) game->ApplyGlobalTint(tint, flags);
 
 	int cx = Pos.x + XPos;
 	int cy = Pos.y - ZPos + YPos;
@@ -706,9 +709,9 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
 	}
 
-	video->BlitGameSprite( frame, cx - viewport.x, cy - viewport.y, flag, tint, cover, palette);
+	video->BlitGameSprite( frame, cx - viewport.x, cy - viewport.y, flags, tint, cover, palette);
 	if (light) {
-		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, 0, tint, NULL, NULL);
+		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, flags^flag, tint, NULL, NULL);
 	}
 	return false;
 }

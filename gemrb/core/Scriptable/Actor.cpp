@@ -7611,13 +7611,15 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
-	unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
 	Game* game = core->GetGame();
 	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 	if (game->TimeStoppedFor(this)) {
 		flags |= BLIT_GREY;
 	}
+	Color tint2 = tint;
+	game->ApplyGlobalTint(tint2, flags);
 
 	// display current frames in the right order
 	const int* zOrder = ca->GetZOrder(Face);
@@ -7641,7 +7643,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 			video->BlitGameSprite( nextFrame, cx - vp.x, cy - vp.y,
-				flags, tint, newsc, ca->GetPartPalette(partnum));
+				flags, tint2, newsc, ca->GetPartPalette(partnum));
 		}
 	}
 }

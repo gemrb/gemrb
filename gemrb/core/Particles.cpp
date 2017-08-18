@@ -195,6 +195,8 @@ bool Particles::AddNew(const Point &point)
 void Particles::Draw(const Region &vp)
 {
 	Video *video=core->GetVideoDriver();
+	Game *game = core->GetGame();
+
 	Point p = vp.Origin();
 	if (owner) {
 		p.x-=pos.x;
@@ -243,8 +245,11 @@ void Particles::Draw(const Region &vp)
 				if (anims) {
 					Animation* anim = anims[0];
 					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+
+					ieDword flags = 0;
+					if (game) game->ApplyGlobalTint(clr, flags);
 					video->BlitGameSprite( nextFrame, points[i].pos.x - p.x, points[i].pos.y - p.y,
-						0, clr, NULL, fragments->GetPartPalette(0));
+						flags, clr, NULL, fragments->GetPartPalette(0));
 				}
 			}
 			break;
