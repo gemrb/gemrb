@@ -28,6 +28,12 @@ struct RevColor {
 
 struct Color {
 	unsigned char r,g,b,a;
+
+	static void MultiplyTint(Color& tint, const Color* tintMod) {
+		tint.r = (tint.r * tintMod->r) >> 8;
+		tint.g = (tint.g * tintMod->g) >> 8;
+		tint.b = (tint.b * tintMod->b) >> 8;
+	}
 }
 #ifdef __GNUC__
 	__attribute__((aligned(4)))
