@@ -477,6 +477,8 @@ public:
 	bool TimeStoppedFor(const Actor* target=NULL);
 	/** updates the infravision info */
 	void Infravision();
+	/** applies the global tint if it is needed */
+	void ApplyGlobalTint(Color &tint, ieDword &flags) const;
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;

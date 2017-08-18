@@ -2049,6 +2049,21 @@ const Color *Game::GetGlobalTint() const
 	return NULL;
 }
 
+// applies the global tint, if any
+void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
+{
+	const Color *globalTint = GetGlobalTint();
+	if (globalTint) {
+		if (flags & BLIT_TINTED) {
+			Color::MultiplyTint(tint, globalTint);
+		} else {
+			flags |= BLIT_TINTED;
+			tint = *globalTint;
+			tint.a = 255;
+		}
+	}
+}
+
 bool Game::IsDay()
 {
 	ieDword daynight = core->Time.GetHour(GameTime);
