@@ -197,6 +197,8 @@ void Particles::Draw(const Region &screen)
 
 	Video *video=core->GetVideoDriver();
 	Region region = video->GetViewport();
+	Game *game = core->GetGame();
+
 	if (owner) {
 		region.x-=pos.x;
 		region.y-=pos.y;
@@ -243,8 +245,11 @@ void Particles::Draw(const Region &screen)
 				if (anims) {
 					Animation* anim = anims[0];
 					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+
+					ieDword flags = 0;
+					if (game) game->ApplyGlobalTint(clr, flags);
 					video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
-						0, clr, NULL, fragments->GetPartPalette(0), &screen);
+						flags, clr, NULL, fragments->GetPartPalette(0), &screen);
 				}
 			}
 			break;

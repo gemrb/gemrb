@@ -75,14 +75,18 @@ Container::~Container()
 void Container::DrawPile(bool highlight, Region screen, Color tint)
 {
 	Video* video = core->GetVideoDriver();
+	Game *game = core->GetGame();
+
+	//draw it with highlight
+	ieDword flags = BLIT_TINTED | (highlight ? 0 : BLIT_NOSHADOW);
+	if (game) game->ApplyGlobalTint(tint, flags);
+
 	CreateGroundIconCover();
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
-			//draw it with highlight
 			video->BlitGameSprite(groundicons[i],
 				screen.x + Pos.x, screen.y + Pos.y,
-				BLIT_TINTED | (highlight ? 0:BLIT_NOSHADOW),
-				tint, groundiconcover);
+				flags, tint, groundiconcover);
 		}
 	}
 }
