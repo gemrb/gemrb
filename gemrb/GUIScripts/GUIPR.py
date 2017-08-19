@@ -30,14 +30,16 @@ from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_CAST
 
+PriestSpellWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 
 def OpenPriestWindow ():
+	global PriestSpellWindow
 	import GUICommonWindows
 
-	Window = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
+	Window = PriestSpellWindow = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
@@ -74,11 +76,15 @@ def OpenPriestWindow ():
 	UpdatePriestWindow (Window)
 	return
 
-def UpdatePriestWindow (Window):
-	global PriestMemorizedSpellList, PriestKnownSpellList
+def UpdatePriestWindow (Window = None):
+	global PriestMemorizedSpellList, PriestKnownSpellList, PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
+	if Window == None:
+		Window = PriestSpellWindow
+	else:
+		PriestSpellWindow = Window
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
