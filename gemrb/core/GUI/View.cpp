@@ -100,10 +100,11 @@ bool View::NeedsDraw() const
 
 bool View::IsVisible() const
 {
-	if (superView && !(flags&Invisible)) {
+	bool isVisible = !(flags&Invisible);
+	if (superView && isVisible) {
 		return superView->IsVisible();
 	}
-	return !(flags&Invisible);
+	return isVisible;
 }
 
 void View::DirtyBGRect(const Region& r)
