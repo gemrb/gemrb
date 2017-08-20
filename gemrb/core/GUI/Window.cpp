@@ -379,6 +379,13 @@ void Window::OnMouseDrag(const MouseEvent& me)
 		ScrollView::OnMouseDrag(me);
 	}
 }
+	
+void Window::OnMouseLeave(const MouseEvent& me, const DragOp*)
+{
+	DispatchMouseMotion(NULL, me);
+	// FIXME?: should we call trackingView->OnMouseLeave?
+	trackingView = NULL;
+}
 
 bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {

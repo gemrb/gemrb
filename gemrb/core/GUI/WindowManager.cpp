@@ -343,6 +343,12 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 	if (event.type == Event::MouseMove) {
 		TooltipTime = GetTickCount();
+		
+		// handle when mouse leaves the window
+		if (hoverWin && HIT_TEST(event, hoverWin) == false) {
+			hoverWin->OnMouseLeave(event.mouse, NULL);
+			hoverWin = NULL;
+		}
 	// handled here instead of as a hotkey, so also gamecontrol can do its thing
 	} else if (event.type == Event::KeyDown && event.keyboard.keycode == GEM_TAB) {
 		if (TooltipTime + ToolTipDelay > GetTickCount()) {

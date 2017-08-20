@@ -109,6 +109,7 @@ public:
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 	void OnMouseDrag(const MouseEvent&);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 
 private: // Private attributes
 	std::set<Control*> Controls;
