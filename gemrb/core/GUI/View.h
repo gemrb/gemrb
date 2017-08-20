@@ -129,7 +129,9 @@ public:
 	void SetFrameSize(const Size&);
 	void SetBackground(Sprite2D*);
 
-	void AddSubviewInFrontOfView(View*, const View* = NULL);
+	// FIXME: I don't think I like this being virtual. Currently required because ScrollView is "overriding" this
+	// we perhapps should instead have ScrollView implement SubviewAdded and move the view to its contentView there
+	virtual void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*);
 	View* RemoveFromSuperview();
 	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
