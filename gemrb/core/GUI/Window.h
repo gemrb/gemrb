@@ -122,8 +122,6 @@ private: // Private attributes
 
 	VideoBuffer* backBuffer;
 	WindowManager& manager;
-
-	bool isMouseDown; // mouse down occured in *this* window
 };
 
 }

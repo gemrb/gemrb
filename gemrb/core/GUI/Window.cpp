@@ -28,7 +28,6 @@ namespace GemRB {
 Window::Window(const Region& frame, WindowManager& mgr)
 	: ScrollView(frame), manager(mgr)
 {
-	isMouseDown = false;
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
@@ -242,7 +241,8 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 
 void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned short mod)
 {
-	isMouseDown = true;
+	assert(target);
+	
 	if (me.button == GEM_MB_ACTION
 		&& !(Flags() & View::IgnoreEvents)
 	) {
@@ -252,10 +252,13 @@ void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned shor
 	TrySetFocus(target);
 	target->OnMouseDown(me, mod);
 	trackingView = target; // all views track the mouse within their bounds
+	assert(me.buttonStates);
 }
 
 void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short mod)
 {
+	assert(target);
+	
 	if (trackingView) {
 		trackingView->OnMouseUp(me, mod);
 	} else if (drag) {
@@ -267,7 +270,6 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 	}
 	drag = NULL;
 	trackingView = NULL;
-	isMouseDown = false;
 }
 	
 bool Window::DispatchKey(View* keyView, const Event& event)
@@ -301,7 +303,7 @@ bool Window::DispatchEvent(const Event& event)
 	if (event.isScreen) {
 		// FIXME: this will be for touch events too. poor name for that!
 		// also using a mask will be more suitable for mixed event types
-		if (!isMouseDown && event.type == Event::MouseUp) {
+		if (trackingView == NULL && event.type == Event::MouseUp) {
 			// window is not the origin of the down event
 			// we then ignore this
 			return false;
@@ -368,7 +370,9 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 
 void Window::OnMouseDrag(const MouseEvent& me)
 {
-	if ((flags&Draggable) && isMouseDown && trackingView == this) {
+	assert(me.buttonStates);
+	// dragging the window to a new position. only happens with left mouse.
+	if ((flags&Draggable) && me.ButtonState(GEM_MB_ACTION) && trackingView == this) {
 		Point newOrigin = frame.Origin() - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {
