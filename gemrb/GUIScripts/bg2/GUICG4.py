@@ -272,8 +272,10 @@ def RecallPress():
 
 	e=GemRB.GetVar("StoredStrExtra")
 	GemRB.SetVar("StrExtra",e)
+	Total = 0
 	for i in range(-1,6):
 		v = GemRB.GetVar("Stored "+str(i) )
+		Total += v
 		GemRB.SetVar("Ability "+str(i), v)
 		Label = AbilityWindow.GetControl(0x10000003+i)
 		if i==0 and v==18 and HasStrExtra==1:
@@ -282,6 +284,10 @@ def RecallPress():
 			Label.SetText(str(v) )
 
 	PointsLeft = GemRB.GetVar("Ability -1")
+
+	# add a counter to the title
+	SumLabel = AbilityWindow.GetControl (0x10000000)
+	SumLabel.SetText(GemRB.GetString(11976) + ": " + str(Total))
 	return
 
 def BackPress():
