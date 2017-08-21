@@ -78,6 +78,7 @@ def CalcLimits(Abidx):
 
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra, PointsLeft
+	global AllPoints18
 
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
@@ -87,7 +88,10 @@ def RollPress():
 	SumLabel.SetUseRGB(1)
 
 	if HasStrExtra:
-		e = GemRB.Roll(1,100,0)
+		if AllPoints18:
+			e = 100
+		else:
+			e = GemRB.Roll(1,100,0)
 	else:
 		e = 0
 	GemRB.SetVar("StrExtra", e)
@@ -104,6 +108,8 @@ def RollPress():
 				v = Minimum
 			if v>Maximum:
 				v = Maximum
+			if AllPoints18:
+				v = 18
 			GemRB.SetVar("Ability "+str(i), v )
 			Total += v
 
@@ -117,13 +123,25 @@ def RollPress():
 	# add a counter to the title
 	SumLabel = AbilityWindow.GetControl (0x10000000)
 	SumLabel.SetText(GemRB.GetString(11976) + ": " + str(Total))
+	AllPoints18 = 0
 	return
+
+def GiveAll18(wIdx, key, mod):
+	global AllPoints18
+	if mod == 2 and key == 127:
+		AllPoints18 = 1
+		RollPress()
+		return 1
+	return 0
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global PointsLeft, HasStrExtra
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
+	global AllPoints18
+
+	AllPoints18 = 0
 	
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	if GemRB.HasResource ("ABCLSMOD", RES_2DA):
@@ -151,6 +169,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
+	AbilityWindow.SetKeyPressEvent (GiveAll18)
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)
