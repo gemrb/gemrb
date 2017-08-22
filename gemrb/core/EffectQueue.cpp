@@ -39,12 +39,7 @@
 
 namespace GemRB {
 
-static struct {
-	const char* Name;
-	EffectFunction Function;
-	int Strref;
-	int Flags;
-} Opcodes[MAX_EFFECTS];
+static EffectDesc Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
 static EffectDesc *effectnames = NULL;
