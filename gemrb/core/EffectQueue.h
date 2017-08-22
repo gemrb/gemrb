@@ -33,6 +33,10 @@
 #include "Effect.h"
 #include "Region.h"
 
+#include "System/Logging.h"
+#include "System/StringBuffer.h"
+
+#include <cassert>
 #include <cstdlib>
 #include <list>
 
@@ -155,11 +159,59 @@ struct EffectRef {
 
 /** Links Effect name to a function implementing the effect */
 struct EffectDesc {
-	const char* Name;
+	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
 	EffectFunction Function;
+	
 	int Flags;
-	int opcode;
+	
+	union {
+		int opcode;
+		int Strref;
+	};
+	
+	typedef StringBuffer (*Formater)(const Effect&);
+	
+	// add more of these or create free functions to add special logging for different effects
+	static StringBuffer FormatString(const Effect& fx) {
+		StringBuffer str;
+		str.appendFormatted("(%2d): Mod: %d, Type: %d", fx.Opcode, fx.Parameter1, fx.Parameter2);
+		return str;
+	}
+	
+	EffectDesc() {
+		Function = NULL;
+		Name = NULL;
+		opcode = -1;
+		formater = NULL;
+	}
+	
+	EffectDesc(const char* name, EffectFunction fn, int flags, int data, Formater fmt = FormatString) {
+		Function = fn;
+		Name = name;
+		Flags = flags;
+		opcode = data;
+		formater = fmt;
+	}
+	
+	operator bool() const {
+		return Function != NULL;
+	}
+	
+	// using a template to bypass conditional evaluation at runtime
+	template<bool DEBUG=false>
+	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
+		return Function(s, a, fx);
+	}
+	
+	Formater formater;
 };
+	
+template<>
+inline int EffectDesc::operator()<true>(Scriptable* s, Actor* a, Effect* fx) const {
+	assert(formater);
+	Log(DEBUG, Name, formater(*fx));
+	return Function(s, a, fx);
+}
 
 enum EffectFlags {
 	EFFECT_NORMAL = 0,
