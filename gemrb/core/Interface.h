@@ -65,7 +65,7 @@ class Control;
 class DataFileMgr;
 struct Effect;
 class EffectQueue;
-struct EffectDesc;
+class EffectDesc;
 class Factory;
 class Font;
 class Game;

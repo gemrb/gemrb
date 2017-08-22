@@ -158,19 +158,20 @@ struct EffectRef {
 };
 
 /** Links Effect name to a function implementing the effect */
-struct EffectDesc {
-	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
+class EffectDesc {
 	EffectFunction Function;
+
+public:
+	typedef StringBuffer (*Formater)(const Effect&);
 	
+	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
 	int Flags;
 	
 	union {
 		int opcode;
 		int Strref;
 	};
-	
-	typedef StringBuffer (*Formater)(const Effect&);
-	
+		
 	// add more of these or create free functions to add special logging for different effects
 	static StringBuffer FormatString(const Effect& fx) {
 		StringBuffer str;
