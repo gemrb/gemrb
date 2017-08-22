@@ -36,7 +36,6 @@
 #include "System/Logging.h"
 #include "System/StringBuffer.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <list>
 
@@ -186,7 +185,7 @@ public:
 		formater = NULL;
 	}
 	
-	EffectDesc(const char* name, EffectFunction fn, int flags, int data, Formater fmt = FormatString) {
+	EffectDesc(const char* name, EffectFunction fn, int flags, int data, Formater fmt = NULL) {
 		Function = fn;
 		Name = name;
 		Flags = flags;
@@ -194,24 +193,33 @@ public:
 		formater = fmt;
 	}
 	
+	void LogEffect(const Effect& fx) const {
+		if (formater) Log(DEBUG, Name, formater(fx));
+		else Log(DEBUG, Name, FormatString(fx));
+	}
+	
 	operator bool() const {
 		return Function != NULL;
 	}
 	
-	// using a template to bypass conditional evaluation at runtime
-	template<bool DEBUG=false>
 	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
+		LogEffect(*fx);
 		return Function(s, a, fx);
 	}
 	
 	Formater formater;
 };
 	
+template<bool DEBUG>
+inline EffectDesc::Formater
+DebugEffectFormater() {
+	return NULL;
+}
+
 template<>
-inline int EffectDesc::operator()<true>(Scriptable* s, Actor* a, Effect* fx) const {
-	assert(formater);
-	Log(DEBUG, Name, formater(*fx));
-	return Function(s, a, fx);
+inline EffectDesc::Formater
+DebugEffectFormater<true>() {
+	return EffectDesc::FormatString;
 }
 
 enum EffectFlags {
