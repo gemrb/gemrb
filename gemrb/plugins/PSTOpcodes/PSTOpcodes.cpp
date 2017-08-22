@@ -64,31 +64,31 @@ int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
 //the engine sorts these, feel free to use any order
 static EffectDesc effectnames[] = {
-	EffectDesc("Bless", fx_bless, 0, -1 ),//82
-	EffectDesc("ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1 ), //c6
-	EffectDesc("Curse", fx_curse, 0, -1 ),//cb
-	EffectDesc("DetectEvil", fx_detect_evil, 0, -1 ), //d2
-	EffectDesc("Embalm", fx_embalm, 0, -1 ), //0xce
-	EffectDesc("FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1 ), //c2
-	EffectDesc("HostileImage", fx_hostile_image, 0, -1 ),//d1
-	EffectDesc("IronFist", fx_iron_fist, 0, -1 ), //d0
-	EffectDesc("JumbleCurse", fx_jumble_curse, 0, -1 ), //d3
-	EffectDesc("MoveView", fx_move_view, EFFECT_NO_ACTOR, -1 ),//cd
-	EffectDesc("MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1 ), //c5
-	EffectDesc("Overlay", fx_overlay, 0, -1 ), //c9
-	EffectDesc("PlayBAM1", fx_play_bam_blended, 0, -1 ), //bb
-	EffectDesc("PlayBAM2", fx_play_bam_not_blended, 0, -1 ),//bc
-	EffectDesc("PlayBAM3", fx_play_bam_not_blended, 0, -1 ), //bd
-	EffectDesc("PlayBAM4", fx_play_bam_not_blended, 0, -1 ), //be
-	EffectDesc("PlayBAM5", fx_play_bam_not_blended, 0, -1 ), //bf
-	EffectDesc("Prayer", fx_prayer, 0, -1 ),//cc
-	EffectDesc("RetreatFrom", fx_retreat_from, 0, -1 ),//6e
-	EffectDesc("SetStatus", fx_set_status, 0, -1 ), //ba
-	EffectDesc("SpeakWithDead", fx_speak_with_dead, 0, -1 ), //d4
-	EffectDesc("SpecialEffect", fx_special_effect, 0, -1 ),//c4
-	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 ), //cf
-	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 ), //c3
-	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1 ), //c0
+	EffectDesc("Bless", fx_bless, 0, -1, DebugEffectFormater<false>() ),//82
+	EffectDesc("ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //c6
+	EffectDesc("Curse", fx_curse, 0, -1, DebugEffectFormater<false>() ),//cb
+	EffectDesc("DetectEvil", fx_detect_evil, 0, -1, DebugEffectFormater<false>() ), //d2
+	EffectDesc("Embalm", fx_embalm, 0, -1, DebugEffectFormater<false>() ), //0xce
+	EffectDesc("FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //c2
+	EffectDesc("HostileImage", fx_hostile_image, 0, -1, DebugEffectFormater<false>() ),//d1
+	EffectDesc("IronFist", fx_iron_fist, 0, -1, DebugEffectFormater<false>() ), //d0
+	EffectDesc("JumbleCurse", fx_jumble_curse, 0, -1, DebugEffectFormater<false>() ), //d3
+	EffectDesc("MoveView", fx_move_view, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ),//cd
+	EffectDesc("MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //c5
+	EffectDesc("Overlay", fx_overlay, 0, -1, DebugEffectFormater<false>() ), //c9
+	EffectDesc("PlayBAM1", fx_play_bam_blended, 0, -1, DebugEffectFormater<false>() ), //bb
+	EffectDesc("PlayBAM2", fx_play_bam_not_blended, 0, -1, DebugEffectFormater<false>() ),//bc
+	EffectDesc("PlayBAM3", fx_play_bam_not_blended, 0, -1, DebugEffectFormater<false>() ), //bd
+	EffectDesc("PlayBAM4", fx_play_bam_not_blended, 0, -1, DebugEffectFormater<false>() ), //be
+	EffectDesc("PlayBAM5", fx_play_bam_not_blended, 0, -1, DebugEffectFormater<false>() ), //bf
+	EffectDesc("Prayer", fx_prayer, 0, -1, DebugEffectFormater<false>() ),//cc
+	EffectDesc("RetreatFrom", fx_retreat_from, 0, -1, DebugEffectFormater<false>() ),//6e
+	EffectDesc("SetStatus", fx_set_status, 0, -1, DebugEffectFormater<false>() ), //ba
+	EffectDesc("SpeakWithDead", fx_speak_with_dead, 0, -1, DebugEffectFormater<false>() ), //d4
+	EffectDesc("SpecialEffect", fx_special_effect, 0, -1, DebugEffectFormater<false>() ),//c4
+	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //cf
+	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //c3
+	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //c0
 	EffectDesc( NULL, NULL, 0, 0 ),
 };
 
