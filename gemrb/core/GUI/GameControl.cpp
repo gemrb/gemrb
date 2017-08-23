@@ -2208,13 +2208,14 @@ void GameControl::DisplayString(Scriptable* target)
 /** changes displayed map to the currently selected PC */
 void GameControl::ChangeMap(Actor *pc, bool forced)
 {
-	// disable so that events dont get dispatched while there is not an area
-	SetFlags(View::IgnoreEvents, OP_OR);
-	ClearMouseState();
-
 	//swap in the area of the actor
 	Game* game = core->GetGame();
 	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
+		// disable so that events dont get dispatched while there is not an area
+		// we are single threaded so this isnt _really_ necessary, but we have been known to post phony events from random places
+		SetFlags(View::IgnoreEvents, OP_OR);
+		ClearMouseState();
+
 		dialoghandler->EndDialog();
 		overInfoPoint = NULL;
 		overContainer = NULL;
@@ -2226,14 +2227,14 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		}
 		game->GetMap( areaname, true );
 		ScreenFlags|=SF_CENTERONACTOR;
+		
+		SetFlags(View::IgnoreEvents, OP_NAND);
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
 		MoveViewportTo( pc->Pos, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
-
-	SetFlags(View::IgnoreEvents, OP_NAND);
 }
 
 bool GameControl::SetScreenFlags(unsigned int value, int mode)
