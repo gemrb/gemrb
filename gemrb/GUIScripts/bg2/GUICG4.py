@@ -197,6 +197,11 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
 		Button.SetVarAssoc("Ability", i)
+		# delete the labels and use the buttons instead
+		AbilityWindow.DeleteControl (i+0x10000009)
+		Button.SetText (AbilityTable.GetValue (i, 0))
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT, OP_OR)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
