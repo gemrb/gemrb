@@ -408,11 +408,10 @@ def OpenStoreShoppingWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetFont ('NUMBER')
 	else:
-		r = Button.GetFrame ()
-		Label = Window.CreateLabel (0x10000043, r["x"],r["y"],r["w"],15,
-			"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = Window.CreateLabel (0x10000044, r["x"],r["y"]+r["h"]-15,r["w"],15,
-			"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+		Label = BackpackButton.CreateLabel (0x10000043, "NUMBER", "0:",
+			IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = BackpackButton.CreateLabel (0x10000044, "NUMBER", "0:",
+			IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
@@ -558,11 +557,10 @@ def OpenStoreStealWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetFont ('NUMBER')
 	else:
-		r = Button.GetFrame ()
-		Label = Window.CreateLabel (0x10000043, r["x"],r["y"],r["w"],15,
-			"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = Window.CreateLabel (0x10000044, r["x"], r["y"]+r["h"]-15, r["w"], 15,
-			"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+		Label = Button.CreateLabel (0x10000043, "NUMBER", "0:",
+			IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Button.CreateLabel (0x10000044, "NUMBER", "0:",
+			IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
