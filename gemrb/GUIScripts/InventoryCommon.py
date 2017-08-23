@@ -450,6 +450,7 @@ def OpenItemAmountWindow ():
 	item = GemRB.GetItem (ResRef)
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
+	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 
 	# item icon
 	Icon = Window.GetControl (0)
