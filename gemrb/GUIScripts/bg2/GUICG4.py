@@ -210,7 +210,6 @@ def OnLoad():
 	StoreButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StorePress)
 	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
-	RerollButton.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, GiveAll18)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	AbilityWindow.SetVisible(WINDOW_VISIBLE)
