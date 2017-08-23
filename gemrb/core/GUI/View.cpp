@@ -374,9 +374,9 @@ void View::SetFrame(const Region& r)
 
 void View::SetFrameOrigin(const Point& p)
 {
+	MarkDirty(); // refresh the old position in the superview
 	frame.x = p.x;
 	frame.y = p.y;
-	MarkDirty();
 }
 
 void View::SetFrameSize(const Size& s)
@@ -384,6 +384,7 @@ void View::SetFrameSize(const Size& s)
 	Size oldSize = frame.Dimensions();
 	if (oldSize == s) return;
 
+	MarkDirty(); // refresh the old position in the superview
 	frame.w = std::max(0, s.w);
 	frame.h = std::max(0, s.h);
 
@@ -399,7 +400,6 @@ void View::SetFrameSize(const Size& s)
 			subview->SetFrame(newSubFrame);
 		}
 	}
-	MarkDirty();
 }
 
 bool View::SetFlags(unsigned int arg_flags, int opcode)
