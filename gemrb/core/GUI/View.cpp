@@ -77,7 +77,7 @@ void View::MarkDirty()
 	if (dirty == false) {
 		dirty = true;
 
-		if (superView && !IsOpaque()) {
+		if (superView) {
 			superView->DirtyBGRect(frame);
 		}
 
@@ -111,6 +111,10 @@ void View::DirtyBGRect(const Region& r)
 {
 	// if we are going to draw the entire BG, no need to compute and store this
 	if (NeedsDraw())
+		return;
+	
+	// no need to draw the BG fro opaque views
+	if (IsOpaque())
 		return;
 
 	// do we want to intersect this too?
