@@ -147,7 +147,9 @@ class GWindow(GView):
     return self.ID != -1
 
   def DeleteControl(self, view): # backwards compatibility
-	RemoveView(view, True)
+	if type(view) == int:
+		view = self.GetControl (view)
+	RemoveView (view, True)
 
   def GetControl(self, id): # backwards compatibility
 	return GetView(self, id)
