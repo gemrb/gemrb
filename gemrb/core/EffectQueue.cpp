@@ -292,6 +292,8 @@ bool Init_EffectQueue()
 				long val;
 				if( valid_number( ret, val ) && (i == val) ) {
 					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
+				} else {
+					Opcodes[i].Strref = -1;
 				}
 			}
 		}
