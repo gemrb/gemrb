@@ -213,12 +213,12 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 
 static int compare_effects(const void *a, const void *b)
 {
-	return stricmp(((EffectRef *) a)->Name,((EffectRef *) b)->Name);
+	return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
 }
 
 static int find_effect(const void *a, const void *b)
 {
-	return stricmp((const char *) a,((const EffectRef *) b)->Name);
+	return stricmp((const char *) a,((const EffectDesc *) b)->Name);
 }
 
 static EffectDesc* FindEffect(const char* effectname)
