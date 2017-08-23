@@ -2013,9 +2013,9 @@ void EffectQueue::dump(StringBuffer& buffer) const
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx = *f;
 		if( fx) {
-			char *Name = NULL;
+			const char *Name = NULL;
 			if( fx->Opcode < MAX_EFFECTS)
-				Name = (char*) Opcodes[fx->Opcode].Name;
+				Name = Opcodes[fx->Opcode].Name;
 
 			buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source);
 		}
