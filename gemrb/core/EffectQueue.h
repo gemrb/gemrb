@@ -203,7 +203,7 @@ public:
 	}
 	
 	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
-		LogEffect(*fx);
+		if (formater) LogEffect(*fx);
 		return Function(s, a, fx);
 	}
 	
