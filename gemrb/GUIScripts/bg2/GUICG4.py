@@ -189,8 +189,6 @@ def OnLoad():
 	RollPress()
 	StorePress()
 	for i in range(6):
-		Label = AbilityWindow.GetControl(i+0x10000009)
-		Label.SetEvent(IE_GUI_LABEL_ON_PRESS, eval("OverPress"+str(i)))
 		Button = AbilityWindow.GetControl(i+30)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
