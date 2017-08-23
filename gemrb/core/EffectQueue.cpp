@@ -255,11 +255,6 @@ bool Init_EffectQueue()
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 
-	memset( Opcodes, 0, sizeof( Opcodes ) );
-	for(i=0;i<MAX_EFFECTS;i++) {
-		Opcodes[i].Strref=-1;
-	}
-
 	initialized = 1;
 
 	AutoTable efftextTable("efftext");
@@ -323,9 +318,10 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
 	}
 
-	memcpy( effectnames + effectnames_count, opcodes, count * sizeof( EffectDesc ));
+	std::copy(opcodes, opcodes + count, effectnames + effectnames_count);
 	effectnames_count += count;
 	effectnames[effectnames_count].Name = NULL;
+
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
