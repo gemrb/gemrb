@@ -63,6 +63,7 @@ private:
 	void DirtyBGRect(const Region&);
 	void DrawBackground(const Region*) const;
 	void DrawSubviews() const;
+	void MarkDirty(bool recursive);
 
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 

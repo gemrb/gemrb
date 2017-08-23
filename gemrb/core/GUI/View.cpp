@@ -71,8 +71,8 @@ void View::SetCursor(Sprite2D* c)
 {
 	cursor = c;
 }
-
-void View::MarkDirty()
+	
+void View::MarkDirty(bool recursive)
 {
 	if (dirty == false) {
 		dirty = true;
@@ -81,11 +81,18 @@ void View::MarkDirty()
 			superView->DirtyBGRect(frame);
 		}
 
-		std::list<View*>::iterator it;
-		for (it = subViews.begin(); it != subViews.end(); ++it) {
-			(*it)->MarkDirty();
+		if (recursive) {
+			std::list<View*>::iterator it;
+			for (it = subViews.begin(); it != subViews.end(); ++it) {
+				(*it)->MarkDirty();
+			}
 		}
 	}
+}
+
+void View::MarkDirty()
+{
+	return MarkDirty(true);
 }
 
 bool View::NeedsDraw() const
@@ -121,6 +128,8 @@ void View::DirtyBGRect(const Region& r)
 	//Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
 	Region clip(Point(), Dimensions());
 	dirtyBGRects.push_back( r.Intersect(clip) );
+	
+	MarkDirty(false);
 }
 
 void View::DrawSubviews() const
