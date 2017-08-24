@@ -48,6 +48,8 @@ namespace GemRB {
 
 		void ContentSizeChanged(const Size&);
 		void ScrollbarValueChange(ScrollBar*);
+		
+		void FlagsChanged(unsigned int /*oldflags*/);
 
 	public:
 		ScrollView(const Region& frame);

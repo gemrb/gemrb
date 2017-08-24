@@ -113,6 +113,19 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");
 	}
 }
+	
+void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (Flags()&IgnoreEvents) {
+		if (hscroll) {
+			hscroll->SetVisible(false);
+		}
+		
+		if (vscroll) {
+			vscroll->SetVisible(false);
+		}
+	}
+}
 
 void ScrollView::AddSubviewInFrontOfView(View* front, const View* back)
 {
