@@ -29,12 +29,8 @@ namespace GemRB {
 
 		class ContentView : public View {
 			private:
-			void SizeChanged(const Size& /* oldsize */) {
-				// considering it an error for a ContentView to exist outside of a ScrollView
-				assert(superView);
-				static_cast<ScrollView*>(superView)->ContentSizeChanged(Frame().Dimensions());
-			}
-
+			void SizeChanged(const Size& /* oldsize */);
+			
 			public:
 			ContentView(const Region& frame)
 			: View(frame) {}

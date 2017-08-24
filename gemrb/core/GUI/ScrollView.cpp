@@ -26,6 +26,14 @@
 namespace GemRB {
 	
 typedef void (ScrollView::*ScrollCB)(Control*);
+	
+void ScrollView::ContentView::SizeChanged(const Size& /* oldsize */)
+{
+	// considering it an error for a ContentView to exist outside of a ScrollView
+	assert(superView);
+	ScrollView* sv = static_cast<ScrollView*>(superView);
+	sv->ContentSizeChanged(Frame().Dimensions());
+}
 
 ScrollView::ScrollView(const Region& frame)
 : View(frame), contentView(Region())
