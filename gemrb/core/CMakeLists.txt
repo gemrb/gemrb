@@ -106,6 +106,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Console.cpp
 	GUI/Control.cpp
 	GUI/EventMgr.cpp
+	GUI/GUIAnimation.cpp
 	GUI/GUIFactory.cpp
 	GUI/GameControl.cpp
 	GUI/Label.cpp
