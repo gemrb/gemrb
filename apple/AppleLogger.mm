@@ -72,7 +72,6 @@ void AppleLogger::LogInternal(log_level level, const char* owner, const char* me
 #endif
 	}
 	NSLog(@"%s", message); // send to OS X logging system
-	StdioLogger::LogInternal(level, owner, message, color); // send to stdout
 }
 
 Logger* createAppleLogger()
