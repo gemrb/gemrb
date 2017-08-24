@@ -55,12 +55,11 @@ Control::Control(const Region& frame)
 
 Control::~Control()
 {
+	assert(InHandler == false);
+
 	if (actionTimer)
 		actionTimer->Invalidate();
 
-	if (InHandler) {
-		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
-	}
 	delete animation;
 
 	Sprite2D::FreeSprite(AnimPicture);
