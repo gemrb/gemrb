@@ -104,5 +104,19 @@ PyObject* PyString_FromAnimID(const char* AnimID)
 	unsigned int i = strnlen(AnimID,2);
 	return PyString_FromStringAndSize( AnimID, i );
 }
+	
+PyObject* PyString_FromStringObj(const std::string& s)
+{
+	return ::PyString_FromString(s.c_str());
+}
+	
+PyObject* PyString_FromStringObj(const String& s)
+{
+	// FIXME: this is wrong, python needs to know the encoding
+	char* cstr = MBCStringFromString(s);
+	PyObject* pyStr = ::PyString_FromString(cstr);
+	free(cstr);
+	return pyStr;
+}
 
 }

@@ -106,6 +106,9 @@ PyObject* PyString_FromResRef(const ieResRef& ResRef);
 
 // Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromAnimID(const char* AnimID);
+	
+PyObject* PyString_FromStringObj(const std::string&);
+PyObject* PyString_FromStringObj(const String&);
 
 template <typename T, class Container>
 PyObject* MakePyList(const Container &source)
