@@ -36,6 +36,7 @@ public:
 };
 
 class PointAnimation : public GUIAnimation {
+public:
 	Point begin, end;
 	
 public:

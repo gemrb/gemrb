@@ -114,6 +114,22 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 	}
 }
 	
+void ScrollView::WillDraw()
+{
+	if (animation) {
+		// temporarily change the origin for drawing purposes
+		contentView.SetFrameOrigin(animation.NextPoint());
+	}
+}
+	
+void ScrollView::DidDraw()
+{
+	if (animation) {
+		// restore the origin to the true location passed to ScrollTo
+		contentView.SetFrameOrigin(animation.end);
+	}
+}
+	
 void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (Flags()&IgnoreEvents) {
@@ -158,12 +174,12 @@ void ScrollView::SetScrollIncrement(int inc)
 	}
 }
 
-void ScrollView::ScrollDelta(const Point& p)
+void ScrollView::ScrollDelta(const Point& p, ieDword duration)
 {
-	ScrollTo(p + contentView.Origin());
+	ScrollTo(p + contentView.Origin(), duration);
 }
 
-void ScrollView::ScrollTo(Point newP)
+void ScrollView::ScrollTo(Point newP, ieDword duration)
 {
 	short maxx = frame.w - contentView.Dimensions().w;
 	short maxy = frame.h - contentView.Dimensions().h;
@@ -172,6 +188,14 @@ void ScrollView::ScrollTo(Point newP)
 	// clamp values so we dont scroll beyond the content
 	newP.x = Clamp<short>(newP.x, 0, maxx);
 	newP.y = Clamp<short>(newP.y, 0, maxy);
+
+	// set up animation if required
+	if  (duration) {
+		animation = PointAnimation(contentView.Origin(), newP, duration);
+	} else {
+		// cancel the existing animation (if any)
+		animation = PointAnimation();
+	}
 
 	contentView.SetFrameOrigin(newP);
 }

@@ -20,6 +20,7 @@
 #ifndef __GemRB__ScrollView__
 #define __GemRB__ScrollView__
 
+#include "GUI/GUIAnimation.h"
 #include "GUI/View.h"
 
 namespace GemRB {
@@ -36,6 +37,8 @@ namespace GemRB {
 			: View(frame) {}
 			bool CanLockFocus() const { return false; }
 		};
+		
+		PointAnimation animation;
 
 		ScrollBar* hscroll;
 		ScrollBar* vscroll;
@@ -43,11 +46,11 @@ namespace GemRB {
 		ContentView contentView;
 
 	private:
-		void ScrollDelta(const Point& p);
-		void ScrollTo(Point p);
-
 		void ContentSizeChanged(const Size&);
 		void ScrollbarValueChange(ScrollBar*);
+		
+		void WillDraw();
+		void DidDraw();
 		
 		void FlagsChanged(unsigned int /*oldflags*/);
 
@@ -65,6 +68,8 @@ namespace GemRB {
 		
 		Point ScrollOffset() const;
 		void SetScrollIncrement(int);
+		void ScrollDelta(const Point& p, ieDword duration = 0);
+		void ScrollTo(Point p, ieDword duration = 0);
 	};
 }
 #endif /* __GemRB__ScrollView__ */
