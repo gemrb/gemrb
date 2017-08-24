@@ -379,10 +379,17 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 
 				if (SBID != 0xffff) {
-					ScrollBar* sb = dynamic_cast<ScrollBar*>(GetControl(SBID, win));
+					// we dont actually care about the scrollbar,
+					// TextAreas automatically produce their own in GemRB
+					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
-						ta->SetScrollBar((ScrollBar*)win->RemoveSubview(sb));
+						delete win->RemoveSubview(sb);
 					}
+				} else {
+					// no scrollbar means we will ignore events
+					// this facilitates ChapterText
+					// FIXME?: does this cause unforseen problems with other text areas?
+					ta->SetFlags(View::IgnoreEvents, OP_OR);
 				}
 				ctrl = ta;
 			}
@@ -468,17 +475,10 @@ endalign:
 				}
 				str->ReadWord( &TAID );
 
-				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
-				/*
-				if (TAID != 0xffff) {
-					TextArea* ta = GetControl<TextArea>(TAID);
-					assert(ta);
-					ta->SetScrollBar(sbar);
-				} else {
-					win->AddSubviewInFrontOfView(sbar);
+				if (TAID == 0xffff) {
+					// text areas produce their own scrollbars in GemRB
+					ctrl = new ScrollBar(ctrlFrame, images);
 				}
-				*/
-				ctrl = sbar;
 			}
 			break;
 

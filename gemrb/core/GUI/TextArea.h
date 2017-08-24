@@ -22,7 +22,7 @@
 #define TEXTAREA_H
 
 #include "GUI/Control.h"
-#include "GUI/ScrollBar.h"
+#include "GUI/ScrollView.h"
 #include "GUI/TextSystem/Font.h"
 #include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/TextSystem/TextContainer.h"
@@ -53,33 +53,55 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void SizeChanged(const Size& /*oldSize*/);
+	
+	class SpanSelector : public TextContainer {
+	private:
+		TextArea& ta;
+		TextContainer* hoverSpan, *selectedSpan;
+		size_t size;
+		
+	private:
+		void ClearHover();
+		TextContainer* TextAtPoint(const Point&);
+		TextContainer* TextAtIndex(size_t idx);
+		
+	public:
+		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered);
+		
+		size_t NumOpts() const { return size;};
+		void MakeSelection(size_t idx);
+		TextContainer* Selection() const { return selectedSpan; }
+		
+		bool CanLockFocus() const { return false; }
+		
+		void OnMouseOver(const MouseEvent& /*me*/);
+		void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	};
 
 public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 
-	bool IsAnimated() const { return animationEnd; }
 	bool IsOpaque() const { return false; }
 
 	/** Sets the Actual Text */
 	void SetText(const String& text);
 	/** Clears the textarea */
 	void ClearText();
-	void ClearHover();
+
 	/** Appends a String to the current Text */
 	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL, ieDword duration = 0);
+	void ScrollToY(int y, short lineduration);
 
-	/** Returns total height of the text */
-	int GetRowHeight() const;
-	/** Set Starting Row */
-	void SetRow(int row);
-	int RowCount() { return rows; }
+	ieDword LineCount() const;
+	ieWord LineHeight() const;
+
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
 						  const Color* color, const Color* hiColor, const Color* selColor);
 	/** Set Selectable */
@@ -90,37 +112,16 @@ public:
 	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(unsigned int optIdx);
-	void SetScrollBar(ScrollBar* sb);
 
 private: // Private attributes
 	// dialog and listbox handling
-	typedef std::pair<int, TextContainer*> OptionSpan;
-	std::vector<OptionSpan> OptSpans;
-	TextContainer* hoverSpan, *selectedSpan;
+	std::vector<ieDword> values;
 	const Content* dialogBeginNode;
 	// dialog options container
-	TextContainer* selectOptions;
+	SpanSelector* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
-	ScrollBar* scrollbar; // temporary; will be superceeded by ScrollView
-
-	struct AnimationPoint {
-		// TODO: we cant currently scroll the x axis
-		// if that happens we should upgrade this to Point
-		int y;
-		unsigned long time;
-
-		AnimationPoint() : y(0), time(0) {}
-		AnimationPoint(int y, unsigned long t) : y(y), time(t) {}
-
-		operator bool() const {
-			return (time > 0);
-		}
-	};
-	AnimationPoint animationBegin, animationEnd;
-
-	int TextYPos;
-	int rows;
+	ScrollView scrollview;
 
 	/** Fonts */
 	Font* finit, * ftext;
@@ -142,8 +143,7 @@ private: //internal functions
 	void SetPalette(const Color*, PALETTE_TYPE);
 
 	void UpdateRowCount(int h);
-	void UpdateScrollbar();
-	void UpdateTextLayout();
+	void UpdateScrollview();
 
 	int ContentHeight() const;
 
@@ -158,11 +158,6 @@ public: //Events
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
 	void OnMouseWheelScroll(const Point& delta);
-	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent& /*me*/);
-	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 
 	void SetFocus();
 

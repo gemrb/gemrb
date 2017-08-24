@@ -54,6 +54,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
+#include "GUI/ScrollBar.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
 #include "GUI/WorldMapControl.h"
@@ -523,15 +524,16 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	String* chapText = StringFromCString(text);
 	if (chapText) {
 		// insert enough newlines to push the text offscreen
-		int rowHeight = ta->GetRowHeight();
-		size_t lines = ta->Dimensions().h / rowHeight;
+		int rowHeight = ta->LineHeight();
+		int h = ta->Dimensions().h;
+		size_t lines = h / rowHeight;
 		ta->AppendText(String(lines, L'\n'));
 		ta->AppendText(*chapText);
-		// add instead of set, because we also scroll to be out of sight so keep the newline count
-		lines += ta->RowCount();
+		// append again after the chtext so it will scroll out of view
+		ta->AppendText(String(lines, L'\n'));
+
 		delete chapText;
-		// animate the scroll: duration = 2500 * lines of text
-		ta->ScrollToY(int(rowHeight * lines), NULL, ieDword(lines * 2500));
+		ta->ScrollToY(h, 2500);
 	}
 	Py_RETURN_NONE;
 }
