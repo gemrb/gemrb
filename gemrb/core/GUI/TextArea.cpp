@@ -32,6 +32,9 @@ namespace GemRB {
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered)
 : TextContainer(Region(), ta.ftext, ta.palettes[PALETTE_SELECTED]), ta(ta)
 {
+	selectedSpan = NULL;
+	hoverSpan = NULL;
+
 	size = opts.size();
 	
 	Size s = ta.Dimensions();
@@ -59,6 +62,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			AppendText(L"\n");
 		}
 	}
+	
+	MakeSelection(0);
 }
 
 void TextArea::SpanSelector::ClearHover()
