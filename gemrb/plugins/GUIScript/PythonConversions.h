@@ -109,17 +109,35 @@ PyObject* PyString_FromAnimID(const char* AnimID);
 	
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
+	
+template <typename T>
+PyObject* PyObject_FromPtr(T* p)
+{
+	return CObject<T>(p);
+}
 
-template <typename T, class Container>
+template <typename T>
+PyObject* PyObject_FromHolder(Holder<T> h)
+{
+	return CObject<T>(h);
+}
+
+template <typename T, PyObject* (*F)(T), class Container>
 PyObject* MakePyList(const Container &source)
 {
 	size_t size = source.size();
 	PyObject *list = PyList_New(size);
 	for (size_t i = 0; i < size; ++i) {
 		// SET_ITEM might be preferable to SetItem here, but MSVC6 doesn't like it.
-		PyList_SetItem(list, i, CObject<T>(source[i]));
+		PyList_SetItem(list, i, F(source[i]));
 	}
 	return list;
+}
+
+template <typename T, class Container>
+PyObject* MakePyList(const Container &source)
+{
+	return MakePyList<Holder<T>, &PyObject_FromHolder<T>, Container>(source);
 }
 
 }
