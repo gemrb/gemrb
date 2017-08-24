@@ -71,7 +71,10 @@ void View::SetCursor(Sprite2D* c)
 {
 	cursor = c;
 }
-	
+
+// TODO: while GemRB does support nested subviews, it does not support overlapping subviews (same superview, intersecting frame)
+// if we wanted to support this we would have to change this to MarkDirty(Region r) and mark all intersecting subviews dirty
+// we also would need this to support partial View redraws
 void View::MarkDirty(bool recursive)
 {
 	if (dirty == false) {
