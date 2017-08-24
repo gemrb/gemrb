@@ -129,6 +129,21 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 	View* v = View::SubviewAt(p, ignoreTransparency, recursive);
 	return (v == &contentView) ? NULL : v;
 }
+	
+Point ScrollView::ScrollOffset() const
+{
+	return contentView.Origin();
+}
+	
+void ScrollView::SetScrollIncrement(int inc)
+{
+	if (hscroll) {
+		hscroll->StepIncrement = inc;
+	}
+	if (vscroll) {
+		vscroll->StepIncrement = inc;
+	}
+}
 
 void ScrollView::ScrollDelta(const Point& p)
 {

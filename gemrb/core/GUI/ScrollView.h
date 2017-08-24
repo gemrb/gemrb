@@ -60,6 +60,9 @@ namespace GemRB {
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 		void OnMouseWheelScroll(const Point& delta);
 		void OnMouseDrag(const MouseEvent&);
+		
+		Point ScrollOffset() const;
+		void SetScrollIncrement(int);
 	};
 }
 #endif /* __GemRB__ScrollView__ */
