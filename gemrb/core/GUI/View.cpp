@@ -437,7 +437,7 @@ void View::SetTooltip(const String& string)
 	TrimString(tooltip); // for proper vertical alaignment
 }
 
-// View simpler either forwards events to concrete subclasses, or to its attached scrollbar
+// View simpley forwards events to its superview	
 void View::OnMouseOver(const MouseEvent& me)
 {
 	if (superView) {
