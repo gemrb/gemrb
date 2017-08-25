@@ -38,22 +38,56 @@
 
 namespace GemRB {
 
+extern unsigned char pl_uppercase[256];
+extern unsigned char pl_lowercase[256];
+	
 //typedef std::basic_string<ieWord> String;
 typedef std::wstring String;
+	
 // String creators
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT char* MBCStringFromString(const String& string);
 
+// char manipulators
+inline wchar_t tolower(wchar_t c) { return ::towlower(c); }
+inline wchar_t toupper(wchar_t c) { return ::towupper(c); }
+
+GEM_EXPORT template <typename T>
+T ToLower(T c) {
+	if (c < 256) {
+		return pl_lowercase[static_cast<unsigned char>(c)];
+	} else {
+		return tolower(c);
+	}
+}
+
+GEM_EXPORT template <typename T>
+T ToUpper(T c) {
+	if (c < 256) {
+		return pl_uppercase[static_cast<unsigned char>(c)];
+	} else {
+		return towupper(c);
+	}
+}
+	
 // String manipulators
-GEM_EXPORT void StringToLower(String& string);
-GEM_EXPORT void StringToUpper(String& string);
+GEM_EXPORT template <typename T>
+void StringToLower(T& string) {
+	for (size_t i = 0; i < string.length(); i++) {
+		string[i] = ToLower(string[i]);
+	}
+}
+	
+GEM_EXPORT template <typename T>
+void StringToUpper(T& string) {
+	for (size_t i = 0; i < string.length(); i++) {
+		string[i] = ToUpper(string[i]);
+	}
+}
+
 GEM_EXPORT void TrimString(String& string);
 
-/* this function will work with pl/cz special characters */
-
-extern unsigned char pl_uppercase[256];
-extern unsigned char pl_lowercase[256];
-
+/* these functions will work with pl/cz special characters */
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
