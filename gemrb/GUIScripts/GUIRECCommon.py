@@ -414,7 +414,6 @@ def OpenScriptWindow ():
 	if script == None:
 		script = "None"
 	scriptindex = ScriptsTable.GetRowIndex (script)
-	GemRB.SetVar ("Selected", scriptindex)
 	ScriptTextArea.SetOptions (options, "Selected", scriptindex)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
