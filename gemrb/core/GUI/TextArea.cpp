@@ -487,7 +487,6 @@ String TextArea::QueryText() const
 	if (selectOptions) {
 		return selectOptions->Selection()->Text();
 	}
-	// FIXME?: used to possibly return newline separated list of options. no idea when that was useful.
 	return textContainer->Text();
 }
 

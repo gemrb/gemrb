@@ -388,14 +388,12 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	scriptCount = len(ScriptTextArea.ListResources (CHR_SCRIPTS))
+	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
 	defaultCount = ScriptsTable.GetRowCount ()
 
 	options = []
-	tat = ScriptTextArea.QueryText ().split("\n")
-	tat.pop() # last item is empty
-	for i in range (scriptCount):
-		script = tat[i]
+	for i in range (len(scripts)):
+		script = scripts[i]
 		if i < defaultCount:
 			GemRB.SetToken ("script", ScriptsTable.GetRowName (i))
 			title = ScriptsTable.GetValue (i,0)
