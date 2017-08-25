@@ -493,7 +493,7 @@ String TextArea::QueryText() const
 void TextArea::ClearSelectOptions()
 {
 	values.clear();
-	delete RemoveSubview(selectOptions);
+	delete scrollview.RemoveSubview(selectOptions);
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
 
