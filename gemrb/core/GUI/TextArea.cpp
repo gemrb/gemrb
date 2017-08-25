@@ -454,7 +454,7 @@ void TextArea::OnMouseWheelScroll(const Point& delta)
 
 void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VarName[0] || optIdx >= selectOptions->NumOpts()) {
+	if (!VarName[0] || selectOptions == NULL || optIdx >= selectOptions->NumOpts()) {
 		return;
 	}
 	if (!selectOptions) {
