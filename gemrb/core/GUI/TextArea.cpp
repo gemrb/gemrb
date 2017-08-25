@@ -42,10 +42,10 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	SetFrameSize(s);
 	
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
-	
+	Region r = Frame();
 	for (size_t i = 0; i < opts.size(); i++) {
 		// FIXME: wrong frame
-		TextContainer* selOption = new TextContainer(Frame(), ta.ftext, ta.palettes[PALETTE_OPTIONS]);
+		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
 		if (numbered) {
 			wchar_t optNum[6];
 			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", i+1);

@@ -55,6 +55,16 @@ private:
 	void SizeChanged(const Size& /*oldSize*/);
 	
 	class SpanSelector : public TextContainer {
+		struct OptSpan : public TextContainer {
+			OptSpan(const Region& frame, Font* font, Holder<Palette> pal)
+			: TextContainer(frame, font, pal) {}
+			
+			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
+			void OnMouseLeave(const MouseEvent& me, const DragOp*) {
+				assert(superView);
+				superView->OnMouseOver(me);
+			}
+		};
 	private:
 		TextArea& ta;
 		TextContainer* hoverSpan, *selectedSpan;
