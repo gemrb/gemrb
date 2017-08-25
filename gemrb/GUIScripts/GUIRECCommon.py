@@ -236,16 +236,16 @@ def OpenCustomPortraitWindow ():
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
 	if GameCheck.IsIWD2():
-		RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 2)
+		RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 2))
 	else:
-		RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 1)
+		RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
-	RowCount2 = PortraitList2.ListResources (CHR_PORTRAITS, 0)
+	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
@@ -388,7 +388,7 @@ def OpenScriptWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
-	scriptCount = ScriptTextArea.ListResources (CHR_SCRIPTS)
+	scriptCount = len(ScriptTextArea.ListResources (CHR_SCRIPTS))
 	defaultCount = ScriptsTable.GetRowCount ()
 
 	options = []

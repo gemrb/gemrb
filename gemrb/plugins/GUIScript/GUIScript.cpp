@@ -4682,7 +4682,7 @@ PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
   * type - one of CHR_PORTRAITS, CHR_SOUNDS, CHR_EXPORTS or CHR_SCRIPTS\n\
   * flags -  currently only used for CHR_PORTRAITS: 0 means the portraits with 'M' as the suffix, anything else 'S'\n\
 \n\
-**Return value:** int - the number of options added to the TextArea"
+**Return value:** list - the list of options added to the TextArea"
 );
 
 static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
@@ -4719,32 +4719,32 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	itflags |= (dirs) ? DirectoryIterator::Directories : 0;
 	dirit.SetFlags(itflags);
 
-	std::vector<String> strings;
+	std::vector<std::string> strings;
 	if (dirit) {
 		do {
-			String* string = StringFromCString(dirit.GetName());
+			std::string string = dirit.GetName();
 			if (dirs == false) {
-				size_t pos = string->find_last_of(L'.');
+				size_t pos = string.find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
-					delete string;
 					continue;
 				}
-				string->resize(pos);
+				string.resize(pos);
 			}
-			StringToUpper(*string);
-			strings.push_back(*string);
-			delete string;
+			StringToUpper(string);
+			strings.push_back(string);
 		} while (++dirit);
 	}
 
 	std::vector<SelectOption> TAOptions;
 	std::sort(strings.begin(), strings.end());
 	for (size_t i =0; i < strings.size(); i++) {
-		TAOptions.push_back(std::make_pair(i, strings[i]));
+		String* string = StringFromCString(strings[i].c_str());
+		TAOptions.push_back(std::make_pair(i, *string));
+		delete string;
 	}
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
-
-	return PyInt_FromLong( TAOptions.size() );
+	
+	return MakePyList<const std::string&, PyString_FromStringObj>(strings);
 }
 
 

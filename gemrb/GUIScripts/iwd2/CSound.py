@@ -49,7 +49,7 @@ def OnLoad():
 	TextAreaControl = SoundWindow.GetControl(45)
 	TextAreaControl.SetVarAssoc("Sound", 0)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
-	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
+	RowCount = len(TextAreaControl.ListResources(CHR_SOUNDS))
 
 	PlayButton = SoundWindow.GetControl(47)
 	PlayButton.SetText(17318)
