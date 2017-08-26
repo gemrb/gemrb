@@ -53,11 +53,11 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			selOption->AppendContent(new TextSpan(optNum, NULL, ta.palettes[PALETTE_SELECTED]));
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], NULL, NULL, &flexFrame));
-		
 		AddSubviewInFrontOfView(selOption);
+		
 		if (EventMgr::TouchInputEnabled) {
-			// now add a newline for keeping the options spaced out (for touch screens)
-			AppendText(L"\n");
+			// keeping the options spaced out (for touch screens)
+			r.y += ta.LineHeight();
 		}
 		r.y += ta.LineHeight();
 	}
