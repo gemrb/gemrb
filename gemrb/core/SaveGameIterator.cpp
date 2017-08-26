@@ -470,16 +470,16 @@ static bool DoSaveGame(const char *Path)
 
 	// Create area preview
 	// FIXME: the preview shoudl be passed in by the caller!
-	core->HideGUI();
+
 	// redraw game window, as it is hidden behind a black overlay
 	core->GetWindowManager()->DrawWindows();
-	Sprite2D* preview = core->GetWindowManager()->GetScreenshot(NULL);
+	WindowManager* wm = core->GetWindowManager();
+	Sprite2D* preview = wm->GetScreenshot(wm->GetGameWindow());
 	// scale down to get more of the screen and reduce the size
 	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 10);
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
-	core->ShowGUI();
 
 	return true;
 }
