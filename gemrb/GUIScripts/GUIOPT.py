@@ -566,7 +566,6 @@ def QuitGamePress ():
 	CloseQuitMsgWindow()
 
 	GemRB.QuitGame ()
-	OpenOptionsWindow()
 	GemRB.SetNextScript ("Start")
 	return
 
