@@ -476,7 +476,7 @@ static bool DoSaveGame(const char *Path)
 	WindowManager* wm = core->GetWindowManager();
 	Sprite2D* preview = wm->GetScreenshot(wm->GetGameWindow());
 	// scale down to get more of the screen and reduce the size
-	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 10);
+	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
