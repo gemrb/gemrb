@@ -80,7 +80,9 @@ WindowManager::WindowManager(Video* vid)
 WindowManager::~WindowManager()
 {
 	DestroyWindows(closedWindows);
+	assert(closedWindows.empty());
 	DestroyWindows(windows);
+	assert(windows.empty());
 
 	video->DestroyBuffer(cursorBuf);
 	video->DestroyBuffer(winFrameBuf);
@@ -90,11 +92,17 @@ WindowManager::~WindowManager()
 
 void WindowManager::DestroyWindows(WindowList& list)
 {
-	while (!list.empty()) {
-        delete list.back();
-		list.pop_back();
+	WindowList::iterator it = list.begin();
+	for (; it != list.end();) {
+		Window* win = *it;
+		// IMPORTANT: ensure the window (a control subview) isnt executing a callback before deleting it
+		if (win->InHandler() == false) {
+			delete win;
+			it = list.erase(it);
+		} else {
+			++it;
+		}
 	}
-	list.clear();
 }
 
 bool WindowManager::IsOpenWindow(Window* win) const
@@ -212,22 +220,10 @@ void WindowManager::ShowAllWindows()
 
 Window* WindowManager::MakeWindow(const Region& rgn)
 {
+	DestroyWindows(closedWindows);
+
 	Window* win = new Window(rgn, *this);
 	windows.push_back(win);
-
-	if (closedWindows.size() > 1) {
-		// delete all but the most recent closed window
-		// FIXME: this is intended for caching (in case the last window is reopened)
-		// but currently there is no way to reopen a window (other than recreating it)
-		// IMPORTANT: aside from caching, the last window probably is in a callback that resulted in this new window...
-		WindowList::iterator it = closedWindows.begin();
-		for (; it != --closedWindows.end();) {
-			Window* win = *it;
-			delete win;
-			it = closedWindows.erase(it);
-		}
-	}
-
 	return win;
 }
 
