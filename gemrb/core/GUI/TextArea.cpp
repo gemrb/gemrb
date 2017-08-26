@@ -247,36 +247,6 @@ void TextArea::UpdateScrollview()
 		Point p(0, TextHeight());
 		selectOptions->SetFrameOrigin(p);
 	}
-	/*
-	int textHeight = ContentHeight();
-	Region nodeBounds;
-	if (dialogBeginNode) {
-		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
-		// add the height of a newline too so that there is a space
-		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-		Size selectFrame = selectOptions->Dimensions();
-		// page = blank line + dialog node + blank line + select options
-		int pageH = ftext->LineHeight + nodeBounds.h + selectFrame.h;
-		if (pageH < frame.h) {
-			// if the node isnt a full page by itself we need to fake it
-			textHeight += frame.h - pageH;
-		}
-	}
-	int rowHeight = GetRowHeight();
-	int newRows = (textHeight + rowHeight - 1) / rowHeight; // round up
-	if (newRows != rows) {
-		UpdateRowCount(textHeight);
-		ieWord visibleRows = (frame.h / GetRowHeight());
-		ieWord sbMax = (rows > visibleRows) ? (rows - visibleRows) : 0;
-		scrollbar->SetValueRange(0, sbMax);
-	}
-
-	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL
-		&& dialogBeginNode) {
-		// now scroll dialogBeginNode to the top less a blank line
-		ScrollToY(nodeBounds.y - ftext->LineHeight);
-	}
-	 */
 }
 
 /** Sets the Actual Text */
