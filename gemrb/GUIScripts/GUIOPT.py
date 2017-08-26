@@ -124,8 +124,6 @@ def OpenOptionsWindow ():
 		MoviesButton.SetText (15415)
 		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
 
-	RestoreWinVisibility ()
-
 	return
 
 def TrySavingConfiguration():
@@ -481,14 +479,6 @@ def CloseSubSubOptionsWindow ():
 		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def RestoreWinVisibility ():
-	if OptionsWindow:
-		OptionsWindow.Focus()
-	if GameOptionsWindow:
-		GameOptionsWindow.Focus()
-	if PortraitWindow:
-		PortraitWindow.Focus()
-
 ###################################################
 
 def OpenSaveMsgWindow ():
@@ -533,8 +523,6 @@ def CloseLoadMsgWindow ():
 	if LoadMsgWindow:
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
-
-	RestoreWinVisibility ()
 
 	return
 
@@ -594,7 +582,7 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelQuitMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
 	Button.MakeEscape()
 
 	# Do you wish to save the game ....
@@ -602,13 +590,6 @@ def OpenQuitMsgWindow ():
 	Text.SetText (16456)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CancelQuitMsgWindow ():
-	CloseQuitMsgWindow()
-
-	RestoreWinVisibility ()
-
 	return
 
 def CloseQuitMsgWindow ():
