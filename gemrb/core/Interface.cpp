@@ -411,7 +411,10 @@ Interface::~Interface(void)
 
 GameControl* Interface::StartGameControl()
 {
-	if (gamectrl) return gamectrl; // if this was already called we dont want to leak
+	if (gamectrl) {
+		gamectrl->SetDisabled(false);
+		return gamectrl; // if this was already called we dont want to leak
+	}
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
@@ -550,6 +553,7 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		gamectrl->SetDisabled(true);
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
@@ -558,6 +562,7 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
+		
 		LoadGame(LoadGameIndex.get(), VersionOverride );
 		LoadGameIndex.release();
 		//after loading a game, always check if the game needs to be upgraded
