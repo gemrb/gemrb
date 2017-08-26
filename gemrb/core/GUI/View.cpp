@@ -80,7 +80,7 @@ void View::MarkDirty(bool recursive)
 	if (dirty == false) {
 		dirty = true;
 
-		if (superView) {
+		if (superView && !IsOpaque()) {
 			superView->DirtyBGRect(frame);
 		}
 
@@ -119,12 +119,14 @@ bool View::IsVisible() const
 
 void View::DirtyBGRect(const Region& r)
 {
+	// no need to draw the parent BG for opaque views
+	if (superView && !IsOpaque()) {
+		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.Origin()), r.Dimensions()));
+		superView->DirtyBGRect(rgn);
+	}
+
 	// if we are going to draw the entire BG, no need to compute and store this
 	if (NeedsDraw())
-		return;
-	
-	// no need to draw the BG fro opaque views
-	if (IsOpaque())
 		return;
 
 	// do we want to intersect this too?
@@ -132,7 +134,9 @@ void View::DirtyBGRect(const Region& r)
 	Region clip(Point(), Dimensions());
 	dirtyBGRects.push_back( r.Intersect(clip) );
 	
-	MarkDirty(false);
+	// FIXME: really need to implement partial drawing
+	MarkDirty();
+	//MarkDirty(false);
 }
 
 void View::DrawSubviews() const
@@ -145,16 +149,6 @@ void View::DrawSubviews() const
 
 void View::DrawBackground(const Region* rgn) const
 {
-	if (superView && !IsOpaque()) {
-		if (rgn) {
-			Region r = frame.Intersect(Region(ConvertPointToSuper(rgn->Origin()), rgn->Dimensions()));
-			superView->DrawBackground(&r);
-		} else {
-			// already in super coordinates
-			superView->DrawBackground(&frame);
-		}
-	}
-
 	// FIXME: technically its possible for the BG to be smaller than the view
 	// if this were to happen then the areas outside the BG wouldnt get redrawn
 	// we should probably draw black in those areas...
@@ -189,9 +183,7 @@ void View::Draw()
 	WillDraw();
 
 	if (NeedsDraw()) {
-		if (background) {
-			DrawBackground(NULL);
-		}
+		DrawBackground(NULL);
 		DrawSelf(drawFrame, intersect);
 		dirty = false;
 	} else {
@@ -202,9 +194,11 @@ void View::Draw()
 	}
 
 	dirtyBGRects.clear();
+
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
 	DidDraw(); // notify subclasses that drawing finished
+	
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }
