@@ -59,7 +59,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			// keeping the options spaced out (for touch screens)
 			r.y += ta.LineHeight();
 		}
-		r.y += ta.LineHeight();
+		r.y += selOption->Dimensions().h;
 	}
 	
 	MakeSelection(0);
