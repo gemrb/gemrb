@@ -72,10 +72,10 @@ void View::SetCursor(Sprite2D* c)
 	cursor = c;
 }
 
-// TODO: while GemRB does support nested subviews, it does not support overlapping subviews (same superview, intersecting frame)
-// if we wanted to support this we would have to change this to MarkDirty(Region r) and mark all intersecting subviews dirty
-// we also would need this to support partial View redraws
-void View::MarkDirty(bool recursive)
+// TODO: while GemRB does support nested subviews, it does not (fully) support overlapping subviews (same superview, intersecting frame)
+// expect weird things to happen with them
+// this method takes the dirty region so the framework exists, but currently this just invalidates any intersecting subviews
+void View::MarkDirty(const Region* rgn)
 {
 	if (dirty == false) {
 		dirty = true;
@@ -84,10 +84,12 @@ void View::MarkDirty(bool recursive)
 			superView->DirtyBGRect(frame);
 		}
 
-		if (recursive) {
-			std::list<View*>::iterator it;
-			for (it = subViews.begin(); it != subViews.end(); ++it) {
-				(*it)->MarkDirty();
+		std::list<View*>::iterator it;
+		for (it = subViews.begin(); it != subViews.end(); ++it) {
+			View* view = *it;
+			if (rgn == NULL || view->frame.IntersectsRegion(*rgn)) {
+				// TODO: implement partial redraws and pass the intersection rather than invalidating the entire view
+				view->MarkDirty();
 			}
 		}
 	}
@@ -95,7 +97,7 @@ void View::MarkDirty(bool recursive)
 
 void View::MarkDirty()
 {
-	return MarkDirty(true);
+	return MarkDirty(NULL);
 }
 
 bool View::NeedsDraw() const
@@ -132,11 +134,10 @@ void View::DirtyBGRect(const Region& r)
 	// do we want to intersect this too?
 	//Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
 	Region clip(Point(), Dimensions());
-	dirtyBGRects.push_back( r.Intersect(clip) );
+	Region dirty = r.Intersect(clip);
+	dirtyBGRects.push_back(dirty);
 	
-	// FIXME: really need to implement partial drawing
-	MarkDirty();
-	//MarkDirty(false);
+	MarkDirty(&dirty);
 }
 
 void View::DrawSubviews() const

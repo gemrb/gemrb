@@ -63,7 +63,7 @@ private:
 	void DirtyBGRect(const Region&);
 	void DrawBackground(const Region*) const;
 	void DrawSubviews() const;
-	void MarkDirty(bool recursive);
+	void MarkDirty(const Region*);
 
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
