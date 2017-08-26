@@ -553,6 +553,8 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		// FIXME: should close all windows, but must fix github issue #5
+		// winmgr->CloseAllWindows();
 		gamectrl->SetDisabled(true);
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
