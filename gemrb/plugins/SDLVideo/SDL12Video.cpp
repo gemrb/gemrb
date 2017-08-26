@@ -132,6 +132,8 @@ Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
 	void* pixels = malloc( Width * Height * 3 );
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
 															0x00ff0000, 0x0000ff00, 0x000000ff);
+	
+	Video::SwapBuffers(0); // swap the buffer to update the display
 	SDL_Rect src = RectFromRegion(r);
 	SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 
