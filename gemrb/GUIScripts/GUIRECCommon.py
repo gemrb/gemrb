@@ -413,11 +413,18 @@ def OpenScriptWindow ():
 	script = GemRB.GetPlayerScript (pc)
 	if script == None:
 		script = "None"
+
+	# FIXME: this doesnt seem to work with "None", returns -1
 	scriptindex = ScriptsTable.GetRowIndex (script)
-	ScriptTextArea.SetOptions (options, "Selected", scriptindex)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
-	UpdateScriptSelection ()
+
+	def UpdateScriptSelection(ta, val):
+		SelectedTextArea.SetText (options[val])
+		return
+	
+	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
+	ScriptTextArea.SetVarAssoc("Selected", scriptindex)
 
 	DoneButton = SubCustomizeWindow.GetControl (5)
 	DoneButton.SetText (11973)
@@ -429,7 +436,6 @@ def OpenScriptWindow ():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
-	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -439,11 +445,6 @@ def DoneScriptWindow ():
 	script = ScriptsTable.GetRowName (GemRB.GetVar ("Selected") )
 	GemRB.SetPlayerScript (pc, script)
 	CloseSubCustomizeWindow ()
-	return
-
-def UpdateScriptSelection():
-	text = ScriptTextArea.QueryText ()
-	SelectedTextArea.SetText (text)
 	return
 
 def RevertBiography():
