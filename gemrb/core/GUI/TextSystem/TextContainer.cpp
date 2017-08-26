@@ -511,6 +511,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	//SetFrameSize(contentBounds);
 	frame.w = contentBounds.w;
 	frame.h = contentBounds.h;
+	
+	MarkDirty();
 }
 
 void ContentContainer::DeleteContentsInRect(Region exclusion)
