@@ -243,6 +243,10 @@ ieDword TextArea::LineCount() const
 
 void TextArea::UpdateScrollview()
 {
+	if (selectOptions) {
+		Point p(0, TextHeight());
+		selectOptions->SetFrameOrigin(p);
+	}
 	/*
 	int textHeight = ContentHeight();
 	Region nodeBounds;
@@ -535,9 +539,8 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 
 	selectOptions = new SpanSelector(*this, strings, numbered);
-	Point p(0, ContentHeight());
-	selectOptions->SetFrameOrigin(p);
 	scrollview.AddSubviewInFrontOfView(selectOptions);
+	
 	UpdateScrollview();
 }
 
