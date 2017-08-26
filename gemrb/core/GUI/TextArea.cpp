@@ -44,7 +44,6 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	Region r = Frame();
 	for (size_t i = 0; i < opts.size(); i++) {
-		// FIXME: wrong frame
 		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
 		if (numbered) {
 			wchar_t optNum[6];
@@ -55,12 +54,12 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], NULL, NULL, &flexFrame));
 		
-		AppendText(L"test");
 		AddSubviewInFrontOfView(selOption);
 		if (EventMgr::TouchInputEnabled) {
 			// now add a newline for keeping the options spaced out (for touch screens)
 			AppendText(L"\n");
 		}
+		r.y += ta.LineHeight();
 	}
 	
 	MakeSelection(0);
