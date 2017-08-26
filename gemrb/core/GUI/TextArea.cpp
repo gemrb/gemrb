@@ -503,7 +503,10 @@ String TextArea::QueryText() const
 	if (selectOptions) {
 		return selectOptions->Selection()->Text();
 	}
-	return textContainer->Text();
+	if (textContainer) {
+		return textContainer->Text();
+	}
+	return String();
 }
 
 void TextArea::ClearSelectOptions()
