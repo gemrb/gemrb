@@ -72,8 +72,8 @@ public:
 	struct Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
-		static const Control::Action Done = ACTION_CUSTOM(1);
-		static const Control::Action Cancel = ACTION_CUSTOM(2);
+		static const Control::Action Done = ACTION_CUSTOM(0);
+		static const Control::Action Cancel = ACTION_CUSTOM(1);
 	};
 
 	TextEdit(const Region& frame, unsigned short maxLength, Point p);

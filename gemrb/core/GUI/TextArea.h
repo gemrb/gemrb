@@ -163,7 +163,7 @@ public: //Events
 	struct Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
-		static const Control::Action Select = ACTION_CUSTOM(1); // selection event such as dialog or a listbox
+		static const Control::Action Select = ACTION_CUSTOM(0); // selection event such as dialog or a listbox
 	};
 
 	/** Key Press Event */
