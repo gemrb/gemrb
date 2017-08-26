@@ -479,13 +479,19 @@ void TextArea::UpdateState(unsigned int optIdx)
 
 	PerformAction(Action::Select);
 }
+	
+int TextArea::TextHeight() const
+{
+	return (textContainer) ? textContainer->Dimensions().h : 0;
+}
+int TextArea::OptionsHeight() const
+{
+	return (selectOptions) ? selectOptions->Dimensions().h : 0;
+}
 
 int TextArea::ContentHeight() const
 {
-	int cHeight = 0;
-	cHeight += (textContainer) ? textContainer->Dimensions().h : 0;
-	cHeight += (selectOptions) ? selectOptions->Dimensions().h : 0;
-	return cHeight;
+	return TextHeight() + OptionsHeight();
 }
 
 String TextArea::QueryText() const

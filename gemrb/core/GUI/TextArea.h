@@ -155,6 +155,8 @@ private: //internal functions
 	void UpdateRowCount(int h);
 	void UpdateScrollview();
 
+	int TextHeight() const;
+	int OptionsHeight() const;
 	int ContentHeight() const;
 
 public: //Events
