@@ -110,6 +110,8 @@ public:
 
 	void OnMouseDrag(const MouseEvent&);
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	
+	bool InHandler() const;
 
 private: // Private attributes
 	std::set<Control*> Controls;

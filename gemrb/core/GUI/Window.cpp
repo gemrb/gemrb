@@ -360,6 +360,17 @@ bool Window::DispatchEvent(const Event& event)
 	}
 	return false;
 }
+	
+bool Window::InHandler() const
+{
+	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+		Control* ctrl = *c;
+		if (ctrl->InHandler()) {
+			return true;
+		}
+	}
+	return false;
+}
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
 {

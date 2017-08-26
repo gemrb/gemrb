@@ -154,8 +154,10 @@ public:
 
 	typedef std::pair<ieDword, ieDword> ValueRange;
 	const static ValueRange MaxValueRange;
+	
 	ieDword GetValue() const { return Value; }
 	ValueRange GetValueRange() const { return range; }
+	
 	void SetValue(ieDword val);
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
@@ -163,6 +165,8 @@ public:
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
     // TODO: implement generic handlers for the other types of event actions
+	
+	bool InHandler() const { return inHandler; }
 	
 protected:
 	struct ActionKey {
@@ -199,7 +203,7 @@ private:
 	Timer* actionTimer;
 	
 	/** True if we are currently in an event handler */
-	int InHandler;
+	int inHandler;
 
 	/** the value of the control to add to the variable */
 	ieDword Value;
