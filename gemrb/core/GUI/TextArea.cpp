@@ -81,6 +81,10 @@ void TextArea::SpanSelector::ClearHover()
 void TextArea::SpanSelector::MakeSelection(size_t idx)
 {
 	TextContainer* optspan = TextAtIndex(idx);
+	
+	if (optspan == selectedSpan) {
+		return; // already selected
+	}
 
 	if (selectedSpan && selectedSpan != optspan) {
 		// reset the previous selection
@@ -89,6 +93,9 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 	}
 	selectedSpan = optspan;
 	selectedSpan->SetPalette(ta.palettes[PALETTE_SELECTED]);
+	
+	// beware, this will recursively call this function.
+	ta.UpdateState(static_cast<unsigned int>(idx));
 }
 	
 TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
@@ -129,7 +136,7 @@ void TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 		unsigned int idx = 0;
 		while (*it++ != span) { ++idx; };
 		
-		ta.UpdateState(idx + 1);
+		MakeSelection(idx);
 	}
 }
 	
