@@ -506,6 +506,7 @@ def OpenLoadMsgWindow ():
 		return
 
 	LoadMsgWindow = Window = GemRB.LoadWindow (4)
+	Window.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	# Load
 	Button = Window.GetControl (0)
