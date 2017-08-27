@@ -24,6 +24,7 @@
 
 import GemRB
 import GameCheck
+import GUICommonWindows
 import LoadScreen
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -331,6 +332,7 @@ def CloseSaveWindow ():
 		SaveWindow.Unload ()
 		SaveWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+	GUICommonWindows.CloseTopWindow ()
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()
 		GemRB.SetNextScript ("Start")
