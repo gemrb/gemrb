@@ -389,6 +389,7 @@ def OpenScriptWindow ():
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
 	defaultCount = ScriptsTable.GetRowCount ()
 
+	options = []
 	i = 0
 	for script in scripts:
 		if i < defaultCount:
