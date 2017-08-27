@@ -571,6 +571,10 @@ def OpenQuitMsgWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (15589)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGamePress)
+	if GUISAVE.SaveWindow:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	# Quit Game
 	Button = Window.GetControl (1)
