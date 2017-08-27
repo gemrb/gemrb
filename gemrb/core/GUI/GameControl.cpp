@@ -1212,7 +1212,10 @@ void GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		return;
 	}
 
-	Map* area = core->GetGame()->GetCurrentArea();
+	Game *game = core->GetGame();
+	if (!game) return;
+	Map *area = game->GetCurrentArea();
+	if (!area) return;
 	Point gameMousePos = GameMousePos();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
