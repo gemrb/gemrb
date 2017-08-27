@@ -39,8 +39,8 @@
 
 namespace GemRB {
 
-extern unsigned char pl_uppercase[256];
-extern unsigned char pl_lowercase[256];
+extern GEM_EXPORT unsigned char pl_uppercase[256];
+extern GEM_EXPORT unsigned char pl_lowercase[256];
 	
 //typedef std::basic_string<ieWord> String;
 typedef std::wstring String;
@@ -53,8 +53,8 @@ GEM_EXPORT char* MBCStringFromString(const String& string);
 inline wchar_t tolower(wchar_t c) { return ::towlower(c); }
 inline wchar_t toupper(wchar_t c) { return ::towupper(c); }
 
-GEM_EXPORT template <typename T>
-T ToLower(T c) {
+template <typename T>
+GEM_EXPORT T ToLower(T c) {
 	if (c < 256) {
 		return pl_lowercase[static_cast<unsigned char>(c)];
 	} else {
@@ -62,8 +62,8 @@ T ToLower(T c) {
 	}
 }
 
-GEM_EXPORT template <typename T>
-T ToUpper(T c) {
+template <typename T>
+GEM_EXPORT T ToUpper(T c) {
 	if (c < 256) {
 		return pl_uppercase[static_cast<unsigned char>(c)];
 	} else {
@@ -72,15 +72,15 @@ T ToUpper(T c) {
 }
 	
 // String manipulators
-GEM_EXPORT template <typename T>
-void StringToLower(T& string) {
+template <typename T>
+GEM_EXPORT void StringToLower(T& string) {
 	for (size_t i = 0; i < string.length(); i++) {
 		string[i] = ToLower(string[i]);
 	}
 }
 	
-GEM_EXPORT template <typename T>
-void StringToUpper(T& string) {
+template <typename T>
+GEM_EXPORT void StringToUpper(T& string) {
 	for (size_t i = 0; i < string.length(); i++) {
 		string[i] = ToUpper(string[i]);
 	}
