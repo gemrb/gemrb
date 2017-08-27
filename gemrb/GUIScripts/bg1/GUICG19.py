@@ -40,7 +40,7 @@ def OnLoad():
 	CharSoundWindow=GemRB.LoadWindow(19, "GUICG")
 
 	VoiceList = CharSoundWindow.GetControl (45)
-	RowCount = len(VoiceList.ListResources (CHR_SOUNDS))
+	VoiceList.ListResources (CHR_SOUNDS)
 	if GemRB.GetVar ("Gender")==1:
 		VoiceList.SetVarAssoc ("Selected", 3) #first male sound
 	else:

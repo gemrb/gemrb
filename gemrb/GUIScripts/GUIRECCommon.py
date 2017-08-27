@@ -391,9 +391,8 @@ def OpenScriptWindow ():
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
 	defaultCount = ScriptsTable.GetRowCount ()
 
-	options = []
-	for i in range (len(scripts)):
-		script = scripts[i]
+	i = 0
+	for script in scripts:
 		if i < defaultCount:
 			GemRB.SetToken ("script", ScriptsTable.GetRowName (i))
 			title = ScriptsTable.GetValue (i,0)
@@ -408,6 +407,8 @@ def OpenScriptWindow ():
 		else:
 			GemRB.SetToken ("script", script)
 			options.append (17167)
+
+		i += 1
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)

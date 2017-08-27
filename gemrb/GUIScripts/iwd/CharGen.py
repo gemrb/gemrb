@@ -2470,7 +2470,7 @@ def CharSoundSelect():
 
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
-	RowCount = len(CharSoundVoiceList.ListResources(CHR_SOUNDS))
+	CharSoundVoiceList.ListResources(CHR_SOUNDS)
 
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
 	CharSoundPlayButton.SetState (IE_GUI_BUTTON_ENABLED)
