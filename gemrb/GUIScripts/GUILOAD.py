@@ -25,6 +25,7 @@
 import GemRB
 import LoadScreen
 import GameCheck
+import GUICommonWindows
 from GameCheck import MAX_PARTY_SIZE
 
 LoadWindow = 0
@@ -136,6 +137,7 @@ def LoadGamePress ():
 	else:
 		# it will close windows, including the loadscreen
 		GemRB.EnterGame ()
+		GUICommonWindows.CloseTopWindow ()
 	return
 
 def GetQuickLoadSlot():
