@@ -246,134 +246,134 @@ static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectDesc effectnames[] = {
-	EffectDesc("ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1, DebugEffectFormater<false>() ), //0
-	EffectDesc("DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1, DebugEffectFormater<false>() ), //49
-	EffectDesc("DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1, DebugEffectFormater<false>() ),//84 (iwd2)
-	EffectDesc("IronSkins", fx_ironskins, 0, -1, DebugEffectFormater<false>() ), //da (iwd2)
-	EffectDesc("Color:FadeRGB", fx_fade_rgb, 0, -1, DebugEffectFormater<false>() ), //e8
-	EffectDesc("IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //e9
-	EffectDesc("ColdDamage", fx_cold_damage, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //ea
-	EffectDesc("ChillTouch", fx_chill_touch, 0, -1, DebugEffectFormater<false>() ), //ec (how)
-	EffectDesc("ChillTouchPanic", fx_chill_touch_panic, 0, -1, DebugEffectFormater<false>() ), //ec (iwd2)
-	EffectDesc("CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //ed
-	EffectDesc("SaveBonus", fx_save_bonus, 0, -1, DebugEffectFormater<false>() ), //ee
-	EffectDesc("SlowPoison", fx_slow_poison, 0, -1, DebugEffectFormater<false>() ), //ef
-	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //f0
-	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //f1
-	EffectDesc("AnimateDead", fx_animate_dead, 0, -1, DebugEffectFormater<false>() ), //f3
-	EffectDesc("Prayer2", fx_prayer, 0, -1, DebugEffectFormater<false>() ), //f4
-	EffectDesc("Curse2", fx_curse, 0, -1, DebugEffectFormater<false>() ), //f5
-	EffectDesc("SummonMonster2", fx_summon_monster2, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //f6
-	EffectDesc("BurningBlood", fx_burning_blood, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //f7
-	EffectDesc("BurningBlood2", fx_burning_blood2, EFFECT_NO_LEVEL_CHECK, -1, DebugEffectFormater<false>() ), //f7
-	EffectDesc("SummonShadowMonster", fx_summon_shadow_monster, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //f8
-	EffectDesc("Recitation", fx_recitation, 0, -1, DebugEffectFormater<false>() ), //f9
-	EffectDesc("RecitationBad", fx_recitation_bad, 0, -1, DebugEffectFormater<false>() ),//fa
-	EffectDesc("LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1, DebugEffectFormater<false>() ),//fb
-	EffectDesc("BlindingOrb", fx_blinding_orb, 0, -1, DebugEffectFormater<false>() ), //fc
-	EffectDesc("RemoveEffects", fx_remove_effects, 0, -1, DebugEffectFormater<false>() ), //fe
-	EffectDesc("SalamanderAura", fx_salamander_aura, 0, -1, DebugEffectFormater<false>() ), //ff
-	EffectDesc("UmberHulkGaze", fx_umberhulk_gaze, 0, -1, DebugEffectFormater<false>() ), //100
-	EffectDesc("ZombieLordAura", fx_zombielord_aura, 0, -1, DebugEffectFormater<false>() ),//101, duff in iwd2
-	EffectDesc("SummonCreature2", fx_summon_creature2, 0, -1, DebugEffectFormater<false>() ), //103
-	EffectDesc("AvatarRemoval", fx_avatar_removal, 0, -1, DebugEffectFormater<false>() ), //104
-	EffectDesc("SummonPomab", fx_summon_pomab, 0, -1, DebugEffectFormater<false>() ), //106
-	EffectDesc("ControlUndead", fx_control_undead, 0, -1, DebugEffectFormater<false>() ), //107
-	EffectDesc("StaticCharge", fx_static_charge, EFFECT_NO_LEVEL_CHECK, -1, DebugEffectFormater<false>() ), //108
-	EffectDesc("CloakOfFear", fx_cloak_of_fear, 0, -1, DebugEffectFormater<false>() ), //109 how/iwd2
-	EffectDesc("EyeOfTheMind", fx_eye_of_the_mind, 0, -1, DebugEffectFormater<false>() ), //10c
-	EffectDesc("EyeOfTheSword", fx_eye_of_the_sword, 0, -1, DebugEffectFormater<false>() ), //10d
-	EffectDesc("EyeOfTheMage", fx_eye_of_the_mage, 0, -1, DebugEffectFormater<false>() ), //10e
-	EffectDesc("EyeOfVenom", fx_eye_of_venom, 0, -1, DebugEffectFormater<false>() ), //10f
-	EffectDesc("EyeOfTheSpirit", fx_eye_of_the_spirit, 0, -1, DebugEffectFormater<false>() ), //110
-	EffectDesc("EyeOfFortitude", fx_eye_of_fortitude, 0, -1, DebugEffectFormater<false>() ), //111
-	EffectDesc("EyeOfStone", fx_eye_of_stone, 0, -1, DebugEffectFormater<false>() ), //112
-	EffectDesc("RemoveSevenEyes", fx_remove_seven_eyes, 0, -1, DebugEffectFormater<false>() ), //113
-	EffectDesc("RemoveEffect", fx_remove_effect, 0, -1, DebugEffectFormater<false>() ), //114
-	EffectDesc("SoulEater", fx_soul_eater, EFFECT_NO_LEVEL_CHECK, -1, DebugEffectFormater<false>() ), //115
-	EffectDesc("ShroudOfFlame", fx_shroud_of_flame, 0, -1, DebugEffectFormater<false>() ),//116
-	EffectDesc("ShroudOfFlame2", fx_shroud_of_flame2, 0, -1, DebugEffectFormater<false>() ),//116
-	EffectDesc("AnimalRage", fx_animal_rage, 0, -1, DebugEffectFormater<false>() ), //117 - berserk?
-	EffectDesc("TurnUndead2", fx_turn_undead2, 0, -1, DebugEffectFormater<false>() ), //118 iwd2
-	EffectDesc("VitriolicSphere", fx_vitriolic_sphere, EFFECT_DICED, -1, DebugEffectFormater<false>() ), //119
-	EffectDesc("SuppressHP", fx_suppress_hp, 0, -1, DebugEffectFormater<false>() ), //11a -- some stat???
-	EffectDesc("FloatText", fx_floattext, 0, -1, DebugEffectFormater<false>() ), //11b
-	EffectDesc("MaceOfDisruption", fx_mace_of_disruption, 0, -1, DebugEffectFormater<false>() ), //11c
-	EffectDesc("State:Set", fx_set_state, 0, -1, DebugEffectFormater<false>() ), //120
-	EffectDesc("CutScene", fx_cutscene, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //121
-	EffectDesc("Protection:Spell2", fx_resist_spell, 0, -1, DebugEffectFormater<false>() ), //ce
-	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1, DebugEffectFormater<false>() ), //122
-	EffectDesc("RodOfSmithing", fx_rod_of_smithing, 0, -1, DebugEffectFormater<false>() ), //123
-	EffectDesc("BeholderDispelMagic", fx_beholder_dispel_magic, 0, -1, DebugEffectFormater<false>() ),//125
-	EffectDesc("HarpyWail", fx_harpy_wail, 0, -1, DebugEffectFormater<false>() ), //126
-	EffectDesc("JackalWereGaze", fx_jackalwere_gaze, 0, -1, DebugEffectFormater<false>() ), //127
-	EffectDesc("UseMagicDeviceModifier", fx_use_magic_device_modifier, 0, -1, DebugEffectFormater<false>() ), //12a
+	EffectDesc("ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1), //0
+	EffectDesc("DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1), //49
+	EffectDesc("DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1),//84 (iwd2)
+	EffectDesc("IronSkins", fx_ironskins, 0, -1), //da (iwd2)
+	EffectDesc("Color:FadeRGB", fx_fade_rgb, 0, -1), //e8
+	EffectDesc("IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1), //e9
+	EffectDesc("ColdDamage", fx_cold_damage, EFFECT_DICED, -1), //ea
+	EffectDesc("ChillTouch", fx_chill_touch, 0, -1), //ec (how)
+	EffectDesc("ChillTouchPanic", fx_chill_touch_panic, 0, -1), //ec (iwd2)
+	EffectDesc("CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1), //ed
+	EffectDesc("SaveBonus", fx_save_bonus, 0, -1), //ee
+	EffectDesc("SlowPoison", fx_slow_poison, 0, -1), //ef
+	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1), //f0
+	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1), //f1
+	EffectDesc("AnimateDead", fx_animate_dead, 0, -1), //f3
+	EffectDesc("Prayer2", fx_prayer, 0, -1), //f4
+	EffectDesc("Curse2", fx_curse, 0, -1), //f5
+	EffectDesc("SummonMonster2", fx_summon_monster2, EFFECT_NO_ACTOR, -1), //f6
+	EffectDesc("BurningBlood", fx_burning_blood, EFFECT_DICED, -1), //f7
+	EffectDesc("BurningBlood2", fx_burning_blood2, EFFECT_NO_LEVEL_CHECK, -1), //f7
+	EffectDesc("SummonShadowMonster", fx_summon_shadow_monster, EFFECT_NO_ACTOR, -1), //f8
+	EffectDesc("Recitation", fx_recitation, 0, -1), //f9
+	EffectDesc("RecitationBad", fx_recitation_bad, 0, -1),//fa
+	EffectDesc("LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1),//fb
+	EffectDesc("BlindingOrb", fx_blinding_orb, 0, -1), //fc
+	EffectDesc("RemoveEffects", fx_remove_effects, 0, -1), //fe
+	EffectDesc("SalamanderAura", fx_salamander_aura, 0, -1), //ff
+	EffectDesc("UmberHulkGaze", fx_umberhulk_gaze, 0, -1), //100
+	EffectDesc("ZombieLordAura", fx_zombielord_aura, 0, -1),//101, duff in iwd2
+	EffectDesc("SummonCreature2", fx_summon_creature2, 0, -1), //103
+	EffectDesc("AvatarRemoval", fx_avatar_removal, 0, -1), //104
+	EffectDesc("SummonPomab", fx_summon_pomab, 0, -1), //106
+	EffectDesc("ControlUndead", fx_control_undead, 0, -1), //107
+	EffectDesc("StaticCharge", fx_static_charge, EFFECT_NO_LEVEL_CHECK, -1), //108
+	EffectDesc("CloakOfFear", fx_cloak_of_fear, 0, -1), //109 how/iwd2
+	EffectDesc("EyeOfTheMind", fx_eye_of_the_mind, 0, -1), //10c
+	EffectDesc("EyeOfTheSword", fx_eye_of_the_sword, 0, -1), //10d
+	EffectDesc("EyeOfTheMage", fx_eye_of_the_mage, 0, -1), //10e
+	EffectDesc("EyeOfVenom", fx_eye_of_venom, 0, -1), //10f
+	EffectDesc("EyeOfTheSpirit", fx_eye_of_the_spirit, 0, -1), //110
+	EffectDesc("EyeOfFortitude", fx_eye_of_fortitude, 0, -1), //111
+	EffectDesc("EyeOfStone", fx_eye_of_stone, 0, -1), //112
+	EffectDesc("RemoveSevenEyes", fx_remove_seven_eyes, 0, -1), //113
+	EffectDesc("RemoveEffect", fx_remove_effect, 0, -1), //114
+	EffectDesc("SoulEater", fx_soul_eater, EFFECT_NO_LEVEL_CHECK, -1), //115
+	EffectDesc("ShroudOfFlame", fx_shroud_of_flame, 0, -1),//116
+	EffectDesc("ShroudOfFlame2", fx_shroud_of_flame2, 0, -1),//116
+	EffectDesc("AnimalRage", fx_animal_rage, 0, -1), //117 - berserk?
+	EffectDesc("TurnUndead2", fx_turn_undead2, 0, -1), //118 iwd2
+	EffectDesc("VitriolicSphere", fx_vitriolic_sphere, EFFECT_DICED, -1), //119
+	EffectDesc("SuppressHP", fx_suppress_hp, 0, -1), //11a -- some stat???
+	EffectDesc("FloatText", fx_floattext, 0, -1), //11b
+	EffectDesc("MaceOfDisruption", fx_mace_of_disruption, 0, -1), //11c
+	EffectDesc("State:Set", fx_set_state, 0, -1), //120
+	EffectDesc("CutScene", fx_cutscene, EFFECT_NO_ACTOR, -1), //121
+	EffectDesc("Protection:Spell2", fx_resist_spell, 0, -1), //ce
+	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1), //122
+	EffectDesc("RodOfSmithing", fx_rod_of_smithing, 0, -1), //123
+	EffectDesc("BeholderDispelMagic", fx_beholder_dispel_magic, 0, -1),//125
+	EffectDesc("HarpyWail", fx_harpy_wail, 0, -1), //126
+	EffectDesc("JackalWereGaze", fx_jackalwere_gaze, 0, -1), //127
+	EffectDesc("UseMagicDeviceModifier", fx_use_magic_device_modifier, 0, -1), //12a
 	//unhardcoded hacks for IWD2
-	EffectDesc("AnimalEmpathyModifier",  fx_animal_empathy_modifier, 0, -1, DebugEffectFormater<false>() ),//12b
-	EffectDesc("BluffModifier", fx_bluff_modifier, 0, -1, DebugEffectFormater<false>() ),//12c
-	EffectDesc("ConcentrationModifier", fx_concentration_modifier, 0, -1, DebugEffectFormater<false>() ),//12d
-	EffectDesc("DiplomacyModifier", fx_diplomacy_modifier, 0, -1, DebugEffectFormater<false>() ),//12e
-	EffectDesc("IntimidateModifier", fx_intimidate_modifier, 0, -1, DebugEffectFormater<false>() ),//12f
-	EffectDesc("SearchModifier", fx_search_modifier, 0, -1, DebugEffectFormater<false>() ),//130
-	EffectDesc("SpellcraftModifier", fx_spellcraft_modifier, 0, -1, DebugEffectFormater<false>() ),//131
-	EffectDesc("TurnLevelModifier", fx_turnlevel_modifier, 0, -1, DebugEffectFormater<false>() ),//133
+	EffectDesc("AnimalEmpathyModifier",  fx_animal_empathy_modifier, 0, -1),//12b
+	EffectDesc("BluffModifier", fx_bluff_modifier, 0, -1),//12c
+	EffectDesc("ConcentrationModifier", fx_concentration_modifier, 0, -1),//12d
+	EffectDesc("DiplomacyModifier", fx_diplomacy_modifier, 0, -1),//12e
+	EffectDesc("IntimidateModifier", fx_intimidate_modifier, 0, -1),//12f
+	EffectDesc("SearchModifier", fx_search_modifier, 0, -1),//130
+	EffectDesc("SpellcraftModifier", fx_spellcraft_modifier, 0, -1),//131
+	EffectDesc("TurnLevelModifier", fx_turnlevel_modifier, 0, -1),//133
 	//unhardcoded hacks for IWD
-	EffectDesc("AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //399
+	EffectDesc("AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1), //399
 	//iwd2 effects
-	EffectDesc("Hopelessness", fx_hopelessness, 0, -1, DebugEffectFormater<false>() ), //400
-	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1, DebugEffectFormater<false>() ), //401
-	EffectDesc("AddEffectsList", fx_add_effects_list, 0, -1, DebugEffectFormater<false>() ), //402
-	EffectDesc("ArmorOfFaith", fx_armor_of_faith, 0, -1, DebugEffectFormater<false>() ), //403
-	EffectDesc("Nausea", fx_nausea, 0, -1, DebugEffectFormater<false>() ), //404
-	EffectDesc("Enfeeblement", fx_enfeeblement, 0, -1, DebugEffectFormater<false>() ), //405
-	EffectDesc("FireShield", fx_fireshield, 0, -1, DebugEffectFormater<false>() ), //406
-	EffectDesc("DeathWard", fx_death_ward, 0, -1, DebugEffectFormater<false>() ), //407
-	EffectDesc("HolyPower", fx_holy_power, 0, -1, DebugEffectFormater<false>() ), //408
-	EffectDesc("RighteousWrath", fx_righteous_wrath, 0, -1, DebugEffectFormater<false>() ), //409
-	EffectDesc("SummonAlly", fx_summon_ally, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //410
-	EffectDesc("SummonEnemy", fx_summon_enemy, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //411
-	EffectDesc("Control2", fx_control, 0, -1, DebugEffectFormater<false>() ), //412
-	EffectDesc("VisualEffectIWD2", fx_visual_effect_iwd2, 0, -1, DebugEffectFormater<false>() ), //413
-	EffectDesc("ResilientSphere", fx_resilient_sphere, 0, -1, DebugEffectFormater<false>() ), //414
-	EffectDesc("BarkSkin", fx_barkskin, 0, -1, DebugEffectFormater<false>() ), //415
-	EffectDesc("BleedingWounds", fx_bleeding_wounds, 0, -1, DebugEffectFormater<false>() ),//416
-	EffectDesc("AreaEffect", fx_area_effect, EFFECT_NO_ACTOR, -1, DebugEffectFormater<false>() ), //417
-	EffectDesc("FreeAction2", fx_free_action_iwd2, 0, -1, DebugEffectFormater<false>() ), //418
-	EffectDesc("Unconsciousness", fx_unconsciousness, 0, -1, DebugEffectFormater<false>() ), //419
-	EffectDesc("EntropyShield", fx_entropy_shield, 0, -1, DebugEffectFormater<false>() ), //421
-	EffectDesc("StormShell", fx_storm_shell, 0, -1, DebugEffectFormater<false>() ), //422
-	EffectDesc("ProtectionFromElements", fx_protection_from_elements, 0, -1, DebugEffectFormater<false>() ), //423
-	EffectDesc("ControlUndead2", fx_control_undead, 0, -1, DebugEffectFormater<false>() ), //425
-	EffectDesc("Aegis", fx_aegis, 0, -1, DebugEffectFormater<false>() ), //426
-	EffectDesc("ExecutionerEyes", fx_executioner_eyes, 0, -1, DebugEffectFormater<false>() ), //427
-	EffectDesc("EffectsOnStruck", fx_effects_on_struck, 0, -1, DebugEffectFormater<false>() ), //429
-	EffectDesc("ProjectileUseEffectList", fx_projectile_use_effect_list, 0, -1, DebugEffectFormater<false>() ), //430
-	EffectDesc("EnergyDrain", fx_energy_drain, 0, -1, DebugEffectFormater<false>() ), //431
-	EffectDesc("TortoiseShell", fx_tortoise_shell, 0, -1, DebugEffectFormater<false>() ), //432
-	EffectDesc("Blink", fx_blink, 0, -1, DebugEffectFormater<false>() ),//433
-	EffectDesc("PersistentUseEffectList", fx_persistent_use_effect_list, 0, -1, DebugEffectFormater<false>() ), //434
-	EffectDesc("DayBlindness", fx_day_blindness, 0, -1, DebugEffectFormater<false>() ), //435
-	EffectDesc("DamageReduction", fx_damage_reduction, 0, -1, DebugEffectFormater<false>() ), //436
-	EffectDesc("Disguise", fx_disguise, 0, -1, DebugEffectFormater<false>() ), //437
-	EffectDesc("HeroicInspiration", fx_heroic_inspiration, 0, -1, DebugEffectFormater<false>() ),//438
-	//EffectDesc("PreventAISlowDown", fx_prevent_ai_slowdown, 0, -1, DebugEffectFormater<false>() ), //439 same as bg2
-	EffectDesc("BarbarianRage", fx_barbarian_rage, 0, -1, DebugEffectFormater<false>() ), //440
-	EffectDesc("Cleave", fx_cleave, 0, -1, DebugEffectFormater<false>() ), //442
-	EffectDesc("MissileDamageReduction", fx_missile_damage_reduction, 0, -1, DebugEffectFormater<false>() ), //443
-	EffectDesc("TensersTransformation", fx_tenser_transformation, 0, -1, DebugEffectFormater<false>() ), //444
-	EffectDesc("SlipperyMind", fx_slippery_mind, 0, -1, DebugEffectFormater<false>() ), //445
-	EffectDesc("SmiteEvil", fx_smite_evil, 0, -1, DebugEffectFormater<false>() ), //446
-	EffectDesc("Restoration", fx_restoration, 0, -1, DebugEffectFormater<false>() ), //447
-	EffectDesc("AlicornLance", fx_alicorn_lance, 0, -1, DebugEffectFormater<false>() ), //448
-	EffectDesc("CallLightning", fx_call_lightning, 0, -1, DebugEffectFormater<false>() ), //449
-	EffectDesc("GlobeInvulnerability", fx_globe_invulnerability, 0, -1, DebugEffectFormater<false>() ), //450
-	EffectDesc("LowerResistance", fx_lower_resistance, 0, -1, DebugEffectFormater<false>() ), //451
-	EffectDesc("Bane", fx_bane, 0, -1, DebugEffectFormater<false>() ), //452
-	EffectDesc("PowerAttack", fx_power_attack, 0, -1, DebugEffectFormater<false>() ), //453
-	EffectDesc("Expertise", fx_expertise, 0, -1, DebugEffectFormater<false>() ), //454
-	EffectDesc("ArterialStrike", fx_arterial_strike, 0, -1, DebugEffectFormater<false>() ), //455
-	EffectDesc("HamString", fx_hamstring, 0, -1, DebugEffectFormater<false>() ), //456
-	EffectDesc("RapidShot", fx_rapid_shot, 0, -1, DebugEffectFormater<false>() ), //457
+	EffectDesc("Hopelessness", fx_hopelessness, 0, -1), //400
+	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1), //401
+	EffectDesc("AddEffectsList", fx_add_effects_list, 0, -1), //402
+	EffectDesc("ArmorOfFaith", fx_armor_of_faith, 0, -1), //403
+	EffectDesc("Nausea", fx_nausea, 0, -1), //404
+	EffectDesc("Enfeeblement", fx_enfeeblement, 0, -1), //405
+	EffectDesc("FireShield", fx_fireshield, 0, -1), //406
+	EffectDesc("DeathWard", fx_death_ward, 0, -1), //407
+	EffectDesc("HolyPower", fx_holy_power, 0, -1), //408
+	EffectDesc("RighteousWrath", fx_righteous_wrath, 0, -1), //409
+	EffectDesc("SummonAlly", fx_summon_ally, EFFECT_NO_ACTOR, -1), //410
+	EffectDesc("SummonEnemy", fx_summon_enemy, EFFECT_NO_ACTOR, -1), //411
+	EffectDesc("Control2", fx_control, 0, -1), //412
+	EffectDesc("VisualEffectIWD2", fx_visual_effect_iwd2, 0, -1), //413
+	EffectDesc("ResilientSphere", fx_resilient_sphere, 0, -1), //414
+	EffectDesc("BarkSkin", fx_barkskin, 0, -1), //415
+	EffectDesc("BleedingWounds", fx_bleeding_wounds, 0, -1),//416
+	EffectDesc("AreaEffect", fx_area_effect, EFFECT_NO_ACTOR, -1), //417
+	EffectDesc("FreeAction2", fx_free_action_iwd2, 0, -1), //418
+	EffectDesc("Unconsciousness", fx_unconsciousness, 0, -1), //419
+	EffectDesc("EntropyShield", fx_entropy_shield, 0, -1), //421
+	EffectDesc("StormShell", fx_storm_shell, 0, -1), //422
+	EffectDesc("ProtectionFromElements", fx_protection_from_elements, 0, -1), //423
+	EffectDesc("ControlUndead2", fx_control_undead, 0, -1), //425
+	EffectDesc("Aegis", fx_aegis, 0, -1), //426
+	EffectDesc("ExecutionerEyes", fx_executioner_eyes, 0, -1), //427
+	EffectDesc("EffectsOnStruck", fx_effects_on_struck, 0, -1), //429
+	EffectDesc("ProjectileUseEffectList", fx_projectile_use_effect_list, 0, -1), //430
+	EffectDesc("EnergyDrain", fx_energy_drain, 0, -1), //431
+	EffectDesc("TortoiseShell", fx_tortoise_shell, 0, -1), //432
+	EffectDesc("Blink", fx_blink, 0, -1),//433
+	EffectDesc("PersistentUseEffectList", fx_persistent_use_effect_list, 0, -1), //434
+	EffectDesc("DayBlindness", fx_day_blindness, 0, -1), //435
+	EffectDesc("DamageReduction", fx_damage_reduction, 0, -1), //436
+	EffectDesc("Disguise", fx_disguise, 0, -1), //437
+	EffectDesc("HeroicInspiration", fx_heroic_inspiration, 0, -1),//438
+	//EffectDesc("PreventAISlowDown", fx_prevent_ai_slowdown, 0, -1), //439 same as bg2
+	EffectDesc("BarbarianRage", fx_barbarian_rage, 0, -1), //440
+	EffectDesc("Cleave", fx_cleave, 0, -1), //442
+	EffectDesc("MissileDamageReduction", fx_missile_damage_reduction, 0, -1), //443
+	EffectDesc("TensersTransformation", fx_tenser_transformation, 0, -1), //444
+	EffectDesc("SlipperyMind", fx_slippery_mind, 0, -1), //445
+	EffectDesc("SmiteEvil", fx_smite_evil, 0, -1), //446
+	EffectDesc("Restoration", fx_restoration, 0, -1), //447
+	EffectDesc("AlicornLance", fx_alicorn_lance, 0, -1), //448
+	EffectDesc("CallLightning", fx_call_lightning, 0, -1), //449
+	EffectDesc("GlobeInvulnerability", fx_globe_invulnerability, 0, -1), //450
+	EffectDesc("LowerResistance", fx_lower_resistance, 0, -1), //451
+	EffectDesc("Bane", fx_bane, 0, -1), //452
+	EffectDesc("PowerAttack", fx_power_attack, 0, -1), //453
+	EffectDesc("Expertise", fx_expertise, 0, -1), //454
+	EffectDesc("ArterialStrike", fx_arterial_strike, 0, -1), //455
+	EffectDesc("HamString", fx_hamstring, 0, -1), //456
+	EffectDesc("RapidShot", fx_rapid_shot, 0, -1), //457
 	EffectDesc(NULL, NULL, 0, 0),
 };
 
