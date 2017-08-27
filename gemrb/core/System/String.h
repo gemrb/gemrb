@@ -23,6 +23,7 @@
 #include "ie_types.h"
 
 #include <cstring>
+#include <cwctype>
 #include <string>
 
 #ifdef HAVE_CONFIG_H
