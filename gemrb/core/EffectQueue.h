@@ -161,8 +161,6 @@ class EffectDesc {
 	EffectFunction Function;
 
 public:
-	typedef StringBuffer (*Formater)(const Effect&);
-	
 	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
 	int Flags;
 	
@@ -170,32 +168,18 @@ public:
 		int opcode;
 		int Strref;
 	};
-		
-	// add more of these or create free functions to add special logging for different effects
-	static StringBuffer FormatString(const Effect& fx) {
-		StringBuffer str;
-		str.appendFormatted("(%2d): Mod: %d, Type: %d", fx.Opcode, fx.Parameter1, fx.Parameter2);
-		return str;
-	}
 	
 	EffectDesc() {
 		Function = NULL;
 		Name = NULL;
 		opcode = -1;
-		formater = NULL;
 	}
 	
-	EffectDesc(const char* name, EffectFunction fn, int flags, int data, Formater fmt = NULL) {
+	EffectDesc(const char* name, EffectFunction fn, int flags, int data) {
 		Function = fn;
 		Name = name;
 		Flags = flags;
 		opcode = data;
-		formater = fmt;
-	}
-	
-	void LogEffect(const Effect& fx) const {
-		if (formater) Log(DEBUG, Name, formater(fx));
-		else Log(DEBUG, Name, FormatString(fx));
 	}
 	
 	operator bool() const {
@@ -203,25 +187,11 @@ public:
 	}
 	
 	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
-		if (formater) LogEffect(*fx);
 		return Function(s, a, fx);
 	}
-	
-	Formater formater;
+
 };
 	
-template<bool DEBUG>
-inline EffectDesc::Formater
-DebugEffectFormater() {
-	return NULL;
-}
-
-template<>
-inline EffectDesc::Formater
-DebugEffectFormater<true>() {
-	return EffectDesc::FormatString;
-}
-
 enum EffectFlags {
 	EFFECT_NORMAL = 0,
 	EFFECT_DICED = 1,
