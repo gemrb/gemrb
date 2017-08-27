@@ -59,7 +59,7 @@ def OpenSaveWindow ():
 	# Cancel button
 	CancelButton = Window.GetControl (ctrl_offset[6])
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSaveWindow)
 	CancelButton.MakeEscape()
 	GemRB.SetVar ("SaveIdx", 0)
 
@@ -184,7 +184,7 @@ def ConfirmedSaveGame():
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
 
-	OpenSaveWindow ()
+	CloseSaveWindow ()
 
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname, sav_version)
