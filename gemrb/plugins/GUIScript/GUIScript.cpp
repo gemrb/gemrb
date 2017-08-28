@@ -3391,11 +3391,11 @@ PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
 \n\
 **Metaclass Prototype:** SetPicture (PictureResRef, DefaultResRef)\n\
 \n\
-**Description:** Sets the Picture of a Button Control from a BMP file.\n\
+**Description:** Sets the Picture of a Button Control from a BMP file or a Sprite2D.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
-  * PictureResRef - the name of the picture (a .bmp resref)\n\
+  * PictureResRef - the name of the picture (a .bmp resref) or a Sprite2D object\n\
   * DefaultResRef - an alternate bmp should the picture be nonexistent\n\
 \n\
 **Return value:** N/A\n\
