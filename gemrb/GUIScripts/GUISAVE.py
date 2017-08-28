@@ -307,6 +307,7 @@ def DeleteGamePress():
 
 	SaveWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (ctrl_offset[12])
+	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (strs['yousure'])
