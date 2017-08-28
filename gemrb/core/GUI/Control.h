@@ -95,27 +95,27 @@ public: // Public attributes
 		Hover,
 		HoverBegin,
 		HoverEnd,
-		
+
 		// other events
 		ValueChange, // many times we only care that the value has changed, not about the event that changed it
-		
+
 		// TODO: probably others will be needed
-		
+
 		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
 	};
 
-    /** Variable length is 40-1 (zero terminator) */
-    char VarName[MAX_VARIABLE_LENGTH];
-    
-    ControlAnimation* animation;
-    Sprite2D* AnimPicture;
-    
-    /** Defines the Control ID Number used for GUI Scripting */
-    ieDword ControlID;
-    /** Type of control */
-    ieByte ControlType;
-    
-    static unsigned int ActionRepeatDelay;
+	/** Variable length is 40-1 (zero terminator) */
+	char VarName[MAX_VARIABLE_LENGTH];
+
+	ControlAnimation* animation;
+	Sprite2D* AnimPicture;
+
+	/** Defines the Control ID Number used for GUI Scripting */
+	ieDword ControlID;
+	/** Type of control */
+	ieByte ControlType;
+
+	static unsigned int ActionRepeatDelay;
 
 public:
 	Control(const Region& frame);
@@ -138,13 +138,13 @@ public:
     
 	bool TracksMouseDown() const { return bool(actionTimer); }
 
-    //Events
-    void SetAction(ControlEventHandler handler); // default action (left mouse button up)
+	//Events
+	void SetAction(ControlEventHandler handler); // default action (left mouse button up)
 	void SetAction(ControlEventHandler handler, Action type, EventButton button = 0,
                    Event::EventMods mod = 0, short count = 0);
 	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
-    /** Run specified handler, it may return error code */
-    bool PerformAction(); // perform default action (left mouse button up)
+	/** Run specified handler, it may return error code */
+	bool PerformAction(); // perform default action (left mouse button up)
 	bool PerformAction(Action action);
 	bool SupportsAction(Action action);
 
