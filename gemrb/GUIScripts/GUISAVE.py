@@ -302,9 +302,9 @@ def DeleteGameCancel():
 def DeleteGamePress():
 	global ConfirmWindow
 
-	SaveWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (ctrl_offset[12])
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
+	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (strs['yousure'])
