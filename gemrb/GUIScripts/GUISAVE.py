@@ -167,7 +167,7 @@ def QuickSavePressed():
 	GemRB.SaveGame(Slot)
 	return
 
-def AbortedSaveGame():
+def CloseConfirmWindow():
 	global ConfirmWindow
 
 	if ConfirmWindow:
@@ -175,6 +175,10 @@ def AbortedSaveGame():
 		ConfirmWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	return
+
+def AbortedSaveGame():
+	CloseConfirmWindow ()
 	return
 
 # User entered save name and pressed save/overwrite.
@@ -288,7 +292,7 @@ def EditChange():
 	return
 
 def DeleteGameConfirm():
-	global Games, ConfirmWindow
+	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Pos = TopIndex + GemRB.GetVar ("SaveIdx")
@@ -298,19 +302,12 @@ def DeleteGameConfirm():
 		GemRB.SetVar ("TopIndex",TopIndex-1)
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress()
-	if ConfirmWindow:
-		ConfirmWindow.Unload ()
-		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+
+	CloseConfirmWindow ()
 	return
 
 def DeleteGameCancel():
-	global ConfirmWindow
-
-	if ConfirmWindow:
-		ConfirmWindow.Unload ()
-		ConfirmWindow = None
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	CloseConfirmWindow ()
 	return
 
 def DeleteGamePress():
