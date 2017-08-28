@@ -630,6 +630,13 @@ void Button::SetPicture(Sprite2D* newpic)
 	ClearPictureList();
 	Picture = newpic;
 	if (Picture) {
+		// try fitting to width if rescaling is possible, otherwise we automatically crop
+		unsigned int ratio = Picture->Width / frame.w;
+		if (ratio > 1) {
+			Sprite2D *img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
+			Sprite2D::FreeSprite(Picture);
+			Picture = img;
+		}
 		Picture->acquire();
 		flags |= IE_GUI_BUTTON_PICTURE;
 	} else {
