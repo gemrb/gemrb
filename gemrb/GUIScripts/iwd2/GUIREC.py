@@ -1209,7 +1209,7 @@ def OpenLevelUpWindow ():
 	Button.SetText (36789)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLUKitWindow)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault ()
 
 	# static Class selection
 	#Label = Window.GetControl (0x10000000)
@@ -1318,7 +1318,7 @@ def OpenLUKitWindow ():
 	Button.SetText (36789)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault ()
 
 	# 1 does not exist, 2-10 are kit buttons
 	# 11 scrollbar, 12 back

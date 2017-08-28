@@ -312,7 +312,7 @@ def DeleteGamePress():
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (strs['delete'])
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
-	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DeleteButton.MakeDefault ()
 
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (strs['cancel'])

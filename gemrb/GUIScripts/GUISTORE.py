@@ -1086,7 +1086,7 @@ def OpenItemAmountWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmItemAmount)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault ()
 
 	# Cancel
 	Button = Window.GetControl (1)
