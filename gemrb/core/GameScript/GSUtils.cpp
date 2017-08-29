@@ -302,8 +302,9 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Point p=map->TMap->GetMapSize();
-	if (p != mp) {
+	Size size = map->TMap->GetMapSize();
+	Region r(Point(), size);
+	if (!r.PointInside(mp)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
