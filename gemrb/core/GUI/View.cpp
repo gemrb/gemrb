@@ -385,9 +385,14 @@ void View::SetFrame(const Region& r)
 
 void View::SetFrameOrigin(const Point& p)
 {
+	Point oldP = frame.Origin();
+	if (oldP == p) return;
+	
 	MarkDirty(); // refresh the old position in the superview
 	frame.x = p.x;
 	frame.y = p.y;
+	
+	OriginChanged(oldP);
 }
 
 void View::SetFrameSize(const Size& s)

@@ -79,6 +79,7 @@ private:
 	// TODO: RESIZE_WIDTH, RESIZE_HEIGHT, and RESIZE_SUBVIEWS should all do something on change
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
+	virtual void OriginChanged(const Point&) {}
 	virtual void WillDraw() {}
 	virtual void DidDraw() {}
 
