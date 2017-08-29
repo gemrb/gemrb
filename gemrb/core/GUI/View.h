@@ -72,8 +72,8 @@ private:
 
 	void AddedToView(View*);
 	void RemovedFromView(View*);
-	virtual void SubviewAdded(View* view, View* parent);
-	virtual void SubviewRemoved(View* view, View* parent);
+	virtual void SubviewAdded(View* view, View* parent) {};
+	virtual void SubviewRemoved(View* view, View* parent) {};
 
 	// notifications
 	// TODO: RESIZE_WIDTH, RESIZE_HEIGHT, and RESIZE_SUBVIEWS should all do something on change

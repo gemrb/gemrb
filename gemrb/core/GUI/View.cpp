@@ -274,7 +274,13 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
-	SubviewAdded(front, this);
+	
+	View* ancestor = this;
+	do {
+		ancestor->SubviewAdded(front, this);
+		ancestor = ancestor->superView;
+	} while (ancestor);
+	
 	front->AddedToView(this);
 }
 
@@ -294,7 +300,13 @@ View* View::RemoveSubview(const View* view)
 
 	subView->superView = NULL;
 	SubviewRemoved(subView, this);
-	subView->RemovedFromView(this);
+	
+	View* ancestor = this;
+	do {
+		ancestor->RemovedFromView(this);
+		ancestor = ancestor->superView;
+	} while (ancestor);
+	
 	return subView;
 }
 
@@ -305,20 +317,6 @@ View* View::RemoveFromSuperview()
 		super->RemoveSubview(this);
 	}
 	return super;
-}
-
-void View::SubviewAdded(View* view, View* parent)
-{
-	if (superView) {
-		superView->SubviewAdded(view, parent);
-	}
-}
-
-void View::SubviewRemoved(View* view, View* parent)
-{
-	if (superView) {
-		superView->SubviewRemoved(view, parent);
-	}
 }
 
 void View::AddedToView(View* view)
