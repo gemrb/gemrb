@@ -47,11 +47,16 @@ ScrollView::ScrollView(const Region& frame)
 	} else {
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
-		// don't bother setting or changing the frame, other methods deal with that.
 		hscroll = NULL;
 		
 		vscroll = new ScrollBar(*sbar);
-		vscroll->SetVisible(false);
+		
+		Region sbFrame = vscroll->Frame();
+		sbFrame.x = frame.w - sbFrame.w;
+		sbFrame.y = 0;
+		sbFrame.h = frame.h;
+		
+		vscroll->SetFrame(sbFrame);
 		
 		View::AddSubviewInFrontOfView(vscroll);
 
@@ -83,19 +88,16 @@ void ScrollView::ContentSizeChanged(const Size& contentSize)
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
 	}
-	if (vscroll && contentSize.h > mySize.h) {
-		assert(vscroll);
-		
-		Region sbFrame = vscroll->Frame();
-		sbFrame.x = frame.w - sbFrame.w;
-		sbFrame.y = 0;
-		sbFrame.h = frame.h;
-		
-		vscroll->SetFrame(sbFrame);
-		vscroll->SetVisible(true);
-
-		Control::ValueRange range(0, contentSize.h - mySize.h);
-		vscroll->SetValueRange(range);
+	if (vscroll) {
+		if (contentSize.h > mySize.h) {
+			vscroll->SetVisible(true);
+			
+			int maxVal = contentSize.h - mySize.h;
+			Control::ValueRange range(0, maxVal);
+			vscroll->SetValueRange(range);
+		} else {
+			vscroll->SetVisible(false);
+		}
 	}
 }
 	
