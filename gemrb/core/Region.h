@@ -110,6 +110,14 @@ public:
 
 	Point Origin() const { return Point(x, y); }
 	Size Dimensions() const { return Size(w, h); }
+	
+	static Region RegionEnclosingRegions(Region r1, const Region& r2) {
+		r1.x = (r2.x < r1.x) ? r2.x : r1.x;
+		r1.y = (r2.y < r1.y) ? r2.y : r1.y;
+		r1.w = (r2.x + r2.w > r1.x + r1.w) ? (r2.x + r2.w) - r1.x : r1.w;
+		r1.h = (r2.y + r2.h > r1.y + r1.h) ? (r2.y + r2.h) - r1.y : r1.h;
+		return r1;
+	}
 
 	template<typename T>
 	static Region RegionEnclosingRegions(T regions) {
