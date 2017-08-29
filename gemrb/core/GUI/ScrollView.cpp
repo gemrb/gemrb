@@ -27,12 +27,48 @@ namespace GemRB {
 	
 typedef void (ScrollView::*ScrollCB)(Control*);
 	
-void ScrollView::ContentView::SizeChanged(const Size& /* oldsize */)
+void ScrollView::ContentView::SizeChanged(const Size& /*oldsize*/)
 {
 	// considering it an error for a ContentView to exist outside of a ScrollView
 	assert(superView);
 	ScrollView* sv = static_cast<ScrollView*>(superView);
-	sv->ContentSizeChanged(Frame().Dimensions());
+	sv->ContentFrameChanged();
+}
+	
+void ScrollView::ContentView::SubviewAdded(View* /*view*/, View* parent)
+{
+	if (parent == this) {
+		ResizeToSubviews();
+	}
+}
+	
+void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* parent)
+{
+	if (parent == this) {
+		ResizeToSubviews();
+	}
+}
+	
+void ScrollView::ContentView::ResizeToSubviews()
+{
+	Size newSize = superView->Dimensions();
+	
+	if (!subViews.empty()) {
+		std::list<View*>::iterator it = subViews.begin();
+		Region bounds = (*it)->Frame();
+		
+		for (++it; it != subViews.end(); ++it) {
+			Region r = (*it)->Frame();
+			bounds = Region::RegionEnclosingRegions(bounds, r);
+		}
+		
+		//Point origin = Origin() + bounds.Origin();
+		//SetFrameOrigin(origin);
+		
+		newSize.w = std::max(newSize.w, bounds.w);
+		newSize.h = std::max(newSize.h, bounds.h);
+	}
+	SetFrameSize(newSize);
 }
 
 ScrollView::ScrollView(const Region& frame)
@@ -81,9 +117,10 @@ ScrollView::~ScrollView()
 	delete vscroll;
 }
 
-void ScrollView::ContentSizeChanged(const Size& contentSize)
+void ScrollView::ContentFrameChanged()
 {
 	const Size& mySize = Dimensions();
+	const Size& contentSize = contentView.Dimensions();
 
 	if (hscroll && contentSize.w > mySize.w) {
 		// assert(hscroll);

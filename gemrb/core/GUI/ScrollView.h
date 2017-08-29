@@ -32,6 +32,11 @@ namespace GemRB {
 			private:
 			void SizeChanged(const Size& /* oldsize */);
 			
+			void SubviewAdded(View* view, View* parent);
+			void SubviewRemoved(View* view, View* parent);
+			
+			void ResizeToSubviews();
+			
 			public:
 			ContentView(const Region& frame)
 			: View(frame) {}
@@ -46,7 +51,7 @@ namespace GemRB {
 		ContentView contentView;
 
 	private:
-		void ContentSizeChanged(const Size&);
+		void ContentFrameChanged();
 		void ScrollbarValueChange(ScrollBar*);
 		
 		void WillDraw();
