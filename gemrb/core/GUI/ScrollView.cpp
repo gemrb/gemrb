@@ -69,6 +69,8 @@ ScrollView::ScrollView(const Region& frame)
 	View::AddSubviewInFrontOfView(&contentView);
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
+	
+	SetFlags(RESIZE_SUBVIEWS, OP_OR);
 }
 
 ScrollView::~ScrollView()
