@@ -2153,7 +2153,7 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 {
 	unsigned int Flags;
 	int Operation = OP_SET;
-	PARSE_ARGS3( args, "Oi|i", &self, &Flags, &Operation );
+	PARSE_ARGS3( args, "OI|i", &self, &Flags, &Operation );
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
