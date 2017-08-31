@@ -318,6 +318,7 @@ bool Window::DispatchEvent(const Event& event)
 		}
 
 		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+		assert(target == NULL || target->IsVisible());
 
 		// special event handling
 		switch (event.type) {
