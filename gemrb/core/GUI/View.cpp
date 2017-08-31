@@ -334,7 +334,7 @@ void View::RemovedFromView(View*)
 
 bool View::HitTest(const Point& p) const
 {
-	if (flags & IgnoreEvents) {
+	if (flags & (IgnoreEvents | Invisible)) {
 		return false;
 	}
 
