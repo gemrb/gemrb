@@ -23,7 +23,6 @@
 
 import GemRB
 import GameCheck
-import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
@@ -69,8 +68,8 @@ def StartLoadScreen ():
 
 	def EndLoadScreen ():
 		GemRB.SetVar ("Progress", 0)
-		MessageWindow.UpdateControlStatus()
-		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+		TMessageTA = GemRB.GetView("MsgSys", 0)
+		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 		
 		if GameCheck.IsBG2Demo():
 			Middle = LoadScreen.GetControl (3)
