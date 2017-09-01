@@ -25,6 +25,7 @@
 
 #include "Region.h"
 #include "RGBAColor.h"
+#include "Sprite2D.h"
 #include "TableMgr.h"
 
 namespace GemRB {
@@ -96,6 +97,8 @@ Region RectFromPy(PyObject* obj);
 ResRef ResRefFromPy(PyObject* obj);
 
 Holder<TableMgr> GetTable(PyObject* obj);
+
+Holder<Sprite2D> SpriteFromPy(PyObject* obj);
 
 /*
  Conversions to PyObject

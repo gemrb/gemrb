@@ -20,6 +20,7 @@
 #include "PythonErrors.h"
 
 #include "GameData.h"
+#include "ImageMgr.h"
 
 namespace GemRB {
 
@@ -89,6 +90,21 @@ Holder<TableMgr> GetTable(PyObject* obj) {
 		tm = gamedata->GetTable( PyInt_AsLong( attr ) );
 	}
 	return tm;
+}
+	
+Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
+{
+	Holder<Sprite2D> pic = NULL;
+	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
+		ResourceHolder<ImageMgr> im(PyString_AsString(pypic));
+		if (im) {
+			pic = im->GetSprite2D();
+			pic->release(); // prevent leak
+		}
+	} else if (pypic != Py_None) {
+		pic = CObject<Sprite2D>(pypic);
+	}
+	return pic;
 }
 
 // Like PyString_FromString(), but for ResRef
