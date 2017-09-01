@@ -38,7 +38,7 @@ EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 bool EventMgr::ModState(unsigned short mod)
 {
-	return modKeys.test(1 >> mod);
+	return modKeys.test(mod >> 1);
 }
 
 bool EventMgr::ButtonState(unsigned short btn)
