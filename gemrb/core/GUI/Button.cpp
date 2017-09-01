@@ -328,7 +328,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 	
 	if (IsDisabled()) {
-		static Color c(50, 30, 10, 120);
+		static const Color c(50, 30, 10, 120);
 		video->DrawRect(rgn, c, true);
 	}
 }
