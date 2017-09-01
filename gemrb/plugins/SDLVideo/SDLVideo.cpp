@@ -87,7 +87,10 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	if (!EvntManager)
 		return GEM_ERROR;
 
-	int modstate = GetModState(event.key.keysym.mod);
+	// FIXME: technically event.key.keysym.mod should be the mod,
+	// but for the mod keys themselves this is 0 and therefore not what GemRB expects
+	// int modstate = GetModState(event.key.keysym.mod);
+	int modstate = GetModState(SDL_GetModState());
 	SDLKey sym = event.key.keysym.sym;
 	SDL_Keycode key = sym;
 	Event e;
@@ -224,7 +227,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:
-			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y));
+			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -232,8 +235,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
 			Point p(event.button.x, event.button.y);
 			EventButton btn = SDL_BUTTON(event.button.button);
-			int mod =  GetModState(SDL_GetModState());
-			e = EvntManager->CreateMouseBtnEvent(p, btn, down, mod);
+			e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
 			EvntManager->DispatchEvent(e);
 			break;
 	}
