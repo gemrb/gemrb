@@ -174,6 +174,10 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
 	// FIXME: this should probably account for modal windows
 	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
+	
+	if (hoverWin == win || hoverWin == win2) {
+		hoverWin = NULL;
+	}
 
 	// if we only have one window, or the 2 windows are the same it is an automatic success
 	if (windows.size() > 1 && win != win2) {
