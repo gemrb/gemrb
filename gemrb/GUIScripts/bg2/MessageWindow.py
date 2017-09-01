@@ -32,22 +32,20 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
 
-MessageWindow = None
-PortraitWindow = None
-OptionsWindow = None
-TMessageTA = None # for dialog code
-
 def OnLoad():
-	global PortraitWindow, OptionsWindow, MessageWindow
-
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 	
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
 	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
+	# for reference: medium = 12 = guiwdmb8, large = 7 = guwbtp38, small = 4 = guwbtp28
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS|IE_GUI_VIEW_RESIZE_SUBVIEWS, OP_OR)
 	MessageWindow.AddAlias("MSGWIN")
+	
+	TMessageTA = MessageWindow.GetControl(1)
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	TMessageTA.AddAlias("MsgSys", 0)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
@@ -94,34 +92,77 @@ def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
 
 def UpdateControlStatus():
-	global MessageWindow, TMessageTA
-	
-	if MessageWindow is None:
-		return
-	
-	GSFlags = GemRB.GetGUIFlags()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
+	MessageWindow = GetView("MSGWIN")
 
-	TMessageTA = MessageWindow.GetControl(1)
 	ExpandButton = MessageWindow.GetControl(0)
-	ExpandButton.SetVisible(True)
-	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
+	ExpandButton.SetDisabled(False)
+
 	ContractButton = MessageWindow.GetControl(3)
-	ContractButton.SetVisible(True)
-	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
+	ContractButton.SetFlags(IE_GUI_VIEW_INVISIBLE|IE_GUI_VIEW_DISABLED, OP_NAND)
+	
+	def GetGSFlags():
+		GSFlags = GemRB.GetGUIFlags()
+		Expand = GSFlags&GS_DIALOGMASK
+		GSFlags = GSFlags-Expand
+		return (GSFlags, Expand)
+
+	def SetMWSize(size, GSFlags):
+		# FIXME: lookup the actual sizes...
+		# or if we are going to do this a lot maybe add a view flag for automatically resizing to the assigned background
+		WinSizes = {GS_SMALLDIALOG : 43,
+					GS_MEDIUMDIALOG : 109,
+					GS_LARGEDIALOG : 238}
+		
+		# FIXME: these are for 800x600. we need to do something like in GUICommon.GetWindowPack()
+		WinBG = {GS_SMALLDIALOG : "guwbtp28",
+				GS_MEDIUMDIALOG : "guiwdmb8",
+				GS_LARGEDIALOG : "guwbtp38"}
+		
+		if size not in WinSizes:
+			return
+
+		frame = MessageWindow.GetFrame()
+		diff = frame['h'] - WinSizes[size]
+		frame['y'] += diff
+		frame['h'] = WinSizes[size]
+		MessageWindow.SetFrame(frame)
+		MessageWindow.SetBackground(WinBG[size])
+		
+		frame = ContractButton.GetFrame()
+		ContractButton.SetPos(frame['x'], frame['y'] - diff)
+		
+		frame = ExpandButton.GetFrame()
+		ExpandButton.SetPos(frame['x'], frame['y'] - diff)
+		
+		GemRB.GameSetScreenFlags(size + GSFlags, OP_SET)
+
+	def OnIncreaseSize():
+		GSFlags, Expand = GetGSFlags()
+		Expand = (Expand + 1)*2 # next size up
+
+		SetMWSize(Expand, GSFlags)
+
+	def OnDecreaseSize():
+		GSFlags, Expand = GetGSFlags()
+		Expand = Expand/2 - 1 # next size down: 6->2, 2->0
+
+		SetMWSize(Expand, GSFlags)
+
+	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnDecreaseSize)
+	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnIncreaseSize)
+	
+	GSFlags, Expand = GetGSFlags()
 
 	#a dialogue is running, setting messagewindow size to maximum
 	if (GSFlags&GS_DIALOG):
-		Expand = GS_LARGEDIALOG
+		SetMWSize(GS_LARGEDIALOG, GSFlags)
 
 	if Expand == GS_LARGEDIALOG:
-		ExpandButton.SetVisible(False)
-	elif Expand == GS_SMALLDIALOG:
-		ContractButton.SetVisible(False)
+		ExpandButton.SetDisabled(True)
 
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	TMessageTA.AddAlias("MsgSys", 0)
+	elif Expand == GS_SMALLDIALOG:
+		ContractButton.SetFlags(IE_GUI_VIEW_INVISIBLE|IE_GUI_VIEW_DISABLED, OP_OR)
+
 	return
 
 def RemoveYoshimo( idx):

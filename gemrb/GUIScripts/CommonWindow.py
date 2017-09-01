@@ -28,38 +28,6 @@ def SetGameGUIHidden(hide):
 def IsGameGUIHidden():
 	return GemRB.GetGUIFlags() & GS_HIDEGUI
 
-# message window expansion
-def OnIncreaseSize():
-	GSFlags = GemRB.GetGUIFlags()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand>2:
-		return
-
-	import MessageWindow
-	frame = MessageWindow.TMessageTA.GetFrame()
-	frame['h'] += 100
-	MessageWindow.MessageWindow.SetFrame(frame)
-
-	Expand = (Expand + 1)*2
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
-
-# message window contraction
-def OnDecreaseSize():
-	GSFlags = GemRB.GetGUIFlags()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand<2:
-		return
-
-	import MessageWindow
-	frame = MessageWindow.TMessageTA.GetFrame()
-	frame['h'] -= 100
-	MessageWindow.MessageWindow.SetFrame(frame)
-
-	Expand = Expand/2 - 1 # 6->2, 2->0
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
-
 
 ##################################################################
 # functions dealing with containers
