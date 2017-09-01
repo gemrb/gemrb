@@ -326,6 +326,11 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			}
 		}
 	}
+	
+	if (IsDisabled()) {
+		static Color c(50, 30, 10, 120);
+		video->DrawRect(rgn, c, true);
+	}
 }
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
