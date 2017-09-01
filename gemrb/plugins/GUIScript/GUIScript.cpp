@@ -2118,28 +2118,23 @@ PyDoc_STRVAR( GemRB_View_SetBackground__doc,
 
 static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 {
-	char *ResRef;
-
-	if (!PyArg_ParseTuple( args, "Os", &self, &ResRef) ) {
+	PyObject* pypic;
+	if (!PyArg_ParseTuple( args, "OO", &self, &pypic) ) {
 		return NULL;
 	}
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
-
-	if (ResRef[0]) {
-		ResourceHolder<ImageMgr> im(ResRef);
-		if (im == NULL) {
-			return RuntimeError("Picture resource not found!\n");
-		}
-
-		Sprite2D* Picture = im->GetSprite2D();
-		if (Picture == NULL) {
+	
+	if (pypic == Py_None) {
+		view->SetBackground(NULL);
+	} else {
+		Holder<Sprite2D> pic = SpriteFromPy(pypic);
+		
+		if (pic == NULL) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
-		view->SetBackground(Picture);
-	} else {
-		view->SetBackground(NULL);
+		view->SetBackground(pic.get());
 	}
 
 	Py_RETURN_NONE;
@@ -3412,40 +3407,25 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 	if (!btn) {
 		return RuntimeError("Cannot find the button!\n");
 	}
-
-	Holder<Sprite2D> pic = NULL;
-	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
-		ResourceHolder<ImageMgr> im(PyString_AsString(pypic));
-		if (im) {
-			pic = im->GetSprite2D();
-			pic->release(); // prevent leak
-		}
-	} else if (pypic == Py_None) {
+	
+	if (pypic == Py_None) {
 		// clear the picture by passing None
 		btn->SetPicture(NULL);
-		Py_RETURN_NONE;
 	} else {
-		pic = CObject<Sprite2D>(pypic);
-	}
-
-	if (!pic && pydefaultPic) {
-		// use default pic
-		if (PyObject_TypeCheck( pydefaultPic, &PyString_Type )) {
-			ResourceHolder<ImageMgr> im(PyString_AsString(pydefaultPic));
-			if (im) {
-				pic = im->GetSprite2D();
-				pic->release(); // prevent leak
-			}
-		} else {
-			pic = CObject<Sprite2D>(pydefaultPic);
+		Holder<Sprite2D> pic = SpriteFromPy(pypic);
+		
+		if (!pic && pydefaultPic) {
+			// use default pic
+			pic = SpriteFromPy(pydefaultPic);
 		}
+		
+		if (!pic) {
+			return RuntimeError("Picture resource not found!\n");
+		}
+		
+		btn->SetPicture(pic.get());
 	}
 
-	if (!pic) {
-		return RuntimeError("Picture resource not found!\n");
-	}
-
-	btn->SetPicture(pic.get());
 	Py_RETURN_NONE;
 }
 
