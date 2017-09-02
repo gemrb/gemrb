@@ -25,6 +25,12 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
+#define DEBUG_VIEWS 0
+
+#if DEBUG_VIEWS
+#include "GUI/TextSystem/Font.h"
+#endif
+
 namespace GemRB {
 
 View::DragOp::DragOp(View* v) : dragView(v)
@@ -182,6 +188,28 @@ void View::Draw()
 	video->SetScreenClip(&intersect);
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
+	
+#if DEBUG_VIEWS
+	if (window == NULL ) {
+		video->DrawRect(drawFrame, ColorBlue, false);
+	} else {
+		video->DrawRect(drawFrame, ColorGreen, false);
+	}
+	
+	ViewScriptingRef* ref = GetScriptingRef();
+	if (ref) {
+		Font* fnt = core->GetFont( "NORMAL" );
+		ScriptingId id = ref->Id;
+		id &= 0x00000000ffffffff; // control id is lower 32bits
+		
+		wchar_t string[42];
+		swprintf(string, sizeof(string), L"id: %llx    group: %s", id, ref->ScriptingGroup().CString());
+		Region r = drawFrame;
+		r.h = fnt->LineHeight;
+		video->DrawRect(r, ColorBlack, true);
+		fnt->Print(r, string, NULL, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
+	}
+#endif
 
 	if (NeedsDraw()) {
 		DrawBackground(NULL);
