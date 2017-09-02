@@ -156,15 +156,14 @@ private:
 
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
-	// GameControl always needs to redraw unless we arent in a game (disabled)
-	bool NeedsDraw() { return !IsDisabled(); };
 	void WillDraw();
 
 public:
 	GameControl(const Region& frame);
 	~GameControl(void);
 
-	bool IsAnimated() const { return true; }
+	// GameControl always needs to redraw unless we arent in a game (disabled)
+	bool IsAnimated() const { return !IsDisabled(); }
 	/** Draws the target reticle for Actor movement. */
 	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
 	/** Sets multiple quicksaves flag*/
