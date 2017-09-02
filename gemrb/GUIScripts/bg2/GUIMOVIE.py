@@ -18,6 +18,7 @@
 #
 import GemRB
 import GameCheck
+from GUIDefines import *
 
 MovieWindow = 0
 TextAreaControl = 0
@@ -35,8 +36,8 @@ def OnLoad():
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	opts = [MoviesTable.GetValue (i, 0) for i in range( MoviesTable.GetRowCount () ) if GemRB.GetVar (MoviesTable.GetRowName (i))==1]
-	TextAreaControl.SetOptions(opts, "MovieIndex", 0)
+	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, MoviePress)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)
@@ -71,6 +72,11 @@ def CreditsPress():
 		MovieWindow.Unload ()
 	GemRB.SetNextScript ("GUISONGS")
 	return
+
+#def CreditsPress():
+#	GemRB.PlayMovie ("CREDITS",1)
+#	MovieWindow.Invalidate ()
+#	return
 
 def DonePress():
 	if MovieWindow:
