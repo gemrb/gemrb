@@ -2189,7 +2189,7 @@ void GameControl::SetCutSceneMode(bool active)
 	} else {
 		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
 	}
-	SetDisabled(active);
+	SetFlags(IgnoreEvents, (active) ? OP_OR : OP_NAND);
 }
 
 //Create an overhead text over a scriptable target
@@ -2250,7 +2250,7 @@ void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
 	SetBits(DialogueFlags, value, mode);
 	if (DialogueFlags&DF_IN_DIALOG) {
-		SetDisabled(false);
+		SetFlags(IgnoreEvents, OP_NAND);
 	}
 }
 
