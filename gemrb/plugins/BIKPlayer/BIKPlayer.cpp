@@ -204,7 +204,8 @@ bool BIKPlayer::Open(DataStream* stream)
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
-		if (ReadHeader()==0) {
+		validVideo = ReadHeader() == 0;
+		if (validVideo) {
 			sound_init( core->GetAudioDrv()->CanPlay());
 			return video_init() == 0;
 		}
