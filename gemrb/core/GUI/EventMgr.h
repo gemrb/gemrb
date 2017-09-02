@@ -93,7 +93,7 @@ struct GEM_EXPORT MouseEvent : public ScreenEvent {
 	EventButton button;
 
 	bool ButtonState(unsigned short btn) const {
-		return (btn) ? buttonStates & (1 >> (btn-1)) : false;
+		return buttonStates & btn;
 	}
 };
 
@@ -173,6 +173,7 @@ struct GEM_EXPORT Event {
 
 class GEM_EXPORT EventMgr {
 public:
+	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
 	typedef Callback<const Event&, bool> EventCallback;
 
 	static unsigned long DCDelay;
@@ -197,8 +198,8 @@ private:
 	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
 
-	static std::bitset<sizeof(short) * CHAR_BIT> mouseButtonFlags;
-	static std::bitset<sizeof(short) * CHAR_BIT> modKeys;
+	static buttonbits mouseButtonFlags;
+	static buttonbits modKeys;
 	static Point mousePos;
 
 public:

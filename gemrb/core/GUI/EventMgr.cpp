@@ -29,8 +29,8 @@ unsigned long EventMgr::DCDelay = 250;
 unsigned long EventMgr::DPDelay = 250;
 bool EventMgr::TouchInputEnabled = true;
 
-std::bitset<sizeof(short) * CHAR_BIT> EventMgr::mouseButtonFlags;
-std::bitset<sizeof(short) * CHAR_BIT> EventMgr::modKeys;
+EventMgr::buttonbits EventMgr::mouseButtonFlags;
+EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
@@ -38,12 +38,12 @@ EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 bool EventMgr::ModState(unsigned short mod)
 {
-	return modKeys.test(mod >> 1);
+	return (modKeys & buttonbits(mod)).any();
 }
 
 bool EventMgr::ButtonState(unsigned short btn)
 {
-	return mouseButtonFlags.test(1 >> btn);
+	return (mouseButtonFlags & buttonbits(btn)).any();
 }
 
 bool EventMgr::MouseDown()
