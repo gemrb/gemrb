@@ -74,6 +74,7 @@ private:
 	const SubtitleSet* subtitles;
 
 protected:
+	// NOTE: make sure any new movie plugins set these!
 	Video::BufferFormat movieFormat;
 	Size movieSize;
 	size_t framePos;
