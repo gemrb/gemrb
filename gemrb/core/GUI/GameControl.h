@@ -158,6 +158,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 	// GameControl always needs to redraw unless we arent in a game (disabled)
 	bool NeedsDraw() { return !IsDisabled(); };
+	void WillDraw();
 
 public:
 	GameControl(const Region& frame);

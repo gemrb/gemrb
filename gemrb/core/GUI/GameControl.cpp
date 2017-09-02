@@ -354,32 +354,30 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	core->GetVideoDriver()->DrawEllipseSegment( p.x - vpOrigin.x, p.y + step - vpOrigin.y, xradius,
 								yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
 }
-
-/** Draws the Control on the Output Display */
-void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
+	
+void GameControl::WillDraw()
 {
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
-
-	Game* game = core->GetGame();
-	if (!game) {
-		return;
-	}
-	Map *area = game->GetCurrentArea();
-	if (!area) {
-		return;
-	}
-
+	
 	// handle keeping the actor in the spotlight, but only when unpaused
 	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
 		Actor *star = core->GetFirstSelectedActor();
 		moveX = star->Pos.x - vpOrigin.x - frame.w/2;
 		moveY = star->Pos.y - vpOrigin.y - frame.h/2;
 	}
-
+	
 	if (moveX || moveY) {
 		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
 	}
+}
 
+/** Draws the Control on the Output Display */
+void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
+{
+	Game* game = core->GetGame();
+	Map *area = game->GetCurrentArea();
+
+	// FIXME: some of this should happen during mouse events
 	// setup outlines
 	InfoPoint *i;
 	unsigned int idx;
@@ -403,6 +401,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		i->Highlight = true;
 	}
 
+	// FIXME: some of this should happen during mouse events
 	Door *d;
 	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
 		d->Highlight = false;
@@ -441,6 +440,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		d->Highlight = true;
 	}
 
+	// FIXME: some of this should happen during mouse events
 	Container *c;
 	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
 		if (c->Flags & CONT_DISABLED) {
@@ -472,6 +472,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	}
 
 	//drawmap should be here so it updates fog of war
+	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 	area->DrawMap( Viewport() );
 	game->DrawWeather(screen, update_scripts);
 
