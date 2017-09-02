@@ -75,7 +75,7 @@ void MoviePlayer::Play(Window* win)
 			Stop(); // error / end
 		}
 		// TODO: pass movie fps (and remove the cap from within the movie decoders)
-	} while (isPlaying && (video->SwapBuffers(0) == GEM_OK));
+	} while ((video->SwapBuffers(0) == GEM_OK) && isPlaying);
 
 	delete win->View::RemoveSubview(mpc);
 	video->DestroyBuffer(vb);
