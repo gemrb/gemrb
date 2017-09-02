@@ -13,19 +13,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-#
+
+
+# GUIMOVIE.py - Play Movies window
+
+###################################################
+
 import GemRB
 import GameCheck
+from GUIDefines import *
 
 MovieWindow = 0
 TextAreaControl = 0
 MoviesTable = 0
-PlayButton = 0
 
 def OnLoad():
-	global MovieWindow, TextAreaControl, MoviesTable, PlayButton
+	global MovieWindow, TextAreaControl, MoviesTable
 
 	MovieWindow = GemRB.LoadWindow (0, "GUIMOVIE")
 	TextAreaControl = MovieWindow.GetControl (0)
@@ -33,30 +38,23 @@ def OnLoad():
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	opts = [MoviesTable.GetValue (i, 0) for i in range( MoviesTable.GetRowCount () ) if GemRB.GetVar (MoviesTable.GetRowName (i))==1]
-	TextAreaControl.SetOptions(opts, "MovieIndex", 0)
-	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, MoviePress)
+	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)
 	DoneButton.SetText (11973)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	MovieWindow.Focus()
 	return
 
-def MoviePress():
-	PlayButton.SetStatus (IE_GUI_BUTTON_ENABLED)
-	return
-
 def PlayPress():
 	s = GemRB.GetVar ("MovieIndex")
-	for i in range( MoviesTable.GetRowCount () ):
+	for i in range (MoviesTable.GetRowCount ()):
 		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar (t)==1:
 			if s==0:
-				PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 				s = MoviesTable.GetRowName (i)
 				GemRB.PlayMovie (s, 1)
 				return
@@ -64,9 +62,14 @@ def PlayPress():
 	return
 
 def CreditsPress():
-	if MovieWindow:
-		MovieWindow.Unload ()
-	GemRB.SetNextScript ("GUISONGS")
+	# arbitrary choice between custom jukebox and actual credits
+	if GameCheck.IsBG1() or GameCheck.IsBG2():
+		if MovieWindow:
+			MovieWindow.Unload ()
+		GemRB.SetNextScript ("GUISONGS")
+	else:
+		GemRB.PlayMovie ("CREDITS",1)
+		MovieWindow.Invalidate ()
 	return
 
 def DonePress():

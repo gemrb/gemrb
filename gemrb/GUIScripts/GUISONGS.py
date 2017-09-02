@@ -23,17 +23,29 @@ import GameCheck
 MovieWindow = 0
 TextAreaControl = 0
 MoviesTable = 0
+MoviesTableName = ""
+CreditsRef = ""
+ColOffset = 0
 
 def OnLoad():
-	global MovieWindow, TextAreaControl, MoviesTable
+	global MovieWindow, TextAreaControl, MoviesTable, MoviesTableName, ColOffset, CreditsRef
 
 	MovieWindow = GemRB.LoadWindow(0, "GUIMOVIE")
 	TextAreaControl = MovieWindow.GetControl(0)
 	PlayButton = MovieWindow.GetControl(2)
 	CreditsButton = MovieWindow.GetControl(3)
 	DoneButton = MovieWindow.GetControl(4)
-	MoviesTable = GemRB.LoadTable("MUSIC")
-	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(1,MoviesTable.GetRowCount() )], "MovieIndex",0)
+
+	if GameCheck.IsBG1():
+		MoviesTableName = "MUSIC"
+		ColOffset = 1
+		CreditsRef = "credits"
+	elif GameCheck.IsBG2():
+		MoviesTableName = "SONGLIST"
+		ColOffset = 0
+		CreditsRef = "endcrdit"
+	MoviesTable = GemRB.LoadTable (MoviesTableName)
+	TextAreaControl.SetOptions ([MoviesTable.GetValue (i, 0) for i in range(ColOffset, MoviesTable.GetRowCount())], "MovieIndex", 0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
@@ -44,13 +56,13 @@ def OnLoad():
 	return
 	
 def PlayPress():
-	s = GemRB.GetVar("MovieIndex")+1
-	t = MoviesTable.GetValue(s, 0)
+	s = GemRB.GetVar ("MovieIndex") + ColOffset
+	t = MoviesTable.GetValue (s, 1-ColOffset)
 	GemRB.LoadMusicPL(t,1)
 	return
 
 def CreditsPress():
-	GemRB.PlayMovie("credits", 1)
+	GemRB.PlayMovie (CreditsRef, 1)
 	return
 
 def DonePress():
