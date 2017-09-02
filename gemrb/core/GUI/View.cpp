@@ -188,6 +188,23 @@ void View::Draw()
 	video->SetScreenClip(&intersect);
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
+
+	if (NeedsDraw()) {
+		DrawBackground(NULL);
+		DrawSelf(drawFrame, intersect);
+		dirty = false;
+	} else {
+		Regions::iterator it = dirtyBGRects.begin();
+		while (it != dirtyBGRects.end()) {
+			DrawBackground(&(*it++));
+		}
+	}
+
+	dirtyBGRects.clear();
+
+	// always call draw on subviews because they can be dirty without us
+	DrawSubviews();
+	DidDraw(); // notify subclasses that drawing finished
 	
 #if DEBUG_VIEWS
 	if (window == NULL ) {
@@ -210,23 +227,6 @@ void View::Draw()
 		fnt->Print(r, string, NULL, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
 	}
 #endif
-
-	if (NeedsDraw()) {
-		DrawBackground(NULL);
-		DrawSelf(drawFrame, intersect);
-		dirty = false;
-	} else {
-		Regions::iterator it = dirtyBGRects.begin();
-		while (it != dirtyBGRects.end()) {
-			DrawBackground(&(*it++));
-		}
-	}
-
-	dirtyBGRects.clear();
-
-	// always call draw on subviews because they can be dirty without us
-	DrawSubviews();
-	DidDraw(); // notify subclasses that drawing finished
 	
 	// restore the screen clip
 	video->SetScreenClip(&clip);
