@@ -206,6 +206,9 @@ bool BIKPlayer::Open(DataStream* stream)
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
 		validVideo = ReadHeader() == 0;
 		if (validVideo) {
+			movieSize.w = header.width;
+			movieSize.h = header.height;
+			framePos = 0;
 			sound_init( core->GetAudioDrv()->CanPlay());
 			return video_init() == 0;
 		}
