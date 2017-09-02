@@ -2215,9 +2215,9 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	//swap in the area of the actor
 	Game* game = core->GetGame();
 	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
-		// disable so that events dont get dispatched while there is not an area
-		// we are single threaded so this isnt _really_ necessary, but we have been known to post phony events from random places
-		SetFlags(View::IgnoreEvents, OP_OR);
+		// disable so that drawing and events dispatched doesn't happen while there is not an area
+		// we are single threaded, but game loading runs its own event loop which will cause events/drawing to come in
+		SetDisabled(true);
 		ClearMouseState();
 
 		dialoghandler->EndDialog();
@@ -2232,7 +2232,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		game->GetMap( areaname, true );
 		ScreenFlags|=SF_CENTERONACTOR;
 		
-		SetFlags(View::IgnoreEvents, OP_NAND);
+		SetDisabled(false);
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
