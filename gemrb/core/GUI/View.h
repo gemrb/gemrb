@@ -111,7 +111,7 @@ public:
 	void Draw();
 
 	void MarkDirty();
-	bool NeedsDraw() const;
+	virtual bool NeedsDraw() const;
 
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const { return background != NULL; }

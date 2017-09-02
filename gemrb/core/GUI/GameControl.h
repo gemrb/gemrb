@@ -157,6 +157,7 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void WillDraw();
+	bool NeedsDraw() const { return !IsDisabled(); };
 
 public:
 	GameControl(const Region& frame);
