@@ -207,7 +207,7 @@ if (boolean) { \
 }
 
 static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
-    if (obj == Py_None) {
+    if (!obj || obj == Py_None) {
         return NULL;
     }
 
