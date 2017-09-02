@@ -1,4 +1,3 @@
-# -*-python-*-
 # GemRB - Infinity Engine Emulator
 # Copyright (C) 2003 The GemRB Project
 #
@@ -23,14 +22,16 @@
 ###################################################
 
 import GemRB
+import GameCheck
 from GUIDefines import *
 
 MovieWindow = 0
 TextAreaControl = 0
 MoviesTable = 0
+PlayButton = 0
 
-def OnLoad ():
-	global MovieWindow, TextAreaControl, MoviesTable
+def OnLoad():
+	global MovieWindow, TextAreaControl, MoviesTable, PlayButton
 
 	GemRB.LoadWindowPack ("GUIMOVIE", 640, 480)
 	MovieWindow = GemRB.LoadWindow (0)
@@ -40,41 +41,54 @@ def OnLoad ():
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	opts = [MoviesTable.GetValue (i, 0) for i in range (0, MoviesTable.GetRowCount () ) if GemRB.GetVar(MoviesTable.GetRowName (i))==1]
-	TextAreaControl.SetOptions(opts,"MovieIndex",0)
+	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
+	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, MoviePress)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)
 	DoneButton.SetText (11973)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	MovieWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
-def PlayPress ():
-	s = GemRB.GetVar("MovieIndex")
-	for i in range (0, MoviesTable.GetRowCount () ):
+def MoviePress():
+	PlayButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+	return
+
+def PlayPress():
+	s = GemRB.GetVar ("MovieIndex")
+	for i in range (MoviesTable.GetRowCount ()):
 		t = MoviesTable.GetRowName (i)
-		if GemRB.GetVar(t)==1:
+		if GemRB.GetVar (t)==1:
 			if s==0:
+				PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 				s = MoviesTable.GetRowName (i)
-				MovieWindow.SetVisible (WINDOW_INVISIBLE)
 				GemRB.PlayMovie (s, 1)
-				MovieWindow.SetVisible (WINDOW_VISIBLE)
+				MovieWindow.Invalidate ()
 				return
-
 			s = s - 1
+	return
 
+def CreditsPress():
+	# arbitrary choice between custom jukebox and actual credits
+	if GameCheck.IsBG1() or GameCheck.IsBG2():
+		if MovieWindow:
+			MovieWindow.Unload ()
+		GemRB.SetNextScript ("GUISONGS")
+	else:
+		GemRB.PlayMovie ("CREDITS",1)
+		MovieWindow.Invalidate ()
+	return
 
-def CreditsPress ():
-	MovieWindow.SetVisible (WINDOW_INVISIBLE)
-	GemRB.PlayMovie ("CREDITS", 1)
-	MovieWindow.SetVisible (WINDOW_VISIBLE)
-
-
-def DonePress ():
+def DonePress():
 	if MovieWindow:
 		MovieWindow.Unload ()
-	GemRB.SetNextScript ("Start")
-
+	if GameCheck.HasTOB():
+		GemRB.SetNextScript ("Start2")
+	else:
+		GemRB.SetNextScript ("Start")
+	return

@@ -13,9 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-#
+
+
+# GUIMOVIE.py - Play Movies window
+
+###################################################
+
 import GemRB
 import GameCheck
 from GUIDefines import *
@@ -46,6 +51,7 @@ def OnLoad():
 	PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
+	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	MovieWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -55,7 +61,7 @@ def MoviePress():
 
 def PlayPress():
 	s = GemRB.GetVar ("MovieIndex")
-	for i in range( MoviesTable.GetRowCount () ):
+	for i in range (MoviesTable.GetRowCount ()):
 		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar (t)==1:
 			if s==0:
@@ -68,15 +74,15 @@ def PlayPress():
 	return
 
 def CreditsPress():
-	if MovieWindow:
-		MovieWindow.Unload ()
-	GemRB.SetNextScript ("GUISONGS")
+	# arbitrary choice between custom jukebox and actual credits
+	if GameCheck.IsBG1() or GameCheck.IsBG2():
+		if MovieWindow:
+			MovieWindow.Unload ()
+		GemRB.SetNextScript ("GUISONGS")
+	else:
+		GemRB.PlayMovie ("CREDITS",1)
+		MovieWindow.Invalidate ()
 	return
-
-#def CreditsPress():
-#	GemRB.PlayMovie ("CREDITS",1)
-#	MovieWindow.Invalidate ()
-#	return
 
 def DonePress():
 	if MovieWindow:
