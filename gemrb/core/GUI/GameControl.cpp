@@ -1856,7 +1856,7 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	Map* area = game->GetCurrentArea();
 
 	// right click
-	if (me.button == GEM_MB_MENU) {
+	if (!isFormationRotation && me.button == GEM_MB_MENU) {
 		if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
 			SetTargetMode(TARGET_MODE_NONE);
 		}
