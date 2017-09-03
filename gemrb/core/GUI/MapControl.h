@@ -88,6 +88,9 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void DrawFog(const Region& rgn);
+	
+	Point ConvertPointToGame(Point) const;
+	Point ConvertPointFromGame(Point) const;
 };
 
 }

@@ -113,6 +113,32 @@ void MapControl::UpdateState(unsigned int Sum)
 	SetValue(Sum);
 }
 	
+Point MapControl::ConvertPointToGame(Point p) const
+{
+	Map* map = core->GetGame()->GetCurrentArea();
+	Size mapsize = map->GetSize();
+	
+	// mos is centered... first convert p to mos coordinates
+	p = p - mosRgn.Origin();
+	
+	p.x *= double(mapsize.w) / mosRgn.w;
+	p.y *= double(mapsize.h) / mosRgn.h;
+	
+	return p;
+}
+	
+Point MapControl::ConvertPointFromGame(Point p) const
+{
+	Map* map = core->GetGame()->GetCurrentArea();
+	Size mapsize = map->GetSize();
+	
+	p.x *= double(mosRgn.w) / mapsize.w;
+	p.y *= double(mosRgn.h) / mapsize.h;
+	
+	// mos is centered... convert p from mos coordinates
+	return p + mosRgn.Origin();
+}
+	
 void MapControl::WillDraw()
 {
 	if (MapMOS) {
@@ -156,12 +182,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
-			Point pos = actor->Pos;
-			pos.x *= double(mosRgn.w) / mapsize.w;
-			pos.y *= double(mosRgn.h) / mapsize.h;
-			pos.x += mosRgn.x;
-			pos.y += mosRgn.y;
-			
+			Point pos = ConvertPointFromGame(actor->Pos);
 			video->DrawEllipse( pos.x, pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
 	}
@@ -174,11 +195,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			const MapNote& mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn.color&7];
 			
-			Point pos = mn.Pos;
-			pos.x *= double(mosRgn.w) / mapsize.w;
-			pos.y *= double(mosRgn.h) / mapsize.h;
-			pos.x += mosRgn.x;
-			pos.y += mosRgn.y;
+			Point pos = ConvertPointFromGame(mn.Pos);
 			
 			//Skip unexplored map notes
 			bool visible = MyMap->IsVisible( pos, true );
