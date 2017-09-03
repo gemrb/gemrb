@@ -45,10 +45,8 @@ class Map;
 
 class GEM_EXPORT MapControl : public Control {
 private:
-	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
-	void DrawFog(const Region& rgn);
-
+	Region mosRgn;
+	
 public:
 	int NotePosX, NotePosY;
 
@@ -85,6 +83,11 @@ private:
 	void ClickHandle();
 	/** Move viewport */
 	void ViewHandle(unsigned short x, unsigned short y);
+	
+	void WillDraw();
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawFog(const Region& rgn);
 };
 
 }

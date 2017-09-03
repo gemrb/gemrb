@@ -112,18 +112,26 @@ void MapControl::UpdateState(unsigned int Sum)
 {
 	SetValue(Sum);
 }
+	
+void MapControl::WillDraw()
+{
+	if (MapMOS) {
+		const Size mosSize(MapMOS->Width, MapMOS->Height);
+		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
+		mosRgn = Region(Origin() + center, mosSize);
+	} else {
+		mosRgn = Region(Point(), Dimensions());
+	}
+}
 
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
-	if (MapMOS == NULL) return; // FIXME: I'm not sure if/why/when a NULL MOS is valid
-	
-	const Size mosSize(MapMOS->Width, MapMOS->Height);
-	const Point center(rgn.w/2 - mosSize.w/2, rgn.h/2 - mosSize.h/2);
-	const Point origin = rgn.Origin() + center;
-	
-	video->BlitSprite( MapMOS, origin.x, origin.y, &rgn );
+
+	if (MapMOS) {
+		video->BlitSprite( MapMOS, mosRgn.x, mosRgn.y, NULL );
+	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(rgn);
@@ -133,13 +141,13 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	Size mapsize = map->GetSize();
 
 	Region vp = gc->Viewport();
-	vp.x *= double(mosSize.w) / mapsize.w;
-	vp.y *= double(mosSize.h) / mapsize.h;
-	vp.w *= double(mosSize.w) / mapsize.w;
-	vp.h *= double(mosSize.h) / mapsize.h;
+	vp.x *= double(mosRgn.w) / mapsize.w;
+	vp.y *= double(mosRgn.h) / mapsize.h;
+	vp.w *= double(mosRgn.w) / mapsize.w;
+	vp.h *= double(mosRgn.h) / mapsize.h;
 	
-	vp.x += origin.x;
-	vp.y += origin.y;
+	vp.x += mosRgn.x;
+	vp.y += mosRgn.y;
 	video->DrawRect(vp, colors[green], false );
 	
 	// Draw PCs' ellipses
@@ -149,10 +157,10 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
 			Point pos = actor->Pos;
-			pos.x *= double(mosSize.w) / mapsize.w;
-			pos.y *= double(mosSize.h) / mapsize.h;
-			pos.x += origin.x;
-			pos.y += origin.y;
+			pos.x *= double(mosRgn.w) / mapsize.w;
+			pos.y *= double(mosRgn.h) / mapsize.h;
+			pos.x += mosRgn.x;
+			pos.y += mosRgn.y;
 			
 			video->DrawEllipse( pos.x, pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
@@ -167,10 +175,10 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			Sprite2D *anim = Flag[mn.color&7];
 			
 			Point pos = mn.Pos;
-			pos.x *= double(mosSize.w) / mapsize.w;
-			pos.y *= double(mosSize.h) / mapsize.h;
-			pos.x += origin.x;
-			pos.y += origin.y;
+			pos.x *= double(mosRgn.w) / mapsize.w;
+			pos.y *= double(mosRgn.h) / mapsize.h;
+			pos.x += mosRgn.x;
+			pos.y += mosRgn.y;
 			
 			//Skip unexplored map notes
 			bool visible = MyMap->IsVisible( pos, true );
