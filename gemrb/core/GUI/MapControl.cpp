@@ -123,9 +123,9 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	Video* video = core->GetVideoDriver();
 	if (MapMOS == NULL) return; // FIXME: I'm not sure if/why/when a NULL MOS is valid
 	
-	Size mosSize(MapMOS->Width, MapMOS->Height);
-	Point center(rgn.w/2 - mosSize.w/2, rgn.h/2 - mosSize.h/2);
-	Point origin = rgn.Origin() + center;
+	const Size mosSize(MapMOS->Width, MapMOS->Height);
+	const Point center(rgn.w/2 - mosSize.w/2, rgn.h/2 - mosSize.h/2);
+	const Point origin = rgn.Origin() + center;
 	
 	video->BlitSprite( MapMOS, origin.x, origin.y, &rgn );
 
@@ -169,28 +169,22 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn.color&7];
+			
 			Point pos = mn.Pos;
-			/*
-			if (convertToGame) {
-				vp.x = GAME_TO_SCREENX(mn.Pos.x);
-				vp.y = GAME_TO_SCREENY(mn.Pos.y);
-			} else { //pst style
-				vp.x = MAP_TO_SCREENX(mn.Pos.x);
-				vp.y = MAP_TO_SCREENY(mn.Pos.y);
-				pos.x = pos.x * MAP_MULT / MAP_DIV;
-				pos.y = pos.y * MAP_MULT / MAP_DIV;
-			}
-			 */
-
+			pos.x *= double(mosSize.w) / mapsize.w;
+			pos.y *= double(mosSize.h) / mapsize.h;
+			pos.x += origin.x;
+			pos.y += origin.y;
+			
 			//Skip unexplored map notes
 			bool visible = MyMap->IsVisible( pos, true );
 			if (!visible)
 				continue;
 
 			if (anim) {
-				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, &rgn );
+				video->BlitSprite( anim, pos.x - anim->Width/2, pos.y - anim->Height/2, &rgn );
 			} else {
-				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn.color&7] );
+				video->DrawEllipse( pos.x, pos.y, 6, 5, colors[mn.color&7] );
 			}
 		}
 	}
