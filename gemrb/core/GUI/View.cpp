@@ -215,6 +215,7 @@ void View::Draw()
 	} else {
 		video->DrawRect(drawFrame, ColorGreen, false);
 	}
+	debuginfo = debuginfo || EventMgr::ModState(GEM_MOD_CTRL);
 	
 	if (debuginfo) {
 		ViewScriptingRef* ref = GetScriptingRef();
@@ -224,7 +225,7 @@ void View::Draw()
 			id &= 0x00000000ffffffff; // control id is lower 32bits
 			
 			wchar_t string[256];
-			swprintf(string, sizeof(string), L"id: %llx    group: %s    flags: %lu",
+			swprintf(string, sizeof(string), L"id: %lu    group: %s    flags: %lu",
 					 id, ref->ScriptingGroup().CString(), flags);
 			Region r = drawFrame;
 			r.h = fnt->LineHeight;
