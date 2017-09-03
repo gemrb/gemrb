@@ -468,6 +468,7 @@ public:
 
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
+	Size GetSize() const;
 	int GetExploredMapSize() const;
 	/*fills the explored bitmap with setreset */
 	void Explore(int setreset);

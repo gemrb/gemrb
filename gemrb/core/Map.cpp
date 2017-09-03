@@ -3311,6 +3311,11 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	}
 	return 0;
 }
+	
+Size Map::GetSize() const
+{
+	return TMap->GetMapSize();
+}
 
 //--------explored bitmap-----------
 int Map::GetExploredMapSize() const

@@ -1457,7 +1457,7 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 		Map *area = game->GetCurrentArea();
 		if (!area) return;
 
-		Size mapsize = area->TMap->GetMapSize();
+		Size mapsize = area->GetSize();
 
 		if (center) {
 			p.x -= frame.w/2;
