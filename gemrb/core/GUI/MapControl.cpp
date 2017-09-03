@@ -149,29 +149,32 @@ void MapControl::UpdateState(unsigned int Sum)
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	Realize();
-
 	Video* video = core->GetVideoDriver();
-	if (MapMOS) {
-		Point pos(rgn.w/2 - MapMOS->Width/2, rgn.h/2 - MapMOS->Height/2);
-		video->BlitSprite( MapMOS, rgn.x + pos.x, rgn.y + pos.y, &rgn );
-	}
+	if (MapMOS == NULL) return; // FIXME: I'm not sure if/why/when a NULL MOS is valid
+	
+	Size mosSize(MapMOS->Width, MapMOS->Height);
+	Point center(rgn.w/2 - mosSize.w/2, rgn.h/2 - mosSize.h/2);
+	Point origin = rgn.Origin() + center;
+	
+	video->BlitSprite( MapMOS, origin.x, origin.y, &rgn );
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(rgn);
 
-	Region vp = core->GetGameControl()->Viewport();
-	vp.w = ViewWidth;
-	vp.h = ViewHeight;
+	GameControl* gc = core->GetGameControl();
+	Map* map = core->GetGame()->GetCurrentArea();
+	Size mapsize = map->GetSize();
 
-	/*
-	if ((vp.x + vp.w) >= MAP_TO_SCREENX( frame.w ))
-		vp.w = MAP_TO_SCREENX( frame.w ) - vp.x;
-	if ((vp.y + vp.h) >= MAP_TO_SCREENY( frame.h ))
-		vp.h = MAP_TO_SCREENY( frame.h ) - vp.y;
-*/
-	video->DrawRect( vp, colors[green], false );
-
+	Region vp = gc->Viewport();
+	vp.x *= double(mosSize.w) / mapsize.w;
+	vp.y *= double(mosSize.h) / mapsize.h;
+	vp.w *= double(mosSize.w) / mapsize.w;
+	vp.h *= double(mosSize.h) / mapsize.h;
+	
+	vp.x += origin.x;
+	vp.y += origin.y;
+	video->DrawRect(vp, colors[green], false );
+	
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(true);
