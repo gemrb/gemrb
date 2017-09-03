@@ -65,17 +65,12 @@ public:
 	Control *LinkedLabel;
 	// Size of big map (area) in pixels
 	short MapWidth, MapHeight;
-	// Size of area viewport. FIXME: hack!
-	short ViewWidth, ViewHeight;
-	short XCenter, YCenter;
 
 	MapControl(const Region& frame);
 	~MapControl(void);
 
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(unsigned int Sum);
-	/** Compute parameters after changes in control's or screen geometry */
-	void Realize();
 
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);

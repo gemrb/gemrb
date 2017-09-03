@@ -60,8 +60,7 @@ MapControl::MapControl(const Region& frame)
 	ScrollY = 0;
 	NotePosX = 0;
 	NotePosY = 0;
-	MapWidth = MapHeight = ViewWidth = ViewHeight = 0;
-	XCenter = YCenter = 0;
+	MapWidth = MapHeight = 0;
 	lastMouseX = lastMouseY = 0;
 	mouseIsDown = false;
 	convertToGame = true;
@@ -111,34 +110,6 @@ void MapControl::DrawFog(const Region& /*rgn*/)
 		}
 	}
 */
-}
-
-// To be called after changes in control's or screen geometry
-void MapControl::Realize()
-{
-	/*
-	// FIXME: ugly!! How to get area size in pixels?
-	//Map *map = core->GetGame()->GetCurrentMap();
-	//MapWidth = map->GetWidth();
-	//MapHeight = map->GetHeight();
-
-	if (MapMOS) {
-		MapWidth = (short) MapMOS->Width;
-		MapHeight = (short) MapMOS->Height;
-	} else {
-		MapWidth = 0;
-		MapHeight = 0;
-	}
-
-	// FIXME: ugly hack! What is the actual viewport size?
-	ViewWidth = (short) (core->Width * MAP_DIV / MAP_MULT);
-	ViewHeight = (short) (core->Height * MAP_DIV / MAP_MULT);
-
-	XCenter = (short) (frame.w - MapWidth ) / 2;
-	YCenter = (short) (frame.h - MapHeight ) / 2;
-	if (XCenter < 0) XCenter = 0;
-	if (YCenter < 0) YCenter = 0;
-	*/
 }
 
 void MapControl::UpdateState(unsigned int Sum)
@@ -304,16 +275,8 @@ void MapControl::ClickHandle()
 
 void MapControl::ViewHandle(unsigned short x, unsigned short y)
 {
-	short xp = (short) (x - ViewWidth / 2);
-	short yp = (short) (y - ViewHeight / 2);
-
-	if (xp + ViewWidth > MapWidth) xp = MapWidth - ViewWidth;
-	if (yp + ViewHeight > MapHeight) yp = MapHeight - ViewHeight;
-	if (xp < 0) xp = 0;
-	if (yp < 0) yp = 0;
-
 	// clear any previously scheduled moves and then do it asap, so it works while paused
-	Point p;//(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
+	Point p(x,y);//(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
 	core->timer->SetMoveViewPort( p, 0, false );
 }
 
