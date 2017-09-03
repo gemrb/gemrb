@@ -31,6 +31,14 @@ QuickLoadSlot = 0
 def OnLoad():
 	global StartWindow, QuickLoadSlot
 
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if not skip_videos:
+		GemRB.PlayMovie ('BISLOGO', 1)
+		GemRB.PlayMovie ('WOTC', 1)
+		GemRB.PlayMovie ('NVIDIA', 1)
+		GemRB.PlayMovie ('INTRO', 1)
+		GemRB.SetVar ("SkipIntroVideos", 1)
+
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
 	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
 	if screen_width == 1024:
