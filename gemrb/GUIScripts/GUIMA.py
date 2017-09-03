@@ -104,14 +104,17 @@ def ShowMap ():
 		Label.SetText ("")
 
 	# Map Control
+	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+		Window.CreateMapControl (1000, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	else:
-		Window.CreateMapControl (2, 0, 0, 0, 0)
+		Window.CreateMapControl (1000, 0, 0, 0, 0)
 
-	Map = Window.GetControl (2)
+	Map = Window.GetControl (1000)
+	Map.SetFrame(placeholder.GetFrame())
+	Window.DeleteControl (placeholder)
+	
 	if HasMapNotes ():
-		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
@@ -144,19 +147,22 @@ def OpenMapWindow ():
 		Button = Window.GetControl (3)
 		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		# Is this an option?
-		GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 		Label = Window.GetControl (0x10000003)
 		Label.SetText ("")
 
 	# Map Control
+	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+		Window.CreateMapControl (1000, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	else:
-		Window.CreateMapControl (2, 0, 0, 0, 0)
+		Window.CreateMapControl (1000, 0, 0, 0, 0)
 
-	Map = Window.GetControl (2)
+	Map = Window.GetControl (1000)
+	Map.SetFrame(placeholder.GetFrame())
+	Window.DeleteControl (placeholder)
+
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
