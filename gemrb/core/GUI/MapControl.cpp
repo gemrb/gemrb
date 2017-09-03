@@ -324,38 +324,17 @@ void MapControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 	*/
 }
 
-/** Special Key Press */
-bool MapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
+bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	ieDword keyScrollSpd = 64;
-	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key.keycode) {
+	switch (key.keycode) {
 		case GEM_LEFT:
-			ScrollX -= keyScrollSpd;
-			break;
-		case GEM_UP:
-			ScrollY -= keyScrollSpd;
-			break;
 		case GEM_RIGHT:
-			ScrollX += keyScrollSpd;
-			break;
+		case GEM_UP:
 		case GEM_DOWN:
-			ScrollY += keyScrollSpd;
-			break;
-		default:
-			return Control::OnKeyPress(Key, mod);
+			GameControl* gc = core->GetGameControl();
+			return gc->OnKeyPress(key, mod);
 	}
-
-	if (ScrollX > MapWidth - frame.w)
-		ScrollX = MapWidth - frame.w;
-	if (ScrollY > MapHeight - frame.h)
-		ScrollY = MapHeight - frame.h;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
-	MarkDirty();
-	return true;
+	return false;
 }
 
 }
