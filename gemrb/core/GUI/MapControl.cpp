@@ -83,29 +83,25 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(const Region& /*rgn*/)
+void MapControl::DrawFog(const Region& rgn)
 {
-/*
 	Video *video = core->GetVideoDriver();
-	Point p = rgn.Origin();
+	const Size mapsize = MyMap->GetSize();
+	Point p;
 
-	// FIXME: this is ugly, the knowledge of Map and ExploredMask
-	//   sizes should be in Map.cpp
-	int w = MyMap->GetWidth() / 2;
-	int h = MyMap->GetHeight() / 2;
-
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			p.x = (MAP_MULT * x), p.y = (MAP_MULT * y);
-			bool visible = MyMap->IsVisible( p, true );
+	for (; p.y < rgn.h; ++p.y) {
+		for (; p.x < rgn.w; ++p.x) {
+			Point gameP = p;
+			gameP.x *= double(mapsize.w) / mosRgn.w;
+			gameP.y *= double(mapsize.h) / mosRgn.h;
+			
+			bool visible = MyMap->IsVisible( gameP, true );
 			if (!visible) {
-				p.x = (MAP_DIV * x), p.y = (MAP_DIV * y);
-				Region rgn = Region ( ConvertPointToScreen(p), Size(MAP_DIV, MAP_DIV) );
+				Region rgn = Region ( ConvertPointToScreen(p), Size(1, 1) );
 				video->DrawRect( rgn, colors[black] );
 			}
 		}
 	}
-*/
 }
 
 void MapControl::UpdateState(unsigned int Sum)
@@ -115,7 +111,7 @@ void MapControl::UpdateState(unsigned int Sum)
 	
 Point MapControl::ConvertPointToGame(Point p) const
 {
-	Size mapsize = MyMap->GetSize();
+	const Size mapsize = MyMap->GetSize();
 	
 	// mos is centered... first convert p to mos coordinates
 	// mos is in win coordinates (to make things easy elsewhere)
@@ -129,7 +125,7 @@ Point MapControl::ConvertPointToGame(Point p) const
 	
 Point MapControl::ConvertPointFromGame(Point p) const
 {
-	Size mapsize = MyMap->GetSize();
+	const Size mapsize = MyMap->GetSize();
 	
 	p.x *= double(mosRgn.w) / mapsize.w;
 	p.y *= double(mosRgn.h) / mapsize.h;
@@ -159,10 +155,10 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
-		DrawFog(rgn);
+		DrawFog(mosRgn);
 
 	GameControl* gc = core->GetGameControl();
-	Size mapsize = MyMap->GetSize();
+	const Size mapsize = MyMap->GetSize();
 
 	Region vp = gc->Viewport();
 	vp.x *= double(mosRgn.w) / mapsize.w;
