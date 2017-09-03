@@ -153,7 +153,8 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	Video* video = core->GetVideoDriver();
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, 0, 0, &rgn );
+		Point pos(rgn.w/2 - MapMOS->Width/2, rgn.h/2 - MapMOS->Height/2);
+		video->BlitSprite( MapMOS, rgn.x + pos.x, rgn.y + pos.y, &rgn );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
