@@ -1372,8 +1372,12 @@ void GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		}
 	}
 end_function:
-	if (lastCursor != nextCursor) {
-		lastCursor = (unsigned char) nextCursor;
+	if (nextCursor >= 0 && lastCursor != nextCursor) {
+		// FIXME: this is a temporary hack to enable cursors
+		// the above code needs to be refactored to not set IE_CURSOR_GRAY, but rather set a bool backing an override for IsDisabledCursor()
+		SetBits(nextCursor, IE_CURSOR_GRAY, OP_NAND);
+		lastCursor = nextCursor ;
+		SetCursor(core->Cursors[lastCursor]);
 	}
 }
 
@@ -1489,8 +1493,6 @@ Region GameControl::Viewport()
 void GameControl::UpdateScrolling() {
 	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
 	if (!core->GetMouseScrollSpeed() || (moveX == 0 && moveY == 0)) {
-		// FIXME: this should be something with lastCursor...
-		SetCursor(NULL);
 		return;
 	}
 
