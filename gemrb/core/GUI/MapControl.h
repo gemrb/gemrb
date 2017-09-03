@@ -83,6 +83,7 @@ private:
 	void ClickHandle(const MouseEvent&);
 	/** Move viewport */
 	void UpdateViewport(Point p);
+	void UpdateCursor();
 	
 	void WillDraw();
 	/** Draws the Control on the Output Display */

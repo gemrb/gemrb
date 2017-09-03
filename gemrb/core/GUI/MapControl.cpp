@@ -216,21 +216,9 @@ void MapControl::UpdateViewport(Point vp)
 	// clear any previously scheduled moves and then do it asap, so it works while paused
 	core->timer->SetMoveViewPort( vp, 0, false );
 }
-
-/** Mouse Button Down */
-void MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
-{
-	if (me.ButtonState(GEM_MB_ACTION)) {
-		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-		UpdateViewport(ConvertPointFromScreen(me.Pos()));
-	}
-}
 	
-/** Mouse Over Event */
-void MapControl::OnMouseOver(const MouseEvent& me)
+void MapControl::UpdateCursor()
 {
-	Point p = ConvertPointFromScreen(me.Pos());
-	
 	ieDword val = GetValue();
 	switch (val) {
 		case MAP_REVEAL: //for farsee effect
@@ -240,10 +228,27 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
+			Sprite2D* cursor = (EventMgr::ButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_GRAB] : NULL;
+			SetCursor(cursor);
 			break;
 	}
+}
+
+/** Mouse Button Down */
+void MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	}
+	UpdateCursor();
+}
 	
+/** Mouse Over Event */
+void MapControl::OnMouseOver(const MouseEvent& me)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+	
+	ieDword val = GetValue();
 	if (val) {
 		unsigned int dist = 16;
 		p = ConvertPointToGame(p);
@@ -265,6 +270,8 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( L"" );
 	}
+	
+	UpdateCursor();
 }
 	
 void MapControl::OnMouseDrag(const MouseEvent& me)
@@ -287,20 +294,23 @@ void MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			UpdateViewport(p);
 			notePos = ConvertPointToGame(p);
 			ClickHandle(me);
-			return;
+			break;
 		case MAP_NO_NOTES:
 			UpdateViewport(p);
-			return;
+			break;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
 			if (me.ButtonState(GEM_MB_ACTION)) {
 				UpdateViewport(p);
 			}
 			ClickHandle(me);
-			return;
+			break;
 		default:
-			return Control::OnMouseUp(me, mod);
+			Control::OnMouseUp(me, mod);
+			break;
 	}
+	
+	UpdateCursor();
 }
 
 bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
