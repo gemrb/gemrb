@@ -330,15 +330,16 @@ View* View::RemoveSubview(const View* view)
 	assert(it != subViews.end());
 
 	View* subView = *it;
+	assert(subView == view);
 	subViews.erase(it);
 	DirtyBGRect(subView->Frame());
 
 	subView->superView = NULL;
-	SubviewRemoved(subView, this);
+	subView->RemovedFromView(this);
 	
 	View* ancestor = this;
 	do {
-		ancestor->RemovedFromView(this);
+		ancestor->SubviewRemoved(subView, this);
 		ancestor = ancestor->superView;
 	} while (ancestor);
 	
