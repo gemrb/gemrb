@@ -46,10 +46,9 @@ class Map;
 class GEM_EXPORT MapControl : public Control {
 private:
 	Region mosRgn;
+	Point notePos;
 	
 public:
-	int NotePosX, NotePosY;
-
 	// Small map bitmap
 	Sprite2D* MapMOS;
 	// current map

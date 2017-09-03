@@ -56,8 +56,6 @@ MapControl::MapControl(const Region& frame)
 	ControlType = IE_GUI_MAP;
 
 	LinkedLabel = NULL;
-	NotePosX = 0;
-	NotePosY = 0;
 	MapWidth = MapHeight = 0;
 
 	memset(Flag,0,sizeof(Flag) );
@@ -207,8 +205,8 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 void MapControl::ClickHandle()
 {
-	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
-	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
+	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
+	core->GetDictionary()->SetAt( "MapControlY", notePos.y );
 }
 
 void MapControl::UpdateViewport(Point vp)
@@ -255,14 +253,12 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 				if (LinkedLabel) {
 					LinkedLabel->SetText( mn.text );
 				}
-				NotePosX = mn.Pos.x;
-				NotePosY = mn.Pos.y;
+				notePos = mn.Pos;
 				return;
 			}
 		}
 
-		NotePosX = p.x;
-		NotePosY = p.y;
+		notePos = p;
 	}
 	if (LinkedLabel) {
 		LinkedLabel->SetText( L"" );
