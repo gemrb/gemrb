@@ -220,7 +220,10 @@ void MapControl::UpdateViewport(Point vp)
 /** Mouse Button Down */
 void MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
+		UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	}
 }
 	
 /** Mouse Over Event */
@@ -229,16 +232,15 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	Point p = ConvertPointFromScreen(me.Pos());
 	
 	ieDword val = GetValue();
-	// FIXME: implement cursor changing
 	switch (val) {
 		case MAP_REVEAL: //for farsee effect
-			//Owner->Cursor = IE_CURSOR_CAST;
+			SetCursor(core->Cursors[IE_CURSOR_CAST]);
 			break;
 		case MAP_SET_NOTE:
-			//Owner->Cursor = IE_CURSOR_GRAB;
+			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			//Owner->Cursor = IE_CURSOR_NORMAL;
+			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 			break;
 	}
 	
