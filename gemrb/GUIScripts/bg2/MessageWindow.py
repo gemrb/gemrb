@@ -92,7 +92,7 @@ def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
 
 def UpdateControlStatus():
-	MessageWindow = GetView("MSGWIN")
+	MessageWindow = GemRB.GetView("MSGWIN")
 
 	ExpandButton = MessageWindow.GetControl(0)
 	ExpandButton.SetDisabled(False)
