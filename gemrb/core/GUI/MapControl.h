@@ -50,11 +50,8 @@ private:
 	void DrawFog(const Region& rgn);
 
 public:
-	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
-	unsigned short lastMouseX, lastMouseY;
-	bool mouseIsDown;
-	bool convertToGame;
+
 	// Small map bitmap
 	Sprite2D* MapMOS;
 	// current map

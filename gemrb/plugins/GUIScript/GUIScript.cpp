@@ -2022,8 +2022,6 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 			MapControl* map = new MapControl(rgn);
 			if (Flag2) { //pst flavour
-				map->convertToGame = false;
-
 				ResourceHolder<ImageMgr> anim(Flag);
 				if (anim) {
 					map->Flag[0] = anim->GetSprite2D();

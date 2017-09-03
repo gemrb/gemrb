@@ -56,14 +56,10 @@ MapControl::MapControl(const Region& frame)
 	ControlType = IE_GUI_MAP;
 
 	LinkedLabel = NULL;
-	ScrollX = 0;
-	ScrollY = 0;
 	NotePosX = 0;
 	NotePosY = 0;
 	MapWidth = MapHeight = 0;
-	lastMouseX = lastMouseY = 0;
-	mouseIsDown = false;
-	convertToGame = true;
+
 	memset(Flag,0,sizeof(Flag) );
 
 	MyMap = core->GetGame()->GetCurrentArea();
@@ -194,24 +190,6 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 void MapControl::OnMouseOver(const MouseEvent& me)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
-	if (mouseIsDown) {
-		MarkDirty();
-		ScrollX -= p.x - lastMouseX;
-		ScrollY -= p.y - lastMouseY;
-
-		if (ScrollX > MapWidth - frame.w)
-			ScrollX = MapWidth - frame.w;
-		if (ScrollY > MapHeight - frame.h)
-			ScrollY = MapHeight - frame.h;
-		if (ScrollX < 0)
-			ScrollX = 0;
-		if (ScrollY < 0)
-			ScrollY = 0;
-		ViewHandle(p.x, p.y);
-	}
-
-	lastMouseX = p.x;
-	lastMouseY = p.y;
 
 	ieDword val = GetValue();
 	// FIXME: implement cursor changing
@@ -228,7 +206,6 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	}
 
 	if (val) {
-		Point mp;
 		/*
 		unsigned int dist;
 		if (convertToGame) {
@@ -253,8 +230,8 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 			}
 		}
 		*/
-		NotePosX = mp.x;
-		NotePosY = mp.y;
+		NotePosX = p.x;
+		NotePosY = p.y;
 	}
 	if (LinkedLabel) {
 		LinkedLabel->SetText( L"" );
@@ -277,7 +254,6 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 /** Mouse Button Down */
 void MapControl::OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
-	mouseIsDown = true;
 	/*
 	Region vp = core->GetGameControl()->Viewport();
 	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
@@ -291,15 +267,10 @@ void MapControl::OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 /** Mouse Button Up */
 void MapControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	if (!mouseIsDown) {
-		return;
-	}
-
 	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
 		window->Close();
 	}
 
-	mouseIsDown = false;
 	/*
 	switch(Value) {
 		case MAP_REVEAL:
