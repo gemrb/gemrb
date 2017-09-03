@@ -103,8 +103,9 @@ def DisplayOverview(step):
 	#AcceptButton.MakeDefault()
 	AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 
-	ScrollBar = CharGenWindow.GetControl (10)
-	ScrollBar.SetDefaultScrollBar ()
+	# now automatically ignored and added instead
+	#ScrollBar = CharGenWindow.GetControl (10)
+	#ScrollBar.SetDefaultScrollBar ()
 
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetText (13955)
