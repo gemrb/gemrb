@@ -181,7 +181,13 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
-			video->DrawEllipse( actor->Pos.x, actor->Pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
+			Point pos = actor->Pos;
+			pos.x *= double(mosSize.w) / mapsize.w;
+			pos.y *= double(mosSize.h) / mapsize.h;
+			pos.x += origin.x;
+			pos.y += origin.y;
+			
+			video->DrawEllipse( pos.x, pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
