@@ -2010,12 +2010,11 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_GUI_MAP:
 		{
-			int LabelID;
+			ScriptingId LabelID = -1;
 			char *Flag = NULL;
 			char *Flag2 = NULL;
 
-			if (!PyArg_ParseTuple( constructArgs, "Invalid parameters for Map",
-								  "is|s", &LabelID, &Flag, &Flag2))
+			if (!PyArg_ParseTuple( constructArgs, "ks|s", &LabelID, &Flag, &Flag2))
 			{
 				Flag = NULL;
 				PyErr_Clear(); //clearing the exception
