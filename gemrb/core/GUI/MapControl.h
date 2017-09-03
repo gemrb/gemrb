@@ -71,6 +71,8 @@ public:
 
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(unsigned int Sum);
+	
+	bool IsAnimated() const { return true; }
 
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
