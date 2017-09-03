@@ -94,6 +94,10 @@ def MaximizePortraits():
 def UpdateControlStatus():
 	MessageWindow = GemRB.GetView("MSGWIN")
 
+	if not MessageWindow:
+		# exit if we get called from core without the right window pack being loaded
+		return
+
 	ExpandButton = MessageWindow.GetControl(0)
 	ExpandButton.SetDisabled(False)
 
