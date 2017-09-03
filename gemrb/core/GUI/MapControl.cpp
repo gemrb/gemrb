@@ -203,7 +203,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 }
 
-void MapControl::ClickHandle()
+void MapControl::ClickHandle(const MouseEvent&)
 {
 	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
 	core->GetDictionary()->SetAt( "MapControlY", notePos.y );
@@ -273,34 +273,32 @@ void MapControl::OnMouseDrag(const MouseEvent& me)
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
+void MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
 		window->Close();
 	}
+	Point p = ConvertPointFromScreen(me.Pos());
 
-	/*
-	switch(Value) {
+	switch(GetValue()) {
 		case MAP_REVEAL:
-			ViewHandle(p.x, p.y);
-			NotePosX = (short) SCREEN_TO_MAPX(p.x) * MAP_MULT / MAP_DIV;
-			NotePosY = (short) SCREEN_TO_MAPY(p.y) * MAP_MULT / MAP_DIV;
-			ClickHandle(Button);
+			UpdateViewport(p);
+			notePos = ConvertPointToGame(p);
+			ClickHandle(me);
 			return;
 		case MAP_NO_NOTES:
-			ViewHandle(p.x, p.y);
+			UpdateViewport(p);
 			return;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
-			if (Button == GEM_MB_ACTION) {
-				ViewHandle(p.x, p.y);
+			if (me.ButtonState(GEM_MB_ACTION)) {
+				UpdateViewport(p);
 			}
-			ClickHandle(Button);
+			ClickHandle(me);
 			return;
 		default:
-			return Control::OnMouseUp(me, Mod);
+			return Control::OnMouseUp(me, mod);
 	}
-	*/
 }
 
 bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)

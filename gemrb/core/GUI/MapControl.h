@@ -80,7 +80,7 @@ public:
 
 private:
 	/** Call event handler on click */
-	void ClickHandle();
+	void ClickHandle(const MouseEvent&);
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	
