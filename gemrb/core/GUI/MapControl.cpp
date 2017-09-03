@@ -119,7 +119,8 @@ Point MapControl::ConvertPointToGame(Point p) const
 	Size mapsize = map->GetSize();
 	
 	// mos is centered... first convert p to mos coordinates
-	p = p - mosRgn.Origin();
+	// mos is in win coordinates (to make things easy elsewhere)
+	p = ConvertPointToSuper(p) - mosRgn.Origin();
 	
 	p.x *= double(mapsize.w) / mosRgn.w;
 	p.y *= double(mapsize.h) / mosRgn.h;
@@ -211,11 +212,31 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 }
 
+void MapControl::ClickHandle()
+{
+	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
+	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
+}
+
+void MapControl::UpdateViewport(Point vp)
+{
+	vp = ConvertPointToGame(vp);
+	
+	// clear any previously scheduled moves and then do it asap, so it works while paused
+	core->timer->SetMoveViewPort( vp, 0, false );
+}
+
+/** Mouse Button Down */
+void MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	UpdateViewport(ConvertPointFromScreen(me.Pos()));
+}
+	
 /** Mouse Over Event */
 void MapControl::OnMouseOver(const MouseEvent& me)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
-
+	
 	ieDword val = GetValue();
 	// FIXME: implement cursor changing
 	switch (val) {
@@ -229,23 +250,15 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 			//Owner->Cursor = IE_CURSOR_NORMAL;
 			break;
 	}
-
+	
 	if (val) {
-		/*
-		unsigned int dist;
-		if (convertToGame) {
-			mp.x = (short) SCREEN_TO_GAMEX(p.x);
-			mp.y = (short) SCREEN_TO_GAMEY(p.y);
-			dist = 100;
-		} else {
-			mp.x = (short) SCREEN_TO_MAPX(p.x);
-			mp.y = (short) SCREEN_TO_MAPY(p.y);
-			dist = 16;
-		}
+		unsigned int dist = 16;
+		p = ConvertPointToGame(p);
+
 		int i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
-			if (Distance(mp, mn.Pos)<dist) {
+			if (Distance(p, mn.Pos)<dist) {
 				if (LinkedLabel) {
 					LinkedLabel->SetText( mn.text );
 				}
@@ -254,7 +267,7 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 				return;
 			}
 		}
-		*/
+
 		NotePosX = p.x;
 		NotePosY = p.y;
 	}
@@ -262,31 +275,12 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 		LinkedLabel->SetText( L"" );
 	}
 }
-
-void MapControl::ClickHandle()
+	
+void MapControl::OnMouseDrag(const MouseEvent& me)
 {
-	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
-	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-}
-
-void MapControl::ViewHandle(unsigned short x, unsigned short y)
-{
-	// clear any previously scheduled moves and then do it asap, so it works while paused
-	Point p(x,y);//(xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV);
-	core->timer->SetMoveViewPort( p, 0, false );
-}
-
-/** Mouse Button Down */
-void MapControl::OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/)
-{
-	/*
-	Region vp = core->GetGameControl()->Viewport();
-	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
-	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
-	ViewHandle(p.x, p.y);
-	lastMouseX = p.x;
-	lastMouseY = p.y;
-	*/
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	}
 }
 
 /** Mouse Button Up */

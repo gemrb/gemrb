@@ -73,6 +73,7 @@ public:
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(const MouseEvent&);
+	void OnMouseDrag(const MouseEvent& /*me*/);
 	/** Mouse Button Down */
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
@@ -82,7 +83,7 @@ private:
 	/** Call event handler on click */
 	void ClickHandle();
 	/** Move viewport */
-	void ViewHandle(unsigned short x, unsigned short y);
+	void UpdateViewport(Point p);
 	
 	void WillDraw();
 	/** Draws the Control on the Output Display */
