@@ -27,6 +27,8 @@
 
 #include <list>
 
+#define DEBUG_VIEWS 1
+
 namespace GemRB {
 
 class Sprite2D;
@@ -104,6 +106,10 @@ public:
 		Disabled = 1 << 27,
 		IgnoreEvents = 1 << 26
 	};
+	
+#if DEBUG_VIEWS
+	bool debuginfo;
+#endif
 
 	View(const Region& frame);
 	virtual ~View();
@@ -159,8 +165,8 @@ public:
 
 	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
 	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {};
-	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {};
+	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	virtual void OnMouseOver(const MouseEvent& /*me*/);
 	virtual void OnMouseDrag(const MouseEvent& /*me*/);
 	virtual void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);

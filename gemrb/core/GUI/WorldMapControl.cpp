@@ -268,9 +268,10 @@ void WorldMapControl::OnMouseOver(const MouseEvent& me)
 }
 
 /** Mouse Leave Event */
-void WorldMapControl::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
+void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
 	Area = NULL;
+	Control::OnMouseLeave(me, op);
 }
 
 /** Mouse Button Down */
