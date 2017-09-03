@@ -115,8 +115,7 @@ void MapControl::UpdateState(unsigned int Sum)
 	
 Point MapControl::ConvertPointToGame(Point p) const
 {
-	Map* map = core->GetGame()->GetCurrentArea();
-	Size mapsize = map->GetSize();
+	Size mapsize = MyMap->GetSize();
 	
 	// mos is centered... first convert p to mos coordinates
 	// mos is in win coordinates (to make things easy elsewhere)
@@ -130,8 +129,7 @@ Point MapControl::ConvertPointToGame(Point p) const
 	
 Point MapControl::ConvertPointFromGame(Point p) const
 {
-	Map* map = core->GetGame()->GetCurrentArea();
-	Size mapsize = map->GetSize();
+	Size mapsize = MyMap->GetSize();
 	
 	p.x *= double(mosRgn.w) / mapsize.w;
 	p.y *= double(mosRgn.h) / mapsize.h;
@@ -164,8 +162,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		DrawFog(rgn);
 
 	GameControl* gc = core->GetGameControl();
-	Map* map = core->GetGame()->GetCurrentArea();
-	Size mapsize = map->GetSize();
+	Size mapsize = MyMap->GetSize();
 
 	Region vp = gc->Viewport();
 	vp.x *= double(mosRgn.w) / mapsize.w;
