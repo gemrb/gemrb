@@ -2010,11 +2010,11 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_GUI_MAP:
 		{
-			ScriptingId LabelID = -1;
+			PyObject* pylabel = NULL;
 			char *Flag = NULL;
 			char *Flag2 = NULL;
 
-			if (!PyArg_ParseTuple( constructArgs, "ks|s", &LabelID, &Flag, &Flag2))
+			if (!PyArg_ParseTuple( constructArgs, "Os|s", &pylabel, &Flag, &Flag2))
 			{
 				Flag = NULL;
 				PyErr_Clear(); //clearing the exception
@@ -2040,6 +2040,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 				}
 			}
+			
+			map->LinkedLabel = GetView<Label>(pylabel);
+			
 			view = map;
 		}
 			break;

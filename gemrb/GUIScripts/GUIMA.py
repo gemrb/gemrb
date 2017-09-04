@@ -106,7 +106,7 @@ def ShowMap ():
 	# Map Control
 	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (1000, 0, 0, 0, 0, 0x10000003, "FLAG1")
+		Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
 	else:
 		Window.CreateMapControl (1000, 0, 0, 0, 0)
 
@@ -155,7 +155,7 @@ def OpenMapWindow ():
 	# Map Control
 	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (1000, 0, 0, 0, 0, 0x10000003, "FLAG1")
+		Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
 	else:
 		Window.CreateMapControl (1000, 0, 0, 0, 0)
 
