@@ -250,13 +250,15 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	
 	ieDword val = GetValue();
 	if (val) {
-		unsigned int dist = 16;
 		p = ConvertPointToGame(p);
 
-		int i = MyMap -> GetMapNoteCount();
+		Size mapsize = MyMap->GetSize();
+		int i = MyMap->GetMapNoteCount();
 		while (i--) {
-			const MapNote& mn = MyMap -> GetMapNote(i);
-			if (Distance(p, mn.Pos)<dist) {
+			const MapNote& mn = MyMap->GetMapNote(i);
+			Sprite2D *anim = Flag[mn.color&7];
+			
+			if (Distance(p, mn.Pos) < anim->Width / 2 * double(mapsize.w) / mosRgn.w) {
 				if (LinkedLabel) {
 					LinkedLabel->SetText( mn.text );
 				}
