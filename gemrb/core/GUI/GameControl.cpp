@@ -1859,41 +1859,44 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	Map* area = game->GetCurrentArea();
 
 	// right click
-	if (!isFormationRotation && me.button == GEM_MB_MENU) {
-		if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
-			SetTargetMode(TARGET_MODE_NONE);
-		}
-		// update the action bar
-		core->SetEventFlag(EF_ACTION);
-		return ClearMouseState();
-	}
-
-	// any other button behaves as left click (scrollwhell buttons are mosue wheel events now)
-	if (isDoubleClick) MoveViewportTo(p, true);
-
-	// handle actions
-	if (target_mode != TARGET_MODE_NONE) {
-		PerformSelectedAction(p);
-		return ClearMouseState();
-	}
-
-	// handle selections
-	Actor* targetActor = area->GetActor(p, target_types);
-	if (isSelectionRect) {
-		MakeSelection(SelectionRect(), Mod&GEM_MOD_SHIFT);
-		return ClearMouseState();
-	} else if (targetActor) {
-		if (Mod & GEM_MOD_SHIFT) {
-			game->SelectActor(targetActor, true, SELECT_NORMAL);
+	if (me.button == GEM_MB_MENU) {
+		if (!isFormationRotation) {
+			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+				SetTargetMode(TARGET_MODE_NONE);
+			}
+			// update the action bar
+			core->SetEventFlag(EF_ACTION);
+			return ClearMouseState();
 		} else {
-			game->SelectActor(targetActor, true, SELECT_REPLACE);
+			p = gameClickPoint;
 		}
-		return ClearMouseState();
+	} else {
+		// any other button behaves as left click (scrollwhell buttons are mosue wheel events now)
+		if (isDoubleClick) MoveViewportTo(p, true);
+		
+		// handle actions
+		if (target_mode != TARGET_MODE_NONE) {
+			PerformSelectedAction(p);
+			return ClearMouseState();
+		}
+		
+		// handle selections
+		Actor* targetActor = area->GetActor(p, target_types);
+		if (isSelectionRect) {
+			MakeSelection(SelectionRect(), Mod&GEM_MOD_SHIFT);
+			return ClearMouseState();
+		} else if (targetActor) {
+			if (Mod & GEM_MOD_SHIFT) {
+				game->SelectActor(targetActor, true, SELECT_NORMAL);
+			} else {
+				game->SelectActor(targetActor, true, SELECT_REPLACE);
+			}
+			return ClearMouseState();
+		}
 	}
 
 	// handle movement/travel
 	CommandSelectedMovement(p);
-
 	ClearMouseState();
 }
 
@@ -1972,7 +1975,6 @@ void GameControl::CommandSelectedMovement(const Point& p)
 	Point src;
 	Point move = p;
 	if (isFormationRotation) {
-		move = gameClickPoint;
 		src = GameMousePos();
 	} else {
 		src = party[0]->Pos;
