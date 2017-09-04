@@ -656,12 +656,6 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case GEM_ESCAPE:
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			break;
-		case GEM_PGUP:
-			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
-			break;
-		case GEM_PGDOWN:
-			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
-			break;
 		case '0':
 			game->SelectActor( NULL, false, SELECT_NORMAL );
 			i = game->GetPartySize(false)/2+1;
