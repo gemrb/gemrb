@@ -637,28 +637,6 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 	return ret;
 }
 
-PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
-"===== EndCutSceneMode =====\n\
-\n\
-**Prototype:** EndCutSceneMode ()\n\
-\n\
-**Description:** Exits the CutScene Mode. It is similar to the gamescript \n\
-command of the same name. It gives back the cursor and shows the game GUI \n\
-windows hidden by the CutSceneMode() gamescript action. \n\
-This is mainly a debugging command.\n\
-\n\
-**Parameters:** N/A\n\
-\n\
-**Return value:** N/A\n\
-"
-);
-
-static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
-{
-	core->SetCutSceneMode( false );
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
 "===== LoadWindow =====\n\
 \n\
@@ -12790,7 +12768,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DropDraggedItem, METH_VARARGS),
 	METHOD(DumpActor, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS),
-	METHOD(EndCutSceneMode, METH_NOARGS),
 	METHOD(EnterGame, METH_NOARGS),
 	METHOD(EnterStore, METH_VARARGS),
 	METHOD(EvaluateString, METH_VARARGS),
