@@ -693,7 +693,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a || currentBuf->format->Amask) {
 
-			long val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
+			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
 		} else {
