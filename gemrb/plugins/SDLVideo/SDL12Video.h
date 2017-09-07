@@ -55,13 +55,13 @@ private:
 };
 
 
-class SDLOverlayVideoBuffer : public SDLSurfaceVideoBuffer {
+class SDLOverlayVideoBuffer : public VideoBuffer {
 	SDL_Overlay* overlay;
 	Point renderPos;
 
 public:
-	SDLOverlayVideoBuffer(SDL_Surface* buffer, const Point& p, SDL_Overlay* overlay)
-	: SDLSurfaceVideoBuffer(buffer, p)
+	SDLOverlayVideoBuffer(const Point& p, SDL_Overlay* overlay)
+	: VideoBuffer(p)
 	{
 		assert(overlay);
 		this->overlay = overlay;
@@ -72,6 +72,7 @@ public:
 	}
 
 	void Clear() {}
+	void SetColorKey(const Color&) {}
 
 	class Size Size() {
 		return GemRB::Size(overlay->w, overlay->h);

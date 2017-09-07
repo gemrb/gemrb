@@ -77,19 +77,20 @@ int SDL12VideoDriver::CreateDriverDisplay(const Size& s, int b, const char* titl
 
 VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
-	SDL_Surface* buf = NULL;
-	if (fmt == RGBA8888) {
-		buf = SDL_DisplayFormatAlpha(tmp);
-	} else {
-		buf = SDL_DisplayFormat(tmp);
-	}
-
-	SDL_FreeSurface(tmp);
 	if (fmt == YV12) {
-		return new SDLOverlayVideoBuffer(buf, r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
+		return new SDLOverlayVideoBuffer(r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
+	} else {
+		SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
+		SDL_Surface* buf = NULL;
+		if (fmt == RGBA8888) {
+			buf = SDL_DisplayFormatAlpha(tmp);
+		} else {
+			buf = SDL_DisplayFormat(tmp);
+		}
+		
+		SDL_FreeSurface(tmp);
+		return new SDLSurfaceVideoBuffer(buf, r.Origin());
 	}
-	return new SDLSurfaceVideoBuffer(buf, r.Origin());
 }
 
 // sets brightness and contrast
