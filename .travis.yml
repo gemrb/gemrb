@@ -47,6 +47,7 @@ script:
   - if [ $TRAVIS_OS_NAME != osx ]; then static="-DSTATIC_LINK=1"; fi
   - cmake -DCMAKE_INSTALL_PREFIX=iprefix $static ..
   - make
+  - sed -i 's,#AudioDriver,,' ../gemrb/GemRB.cfg.noinstall.sample
   - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
   - make install
 
