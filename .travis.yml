@@ -23,9 +23,7 @@ addons:
     - libsdl-mixer1.2-dev
     - libfreetype6
     - libfreetype6-dev
-    - libvlc5
     - libvlc-dev
-    - libvlccore5
     - libvlccore-dev
     - libpng12-0
     - libpng12-dev
