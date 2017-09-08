@@ -84,6 +84,8 @@ public:
 	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) = 0;
 	virtual ::GemRB::Size Size() = 0;
 	virtual void SetColorKey(const Color&) = 0;
+	
+	virtual void RenderOnDisplay(void* display) = 0;
 };
 
 /**

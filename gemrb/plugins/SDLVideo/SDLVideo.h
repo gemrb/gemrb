@@ -172,9 +172,10 @@ public:
 		return buffer;
 	}
 
-	virtual void RenderOnDisplay(SDL_Surface* display) {
+	void RenderOnDisplay(void* display) {
+		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 		SDL_Rect dst = { origin.x, origin.y, (unsigned short) buffer->w, (unsigned short) buffer->h };
-		SDL_BlitSurface( buffer, NULL, display, &dst );
+		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
 	}
 
 	class Size Size() {

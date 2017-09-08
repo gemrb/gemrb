@@ -78,14 +78,14 @@ public:
 		return GemRB::Size(overlay->w, overlay->h);
 	}
 
-	void RenderOnDisplay(SDL_Surface* display) {
-		//SDLSurfaceVideoBuffer::RenderOnDisplay(display); // probably does nothing
+	void RenderOnDisplay(void* display) {
+		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 
 		SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
 		SDL_DisplayYUVOverlay(overlay, &dest);
 		
 		SDL_Surface* sdl_disp = SDL_GetVideoSurface();
-		SDL_LowerBlit(sdl_disp, &dest, display, &dest);
+		SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
 	}
 
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {

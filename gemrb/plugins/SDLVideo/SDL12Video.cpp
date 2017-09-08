@@ -119,8 +119,7 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	VideoBuffers::iterator it;
 	it = buffers.begin();
 	for (; it != buffers.end(); ++it) {
-		SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
-		vb->RenderOnDisplay(disp);
+		(*it)->RenderOnDisplay(disp);
 	}
 	SDL_Flip( disp );
 }
