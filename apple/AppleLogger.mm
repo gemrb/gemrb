@@ -41,7 +41,7 @@ AppleLogger::~AppleLogger()
 void AppleLogger::textcolor(log_color /*c*/)
 {}
 	
-void AppleLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
+void AppleLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
 {
 	if (level == FATAL) {
 		// display a GUI alert for FATAL errors
