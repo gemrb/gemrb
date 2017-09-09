@@ -50,28 +50,30 @@ public:
 	static const TypeID ID;
 
 	class SubtitleSet {
+		Palette* pal;
 		Font* font;
-		Palette* palette;
+	
 	public:
-		SubtitleSet(Font* fnt, Palette* pal = NULL) {
+		SubtitleSet(Font* fnt, Color fore = ColorWhite, Color bg = ColorBlack)
+		: pal(new Palette(fore, bg)) {
 			font = fnt;
-			palette = pal;
+			assert(font);
+		}
+		
+		virtual ~SubtitleSet() {
+			pal->release();
 		}
 
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
-
-		const Font* getFont() const { return font; }
-		Palette* getPalette() const {
-			if (!palette) {
-				return font->GetPalette().get();
-			}
-			return palette;
+		
+		void RenderInRegion(const Region& rgn, size_t frame) const {
+			font->Print(rgn, SubtitleAtFrame(frame), pal, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
 		}
 	};
 
 private:
 	bool isPlaying;
-	const SubtitleSet* subtitles;
+	SubtitleSet* subtitles;
 
 protected:
 	// NOTE: make sure any new movie plugins set these!
@@ -93,7 +95,7 @@ public:
 	void Play(Window* win);
 	virtual void Stop();
 
-	void SetSubtitles(const SubtitleSet& subs);
+	void SetSubtitles(SubtitleSet* subs);
 };
 
 class MoviePlayerControls : public View {

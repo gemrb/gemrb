@@ -2813,7 +2813,7 @@ int Interface::PlayMovie(const char* resref)
 	}
 
 	//one of these two should exist (they both mean the same thing)
-	ieDword subtitles = 0;
+	ieDword subtitles = true;
 	vars->Lookup("Display Movie Subtitles", subtitles);
 	if (!subtitles) {
 		vars->Lookup("Display Subtitles", subtitles);
@@ -2825,8 +2825,8 @@ int Interface::PlayMovie(const char* resref)
 			FrameMap subs;
 
 		public:
-			IESubtitles(class Font* fnt, class Palette* pal, ResRef resref)
-			: MoviePlayer::SubtitleSet(fnt, pal)
+			IESubtitles(class Font* fnt, ResRef resref, Color fore = ColorWhite, Color bg = ColorBlack)
+			: MoviePlayer::SubtitleSet(fnt, fore, bg)
 			{
 				AutoTable sttable(resref);
 
@@ -2852,20 +2852,22 @@ int Interface::PlayMovie(const char* resref)
 			}
 		};
 
+		Font* font = GetFont(MovieFontResRef);
+		Color fore = font->GetPalette()->front;
+		Color bg = font->GetPalette()->back;
+
 		AutoTable sttable(resref);
 		if (sttable) {
 			int r = atoi(sttable->QueryField("red", "frame"));
 			int g = atoi(sttable->QueryField("green", "frame"));
 			int b = atoi(sttable->QueryField("blue", "frame"));
-			Palette* pal = NULL;
+			
 			if (r || g || b) {
-				Color fore(ieByte(r), ieByte(g), ieByte(b), 0x00);
-				Color back;
-				pal = new Palette( fore, back );
+				fore = Color(ieByte(r), ieByte(g), ieByte(b), 0x00);
+				bg = ColorBlack;
 			}
 
-			mp->SetSubtitles(IESubtitles(GetFont(MovieFontResRef), pal, resref));
-			gamedata->FreePalette( pal );
+			mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));
 		}
 	}
 
