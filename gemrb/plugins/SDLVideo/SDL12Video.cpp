@@ -118,10 +118,12 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
 	VideoBuffers::iterator it;
 	it = buffers.begin();
+	bool flip = false;
 	for (; it != buffers.end(); ++it) {
-		(*it)->RenderOnDisplay(disp);
+		flip = (*it)->RenderOnDisplay(disp) || flip;
 	}
-	SDL_Flip( disp );
+	
+	if (flip) SDL_Flip( disp );
 }
 
 Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )

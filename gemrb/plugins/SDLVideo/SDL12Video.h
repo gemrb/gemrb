@@ -80,7 +80,7 @@ public:
 		return GemRB::Size(overlay->w, overlay->h);
 	}
 
-	void RenderOnDisplay(void* /*display*/) {
+	bool RenderOnDisplay(void* /*display*/) {
 		if (changed) {
 			SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
 			SDL_DisplayYUVOverlay(overlay, &dest);
@@ -97,6 +97,7 @@ public:
 			//SDL_Surface* sdl_disp = SDL_GetVideoSurface();
 			//SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
 		}
+		return changed;
 	}
 
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {

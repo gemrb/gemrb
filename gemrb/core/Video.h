@@ -85,7 +85,7 @@ public:
 	virtual ::GemRB::Size Size() = 0;
 	virtual void SetColorKey(const Color&) = 0;
 	
-	virtual void RenderOnDisplay(void* display) = 0;
+	virtual bool RenderOnDisplay(void* display) = 0;
 };
 
 /**
