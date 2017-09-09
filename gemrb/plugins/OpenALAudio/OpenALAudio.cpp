@@ -587,6 +587,7 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 	if (MusicSource == 0) {
 		alGenSources( 1, &MusicSource );
 		if (checkALError("Unable to create music source", ERROR)) {
+			alDeleteBuffers(MUSICBUFFERS, MusicBuffer);
 			return -1;
 		}
 
@@ -932,6 +933,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 
 	alBufferData(Buffer, GetFormatEnum(channels, bits), memory, size, samplerate);
 	if (checkALError("Unable to buffer data", ERROR)) {
+		alDeleteBuffers(1, &Buffer);
 		return;
 	}
 
