@@ -924,8 +924,10 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 		        int channels, short* memory,
 		        int size, int samplerate)
 {
+	streams[stream].delete_buffers = true;
+	streams[stream].ClearProcessedBuffers();
+	
 	ALuint Buffer;
-
 	alGenBuffers(1, &Buffer);
 	if (checkALError("Unable to create buffer", ERROR)) {
 		return;
@@ -936,9 +938,6 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 		alDeleteBuffers(1, &Buffer);
 		return;
 	}
-
-	streams[stream].delete_buffers = true;
-	streams[stream].ClearProcessedBuffers();
 
 	QueueALBuffer(streams[stream].Source, Buffer);
 }
