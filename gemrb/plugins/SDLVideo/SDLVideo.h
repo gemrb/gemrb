@@ -62,6 +62,11 @@ inline int GetModState(int modstate)
 	if (modstate&KMOD_ALT) value |= GEM_MOD_ALT;
 	return value;
 }
+	
+inline SDL_Rect RectFromRegion(const Region& rgn)
+{
+	return {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
+}
 
 class SDLVideoDriver : public Video {
 public:
@@ -132,9 +137,6 @@ public:
 	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
 	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
 	static void GetSurfacePixel(SDL_Surface* surf, short x, short y, Color& c);
-
-	// we need to beable to convert between Region and SDL_Rect
-	static SDL_Rect RectFromRegion(const Region& rgn);
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {
@@ -209,7 +211,7 @@ public:
 			va_end(args);
 		}
 
-		SDL_Rect dst = SDLVideoDriver::RectFromRegion(bufDest);
+		SDL_Rect dst = RectFromRegion(bufDest);
 		SDL_BlitSurface(sprite, NULL, buffer, &dst);
 		SDL_FreeSurface(sprite);
 	}
