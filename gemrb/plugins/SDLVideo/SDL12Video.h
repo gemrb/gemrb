@@ -58,6 +58,7 @@ private:
 class SDLOverlayVideoBuffer : public VideoBuffer {
 	SDL_Overlay* overlay;
 	Point renderPos;
+	bool changed;
 
 public:
 	SDLOverlayVideoBuffer(const Point& p, SDL_Overlay* overlay)
@@ -65,6 +66,7 @@ public:
 	{
 		assert(overlay);
 		this->overlay = overlay;
+		changed = false;
 	}
 
 	~SDLOverlayVideoBuffer() {
@@ -78,14 +80,23 @@ public:
 		return GemRB::Size(overlay->w, overlay->h);
 	}
 
-	void RenderOnDisplay(void* display) {
-		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
-
-		SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
-		SDL_DisplayYUVOverlay(overlay, &dest);
-		
-		SDL_Surface* sdl_disp = SDL_GetVideoSurface();
-		SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
+	void RenderOnDisplay(void* /*display*/) {
+		if (changed) {
+			SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
+			SDL_DisplayYUVOverlay(overlay, &dest);
+			changed = false;
+			
+			// IMPORTANT: if we ever wanted to combine rendering of overlay buffers with other buffers
+			// we would need to blit the result back to the display buffer
+			// I'm commenting it out because we currently only use these overlays for video
+			// and we need all the CPU we can get for that
+			// additionally, the changed flag probably won't work at that point
+			
+			
+			//SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
+			//SDL_Surface* sdl_disp = SDL_GetVideoSurface();
+			//SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
+		}
 	}
 
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
@@ -122,6 +133,7 @@ public:
 		}
 		SDL_UnlockYUVOverlay(overlay);
 		renderPos = bufDest.Origin();
+		changed = true;
 	}
 };
 
