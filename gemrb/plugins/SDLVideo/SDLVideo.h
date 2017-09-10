@@ -184,9 +184,10 @@ public:
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
 		SDL_Surface* sprite = NULL;
 
-		if (buffer->format->BitsPerPixel == 16) {
+		// FIXME: this shold support everything from Video::BufferFormat
+		if (buffer->format->BitsPerPixel == 16) { // RGB565
 			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
-		} else {
+		} else { // RGBPAL8
 			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
 			va_list args;
 			va_start(args, pitch);
