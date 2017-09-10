@@ -110,6 +110,8 @@ private:
 	
 class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Texture* texture;
+	SDL_Renderer* renderer;
+	Video::BufferFormat inputFormat; // the format of the pixel data the client thinks we use, we may have to convert in CopyPixels()
 	
 private:
 	Region TextureRegion(SDL_Texture* tex, const Point& p) {
@@ -119,10 +121,11 @@ private:
 	}
 	
 public:
-	SDLTextureVideoBuffer(const Point& p, SDL_Texture* texture)
-	: VideoBuffer(TextureRegion(texture, p)), texture(texture)
+	SDLTextureVideoBuffer(const Point& p, SDL_Texture* texture, Video::BufferFormat fmt, SDL_Renderer* renderer)
+	: VideoBuffer(TextureRegion(texture, p)), texture(texture), renderer(renderer), inputFormat(fmt)
 	{
 		assert(texture);
+		assert(renderer);
 	}
 	
 	~SDLTextureVideoBuffer() {
@@ -130,19 +133,9 @@ public:
 	}
 	
 	void Clear() {
-		void *pixels;
-		int pitch;
-		if(SDL_LockTexture(texture, NULL, &pixels, &pitch) != GEM_OK) {
-			Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-			return;
-		}
-		
-		ieByte* dest = (ieByte*)pixels;
-		for(int row = 0; row < rect.h; row++) {
-			memset(dest, SDL_ALPHA_TRANSPARENT, pitch);
-			dest += pitch;
-		}
-		SDL_UnlockTexture(texture);
+		SDL_SetRenderTarget(renderer, texture);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+		SDL_RenderFillRect(renderer, NULL);
 	}
 	
 	bool RenderOnDisplay(void* display) {
@@ -153,30 +146,38 @@ public:
 	}
 	
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
-		int sdlpitch = (pitch) ? *pitch : rect.w;
+		int sdlpitch = (pitch) ? *pitch : bufDest.w;
 		SDL_Rect dest = RectFromRegion(bufDest);
-		SDL_UpdateTexture(texture, &dest, pixelBuf, sdlpitch);
-		// FIXME: don't know if this comment still applies
-		/*
-		 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
-		 Don't know how universal it is yet so leaving this in commented out just in case
-		 
-		 void *pixels;
-		 int pitch;
-		 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-		 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-		 return GEM_ERROR;
-		 }
-		 
-		 ieByte* src = (ieByte*)backBuf->pixels;
-		 ieByte* dest = (ieByte*)pixels;
-		 for( int row = 0; row < height; row++ ) {
-		 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
-		 dest += pitch;
-		 src += backBuf->pitch;
-		 }
-		 SDL_UnlockTexture(screenTexture);
-		 */
+		
+		Uint32 fmt;
+		SDL_QueryTexture(texture, &fmt, NULL, NULL, NULL);
+		
+		if (fmt == SDL_PIXELFORMAT_YV12) {
+			va_list args;
+			va_start(args, pitch);
+			
+			enum PLANES {Y, U, V};
+			ieByte* planes[3];
+			unsigned int strides[3];
+			
+			planes[Y] = static_cast<ieByte*>(pixelBuf);
+			strides[Y] = *pitch;
+			planes[U] = va_arg(args, ieByte*);
+			strides[U] = *va_arg(args, int*);
+			planes[V] = va_arg(args, ieByte*);
+			strides[V] = *va_arg(args, int*);
+			va_end(args);
+			
+			SDL_UpdateYUVTexture(texture, &dest, planes[Y], strides[Y], planes[U], strides[U], planes[V], strides[V]);
+		} else if (fmt == SDLPixelFormatFromBufferFormat(inputFormat)) {
+			SDL_UpdateTexture(texture, &dest, pixelBuf, sdlpitch);
+		} else {
+			// assuming the texture is a 4 byte per pixel format
+			void* pixels = malloc(4 * bufDest.w * bufDest.h);
+			SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, sdlpitch, fmt, pixels, bufDest.w);
+			SDL_UpdateTexture(texture, &dest, pixels, bufDest.w);
+			free(pixels);
+		}
 	}
 };
 
