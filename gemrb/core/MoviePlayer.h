@@ -61,7 +61,7 @@ public:
 		}
 		
 		virtual ~SubtitleSet() {
-			pal->release();
+			if (pal) pal->release();
 		}
 
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
