@@ -2833,7 +2833,7 @@ int Interface::PlayMovie(const char* resref)
 				for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
 					const char* frameField = sttable->QueryField(i, 0);
 					const char* strField = sttable->QueryField(i, 1);
-					if (frameField && strField) {
+					if (frameField && strField) { // this skips the initial palette rows
 						subs[atoi(frameField)] = atoi(strField);
 					}
 				}
