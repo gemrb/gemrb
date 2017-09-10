@@ -79,7 +79,7 @@ public:
 	VideoBuffer(const Region& r) : rect(r) {}
 	virtual ~VideoBuffer() {}
 	
-	::GemRB::Size Size() { return rect.Dimensions(); }
+	::GemRB::Size Size() const { return rect.Dimensions(); }
 	void SetOrigin(const Point& p) { rect.x = p.x, rect.y = p.y; }
 
 	virtual void Clear() = 0;
