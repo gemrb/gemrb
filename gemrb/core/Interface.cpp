@@ -2853,8 +2853,9 @@ int Interface::PlayMovie(const char* resref)
 		};
 
 		Font* font = GetFont(MovieFontResRef);
-		Color fore = font->GetPalette()->front;
-		Color bg = font->GetPalette()->back;
+		Holder<Palette> pal = font->GetPalette();
+		Color fore = pal->front;
+		Color bg = pal->back;
 
 		AutoTable sttable(resref);
 		if (sttable) {
@@ -2863,8 +2864,8 @@ int Interface::PlayMovie(const char* resref)
 			int b = atoi(sttable->QueryField("blue", "frame"));
 			
 			if (r || g || b) {
-				fore = Color(ieByte(r), ieByte(g), ieByte(b), 0x00);
-				bg = ColorBlack;
+				fore = Color(ieByte(r), ieByte(g), ieByte(b), 0xff);
+				bg = Color(0, 0, 0, 0);
 			}
 
 			mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));

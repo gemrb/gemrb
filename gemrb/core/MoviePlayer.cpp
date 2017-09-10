@@ -67,18 +67,20 @@ void MoviePlayer::Play(Window* win)
 	isPlaying = true;
 	do {
 		// taking over the application runloop...
+		
+		// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
+		// However, since we completely block the normal game loop we will bypass WindowManager drawing
+		//WindowManager::DefaultWindowManager().DrawWindows();
+		
+		// first draw the window for play controls/subtitles
+		win->Draw();
+		if (subtitles) {
+			// we purposely draw on the window, which may be larger than the video
+			subtitles->RenderInRegion(win->Frame(), framePos);
+		}
+		
 		video->PushDrawingBuffer(vb);
-		if (DecodeFrame(*vb)) {
-			if (subtitles) {
-				// we purposely draw on the window, which may be larger than the video
-				subtitles->RenderInRegion(win->Frame(), framePos);
-			}
-			// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
-			// However, since we completely block the normal game loop we will bypass WindowManager drawing
-			//WindowManager::DefaultWindowManager().DrawWindows();
-
-			//win.Draw(); // if we had any playback controls we would need to draw them
-		} else {
+		if (DecodeFrame(*vb) == false) {
 			Stop(); // error / end
 		}
 		// TODO: pass movie fps (and remove the cap from within the movie decoders)

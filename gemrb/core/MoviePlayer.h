@@ -50,12 +50,12 @@ public:
 	static const TypeID ID;
 
 	class SubtitleSet {
-		Palette* pal;
+		Holder<Palette> pal;
 		Font* font;
 	
 	public:
 		SubtitleSet(Font* fnt, Color fore = ColorWhite, Color bg = ColorBlack)
-		: pal(new Palette(fore, bg)) {
+		: pal((fore.a != 0) ? new Palette(fore, bg) : NULL) {
 			font = fnt;
 			assert(font);
 		}
@@ -67,7 +67,8 @@ public:
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
 		
 		void RenderInRegion(const Region& rgn, size_t frame) const {
-			font->Print(rgn, SubtitleAtFrame(frame), pal, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+			const String& str = SubtitleAtFrame(frame);
+			font->Print(rgn, str, pal.get(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
 		}
 	};
 
