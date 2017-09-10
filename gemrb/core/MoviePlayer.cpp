@@ -50,12 +50,16 @@ void MoviePlayer::Play(Window* win)
 	assert(win);
 	Video* video = core->GetVideoDriver();
 
-	win->SetFlags(Window::Borderless, OP_OR);
-	win->SetPosition(Window::PosCentered);
 	MoviePlayerControls* mpc = new MoviePlayerControls(*this);
+	mpc->SetFrameSize(win->Dimensions());
 	win->AddSubviewInFrontOfView(mpc);
 
-	VideoBuffer* vb = video->CreateBuffer(win->Frame(), movieFormat);
+	// center over win
+	const Region& winFrame = win->Frame();
+	const Size& size = Dimensions();
+	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
+	center = center + winFrame.Origin();
+	VideoBuffer* vb = video->CreateBuffer(Region(center, size), movieFormat);
 
 	// currently, our MoviePlayer implementation takes over the entire screen
 	// not only that but the Play method blocks until movie is done/stopped.
@@ -66,6 +70,7 @@ void MoviePlayer::Play(Window* win)
 		video->PushDrawingBuffer(vb);
 		if (DecodeFrame(*vb)) {
 			if (subtitles) {
+				// we purposely draw on the window, which may be larger than the video
 				subtitles->RenderInRegion(win->Frame(), framePos);
 			}
 			// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen

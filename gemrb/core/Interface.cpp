@@ -2884,7 +2884,9 @@ int Interface::PlayMovie(const char* resref)
 
 	// clear whatever is currently on screen
 	SetCutSceneMode(true);
-	Window* win = winmgr->MakeWindow(Region(Point(), mp->Dimensions()));
+	Region screen(0,0, Width, Height);
+	Window* win = winmgr->MakeWindow(screen);
+	win->SetFlags(Window::Borderless, OP_OR);
 
 	mp->Play(win);
 	win->Close();
