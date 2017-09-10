@@ -91,6 +91,78 @@ private:
 	float ScaleCoordinateHorizontal(float x);
 	float ScaleCoordinateVertical(float y);
 };
+	
+class SDLTextureVideoBuffer : public VideoBuffer {
+	SDL_Texture* texture;
+	
+private:
+	Region TextureRegion(SDL_Texture* tex, const Point& p) {
+		int w, h;
+		SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+		return Region(p, ::GemRB::Size(w, h));
+	}
+	
+public:
+	SDLTextureVideoBuffer(const Point& p, SDL_Texture* texture)
+	: VideoBuffer(TextureRegion(texture, p)), texture(texture)
+	{
+		assert(texture);
+	}
+	
+	~SDLTextureVideoBuffer() {
+		SDL_DestroyTexture(texture);
+	}
+	
+	void Clear() {
+		void *pixels;
+		int pitch;
+		if(SDL_LockTexture(texture, NULL, &pixels, &pitch) != GEM_OK) {
+			Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
+			return;
+		}
+		
+		ieByte* dest = (ieByte*)pixels;
+		for(int row = 0; row < rect.h; row++) {
+			memset(dest, SDL_ALPHA_TRANSPARENT, pitch);
+			dest += pitch;
+		}
+		SDL_UnlockTexture(texture);
+	}
+	
+	bool RenderOnDisplay(void* display) {
+		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
+		SDL_Rect dst = RectFromRegion(rect);
+		SDL_RenderCopy(renderer, texture, NULL, &dst);
+		return true;
+	}
+	
+	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+		int sdlpitch = (pitch) ? *pitch : rect.w;
+		SDL_Rect dest = RectFromRegion(bufDest);
+		SDL_UpdateTexture(texture, &dest, pixelBuf, sdlpitch);
+		// FIXME: don't know if this comment still applies
+		/*
+		 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
+		 Don't know how universal it is yet so leaving this in commented out just in case
+		 
+		 void *pixels;
+		 int pitch;
+		 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
+		 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
+		 return GEM_ERROR;
+		 }
+		 
+		 ieByte* src = (ieByte*)backBuf->pixels;
+		 ieByte* dest = (ieByte*)pixels;
+		 for( int row = 0; row < height; row++ ) {
+		 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
+		 dest += pitch;
+		 src += backBuf->pitch;
+		 }
+		 SDL_UnlockTexture(screenTexture);
+		 */
+	}
+};
 
 }
 
