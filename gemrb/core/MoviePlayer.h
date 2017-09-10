@@ -60,9 +60,7 @@ public:
 			assert(font);
 		}
 		
-		virtual ~SubtitleSet() {
-			if (pal) pal->release();
-		}
+		virtual ~SubtitleSet() {}
 
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
 		
