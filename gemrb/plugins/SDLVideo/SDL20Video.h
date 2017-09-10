@@ -24,6 +24,22 @@
 #include "SDLVideo.h"
 
 namespace GemRB {
+	
+Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt) {
+	switch (fmt) {
+		case Video::RGBPAL8:
+		case Video::RGB565:
+		case Video::RGBA8888:
+		case Video::DISPLAY:
+			// we always use 32bit RGBA and convert from RGBPAL8 and RGB565 to RGBA8888
+			// part of the reason is that many devices don't support lower bit depth and SDL doesnt have a way to update paletized textures
+			return SDL_PIXELFORMAT_RGBA8888;
+		case Video::YV12:
+			return SDL_PIXELFORMAT_YV12;
+		default:
+			return SDL_PIXELFORMAT_UNKNOWN;
+	}
+}
 
 enum MultiGestureType {
 	GESTURE_NONE = 0,
