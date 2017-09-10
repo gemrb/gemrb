@@ -64,9 +64,10 @@ public:
 
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
 		
-		void RenderInRegion(const Region& rgn, size_t frame) const {
+		void RenderInBuffer(const VideoBuffer& buffer, size_t frame) const {
 			const String& str = SubtitleAtFrame(frame);
-			font->Print(rgn, str, pal.get(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+			Region rect(Point(), buffer.Size());
+			font->Print(rect, str, pal.get(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
 		}
 	};
 

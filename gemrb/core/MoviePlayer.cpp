@@ -60,6 +60,11 @@ void MoviePlayer::Play(Window* win)
 	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
 	center = center + winFrame.Origin();
 	VideoBuffer* vb = video->CreateBuffer(Region(center, size), movieFormat);
+	
+	// FIXME: arbitrary frame of my choosing, not sure there is a better method
+	// this hould probably at least be sized according to line height
+	Region subFrame(20, winFrame.h - center.y - 20, winFrame.w - 40, center.y);
+	VideoBuffer* subBuf = video->CreateBuffer(subFrame);
 
 	// currently, our MoviePlayer implementation takes over the entire screen
 	// not only that but the Play method blocks until movie is done/stopped.
@@ -73,10 +78,14 @@ void MoviePlayer::Play(Window* win)
 		//WindowManager::DefaultWindowManager().DrawWindows();
 		
 		// first draw the window for play controls/subtitles
-		win->Draw();
+		//win->Draw();
 		if (subtitles) {
+			assert(subBuf);
 			// we purposely draw on the window, which may be larger than the video
-			subtitles->RenderInRegion(win->Frame(), framePos);
+			subBuf->Clear();
+			video->PushDrawingBuffer(subBuf);
+			subtitles->RenderInBuffer(*subBuf, framePos);
+			video->PopDrawingBuffer();
 		}
 		
 		video->PushDrawingBuffer(vb);
@@ -88,6 +97,7 @@ void MoviePlayer::Play(Window* win)
 
 	delete win->View::RemoveSubview(mpc);
 	video->DestroyBuffer(vb);
+	video->DestroyBuffer(subBuf);
 }
 
 void MoviePlayer::Stop()
