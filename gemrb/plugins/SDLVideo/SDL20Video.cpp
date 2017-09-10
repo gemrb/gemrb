@@ -98,184 +98,23 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	return GEM_OK;
 }
 
-VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region&, BufferFormat)
+VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	return NULL;
+	Uint32 format = SDLPixelFormatFromBufferFormat(fmt);
+	if (format == SDL_PIXELFORMAT_UNKNOWN)
+		return NULL;
+	
+	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
+	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt);
 }
 
-/*
-void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
-{
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_RenderClear(renderer);
-
-	if (screenTexture) SDL_DestroyTexture(screenTexture);
-	if (yuv) {
-		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
-	} else {
-		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-	}
-	if (!screenTexture) {
-		Log(ERROR, "SDL 2 Driver", "Unable to create texture for video playback: %s", SDL_GetError());
-	}
-	w = width;
-	h = height;
-}
-
-void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
-							   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-							   unsigned int h, unsigned int dstx, unsigned int dsty,
-							   int g_truecolor, unsigned char *pal, ieDword titleref)
-{
-	assert( bufw == w && bufh == h );
-
-	SDL_Rect srcRect = {(int)sx, (int)sy, (int)w, (int)h};
-	SDL_Rect destRect = {(int)dstx, (int)dsty, (int)w, (int)h};
-
-	Uint32 *dst;
-	unsigned int row, col;
-	void *pixels;
-	int pitch;
-	SDL_Color color = {0, 0, 0, 0};
-
-	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
-		return;
-	}
-	if (g_truecolor) {
-		Uint16 *src = (Uint16*)buf;
-		for (row = 0; row < bufh; ++row) {
-			dst = (Uint32*)((Uint8*)pixels + row * pitch);
-			for (col = 0; col < bufw; ++col) {
-				color.r = ((*src & 0x7C00) >> 7) | ((*src & 0x7C00) >> 12);
-				color.g = ((*src & 0x03E0) >> 2) | ((*src & 0x03E0) >> 8);
-				color.b = ((*src & 0x001F) << 3) | ((*src & 0x001F) >> 2);
-				// video player texture is of ARGB format. buf is RGB555
-				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
-				src++;
-			}
-		}
-	} else {
-		Uint8 *src = buf;
-		SDL_Palette* palette;
-		palette = SDL_AllocPalette(256);
-		for (int i = 0; i < 256; i++) {
-			palette->colors[i].r = ( *pal++ ) << 2;
-			palette->colors[i].g = ( *pal++ ) << 2;
-			palette->colors[i].b = ( *pal++ ) << 2;
-		}
-		for (row = 0; row < bufh; ++row) {
-			dst = (Uint32*)((Uint8*)pixels + row * pitch);
-			for (col = 0; col < bufw; ++col) {
-				color = palette->colors[*src++];
-				// video player texture is of ARGB format
-				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
-			}
-		}
-		SDL_FreePalette(palette);
-	}
-	SDL_UnlockTexture(screenTexture);
-
-	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
-
-	if (titleref>0) {
-		SDL_Rect rect = RectFromRegion(subtitleregion);
-		SDL_RenderFillRect(renderer, &rect);
-		DrawMovieSubtitle( titleref );
-	}
-
-	SDL_RenderPresent(renderer);
-}
-
-void SDL20VideoDriver::showYUVFrame()
-{
-	SDL_Rect destRect;
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-
- // This is superseded by SDL_UpdateYUVTexture, but I havent throughly tested it.
- // Not that I expect it to perform worse than the manual code :)
-	Uint8 *pixels;
-	int pitch;
-	if(SDL_LockTexture(screenTexture, NULL, (void**)&pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
-		return;
-	}
-	pitch = w;
-	if((unsigned int)pitch == strides[0]) {
-		int size = pitch * bufh;
-		memcpy(pixels, buf[0], size);
-		memcpy(pixels + size, buf[2], size / 4);
-		memcpy(pixels + size * 5 / 4, buf[1], size / 4);
-	} else {
-		unsigned char *Y,*U,*V,*iY,*iU,*iV;
-		unsigned int i;
-		Y = pixels;
-		V = pixels + pitch * h;
-		U = pixels + pitch * h * 5 / 4;
-
-		iY = buf[0];
-		iU = buf[1];
-		iV = buf[2];
-
-		for (i = 0; i < (h/2); i++) {
-			memcpy(Y,iY,pitch);
-			iY += strides[0];
-			Y += pitch;
-
-			memcpy(Y,iY,pitch);
-			memcpy(U,iU,pitch / 2);
-			memcpy(V,iV,pitch / 2);
-
-			Y  += pitch;
-			U  += pitch / 2;
-			V  += pitch / 2;
-			iY += strides[0];
-			iU += strides[1];
-			iV += strides[2];
-		}
-	}
-	SDL_UnlockTexture(screenTexture);
- *//*
-	SDL_RenderClear(renderer);
-	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[1], strides[1], buf[2], strides[2]);
-	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
-	SDL_RenderPresent(renderer);
-}
-*/
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
 	VideoBuffers::iterator it;
 	it = buffers.begin();
 	for (; it != buffers.end(); ++it) {
-		//SDLSurfaceVideoBuffer* vb = static_cast<SDLSurfaceVideoBuffer*>(*it);
-		//vb->RenderOnDisplay(disp);
+		(*it)->RenderOnDisplay(renderer);
 	}
-
-	//SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
-	/*
-	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
-	 Don't know how universal it is yet so leaving this in commented out just in case
-
-	 void *pixels;
-	 int pitch;
-	 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-	 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-	 return GEM_ERROR;
-	 }
-
-	 ieByte* src = (ieByte*)backBuf->pixels;
-	 ieByte* dest = (ieByte*)pixels;
-	 for( int row = 0; row < height; row++ ) {
-	 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
-	 dest += pitch;
-	 src += backBuf->pitch;
-	 }
-	 SDL_UnlockTexture(screenTexture);
-	 */
 
 	SDL_RenderPresent( renderer );
 }
