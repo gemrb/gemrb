@@ -71,6 +71,7 @@ bool MVEPlay::Open(DataStream* stream)
 bool MVEPlay::DecodeFrame(VideoBuffer& buf)
 {
 	vidBuf = &buf;
+	++framePos;
 	return (validVideo && decoder.next_frame());
 }
 
