@@ -222,7 +222,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			e = EvntManager->CreateKeyEvent(key, true, modstate);
 			if (e.keyboard.character) {
-				e.keyboard.character = event.key.keysym.unicode; // FIXME: invalid in SDL2
+#if SDL_VERSION_ATLEAST(1,3,0)
+				e.keyboard.character = SDL_GetKeyFromScancode(event.key.keysym.scancode);
+#else
+				e.keyboard.character = event.key.keysym.unicode;
+#endif
 			}
 			EvntManager->DispatchEvent(e);
 			break;
