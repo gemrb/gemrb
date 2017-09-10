@@ -86,8 +86,7 @@ int main(int argc, char* argv[])
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
-		Log(MESSAGE, "Main", "Press enter to continue...");
-		getc(stdin);
+		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
 		return -1;
 	}

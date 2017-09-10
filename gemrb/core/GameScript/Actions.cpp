@@ -2085,10 +2085,12 @@ void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (actor->GetStance()!=parameters->int0Parameter) {
+	// HACK HACK: avoid too long waits due to buggy AI evaluation
+	if (actor->GetStance() != parameters->int0Parameter || parameters->int1Parameter > (signed)core->Time.round_size) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	parameters->int1Parameter++;
 }
 
 // the spell target and attack target are different only in iwd2

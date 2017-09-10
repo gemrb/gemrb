@@ -25,9 +25,7 @@ addons:
     - libsdl-mixer1.2-dev
     - libfreetype6
     - libfreetype6-dev
-    - libvlc5
     - libvlc-dev
-    - libvlccore5
     - libvlccore-dev
     - libpng12-0
     - libpng12-dev
@@ -62,6 +60,7 @@ script:
   - if [ $TRAVIS_OS_NAME != osx ]; then static="-DSTATIC_LINK=1"; fi
   - cmake -DCMAKE_INSTALL_PREFIX=iprefix $static ..
   - make
+  - if [ $TRAVIS_OS_NAME != osx ]; then sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample; fi
   - if [ $TRAVIS_OS_NAME != osx ]; then ulimit -c unlimited -S && gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
   - make install
 
