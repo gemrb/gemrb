@@ -74,7 +74,6 @@ public:
 	}
 
 	void Clear() {}
-	void SetColorKey(const Color&) {}
 
 	bool RenderOnDisplay(void* /*display*/) {
 		if (changed) {

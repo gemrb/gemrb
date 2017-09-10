@@ -65,8 +65,7 @@ WindowManager::WindowManager(Video* vid)
 	// FIXME: need to recreate these if resolution changes
 	// NOTE: TT width is 138 = 128px (bg) + 10px (right curl) for BG2
 	// FIXME?: update this to the widest width needed for all games (if different)
-	cursorBuf = vid->CreateBuffer(Region(0,0,138,64));
-	cursorBuf->SetColorKey(ColorGreen);
+	cursorBuf = vid->CreateBuffer(Region(0,0,138,64), Video::RGBA8888);
 	winFrameBuf = vid->CreateBuffer(screen, Video::RGBA8888);
 
 	// set the buffer that always gets cleared just in case anything

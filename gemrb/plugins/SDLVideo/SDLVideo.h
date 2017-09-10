@@ -181,10 +181,6 @@ public:
 		return true;
 	}
 
-	void SetColorKey(const Color& c) {
-		SDL_SetColorKey(buffer, SDL_SRCCOLORKEY, SDL_MapRGBA(buffer->format, c.r, c.g, c.b, c.a));
-	}
-
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
 		SDL_Surface* sprite = NULL;
 

@@ -85,7 +85,6 @@ public:
 	virtual void Clear() = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
 	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) = 0;
-	virtual void SetColorKey(const Color&) = 0;
 	
 	virtual bool RenderOnDisplay(void* display) = 0;
 };
