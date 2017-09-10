@@ -121,7 +121,7 @@ void Window::RecreateBuffer()
 
 void Window::WillDraw()
 {
-	backBuffer->origin = frame.Origin();
+	backBuffer->SetOrigin(frame.Origin());
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 

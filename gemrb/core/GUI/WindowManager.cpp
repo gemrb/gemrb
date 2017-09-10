@@ -389,7 +389,7 @@ void WindowManager::DrawMouse() const
 
 	// cursor is buffer midpoint, but offset by distance to edge
 	Point mid = eventMgr.MousePos() - pos;
-	cursorBuf->origin = pos;
+	cursorBuf->SetOrigin(pos);
 	DrawCursor(mid);
 	// tooltip is *always* midpoint to the buffer
 	// this will ensure the entire tooltip is visible

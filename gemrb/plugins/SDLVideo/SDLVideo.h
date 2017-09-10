@@ -144,7 +144,7 @@ class SDLSurfaceVideoBuffer : public VideoBuffer {
 
 public:
 	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p)
-	: VideoBuffer(p)
+	: VideoBuffer(Region(p, ::GemRB::Size(surf->w, surf->h)))
 	{
 		assert(surf);
 		buffer = surf;
@@ -176,13 +176,9 @@ public:
 
 	bool RenderOnDisplay(void* display) {
 		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
-		SDL_Rect dst = { origin.x, origin.y, (unsigned short) buffer->w, (unsigned short) buffer->h };
+		SDL_Rect dst = RectFromRegion(rect);
 		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
 		return true;
-	}
-
-	class Size Size() {
-		return GemRB::Size(buffer->w, buffer->h);
 	}
 
 	void SetColorKey(const Color& c) {

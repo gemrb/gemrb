@@ -72,17 +72,19 @@ enum TileBlitFlags {
 #define TOOLTIP_DELAY_FACTOR 250
 
 class GEM_EXPORT VideoBuffer {
+protected:
+	Region rect;
+	
 public:
-	Point origin;
-
-public:
-	VideoBuffer(Point o) : origin(o) {}
+	VideoBuffer(const Region& r) : rect(r) {}
 	virtual ~VideoBuffer() {}
+	
+	::GemRB::Size Size() { return rect.Dimensions(); }
+	void SetOrigin(const Point& p) { rect.x = p.x, rect.y = p.y; }
 
 	virtual void Clear() = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
 	virtual void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) = 0;
-	virtual ::GemRB::Size Size() = 0;
 	virtual void SetColorKey(const Color&) = 0;
 	
 	virtual bool RenderOnDisplay(void* display) = 0;

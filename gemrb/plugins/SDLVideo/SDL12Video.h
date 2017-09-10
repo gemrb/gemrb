@@ -62,7 +62,7 @@ class SDLOverlayVideoBuffer : public VideoBuffer {
 
 public:
 	SDLOverlayVideoBuffer(const Point& p, SDL_Overlay* overlay)
-	: VideoBuffer(p)
+	: VideoBuffer(Region(p, ::GemRB::Size(overlay->w, overlay->h)))
 	{
 		assert(overlay);
 		this->overlay = overlay;
@@ -76,13 +76,9 @@ public:
 	void Clear() {}
 	void SetColorKey(const Color&) {}
 
-	class Size Size() {
-		return GemRB::Size(overlay->w, overlay->h);
-	}
-
 	bool RenderOnDisplay(void* /*display*/) {
 		if (changed) {
-			SDL_Rect dest = {origin.x, origin.y, (unsigned short) overlay->w, (unsigned short) overlay->h};
+			SDL_Rect dest = RectFromRegion(rect);
 			SDL_DisplayYUVOverlay(overlay, &dest);
 			changed = false;
 			
@@ -97,7 +93,7 @@ public:
 			//SDL_Surface* sdl_disp = SDL_GetVideoSurface();
 			//SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
 		}
-		return changed;
+		return false;
 	}
 
 	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
