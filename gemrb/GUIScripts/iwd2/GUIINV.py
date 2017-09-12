@@ -30,6 +30,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
+from ie_restype import RES_BAM
 
 InventoryWindow = None
 PortraitWindow = None
@@ -238,8 +239,10 @@ def RefreshInventoryWindow ():
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-	Button.SetAnimation (GUICommonWindows.GetActorPaperDoll (pc)+"G11")
-	Button.SetAnimationPalette (Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
+	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"G11"
+	if GemRB.HasResource (pdoll, RES_BAM):
+		Button.SetAnimation (pdoll)
+		Button.SetAnimationPalette (Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
 
 	# portrait
 	Button = Window.GetControl (84)
