@@ -58,7 +58,7 @@ private:
 class SDLOverlayVideoBuffer : public VideoBuffer {
 	SDL_Overlay* overlay;
 	Point renderPos;
-	bool changed;
+	mutable bool changed;
 
 public:
 	SDLOverlayVideoBuffer(const Point& p, SDL_Overlay* overlay)
@@ -75,7 +75,7 @@ public:
 
 	void Clear() {}
 
-	bool RenderOnDisplay(void* /*display*/) {
+	bool RenderOnDisplay(void* /*display*/) const {
 		if (changed) {
 			SDL_Rect dest = RectFromRegion(rect);
 			SDL_DisplayYUVOverlay(overlay, &dest);

@@ -138,7 +138,7 @@ public:
 		SDL_RenderFillRect(renderer, NULL);
 	}
 	
-	bool RenderOnDisplay(void* display) {
+	bool RenderOnDisplay(void* display) const {
 		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_RenderCopy(renderer, texture, NULL, &dst);

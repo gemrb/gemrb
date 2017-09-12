@@ -175,7 +175,7 @@ public:
 		return buffer;
 	}
 
-	bool RenderOnDisplay(void* display) {
+	bool RenderOnDisplay(void* display) const {
 		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
