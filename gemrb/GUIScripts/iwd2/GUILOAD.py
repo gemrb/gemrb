@@ -65,8 +65,8 @@ def OnLoad ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
-		for j in range (MAX_PARTY_SIZE):
-			Button = LoadWindow.GetControl (25 + i*MAX_PARTY_SIZE + j)
+		for j in range (min(6, MAX_PARTY_SIZE)):
+			Button = LoadWindow.GetControl (25 + i*min(6, MAX_PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 			Button.SetSize (21, 21)
@@ -122,8 +122,8 @@ def ScrollBarPress ():
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture ("")
-		for j in range (MAX_PARTY_SIZE):
-			Button=LoadWindow.GetControl (25 + i*MAX_PARTY_SIZE + j)
+		for j in range (min(6, MAX_PARTY_SIZE)):
+			Button=LoadWindow.GetControl (25 + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos<len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
