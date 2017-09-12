@@ -2888,6 +2888,7 @@ int Interface::PlayMovie(const char* resref)
 	Region screen(0,0, Width, Height);
 	Window* win = winmgr->MakeWindow(screen);
 	win->SetFlags(Window::Borderless, OP_OR);
+	winmgr->PresentModalWindow(win);
 
 	mp->Play(win);
 	win->Close();
