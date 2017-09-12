@@ -123,6 +123,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	OrderFront(win);
 	win->SetDisabled(false);
 	win->SetFlags(Window::Modal, OP_OR);
+	win->SetVisible(true);
 	modalWin = win;
 
 	if (Shadow != ShadowNone) {
