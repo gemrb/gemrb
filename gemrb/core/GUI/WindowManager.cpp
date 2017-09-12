@@ -209,7 +209,7 @@ void WindowManager::HideAllWindows()
 	// we don't ever hide the gamewindow, however, we will cover it in black
 	// this way the screen can be cleared for anything that wants to take over drawing (videos)
 	// otherwise the next draw cycle will simply redraw the gamewindow
-	gameWin->Draw(); // FIXME: relying on sideeffect, dont care about drawing
+	video->PushDrawingBuffer(winFrameBuf);
 	video->DrawRect(Region(0,0,screen.w,screen.h), ColorBlack);
 }
 
