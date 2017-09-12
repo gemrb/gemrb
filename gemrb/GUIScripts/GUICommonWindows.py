@@ -1392,6 +1392,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
+		Mode = "horizontal"
 		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
 		return pairs
 
