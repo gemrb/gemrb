@@ -198,7 +198,7 @@ private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on input release up only
 	unsigned int repeatDelay;
-	typedef std::map<ActionKey, ControlEventHandler>::const_iterator ActionIterator;
+	typedef std::map<ActionKey, ControlEventHandler>::iterator ActionIterator;
 	std::map<ActionKey, ControlEventHandler> actions;
 	Timer* actionTimer;
 	
