@@ -65,7 +65,8 @@ inline int GetModState(int modstate)
 	
 inline SDL_Rect RectFromRegion(const Region& rgn)
 {
-	return {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
+	SDL_Rect rect = {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
+	return rect;
 }
 
 class SDLVideoDriver : public Video {
