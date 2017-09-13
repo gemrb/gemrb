@@ -70,8 +70,6 @@ BIKPlayer::BIKPlayer(void)
 	memset(&c_scantable, 0, sizeof(c_scantable));
 	memset(&c_bundle, 0, sizeof(c_bundle));
 	memset(&c_col_high, 0, sizeof(c_col_high));
-	memset(&c_pic, 0, sizeof(c_pic));
-	memset(&c_last, 0, sizeof(c_last));
 	memset(&header, 0, sizeof(header));
 	memset(s_coeffs_ptr, 0, sizeof(s_coeffs_ptr));
 	timer_last_sec = timer_last_usec = frame_wait = c_col_lastval = 0;
@@ -195,6 +193,7 @@ int BIKPlayer::ReadHeader()
 	}
 
 	str->Seek(4, GEM_CURRENT_POS);
+	
 	return 0;
 }
 
@@ -460,9 +459,13 @@ int BIKPlayer::video_init()
 				bink_tree_bits[i], 1, 1, INIT_VLC_LE);
 		}
 	}
-
-	memset(&c_pic,0, sizeof(AVFrame));
-	memset(&c_last,0, sizeof(AVFrame));
+	
+	c_pic = &c_frames[0];
+	c_last = &c_frames[1];
+	
+	c_pic->get_buffer(header.width, header.height);
+	c_last->get_buffer(header.width, header.height);
+	
 
 	ff_init_scantable(&c_scantable, bink_scan);
 
@@ -493,39 +496,9 @@ int BIKPlayer::EndAudio()
 	return 0;
 }
 
-static inline void release_buffer(AVFrame *p)
-{
-	int i;
-
-	for(i=0;i<3;i++) {
-		av_freep((void **) &p->data[i]);
-	}
-}
-
-static inline void ff_fill_linesize(AVFrame *picture, int width)
-{
-	memset(picture->linesize, 0, sizeof(picture->linesize));
-	int w2 = (width + (1 << 1) - 1) >> 1;
-	picture->linesize[0] = width;
-	picture->linesize[1] = w2;
-	picture->linesize[2] = w2;
-}
-
-static inline void get_buffer(AVFrame *p, int width, int height)
-{
-	ff_fill_linesize(p, width);
-	for(int plane=0;plane<3;plane++) {
-		p->data[plane] = (uint8_t *) av_malloc(p->linesize[plane]*height);
-	}
-}
-
 int BIKPlayer::EndVideo()
 {
-	int i;
-
-	release_buffer(&c_pic);
-	release_buffer(&c_last);
-	for (i = 0; i < BINK_NB_SRC; i++) {
+	for (int i = 0; i < BINK_NB_SRC; i++) {
 		av_freep((void **) &c_bundle[i].data);
 	}
 	return 0;
@@ -1338,10 +1311,9 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 	//this is compatible only with the BIKi version
 	v_gb.skip_bits(32);
 
-	get_buffer(&c_pic, header.width, header.height);
 	//plane order is YUV
 	for (plane = 0; plane < 3; plane++) {
-		const int stride = c_pic.linesize[plane];
+		const int stride = c_pic->linesize[plane];
 
 		bw = plane ? (header.width  + 15) >> 4 : (header.width  + 7) >> 3;
 		bh = plane ? (header.height + 15) >> 4 : (header.height + 7) >> 3;
@@ -1375,12 +1347,8 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 			if (read_runs(&c_bundle[BINK_SRC_RUN]) < 0)
 				return -1;
 
-			//why is this here?
-			if (by == bh)
-				break;
-
-			dst = c_pic.data[plane] + 8*by*stride;
-			prev = c_last.data[plane] + 8*by*stride;
+			dst = c_pic->data[plane] + 8*by*stride;
+			prev = c_last->data[plane] + 8*by*stride;
 			for (bx = 0; bx < bw; bx++, dst += 8, prev += 8) {
 				blk = get_value(BINK_SRC_BLOCK_TYPES);
 				if ((by & 1) && (blk == SCALED_BLOCK) ) {
@@ -1555,15 +1523,12 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 		int dest_y = unsigned(bufsize.w - header.height) >> 1;
 
 		buf.CopyPixels(Region(dest_x, dest_y, header.width, header.height),
-					   c_pic.data[0], &c_pic.linesize[0], // Y
-					   c_pic.data[1], &c_pic.linesize[1], // U
-					   c_pic.data[2], &c_pic.linesize[2]);// V
+					   c_pic->data[0], &c_pic->linesize[0], // Y
+					   c_pic->data[1], &c_pic->linesize[1], // U
+					   c_pic->data[2], &c_pic->linesize[2]);// V
 	}
 
-	//release the old frame even when frame is skipped
-	release_buffer(&c_last);
-	memcpy(&c_last, &c_pic, sizeof(AVFrame));
-	memset(&c_pic, 0, sizeof(AVFrame));
+	std::swap(c_pic, c_last);
 	return 0;
 }
 

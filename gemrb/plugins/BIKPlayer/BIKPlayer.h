@@ -108,14 +108,50 @@ enum BlockTypes {
 };
  
 typedef struct AVFrame {
-	  /**
-	   * pointer to the picture planes.
-	   * This might be different from the first allocated byte
-	   * - encoding: 
-	   * - decoding: 
-	   */
-	  uint8_t *data[3];
-	  int linesize[3];
+	/**
+	* pointer to the picture planes.
+	* This might be different from the first allocated byte
+	* - encoding: 
+	* - decoding: 
+	*/
+	uint8_t *data[3];
+	int linesize[3];
+	
+	AVFrame() : data(), linesize() {}
+	
+	AVFrame(int width, int height)
+	: data(), linesize() {
+		get_buffer(width, height);
+	}
+	
+	~AVFrame() {
+		release_buffer();
+	}
+	
+	void ff_fill_linesize(int width)
+	{
+		int w2 = (width + (1 << 1) - 1) >> 1;
+		linesize[0] = width;
+		linesize[1] = w2;
+		linesize[2] = w2;
+	}
+	
+	void release_buffer()
+	{
+		for(int i=0;i<3;i++) {
+			av_free(data[i]);
+		}
+	}
+	
+	void get_buffer(int width, int height)
+	{
+		release_buffer();
+		
+		ff_fill_linesize(width);
+		for(int plane=0; plane<3; plane++) {
+			data[plane] = (uint8_t *) av_malloc(linesize[plane]*height);
+		}
+	}
 } AVFrame;
 
 typedef struct {
@@ -203,7 +239,9 @@ private:
 	VLC bink_trees[16];
 	int16_t table[16 * 128][2];
 	GetBitContext v_gb;
-	AVFrame c_pic, c_last;
+	
+	AVFrame c_frames[2];
+	AVFrame *c_pic, *c_last;
 
 private:
 	void timer_start();
