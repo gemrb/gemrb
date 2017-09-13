@@ -111,6 +111,7 @@ def OpenReformPartyWindow ():
 	Button = Window.GetControl (15)
 	Button.SetText (42514)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	# TODO: implement removal for minmaxers
 
 	# Done
 	Button = Window.GetControl (8)

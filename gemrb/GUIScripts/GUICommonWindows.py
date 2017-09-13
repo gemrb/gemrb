@@ -1403,6 +1403,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
+		Mode = "horizontal"
 		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
 		return pairs
 
@@ -1449,7 +1450,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	for i in range(len(pairs), PartySize):
 		if limitStep > limit:
-			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d vs %d" %(limit, buttonHeight)
+			raise SystemExit, "Not enough window space for so many party members (portraits), bailing out! %d vs width/height of %d/%d" %(limit, buttonWidth, buttonHeight)
 		nextID = 1000 + i
 		control = Window.GetControl (nextID)
 		if control:
