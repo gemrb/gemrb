@@ -652,6 +652,8 @@ void BIKPlayer::DecodeBlock(short *out)
 //audio samples
 int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
 {
+	if (data_size == 0) return 0;
+	
 	int bits = data_size*8;
 	s_gb.init_get_bits((uint8_t *) data, bits);
 
