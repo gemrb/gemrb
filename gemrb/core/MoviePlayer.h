@@ -67,7 +67,7 @@ public:
 		void RenderInBuffer(const VideoBuffer& buffer, size_t frame) const {
 			const String& str = SubtitleAtFrame(frame);
 			Region rect(Point(), buffer.Size());
-			font->Print(rect, str, pal.get(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_BOTTOM);
+			font->Print(rect, str, pal.get(), IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
 		}
 	};
 
