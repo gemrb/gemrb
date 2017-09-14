@@ -2852,20 +2852,21 @@ int Interface::PlayMovie(const char* resref)
 			}
 		};
 
-		Font* font = GetFont(MovieFontResRef);
-		Holder<Palette> pal = font->GetPalette();
-		Color fore = pal->front;
-		Color bg = pal->back;
-
 		AutoTable sttable(resref);
 		if (sttable) {
+			Font* font = GetFont(MovieFontResRef);
+			Holder<Palette> pal = font->GetPalette();
+			Color fore = pal->front;
+			Color bg = pal->back;
+
 			int r = atoi(sttable->QueryField("red", "frame"));
 			int g = atoi(sttable->QueryField("green", "frame"));
 			int b = atoi(sttable->QueryField("blue", "frame"));
 			
 			if (r || g || b) {
-				fore = Color(ieByte(r), ieByte(g), ieByte(b), 0xff);
-				bg = Color(0, 0, 0, 0);
+				// FIXME: this doesn't look very good (IWD2), wrong font?
+				bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
+				fore = Color(0, 0, 0, 0xff);
 			}
 
 			mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));
