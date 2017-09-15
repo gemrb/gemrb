@@ -84,7 +84,6 @@ void MoviePlayer::Play(Window* win)
 		if (subtitles) {
 			assert(subBuf);
 			// we purposely draw on the window, which may be larger than the video
-			subBuf->Clear();
 			video->PushDrawingBuffer(subBuf);
 			subtitles->RenderInBuffer(*subBuf, framePos);
 		}
