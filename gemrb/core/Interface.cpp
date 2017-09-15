@@ -2848,6 +2848,7 @@ int Interface::PlayMovie(const char* resref)
 			}
 
 			const String& SubtitleAtFrame(size_t frameNum) const {
+				// FIXME: we cant go backwards now... we dont need to, but this is ugly
 				if (frameNum >= nextSubFrame) {
 					FrameMap::const_iterator it;
 					it = subs.upper_bound(frameNum);
