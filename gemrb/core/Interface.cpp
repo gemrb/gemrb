@@ -2823,12 +2823,16 @@ int Interface::PlayMovie(const char* resref)
 		class IESubtitles : public MoviePlayer::SubtitleSet {
 			typedef std::map<size_t, ieStrRef> FrameMap;
 			FrameMap subs;
+			mutable size_t nextSubFrame;
+			mutable String* cachedSub;
 
 		public:
 			IESubtitles(class Font* fnt, ResRef resref, Color fore = ColorWhite, Color bg = ColorBlack)
 			: MoviePlayer::SubtitleSet(fnt, fore, bg)
 			{
 				AutoTable sttable(resref);
+				cachedSub = NULL;
+				nextSubFrame = 0;
 
 				for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
 					const char* frameField = sttable->QueryField(i, 0);
@@ -2838,17 +2842,25 @@ int Interface::PlayMovie(const char* resref)
 					}
 				}
 			}
+			
+			~IESubtitles() {
+				delete cachedSub;
+			}
 
 			const String& SubtitleAtFrame(size_t frameNum) const {
-				// TODO?: this isnt very efficient; it is performing a subtitle search every frame
-				// with our use case, we could get by with an iterator set in construction and advanced here when frameNum matches/exceeds the next value
-				// obviously if we do that change the interface to be something like NextSubtitle(frame)
-				FrameMap::const_iterator it;
-				it = subs.upper_bound(frameNum);
-				if (it != subs.begin()) {
-					--it;
+				if (frameNum >= nextSubFrame) {
+					FrameMap::const_iterator it;
+					it = subs.upper_bound(frameNum);
+					nextSubFrame = it->first;
+					if (it != subs.begin()) {
+						--it;
+					}
+					delete cachedSub;
+					cachedSub = core->GetString(it->second);
 				}
-				return *core->GetString(it->second);
+				
+				assert(cachedSub);
+				return *cachedSub;
 			}
 		};
 
