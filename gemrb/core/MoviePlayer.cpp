@@ -64,8 +64,9 @@ void MoviePlayer::Play(Window* win)
 	if (subtitles) {
 		// FIXME: arbitrary frame of my choosing, not sure there is a better method
 		// this hould probably at least be sized according to line height
-		Region subFrame(0, winFrame.h - center.y, winFrame.w, center.y);
-		subBuf = video->CreateBuffer(subFrame);
+		int y = std::min<int>(winFrame.h - center.y, winFrame.h - 50.0);
+		Region subFrame(0, y, winFrame.w, 50.0);
+		subBuf = video->CreateBuffer(subFrame, Video::RGBA8888);
 	}
 
 	// currently, our MoviePlayer implementation takes over the entire screen
@@ -81,16 +82,17 @@ void MoviePlayer::Play(Window* win)
 		
 		// first draw the window for play controls/subtitles
 		//win->Draw();
+		
+		video->PushDrawingBuffer(vb);
+		if (DecodeFrame(*vb) == false) {
+			Stop(); // error / end
+		}
+		
 		if (subtitles) {
 			assert(subBuf);
 			// we purposely draw on the window, which may be larger than the video
 			video->PushDrawingBuffer(subBuf);
 			subtitles->RenderInBuffer(*subBuf, framePos);
-		}
-		
-		video->PushDrawingBuffer(vb);
-		if (DecodeFrame(*vb) == false) {
-			Stop(); // error / end
 		}
 		// TODO: pass movie fps (and remove the cap from within the movie decoders)
 	} while ((video->SwapBuffers(0) == GEM_OK) && isPlaying);
