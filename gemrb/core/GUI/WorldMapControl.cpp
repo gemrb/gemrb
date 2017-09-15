@@ -257,6 +257,7 @@ void WorldMapControl::OnMouseOver(const MouseEvent& me)
 					wchar_t dist[10];
 					swprintf(dist, 10, L": %d", worldmap->GetDistance(Area->AreaName));
 					SetTooltip(*str + dist);
+					delete str;
 				}
 			}
 			break;

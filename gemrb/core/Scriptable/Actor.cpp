@@ -3308,8 +3308,10 @@ void Actor::RefreshPCStats() {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				String text = *core->GetString(28895) + L"1"; // FIXME
-				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
+				String* text = core->GetString(28895);
+				text->push_back(L'1');
+				displaymsg->DisplayString(*text, DMC_BG2XPGREEN, this);
+				delete text;
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
