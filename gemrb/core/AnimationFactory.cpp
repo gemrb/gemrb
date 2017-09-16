@@ -142,9 +142,6 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->release();
 	}
 
-	spr->XPos = frames[0]->XPos;
-	spr->YPos = frames[0]->YPos;
-
 	return spr;
 }
 

@@ -200,11 +200,8 @@ Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 		dest->renderFlags ^= BLIT_MIRRORY;
 	}
 
-	dest->XPos = sprite->XPos;
 	if (MirrorAnchor)
 		dest->YPos = sprite->Height - sprite->YPos;
-	else
-		dest->YPos = sprite->YPos;
 
 	return dest;
 }
@@ -239,9 +236,6 @@ Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAncho
 
 	if (MirrorAnchor)
 		dest->XPos = sprite->Width - sprite->XPos;
-	else
-		dest->XPos = sprite->XPos;
-	dest->YPos = sprite->YPos;
 
 	return dest;
 }
