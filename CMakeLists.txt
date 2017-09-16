@@ -135,6 +135,7 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 endif (${LAYOUT} MATCHES "home")
+file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
 
 # check if this is a release version
 SET(RC "")
