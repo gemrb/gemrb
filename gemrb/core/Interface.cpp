@@ -2846,10 +2846,14 @@ int Interface::PlayMovie(const char* resref)
 			~IESubtitles() {
 				delete cachedSub;
 			}
+			
+			size_t NextSubtitleFrame() const {
+				return nextSubFrame;
+			}
 
 			const String& SubtitleAtFrame(size_t frameNum) const {
 				// FIXME: we cant go backwards now... we dont need to, but this is ugly
-				if (frameNum >= nextSubFrame) {
+				if (frameNum >= NextSubtitleFrame()) {
 					FrameMap::const_iterator it;
 					it = subs.upper_bound(frameNum);
 					nextSubFrame = it->first;
