@@ -239,7 +239,7 @@ CachePath=@DEFAULT_CACHE_DIR@
 #  GemRB from source directory on Linux.            #
 #####################################################
 
-#PluginsPath=@PLUGIN_DIR@
+#PluginsPath=@DEFAULT_PLUGIN_DIR@
 
 #####################################################
 #  Custom Font Path [String]           		    #

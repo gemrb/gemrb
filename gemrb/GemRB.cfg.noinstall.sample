@@ -181,7 +181,7 @@ CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
 #  Cache directory.                                 #
 #####################################################
 
-CachePath=@DEFAULT_CACHE_DIR@
+CachePath=./gemrb/Cache2/
 
 #####################################################
 #  GemRB Save Path [String]                         #

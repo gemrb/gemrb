@@ -82,9 +82,7 @@ MACRO(SET_PATH variable default)
 ENDMACRO(SET_PATH)
 
 if (${LAYOUT} MATCHES "home")
-	# convert the slashes for windows' users' convenience
-	file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/plugins NATIVE_PLUGINS_DIR)
-	SET_PATH( PLUGIN_DIR ${NATIVE_PLUGINS_DIR} )
+	SET_PATH( PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/plugins )
 	SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX} )
 	SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6 )
 	SET_PATH( BIN_DIR ${CMAKE_INSTALL_PREFIX} )
@@ -135,6 +133,8 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 endif (${LAYOUT} MATCHES "home")
+# convert the slashes for windows' users' convenience
+file(TO_NATIVE_PATH ${PLUGIN_DIR} DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
 
 # check if this is a release version
