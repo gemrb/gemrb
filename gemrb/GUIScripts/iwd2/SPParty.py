@@ -56,7 +56,7 @@ def OnLoad():
 	GemRB.SetVar("PartyIdx",0)
 	GemRB.SetVar("TopIndex",0)
 	
-	for i in range(0,MAX_PARTY_SIZE):
+	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, PartyButtonPress)
@@ -71,7 +71,7 @@ def OnLoad():
 def ScrollBarPress():
 	global PartySelectWindow, PartyCount
 	Pos = GemRB.GetVar("TopIndex")
-	for i in range(0,MAX_PARTY_SIZE):
+	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetText("")
@@ -81,7 +81,7 @@ def ScrollBarPress():
 		else:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)
 
-	for i in range(0,MAX_PARTY_SIZE):
+	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
 		if ActPos<PartyCount:
@@ -144,7 +144,7 @@ def PartyButtonPress():
 def LoadPartyCharacters():
 	i = GemRB.GetVar("PartyIdx")
 	Tag = "Party " + str(i)
-	for j in range(1, MAX_PARTY_SIZE+1):
+	for j in range(1, min(6, MAX_PARTY_SIZE)+1):
 		Key = "Char"+str(j)
 		CharName = GemRB.GetINIPartyKey(Tag, Key, "")
 		print Tag, Key, CharName
