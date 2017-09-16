@@ -48,6 +48,11 @@ OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
 
+if not BonusSpellTable:
+	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
+if not HateRaceTable:
+	HateRaceTable = GemRB.LoadTable ("haterace")
+
 # class level stats
 Classes = IDLUCommon.Levels
 
@@ -97,11 +102,6 @@ def OpenRecordsWindow ():
 	Window.SetFrame ()
 
 	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
-
-	if not BonusSpellTable:
-		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
-	if not HateRaceTable:
-		HateRaceTable = GemRB.LoadTable ("haterace")
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -239,7 +239,7 @@ def HasClassFeatures (pc):
 		return True
 	return False
 
-def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
+def DisplayFavouredEnemy (pc, RangerLevel, second, RecordsTextArea):
 	RaceID = 0
 	if second == -1:
 		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE)
@@ -296,7 +296,7 @@ def DisplayCommon (pc):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-def DisplaySavingThrows (pc):
+def DisplaySavingThrows (pc, RecordsTextArea):
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(17379) + "[/color]\n")
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
@@ -315,8 +315,9 @@ def GNZS(pc, s1, st, force=False):
 		RecordsTextArea.Append (DelimitedText(s1, value, 0))
 	return
 
-def DisplayGeneral (pc):
-	Window = RecordsWindow
+def DisplayGeneral (pc, targetTextArea):
+	global RecordsTextArea
+	RecordsTextArea = targetTextArea
 
 	#levels
 	# get special level penalty for subrace
@@ -392,7 +393,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append ("[p]" + Align + "[/p]")
 
 	#saving throws
-	DisplaySavingThrows (pc)
+	DisplaySavingThrows (pc, RecordsTextArea)
 
 	#class features
 	if HasClassFeatures(pc):
@@ -425,9 +426,9 @@ def DisplayGeneral (pc):
 		else:
 			RangerString += GemRB.GetString (15897)
 		RecordsTextArea.Append (RangerString + "[/color]\n")
-		DisplayFavouredEnemy (pc, RangerLevel)
+		DisplayFavouredEnemy (pc, RangerLevel, -1, RecordsTextArea)
 		for i in range (7):
-			DisplayFavouredEnemy (pc, RangerLevel, i)
+			DisplayFavouredEnemy (pc, RangerLevel, i, RecordsTextArea)
 
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
@@ -1058,7 +1059,7 @@ def UpdateRecordsWindow ():
 
 	SelectWindow = GemRB.GetVar ("SelectWindow")
 	if SelectWindow == 1:
-		DisplayGeneral (pc)
+		DisplayGeneral (pc, RecordsTextArea)
 	elif SelectWindow == 2:
 		DisplayWeapons (pc)
 	elif SelectWindow == 3:
