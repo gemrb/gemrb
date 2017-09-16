@@ -3497,14 +3497,12 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			print("Picture == NULL");
-			return NULL;
+			return RuntimeError("Picture == NULL");
 		}
 	} else {
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
-			print("Picture == NULL");
-			return NULL;
+			return RuntimeError("Picture == NULL");
 		}
 	}
 
