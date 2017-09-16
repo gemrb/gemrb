@@ -40,6 +40,8 @@ def OnLoad():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	NameField = NameWindow.GetControl(2)
+	NameField.SetText (GemRB.GetToken ("CHARNAME"))
+	EditChange ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)

@@ -92,6 +92,7 @@ def SelectFile():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
+	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
 	Portrait = GemRB.GetPlayerPortrait (Slot,0)
 	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
 	ImportWindow.SetVisible(WINDOW_FRONT) #bring it to the front
