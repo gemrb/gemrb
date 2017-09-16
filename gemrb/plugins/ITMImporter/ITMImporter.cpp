@@ -137,7 +137,7 @@ bool ITMImporter::Open(DataStream* stream)
 // iwd1 has hardcoded bonuses (weapons named ZZ*) vs race or alignment mask
 // bg1 already handled it with external effects, so this was actually not necessary
 // Example: ZZ05WE, +1 bonus vs lawful alignments or Giant Killer (+1, +4 vs. Giants)
-// RESEARCH: also inc enchantment level, weapon speed?
+// NOTE: the original did not increment enchantment level nor weapon speed
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
