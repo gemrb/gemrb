@@ -95,6 +95,8 @@ def SelectFile():
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
 	Portrait = GemRB.GetPlayerPortrait (Slot,0)
 	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1))
+	GemRB.SetToken ("LargePortrait", Portrait)
 	ImportWindow.SetVisible(WINDOW_FRONT) #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
