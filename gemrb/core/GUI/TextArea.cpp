@@ -248,6 +248,7 @@ void TextArea::UpdateScrollview()
 		Point p(0, TextHeight());
 		selectOptions->SetFrameOrigin(p);
 	}
+	scrollview.Update();
 }
 
 /** Sets the Actual Text */

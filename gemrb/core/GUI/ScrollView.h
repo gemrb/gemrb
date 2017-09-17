@@ -35,12 +35,13 @@ namespace GemRB {
 			void SubviewAdded(View* view, View* parent);
 			void SubviewRemoved(View* view, View* parent);
 			
-			void ResizeToSubviews();
-			
 			public:
 			ContentView(const Region& frame)
 			: View(frame) {}
+			
 			bool CanLockFocus() const { return false; }
+			// TODO: this should be private and happen automatically
+			void ResizeToSubviews();
 		};
 		
 		PointAnimation animation;
@@ -70,6 +71,10 @@ namespace GemRB {
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 		void OnMouseWheelScroll(const Point& delta);
 		void OnMouseDrag(const MouseEvent&);
+		
+		// TODO: this isn't how we want to do things
+		// this should happen automatically as subivews are addred/removed/resized
+		void Update() { contentView.ResizeToSubviews(); };
 		
 		Point ScrollOffset() const;
 		void SetScrollIncrement(int);
