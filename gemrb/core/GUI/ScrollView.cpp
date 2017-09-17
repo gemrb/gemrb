@@ -74,6 +74,8 @@ void ScrollView::ContentView::ResizeToSubviews()
 ScrollView::ScrollView(const Region& frame)
 : View(frame), contentView(Region())
 {
+	View::AddSubviewInFrontOfView(&contentView);
+
 	ScrollBar* sbar = GetControl<ScrollBar>("SBGLOB", 0);
 	if (sbar == NULL) {
 		// FIXME: this happens with the console window (non-issue, but causing noise)
@@ -94,18 +96,17 @@ ScrollView::ScrollView(const Region& frame)
 		
 		vscroll->SetFrame(sbFrame);
 		
-		View::AddSubviewInFrontOfView(vscroll);
+		// ensure scrollbars are on top
+		View::AddSubviewInFrontOfView(vscroll, &contentView);
 
 		ControlEventHandler handler = NULL;
 		ScrollCB cb = reinterpret_cast<ScrollCB>(&ScrollView::ScrollbarValueChange);
 		handler = new MethodCallback<ScrollView, Control*>(this, cb);
 		vscroll->SetAction(handler, Control::ValueChange);
 	}
-
-	View::AddSubviewInFrontOfView(&contentView);
+	
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
-	
 	SetFlags(RESIZE_SUBVIEWS, OP_OR);
 }
 
