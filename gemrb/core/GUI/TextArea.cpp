@@ -248,6 +248,14 @@ void TextArea::UpdateScrollview()
 		Point p(0, TextHeight());
 		selectOptions->SetFrameOrigin(p);
 	}
+	// FIXME: bad hack
+	// Ideally the View class should have some autoresizing baked in
+	// until then just hack a resize for the scrollbar
+	int texth = TextHeight();
+	if (texth >= frame.h) {
+		textContainer->SetFrameSize(Size(frame.w - 16, texth));
+	}
+	
 	scrollview.Update();
 }
 
