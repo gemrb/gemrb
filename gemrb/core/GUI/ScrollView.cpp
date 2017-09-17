@@ -22,6 +22,7 @@
 #include "GUI/ScrollBar.h"
 
 #include "GUIScriptInterface.h"
+#include "Interface.h"
 
 namespace GemRB {
 	
@@ -69,6 +70,30 @@ void ScrollView::ContentView::ResizeToSubviews()
 		newSize.h = std::max(newSize.h, bounds.h);
 	}
 	SetFrameSize(newSize);
+}
+	
+void ScrollView::ContentView::WillDraw()
+{
+	Video* video = core->GetVideoDriver();
+	screenClip = video->GetScreenClip();
+	
+	ScrollView* parent = static_cast<ScrollView*>(superView);
+	
+	Region clipArea = parent->ContentRegion();
+	Point origin = parent->ConvertPointToWindow(clipArea.Origin());
+	clipArea.x = origin.x;
+	clipArea.y = origin.y;
+	
+	const Region intersect = screenClip.Intersect(clipArea);
+	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+	
+	// clip drawing to the ContentRegion, then restore after drawing
+	video->SetScreenClip(&intersect);
+}
+
+void ScrollView::ContentView::DidDraw()
+{
+	core->GetVideoDriver()->SetScreenClip(&screenClip);
 }
 
 ScrollView::ScrollView(const Region& frame)
@@ -120,7 +145,8 @@ ScrollView::~ScrollView()
 
 void ScrollView::ContentFrameChanged()
 {
-	const Size& mySize = Dimensions();
+	// FIXME: this is assuming an origin of 0,0
+	const Size& mySize = ContentRegion().Dimensions();
 	const Size& contentSize = contentView.Dimensions();
 
 	if (hscroll && contentSize.w > mySize.w) {
@@ -170,6 +196,18 @@ void ScrollView::DidDraw()
 		// restore the origin to the true location passed to ScrollTo
 		contentView.SetFrameOrigin(animation.end);
 	}
+}
+	
+Region ScrollView::ContentRegion() const
+{
+	Region cr = Region(Point(0,0), Dimensions());
+	if (hscroll && hscroll->IsVisible()) {
+		cr.h -= hscroll->Frame().h;
+	}
+	if (vscroll && vscroll->IsVisible()) {
+		cr.w -= vscroll->Frame().w;
+	}
+	return cr;
 }
 	
 void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
