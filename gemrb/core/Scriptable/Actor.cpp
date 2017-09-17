@@ -5550,7 +5550,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 }
 
 //if dual stuff needs to be handled on load too, improve this method with it
-int Actor::GetHpAdjustment(int multiplier) const
+int Actor::GetHpAdjustment(int multiplier, bool modified) const
 {
 	int val;
 
@@ -5559,11 +5559,18 @@ int Actor::GetHpAdjustment(int multiplier) const
 		return 0;
 	}
 
+	const ieDword *stats;
+	if (modified) {
+		stats = Modified;
+	} else {
+		stats = BaseStats;
+	}
+
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
-		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, stats[IE_CON]);
 	} else {
-		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL, stats[IE_CON]);
 	}
 
 	// ensure the change does not kill the actor
