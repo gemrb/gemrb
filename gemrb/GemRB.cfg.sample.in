@@ -40,7 +40,7 @@
 #                                                   #
 #####################################################
 
-GameType=bg2
+GameType=auto
 
 #####################################################
 #  Game Name [String] Title for GemRB window, use   #
@@ -239,7 +239,7 @@ CachePath=@DEFAULT_CACHE_DIR@
 #  GemRB from source directory on Linux.            #
 #####################################################
 
-#PluginsPath=@DEFAULT_PLUGIN_DIR@
+#PluginsPath=@DEFAULT_PLUGINS_DIR@
 
 #####################################################
 #  Custom Font Path [String]           		    #
