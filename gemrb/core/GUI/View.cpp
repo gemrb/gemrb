@@ -180,9 +180,9 @@ void View::Draw()
 	if (flags&Invisible) return;
 
 	Video* video = core->GetVideoDriver();
-	const Region& clip = video->GetScreenClip();
-	const Region& drawFrame = Region(ConvertPointToWindow(Point(0,0)), Dimensions());
-	const Region& intersect = clip.Intersect(drawFrame);
+	const Region clip = video->GetScreenClip();
+	const Region drawFrame = Region(ConvertPointToWindow(Point(0,0)), Dimensions());
+	const Region intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing
