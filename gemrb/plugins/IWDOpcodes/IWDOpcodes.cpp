@@ -3289,7 +3289,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	for(int i=0;i<32;i++) {
 		int stat = target->GetSkillStat(i);
 		if (stat<0) break;
-		STAT_SUB(stat, 1);
+		STAT_SUB(stat, penalty);
 	}
 	return FX_APPLIED;
 }
