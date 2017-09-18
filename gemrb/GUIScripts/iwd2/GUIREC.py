@@ -852,9 +852,8 @@ def DisplaySkills (pc, SkillsArea):
 					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)
 				untrained = nameTab.GetValue (i, 3)
-				
-				# only show (modified) skills that either don't require training or had it already
-				if (value and untrained) or (not untrained and base):
+				# only show positive (modified) skills that either don't require training or had it already
+				if (value>0 and untrained) or (not untrained and base):
 					items.append((name, str(value) + " (" + str(base) + ")",))
 			
 		items.sort()
