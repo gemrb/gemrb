@@ -333,6 +333,20 @@ static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 	return dc;
 }
 
+static bool StatIsASkill(unsigned int StatID) {
+	// traps, lore, stealth, lockpicking, pickpocket
+	if (StatID >= IE_LORE && StatID <= IE_PICKPOCKET) return true;
+
+	// alchemy, animals, bluff, concentration, diplomacy, intimidate, search, spellcraft, magicdevice
+	// NOTE: change if you want to use IE_EXTRAPROFICIENCY1..., as they use the same values
+	if (StatID >= IE_ALCHEMY && StatID <= IE_MAGICDEVICE) return true;
+
+	// Hide, Wilderness_Lore
+	if (StatID == IE_HIDEINSHADOWS || StatID == IE_TRACKING) return true;
+
+	return false;
+}
+
 static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 {
 	//this is a hack, if more PCStats fields are needed, improve it
@@ -346,7 +360,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 		return ps->ExtraSettings[StatID];
 	}
 	if (Mod) {
-		return actor->GetStat( StatID );
+		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
+			return actor->GetSkill(StatID);
+		} else {
+			return actor->GetStat(StatID);
+		}
 	}
 	return actor->GetBase( StatID );
 }
@@ -8176,7 +8194,7 @@ PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 **Prototype:** GemRB.GetPlayerStat(globalID, StatID[, Base])\n\
 \n\
 **Description:** Queries a stat of the player character. The stats are \n\
-listed in ie_stats.py.\n\
+listed in ie_stats.py. For IWD2 skills, it takes all bonuses into account.\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
