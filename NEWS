@@ -1,8 +1,9 @@
-GemRB git (120e2640):
+GemRB git (1b24eb15f):
   New features:
     - 
+    - dialogF.tlk handling
     - SDL2 resolution-independent window scaling, IRIX compatibility
-    - regeneration during sleep, iwd2 ability stacking
+    - regeneration during sleep, iwd2 ability stacking, iwd ZZ* weapon bonuses
     - portrait.2da handling, time dilation
 
   Improved features:
@@ -10,7 +11,7 @@ GemRB git (120e2640):
     - better compatibility with bgt, 10pp, ia, kelsey
     - sdl2 input, mouse scrolling
     - iwd2 cg&lu, item (un)usability, avatar sizes
-    - ambients, verbal constants, random walk
+    - ambients, verbal constants, random walk, walk sounds
     - bugfixes
 
 GemRB v0.8.4 (2016-02-29):
