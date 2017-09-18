@@ -60,7 +60,7 @@ class Wall_Polygon;
 #define SPF_WAIT		0x0004	//spawn temporarily disabled
 
 //area flags (pst uses them only for resting purposes!)
-#define AF_NOSAVE         1 // unused in pst
+#define AF_NOSAVE         1
 #define AF_TUTORIAL       2 // pst: "You cannot rest here."
 #define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
 //                        6 // pst: "You must obtain permission to rest here."
