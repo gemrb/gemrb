@@ -9381,10 +9381,14 @@ int Actor::GetSkill(unsigned int skill, bool ids) const
 	if (skill >= skillstats.size()) return -1;
 	int ret = GetStat(skillstats[skill][0]);
 	int base = GetBase(skillstats[skill][0]);
+	int modStat = skillstats[skill][1];
 	// only give other boni for trained skills or those that don't require it
 	// untrained trained skills are not usable!
+	// DEX is handled separately by GetSkillBonus and applied directly after effects
 	if (base > 0 || skillstats[skill][2]) {
-		ret += GetAbilityBonus(skillstats[skill][1]);
+		if (modStat != IE_DEX) {
+			ret += GetAbilityBonus(modStat);
+		}
 	} else {
 		ret = 0;
 	}
