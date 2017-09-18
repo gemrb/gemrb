@@ -56,10 +56,11 @@ void ScrollView::ContentView::ResizeToSubviews()
 	
 	if (!subViews.empty()) {
 		std::list<View*>::iterator it = subViews.begin();
-		Region bounds = (*it)->Frame();
+		View* view = *it;
+		Region bounds = view->Frame();
 		
 		for (++it; it != subViews.end(); ++it) {
-			Region r = (*it)->Frame();
+			Region r = view->Frame();
 			bounds = Region::RegionEnclosingRegions(bounds, r);
 		}
 		
@@ -172,10 +173,10 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 	const Point& origin = contentView.Origin();
 	
 	if (sb == hscroll) {
-		Point p(sb->GetValue(), origin.y);
+		Point p(-sb->GetValue(), origin.y);
 		ScrollTo(p);
 	} else if (sb == vscroll) {
-		Point p(origin.x, sb->GetValue());
+		Point p(origin.x, -sb->GetValue());
 		ScrollTo(p);
 	} else {
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");
@@ -266,8 +267,8 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	assert(maxx <= 0 && maxy <= 0);
 
 	// clamp values so we dont scroll beyond the content
-	newP.x = Clamp<short>(newP.x, 0, maxx);
-	newP.y = Clamp<short>(newP.y, 0, maxy);
+	newP.x = Clamp<short>(newP.x, maxx, 0);
+	newP.y = Clamp<short>(newP.y, maxy, 0);
 
 	// set up animation if required
 	if  (duration) {
