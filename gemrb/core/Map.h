@@ -318,6 +318,7 @@ private:
 	ieWord trackDiff;
 	unsigned short* MapSet;
 	unsigned short* SrchMap; //internal searchmap
+	unsigned short* MaterialMap;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;

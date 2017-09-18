@@ -376,6 +376,7 @@ Map::~Map(void)
 
 	free( MapSet );
 	free( SrchMap );
+	free( MaterialMap );
 
 	//close the current container if it was owned by this map, this avoids a crash
 	Container *c = core->GetCurrentContainer();
@@ -471,10 +472,14 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	//Internal Searchmap
 	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
+	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
 		int x=sr->GetWidth();
 		while(x--) {
-			SrchMap[y*Width+x] = Passable[sr->GetAt(x,y)&PATH_MAP_AREAMASK];
+			unsigned short value = sr->GetAt(x,y) & PATH_MAP_AREAMASK;
+			size_t index = y * Width + x;
+			SrchMap[index] = Passable[value];
+			MaterialMap[index] = value;
 		}
 	}
 
@@ -885,7 +890,7 @@ void Map::UpdateScripts()
 void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	for(int i=0;i<tsndcount;i++) {
 		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
-			int type = GetInternalSearchMap( Pos.x/16, Pos.y/12 )&PATH_MAP_AREAMASK;
+			int type = MaterialMap[Pos.x/16 + Pos.y/12 * Width];
 			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
 			return;
 		}

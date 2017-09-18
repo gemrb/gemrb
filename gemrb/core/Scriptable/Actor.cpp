@@ -1565,12 +1565,12 @@ void Actor::ReleaseMemory()
 			xpbonuslevels = -1;
 			xpbonustypes = -1;
 		}
-		
+
 		if (xpcap) {
 			free(xpcap);
 			xpcap = NULL;
 		}
-		
+
 		if (levelslots) {
 			for (i=0; i<classcount; i++) {
 				if (levelslots[i]) {
@@ -2062,7 +2062,7 @@ static void InitActorTables()
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
-	
+
 	tm.load("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
@@ -4440,13 +4440,22 @@ void Actor::PlayWalkSound()
 	area->ResolveTerrainSound(Sound, Pos);
 
 	if (Sound[0] != '*') {
-		if (cnt) {
-			int l = strlen(Sound);
+		int l = strlen(Sound);
+		/* IWD2 sometimes appends numbers here, not letters. */
+		if (core->HasFeature(GF_3ED_RULES) && 0 == memcmp(Sound, "FS_", 3)) {
 			if (l < 8) {
-				Sound[l] = cnt + 0x60; // append 'a'-'g'
+				Sound[l] = cnt + 0x31;
 				Sound[l+1] = 0;
 			}
+		} else {
+			if (cnt) {
+				if (l < 8) {
+					Sound[l] = cnt + 0x60; // append 'a'-'g'
+					Sound[l+1] = 0;
+				}
+			}
 		}
+
 		unsigned int len = 0;
 		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
 		nextWalk = thisTime + len;
