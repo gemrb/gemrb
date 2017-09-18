@@ -847,15 +847,14 @@ def DisplaySkills (pc, SkillsArea):
 				items.append (value)
 			elif not feats:
 				value = GemRB.GetPlayerStat (pc, item)
-				modStat = itemTab.GetValue (i, 1, GTV_STAT)
-				if modStat != IE_DEX: # already handled in core
-					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)
 				untrained = nameTab.GetValue (i, 3)
 				# only show positive (modified) skills that either don't require training or had it already
-				if (value>0 and untrained) or (not untrained and base):
+				if (untrained and value == base and value > 0):
+					items.append((name, str(value),))
+				elif (value>0 and untrained) or (not untrained and base):
 					items.append((name, str(value) + " (" + str(base) + ")",))
-			
+
 		items.sort()
 		for item in items:
 			if len(item) > 1:
