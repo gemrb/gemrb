@@ -101,10 +101,8 @@ static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
-static int *skillstats = NULL;
-static int *skillabils = NULL;
-static int *skilltraining = NULL;
-static int skillcount = -1;
+static std::map<int, std::vector<int> > skillstats;
+static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
@@ -1592,18 +1590,7 @@ void Actor::ReleaseMemory()
 			free(maxLevelForHpRoll);
 			maxLevelForHpRoll=NULL;
 		}
-		if (skillstats) {
-			free(skillstats);
-			skillstats=NULL;
-		}
-		if (skillabils) {
-			free(skillabils);
-			skillabils=NULL;
-		}
-		if (skilltraining) {
-			free(skilltraining);
-			skilltraining=NULL;
-		}
+		skillstats.clear();
 
 		if (afcomments) {
 			for(i=0;i<afcount;i++) {
@@ -2426,15 +2413,21 @@ static void InitActorTables()
 	tm.load("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
-		skillcount = rowcount;
-		if (rowcount) {
-			skillstats = (int *) malloc(rowcount * sizeof(int) );
-			skillabils = (int *) malloc(rowcount * sizeof(int) );
-			skilltraining = (int *) malloc(rowcount * sizeof(int) );
-			while(rowcount--) {
-				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-				skilltraining[rowcount] = atoi(tm->QueryField(rowcount, 2));
+		int colcount = tm->GetColumnCount();
+		for (i = 0; i < rowcount; i++) {
+			skillstats[i] = std::vector<int>();
+			int j, val;
+			for(j = 0; j < colcount; j++) {
+				// the stat and ability columns need conversion into numbers
+				if (j < 2) {
+					val = core->TranslateStat(tm->QueryField(i, j));
+					if (j == 0) {
+						stat2skill[val] = i;
+					}
+				} else {
+					val = atoi(tm->QueryField(i, j));
+				}
+				skillstats[i].push_back (val);
 			}
 		}
 	}
@@ -9375,31 +9368,23 @@ int Actor::GetAbilityBonus(unsigned int ability, int value) const
 
 int Actor::GetSkillStat(unsigned int skill) const
 {
-	if (skill>=(unsigned int) skillcount) return -1;
-	return skillstats[skill];
+	if (skill >= skillstats.size()) return -1;
+	return skillstats[skill][0];
 }
 
 int Actor::GetSkill(unsigned int skill, bool ids) const
 {
 	if (!ids) {
-		// FIXME: inefficient
-		bool found = false;
-		for (int i=0; i<skillcount; i++) {
-			if ((signed)skill == skillstats[i]) {
-				found = true;
-				skill = i;
-				break;
-			}
-		}
-		if (!found) return -1;
+		// called with a stat, not a skill index
+		skill = stat2skill[skill];
 	}
-	if (skill>=(unsigned int) skillcount) return -1;
-	int ret = GetStat(skillstats[skill]);
-	int base = GetBase(skillstats[skill]);
+	if (skill >= skillstats.size()) return -1;
+	int ret = GetStat(skillstats[skill][0]);
+	int base = GetBase(skillstats[skill][0]);
 	// only give other boni for trained skills or those that don't require it
 	// untrained trained skills are not usable!
-	if (base > 0 || skilltraining[skill]) {
-		ret += GetAbilityBonus(skillabils[skill]);
+	if (base > 0 || skillstats[skill][2]) {
+		ret += GetAbilityBonus(skillstats[skill][1]);
 	} else {
 		ret = 0;
 	}
