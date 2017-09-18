@@ -1245,18 +1245,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//add autonote.ini entries
 		if( INInote ) {
 			color = 1; //read only note
-			int count = INInote->GetKeyAsInt( map->GetScriptName(), "count", 0);
+			const char *scriptName = map->GetScriptName();
+			int count = INInote->GetKeyAsInt(scriptName, "count", 0);
 			while (count) {
 				char key[32];
 				int value;
 				sprintf(key, "xPos%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.x = value;
 				sprintf(key, "yPos%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.y = value;
 				sprintf(key, "text%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				map->AddMapNote( point, color, value);
 				count--;
 			}
