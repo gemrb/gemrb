@@ -4440,13 +4440,22 @@ void Actor::PlayWalkSound()
 	area->ResolveTerrainSound(Sound, Pos);
 
 	if (Sound[0] != '*') {
-		if (cnt) {
-			int l = strlen(Sound);
+		int l = strlen(Sound);
+		if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
 			if (l < 8) {
-				Sound[l] = cnt + 0x60; // append 'a'-'g'
+				/* IWD2 always appends numbers here, not letters. */
+				Sound[l] = cnt + 0x31;
 				Sound[l+1] = 0;
 			}
+		} else {
+			if (cnt) {
+				if (l < 8) {
+					Sound[l] = cnt + 0x60; // append 'a'-'g'
+					Sound[l+1] = 0;
+				}
+			}
 		}
+
 		unsigned int len = 0;
 		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
 		nextWalk = thisTime + len;
