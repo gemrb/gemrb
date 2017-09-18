@@ -1565,12 +1565,12 @@ void Actor::ReleaseMemory()
 			xpbonuslevels = -1;
 			xpbonustypes = -1;
 		}
-		
+
 		if (xpcap) {
 			free(xpcap);
 			xpcap = NULL;
 		}
-		
+
 		if (levelslots) {
 			for (i=0; i<classcount; i++) {
 				if (levelslots[i]) {
@@ -2062,7 +2062,7 @@ static void InitActorTables()
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
-	
+
 	tm.load("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
@@ -4441,9 +4441,9 @@ void Actor::PlayWalkSound()
 
 	if (Sound[0] != '*') {
 		int l = strlen(Sound);
-		if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		/* IWD2 sometimes appends numbers here, not letters. */
+		if (core->HasFeature(GF_3ED_RULES) && 0 == memcmp(Sound, "FS_", 3)) {
 			if (l < 8) {
-				/* IWD2 always appends numbers here, not letters. */
 				Sound[l] = cnt + 0x31;
 				Sound[l+1] = 0;
 			}
