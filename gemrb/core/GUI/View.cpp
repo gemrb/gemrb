@@ -304,7 +304,8 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 		if (super != NULL) {
 			front->superView->RemoveSubview(front);
 		}
-		subViews.insert(it, front);
+		// remember, being "in front" means coming after in the list
+		subViews.insert(++it, front);
 	}
 
 	front->superView = this;
