@@ -134,6 +134,8 @@ def OpenSkillsWindow(chargen, level=0):
 		ClassColumn = BaseClass
 
 	PointsLeft = SkillPtsTable.GetValue (0, ClassColumn)
+	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5
+	PointsLeft += IntBonus * LevelDiff
 
 	# at least 1 skillpoint / level advanced
 	if PointsLeft < 1:
@@ -151,9 +153,6 @@ def OpenSkillsWindow(chargen, level=0):
 	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS") * LevelDiff
 	if Level < 2:
 		PointsLeft += RaceBonusTable.GetValue (RaceName, "LEVEL1_BONUS")
-
-	IntBonus = GemRB.GetPlayerStat (pc, IE_INT)/2 - 5 # intelligence bonus
-	PointsLeft += IntBonus * LevelDiff
 
 	PointsLeft += GemRB.GetPlayerStat (pc, IE_UNUSED_SKILLPTS)
 
