@@ -1,0 +1,10 @@
+2DA V1.0
+*
+           RESREF     MIN        MAX        RANGE
+NONE       *          0x0000     0xffff     0
+DEFAULT    SOUND      0x5000     0x6fff     4
+DEFAULT    SOUND      0x7500     0x77ff     4
+DEFAULT    SOUND      0x7f00     0x7fff     4
+DEFAULT    SOUND      0xc800     0xcfff     4
+NONE       *          0xef00     0xefff     0
+
