@@ -72,6 +72,7 @@ private:
 	// subclasses can then use the list to efficiently redraw only those sections that are dirty
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
 
+	void AddedToWindow(Window*);
 	void AddedToView(View*);
 	void RemovedFromView(View*);
 	virtual void SubviewAdded(View* /*view*/, View* /*parent*/) {};

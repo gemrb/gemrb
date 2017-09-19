@@ -355,13 +355,26 @@ View* View::RemoveFromSuperview()
 	}
 	return super;
 }
+	
+void View::AddedToWindow(Window* newwin)
+{
+	window = newwin;
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* subview = *it;
+		subview->AddedToWindow(newwin);
+	}
+}
 
 void View::AddedToView(View* view)
 {
-	Window* win = view->GetWindow();
-	if (win == NULL)
-		win = dynamic_cast<Window*>(view);
-	window = win;
+	Window* newwin = view->GetWindow();
+	if (newwin == NULL)
+		newwin = dynamic_cast<Window*>(view);
+	
+	if (newwin != window) {
+		AddedToWindow(newwin);
+	}
 }
 
 void View::RemovedFromView(View*)
