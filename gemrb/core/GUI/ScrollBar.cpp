@@ -84,7 +84,7 @@ int ScrollBar::YPosFromValue() const
 {
 	const ValueRange& range = GetValueRange();
 	if (range.second == range.first) return 0;
-	return (SliderPxRange() / (range.second - range.first)) * GetValue();
+	return (SliderPxRange() / double(range.second - range.first)) * GetValue();
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
