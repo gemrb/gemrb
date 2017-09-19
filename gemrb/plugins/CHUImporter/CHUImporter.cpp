@@ -376,6 +376,9 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
+				
+				// FIXME: this is a hack. we should lookup the actual width of the scrollbar
+				if (SBID != 0xffff) ctrlFrame.w += 16;
 				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 
 				if (SBID != 0xffff) {
