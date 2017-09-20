@@ -7,6 +7,9 @@
 #cmakedefine HAVE_STRNDUP 1
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
+#cmakedefine HAVE_MEMALIGN 1
+#cmakedefine HAVE_ALIGNED_MALLOC 1
+#cmakedefine HAVE_POSIX_MEMALIGN 1
 #cmakedefine PLUGIN_DIR "${PLUGIN_DIR}"
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
