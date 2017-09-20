@@ -59,7 +59,7 @@ public:
 		IMAGE_COUNT
 	};
 
-	unsigned int StepIncrement;
+	int StepIncrement;
 
 	ScrollBar(const Region& frame, Sprite2D*[IMAGE_COUNT]);
 	ScrollBar(const ScrollBar& sb);
