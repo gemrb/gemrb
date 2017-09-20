@@ -113,11 +113,10 @@ def UpdateControlStatus():
 		return (GSFlags, Expand)
 
 	def SetMWSize(size, GSFlags):
-		# FIXME: lookup the actual sizes...
 		# or if we are going to do this a lot maybe add a view flag for automatically resizing to the assigned background
-		WinSizes = {GS_SMALLDIALOG : 43,
+		WinSizes = {GS_SMALLDIALOG : 45,
 					GS_MEDIUMDIALOG : 109,
-					GS_LARGEDIALOG : 238}
+					GS_LARGEDIALOG : 237}
 		
 		# FIXME: these are for 800x600. we need to do something like in GUICommon.GetWindowPack()
 		WinBG = {GS_SMALLDIALOG : "guwbtp28",
