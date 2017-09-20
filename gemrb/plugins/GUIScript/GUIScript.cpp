@@ -66,7 +66,7 @@
 #include <algorithm>
 #include <cstdio>
 
-#if !defined(WIN32) && !defined(__MINGW32__)
+#if DECLARE_STRLCPY
 // MIPSPro fix for IRIX
 size_t strlcpy(char *, const char *, size_t);
 #endif
