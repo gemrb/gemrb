@@ -95,8 +95,10 @@ void ScrollBar::UpdateState(unsigned int Sum)
 
 void ScrollBar::ScrollBySteps(int steps)
 {
-	ieDword val = GetValue() + (steps * StepIncrement);
-	SetValue(val); 
+	int val = GetValue() + (steps * StepIncrement);
+	const ValueRange& range = GetValueRange();
+	ieDword clamped = Clamp<int>(val, range.first, range.second);
+	SetValue(clamped);
 }
 
 /** SDL < 1.3 Mousewheel support */
