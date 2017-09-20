@@ -135,6 +135,7 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version();
 #ifdef WIN32
 #include <windows.h>
 
+BOOL APIENTRY DllMain(HANDLE, DWORD,	LPVOID);
 BOOL APIENTRY DllMain(HANDLE /*hModule*/, DWORD  /*ul_reason_for_call*/,
 	LPVOID /*lpReserved*/)
 {

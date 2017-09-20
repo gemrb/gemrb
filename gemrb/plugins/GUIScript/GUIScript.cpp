@@ -66,8 +66,10 @@
 #include <algorithm>
 #include <cstdio>
 
+#if !defined(WIN32) && !defined(__MINGW32__)
 // MIPSPro fix for IRIX
 size_t strlcpy(char *, const char *, size_t);
+#endif
 
 using namespace GemRB;
 
