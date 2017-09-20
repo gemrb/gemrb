@@ -33,8 +33,8 @@
 #include "common.h"
 
 /* You can redefine av_malloc and av_free in your project to use your
-	 memory allocator. You do not need to suppress this file because the
-	 linker will do it automatically. */
+   memory allocator. You do not need to suppress this file because the
+   linker will do it automatically. */
 
 void *av_malloc(unsigned int size)
 {
@@ -67,7 +67,13 @@ void av_free(void *ptr)
 {
 	/* XXX: this test should not be needed on most libcs */
 	if (ptr)
+#if !defined(HAVE_POSIX_MEMALIGN) && !defined(HAVE_ALIGNED_MALLOC) && !defined(HAVE_MEMALIGN)
 		free((char*)ptr - ((char*)ptr)[-1]);
+#elif HAVE_ALIGNED_MALLOC
+		_aligned_free(ptr);
+#else
+		free(ptr);
+#endif
 }
 
 void av_freep(void **arg)
