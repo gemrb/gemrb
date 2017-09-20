@@ -216,8 +216,10 @@ void ScrollBar::OnMouseWheelScroll(const Point& delta)
 /** Mouse Drag Event */
 void ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
-	Point p = ConvertPointFromScreen(me.Pos());
-	SetPosForY(p.y - Frames[IMAGE_SLIDER]->YPos);
+	if (State&SLIDER_GRAB) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		SetPosForY(p.y - Frames[IMAGE_SLIDER]->YPos);
+	}
 }
 
 }
