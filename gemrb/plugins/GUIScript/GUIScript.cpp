@@ -69,7 +69,7 @@
 #include <cstdio>
 
 // MIPSPro fix for IRIX
-size_t strlcpy(char *, const char *, size_t);
+GEM_EXPORT size_t strlcpy(char *, const char *, size_t);
 
 using namespace GemRB;
 
