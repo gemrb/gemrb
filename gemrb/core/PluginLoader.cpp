@@ -98,7 +98,11 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 static void PrintDLError(const char *msg=NULL)
 {
 	char buffer[_MAX_PATH*2];
+#ifdef _MSC_VER
 	_strerror_s(buffer, NULL);
+#else
+	sprintf(buffer, "code %lu", GetLastError());
+#endif
 	Log(DEBUG, "PluginLoader", msg ? msg : "Error: %s", buffer);
 }
 
