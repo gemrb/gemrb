@@ -72,16 +72,15 @@ def OnLoad ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=LoadWindow.GetControl (25)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarUpdated)
 	Games=GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
-	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
-	ScrollBarPress ()
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
+	ScrollBarUpdated ()
 	LoadWindow.Focus()
 	return
 
-def ScrollBarPress ():
+def ScrollBarUpdated ():
 	#draw load game portraits
 	Pos = GemRB.GetVar ("TopIndex")
 	for i in range (4):
@@ -171,7 +170,7 @@ def DeleteGameConfirm():
 		GemRB.SetVar ("TopIndex",TopIndex-1)
 	del Games[Pos]
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
-	ScrollBarPress ()
+	ScrollBarUpdated ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 	LoadWindow.Focus()
