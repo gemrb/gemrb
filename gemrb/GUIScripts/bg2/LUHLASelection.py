@@ -91,7 +91,8 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			ScrollBar = HLAWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252}, "GUISCRCW")
 			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, HLAShowAbilities)
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
-			ScrollBar.SetVarAssoc ("HLATopIndex", GUICommon.ceildiv ( ( len (HLAAbilities)-25 ) , 5 ) + 1 )
+			count = GUICommon.ceildiv (len(HLAAbilities) - 25, 5) + 1
+			ScrollBar.SetVarAssoc ("HLATopIndex", count, 0, count)
 			ScrollBar.SetDefaultScrollBar ()
 
 	# draw our HLAs and show the window

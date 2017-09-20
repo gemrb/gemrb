@@ -218,10 +218,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
 					HideUnhideScrollBar(0)
+					extraCount = len (Spells[i]) - ButtonCount
 					if chargen:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount ) , 6 ) + 1 )
+						count = GUICommon.ceildiv (extraCount, 6) + 1
+						ScrollBar.SetVarAssoc ("SpellTopIndex", count, 0, count)
 					else: #there are five rows of 5 spells in level up of sorcs
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount-1 ) , 5 ) + 1 )
+						count = GUICommon.ceildiv (extraCount-1, 5) + 1
+						ScrollBar.SetVarAssoc ("SpellTopIndex", count, 0, count)
 				else:
 					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
