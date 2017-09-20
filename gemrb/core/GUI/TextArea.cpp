@@ -334,7 +334,7 @@ void TextArea::AppendText(const String& text)
 		// scroll to the bottom
 		int bottom = ContentHeight() - frame.h;
 		if (bottom > 0)
-			ScrollToY(bottom, 500); // animated scroll
+			ScrollToY(-bottom, 0); // FIXME: should be animated scroll of 500
 	}
 	MarkDirty();
 }
