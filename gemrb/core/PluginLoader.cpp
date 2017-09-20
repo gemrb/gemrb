@@ -32,7 +32,6 @@
 
 #ifdef WIN32
 #include <io.h>
-#include <string.h>
 #include <windows.h>
 #else
 #include <sys/types.h>
@@ -95,16 +94,6 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 
 /** Return names of all *.so or *.dll files in the given directory */
 #ifdef WIN32
-static void PrintDLError(const char *msg=NULL)
-{
-	char buffer[_MAX_PATH*2];
-#ifdef _MSC_VER
-	_strerror_s(buffer, NULL);
-#else
-	sprintf(buffer, "code %lu", GetLastError());
-#endif
-	Log(DEBUG, "PluginLoader", msg ? msg : "Error: %s", buffer);
-}
 
 static bool FindFiles( char* path, std::list<char*> &files )
 {
@@ -114,7 +103,7 @@ static bool FindFiles( char* path, std::list<char*> &files )
 	strcat( path, "*.dll" );
 	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
 		//If there is no file matching our search
-		PrintDLError("Error looking up dlls: %s");
+		Log(ERROR, "PluginLoader", "Error looking up dlls.");
 		return false;
 	}
 
@@ -127,11 +116,6 @@ static bool FindFiles( char* path, std::list<char*> &files )
 }
 
 #else // ! WIN32
-
-static void PrintDLError()
-{
-	Log(DEBUG, "PluginLoader", "Error: %s", dlerror());
-}
 
 bool static FindFiles( char* path, std::list<char*> &files )
 {
@@ -204,7 +188,6 @@ void LoadPlugins(char* pluginpath)
 #endif
 		if (hMod == NULL) {
 			Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", path);
-			PrintDLError();
 			continue;
 		}
 
