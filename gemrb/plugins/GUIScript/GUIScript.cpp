@@ -1868,13 +1868,15 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
 	PyObject* Value;
 	char* VarName;
-	PARSE_ARGS3( args, "OsO", &self, &VarName, &Value );
+	ieDword min, max = 0;
+	PARSE_ARGS5( args, "OsO|KK", &self, &VarName, &Value, &min, &max );
 
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
+	ctrl->SetValueRange(min, max);
 	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 
 	/** setting the correct state for this control */
