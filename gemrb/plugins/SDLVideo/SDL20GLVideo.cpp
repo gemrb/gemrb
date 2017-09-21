@@ -504,8 +504,17 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	{
 		totint = core->GetGame()->GetGlobalTint();
 	}
-	return GLBlitSprite((GLTextureSprite2D*)spr, Region(0, 0, spr->Width, spr->Height), dst,
+
+	if (!(blitFlags & BLIT_HALFTRANS)) {
+		glBlendFunc(GL_ONE, GL_ZERO);
+	}
+
+	GLBlitSprite((GLTextureSprite2D*)spr, Region(0, 0, spr->Width, spr->Height), dst,
 						NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
+
+	if (!(blitFlags & BLIT_HALFTRANS)) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
 }
 
 void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
