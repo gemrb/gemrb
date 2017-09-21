@@ -39,18 +39,27 @@
 void *av_malloc(unsigned int size)
 {
 	void *ptr = NULL;
-	long diff;
 
-	/* let's disallow possible ambiguous cases */
-	if(size > (INT_MAX-16) )
+	/* let's disallow possibly ambiguous cases */
+	if (size > (INT_MAX - 16) || !size)
 		return NULL;
 
-	ptr = malloc(size+16);
+#if HAVE_POSIX_MEMALIGN
+	if (posix_memalign(&ptr, 16, size))
+		ptr = NULL;
+#elif HAVE_ALIGNED_MALLOC
+	ptr = _aligned_malloc(size, 16);
+#elif HAVE_MEMALIGN
+	ptr = memalign(16, size);
+#else
+	ptr = malloc(size + 16);
 	if(!ptr)
 		return ptr;
-	diff= ((-(long)ptr - 1)&15) + 1;
+	long diff = ((-(size_t)ptr - 1) & 15) + 1;
 	ptr = (char*)ptr + diff;
-	((char*)ptr)[-1]= diff;
+	((char*)ptr)[-1] = diff;
+#endif
+
 	return ptr;
 }
 
@@ -58,7 +67,13 @@ void av_free(void *ptr)
 {
 	/* XXX: this test should not be needed on most libcs */
 	if (ptr)
+#if !defined(HAVE_POSIX_MEMALIGN) && !defined(HAVE_ALIGNED_MALLOC) && !defined(HAVE_MEMALIGN)
 		free((char*)ptr - ((char*)ptr)[-1]);
+#elif HAVE_ALIGNED_MALLOC
+		_aligned_free(ptr);
+#else
+		free(ptr);
+#endif
 }
 
 void av_freep(void **arg)
