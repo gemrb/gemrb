@@ -66,10 +66,8 @@
 #include <algorithm>
 #include <cstdio>
 
-#if DECLARE_STRLCPY
 // MIPSPro fix for IRIX
-size_t strlcpy(char *, const char *, size_t);
-#endif
+GEM_EXPORT size_t strlcpy(char *, const char *, size_t);
 
 using namespace GemRB;
 
