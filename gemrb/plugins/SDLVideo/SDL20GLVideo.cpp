@@ -358,6 +358,14 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 	program->SetUniformValue("u_tint", COLOR_SIZE, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255);
 	program->SetUniformValue("u_alphaModifier", 1, alphaModifier);
 
+	unsigned int shadowMode = 1;
+	if (flags & BLIT_NOSHADOW) {
+		shadowMode = 0;
+	} else if (flags & BLIT_TRANSSHADOW) {
+		shadowMode = 2;
+	}
+	program->SetUniformValue("u_shadowMode", 1, (GLint)shadowMode);
+
 	GLint a_position = program->GetAttribLocation("a_position");
 	GLint a_texCoord = program->GetAttribLocation("a_texCoord");
 
