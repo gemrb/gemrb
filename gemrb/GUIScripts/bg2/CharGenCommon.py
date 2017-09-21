@@ -105,7 +105,7 @@ def DisplayOverview(step):
 
 	# now automatically ignored and added instead
 	#ScrollBar = CharGenWindow.GetControl (10)
-	#ScrollBar.SetDefaultScrollBar ()
+	#ScrollBar.Focus ()
 
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetText (13955)

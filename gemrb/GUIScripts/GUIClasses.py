@@ -71,6 +71,7 @@ class GView:
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
+	'Focus': _GemRB.View_Focus
 	}
 	__slots__ = ['SCRIPT_GROUP']
 
@@ -234,9 +235,7 @@ class GTextEdit(GControl):
   }
 
 class GScrollBar(GControl):
-  methods = {
-    'SetDefaultScrollBar': _GemRB.ScrollBar_SetDefaultScrollBar
-  }
+  pass
 
 class GButton(GControl):
   methods = {

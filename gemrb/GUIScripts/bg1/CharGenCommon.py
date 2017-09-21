@@ -103,7 +103,7 @@ class CharGen:
 
 		#set scrollbar
 		ScrollBar = CharGenWindow.GetControl (10)
-		ScrollBar.SetDefaultScrollBar()	
+		ScrollBar.Focus()	
 		
 		#set import
 		ImportButton = CharGenWindow.GetControl (13)

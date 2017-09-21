@@ -131,7 +131,7 @@ def ResetScrollBar ():
 	GemRB.SetVar ("SpellTopIndex",0)
 	ScrollBar.SetVarAssoc ("SpellTopIndex", len(KnownSpellList))
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBar.SetDefaultScrollBar ()
+	ScrollBar.Focus ()
 
 def ScrollBarPress ():
 	UpdateSpellBookWindow ()

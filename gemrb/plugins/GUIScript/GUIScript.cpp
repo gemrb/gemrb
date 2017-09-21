@@ -1530,6 +1530,7 @@ static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 	PARSE_ARGS1( args, "O", &self );
 
 	Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
 	win->Focus();
 
 	Py_RETURN_NONE;
@@ -2158,6 +2159,24 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
 	RETURN_BOOL(view->SetFlags( Flags, Operation ));
+}
+
+PyDoc_STRVAR( GemRB_View_Focus__doc,
+			 "View.Focus()\n\n"
+			 "Focuses the view in it's window to direct keyboard and certain other events to the view." );
+
+static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
+{
+	PARSE_ARGS1( args, "O", &self );
+	
+	View* view = GetView<View>(self);
+	ABORT_IF_NULL(view);
+	Window* win = view->GetWindow();
+	ABORT_IF_NULL(win);
+	
+	win->SetFocused(view);
+	
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
@@ -3274,37 +3293,6 @@ static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject*
 	GET_GAMECONTROL();
 
 	gc->ToggleAlwaysRun();
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_ScrollBar_SetDefaultScrollBar__doc,
-"===== ScrollBar_SetDefaultScrollBar =====\n\
-\n\
-**Prototype:** GemRB.SetDefaultScrollBar (WindowIndex, ControlIndex)\n\
-\n\
-**Metaclass Prototype:** SetDefaultScrollBar ()\n\
-\n\
-**Description:** Sets a ScrollBar as default on a window. If any control \n\
-receives mousewheel events, it will be relayed to this ScrollBar, unless \n\
-there is another attached to the control.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex, ControlIndex - the ScrollBar control's reference\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Control_AttachScrollBar]]"
-);
-
-static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject* self, PyObject* args)
-{
-	PARSE_ARGS1( args,  "O", &self);
-
-	ScrollBar* sb = GetView<ScrollBar>(self);
-	ABORT_IF_NULL(sb);
-
-	sb->SetFlags(IE_GUI_SCROLLBAR<<24, OP_OR);
 
 	Py_RETURN_NONE;
 }
@@ -13013,7 +13001,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(SaveGame_GetPortrait, METH_VARARGS),
 	METHOD(SaveGame_GetPreview, METH_VARARGS),
 	METHOD(SaveGame_GetSaveID, METH_VARARGS),
-	METHOD(ScrollBar_SetDefaultScrollBar, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
 	METHOD(Symbol_Unload, METH_VARARGS),
 	METHOD(Table_FindValue, METH_VARARGS),
@@ -13036,6 +13023,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
+	METHOD(View_Focus, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),

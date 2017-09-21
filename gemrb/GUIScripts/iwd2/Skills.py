@@ -209,7 +209,7 @@ def OpenSkillsWindow(chargen, level=0):
 
 	ScrollBarControl = SkillWindow.GetControl(104)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBarControl.SetDefaultScrollBar ()
+	ScrollBarControl.Focus ()
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
