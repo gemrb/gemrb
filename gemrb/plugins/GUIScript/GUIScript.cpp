@@ -13133,13 +13133,14 @@ bool GUIScript::Init(void)
 	// Add generic script path early, so GameType detection works
 	PyList_Append(sysPath, PyString_FromString(path));
 
+	PyModule_AddStringConstant(pGemRB, "GEMRB_VERSION", GEMRB_STRING);
+
 	char main[_MAX_PATH];
 	PathJoin(main, path, "Main.py", NULL);
 	if (!ExecFile(main)) {
 		Log(ERROR, "GUIScript", "Failed to execute %s", main);
 		return false;
 	}
-	PyRun_SimpleString( "GEMRB_VERSION = '" GEMRB_STRING "'" );
 
 	// Detect GameType if it was set to auto
 	if (stricmp( core->GameType, "auto" ) == 0) {

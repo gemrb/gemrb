@@ -100,7 +100,7 @@ def OpenOptionsWindow ():
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x10000007)
-	Label.SetText (GEMRB_VERSION)
+	Label.SetText (GemRB.GEMRB_VERSION)
 	
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
