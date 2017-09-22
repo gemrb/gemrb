@@ -441,8 +441,32 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 	glDeleteBuffers(1, &buffer);
 }
 
+void GLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped) {
+	if (clipped) {
+		x += xCorr;
+		y += yCorr;
+		if (( x >= ( xCorr + Viewport.w ) ) || ( y >= ( yCorr + Viewport.h ) )) {
+			return;
+		}
+		if (( x < xCorr ) || ( y < yCorr )) {
+			return;
+		}
+	} else {
+		if (( x >= disp->w ) || ( y >= disp->h )) {
+			return;
+		}
+		if (( x < 0 ) || ( y < 0 )) {
+			return;
+		}
+	}
+
+	Region region(x, y, 1, 1);
+	clearRect(region, color);
+}
+
 void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned short xr, unsigned short yr, float thickness, const Color& color)
 {
+	glDisable(GL_SCISSOR_TEST);
 	const float support = 0.75;
 	useProgram(programEllipse);
     if (thickness < 1.0) thickness = 1.0;
@@ -480,6 +504,7 @@ void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned s
 	glDisableVertexAttribArray(a_position);
 
 	glDeleteBuffers(1, &buffer);
+	glEnable(GL_SCISSOR_TEST);
 }
 
 void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
