@@ -216,7 +216,7 @@ void MapControl::UpdateViewport(Point vp)
 	// clear any previously scheduled moves and then do it asap, so it works while paused
 	core->timer->SetMoveViewPort( vp, 0, false );
 }
-	
+
 void MapControl::UpdateCursor()
 {
 	ieDword val = GetValue();
@@ -228,7 +228,7 @@ void MapControl::UpdateCursor()
 			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			Sprite2D* cursor = (EventMgr::ButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_GRAB] : NULL;
+			Sprite2D* cursor = (EventMgr::ButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_PRESSED] : NULL;
 			SetCursor(cursor);
 			break;
 	}
