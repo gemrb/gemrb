@@ -554,8 +554,8 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 	}
 	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
 	GLuint coverTexture = 0;
-	
-	if (!anchor && core->GetGame()) 
+
+	if (!(flags & BLIT_GLOW) && !anchor && core->GetGame())
 	{
 		const Color *totint = core->GetGame()->GetGlobalTint();
 		if (totint) 
