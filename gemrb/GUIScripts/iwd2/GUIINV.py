@@ -88,7 +88,7 @@ def OpenInventoryWindow ():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, OpenInventoryWindow)
 	Window.SetFrame ()
 
 	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)

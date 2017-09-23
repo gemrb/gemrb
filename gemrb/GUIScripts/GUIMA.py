@@ -153,6 +153,7 @@ def ShowMap ():
 
 ###################################################
 def OpenMapWindow ():
+	import GameCheck
 	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -189,7 +190,7 @@ def OpenMapWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, GameCheck.IsIWD2(), OpenMapWindow)
 	OptionsWindow.SetFrame ()
 
 	# World Map

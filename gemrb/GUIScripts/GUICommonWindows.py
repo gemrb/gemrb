@@ -256,6 +256,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		UpdateClock ()
 	else:
 		rb = OptionControl['Rest']
+		if iwd2:
+			UpdateClock ()
 
 	# Rest
 	if Window.HasControl (rb):
@@ -2042,12 +2044,14 @@ def UpdateClock ():
 
 	else:
 		Clock = None
-		if OptionsWindow and OptionsWindow.HasControl (9):
-			Clock = OptionsWindow.GetControl (9)
+		if OptionsWindow:
+			if GameCheck.IsIWD2():
+				Clock = OptionsWindow.GetControl (10)
+			elif OptionsWindow.HasControl(9):
+				Clock = OptionsWindow.GetControl (9)
 		elif ActionsWindow and ActionsWindow.HasControl (62):
 			Clock = ActionsWindow.GetControl (62)
-
-		if Clock and Clock.HasAnimation("CGEAR"):
+		if Clock and (Clock.HasAnimation("CGEAR") or GameCheck.IsIWD2()):
 			Hours = (GemRB.GetGameTime () % 7200) / 300
 			GUICommon.SetGamedaysAndHourToken ()
 			Clock.SetBAM ("CDIAL", 0, (Hours + 12) % 24)
