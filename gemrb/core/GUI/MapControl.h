@@ -84,7 +84,8 @@ private:
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	void UpdateCursor();
-	
+
+	Region GetViewport() const;
 	void WillDraw();
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);

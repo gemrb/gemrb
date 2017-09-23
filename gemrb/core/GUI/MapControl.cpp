@@ -143,6 +143,22 @@ void MapControl::WillDraw()
 	}
 }
 
+Region MapControl::GetViewport() const
+{
+	GameControl* gc = core->GetGameControl();
+	Region vp = gc->Viewport();
+	const Size mapsize = MyMap->GetSize();
+
+	vp.x *= double(mosRgn.w) / mapsize.w;
+	vp.y *= double(mosRgn.h) / mapsize.h;
+	vp.w *= double(mosRgn.w) / mapsize.w;
+	vp.h *= double(mosRgn.h) / mapsize.h;
+
+	vp.x += mosRgn.x;
+	vp.y += mosRgn.y;
+	return vp;
+}
+
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
@@ -155,17 +171,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(mosRgn);
 
-	GameControl* gc = core->GetGameControl();
-	const Size mapsize = MyMap->GetSize();
-
-	Region vp = gc->Viewport();
-	vp.x *= double(mosRgn.w) / mapsize.w;
-	vp.y *= double(mosRgn.h) / mapsize.h;
-	vp.w *= double(mosRgn.w) / mapsize.w;
-	vp.h *= double(mosRgn.h) / mapsize.h;
-	
-	vp.x += mosRgn.x;
-	vp.y += mosRgn.y;
+	Region vp = GetViewport();
 	video->DrawRect(vp, colors[green], false );
 	
 	// Draw PCs' ellipses
