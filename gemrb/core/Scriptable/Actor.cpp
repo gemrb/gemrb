@@ -7634,7 +7634,7 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 
 void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, const Color& tint)
+			unsigned char Face, const Color& tint, bool noGlobalTint)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -7646,6 +7646,9 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 	if (game->TimeStoppedFor(this)) {
 		flags |= BLIT_GREY;
+	}
+	if (noGlobalTint) {
+		flags |= BLIT_GLOW;
 	}
 
 	// display current frames in the right order
@@ -8056,16 +8059,28 @@ void Actor::Draw(const Region &screen)
 			}
 		}
 
-		//infravision tint
+		bool noGlobalTint = false;
+		// infravision, independent of light map and global light
+		int areaType = GetCurrentArea()->AreaType;
+
 		if ( HasBodyHeat() &&
 			(area->GetLightLevel(Pos)<128) &&
-			core->GetGame()->PartyHasInfravision()) {
-			tint.r=255;
+			core->GetGame()->PartyHasInfravision() &&
+			((!core->GetGame()->IsDay() && (areaType & AT_OUTDOOR)) || (areaType & AT_DUNGEON))) {
+			noGlobalTint = true;
+			tint.r = 255;
+
+			/* IWD2: infravision is white, not red. */
+			if(core->HasFeature(GF_3ED_RULES)) {
+				tint.g = tint.b = 255;
+			} else {
+				tint.g = tint.b = 120;
+			}
 		}
 
 		// actor itself
 		newsc = sc = GetSpriteCover();
-		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
+		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint, noGlobalTint);
 		if (newsc != sc) SetSpriteCover(newsc);
 
 		// blur sprites in front of the actor
@@ -8077,7 +8092,7 @@ void Actor::Draw(const Region &screen)
 					blurx -= blurdx; blury -= blurdy;
 					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-						anims, Face, tint);
+						anims, Face, tint, noGlobalTint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[i] = newsc;
