@@ -217,6 +217,9 @@ void MapControl::ClickHandle(const MouseEvent&)
 
 void MapControl::UpdateViewport(Point vp)
 {
+	Region vp2 = GetViewport();
+	vp.x -= vp2.w/2;
+	vp.y -= vp2.h/2;
 	vp = ConvertPointToGame(vp);
 	
 	// clear any previously scheduled moves and then do it asap, so it works while paused
