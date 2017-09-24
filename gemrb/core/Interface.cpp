@@ -555,7 +555,15 @@ void Interface::HandleFlags()
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// FIXME: should close all windows, but must fix github issue #5
 		// winmgr->CloseAllWindows();
+		
+		// ...until then, just clear the mta text
+		TextArea* mta = GetMessageTextArea();
+		if (mta) {
+			mta->ClearText();
+		}
+
 		gamectrl->SetDisabled(true);
+		
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
