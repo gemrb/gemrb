@@ -41,6 +41,7 @@ class Sprite2D;
 #define UP_PRESS	 0x0001
 #define DOWN_PRESS   0x0010
 #define SLIDER_GRAB  0x0100
+#define SLIDER_HORIZONTAL 0x1000
 
 /**
  * @class ScrollBar
@@ -67,6 +68,8 @@ public:
 
 	bool IsOpaque() const;
 
+	/* scroll so the slider is centered at point p */
+	void ScrollTo(Point p);
 	void ScrollUp();
 	void ScrollDown();
 	void ScrollBySteps(int steps);
@@ -109,8 +112,7 @@ private:
 	}
 
 	void DrawSelf(Region drawFrame, const Region& clip);
-	void SetPosForY(int y);
-	int YPosFromValue() const;
+	Point AxisPosFromValue() const;
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */
 	int SliderPxRange() const;

@@ -68,23 +68,32 @@ int ScrollBar::GetFrameHeight(int frame) const
 	return Frames[frame]->Height;
 }
 
-void ScrollBar::SetPosForY(int y)
+// FIXME: horizontal broken
+void ScrollBar::ScrollTo(Point p)
 {
-	y -= GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+	p.y -= GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
 
 	int pxRange = SliderPxRange();
-	float percent = Clamp<float>(y, 0, pxRange) / pxRange;
+	float percent = Clamp<float>(p.y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
 	ieDword newPos = ((percent * (range.second - range.first)) + range.first);
 	SetValue(newPos);
 }
 
-int ScrollBar::YPosFromValue() const
+Point ScrollBar::AxisPosFromValue() const
 {
 	const ValueRange& range = GetValueRange();
-	if (range.second == range.first) return 0;
-	return (SliderPxRange() / double(range.second - range.first)) * GetValue();
+	if (range.second == range.first) return Point();
+	
+	Point p;
+	short xy = (SliderPxRange() / double(range.second - range.first)) * GetValue();
+	if (State&SLIDER_HORIZONTAL) {
+		p.x = xy;
+	} else {
+		p.y = xy;
+	}
+	return p;
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
@@ -154,7 +163,8 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		}
 		// draw the slider
 		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Width - 1) / 2 );
-		int sly = YPosFromValue();
+		// FIXME: doesnt respect SLIDER_HORIZONTAL
+		int sly = AxisPosFromValue().y;
 		video->BlitSprite( Frames[IMAGE_SLIDER].get(),
 						  drawFrame.x + slx + Frames[IMAGE_SLIDER]->XPos,
 						  drawFrame.y + Frames[IMAGE_SLIDER]->YPos + upMy + sly, &drawFrame );
@@ -170,6 +180,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
+	// FIXME: this doesn't respect SLIDER_HORIZONTAL
 	Point p = ConvertPointFromScreen(me.Pos());
 	if (p.y <= GetFrameHeight(IMAGE_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
@@ -184,14 +195,14 @@ void ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	// if we made it this far we will jump the nib to y and "grab" it
 	// this way we only need to click once to jump+scroll
 	State |= SLIDER_GRAB;
-	ieWord sliderPos = YPosFromValue() + GetFrameHeight(IMAGE_UP_UNPRESSED);
+	ieWord sliderPos = AxisPosFromValue().y + GetFrameHeight(IMAGE_UP_UNPRESSED);
 	if (p.y >= sliderPos && p.y <= sliderPos + GetFrameHeight(IMAGE_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
 		// scrollbars may share images, so no, we shouldn't do this. need to fix or odd behavior will occur when 2 scrollbars are visible.
 		Frames[IMAGE_SLIDER]->YPos = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
 		return;
 	}
-	SetPosForY(p.y);
+	ScrollTo(p);
 }
 
 /** Mouse Button Up */
@@ -206,10 +217,8 @@ void ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 void ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
-		short fauxY = YPosFromValue();
-		if (fauxY + delta.y <= 0) fauxY = 0;
-		else fauxY += delta.y;
-		SetPosForY(fauxY);
+		Point p = AxisPosFromValue() + delta;
+		ScrollTo(p);
 	}
 }
 
@@ -218,7 +227,8 @@ void ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		SetPosForY(p.y - Frames[IMAGE_SLIDER]->YPos);
+		Point offset(Frames[IMAGE_SLIDER]->XPos, Frames[IMAGE_SLIDER]->YPos);
+		ScrollTo(p - offset);
 	}
 }
 
