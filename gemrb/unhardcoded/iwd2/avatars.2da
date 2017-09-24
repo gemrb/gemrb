@@ -68,7 +68,7 @@
 0x5301     CEMT1      CEMT2      CEMT3      CEMF4      0          2          0          M
 0x5302     CDMT1      CDMT2      CDMT3      CDMF4      0          2          0          S
 0x5303     CIMT1      CIMT2      CIMT3      CIMF4      0          2          0          S
-0x5310     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          M
+0x5310     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          N
 0x5311     CEFT1      CEFT2      CEFT3      CEFF4      0          2          0          M
 0x5312     CDMT1      CDMT2      CDMT3      CDMF4      0          2          0          S
 0x5313     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
@@ -114,12 +114,12 @@
 0x6303     CIMT1      CIMT2      CIMT3      CIMF4      0          2          0          S
 0x6304     CIMT1      CIMT2      CIMT3      CIMF4      0          2          0          S
 0x6305     CHMT1      CHMT2      CHMT3      CHMF4      0          2          0          L
-0x6310     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          M
+0x6310     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          N
 0x6311     CEFT1      CEFT2      CEFT3      CEFF4      0          2          0          M
 0x6312     CDMT1      CDMT2      CDMT3      CDMF4      0          2          0          S
 0x6313     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
 0x6314     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
-0x6315     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          M
+0x6315     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          N
 0x6400     UDRZ1      UDRZ1      UDRZ1      UDRZ1      6          2          0          *
 0x6401     UELM1      UELM1      UELM1      UELM1      6          2          1          *
 0x6402     CMNK1      CMNK1      CMNK1      CMNK1      6          2          0          M
