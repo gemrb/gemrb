@@ -80,10 +80,11 @@ namespace GemRB {
 		
 		// TODO: this isn't how we want to do things
 		// this should happen automatically as subivews are addred/removed/resized
-		void Update() { contentView.ResizeToSubviews(); };
+		void Update();
 		
 		Point ScrollOffset() const;
 		void SetScrollIncrement(int);
+		
 		void ScrollDelta(const Point& p, ieDword duration = 0);
 		void ScrollTo(Point p, ieDword duration = 0);
 		

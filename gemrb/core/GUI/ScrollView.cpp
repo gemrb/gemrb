@@ -239,12 +239,30 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 	View* v = View::SubviewAt(p, ignoreTransparency, recursive);
 	return (v == &contentView) ? NULL : v;
 }
+
+void ScrollView::Update()
+{
+	contentView.ResizeToSubviews();
 	
+	const Size& mySize = ContentRegion().Dimensions();
+	const Size& contentSize = contentView.Dimensions();
+	
+	Point origin = contentView.Origin(); // how much we have scrolled in -px
+	Point max(contentSize.w - mySize.w, contentSize.h - mySize.h);
+	
+	if (vscroll) {
+		vscroll->SetValue(-origin.y);
+	}
+	if (hscroll) {
+		vscroll->SetValue(-origin.x);
+	}
+}
+
 Point ScrollView::ScrollOffset() const
 {
 	return contentView.Origin();
 }
-	
+
 void ScrollView::SetScrollIncrement(int inc)
 {
 	if (hscroll) {
@@ -279,6 +297,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	}
 
 	contentView.SetFrameOrigin(newP);
+	Update();
 }
 
 bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
