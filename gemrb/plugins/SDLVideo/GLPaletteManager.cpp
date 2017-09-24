@@ -40,10 +40,7 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 		{
 			for (unsigned int i=0; i<256; i++)
 			{
-				if (colors[i].a == 0)
-				{
-					colors[i].a = 0xFF;
-				}
+				colors[i].a = 0xFF;
 			}
 		}
 		colors[colorKey].a = 0;
