@@ -376,17 +376,18 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
-				
-				// FIXME: this is a hack. we should lookup the actual width of the scrollbar
-				if (SBID != 0xffff) ctrlFrame.w += 16;
-				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 
+				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
 				if (SBID != 0xffff) {
 					// we dont actually care about the scrollbar,
 					// TextAreas automatically produce their own in GemRB
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
+						int w = sb->Frame().w;
 						delete win->RemoveSubview(sb);
+						Size taSize = ta->Dimensions();
+						taSize.w += w;
+						ta->SetFrameSize(taSize);
 					}
 				} else {
 					// no scrollbar means we will ignore events
@@ -477,10 +478,21 @@ endalign:
 					images[i] = bam->GetFrame( imgIdx, Cycle );
 				}
 				str->ReadWord( &TAID );
-
+				
+				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
+				
 				if (TAID == 0xffff) {
 					// text areas produce their own scrollbars in GemRB
-					ctrl = new ScrollBar(ctrlFrame, images);
+					ctrl = sb;
+				} else {
+					TextArea* ta = GetControl<TextArea>(TAID, win);
+					if (ta) {
+						int w = sb->Frame().w;
+						Size taSize = ta->Dimensions();
+						taSize.w += w;
+						ta->SetFrameSize(taSize);
+					}
+					delete sb;
 				}
 			}
 			break;
