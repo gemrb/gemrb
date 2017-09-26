@@ -476,7 +476,7 @@ public:
 	/** check if the passed actor is a victim of timestop */
 	bool TimeStoppedFor(const Actor* target=NULL);
 	/** updates the infravision info */
-	void Infravision();
+	void Infravision(const Actor *target=NULL);
 	/** applies the global tint if it is needed */
 	void ApplyGlobalTint(Color &tint, ieDword &flags) const;
 	/** gets the colour which should be applied over the game area,

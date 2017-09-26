@@ -707,7 +707,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	if (! (flags & SELECT_QUIET)) {
 		core->SetEventFlag(EF_SELECTION);
 	}
-	Infravision();
+	Infravision(actor);
 	return true;
 }
 
@@ -1995,25 +1995,35 @@ bool Game::TimeStoppedFor(const Actor* target)
 	return true;
 }
 
-//recalculate the party's infravision state
-void Game::Infravision()
+/*
+ * Infravision: on specific actor with infravision or whole party with
+ *  at least one infravision actor and group-wide setting enabled.
+ */
+void Game::Infravision(const Actor *actor)
 {
-	ieDword tmp = 0;
 	hasInfra = false;
-	core->GetDictionary()->Lookup("infravision", tmp);
-	if (!tmp) return;
 	Map *map = GetCurrentArea();
 	if (!map) return;
-	for(size_t i=0;i<PCs.size();i++) {
-		Actor *actor = PCs[i];
-		if (!IsAlive(actor)) continue;
-		if (actor->GetCurrentArea()!=map) continue;
-		//Group infravision overrides this???
-		if (!actor->Selected) continue;
-		if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) {
-			hasInfra = true;
-			return;
+
+	if (actor) {
+		hasInfra = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
+	} else {
+		unsigned char actorsWithInfravision = 0;
+		ieDword tmp = 0;
+		core->GetDictionary()->Lookup("infravision", tmp);
+
+		for(size_t i=0;i<PCs.size();i++) {
+			Actor *actor = PCs[i];
+			if (!IsAlive(actor)) continue;
+			if (actor->GetCurrentArea()!=map) continue;
+			//Group infravision overrides this???
+			if (!actor->Selected) continue;
+			if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) {
+				actorsWithInfravision += 1;
+			}
 		}
+
+		hasInfra = PCs.size() == actorsWithInfravision || (actorsWithInfravision > 0 && tmp);
 	}
 }
 
