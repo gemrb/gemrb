@@ -214,12 +214,14 @@ void ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 }
 
 /** Mousewheel scroll */
-void ScrollBar::OnMouseWheelScroll(const Point& delta)
+bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
 		Point p = AxisPosFromValue() + delta;
 		ScrollTo(p);
+		return true;
 	}
+	return false;
 }
 
 /** Mouse Drag Event */

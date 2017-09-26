@@ -85,7 +85,7 @@ public:
 	/** Mouse Drag Event */
 	void OnMouseDrag(const MouseEvent&);
 	/** Mouse Wheel Scroll Event */
-	void OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta);
 
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */

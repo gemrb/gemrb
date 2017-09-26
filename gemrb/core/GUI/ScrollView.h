@@ -75,7 +75,7 @@ namespace GemRB {
 		View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-		void OnMouseWheelScroll(const Point& delta);
+		bool OnMouseWheelScroll(const Point& delta);
 		void OnMouseDrag(const MouseEvent&);
 		
 		// TODO: this isn't how we want to do things

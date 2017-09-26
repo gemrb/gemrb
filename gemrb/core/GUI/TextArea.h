@@ -169,7 +169,7 @@ public: //Events
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
-	void OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta);
 
 	void SetFocus();
 

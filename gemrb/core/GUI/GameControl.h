@@ -186,7 +186,7 @@ public:
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	void OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta);
 
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const;

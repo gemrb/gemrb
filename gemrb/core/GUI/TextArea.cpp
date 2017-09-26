@@ -434,12 +434,12 @@ void TextArea::ScrollToY(int y, short lineduration)
 
 /** Mousewheel scroll */
 /** This method is key to touchscreen scrolling */
-void TextArea::OnMouseWheelScroll(const Point& delta)
+bool TextArea::OnMouseWheelScroll(const Point& delta)
 {
 	// the only time we should get this event is when AnimPicture is set
 	// otherwise the scrollview would have recieved this
 	assert(AnimPicture);
-	scrollview.OnMouseWheelScroll(delta);
+	return scrollview.OnMouseWheelScroll(delta);
 }
 
 void TextArea::UpdateState(unsigned int optIdx)

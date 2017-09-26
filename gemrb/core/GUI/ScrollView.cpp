@@ -327,9 +327,10 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
 	return false;
 }
 
-void ScrollView::OnMouseWheelScroll(const Point& delta)
+bool ScrollView::OnMouseWheelScroll(const Point& delta)
 {
 	ScrollDelta(delta);
+	return true;
 }
 
 void ScrollView::OnMouseDrag(const MouseEvent& me)

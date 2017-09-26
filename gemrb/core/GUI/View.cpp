@@ -529,11 +529,12 @@ void View::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	}
 }
 
-void View::OnMouseWheelScroll(const Point& delta)
+bool View::OnMouseWheelScroll(const Point& delta)
 {
 	if (superView) {
-		superView->OnMouseWheelScroll(delta);
+		return superView->OnMouseWheelScroll(delta);
 	}
+	return false;
 }
 
 void View::AssignScriptingRef(ViewScriptingRef* ref)

@@ -87,7 +87,7 @@ public:
 	/** Mouse Button Up */
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Wheel Event */
-	void OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta);
 
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 

@@ -294,7 +294,7 @@ void WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 }
 
 /** Mouse wheel scroll */
-void WorldMapControl::OnMouseWheelScroll(const Point& delta)
+bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
 	ScrollX += delta.x;
 	ScrollY += delta.y;
@@ -309,6 +309,8 @@ void WorldMapControl::OnMouseWheelScroll(const Point& delta)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
+	
+	return true;
 }
 
 bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)

@@ -1994,9 +1994,10 @@ void GameControl::CommandSelectedMovement(const Point& p)
 	}
 }
 
-void GameControl::OnMouseWheelScroll(const Point& delta)
+bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
 	Scroll(delta);
+	return true;
 }
 
 void GameControl::Scroll(const Point& amt)

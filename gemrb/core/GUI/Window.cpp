@@ -324,12 +324,23 @@ bool Window::DispatchEvent(const Event& event)
 		switch (event.type) {
 			case Event::MouseScroll:
 				// retarget if NULL or disabled
-				if (target == NULL || target->IsDisabled()) {
-					OnMouseWheelScroll( event.mouse.Delta() );
-				} else {
-					target->OnMouseWheelScroll( event.mouse.Delta() );
+				{
+					Point delta = event.mouse.Delta();
+					if (target && !target->IsDisabled()) {
+						if (target->OnMouseWheelScroll(delta)) {
+							return true;
+						}
+					}
+					
+					if (focusView && !focusView->IsDisabled()) {
+						if (focusView->OnMouseWheelScroll(delta)) {
+							return true;
+						}
+						
+					}
+					
+					return OnMouseWheelScroll(delta);
 				}
-				return true;
 			case Event::MouseMove:
 				// allows NULL and disabled targets
 				DispatchMouseMotion(target, event.mouse);
