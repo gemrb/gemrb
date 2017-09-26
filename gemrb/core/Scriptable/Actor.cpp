@@ -7648,7 +7648,10 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 		flags |= BLIT_GREY;
 	}
 	Color tint2 = tint;
-	game->ApplyGlobalTint(tint2, flags);
+
+	if (!noGlobalTint) {
+		game->ApplyGlobalTint(tint2, flags);
+	}
 
 	// display current frames in the right order
 	const int* zOrder = ca->GetZOrder(Face);
@@ -8060,12 +8063,10 @@ void Actor::Draw(const Region &screen)
 
 		bool noGlobalTint = false;
 		// infravision, independent of light map and global light
-		int areaType = GetCurrentArea()->AreaType;
-
 		if ( HasBodyHeat() &&
-			(area->GetLightLevel(Pos)<128) &&
 			core->GetGame()->PartyHasInfravision() &&
-			((!core->GetGame()->IsDay() && (areaType & AT_OUTDOOR)) || (areaType & AT_DUNGEON))) {
+			!core->GetGame()->IsDay() &&
+			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
 			noGlobalTint = true;
 			tint.r = 255;
 
