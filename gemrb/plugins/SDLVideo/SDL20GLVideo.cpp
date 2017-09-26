@@ -512,27 +512,6 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 	}
 	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
 	GLuint coverTexture = 0;
-	
-	if (!anchor && core->GetGame()) 
-	{
-		const Color *totint = core->GetGame()->GetGlobalTint();
-		if (totint) 
-		{
-			if (flags & BLIT_TINTED) 
-			{
-				tint.r = (tint.r * totint->r) >> 8;
-				tint.g = (tint.g * totint->g) >> 8;
-				tint.b = (tint.b * totint->b) >> 8;
-			} 
-			else
-			{
-				flags |= BLIT_TINTED;
-				tint = *totint;
-			}
-		}
-	}
-
-
 
 	if(glSprite->IsPaletted())
 	{
