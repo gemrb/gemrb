@@ -40,6 +40,7 @@
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
+#include "Video.h"
 
 #include <algorithm>
 #include <iterator>
@@ -532,7 +533,7 @@ int Game::JoinParty(Actor* actor, int join)
 				CopyResRef(actor->LargePortrait, ptab->QueryField(actor->LargePortrait, "REPLACEMENT"));
 			}
 		}
-		
+
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
@@ -1994,26 +1995,38 @@ bool Game::TimeStoppedFor(const Actor* target)
 	return true;
 }
 
-//recalculate the party's infravision state
 void Game::Infravision()
 {
-	ieDword tmp = 0;
 	hasInfra = false;
-	core->GetDictionary()->Lookup("infravision", tmp);
-	if (!tmp) return;
 	Map *map = GetCurrentArea();
 	if (!map) return;
+
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("infravision", tmp);
+
+	bool someoneWithInfravision = false;
+	bool allSelectedWithInfravision = true;
+	bool someoneSelected = false;
+
 	for(size_t i=0;i<PCs.size();i++) {
 		Actor *actor = PCs[i];
 		if (!IsAlive(actor)) continue;
 		if (actor->GetCurrentArea()!=map) continue;
-		//Group infravision overrides this???
-		if (!actor->Selected) continue;
-		if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) {
-			hasInfra = true;
-			return;
+
+		bool hasInfravision = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
+		someoneWithInfravision |= hasInfravision;
+
+		someoneSelected |= actor->Selected;
+		if (actor->Selected) {
+			allSelectedWithInfravision &= hasInfravision;
+		}
+
+		if ((someoneWithInfravision && tmp) || !allSelectedWithInfravision) {
+			break;
 		}
 	}
+
+	hasInfra = (tmp && someoneWithInfravision) || (allSelectedWithInfravision && someoneSelected);
 }
 
 //returns the colour which should be applied onto the whole game area viewport
@@ -2053,6 +2066,21 @@ const Color *Game::GetGlobalTint() const
 	}
 
 	return NULL;
+}
+
+// applies the global tint, if any
+void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
+{
+	const Color *globalTint = GetGlobalTint();
+	if (globalTint) {
+		if (flags & BLIT_TINTED) {
+			Color::MultiplyTint(tint, globalTint);
+		} else {
+			flags |= BLIT_TINTED;
+			tint = *globalTint;
+			tint.a = 255;
+		}
+	}
 }
 
 bool Game::IsDay()
