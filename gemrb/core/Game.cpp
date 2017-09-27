@@ -707,7 +707,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	if (! (flags & SELECT_QUIET)) {
 		core->SetEventFlag(EF_SELECTION);
 	}
-	Infravision(actor);
+	Infravision();
 	return true;
 }
 
@@ -1995,36 +1995,38 @@ bool Game::TimeStoppedFor(const Actor* target)
 	return true;
 }
 
-/*
- * Infravision: on specific actor with infravision or whole party with
- *  at least one infravision actor and group-wide setting enabled.
- */
-void Game::Infravision(const Actor *actor)
+void Game::Infravision()
 {
 	hasInfra = false;
 	Map *map = GetCurrentArea();
 	if (!map) return;
 
-	if (actor) {
-		hasInfra = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
-	} else {
-		unsigned char actorsWithInfravision = 0;
-		ieDword tmp = 0;
-		core->GetDictionary()->Lookup("infravision", tmp);
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("infravision", tmp);
 
-		for(size_t i=0;i<PCs.size();i++) {
-			Actor *actor = PCs[i];
-			if (!IsAlive(actor)) continue;
-			if (actor->GetCurrentArea()!=map) continue;
-			//Group infravision overrides this???
-			if (!actor->Selected) continue;
-			if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) {
-				actorsWithInfravision += 1;
-			}
+	bool someoneWithInfravision = false;
+	bool allSelectedWithInfravision = true;
+	bool someoneSelected = false;
+
+	for(size_t i=0;i<PCs.size();i++) {
+		Actor *actor = PCs[i];
+		if (!IsAlive(actor)) continue;
+		if (actor->GetCurrentArea()!=map) continue;
+
+		bool hasInfravision = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
+		someoneWithInfravision |= hasInfravision;
+
+		someoneSelected |= actor->Selected;
+		if (actor->Selected) {
+			allSelectedWithInfravision &= hasInfravision;
 		}
 
-		hasInfra = PCs.size() == actorsWithInfravision || (actorsWithInfravision > 0 && tmp);
+		if ((someoneWithInfravision && tmp) || !allSelectedWithInfravision) {
+			break;
+		}
 	}
+
+	hasInfra = (tmp && someoneWithInfravision) || (allSelectedWithInfravision && someoneSelected);
 }
 
 //returns the colour which should be applied onto the whole game area viewport
