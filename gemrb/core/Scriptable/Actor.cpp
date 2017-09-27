@@ -7634,7 +7634,7 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 
 void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, const Color& tint, bool noGlobalTint)
+			unsigned char Face, const Color& tint)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -8058,13 +8058,11 @@ void Actor::Draw(const Region &screen)
 			}
 		}
 
-		bool noGlobalTint = false;
 		// infravision, independent of light map and global light
 		if ( HasBodyHeat() &&
 			core->GetGame()->PartyHasInfravision() &&
 			!core->GetGame()->IsDay() &&
 			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-			noGlobalTint = true;
 			tint.r = 255;
 
 			/* IWD2: infravision is white, not red. */
@@ -8077,7 +8075,7 @@ void Actor::Draw(const Region &screen)
 
 		// actor itself
 		newsc = sc = GetSpriteCover();
-		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint, noGlobalTint);
+		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
 		if (newsc != sc) SetSpriteCover(newsc);
 
 		// blur sprites in front of the actor
@@ -8089,7 +8087,7 @@ void Actor::Draw(const Region &screen)
 					blurx -= blurdx; blury -= blurdy;
 					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-						anims, Face, tint, noGlobalTint);
+						anims, Face, tint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[i] = newsc;
