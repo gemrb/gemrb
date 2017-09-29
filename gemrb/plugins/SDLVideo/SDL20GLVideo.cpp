@@ -507,6 +507,28 @@ void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned s
 	glEnable(GL_SCISSOR_TEST);
 }
 
+static Region ClipSprite(const Sprite2D &sprite, const Region &clip, const int tx, const int ty) {
+	Region r(0, 0, sprite.Width, sprite.Height);
+
+	if (tx - clip.x < 0) {
+		r.w = sprite.Width + (tx - clip.x);
+		r.x = sprite.Width - r.w;
+	}
+	if (tx + sprite.Width > clip.x + clip.w) {
+		r.w = sprite.Width - (tx + sprite.Width - (clip.x + clip.w));
+	}
+
+	if (ty - clip.y < 0) {
+		r.h = sprite.Height + (ty - clip.y);
+		r.y = sprite.Height - r.h;
+	}
+	if (ty + sprite.Height > clip.y + clip.h) {
+		r.h = sprite.Height - (ty + sprite.Height - (clip.y + clip.h));
+	}
+
+	return r;
+}
+
 void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	int tx = x - spr->XPos;
@@ -518,15 +540,20 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	if (flags & TILE_GREY) blitFlags |= BLIT_GREY;
 	if (flags & TILE_SEPIA) blitFlags |= BLIT_SEPIA;
 
-	Region dst(tx, ty, spr->Width, spr->Height);
-	if(clip)
-	{
-		dst = dst.Intersect(*clip);
+	int w = spr->Width, h = spr->Height, dx = 0, dy = 0;
+	if (clip) {
+		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
+		w = clippedTile.w;
+		h = clippedTile.h;
+		dx = clippedTile.x;
+		dy = clippedTile.y;
 	}
 
+	Region src(dx, dy, w, h);
+	Region dst(tx + dx, ty + dy, w, h);
+
 	const Color* totint = NULL;
-	if (core->GetGame()) 
-	{
+	if (core->GetGame()) {
 		totint = core->GetGame()->GetGlobalTint();
 	}
 
@@ -534,7 +561,7 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 		glBlendFunc(GL_ONE, GL_ZERO);
 	}
 
-	GLBlitSprite((GLTextureSprite2D*)spr, Region(0, 0, spr->Width, spr->Height), dst,
+	GLBlitSprite((GLTextureSprite2D*)spr, src, dst,
 						NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
 
 	if (!(blitFlags & BLIT_HALFTRANS)) {
@@ -591,11 +618,18 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
-	Region src(0, 0, glSprite->Width, glSprite->Height);
-	Region dst(tx, ty, glSprite->Width, glSprite->Height);
+	int w = glSprite->Width, h = glSprite->Height, dx = 0, dy = 0;
 	if (clip) {
-		dst = dst.Intersect(*clip);
+		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
+		w = clippedTile.w;
+		h = clippedTile.h;
+		dx = clippedTile.x;
+		dy = clippedTile.y;
 	}
+
+	Region src(dx, dy, w, h);
+	Region dst(tx + dx, ty + dy, w, h);
+
 	if (tint.r == 0 && tint.g == 0 && tint.b == 0)
 		GLBlitSprite(glSprite, src, dst, palette, flags);
 	else
