@@ -40,7 +40,7 @@ def OnLoad():
 	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
 	# for reference: medium = 12 = guiwdmb8, large = 7 = guwbtp38, small = 4 = guwbtp28
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS|IE_GUI_VIEW_RESIZE_SUBVIEWS, OP_OR)
+	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	MessageWindow.AddAlias("MSGWIN")
 	
 	TMessageTA = MessageWindow.GetControl(1)

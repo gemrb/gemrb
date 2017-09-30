@@ -21,9 +21,18 @@
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
 
 # view flags
-IE_GUI_VIEW_RESIZE_SUBVIEWS = 1 << 31	# resize immidiate subviews by the same ammount as this views frame change
-IE_GUI_VIEW_RESIZE_HEIGHT 	= 1 << 30	# resize the view vertically if vertical content exceeds width
-IE_GUI_VIEW_RESIZE_WIDTH 	= 1 << 29	# resize the view horizontally if horizontal content exceeds width
+IE_GUI_VIEW_RESIZE_NONW			= 0
+IE_GUI_VIEW_RESIZE_TOP			= 1 << 0 # keep my top relative to my super
+IE_GUI_VIEW_RESIZE_BOTTOM		= 1 << 1 # keep my bottom relative to my super
+IE_GUI_VIEW_RESIZE_VERTICAL		= IE_GUI_VIEW_RESIZE_TOP|IE_GUI_VIEW_RESIZE_BOTTOM # top+bottom effectively resizes me vertically
+IE_GUI_VIEW_RESIZE_LEFT			= 1 << 3 # keep my left relative to my super
+IE_GUI_VIEW_RESIZE_RIGHT		= 1 << 4 # keep my right relative to my super
+IE_GUI_VIEW_RESIZE_HORIZONTAL	= IE_GUI_VIEW_RESIZE_LEFT|IE_GUI_VIEW_RESIZE_RIGHT # top+bottom effectively resizes me horizontaly
+IE_GUI_VIEW_RESIZE_ALL			= IE_GUI_VIEW_RESIZE_VERTICAL|IE_GUI_VIEW_RESIZE_HORIZONTAL # resize me relative to my super
+
+# TODO: move these to TextContainer
+IE_GUI_VIEW_RESIZE_WIDTH	= 1 << 27	# resize the view horizontally if horizontal content exceeds width
+IE_GUI_VIEW_RESIZE_HEIGHT	= 1 << 26	# resize the view vertically if vertical content exceeds width
 
 IE_GUI_VIEW_INVISIBLE		= 1 << 30
 IE_GUI_VIEW_DISABLED		= 1 << 29

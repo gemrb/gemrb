@@ -2161,6 +2161,21 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 	RETURN_BOOL(view->SetFlags( Flags, Operation ));
 }
 
+PyDoc_STRVAR( GemRB_View_SetResizeFlags__doc,
+			 "SetViewFlags(GView, Flags, Operation)\n\n"
+			 "Sets the Display Flags of a View. Operation defaults to OP_SET." );
+
+static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
+{
+	unsigned int flags;
+	int op = OP_SET;
+	PARSE_ARGS3( args, "OI|i", &self, &flags, &op );
+	
+	View* view = GetView<View>(self);
+	ABORT_IF_NULL(view);
+	RETURN_BOOL(view->SetAutoResizeFlags( flags, op ));
+}
+
 PyDoc_STRVAR( GemRB_View_Focus__doc,
 			 "View.Focus()\n\n"
 			 "Focuses the view in it's window to direct keyboard and certain other events to the view." );
@@ -13023,6 +13038,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetBackground, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
+	METHOD(View_SetResizeFlags, METH_VARARGS),
 	METHOD(View_Focus, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),

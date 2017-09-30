@@ -71,6 +71,7 @@ class GView:
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
+	'SetResizeFlags': _GemRB.View_SetResizeFlags,
 	'Focus': _GemRB.View_Focus
 	}
 	__slots__ = ['SCRIPT_GROUP']
