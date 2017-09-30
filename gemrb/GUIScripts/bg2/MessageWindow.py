@@ -45,6 +45,7 @@ def OnLoad():
 	
 	TMessageTA = MessageWindow.GetControl(1)
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	TMessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	TMessageTA.AddAlias("MsgSys", 0)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
@@ -132,13 +133,7 @@ def UpdateControlStatus():
 		frame['h'] = WinSizes[size]
 		MessageWindow.SetFrame(frame)
 		MessageWindow.SetBackground(WinBG[size])
-		
-		frame = ContractButton.GetFrame()
-		ContractButton.SetPos(frame['x'], frame['y'] - diff)
-		
-		frame = ExpandButton.GetFrame()
-		ExpandButton.SetPos(frame['x'], frame['y'] - diff)
-		
+
 		GemRB.GameSetScreenFlags(size + GSFlags, OP_SET)
 
 	def OnIncreaseSize():
