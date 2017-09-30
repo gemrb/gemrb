@@ -3040,6 +3040,8 @@ void Interface::DrawWindows(bool allow_delete)
 {
 	//here comes the REAL drawing of windows
 	static bool modalShield = false;
+	static size_t windowStackShield = 0;
+
 	if (ModalWindow) {
 		if (!modalShield) {
 			// only draw the shield layer once
@@ -3050,8 +3052,11 @@ void Interface::DrawWindows(bool allow_delete)
 				shieldColor.a = 0xff;
 			}
 			video->DrawRect( Region( 0, 0, Width, Height ), shieldColor );
+			video->TakeBackgroundBuffer();
 			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
 			modalShield = true;
+		} else {
+			video->DrawBackgroundBuffer();
 		}
 		ModalWindow->DrawWindow();
 		return;
@@ -3059,6 +3064,15 @@ void Interface::DrawWindows(bool allow_delete)
 	modalShield = false;
 
 	size_t i = topwin.size();
+	bool backgroundRedrawn = false;
+
+	if (windowStackShield != i) {
+		if (i > 1) {
+			video->TakeBackgroundBuffer();
+		}
+		windowStackShield = i;
+	}
+
 	while(i--) {
 		unsigned int t = topwin[i];
 
@@ -3077,6 +3091,9 @@ void Interface::DrawWindows(bool allow_delete)
 				}
 			} else if (win->Visible) {
 				win->DrawWindow();
+			} else if (!win->Visible && !backgroundRedrawn) {
+				backgroundRedrawn = true;
+				video->DrawBackgroundBuffer();
 			}
 		}
 	}
