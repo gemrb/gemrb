@@ -60,6 +60,7 @@ protected:
 
 	// Flags: top byte is reserved for View flags, subclasses may use the remaining bits however they want
 	unsigned int flags;
+	unsigned short autoresizeFlags; // these flags don't produce notifications
 
 private:
 	void DirtyBGRect(const Region&);
@@ -79,7 +80,6 @@ private:
 	virtual void SubviewRemoved(View* /*view*/, View* /*parent*/) {};
 
 	// notifications
-	// TODO: RESIZE_WIDTH, RESIZE_HEIGHT, and RESIZE_SUBVIEWS should all do something on change
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void OriginChanged(const Point&) {}
@@ -96,16 +96,25 @@ public:
 	};
 
 	enum AutoresizeFlags {
-		RESIZE_WIDTH = 1 << 29,		// resize the view horizontally if horizontal content exceeds width
-		RESIZE_HEIGHT = 1 << 30,	// resize the view vertically if vertical content exceeds width
-
-		RESIZE_SUBVIEWS = 1 << 31	// resize immidiate subviews by the same ammount as this views frame change
+		// when a superview frame changes...
+		ResizeNone = 0,
+		ResizeTop = 1 << 0, // keep my top relative to my super
+		ResizeBottom = 1 << 1, // keep my bottom relative to my super
+		ResizeVertical = ResizeTop|ResizeBottom, // top+bottom effectively resizes me vertically
+		ResizeLeft = 1 << 3, // keep my left relative to my super
+		ResizeRight = 1 << 4, // keep my right relative to my super
+		ResizeHorizontal = ResizeLeft|ResizeRight, // top+bottom effectively resizes me horizontaly
+		ResizeAll = ResizeVertical|ResizeHorizontal, // resize me relative to my super
+		
+		// TODO: move these to TextContainer
+		RESIZE_WIDTH = 1 << 27,		// resize the view horizontally if horizontal content exceeds width
+		RESIZE_HEIGHT = 1 << 26	// resize the view vertically if vertical content exceeds width
 	};
 
 	enum ViewFlags {
-		Invisible = 1 << 28,
-		Disabled = 1 << 27,
-		IgnoreEvents = 1 << 26
+		Invisible = 1 << 30,
+		Disabled = 1 << 29,
+		IgnoreEvents = 1 << 28
 	};
 	
 #if DEBUG_VIEWS
@@ -125,7 +134,9 @@ public:
 	virtual bool HitTest(const Point& p) const;
 
 	bool SetFlags(unsigned int arg_flags, int opcode);
-	inline unsigned int Flags() { return flags; }
+	inline unsigned int Flags() const { return flags; }
+	bool SetAutoResizeFlags(unsigned short arg_flags, int opcode);
+	unsigned short AutoResizeFlags() const { return autoresizeFlags; }
 
 	void SetVisible(bool vis) { SetFlags(Invisible, (vis) ? OP_NAND : OP_OR ); }
 	bool IsVisible() const;

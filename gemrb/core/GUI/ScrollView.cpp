@@ -52,6 +52,7 @@ void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* parent)
 	
 void ScrollView::ContentView::ResizeToSubviews()
 {
+	// content view behaves as if RESIZE_WIDTH and RESIZE_HEIGHT are set always
 	Size newSize = superView->Dimensions();
 	
 	if (!subViews.empty()) {
@@ -129,11 +130,11 @@ ScrollView::ScrollView(const Region& frame)
 		ScrollCB cb = reinterpret_cast<ScrollCB>(&ScrollView::ScrollbarValueChange);
 		handler = new MethodCallback<ScrollView, Control*>(this, cb);
 		vscroll->SetAction(handler, Control::ValueChange);
+		vscroll->SetAutoResizeFlags(ResizeRight, OP_SET);
 	}
 	
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
-	SetFlags(RESIZE_SUBVIEWS, OP_OR);
 }
 
 ScrollView::~ScrollView()
@@ -142,6 +143,11 @@ ScrollView::~ScrollView()
 	
 	delete hscroll;
 	delete vscroll;
+}
+	
+void ScrollView::SizeChanged(const Size& /* oldsize */)
+{
+	Update();
 }
 
 void ScrollView::ContentFrameChanged()
@@ -254,7 +260,7 @@ void ScrollView::Update()
 		vscroll->SetValue(-origin.y);
 	}
 	if (hscroll) {
-		vscroll->SetValue(-origin.x);
+		hscroll->SetValue(-origin.x);
 	}
 }
 

@@ -52,7 +52,6 @@ class GEM_EXPORT TextArea : public Control {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
-	void SizeChanged(const Size& /*oldSize*/);
 	
 	class SpanSelector : public TextContainer {
 		struct OptSpan : public TextContainer {

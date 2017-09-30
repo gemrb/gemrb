@@ -47,6 +47,7 @@ View::View(const Region& frame)
 
 	dirty = true;
 	flags = 0;
+	autoresizeFlags = ResizeNone;
 	
 #if DEBUG_VIEWS
 	debuginfo = false;
@@ -441,6 +442,25 @@ void View::SetFrameOrigin(const Point& p)
 	frame.y = p.y;
 	
 	OriginChanged(oldP);
+	/*
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* subview = *it;
+		Point newSubOrigin = subview->Origin();
+		unsigned short flags = subview->AutoResizeFlags();
+		int delta = frame.x - oldP.x;
+		
+		if (flags&ResizeLeft) {
+			newSubOrigin.x += frame.x - oldP.x;
+		}
+		
+		delta = frame.y - oldP.y;
+		if (flags&ResizeTop) {
+			newSubOrigin.x += frame.y - oldP.y;
+		}
+		
+		subview->SetFrameOrigin(newSubOrigin);
+	}*/
 }
 
 void View::SetFrameSize(const Size& s)
@@ -454,15 +474,31 @@ void View::SetFrameSize(const Size& s)
 
 	SizeChanged(oldSize);
 
-	if (Flags()&RESIZE_SUBVIEWS) {
-		std::list<View*>::iterator it;
-		for (it = subViews.begin(); it != subViews.end(); ++it) {
-			View* subview = *it;
-			Region newSubFrame = subview->Frame();
-			newSubFrame.w += s.w - oldSize.w;
-			newSubFrame.h += s.h - oldSize.h;
-			subview->SetFrame(newSubFrame);
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* subview = *it;
+		Region newSubFrame = subview->Frame();
+		unsigned short flags = subview->AutoResizeFlags();
+		int delta = frame.w - oldSize.w;
+		
+		if (flags&ResizeRight) {
+			if (flags&ResizeLeft) {
+				newSubFrame.w += delta;
+			} else {
+				newSubFrame.x += delta;
+			}
 		}
+		
+		delta = frame.h - oldSize.h;
+		if (flags&ResizeBottom) {
+			if (flags&ResizeTop) {
+				newSubFrame.h += delta;
+			} else {
+				newSubFrame.y += delta;
+			}
+		}
+		
+		subview->SetFrame(newSubFrame);
 	}
 }
 
@@ -477,6 +513,11 @@ bool View::SetFlags(unsigned int arg_flags, int opcode)
 	}
 
 	return ret;
+}
+	
+bool View::SetAutoResizeFlags(unsigned short arg_flags, int opcode)
+{
+	return SetBits(autoresizeFlags, arg_flags, opcode);
 }
 
 void View::SetTooltip(const String& string)

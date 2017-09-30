@@ -197,8 +197,9 @@ void TextArea::Init()
 	ClearSelectOptions();
 	ClearText();
 	SetAnimPicture(NULL);
-	
+
 	scrollview.SetScrollIncrement(LineHeight());
+	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
 }
 
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
@@ -207,13 +208,6 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		// speaker portrait
 		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.x, drawFrame.y);
 	}
-}
-
-void TextArea::SizeChanged(const Size& /*oldSize*/)
-{
-	// TODO: subview resizing should be able to be handled generically by View
-	Region r(Point(), Dimensions());
-	scrollview.SetFrame(r);
 }
 
 void TextArea::SetAnimPicture(Sprite2D* pic)
