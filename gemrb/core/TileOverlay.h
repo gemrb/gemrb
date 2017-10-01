@@ -42,7 +42,6 @@ public:
 	~TileOverlay(void);
 	void AddTile(Tile* tile);
 	void Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags);
-	void BumpViewport(const Region &viewport, Region &vp);
 };
 
 }

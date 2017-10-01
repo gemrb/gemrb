@@ -50,39 +50,8 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
-{
-	bool bump = false;
-	vp.w = viewport.w;
-	vp.h = viewport.h;
-	if (( vp.x + vp.w ) > w * 64) {
-		vp.x = ( w * 64 - vp.w );
-		bump = true;
-	}
-	if (vp.x < 0) {
-		vp.x = 0;
-		bump = true;
-	}
-	if (( vp.y + vp.h ) > h * 64) {
-		vp.y = ( h * 64 - vp.h );
-		bump = true;
-	}
-	if (vp.y < 0) {
-		vp.y = 0;
-		bump = true;
-	}
-	if(bump && !(core->timer->ViewportIsMoving())) {
-		core->timer->SetMoveViewPort( vp.Origin(), 0, false );
-	}
-}
-
 void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags)
 {
-	// if the video's viewport is partially outside of the map, bump it back
-	// FIXME: TitleOverlay should have nothing to do with moving the viewport
-	// move this to GameControl
-	//BumpViewport(viewport, vp);
-
 	// determine which tiles are visible
 	int sx = viewport.x / 64;
 	int sy = viewport.y / 64;
