@@ -110,11 +110,9 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
-	Color c;
-	if (x >= Width || y >= Height) return c;
+	if (x >= Width || y >= Height) return Color();
 
-	SDLVideoDriver::GetSurfacePixel(surface, x, y, c);
-	return c;
+	return SDLVideoDriver::GetSurfacePixel(surface, x, y);
 }
 
 bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
