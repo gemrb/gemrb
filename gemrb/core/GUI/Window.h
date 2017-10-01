@@ -112,6 +112,7 @@ public:
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	
 	bool InHandler() const;
+	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }
 
 private: // Private attributes
 	std::set<Control*> Controls;
