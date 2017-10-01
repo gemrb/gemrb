@@ -274,6 +274,7 @@ void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) 
 ContentContainer::ContentContainer(const Region& frame)
 : View(frame)
 {
+	margin = 0;
 	SizeChanged(Size());
 }
 
@@ -293,12 +294,13 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;
+	Point dp = drawFrame.Origin() + Point(margin, margin);
 
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
 		const Layout& l = *it;
 		// TODO: pass the clip rect so we can skip non-intersecting regions
-		l.content->DrawContentsInRegions(l.regions, drawFrame.Origin());
+		l.content->DrawContentsInRegions(l.regions, dp);
 	}
 }
 
@@ -464,9 +466,13 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	Region layoutFrame = Region(Point(), contentBounds);
 	if (Flags()&RESIZE_WIDTH) {
 		layoutFrame.w = SHRT_MAX;
+	} else {
+		layoutFrame.w -= margin*2;
 	}
 	if (Flags()&RESIZE_HEIGHT) {
 		layoutFrame.h = SHRT_MAX;
+	} else {
+		layoutFrame.h -= margin*2;
 	}
 
 	assert(!layoutFrame.Dimensions().IsEmpty());

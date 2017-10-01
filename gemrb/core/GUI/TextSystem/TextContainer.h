@@ -99,6 +99,7 @@ class ContentContainer : public View
 {
 public:
 	typedef std::list<Content*> ContentList;
+	
 protected:
 	ContentList contents;
 
@@ -132,6 +133,7 @@ protected:
 	typedef std::deque<Layout> ContentLayout;
 	ContentLayout layout;
 	Point layoutPoint;
+	size_t margin;
 
 public:
 	ContentContainer(const Region& frame);
@@ -151,6 +153,9 @@ public:
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
+	
+	size_t Margin() const { return margin; }
+	void SetMargin(size_t m) { margin = m; MarkDirty(); }
 
 protected:
 	void SubviewAdded(View* view, View* parent);
