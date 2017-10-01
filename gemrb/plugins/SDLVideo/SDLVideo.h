@@ -162,6 +162,9 @@ public:
 							ieDword titleref)=0;
 	int PollMovieEvents();
 
+	void DrawBackgroundBuffer() {};
+	void FreeBackgroundBuffer() {};
+	void TakeBackgroundBuffer() {};
 protected:
 	void DrawMovieSubtitle(ieDword strRef);
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);

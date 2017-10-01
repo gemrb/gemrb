@@ -246,6 +246,10 @@ public:
 	Region GetViewport(void) const;
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);
+
+	virtual void DrawBackgroundBuffer() = 0;
+	virtual void FreeBackgroundBuffer() = 0;
+	virtual void TakeBackgroundBuffer() = 0;
 };
 
 }

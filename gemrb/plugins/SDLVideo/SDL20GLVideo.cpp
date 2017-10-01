@@ -30,6 +30,7 @@ GLVideoDriver::~GLVideoDriver()
 	if (programRect) programRect->Release();
 	if (programEllipse) programEllipse->Release();
 	delete paletteManager;
+	FreeBackgroundBuffer();
 	SDL_GL_DeleteContext(context);
 }
 
@@ -88,6 +89,7 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 
 	Viewport.w = width;
 	Viewport.h = height;
+	GLViewport = Region(0, 0, width, height);
 
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
@@ -125,7 +127,7 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 #endif
 	if (!createPrograms()) return GEM_ERROR;
 	paletteManager = new GLPaletteManager();
-	glViewport(0, 0, width, height);
+	glViewport(GLViewport.x, GLViewport.y, GLViewport.w, GLViewport.h);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_SCISSOR_TEST);
@@ -407,7 +409,7 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
 	useProgram(programRect);
-	glViewport(0, 0, width, height);
+	glViewport(GLViewport.x, GLViewport.y, GLViewport.w, GLViewport.h);
 	Region scissorRect = ClippedDrawingRect(Region(0, 0, width, height));
 	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	GLfloat* data = new GLfloat[count*VERTEX_SIZE];
@@ -817,6 +819,25 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 	return screenshot;
 }
 
+void GLVideoDriver::DrawBackgroundBuffer() {
+	if (!backgroundBuffer) {
+		return;
+	}
+
+	GLBlitSprite(backgroundBuffer, GLViewport, GLViewport);
+}
+
+void GLVideoDriver::FreeBackgroundBuffer() {
+	if (NULL != backgroundBuffer) {
+		delete backgroundBuffer;
+		backgroundBuffer = NULL;
+	}
+}
+
+void GLVideoDriver::TakeBackgroundBuffer() {
+	FreeBackgroundBuffer();
+	backgroundBuffer = static_cast<GLTextureSprite2D*>(GetScreenshot(GLViewport));
+}
 
 #include "plugindef.h"
 

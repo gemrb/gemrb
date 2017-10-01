@@ -36,11 +36,14 @@ namespace GemRB
 		GLSLProgram* programPalSepia; // shader program for paletted sprites  with sepia effect
 		GLSLProgram* programRect; // shader program for drawing rects and lines
 		GLSLProgram* programEllipse; // shader program for drawing ellipses and circles
-		
+
 		Uint32 spritesPerFrame; // sprites counter
 		GLSLProgram* lastUsedProgram; // stores last used program to prevent switching if possible (switching may cause performance lack)
 
 		GLPaletteManager* paletteManager; // palette manager instance
+
+		GLTextureSprite2D *backgroundBuffer;
+		Region GLViewport;
 
 		void useProgram(GLSLProgram* program); // use this instead program->Use()
 		bool createPrograms();
@@ -71,6 +74,10 @@ namespace GemRB
 		/*void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines = true, bool clipped = true);*/
 		void DestroyMovieScreen();
 		Sprite2D* GetScreenshot(Region r);
+
+		void DrawBackgroundBuffer();
+		void FreeBackgroundBuffer();
+		void TakeBackgroundBuffer();
 	};
 }
 
