@@ -385,7 +385,8 @@ void View::RemovedFromView(View*)
 
 bool View::HitTest(const Point& p) const
 {
-	if (flags & (IgnoreEvents | Invisible)) {
+	Region r(Point(), Dimensions());
+	if (!r.PointInside(p)) {
 		return false;
 	}
 
@@ -401,9 +402,8 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 	std::list<View*>::reverse_iterator it;
 	for (it = subViews.rbegin(); it != subViews.rend(); ++it) {
 		View* v = *it;
-		const Region& viewFrame = v->Frame();
 		Point subP = v->ConvertPointFromSuper(p);
-		if (viewFrame.PointInside(p) && (ignoreTransparency || v->HitTest(subP))) {
+		if ((ignoreTransparency && v->frame.PointInside(p)) || v->HitTest(subP)) {
 			if (recursive) {
 				View* subV = v->SubviewAt(subP, ignoreTransparency, recursive);
 				v = (subV) ? subV : v;

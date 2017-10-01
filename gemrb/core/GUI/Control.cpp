@@ -218,6 +218,14 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
 	return &core->SetTimer(h, ActionRepeatDelay);
 }
+	
+bool Control::HitTest(const Point& p) const
+{
+	if (!(flags & (IgnoreEvents | Invisible))) {
+		return View::HitTest(p);
+	}
+	return false;
+}
 
 void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {

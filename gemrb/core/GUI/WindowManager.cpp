@@ -303,7 +303,7 @@ bool WindowManager::HotKey(const Event& event)
 }
 
 #define HIT_TEST(e, w) \
-((w)->Frame().PointInside(e.mouse.Pos()))
+((w)->HitTest((w)->ConvertPointFromScreen(e.mouse.Pos())))
 
 Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_iterator& current)
 {

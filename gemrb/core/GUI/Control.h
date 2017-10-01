@@ -161,6 +161,8 @@ public:
 	void SetValue(ieDword val);
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
+	
+	bool HitTest(const Point& p) const;
 
 	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
