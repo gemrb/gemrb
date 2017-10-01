@@ -44,6 +44,7 @@ def OnLoad():
 	global HairColor, SkinColor, MajorColor, MinorColor
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	import CharGenCommon
 	CharGenCommon.PositionCharGenWin (ColorWindow)
 
