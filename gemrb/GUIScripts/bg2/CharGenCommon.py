@@ -42,6 +42,7 @@ def DisplayOverview(step):
 	global CharGenWindow, TextAreaControl, PortraitName
 
 	CharGenWindow = GemRB.LoadWindow (0, "GUICG")
+	CharGenWindow.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GemRB.SetVar ("Step", step)
 
 	###
