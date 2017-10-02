@@ -46,7 +46,7 @@ def OnLoad():
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	import CharGenCommon
-	CharGenCommon.PositionCharGenWin (ColorWindow)
+	CharGenCommon.PositionCharGenWin (ColorWindow, -6)
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
