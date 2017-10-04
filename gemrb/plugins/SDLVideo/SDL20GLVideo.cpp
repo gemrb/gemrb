@@ -624,7 +624,7 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 	Region src(dx, dy, w, h);
 	Region dst(tx + dx, ty + dy, w, h);
 
-	if (tint.r == 0 && tint.g == 0 && tint.b == 0)
+	if (!(flags & BLIT_TINTED) || (tint.r == 0 && tint.g == 0 && tint.b == 0))
 		GLBlitSprite(glSprite, src, dst, palette, flags);
 	else
 		GLBlitSprite(glSprite, src, dst, palette, flags, &tint);
