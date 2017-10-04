@@ -1697,7 +1697,9 @@ void Projectile::DrawTravel(const Region &screen)
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
 	ieDword flags = flag;
-	if (game) game->ApplyGlobalTint(tint2, flags);
+	if (TFlags&PTF_TINT) {
+		if (game) game->ApplyGlobalTint(tint2, flags);
+	}
 
 	if (light) {
 		video->BlitGameSprite(light, pos.x, pos.y, flags^flag, tint2, NULL, NULL, &screen);
