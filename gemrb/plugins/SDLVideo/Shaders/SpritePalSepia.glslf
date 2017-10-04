@@ -20,7 +20,7 @@ void main()
 		vec4 color = texture2D(s_palette, vec2((0.5 + index*255.0)/256.0, 0.5));
 
 		if (2 == u_shadowMode && (1 == iindex)) {
-			color = vec4(color.r/2.0, color.g/2.0, color.b/2.0, 0.5);
+			color = vec4(color.r, color.g, color.b, 1) * 0.5;
 		}
 
 		float gray = (color.r + color.g + color.b)*0.333333;
