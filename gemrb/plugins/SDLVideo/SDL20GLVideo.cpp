@@ -555,12 +555,18 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	Region dst(tx + dx, ty + dy, w, h);
 
 	const Color* totint = NULL;
+	Color tileTint;
+
 	if (core->GetGame()) {
 		totint = core->GetGame()->GetGlobalTint();
+		if (totint) {
+			tileTint = *totint;
+			tileTint.a = 0xFF;
+		}
 	}
 
 	GLBlitSprite((GLTextureSprite2D*)spr, src, dst,
-						NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
+						NULL, blitFlags, (totint ? &tileTint : NULL), (GLTextureSprite2D*)mask);
 }
 
 void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
