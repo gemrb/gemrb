@@ -7647,8 +7647,6 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 	if (game->TimeStoppedFor(this)) {
 		flags |= BLIT_GREY;
 	}
-	Color tint2 = tint;
-	game->ApplyGlobalTint(tint2, flags);
 
 	// display current frames in the right order
 	const int* zOrder = ca->GetZOrder(Face);
@@ -7672,7 +7670,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				flags, tint2, newsc, ca->GetPartPalette(partnum), &screen);
+				flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
 		}
 	}
 }
@@ -8058,10 +8056,14 @@ void Actor::Draw(const Region &screen)
 			}
 		}
 
+		Game* game = core->GetGame();
+		ieDword flags = !ca->lockPalette ? BLIT_TINTED : 0;
+		game->ApplyGlobalTint(tint, flags);
+
 		// infravision, independent of light map and global light
 		if ( HasBodyHeat() &&
-			core->GetGame()->PartyHasInfravision() &&
-			!core->GetGame()->IsDay() &&
+			game->PartyHasInfravision() &&
+			!game->IsDay() &&
 			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
 			tint.r = 255;
 
