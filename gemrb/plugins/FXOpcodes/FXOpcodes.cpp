@@ -1034,7 +1034,7 @@ int fx_attacks_per_round_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 {
 	if(0) print("fx_attacks_per_round_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	int tmp = (signed) fx->Parameter1;
-	if (fx->Parameter2!=2) {
+	if (fx->Parameter2 != MOD_PERCENT) {
 		if (tmp>10) tmp=10;
 		else if (tmp<-10) tmp=-10;
 		tmp <<= 1;
