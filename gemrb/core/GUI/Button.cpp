@@ -670,7 +670,7 @@ void Button::StackPicture(Sprite2D* Picture)
 
 bool Button::HitTest(const Point& p) const
 {
-	bool hit = View::HitTest(p);
+	bool hit = Control::HitTest(p);
 	if (hit) {
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
