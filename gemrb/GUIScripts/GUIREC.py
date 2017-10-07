@@ -47,6 +47,8 @@ def OpenRecordsWindow ():
 
 	import GUICommonWindows
 	Window = GUICommonWindows.OpenTopWindow(2, "GUIREC", UpdateRecordsWindow)
+	if not Window:
+		return
 
 	# dual class
 	Button = Window.GetControl (0)

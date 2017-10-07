@@ -137,6 +137,8 @@ def ShowMap ():
 def OpenMapWindow ():
 
 	MapWindow = Window = GUICommonWindows.OpenTopWindow(2, "GUIMAP")
+	if not MapWindow:
+		return
 
 	# World Map
 	Button = Window.GetControl (1)

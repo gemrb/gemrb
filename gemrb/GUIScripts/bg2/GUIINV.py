@@ -41,6 +41,8 @@ def OpenInventoryWindow ():
 
 	import GUICommonWindows
 	Window = GUICommonWindows.OpenTopWindow (2, "GUIINV", InitInventoryWindow)
+	if not Window:
+		return
 	Window.AddAlias("WIN_INV")
 
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)

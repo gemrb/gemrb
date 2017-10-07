@@ -40,6 +40,8 @@ def OpenJournalWindow ():
 	global Chapter
 	
 	JournalWindow = GUICommonWindows.OpenTopWindow(2, "GUIJRNL", InitLogWindow)
+	if not JournalWindow:
+		return
 	JournalWindow.AddAlias("WIN_JRNL")
 		
 	Table = GemRB.LoadTable("YEARS")

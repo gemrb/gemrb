@@ -61,6 +61,8 @@ def OpenMageWindow ():
 		winid = 2
 
 	MageWindow = GUICommonWindows.OpenTopWindow(winid, "GUIMG", UpdateMageWindow)
+	if not MageWindow:
+		return
 
 	Button = MageWindow.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)

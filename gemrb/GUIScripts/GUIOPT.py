@@ -72,6 +72,8 @@ def OpenOptionsWindow ():
 	CommonWindow.CloseContainerWindow ()
 
 	Window = GUICommonWindows.OpenTopWindow(2, "GUIOPT")
+	if not Window:
+		return
 
 	# Return to Game
 	Button = Window.GetControl (11)

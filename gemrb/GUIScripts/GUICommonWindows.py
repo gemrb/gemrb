@@ -60,6 +60,7 @@ ActionsWindow = None
 CurrentWindow = None
 ActionBarControlOffset = 0
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
+oldPack = ""
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -1361,12 +1362,20 @@ def CloseTopWindow ():
 	return False
 
 def OpenTopWindow (id, pack, selectionHandler = None):
-	# FIXME: is it a problem to "reopen" the window if it is already the top win?
-	# probably just wasteful to close and reopen it...
+	global oldPack
+
+	window = GemRB.GetView ("WIN_TOP")
+	# only close the window if we get called a second time with it
+	if window and pack == oldPack:
+		CloseTopWindow ()
+		oldPack = ""
+		return None
+
 	CloseTopWindow ()
 	window = GemRB.LoadWindow (id, pack)
 	if window:
 		SetTopWindow (window, selectionHandler)
+		oldPack = pack
 
 	return window
 

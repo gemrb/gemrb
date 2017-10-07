@@ -40,6 +40,8 @@ def OpenPriestWindow ():
 	import GUICommonWindows
 
 	Window = PriestSpellWindow = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
+	if not Window:
+		return
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
