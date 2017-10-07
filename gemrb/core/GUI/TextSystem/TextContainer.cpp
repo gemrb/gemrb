@@ -288,13 +288,21 @@ ContentContainer::~ContentContainer()
 
 void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
+	Video* video = core->GetVideoDriver();
 #if DEBUG_TEXT
-	core->GetVideoDriver()->DrawRect(clip, ColorGreen, true);
+	video->DrawRect(clip, ColorGreen, true);
 #endif
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;
 	Point dp = drawFrame.Origin() + Point(margin, margin);
+	
+	Region sc = video->GetScreenClip();
+	sc.x += margin;
+	sc.y += margin;
+	sc.w -= margin*2;
+	sc.h -= margin*2;
+	video->SetScreenClip(&sc);
 
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
