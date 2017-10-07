@@ -917,7 +917,13 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
 				if (i == kitclass && !IsDualInactive()) {
-					ApplyClab(clab, max, remove);
+					// in case of dc reactivation, we already removed the clabs on activation of new class
+					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
+					if (IsDualClassed()) {
+						ApplyClab(clab, max, 2);
+					} else {
+						ApplyClab(clab, max, remove);
+					}
 				} else {
 					ApplyClab(classabilities[i], max, remove);
 				}
