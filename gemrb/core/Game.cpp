@@ -2022,7 +2022,7 @@ void Game::Infravision()
 			allSelectedWithInfravision &= hasInfravision;
 		}
 
-		if ((someoneWithInfravision && tmp) || !allSelectedWithInfravision) {
+		if ((someoneWithInfravision && tmp) || (!tmp && !allSelectedWithInfravision)) {
 			break;
 		}
 	}
