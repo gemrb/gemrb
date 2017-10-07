@@ -940,13 +940,15 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 	return true;
 }
 
-void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
+void Actor::ApplyClab(const char *clab, ieDword max, int remove)
 {
 	if (clab && clab[0]!='*') {
 		if (max) {
 			//singleclass
-			ApplyClab_internal(this, clab, max, true);
-			if (!remove) {
+			if (remove != 2) {
+				ApplyClab_internal(this, clab, max, true);
+			}
+			if (remove != 1) {
 				ApplyClab_internal(this, clab, max, false);
 			}
 		}

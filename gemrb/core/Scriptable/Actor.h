@@ -582,7 +582,7 @@ public:
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(bool remove, ieDword baseclass=0);
 	/* applies the class abilities*/
-	void ApplyClab(const char *clab, ieDword max, bool remove);
+	void ApplyClab(const char *clab, ieDword max, int remove);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
