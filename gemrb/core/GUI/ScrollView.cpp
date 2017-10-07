@@ -130,7 +130,7 @@ ScrollView::ScrollView(const Region& frame)
 		ScrollCB cb = reinterpret_cast<ScrollCB>(&ScrollView::ScrollbarValueChange);
 		handler = new MethodCallback<ScrollView, Control*>(this, cb);
 		vscroll->SetAction(handler, Control::ValueChange);
-		vscroll->SetAutoResizeFlags(ResizeRight, OP_SET);
+		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 	}
 	
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
