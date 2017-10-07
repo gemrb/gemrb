@@ -505,7 +505,10 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 		ieDword flags = Flags();
 		if (flags&(RESIZE_HEIGHT|RESIZE_WIDTH)) {
-			const Region& bounds = Region::RegionEnclosingRegions(rgns);
+			Region bounds = Region::RegionEnclosingRegions(rgns);
+			bounds.w += margin*2;
+			bounds.h += margin*2;
+			
 			if (flags&RESIZE_HEIGHT)
 				contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
 			if (flags&RESIZE_WIDTH)
