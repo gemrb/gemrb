@@ -916,7 +916,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 			if (multiclass & msk) {
 				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
-				if (i==kitclass && !IsDualClassed()) {
+				if (i == kitclass && !IsDualInactive()) {
 					ApplyClab(clab, max, remove);
 				} else {
 					ApplyClab(classabilities[i], max, remove);
