@@ -767,12 +767,16 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
-static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove)
+static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
 	AutoTable table(clab);
 	if (table) {
 		int row = table->GetRowCount();
-		for(int i=0;i<level;i++) {
+		int maxLevel = level;
+		// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
+		// permanent effects like the charisma degradation in the oozemaster
+		if (remove) maxLevel -= diff;
+		for(int i=0;i<maxLevel;i++) {
 			for (int j=0;j<row;j++) {
 				const char *res = table->QueryField(j,i);
 				if (res[0]=='*') continue;
@@ -882,7 +886,7 @@ static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 
 //applies a kit on the character
 // iwd2 has support for multikit characters, so we have more work
-bool Actor::ApplyKit(bool remove, ieDword baseclass)
+bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
@@ -909,6 +913,9 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 		}
 	}
 
+	// a negative level diff happens when dualclassing due to three level stats being used and switched around
+	if (diff < 0) diff = 0;
+
 	//multi class
 	if (multiclass) {
 		ieDword msk = 1;
@@ -920,12 +927,12 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 					// in case of dc reactivation, we already removed the clabs on activation of new class
 					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
 					if (IsDualClassed()) {
-						ApplyClab(clab, max, 2);
+						ApplyClab(clab, max, 2, 0);
 					} else {
-						ApplyClab(clab, max, remove);
+						ApplyClab(clab, max, remove, diff);
 					}
 				} else {
-					ApplyClab(classabilities[i], max, remove);
+					ApplyClab(classabilities[i], max, remove, diff);
 				}
 			}
 			msk+=msk;
@@ -939,23 +946,23 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 	max = GetLevelInClass(cls);
 	// iwd2 has clabs for kits and classes in the same table
 	if (kitclass==cls || iwd2class) {
-		ApplyClab(clab, max, remove);
+		ApplyClab(clab, max, remove, diff);
 	} else {
-		ApplyClab(classabilities[cls], max, remove);
+		ApplyClab(classabilities[cls], max, remove, diff);
 	}
 	return true;
 }
 
-void Actor::ApplyClab(const char *clab, ieDword max, int remove)
+void Actor::ApplyClab(const char *clab, ieDword max, int remove, int diff)
 {
 	if (clab && clab[0]!='*') {
 		if (max) {
 			//singleclass
 			if (remove != 2) {
-				ApplyClab_internal(this, clab, max, true);
+				ApplyClab_internal(this, clab, max, true, diff);
 			}
 			if (remove != 1) {
-				ApplyClab_internal(this, clab, max, false);
+				ApplyClab_internal(this, clab, max, false, 0);
 			}
 		}
 	}
@@ -1014,7 +1021,7 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
 	if (newValue!=oldValue) {
-		actor->ApplyKit(false, baseClass);
+		actor->ApplyKit(false, baseClass, newValue-oldValue);
 	}
 	actor->GotLUFeedback = false;
 	if (third && actor->PCStats) {

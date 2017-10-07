@@ -580,9 +580,9 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(bool remove, ieDword baseclass=0);
+	bool ApplyKit(bool remove, ieDword baseclass=0, int diff=0);
 	/* applies the class abilities*/
-	void ApplyClab(const char *clab, ieDword max, int remove);
+	void ApplyClab(const char *clab, ieDword max, int remove, int diff);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
