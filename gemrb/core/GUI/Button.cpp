@@ -399,6 +399,12 @@ String Button::TooltipText() const
 			case GEM_RETURN:
 				s += L"Ret";
 				break;
+			case GEM_PGUP:
+				s += L"PgUp";
+				break;
+			case GEM_PGDOWN:
+				s += L"PgDn";
+				break;
 			default:
 				// TODO: check if there are more possible keys
 				if (hotKey >= GEM_FUNCTIONX(1) && hotKey <= GEM_FUNCTIONX(16)) {
