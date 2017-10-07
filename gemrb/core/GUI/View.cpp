@@ -442,25 +442,6 @@ void View::SetFrameOrigin(const Point& p)
 	frame.y = p.y;
 	
 	OriginChanged(oldP);
-	/*
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* subview = *it;
-		Point newSubOrigin = subview->Origin();
-		unsigned short flags = subview->AutoResizeFlags();
-		int delta = frame.x - oldP.x;
-		
-		if (flags&ResizeLeft) {
-			newSubOrigin.x += frame.x - oldP.x;
-		}
-		
-		delta = frame.y - oldP.y;
-		if (flags&ResizeTop) {
-			newSubOrigin.x += frame.y - oldP.y;
-		}
-		
-		subview->SetFrameOrigin(newSubOrigin);
-	}*/
 }
 
 void View::SetFrameSize(const Size& s)
