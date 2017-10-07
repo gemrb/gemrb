@@ -1996,7 +1996,11 @@ void GameControl::CommandSelectedMovement(const Point& p)
 
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	Scroll(delta);
+	// gc uses the opposite direction
+	Point d = delta;
+	d.x *= -1;
+	d.y *= -1;
+	Scroll(d);
 	return true;
 }
 
