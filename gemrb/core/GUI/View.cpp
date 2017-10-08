@@ -461,15 +461,17 @@ void View::SetFrameSize(const Size& s)
 		Region newSubFrame = subview->Frame();
 		unsigned short flags = subview->AutoResizeFlags();
 		int delta = frame.w - oldSize.w;
-		
+
 		if (flags&ResizeRight) {
 			if (flags&ResizeLeft) {
 				newSubFrame.w += delta;
 			} else {
 				newSubFrame.x += delta;
 			}
+		} else if (flags&ResizeLeft) {
+			newSubFrame.x += delta;
 		}
-		
+
 		delta = frame.h - oldSize.h;
 		if (flags&ResizeBottom) {
 			if (flags&ResizeTop) {
@@ -477,8 +479,10 @@ void View::SetFrameSize(const Size& s)
 			} else {
 				newSubFrame.y += delta;
 			}
+		} else if (flags&ResizeTop) {
+			newSubFrame.y += delta;
 		}
-		
+
 		subview->SetFrame(newSubFrame);
 	}
 }
