@@ -770,60 +770,57 @@ void Actor::SetCircleSize()
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
 	AutoTable table(clab);
-	if (table) {
-		int row = table->GetRowCount();
-		int maxLevel = level;
-		// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
-		// permanent effects like the charisma degradation in the oozemaster
-		if (remove) maxLevel -= diff;
-		for(int i=0;i<maxLevel;i++) {
-			for (int j=0;j<row;j++) {
-				const char *res = table->QueryField(j,i);
-				if (res[0]=='*') continue;
+	if (!table) return;
 
-				if (!memcmp(res,"AP_",3)) {
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+	int row = table->GetRowCount();
+	int maxLevel = level;
+	// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
+	// permanent effects like the charisma degradation in the oozemaster
+	if (remove) maxLevel -= diff;
+	for(int i=0; i<maxLevel; i++) {
+		for (int j=0; j<row; j++) {
+			const char *res = table->QueryField(j,i);
+			if (res[0]=='*') continue;
+
+			if (!memcmp(res,"AP_",3)) {
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"GA_",3)) {
-					if (remove) {
-						actor->spellbook.RemoveSpell(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_MEMO);
-					}
+			} else if (!memcmp(res,"GA_",3)) {
+				if (remove) {
+					actor->spellbook.RemoveSpell(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_MEMO);
 				}
-				else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
-					//memorize these?
-					// we now learn them just to get the feedback string out
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
-						actor->spellbook.RemoveSpell(res+3);
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+			} else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
+				//memorize these?
+				// we now learn them just to get the feedback string out
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
-					//don't memorize these?
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
-						actor->spellbook.RemoveSpell(res+3);
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+			} else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
+				//don't memorize these?
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"RA_",3)) {//iwd2 only
-					//remove ability
-					int x=atoi(res+3);
-					actor->spellbook.RemoveSpell(x);
-				}
+			} else if (!memcmp(res,"RA_",3)) {//iwd2 only
+				//remove ability
+				int x=atoi(res+3);
+				actor->spellbook.RemoveSpell(x);
 			}
 		}
 	}
+
 }
 
 #define BG2_KITMASK  0xffffc000
