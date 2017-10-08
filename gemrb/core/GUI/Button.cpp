@@ -420,8 +420,9 @@ String Button::TooltipText() const
 				}
 				break;
 		}
-		s += L": ";
-		return s += ((tooltip.length()) ? tooltip : QueryText());
+		String tt = ((tooltip.length()) ? tooltip : QueryText());
+		tt = (tt.length()) ? s + L": " + tt : s;
+		return tt;
 	}
 	return Control::TooltipText();
 }
