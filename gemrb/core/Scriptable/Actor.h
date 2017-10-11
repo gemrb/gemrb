@@ -350,6 +350,7 @@ public:
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
+	CharAnimations *shadowAnimations;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
 	// true when command has been played after select
