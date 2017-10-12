@@ -61,6 +61,8 @@
 #define REFERENCE_DISTANCE 50
 #define ACM_BUFFERSIZE 8192
 
+#define LISTENER_HEIGHT 100.0f
+
 namespace GemRB {
 
 class OpenALSoundHandle : public SoundHandle {

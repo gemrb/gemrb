@@ -613,7 +613,7 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 
 void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 {
-	alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f );
+	alListener3f( AL_POSITION, (float) XPos, (float) YPos, LISTENER_HEIGHT );
 	checkALError("Unable to update listener position.", WARNING);
 }
 
