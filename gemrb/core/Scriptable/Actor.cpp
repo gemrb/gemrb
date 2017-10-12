@@ -7744,6 +7744,7 @@ void Actor::UpdateAnimations()
 	if (!anims) {
 		return;
 	}
+	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 
 	//If you find a better place for it, I'll really be glad to put it there
 	//IN BG1 and BG2, this is at the ninth frame...
@@ -7756,9 +7757,15 @@ void Actor::UpdateAnimations()
 	if (Immobile()) {
 		// update animation, continue last-displayed frame
 		anims[0]->LastFrame();
+		if (shadowAnimations) {
+			shadowAnimations[0]->LastFrame();
+		}
 	} else {
 		// update animation, maybe advance a frame (if enough time has passed)
 		anims[0]->NextFrame();
+		if (shadowAnimations) {
+			shadowAnimations[0]->NextFrame();
+		}
 	}
 
 	// update all other animation parts, in sync with the first part
@@ -7773,6 +7780,11 @@ void Actor::UpdateAnimations()
 			// restart animation
 			anims[0]->endReached = false;
 			anims[0]->SetPos(0);
+
+			if (shadowAnimations) {
+				shadowAnimations[0]->endReached = false;
+				shadowAnimations[0]->SetPos(0);
+			}
 		}
 	} else {
 		//check if walk sounds need to be played
@@ -8087,8 +8099,13 @@ void Actor::Draw(const Region &screen)
 			}
 		}
 
-		// actor itself
 		newsc = sc = GetSpriteCover();
+		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
+		if (shadowAnimations) {
+			DrawActorSprite(screen, cx, cy, BBox, newsc, shadowAnimations, Face, tint);
+		}
+
+		// actor itself
 		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
 		if (newsc != sc) SetSpriteCover(newsc);
 
