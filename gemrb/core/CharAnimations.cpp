@@ -2624,6 +2624,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
+		case IE_ANI_HIDE:
 			strcat( ResRef, "g1" );
 			Cycle = Orient / 2;
 			break;
