@@ -3573,6 +3573,12 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 				int skipped = count;
 				while (count) {
 					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
+					if (slot == -1) {
+						// probably an inventory bug, shouldn't happen
+						Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+						skipped--;
+						continue;
+					}
 					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
 					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
 						// already full (or nonstackable), nothing to do here
@@ -3609,7 +3615,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 		while (count) {
 			int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
-			assert (slot != -1);
+			if (slot == -1) continue;
 			// containers don't really care about position, so every new item is placed at the last spot
 			CREItem *item = othercontainer->RemoveItem(slot, 0);
 			othercontainer->AddItem(item);
