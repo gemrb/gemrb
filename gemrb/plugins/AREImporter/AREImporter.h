@@ -24,6 +24,7 @@
 #include "MapMgr.h"
 
 #include "Map.h" // proIterator
+#include "MapReverb.h"
 
 namespace GemRB {
 

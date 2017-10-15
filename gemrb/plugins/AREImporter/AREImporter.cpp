@@ -478,6 +478,15 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
+
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		str->Seek(SongHeader + 80, GEM_STREAM_START);
+		str->ReadDword(&map->SongHeader.reverbID);
+	} else {
+		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
+	}
+	map->SetupReverbInfo();
+
 	str->Seek( RestHeader + 32, GEM_STREAM_START );
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->RestHeader.Strref + i );
