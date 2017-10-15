@@ -68,6 +68,7 @@ libgemrb_core_la_SOURCES = \
 	LRUCache.cpp \
 	Map.cpp \
 	MapMgr.cpp \
+	MapReverb.cpp \
 	MoviePlayer.cpp \
 	MusicMgr.cpp \
 	Palette.cpp \
