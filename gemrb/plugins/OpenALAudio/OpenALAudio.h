@@ -33,6 +33,7 @@
 #include "MusicMgr.h"
 #include "SoundMgr.h"
 #include "System/FileStream.h"
+#include "MapReverb.h"
 
 #include <SDL.h>
 
@@ -40,13 +41,22 @@
 #ifdef __APPLE_CC__
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#ifdef HAVE_OPENAL_EFX_H
+#include <OpenAL/efx.h>
+#endif
 #else
 #include <AL/al.h>
 #include <AL/alc.h>
-#endif 
+#ifdef HAVE_OPENAL_EFX_H
+#include <AL/efx.h>
+#endif
+#endif
 #else
 #include <al.h>
 #include <alc.h>
+#ifdef HAVE_OPENAL_EFX_H
+#include <efx.h>
+#endif
 #endif
 
 #if ANDROID && SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
@@ -129,6 +139,7 @@ public:
 	void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
 				int size, int samplerate);
+	void UpdateMapAmbient(MapReverb&);
 private:
 	int QueueALBuffer(ALuint source, ALuint buffer);
 
@@ -152,6 +163,16 @@ private:
 	bool stayAlive;
 	short* music_memory;
 	SDL_Thread* musicThread;
+
+	bool InitEFX(void);
+	bool hasReverbProperties;
+
+#ifdef HAVE_OPENAL_EFX_H
+	bool hasEFX;
+	ALuint efxEffectSlot;
+	ALuint efxEffect;
+	MapReverbProperties reverbProperties;
+#endif
 };
 
 }
