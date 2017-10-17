@@ -333,6 +333,7 @@ def OpenStoreShoppingWindow ():
 			Button.SetBorder (0,0,0,0,0,128,0,0,100,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		Button.SetBorder (1, 0,0,0,0, 255,128,128,64, 0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
@@ -1471,6 +1472,12 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		if type == ITEM_STORE:
 			Price = GetRealPrice (pc, "buy", Item, Slot)
 			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, type)
+
+			if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
+				Button.EnableBorder (1, 0)
+			else:
+				Button.EnableBorder (1, 1)
+
 			if steal:
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
