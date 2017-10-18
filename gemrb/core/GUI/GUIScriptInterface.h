@@ -32,12 +32,12 @@ public:
 	ViewScriptingRef(View* view, ScriptingId id, ResRef group)
 	: ScriptingRef(view, id), group(group) {}
 
-	const ResRef& ScriptingGroup() {
+	const ResRef& ScriptingGroup() const {
 		return group;
 	}
 
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() {
+	virtual const ScriptingClassId ScriptingClass() const {
 		return ScriptingGroup().CString();
 	};
 
@@ -50,11 +50,13 @@ public:
 
 class WindowScriptingRef : public ViewScriptingRef {
 public:
+	typedef Window* RefType;
+	
 	WindowScriptingRef(Window* win, ScriptingId id, ResRef winpack)
 	: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() {
+	virtual const ScriptingClassId ScriptingClass() const {
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
@@ -62,17 +64,17 @@ public:
 	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
 		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
 	}
-
-	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 class ControlScriptingRef : public ViewScriptingRef {
 public:
+	typedef Control* RefType;
+	
 	ControlScriptingRef(Control* ctrl, ScriptingId id, ResRef group)
 	: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() {
+	const ScriptingClassId ScriptingClass() const {
 		Control* ctrl = static_cast<Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
@@ -93,18 +95,16 @@ public:
 	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
 		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
 	}
-
-	// TODO: perhapps in the future the GUI script implementation for window methods should be moved here
 };
 
 
 Window* GetWindow(ScriptingId id, ResRef pack);
-WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
+const WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
 
 GEM_EXPORT View* GetView(ScriptingRefBase* base);
 GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
 GEM_EXPORT ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
-GEM_EXPORT ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
+GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
 
 template <class T>
 T* GetControl(ScriptingId id, Window* win) {

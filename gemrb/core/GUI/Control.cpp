@@ -19,6 +19,7 @@
  */
 
 #include "GUI/Control.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Window.h"
 
 #include "win32def.h"
@@ -251,6 +252,11 @@ void Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	if (repeatDelay && SupportsAction(key)) {
 		actionTimer = StartActionTimer(actions[key]);
 	}
+}
+	
+ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
+{
+	return new ControlScriptingRef(this, id, group);
 }
 
 }

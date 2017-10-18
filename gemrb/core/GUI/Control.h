@@ -83,6 +83,7 @@ public:
 class GEM_EXPORT Control : public View {
 private:
 	Timer* StartActionTimer(const ControlEventHandler& action);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
     
 public: // Public attributes
 	enum Action {

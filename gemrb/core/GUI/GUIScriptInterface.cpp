@@ -22,7 +22,7 @@
 
 namespace GemRB {
 
-static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, WindowScriptingRef* winref)
+static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, const WindowScriptingRef* winref)
 {
 	if (winref) {
 		id &= 0x00000000ffffffff; // control id is lower 32bits
@@ -45,7 +45,7 @@ ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 {
 	ResRef group = "Control";
 	if (win) {
-		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(win->GetScriptingRef());
+		const WindowScriptingRef* winref = static_cast<const WindowScriptingRef*>(win->GetScriptingRef());
 		if (winref) {
 			group = winref->ScriptingGroup();
 			id = ModifiedCtrlIdForWin(id, winref);
@@ -67,15 +67,16 @@ Window* GetWindow(ScriptingId id, ResRef pack)
 	return dynamic_cast<Window*>(view);
 }
 
-ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
+const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
 {
 	if (!ctrl) return NULL;
-	assert(ctrl->GetScriptingRef() == NULL);
+	//const ControlScriptingRef* test = static_cast<const ControlScriptingRef*>(ctrl->GetScriptingRef());
+	//assert(test == NULL);
 
 	ResRef group = "Control";
     Window* win = ctrl->GetWindow();
 	if (win) {
-		WindowScriptingRef* winref = static_cast<WindowScriptingRef*>(win->GetScriptingRef());
+		const WindowScriptingRef* winref = static_cast<const WindowScriptingRef*>(win->GetScriptingRef());
 		if (winref) {
 			id = ModifiedCtrlIdForWin(id, winref);
 			group = winref->ScriptingGroup();
@@ -83,29 +84,15 @@ ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
 	}
 
 	ctrl->ControlID = (ieDword)id;
-	ControlScriptingRef* ref = new ControlScriptingRef(ctrl, id, group);
-	if (ScriptEngine::RegisterScriptingRef(ref)) {
-		ctrl->AssignScriptingRef(ref);
-		return ref;
-	}
-	// registration with script engine failed
-	delete ref;
-	return NULL;
+	return static_cast<const ControlScriptingRef*>(ctrl->AssignScriptingRef(id, group));
 }
 
-WindowScriptingRef* RegisterScriptableWindow(Window* win, ResRef pack, ScriptingId id)
+const WindowScriptingRef* RegisterScriptableWindow(Window* win, ResRef pack, ScriptingId id)
 {
 	if (!win) return NULL;
 	assert(win->GetScriptingRef() == NULL);
 
-	WindowScriptingRef* ref = new WindowScriptingRef(win, id, pack);
-	if (ScriptEngine::RegisterScriptingRef(ref)) {
-		win->AssignScriptingRef(ref);
-		return ref;
-	}
-	// registration with script engine failed
-	delete ref;
-	return NULL;
+	return static_cast<const WindowScriptingRef*>(win->AssignScriptingRef(id, pack));
 }
 
 }

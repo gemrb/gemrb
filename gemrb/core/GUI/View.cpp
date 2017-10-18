@@ -41,7 +41,6 @@ View::DragOp::~DragOp() {
 View::View(const Region& frame)
 	: frame(frame)
 {
-	scriptingRef = NULL;
 	superView = NULL;
 	window = NULL;
 
@@ -56,7 +55,16 @@ View::View(const Region& frame)
 
 View::~View()
 {
-	AssignScriptingRef(NULL);
+	std::list<ViewScriptingRef*>::iterator rit;
+	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
+		ViewScriptingRef* ref = *rit;
+		if (GetView(ref) == this) {
+			ScriptEngine::UnregisterScriptingRef(ref);
+			delete ref;
+		}
+		rit = scriptingRefs.erase(rit);
+	}
+	
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -562,12 +570,30 @@ bool View::OnMouseWheelScroll(const Point& delta)
 	}
 	return false;
 }
-
-void View::AssignScriptingRef(ViewScriptingRef* ref)
+	
+ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ResRef group)
 {
-	ScriptEngine::UnregisterScriptingRef(scriptingRef);
-	delete scriptingRef;
-	scriptingRef = ref;
+	return new ViewScriptingRef(this, id, group);
+}
+	
+const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, ResRef group)
+{
+	ViewScriptingRef* ref = CreateScriptingRef(id, group);
+	if (ScriptEngine::RegisterScriptingRef(ref)) {
+		scriptingRefs.push_back(ref);
+		return ref;
+	} else {
+		delete ref;
+		return NULL;
+	}
+}
+	
+const ViewScriptingRef* View::GetScriptingRef() const
+{
+	if (scriptingRefs.empty()) {
+		return NULL;
+	}
+	return scriptingRefs.front();
 }
 
 }

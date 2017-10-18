@@ -61,7 +61,7 @@ public:
 	bool ExecString(const char* string, bool feedback=false);
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
-	PyObject* ConstructObjectForScriptable(ScriptingRefBase*);
+	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
 	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
 	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
 };

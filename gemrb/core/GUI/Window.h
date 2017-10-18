@@ -82,6 +82,8 @@ private:
 	inline void DispatchMouseUp(View*, const MouseEvent& me, unsigned short /*Mod*/);
 	
 	inline bool DispatchKey(View*, const Event&);
+	
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
 
 public:
 	Window(const Region& frame, WindowManager& mgr);

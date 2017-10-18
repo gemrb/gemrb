@@ -20,6 +20,8 @@
 
 #include "Window.h"
 
+#include "GUI/GUIScriptInterface.h"
+
 #include "Interface.h"
 #include "ScrollBar.h"
 
@@ -422,6 +424,11 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			return true;
 	}
 	return ScrollView::OnKeyPress(key, mod);
+}
+	
+ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
+{
+	return new WindowScriptingRef(this, id, group);
 }
 
 }

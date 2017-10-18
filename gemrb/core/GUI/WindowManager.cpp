@@ -274,7 +274,6 @@ void WindowManager::CloseWindow(Window* win)
 	}
 	closedWindows.push_back(win);
 
-	win->AssignScriptingRef(NULL);
 	win->SetVisible(false);
 	win->SetDisabled(true);
 }

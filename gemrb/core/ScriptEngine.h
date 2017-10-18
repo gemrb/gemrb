@@ -47,9 +47,9 @@ public:
 	virtual ~ScriptingRefBase() {};
 
 	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const ResRef& ScriptingGroup()=0;
+	virtual const ResRef& ScriptingGroup() const=0;
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass()=0;
+	virtual const ScriptingClassId ScriptingClass() const=0;
 };
 
 template <class T>
@@ -57,6 +57,8 @@ class ScriptingRef : public ScriptingRefBase {
 private:
 	T* ref;
 public:
+	typedef T* RefType;
+	
 	ScriptingRef(T* ref, ScriptingId id)
 	: ScriptingRefBase(id), ref(ref) {}
 

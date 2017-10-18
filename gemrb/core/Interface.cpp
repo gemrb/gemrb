@@ -422,9 +422,7 @@ GameControl* Interface::StartGameControl()
 	gamectrl = new GameControl(screen);
 	Window* gamewin = winmgr->GetGameWindow();
 	gamewin->AddSubviewInFrontOfView(gamectrl);
-	ViewScriptingRef* gcref = new ViewScriptingRef(gamectrl, 0, "GC");
-	gamectrl->AssignScriptingRef(gcref);
-	ScriptEngine::RegisterScriptingRef(gcref);
+	gamectrl->AssignScriptingRef(0, "GC");
 	RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 
 	if (guiscript->LoadScript( "MessageWindow" )) {
@@ -1865,9 +1863,7 @@ int Interface::Init(InterfaceConfig* config)
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
 	
-	ViewScriptingRef* ref = new ViewScriptingRef(gamectrl, 0, "CONSOLE");
-	console->AssignScriptingRef(ref);
-	ScriptEngine::RegisterScriptingRef(ref);
+	console->AssignScriptingRef(0, "CONSOLE");
 	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");

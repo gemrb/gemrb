@@ -39,7 +39,7 @@ class GEM_EXPORT View {
 private:
 	Holder<Sprite2D> background;
 	Holder<Sprite2D> cursor;
-	ViewScriptingRef* scriptingRef;
+	std::list<ViewScriptingRef*> scriptingRefs;
 
 	mutable bool dirty;
 
@@ -192,8 +192,9 @@ public:
 	void SetCursor(Sprite2D* c);
 
 	// GUIScripting
-	void AssignScriptingRef(ViewScriptingRef* ref);
-	ViewScriptingRef* GetScriptingRef() { return scriptingRef; }
+	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
+	const ViewScriptingRef* GetScriptingRef() const;
 };
 
 }

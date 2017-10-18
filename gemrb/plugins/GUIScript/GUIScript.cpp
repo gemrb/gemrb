@@ -1217,13 +1217,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 		superView->AddSubviewInFrontOfView(subView, siblingView);
 
         if (registerRef) {
-            // FIXME: This will break if we have a named ref to the subview (doesnt happen yet)
-            // we ought to always reassign the scripting ref and update the named refs.
-            // However, ATM, we can lookup a ref by name, but can't match a ref to a set of names yet
-            // so any named references to "subView" are currently lost here
-
             ScriptingId id = subView->GetScriptingRef()->Id;
-            subView->AssignScriptingRef(NULL);
             // FIXME: no promise that subView is a control (could be a plain view)
             RegisterScriptableControl(static_cast<Control*>(subView), id);
         }
@@ -1247,11 +1241,8 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 	ScriptingId controlId = 0;
 	PARSE_ARGS3( args, "Os|l", &self, &group, &controlId );
 
-	ViewScriptingRef* ref = dynamic_cast<ViewScriptingRef*>(GetScriptingRef(self));
-	assert(ref);
-	ViewScriptingRef* aliasref = ref->Clone(controlId, group);
-	assert(aliasref);
-	ScriptEngine::RegisterScriptingRef(aliasref);
+	View* view = GetView<View>(self);
+	view->AssignScriptingRef(controlId, group);
 	Py_RETURN_NONE;
 }
 
@@ -13443,7 +13434,7 @@ bool GUIScript::ExecString(const char* string, bool feedback)
 	return false;
 }
 
-PyObject* GUIScript::ConstructObjectForScriptable(ScriptingRefBase* ref)
+PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 {
 	if (!ref) return NULL;
 
