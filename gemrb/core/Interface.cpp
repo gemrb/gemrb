@@ -413,17 +413,15 @@ GameControl* Interface::StartGameControl()
 {
 	if (gamectrl) {
 		gamectrl->SetDisabled(false);
-		return gamectrl; // if this was already called we dont want to leak
+	} else {
+		gamedata->DelTable(0xffffu); //dropping ALL tables
+		Region screen(0,0, Width, Height);
+		gamectrl = new GameControl(screen);
+		Window* gamewin = winmgr->GetGameWindow();
+		gamewin->AddSubviewInFrontOfView(gamectrl);
+		gamectrl->AssignScriptingRef(0, "GC");
+		RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 	}
-
-	gamedata->DelTable(0xffffu); //dropping ALL tables
-	Region screen(0,0, Width, Height);
-	winmgr->CloseAllWindows();
-	gamectrl = new GameControl(screen);
-	Window* gamewin = winmgr->GetGameWindow();
-	gamewin->AddSubviewInFrontOfView(gamectrl);
-	gamectrl->AssignScriptingRef(0, "GC");
-	RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "MessageWindow", "OnLoad" );
@@ -551,15 +549,7 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
-		// FIXME: should close all windows, but must fix github issue #5
-		// winmgr->CloseAllWindows();
-		
-		// ...until then, just clear the mta text
-		TextArea* mta = GetMessageTextArea();
-		if (mta) {
-			mta->ClearText();
-		}
-
+		winmgr->CloseAllWindows();
 		gamectrl->SetDisabled(true);
 		
 		// when reaching this, quitflag should be 1 or 2
