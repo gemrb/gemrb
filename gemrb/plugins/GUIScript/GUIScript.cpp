@@ -1264,8 +1264,9 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), id);
 	} else {
 		Window* win = GetView<Window>(lookup);
-		assert(win);
-		ref = GetControlRef(id, win);
+		if (win) {
+			ref = GetControlRef(id, win);
+		}
 	}
 
 	if (ref) {
