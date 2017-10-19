@@ -32,6 +32,7 @@
 #include "GameData.h"
 #include "IniSpawn.h"
 #include "MapMgr.h"
+#include "MapReverb.h"
 #include "MusicMgr.h"
 #include "ImageMgr.h"
 #include "Palette.h"
@@ -368,6 +369,7 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
+	reverb = NULL;
 }
 
 Map::~Map(void)
@@ -433,6 +435,10 @@ Map::~Map(void)
 
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
+	}
+
+	if (reverb) {
+		delete reverb;
 	}
 
 	//malloc-d in AREImp
@@ -4108,6 +4114,12 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
+}
+
+void Map::SetupReverbInfo() {
+	if (!reverb) {
+		reverb = new MapReverb(*this);
+	}
 }
 
 }

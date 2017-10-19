@@ -41,6 +41,7 @@
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 #include "Video.h"
+#include "MapReverb.h"
 
 #include <algorithm>
 #include <iterator>
@@ -958,6 +959,10 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		core->UnhideGCWindow();
 	}
 	newMap->InitActors();
+
+	if (newMap->reverb) {
+		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
+	}
 
 	return ret;
 failedload:

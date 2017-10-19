@@ -27,6 +27,28 @@
 
 using namespace GemRB;
 
+template <typename TO, typename FROM>
+TO fnptr_cast(FROM ptr) {
+	union {
+		FROM ptr_from;
+		TO ptr_to;
+	} u;
+	u.ptr_from = ptr;
+
+	return u.ptr_to;
+}
+
+#ifdef HAVE_OPENAL_EFX_H
+static LPALGENEFFECTS alGenEffects = NULL;
+static LPALDELETEEFFECTS alDeleteEffects = NULL;
+static LPALISEFFECT alIsEffect = NULL;
+static LPALGENAUXILIARYEFFECTSLOTS alGenAuxiliaryEffectSlots = NULL;
+static LPALDELETEAUXILIARYEFFECTSLOTS alDeleteAuxiliaryEffectSlots = NULL;
+static LPALEFFECTI alEffecti = NULL;
+static LPALEFFECTF alEffectf = NULL;
+static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = NULL;
+#endif
+
 static bool checkALError(const char* msg, log_level level) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
@@ -156,6 +178,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	ambim = NULL;
 	musicThread = NULL;
 	stayAlive = false;
+	hasReverbProperties = false;
 }
 
 void OpenALAudioDriver::PrintDeviceList ()
@@ -220,10 +243,71 @@ bool OpenALAudioDriver::Init(void)
 	musicThread = SDL_CreateThread( MusicManager, this );
 #endif
 
+	if (!InitEFX()) {
+		Log(MESSAGE, "OpenAL", "EFX not available.");
+	}
+
 	ambim = new AmbientMgrAL;
 	speech.free = true;
 	speech.ambient = false;
 	return true;
+}
+
+bool OpenALAudioDriver::InitEFX(void) {
+#ifdef HAVE_OPENAL_EFX_H
+	ALCdevice *device = alcGetContextsDevice (alutContext);
+	ALCint auxSends = 0;
+	hasEFX = false;
+
+	if (AL_FALSE == alcIsExtensionPresent(device, "ALC_EXT_EFX")) {
+		return false;
+	}
+
+	alcGetIntegerv(device, ALC_MAX_AUXILIARY_SENDS, 1, &auxSends);
+
+	if (auxSends < 1) {
+		return false;
+	}
+
+	alGenEffects = fnptr_cast<LPALGENEFFECTS>(alGetProcAddress("alGenEffects"));
+	alDeleteEffects = fnptr_cast<LPALDELETEEFFECTS>(alGetProcAddress("alDeleteEffects"));
+	alIsEffect = fnptr_cast<LPALISEFFECT>(alGetProcAddress("alIsEffect"));
+	alGenAuxiliaryEffectSlots = fnptr_cast<LPALGENAUXILIARYEFFECTSLOTS>(alGetProcAddress("alGenAuxiliaryEffectSlots"));
+	alDeleteAuxiliaryEffectSlots = fnptr_cast<LPALDELETEAUXILIARYEFFECTSLOTS>(alGetProcAddress("alDeleteAuxiliaryEffectSlots"));
+	alEffecti = fnptr_cast<LPALEFFECTI>(alGetProcAddress("alEffecti"));
+	alEffectf = fnptr_cast<LPALEFFECTF>(alGetProcAddress("alEffectf"));
+	alAuxiliaryEffectSloti = fnptr_cast<LPALAUXILIARYEFFECTSLOTI>(alGetProcAddress("alAuxiliaryEffectSloti"));
+
+	if (!alGenEffects || !alDeleteEffects || !alIsEffect) {
+		return false;
+	}
+
+	alGenAuxiliaryEffectSlots(1, &efxEffectSlot);
+
+	if (AL_NO_ERROR != alGetError()) {
+		return false;
+	}
+
+	alGenEffects(1, &efxEffect);
+
+	if (AL_NO_ERROR != alGetError()) {
+		return false;
+	}
+
+	if (alIsEffect(efxEffect)) {
+		alEffecti(efxEffect, AL_EFFECT_TYPE, AL_EFFECT_REVERB);
+
+		if (AL_NO_ERROR == alGetError()) {
+			alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+
+			if (AL_NO_ERROR == alGetError()) {
+				hasEFX = true;
+				return true;
+			}
+		}
+	}
+#endif
+	return false;
 }
 
 int OpenALAudioDriver::CountAvailableSources(int limit)
@@ -268,6 +352,13 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	speech.ForceClear();
 	ResetMusics();
 	clearBufferCache(true);
+
+#ifdef HAVE_OPENAL_EFX_H
+	if (hasEFX) {
+		alDeleteAuxiliaryEffectSlots(1, &efxEffectSlot);
+		alDeleteEffects(1, &efxEffect);
+	}
+#endif
 
 	ALCdevice *device;
 
@@ -440,6 +531,17 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 	alSourcefv( Source, AL_POSITION, SourcePos );
 	checkALError("Unable to set audio parameters", WARNING);
+
+#ifdef HAVE_OPENAL_EFX_H
+	ieDword efxSetting;
+	core->GetDictionary()->Lookup("Environmental Audio", efxSetting);
+
+	if (efxSetting && hasReverbProperties && ((0 != XPos && 0 != YPos) || (flags & GEM_SND_RELATIVE))) {
+		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
+	} else {
+		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);
+	}
+#endif
 
 	assert(!stream->delete_buffers);
 
@@ -925,7 +1027,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 {
 	streams[stream].delete_buffers = true;
 	streams[stream].ClearProcessedBuffers();
-	
+
 	ALuint Buffer;
 	alGenBuffers(1, &Buffer);
 	if (checkALError("Unable to create buffer", ERROR)) {
@@ -982,6 +1084,43 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 	}
 	return GEM_OK;
 }
+
+#ifdef HAVE_OPENAL_EFX_H
+void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
+	if (hasEFX) {
+		mapReverb.getReverbProperties(reverbProperties);
+		hasReverbProperties = true;
+
+		alDeleteEffects(1, &efxEffect);
+		alGenEffects(1, &efxEffect);
+
+		if (!reverbProperties.reverbDisabled) {
+			alEffecti(efxEffect, AL_EFFECT_TYPE, AL_EFFECT_REVERB);
+
+			alEffectf(efxEffect, AL_REVERB_DENSITY, reverbProperties.reverbData.flDensity);
+			alEffectf(efxEffect, AL_REVERB_DIFFUSION, reverbProperties.reverbData.flDiffusion);
+			alEffectf(efxEffect, AL_REVERB_GAIN, reverbProperties.reverbData.flGain);
+			alEffectf(efxEffect, AL_REVERB_GAINHF, reverbProperties.reverbData.flGainHF);
+			alEffectf(efxEffect, AL_REVERB_DECAY_TIME, reverbProperties.reverbData.flDecayTime);
+			alEffectf(efxEffect, AL_REVERB_DECAY_HFRATIO, reverbProperties.reverbData.flDecayHFRatio);
+			alEffectf(efxEffect, AL_REVERB_REFLECTIONS_GAIN, reverbProperties.reverbData.flReflectionsGain);
+			alEffectf(efxEffect, AL_REVERB_REFLECTIONS_DELAY, reverbProperties.reverbData.flReflectionsDelay);
+			alEffectf(efxEffect, AL_REVERB_LATE_REVERB_GAIN, reverbProperties.reverbData.flLateReverbGain);
+			alEffectf(efxEffect, AL_REVERB_LATE_REVERB_DELAY, reverbProperties.reverbData.flLateReverbDelay);
+			alEffectf(efxEffect, AL_REVERB_AIR_ABSORPTION_GAINHF, reverbProperties.reverbData.flAirAbsorptionGainHF);
+			alEffectf(efxEffect, AL_REVERB_ROOM_ROLLOFF_FACTOR, reverbProperties.reverbData.flRoomRolloffFactor);
+			alEffecti(efxEffect, AL_REVERB_DECAY_HFLIMIT, reverbProperties.reverbData.iDecayHFLimit);
+		} else {
+			alEffecti(efxEffect, AL_EFFECT_TYPE, 0);
+		}
+
+		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+	}
+}
+#else
+void OpenALAudioDriver::UpdateMapAmbient(MapReverb&) {
+}
+#endif
 
 #include "plugindef.h"
 

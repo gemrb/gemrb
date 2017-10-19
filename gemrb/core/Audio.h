@@ -39,6 +39,7 @@ namespace GemRB {
 
 class AmbientMgr;
 class SoundMgr;
+class MapReverb;
 
 class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
 public:
@@ -77,6 +78,7 @@ public:
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory, int size, int samplerate) = 0;
+	virtual void UpdateMapAmbient(MapReverb&) {};
 
 protected:
 	AmbientMgr* ambim;

@@ -41,6 +41,7 @@ class CREItem;
 class GameControl;
 class Image;
 class IniSpawn;
+class MapReverb;
 class Palette;
 class Particles;
 struct PathNode;
@@ -121,6 +122,7 @@ class Wall_Polygon;
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
+	ieDword reverbID;
 };
 
 struct RestHeaderType {
@@ -311,6 +313,7 @@ public:
 	Sprite2D *Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
+	MapReverb *reverb;
 
 private:
 	ieStrRef trackString;
@@ -554,6 +557,7 @@ public:
 	unsigned short GetInternalSearchMap(int x, int y) const;
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
+	void SetupReverbInfo();
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
