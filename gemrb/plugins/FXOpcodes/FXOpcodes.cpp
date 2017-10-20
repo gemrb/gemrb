@@ -5500,6 +5500,7 @@ int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_PRISON);
 	target->SendDiedTrigger();
+	target->Stop();
 	return FX_APPLIED;
 }
 
