@@ -122,13 +122,10 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 		// protection against creature
 		if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {
 			// TODO: de-hardcode these (may not all be correct anyway)
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 2, source->Modified[IE_EA])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 3, source->Modified[IE_GENERAL])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 4, source->Modified[IE_RACE])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 5, source->Modified[IE_CLASS])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 6, source->Modified[IE_SPECIFIC])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 7, source->Modified[IE_SEX])) return false;
-			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 8, source->Modified[IE_ALIGNMENT])) return false;
+			ieDword idsStat[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT };
+			for (int i=0; i<7; i++) {
+				if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, i+2, source->Modified[idsStat[i]])) return false;
+			}
 		}
 	}
 	return true;
