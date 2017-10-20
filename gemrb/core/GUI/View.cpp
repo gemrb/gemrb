@@ -55,15 +55,7 @@ View::View(const Region& frame)
 
 View::~View()
 {
-	std::list<ViewScriptingRef*>::iterator rit;
-	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
-		ViewScriptingRef* ref = *rit;
-		if (GetView(ref) == this) {
-			ScriptEngine::UnregisterScriptingRef(ref);
-			delete ref;
-		}
-		rit = scriptingRefs.erase(rit);
-	}
+	ClearScriptingRefs();
 	
 	if (superView) {
 		superView->RemoveSubview(this);
@@ -569,6 +561,19 @@ bool View::OnMouseWheelScroll(const Point& delta)
 		return superView->OnMouseWheelScroll(delta);
 	}
 	return false;
+}
+	
+void View::ClearScriptingRefs()
+{
+	std::list<ViewScriptingRef*>::iterator rit;
+	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
+		ViewScriptingRef* ref = *rit;
+		if (GetView(ref) == this) {
+			ScriptEngine::UnregisterScriptingRef(ref);
+			delete ref;
+		}
+		rit = scriptingRefs.erase(rit);
+	}
 }
 	
 ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ResRef group)

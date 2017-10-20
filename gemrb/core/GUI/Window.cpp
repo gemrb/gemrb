@@ -53,6 +53,8 @@ Window::~Window()
 
 void Window::Close()
 {
+	ClearScriptingRefs();
+
 	if (flags&DestroyOnClose) {
 		manager.CloseWindow(this);
 	} else {

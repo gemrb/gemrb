@@ -85,6 +85,11 @@ private:
 	virtual void OriginChanged(const Point&) {}
 	virtual void WillDraw() {}
 	virtual void DidDraw() {}
+	
+	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	
+protected:
+	void ClearScriptingRefs();
 
 public:
 	// using Held so we can have polymorphic drag operations
@@ -192,7 +197,6 @@ public:
 	void SetCursor(Sprite2D* c);
 
 	// GUIScripting
-	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
 	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
 	const ViewScriptingRef* GetScriptingRef() const;
 };
