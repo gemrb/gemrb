@@ -6780,6 +6780,9 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 
 void Actor::PerformAttack(ieDword gameTime)
 {
+	// don't let imprisoned or otherwise missing actors continue their attack
+	if (Modified[IE_AVATARREMOVAL]) return;
+
 	if (InParty) {
 		// TODO: this is temporary hack
 		Game *game = core->GetGame();
