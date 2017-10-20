@@ -75,6 +75,9 @@ class GView:
 	'Focus': _GemRB.View_Focus
 	}
 	__slots__ = ['SCRIPT_GROUP']
+	
+	def __nonzero__(self):
+		return self.ID != -1
 
 	def SetSize(self, w, h):
 		r = self.GetFrame()
@@ -147,9 +150,6 @@ class GWindow(GView):
     'ShowModal': _GemRB.Window_ShowModal,
   }
 
-  def __nonzero__(self):
-    return self.ID != -1
-
   def DeleteControl(self, view): # backwards compatibility
 	if type(view) == int:
 		view = self.GetControl (view)
@@ -162,9 +162,7 @@ class GWindow(GView):
 	self.Close()
 
   def Close(self):
-	if self.ID != -1:
-		RemoveView(self, False)
-		self.ID = -1
+	RemoveView(self, False)
 
 class GControl(GView):
   methods = {
