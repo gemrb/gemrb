@@ -8755,7 +8755,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
 	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
-	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+	int multiplier = Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
 
 	if (third) {
