@@ -9523,10 +9523,9 @@ void Actor::CreateDerivedStatsBG()
 		} else {
 			AutoTable tm("backstab");
 			//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
-			//TODO: AP_SPCL332 (increase backstab by one) seems to not be effecting this at all
-			//for assassins perhaps the effect is being called prior to this, and this overwrites it;
-			//stalkers work correctly, which is even more odd, considering as they use the same
-			//effect and backstabmultiplier would be 0 for them
+			// assassin's AP_SPCL332 (increase backstab by one) is not effecting this at all,
+			// it's just applied later
+			// stalkers work by just using the effect, since they're not thieves
 			if (tm)	{
 				ieDword cols = tm->GetColumnCount();
 				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
