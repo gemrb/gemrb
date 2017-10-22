@@ -682,12 +682,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		RecordsTextArea.Append ("\n")
 
 def DisplayWeapons (pc):
-	Window = RecordsWindow
-
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
-	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
-	# maybe add an iwd2 mode to GemRB.GetAbilityBonus
-	GA = lambda s, pc=pc: int((GS(s)-10)/2)
 
 	###################
 	# Attack Roll Modifiers
@@ -696,7 +691,6 @@ def DisplayWeapons (pc):
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	combatdet2 = combatdet # placeholder for the potential offhand numbers
 	ac = combatdet["AC"]
-	tohit = combatdet["ToHitStats"]
 	dualwielding = GemRB.IsDualWielding(pc)
 	if dualwielding:
 		combatdet2 = GemRB.GetCombatDetails(pc, 1)
@@ -821,7 +815,7 @@ def DisplayWeapons (pc):
 	if dualwielding:
 		WeaponOfHand(pc, combatdet2, dualwielding, 1)
 
-	DisplaySavingThrows (pc)
+	DisplaySavingThrows (pc, RecordsTextArea)
 
 	return
 
@@ -1124,7 +1118,7 @@ def UpdateHelpWindow ():
 		GemRB.SetVar ("Selected",0)
 
 	for i in range(11):
-		Button = Window.GetControl (i+27)
+		#Button = Window.GetControl (i+27)
 		Label = Window.GetControl (i+0x10000004)
 		if Topic==i:
 			Label.SetTextColor (255,255,0)
