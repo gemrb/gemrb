@@ -4059,11 +4059,13 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_BIT_OR(IE_DISABLEDBUTTON, (1<<ACT_CAST)|(1<<ACT_QSPELL1)|(1<<ACT_QSPELL2)|(1<<ACT_QSPELL3) );
 	}
 
-	for(int i=0;i<polystatcount;i++) {
-		//copy only the animation ID
-		if (fx->Parameter2 && polymorph_stats[i] != IE_ANIMATION_ID) continue;
-
-		target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+	if (fx->Parameter2) {
+		// copy only the animation ID (line 23 in polystat.2da)
+		target->SetStat(IE_ANIMATION_ID, target->polymorphCache->stats[23], 1);
+	} else {
+		for(int i=0; i<polystatcount; i++) {
+			target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+		}
 	}
 
 	return FX_APPLIED;
