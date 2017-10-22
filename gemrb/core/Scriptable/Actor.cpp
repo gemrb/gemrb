@@ -445,6 +445,7 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
+	shadowAnimations = NULL;
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;

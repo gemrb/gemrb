@@ -369,7 +369,9 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
+	SongHeader.reverbID = 0;
 	reverb = NULL;
+	MaterialMap = NULL;
 }
 
 Map::~Map(void)

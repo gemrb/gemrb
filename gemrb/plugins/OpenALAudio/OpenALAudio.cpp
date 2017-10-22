@@ -179,6 +179,12 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	musicThread = NULL;
 	stayAlive = false;
 	hasReverbProperties = false;
+#ifdef HAVE_OPENAL_EFX_H
+	hasEFX = false;
+	efxEffectSlot = efxEffect = 0;
+	reverbProperties.reverbData = {};
+	reverbProperties.reverbDisabled = true;
+#endif
 }
 
 void OpenALAudioDriver::PrintDeviceList ()
