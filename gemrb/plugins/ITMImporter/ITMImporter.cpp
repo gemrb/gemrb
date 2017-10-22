@@ -166,6 +166,7 @@ static void AddZZFeatures(Item *s)
 		CopyResRef(fx->Source, s->Name);
 		// use the space reserved earlier
 		memcpy(s->equipping_features + (s->EquippingFeatureCount - 1 - i), fx, sizeof(Effect));
+		delete fx;
 	}
 }
 

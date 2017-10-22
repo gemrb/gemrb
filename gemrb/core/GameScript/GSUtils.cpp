@@ -820,6 +820,7 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 			area->AddVVCell(new VEFObject(vvc));
 		} else {
 			Log(WARNING, "GSUtils", "Skipping visual effect positioning due to missing area!");
+			delete vvc;
 		}
 	}
 }
