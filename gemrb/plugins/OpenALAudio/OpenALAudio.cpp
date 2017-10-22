@@ -182,7 +182,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 #ifdef HAVE_OPENAL_EFX_H
 	hasEFX = false;
 	efxEffectSlot = efxEffect = 0;
-	reverbProperties.reverbData = {};
+	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
 #endif
 }
