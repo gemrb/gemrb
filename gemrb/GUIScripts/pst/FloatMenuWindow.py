@@ -467,7 +467,6 @@ def ClearSlot (i):
 	Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
 	Button.SetPicture ('')
 	Button.SetText ('')
-	Button.SetTooltip ('')
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 def FloatMenuSelectPreviousPC ():

@@ -386,6 +386,10 @@ void Button::SetFont(Font* newfont)
 
 String Button::TooltipText() const
 {
+	if (IsDisabled()) {
+		return L"";
+	}
+
 	ieDword showHotkeys = 0;
 	core->GetDictionary()->Lookup("Hotkeys On Tooltips", showHotkeys);
 

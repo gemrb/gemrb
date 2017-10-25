@@ -223,7 +223,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetTooltip ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# disable all spells if fx_disable_spellcasting was run with the same type
@@ -244,7 +243,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetText ("")
-			Button.SetTooltip ("")
 			continue
 		Spell = memorizedSpells[i+Start]
 		spellType = Spell['SpellType']
@@ -292,7 +290,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetTooltip ("")
 
 #################################################################
 # routines used during character generation and levelup
