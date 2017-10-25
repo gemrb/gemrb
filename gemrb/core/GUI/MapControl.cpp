@@ -317,10 +317,10 @@ void MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			ClickHandle(me);
 			break;
 		default:
-			Control::OnMouseUp(me, mod);
 			break;
 	}
-	
+
+	Control::OnMouseUp(me, mod);
 	UpdateCursor();
 }
 
