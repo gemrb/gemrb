@@ -579,7 +579,7 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
 		ButtonBorder *fr = &borders[i];
 		if (fr->enabled) {
-			pulseBorder = true;
+			pulseBorder = !fr->filled;
 			MarkDirty();
 			break;
 		}
