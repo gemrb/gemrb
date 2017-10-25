@@ -514,7 +514,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
-	TextArea.SetStatus (IE_GUI_CONTROL_FOCUSED) # DO NOT MOVE near the rest of TextArea handling
+	TextArea.Focus() # DO NOT MOVE near the rest of TextArea handling
 	return
 
 def ClearBiography():
@@ -613,7 +613,7 @@ def OpenExportWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
-	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	NameField.Focus()
 	return
 
 def ExportDonePress():

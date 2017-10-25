@@ -93,7 +93,7 @@ def UpdateControlStatus():
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 
 	if Override:
-		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+		TMessageTA.Focus()
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:

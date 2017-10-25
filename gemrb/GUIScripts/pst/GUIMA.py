@@ -89,12 +89,12 @@ def OpenMapWindow ():
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.MakeEscape()
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.Focus()
 
 def NoteChanged ():
 	#shift focus to the static label
 	Label = MapWindow.GetControl (4)
-	Label.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Label.Focus()
 
 	Edit = MapWindow.GetControl (6)
 	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, None)
@@ -115,7 +115,7 @@ def SetMapNote ():
 
 	Edit = MapWindow.GetControl (6)
 	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, NoteChanged)
-	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Edit.Focus()
 
 	#copy the text from the static label into the editbox
 	Edit.SetText (Label.QueryText())
@@ -160,7 +160,7 @@ def WorldMapWindowCommon (Travel):
 	WMap.SetAnimation ("WMPTY")
 	#center on current area
 	WMap.AdjustScrolling (0,0)
-	WMap.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WMap.Focus()
 
 	# Done
 	Button = Window.GetControl (0)

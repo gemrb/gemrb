@@ -86,7 +86,7 @@ def NextDialogState ():
 
 	ContinueWindow.SetVisible(False)
 
-	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	MessageWindow.TMessageTA.Focus()
 
 def OpenEndMessageWindow ():
 	ContinueWindow.Focus()
@@ -94,7 +94,7 @@ def OpenEndMessageWindow ():
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.Focus()
 
 def OpenContinueMessageWindow ():
 	ContinueWindow.Focus()
@@ -103,7 +103,7 @@ def OpenContinueMessageWindow ():
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.Focus()
 
 def UpdateReformWindow ():
 	Window = ReformPartyWindow

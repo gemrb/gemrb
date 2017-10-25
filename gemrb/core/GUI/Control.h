@@ -37,8 +37,6 @@
 #define IE_GUI_MAP              9 // gemrb extension
 #define IE_GUI_INVALID          255
 
-#define IE_GUI_CONTROL_FOCUSED  0x80
-
 #include "RGBAColor.h"
 #include "exports.h"
 #include "win32def.h"

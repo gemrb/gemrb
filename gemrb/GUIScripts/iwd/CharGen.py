@@ -2541,7 +2541,7 @@ def BiographyPress():
 	BiographyField = BiographyWindow.GetControl (4)
 	BiographyTextArea = BiographyWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
 	BiographyField = BiographyTextArea.SubstituteForControl(BiographyField)
-	BiographyField.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	BiographyField.Focus()
 
 	BIO = GemRB.GetToken("Biography")
 	if BIO:
@@ -2625,7 +2625,7 @@ def NamePress():
 	NameField = NameWindow.GetControl (2)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, NameEditChange)
 	NameField.SetText (GemRB.GetToken ("CHARNAME") )
-	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	NameField.Focus()
 
 	NameWindow.Focus()
 	NameEditChange()

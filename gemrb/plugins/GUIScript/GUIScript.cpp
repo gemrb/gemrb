@@ -1805,29 +1805,19 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 	if (ctrl == NULL) {
 		return RuntimeError( "Control is not found." );
 	}
-	if (status&IE_GUI_CONTROL_FOCUSED) {
-		ctrl->SetFocus();
-	}
-
-	//check if the status parameter was intended to use with this control
-	//Focus will sadly break this at the moment, because it is common for all control types
-	int check = (status >> 24) & 0xff;
-	if ( (check!=0x7f) && (ctrl->ControlType != check) ) {
-		return RuntimeError( "Control type is not matching." );
-	}
 
 	switch (ctrl->ControlType) {
 		case IE_GUI_BUTTON:
 			//Button
-		{
-			Button* btn = ( Button* ) ctrl;
-			btn->SetState( ( unsigned char ) ( status & 0x7f ) );
-		}
+			{
+				Button* btn = ( Button* ) ctrl;
+				btn->SetState( status );
+			}
 			break;
 		case IE_GUI_WORLDMAP:
 			break;
 		default:
-			ctrl->SetValue(status & 0x7f);
+			ctrl->SetValue(status);
 			break;
 	}
 

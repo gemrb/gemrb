@@ -457,7 +457,8 @@ def OpenItemAmountWindow ():
 	Text = Window.GetControl (6)
 	Text.SetSize (40, 40)
 	Text.SetText ("1")
-	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.Focus()
 
 	# Done
 	Button = Window.GetControl (2)

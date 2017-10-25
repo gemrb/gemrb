@@ -43,7 +43,7 @@ def OnLoad():
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
 
 	NameWindow.ShowModal (MODAL_SHADOW_GRAY)
-	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	NameField.Focus()
 	return
 
 def NextPress():

@@ -257,7 +257,7 @@ def OpenSaveDetailWindow ():
 
 	CheckSaveName ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED) # ShowModal will happily reset this..
+	Edit.Focus() # ShowModal will happily reset this..
 
 
 # Disable Save/Overwrite button if the save slotname is empty,

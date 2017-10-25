@@ -124,12 +124,11 @@ def ShowMap ():
 	
 	PortraitWindow.SetVisible(True)
 	OptionsWindow.SetVisible(True)
-	Window.Focus()
+	Map.Focus()
 	
 	if HasMapNotes ():
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED|IE_GUI_MAP_REVEAL_MAP)
-	else:
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
+		Map.SetStatus (IE_GUI_MAP_REVEAL_MAP)
+
 	GemRB.GamePause (0,0)
 	return
 
@@ -168,9 +167,9 @@ def OpenMapWindow ():
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
-	else:
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
+		Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
+
+	Map.Focus()
 
 	return
 
@@ -215,10 +214,6 @@ def SetMapNote ():
 	CloseNoteWindow ()
 	return
 
-def SetFocusBack ():
-	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	return
-
 def AddNoteWindow ():
 	global NoteWindow, NoteLabel
 
@@ -241,7 +236,7 @@ def AddNoteWindow ():
 		Label.SetSprites ("FLAG1", i,0,1,2,0)
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
-		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetFocusBack)
+		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteLabel.Focus())
 
 	#set
 	Label = NoteWindow.GetControl (0)
@@ -261,7 +256,7 @@ def AddNoteWindow ():
 	Label.SetText (13957)
 
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
-	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	NoteLabel.Focus()
 	return
 
 def OpenWorldMapWindowInside ():
@@ -419,7 +414,7 @@ def WorldMapWindowCommon (Travel):
 	Button.MakeEscape()
 
 	Window.Focus()
-	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WorldMapControl.Focus()
 	return
 
 def MapN():

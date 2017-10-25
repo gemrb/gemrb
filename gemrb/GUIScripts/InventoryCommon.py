@@ -464,7 +464,8 @@ def OpenItemAmountWindow ():
 	if GameCheck.IsIWD2():
 		Text.SetSize (40, 40)
 	Text.SetText (str (StackAmount//2))
-	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.Focus()
 
 	# Decrease
 	Button = Window.GetControl (4)

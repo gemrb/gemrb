@@ -271,7 +271,7 @@ def OpenConfirmWindow ():
 
 	ConfirmWindow.Focus()
 	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
-	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED) # ShowModal will happily reset this..
+	NameField.Focus() # ShowModal will happily reset this..
 	return
 
 # Disable Save/Overwrite button if the save slotname is empty,

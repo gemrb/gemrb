@@ -595,7 +595,8 @@ def OpenStoreDonateWindow ():
 	Field = Window.GetControl ('STOTEDIT')
 	Field.SetText ("0")
 	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
-	Field.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+	Field.SetStatus (IE_GUI_EDIT_NUMBER)
+	Field.Focus()
 
 	# +
 	Button = Window.GetControl ('STOPLUS')
@@ -1070,7 +1071,8 @@ def OpenItemAmountWindow ():
 	# item amount
 	Text = Window.GetControl (6)
 	Text.SetText (str (Amount))
-	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.Focus()
 
 	# Decrease
 	Button = Window.GetControl (4)

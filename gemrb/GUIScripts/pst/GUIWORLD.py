@@ -61,14 +61,14 @@ def NextDialogState ():
 	Button.SetText(28082)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
-	MessageWindow.MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	MessageWindow.MessageTA.Focus()
 
 def OpenEndMessageWindow ():
 	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.Focus()
 
 def OpenContinueMessageWindow ():
 	#continue
@@ -76,7 +76,7 @@ def OpenContinueMessageWindow ():
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.Focus()
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
