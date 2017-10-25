@@ -151,9 +151,8 @@ bool WindowManager::FocusWindow(Window* win)
 		if (gameWin == win) {
 			core->SetEventFlag(EF_CONTROL);
 		}
-        
-		win->SetDisabled(false);
-		return true;
+
+		return !win->IsDisabled();
 	}
 	return false;
 }
