@@ -37,6 +37,8 @@ ErrorWindow = None
 StackAmount = 0
 pause = None
 
+UpdateInventoryWindow = None
+
 def OnDragItemGround ():
 	"""Drops and item to the ground."""
 
@@ -52,7 +54,7 @@ def OnDragItemGround ():
 	else:
 		GemRB.DropDraggedItem (pc, -2) #dropping on ground
 
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def OnAutoEquip ():
@@ -69,7 +71,7 @@ def OnAutoEquip ():
 	if GemRB.IsDraggingItem ()==1:
 		GemRB.PlaySound("GAM_47") #failed equip
 
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def OnDragItem ():
@@ -124,7 +126,7 @@ def OnDragItem ():
 			if GemRB.GetPlayerStat (pc, IE_STATE_ID) & (STATE_BERSERK) and GemRB.IsDraggingItem ():
 				GemRB.DropDraggedItem (pc, -3)
 
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def OnDropItemToPC (btn):
@@ -134,7 +136,7 @@ def OnDropItemToPC (btn):
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def DecreaseStackAmount ():
@@ -230,7 +232,7 @@ def MouseLeaveGround ():
 def CloseItemInfoWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def DisplayItem (itemresref, type):
@@ -355,6 +357,8 @@ def DisplayItem (itemresref, type):
 
 	# in pst one can cycle through all the items from the description window
 	if GameCheck.IsPST():
+		import GUIINV
+
 		#left scroll
 		Button = Window.GetControl (13)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.LeftItemScroll)
@@ -373,7 +377,7 @@ def OpenItemInfoWindow (btn, slot):
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
 	if TryAutoIdentification(pc, item, slot, slot_item, True):
-		GUIINV.UpdateInventoryWindow ()
+		UpdateInventoryWindow ()
 
 	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 1
@@ -424,7 +428,7 @@ def OpenItemAmountWindow ():
 		ItemAmountWindow = None
 		UsedSlot = None
 		OverSlot = None
-		GUIINV.UpdateInventoryWindow()
+		UpdateInventoryWindow()
 		return
 
 	UsedSlot = GemRB.GetVar ("ItemButton")
@@ -588,7 +592,7 @@ def ColorDonePress():
 		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
 	else:
 		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def HairPress():
@@ -706,7 +710,7 @@ def OpenErrorWindow (strref):
 def CloseErrorWindow ():
 	if ErrorWindow:
 		ErrorWindow.Unload ()
-	GUIINV.UpdateInventoryWindow ()
+	UpdateInventoryWindow ()
 	return
 
 def ReadItemWindow ():
@@ -946,5 +950,3 @@ def AbilitiesItemWindow ():
 	Button.MakeEscape()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
-
-import GUIINV

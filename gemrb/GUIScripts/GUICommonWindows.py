@@ -38,19 +38,6 @@ import InventoryCommon
 if not GameCheck.IsPST():
   import Spellbook  ##not used in pst - YET
 
-# needed for all the Open*Window callbacks in the OptionsWindow
-import GUIJRNL
-import GUIMA
-import GUIINV
-import GUIOPT
-if GameCheck.IsIWD2():
-	# one spellbook for all spell types
-	import GUISPL
-else:
-	import GUIMG
-	import GUIPR
-import GUIREC
-
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
@@ -125,6 +112,19 @@ def InitOptionButton(Window, Index, Action=0,IsPage=1):
 ##these defaults don't seem to break the games other than pst
 def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
+	
+	# needed for all the Open*Window callbacks in the OptionsWindow
+	import GUIJRNL
+	import GUIMA
+	import GUIINV
+	import GUIOPT
+	if GameCheck.IsIWD2():
+		# one spellbook for all spell types
+		import GUISPL
+	else:
+		import GUIMG
+		import GUIPR
+	import GUIREC
 
 	global OptionsWindow, ActionBarControlOffset
 

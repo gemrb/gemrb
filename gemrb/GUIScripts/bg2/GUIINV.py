@@ -24,6 +24,7 @@
 
 import GemRB
 import GUICommon
+import GUICommonWindows
 import CommonTables
 import InventoryCommon
 from GUIDefines import *
@@ -34,7 +35,6 @@ from ie_spells import *
 def OpenInventoryWindow ():
 	"""Opens the inventory window."""
 
-	import GUICommonWindows
 	Window = GUICommonWindows.OpenTopWindow (2, "GUIINV", InitInventoryWindow)
 	if not Window:
 		return
@@ -133,6 +133,8 @@ def UpdateInventoryWindow ():
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
+
+InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
