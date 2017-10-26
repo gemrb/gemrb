@@ -238,9 +238,9 @@ def OnPriestMemorizeSpell ():
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
 		GemRB.PlaySound ("GAM_24")
-		Button = PriestWindow.GetControl(index + 27)
+		Button = PriestSpellWindow.GetControl(index + 27)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-		Button2 = PriestWindow.GetControl(mem_cnt + 2)
+		Button2 = PriestSpellWindow.GetControl(mem_cnt + 2)
 		if GameCheck.IsBG2(): # no blending
 			Button.SetAnimation ("FLASH")
 			Button2.SetAnimation ("FLASH")
@@ -318,7 +318,7 @@ def OnPriestUnmemorizeSpell ():
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
 		GemRB.PlaySound ("GAM_44")
-		Button = PriestWindow.GetControl(index + 3)
+		Button = PriestSpellWindow.GetControl(index + 3)
 		Button.SetAnimation ("FLASH", 0, GameCheck.IsBG2() is False) # no blending for bg2
 	return
 
