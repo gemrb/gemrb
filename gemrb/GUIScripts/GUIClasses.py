@@ -159,6 +159,11 @@ class GWindow(GView):
     'ShowModal': _GemRB.Window_ShowModal,
   }
 
+  OnClose = {}
+
+  def SetOnClose(self, onClose):
+	GWindow.OnClose[self.__hash__()] = onClose
+
   def DeleteControl(self, view): # backwards compatibility
 	if type(view) == int:
 		view = self.GetControl (view)
@@ -171,6 +176,11 @@ class GWindow(GView):
 	self.Close()
 
   def Close(self):
+	key = self.__hash__()
+	if key in GWindow.OnClose:
+	  GWindow.OnClose[key](self)
+	  del GWindow.OnClose[key]
+	
 	RemoveView(self, False)
 
 class GControl(GView):
