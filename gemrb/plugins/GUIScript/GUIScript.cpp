@@ -1764,8 +1764,7 @@ PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
 **Metaclass Prototype:** SetStatus (State)\n\
 \n\
 **Description:** Sets the state of a Control. For buttons, this is the \n\
-same as SetButtonState. You can additionally use 0x80 for a focused \n\
-control (IE_GUI_CONTROL_FOCUSED).\n\
+same as SetButtonState.\n\
 For other controls, this command will set the common value of the \n\
 control, which has various uses.\n\
 \n\
