@@ -1391,6 +1391,22 @@ def SetTopWindow (window, selectionHandler = None):
 
 	SetSelectionChangeHandler (selectionHandler)
 
+def OpenWindowOnce(id, pack):
+	window = GemRB.GetView(pack, id)
+	if window:
+		window.Focus()
+		return None
+	else:
+		return GemRB.LoadWindow(id, pack)
+
+def ToggleWindow(id, pack):
+	window = GemRB.GetView(pack, id)
+	if window:
+		window.Close()
+		return None
+	else:
+		return GemRB.LoadWindow(id, pack)
+
 # returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
 # in the rest, it will enable extra button generation for higher resolutions
