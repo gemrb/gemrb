@@ -76,6 +76,11 @@ class GView:
 	}
 	__slots__ = ['SCRIPT_GROUP']
 	
+	def __eq__(self, rhs):
+		if rhs == None:
+			return self.ID == -1
+		return self.ID == rhs.ID and self.SCRIPT_GROUP == rhs.SCRIPT_GROUP
+	
 	def __nonzero__(self):
 		return self.ID != -1
 

@@ -1266,7 +1266,9 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (ref) {
-		return gs->ConstructObjectForScriptable(ref);
+		View* retView = GetView(ref);
+		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
+		return gs->ConstructObjectForScriptable(retView->GetScriptingRef());
 	}
 	Py_RETURN_NONE;
 }
