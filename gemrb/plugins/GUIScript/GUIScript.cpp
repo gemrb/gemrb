@@ -197,7 +197,7 @@ if (!PyArg_ParseTuple( args, fmt, a, b, c, d, e, f)) { \
 }
 
 #define ABORT_IF_NULL(thing) \
-if (thing == NULL) return NULL;
+if (thing == NULL) return RuntimeError(#thing " cannot be null.");
 
 #define RETURN_BOOL(boolean) \
 if (boolean) { \
@@ -684,13 +684,8 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	PyArg_ParseTuple( args, "i|si", &WindowID, &ref, &pos );
 
 	Window* win = core->LoadWindow( WindowID, ref, pos );
-	if (win) {
-		return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
-	}
-
-	char buf[256];
-	snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
-	return RuntimeError(buf);
+	ABORT_IF_NULL(win);
+	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -1242,6 +1237,7 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 	PARSE_ARGS3( args, "Os|l", &self, &group, &controlId );
 
 	View* view = GetView<View>(self);
+	ABORT_IF_NULL(view);
 	view->AssignScriptingRef(controlId, group);
 	Py_RETURN_NONE;
 }
@@ -8989,7 +8985,7 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 	//we should use getslotitem, because
 	//getitem would remove the item from the inventory!
 	CREItem *si = actor->inventory.GetSlotItem(Slot);
-	ABORT_IF_NULL(si);
+	if (si == NULL) return NULL;
 
 	//it is always possible to put these items into the inventory
 	// however in pst, we need to ensure immovable swappables are swappable
