@@ -40,19 +40,21 @@ def RevealMap ():
 
 	GemRB.RevealArea (PosX, PosY, 30, 1)
 	GemRB.GamePause (0,0)
+	
+	MapWindow.Close()
 	return
 
 ###################################################
 # for farsight effect
 ###################################################
 def ShowMap ():
-	global MapWindow
-
-	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
+	Window = OpenMapWindow()
 
 	# World Map
 	Button = Window.GetControl (1)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+
+	Map = Window.GetControl (1000)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -61,28 +63,12 @@ def ShowMap ():
 
 		Label = Window.GetControl (0x10000003)
 		Label.SetText ("")
-
-	# Map Control
-	placeholder = Window.GetControl (2)
-	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
-	else:
-		Window.CreateMapControl (1000, 0, 0, 0, 0)
-
-	Map = Window.GetControl (1000)
-	Map.SetFrame(placeholder.GetFrame())
-	Window.DeleteControl (placeholder)
 	
-	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
-	Window.Focus()
-	Map.Focus()
-	
-	if HasMapNotes ():
-		Map.SetStatus (IE_GUI_MAP_REVEAL_MAP)
 
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	GemRB.GamePause (0,0)
 	return
 
@@ -131,19 +117,6 @@ OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindow
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 
-def CloseNoteWindow ():
-	if NoteWindow:
-		NoteWindow.Unload ()
-	MapWindow.Focus()
-	return
-
-def RemoveMapNote ():
-	PosX = GemRB.GetVar ("MapControlX")
-	PosY = GemRB.GetVar ("MapControlY")
-	GemRB.SetMapnote (PosX, PosY, 0, "")
-	CloseNoteWindow ()
-	return
-
 def QueryText ():
 	if not GameCheck.IsIWD2():
 		return  NoteLabel.QueryText ()
@@ -160,21 +133,21 @@ def QueryText ():
 		row += 1
 	return Data
 
-def SetMapNote ():
+def SetMapNote (Text):
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
-	Text = QueryText ()
 	Color = GemRB.GetVar ("Color")
 	GemRB.SetMapnote (PosX, PosY, Color, Text)
-	CloseNoteWindow ()
+	NoteWindow.Close()
 	return
 
 def AddNoteWindow ():
-	global NoteWindow, NoteLabel
+	global NoteWindow, NoteLabel, MapWindow
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
 	NoteWindow = GemRB.LoadWindow (5)
+	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	NoteLabel = NoteWindow.GetControl (1)
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
@@ -182,7 +155,7 @@ def AddNoteWindow ():
 		NoteTA = MapWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
 		NoteLabel = NoteTA.SubstituteForControl(NoteLabel)
 	else:
-		NoteLabel.SetBackground ("")
+		NoteLabel.SetBackground (None)
 	NoteLabel.SetText (Text)
 
 	for i in range(8):
@@ -195,19 +168,19 @@ def AddNoteWindow ():
 
 	#set
 	Label = NoteWindow.GetControl (0)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMapNote)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(QueryText()))
 	Label.SetText (11973)
 	Label.MakeDefault()
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseNoteWindow)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteWindow.Close())
 	Label.SetText (13727)
 	Label.MakeEscape()
 
 	#remove
 	Label = NoteWindow.GetControl (3)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveMapNote)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(""))
 	Label.SetText (13957)
 
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -217,9 +190,7 @@ def AddNoteWindow ():
 def OpenWorldMapWindowInside ():
 	global MapWindow
 
-	OpenMapWindow () #closes mapwindow
-	MapWindow = -1
-	print "MapWindow=",MapWindow
+	MapWindow.Close()
 	WorldMapWindowCommon (-1)
 	return
 
