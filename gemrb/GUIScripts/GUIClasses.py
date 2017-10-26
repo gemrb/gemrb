@@ -74,12 +74,16 @@ class GView:
 	'SetResizeFlags': _GemRB.View_SetResizeFlags,
 	'Focus': _GemRB.View_Focus
 	}
+
 	__slots__ = ['SCRIPT_GROUP']
 	
 	def __eq__(self, rhs):
 		if rhs == None:
 			return self.ID == -1
 		return self.ID == rhs.ID and self.SCRIPT_GROUP == rhs.SCRIPT_GROUP
+	
+	def __hash__(self):
+		return self.SCRIPT_GROUP + str(self.ID)
 	
 	def __nonzero__(self):
 		return self.ID != -1
