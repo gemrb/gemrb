@@ -133,11 +133,10 @@ def ShowMap ():
 	return
 
 ###################################################
-def OpenMapWindow ():
 
-	MapWindow = Window = GUICommonWindows.OpenTopWindow(2, "GUIMAP")
-	if not MapWindow:
-		return
+def InitMapWindow (Window):
+	global MapWindow
+	MapWindow = Window
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -156,11 +155,10 @@ def OpenMapWindow ():
 	# Map Control
 	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
+		Map = Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
 	else:
-		Window.CreateMapControl (1000, 0, 0, 0, 0)
+		Map = Window.CreateMapControl (1000, 0, 0, 0, 0)
 
-	Map = Window.GetControl (1000)
 	Map.SetFrame(placeholder.GetFrame())
 	Window.DeleteControl (placeholder)
 
@@ -172,6 +170,9 @@ def OpenMapWindow ():
 	Map.Focus()
 
 	return
+
+ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
+OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()

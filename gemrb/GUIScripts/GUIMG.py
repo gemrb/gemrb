@@ -38,7 +38,7 @@ MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
 
 # bg2 stuff for handling triggers and contingencies
-BookType = None
+Sorcerer = None
 OtherWindow = None
 Exclusions = None
 ContCond = None
@@ -46,23 +46,19 @@ ContTarg = None
 SpellType = None
 Level = 1
 
-def OpenMageWindow ():
-	global MageWindow, BookType
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	BookType = 0
+def ToggleSpellWindow():
+	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
-	if GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc):
-		BookType = 1
-
-	if BookType:
-		winid = 8
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+	if Sorcerer:
+		ToggleSorcererWindow()
 	else:
-		winid = 2
+		ToggleMageWindow()
 
-	MageWindow = GUICommonWindows.OpenTopWindow(winid, "GUIMG", UpdateMageWindow)
-	if not MageWindow:
-		return
+def InitMageWindow (window):
+	global MageWindow
+	MageWindow = window
 
 	Button = MageWindow.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
@@ -84,7 +80,7 @@ def OpenMageWindow ():
 			Button.SetVarAssoc ("MageSpellLevel", i)
 
 	# Setup memorized spells buttons
-	if not BookType:
+	if not Sorcerer:
 		for i in range (12):
 			Button = MageWindow.GetControl (3 + i)
 			color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 64}
@@ -102,10 +98,8 @@ def OpenMageWindow ():
 	UpdateMageWindow (MageWindow)
 	return
 
-def UpdateMageWindow (window):
-	global MageMemorizedSpellList, MageKnownSpellList, MageWindow
-
-	MageWindow = window
+def UpdateMageWindow (MageWindow):
+	global MageMemorizedSpellList, MageKnownSpellList
 
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
@@ -130,7 +124,7 @@ def UpdateMageWindow (window):
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
-	if not BookType:
+	if not Sorcerer:
 		for i in range (12):
 			Button = MageWindow.GetControl (3 + i)
 			if i < mem_cnt:
@@ -192,6 +186,15 @@ def UpdateMageWindow (window):
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 	return
+
+def MageSelectionChanged (Window):
+	pass
+
+ToggleMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
+OpenMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
+
+ToggleSorcererWindow = GUICommonWindows.CreateTopWinLoader(8, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
+OpenSorcererWindow = GUICommonWindows.CreateTopWinLoader(8, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel

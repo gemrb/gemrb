@@ -35,13 +35,11 @@ StartTime = 0
 StartYear = 0
 
 ###################################################
-def OpenJournalWindow ():
+
+def InitJournalWindow (JournalWindow):
 	global StartTime, StartYear
 	global Chapter
 	
-	JournalWindow = GUICommonWindows.OpenTopWindow(2, "GUIJRNL", InitLogWindow)
-	if not JournalWindow:
-		return
 	JournalWindow.AddAlias("WIN_JRNL")
 		
 	Table = GemRB.LoadTable("YEARS")
@@ -98,14 +96,8 @@ def OpenJournalWindow ():
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter>65535:
 		Chapter=0
-		
-	UpdateLogWindow()
 
 	return
-	
-def InitLogWindow(Window):
-	UpdateLogWindow()
-
 
 def ToggleOrderWindow ():
 	global Order
@@ -117,9 +109,9 @@ def ToggleOrderWindow ():
 	UpdateLogWindow ()
 	return
 
-def UpdateLogWindow ():
-
-	JournalWindow = GemRB.GetView("WIN_JRNL")
+def UpdateLogWindow (JournalWindow):
+	if JournalWindow == None:
+		JournalWindow = GemRB.GetView("WIN_JRNL")
 
 	Section = GemRB.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
@@ -162,6 +154,9 @@ def UpdateLogWindow ():
 		Text.Append (JournalText)
 
 	return
+
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateLogWindow)
 
 ###################################################
 def PrevChapterPress ():

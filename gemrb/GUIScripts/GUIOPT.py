@@ -64,16 +64,10 @@ else:
 	HEIGHT = 480
 
 ###################################################
-def OpenOptionsWindow ():
+def InitOptionsWindow (Window):
 	"""Open main options window"""
 
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
-
 	CommonWindow.CloseContainerWindow ()
-
-	Window = GUICommonWindows.OpenTopWindow(2, "GUIOPT")
-	if not Window:
-		return
 
 	# Return to Game
 	Button = Window.GetControl (11)
@@ -127,6 +121,9 @@ def OpenOptionsWindow ():
 		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
 
 	return
+
+ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
+OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow)
 
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():

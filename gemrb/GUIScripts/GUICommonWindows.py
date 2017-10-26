@@ -47,7 +47,6 @@ ActionsWindow = None
 CurrentWindow = None
 ActionBarControlOffset = 0
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
-oldPack = ""
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -642,9 +641,6 @@ def UpdateActionsWindow ():
 	else:
 		CurrentWindow = ActionsWindow
 		ActionBarControlOffset = 0
-
-	if CurrentWindow == -1:
-		return
 
 	if CurrentWindow == None:
 		return
@@ -1338,53 +1334,61 @@ def SetSelectionChangeMultiHandler (handler):
 def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
 	if window:
-		GemRB.LeaveContainer()
-		if GemRB.IsDraggingItem () == 1:
-			pc = GemRB.GameGetSelectedPCSingle ()
-			#store the item in the inventory before window is closed
-			GemRB.DropDraggedItem (pc, -3)
-			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem () == 1:
-				GemRB.DropDraggedItem (pc, -2)
-
-		#don't go back to multi selection mode when going to the store screen
-		if not GemRB.GetVar ("Inventory"):
-			SetSelectionChangeHandler (None)
-
 		window.Close()
-		return True
 
-	return False
+# TODO: this really looks like (most of?) it only applies to the inventory window
+# it woudl be better to move that to GUIINV
+def TopWindowClosed(window):
+	GemRB.LeaveContainer()
+	if GemRB.IsDraggingItem () == 1:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		#store the item in the inventory before window is closed
+		GemRB.DropDraggedItem (pc, -3)
+		#dropping on ground if cannot store in inventory
+		if GemRB.IsDraggingItem () == 1:
+			GemRB.DropDraggedItem (pc, -2)
+	
+	#don't go back to multi selection mode when going to the store screen
+	if not GemRB.GetVar ("Inventory"):
+		SetSelectionChangeHandler (None)
 
-def OpenTopWindow (id, pack, selectionHandler = None):
-	global oldPack
+def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None):
+	def ret ():
+		window = loader(id, pack)
 
-	window = GemRB.GetView ("WIN_TOP")
-	# only close the window if we get called a second time with it
-	if window and pack == oldPack:
-		CloseTopWindow ()
-		oldPack = ""
-		return None
+		if window:
+			if initer:
+				initer(window)
+	
+			if selectionHandler:
+				selectionHandler(window)
+	
+			SetTopWindow (window, selectionHandler)
+			window.SetOnClose(TopWindowClosed)
 
-	CloseTopWindow ()
-	window = GemRB.LoadWindow (id, pack)
-	if window:
-		SetTopWindow (window, selectionHandler)
-		oldPack = pack
-
-	return window
+		return window
+	
+	return ret
 
 def SetTopWindow (window, selectionHandler = None):
+	topwin = GemRB.GetView("WIN_TOP")
+	if topwin == window:
+		return
+	
+	if topwin:
+		topwin.Close()
+
 	if window:
 		window.AddAlias("WIN_TOP")
 		window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
 
 		if selectionHandler:
-			import copy
 			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
 
-	SetSelectionChangeHandler (selectionHandler)
+		SetSelectionChangeHandler (selectionHandler)
+	else:
+		SetSelectionChangeHandler (None)
 
 def OpenWindowOnce(id, pack):
 	window = GemRB.GetView(pack, id)

@@ -25,6 +25,7 @@
 import GemRB
 import GameCheck
 import GUICommon
+import GUICommonWindows
 import CommonTables
 from GUIDefines import *
 from ie_stats import *
@@ -35,14 +36,10 @@ PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 
-def OpenPriestWindow ():
+def InitPriestWindow (Window):
 	global PriestSpellWindow
-	import GUICommonWindows
-
-	Window = PriestSpellWindow = GUICommonWindows.OpenTopWindow(2, "GUIPR", UpdatePriestWindow)
-	if not Window:
-		return
-
+	PriestSpellWindow = Window
+	
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
 
@@ -75,18 +72,16 @@ def OpenPriestWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	UpdatePriestWindow (Window)
 	return
 
-def UpdatePriestWindow (Window = None):
-	global PriestMemorizedSpellList, PriestKnownSpellList, PriestSpellWindow
+def UpdatePriestWindow (Window=None):
+	global PriestMemorizedSpellList, PriestKnownSpellList
+	
+	if Window == None:
+		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
-	if Window == None:
-		Window = PriestSpellWindow
-	else:
-		PriestSpellWindow = Window
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
@@ -167,6 +162,9 @@ def UpdatePriestWindow (Window = None):
 
 	Window.Focus()
 	return
+
+TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow)
+OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow)
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel

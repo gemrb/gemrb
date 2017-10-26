@@ -23,6 +23,7 @@
 import GemRB
 import GameCheck
 import GUICommon
+import GUICommonWindows
 import Spellbook
 import CommonTables
 import LUCommon
@@ -42,13 +43,9 @@ ScriptTextArea = None
 SelectedTextArea = None
 
 ###################################################
-def OpenRecordsWindow ():
-	"""Open Records Window"""
 
-	import GUICommonWindows
-	Window = GUICommonWindows.OpenTopWindow(2, "GUIREC", UpdateRecordsWindow)
-	if not Window:
-		return
+def InitRecordsWindow (Window):
+	"""Open Records Window"""
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -86,21 +83,7 @@ def OpenRecordsWindow ():
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
 
-	UpdateRecordsWindow(Window)
 	return
-
-#original returns to game before continuing...
-def OpenRecReformPartyWindow ():
-	OpenRecordsWindow ()
-	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
-	return
-
-#don't allow exporting polymorphed or dead characters
-def Exportable(pc):
-	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
-	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
-	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
-	return True
 
 def UpdateRecordsWindow (Window):
 	global alignment_help
@@ -239,6 +222,22 @@ def UpdateRecordsWindow (Window):
 	#TODO: making window visible/shaded depending on the pc's state
 
 	return
+
+ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow)
+OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow)
+
+#original returns to game before continuing...
+def OpenRecReformPartyWindow ():
+	OpenRecordsWindow ()
+	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
+	return
+
+#don't allow exporting polymorphed or dead characters
+def Exportable(pc):
+	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
+	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
+	return True
 
 def GetStatColor (pc, stat):
 	a = GemRB.GetPlayerStat (pc, stat)

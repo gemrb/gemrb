@@ -32,14 +32,10 @@ from ie_stats import *
 from ie_slots import *
 from ie_spells import *
 
-def OpenInventoryWindow ():
+def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
-	Window = GUICommonWindows.OpenTopWindow (2, "GUIINV", InitInventoryWindow)
-	if not Window:
-		return
 	Window.AddAlias("WIN_INV")
-
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
 
 	#ground items scrollbar
@@ -108,19 +104,15 @@ def OpenInventoryWindow ():
 
 	GemRB.SetVar ("TopIndex", 0)
 
-	UpdateInventoryWindow()
 	return
 
-
-def InitInventoryWindow (Window):
-	UpdateInventoryWindow ()
-
-
-def UpdateInventoryWindow ():
+def UpdateInventoryWindow (Window):
 	"""Redraws the inventory window and resets TopIndex."""
 
-	Window = GemRB.GetView("WIN_INV")
-	
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
+
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
@@ -133,6 +125,9 @@ def UpdateInventoryWindow ():
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
+
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
 
 InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
