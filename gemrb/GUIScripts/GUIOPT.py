@@ -39,10 +39,6 @@ from GUIDefines import *
 
 ###################################################
 GameOptionsWindow = None # not in PST
-PortraitWindow = None # not in BG1 or PST
-OldPortraitWindow = None #not in BG1 or PST
-OptionsWindow = None
-OldOptionsWindow = None
 HelpTextArea = None
 
 LoadMsgWindow = None
@@ -55,13 +51,6 @@ if GameCheck.IsBG1():
 else:
 	# just an alias to keep our logic from being plagued by too many GameCheck.IsBG1() checks
 	HelpTextArea2 = HelpTextArea
-
-if GameCheck.IsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
-else:
-	WIDTH = 640
-	HEIGHT = 480
 
 ###################################################
 def InitOptionsWindow (Window):

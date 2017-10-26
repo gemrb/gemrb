@@ -137,7 +137,6 @@ def LoadGamePress ():
 	else:
 		# it will close windows, including the loadscreen
 		GemRB.EnterGame ()
-		GUICommonWindows.CloseTopWindow ()
 	return
 
 def GetQuickLoadSlot():

@@ -32,27 +32,8 @@ NoteWindow = None
 WorldMapWindow = None
 WorldMapControl = None
 
-if GameCheck.IsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
-else:
-	WIDTH = 640
-	HEIGHT = 480
-
 def RevealMap ():
 	global MapWindow
-
-	if GUICommon.CloseOtherWindow (ShowMap):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
 
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
@@ -67,29 +48,7 @@ def RevealMap ():
 def ShowMap ():
 	global MapWindow
 
-	if GUICommon.CloseOtherWindow (ShowMap):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
-
-		return
-
 	MapWindow = Window = GemRB.LoadWindow (2, "GUIMAP")
-	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, ShowMap)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 
 	# World Map
 	Button = Window.GetControl (1)
@@ -119,11 +78,6 @@ def ShowMap ():
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
 	Window.Focus()
-	OptionsWindow.SetDisabled (True)
-	PortraitWindow.SetDisabled (True)
-	
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
 	Map.Focus()
 	
 	if HasMapNotes ():
