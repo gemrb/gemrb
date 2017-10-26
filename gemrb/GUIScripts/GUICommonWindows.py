@@ -1491,6 +1491,11 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	return pairs
 
+def OpenInventoryWindowClick (pcID):
+	import GUIINV
+	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
+	GUIINV.OpenInventoryWindow ()
+	return
 
 def OpenPortraitWindow (needcontrols=0):
 	global PortraitWindow
@@ -1565,7 +1570,7 @@ def OpenPortraitWindow (needcontrols=0):
 			label.SetFrame(Button.GetInsetFrame(4))
 
 		if needcontrols or GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (GUIINV.OpenInventoryWindowClick, pcID))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (OpenInventoryWindowClick, pcID))
 		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
 
@@ -1638,7 +1643,7 @@ def UpdatePortraitWindow ():
 						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		# TODO: recheck if this resetting is needed for all or for none
 		if GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (GUIINV.OpenInventoryWindowClick, pcID))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (OpenInventoryWindowClick, pcID))
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
 
 		Button.SetFlags (portraitFlags, OP_SET)

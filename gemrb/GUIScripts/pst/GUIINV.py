@@ -36,12 +36,6 @@ InventoryWindow = None
 ItemAmountWindow = None
 OverSlot = None
 
-def OpenInventoryWindowClick (pcID):
-	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
-	OpenInventoryWindow ()
-	return
-
-
 ItemHash = {}
 
 # Control ID's:

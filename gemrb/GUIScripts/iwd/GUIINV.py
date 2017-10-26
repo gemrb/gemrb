@@ -38,11 +38,6 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 
-def OpenInventoryWindowClick (pcID):
-	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
-	OpenInventoryWindow ()
-	return
-
 def OpenInventoryWindow ():
 	"""Opens the inventory window."""
 
