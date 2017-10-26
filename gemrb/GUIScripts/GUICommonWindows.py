@@ -1335,11 +1335,6 @@ def SetSelectionChangeMultiHandler (handler):
 	SelectionChangeMultiHandler = handler
 	#SelectionChanged ()
 
-def RunSelectionChangeHandler ():
-	if SelectionChangeHandler:
-		SelectionChangeHandler ()
-	return
-
 def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
 	if window:
@@ -1854,7 +1849,8 @@ def SelectionChanged ():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
 	CommonWindow.CloseContainerWindow()
-	RunSelectionChangeHandler ()
+	if SelectionChangeHandler:
+		SelectionChangeHandler ()
 	return
 
 def ActionStopPressed ():
