@@ -188,7 +188,12 @@ def UpdateMageWindow (MageWindow):
 	return
 
 def MageSelectionChanged (Window):
-	pass
+	def SelectionChanged ():
+		# start from scratch because its easier
+		Window.Close()
+		ToggleSpellWindow()
+
+	GUICommonWindows.SetSelectionChangeHandler(SelectionChanged)
 
 ToggleMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
 OpenMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
