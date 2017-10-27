@@ -234,4 +234,27 @@ void ScrollBar::OnMouseDrag(const MouseEvent& me)
 	}
 }
 
+bool ScrollBar::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
+{
+	if ( State == 0 ) {
+		switch (key.keycode) {
+			// TODO: should probably only handle keys coresponding to scroll direction
+			case GEM_UP:
+			ScrollUp();
+			return true;
+			case GEM_DOWN:
+			ScrollDown();
+			return true;
+			case GEM_LEFT:
+			// TODO: implement horizontal scrollbars
+			return true;
+			case GEM_RIGHT:
+			// TODO: implement horizontal scrollbars
+			return true;
+		}
+	}
+	
+	return Control::OnKeyPress(key, mod);
+}
+
 }
