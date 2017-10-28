@@ -28,6 +28,8 @@
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
 
+#include <cmath>
+
 namespace GemRB {
 
 ScrollBar::ScrollBar(const Region& frame, Sprite2D* images[IMAGE_COUNT])
@@ -77,7 +79,7 @@ void ScrollBar::ScrollTo(Point p)
 	float percent = Clamp<float>(p.y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
-	ieDword newPos = ((percent * (range.second - range.first)) + range.first);
+	ieDword newPos = (round(percent * (range.second - range.first)) + range.first);
 	SetValue(newPos);
 }
 
