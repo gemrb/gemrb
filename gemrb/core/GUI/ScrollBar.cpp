@@ -219,8 +219,17 @@ void ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
-		Point p = AxisPosFromValue() + delta;
-		ScrollTo(p);
+		Point p = delta;
+		short* xy = (State&SLIDER_HORIZONTAL) ? &p.x : &p.y;
+		if (*xy == 0) return false;
+
+		ieDword oldval = GetValue();
+		*xy += GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+		ScrollTo(p + AxisPosFromValue());
+		if (oldval == GetValue()) {
+			// just in case delta wasn't enough to move us. we want to force one in that case.
+			ScrollBySteps((delta.y) < 0 ? 1 : -1);
+		}
 		return true;
 	}
 	return false;
