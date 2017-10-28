@@ -53,9 +53,8 @@ Window::~Window()
 
 void Window::Close()
 {
-	ClearScriptingRefs();
-
 	if (flags&DestroyOnClose) {
+		ClearScriptingRefs();
 		manager.CloseWindow(this);
 	} else {
 		// somebody wants to keep a handle to this window around to display it later
