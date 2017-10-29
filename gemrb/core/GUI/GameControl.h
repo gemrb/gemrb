@@ -146,6 +146,8 @@ private:
 	//doors
 	int GetCursorOverDoor(Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
+	
+	void UpdateCursor();
 
 	void PerformSelectedAction(const Point& p);
 	void CommandSelectedMovement(const Point& p);

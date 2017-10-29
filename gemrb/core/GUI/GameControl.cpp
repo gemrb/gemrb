@@ -207,6 +207,8 @@ void GameControl::ClearMouseState()
 	isSelectionRect = false;
 	isFormationRotation = false;
 	isDoubleClick = false;
+	
+	UpdateCursor();
 }
 
 // generate an action to do the actual movement
@@ -1208,16 +1210,22 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		return true;
 	}
 
+	UpdateCursor();
+	return true;
+}
+	
+void GameControl::UpdateCursor()
+{
 	Game *game = core->GetGame();
-	if (!game) return true;
+	if (!game) return;
 	Map *area = game->GetCurrentArea();
-	if (!area) return true;
+	if (!area) return;
 	Point gameMousePos = GameMousePos();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
 		lastCursor = IE_CURSOR_BLOCKED;
-		return true;
+		return;
 	}
 
 	overInfoPoint = area->TMap->GetInfoPoint( gameMousePos, true );
@@ -1229,7 +1237,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	if (nextCursor == IE_CURSOR_INVALID) {
 		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
-		return true;
+		return;
 	}
 
 	if (overDoor) {
@@ -1258,7 +1266,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	if (nextCursor == IE_CURSOR_INVALID) {
 		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
-		return true;
+		return;
 	}
 
 	// let us target party members even if they are invisible
@@ -1344,7 +1352,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 			case EA_EVILCUTOFF:
 			case EA_GOODCUTOFF:
 				break;
-
+			
 			case EA_PC:
 			case EA_FAMILIAR:
 			case EA_ALLY:
@@ -1352,9 +1360,9 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 			case EA_CHARMED:
 			case EA_EVILBUTGREEN:
 				if (target_types & GA_NO_ENEMY)
-					nextCursor^=1;
+				nextCursor^=1;
 				break;
-
+			
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
 				if (target_types & GA_NO_ALLY)
@@ -1374,7 +1382,6 @@ end_function:
 		lastCursor = nextCursor ;
 		SetCursor(core->Cursors[lastCursor]);
 	}
-	return true;
 }
 
 bool GameControl::OnMouseDrag(const MouseEvent& me)
@@ -1506,6 +1513,8 @@ void GameControl::UpdateScrolling() {
 		cursorFrame = 4; // left
 	}
 
+	// FIXME: this actually doesnt work when the protrait/options/action window obscures us
+	// we would need to set the cursor on the gamewin itself and add code in WindowManager to have gamewin cursors trump everything else
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
 	SetCursor(cursor);
 	Sprite2D::FreeSprite(cursor);
