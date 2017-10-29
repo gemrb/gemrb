@@ -66,6 +66,11 @@ namespace GemRB {
 		void DidDraw();
 		
 		void FlagsChanged(unsigned int /*oldflags*/);
+		
+	protected:
+		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+		bool OnMouseWheelScroll(const Point& delta);
+		bool OnMouseDrag(const MouseEvent&);
 
 	public:
 		ScrollView(const Region& frame);
@@ -74,10 +79,6 @@ namespace GemRB {
 		void AddSubviewInFrontOfView(View*, const View* = NULL);
 		View* RemoveSubview(const View*);
 		View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
-
-		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-		bool OnMouseWheelScroll(const Point& delta);
-		void OnMouseDrag(const MouseEvent&);
 		
 		// TODO: this isn't how we want to do things
 		// this should happen automatically as subivews are addred/removed/resized

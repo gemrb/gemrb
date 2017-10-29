@@ -111,7 +111,7 @@ TextContainer* TextArea::SpanSelector::TextAtIndex(size_t idx)
 	return static_cast<TextContainer*>(*it);
 }
 
-void TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
+bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 	TextContainer* span = TextAtPoint(p);
@@ -124,9 +124,10 @@ void TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 		hoverSpan = span;
 		hoverSpan->SetPalette(ta.palettes[PALETTE_HOVER]);
 	}
+	return true;
 }
 	
-void TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
+bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 	TextContainer* span = TextAtPoint(p);
@@ -138,12 +139,13 @@ void TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 		
 		MakeSelection(idx);
 	}
+	return true;
 }
 	
 void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
 	ClearHover();
-	TextContainer::OnMouseLeave(me, op);
+	TextContainer::MouseLeave(me, op);
 }
 
 TextArea::TextArea(const Region& frame, Font* text)
@@ -433,7 +435,8 @@ bool TextArea::OnMouseWheelScroll(const Point& delta)
 	// the only time we should get this event is when AnimPicture is set
 	// otherwise the scrollview would have recieved this
 	assert(AnimPicture);
-	return scrollview.OnMouseWheelScroll(delta);
+	scrollview.MouseWheelScroll(delta);
+	return true;
 }
 
 void TextArea::UpdateState(unsigned int optIdx)

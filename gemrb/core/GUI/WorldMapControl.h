@@ -78,14 +78,15 @@ public:
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
 
+protected:
 	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent& /*me*/);
+	bool OnMouseOver(const MouseEvent& /*me*/);
 	/** Mouse Leave Event */
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Wheel Event */
 	bool OnMouseWheelScroll(const Point& delta);
 

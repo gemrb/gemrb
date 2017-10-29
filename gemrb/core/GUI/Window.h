@@ -83,6 +83,11 @@ private:
 	
 	inline bool DispatchKey(View*, const Event&);
 	
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	
+	bool OnMouseDrag(const MouseEvent&);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
 
 public:
@@ -107,11 +112,6 @@ public:
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
-
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-
-	void OnMouseDrag(const MouseEvent&);
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	
 	bool InHandler() const;
 	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }

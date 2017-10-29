@@ -78,17 +78,6 @@ public:
 	void UpdateState(unsigned int Sum);
 	bool TracksMouseDown() const { return true; }
 
-	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Drag Event */
-	void OnMouseDrag(const MouseEvent&);
-	/** Mouse Wheel Scroll Event */
-	bool OnMouseWheelScroll(const Point& delta);
-	
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Holder<Sprite2D> Frames[IMAGE_COUNT];
@@ -118,6 +107,18 @@ private:
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */
 	int SliderPxRange() const;
+	
+protected:
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	/** Mouse Drag Event */
+	bool OnMouseDrag(const MouseEvent&);
+	/** Mouse Wheel Scroll Event */
+	bool OnMouseWheelScroll(const Point& delta);
+	
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 };
 
 }

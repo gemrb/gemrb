@@ -319,8 +319,8 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 	}
 
 	GameControl* gc = core->GetGameControl();
-	gc->OnMouseDown(me, 0);
-	gc->OnMouseUp(me, 0);
+	gc->MouseDown(me, 0);
+	gc->MouseUp(me, 0);
 
 	Sender->ReleaseCurrentAction();
 }

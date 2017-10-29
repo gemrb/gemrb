@@ -89,13 +89,14 @@ private: // Private attributes
 	unsigned char State;
 	/** Slider Position Value */
 	unsigned int Pos;
-public: // Public Events
+
+protected:
 	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent&);
+	bool OnMouseOver(const MouseEvent&);
 };
 
 }

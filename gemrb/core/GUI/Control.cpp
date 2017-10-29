@@ -228,7 +228,7 @@ bool Control::HitTest(const Point& p) const
 	return false;
 }
 
-void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
+bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Click, mod, me.button, me.repeats);
 	if (SupportsAction(key)) {
@@ -244,14 +244,16 @@ void Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		me2.repeats = 1;
 		OnMouseUp(me2, mod);
 	}
+	return true; // always handled
 }
 
-void Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
+bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Click, mod, me.button, me.repeats);
 	if (repeatDelay && SupportsAction(key)) {
 		actionTimer = StartActionTimer(actions[key]);
 	}
+	return true; // always handled
 }
 	
 ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)

@@ -163,8 +163,6 @@ public:
 	
 	bool HitTest(const Point& p) const;
 
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
     // TODO: implement generic handlers for the other types of event actions
 	
 	bool InHandler() const { return inHandler; }
@@ -194,6 +192,9 @@ protected:
 	
 	bool SupportsAction(const ActionKey&);
 	bool PerformAction(const ActionKey&);
+	
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay

@@ -41,6 +41,7 @@ View::DragOp::~DragOp() {
 View::View(const Region& frame)
 	: frame(frame)
 {
+	eventProxy = NULL;
 	superView = NULL;
 	window = NULL;
 
@@ -510,57 +511,86 @@ void View::SetTooltip(const String& string)
 	tooltip = string;
 	TrimString(tooltip); // for proper vertical alaignment
 }
+
+// View simply forwards to its eventProxy, if one exists,
+// otherwise attempts to handle the event by calling "OnEvent"
+// if the event is unhandled, bubble it up to the superview
+#define HandleEvent1(meth, p1) \
+HandleEvent(meth(p1))
+
+#define HandleEvent2(meth, p1, p2) \
+HandleEvent(meth(p1, p2))
 	
-void View::OnMouseEnter(const MouseEvent& /*me*/, const DragOp*)
+#define HandleEvent(meth) \
+if (eventProxy) { \
+	eventProxy->On ## meth; \
+	return; \
+} \
+\
+bool handled = On ## meth; \
+\
+if (handled == false && superView) { \
+	superView->meth; \
+}
+
+bool View::KeyPress(const KeyboardEvent& key, unsigned short mod)
+{
+	if (eventProxy) {
+		return eventProxy->OnKeyPress(key, mod);
+	}
+	return false;
+}
+
+bool View::KeyRelease(const KeyboardEvent& key, unsigned short mod)
+{
+	if (eventProxy) {
+		return eventProxy->OnKeyRelease(key, mod);
+	}
+	return false;
+}
+
+void View::MouseEnter(const MouseEvent& me, const DragOp* op)
 {
 #if DEBUG_VIEWS
 	debuginfo = true;
 #endif
+	
+	OnMouseEnter(me, op);
 }
 
-void View::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
+void View::MouseLeave(const MouseEvent& me, const DragOp* op)
 {
 #if DEBUG_VIEWS
 	debuginfo = false;
 	MarkDirty();
 #endif
+	
+	OnMouseLeave(me, op);
 }
 
-// View simpley forwards events to its superview	
-void View::OnMouseOver(const MouseEvent& me)
+void View::MouseOver(const MouseEvent& me)
 {
-	if (superView) {
-		superView->OnMouseOver(me);
-	}
+	HandleEvent1(MouseOver, me);
 }
 
-void View::OnMouseDrag(const MouseEvent& me)
+void View::MouseDrag(const MouseEvent& me)
 {
-	if (superView) {
-		superView->OnMouseDrag(me);
-	}
+	HandleEvent1(MouseDrag, me);
 }
 
-void View::OnMouseDown(const MouseEvent& me, unsigned short mod)
+void View::MouseDown(const MouseEvent& me, unsigned short mod)
 {
-	if (superView) {
-		superView->OnMouseDown(me, mod);
-	}
+	HandleEvent2(MouseDown, me, mod);
 }
 
-void View::OnMouseUp(const MouseEvent& me, unsigned short mod)
+void View::MouseUp(const MouseEvent& me, unsigned short mod)
 {
-	if (superView) {
-		superView->OnMouseUp(me, mod);
-	}
+	HandleEvent2(MouseUp, me, mod);
 }
 
-bool View::OnMouseWheelScroll(const Point& delta)
+void View::MouseWheelScroll(const Point& delta)
 {
-	if (superView) {
-		return superView->OnMouseWheelScroll(delta);
-	}
-	return false;
+	HandleEvent1(MouseWheelScroll, delta);
 }
 	
 void View::ClearScriptingRefs()

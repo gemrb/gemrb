@@ -473,11 +473,11 @@ void Button::CompleteDragOperation(const DragOp& dop)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
+bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Action::DragDrop);
     if (core->GetDraggedItem() && !SupportsAction(key)) {
-        return;
+        return true;
     }
     
 	if (me.button == GEM_MB_ACTION) {
@@ -487,18 +487,18 @@ void Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
-			return;
+			return true;
 		}
 		SetState( IE_GUI_BUTTON_PRESSED );
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
 	}
-	Control::OnMouseDown(me, mod);
+	return Control::OnMouseDown(me, mod);
 }
 
 /** Mouse Button Up */
-void Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
+bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	bool drag = core->GetDraggedItem () != NULL;
 
@@ -508,7 +508,7 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
             PerformAction(key);
         } else {
             //if something was dropped, but it isn't handled here: it didn't happen
-            return;
+            return false;
         }
     }
 
@@ -551,13 +551,13 @@ void Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			window->RedrawControls( VarName, val );
 		}
 	}
-    Control::OnMouseUp(me, mod);
+    return Control::OnMouseUp(me, mod);
 }
 
-void Button::OnMouseOver(const MouseEvent& me)
+bool Button::OnMouseOver(const MouseEvent& me)
 {
 	if (State == IE_GUI_BUTTON_LOCKED) {
-		return;
+		return true;
 	}
 
 	if ((flags & IE_GUI_BUTTON_DRAGGABLE) &&
@@ -569,12 +569,13 @@ void Button::OnMouseOver(const MouseEvent& me)
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		drag_start = drag_start + sp;
+		return true;
     } else {
-        Control::OnMouseOver(me);
+        return Control::OnMouseOver(me);
     }
 }
 
-void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
+void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 {
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
@@ -588,11 +589,9 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 			break;
 		}
 	}
-
-    Control::OnMouseEnter(me, dop);
 }
 
-void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
+void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* /*dop*/)
 {
 	if (State == IE_GUI_BUTTON_PRESSED && !(flags & IE_GUI_BUTTON_RADIOBUTTON) && !TracksMouseDown()) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
@@ -601,8 +600,6 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 		pulseBorder = false;
 		MarkDirty();
 	}
-
-    Control::OnMouseLeave(me, dop);
 }
 
 /** Sets the Text of the current control */

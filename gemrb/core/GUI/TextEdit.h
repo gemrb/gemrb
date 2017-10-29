@@ -67,6 +67,9 @@ private:
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 
 public:
 	struct Action {
@@ -93,9 +96,6 @@ public:
 	void SetBufferLength(ieWord buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
-    
-    /** Key Press Event */
-    bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
     
     void SetFocus();
 };

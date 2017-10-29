@@ -158,16 +158,6 @@ public:
 	Holder<DragOp> DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
-	/** Mouse Enter */
-	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
-	/** Mouse Leave */
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
-	/** Mouse Over */
-	void OnMouseOver(const MouseEvent&);
-	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 
 	Sprite2D* Cursor() const;
 
@@ -219,6 +209,18 @@ private: // Private attributes
 
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	
+protected:
+	/** Mouse Enter */
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	/** Mouse Leave */
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	/** Mouse Over */
+	bool OnMouseOver(const MouseEvent&);
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 };
 
 }

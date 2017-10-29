@@ -138,7 +138,7 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 }
 
 /** Mouse Button Down */
-void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+bool Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	int mx = (KnobPos.x + ( Pos * KnobStep ) - Knob->XPos);
@@ -151,24 +151,26 @@ void Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (( p.x >= mx ) && ( p.y >= my )) {
 		if (( p.x <= Mx ) && ( p.y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
-            return;
+            return true;
 		}
 	}
 
 	SetPosition(ConvertPointFromScreen(me.Pos()));
+	return true;
 }
 
 /** Mouse Button Up */
-void Slider::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
+bool Slider::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
 		MarkDirty();
 	}
 	State = IE_GUI_SLIDER_KNOB;
+	return true;
 }
 
 /** Mouse Over Event */
-void Slider::OnMouseOver(const MouseEvent& me)
+bool Slider::OnMouseOver(const MouseEvent& me)
 {
 	MarkDirty();
 	unsigned int oldPos = Pos;
@@ -179,6 +181,7 @@ void Slider::OnMouseOver(const MouseEvent& me)
             Control::OnMouseOver(me);
         }
 	}
+	return true;
 }
 
 }

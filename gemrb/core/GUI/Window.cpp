@@ -213,13 +213,13 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 	if (target) {
 		if (target != hoverView) {
 			if (hoverView) {
-				hoverView->OnMouseLeave(me, drag.get());
+				hoverView->MouseLeave(me, drag.get());
 				left = true;
 			}
-			target->OnMouseEnter(me, drag.get());
+			target->MouseEnter(me, drag.get());
 		}
 	} else if (hoverView) {
-		hoverView->OnMouseLeave(me, drag.get());
+		hoverView->MouseLeave(me, drag.get());
 		left = true;
 	}
 	if (left) {
@@ -236,9 +236,9 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 	if (trackingView) {
 		// tracking will eat this event
 		assert(me.buttonStates);
-		trackingView->OnMouseDrag(me);
+		trackingView->MouseDrag(me);
 	} else if (target) {
-		target->OnMouseOver(me);
+		target->MouseOver(me);
 	}
 	hoverView = target;
 }
@@ -254,7 +254,7 @@ void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned shor
 	}
 
 	TrySetFocus(target);
-	target->OnMouseDown(me, mod);
+	target->MouseDown(me, mod);
 	trackingView = target; // all views track the mouse within their bounds
 	assert(me.buttonStates);
 }
@@ -264,13 +264,13 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 	assert(target);
 	
 	if (trackingView) {
-		trackingView->OnMouseUp(me, mod);
+		trackingView->MouseUp(me, mod);
 	} else if (drag) {
 		if (target->AcceptsDragOperation(*drag)) {
 			target->CompleteDragOperation(*drag);
 		}
 	} else if (target) {
-		target->OnMouseUp(me, mod);
+		target->MouseUp(me, mod);
 	}
 	drag = NULL;
 	trackingView = NULL;
@@ -288,14 +288,14 @@ bool Window::DispatchKey(View* keyView, const Event& event)
 	bool handled = false;
 	if (keyView) {
 		handled = (event.type == Event::KeyDown)
-		? keyView->OnKeyPress(event.keyboard, event.mod)
-		: keyView->OnKeyRelease(event.keyboard, event.mod);
+		? keyView->KeyPress(event.keyboard, event.mod)
+		: keyView->KeyRelease(event.keyboard, event.mod);
 	}
 	
 	if (!handled) {
 		handled = (event.type == Event::KeyDown)
-		? OnKeyPress(event.keyboard, event.mod)
-		: OnKeyRelease(event.keyboard, event.mod);
+		? KeyPress(event.keyboard, event.mod)
+		: KeyRelease(event.keyboard, event.mod);
 	}
 	return handled;
 }
@@ -330,20 +330,12 @@ bool Window::DispatchEvent(const Event& event)
 				// retarget if NULL or disabled
 				{
 					Point delta = event.mouse.Delta();
-					if (target && !target->IsDisabled()) {
-						if (target->OnMouseWheelScroll(delta)) {
-							return true;
-						}
+					if (target == NULL || target->IsDisabled()) {
+						target = this;
 					}
-					
-					if (focusView && !focusView->IsDisabled()) {
-						if (focusView->OnMouseWheelScroll(delta)) {
-							return true;
-						}
-						
-					}
-					
-					return OnMouseWheelScroll(delta);
+
+					target->MouseWheelScroll(delta);
+					return true;
 				}
 			case Event::MouseMove:
 				// allows NULL and disabled targets
@@ -395,7 +387,7 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	return true;
 }
 
-void Window::OnMouseDrag(const MouseEvent& me)
+bool Window::OnMouseDrag(const MouseEvent& me)
 {
 	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
@@ -405,6 +397,7 @@ void Window::OnMouseDrag(const MouseEvent& me)
 	} else {
 		ScrollView::OnMouseDrag(me);
 	}
+	return true;
 }
 	
 void Window::OnMouseLeave(const MouseEvent& me, const DragOp*)

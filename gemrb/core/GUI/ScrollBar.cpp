@@ -112,13 +112,11 @@ void ScrollBar::ScrollBySteps(int steps)
 	SetValue(clamped);
 }
 
-/** SDL < 1.3 Mousewheel support */
 void ScrollBar::ScrollUp()
 {
 	ScrollBySteps(-1);
 }
 
-/** SDL < 1.3 Mousewheel support */
 void ScrollBar::ScrollDown()
 {
 	ScrollBySteps(1);
@@ -180,19 +178,19 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 }
 
 /** Mouse Button Down */
-void ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	// FIXME: this doesn't respect SLIDER_HORIZONTAL
 	Point p = ConvertPointFromScreen(me.Pos());
 	if (p.y <= GetFrameHeight(IMAGE_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
 		ScrollUp();
-		return;
+		return true;
 	}
 	if (p.y >= frame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED)) {
 		State |= DOWN_PRESS;
 		ScrollDown();
-		return;
+		return true;
 	}
 	// if we made it this far we will jump the nib to y and "grab" it
 	// this way we only need to click once to jump+scroll
@@ -202,17 +200,19 @@ void ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
 		// scrollbars may share images, so no, we shouldn't do this. need to fix or odd behavior will occur when 2 scrollbars are visible.
 		Frames[IMAGE_SLIDER]->YPos = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
-		return;
+		return true;
 	}
 	ScrollTo(p);
+	return true;
 }
 
 /** Mouse Button Up */
-void ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
+bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	State = 0;
 	Frames[IMAGE_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
+	return true;
 }
 
 /** Mousewheel scroll */
@@ -232,17 +232,18 @@ bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 		}
 		return true;
 	}
-	return false;
+	return Control::OnMouseWheelScroll(delta);
 }
 
 /** Mouse Drag Event */
-void ScrollBar::OnMouseDrag(const MouseEvent& me)
+bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
 		Point offset(Frames[IMAGE_SLIDER]->XPos, Frames[IMAGE_SLIDER]->YPos);
 		ScrollTo(p - offset);
 	}
+	return true;
 }
 
 bool ScrollBar::OnKeyPress(const KeyboardEvent& key, unsigned short mod)

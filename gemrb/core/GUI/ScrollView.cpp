@@ -337,7 +337,7 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		return true;
 	}
 
-	return false;
+	return this->Control::OnKeyPress(key, mod);
 }
 
 bool ScrollView::OnMouseWheelScroll(const Point& delta)
@@ -346,11 +346,14 @@ bool ScrollView::OnMouseWheelScroll(const Point& delta)
 	return true;
 }
 
-void ScrollView::OnMouseDrag(const MouseEvent& me)
+bool ScrollView::OnMouseDrag(const MouseEvent& me)
 {
 	if (EventMgr::ButtonState(GEM_MB_ACTION)) {
 		ScrollDelta(me.Delta());
+		return true;
 	}
+	
+	return false;
 }
 
 }

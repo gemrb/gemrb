@@ -68,16 +68,6 @@ public:
 	
 	bool IsAnimated() const { return true; }
 
-	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
-	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent&);
-	void OnMouseDrag(const MouseEvent& /*me*/);
-	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-
 private:
 	/** Call event handler on click */
 	void ClickHandle(const MouseEvent&);
@@ -93,6 +83,17 @@ private:
 	
 	Point ConvertPointToGame(Point) const;
 	Point ConvertPointFromGame(Point) const;
+	
+protected:
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	/** Mouse Over Event */
+	bool OnMouseOver(const MouseEvent&);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 };
 
 }

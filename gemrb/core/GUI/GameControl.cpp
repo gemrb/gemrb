@@ -749,7 +749,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 	if (DialogueFlags&DF_IN_DIALOG) {
 		TextArea* ta = core->GetMessageTextArea();
 		assert(ta);
-		return ta->OnKeyRelease(Key, Mod);
+		ta->KeyRelease(Key, Mod);
+		return true;
 	}
 
 	Point gameMousePos = GameMousePos();
@@ -1201,22 +1202,22 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 }
 
 /** Mouse Over Event */
-void GameControl::OnMouseOver(const MouseEvent& /*me*/)
+bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return;
+		return true;
 	}
 
 	Game *game = core->GetGame();
-	if (!game) return;
+	if (!game) return true;
 	Map *area = game->GetCurrentArea();
-	if (!area) return;
+	if (!area) return true;
 	Point gameMousePos = GameMousePos();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
 		lastCursor = IE_CURSOR_BLOCKED;
-		return;
+		return true;
 	}
 
 	overInfoPoint = area->TMap->GetInfoPoint( gameMousePos, true );
@@ -1228,7 +1229,7 @@ void GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	if (nextCursor == IE_CURSOR_INVALID) {
 		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
-		return;
+		return true;
 	}
 
 	if (overDoor) {
@@ -1257,7 +1258,7 @@ void GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	if (nextCursor == IE_CURSOR_INVALID) {
 		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
-		return;
+		return true;
 	}
 
 	// let us target party members even if they are invisible
@@ -1373,13 +1374,14 @@ end_function:
 		lastCursor = nextCursor ;
 		SetCursor(core->Cursors[lastCursor]);
 	}
+	return true;
 }
 
-void GameControl::OnMouseDrag(const MouseEvent& me)
+bool GameControl::OnMouseDrag(const MouseEvent& me)
 {
 	if (target_mode != TARGET_MODE_NONE) {
 		// we are in a target mode; nothing here applies
-		return;
+		return true;
 	}
 
 	if (me.ButtonState(GEM_MB_ACTION)) {
@@ -1403,6 +1405,7 @@ void GameControl::OnMouseDrag(const MouseEvent& me)
 	if (isFormationRotation) {
 		lastCursor = IE_CURSOR_USE;
 	}
+	return true;
 }
 
 Point GameControl::GameMousePos() const
@@ -1818,10 +1821,10 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 	return false;
 }
 /** Mouse Button Down */
-void GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
+bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
 	if (ScreenFlags&SF_DISABLEMOUSE)
-		return;
+		return true;
 
 	Point p = ConvertPointFromScreen(me.Pos());
 	gameClickPoint = p + vpOrigin;
@@ -1836,13 +1839,15 @@ void GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 		isDoubleClick = me.repeats == 2;
 		break;
 	}
+	return true;
 }
 
 /** Mouse Button Up */
-void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
+bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return ClearMouseState();
+		ClearMouseState();
+		return true;
 	}
 
 	//heh, i found no better place
@@ -1860,7 +1865,8 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 			// update the action bar
 			core->SetEventFlag(EF_ACTION);
-			return ClearMouseState();
+			ClearMouseState();
+			return true;
 		} else {
 			p = gameClickPoint;
 		}
@@ -1871,27 +1877,31 @@ void GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		// handle actions
 		if (target_mode != TARGET_MODE_NONE) {
 			PerformSelectedAction(p);
-			return ClearMouseState();
+			ClearMouseState();
+			return true;
 		}
 		
 		// handle selections
 		Actor* targetActor = area->GetActor(p, target_types);
 		if (isSelectionRect) {
 			MakeSelection(SelectionRect(), Mod&GEM_MOD_SHIFT);
-			return ClearMouseState();
+			ClearMouseState();
+			return true;
 		} else if (targetActor) {
 			if (Mod & GEM_MOD_SHIFT) {
 				game->SelectActor(targetActor, true, SELECT_NORMAL);
 			} else {
 				game->SelectActor(targetActor, true, SELECT_REPLACE);
 			}
-			return ClearMouseState();
+			ClearMouseState();
+			return true;
 		}
 	}
 
 	// handle movement/travel
 	CommandSelectedMovement(p);
 	ClearMouseState();
+	return true;
 }
 
 void GameControl::PerformSelectedAction(const Point& p)

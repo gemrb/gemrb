@@ -244,16 +244,17 @@ void MapControl::UpdateCursor()
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.ButtonState(GEM_MB_ACTION)) {
 		UpdateViewport(ConvertPointFromScreen(me.Pos()));
 	}
 	UpdateCursor();
+	return true;
 }
 	
 /** Mouse Over Event */
-void MapControl::OnMouseOver(const MouseEvent& me)
+bool MapControl::OnMouseOver(const MouseEvent& me)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 	
@@ -272,7 +273,7 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 					LinkedLabel->SetText( mn.text );
 				}
 				notePos = mn.Pos;
-				return;
+				return true;
 			}
 		}
 
@@ -283,17 +284,19 @@ void MapControl::OnMouseOver(const MouseEvent& me)
 	}
 	
 	UpdateCursor();
+	return true;
 }
 	
-void MapControl::OnMouseDrag(const MouseEvent& me)
+bool MapControl::OnMouseDrag(const MouseEvent& me)
 {
 	if (me.ButtonState(GEM_MB_ACTION)) {
 		UpdateViewport(ConvertPointFromScreen(me.Pos()));
 	}
+	return true;
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
+bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
 		window->Close();
@@ -322,6 +325,7 @@ void MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 	Control::OnMouseUp(me, mod);
 	UpdateCursor();
+	return true;
 }
 
 bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
@@ -332,9 +336,10 @@ bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		case GEM_UP:
 		case GEM_DOWN:
 			GameControl* gc = core->GetGameControl();
-			return gc->OnKeyPress(key, mod);
+			gc->KeyPress(key, mod);
+			return true;
 	}
-	return false;
+	return Control::OnKeyPress(key, mod);
 }
 
 }

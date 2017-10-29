@@ -61,7 +61,7 @@ private:
 			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
 			void OnMouseLeave(const MouseEvent& me, const DragOp*) {
 				assert(superView);
-				superView->OnMouseOver(me);
+				superView->MouseOver(me);
 			}
 		};
 	private:
@@ -74,6 +74,10 @@ private:
 		TextContainer* TextAtPoint(const Point&);
 		TextContainer* TextAtIndex(size_t idx);
 		
+		bool OnMouseOver(const MouseEvent& /*me*/);
+		bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+		
 	public:
 		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered);
 		
@@ -82,10 +86,6 @@ private:
 		TextContainer* Selection() const { return selectedSpan; }
 		
 		bool CanLockFocus() const { return false; }
-		
-		void OnMouseOver(const MouseEvent& /*me*/);
-		void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	};
 
 public:

@@ -36,6 +36,36 @@ class ViewScriptingRef;
 class Window;
 
 class GEM_EXPORT View {
+public:
+	// using Held so we can have polymorphic drag operations
+	struct DragOp : public Held<DragOp> {
+		View* dragView;
+		
+		DragOp(View* v);
+		virtual ~DragOp();
+	};
+	
+	enum AutoresizeFlags {
+		// when a superview frame changes...
+		ResizeNone = 0,
+		ResizeTop = 1 << 0, // keep my top relative to my super
+		ResizeBottom = 1 << 1, // keep my bottom relative to my super
+		ResizeVertical = ResizeTop|ResizeBottom, // top+bottom effectively resizes me vertically
+		ResizeLeft = 1 << 3, // keep my left relative to my super
+		ResizeRight = 1 << 4, // keep my right relative to my super
+		ResizeHorizontal = ResizeLeft|ResizeRight, // top+bottom effectively resizes me horizontaly
+		ResizeAll = ResizeVertical|ResizeHorizontal, // resize me relative to my super
+		
+		// TODO: move these to TextContainer
+		RESIZE_WIDTH = 1 << 27,		// resize the view horizontally if horizontal content exceeds width
+		RESIZE_HEIGHT = 1 << 26	// resize the view vertically if vertical content exceeds width
+	};
+	
+	enum ViewFlags {
+		Invisible = 1 << 30,
+		Disabled = 1 << 29,
+		IgnoreEvents = 1 << 28
+	};
 private:
 	Holder<Sprite2D> background;
 	Holder<Sprite2D> cursor;
@@ -47,6 +77,8 @@ private:
 	// MarkDirty could take a region, and more complicated views could potentially
 	// save a lot of drawing time by only drawing their dirty portions (GameControl?)
 	Regions dirtyBGRects;
+	
+	View* eventProxy;
 
 protected:
 	View* superView;
@@ -90,38 +122,25 @@ private:
 	
 protected:
 	void ClearScriptingRefs();
+	
+	// TODO: recheck use of IgnoreEvents flag. It may not be needed anymore since we can just return false for those cases.
+	// TODO: examine window event dispatch, all bubbling should be handled implicitly here
+	// TODO: recheck drag/drop code. probably should return false sometimes.
+	
+	// these events make no sense to forward
+	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {}
+	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {}
+	
+	// default view implementation does nothing but ignore the event
+	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnMouseOver(const MouseEvent& /*me*/) { return false; }
+	virtual bool OnMouseDrag(const MouseEvent& /*me*/) { return false; }
+	virtual bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnMouseWheelScroll(const Point&) { return false; }
 
 public:
-	// using Held so we can have polymorphic drag operations
-	struct DragOp : public Held<DragOp> {
-		View* dragView;
-
-		DragOp(View* v);
-		virtual ~DragOp();
-	};
-
-	enum AutoresizeFlags {
-		// when a superview frame changes...
-		ResizeNone = 0,
-		ResizeTop = 1 << 0, // keep my top relative to my super
-		ResizeBottom = 1 << 1, // keep my bottom relative to my super
-		ResizeVertical = ResizeTop|ResizeBottom, // top+bottom effectively resizes me vertically
-		ResizeLeft = 1 << 3, // keep my left relative to my super
-		ResizeRight = 1 << 4, // keep my right relative to my super
-		ResizeHorizontal = ResizeLeft|ResizeRight, // top+bottom effectively resizes me horizontaly
-		ResizeAll = ResizeVertical|ResizeHorizontal, // resize me relative to my super
-		
-		// TODO: move these to TextContainer
-		RESIZE_WIDTH = 1 << 27,		// resize the view horizontally if horizontal content exceeds width
-		RESIZE_HEIGHT = 1 << 26	// resize the view vertically if vertical content exceeds width
-	};
-
-	enum ViewFlags {
-		Invisible = 1 << 30,
-		Disabled = 1 << 29,
-		IgnoreEvents = 1 << 28
-	};
-	
 #if DEBUG_VIEWS
 	bool debuginfo;
 #endif
@@ -180,21 +199,23 @@ public:
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
-	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; };
-	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
-	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
-	virtual void OnMouseOver(const MouseEvent& /*me*/);
-	virtual void OnMouseDrag(const MouseEvent& /*me*/);
-	virtual void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	virtual void OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	virtual bool OnMouseWheelScroll(const Point&);
+	virtual bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	virtual bool KeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+
+	virtual void MouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	virtual void MouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	virtual void MouseOver(const MouseEvent& /*me*/);
+	virtual void MouseDrag(const MouseEvent& /*me*/);
+	virtual void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	virtual void MouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	virtual void MouseWheelScroll(const Point&);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
 	virtual Sprite2D* Cursor() const { return cursor.get(); }
 	void SetCursor(Sprite2D* c);
+	void SetEventProxy(View* proxy) { eventProxy = proxy; }
 
 	// GUIScripting
 	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);

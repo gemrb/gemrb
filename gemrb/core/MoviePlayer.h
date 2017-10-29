@@ -108,19 +108,20 @@ class MoviePlayerControls : public View {
 private:
 	// currently dont have any real controls
 	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {}
-
-public:
-	MoviePlayerControls(MoviePlayer& player)
-	: View(Region(Point(), player.Dimensions())), player(player) {}
-
+	
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) {
 		player.Stop();
 		return true;
 	}
-
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) {
+	
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) {
 		player.Stop();
+		return true;
 	}
+
+public:
+	MoviePlayerControls(MoviePlayer& player)
+	: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 
 }

@@ -70,12 +70,10 @@ private:
 	/** Color Palette */
 	Palette* palette;
 
-public: //Events
-	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
-
+public:
 	void SetFocus();
 	bool SetEvent(int eventType, ControlEventHandler handler);
+
 private:
 	void HistoryBack();
 	void HistoryForward();
@@ -84,6 +82,10 @@ private:
 
 	/** Draws the Console on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	
+protected:
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 };
 
 }

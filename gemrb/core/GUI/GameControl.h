@@ -171,23 +171,6 @@ public:
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
 
-	//Events
-	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
-	/** Key Release Event */
-	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
-	/** Mouse Over Event */
-	void OnMouseOver(const MouseEvent&);
-	void OnMouseDrag(const MouseEvent& /*me*/);
-	/** Currently only deals with the GEM_TAB exception */
-	bool DispatchEvent(const Event& event);
-
-	/** Mouse Button Down */
-	void OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	bool OnMouseWheelScroll(const Point& delta);
-
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const;
 
@@ -243,6 +226,24 @@ public:
 	/** Page is the spell type + spell level info */
 	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	void ToggleAlwaysRun();
+	
+protected:
+	//Events
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	/** Key Release Event */
+	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
+	/** Mouse Over Event */
+	bool OnMouseOver(const MouseEvent&);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
+	/** Currently only deals with the GEM_TAB exception */
+	bool DispatchEvent(const Event& event);
+	
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseWheelScroll(const Point& delta);
 };
 
 }

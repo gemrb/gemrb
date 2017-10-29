@@ -203,7 +203,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 }
 
 /** Mouse Over Event */
-void WorldMapControl::OnMouseOver(const MouseEvent& me)
+bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	lastCursor = IE_CURSOR_GRAB;
@@ -266,6 +266,7 @@ void WorldMapControl::OnMouseOver(const MouseEvent& me)
 			SetTooltip(L"");
 		}
 	}
+	return true;
 }
 
 /** Mouse Leave Event */
@@ -276,7 +277,7 @@ void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 }
 
 /** Mouse Button Down */
-void WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.button == GEM_MB_ACTION) {
 		MouseIsDown = true;
@@ -285,7 +286,7 @@ void WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 }
 
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
+bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	MouseIsDown = false;
 	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
