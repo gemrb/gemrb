@@ -110,7 +110,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
-			ScrollBar.Focus ()
+			SkillsWindow.SetEventProxy(ScrollBar)
 	elif type == LUSKILLS_TYPE_CHARGEN:
 		SkillsOffsetPress = 21
 		SkillsOffsetButton1 = 11
@@ -122,7 +122,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
-			ScrollBar.Focus ()
+			SkillsWindow.SetEventProxy(ScrollBar)
 	else:
 		return
 

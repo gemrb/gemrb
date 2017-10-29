@@ -2068,6 +2068,27 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 	return gs->ConstructObjectForScriptable(view->GetScriptingRef());
 }
 
+PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
+			 "SetEventProxy(GView, GView)\n\n"
+			 "Set a proxy view that will receive events on behalf of the target." );
+
+static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
+{
+	PyObject* pyView = NULL;
+	PyArg_ParseTuple( args,  "OO", &self, &pyView);
+	
+	View* target = GetView<View>(self);
+	ABORT_IF_NULL(target);
+	View* proxy = NULL;
+	if (pyView != Py_None) {
+		proxy = GetView<View>(pyView);
+		ABORT_IF_NULL(proxy);
+	}
+	target->SetEventProxy(proxy);
+	
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
 			 "GetFrame(GView)\n\n"
 			 "Returns a dictionary with members 'x', 'y', 'w', and 'h' representing the views frame rect." );
@@ -13018,6 +13039,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_AddSubview, METH_VARARGS),
 	METHOD(View_GetFrame, METH_VARARGS),
 	METHOD(View_SetBackground, METH_VARARGS),
+	METHOD(View_SetEventProxy, METH_VARARGS),
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
 	METHOD(View_SetResizeFlags, METH_VARARGS),

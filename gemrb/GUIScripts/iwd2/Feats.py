@@ -340,7 +340,7 @@ def OpenFeatsWindow(chargen=0):
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
-	ScrollBarControl.Focus ()
+	FeatWindow.SetEventProxy(ScrollBarControl)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	RedrawFeats()

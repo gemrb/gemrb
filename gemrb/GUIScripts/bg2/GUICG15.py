@@ -71,7 +71,7 @@ def OnLoad():
 	ScrollBarControl = RaceWindow.GetControl(1)
 	ScrollBarControl.SetVarAssoc("TopIndex", RaceCount)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
-	ScrollBarControl.Focus ()
+	RaceWindow.SetEventProxy(ScrollBarControl)
 
 	for i in range(LISTSIZE):
 		Button = RaceWindow.GetControl(i+6)

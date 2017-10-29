@@ -67,6 +67,7 @@ class GView:
 	methods = {
 	'AddAlias': _GemRB.View_AddAlias,
 	'AddSubview': _GemRB.View_AddSubview,
+	'SetEventProxy': _GemRB.View_SetEventProxy,
 	'GetFrame': _GemRB.View_GetFrame,
     'SetFrame': _GemRB.View_SetFrame,
     'SetBackground': _GemRB.View_SetBackground,

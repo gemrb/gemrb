@@ -95,7 +95,7 @@ def OnLoad():
 			ScrollBar = KitWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
 			ScrollBar.SetVarAssoc ("TopIndex", tmpRowCount-10, 0, tmpRowCount-10)
 			ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawKits)
-			ScrollBar.Focus()
+			KitWindow.SetEventProxy(ScrollBar)
 
 	elif not EnhanceGUI and RowCount>10:
 		RowCount = 10

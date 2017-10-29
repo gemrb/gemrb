@@ -212,7 +212,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			if(EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
-#				ScrollBar.Focus ()
 
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
 				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):

@@ -63,7 +63,7 @@ def OnLoad():
 		ScrollBar = ClassWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
 		ScrollBar.SetVarAssoc("TopIndex", len(MCRowIndices)-10)
 		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawMCs)
-		ScrollBar.Focus()
+		ClassWindow.SetEventProxy(ScrollBar)
 
 	BackButton = ClassWindow.GetControl(14)
 	BackButton.SetText(15416)

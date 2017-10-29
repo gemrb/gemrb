@@ -93,7 +93,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
 			count = GUICommon.ceildiv (len(HLAAbilities) - 25, 5) + 1
 			ScrollBar.SetVarAssoc ("HLATopIndex", count, 0, count)
-			ScrollBar.Focus ()
+			HLAWindow.SetEventProxy(ScrollBar)
 
 	# draw our HLAs and show the window
 	HLAShowAbilities ()
