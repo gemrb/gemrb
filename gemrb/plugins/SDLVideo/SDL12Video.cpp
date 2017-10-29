@@ -173,7 +173,12 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 		// remap these to mousewheel events
 		int speed = core->GetMouseScrollSpeed();
 		speed *= (button == SDL_BUTTON_WHEELUP) ? 1 : -1;
-		Event e = EventMgr::CreateMouseWheelEvent(Point(0, speed));
+		Event e;
+		if (SDL_GetModState() & KMOD_SHIFT) {
+			e = EventMgr::CreateMouseWheelEvent(Point(speed, 0));
+		} else{
+			e = EventMgr::CreateMouseWheelEvent(Point(0, speed));
+		}
 		EvntManager->DispatchEvent(e);
 		return GEM_OK;
 	}
