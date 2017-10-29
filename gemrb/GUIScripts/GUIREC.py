@@ -800,7 +800,7 @@ def OpenInformationWindow ():
 
 	if InformationWindow != None:
 		GUIRECCommon.CloseBiographyWindow ()
-		CloseInformationWindow ()
+		InformationWindow.Close()
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
@@ -813,7 +813,7 @@ def OpenInformationWindow ():
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseInformationWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InformationWindow.Close())
 	Button.MakeEscape()
 
 	TotalPartyExp = 0
@@ -905,17 +905,6 @@ def OpenInformationWindow ():
 	Label.SetText (str (stat['KillsTotalCount']))
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseInformationWindow ():
-	global InformationWindow
-
-	if InformationWindow:
-		InformationWindow.Unload ()
-	InformationWindow = None
-
-	PortraitWindow.SetVisible(True)
-	RecordsWindow.Focus()
 	return
 
 def OpenKitInfoWindow ():
