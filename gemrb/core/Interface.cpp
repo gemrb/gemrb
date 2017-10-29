@@ -423,10 +423,6 @@ GameControl* Interface::StartGameControl()
 		RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
 	}
 
-	if (guiscript->LoadScript( "MessageWindow" )) {
-		guiscript->RunFunction( "MessageWindow", "OnLoad" );
-	}
-
 	return gamectrl;
 }
 
@@ -508,7 +504,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_EXPANSION) {
 		EventFlag&=~EF_EXPANSION;
-		guiscript->RunFunction( "MessageWindow", "GameExpansion", false );
+		guiscript->RunFunction( "Game", "GameExpansion", false );
 		return;
 	}
 
@@ -573,6 +569,8 @@ void Interface::HandleFlags()
 			timer->Init();
 
 			GameControl* gc = StartGameControl();
+			guiscript->LoadScript( "Game" );
+			guiscript->RunFunction( "Game", "EnterGame" );
 
 			//switch map to protagonist
 			Actor* actor = GetFirstSelectedPC(true);
