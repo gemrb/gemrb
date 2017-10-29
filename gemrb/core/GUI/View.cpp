@@ -543,7 +543,7 @@ bool View::KeyPress(const KeyboardEvent& key, unsigned short mod)
 	if (eventProxy) {
 		return eventProxy->OnKeyPress(key, mod);
 	}
-	return false;
+	return OnKeyPress(key, mod);
 }
 
 bool View::KeyRelease(const KeyboardEvent& key, unsigned short mod)
@@ -551,7 +551,7 @@ bool View::KeyRelease(const KeyboardEvent& key, unsigned short mod)
 	if (eventProxy) {
 		return eventProxy->OnKeyRelease(key, mod);
 	}
-	return false;
+	return OnKeyRelease(key, mod);
 }
 
 void View::MouseEnter(const MouseEvent& me, const DragOp* op)
