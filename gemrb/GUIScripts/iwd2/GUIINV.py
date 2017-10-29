@@ -199,6 +199,8 @@ def UpdateInventoryWindow ():
 		InventoryCommon.UpdateSlot (pc, i)
 	return
 
+InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
+
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
 

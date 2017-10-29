@@ -181,6 +181,8 @@ def UpdateInventoryWindow ():
 	for i in range (46):
 		UpdateSlot (pc, i)
 
+InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
+
 def RefreshInventoryWindow ():
 	"""Partial redraw without resetting TopIndex."""
 
