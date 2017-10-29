@@ -283,6 +283,7 @@ bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		MouseIsDown = true;
 		LastMousePos = ConvertPointFromScreen(me.Pos());
 	}
+	return true;
 }
 
 /** Mouse Button Up */
@@ -292,6 +293,7 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
         Control::OnMouseUp(me, Mod);
 	}
+	return true;
 }
 
 /** Mouse wheel scroll */

@@ -237,12 +237,12 @@ def WorldMapWindowCommon (Travel):
 	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
 	if GameCheck.IsBG2():
-		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 105, 640, 375, Travel, "floattxt")
 	elif GameCheck.IsBG1():
-		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont", 1)
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 105, 640, 375, Travel, "toolfont", 1)
 		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
 	else:
-		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 105, 640, 375, Travel, "infofont")
 
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
