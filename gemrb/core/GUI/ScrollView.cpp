@@ -264,6 +264,13 @@ void ScrollView::Update()
 	}
 }
 
+bool ScrollView::CanScroll(const Point& p) const
+{
+	const Size& mySize = ContentRegion().Dimensions();
+	const Size& contentSize = contentView.Dimensions();
+	return contentSize.h > mySize.h + p.y && contentSize.w > mySize.w + p.x;
+}
+
 Point ScrollView::ScrollOffset() const
 {
 	return contentView.Origin();
@@ -306,7 +313,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	Update();
 }
 
-bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
+bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
 	// TODO: get scroll amount from settings
 	int amount = 10;
@@ -325,7 +332,7 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
 			scroll.x = -amount;
 			break;
 	}
-	if (!scroll.isnull()) {
+	if (!scroll.isnull() && CanScroll(scroll)) {
 		ScrollDelta(scroll);
 		return true;
 	}
