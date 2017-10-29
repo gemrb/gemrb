@@ -337,7 +337,7 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		return true;
 	}
 
-	return this->Control::OnKeyPress(key, mod);
+	return this->View::OnKeyPress(key, mod);
 }
 
 bool ScrollView::OnMouseWheelScroll(const Point& delta)
