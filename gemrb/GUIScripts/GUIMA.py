@@ -80,7 +80,7 @@ def InitMapWindow (Window):
 
 	# World Map
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: WorldMapWindowCommon (-1))
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -187,13 +187,6 @@ def AddNoteWindow ():
 	NoteLabel.Focus()
 	return
 
-def OpenWorldMapWindowInside ():
-	global MapWindow
-
-	MapWindow.Close()
-	WorldMapWindowCommon (-1)
-	return
-
 def OpenWorldMapWindow ():
 	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
@@ -238,56 +231,19 @@ def MoveToNewArea ():
 		GemRB.DisplayString (10689, 0xffffff)
 	return
 
-def CloseWorldMapWindow ():
-	global WorldMapWindow, WorldMapControl
-	global OldPortraitWindow, OldOptionsWindow
-
-	if WorldMapWindow:
-		WorldMapWindow.Unload ()
-	WorldMapWindow = None
-	WorldMapControl = None
-	if GameCheck.IsIWD2():
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-	GemRB.SetVar ("OtherWindow", -1)
-	return
-
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
-	global OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
-		CloseWorldMapWindow ()
-		return
 
 	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
-	#(fuzzie just copied this from the map window code..)
-	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
-	#saving the original portrait window
-	if GameCheck.IsIWD2():
-		OldPortraitWindow = GUICommonWindows.PortraitWindow
-		PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-		OldOptionsWindow = GUICommonWindows.OptionsWindow
-		OptionsWindow = GemRB.LoadWindow (0)
-		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
-
 	if GameCheck.IsBG2():
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
 	elif GameCheck.IsBG1():
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont", 1)
-		WorldMapControl = Window.GetControl (4)
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont", 1)
 		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
 	else:
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
-	WorldMapControl = Window.GetControl (4)
+		WorldMapControl = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
+
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
 	# center on current area
@@ -333,14 +289,9 @@ def WorldMapWindowCommon (Travel):
 
 	# Done
 	Button = Window.GetControl (0)
-	if Travel>=0:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
-	else:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: WorldMapWindow.Close())
 	Button.MakeEscape()
 
-	Window.Focus()
-	WorldMapControl.Focus()
 	return
 
 def MapN():

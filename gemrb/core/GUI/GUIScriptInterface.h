@@ -87,6 +87,8 @@ public:
 				return "TextArea";
 			case IE_GUI_SCROLLBAR:
 				return "ScrollBar";
+			case IE_GUI_WORLDMAP:
+				return "WorldMap";
 			default:
 				return "Control";
 		}
