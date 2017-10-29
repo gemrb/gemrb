@@ -1316,9 +1316,8 @@ def SetSelectionChangeHandler (handler):
 	#if (not SelectionChangeHandler) and handler:
 	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
-		if not sel:
-			sel = 1
-		GemRB.GameSelectPCSingle (sel)
+		if sel:
+			GemRB.GameSelectPCSingle (sel)
 
 	SelectionChangeHandler = handler
 
@@ -1351,6 +1350,8 @@ def TopWindowClosed(window):
 	#don't go back to multi selection mode when going to the store screen
 	if not GemRB.GetVar ("Inventory"):
 		SetSelectionChangeHandler (None)
+
+	SelectionChanged()
 
 def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None):
 	def ret ():
