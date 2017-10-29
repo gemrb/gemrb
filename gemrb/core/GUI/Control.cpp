@@ -237,14 +237,15 @@ bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			actionTimer->Invalidate();
 			actionTimer = NULL;
 		}
+		return true;
 	} else if (me.repeats > 1) {
 		// also try a single-click in case there is no doubleclick handler
 		// and there is never a triple+ click handler
 		MouseEvent me2(me);
 		me2.repeats = 1;
-		OnMouseUp(me2, mod);
+		return OnMouseUp(me2, mod);
 	}
-	return true; // always handled
+	return View::OnMouseUp(me, mod); // always handled
 }
 
 bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
@@ -252,8 +253,9 @@ bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	ActionKey key(Click, mod, me.button, me.repeats);
 	if (repeatDelay && SupportsAction(key)) {
 		actionTimer = StartActionTimer(actions[key]);
+		return true;
 	}
-	return true; // always handled
+	return View::OnMouseDown(me, mod);
 }
 	
 ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
