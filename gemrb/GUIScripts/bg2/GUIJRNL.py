@@ -53,6 +53,9 @@ def InitJournalWindow (JournalWindow):
 	# next chapter
 	Button = JournalWindow.GetControl (4)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextChapterPress)
+	
+	def Update():
+		UpdateLogWindow(JournalWindow)
 
 	GemRB.SetVar ("Section", Section)
 	# Quests
@@ -60,28 +63,28 @@ def InitJournalWindow (JournalWindow):
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 1)
 	Button.SetText (45485)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateLogWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# Quests completed
 	Button = JournalWindow.GetControl (7)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 2)
 	Button.SetText (45486)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateLogWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# Journal
 	Button = JournalWindow.GetControl (8)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 4)
 	Button.SetText (15333)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateLogWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# User
 	Button = JournalWindow.GetControl (9)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 0)
 	Button.SetText (45487)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateLogWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# Order
 	Button = JournalWindow.GetControl (10)
@@ -106,7 +109,7 @@ def ToggleOrderWindow ():
 		Order = 0
 	else:
 		Order = 1
-	UpdateLogWindow ()
+	UpdateLogWindow (None)
 	return
 
 def UpdateLogWindow (JournalWindow):
@@ -169,7 +172,7 @@ def PrevChapterPress ():
 	if Chapter > firstChapter:
 		Chapter = Chapter - 1
 		GemRB.SetToken ("CurrentChapter", str(Chapter) )
-		UpdateLogWindow ()
+		UpdateLogWindow (None)
 	return
 
 ###################################################
@@ -179,7 +182,7 @@ def NextChapterPress ():
 	if Chapter < GemRB.GetGameVar("chapter"):
 		Chapter = Chapter + 1
 		GemRB.SetToken ("CurrentChapter", str(Chapter) )
-		UpdateLogWindow ()
+		UpdateLogWindow (None)
 	return
 
 ###################################################
