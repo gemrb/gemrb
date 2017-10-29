@@ -274,7 +274,7 @@ void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) 
 ContentContainer::ContentContainer(const Region& frame)
 : View(frame)
 {
-	margin = 0;
+	margin.top = 0, margin.right = 0, margin.bottom = 0, margin.left = 0;
 	SizeChanged(Size());
 }
 
@@ -286,6 +286,15 @@ ContentContainer::~ContentContainer()
 	}
 }
 
+void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left)
+{
+	margin.top = top;
+	margin.right = right;
+	margin.bottom = bottom;
+	margin.left = left;
+	MarkDirty();
+}
+
 void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
@@ -295,13 +304,13 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;
-	Point dp = drawFrame.Origin() + Point(margin, margin);
+	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
 	
 	Region sc = video->GetScreenClip();
-	sc.x += margin;
-	sc.y += margin;
-	sc.w -= margin*2;
-	sc.h -= margin*2;
+	sc.x += margin.left;
+	sc.y += margin.top;
+	sc.w -= margin.left + margin.right;
+	sc.h -= margin.top + margin.bottom;
 	video->SetScreenClip(&sc);
 
 	ContentLayout::const_iterator it = layout.begin();
@@ -475,12 +484,12 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	if (Flags()&RESIZE_WIDTH) {
 		layoutFrame.w = SHRT_MAX;
 	} else {
-		layoutFrame.w -= margin*2;
+		layoutFrame.w -= margin.left + margin.right;
 	}
 	if (Flags()&RESIZE_HEIGHT) {
 		layoutFrame.h = SHRT_MAX;
 	} else {
-		layoutFrame.h -= margin*2;
+		layoutFrame.h -= margin.top + margin.bottom;
 	}
 
 	assert(!layoutFrame.Dimensions().IsEmpty());
@@ -514,8 +523,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		ieDword flags = Flags();
 		if (flags&(RESIZE_HEIGHT|RESIZE_WIDTH)) {
 			Region bounds = Region::RegionEnclosingRegions(rgns);
-			bounds.w += margin*2;
-			bounds.h += margin*2;
+			bounds.w += margin.left + margin.right;
+			bounds.h += margin.top + margin.bottom;
 			
 			if (flags&RESIZE_HEIGHT)
 				contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;

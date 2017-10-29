@@ -133,7 +133,13 @@ protected:
 	typedef std::deque<Layout> ContentLayout;
 	ContentLayout layout;
 	Point layoutPoint;
-	size_t margin;
+
+	struct {
+		ieByte top;
+		ieByte right;
+		ieByte bottom;
+		ieByte left;
+	} margin;
 
 public:
 	ContentContainer(const Region& frame);
@@ -154,8 +160,10 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
 	
-	size_t Margin() const { return margin; }
-	void SetMargin(size_t m) { margin = m; MarkDirty(); }
+	void SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left);
+	inline void SetMargin(ieByte top, ieByte right, ieByte bottom) { SetMargin(top, right, bottom, right); }
+	inline void SetMargin(ieByte top, ieByte right) { SetMargin(top, right, top, right); }
+	inline void SetMargin(ieByte top) { SetMargin(top, top, top, top); }
 
 protected:
 	void SubviewAdded(View* view, View* parent);
