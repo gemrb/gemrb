@@ -40,7 +40,6 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	SetColor(ColorWhite, ColorBlack);
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
-	SetFlags(IgnoreEvents, OP_OR);
 	SetText(string);
 }
 
