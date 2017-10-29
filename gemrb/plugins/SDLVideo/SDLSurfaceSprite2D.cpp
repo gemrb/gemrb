@@ -107,6 +107,15 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
 	assert(RLE == false);
 }
+	
+bool SDLSurfaceSprite2D::HasTransparency() const
+{
+#if SDL_VERSION_ATLEAST(1,3,0)
+	return SDL_ISPIXELFORMAT_ALPHA(surface->format) || SDL_GetColorKey(surface, NULL) != -1;
+#else
+	return surface->format->Amask > 0 || (surface->flags | SDL_SRCCOLORKEY);
+#endif
+}
 
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {

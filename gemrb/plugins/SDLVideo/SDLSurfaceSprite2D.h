@@ -44,6 +44,7 @@ public:
 	void SetPalette(Color* pal);
 	ieDword GetColorKey() const;
 	void SetColorKey(ieDword pxvalue);
+	bool HasTransparency() const;
 	Color GetPixel(unsigned short x, unsigned short y) const;
 	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 						 ieDword bmask, ieDword amask);

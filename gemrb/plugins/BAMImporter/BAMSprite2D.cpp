@@ -112,4 +112,10 @@ Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
 	return c;
 }
 
+bool BAMSprite2D::HasTransparency() const
+{
+	// BAMs always use green for transparency and if colorkey > 0 it guarantees we have green
+	return colorkey > 0 || (pal->col[0].r == 0 && pal->col[0].g == 0xff && pal->col[0].b == 0);
+}
+
 }

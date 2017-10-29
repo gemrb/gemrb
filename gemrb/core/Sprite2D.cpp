@@ -65,7 +65,6 @@ Sprite2D::~Sprite2D()
 
 bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 {
-	// TODO: this wont work for non-bam sprites, but it isn't used for any currently.
 	return GetPixel(x, y).a == 0;
 }
 

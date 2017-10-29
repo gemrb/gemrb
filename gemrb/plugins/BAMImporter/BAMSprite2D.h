@@ -47,6 +47,7 @@ public:
 	Color GetPixel(unsigned short x, unsigned short y) const;
 	ieDword GetColorKey() const { return colorkey; };
 	void SetColorKey(ieDword ck) { colorkey = (ieByte)ck; };
+	bool HasTransparency() const;
 };
 
 }
