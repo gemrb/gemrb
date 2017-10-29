@@ -426,6 +426,24 @@ GameControl* Interface::StartGameControl()
 	return gamectrl;
 }
 
+void Interface::CreateConsole()
+{
+	Region frame(0, 0, 640, 25);
+	
+	Window* consoleWin = winmgr->MakeWindow(frame);
+	Console* console = new Console(frame);
+	consoleWin->AddSubviewInFrontOfView(console);
+	console->SetCursor(GetCursorSprite());
+	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
+	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
+	consoleWin->SetPosition(Window::PosHmid);
+	
+	console->AssignScriptingRef(0, "CONSOLE");
+	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);
+	Window* conwin = GetWindow(0, "WIN_CON");
+	assert(conwin == consoleWin);
+}
+
 /* handle main loop events that might destroy or create windows
 thus cannot be called from DrawWindows directly
 these events are pending until conditions are right
@@ -1841,18 +1859,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Setting up the Console...");
-	Region frame(0, 0, 640, 25);
-	
-	Window* consoleWin = winmgr->MakeWindow(frame);
-	Console* console = new Console(frame);
-	consoleWin->AddSubviewInFrontOfView(console);
-	console->SetCursor(GetCursorSprite());
-	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
-	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
-	consoleWin->SetPosition(Window::PosHmid);
-	
-	console->AssignScriptingRef(0, "CONSOLE");
-	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);
+	CreateConsole();
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
