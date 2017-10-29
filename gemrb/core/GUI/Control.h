@@ -121,7 +121,7 @@ public:
 	virtual ~Control();
 
 	virtual bool IsAnimated() const { return animation; }
-	virtual bool IsOpaque() const { return true; }
+	bool IsOpaque() const;
 
 	/** Sets the Text of the current control */
 	void SetText(const String*);

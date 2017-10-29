@@ -54,7 +54,7 @@ public:
 	Progressbar(const Region& frame, unsigned short KnobStepsCount);
 	~Progressbar();
 
-	bool IsOpaque() const { return BackGround; }
+	bool IsOpaque() const { return BackGround && BackGround->HasTransparency() == false; }
 
 	/** Sets the background images */
 	void SetImage(Sprite2D * img, Sprite2D * img2);

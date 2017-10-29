@@ -66,6 +66,11 @@ Control::~Control()
 	Sprite2D::FreeSprite(AnimPicture);
 }
 
+bool Control::IsOpaque() const
+{
+	 return AnimPicture && AnimPicture->HasTransparency() == false;
+}
+
 void Control::SetText(const String* string)
 {
 	SetText((string) ? *string : L"");

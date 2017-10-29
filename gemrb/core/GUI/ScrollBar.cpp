@@ -124,12 +124,7 @@ void ScrollBar::ScrollDown()
 
 bool ScrollBar::IsOpaque() const
 {
-	/*
-	 IWD2 scrollbars have a transparent trough and we dont have a good way to know about such things.
-	 returning false for now.
-	return (Frames[IE_GUI_SCROLLBAR_TROUGH]->Width >= Frames[IE_GUI_SCROLLBAR_SLIDER]->Width);
-	 */
-	return false;
+	return Frames[IMAGE_TROUGH]->HasTransparency() == false;
 }
 
 /** Draws the ScrollBar control */

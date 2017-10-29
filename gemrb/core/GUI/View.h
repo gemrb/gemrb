@@ -154,7 +154,7 @@ public:
 	virtual bool NeedsDraw() const;
 
 	virtual bool IsAnimated() const { return false; }
-	virtual bool IsOpaque() const { return background != NULL; }
+	virtual bool IsOpaque() const;
 	virtual bool HitTest(const Point& p) const;
 
 	bool SetFlags(unsigned int arg_flags, int opcode);

@@ -384,6 +384,11 @@ void View::RemovedFromView(View*)
 	window = NULL;
 }
 
+bool View::IsOpaque() const
+{
+	return background && background->HasTransparency() == false;
+}
+
 bool View::HitTest(const Point& p) const
 {
 	Region r(Point(), Dimensions());
