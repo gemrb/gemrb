@@ -92,7 +92,7 @@ GameControl::GameControl(const Region& frame)
 	overInfoPoint = NULL;
 	drawPath = NULL;
 	pfs.null();
-	lastCursor = IE_CURSOR_NORMAL;
+	lastCursor = IE_CURSOR_INVALID;
 	moveX = moveY = 0;
 	numScrollCursor = 0;
 	DebugFlags = 0;
@@ -1376,12 +1376,17 @@ void GameControl::UpdateCursor()
 	}
 end_function:
 	if (nextCursor >= 0 && lastCursor != nextCursor) {
-		// FIXME: this is a temporary hack to enable cursors
-		// the above code needs to be refactored to not set IE_CURSOR_GRAY, but rather set a bool backing an override for IsDisabledCursor()
-		SetBits(nextCursor, IE_CURSOR_GRAY, OP_NAND);
 		lastCursor = nextCursor ;
-		SetCursor(core->Cursors[lastCursor]);
+		SetCursor(core->Cursors[lastCursor & ~IE_CURSOR_GRAY]);
 	}
+}
+
+bool GameControl::IsDisabledCursor() const
+{
+	if (lastCursor == IE_CURSOR_INVALID)
+		return this->Control::IsDisabledCursor();
+
+	return bool(lastCursor&IE_CURSOR_GRAY);
 }
 
 bool GameControl::OnMouseDrag(const MouseEvent& me)
@@ -1517,6 +1522,7 @@ void GameControl::UpdateScrolling() {
 	// we would need to set the cursor on the gamewin itself and add code in WindowManager to have gamewin cursors trump everything else
 	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
 	SetCursor(cursor);
+	lastCursor = IE_CURSOR_INVALID;
 	Sprite2D::FreeSprite(cursor);
 
 	numScrollCursor = (numScrollCursor+1) % 15;

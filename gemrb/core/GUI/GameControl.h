@@ -99,7 +99,7 @@ private:
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
 	int target_mode;
-	unsigned char lastCursor;
+	int lastCursor;
 	short moveX, moveY;
 	int numScrollCursor;
 	int DebugFlags;
@@ -148,6 +148,7 @@ private:
 	void HandleDoor(Door *door, Actor *actor);
 	
 	void UpdateCursor();
+	bool IsDisabledCursor() const;
 
 	void PerformSelectedAction(const Point& p);
 	void CommandSelectedMovement(const Point& p);
