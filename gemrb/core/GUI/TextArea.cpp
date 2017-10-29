@@ -519,7 +519,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 
 	selectOptions = new SpanSelector(*this, strings, numbered);
-	selectOptions->SetMargin(3);
+	selectOptions->SetMargin(0, 3);
 	scrollview.AddSubviewInFrontOfView(selectOptions);
 	
 	UpdateScrollview();
@@ -531,7 +531,7 @@ void TextArea::ClearText()
 
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palettes[PALETTE_NORMAL]);
-	textContainer->SetMargin(3);
+	textContainer->SetMargin(0, 3);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
