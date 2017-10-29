@@ -3821,6 +3821,11 @@ void Interface::LoadProgress(int percent)
 void Interface::ReleaseDraggedItem()
 {
 	DraggedItem=NULL; //shouldn't free this
+	
+	Window* invwin = GetWindow(0, "WIN_INV");
+	if (invwin) {
+		invwin->SetCursor(NULL);
+	}
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
@@ -3833,6 +3838,17 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 		delete DraggedItem;
 	}
 	DraggedItem = item;
+
+	// FIXME: not sure if this is the best place or if there is a better way to get the icon
+	Window* invwin = GetWindow(0, "WIN_INV");
+	if (invwin) {
+		Item* i = gamedata->GetItem(item->ItemResRef);
+		Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
+		if (pic) {
+			invwin->SetCursor(pic);
+			pic->release();
+		}
+	}
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
