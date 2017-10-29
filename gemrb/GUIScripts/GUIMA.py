@@ -257,39 +257,48 @@ def WorldMapWindowCommon (Travel):
 		#north
 		Button = Window.GetControl (1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
+		Button.SetActionInterval (200)
 
 		#south
 		Button = Window.GetControl (2)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
+		Button.SetActionInterval (200)
 
 	if GameCheck.IsBG2():
 		#northwest
 		Button = Window.GetControl (8)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
+		Button.SetActionInterval (200)
 
 		#northeast
 		Button = Window.GetControl (9)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
+		Button.SetActionInterval (200)
 
 		#west
 		Button = Window.GetControl (10)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
+		Button.SetActionInterval (200)
 
 		#center
 		Button = Window.GetControl (11)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
+		Button.SetActionInterval (200)
 
 		#east
 		Button = Window.GetControl (12)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
+		Button.SetActionInterval (200)
 
 		#southwest
 		Button = Window.GetControl (13)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
+		Button.SetActionInterval (200)
 
 		#southeast
 		Button = Window.GetControl (14)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
+		Button.SetActionInterval (200)
 
 	# Done
 	Button = Window.GetControl (0)
