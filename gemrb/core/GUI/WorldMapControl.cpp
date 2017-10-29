@@ -38,7 +38,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;
 	ScrollY = 0;
-	MouseIsDown = false;
 	lastCursor = 0;
 	Area = NULL;
 	SetValue(direction);
@@ -209,12 +208,6 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	lastCursor = IE_CURSOR_GRAB;
 	Point p = ConvertPointFromScreen(me.Pos());
 
-	if (MouseIsDown) {
-		AdjustScrolling(LastMousePos.x - p.x, LastMousePos.y - p.y);
-	}
-
-	LastMousePos = p;
-
 	if (GetValue()!=(ieDword) -1) {
 		Point mapOff = p + Point(ScrollX, ScrollY);
 
@@ -269,6 +262,16 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	return true;
 }
 
+bool WorldMapControl::OnMouseDrag(const MouseEvent& me)
+{
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		AdjustScrolling(LastMousePos.x - p.x, LastMousePos.y - p.y);
+		LastMousePos = p;
+	}
+	return true;
+}
+
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
@@ -280,7 +283,6 @@ void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.button == GEM_MB_ACTION) {
-		MouseIsDown = true;
 		LastMousePos = ConvertPointFromScreen(me.Pos());
 	}
 	return true;
@@ -289,7 +291,6 @@ bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 /** Mouse Button Up */
 bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
-	MouseIsDown = false;
 	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
         Control::OnMouseUp(me, Mod);
 	}

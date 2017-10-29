@@ -74,13 +74,13 @@ public:
 	void SetOverrideIconPalette(bool override) { OverrideIconPalette = override; };
 	int ScrollX, ScrollY;
 	Point LastMousePos;
-	bool MouseIsDown;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
 
 protected:
 	/** Mouse Over Event */
 	bool OnMouseOver(const MouseEvent& /*me*/);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
 	/** Mouse Leave Event */
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 	/** Mouse Button Down */
