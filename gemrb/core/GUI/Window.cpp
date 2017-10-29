@@ -149,10 +149,11 @@ String Window::TooltipText() const
 
 Sprite2D* Window::Cursor() const
 {
+	Sprite2D* cursor = NULL;
 	if (hoverView) {
-		return hoverView->Cursor();
+		cursor = hoverView->Cursor();
 	}
-	return ScrollView::Cursor();
+	return (cursor) ? cursor : ScrollView::Cursor();
 }
 
 bool Window::IsDisabledCursor() const
