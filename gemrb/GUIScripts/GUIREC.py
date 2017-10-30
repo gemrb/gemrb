@@ -228,8 +228,8 @@ OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWi
 
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():
-	OpenRecordsWindow ()
-	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
+	ToggleRecordsWindow()
+	GUIWORLD.OpenReformPartyWindow()
 	return
 
 #don't allow exporting polymorphed or dead characters

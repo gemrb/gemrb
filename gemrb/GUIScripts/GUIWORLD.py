@@ -207,7 +207,7 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
+	global ReformPartyWindow
 	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
@@ -223,7 +223,7 @@ def OpenReformPartyWindow ():
 		GUICommonWindows.UpdatePortraitWindow()
 		return
 
-	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
 
 	# skip exportable party members (usually only the protagonist)
 	removable_pcs = []
