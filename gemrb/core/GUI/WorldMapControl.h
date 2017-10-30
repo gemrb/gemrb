@@ -95,8 +95,6 @@ protected:
 private:
 	//font for printing area names
 	Font* ftext;
-	//mouse cursor
-	unsigned char lastCursor;
 	//current area
 	ieResRef currentArea;
 	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient

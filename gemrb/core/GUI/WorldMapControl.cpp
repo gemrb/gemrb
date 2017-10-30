@@ -38,9 +38,9 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	ControlType = IE_GUI_WORLDMAP;
 	ScrollX = 0;
 	ScrollY = 0;
-	lastCursor = 0;
 	Area = NULL;
 	SetValue(direction);
+	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	OverrideIconPalette = false;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
@@ -205,7 +205,6 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	lastCursor = IE_CURSOR_GRAB;
 	Point p = ConvertPointFromScreen(me.Pos());
 
 	if (GetValue()!=(ieDword) -1) {
@@ -242,7 +241,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			}
 			if (!rgn.PointInside(mapOff)) continue;
 
-			lastCursor = IE_CURSOR_NORMAL;
+			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 			Area=ae;
 			if(oldArea!=ae) {
 				String* str = core->GetString(23084);
@@ -283,6 +282,7 @@ void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.button == GEM_MB_ACTION) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB+1]);
 		LastMousePos = ConvertPointFromScreen(me.Pos());
 	}
 	return true;
@@ -291,7 +291,8 @@ bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 /** Mouse Button Up */
 bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
-	if (me.button == GEM_MB_ACTION && lastCursor==IE_CURSOR_NORMAL) {
+	if (me.button == GEM_MB_ACTION) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
         Control::OnMouseUp(me, Mod);
 	}
 	return true;
