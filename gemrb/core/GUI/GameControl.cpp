@@ -1385,7 +1385,7 @@ end_function:
 bool GameControl::IsDisabledCursor() const
 {
 	if (lastCursor == IE_CURSOR_INVALID)
-		return this->Control::IsDisabledCursor();
+		return this->View::IsDisabledCursor();
 
 	return bool(lastCursor&IE_CURSOR_GRAY);
 }
