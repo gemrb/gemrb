@@ -302,7 +302,7 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
 	ScrollX += delta.x;
-	ScrollY += delta.y;
+	ScrollY -= delta.y;
 
 	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
