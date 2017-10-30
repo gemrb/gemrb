@@ -208,6 +208,7 @@ void GameControl::ClearMouseState()
 	isFormationRotation = false;
 	isDoubleClick = false;
 	
+	SetCursor(NULL);
 	UpdateCursor();
 }
 
@@ -1415,7 +1416,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 	}
 
 	if (isFormationRotation) {
-		lastCursor = IE_CURSOR_USE;
+		SetCursor(core->Cursors[IE_CURSOR_USE]);
 	}
 	return true;
 }
