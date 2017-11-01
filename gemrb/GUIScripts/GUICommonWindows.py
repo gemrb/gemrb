@@ -1338,6 +1338,9 @@ def CloseTopWindow ():
 # TODO: this really looks like (most of?) it only applies to the inventory window
 # it woudl be better to move that to GUIINV
 def TopWindowClosed(window):
+	GameWin = GemRB.GetView("GAMEWIN")
+	GameWin.SetDisabled(False)
+
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
 		pc = GemRB.GameGetSelectedPCSingle ()
@@ -1366,6 +1369,8 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None)
 	
 			SetTopWindow (window, selectionHandler)
 			window.SetOnClose(TopWindowClosed)
+			GameWin = GemRB.GetView("GAMEWIN")
+			GameWin.SetDisabled(True)
 
 		return window
 	
