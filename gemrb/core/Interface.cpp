@@ -3822,10 +3822,7 @@ void Interface::ReleaseDraggedItem()
 {
 	DraggedItem=NULL; //shouldn't free this
 	
-	Window* invwin = GetWindow(0, "WIN_INV");
-	if (invwin) {
-		invwin->SetCursor(NULL);
-	}
+	winmgr->GetGameWindow()->SetCursor(NULL);
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
@@ -3840,14 +3837,11 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	DraggedItem = item;
 
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
-	Window* invwin = GetWindow(0, "WIN_INV");
-	if (invwin) {
-		Item* i = gamedata->GetItem(item->ItemResRef);
-		Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
-		if (pic) {
-			invwin->SetCursor(pic);
-			pic->release();
-		}
+	Item* i = gamedata->GetItem(item->ItemResRef);
+	Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
+	if (pic) {
+		winmgr->GetGameWindow()->SetCursor(pic);
+		pic->release();
 	}
 }
 
