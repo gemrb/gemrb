@@ -389,7 +389,6 @@ void GameControl::WillDraw()
 			// set these cursors on game window so they are universal
 			Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
 			window->SetCursor(cursor);
-			lastCursor = IE_CURSOR_INVALID;
 			Sprite2D::FreeSprite(cursor);
 			
 			numScrollCursor = (numScrollCursor+1) % 15;
@@ -1167,7 +1166,7 @@ int GameControl::GetCursorOverDoor(Door *overDoor) const
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
 			Game *game = core->GetGame();
 			Map *area = game->GetCurrentArea();
-			if (!area) return IE_CURSOR_BLOCKED;
+			assert(area);
 			return area->GetCursor(overDoor->Pos);
 		} else {
 			return lastCursor|IE_CURSOR_GRAY;
@@ -1256,12 +1255,10 @@ void GameControl::UpdateCursor()
 
 	overInfoPoint = area->TMap->GetInfoPoint( gameMousePos, true );
 	if (overInfoPoint) {
-		//nextCursor = overInfoPoint->Cursor;
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
-	// recheck in case the positioon was different, resulting in a new isVisible check
+	// recheck in case the position was different, resulting in a new isVisible check
 	if (nextCursor == IE_CURSOR_INVALID) {
-		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
@@ -1290,7 +1287,6 @@ void GameControl::UpdateCursor()
 	// recheck in case the positioon was different, resulting in a new isVisible check
 	// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
 	if (nextCursor == IE_CURSOR_INVALID) {
-		//Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
@@ -1401,10 +1397,10 @@ void GameControl::UpdateCursor()
 		}
 	}
 end_function:
-	if (nextCursor >= 0 && lastCursor != nextCursor) {
+	if (nextCursor >= 0) {
 		lastCursor = nextCursor ;
-		SetCursor(core->Cursors[lastCursor & ~IE_CURSOR_GRAY]);
 	}
+	SetCursor(core->Cursors[lastCursor & ~IE_CURSOR_GRAY]);
 }
 
 bool GameControl::IsDisabledCursor() const
