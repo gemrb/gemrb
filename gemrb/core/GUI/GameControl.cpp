@@ -1453,6 +1453,13 @@ Point GameControl::GameMousePos() const
 
 bool GameControl::OnGlobalMouseMove(const Event& e)
 {
+	// we are using the window->IsDisabled on purpose
+	// to avoid bugs, we are disabling the window when we open one of the "top window"s
+	// GC->IsDisabled is for other uses
+	if (window->IsDisabled()) {
+		return false;
+	}
+	
 #define SCROLL_AREA_WIDTH 5
 	Region mask = frame;
 	mask.x += SCROLL_AREA_WIDTH;
