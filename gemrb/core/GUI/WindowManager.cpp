@@ -398,8 +398,12 @@ void WindowManager::DrawMouse() const
 
 void WindowManager::DrawCursor(const Point& pos) const
 {
-	// GameWin cursor is a global override
-	// we use this for drag items and some others
+	// Cursor draw priority:
+	// 1. gamewin cursor trumps all (we use this for drag items and some others)
+	// 2. hoverwin cursor
+	// 3. hoverview cursor
+	// 4. WindowManager cursors
+
 	Holder<Sprite2D> cur(gameWin->View::Cursor());
 	
 	if (!cur && hoverWin) {
