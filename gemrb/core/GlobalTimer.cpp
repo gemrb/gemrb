@@ -79,11 +79,6 @@ void GlobalTimer::Freeze()
 	ieDword count = advance/interval;
 	// pst/bg2 do this, if you fix it for another game, wrap it in a check
 	DoFadeStep(count);
-
-	// show scrolling cursor while paused
-	GameControl* gc = core->GetGameControl();
-	if (gc)
-		gc->UpdateScrolling();
 }
 
 bool GlobalTimer::ViewportIsMoving()
@@ -161,10 +156,6 @@ bool GlobalTimer::Update()
 	unsigned long thisTime;
 	unsigned long advance;
 
-	gc = core->GetGameControl();
-	if (gc)
-		gc->UpdateScrolling();
-
 	UpdateAnimations(false);
 
 	thisTime = GetTickCount();
@@ -181,6 +172,7 @@ bool GlobalTimer::Update()
 	ieDword count = advance/interval;
 	DoStep(count);
 	DoFadeStep(count);
+	gc = core->GetGameControl();
 	if (!gc) {
 		goto end;
 	}

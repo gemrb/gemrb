@@ -371,6 +371,31 @@ void GameControl::WillDraw()
 	
 	if (moveX || moveY) {
 		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
+		
+		if (core->GetMouseScrollSpeed()) {
+			int cursorFrame = 0; // right
+			if (moveY < 0) {
+				cursorFrame = 2; // up
+				if (moveX > 0) cursorFrame--; // +right
+				else if (moveX < 0) cursorFrame++; // +left
+			} else if (moveY > 0) {
+				cursorFrame = 6; // down
+				if (moveX > 0) cursorFrame++; // +right
+				else if (moveX < 0) cursorFrame--; // +left
+			} else if (moveX < 0) {
+				cursorFrame = 4; // left
+			}
+			
+			// set these cursors on game window so they are universal
+			Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
+			window->SetCursor(cursor);
+			lastCursor = IE_CURSOR_INVALID;
+			Sprite2D::FreeSprite(cursor);
+			
+			numScrollCursor = (numScrollCursor+1) % 15;
+		}
+	} else if (!window->IsDisabled()) {
+		window->SetCursor(NULL);
 	}
 }
 
@@ -1498,35 +1523,6 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 Region GameControl::Viewport()
 {
 	return Region(vpOrigin, frame.Dimensions());
-}
-
-void GameControl::UpdateScrolling() {
-	// mouse scroll speed is checked because scrolling is not always done by the mouse (ie cutscenes/keyboard/etc)
-	if (!core->GetMouseScrollSpeed() || (moveX == 0 && moveY == 0)) {
-		return;
-	}
-
-	int cursorFrame = 0; // right
-	if (moveY < 0) {
-		cursorFrame = 2; // up
-		if (moveX > 0) cursorFrame--; // +right
-		else if (moveX < 0) cursorFrame++; // +left
-	} else if (moveY > 0) {
-		cursorFrame = 6; // down
-		if (moveX > 0) cursorFrame++; // +right
-		else if (moveX < 0) cursorFrame--; // +left
-	} else if (moveX < 0) {
-		cursorFrame = 4; // left
-	}
-
-	// FIXME: this actually doesnt work when the protrait/options/action window obscures us
-	// we would need to set the cursor on the gamewin itself and add code in WindowManager to have gamewin cursors trump everything else
-	Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-	SetCursor(cursor);
-	lastCursor = IE_CURSOR_INVALID;
-	Sprite2D::FreeSprite(cursor);
-
-	numScrollCursor = (numScrollCursor+1) % 15;
 }
 
 //generate action code for source actor to try to attack a target

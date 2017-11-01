@@ -177,7 +177,6 @@ public:
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const;
 
-	void UpdateScrolling();
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
 	bool SetScreenFlags(unsigned int value, int mode);
