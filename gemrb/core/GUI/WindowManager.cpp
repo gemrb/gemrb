@@ -190,7 +190,7 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 
 	Window* frontWin = windows.front();
 	if ((front && frontWin == win2) || win == frontWin) {
-		TooltipTime = GetTickCount();
+		TooltipTime = 0;
 	}
 
 	return true;
