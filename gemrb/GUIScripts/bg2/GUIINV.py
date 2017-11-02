@@ -106,7 +106,7 @@ def InitInventoryWindow (Window):
 
 	return
 
-def UpdateInventoryWindow (Window):
+def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
 
 	if Window == None:
