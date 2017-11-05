@@ -532,7 +532,7 @@ void TextArea::ClearText()
 
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palettes[PALETTE_NORMAL]);
-	textContainer->SetMargin(0, 3);
+	textContainer->SetMargin(0, 3, LineHeight(), 3);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
