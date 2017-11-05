@@ -170,21 +170,18 @@ public:
 protected:
 	struct ActionKey {
 		uint32_t key;
-		
+
 		ActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
 			// pack the parameters into the 32 bit key...
 			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
 			key = 0;
-			uint32_t mask = 0xFF;
+			uint32_t mask = 0x000000FF;
 			key |= type & mask;
-			mask <<= 8u;
-			key |= (mod << 8) & mask;
-			mask <<= 8u;
-			key |= (button << 16) & mask;
-			mask <<= 8u;
-			key |= (count << 24) & mask;
+			key |= (mod & mask) << 8;
+			key |= (button & mask) << 16;
+			key |= (count & mask) << 24;
 		}
-		
+
 		bool operator< (const ActionKey& ak) const {
 			return key < ak.key;
 		}
