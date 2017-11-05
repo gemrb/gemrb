@@ -183,6 +183,7 @@ public:
 	View* RemoveFromSuperview();
 	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 	Window* GetWindow() const;
+	bool ContainsView(const View* view) const;
 
 	Point ConvertPointToSuper(const Point&) const;
 	Point ConvertPointFromSuper(const Point&) const;
