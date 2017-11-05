@@ -422,6 +422,10 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 
 bool View::ContainsView(const View* view) const
 {
+	if (view == NULL) {
+		return false;
+	}
+
 	if (this == view) {
 		return true;
 	}
