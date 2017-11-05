@@ -250,11 +250,7 @@ void ScrollView::Update()
 {
 	contentView.ResizeToSubviews();
 	
-	const Size& mySize = ContentRegion().Dimensions();
-	const Size& contentSize = contentView.Dimensions();
-	
 	Point origin = contentView.Origin(); // how much we have scrolled in -px
-	Point max(contentSize.w - mySize.w, contentSize.h - mySize.h);
 	
 	if (vscroll) {
 		vscroll->SetValue(-origin.y);
@@ -286,20 +282,22 @@ void ScrollView::SetScrollIncrement(int inc)
 	}
 }
 
-void ScrollView::ScrollDelta(const Point& p, ieDword duration)
+void ScrollView::ScrollDelta(const Point& p, bool clamp, ieDword duration)
 {
-	ScrollTo(p + contentView.Origin(), duration);
+	ScrollTo(p + contentView.Origin(), clamp, duration);
 }
 
-void ScrollView::ScrollTo(Point newP, ieDword duration)
+void ScrollView::ScrollTo(Point newP, bool clamp, ieDword duration)
 {
 	short maxx = frame.w - contentView.Dimensions().w;
 	short maxy = frame.h - contentView.Dimensions().h;
 	assert(maxx <= 0 && maxy <= 0);
 
-	// clamp values so we dont scroll beyond the content
-	newP.x = Clamp<short>(newP.x, maxx, 0);
-	newP.y = Clamp<short>(newP.y, maxy, 0);
+	if (clamp) {
+		// clamp values so we dont scroll beyond the content
+		newP.x = Clamp<short>(newP.x, maxx, 0);
+		newP.y = Clamp<short>(newP.y, maxy, 0);
+	}
 
 	// set up animation if required
 	if  (duration) {

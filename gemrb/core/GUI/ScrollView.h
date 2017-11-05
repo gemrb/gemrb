@@ -87,8 +87,8 @@ namespace GemRB {
 		Point ScrollOffset() const;
 		void SetScrollIncrement(int);
 		
-		void ScrollDelta(const Point& p, ieDword duration = 0);
-		void ScrollTo(Point p, ieDword duration = 0);
+		void ScrollDelta(const Point& p, bool clamp = true, ieDword duration = 0);
+		void ScrollTo(Point p, bool clamp = true, ieDword duration = 0);
 		bool CanScroll(const Point& p) const;
 		
 		Region ContentRegion() const;

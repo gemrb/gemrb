@@ -425,7 +425,7 @@ ieWord TextArea::LineHeight() const
 void TextArea::ScrollToY(int y, short lineduration)
 {
 	ieDword duration = lineduration * LineCount();
-	scrollview.ScrollTo(Point(0, y), duration);
+	scrollview.ScrollTo(Point(0, y), true, duration);
 }
 
 /** Mousewheel scroll */
