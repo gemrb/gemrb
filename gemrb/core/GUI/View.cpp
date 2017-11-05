@@ -555,10 +555,11 @@ if (eventProxy) { \
 	return; \
 } \
 \
-bool handled = On ## meth; \
-\
-if (handled == false && superView) { \
-	superView->meth; \
+if ((flags&(Disabled|IgnoreEvents)) == 0) { \
+	bool handled = On ## meth; \
+	if (handled == false && superView) { \
+		superView->meth; \
+	} \
 }
 
 bool View::KeyPress(const KeyboardEvent& key, unsigned short mod)
