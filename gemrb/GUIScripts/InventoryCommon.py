@@ -74,7 +74,7 @@ def OnAutoEquip ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDragItem ():
+def OnDragItem (btn, slot):
 	"""Updates dragging."""
 
 	#don't call when splitting items
@@ -82,7 +82,6 @@ def OnDragItem ():
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	
 	if not GemRB.IsDraggingItem ():
@@ -180,20 +179,19 @@ def DragItemAmount ():
 	OpenItemAmountWindow ()
 	return
 
-def MouseEnterSlot ():
+def MouseEnterSlot (btn, slot):
 	global OverSlot
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	OverSlot = GemRB.GetVar ("ItemButton")
+	OverSlot = slot
 	if GemRB.IsDraggingItem ()==1:
-		UpdateSlot (pc, OverSlot-1)
+		UpdateSlot (pc, slot-1)
 	return
 
-def MouseLeaveSlot ():
+def MouseLeaveSlot (btn, slot):
 	global OverSlot
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
 	if slot == OverSlot or not GemRB.IsDraggingItem ():
 		OverSlot = None
 	UpdateSlot (pc, slot-1)
@@ -412,7 +410,7 @@ def OpenGroundItemAmountWindow ():
 	pass
 
 # TODO: can the GUISTORE be consolidate with this one?
-def OpenItemAmountWindow ():
+def OpenItemAmountWindow (btn, slot):
 	"""Open the split window."""
 
 	global UsedSlot, OverSlot
@@ -429,7 +427,7 @@ def OpenItemAmountWindow ():
 		UpdateInventoryWindow()
 		return
 
-	UsedSlot = GemRB.GetVar ("ItemButton")
+	UsedSlot = slot
 	if GemRB.IsDraggingItem ()==1:
 		GemRB.DropDraggedItem (pc, UsedSlot)
 		#redraw slot
