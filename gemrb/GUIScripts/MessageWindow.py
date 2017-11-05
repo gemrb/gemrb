@@ -153,12 +153,12 @@ def UpdateControlStatus():
 	
 	GSFlags, Expand = GetGSFlags()
 
-	#a dialogue is running, setting messagewindow size to maximum
-	if (GSFlags&GS_DIALOG):
-		SetMWSize(GS_LARGEDIALOG, GSFlags)
-
 	if Expand == GS_LARGEDIALOG:
 		ExpandButton.SetDisabled(True)
+
+	elif (GSFlags&GS_DIALOG):
+		#a dialogue is running, setting messagewindow size to maximum
+		SetMWSize(GS_LARGEDIALOG, GSFlags)
 
 	elif Expand == GS_SMALLDIALOG:
 		ContractButton.SetFlags(IE_GUI_VIEW_INVISIBLE|IE_GUI_VIEW_DISABLED, OP_OR)
