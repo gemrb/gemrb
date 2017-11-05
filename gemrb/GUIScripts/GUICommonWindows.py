@@ -1597,7 +1597,7 @@ def OpenPortraitWindow (needcontrols=0):
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, pcID))
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, ButtonIndexBinder(InventoryCommon.OnDropItemToPC, pcID))
 
 		if GameCheck.IsIWD1():
 			# overlay a label, so we can display the hp with the correct font. Regular button label

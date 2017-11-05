@@ -129,10 +129,8 @@ def OnDragItem ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDropItemToPC (btn):
+def OnDropItemToPC (pc):
 	"""Gives an item to another character."""
-
-	pc = btn.ID + 1;
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
