@@ -251,7 +251,9 @@ void TextArea::UpdateScrollview()
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		int y = nodeBounds.y - LineHeight();
 		scrollview.ScrollTo(Point(0, -y), false, 0);
+		scrollview.SetFlags(View::IgnoreEvents, OP_OR);
 	} else {
+		scrollview.SetFlags(View::IgnoreEvents, OP_NAND);
 		scrollview.Update();
 	}
 }
