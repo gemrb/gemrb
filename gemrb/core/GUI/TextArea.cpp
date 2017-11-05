@@ -244,15 +244,16 @@ void TextArea::UpdateScrollview()
 		Point p(0, TextHeight());
 		selectOptions->SetFrameOrigin(p);
 	}
-	// FIXME: bad hack
-	// Ideally the View class should have some autoresizing baked in
-	// until then just hack a resize for the scrollbar
-	int texth = TextHeight();
-	if (texth >= frame.h) {
-		textContainer->SetFrameSize(Size(frame.w - 16, texth));
+
+	if (Flags()&IE_GUI_TEXTAREA_AUTOSCROLL
+		&& dialogBeginNode) {
+		// now scroll dialogBeginNode to the top less a blank line
+		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+		int y = nodeBounds.y - LineHeight();
+		scrollview.ScrollTo(Point(0, -y), false, 0);
+	} else {
+		scrollview.Update();
 	}
-	
-	scrollview.Update();
 }
 
 /** Sets the Actual Text */

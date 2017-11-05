@@ -106,7 +106,7 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, short lineduration);
+	void ScrollToY(int y, short lineduration = 0);
 
 	ieDword LineCount() const;
 	ieWord LineHeight() const;
@@ -151,7 +151,6 @@ private: //internal functions
 	void Init();
 	void SetPalette(const Color*, PALETTE_TYPE);
 
-	void UpdateRowCount(int h);
 	void UpdateScrollview();
 
 	int TextHeight() const;
