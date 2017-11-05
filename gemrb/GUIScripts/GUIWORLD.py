@@ -46,8 +46,7 @@ def OpenDialogButton(id):
 	MsgWin = GemRB.GetView("MSGWIN")
 	
 	frame = MsgWin.GetFrame()
-	WFrame = window.GetFrame()
-	window.SetPos(frame['x'], frame['y'] + (frame['h'] - WFrame['h']))
+	window.SetPos(frame['x'], frame['y'] + frame['h'])
 	return window
 
 def DialogStarted ():
