@@ -502,10 +502,10 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	bool drag = core->GetDraggedItem () != NULL;
 
-    if (drag) {
+    if (drag && me.repeats == 1) {
         ActionKey key(Action::DragDrop);
         if (SupportsAction(key)) {
-            PerformAction(key);
+            return PerformAction(key);
         } else {
             //if something was dropped, but it isn't handled here: it didn't happen
             return false;
