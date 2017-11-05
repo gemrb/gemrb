@@ -422,6 +422,10 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 
 bool View::ContainsView(const View* view) const
 {
+	if (this == view) {
+		return true;
+	}
+
 	std::list<View*>::const_iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		const View* subview = *it;
