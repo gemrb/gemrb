@@ -29,7 +29,6 @@ import GUICommonWindows
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
-import MessageWindow
 import CommonWindow
 
 FRAME_PC_SELECTED = 0
@@ -39,6 +38,17 @@ ContinueWindow = None
 ReformPartyWindow = None
 
 removable_pcs = []
+
+def OpenDialogButton(id):
+	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack())
+	window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	
+	MsgWin = GemRB.GetView("MSGWIN")
+	
+	frame = MsgWin.GetFrame()
+	WFrame = window.GetFrame()
+	window.SetPos(frame['x'], frame['y'] + (frame['h'] - WFrame['h']))
+	return window
 
 def DialogStarted ():
 	global ContinueWindow
@@ -55,9 +65,10 @@ def DialogStarted ():
 		GUICommonWindows.UpdatePortraitWindow ()
 
 	# we want this to happen before we start fiddling with the GUI
+	import MessageWindow
 	MessageWindow.UpdateControlStatus()
 
-	ContinueWindow = Window = GemRB.LoadWindow (9, GUICommon.GetWindowPack())
+	ContinueWindow = OpenDialogButton(9)
 
 	GUICommonWindows.EmptyControls()
 
@@ -85,8 +96,8 @@ def NextDialogState ():
 		return
 
 	ContinueWindow.SetVisible(False)
-
-	MessageWindow.TMessageTA.Focus()
+	TMessageTA = GemRB.GetView("MsgSys", 0)
+	TMessageTA.Focus()
 
 def OpenEndMessageWindow ():
 	ContinueWindow.Focus()
