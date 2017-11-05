@@ -338,7 +338,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 {
 	if (windows.empty()) return false;
 
-	if (event.type == Event::MouseMove) {
+	if (event.EventMaskFromType(event.type) & Event::AllMouseMask) {
 		TooltipTime = GetTickCount();
 		
 		// handle when mouse leaves the window
