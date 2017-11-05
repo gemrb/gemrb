@@ -80,13 +80,23 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 	}
 }
 
-void Window::SubviewRemoved(View* subview, View* /*parent*/)
+void Window::SubviewRemoved(View* subview, View* parent)
 {
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
 		Controls.erase(ctrl);
 	}
-	if (focusView == ctrl) {
+
+	if (subview->ContainsView(trackingView)) {
+		trackingView = NULL;
+		drag = NULL;
+	}
+
+	if (subview->ContainsView(hoverView)) {
+		hoverView = parent;
+	}
+
+	if (subview->ContainsView(focusView)) {
 		focusView = NULL;
 		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 			Control* ctrl = *c;
