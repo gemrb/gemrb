@@ -1989,6 +1989,9 @@ void GameControl::CommandSelectedMovement(const Point& p)
 			party.push_back(act);
 		}
 	}
+	
+	if (party.empty())
+		return;
 
 	//party formation movement
 	Point src;
