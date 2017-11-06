@@ -68,8 +68,8 @@ void ScrollView::ContentView::ResizeToSubviews()
 		//Point origin = Origin() + bounds.Origin();
 		//SetFrameOrigin(origin);
 		
-		newSize.w = std::max(newSize.w, bounds.w);
-		newSize.h = std::max(newSize.h, bounds.h);
+		newSize.w = std::max(newSize.w, bounds.w + bounds.x);
+		newSize.h = std::max(newSize.h, bounds.h + bounds.y);
 	}
 	SetFrameSize(newSize);
 }
