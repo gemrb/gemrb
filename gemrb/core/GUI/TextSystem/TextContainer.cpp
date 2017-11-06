@@ -292,7 +292,8 @@ void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte
 	margin.right = right;
 	margin.bottom = bottom;
 	margin.left = left;
-	MarkDirty();
+
+	LayoutContentsFrom(contents.begin());
 }
 
 void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
