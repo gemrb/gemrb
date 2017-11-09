@@ -42,7 +42,7 @@ Content::~Content()
 
 Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	const Region& layoutRgn = Region(rgn.Origin() + p, rgn.Dimensions());
+	const Region& layoutRgn = Region(rgn.Origin() + p, frame.Dimensions());
 	return Regions(1, layoutRgn);
 }
 
