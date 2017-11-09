@@ -249,9 +249,9 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 void ScrollView::Update()
 {
 	contentView.ResizeToSubviews();
-	
+
 	Point origin = contentView.Origin(); // how much we have scrolled in -px
-	
+
 	if (vscroll) {
 		vscroll->SetValue(-origin.y);
 	}
@@ -282,22 +282,20 @@ void ScrollView::SetScrollIncrement(int inc)
 	}
 }
 
-void ScrollView::ScrollDelta(const Point& p, bool clamp, ieDword duration)
+void ScrollView::ScrollDelta(const Point& p, ieDword duration)
 {
-	ScrollTo(p + contentView.Origin(), clamp, duration);
+	ScrollTo(p + contentView.Origin(), duration);
 }
 
-void ScrollView::ScrollTo(Point newP, bool clamp, ieDword duration)
+void ScrollView::ScrollTo(Point newP, ieDword duration)
 {
 	short maxx = frame.w - contentView.Dimensions().w;
 	short maxy = frame.h - contentView.Dimensions().h;
 	assert(maxx <= 0 && maxy <= 0);
 
-	if (clamp) {
-		// clamp values so we dont scroll beyond the content
-		newP.x = Clamp<short>(newP.x, maxx, 0);
-		newP.y = Clamp<short>(newP.y, maxy, 0);
-	}
+	// clamp values so we dont scroll beyond the content
+	newP.x = Clamp<short>(newP.x, maxx, 0);
+	newP.y = Clamp<short>(newP.y, maxy, 0);
 
 	// set up animation if required
 	if  (duration) {

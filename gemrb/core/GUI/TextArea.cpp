@@ -251,7 +251,7 @@ void TextArea::UpdateScrollview()
 		// now scroll dialogBeginNode to the top less a blank line
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		int y = nodeBounds.y - LineHeight();
-		scrollview.ScrollTo(Point(0, -y), false, 0);
+		scrollview.ScrollTo(Point(0, -y), 0);
 	}
 }
 
@@ -425,7 +425,7 @@ ieWord TextArea::LineHeight() const
 void TextArea::ScrollToY(int y, short lineduration)
 {
 	ieDword duration = lineduration * LineCount();
-	scrollview.ScrollTo(Point(0, y), true, duration);
+	scrollview.ScrollTo(Point(0, y), duration);
 }
 
 /** Mousewheel scroll */
