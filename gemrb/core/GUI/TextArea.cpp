@@ -510,7 +510,6 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
-		//selectOptions->AppendText(L"\n"); // always want a gap between text and select options for dialog
 	}
 	
 	values.reserve(opts.size());
@@ -521,9 +520,15 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 
 	ContentContainer::Margin m;
+	if (dialogBeginNode) {
+		m = ContentContainer::Margin(LineHeight(), 40, 0);
+	} else {
+		m = ContentContainer::Margin(0, 3);
+	}
+
 	selectOptions = new SpanSelector(*this, strings, numbered, m);
 	scrollview.AddSubviewInFrontOfView(selectOptions);
-	
+
 	UpdateScrollview();
 }
 
@@ -533,7 +538,7 @@ void TextArea::ClearText()
 
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palettes[PALETTE_NORMAL]);
-	textContainer->SetMargin(0, 3, LineHeight(), 3);
+	textContainer->SetMargin(0, 3);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
