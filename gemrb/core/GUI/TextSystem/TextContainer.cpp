@@ -274,7 +274,6 @@ void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) 
 ContentContainer::ContentContainer(const Region& frame)
 : View(frame)
 {
-	margin.top = 0, margin.right = 0, margin.bottom = 0, margin.left = 0;
 	SizeChanged(Size());
 }
 
@@ -286,14 +285,15 @@ ContentContainer::~ContentContainer()
 	}
 }
 
+void ContentContainer::SetMargin(Margin m)
+{
+	margin = m;
+	LayoutContentsFrom(contents.begin());
+}
+
 void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left)
 {
-	margin.top = top;
-	margin.right = right;
-	margin.bottom = bottom;
-	margin.left = left;
-
-	LayoutContentsFrom(contents.begin());
+	SetMargin(Margin(top, right, bottom, left));
 }
 
 void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)

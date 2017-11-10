@@ -100,7 +100,28 @@ class ContentContainer : public View
 {
 public:
 	typedef std::list<Content*> ContentList;
-	
+
+	struct Margin {
+		ieByte top;
+		ieByte right;
+		ieByte bottom;
+		ieByte left;
+
+		Margin() : top(0), right(0), bottom(0), left(0) {}
+
+		Margin(ieByte top)
+		: top(top), right(top), bottom(top), left(top) {}
+
+		Margin(ieByte top, ieByte right)
+		: top(top), right(right), bottom(top), left(right) {}
+
+		Margin(ieByte top, ieByte right, ieByte bottom)
+		: top(top), right(right), bottom(bottom), left(right) {}
+
+		Margin(ieByte top, ieByte right, ieByte bottom, ieByte left)
+		: top(top), right(right), bottom(bottom), left(left) {}
+	};
+
 protected:
 	ContentList contents;
 
@@ -135,12 +156,7 @@ protected:
 	ContentLayout layout;
 	Point layoutPoint;
 
-	struct {
-		ieByte top;
-		ieByte right;
-		ieByte bottom;
-		ieByte left;
-	} margin;
+	Margin margin;
 
 public:
 	ContentContainer(const Region& frame);
@@ -161,6 +177,7 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
 	
+	void SetMargin(Margin m);
 	void SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left);
 	inline void SetMargin(ieByte top, ieByte right, ieByte bottom) { SetMargin(top, right, bottom, right); }
 	inline void SetMargin(ieByte top, ieByte right) { SetMargin(top, right, top, right); }
