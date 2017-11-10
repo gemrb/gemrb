@@ -35,6 +35,7 @@ class ContentContainer;
 class TextContainer;
 
 // interface for both content and content containers
+// can instantiate to produce empty areas in layout
 class Content {
 friend class ContentContainer;
 protected:
@@ -51,7 +52,7 @@ public:
 
 protected:
 	// point is relative to Region. Region is a screen region.
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const=0;
+	virtual void DrawContentsInRegions(const Regions&, const Point&) const {};
 	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
 };
 
