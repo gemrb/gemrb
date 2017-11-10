@@ -36,15 +36,18 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	hoverSpan = NULL;
 
 	size = opts.size();
-	
+
 	Size s = ta.Dimensions();
 	s.h = 0; // will dynamically size itself
 	SetFrameSize(s);
 	SetMargin(m);
-	
+
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	Point origin(margin.left, margin.top);
 	Region r(origin, Dimensions());
+	r.w = std::max(r.w - margin.left - margin.right, 0);
+	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
 		if (numbered) {
@@ -61,9 +64,13 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			// keeping the options spaced out (for touch screens)
 			r.y += ta.LineHeight();
 		}
-		r.y += selOption->Dimensions().h;
+		r.y += selOption->Dimensions().h; // FIXME: this can overflow the height
 	}
-	
+
+	// update height without a notification.
+	// this is actually done when adding a subview, but sometimes we dont have any
+	frame.h = r.y;
+
 	// update layout point in case anybody wants to append content to us
 	layoutPoint = r.Origin();
 
