@@ -245,18 +245,30 @@ ieDword TextArea::LineCount() const
 
 void TextArea::UpdateScrollview()
 {
-	if (selectOptions) {
-		Point p(0, TextHeight());
-		selectOptions->SetFrameOrigin(p);
-	}
-	scrollview.Update();
-
 	if (Flags()&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
-		// now scroll dialogBeginNode to the top less a blank line
+		assert(textContainer && selectOptions);
+
+		const Region& textFrame = textContainer->Frame();
+		Point p(textFrame.x, textFrame.h);
+		selectOptions->SetFrameOrigin(p);
+
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+
+		int blankH = frame.h - LineHeight() - nodeBounds.h - OptionsHeight();
+		if (blankH > 0) {
+			// blank is owned by selectOptions and deleted when those are cleared
+			Content* blank = new Content(Size(1, blankH - LineHeight()));
+			selectOptions->AppendContent(blank);
+		}
+
+		// now scroll dialogBeginNode to the top less a blank line
 		int y = nodeBounds.y - LineHeight();
+		// FIXME: must update before the scroll, but this should be automaticly done as a reaction to changing sizes/origins of subviews
+		scrollview.Update();
 		scrollview.ScrollTo(Point(0, -y), 0);
+	} else {
+		scrollview.Update();
 	}
 }
 
