@@ -145,7 +145,7 @@ bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
 	ClearHover();
-	TextContainer::MouseLeave(me, op);
+	TextContainer::OnMouseLeave(me, op);
 }
 
 TextArea::TextArea(const Region& frame, Font* text)
