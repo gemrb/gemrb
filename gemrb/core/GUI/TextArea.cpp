@@ -29,7 +29,7 @@
 
 namespace GemRB {
 	
-TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered)
+TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
 : TextContainer(Region(), ta.ftext, ta.palettes[PALETTE_SELECTED]), ta(ta)
 {
 	selectedSpan = NULL;
@@ -40,9 +40,11 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Size s = ta.Dimensions();
 	s.h = 0; // will dynamically size itself
 	SetFrameSize(s);
+	SetMargin(m);
 	
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
-	Region r = Frame();
+	Point origin(margin.left, margin.top);
+	Region r(origin, Dimensions());
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
 		if (numbered) {
@@ -54,7 +56,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], NULL, NULL, &flexFrame));
 		AddSubviewInFrontOfView(selOption);
-		
+
 		if (EventMgr::TouchInputEnabled) {
 			// keeping the options spaced out (for touch screens)
 			r.y += ta.LineHeight();
@@ -518,8 +520,8 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		strings[i] = &(opts[i].second);
 	}
 
-	selectOptions = new SpanSelector(*this, strings, numbered);
-	selectOptions->SetMargin(0, 3);
+	ContentContainer::Margin m;
+	selectOptions = new SpanSelector(*this, strings, numbered, m);
 	scrollview.AddSubviewInFrontOfView(selectOptions);
 	
 	UpdateScrollview();

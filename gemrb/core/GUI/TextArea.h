@@ -79,7 +79,9 @@ private:
 		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 		
 	public:
-		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered);
+		// FIXME: we get messed up is SetMargin is called. there is no notification that they have changed and so our subviews are overflowing.
+		// working around that by passing them in the ctor, but its a poor fix.
+		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered, ContentContainer::Margin m = Margin());
 		
 		size_t NumOpts() const { return size;};
 		void MakeSelection(size_t idx);
