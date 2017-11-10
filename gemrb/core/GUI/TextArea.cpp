@@ -64,6 +64,9 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		r.y += selOption->Dimensions().h;
 	}
 	
+	// update layout point in case anybody wants to append content to us
+	layoutPoint = r.Origin();
+
 	MakeSelection(0);
 }
 
