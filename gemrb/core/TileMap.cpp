@@ -219,37 +219,35 @@ void TileMap::DrawOverlays(const Region& viewport, int rain, int flags)
 // Ratio of bg tile size and fog tile size
 #define CELL_RATIO 2
 
+inline bool MaskHit( int x, int y, const Size& s, ieByte* mask)
+{
+	if (x <= 0 || x >= (s.w - 1) || y <= 0 || y >= (s.h - 1)) {
+		// edges are always foggy
+		return false;
+	}
+
+	div_t res = div(s.w * y + x, 8);
+	return mask[res.quot] & (1 << res.rem);
+}
+	
 // Returns 1 if map at (x;y) was explored, else 0. Points outside map are
 //   always considered as explored
-#define IS_EXPLORED( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (explored_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
-
-#define IS_VISIBLE( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (visible_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
-
+#define IS_EXPLORED( x, y ) MaskHit(x, y, size, explored_mask)
+	
+#define IS_VISIBLE( x, y ) MaskHit(x, y, size, visible_mask)
+	
 #define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
-
 
 void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region vp)
 {
 	// viewport - pos & size of the control
-	int w = XCellCount * CELL_RATIO;
-	int h = YCellCount * CELL_RATIO;
+	Size size(XCellCount * CELL_RATIO, YCellCount * CELL_RATIO);
+
 	if (LargeMap) {
-		w++;
-		h++;
+		size.w++;
+		size.h++;
 	}
 
-	if (( vp.x + vp.w ) > w * CELL_SIZE) {
-		vp.x = ( w * CELL_SIZE - vp.w );
-	}
-	if (vp.x < 0) {
-		vp.x = 0;
-	}
-	if (( vp.y + vp.h ) > h * CELL_SIZE) {
-		vp.y = ( h * CELL_SIZE - vp.h );
-	}
-	if (vp.y < 0) {
-		vp.y = 0;
-	}
 	int sx = ( vp.x ) / CELL_SIZE;
 	int sy = ( vp.y ) / CELL_SIZE;
 	int dx = sx + vp.w / CELL_SIZE + 2;
@@ -264,8 +262,8 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 	}
 
 	Video* vid = core->GetVideoDriver();
-	for (int y = sy; y < dy && y < h; y++) {
-		for (int x = sx; x < dx && x < w; x++) {
+	for (int y = sy; y < dy; y++) {
+		for (int x = sx; x < dx; x++) {
 			Region r = Region(x0 + ( (x - sx) * CELL_SIZE ), y0 + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
 			if (! IS_EXPLORED( x, y )) {
 				// Unexplored tiles are all black
