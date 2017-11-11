@@ -1505,14 +1505,16 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 			p.x -= frame.w/2;
 			p.y -= frame.h/2;
 		}
-		if (p.x + frame.w >= mapsize.w) {
-			p.x = mapsize.w - frame.w - 1;
+
+		// TODO: make the overflow more dynamic
+		if (p.x + frame.w >= mapsize.w + 64) {
+			p.x = mapsize.w - frame.w + 64;
 		}
-		if (p.x < 0) {
-			p.x = 0;
+		if (p.x < -64) {
+			p.x = -64;
 		}
-		if (p.y + frame.h >= mapsize.h) {
-			p.y = mapsize.h - frame.h - 1;
+		if (p.y + frame.h >= mapsize.h + 288) {
+			p.y = mapsize.h - frame.h + 288;
 		}
 		if (p.y < 0) {
 			p.y = 0;
