@@ -238,7 +238,7 @@ inline bool MaskHit( int x, int y, const Size& s, ieByte* mask)
 	
 #define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
 
-void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region vp)
+void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
 {
 	// viewport - pos & size of the control
 	Size size(XCellCount * CELL_RATIO, YCellCount * CELL_RATIO);

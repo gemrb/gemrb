@@ -93,7 +93,7 @@ public:
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(const Region& screen, int rain, int flags);
-	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
+	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
 	Size GetMapSize();
 public:
 	int XCellCount, YCellCount;
