@@ -163,6 +163,7 @@ Region MapControl::GetViewport() const
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
+	video->DrawRect(rgn, ColorBlack, true);
 
 	if (MapMOS) {
 		video->BlitSprite( MapMOS, mosRgn.x, mosRgn.y, NULL );
