@@ -53,10 +53,10 @@ void TileOverlay::AddTile(Tile* tile)
 void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags)
 {
 	// determine which tiles are visible
-	int sx = viewport.x / 64;
-	int sy = viewport.y / 64;
-	int dx = ( viewport.x + viewport.w + 63 ) / 64;
-	int dy = ( viewport.y + viewport.h + 63 ) / 64;
+	int sx = std::max(viewport.x / 64, 0);
+	int sy = std::max(viewport.y / 64, 0);
+	int dx = ( std::max(viewport.x, 0) + viewport.w + 63 ) / 64;
+	int dy = ( std::max(viewport.y, 0) + viewport.h + 63 ) / 64;
 
 	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
