@@ -1248,11 +1248,40 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		return true;
 	}
 
-	UpdateCursor();
+	Map* area = CurrentArea();
+	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
+	if (lastActor) {
+		lastActor->SetOver( false );
+	}
+
+	Point gameMousePos = GameMousePos();
+	// let us target party members even if they are invisible
+	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+	if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
+		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
+			lastActor = NULL;
+		}
+	}
+
+	if ((target_types & GA_NO_SELF) && lastActor ) {
+		if (lastActor == core->GetFirstSelectedActor()) {
+			lastActor=NULL;
+		}
+	}
+
+	if (lastActor) {
+		lastActorID = lastActor->GetGlobalID();
+		lastActor->SetOver( true );
+	} else {
+		lastActorID = 0;
+	}
+
+	UpdateCursor(lastActor);
+
 	return true;
 }
-	
-void GameControl::UpdateCursor()
+
+void GameControl::UpdateCursor(Actor* lastActor)
 {
 	Map *area = CurrentArea();
 	if (area == NULL) {
@@ -1284,10 +1313,6 @@ void GameControl::UpdateCursor()
 	if (overContainer) {
 		overContainer->Highlight = false;
 	}
-	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-	if (lastActor) {
-		lastActor->SetOver( false );
-	}
 
 	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
@@ -1306,23 +1331,7 @@ void GameControl::UpdateCursor()
 		return;
 	}
 
-	// let us target party members even if they are invisible
-	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-	if (lastActor && lastActor->Modified[IE_EA]>=EA_CONTROLLED) {
-		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
-			lastActor = NULL;
-		}
-	}
-
-	if ((target_types & GA_NO_SELF) && lastActor ) {
-		if (lastActor == core->GetFirstSelectedActor()) {
-			lastActor=NULL;
-		}
-	}
-
 	if (lastActor) {
-		lastActorID = lastActor->GetGlobalID();
-		lastActor->SetOver( true );
 		ieDword type = lastActor->GetStat(IE_EA);
 		if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 			nextCursor = IE_CURSOR_ATTACK;
@@ -1336,8 +1345,6 @@ void GameControl::UpdateCursor()
 		} else {
 			nextCursor = IE_CURSOR_NORMAL;
 		}
-	} else {
-		lastActorID = 0;
 	}
 
 	if (target_mode == TARGET_MODE_TALK) {

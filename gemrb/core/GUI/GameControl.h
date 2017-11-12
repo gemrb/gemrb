@@ -147,7 +147,7 @@ private:
 	int GetCursorOverDoor(Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
 	
-	void UpdateCursor();
+	void UpdateCursor(Actor* hoverActor = NULL);
 	bool IsDisabledCursor() const;
 
 	void PerformSelectedAction(const Point& p);
