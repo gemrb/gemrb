@@ -131,8 +131,6 @@ public:
 	int target_types;
 
 private:
-	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieDword ID);
 	Map* CurrentArea() const;
 
 	Region SelectionRect() const;

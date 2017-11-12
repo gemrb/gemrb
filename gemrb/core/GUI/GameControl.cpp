@@ -2301,18 +2301,6 @@ void GameControl::SetDialogueFlags(unsigned int value, int mode)
 	}
 }
 
-Actor *GameControl::GetActorByGlobalID(ieDword globalID)
-{
-	if (!globalID)
-		return NULL;
-	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea( );
-	if (!area)
-		return NULL;
-	return
-		area->GetActorByGlobalID(globalID);
-}
-
 Map* GameControl::CurrentArea() const
 {
 	Game *game = core->GetGame();
@@ -2324,7 +2312,12 @@ Map* GameControl::CurrentArea() const
 
 Actor *GameControl::GetLastActor()
 {
-	return GetActorByGlobalID(lastActorID);
+	Actor* actor = NULL;
+	Map* area = CurrentArea();
+	if (area) {
+		actor = area->GetActorByGlobalID(lastActorID);
+	}
+	return actor;
 }
 
 //Set up an item use which needs targeting
