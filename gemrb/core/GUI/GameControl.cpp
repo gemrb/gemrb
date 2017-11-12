@@ -1228,6 +1228,19 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 	return core->Cursors[curIdx];
 }
 
+Sprite2D* GameControl::Cursor() const
+{
+	Sprite2D* cursor = View::Cursor();
+	if (cursor == NULL && lastCursor != IE_CURSOR_INVALID) {
+		int idx = lastCursor & ~IE_CURSOR_GRAY;
+		if (EventMgr::MouseDown()) {
+			++idx;
+		}
+		cursor = core->Cursors[idx];
+	}
+	return cursor;
+}
+
 /** Mouse Over Event */
 bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
@@ -1400,7 +1413,6 @@ end_function:
 	if (nextCursor >= 0) {
 		lastCursor = nextCursor ;
 	}
-	SetCursor(core->Cursors[lastCursor & ~IE_CURSOR_GRAY]);
 }
 
 bool GameControl::IsDisabledCursor() const
