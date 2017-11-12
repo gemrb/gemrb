@@ -1254,10 +1254,12 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	
 void GameControl::UpdateCursor()
 {
-	Game *game = core->GetGame();
-	if (!game) return;
-	Map *area = game->GetCurrentArea();
-	if (!area) return;
+	Map *area = CurrentArea();
+	if (area == NULL) {
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
+
 	Point gameMousePos = GameMousePos();
 	int nextCursor = area->GetCursor( gameMousePos );
 	//make the invisible area really invisible
@@ -1506,10 +1508,10 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 	} else {
 		updateVPTimer = true;
 
-		Game *game = core->GetGame();
-		if (!game) return;
-		Map *area = game->GetCurrentArea();
-		if (!area) return;
+		Map* area = CurrentArea();
+		if (area == NULL) {
+			return;
+		}
 
 		Size mapsize = area->GetSize();
 
@@ -2309,6 +2311,15 @@ Actor *GameControl::GetActorByGlobalID(ieDword globalID)
 		return NULL;
 	return
 		area->GetActorByGlobalID(globalID);
+}
+
+Map* GameControl::CurrentArea() const
+{
+	Game *game = core->GetGame();
+	if (game) {
+		return game->GetCurrentArea();
+	}
+	return NULL;
 }
 
 Actor *GameControl::GetLastActor()
