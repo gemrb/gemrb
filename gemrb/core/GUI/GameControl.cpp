@@ -1883,13 +1883,37 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		}
 	} else {
 		// any other button behaves as left click (scrollwhell buttons are mosue wheel events now)
-		if (isDoubleClick) MoveViewportTo(p, true);
-		
-		// handle actions
-		if (target_mode != TARGET_MODE_NONE) {
-			PerformSelectedAction(p);
-			ClearMouseState();
-			return true;
+		if (isDoubleClick) {
+			MoveViewportTo(p, true);
+		} else {
+			// handle actions
+			// FIXME: is this the right place to do this? seems ok.
+			if (target_mode == TARGET_MODE_NONE && lastActorID) {
+				switch (lastCursor & ~IE_CURSOR_GRAY) {
+					case IE_CURSOR_TALK:
+						SetTargetMode(TARGET_MODE_TALK);
+						break;
+					case IE_CURSOR_ATTACK:
+						SetTargetMode(TARGET_MODE_ATTACK);
+						break;
+					case IE_CURSOR_CAST:
+						SetTargetMode(TARGET_MODE_CAST);
+						break;
+					case IE_CURSOR_DEFEND:
+						SetTargetMode(TARGET_MODE_DEFEND);
+						break;
+					case IE_CURSOR_PICK:
+						SetTargetMode(TARGET_MODE_PICK);
+						break;
+					default: break;
+				}
+			}
+
+			if (target_mode != TARGET_MODE_NONE) {
+				PerformSelectedAction(p);
+				ClearMouseState();
+				return true;
+			}
 		}
 		
 		// handle selections
