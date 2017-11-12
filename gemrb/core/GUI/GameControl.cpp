@@ -1391,33 +1391,6 @@ void GameControl::UpdateCursor(Actor* lastActor)
 		goto end_function;
 	}
 
-	if (lastActor) {
-		switch (lastActor->GetStat(IE_EA)) {
-			case EA_EVILCUTOFF:
-			case EA_GOODCUTOFF:
-				break;
-			
-			case EA_PC:
-			case EA_FAMILIAR:
-			case EA_ALLY:
-			case EA_CONTROLLED:
-			case EA_CHARMED:
-			case EA_EVILBUTGREEN:
-				if (target_types & GA_NO_ENEMY)
-				nextCursor^=1;
-				break;
-			
-			case EA_ENEMY:
-			case EA_GOODBUTRED:
-				if (target_types & GA_NO_ALLY)
-					nextCursor^=1;
-				break;
-			default:
-				if (!(target_types & GA_NO_NEUTRAL))
-					nextCursor^=1;
-				break;
-		}
-	}
 end_function:
 	if (nextCursor >= 0) {
 		lastCursor = nextCursor ;
