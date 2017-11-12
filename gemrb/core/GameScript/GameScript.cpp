@@ -461,6 +461,7 @@ static const ActionLink actionnames[] = {
 	{"addspecialability", GameScript::AddSpecialAbility, 0},
 	{"addsuperkit", GameScript::AddSuperKit, 0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
+	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
 	{"addxpvar", GameScript::AddXP2DA, 0},
@@ -811,6 +812,7 @@ static const ActionLink actionnames[] = {
 	{"removerangerhood", GameScript::RemoveRangerHood, 0},
 	{"removespell", GameScript::RemoveSpell, 0},
 	{"removetraps", GameScript::RemoveTraps, AF_BLOCKING},
+	{"removeworldmapareaflag", GameScript::RemoveWorldmapAreaFlag, 0},
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
@@ -877,6 +879,7 @@ static const ActionLink actionnames[] = {
 	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},
 	{"setinterrupt", GameScript::SetInterrupt, 0},
+	{"setitemflags", GameScript::SetItemFlags, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setmarkedspell", GameScript::SetMarkedSpell, 0},

@@ -947,6 +947,7 @@ public:
 	static void AddSpecialAbility(Scriptable* Sender, Action* parameters);
 	static void AddSuperKit(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
+	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
@@ -1249,6 +1250,7 @@ public:
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveSpell(Scriptable* Sender, Action* parameters);
 	static void RemoveTraps(Scriptable* Sender, Action* parameters);
+	static void RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);
@@ -1305,6 +1307,7 @@ public:
 	static void SetHPPercent(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetInterrupt(Scriptable* Sender, Action* parameters);
+	static void SetItemFlags(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMarkedSpell(Scriptable* Sender, Action* parameters);
 	static void SetMasterArea(Scriptable* Sender, Action* parameters);
