@@ -1,16 +1,16 @@
-GemRB git (1b24eb15f):
+GemRB git (8940f61):
   New features:
     - 
     - dialogF.tlk handling
-    - SDL2 resolution-independent window scaling, IRIX compatibility
+    - SDL2 resolution-independent window scaling, environmental audio, IRIX compatibility
     - regeneration during sleep, iwd2 ability stacking, iwd ZZ* weapon bonuses
-    - portrait.2da handling, time dilation
+    - portrait.2da handling, time dilation, avatar shadows
 
   Improved features:
-    - 
-    - better compatibility with bgt, 10pp, ia, kelsey
-    - sdl2 input, mouse scrolling
-    - iwd2 cg&lu, item (un)usability, avatar sizes
+    - infravision
+    - better compatibility with bgt, 10pp, ia, kelsey, dr
+    - sdl2 input, mouse scrolling, opengl driver
+    - iwd2 cg&lu, item (un)usability, avatar sizes, permanent clabs
     - ambients, verbal constants, random walk, walk sounds
     - bugfixes
 
