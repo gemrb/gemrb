@@ -396,6 +396,7 @@ static const TriggerLink triggernames[] = {
 	{"statecheck", GameScript::StateCheck, 0},
 	{"stealfailed", GameScript::StealFailed, 0},
 	{"storehasitem", GameScript::StoreHasItem, 0},
+	{"storymodeon", GameScript::StoryModeOn, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace, 0},
 	{"summoninglimit", GameScript::SummoningLimit, 0},

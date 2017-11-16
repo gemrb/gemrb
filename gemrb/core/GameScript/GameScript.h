@@ -886,6 +886,7 @@ public: //Script Functions
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int StealFailed(Scriptable* Sender, Trigger* parameters);
 	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);
+	static int StoryModeOn(Scriptable* Sender, Trigger* /*parameters*/);
 	static int StuffGlobalRandom(Scriptable* Sender, Trigger* parameters);
 	static int SubRace(Scriptable* Sender, Trigger* parameters);
 	static int SummoningLimit(Scriptable* Sender, Trigger* parameters);

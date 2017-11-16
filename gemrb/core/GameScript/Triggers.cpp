@@ -3461,6 +3461,17 @@ int GameScript::NightmareModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+int GameScript::StoryModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	ieDword mode;
+
+	core->GetDictionary()->Lookup("Story Mode", mode);
+	if (mode) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	ieDword diff;
