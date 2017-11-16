@@ -625,6 +625,7 @@ public: //Script Functions
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int CreatureHidden( Scriptable* Sender, Trigger* parameters);
+	static int CurrentAmmo(Scriptable* Sender, Trigger* parameters);
 	static int CurrentAreaIs(Scriptable* Sender, Trigger* parameters);
 	static int DamageTaken(Scriptable* Sender, Trigger* parameters);
 	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);

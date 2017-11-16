@@ -100,6 +100,7 @@ static const TriggerLink triggernames[] = {
 	{"combatcountergt", GameScript::CombatCounterGT, 0},
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
 	{"contains", GameScript::Contains, 0},
+	{"currentammo", GameScript::CurrentAmmo, 0},
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
 	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
