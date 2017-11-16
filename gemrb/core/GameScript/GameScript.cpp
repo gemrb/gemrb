@@ -79,6 +79,7 @@ static const TriggerLink triggernames[] = {
 	{"charname", GameScript::CharName, 0}, //not scripting name
 	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
+	{"checkitemslot", GameScript::HasItemSlot, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
 	{"checkpartylevel", GameScript::CheckPartyLevel, 0},
 	{"checkskill", GameScript::CheckSkill, 0},
@@ -264,6 +265,7 @@ static const TriggerLink triggernames[] = {
 	{"los", GameScript::LOS, 0},
 	{"lt", GameScript::LT, 0},
 	{"modalstate", GameScript::ModalState, 0},
+	{"modalstateobject", GameScript::ModalState, 0},
 	{"morale", GameScript::Morale, 0},
 	{"moralegt", GameScript::MoraleGT, 0},
 	{"moralelt", GameScript::MoraleLT, 0},
