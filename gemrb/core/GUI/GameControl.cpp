@@ -372,7 +372,7 @@ void GameControl::WillDraw()
 	if (moveX || moveY) {
 		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
 		
-		if (core->GetMouseScrollSpeed()) {
+		if ((DialogueFlags&DF_IN_DIALOG) == 0 && core->GetMouseScrollSpeed()) {
 			int cursorFrame = 0; // right
 			if (moveY < 0) {
 				cursorFrame = 2; // up
