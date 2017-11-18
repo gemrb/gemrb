@@ -5958,38 +5958,6 @@ static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* 
 	return PyInt_FromLong( 0 );
 }
 
-PyDoc_STRVAR( GemRB_GameControlSetLastActor__doc,
-"===== GameControlSetLastActor =====\n\
-\n\
-**Prototype:** GemRB.GameControlSetLastActor ([partyID])\n\
-\n\
-**Description:** Sets LastActor in the GameControl object. The LastActor \n\
-object is the character which is currently being hovered over by the \n\
-player. Its feet circle is flickering.\n\
-\n\
-**Parameters:**\n\
-  * partyID - 0 to delete any previous settings, or the pc ID.\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:GameSelectPCSingle]]\n\
-"
-);
-
-static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* args)
-{
-	int PartyID = 0;
-	PARSE_ARGS1( args, "|i", &PartyID );
-
-	GET_GAME();
-	GET_GAMECONTROL();
-
-	Actor* actor = game->FindPC( PartyID );
-	gc->SetLastActor(actor, gc->GetLastActor() );
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
 "===== ActOnPC =====\n\
 \n\
@@ -12810,7 +12778,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FindStoreItem, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
 	METHOD(GameControlToggleAlwaysRun, METH_NOARGS),
-	METHOD(GameControlSetLastActor, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(GameGetReputation, METH_NOARGS),

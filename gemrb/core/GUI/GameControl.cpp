@@ -2219,18 +2219,6 @@ void GameControl::MakeSelection(const Region &r, bool extend)
 	free( ab );
 }
 
-void GameControl::SetLastActor(Actor *actor, Actor *prevActor)
-{
-	if (prevActor)
-		prevActor->SetOver( false );
-	if (!actor) {
-		lastActorID = 0;
-	} else {
-		lastActorID = actor->GetGlobalID();
-		actor->SetOver( true );
-	}
-}
-
 void GameControl::SetCutSceneMode(bool active)
 {
 	if (active) {
