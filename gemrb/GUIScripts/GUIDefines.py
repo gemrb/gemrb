@@ -58,7 +58,6 @@ IE_GUI_BUTTON_LOWERCASE    = 0x00002000
 IE_GUI_BUTTON_MULTILINE    = 0x00004000 # don't set the SINGLE_LINE font rendering flag
 #end of hardcoded section
 
-IE_GUI_BUTTON_DRAGGABLE    = 0x00008000
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart

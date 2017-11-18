@@ -1661,7 +1661,7 @@ def UpdatePortraitWindow ():
 			continue
 
 		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
-						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
+						IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		# TODO: recheck if this resetting is needed for all or for none
 		if GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (OpenInventoryWindowClick, pcID))
@@ -1750,7 +1750,7 @@ def UpdateAnimatedPortrait (Window,i):
 	else:
 		cycle = 0
 
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE |IE_GUI_BUTTON_MULTILINE, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_MULTILINE, OP_SET)
 	if cycle<6:
 		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 

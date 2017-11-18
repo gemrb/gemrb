@@ -69,7 +69,6 @@ class Palette;
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
 #define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag
 //end of hardcoded part
-#define IE_GUI_BUTTON_DRAGGABLE    0x00008000
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
@@ -78,8 +77,6 @@ class Palette;
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00400000 // horizontal clipping of overlay
-//WARNING: we cannot add any more flags here
-//the top 8 bits are reserved for the control ID (see setFlags)
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick

@@ -444,7 +444,7 @@ Sprite2D* Button::Cursor() const
 
 Holder<Button::DragOp> Button::DragOperation()
 {
-	if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+	if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT)) {
 		EnableBorder(1, true);
 		return Holder<Button::DragOp>(new PortraitDragOp(this));
 	}
@@ -453,8 +453,8 @@ Holder<Button::DragOp> Button::DragOperation()
 
 bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
-	if (dop.dragView != this && dynamic_cast<const PortraitDragOp*>(&dop)) {
-		return (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT);
+	if (dop.dragView != this && (Picture && (flags & IE_GUI_BUTTON_PORTRAIT))) {
+		return dynamic_cast<const PortraitDragOp*>(&dop);
 	}
 	return View::AcceptsDragOperation(dop);
 }
@@ -466,8 +466,7 @@ void Button::CompleteDragOperation(const DragOp& dop)
 		EnableBorder(1, false);
 	} else {
 		// this was the receiver
-		const PortraitDragOp* pdop = dynamic_cast<const PortraitDragOp*>(&dop);
-		assert(pdop); // CompleteDragOperation shouldnt be called if we dont accept...
+		const PortraitDragOp* pdop = static_cast<const PortraitDragOp*>(&dop);
 		core->GetGame()->SwapPCs(pdop->PC, ControlID + 1);
 	}
 }
@@ -560,19 +559,7 @@ bool Button::OnMouseOver(const MouseEvent& me)
 		return true;
 	}
 
-	if ((flags & IE_GUI_BUTTON_DRAGGABLE) &&
-			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
-
-		Point sp = me.Pos() - drag_start;
-		core->GetDictionary()->SetAt( "DragX", sp.x );
-		core->GetDictionary()->SetAt( "DragY", sp.y );
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		drag_start = drag_start + sp;
-		return true;
-    } else {
-        return Control::OnMouseOver(me);
-    }
+	return Control::OnMouseOver(me);
 }
 
 void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
