@@ -118,7 +118,11 @@ TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
 	
 TextContainer* TextArea::SpanSelector::TextAtIndex(size_t idx)
 {
-	std::list<View*>::iterator it = subViews.begin();
+	if (subViews.empty()|| idx > subViews.size() - 1) {
+		return NULL;
+	}
+
+	std::list<View*>::reverse_iterator it = subViews.rbegin();
 	std::advance(it, idx);
 	return static_cast<TextContainer*>(*it);
 }
