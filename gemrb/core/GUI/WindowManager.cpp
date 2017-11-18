@@ -510,7 +510,8 @@ void WindowManager::DrawWindows() const
 	gameWin->Draw();
 
 	bool drawFrame = false;
-	const Region& frontWinFrame = windows.front()->Frame();
+	Window* frontWin = windows.front();
+	const Region& frontWinFrame = frontWin->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::const_reverse_iterator rit = windows.rbegin();
 	for (; rit != windows.rend(); ++rit) {
@@ -525,7 +526,7 @@ void WindowManager::DrawWindows() const
 		const Region& frame = win->Frame();
 
 		// FYI... this only checks if the front window obscures... could be covered by another window too
-		if (win != windows.front() && win->NeedsDraw()) {
+		if (frontWin->IsVisible() && win != frontWin && win->NeedsDraw()) {
 			Region intersect = frontWinFrame.Intersect(frame);
 			if (intersect == frame) {
 				// this window is completely obscured by the front window
