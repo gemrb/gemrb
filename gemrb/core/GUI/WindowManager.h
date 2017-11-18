@@ -53,6 +53,7 @@ private:
 	Window* modalWin;
 	Window* gameWin;
 	Window* hoverWin;
+	Window* trackingWin;
 
 	EventMgr eventMgr;
 

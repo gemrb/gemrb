@@ -240,16 +240,13 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 		if (trackingView && !drag) {
 			drag = trackingView->DragOperation();
 		}
-		if (trackingView == hoverView
-			&& !trackingView->TracksMouseDown())
-		{
-			trackingView = NULL;
-		}
 	}
 	if (trackingView) {
 		// tracking will eat this event
-		assert(me.buttonStates);
-		trackingView->MouseDrag(me);
+		if (me.buttonStates)
+			trackingView->MouseDrag(me);
+		else
+			trackingView = NULL;
 	} else if (target) {
 		target->MouseOver(me);
 	}
@@ -275,13 +272,14 @@ void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned shor
 void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short mod)
 {
 	assert(target);
-	
-	if (trackingView) {
-		trackingView->MouseUp(me, mod);
-	} else if (drag) {
-		if (target->AcceptsDragOperation(*drag)) {
+
+	if (drag) {
+		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
 			target->CompleteDragOperation(*drag);
 		}
+	} else if (trackingView) {
+		if (trackingView == target || trackingView->TracksMouseDown())
+			trackingView->MouseUp(me, mod);
 	} else if (target) {
 		target->MouseUp(me, mod);
 	}
@@ -318,14 +316,6 @@ bool Window::DispatchEvent(const Event& event)
 	View* target = NULL;
 
 	if (event.isScreen) {
-		// FIXME: this will be for touch events too. poor name for that!
-		// also using a mask will be more suitable for mixed event types
-		if (trackingView == NULL && event.type == Event::MouseUp) {
-			// window is not the origin of the down event
-			// we then ignore this
-			return false;
-		}
-
 		Point screenPos = event.mouse.Pos();
 		if (!frame.PointInside(screenPos)) {
 			// this can hapen if the window is modal since it will absorb all events
@@ -416,8 +406,6 @@ bool Window::OnMouseDrag(const MouseEvent& me)
 void Window::OnMouseLeave(const MouseEvent& me, const DragOp*)
 {
 	DispatchMouseMotion(NULL, me);
-	// FIXME?: should we call trackingView->OnMouseLeave?
-	trackingView = NULL;
 }
 
 bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)

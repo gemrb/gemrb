@@ -48,6 +48,7 @@ WindowManager::WindowManager(Video* vid)
 
 	hoverWin = NULL;
 	modalWin = NULL;
+	trackingWin = NULL;
 
 	eventMgr.RegisterEventMonitor(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
 
@@ -262,6 +263,10 @@ void WindowManager::CloseWindow(Window* win)
 		hoverWin = NULL;
 	}
 
+	if (win == trackingWin) {
+		trackingWin = NULL;
+	}
+
 	bool isFront = it == windows.begin();
 	it = windows.erase(it);
 	if (it != windows.end()) {
@@ -336,6 +341,15 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 
 bool WindowManager::DispatchEvent(const Event& event)
 {
+	if (eventMgr.MouseDown() == false) {
+		trackingWin = NULL;
+	} else if (event.isScreen && trackingWin) {
+		if (trackingWin->IsDisabled() == false) {
+			trackingWin->DispatchEvent(event);
+		}
+		return true;
+	}
+
 	if (windows.empty()) return false;
 
 	if (event.EventMaskFromType(event.type) & Event::AllMouseMask) {
@@ -359,6 +373,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 		if (target->IsDisabled() || target->DispatchEvent(event)) {
 			if (event.isScreen && target->IsVisible()) {
 				hoverWin = target;
+				if (event.type == Event::MouseDown) {
+					trackingWin = target;
+				}
 			}
 			return true;
 		}
@@ -431,6 +448,9 @@ void WindowManager::DrawTooltip(const Point& mid) const
 	static unsigned long time = 0;
 	static Holder<SoundHandle> tooltip_sound = NULL;
 	static bool reset = false;
+
+	if (trackingWin) // if the mouse is held down we dont want tooltips
+		TooltipTime = GetTickCount();
 
 	if (time != TooltipTime + ToolTipDelay) {
 		time = TooltipTime + ToolTipDelay;
