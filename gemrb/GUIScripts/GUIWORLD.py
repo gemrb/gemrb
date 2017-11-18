@@ -42,11 +42,18 @@ removable_pcs = []
 def OpenDialogButton(id):
 	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack())
 	window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	
+
 	MsgWin = GemRB.GetView("MSGWIN")
-	
+
 	frame = MsgWin.GetFrame()
 	window.SetPos(frame['x'], frame['y'] + frame['h'])
+
+	# Dialog button shouldnt be in front
+	win = GemRB.GetView("OPTWIN")
+	win.Focus()
+	win = GemRB.GetView("PORTWIN")
+	win.Focus()
+
 	return window
 
 def DialogStarted ():
