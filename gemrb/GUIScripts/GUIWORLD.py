@@ -70,28 +70,15 @@ def DialogStarted ():
 	if GUICommonWindows.PortraitWindow:
 		GUICommonWindows.UpdatePortraitWindow ()
 
-	# we want this to happen before we start fiddling with the GUI
-	import MessageWindow
-	MessageWindow.UpdateControlStatus()
-
 	ContinueWindow = OpenDialogButton(9)
-
-	GUICommonWindows.EmptyControls()
 
 def DialogEnded ():
 	global ContinueWindow
 
-	# TODO: why is this being called at game start?!
-	if not ContinueWindow:
-		return
-
 	GUICommonWindows.UpdateActionsWindow()
 
-	ContinueWindow.Unload ()
+	ContinueWindow.Close ()
 	ContinueWindow = None
-
-	if GUICommonWindows.PortraitWindow:
-		GUICommonWindows.UpdatePortraitWindow ()
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open
@@ -102,11 +89,9 @@ def NextDialogState ():
 		return
 
 	ContinueWindow.SetVisible(False)
-	TMessageTA = GemRB.GetView("MsgSys", 0)
-	TMessageTA.Focus()
 
 def OpenEndMessageWindow ():
-	ContinueWindow.Focus()
+	ContinueWindow.SetVisible(True)
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
@@ -114,7 +99,7 @@ def OpenEndMessageWindow ():
 	Button.Focus()
 
 def OpenContinueMessageWindow ():
-	ContinueWindow.Focus()
+	ContinueWindow.SetVisible(True)
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
