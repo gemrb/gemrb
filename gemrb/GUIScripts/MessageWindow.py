@@ -162,13 +162,12 @@ def UpdateControlStatus():
 
 	GSFlags, Expand = GetGSFlags()
 
-	if MTARestoreSize:
-		SetMWSize(MTARestoreSize, GSFlags)
-		Expand = MTARestoreSize
-		MTARestoreSize = None
-
 	if Expand == GS_LARGEDIALOG:
-		ExpandButton.SetDisabled(True)
+		if MTARestoreSize and (GSFlags&GS_DIALOG) == 0:
+			SetMWSize(MTARestoreSize, GSFlags)
+			MTARestoreSize = None
+		else:
+			ExpandButton.SetDisabled(True)
 
 	elif (GSFlags&GS_DIALOG):
 		MTARestoreSize = Expand
