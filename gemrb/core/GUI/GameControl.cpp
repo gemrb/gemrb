@@ -2145,6 +2145,7 @@ void GameControl::SetTargetMode(int mode) {
 void GameControl::ResetTargetMode() {
 	target_types = GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED;
 	SetTargetMode(TARGET_MODE_NONE);
+	UpdateCursor();
 }
 
 void GameControl::UpdateTargetMode() {
