@@ -411,13 +411,15 @@ Interface::~Interface(void)
 
 GameControl* Interface::StartGameControl()
 {
+	Window* gamewin = winmgr->GetGameWindow();
+	gamewin->SetDisabled(false);
+
 	if (gamectrl) {
 		gamectrl->SetDisabled(false);
 	} else {
 		gamedata->DelTable(0xffffu); //dropping ALL tables
 		Region screen(0,0, Width, Height);
 		gamectrl = new GameControl(screen);
-		Window* gamewin = winmgr->GetGameWindow();
 		gamewin->AddSubviewInFrontOfView(gamectrl);
 		gamectrl->AssignScriptingRef(0, "GC");
 		RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
