@@ -119,9 +119,10 @@ void EventMgr::DispatchEvent(Event& e)
 	// no hot keys or their listeners refused the event...
 	EventTaps::iterator it = Taps.begin();
 	for (; it != Taps.end(); ++it) {
-		if (it->first & e.EventMaskFromType(e.type)) {
+		const std::pair<Event::EventTypeMask, Holder<EventCallback> >& pair = it->second;
+		if (pair.first & e.EventMaskFromType(e.type)) {
 			// all matching taps get a copy of the event
-			EventCallback* cb = it->second.get();
+			EventCallback* cb = pair.second.get();
 			(*cb)(e);
 		}
 	}
@@ -137,11 +138,17 @@ bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short 
 	return true;
 }
 
-size_t EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)
 {
-	Taps.push_back(std::make_pair(mask, cb));
+	static size_t id = 0;
+	Taps[id] = std::make_pair(mask, cb);
 	// return the "id" of the inserted tap so it could be unregistered later on
-	return Taps.size() - 1;
+	return id++;
+}
+
+void EventMgr::UnRegisterEventMonitor(TapMonitorId monitor)
+{
+	Taps.erase(monitor);
 }
 
 Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)

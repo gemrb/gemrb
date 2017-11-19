@@ -175,6 +175,7 @@ class GEM_EXPORT EventMgr {
 public:
 	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
 	typedef Callback<const Event&, bool> EventCallback;
+	typedef size_t TapMonitorId;
 
 	static unsigned long DCDelay;
 	static unsigned long DPDelay;
@@ -187,13 +188,14 @@ public:
 
 	// TODO/FIXME: need to be able to unregister hotkeys/monitors
 	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
-	static size_t RegisterEventMonitor(EventCallback*, Event::EventTypeMask mask = Event::AllEventsMask);
+	static TapMonitorId RegisterEventMonitor(EventCallback*, Event::EventTypeMask mask = Event::AllEventsMask);
+	static void UnRegisterEventMonitor(TapMonitorId monitor);
 
 private:
 	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
-	typedef std::vector< std::pair<Event::EventTypeMask, Holder<EventCallback> > > EventTaps;
+	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, Holder<EventCallback> > > EventTaps;
 
 	static EventTaps Taps;
 	static std::map<int, EventCallback*> HotKeys;
