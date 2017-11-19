@@ -46,6 +46,8 @@ public:
 	static Holder<Sprite2D> CursorMouseDown;
 
 private:
+	bool drawCursor;
+
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
@@ -96,6 +98,7 @@ public:
 	bool IsPresentingModalWindow() const;
 	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
 
+	void SetCursorEnabled(bool enabled) { drawCursor = enabled; }
 
 	/*
 	 Drawing is done in layers:

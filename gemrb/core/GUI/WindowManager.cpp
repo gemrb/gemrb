@@ -46,6 +46,8 @@ WindowManager::WindowManager(Video* vid)
 {
 	assert(vid);
 
+	drawCursor = true;
+
 	hoverWin = NULL;
 	modalWin = NULL;
 	trackingWin = NULL;
@@ -364,6 +366,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 void WindowManager::DrawMouse() const
 {
+	if (drawCursor == false)
+		return;
+
 	Point pos = eventMgr.MousePos();
 	Size bufSize = cursorBuf->Size();
 	pos.y += 10; // the cursor needs to be slightly above the buffer midpoint to completely fit.
