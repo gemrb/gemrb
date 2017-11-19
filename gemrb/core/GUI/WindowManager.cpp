@@ -299,7 +299,7 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 		// then the Window class should be responsible for bounds checking
 
 		// the NULL return is so that if this is called again after returning modalWindow there is no NextTarget
-		current = windows.end(); // invalidate the iterator, no other target s possible.
+		current = windows.end(); // invalidate the iterator, no other target is possible.
 		return modalWin;
 	}
 
@@ -320,6 +320,10 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 bool WindowManager::DispatchEvent(const Event& event)
 {
 	if (eventMgr.MouseDown() == false) {
+		if (event.type == Event::MouseUp && trackingWin == NULL) {
+			// we don't deliver mouse up events if there isn't a corresponding mouse down.
+			return false;
+		}
 		trackingWin = NULL;
 	} else if (event.isScreen && trackingWin) {
 		if (trackingWin->IsDisabled() == false) {
