@@ -67,14 +67,21 @@ public:
 
 
 class GEM_EXPORT ScriptEngine : public Plugin {
-private:
+public:
 	typedef std::map<ScriptingId, ScriptingRefBase*> ScriptingDefinitions;
+	
+private:
 	typedef std::map<ResRef, ScriptingDefinitions> ScriptingDict;
 	static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(ScriptingRefBase* ref);
 	static bool UnregisterScriptingRef(ScriptingRefBase* ref);
+
+	static ScriptingDefinitions GetScriptingGroup(ResRef groupId)
+	{
+		return GUIDict[groupId];
+	}
 
 	static ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
 	{

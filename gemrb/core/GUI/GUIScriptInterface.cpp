@@ -67,6 +67,20 @@ Window* GetWindow(ScriptingId id, ResRef pack)
 	return dynamic_cast<Window*>(view);
 }
 
+std::vector<View*> GetViews(ResRef group)
+{
+	ScriptEngine::ScriptingDefinitions defs = ScriptEngine::GetScriptingGroup(group);
+	std::vector<View*> views;
+
+	ScriptEngine::ScriptingDefinitions::iterator it;
+	for (it = defs.begin(); it != defs.end(); ++it) {
+		ViewScriptingRef* ref = static_cast<ViewScriptingRef*>(it->second);
+		views.push_back(ref->GetObject());
+	}
+
+	return views;
+}
+
 const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
 {
 	if (!ctrl) return NULL;

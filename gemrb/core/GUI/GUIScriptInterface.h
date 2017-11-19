@@ -104,6 +104,7 @@ Window* GetWindow(ScriptingId id, ResRef pack);
 const WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
 
 GEM_EXPORT View* GetView(ScriptingRefBase* base);
+GEM_EXPORT std::vector<View*> GetViews(ResRef pack);
 GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
 GEM_EXPORT ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id);
