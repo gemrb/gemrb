@@ -73,8 +73,6 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	// update layout point in case anybody wants to append content to us
 	layoutPoint = r.Origin();
-
-	MakeSelection(0);
 }
 
 void TextArea::SpanSelector::ClearHover()
@@ -93,7 +91,7 @@ void TextArea::SpanSelector::ClearHover()
 void TextArea::SpanSelector::MakeSelection(size_t idx)
 {
 	TextContainer* optspan = TextAtIndex(idx);
-	
+
 	if (optspan == selectedSpan) {
 		return; // already selected
 	}
@@ -101,11 +99,13 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 	if (selectedSpan && selectedSpan != optspan) {
 		// reset the previous selection
 		selectedSpan->SetPalette(ta.palettes[PALETTE_OPTIONS]);
-		MarkDirty();
 	}
 	selectedSpan = optspan;
-	selectedSpan->SetPalette(ta.palettes[PALETTE_SELECTED]);
 	
+	if (selectedSpan) {
+		selectedSpan->SetPalette(ta.palettes[PALETTE_SELECTED]);
+	}
+
 	// beware, this will recursively call this function.
 	ta.UpdateState(static_cast<unsigned int>(idx));
 }
@@ -469,7 +469,7 @@ bool TextArea::OnMouseWheelScroll(const Point& delta)
 
 void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VarName[0] || selectOptions == NULL || optIdx >= selectOptions->NumOpts()) {
+	if (!VarName[0] || optIdx >= selectOptions->NumOpts()) {
 		return;
 	}
 	if (!selectOptions) {
@@ -532,12 +532,12 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	SetPalette(selColor, PALETTE_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
-	
+
 	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
 	}
-	
+
 	values.reserve(opts.size());
 	std::vector<const String*> strings(opts.size());
 	for (size_t i = 0; i < opts.size(); i++) {
@@ -546,14 +546,17 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 
 	ContentContainer::Margin m;
+	size_t selectIdx = -1;
 	if (dialogBeginNode) {
 		m = ContentContainer::Margin(LineHeight(), 40, 0);
 	} else {
 		m = ContentContainer::Margin(0, 3);
+		selectIdx = GetValue();
 	}
 
 	selectOptions = new SpanSelector(*this, strings, numbered, m);
 	scrollview.AddSubviewInFrontOfView(selectOptions);
+	selectOptions->MakeSelection(selectIdx);
 
 	UpdateScrollview();
 }
