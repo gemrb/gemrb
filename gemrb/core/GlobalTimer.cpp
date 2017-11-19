@@ -54,6 +54,7 @@ void GlobalTimer::Init()
 	shakeCounter = 0;
 	startTime = 0; //forcing an update
 	speed = 0;
+	goal = Point(-1,-1);
 	ClearAnimations();
 }
 
@@ -83,7 +84,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return goal != currentVP.Origin();
+	return goal.isempty() ? false : goal != currentVP.Origin();
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -106,6 +107,9 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 
 void GlobalTimer::DoStep(int count)
 {
+	if (!ViewportIsMoving())
+		return;
+
 	GameControl* gc = core->GetGameControl();
 
 	Point p = currentVP.Origin();

@@ -159,27 +159,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return false;
 	}
 
-	/*
-	 FIXME: need to reimplement this
-	Video *video = core->GetVideoDriver();
-	if (previousX == -1) {
-		//save previous viewport so we can restore it at the end
-		Region vp = video->GetViewport();
-		previousX = vp.x;
-		previousY = vp.y;
-	}
-	*/
-	//TODO: this should not jump but scroll to the destination
-	gc->MoveViewportTo(tgt->Pos, true);
-
-	//check if we are already in dialog
-	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		return true;
-	}
-
-	//no exploring while in dialogue
-	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_OR);
-	gc->SetDialogueFlags(DF_IN_DIALOG, OP_OR);
+	prevViewPortLoc = gc->Viewport().Origin();
+	gc->MoveViewportTo(tgt->Pos, true, 75); // FIXME: arbitrary guess value
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	// NOTE: besides marking pause/not pause, they determine what happens if
@@ -187,15 +168,21 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	//Bit 0: Enemy()
 	//Bit 1: EscapeArea()
 	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
+	unsigned int flags = 0;
 	if (!(dlg->Flags&7) ) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
+		flags |= DF_FREEZE_SCRIPTS;
 	}
+	gc->SetDialogueFlags(DF_IN_DIALOG|flags, OP_OR);
 	return true;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	if (dlg == NULL) {
+		return; // no dialog, nothing to do.
+	}
+
 	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
 		return;
 	}
@@ -234,7 +221,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_NAND);
 	}
 	gc->SetDialogueFlags(0, OP_SET);
-	gc->MoveViewportTo(prevViewPortLoc, false);
+	gc->MoveViewportTo(prevViewPortLoc, false, 75); // FIXME: arbitrary guess value
 	core->SetEventFlag(EF_PORTRAIT);
 }
 

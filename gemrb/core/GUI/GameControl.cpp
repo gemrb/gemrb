@@ -1482,10 +1482,10 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 
 void GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
-	if (updateVPTimer || speed) {
+	if (updateVPTimer && speed) {
 		updateVPTimer = false;
 		core->timer->SetMoveViewPort(p, speed, center);
-	} else {
+	} else if (p != vpOrigin) {
 		updateVPTimer = true;
 
 		Map* area = CurrentArea();
@@ -1516,6 +1516,8 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 		core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
 		vpOrigin = p;
+	} else {
+		updateVPTimer = true;
 	}
 }
 
