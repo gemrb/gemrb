@@ -1970,7 +1970,7 @@ void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, OP_OR);
+		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, OP_OR);
 	}
 }
 
@@ -1978,7 +1978,7 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, OP_NAND);
+		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, OP_NAND);
 	}
 }
 
