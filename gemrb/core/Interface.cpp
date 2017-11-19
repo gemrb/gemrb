@@ -481,15 +481,11 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_CONTROL) {
 		// handle this before clearing EF_CONTROL
 		// otherwise we do this every frame
-		if (game->ControlStatus & CS_HIDEGUI) {
-			HideGUI();
-		} else {
-			ShowGUI();
-		}
-		
+		ToggleViewsVisible(!(game->ControlStatus & CS_HIDEGUI), "HIDE_CUT");
+
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
-		
+
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
@@ -2555,26 +2551,24 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
 	// obviously its possible the id can conflict with an existing window
 	return guifact->CreateWindow(WindowID, frame);
 }
-	
-void Interface::HideGUI()
+
+inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, int op)
 {
-	if (game) {
-		game->SetControlStatus(CS_HIDEGUI, OP_OR );
+	std::vector<View*>::const_iterator it = views.begin();
+	for (; it != views.end(); ++it) {
+		View* view = *it;
+		view->SetFlags(flags, op);
 	}
-	
-	winmgr->HideAllWindows();
 }
-	
-void Interface::ShowGUI()
+
+void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 {
-	if (game) {
-		game->SetControlStatus(CS_HIDEGUI, OP_NAND );
+	if (game && group == ResRef("HIDE_CUT")) {
+		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
 	}
-	
-	winmgr->ShowAllWindows();
-	// console stays hidden when unhiding the GUI
-	Window* conwin = GetWindow(0, "WIN_CON");
-	conwin->SetVisible(false);
+
+	std::vector<View*> views = GetViews(group);
+	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
 bool Interface::IsFreezed()
@@ -3104,12 +3098,8 @@ void Interface::SetCutSceneMode(bool active)
 	if (gc) {
 		gc->SetCutSceneMode( active );
 	}
-	
-	if (active) {
-		HideGUI();
-	} else {
-		ShowGUI();
-	}
+
+	ToggleViewsVisible(!active, "HIDE_CUT");
 }
 
 /** returns true if in dialogue or cutscene */

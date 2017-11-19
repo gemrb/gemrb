@@ -35,6 +35,7 @@ def OnLoad():
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	MessageWindow.AddAlias("MSGWIN")
+	MessageWindow.AddAlias("HIDE_CUT", 0)
 	
 	TMessageTA = MessageWindow.GetControl(1)
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
@@ -45,6 +46,7 @@ def OnLoad():
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	ActionsWindow.AddAlias("ACTWIN")
+	ActionsWindow.AddAlias("HIDE_CUT", 1)
 	
 	aFrame = ActionsWindow.GetFrame()
 	mFrame = MessageWindow.GetFrame()
@@ -59,10 +61,12 @@ def OnLoad():
 	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	OptionsWindow.AddAlias("OPTWIN")
+	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 	PortraitWindow.AddAlias("PORTWIN")
+	PortraitWindow.AddAlias("HIDE_CUT", 3)
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
