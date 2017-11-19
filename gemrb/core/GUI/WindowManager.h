@@ -96,8 +96,6 @@ public:
 	bool IsPresentingModalWindow() const;
 	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
 
-	void HideAllWindows();
-	void ShowAllWindows();
 
 	/*
 	 Drawing is done in layers:
