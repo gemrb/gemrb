@@ -1377,10 +1377,11 @@ end_function:
 
 bool GameControl::IsDisabledCursor() const
 {
-	if (lastCursor == IE_CURSOR_INVALID)
-		return this->View::IsDisabledCursor();
+	bool isDisabled = View::IsDisabledCursor();
+	if (lastCursor != IE_CURSOR_INVALID)
+		isDisabled |= bool(lastCursor&IE_CURSOR_GRAY);
 
-	return bool(lastCursor&IE_CURSOR_GRAY);
+	return isDisabled;
 }
 
 bool GameControl::OnMouseDrag(const MouseEvent& me)
