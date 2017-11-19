@@ -2571,6 +2571,12 @@ void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
+void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
+{
+	std::vector<View*> views = GetViews(group);
+	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
+}
+
 bool Interface::IsFreezed()
 {
 	return !update_scripts;

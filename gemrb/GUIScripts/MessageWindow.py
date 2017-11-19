@@ -47,6 +47,7 @@ def OnLoad():
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)
+	ActionsWindow.AddAlias("NOT_DLG", 0)
 	
 	aFrame = ActionsWindow.GetFrame()
 	mFrame = MessageWindow.GetFrame()
@@ -62,11 +63,13 @@ def OnLoad():
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	OptionsWindow.AddAlias("OPTWIN")
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
+	OptionsWindow.AddAlias("NOT_DLG", 1)
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 	PortraitWindow.AddAlias("PORTWIN")
 	PortraitWindow.AddAlias("HIDE_CUT", 3)
+	PortraitWindow.AddAlias("NOT_DLG", 2)
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)

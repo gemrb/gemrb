@@ -138,6 +138,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
+	core->ToggleViewsEnabled(false, "NOT_DLG");
+
 	// iwd2 ignores conditions when following external references and
 	// also just goes directly for the referenced state
 	// look at 41cmolb1 and 41cmolb2 for an example
@@ -212,6 +214,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 	delete dlg;
 	dlg = NULL;
 
+	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
