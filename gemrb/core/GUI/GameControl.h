@@ -54,11 +54,9 @@ class DialogHandler;
 
 //screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define SF_DISABLEMOUSE  1  //no mouse cursor
-#define SF_CENTERONACTOR 2  //
-#define SF_ALWAYSCENTER  4
-#define SF_LOCKSCROLL    8 //don't scroll
-#define SF_CUTSCENE      16 //don't push new actions onto the action queue
+#define SF_CENTERONACTOR 1  //
+#define SF_ALWAYSCENTER  2
+#define SF_CUTSCENE      4 //don't push new actions onto the action queue
 
 // target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -161,6 +159,8 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void WillDraw();
 	bool NeedsDraw() const { return !IsDisabled(); };
+
+	void FlagsChanged(unsigned int /*oldflags*/);
 
 public:
 	GameControl(const Region& frame);

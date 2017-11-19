@@ -220,9 +220,6 @@ void DialogHandler::EndDialog(bool try_to_break)
 	//restoring original size
 	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
 	GameControl* gc = core->GetGameControl();
-	if ( !(gc->GetScreenFlags()&SF_CUTSCENE)) {
-		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_NAND);
-	}
 	gc->SetDialogueFlags(0, OP_SET);
 	gc->MoveViewportTo(prevViewPortLoc, false, 75); // FIXME: arbitrary guess value
 	core->SetEventFlag(EF_PORTRAIT);

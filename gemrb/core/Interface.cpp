@@ -3112,7 +3112,7 @@ void Interface::SetCutSceneMode(bool active)
 bool Interface::InCutSceneMode() const
 {
 	GameControl *gc = GetGameControl();
-	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&(SF_DISABLEMOUSE|SF_CUTSCENE))) {
+	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_CUTSCENE)) {
 		return true;
 	}
 	return false;

@@ -368,11 +368,11 @@ void GameControl::WillDraw()
 		moveX = star->Pos.x - vpOrigin.x - frame.w/2;
 		moveY = star->Pos.y - vpOrigin.y - frame.h/2;
 	}
-	
+
 	if (moveX || moveY) {
 		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
-		
-		if ((DialogueFlags&DF_IN_DIALOG) == 0 && core->GetMouseScrollSpeed()) {
+
+		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
 			int cursorFrame = 0; // right
 			if (moveY < 0) {
 				cursorFrame = 2; // up
@@ -385,7 +385,7 @@ void GameControl::WillDraw()
 			} else if (moveX < 0) {
 				cursorFrame = 4; // left
 			}
-			
+
 			// set these cursors on game window so they are universal
 			Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
 			window->SetCursor(cursor);
@@ -529,9 +529,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		}
 	}
 
-	if (ScreenFlags & SF_DISABLEMOUSE)
-		return;
-
 	Video* video = core->GetVideoDriver();
 	// Draw selection rect
 	if (isSelectionRect) {
@@ -643,12 +640,6 @@ bool GameControl::DispatchEvent(const Event& event)
 /** Key Press Event */
 bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
-	if (DialogueFlags&DF_IN_DIALOG) {
-		TextArea* ta = core->GetMessageTextArea();
-		assert(ta);
-		return ta->OnKeyPress(Key, mod);
-	}
-
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 
@@ -773,13 +764,6 @@ static EffectRef damage_ref = { "Damage", -1 };
 /** Key Release Event */
 bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
-	if (DialogueFlags&DF_IN_DIALOG) {
-		TextArea* ta = core->GetMessageTextArea();
-		assert(ta);
-		ta->KeyRelease(Key, Mod);
-		return true;
-	}
-
 	Point gameMousePos = GameMousePos();
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
@@ -1244,10 +1228,6 @@ Sprite2D* GameControl::Cursor() const
 /** Mouse Over Event */
 bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
-	if (ScreenFlags & SF_DISABLEMOUSE) {
-		return true;
-	}
-
 	Map* area = CurrentArea();
 	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 	if (lastActor) {
@@ -1446,7 +1426,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	// we are using the window->IsDisabled on purpose
 	// to avoid bugs, we are disabling the window when we open one of the "top window"s
 	// GC->IsDisabled is for other uses
-	if (window->IsDisabled()) {
+	if (window->IsDisabled() || Flags()&IgnoreEvents) {
 		return false;
 	}
 	
@@ -1836,9 +1816,6 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
-	if (ScreenFlags&SF_DISABLEMOUSE)
-		return true;
-
 	Point p = ConvertPointFromScreen(me.Pos());
 	gameClickPoint = p + vpOrigin;
 
@@ -1858,11 +1835,6 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 /** Mouse Button Up */
 bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
-	if (ScreenFlags & SF_DISABLEMOUSE) {
-		ClearMouseState();
-		return true;
-	}
-
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
@@ -2056,12 +2028,7 @@ bool GameControl::OnMouseWheelScroll(const Point& delta)
 
 void GameControl::Scroll(const Point& amt)
 {
-	if (ScreenFlags & SF_LOCKSCROLL) {
-		moveX = 0;
-		moveY = 0;
-	} else {
-		MoveViewportTo( vpOrigin + amt, false);
-	}
+	MoveViewportTo(vpOrigin + amt, false);
 }
 
 void GameControl::PerformActionOn(Actor *actor)
@@ -2224,13 +2191,13 @@ void GameControl::MakeSelection(const Region &r, bool extend)
 void GameControl::SetCutSceneMode(bool active)
 {
 	if (active) {
-		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
+		ScreenFlags |= SF_CUTSCENE;
 		moveX = 0;
 		moveY = 0;
 	} else {
-		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
+		ScreenFlags &= ~SF_CUTSCENE;
 	}
-	SetFlags(IgnoreEvents, (active) ? OP_OR : OP_NAND);
+	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
 }
 
 //Create an overhead text over a scriptable target
@@ -2282,6 +2249,13 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 }
 
+void GameControl::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (Flags()&IgnoreEvents) {
+		ClearMouseState();
+	}
+}
+
 bool GameControl::SetScreenFlags(unsigned int value, int mode)
 {
 	return SetBits(ScreenFlags, value, mode);
@@ -2290,9 +2264,7 @@ bool GameControl::SetScreenFlags(unsigned int value, int mode)
 void GameControl::SetDialogueFlags(unsigned int value, int mode)
 {
 	SetBits(DialogueFlags, value, mode);
-	if (DialogueFlags&DF_IN_DIALOG) {
-		SetFlags(IgnoreEvents, OP_NAND);
-	}
+	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? OP_OR : OP_NAND);
 }
 
 Map* GameControl::CurrentArea() const
