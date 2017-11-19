@@ -92,6 +92,7 @@ def MaximizeOptions():
 def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
 
+MTARestoreSize = None
 def UpdateControlStatus():
 	MessageWindow = GemRB.GetView("MSGWIN")
 
@@ -155,15 +156,22 @@ def UpdateControlStatus():
 
 		SetMWSize(Expand, GSFlags)
 
+	global MTARestoreSize
 	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnDecreaseSize)
 	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnIncreaseSize)
-	
+
 	GSFlags, Expand = GetGSFlags()
+
+	if MTARestoreSize:
+		SetMWSize(MTARestoreSize, GSFlags)
+		Expand = MTARestoreSize
+		MTARestoreSize = None
 
 	if Expand == GS_LARGEDIALOG:
 		ExpandButton.SetDisabled(True)
 
 	elif (GSFlags&GS_DIALOG):
+		MTARestoreSize = Expand
 		#a dialogue is running, setting messagewindow size to maximum
 		SetMWSize(GS_LARGEDIALOG, GSFlags)
 
