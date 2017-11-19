@@ -1063,9 +1063,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 }
 
 String GameControl::TooltipText() const {
-	// not bothering checking if game or area is null. If we are somehow entering this method when either is false,
-	// then something is horribly broken elsewhere. by definition we cant have a GameControl without these things.
-	Map* area = core->GetGame()->GetCurrentArea();
+	Map* area = CurrentArea();
 	if (area == NULL) {
 		return View::TooltipText();
 	}
