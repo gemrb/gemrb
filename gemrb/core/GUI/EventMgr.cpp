@@ -117,8 +117,9 @@ void EventMgr::DispatchEvent(Event& e)
 	}
 
 	// no hot keys or their listeners refused the event...
-	EventTaps::iterator it = Taps.begin();
-	for (; it != Taps.end(); ++it) {
+	EventTaps tapsCopy = Taps; // copy this because its possible things get unregistered as a result of the event
+	EventTaps::iterator it = tapsCopy.begin();
+	for (; it != tapsCopy.end(); ++it) {
 		const std::pair<Event::EventTypeMask, Holder<EventCallback> >& pair = it->second;
 		if (pair.first & e.EventMaskFromType(e.type)) {
 			// all matching taps get a copy of the event

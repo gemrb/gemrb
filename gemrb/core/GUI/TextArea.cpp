@@ -67,12 +67,42 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		r.y += selOption->Dimensions().h; // FIXME: this can overflow the height
 	}
 
+	if (numbered) {
+		// in a sane world we would simply focus the window and this View
+		// unfortunately, focusing the window makes it overlap with the portwin/optwin...
+		EventMgr::EventCallback* cb = new MethodCallback<SpanSelector, const Event&, bool>(this, &SpanSelector::KeyEvent);
+		id = EventMgr::RegisterEventMonitor(cb, Event::KeyDownMask);
+	} else {
+		id = -1;
+	}
+
 	// update height without a notification.
 	// this is actually done when adding a subview, but sometimes we dont have any
 	frame.h = r.y;
 
 	// update layout point in case anybody wants to append content to us
 	layoutPoint = r.Origin();
+}
+	
+TextArea::SpanSelector::~SpanSelector()
+{
+	EventMgr::UnRegisterEventMonitor(id);
+}
+
+bool TextArea::SpanSelector::KeyEvent(const Event& event)
+{
+	return OnKeyPress(event.keyboard, 0);
+}
+
+bool TextArea::SpanSelector::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
+{
+	KeyboardKey chr = key.character;
+	if (chr < '1' || chr > '9')
+		return false;
+
+	unsigned int idx = chr - '1';
+	MakeSelection(idx);
+	return true;
 }
 
 void TextArea::SpanSelector::ClearHover()
@@ -434,14 +464,7 @@ bool TextArea::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 		return true;
 	}
 
-	if (( Key.character < '1' ) || ( Key.character > '9' ))
-		return false;
-
-	MarkDirty();
-
-	unsigned int lookupIdx = Key.character - '1';
-	UpdateState(lookupIdx);
-	return true;
+	return false;
 }
 
 ieWord TextArea::LineHeight() const
