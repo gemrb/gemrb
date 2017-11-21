@@ -14156,7 +14156,7 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 
 	if (useup) {
 		//use the found item's first usage
-		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT|UI_FAKE);
+		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT|UI_FAKE|UI_NOAURA);
 	} else {
 		CREItem *si = actor->inventory.GetSlotItem( slot );
 		if (si->Usages[0]) useup = 1;
