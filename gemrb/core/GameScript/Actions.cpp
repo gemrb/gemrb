@@ -5112,7 +5112,8 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	AttackCore(Sender, tar, 0);
 
 	Sender->CurrentActionState--;
-	if (!Sender->CurrentActionState) {
+	if (Sender->CurrentActionState <= 0) {
+		Sender->CurrentActionState = 0;
 		Sender->ReleaseCurrentAction();
 	}
 }
