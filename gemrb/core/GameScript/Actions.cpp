@@ -1653,7 +1653,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter, 0)) {
 			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 		}
 	}
