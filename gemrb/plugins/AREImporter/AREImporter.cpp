@@ -1035,9 +1035,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
-			//TODO: script order
-			memset(Scripts,0,sizeof(Scripts));
 
+			memset(Scripts, 0, sizeof(Scripts));
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
 			str->ReadResRef( Scripts[SCR_GENERAL] );
 			str->ReadResRef( Scripts[SCR_CLASS] );
