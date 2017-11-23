@@ -750,8 +750,13 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			pnt.x = parameters->pointParameter.x;
 			pnt.y = parameters->pointParameter.y;
 			if (pnt.isempty()) {
-				pnt.x = Sender->Pos.x;
-				pnt.y = Sender->Pos.y;
+				if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
+					pnt.x = ((InfoPoint *)Sender)->TrapLaunch.x;
+					pnt.y = ((InfoPoint *)Sender)->TrapLaunch.y;
+				} else {
+					pnt.x = Sender->Pos.x;
+					pnt.y = Sender->Pos.y;
+				}
 			}
 			break;
 	}
