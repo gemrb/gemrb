@@ -111,12 +111,15 @@ public:
 	Point Origin() const { return Point(x, y); }
 	Size Dimensions() const { return Size(w, h); }
 	
-	static Region RegionEnclosingRegions(Region r1, const Region& r2) {
-		r1.x = (r2.x < r1.x) ? r2.x : r1.x;
-		r1.y = (r2.y < r1.y) ? r2.y : r1.y;
-		r1.w = (r2.x + r2.w > r1.x + r1.w) ? (r2.x + r2.w) - r1.x : r1.w;
-		r1.h = (r2.y + r2.h > r1.y + r1.h) ? (r2.y + r2.h) - r1.y : r1.h;
-		return r1;
+	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
+		Point min, max;
+
+		min.x = std::min(r1.x, r2.x);
+		min.y = std::min(r1.y, r2.y);
+		max.x = std::max(r1.x + r1.w, r2.x + r2.w);
+		max.y = std::max(r1.y + r1.h, r2.y + r2.h);
+
+		return RegionFromPoints(min, max);
 	}
 
 	template<typename T>
@@ -128,10 +131,7 @@ public:
 		for (; it != regions.end(); ++it) {
 			// now expand it as needed
 			const Region& r = *it;
-			bounds.x = (r.x < bounds.x) ? r.x : bounds.x;
-			bounds.y = (r.y < bounds.y) ? r.y : bounds.y;
-			bounds.w = (r.x + r.w > bounds.x + bounds.w) ? (r.x + r.w) - bounds.x : bounds.w;
-			bounds.h = (r.y + r.h > bounds.y + bounds.h) ? (r.y + r.h) - bounds.y : bounds.h;
+			bounds = RegionEnclosingRegions(bounds, r);
 		}
 		return bounds;
 	}
