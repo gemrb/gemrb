@@ -93,12 +93,12 @@ Size::Size(int w, int h)
 	this->h = h;
 }
 
-bool Size::operator==(const Size& size)
+bool Size::operator==(const Size& size) const
 {
 	return (w == size.w &&  h == size.h);
 }
 
-bool Size::operator!=(const Size& size)
+bool Size::operator!=(const Size& size) const
 {
 	return !(*this == size);
 }
@@ -109,12 +109,12 @@ Region::Region(void)
 	x = y = w = h = 0;
 }
 
-bool Region::operator==(const Region& rgn)
+bool Region::operator==(const Region& rgn) const
 {
 	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
 }
 
-bool Region::operator!=(const Region& rgn)
+bool Region::operator!=(const Region& rgn) const
 {
 	return !(*this == rgn);
 }

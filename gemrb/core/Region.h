@@ -79,8 +79,8 @@ public:
 	Size();
 	Size(int, int);
 
-	bool operator==(const Size& size);
-	bool operator!=(const Size& size);
+	bool operator==(const Size& size) const;
+	bool operator!=(const Size& size) const;
 	int Area() const { return w * h; }
 	bool IsZero() const { return w == 0 && h == 0; }
 	bool IsEmpty() const { return w <= 0 || h <= 0; }
@@ -99,8 +99,8 @@ public:
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
 
-	bool operator==(const Region& rgn);
-	bool operator!=(const Region& rgn);
+	bool operator==(const Region& rgn) const;
+	bool operator!=(const Region& rgn) const;
 
 	bool PointInside(const Point &p) const;
 	bool RectInside(const Region& r) const;
