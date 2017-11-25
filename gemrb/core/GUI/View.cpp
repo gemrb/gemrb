@@ -455,33 +455,8 @@ Window* View::GetWindow() const
 	return NULL;
 }
 
-void View::SetFrame(const Region& r)
+void View::ResizeSubviews(const Size& oldSize)
 {
-	SetFrameOrigin(r.Origin());
-	SetFrameSize(r.Dimensions());
-}
-
-void View::SetFrameOrigin(const Point& p)
-{
-	Point oldP = frame.Origin();
-	if (oldP == p) return;
-	
-	MarkDirty(); // refresh the old position in the superview
-	frame.x = p.x;
-	frame.y = p.y;
-	
-	OriginChanged(oldP);
-}
-
-void View::SetFrameSize(const Size& s)
-{
-	const Size oldSize = frame.Dimensions();
-	if (oldSize == s) return;
-
-	MarkDirty(); // refresh the old position in the superview
-	frame.w = std::max(0, s.w);
-	frame.h = std::max(0, s.h);
-
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* subview = *it;
@@ -516,6 +491,37 @@ void View::SetFrameSize(const Size& s)
 
 		subview->SetFrame(newSubFrame);
 	}
+	MarkDirty();
+}
+
+void View::SetFrame(const Region& r)
+{
+	SetFrameOrigin(r.Origin());
+	SetFrameSize(r.Dimensions());
+}
+
+void View::SetFrameOrigin(const Point& p)
+{
+	Point oldP = frame.Origin();
+	if (oldP == p) return;
+	
+	MarkDirty(); // refresh the old position in the superview
+	frame.x = p.x;
+	frame.y = p.y;
+	
+	OriginChanged(oldP);
+}
+
+void View::SetFrameSize(const Size& s)
+{
+	const Size oldSize = frame.Dimensions();
+	if (oldSize == s) return;
+
+	MarkDirty(); // refresh the old position in the superview
+	frame.w = std::max(0, s.w);
+	frame.h = std::max(0, s.h);
+
+	ResizeSubviews(oldSize);
 
 	SizeChanged(oldSize);
 }

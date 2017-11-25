@@ -119,10 +119,12 @@ private:
 	virtual void DidDraw() {}
 	
 	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
-	
+
 protected:
 	void ClearScriptingRefs();
-	
+
+	void ResizeSubviews(const Size& oldsize);
+
 	// TODO: recheck use of IgnoreEvents flag. It may not be needed anymore since we can just return false for those cases.
 	// TODO: examine window event dispatch, all bubbling should be handled implicitly here
 	// TODO: recheck drag/drop code. probably should return false sometimes.

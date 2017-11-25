@@ -458,10 +458,6 @@ void ContentContainer::LayoutContentsFrom(const Content* c)
 
 void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 {
-	static bool recursed = false;
-	if (recursed)
-		return;
-
 	if (it == contents.end()) {
 		return; // must bail or things will get screwed up!
 	}
@@ -538,13 +534,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		}
 	}
 
-	// avoid infinite layout loop...
-	// we can't just set the values directly, because then the autoresizing doesn't happen
-	recursed = true;
-	SetFrameSize(contentBounds);
-	recursed = false;
-
-	MarkDirty();
+	// avoid infinite layout recursion when calling SetFrameSize...
+	Size oldSize = Dimensions();
+	frame.w = contentBounds.w;
+	frame.h = contentBounds.h;
+	ResizeSubviews(oldSize);
 }
 
 void ContentContainer::DeleteContentsInRect(Region exclusion)
