@@ -470,13 +470,16 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		exContent = *--it;
 		it++;
 	}
+
 	// clear the existing layout, but only for "it" and onward
 	ContentList::const_iterator clearit = it;
 	for (; clearit != contents.end(); ++clearit) {
 		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
 			layoutPoint = Point(); // reset cached layoutPoint
-			layout.erase(i);
+			// since 'layout' is sorted alongsize 'contents' we should be able clear everyting following 'i' and bail
+			layout.erase(i, layout.end());
+			break;
 		}
 	}
 
