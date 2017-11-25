@@ -42,8 +42,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Size s = ta.Dimensions();
 	s.h = 0; // will dynamically size itself
 
-	SetFrameSize(s);
 	SetMargin(m);
+	SetFrameSize(s);
 
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	Point origin(margin.left, margin.top);
@@ -78,9 +78,6 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	} else {
 		id = -1;
 	}
-
-	// update layout point in case anybody wants to append content to us
-	layoutPoint = r.Origin();
 
 	assert((Flags()&RESIZE_WIDTH) == 0);
 }
@@ -300,12 +297,11 @@ void TextArea::UpdateScrollview()
 
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 
-		int blankH = frame.h - LineHeight() - nodeBounds.h - OptionsHeight();
+		int optH = OptionsHeight();
+		int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 		if (blankH > 0) {
-			// blank is owned by selectOptions and deleted when those are cleared
-			int sub = (selectOptions->NumOpts()) ? LineHeight() : 0;
-			Content* blank = new Content(Size(textFrame.w, blankH - sub));
-			selectOptions->AppendContent(blank);
+			optH += blankH;
+			selectOptions->SetFrameSize(Size(textFrame.w, optH));
 		}
 
 		// now scroll dialogBeginNode to the top less a blank line
