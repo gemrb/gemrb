@@ -110,7 +110,6 @@ void Window::SubviewRemoved(View* subview, View* parent)
 void Window::SizeChanged(const Size& /*oldSize*/)
 {
 	RecreateBuffer();
-	Update();
 }
 
 void Window::FlagsChanged(unsigned int oldflags)

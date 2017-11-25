@@ -475,20 +475,22 @@ void View::SetFrameOrigin(const Point& p)
 
 void View::SetFrameSize(const Size& s)
 {
-	Size oldSize = frame.Dimensions();
+	const Size oldSize = frame.Dimensions();
 	if (oldSize == s) return;
 
 	MarkDirty(); // refresh the old position in the superview
 	frame.w = std::max(0, s.w);
 	frame.h = std::max(0, s.h);
 
-	SizeChanged(oldSize);
-
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* subview = *it;
-		Region newSubFrame = subview->Frame();
 		unsigned short flags = subview->AutoResizeFlags();
+
+		if (flags == ResizeNone)
+			continue;
+
+		Region newSubFrame = subview->Frame();
 		int delta = frame.w - oldSize.w;
 
 		if (flags&ResizeRight) {
@@ -514,6 +516,8 @@ void View::SetFrameSize(const Size& s)
 
 		subview->SetFrame(newSubFrame);
 	}
+
+	SizeChanged(oldSize);
 }
 
 bool View::SetFlags(unsigned int arg_flags, int opcode)

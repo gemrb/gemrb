@@ -32,6 +32,8 @@ namespace GemRB {
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
 : TextContainer(Region(), ta.ftext, ta.palettes[PALETTE_SELECTED]), ta(ta)
 {
+	SetFlags(RESIZE_WIDTH, OP_NAND);
+
 	selectedSpan = NULL;
 	hoverSpan = NULL;
 
@@ -39,6 +41,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	Size s = ta.Dimensions();
 	s.h = 0; // will dynamically size itself
+
 	SetFrameSize(s);
 	SetMargin(m);
 
@@ -76,12 +79,10 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		id = -1;
 	}
 
-	// update height without a notification.
-	// this is actually done when adding a subview, but sometimes we dont have any
-	frame.h = r.y;
-
 	// update layout point in case anybody wants to append content to us
 	layoutPoint = r.Origin();
+
+	assert((Flags()&RESIZE_WIDTH) == 0);
 }
 	
 TextArea::SpanSelector::~SpanSelector()
@@ -286,20 +287,24 @@ ieDword TextArea::LineCount() const
 
 void TextArea::UpdateScrollview()
 {
+	const Region textFrame = (textContainer) ? textContainer->Frame() : Region();
+
+	if (selectOptions) {
+		Point p(textFrame.x, textFrame.h);
+		selectOptions->SetFrameOrigin(p);
+	}
+
 	if (Flags()&IE_GUI_TEXTAREA_AUTOSCROLL
 		&& dialogBeginNode) {
 		assert(textContainer && selectOptions);
-
-		const Region& textFrame = textContainer->Frame();
-		Point p(textFrame.x, textFrame.h);
-		selectOptions->SetFrameOrigin(p);
 
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 
 		int blankH = frame.h - LineHeight() - nodeBounds.h - OptionsHeight();
 		if (blankH > 0) {
 			// blank is owned by selectOptions and deleted when those are cleared
-			Content* blank = new Content(Size(1, blankH - LineHeight()));
+			int sub = (selectOptions->NumOpts()) ? LineHeight() : 0;
+			Content* blank = new Content(Size(textFrame.w, blankH - sub));
 			selectOptions->AppendContent(blank);
 		}
 

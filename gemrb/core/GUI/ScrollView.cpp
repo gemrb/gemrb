@@ -30,48 +30,46 @@ typedef void (ScrollView::*ScrollCB)(Control*);
 	
 void ScrollView::ContentView::SizeChanged(const Size& /*oldsize*/)
 {
+	ResizeToSubviews();
 	// considering it an error for a ContentView to exist outside of a ScrollView
 	assert(superView);
 	ScrollView* sv = static_cast<ScrollView*>(superView);
-	sv->ContentFrameChanged();
+	sv->UpdateScrollbars();
 }
 	
-void ScrollView::ContentView::SubviewAdded(View* /*view*/, View* parent)
+void ScrollView::ContentView::SubviewAdded(View* /*view*/, View* /*parent*/)
 {
-	if (parent == this) {
-		ResizeToSubviews();
-	}
+	ResizeToSubviews();
 }
 	
-void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* parent)
+void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* /*parent*/)
 {
-	if (parent == this) {
-		ResizeToSubviews();
-	}
+	ResizeToSubviews();
 }
 	
 void ScrollView::ContentView::ResizeToSubviews()
 {
 	// content view behaves as if RESIZE_WIDTH and RESIZE_HEIGHT are set always
 	Size newSize = superView->Dimensions();
-	
+
 	if (!subViews.empty()) {
 		std::list<View*>::iterator it = subViews.begin();
-		View* view = *it;
-		Region bounds = view->Frame();
-		
+		Region bounds = (*it)->Frame();
+
 		for (++it; it != subViews.end(); ++it) {
-			Region r = view->Frame();
+			Region r = (*it)->Frame();
 			bounds = Region::RegionEnclosingRegions(bounds, r);
 		}
-		
-		//Point origin = Origin() + bounds.Origin();
-		//SetFrameOrigin(origin);
-		
-		newSize.w = std::max(newSize.w, bounds.w + bounds.x);
-		newSize.h = std::max(newSize.h, bounds.h + bounds.y);
+
+		newSize.w = std::max(newSize.w, bounds.w);
+		newSize.h = std::max(newSize.h, bounds.h);
 	}
-	SetFrameSize(newSize);
+	assert(newSize.w >= superView->Frame().w && newSize.h >= superView->Frame().h);
+
+	// set frame size directly to avoid infinite recursion
+	// subviews were already resized, so no need to run the autoresize
+	frame.w = newSize.w;
+	frame.h = newSize.h;
 }
 	
 void ScrollView::ContentView::WillDraw()
@@ -132,9 +130,10 @@ ScrollView::ScrollView(const Region& frame)
 		vscroll->SetAction(handler, Control::ValueChange);
 		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 	}
-	
+
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
+	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
 }
 
 ScrollView::~ScrollView()
@@ -144,33 +143,30 @@ ScrollView::~ScrollView()
 	delete hscroll;
 	delete vscroll;
 }
-	
-void ScrollView::SizeChanged(const Size& /* oldsize */)
-{
-	Update();
-}
 
-void ScrollView::ContentFrameChanged()
+void ScrollView::UpdateScrollbars()
 {
 	// FIXME: this is assuming an origin of 0,0
 	const Size& mySize = ContentRegion().Dimensions();
-	const Size& contentSize = contentView.Dimensions();
+	const Region& contentFrame = contentView.Frame();
 
-	if (hscroll && contentSize.w > mySize.w) {
+	if (hscroll && contentFrame.w > mySize.w) {
 		// assert(hscroll);
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
+		hscroll->SetValue(-contentFrame.Origin().x);
 	}
 	if (vscroll) {
-		if (contentSize.h > mySize.h) {
+		if (contentFrame.h > mySize.h) {
 			vscroll->SetVisible(true);
 			
-			int maxVal = contentSize.h - mySize.h;
+			int maxVal = contentFrame.h - mySize.h;
 			Control::ValueRange range(0, maxVal);
 			vscroll->SetValueRange(range);
 		} else {
 			vscroll->SetVisible(false);
 		}
+		vscroll->SetValue(-contentFrame.Origin().y);
 	}
 }
 	
@@ -249,15 +245,7 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 void ScrollView::Update()
 {
 	contentView.ResizeToSubviews();
-
-	Point origin = contentView.Origin(); // how much we have scrolled in -px
-
-	if (vscroll) {
-		vscroll->SetValue(-origin.y);
-	}
-	if (hscroll) {
-		hscroll->SetValue(-origin.x);
-	}
+	UpdateScrollbars();
 }
 
 bool ScrollView::CanScroll(const Point& p) const
@@ -306,7 +294,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	}
 
 	contentView.SetFrameOrigin(newP);
-	Update();
+	UpdateScrollbars();
 }
 
 bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)

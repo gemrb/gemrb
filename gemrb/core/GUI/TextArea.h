@@ -159,6 +159,7 @@ private: //internal functions
 	void SetPalette(const Color*, PALETTE_TYPE);
 
 	void UpdateScrollview();
+	void SizeChanged(const Size&) { UpdateScrollview(); }
 
 	int TextHeight() const;
 	int OptionsHeight() const;

@@ -58,8 +58,7 @@ namespace GemRB {
 		ContentView contentView;
 
 	private:
-		void SizeChanged(const Size& /* oldsize */);
-		void ContentFrameChanged();
+		void UpdateScrollbars();
 		void ScrollbarValueChange(ScrollBar*);
 		
 		void WillDraw();
