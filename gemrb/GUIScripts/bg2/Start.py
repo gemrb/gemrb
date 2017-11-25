@@ -64,7 +64,7 @@ def OnLoad():
 	
 def SoAPress():
 	if StartWindow:
-		StartWindow.Unload()
+		StartWindow.Close()
 	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
 	GemRB.SetNextScript("Start2")
@@ -74,6 +74,6 @@ def ToBPress():
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetVar("oldgame",0)
 	if StartWindow:
-		StartWindow.Unload()
+		StartWindow.Close()
 	GemRB.SetNextScript("Start2")
 	return

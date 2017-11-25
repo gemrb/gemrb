@@ -2908,9 +2908,12 @@ int Interface::PlayMovie(const char* resref)
 	Window* win = winmgr->MakeWindow(screen);
 	win->SetFlags(Window::Borderless, OP_OR);
 	winmgr->PresentModalWindow(win);
+	winmgr->SetCursorEnabled(false);
+	winmgr->DrawWindows();
 
 	mp->Play(win);
 	win->Close();
+	winmgr->SetCursorEnabled(true);
 	SetCutSceneMode(false);
 	if (sound_override) {
 		sound_override->Stop();

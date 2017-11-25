@@ -39,17 +39,18 @@ def OnLoad():
 
 	if GameCheck.IsBG2Demo():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
-	
-	StartWindow = GemRB.LoadWindow (0, "START")
+
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
-		if GameCheck.HasTOB():
-			StartWindow.SetBackground("STARTOLD")
 		if not skip_videos:
 			GemRB.PlayMovie ("INTRO15F", 1)
 	else:
 		if not skip_videos:
 			GemRB.PlayMovie ("INTRO", 1)
+
+	StartWindow = GemRB.LoadWindow (0, "START")
+	if GemRB.GetVar("oldgame")==1 and GameCheck.HasTOB():
+		StartWindow.SetBackground("STARTOLD")
 
 	#end ToB specific part
 	SinglePlayerButton = StartWindow.GetControl (0)
