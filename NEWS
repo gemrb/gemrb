@@ -6,7 +6,7 @@ GemRB git (782578d1a):
     - 
     - bugfixes
 
-GemRB git (2017-11-26):
+GemRB v0.8.5 (2017-11-26):
   New features:
     - SDL2 resolution-independent window scaling, environmental audio, IRIX compatibility
     - regeneration during sleep, time dilation
