@@ -1,10 +1,9 @@
-GemRB git (8940f61):
+GemRB git (2017-11-26):
   New features:
-    - 
-    - dialogF.tlk handling
     - SDL2 resolution-independent window scaling, environmental audio, IRIX compatibility
-    - regeneration during sleep, iwd2 ability stacking, iwd ZZ* weapon bonuses
-    - portrait.2da handling, time dilation, avatar shadows
+    - regeneration during sleep, time dilation
+    - iwd2 ability stacking, iwd ZZ* weapon bonuses
+    - portrait.2da handling, avatar shadows, dialogF.tlk handling
 
   Improved features:
     - infravision
