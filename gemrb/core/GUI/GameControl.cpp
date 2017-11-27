@@ -2168,7 +2168,7 @@ void GameControl::MakeSelection(const Region &r, bool extend)
 	Map* area = game->GetCurrentArea();
 
 	Actor **ab;
-	int count = area->GetActorsInRect(ab, r, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY);
+	int count = area->GetActorsInRect(ab, r, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL);
 	if (!extend && count > 0) {
 		std::set<Actor*>::iterator it = highlighted.begin();
 		for (; it != highlighted.end(); ++it) {
@@ -2181,9 +2181,10 @@ void GameControl::MakeSelection(const Region &r, bool extend)
 	}
 
 	for (int i = 0; i < count; i++) {
-		if (highlighted.insert( ab[i] ).second == true) {
-			ab[i]->SetOver( true );
-			game->SelectActor( ab[i], true, SELECT_NORMAL );
+		Actor* actor = ab[i];
+		if (highlighted.insert( actor ).second == true) {
+			actor->SetOver( true );
+			game->SelectActor( actor, true, SELECT_NORMAL );
 		}
 	}
 	free( ab );
