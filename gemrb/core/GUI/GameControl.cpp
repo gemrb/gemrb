@@ -1411,6 +1411,8 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 
 	if (isFormationRotation) {
 		SetCursor(core->Cursors[IE_CURSOR_USE]);
+	} else if (isSelectionRect) {
+		SetCursor(core->Cursors[IE_CURSOR_PRESSED]);
 	}
 	return true;
 }
