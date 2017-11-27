@@ -214,7 +214,7 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
-		Point p = delta;
+		Point p = Point(-delta.x, -delta.y);
 		short* xy = (State&SLIDER_HORIZONTAL) ? &p.x : &p.y;
 		if (*xy == 0) return false;
 
