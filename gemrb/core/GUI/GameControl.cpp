@@ -1884,7 +1884,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 		}
 
-		if (target_mode != TARGET_MODE_NONE) {
+		if (target_mode != TARGET_MODE_NONE || overInfoPoint) {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
