@@ -41,7 +41,7 @@ Point PointAnimation::NextPoint() const {
 		unsigned long deltaT = endtime - begintime;
 		Point p;
 		p.x = deltax * double(curTime - begintime) / deltaT;
-		p.x = deltay * double(curTime - begintime) / deltaT;
+		p.y = deltay * double(curTime - begintime) / deltaT;
 		return begin + p;
 	}
 	return end;
