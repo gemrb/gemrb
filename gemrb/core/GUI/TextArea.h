@@ -160,6 +160,7 @@ private: //internal functions
 
 	void UpdateScrollview();
 	void SizeChanged(const Size&) { UpdateScrollview(); }
+	void FlagsChanged(unsigned int /*oldflags*/);
 
 	int TextHeight() const;
 	int OptionsHeight() const;

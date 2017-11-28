@@ -246,6 +246,7 @@ void TextArea::Init()
 
 	scrollview.SetScrollIncrement(LineHeight());
 	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
+	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? OP_OR : OP_NAND);
 }
 
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
@@ -311,6 +312,15 @@ void TextArea::UpdateScrollview()
 		scrollview.ScrollTo(Point(0, -y), 0);
 	} else {
 		scrollview.Update();
+	}
+}
+
+void TextArea::FlagsChanged(unsigned int oldflags)
+{
+	if (Flags()&View::IgnoreEvents) {
+		scrollview.SetFlags(View::IgnoreEvents, OP_OR);
+	} else if (oldflags&View::IgnoreEvents) {
+		scrollview.SetFlags(View::IgnoreEvents, OP_NAND);
 	}
 }
 

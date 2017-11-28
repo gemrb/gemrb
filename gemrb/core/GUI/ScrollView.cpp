@@ -158,8 +158,8 @@ void ScrollView::UpdateScrollbars()
 	}
 	if (vscroll) {
 		if (contentFrame.h > mySize.h) {
-			vscroll->SetVisible(true);
-			
+			vscroll->SetVisible((Flags()&View::IgnoreEvents) ? false : true);
+
 			int maxVal = contentFrame.h - mySize.h;
 			Control::ValueRange range(0, maxVal);
 			vscroll->SetValueRange(range);
