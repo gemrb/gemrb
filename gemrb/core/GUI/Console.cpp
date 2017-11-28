@@ -59,8 +59,9 @@ bool Console::HandleHotKey(const Event& e)
 	if (e.type != Event::KeyDown) return false;
 
 	// the only hot key console registers is for hiding / showing itself
-	window->SetVisible(!IsVisible());
 	if (IsVisible()) {
+		window->Close();
+	} else {
 		window->Focus();
 	}
 	return true;
