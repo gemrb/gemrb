@@ -62,7 +62,7 @@ struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
 			rpos = fname + strlen(fname)-1;
 		}
 
-		const char* fpos = rpos - len;
+		const char* fpos = rpos - len + 1;
 		if (fpos < fname) {
 			// impossible to be equal. this length is out of bounds
 			return false;
