@@ -502,13 +502,14 @@ bool TextArea::OnMouseWheelScroll(const Point& delta)
 
 void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VarName[0] || optIdx >= selectOptions->NumOpts()) {
-		return;
-	}
 	if (!selectOptions) {
 		// no selectable options present
 		// set state to safe and return
 		ClearSelectOptions();
+		return;
+	}
+
+	if (!VarName[0] || optIdx >= selectOptions->NumOpts()) {
 		return;
 	}
 
