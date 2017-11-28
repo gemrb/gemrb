@@ -114,6 +114,7 @@ public:
 
 	/** Per Pixel scrolling */
 	void ScrollToY(int y, short lineduration = 0);
+	int ContentHeight() const;
 
 	ieDword LineCount() const;
 	ieWord LineHeight() const;
@@ -164,7 +165,6 @@ private: //internal functions
 
 	int TextHeight() const;
 	int OptionsHeight() const;
-	int ContentHeight() const;
 
 public: //Events
 	struct Action {

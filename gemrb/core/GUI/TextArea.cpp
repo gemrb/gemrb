@@ -399,7 +399,7 @@ void TextArea::AppendText(const String& text)
 		// scroll to the bottom
 		int bottom = ContentHeight() - frame.h;
 		if (bottom > 0)
-			ScrollToY(-bottom, 0); // FIXME: should be animated scroll of 500
+			ScrollToY(-bottom, 500);
 	}
 	MarkDirty();
 }
@@ -484,9 +484,8 @@ ieWord TextArea::LineHeight() const
 }
 
 /** Will scroll y pixels over duration */
-void TextArea::ScrollToY(int y, short lineduration)
+void TextArea::ScrollToY(int y, short duration)
 {
-	ieDword duration = lineduration * LineCount();
 	scrollview.ScrollTo(Point(0, y), duration);
 }
 

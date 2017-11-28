@@ -285,16 +285,17 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	newP.x = Clamp<short>(newP.x, maxx, 0);
 	newP.y = Clamp<short>(newP.y, maxy, 0);
 
+	Point current = contentView.Origin();
+	contentView.SetFrameOrigin(newP);
+	UpdateScrollbars();
+
 	// set up animation if required
 	if  (duration) {
-		animation = PointAnimation(contentView.Origin(), newP, duration);
+		animation = PointAnimation(current, newP, duration);
 	} else {
 		// cancel the existing animation (if any)
 		animation = PointAnimation();
 	}
-
-	contentView.SetFrameOrigin(newP);
-	UpdateScrollbars();
 }
 
 bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)

@@ -533,7 +533,8 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 		ta->AppendText(String(lines, L'\n'));
 
 		delete chapText;
-		ta->ScrollToY(h, 2500);
+		ta->SetFlags(View::IgnoreEvents, OP_OR);
+		ta->ScrollToY(-ta->ContentHeight(), lines * 2500);
 	}
 	Py_RETURN_NONE;
 }
