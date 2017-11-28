@@ -320,9 +320,14 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 bool WindowManager::DispatchEvent(const Event& event)
 {
 	if (eventMgr.MouseDown() == false) {
-		if (event.type == Event::MouseUp && trackingWin == NULL) {
-			// we don't deliver mouse up events if there isn't a corresponding mouse down.
-			return false;
+		if (event.type == Event::MouseUp) {
+			if (trackingWin && HIT_TEST(event, trackingWin)) {
+				trackingWin->DispatchEvent(event);
+				return true;
+			} else {
+				// we don't deliver mouse up events if there isn't a corresponding mouse down.
+				return false;
+			}
 		}
 		trackingWin = NULL;
 	} else if (event.isScreen && trackingWin) {
