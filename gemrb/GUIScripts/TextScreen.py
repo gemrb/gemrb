@@ -132,6 +132,7 @@ def StartTextScreen ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReplayTextScreen)
 
 	#if this was opened from somewhere other than game control close that window
+	import GUICommonWindows
 	GUICommonWindows.CloseTopWindow ()
 
 	TextScreen.ShowModal (MODAL_SHADOW_NONE)
