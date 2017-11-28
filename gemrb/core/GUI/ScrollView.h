@@ -65,7 +65,8 @@ namespace GemRB {
 		void DidDraw();
 		
 		void FlagsChanged(unsigned int /*oldflags*/);
-		
+		void SizeChanged(const Size&);
+
 	protected:
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 		bool OnMouseWheelScroll(const Point& delta);
