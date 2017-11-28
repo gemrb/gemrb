@@ -226,6 +226,14 @@ void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
+void ScrollView::SizeChanged(const Size& oldsize)
+{
+	// keep the same position
+	int dx = frame.w - oldsize.w;
+	int dy = frame.h - oldsize.h;
+	ScrollDelta(Point(dx, dy));
+}
+
 void ScrollView::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	contentView.AddSubviewInFrontOfView(front, back);
