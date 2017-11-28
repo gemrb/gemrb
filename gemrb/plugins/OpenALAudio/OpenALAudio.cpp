@@ -335,7 +335,7 @@ int OpenALAudioDriver::CountAvailableSources(int limit)
 
 	checkALError("Error while auto-detecting number of sources", WARNING);
 
-	// Return number of succesfully allocated sources
+	// Return number of successfully allocated sources
 	return i;
 }
 

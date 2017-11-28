@@ -3,7 +3,7 @@
 ==== Button ====
 
 Buttons are the most versatile controls in the GUI engine. The following button types exist: checkbox, radiobutton and normal button.
-Checkboxes of the same type are cummulative, and usually hold a bit value.
+Checkboxes of the same type are cumulative, and usually hold a bit value.
 Radiobuttons of the same type are mutually exclusive.
 Normal buttons are similar to radiobuttons, but they are not affecting each other.
 

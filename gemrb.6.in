@@ -45,7 +45,7 @@ For example, if the program's name is
 .I torment 
 instead of
 .IR gemrb ,
-the engine first seaches for 
+the engine first searches for 
 .I torment.cfg 
 and only if it's not found it searches for 
 .IR gemrb.cfg .
@@ -65,7 +65,7 @@ A configuration file consists of pairs
 .IR PARAMETER=VALUE ,
 each on its own line. The case of PARAMETER is not significant, 
 GameType is the same as GAMETYPE. If the same PARAMETER is defined 
-more than once, only the last occurence is used.
+more than once, only the last occurrence is used.
 
 Empty lines and lines starting with `#' (hash sign) are ignored.
 
@@ -143,7 +143,7 @@ Whether the game should run in fullscreen mode.
 
 .TP
 .BR TooltipDelay =INT
-Delay (in miliseconds) before tooltips are displayed when the mouse is not moving.
+Delay (in milliseconds) before tooltips are displayed when the mouse is not moving.
 A reasonable number for this option is e.g.
 .IR 500 .
 The default is
@@ -337,11 +337,11 @@ It is not set by default.
 
 .TP
 .BR DoubleClickDelay =INT
-Milisecond threshold for detecting a double click. The default is 250.
+Millisecond threshold for detecting a double click. The default is 250.
 
 .TP
 .BR RepeatKeyDelay =INT
-Milisecond threshold for detecting a repeated key press. The default is 250.
+Millisecond threshold for detecting a repeated key press. The default is 250.
 
 .TP
 .BR UseSoftKeyboard =(0|1)

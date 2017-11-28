@@ -486,7 +486,7 @@ position value:\n\
   * 1  - bottom\n\
   * 2  - right\n\
   * 3  - top\n\
-  * 4  - bottom (cummulative)\n\
+  * 4  - bottom (cumulative)\n\
 \n\
 **Parameters:** N/A\n\
 \n\
@@ -2594,7 +2594,7 @@ PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
 \n\
 **Parameters:**\n\
   * callback - Python function that accepts (windowIndex, key, mod) arguments and returns\n\
-	* 					 1 indicating succesful key press consumption or 0 otherwise. \n\
+	* 					 1 indicating successful key press consumption or 0 otherwise. \n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -5554,7 +5554,7 @@ being visible, selectable, dead, etc.\n\
 \n\
 **Parameters:** \n\
   * PartyID - party ID or global ID of the actor to check\n\
-  * flags   - bits to check agains (see GameControlSetTargetMode)\n\
+  * flags   - bits to check against (see GameControlSetTargetMode)\n\
 \n\
 **See also:** [[guiscript:GameControlSetTargetMode]]\n\
 \n\
@@ -8380,7 +8380,7 @@ must be called once after a character was created and before EnterGame().\n\
   * Portrait2 - small portrait\n\
   * clear - clear all the quickslot/spell/item fields?\n\
 \n\
-avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
+avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cumulative values to the animationID. \n\
 \n\
 **For example:**\n\
 avprefix.2da\n\
@@ -10506,7 +10506,7 @@ parameter matches the arguments.\n\
 **Parameters:** \n\
   * globalID  - party ID or global ID of the actor to use\n\
   * EffectName - effect reference name (eg. 'State:Helpless')\n\
-  * Parameter2 - parameter2 of targetted effect\n\
+  * Parameter2 - parameter2 of targeted effect\n\
 \n\
 **Return value:** N/A"
 );
@@ -12846,7 +12846,7 @@ static bool CanUseActionButton(Actor *pcc, int type)
 			capability = pcc->GetSkill(IE_LOCKPICKING) + pcc->GetSkill(IE_PICKPOCKET);
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	} else {
 		// use levels instead, so inactive dualclasses work as expected
@@ -12858,7 +12858,7 @@ static bool CanUseActionButton(Actor *pcc, int type)
 			capability = pcc->GetThiefLevel() + pcc->GetBardLevel();
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	}
 	return capability > 0;
@@ -14855,7 +14855,7 @@ PyDoc_STRVAR( GemRB_SetTickHook__doc,
 This is useful for things like running a twisted reactor.\n\
 \n\
 **Parameters:**\n\
-  * callback - pyton function to run\
+  * callback - python function to run\
 \n\
 **Return value:** N/A"
 );

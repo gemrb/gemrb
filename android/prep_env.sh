@@ -243,7 +243,7 @@ function move_and_edit_projectfiles {
 function finished {
   popd # back from $ENVROOT
   local build_path=${ENVROOT##$PWD/}
-  echo -en "That should be it, provided all the commands ran succesfully.\n\n" # TODO: Error checking beyond $1
+  echo -en "That should be it, provided all the commands ran successfully.\n\n" # TODO: Error checking beyond $1
   echo -en "To build:\n"
   echo -en "  cd $build_path/build/gemrb\n"
   echo -en "  ndk-build && ant debug\n\n"
