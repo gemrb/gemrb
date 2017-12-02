@@ -28,13 +28,18 @@ namespace GemRB {
 	
 typedef void (ScrollView::*ScrollCB)(Control*);
 	
-void ScrollView::ContentView::SizeChanged(const Size& /*oldsize*/)
+void ScrollView::ContentView::SizeChanged(const Size& oldsize)
 {
-	ResizeToSubviews();
 	// considering it an error for a ContentView to exist outside of a ScrollView
 	assert(superView);
 	ScrollView* sv = static_cast<ScrollView*>(superView);
-	sv->UpdateScrollbars();
+
+	// keep the same position
+	int dx = frame.w - oldsize.w;
+	int dy = frame.h - oldsize.h;
+
+	ResizeToSubviews();
+	sv->ScrollDelta(Point(dx, dy));
 }
 	
 void ScrollView::ContentView::SubviewAdded(View* /*view*/, View* /*parent*/)
@@ -224,14 +229,6 @@ void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
 			vscroll->SetVisible(false);
 		}
 	}
-}
-
-void ScrollView::SizeChanged(const Size& oldsize)
-{
-	// keep the same position
-	int dx = frame.w - oldsize.w;
-	int dy = frame.h - oldsize.h;
-	ScrollDelta(Point(dx, dy));
 }
 
 void ScrollView::AddSubviewInFrontOfView(View* front, const View* back)

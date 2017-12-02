@@ -65,7 +65,6 @@ namespace GemRB {
 		void DidDraw();
 		
 		void FlagsChanged(unsigned int /*oldflags*/);
-		void SizeChanged(const Size&);
 
 	protected:
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
@@ -81,7 +80,7 @@ namespace GemRB {
 		View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 		
 		// TODO: this isn't how we want to do things
-		// this should happen automatically as subivews are addred/removed/resized
+		// this should happen automatically as subivews are added/removed/resized
 		void Update();
 		
 		Point ScrollOffset() const;
