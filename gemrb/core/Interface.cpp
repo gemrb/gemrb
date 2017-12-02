@@ -3839,7 +3839,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
 	Item* i = gamedata->GetItem(item->ItemResRef);
-	Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
+	Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
 	if (pic) {
 		winmgr->GetGameWindow()->SetCursor(pic);
 		pic->release();
