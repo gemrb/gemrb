@@ -220,7 +220,7 @@ void View::Draw()
 	debuginfo = debuginfo || EventMgr::ModState(GEM_MOD_CTRL);
 	
 	if (debuginfo) {
-		ViewScriptingRef* ref = GetScriptingRef();
+		const ViewScriptingRef* ref = GetScriptingRef();
 		if (ref) {
 			Font* fnt = core->GetFont( "NORMAL" );
 			ScriptingId id = ref->Id;
