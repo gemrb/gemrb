@@ -129,6 +129,11 @@ def UpdateControlStatus():
 		
 		if size not in WinSizes:
 			return
+		
+		frame = ContractButton.GetFrame();
+		if size != GS_SMALLDIALOG:
+			frame['y'] -= (frame['h'] + 6)
+		ExpandButton.SetFrame(frame)
 
 		frame = MessageWindow.GetFrame()
 		diff = frame['h'] - WinSizes[size]
@@ -136,11 +141,6 @@ def UpdateControlStatus():
 		frame['h'] = WinSizes[size]
 		MessageWindow.SetFrame(frame)
 		MessageWindow.SetBackground(WinBG[size])
-		
-		frame = ContractButton.GetFrame();
-		if size != GS_SMALLDIALOG:
-			frame['y'] -= (frame['h'] + 6)
-		ExpandButton.SetFrame(frame)
 
 		GemRB.GameSetScreenFlags(size + GSFlags, OP_SET)
 
