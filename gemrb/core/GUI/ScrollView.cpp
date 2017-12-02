@@ -290,7 +290,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	newP.x = Clamp<short>(newP.x, maxx, 0);
 	newP.y = Clamp<short>(newP.y, maxy, 0);
 
-	Point current = contentView.Origin();
+	Point current = (animation) ? animation.NextPoint() : contentView.Origin();
 	contentView.SetFrameOrigin(newP);
 	UpdateScrollbars();
 
