@@ -138,8 +138,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	if (!gc)
 		return false;
 
-	core->ToggleViewsEnabled(false, "NOT_DLG");
-
 	// iwd2 ignores conditions when following external references and
 	// also just goes directly for the referenced state
 	// look at 41cmolb1 and 41cmolb2 for an example
@@ -161,6 +159,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return false;
 	}
 
+	core->ToggleViewsEnabled(false, "NOT_DLG");
 	prevViewPortLoc = gc->Viewport().Origin();
 	gc->MoveViewportTo(tgt->Pos, true, 75); // FIXME: arbitrary guess value
 
