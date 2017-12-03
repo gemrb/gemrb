@@ -289,7 +289,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		Region r = rgn;
-		if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+		if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT)) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
@@ -433,7 +433,7 @@ String Button::TooltipText() const
 
 Sprite2D* Button::Cursor() const
 {
-	if ((flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+	if (flags & IE_GUI_BUTTON_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
 			return gc->GetTargetActionCursor();
