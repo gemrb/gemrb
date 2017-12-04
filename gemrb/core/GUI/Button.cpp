@@ -568,6 +568,11 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
+	if (flags & IE_GUI_BUTTON_PORTRAIT) {
+		GameControl* gc = core->GetGameControl();
+		gc->SetLastActor(core->GetGame()->FindPC(ControlID + 1));
+	}
+
 	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
 		ButtonBorder *fr = &borders[i];
 		if (fr->enabled) {
@@ -583,6 +588,12 @@ void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* dop)
 	if (State == IE_GUI_BUTTON_PRESSED && dop == NULL) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
 	}
+
+	if (flags & IE_GUI_BUTTON_PORTRAIT) {
+		GameControl* gc = core->GetGameControl();
+		gc->SetLastActor(NULL);
+	}
+
 	if (pulseBorder) {
 		pulseBorder = false;
 		MarkDirty();
