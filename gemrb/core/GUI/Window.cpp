@@ -316,7 +316,7 @@ bool Window::DispatchEvent(const Event& event)
 
 	if (event.isScreen) {
 		Point screenPos = event.mouse.Pos();
-		if (!frame.PointInside(screenPos)) {
+		if (!frame.PointInside(screenPos) && trackingView == NULL) {
 			// this can hapen if the window is modal since it will absorb all events
 			// the window manager maybe shouldnt dispatch the events in this case
 			// but this is a public function and its possible to post a phoney event from anywhere anyway

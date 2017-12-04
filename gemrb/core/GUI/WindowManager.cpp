@@ -321,7 +321,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 {
 	if (eventMgr.MouseDown() == false) {
 		if (event.type == Event::MouseUp) {
-			if (trackingWin && HIT_TEST(event, trackingWin)) {
+			if (trackingWin) {
 				trackingWin->DispatchEvent(event);
 				return true;
 			} else {
