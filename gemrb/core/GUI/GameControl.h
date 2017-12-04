@@ -222,6 +222,7 @@ public:
 	/** Displays a string on screen */
 	void DisplayString(const Point &p, const char *Text);
 	Actor *GetLastActor();
+	void SetLastActor(Actor* lastActor);
 	/** changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
 	/** Sets up targeting with spells or items */

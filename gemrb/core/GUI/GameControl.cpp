@@ -1247,13 +1247,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		}
 	}
 
-	if (lastActor) {
-		lastActorID = lastActor->GetGlobalID();
-		lastActor->SetOver( true );
-	} else {
-		lastActorID = 0;
-	}
-
+	SetLastActor(lastActor);
 	UpdateCursor(lastActor);
 
 	return true;
@@ -2286,6 +2280,21 @@ Actor *GameControl::GetLastActor()
 		actor = area->GetActorByGlobalID(lastActorID);
 	}
 	return actor;
+}
+
+void GameControl::SetLastActor(Actor* lastActor)
+{
+	if (lastActorID) {
+		Map* area = CurrentArea();
+		Actor* current = area->GetActorByGlobalID(lastActorID);
+		current->SetOver(false);
+		lastActorID = 0;
+	}
+
+	if (lastActor) {
+		lastActorID = lastActor->GetGlobalID();
+		lastActor->SetOver(true);
+	}
 }
 
 //Set up an item use which needs targeting
