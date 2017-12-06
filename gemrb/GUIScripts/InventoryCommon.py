@@ -131,6 +131,8 @@ def OnDragItem (btn, slot):
 def OnDropItemToPC (pc):
 	"""Gives an item to another character."""
 
+	if pc > GemRB.GetPartySize ():
+		return
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	UpdateInventoryWindow ()
