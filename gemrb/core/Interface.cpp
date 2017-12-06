@@ -3836,6 +3836,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 		delete DraggedItem;
 	}
 	DraggedItem = item;
+	if (!item) return;
 
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
 	Item* i = gamedata->GetItem(item->ItemResRef);
