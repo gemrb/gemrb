@@ -559,6 +559,12 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 		delete RemoveContent(content, false);
 	}
 
+	if (Flags()&RESIZE_HEIGHT) {
+		frame.h = 0;
+	}
+	if (Flags()&RESIZE_WIDTH) {
+		frame.w = 0;
+	}
 	// TODO: we could optimize this to only layout content after exclusion.y
 	LayoutContentsFrom(contents.begin());
 }
