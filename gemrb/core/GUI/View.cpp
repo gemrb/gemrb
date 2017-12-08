@@ -195,7 +195,6 @@ void View::Draw()
 	if (NeedsDraw()) {
 		DrawBackground(NULL);
 		DrawSelf(drawFrame, intersect);
-		dirty = false;
 	} else {
 		Regions::iterator it = dirtyBGRects.begin();
 		while (it != dirtyBGRects.end()) {
@@ -208,6 +207,7 @@ void View::Draw()
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
 	DidDraw(); // notify subclasses that drawing finished
+	dirty = false;
 	
 #if DEBUG_VIEWS
 	Window* win = GetWindow();
