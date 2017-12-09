@@ -35,9 +35,6 @@ ExitWindow = 0
 def OnLoad ():
 	global PartyFormationWindow
 
-	GUICommonWindows.PortraitWindow = None
-	GUICommonWindows.SelectionChangeHandler = None
-
 	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
@@ -102,7 +99,6 @@ def OnLoad ():
 			GemRB.SetVar ("PlayMode",0) #using first row
 
 	LoadScreen.CloseLoadScreen()
-	PartyFormationWindow.Focus()
 	return
 
 def CreateCharPress ():
@@ -156,6 +152,7 @@ def ModifyCharsPress ():
 	return
 
 def EnterGamePress ():
+	PartyFormationWindow.Close()
 	GemRB.EnterGame ()
 	return
 
@@ -163,7 +160,7 @@ def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
 	PartyFormationWindow.SetVisible(False)
-	ExitWindow = GemRB.LoadWindow (7)
+	ExitWindow = GemRB.LoadWindow (7, "GUISP")
 
 	ExitButton = ExitWindow.GetControl (1)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitExitPress)

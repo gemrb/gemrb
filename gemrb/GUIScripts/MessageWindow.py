@@ -58,8 +58,11 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
 		Button=ActionsWindow.GetControl(61)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
-		
-	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
+
+	if GameCheck.HasHOW():
+		OptionsWindow = GemRB.LoadWindow(25, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
+	else:
+		OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	OptionsWindow.AddAlias("OPTWIN")
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
