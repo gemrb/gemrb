@@ -570,7 +570,8 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 
 	if (flags & IE_GUI_BUTTON_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
-		gc->SetLastActor(core->GetGame()->FindPC(ControlID + 1));
+		if (gc)
+			gc->SetLastActor(core->GetGame()->FindPC(ControlID + 1));
 	}
 
 	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
@@ -591,7 +592,8 @@ void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* dop)
 
 	if (flags & IE_GUI_BUTTON_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
-		gc->SetLastActor(NULL);
+		if (gc)
+			gc->SetLastActor(NULL);
 	}
 
 	if (pulseBorder) {
