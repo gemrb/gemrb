@@ -576,14 +576,20 @@ void Actor::SetName(const char* ptr, unsigned char type)
 	char* end = name + strlen(name) - 1;
 	while (end > name && isspace(*end)) end--;
 	*(end+1) = '\0'; // trim whitespace from the end
+
+	if (type == 0) {
+		SetName(ptr, 1);
+	}
 }
 
 void Actor::SetName(int strref, unsigned char type)
 {
 	char* name = NULL;
-	if (type == 1) {
+	if (type <= 1) {
 		name = core->GetCString( strref );
 		LongStrRef = strref;
+		if (type == 0)
+			ShortStrRef = strref;
 	} else {
 		name = core->GetCString( strref );
 		ShortStrRef = strref;
