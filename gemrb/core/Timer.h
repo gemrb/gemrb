@@ -51,6 +51,10 @@ public:
 		NextFireDate();
 	}
 
+	~Timer() {
+		Invalidate();
+	}
+
 	void SetInverval(TimeInterval i) {
 		fireDate += (i - interval);
 		interval = i;
@@ -66,6 +70,7 @@ public:
 
 	void Invalidate() {
 		valid = false;
+		action.release();
 	}
 
 	bool IsRunning() const {
