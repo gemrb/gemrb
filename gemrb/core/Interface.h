@@ -381,7 +381,7 @@ private:
 	/** Next Script Name */
 	char NextScript[64];
 
-	std::vector<Timer> timers;
+	std::deque<Timer> timers;
 	int SpecialSpellsCount;
 	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;

@@ -939,7 +939,7 @@ void Interface::Main()
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 
 	do {
-		std::vector<Timer>::iterator it;
+		std::deque<Timer>::iterator it;
 		for (it = timers.begin(); it != timers.end();) {
 			if (it->IsRunning()) {
 				it->Update();
