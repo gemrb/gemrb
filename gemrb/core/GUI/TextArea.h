@@ -139,6 +139,7 @@ private: // Private attributes
 	// standard text display container
 	TextContainer* textContainer;
 	ScrollView scrollview;
+	Timer* historyTimer;
 
 	/** Fonts */
 	Font* finit, * ftext;
@@ -165,6 +166,8 @@ private: //internal functions
 
 	int TextHeight() const;
 	int OptionsHeight() const;
+
+	void TrimHistory(size_t lines);
 
 public: //Events
 	struct Action {

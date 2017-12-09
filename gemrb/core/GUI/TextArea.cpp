@@ -236,6 +236,7 @@ void TextArea::Init()
 
 	selectOptions = NULL;
 	textContainer = NULL;
+	historyTimer = NULL;
 	
 	AddSubviewInFrontOfView(&scrollview);
 
@@ -343,16 +344,49 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 	}
 }
 
+void TextArea::TrimHistory(size_t lines)
+{
+	int height = int(LineHeight() * lines);
+	Region exclusion(Point(), Size(frame.w, height));
+	scrollview.ScrollDelta(Point(0, exclusion.h));
+	textContainer->DeleteContentsInRect(exclusion);
+	scrollview.Update();
+
+	if (historyTimer) {
+		historyTimer->Invalidate();
+		historyTimer = NULL;
+	}
+}
+
 void TextArea::AppendText(const String& text)
 {
-	if (flags&IE_GUI_TEXTAREA_HISTORY) {
+	if ((flags&IE_GUI_TEXTAREA_HISTORY)) {
+		if (historyTimer) {
+			historyTimer->Invalidate();
+			historyTimer = NULL;
+		}
+
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
-		// start trimming content from the top until we are under the limit.
-		Size frame = textContainer->Dimensions();
-		int currHeight = frame.h;
+		int currHeight = ContentHeight();
 		if (currHeight > heightLimit) {
-			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
-			textContainer->DeleteContentsInRect(exclusion);
+			size_t lines = (currHeight - heightLimit) / LineHeight();
+
+			class AnimationEndEventHandler : public Callback<void, void> {
+				TextArea* ta;
+				const size_t lines;
+
+			public:
+				AnimationEndEventHandler(TextArea* ta, size_t lines)
+				: ta(ta), lines(lines) {}
+
+				void operator()() const {
+					ta->TrimHistory(lines);
+				}
+			};
+
+			EventHandler h = new AnimationEndEventHandler(this, lines);
+			assert(historyTimer == NULL);
+			historyTimer = &core->SetTimer(h, 500);
 		}
 	}
 
@@ -394,6 +428,7 @@ void TextArea::AppendText(const String& text)
 	}
 
 	UpdateScrollview();
+
 	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
 	{
 		// scroll to the bottom
