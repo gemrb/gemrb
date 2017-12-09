@@ -37,8 +37,7 @@ StartYear = 0
 ###################################################
 
 def InitJournalWindow (JournalWindow):
-	global StartTime, StartYear
-	global Chapter
+	global StartTime, StartYear, Chapter
 	
 	JournalWindow.AddAlias("WIN_JRNL")
 		

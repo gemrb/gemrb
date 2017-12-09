@@ -27,79 +27,45 @@ import GUICommonWindows
 from GUIDefines import *
 
 ###################################################
-JournalWindow = None
-OldOptionsWindow = None
-OldPortraitWindow = None
 OverSlot = None
 Chapter = 0
 StartTime = 0
 StartYear = 0
 
 ###################################################
-def OpenJournalWindow ():
-	global JournalWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
+def InitJournalWindow (JournalWindow):
 	global StartTime, StartYear, Chapter
 
-	if GUICommon.CloseOtherWindow (OpenJournalWindow):
-
-		if JournalWindow:
-			JournalWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-		
-		JournalWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
+	JournalWindow.AddAlias("WIN_JRNL")
 		
 	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
-	
-	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
-	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenJournalWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
-	
-	Button = Window.GetControl (3)
+
+	Button = JournalWindow.GetControl (3)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)
 
-	Button = Window.GetControl (4)
+	Button = JournalWindow.GetControl (4)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
 	GemRB.SetVar("TopIndex", 0)
-	GUICommonWindows.SetSelectionChangeHandler (UpdateJournalWindow)
-	UpdateJournalWindow ()
-	
-	OptionsWindow.Focus()
-	Window.Focus()
-	PortraitWindow.Focus()
+
 	return
 
 ###################################################
-def UpdateJournalWindow ():
-	Window = JournalWindow
+def UpdateJournalWindow (JournalWindow):
+	if JournalWindow == None:
+		JournalWindow = GemRB.GetView("WIN_JRNL")
 
 	# Title
-	Title = Window.GetControl (5)
+	Title = JournalWindow.GetControl (5)
 	Title.SetText (16202 + Chapter)
 
 	# text area
-	Text = Window.GetControl (1)
+	Text = JournalWindow.GetControl (1)
 	Text.Clear ()
 	
 	for i in range (GemRB.GetJournalSize (Chapter)):
@@ -120,6 +86,8 @@ def UpdateJournalWindow ():
 		Text.Append (GemRB.GetString(15980) + "\n")
 		Text.Append (GemRB.GetString(je['Text']) + "\n\n")
 
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateJournalWindow)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateJournalWindow)
 
 ###################################################
 def JournalPrevSectionPress ():
@@ -127,7 +95,7 @@ def JournalPrevSectionPress ():
 
 	if Chapter > 0:
 		Chapter = Chapter - 1
-		UpdateJournalWindow ()
+		UpdateJournalWindow (None)
 
 
 ###################################################
@@ -137,7 +105,7 @@ def JournalNextSectionPress ():
 	#if GemRB.GetJournalSize (Chapter + 1) > 0:
 	if Chapter < GemRB.GetGameVar("chapter"):
 		Chapter = Chapter + 1
-		UpdateJournalWindow ()
+		UpdateJournalWindow (None)
 
 
 ###################################################
