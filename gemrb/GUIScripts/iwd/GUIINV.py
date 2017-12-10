@@ -32,59 +32,15 @@ from ie_stats import *
 from ie_slots import *
 from ie_spells import *
 
-InventoryWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
-
-def OpenInventoryWindow ():
+def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
-	global InventoryWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem () == 1:
-			pc = GemRB.GameGetSelectedPCSingle ()
-			#store the item in the inventory before window is closed
-			GemRB.DropDraggedItem (pc, -3)
-			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem () == 1:
-				GemRB.DropDraggedItem (pc, -2)
-
-		if InventoryWindow:
-			InventoryWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		InventoryWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		GUICommonWindows.UpdatePortraitWindow ()
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		#don't go back to multi selection mode when going to the store screen
-		if not GemRB.GetVar ("Inventory"):
-			GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
-	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
+	Window.AddAlias("WIN_INV")
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RefreshInventoryWindow(Window))
 
 	#Ground Item
 	for i in range (5):
@@ -146,17 +102,14 @@ def OpenInventoryWindow ():
 
 	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-	UpdateInventoryWindow ()
 
-	PortraitWindow.SetVisible(True)
-	OptionsWindow.SetVisible(True)
-	Window.Focus()
 	return
 
-def UpdateInventoryWindow ():
+def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
 
-	Window = InventoryWindow
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
@@ -165,7 +118,7 @@ def UpdateInventoryWindow ():
 	if Count<1:
 		Count=1
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
-	RefreshInventoryWindow ()
+	RefreshInventoryWindow (Window)
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 
@@ -173,12 +126,13 @@ def UpdateInventoryWindow ():
 		InventoryCommon.UpdateSlot (pc, i)
 	return
 
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
+
 InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
-def RefreshInventoryWindow ():
+def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
-
-	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
