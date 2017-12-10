@@ -2287,7 +2287,8 @@ void GameControl::SetLastActor(Actor* lastActor)
 	if (lastActorID) {
 		Map* area = CurrentArea();
 		Actor* current = area->GetActorByGlobalID(lastActorID);
-		current->SetOver(false);
+		if (current)
+			current->SetOver(false);
 		lastActorID = 0;
 	}
 
