@@ -230,9 +230,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Width * Clipping), AnimPicture->Height );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, &r );
+			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, &r );
 		} else {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, &r );
+			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs, rgn.y + yOffs, &r );
 		}
 	}
 

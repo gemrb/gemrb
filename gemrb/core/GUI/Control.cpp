@@ -47,7 +47,6 @@ Control::Control(const Region& frame)
 	SetValueRange(MaxValueRange);
 
 	animation = NULL;
-	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;
 
 	actionTimer = NULL;
@@ -62,8 +61,6 @@ Control::~Control()
 		actionTimer->Invalidate();
 
 	delete animation;
-
-	Sprite2D::FreeSprite(AnimPicture);
 }
 
 bool Control::IsOpaque() const
@@ -197,7 +194,6 @@ void Control::SetValueRange(ieDword min, ieDword max)
 
 void Control::SetAnimPicture(Sprite2D* newpic)
 {
-	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	MarkDirty();
 }

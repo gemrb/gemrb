@@ -107,7 +107,7 @@ public: // Public attributes
 	char VarName[MAX_VARIABLE_LENGTH];
 
 	ControlAnimation* animation;
-	Sprite2D* AnimPicture;
+	Holder<Sprite2D> AnimPicture;
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;

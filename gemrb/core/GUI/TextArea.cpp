@@ -254,7 +254,7 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (AnimPicture) {
 		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.x, drawFrame.y);
+		core->GetVideoDriver()->BlitSprite(AnimPicture.get(), drawFrame.x, drawFrame.y);
 	}
 }
 
