@@ -261,16 +261,16 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 void TextArea::SetAnimPicture(Sprite2D* pic)
 {
 	Control::SetAnimPicture(pic);
-	
+
 	assert(textContainer);
 	Region tf = textContainer->Frame();
 	if (AnimPicture) {
 		// shrink and shift the container to accommodate the image
-		tf.x += AnimPicture->Width;
-		tf.w -= frame.x;
+		tf.x = AnimPicture->Width;
+		tf.w = frame.w - frame.x;
 	} else {
 		tf.x = 0;
-		tf.w = Dimensions().w;
+		tf.w = frame.w;
 	}
 	textContainer->SetFrame(tf);
 }
