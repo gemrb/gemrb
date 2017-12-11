@@ -135,7 +135,7 @@ bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short 
 	// or maybe should we allow mutliple registrations and iterate them until one accepts the event...
 	int flags = mod << 16;
 	flags |= key;
-	HotKeys.insert(std::make_pair(flags, cb));
+	HotKeys[flags] = cb;
 	return true;
 }
 

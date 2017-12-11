@@ -3011,17 +3011,19 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
-			 "Button.SetHotKey(char)\n\n"
-			 "Binds a keyboard key to trigger the control event when its window is focused." );
+			 "Button.SetHotKey(char, bool global)\n\n"
+			 "Binds a keyboard key to trigger the control event when its window is focused.\n"
+			 "If global is set the hot key works even if the window does not have focus." );
 
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
 	unsigned char* hotkey;
-	PARSE_ARGS2(args, "Os", &self, &hotkey);
+	int global = false;
+	PARSE_ARGS3(args, "Os|i", &self, &hotkey, &global);
 
 	Button* btn = GetView<Button>(self);
 	assert(btn);
-	btn->SetHotKey(hotkey[0]);
+	btn->SetHotKey(hotkey[0], global);
 
 	Py_RETURN_NONE;
 }
