@@ -3808,7 +3808,9 @@ void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
 
+	winmgr->SetCursorEnabled(false);
 	winmgr->DrawWindows();
+	winmgr->SetCursorEnabled(true);
 
 	Window* loadwin = GetWindow(0, "LOADWIN");
 	if (loadwin) {
