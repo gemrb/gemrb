@@ -483,7 +483,7 @@ def OpenLoadMsgWindow ():
 	if LoadMsgWindow:
 		return
 
-	LoadMsgWindow = Window = GemRB.LoadWindow (4)
+	LoadMsgWindow = Window = GemRB.LoadWindow (4, "GUIOPT")
 	Window.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	# Load
