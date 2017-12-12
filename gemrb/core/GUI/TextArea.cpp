@@ -346,6 +346,14 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 
 void TextArea::TrimHistory(size_t lines)
 {
+	if (dialogBeginNode) {
+		// we don't trim history in dialog
+		// this allows us to always reference the entire dialog no matter how long it is
+		// we would also have to reapply the selection options origin since it will often be changed by trimming
+		// e.g. selectOptions->SetFrameOrigin(Point(textFrame.x, textFrame.h));
+		return;
+	}
+
 	int height = int(LineHeight() * lines);
 	Region exclusion(Point(), Size(frame.w, height));
 	scrollview.ScrollDelta(Point(0, exclusion.h));
