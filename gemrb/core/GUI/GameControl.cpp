@@ -574,7 +574,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 				c.b = 0x7F;
 			}
 
-			video->DrawPolyline( poly, c, true );
+			video->DrawPolyline( poly, vpOrigin, c, true );
 		}
 	}
 

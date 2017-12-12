@@ -428,7 +428,7 @@ public:
 	ieResRef EnterWav;
 public:
 	bool IsOver(const Point &Pos) const;
-	void DrawOutline() const;
+	void DrawOutline(const Point& origin) const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{

@@ -1844,12 +1844,12 @@ bool Highlightable::IsOver(const Point &Pos) const
 	return outline->PointIn( Pos );
 }
 
-void Highlightable::DrawOutline() const
+void Highlightable::DrawOutline(const Point& origin) const
 {
 	if (!outline) {
 		return;
 	}
-	core->GetVideoDriver()->DrawPolyline( outline, outlineColor, true );
+	core->GetVideoDriver()->DrawPolyline( outline, origin, outlineColor, true );
 }
 
 void Highlightable::SetCursor(unsigned char CursorIndex)

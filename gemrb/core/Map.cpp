@@ -937,7 +937,7 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	free(nearActors);
 }
 
-void Map::DrawHighlightables()
+void Map::DrawHighlightables(const Region& viewport)
 {
 	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
@@ -946,7 +946,7 @@ void Map::DrawHighlightables()
 	while ( (c = TMap->GetContainer(i++))!=NULL ) {
 		if (c->Highlight) {
 			if (c->Type != IE_CONTAINER_PILE) {
-				c->DrawOutline();
+				c->DrawOutline(viewport.Origin());
 			}
 		}
 	}
@@ -954,13 +954,13 @@ void Map::DrawHighlightables()
 	Door *d;
 	i = 0;
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
-		if (d->Highlight) d->DrawOutline();
+		if (d->Highlight) d->DrawOutline(viewport.Origin());
 	}
 
 	InfoPoint *p;
 	i = 0;
 	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
-		if (p->Highlight) p->DrawOutline();
+		if (p->Highlight) p->DrawOutline(viewport.Origin());
 	}
 }
 
@@ -1157,7 +1157,7 @@ void Map::DrawMap(const Region& viewport)
 
 	if (!bgoverride) {
 		//Draw Outlines
-		DrawHighlightables();
+		DrawHighlightables(viewport);
 	}
 
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by

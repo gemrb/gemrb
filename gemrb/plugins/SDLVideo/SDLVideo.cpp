@@ -1011,9 +1011,13 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	}
 }
 
-void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
+void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill)
 {
-	if (!poly->count || !poly->BBox.IntersectsRegion(screenClip)) {
+	Region bbox = poly->BBox;
+	bbox.x -= origin.x;
+	bbox.y -= origin.y;
+
+	if (!poly->count || !bbox.IntersectsRegion(screenClip)) {
 		return;
 	}
 
@@ -1032,10 +1036,10 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 		SDL_LockSurface(currentBuf);
 		std::list<Trapezoid>::iterator iter;
 		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-			++iter)
+			 ++iter)
 		{
-			int y_top = iter->y1; // inclusive
-			int y_bot = iter->y2; // exclusive
+			int y_top = iter->y1 - origin.y; // inclusive
+			int y_bot = iter->y2 - origin.y; // exclusive
 
 			if (y_top < 0) y_top = 0;
 			if (y_bot > screenSize.h) y_bot = screenSize.h;
@@ -1043,21 +1047,24 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 
 			int ledge = iter->left_edge;
 			int redge = iter->right_edge;
-			Point& a = poly->points[ledge];
-			Point& b = poly->points[(ledge+1)%(poly->count)];
-			Point& c = poly->points[redge];
-			Point& d = poly->points[(redge+1)%(poly->count)];
+			const Point& a = poly->points[ledge];
+			const Point& b = poly->points[(ledge+1)%(poly->count)];
+			const Point& c = poly->points[redge];
+			const Point& d = poly->points[(redge+1)%(poly->count)];
 
-			Pixel* line = (Pixel*)(currentBuf->pixels) + y_top * currentBuf->pitch;
+			Pixel* line = (Pixel*)(currentBuf->pixels) + (y_top)*currentBuf->pitch;
 
 			for (int y = y_top; y < y_bot; ++y) {
-				int py = y + screenSize.h;
+				int py = y + origin.y;
 
 				// TODO: maybe use a 'real' line drawing algorithm to
 				// compute these values faster.
 
 				int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
 				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
+
+				lt -= origin.x;
+				rt -= origin.x;
 
 				if (lt < 0) lt = 0;
 				if (rt > screenSize.w) rt = screenSize.w;
@@ -1085,17 +1092,16 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 		SDL_UnlockSurface(currentBuf);
 	}
 
-	short lastX = poly->points[0]. x, lastY = poly->points[0].y;
+	short lastX = poly->points[0].x - origin.x;
+	short lastY = poly->points[0].y - origin.y;
 	unsigned int i;
 
 	for (i = 1; i < poly->count; i++) {
-		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color );
-		lastX = poly->points[i].x;
-		lastY = poly->points[i].y;
+		DrawLine( lastX, lastY, poly->points[i].x - origin.x, poly->points[i].y - origin.y, color );
+		lastX = poly->points[i].x - origin.x;
+		lastY = poly->points[i].y - origin.y;
 	}
-	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color );
-
-	return;
+	DrawLine( lastX, lastY, poly->points[0].x - origin.x, poly->points[0].y - origin.y, color );
 }
 
 void SDLVideoDriver::SetFadeColor(int r, int g, int b)

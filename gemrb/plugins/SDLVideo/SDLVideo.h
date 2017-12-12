@@ -113,7 +113,7 @@ public:
 	/** This functions Draws an Ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color);
 	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
+	virtual void DrawPolyline(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false);
 	virtual void DrawHLine(short x1, short y, short x2, const Color& color);
 	virtual void DrawVLine(short x, short y1, short y2, const Color& color);
 	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color);

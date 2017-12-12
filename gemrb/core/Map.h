@@ -361,7 +361,7 @@ public:
 	void MoveVisibleGroundPiles(const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
-	void DrawHighlightables();
+	void DrawHighlightables(const Region& viewport);
 	void DrawMap(const Region& viewport);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
