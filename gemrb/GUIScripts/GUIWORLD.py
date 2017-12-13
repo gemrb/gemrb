@@ -91,21 +91,19 @@ def NextDialogState ():
 	ContinueWindow.GetControl(0).SetVisible(False)
 
 def OpenEndMessageWindow ():
-	ContinueWindow.GetControl(0).SetVisible(True)
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.Focus()
 
 def OpenContinueMessageWindow ():
-	ContinueWindow.GetControl(0).SetVisible(True)
 	#continue
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
-	Button.Focus()
 
 def UpdateReformWindow ():
 	Window = ReformPartyWindow
