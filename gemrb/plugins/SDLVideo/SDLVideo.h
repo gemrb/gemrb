@@ -131,7 +131,7 @@ protected:
 	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
-	void Wait(int w) { SDL_Delay(w); }
+	void Wait(unsigned long w) { SDL_Delay(w); }
 
 public:
 	// static functions for manipulating surfaces

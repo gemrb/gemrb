@@ -127,7 +127,7 @@ void Video::PopDrawingBuffer()
 	drawingBuffer = drawingBuffers.back();
 }
 
-int Video::SwapBuffers(int fpscap)
+int Video::SwapBuffers(unsigned int fpscap)
 {
 	SwapBuffers(drawingBuffers);
 	drawingBuffers.clear();
@@ -135,7 +135,7 @@ int Video::SwapBuffers(int fpscap)
 	SetScreenClip(NULL);
 
 	if (fpscap) {
-		unsigned int lim = fpscap/1000;
+		unsigned int lim = 1000/fpscap;
 		unsigned long time = GetTickCount();
 		if (( time - lastTime ) < lim) {
 			Wait(lim - int(time - lastTime));

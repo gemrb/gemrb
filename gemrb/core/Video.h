@@ -134,7 +134,7 @@ protected:
 	VideoBuffer* drawingBuffer;
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
-	virtual void Wait(int) = 0;
+	virtual void Wait(unsigned long) = 0;
 
 private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
@@ -153,7 +153,7 @@ public:
 	virtual bool SetFullscreenMode(bool set) = 0;
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
-	int SwapBuffers(int fpscap = 30);
+	int SwapBuffers(unsigned int fpscap = 30);
 	VideoBuffer* CreateBuffer(const Region&, BufferFormat = DISPLAY);
 	void DestroyBuffer(VideoBuffer*);
 	void PushDrawingBuffer(VideoBuffer*);
