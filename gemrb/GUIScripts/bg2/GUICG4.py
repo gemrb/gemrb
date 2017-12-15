@@ -172,8 +172,7 @@ def OnLoad():
 
 	Button = AbilityWindow.CreateButton (2000, 0, 0, 0, 0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GiveAll18)
-	# ctrl+shift+8 but actually works for any combo with 8
-	Button.SetHotKey ("8")
+	Button.SetHotKey ("8", 3, True) # TODO: make defines for CTRL and SHIFT modifiers
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)

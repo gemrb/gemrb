@@ -730,16 +730,16 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 	PushOffset = Point(x,y);
 }
 
-bool Button::SetHotKey(KeyboardKey key, bool global)
+bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 {
 	// FIXME: nothing is unregistering these
 	EventMgr::EventCallback* cb = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
 	if (global) {
-		if (EventMgr::RegisterHotKeyCallback(cb, key)) {
+		if (EventMgr::RegisterHotKeyCallback(cb, key, mod)) {
 			hotKey = key;
 			return true;
 		}
-	} else if (window->RegisterHotKeyCallback(cb, key)) {
+	} else if (window->RegisterHotKeyCallback(cb, key)) { // FIXME: this doesnt respect mod param
 		hotKey = key;
 		return true;
 	}

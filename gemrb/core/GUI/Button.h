@@ -169,7 +169,7 @@ public:
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
 
-	bool SetHotKey(KeyboardKey key, bool global = false);
+	bool SetHotKey(KeyboardKey key, short mod = 0, bool global = false);
 	KeyboardKey HotKey() { return hotKey; }
 
 private: // Private attributes
