@@ -279,11 +279,11 @@ class GButton(GControl):
 
   def MakeDefault(self):
 	  # return key
-	  return self.SetHotKey(chr(0x86), True)
+	  return self.SetHotKey(chr(0x86), 0, True)
 
   def MakeEscape(self):
 	  # escape key
-	  return self.SetHotKey(chr(0x8c), True)
+	  return self.SetHotKey(chr(0x8c), 0, True)
 
   def SetMOS(self, mos):
 	  self.SetPicture(mos) # backwards compatibility
