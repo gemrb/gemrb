@@ -275,9 +275,19 @@ void ScrollView::SetScrollIncrement(int inc)
 	}
 }
 
+void ScrollView::ScrollDelta(const Point& p)
+{
+	ScrollDelta(p, 0);
+}
+
 void ScrollView::ScrollDelta(const Point& p, ieDword duration)
 {
 	ScrollTo(p + contentView.Origin(), duration);
+}
+
+void ScrollView::ScrollTo(const Point& p)
+{
+	ScrollTo(p, 0);
 }
 
 void ScrollView::ScrollTo(Point newP, ieDword duration)

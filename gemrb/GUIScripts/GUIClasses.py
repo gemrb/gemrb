@@ -62,6 +62,16 @@ class GSymbol:
     'Unload': _GemRB.Symbol_Unload
   }
 
+class Scrollable:
+	def Scroll(self, x, y, relative):
+		_GemRB.Scrollable_Scroll(self, x, y, relative)
+
+	def ScrollTo(self, x, y):
+		self.Scroll(x, y, False)
+
+	def ScrollDelta(self, x, y):
+		self.Scroll(x, y, True)
+
 class GView:
 	__metaclass__ = metaIDWrapper
 	methods = {
@@ -152,7 +162,7 @@ class GView:
 	def CreateTextEdit(self, control, *args):
 		return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
 
-class GWindow(GView):
+class GWindow(GView, Scrollable):
   methods = {
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupControls': _GemRB.Window_SetupControls,
@@ -253,7 +263,7 @@ class GTextEdit(GControl):
     'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
   }
 
-class GScrollBar(GControl):
+class GScrollBar(GControl, Scrollable):
   pass
 
 class GButton(GControl):

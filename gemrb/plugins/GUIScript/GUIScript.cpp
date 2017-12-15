@@ -1274,6 +1274,29 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Scrollable_Scroll__doc,
+			 "===== Scrollable_Scroll =====\n\n"
+			 "Scroll(x, y) => None"
+			 );
+
+static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
+{
+	int relative = 0;
+	Point p;
+	PARSE_ARGS4( args, "Oii|i", &self, &p.x, &p.y, &relative );
+
+	View::Scrollable* scroller = GetView<View::Scrollable>(self);
+	ABORT_IF_NULL(scroller);
+	
+	if (relative) {
+		scroller->ScrollDelta(p);
+	} else {
+		scroller->ScrollTo(p);
+	}
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  "===== Control_QueryText =====\n\
  \n\
@@ -12990,6 +13013,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(SaveGame_GetPortrait, METH_VARARGS),
 	METHOD(SaveGame_GetPreview, METH_VARARGS),
 	METHOD(SaveGame_GetSaveID, METH_VARARGS),
+	METHOD(Scrollable_Scroll, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
 	METHOD(Symbol_Unload, METH_VARARGS),
 	METHOD(Table_FindValue, METH_VARARGS),

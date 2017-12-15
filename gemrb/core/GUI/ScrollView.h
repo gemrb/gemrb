@@ -26,7 +26,7 @@
 namespace GemRB {
 	class ScrollBar;
 
-	class GEM_EXPORT ScrollView : public View {
+	class GEM_EXPORT ScrollView : public View, public View::Scrollable {
 
 		class ContentView : public View {
 		private:
@@ -85,9 +85,12 @@ namespace GemRB {
 		
 		Point ScrollOffset() const;
 		void SetScrollIncrement(int);
-		
-		void ScrollDelta(const Point& p, ieDword duration = 0);
-		void ScrollTo(Point p, ieDword duration = 0);
+
+		// we implement the Scrollable interface so we cant just use a default param
+		void ScrollDelta(const Point& p);
+		void ScrollDelta(const Point& p, ieDword duration);
+		void ScrollTo(const Point& p);
+		void ScrollTo(Point p, ieDword duration);
 		bool CanScroll(const Point& p) const;
 		
 		Region ContentRegion() const;

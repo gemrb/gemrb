@@ -70,13 +70,28 @@ int ScrollBar::GetFrameHeight(int frame) const
 	return Frames[frame]->Height;
 }
 
-// FIXME: horizontal broken
-void ScrollBar::ScrollTo(Point p)
+void ScrollBar::ScrollDelta(const Point& delta)
 {
-	p.y -= GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+	Point p = Point(-delta.x, -delta.y);
+	short* xy = (State&SLIDER_HORIZONTAL) ? &p.x : &p.y;
+	if (*xy == 0) return;
+
+	ieDword oldval = GetValue();
+	*xy += GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+	ScrollTo(p + AxisPosFromValue());
+	if (oldval == GetValue()) {
+		// just in case delta wasn't enough to move us. we want to force one in that case.
+		ScrollBySteps((delta.y) < 0 ? 1 : -1);
+	}
+}
+
+// FIXME: horizontal broken
+void ScrollBar::ScrollTo(const Point& p)
+{
+	int y = p.y - GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
 
 	int pxRange = SliderPxRange();
-	float percent = Clamp<float>(p.y, 0, pxRange) / pxRange;
+	float percent = Clamp<float>(y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
 	ieDword newPos = (round(percent * (range.second - range.first)) + range.first);
@@ -214,17 +229,7 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
-		Point p = Point(-delta.x, -delta.y);
-		short* xy = (State&SLIDER_HORIZONTAL) ? &p.x : &p.y;
-		if (*xy == 0) return false;
-
-		ieDword oldval = GetValue();
-		*xy += GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
-		ScrollTo(p + AxisPosFromValue());
-		if (oldval == GetValue()) {
-			// just in case delta wasn't enough to move us. we want to force one in that case.
-			ScrollBySteps((delta.y) < 0 ? 1 : -1);
-		}
+		ScrollDelta(delta);
 		return true;
 	}
 	return Control::OnMouseWheelScroll(delta);

@@ -143,6 +143,8 @@ protected:
 	virtual bool OnMouseWheelScroll(const Point&) { return false; }
 
 public:
+	#include "ViewInterfaces.h"
+
 #if DEBUG_VIEWS
 	bool debuginfo;
 #endif

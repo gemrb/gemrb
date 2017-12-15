@@ -1734,6 +1734,7 @@
 		A2BFA07D1395FF62006ADC12 /* WorldMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMap.h; sourceTree = "<group>"; };
 		A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapMgr.cpp; sourceTree = "<group>"; };
 		A2BFA07F1395FF62006ADC12 /* WorldMapMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMapMgr.h; sourceTree = "<group>"; };
+		A2C517AE1F9D1D7D005D74ED /* ViewInterfaces.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewInterfaces.h; sourceTree = "<group>"; };
 		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
 		A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyStringTransformer.h; sourceTree = "<group>"; };
@@ -3270,6 +3271,7 @@
 				A20A278A1A71E3200077077C /* View.h */,
 				A2BF9FED1395FF62006ADC12 /* Window.cpp */,
 				A2BF9FEE1395FF62006ADC12 /* Window.h */,
+				A2C517AE1F9D1D7D005D74ED /* ViewInterfaces.h */,
 				A2D672DF1B30F40C00264D16 /* WindowManager.cpp */,
 				A2D672E01B30F40C00264D16 /* WindowManager.h */,
 				A2BF9FEF1395FF62006ADC12 /* WorldMapControl.cpp */,

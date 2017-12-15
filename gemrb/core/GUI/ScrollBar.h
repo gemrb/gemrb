@@ -47,7 +47,7 @@ class Sprite2D;
  * @class ScrollBar
  * Widget displaying scrollbars for paging in long text windows
  */
-class GEM_EXPORT ScrollBar : public Control {
+class GEM_EXPORT ScrollBar : public Control, public View::Scrollable {
 public:
 	enum IMAGE_TYPE {
 		IMAGE_UP_UNPRESSED = 0,
@@ -69,7 +69,8 @@ public:
 	bool IsOpaque() const;
 
 	/* scroll so the slider is centered at point p */
-	void ScrollTo(Point p);
+	void ScrollDelta(const Point& p);
+	void ScrollTo(const Point& p);
 	void ScrollUp();
 	void ScrollDown();
 	void ScrollBySteps(int steps);
