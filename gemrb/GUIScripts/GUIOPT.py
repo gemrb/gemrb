@@ -131,7 +131,7 @@ def OpenVideoOptionsWindow ():
 	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIOPT")
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
 
@@ -196,7 +196,7 @@ def OpenAudioOptionsWindow ():
 	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (7)
+	Window = GemRB.LoadWindow (7, "GUIOPT")
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, Window, 24)
@@ -237,7 +237,7 @@ def OpenCharacterSoundsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (12)
+	Window = GemRB.LoadWindow (12, "GUIOPT")
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
@@ -281,7 +281,7 @@ def OpenGameplayOptionsWindow ():
 	CloseSubOptionsWindow ()
 
 	#gameplayoptions
-	Window = GemRB.LoadWindow (8)
+	Window = GemRB.LoadWindow (8, "GUIOPT")
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
 
@@ -334,7 +334,7 @@ def OpenFeedbackOptionsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (9)
+	Window = GemRB.LoadWindow (9, "GUIOPT")
 	# same as HelpTextArea if not BG1
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
@@ -379,7 +379,7 @@ def OpenAutopauseOptionsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (10)
+	Window = GemRB.LoadWindow (10, "GUIOPT")
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
@@ -552,7 +552,7 @@ def OpenQuitMsgWindow ():
 	if QuitMsgWindow:
 		return
 
-	QuitMsgWindow = Window = GemRB.LoadWindow (5)
+	QuitMsgWindow = Window = GemRB.LoadWindow (5, "GUIOPT")
 	QuitMsgWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	# Save
