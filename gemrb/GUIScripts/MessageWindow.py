@@ -55,9 +55,9 @@ def OnLoad():
 	
 	Button = ActionsWindow.GetControl(60)
 	if Button:
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
 		Button=ActionsWindow.GetControl(61)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
 
 	if GameCheck.HasHOW():
 		OptionsWindow = GemRB.LoadWindow(25, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
@@ -78,22 +78,31 @@ def OnLoad():
 	Button = OptionsWindow.GetControl (10)
 	if Button:
 		Button = OptionsWindow.GetControl (10)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
 		Button = PortraitWindow.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
-	
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
+
 	UpdateControlStatus(True)
 
-def MinimizeOptions():
-	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_OR)
+MinimizedWindows = {}
+def ToggleWindowMinimize(win, GSFlag = 0):
+	key = win.ID
+	if key in MinimizedWindows:
+		# restore to original size
+		win.SetSize(*MinimizedWindows[key])
+		del MinimizedWindows[key]
 
-def MaximizeOptions():
-	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_NAND)
+		if GSFlag: # stored in save
+			GemRB.GameSetScreenFlags(GSFlag, OP_NAND)
 
-# MinimizePortraits is in GUICommonWindows for dependency reasons
+	else: # minimize
+		size = win.GetSize()
+		MinimizedWindows[key] = size
+		win.SetSize(size[0], 5)
+		win.ScrollTo(0,0)
 
-def MaximizePortraits():
-	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
+		if GSFlag: # stored in save
+			GemRB.GameSetScreenFlags(GSFlag, OP_OR)
 
 MTARestoreSize = None
 def UpdateControlStatus(init = False):
@@ -166,6 +175,12 @@ def UpdateControlStatus(init = False):
 	GSFlags, Expand = GetGSFlags()
 	if init:
 		SetMWSize(Expand, GSFlags)
+		if GSFlags&GS_OPTIONPANE:
+			win = GemRB.GetView("OPTWIN")
+			ToggleWindowMinimize(win)
+		if GSFlags&GS_PORTRAITPANE:
+			win = GemRB.GetView("PORTWIN")
+			ToggleWindowMinimize(win)
 	else:
 		if Expand == GS_LARGEDIALOG:
 			if MTARestoreSize and (GSFlags&GS_DIALOG) == 0:

@@ -264,15 +264,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	return
 
-def OptionsPress ():
-	"""Toggles the options pane """
-	PP = GemRB.GetGUIFlags () & GS_OPTIONPANE
-	if PP:
-		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_NAND)
-	else:
-		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_OR)
-	return
-
 def OnLockViewPress ():
 	Button = OptionsWindow.GetControl (0)
 	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_XOR)

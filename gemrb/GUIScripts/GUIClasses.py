@@ -99,6 +99,14 @@ class GView:
 	def __nonzero__(self):
 		return self.ID != -1
 
+	def GetSize(self):
+		frame = self.GetFrame()
+		return (frame['w'], frame['h'])
+
+	def GetPos(self):
+		frame = self.GetFrame()
+		return (frame['x'], frame['y'])
+
 	def SetSize(self, w, h):
 		r = self.GetFrame()
 		r['w'] = w
