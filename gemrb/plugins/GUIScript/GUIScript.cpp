@@ -3040,14 +3040,14 @@ PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
 
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
-	unsigned char* hotkey;
+	char hotkey;
 	unsigned int mods;
 	int global = false;
-	PARSE_ARGS4(args, "Os|Ki", &self, &hotkey, &mods, &global);
+	PARSE_ARGS4(args, "Oc|Ki", &self, &hotkey, &mods, &global);
 
 	Button* btn = GetView<Button>(self);
 	assert(btn);
-	btn->SetHotKey(hotkey[0], mods, global);
+	btn->SetHotKey(hotkey, mods, global);
 
 	Py_RETURN_NONE;
 }
