@@ -36,8 +36,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	: Control(frame)
 {
 	ControlType = IE_GUI_WORLDMAP;
-	ScrollX = 0;
-	ScrollY = 0;
 	Area = NULL;
 	SetValue(direction);
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
@@ -95,10 +93,8 @@ WorldMapControl::~WorldMapControl(void)
 /** Draws the Control on the Output Display */
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
+#define MAP_TO_SCREENX(i) rgn.x - Pos.x + (i)
+#define MAP_TO_SCREENY(i) rgn.y - Pos.y + (i)
 	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
@@ -172,33 +168,23 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 #undef MAP_TO_SCREENY
 }
 
-void WorldMapControl::AdjustScrolling(short x, short y)
+void WorldMapControl::ScrollDelta(const Point& delta)
 {
-	WorldMap* worldmap = core->GetWorldMap();
-	if (x || y) {
-		ScrollX += x;
-		ScrollY += y;
-	} else {
-		//center worldmap on current area
-		unsigned entry;
+	ScrollTo(Pos + delta);
+}
 
-		WMPAreaEntry *m = worldmap->GetArea(currentArea,entry);
-		if (m) {
-			ScrollX = m->X - frame.w / 2;
-			ScrollY = m->Y - frame.h / 2;
-		}
-	}
+void WorldMapControl::ScrollTo(const Point& pos)
+{
+	Pos = pos;
+	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - frame.w)
-		ScrollX = MapMOS->Width - frame.w;
-	if (ScrollY > MapMOS->Height - frame.h)
-		ScrollY = MapMOS->Height - frame.h;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
+
+	int maxx = MapMOS->Width - frame.w;
+	int maxy = MapMOS->Height - frame.h;
+	Pos.x = Clamp<int>(Pos.x, 0, maxx);
+	Pos.y = Clamp<int>(Pos.y, 0, maxy);
+
 	MarkDirty();
-	Area = NULL;
 }
 
 /** Mouse Over Event */
@@ -208,7 +194,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	Point p = ConvertPointFromScreen(me.Pos());
 
 	if (GetValue()!=(ieDword) -1) {
-		Point mapOff = p + Point(ScrollX, ScrollY);
+		Point mapOff = p + Pos;
 
 		WMPAreaEntry *oldArea = Area;
 		Area = NULL;
@@ -264,9 +250,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 bool WorldMapControl::OnMouseDrag(const MouseEvent& me)
 {
 	if (me.ButtonState(GEM_MB_ACTION)) {
-		Point p = ConvertPointFromScreen(me.Pos());
-		AdjustScrolling(LastMousePos.x - p.x, LastMousePos.y - p.y);
-		LastMousePos = p;
+		ScrollDelta(me.Delta());
 	}
 	return true;
 }
@@ -283,7 +267,6 @@ bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.button == GEM_MB_ACTION) {
 		SetCursor(core->Cursors[IE_CURSOR_GRAB+1]);
-		LastMousePos = ConvertPointFromScreen(me.Pos());
 	}
 	return true;
 }
@@ -301,20 +284,7 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 /** Mouse wheel scroll */
 bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
-	ScrollX += delta.x;
-	ScrollY -= delta.y;
-
-	WorldMap* worldmap = core->GetWorldMap();
-	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - frame.w)
-		ScrollX = MapMOS->Width - frame.w;
-	if (ScrollY > MapMOS->Height - frame.h)
-		ScrollY = MapMOS->Height - frame.h;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
-	
+	ScrollDelta(delta);
 	return true;
 }
 

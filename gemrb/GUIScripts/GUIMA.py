@@ -308,39 +308,39 @@ def WorldMapWindowCommon (Travel):
 	return
 
 def MapN():
-	WorldMapControl.AdjustScrolling (0, -10)
+	WorldMapControl.Scroll (0, -10)
 	return
 
 def MapNE():
-	WorldMapControl.AdjustScrolling (10, -10)
+	WorldMapControl.Scroll (10, -10)
 	return
 
 def MapE():
-	WorldMapControl.AdjustScrolling (10, 0)
+	WorldMapControl.Scroll (10, 0)
 	return
 
 def MapSE():
-	WorldMapControl.AdjustScrolling (10, 10)
+	WorldMapControl.Scroll (10, 10)
 	return
 
 def MapS():
-	WorldMapControl.AdjustScrolling (0, 10)
+	WorldMapControl.Scroll (0, 10)
 	return
 
 def MapSW():
-	WorldMapControl.AdjustScrolling (-10, 10)
+	WorldMapControl.Scroll (-10, 10)
 	return
 
 def MapW():
-	WorldMapControl.AdjustScrolling (-10, 0)
+	WorldMapControl.Scroll (-10, 0)
 	return
 
 def MapNW():
-	WorldMapControl.AdjustScrolling (-10, -10)
+	WorldMapControl.Scroll (-10, -10)
 	return
 
 def MapC():
-	WorldMapControl.AdjustScrolling (0, 0)
+	WorldMapControl.Scroll (0, 0, False)
 	return
 
 ###################################################

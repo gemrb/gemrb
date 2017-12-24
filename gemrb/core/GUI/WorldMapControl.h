@@ -56,7 +56,7 @@ class WorldMapControl;
 
 #define IE_GUI_WORLDMAP_ON_PRESS   IE_GUI_CUSTOMEVENT
 
-class GEM_EXPORT WorldMapControl : public Control {
+class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region&);
@@ -66,14 +66,14 @@ public:
 	~WorldMapControl(void);
 
 	/** Allows modification of the scrolling factor from outside */
-	void AdjustScrolling(short x, short y);
+	void ScrollDelta(const Point& delta);
+	void ScrollTo(const Point& pos);
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
 	/** Set color for one type of area labels */
 	void SetColor(int which, Color color);
 	void SetOverrideIconPalette(bool override) { OverrideIconPalette = override; };
-	int ScrollX, ScrollY;
-	Point LastMousePos;
+	Point Pos;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
 

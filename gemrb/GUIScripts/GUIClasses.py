@@ -63,7 +63,7 @@ class GSymbol:
   }
 
 class Scrollable:
-	def Scroll(self, x, y, relative):
+	def Scroll(self, x, y, relative = True):
 		_GemRB.Scrollable_Scroll(self, x, y, relative)
 
 	def ScrollTo(self, x, y):
@@ -214,7 +214,6 @@ class GControl(GView):
     'SetAction': _GemRB.Control_SetAction,
     'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus,
-    'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
 
   # backwards compatibility
@@ -250,9 +249,8 @@ class GLabel(GControl):
     'SetUseRGB': _GemRB.Label_SetUseRGB
   }
 
-class GTextArea(GControl):
+class GTextArea(GControl, Scrollable):
   methods = {
-    'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'ListResources': _GemRB.TextArea_ListResources
   }
@@ -313,9 +311,8 @@ class GButton(GControl):
 	  frame = self.GetFrame()
 	  return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
 
-class GWorldMap(GControl):
+class GWorldMap(GControl, Scrollable):
   methods = {
-    'AdjustScrolling': _GemRB.WorldMap_AdjustScrolling,
     'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea,
     'SetTextColor': _GemRB.WorldMap_SetTextColor
   }

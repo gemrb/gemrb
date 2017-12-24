@@ -2701,47 +2701,6 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_WorldMap_AdjustScrolling__doc,
-"===== WorldMap_AdjustScrolling =====\n\
-\n\
-**Prototype:** GemRB.AdjustScrolling (WindowIndex, ControlIndex, x, y)\n\
-\n\
-**Metaclass Prototype:** AdjustScrolling (x, y)\n\
-\n\
-**Description:** Sets the scrolling offset of a WorldMapControl.\n\
-\n\
-**Parameters:** \n\
-  * WindowIndex - the windows's reference\n\
-  * ControlIndex - the control's reference\n\
-  * x, y - scrolling offset values\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**Example:**\n\
-    # northeast\n\
-    Button = GemRB.GetControl (Window, 9)\n\
-    Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, 'MapNE')\n\
-...\n\
-\n\
-**def MapNE():**\n\
-    WorldMapControl.AdjustScrolling (10, -10)\n\
-    return\
-The above lines set up a button event. When the button is pressed the worldmap will be shifted in the northeastern direction.\n\
-\n\
-**See also:** [[guiscript:Window_CreateWorldMapControl]"
-);
-
-static PyObject* GemRB_WorldMap_AdjustScrolling(PyObject* self, PyObject* args)
-{
-	int x, y;
-	PARSE_ARGS3( args,  "Oii", &self, &x, &y );
-
-	WorldMapControl* wmap = GetView<WorldMapControl>(self);
-	ABORT_IF_NULL(wmap);
-	wmap->AdjustScrolling(x, y);
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_CreateMovement__doc,
 "===== CreateMovement =====\n\
 \n\
@@ -13043,7 +13002,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
-	METHOD(WorldMap_AdjustScrolling, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
 	METHOD(WorldMap_SetTextColor, METH_VARARGS),
 	// terminating entry
