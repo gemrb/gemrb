@@ -105,7 +105,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		return NULL;
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
-	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt);
+	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
 }
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)

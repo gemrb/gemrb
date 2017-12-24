@@ -1228,6 +1228,10 @@ Color SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y)
 	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 	
 	// check color key... SDL_GetRGBA wont get this
+#if SDL_VERSION_ATLEAST(1,3,0)
+	if (SDL_GetColorKey(surface, NULL) != -1) c.a = SDL_ALPHA_TRANSPARENT;
+#else
 	if (surface->format->colorkey == val) c.a = SDL_ALPHA_TRANSPARENT;
+#endif
 	return c;
 }
