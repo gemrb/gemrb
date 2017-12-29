@@ -98,7 +98,7 @@ public:
 						  const Region* clip, unsigned int flags);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
-								SpriteCover* cover, Palette *palette = NULL, const Region* clip = NULL);
+								SpriteCover* cover, const Region* clip = NULL);
 
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true);

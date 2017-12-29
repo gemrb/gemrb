@@ -1811,7 +1811,7 @@ void Projectile::Draw(Sprite2D* spr, const Point& p,
 		  unsigned int flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();
-	video->BlitGameSprite(spr, p.x, p.y, flags, tint, NULL, palette);
+	video->BlitGameSpriteWithPalette(spr, palette, p.x, p.y, flags, tint, NULL);
 }
 
 }

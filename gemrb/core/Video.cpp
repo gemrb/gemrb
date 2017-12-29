@@ -281,6 +281,22 @@ void Video::BlitTiled(Region rgn, const Sprite2D* img)
 	}
 }
 
+void Video::BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
+							   unsigned int flags, Color tint,
+							   SpriteCover* cover,
+							   const Region* clip)
+{
+	if (pal) {
+		Palette* oldpal = spr->GetPalette();
+		spr->SetPalette(pal);
+		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
+		spr->SetPalette(oldpal);
+		oldpal->release();
+	} else {
+		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
+	}
+}
+
 //Sprite conversion, creation
 Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 {

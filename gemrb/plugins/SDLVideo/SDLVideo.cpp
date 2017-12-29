@@ -431,8 +431,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 //cannot make const reference from tint, it is modified locally
 void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
-		SpriteCover* cover, Palette *palette,
-		const Region* clip)
+		SpriteCover* cover, const Region* clip)
 {
 	assert(spr);
 
@@ -444,12 +443,9 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 			Video::BlitSprite(spr, x, y, clip);
 			return;
 		}
-	} else {
-		if (!palette) {
-			palette = spr->GetPalette();
-			palette->release(); // GetPalette increases the ref count
-		}
 	}
+
+	Palette* palette = spr->GetPalette();
 
 	// global tint is handled by the callers
 
@@ -675,6 +671,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 	}
 
+	if (palette)
+		palette->release();
 	SDL_UnlockSurface(currentBuf);
 }
 

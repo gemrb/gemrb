@@ -7650,8 +7650,8 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 			}
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
-			video->BlitGameSprite( nextFrame, cx - vp.x, cy - vp.y,
-				flags, tint2, newsc, ca->GetPartPalette(partnum));
+			video->BlitGameSpriteWithPalette(nextFrame, ca->GetPartPalette(partnum),
+											 cx - vp.x, cy - vp.y, flags, tint2, newsc);
 		}
 	}
 }

@@ -210,7 +210,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			video->BlitSprite( Picture, picXPos, picYPos, &rb );
 
 			// TODO: Add an option to add BLIT_GREY to the flags
-			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, 0, &ro);
+			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, &ro);
 
 			// do NOT uncomment this, you can't change Changed or invalidate things from
 			// the middle of Window::DrawWindow() -- it needs moving to somewhere else

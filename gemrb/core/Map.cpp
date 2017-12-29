@@ -4011,8 +4011,8 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 			}
 		}
 
-		video->BlitGameSprite( frame, Pos.x - viewport.x, Pos.y - viewport.y,
-							  flags, tint, covers?covers[ac]:0, palette );
+		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y,
+										 flags, tint, covers?covers[ac]:0);
 	}
 }
 

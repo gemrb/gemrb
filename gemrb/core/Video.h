@@ -191,8 +191,14 @@ public:
 	// not a pretty interface :)
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
 								unsigned int flags, Color tint,
-								SpriteCover* cover, Palette *palette = NULL,
+								SpriteCover* cover,
 								const Region* clip = NULL) = 0;
+
+	void BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
+				   unsigned int flags, Color tint,
+				   SpriteCover* cover,
+				   const Region* clip = NULL);
+
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;

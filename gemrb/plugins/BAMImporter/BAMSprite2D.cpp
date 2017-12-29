@@ -35,6 +35,8 @@ BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
 	RLE = rle;
 	BAM = true;
 	freePixels = false; // managed by AnimationFactory
+
+	assert(pal);
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
@@ -70,9 +72,12 @@ Palette* BAMSprite2D::GetPalette() const
 
 void BAMSprite2D::SetPalette(Palette* palette)
 {
-	if (palette) {
-		palette->acquire();
+	if (palette == NULL) {
+		Log(WARNING, "BAMSprite2D", "cannot set a NULL palette.");
+		return;
 	}
+
+	palette->acquire();
 	if (pal) {
 		pal->release();
 	}

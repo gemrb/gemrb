@@ -709,9 +709,10 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
 	}
 
-	video->BlitGameSprite( frame, cx - viewport.x, cy - viewport.y, flags, tint, cover, palette);
+	video->BlitGameSpriteWithPalette(frame, palette, cx - viewport.x, cy - viewport.y, flags, tint, cover);
+
 	if (light) {
-		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, flags^flag, tint, NULL, NULL);
+		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, flags^flag, tint, NULL);
 	}
 	return false;
 }

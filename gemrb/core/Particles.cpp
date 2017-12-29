@@ -248,8 +248,10 @@ void Particles::Draw(const Region &vp)
 
 					ieDword flags = 0;
 					if (game) game->ApplyGlobalTint(clr, flags);
-					video->BlitGameSprite( nextFrame, points[i].pos.x - p.x, points[i].pos.y - p.y,
-						flags, clr, NULL, fragments->GetPartPalette(0));
+
+					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
+													 points[i].pos.x - p.x, points[i].pos.y - p.y,
+													 flags, clr, NULL);
 				}
 			}
 			break;
