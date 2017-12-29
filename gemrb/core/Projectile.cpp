@@ -1612,7 +1612,6 @@ void Projectile::SetupWall()
 
 void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
-	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 	PathNode *iter = path;
 	Sprite2D *frame = travel[face]->NextFrame();
@@ -1625,14 +1624,13 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 			pos.y-=FLY_HEIGHT;
 		}
 
-		video->BlitGameSprite(frame, pos.x, pos.y, flag, tint2, NULL, palette);
+		Draw(frame, pos, flag, tint2);
 		iter = iter->Next;
 	}
 }
 
 void Projectile::DrawTravel(const Region& viewport)
 {
-	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 	ieDword flag;
 
@@ -1693,7 +1691,7 @@ void Projectile::DrawTravel(const Region& viewport)
 	if (game) game->ApplyGlobalTint(tint2, flags);
 
 	if (light) {
-		video->BlitGameSprite(light, pos.x, pos.y, flags^flag, tint2, NULL, NULL);
+		Draw(light, pos, flags^flag, tint2);
 	}
 
 	if (ExtFlags&PEF_POP) {
@@ -1715,7 +1713,7 @@ void Projectile::DrawTravel(const Region& viewport)
 				}
 			}
 
-			video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette);
+			Draw(frame, pos, flags, tint2);
 			return;
 	}
 	
@@ -1726,7 +1724,7 @@ void Projectile::DrawTravel(const Region& viewport)
 	
 	if (shadow[face]) {
 		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette);
+		Draw(frame, pos, flags, tint2);
 	}
 
 	pos.y-=GetZPos();
@@ -1736,14 +1734,14 @@ void Projectile::DrawTravel(const Region& viewport)
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {
 				Sprite2D *frame = travel[i]->NextFrame();
-				video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette);
+				Draw(frame, pos, flags, tint2);
 				pos.y-=frame->YPos;
 			}
 		}
 	} else {
 		if (travel[face]) {
 			Sprite2D *frame = travel[face]->NextFrame();
-			video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette);
+			Draw(frame, pos, flags, tint2);
 		}
 	}
 
@@ -1809,5 +1807,11 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
+void Projectile::Draw(Sprite2D* spr, const Point& p,
+		  unsigned int flags, Color tint) const
+{
+	Video *video = core->GetVideoDriver();
+	video->BlitGameSprite(spr, p.x, p.y, flags, tint, NULL, palette);
+}
 
 }

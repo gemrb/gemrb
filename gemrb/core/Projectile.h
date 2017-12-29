@@ -409,6 +409,10 @@ private:
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
+
+private:
+	void Draw(Sprite2D* spr, const Point& p,
+			  unsigned int flags, Color tint) const;
 };
 
 }
