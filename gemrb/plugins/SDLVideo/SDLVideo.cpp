@@ -379,32 +379,21 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 }
 
-void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst)
 {
 	if (dst.w <= 0 || dst.h <= 0)
 		return; // we already know blit fails
 
 	if (!spr->BAM) {
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
-		if (palette) {
-			SDL_Color* palColors = (SDL_Color*)spr->GetPaletteColors();
-			SetSurfacePalette(surf, (SDL_Color*)palette->col);
-			BlitSurfaceClipped(surf, src, dst);
-			SetSurfacePalette(surf, palColors);
-		} else {
-			BlitSurfaceClipped(surf, src, dst);
-		}
+		BlitSurfaceClipped(surf, src, dst);
 	} else {
 		const Uint8* srcdata = (const Uint8*)spr->pixels;
 		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 
 		SDL_LockSurface(currentBuf);
 
-		Palette* pal = palette;
-		if (!pal) {
-			pal = spr->GetPalette();
-			pal->release();
-		}
+		Palette* pal = spr->GetPalette();
 		SRShadow_Regular shadow;
 
 		// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
@@ -434,6 +423,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
 		}
 
+		pal->release();
 		SDL_UnlockSurface(currentBuf);
 	}
 }

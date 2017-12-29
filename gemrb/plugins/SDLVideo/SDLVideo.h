@@ -96,7 +96,7 @@ public:
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags);
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* pal = NULL);
+	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								SpriteCover* cover, Palette *palette = NULL, const Region* clip = NULL);
 

@@ -247,7 +247,7 @@ bool Video::GetFullscreenMode() const
 }
 
 void Video::BlitSprite(const Sprite2D* spr, int x, int y,
-								const Region* clip, Palette* palette)
+								const Region* clip)
 {
 	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
 	Region fClip = ClippedDrawingRect(dst, clip);
@@ -266,7 +266,7 @@ void Video::BlitSprite(const Sprite2D* spr, int x, int y,
 	assert(src.w == fClip.w && src.h == fClip.h);
 
 	// just pass fclip as dst
-	BlitSprite(spr, src, fClip, palette);
+	BlitSprite(spr, src, fClip);
 }
 
 void Video::BlitTiled(Region rgn, const Sprite2D* img)
