@@ -21,20 +21,24 @@
 #ifndef SPRITECOVER_H
 #define SPRITECOVER_H
 
-#include "exports.h"
+#include "Polygon.h"
+#include "Sprite2D.h"
 
 namespace GemRB {
 
 class GEM_EXPORT SpriteCover {
+	Sprite2D* mask;
 public:
-	unsigned char* pixels;
-	int worldx, worldy; // world coords for which the cover has been computed
-	int XPos, YPos, Width, Height;
-	int flags;
-	SpriteCover(void);
-	~SpriteCover(void);
+	Point wp; // world coords for which the cover has been computed
+	int dither;
 
+	SpriteCover(const Point& wp, const Region& rgn, int dither = 0);
+	~SpriteCover();
+
+	const Sprite2D* GetMask() const { return mask; }
 	bool Covers(int x, int y, int xpos, int ypos, int width, int height) const;
+
+	void AddPolygon(Wall_Polygon* poly);
 };
 
 

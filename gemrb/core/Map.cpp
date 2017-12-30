@@ -2024,16 +2024,7 @@ unsigned int Map::GetBlocked(const Point &c)
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	unsigned int width, unsigned int height, int flags, bool areaanim)
 {
-	SpriteCover* sc = new SpriteCover;
-	sc->worldx = x;
-	sc->worldy = y;
-	sc->XPos = xpos;
-	sc->YPos = ypos;
-	sc->Width = width;
-	sc->Height = height;
-
-	Video* video = core->GetVideoDriver();
-	video->InitSpriteCover(sc, flags);
+	SpriteCover* sc = new SpriteCover(Point(x, y), Region(xpos, ypos, width, height), flags);
 
 	unsigned int wpcount = GetWallCount();
 	unsigned int i;
@@ -2045,7 +2036,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 		if (!wp->PointCovered(x, y)) continue;
 		if (areaanim && !(wp->GetPolygonFlag() & WF_COVERANIMS)) continue;
 
-		video->AddPolygonToSpriteCover(sc, wp);
+		sc->AddPolygon(wp);
 	}
 
 	return sc;
