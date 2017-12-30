@@ -274,8 +274,6 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
-	if (palette == NULL) return NULL;
-
 	SDLSurfaceSprite2D* spr = new SDLSurfaceSprite2D(w, h, bpp, pixels);
 	spr->SetPalette(palette);
 	if (cK) {
