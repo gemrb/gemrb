@@ -23,8 +23,6 @@
 
 #include "System/Logging.h"
 
-#include <SDL.h>
-
 namespace GemRB {
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pixels,
@@ -39,6 +37,16 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 		SDL_FillRect(surface, NULL, 0);
 		pixels = surface->pixels;
 	}
+}
+
+SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
+										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
+: Sprite2D(Width, Height, Bpp, NULL)
+{
+	surface = SDL_CreateRGBSurface( Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
+									   rmask, gmask, bmask, amask );
+	SDL_FillRect(surface, NULL, 0);
+	pixels = surface->pixels;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -184,5 +192,63 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 	}
 	return false;
 }
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
+									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
+: SDLSurfaceSprite2D(Width, Height, Bpp, pixels, rmask, gmask, bmask, amask)
+{
+	dirty = true;
+	texture = NULL;
+}
+
+SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
+									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
+: SDLSurfaceSprite2D(Width, Height, Bpp, rmask, gmask, bmask, amask)
+{
+	dirty = true;
+	texture = NULL;
+}
+
+SDLTextureSprite2D::SDLTextureSprite2D(const SDLSurfaceSprite2D &obj)
+: SDLSurfaceSprite2D(obj)
+{
+	dirty = true;
+	texture = NULL;
+}
+
+SDLTextureSprite2D* SDLTextureSprite2D::copy() const
+{
+	return new SDLTextureSprite2D(*this);
+}
+
+SDLTextureSprite2D::~SDLTextureSprite2D()
+{
+	SDL_DestroyTexture(texture);
+}
+
+SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
+{
+	if (dirty) {
+		SDL_DestroyTexture(texture);
+		texture = SDL_CreateTextureFromSurface(renderer, GetSurface());
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+		dirty = false;
+	}
+	return texture;
+}
+
+void SDLTextureSprite2D::SetPalette(Palette *pal)
+{
+	dirty = true;
+	SDLSurfaceSprite2D::SetPalette(pal);
+}
+
+void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
+{
+	dirty = true;
+	SDLSurfaceSprite2D::SetColorKey(pxvalue);
+}
+#endif
 
 }

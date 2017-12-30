@@ -22,6 +22,7 @@
 #define SDL20VideoDRIVER_H
 
 #include "SDLVideo.h"
+#include "SDLSurfaceSprite2D.h"
 
 namespace GemRB {
 	

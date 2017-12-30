@@ -23,8 +23,7 @@
 
 #include "Sprite2D.h"
 
-struct SDL_Surface;
-struct SDL_Color;
+#include <SDL.h>
 
 namespace GemRB {
 
@@ -33,7 +32,9 @@ private:
 	SDL_Surface* surface;
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
-					   ieDword rmask = 0, ieDword gmask = 0, ieDword bmask = 0, ieDword amask = 0);
+					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+	SDLSurfaceSprite2D(int Width, int Height, int Bpp,
+					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
 	SDLSurfaceSprite2D* copy() const;
 	~SDLSurfaceSprite2D();
@@ -55,6 +56,30 @@ public:
 
 	SDL_Surface* GetSurface() const { return surface; };
 };
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+// TODO: this is a lazy implementation
+// it would probably be better to not inherit from SDLSurfaceSprite2D
+// the hard part is handling the palettes ourselves
+class SDLTextureSprite2D : public SDLSurfaceSprite2D {
+	mutable SDL_Texture* texture;
+	mutable bool dirty;
+public:
+	SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
+					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+	SDLTextureSprite2D(int Width, int Height, int Bpp,
+					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+	SDLTextureSprite2D(const SDLSurfaceSprite2D &obj);
+	SDLTextureSprite2D* copy() const;
+	~SDLTextureSprite2D();
+
+	using SDLSurfaceSprite2D::SetPalette;
+	void SetPalette(Palette *pal);
+	void SetColorKey(ieDword pxvalue);
+
+	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
+};
+#endif
 
 }
 
