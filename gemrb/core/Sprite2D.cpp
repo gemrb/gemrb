@@ -26,8 +26,8 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
-	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
+Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* pixels)
+	: pixels(pixels), Width(Width), Height(Height), Bpp(Bpp)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
@@ -58,8 +58,7 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 Sprite2D::~Sprite2D()
 {
 	if (freePixels) {
-		// FIXME: casting away const.
-		free((void*)pixels);
+		free(pixels);
 	}
 }
 
@@ -67,6 +66,19 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 {
 	return GetPixel(x, y).a == 0;
 }
+
+const void* Sprite2D::LockSprite() const
+{
+	return pixels;
+}
+
+void* Sprite2D::LockSprite()
+{
+	return pixels;
+}
+
+void Sprite2D::UnlockSprite() const
+{}
 
 void Sprite2D::release()
 {

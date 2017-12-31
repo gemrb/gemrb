@@ -25,7 +25,7 @@
 
 namespace GemRB {
 
-BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
+BAMSprite2D::BAMSprite2D(int Width, int Height, void* pixels,
 						 bool rle, Palette* palette, ieDword ck)
 	: Sprite2D(Width, Height, 8, pixels)
 {

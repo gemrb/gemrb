@@ -38,6 +38,10 @@ public:
 	SDLSurfaceSprite2D* copy() const;
 	~SDLSurfaceSprite2D();
 
+	const void* LockSprite() const;
+	void* LockSprite();
+	void UnlockSprite() const;
+
 	Palette *GetPalette() const;
 	const Color* GetPaletteColors() const;
 	void SetPalette(Palette *pal);

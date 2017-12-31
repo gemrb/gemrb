@@ -59,6 +59,23 @@ SDLSurfaceSprite2D::~SDLSurfaceSprite2D()
 	SDL_FreeSurface(surface);
 }
 
+const void* SDLSurfaceSprite2D::LockSprite() const
+{
+	SDL_LockSurface(surface);
+	return surface->pixels;
+}
+
+void* SDLSurfaceSprite2D::LockSprite()
+{
+	SDL_LockSurface(surface);
+	return surface->pixels;
+}
+
+void SDLSurfaceSprite2D::UnlockSprite() const
+{
+	SDL_UnlockSurface(surface);
+}
+
 /** Get the Palette of a Sprite */
 Palette* SDLSurfaceSprite2D::GetPalette() const
 {

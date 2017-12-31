@@ -291,13 +291,13 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
 
-	const Uint8* data = (const Uint8*)spr->pixels;
+	const Uint8* data = static_cast<const Uint8*>(spr->LockSprite());
 	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
 
 	const Uint8* mask_data = NULL;
 	Uint32 ck = 0;
 	if (mask) {
-		mask_data = (Uint8*) mask->pixels;
+		mask_data = static_cast<const Uint8*>(mask->LockSprite());
 		ck = mask->GetColorKey();
 	}
 
@@ -373,6 +373,11 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 	}
 
+	if (mask)
+		mask->UnlockSprite();
+
+	spr->UnlockSprite();
+
 #undef DO_BLIT
 
 }
@@ -386,7 +391,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
 		BlitSurfaceClipped(surf, src, dst);
 	} else {
-		const Uint8* srcdata = (const Uint8*)spr->pixels;
+		const Uint8* srcdata = static_cast<const Uint8*>(spr->LockSprite());
 		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
 
 		SDL_LockSurface(currentBuf);
@@ -423,6 +428,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 
 		pal->release();
 		SDL_UnlockSurface(currentBuf);
+		spr->UnlockSprite();
 	}
 }
 
@@ -477,7 +483,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	// other combinations use general case
 
 
-	const Uint8* srcdata = (const Uint8*)spr->pixels;
+	const Uint8* srcdata = static_cast<const Uint8*>(spr->LockSprite());
 	int tx = x - spr->XPos;
 	int ty = y - spr->YPos;
 
@@ -632,7 +638,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 			else
 				col = palette->col;
 
-			const Uint8 *data = (const Uint8*)spr->pixels;
+			const Uint8 *data = srcdata;
 
 			SRBlender_Alpha blender;
 			SRShadow_NOP shadow;
@@ -650,7 +656,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 		} else {
 
-			const Uint32 *data = (const Uint32*)spr->pixels;
+			const Uint32 *data = (const Uint32*)srcdata;
 
 			SRBlender_Alpha blender;
 			if (remflags & BLIT_TINTED) {
@@ -672,6 +678,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	if (palette)
 		palette->release();
 	SDL_UnlockSurface(currentBuf);
+
+	spr->UnlockSprite();
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */

@@ -138,7 +138,7 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-			bool BAMsprite, const unsigned char* data)
+			bool BAMsprite, unsigned char* data)
 {
 	Sprite2D* spr = 0;
 
@@ -146,7 +146,7 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 		bool RLECompressed = (frames[findex].FrameData & 0x80000000) == 0;
 
 		assert(data);
-		const unsigned char* framedata = data;
+		unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
 		spr = new BAMSprite2D (frames[findex].Width,
 							   frames[findex].Height,

@@ -186,7 +186,8 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 	// FIXME: should we adjust for spr->XPos too?
 	Point pos(0, Baseline - spr->YPos);
 
-	Glyph tmp = Glyph(size, pos, (ieByte*)spr->pixels, spr->Width);
+	Glyph tmp = Glyph(size, pos, (ieByte*)spr->LockSprite(), spr->Width);
+	spr->UnlockSprite(); // FIXME: this is assuming it is ok to hang onto to pixel buffer returned from LockSprite()
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
 		// page is full, make a new one

@@ -53,20 +53,26 @@ private:
 	int RefCount;
 protected:
 	bool freePixels;
+	void* pixels;
+
 public:
 	int XPos, YPos, Width, Height, Bpp;
 
 	bool BAM;
 	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
 	ieDword renderFlags;
-	const void* pixels;
 
-	Sprite2D(int Width, int Height, int Bpp, const void* pixels);
+	Sprite2D(int Width, int Height, int Bpp, void* pixels);
 	Sprite2D(const Sprite2D &obj);
 	virtual Sprite2D* copy() const = 0;
 	virtual ~Sprite2D();
 
 	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
+
+	virtual const void* LockSprite() const;
+	virtual void* LockSprite();
+	virtual void UnlockSprite() const;
+
 	virtual Palette *GetPalette() const = 0;
 	virtual const Color* GetPaletteColors() const = 0;
 	virtual void SetPalette(Palette *pal) = 0;
