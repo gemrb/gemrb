@@ -22,10 +22,6 @@
 
 #include "Interface.h"
 
-#include "GUI/Button.h"
-#include "GUI/Console.h"
-#include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
-
 using namespace GemRB;
 
 //touch gestures
@@ -124,36 +120,6 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region /*r*/ )
 	return NULL;
 }
 
-int SDL20VideoDriver::PollEvents()
-{
-	if (ignoreNextFingerUp <= 0
-		&& firstFingerDownTime
-		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
-		// enough time has passed to transform firstTouch into a right click event
-
-		// store the finger coordinates before calling ProcessFirstTouch (they get cleared)
-		//int x = firstFingerDown.x;
-		//int y = firstFingerDown.y;
-		ProcessFirstTouch(GEM_MB_MENU);
-
-		if (currentGesture.type == GESTURE_NONE) {
-			/*
-			Control* focusCtrl = EvntManager->GetFocusedControl();
-			if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
-				&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE) {
-
-				BeginMultiGesture(GESTURE_FORMATION_ROTATION);
-			} else {
-				EvntManager->MouseUp(x, y, GEM_MB_MENU, GetModState());
-				ignoreNextFingerUp = 1;
-			}
-			*/
-		}
-	}
-
-	return SDLVideoDriver::PollEvents();
-}
-
 void SDL20VideoDriver::ClearFirstTouch()
 {
 	firstFingerDown = SDL_TouchFingerEvent();
@@ -188,13 +154,6 @@ void SDL20VideoDriver::EndMultiGesture(bool success)
 								 currentGesture.endPoint.y,
 								 currentGesture.endButton, GetModState(SDL_GetModState()) );
 			 */
-		}
-	}
-	if (currentGesture.type) {
-		GameControl* gc = core->GetGameControl();
-		if (gc) {
-			// FIXME: should this always happen?
-			gc->ClearMouseState();
 		}
 	}
 
@@ -254,65 +213,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			if (numFingers > 1) {
 				ignoreNextFingerUp = numFingers;
 			}
-
-			/*
-			if (numFingers == core->NumFingScroll
-				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
-				//any # of fingers != NumFingKBoard will scroll a text area
-				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
-					// if we are scrolling a text area we dont want the keyboard in the way
-					HideSoftKeyboard();
-				} else if (!focusCtrl || focusCtrl->ControlType == IE_GUI_BUTTON) {
-					// ensure the control we touched becomes focused before attempting to scroll it.
-					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
-					// this can result in a selection box being created
-
-					EvntManager->MouseDown(ScaleCoordinateHorizontal(event.tfinger.x),
-										   ScaleCoordinateVertical(event.tfinger.y),
-										   GEM_MB_ACTION, 0);
-					focusCtrl = EvntManager->GetFocusedControl();
-					if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
-						((GameControl*)focusCtrl)->ClearMouseState();
-					}
-				}
-				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = (event.tfinger.dx * width) * -1;
-				int scrollY = (event.tfinger.dy * height) * -1;
-
-				EvntManager->MouseWheelScroll( scrollX, scrollY );
-			} else if (numFingers == core->NumFingKboard && !continuingGesture) {
-				int delta = (int)(event.tfinger.dy * height) * -1;
-				if (delta >= MIN_GESTURE_DELTA_PIXELS){
-					// if the keyboard is already up interpret this gesture as console pop
-					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
-					else ShowSoftKeyboard();
-				} else if (delta <= -MIN_GESTURE_DELTA_PIXELS) {
-					HideSoftKeyboard();
-				}
-			} else if (numFingers == 1) { //click and drag
-				if (!continuingGesture) {
-					int x = event.tfinger.dx * width;
-					int y = event.tfinger.dy * height;
-					if ((x >= -MIN_GESTURE_DELTA_PIXELS
-						&& x <= MIN_GESTURE_DELTA_PIXELS)
-						||
-						(y >= -MIN_GESTURE_DELTA_PIXELS
-						&& y <= MIN_GESTURE_DELTA_PIXELS)) {
-						break;
-					} else //if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)
-					{
-						//break;
-					}
-					ProcessFirstTouch(GEM_MB_ACTION);
-				}
-
-				// standard mouse movement
-				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
-							  ScaleCoordinateVertical(event.tfinger.y));
-			}
-			// we set this on finger motion because simple up/down are not part of gestures
-			continuingGesture = true;
-			*/
 			break;
 		case SDL_FINGERDOWN:
 			if (!finger0) numFingers++;
@@ -348,7 +248,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
 					/*&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL*/) {
 					// scrolling cancels previous action
-					((GameControl*)focusCtrl)->ClearMouseState();
 				}
 			}
 			break;
@@ -396,23 +295,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				then touch and drag with a second finger (while maintaining contact with first)
 				to move the application point
 				*/
-				GameControl* gc = (GameControl*)focusCtrl;
-				switch (currentGesture.type) {
-					case GESTURE_FORMATION_ROTATION:
-					{
-						SDL_Finger* secondFinger = SDL_GetTouchFinger(event.mgesture.touchId, 1);
-						if (secondFinger && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
-							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
-							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
-							//gc->OnMouseOver(x, y);
-							currentGesture.endPoint = Point(x, y);
-						}
-						break;
-					}
-					case GESTURE_NONE:
-					default:
-						break;
-				}
 			}
 			break;
 		case SDL_MOUSEWHEEL:
@@ -468,42 +350,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 			}
 			break;
-		// conditionally handle mouse events
-		// discard them if they are produced by touch events
-		// do NOT discard mouse wheel events
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			if (event.button.which == SDL_TOUCH_MOUSEID) {
-				break;
-			}
-			else {
-				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
-				return SDLVideoDriver::ProcessEvent(event);
-			}
-		case SDL_KEYDOWN:
-			{
-				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				/*if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
-					// special treatment: console popping is the only KEYDOWN event in SDLVideoDriver::ProcessEvent that uses a standard key (and therefore will never be hit). Therefore, implement this here also.
-					core->PopupConsole();
-					break;
-				}*/
-				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
-					// if key is literally just ctrl or shift -- skip it.
-					break;
-				}
-				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
-					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Never ignore numpad enter.
-					break;
-				}
-				if (key >= 32 && key < 127) {
-					// ignore keys that generate text (these are handeled by SDL_TEXTINPUT).
-					break;
-				}
-			}
-			// fall through
-		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
