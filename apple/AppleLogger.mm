@@ -65,7 +65,7 @@ void AppleLogger::LogInternal(log_level level, const char* owner, const char* me
 		[alert addButtonWithTitle: @"OK"];
 		[alert setMessageText: alertTitle];
 		[alert setInformativeText: alertMessage];
-		[alert setAlertStyle: NSCriticalAlertStyle];
+		[alert setAlertStyle: NSAlertStyleCritical];
 
 		[alert runModal];
 		[alert release];
