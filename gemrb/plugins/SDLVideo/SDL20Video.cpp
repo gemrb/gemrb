@@ -115,6 +115,12 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	SDL_RenderPresent( renderer );
 }
 
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
+{
+	assert(drawingBuffer);
+	return static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+}
+
 Sprite2D* SDL20VideoDriver::GetScreenshot( Region /*r*/ )
 {
 	return NULL;

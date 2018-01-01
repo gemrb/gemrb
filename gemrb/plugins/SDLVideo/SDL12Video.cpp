@@ -126,6 +126,12 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	if (flip) SDL_Flip( disp );
 }
 
+SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer()
+{
+	assert(drawingBuffer);
+	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
+}
+
 Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
 {
 	unsigned int Width = r.w ? r.w : screenSize.w;

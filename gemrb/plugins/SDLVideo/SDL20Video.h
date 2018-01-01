@@ -106,6 +106,8 @@ private:
 	// TODO: probably need to apply this to mouse input
 	float ScaleCoordinateHorizontal(float x);
 	float ScaleCoordinateVertical(float y);
+
+	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
 };
 	
 class SDLTextureVideoBuffer : public VideoBuffer {

@@ -26,6 +26,8 @@
 #include "GUI/EventMgr.h"
 #include "win32def.h"
 
+#include "SDLSurfaceSprite2D.h"
+
 #include <vector>
 #include <SDL.h>
 
@@ -120,7 +122,16 @@ public:
 	void SetFadePercent(int percent);
 
 protected:
-	inline SDL_Surface* CurrentSurfaceBuffer();
+#if SDL_VERSION_ATLEAST(1,3,0)
+	typedef SDL_Texture vid_buf_t;
+	typedef SDLTextureSprite2D sprite_t;
+#else
+	typedef SDL_Surface vid_buf_t;
+	typedef SDLSurfaceSprite2D sprite_t;
+#endif
+
+	virtual inline vid_buf_t* CurrentRenderBuffer()=0;
+
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	void SetPixel(short x, short y, const Color& color);
@@ -134,78 +145,6 @@ public:
 	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
 	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
 	static Color GetSurfacePixel(SDL_Surface* surf, short x, short y);
-};
-
-class SDLSurfaceVideoBuffer : public VideoBuffer {
-	SDL_Surface* buffer;
-
-public:
-	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p)
-	: VideoBuffer(Region(p, ::GemRB::Size(surf->w, surf->h)))
-	{
-		assert(surf);
-		buffer = surf;
-
-		Clear();
-	}
-
-	~SDLSurfaceVideoBuffer() {
-		SDL_FreeSurface(buffer);
-	}
-
-	void Clear() {
-		Uint32 ck = 0;
-#if SDL_VERSION_ATLEAST(1,3,0)
-		if (SDL_GetColorKey(buffer, &ck) == 0) {
-#else
-		ck = buffer->format->colorkey;
-		if (ck) {
-#endif
-			SDL_FillRect(buffer, NULL, ck);
-		} else {
-			SDL_FillRect(buffer, NULL, SDL_MapRGBA(buffer->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT));
-		}
-	}
-
-	SDL_Surface* Surface() {
-		return buffer;
-	}
-
-	bool RenderOnDisplay(void* display) const {
-		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
-		SDL_Rect dst = RectFromRegion(rect);
-		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
-		return true;
-	}
-
-	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
-		SDL_Surface* sprite = NULL;
-
-		// FIXME: this shold support everything from Video::BufferFormat
-		if (buffer->format->BitsPerPixel == 16) { // RGB565
-			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
-		} else { // RGBPAL8
-			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
-			va_list args;
-			va_start(args, pitch);
-			ieByte* pal = va_arg(args, ieByte*);
-			for (int i = 0; i < 256; i++) {
-				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-#if SDL_VERSION_ATLEAST(1,3,0)
-				sprite->format->palette->colors[i].a = 0;
-#else
-				sprite->format->palette->colors[i].unused = 0;
-#endif
-			}
-			va_end(args);
-		}
-
-		SDL_Rect dst = RectFromRegion(bufDest);
-		SDL_BlitSurface(sprite, NULL, buffer, &dst);
-		SDL_FreeSurface(sprite);
-	}
 };
 
 }

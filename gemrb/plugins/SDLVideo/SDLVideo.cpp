@@ -19,7 +19,6 @@
  */
 
 #include "SDLVideo.h"
-#include "SDLSurfaceSprite2D.h"
 
 #include "TileRenderer.inl"
 #include "SpriteRenderer.inl"
@@ -62,12 +61,6 @@ int SDLVideoDriver::Init(void)
 	}
 	SDL_ShowCursor(SDL_DISABLE);
 	return GEM_OK;
-}
-
-SDL_Surface* SDLVideoDriver::CurrentSurfaceBuffer()
-{
-	assert(drawingBuffer);
-	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
 }
 
 int SDLVideoDriver::PollEvents()
@@ -249,7 +242,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	SDLSurfaceSprite2D* spr = new SDLSurfaceSprite2D(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
+	sprite_t* spr = new sprite_t(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
 
 	if (cK) {
 		spr->SetColorKey(index);
@@ -274,7 +267,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
-	SDLSurfaceSprite2D* spr = new SDLSurfaceSprite2D(w, h, bpp, pixels, 0, 0, 0, 0);
+	sprite_t* spr = new sprite_t(w, h, bpp, pixels, 0, 0, 0, 0);
 
 	spr->SetPalette(palette);
 	if (cK) {
@@ -313,7 +306,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 		}
 	}
 
-	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
 #define DO_BLIT \
 		if (currentBuf->format->BytesPerPixel == 4) \
 			BlitTile_internal<Uint32>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
@@ -393,7 +386,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Re
 		BlitSurfaceClipped(surf, src, dst);
 	} else {
 		const Uint8* srcdata = static_cast<const Uint8*>(spr->LockSprite());
-		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+		SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 		SDL_LockSurface(currentBuf);
 
@@ -492,7 +485,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	if (finalclip.w <= 0 || finalclip.h <= 0)
 		return;
 
-	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	SDL_LockSurface(currentBuf);
 
 	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
@@ -687,7 +680,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 {
 	if (fill) {
-		SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+		SDL_Surface* currentBuf = CurrentRenderBuffer();
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a || currentBuf->format->Amask) {
@@ -725,7 +718,7 @@ void SDLVideoDriver::SetPixel(const Point& p, const Color& color)
 		return;
 	}
 
-	SDLVideoDriver::SetSurfacePixel(CurrentSurfaceBuffer(), p.x, p.y, color);
+	SDLVideoDriver::SetSurfacePixel(CurrentRenderBuffer(), p.x, p.y, color);
 }
 
 /*
@@ -1016,7 +1009,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Point& origin, const 
 		return;
 	}
 
-	SDL_Surface* currentBuf = CurrentSurfaceBuffer();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	if (fill) {
 		Uint32 alphacol32 = SDL_MapRGBA(currentBuf->format, color.r/2, color.g/2, color.b/2, 0);
 		Uint16 alphacol16 = (Uint16)alphacol32;
@@ -1142,7 +1135,7 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 
 	SDL_Rect drect = RectFromRegion(dclipped);
 	// since we should already be clipped we can call SDL_LowerBlit directly
-	SDL_LowerBlit(surf, &srect, CurrentSurfaceBuffer(), &drect);
+	SDL_LowerBlit(surf, &srect, CurrentRenderBuffer(), &drect);
 }
 
 // static class methods
@@ -1189,7 +1182,7 @@ void SDLVideoDriver::SetSurfacePixel(SDL_Surface* surface, short x, short y, con
 			*(Uint32 *)pixels = val;
 			break;
 		default:
-			Log(ERROR, "SDLSurfaceSprite2D", "Working with unknown pixel format: %s", SDL_GetError());
+			Log(ERROR, "sprite_t", "Working with unknown pixel format: %s", SDL_GetError());
 			break;
 	}
 
