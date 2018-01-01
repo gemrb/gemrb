@@ -40,6 +40,9 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#ifndef R_OK
+#define R_OK 04
+#endif
 
 #include <cassert>
 #include <set>
