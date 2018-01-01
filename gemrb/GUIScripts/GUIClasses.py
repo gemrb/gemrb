@@ -214,6 +214,7 @@ class GControl(GView):
     'SetAction': _GemRB.Control_SetAction,
     'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus,
+    'SubstituteForControl': _GemRB.Control_SubstituteForControl
   }
 
   # backwards compatibility
@@ -249,8 +250,9 @@ class GLabel(GControl):
     'SetUseRGB': _GemRB.Label_SetUseRGB
   }
 
-class GTextArea(GControl, Scrollable):
+class GTextArea(GControl):
   methods = {
+    'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
     'ListResources': _GemRB.TextArea_ListResources
   }
