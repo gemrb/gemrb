@@ -102,8 +102,6 @@ public:
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	/** This functions Draws a Circle */
 	void SetPixel(const Point&, const Color& color);
-	/** Gets the pixel of the backbuffer surface */
-	void GetPixel(short x, short y, Color& color);
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
