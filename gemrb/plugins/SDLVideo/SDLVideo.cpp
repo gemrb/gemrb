@@ -1038,7 +1038,11 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 	it = points.begin();
 	for (; it != points.end(); ++it) {
 		SDL_Point p = *it;
-		assert(p.x <= surface->w && p.y <= surface->h);
+		if (p.x > surface->w || p.y > surface->h || p.x < 0 || p.y < 0) {
+			// some of our primitive operations don't clip their points so we dont log the warning
+			//Log(WARNING, "SDLVideo", "Attempting to draw a point outside the surface")
+			continue;
+		}
 		unsigned char* pixel = ( ( unsigned char * ) surface->pixels ) + ( ( p.y * surface->w + p.x) * fmt->BytesPerPixel );
 
 		// dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
