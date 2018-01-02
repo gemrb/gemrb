@@ -261,7 +261,7 @@ void Particles::Draw(const Region &vp)
 			break;
 		case SP_TYPE_POINT:
 		default:
-			video->SetPixel (points[i].pos - p, clr);
+			video->DrawPoint(points[i].pos - p, clr);
 			break;
 		// this is more like a raindrop
 		case SP_TYPE_LINE:

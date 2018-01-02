@@ -1849,7 +1849,9 @@ void Highlightable::DrawOutline(const Point& origin) const
 	if (!outline) {
 		return;
 	}
-	core->GetVideoDriver()->DrawPolyline( outline, origin, outlineColor, true );
+	Color fillcol(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a/2);
+	core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true );
+	core->GetVideoDriver()->DrawPolygon( outline, origin, outlineColor, false );
 }
 
 void Highlightable::SetCursor(unsigned char CursorIndex)

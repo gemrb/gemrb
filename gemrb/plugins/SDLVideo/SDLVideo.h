@@ -98,10 +98,7 @@ public:
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								SpriteCover* cover, const Region* clip = NULL);
 
-	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	/** This functions Draws a Circle */
-	void SetPixel(const Point&, const Color& color);
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
@@ -109,10 +106,8 @@ public:
 	/** This functions Draws an Ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color);
 	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false);
-	virtual void DrawHLine(short x1, short y, short x2, const Color& color);
-	virtual void DrawVLine(short x, short y1, short y2, const Color& color);
-	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color);
+	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false);
+
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 
@@ -126,13 +121,17 @@ protected:
 #else
 	typedef SDL_Surface vid_buf_t;
 	typedef SDLSurfaceSprite2D sprite_t;
+	typedef Point SDL_Point;
 #endif
 
 	virtual inline vid_buf_t* CurrentRenderBuffer()=0;
 
 	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
+
+	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
+	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
+
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
-	void SetPixel(short x, short y, const Color& color);
 	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
@@ -141,7 +140,7 @@ protected:
 public:
 	// static functions for manipulating surfaces
 	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
-	static void SetSurfacePixel(SDL_Surface* surf, short x, short y, const Color& color);
+	static void SetSurfacePixels(SDL_Surface* surf, const std::vector<SDL_Point>& pixels, const Color& color);
 	static Color GetSurfacePixel(SDL_Surface* surf, short x, short y);
 };
 

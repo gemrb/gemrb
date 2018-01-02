@@ -93,6 +93,150 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
+void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color)
+{
+	if (!screenClip.PointInside(p)) {
+		return;
+	}
+
+	std::vector<SDL_Point> points;
+	points.push_back(p);
+	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, color);
+}
+
+void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
+{
+	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, reinterpret_cast<const Color&>(color));
+}
+
+void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)
+{
+	std::vector<SDL_Point>::const_iterator it = points.begin();
+	while (it != points.end()) {
+		Point p1 = *it++;
+		if (it == points.end()) {
+			Log(WARNING, "SDL12Video", "DrawLines was passed an odd number of points. Last point discarded.");
+			break;
+		}
+		Point p2 = *it++;
+		DrawLine(p1.x, p1.y, p2.x, p2.y, reinterpret_cast<const Color&>(color));
+	}
+}
+
+void SDL12VideoDriver::DrawHLine(short x1, short y, short x2, const Color& color)
+{
+	if (x1 > x2) {
+		short tmpx = x1;
+		x1 = x2;
+		x2 = tmpx;
+	}
+
+	std::vector<SDL_Point> points;
+	for (; x1 <= x2 ; x1++ )
+		points.push_back(Point(x1, y));
+
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+}
+
+void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color)
+{
+	if (y1 > y2) {
+		short tmpy = y1;
+		y1 = y2;
+		y2 = tmpy;
+	}
+
+	std::vector<SDL_Point> points;
+	for (; y1 <= y2 ; y1++ )
+		points.push_back(Point(x, y1));
+
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+}
+
+void SDL12VideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color)
+{
+	bool yLonger = false;
+	int shortLen = y2 - y1;
+	int longLen = x2 - x1;
+	if (abs( shortLen ) > abs( longLen )) {
+		int swap = shortLen;
+		shortLen = longLen;
+		longLen = swap;
+		yLonger = true;
+	}
+	int decInc;
+	if (longLen == 0) {
+		decInc = 0;
+	} else {
+		decInc = ( shortLen << 16 ) / longLen;
+	}
+
+	std::vector<SDL_Point> points;
+
+	do { // TODO: rewrite without loop
+		if (yLonger) {
+			if (longLen > 0) {
+				longLen += y1;
+				for (int j = 0x8000 + ( x1 << 16 ); y1 <= longLen; ++y1) {
+					points.push_back(Point( j >> 16, y1 ));
+					j += decInc;
+				}
+				break;
+			}
+			longLen += y1;
+			for (int j = 0x8000 + ( x1 << 16 ); y1 >= longLen; --y1) {
+				points.push_back(Point( j >> 16, y1 ));
+				j -= decInc;
+			}
+			break;
+		}
+
+		if (longLen > 0) {
+			longLen += x1;
+			for (int j = 0x8000 + ( y1 << 16 ); x1 <= longLen; ++x1) {
+				points.push_back(Point( x1, j >> 16 ));
+				j += decInc;
+			}
+			break;
+		}
+		longLen += x1;
+		for (int j = 0x8000 + ( y1 << 16 ); x1 >= longLen; --x1) {
+			points.push_back(Point( x1, j >> 16 ));
+			j -= decInc;
+		}
+	} while (false);
+
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+}
+
+/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
+void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
+{
+	if (fill) {
+		SDL_Surface* currentBuf = CurrentRenderBuffer();
+		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
+			return;
+		} else if ( SDL_ALPHA_OPAQUE == color.a || currentBuf->format->Amask) {
+
+			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
+			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
+			SDL_FillRect( currentBuf, &drect, val );
+		} else {
+			SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
+			SDL_Color c = {color.r, color.g, color.b, color.a};
+			SetSurfacePalette(rectsurf, &c, 1);
+			SetSurfaceAlpha(rectsurf, color.a);
+			BlitSurfaceClipped(rectsurf, Region(0, 0, rgn.w, rgn.h), rgn);
+			SDL_FreeSurface( rectsurf );
+		}
+	} else {
+		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color );
+		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color );
+		DrawHLine( rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color );
+		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color );
+	}
+}
+
 // sets brightness and contrast
 // FIXME:SetGammaRamp doesn't seem to work
 // WARNING: SDL 1.2.13 crashes in SetGamma on Windows (it was fixed in SDL's #3533 Revision)

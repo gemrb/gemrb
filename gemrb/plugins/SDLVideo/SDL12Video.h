@@ -46,6 +46,10 @@ public:
 
 	bool SupportsBAMSprites() { return true; }
 
+	void DrawLine(short x1, short y1, short x2, short y2, const Color& color);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
+	void DrawPoint(const Point& p, const Color& color);
+
 private:
 	void SwapBuffers(VideoBuffers&);
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
@@ -53,6 +57,11 @@ private:
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);
+
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
+	void DrawHLine(short x1, short y, short x2, const Color& color);
+	void DrawVLine(short x, short y1, short y2, const Color& color);
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {

@@ -85,6 +85,10 @@ public:
 	void HideSoftKeyboard();
 	bool TouchInputEnabled();
 
+	void DrawLine(short x1, short y1, short x2, short y2, const Color& color);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
+	void DrawPoint(const Point& p, const Color& color);
+
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
 
@@ -108,6 +112,10 @@ private:
 	float ScaleCoordinateVertical(float y);
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
+	int UpdateRenderTarget();
+
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
 };
 	
 class SDLTextureVideoBuffer : public VideoBuffer {

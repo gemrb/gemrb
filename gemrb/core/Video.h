@@ -201,7 +201,7 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true) = 0;
 
-	virtual void SetPixel(const Point&, const Color& color) = 0;
+	virtual void DrawPoint(const Point&, const Color& color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color) = 0;
 	/** Draws an Ellipse Segment */
@@ -210,7 +210,7 @@ public:
 	/** Draws an ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color) = 0;
 	/** Draws a polygon on the screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false) = 0;
+	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false) = 0;
 	/** Draws a line segment */
 	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color) = 0;
 	/** Blits a Sprite filling the Region */
