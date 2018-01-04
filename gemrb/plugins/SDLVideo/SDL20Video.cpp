@@ -96,7 +96,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 
 VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	Uint32 format = SDLPixelFormatFromBufferFormat(fmt);
+	Uint32 format = SDLPixelFormatFromBufferFormat(fmt, renderer);
 	if (format == SDL_PIXELFORMAT_UNKNOWN)
 		return NULL;
 	

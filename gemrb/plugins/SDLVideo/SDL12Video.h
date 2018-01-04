@@ -106,18 +106,22 @@ public:
 		return true;
 	}
 
-	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
 		SDL_Surface* sprite = NULL;
+
+		// we can safely const_cast pixelBuf because the surface is destroyed before return and we dont alter it
 
 		// FIXME: this shold support everything from Video::BufferFormat
 		if (buffer->format->BitsPerPixel == 16) { // RGB565
-			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
+			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
 		} else { // RGBPAL8
-			sprite = SDL_CreateRGBSurfaceFrom( pixelBuf, bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
+			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
 			va_list args;
 			va_start(args, pitch);
 			ieByte* pal = va_arg(args, ieByte*);
 			for (int i = 0; i < 256; i++) {
+				// FIXME: this should have been converted to a Palette in MVEPlayer
+				// currently this is useless for other uses
 				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
@@ -176,15 +180,15 @@ public:
 		return false;
 	}
 
-	void CopyPixels(const Region& bufDest, void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
 		va_list args;
 		va_start(args, pitch);
 
 		enum PLANES {Y, U, V};
-		ieByte* planes[3];
+		const ieByte* planes[3];
 		unsigned int strides[3];
 
-		planes[Y] = static_cast<ieByte*>(pixelBuf);
+		planes[Y] = static_cast<const ieByte*>(pixelBuf);
 		strides[Y] = *pitch;
 		planes[U] = va_arg(args, ieByte*);
 		strides[U] = *va_arg(args, int*);
@@ -195,7 +199,7 @@ public:
 
 		SDL_LockYUVOverlay(overlay);
 		for (unsigned int plane = 0; plane < 3; plane++) {
-			unsigned char *data = planes[plane];
+			const unsigned char *data = planes[plane];
 			unsigned int size = overlay->pitches[plane];
 			if (strides[plane] < size) {
 				size = strides[plane];
