@@ -139,7 +139,7 @@ protected:
 
 public:
 	// static functions for manipulating surfaces
-	static void SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors = 256);
+	static int SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
 	static void SetSurfacePixels(SDL_Surface* surf, const std::vector<SDL_Point>& pixels, const Color& color);
 	static Color GetSurfacePixel(SDL_Surface* surf, short x, short y);
 };

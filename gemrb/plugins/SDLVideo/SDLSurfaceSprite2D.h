@@ -30,6 +30,8 @@ namespace GemRB {
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
 	SDL_Surface* surface;
+	mutable Palette* palette; // simpley a cache for comparing against calls to SetPalette for performance reasons.
+
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
@@ -45,8 +47,8 @@ public:
 
 	Palette *GetPalette() const;
 	const Color* GetPaletteColors() const;
+	int SetPalette(const Color* pal);
 	void SetPalette(Palette *pal);
-	void SetPalette(Color* pal);
 	ieDword GetColorKey() const;
 	void SetColorKey(ieDword pxvalue);
 	bool HasTransparency() const;
@@ -64,6 +66,7 @@ public:
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable SDL_Texture* texture;
 	mutable bool dirty;
+
 public:
 	SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);

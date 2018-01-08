@@ -37,6 +37,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 		SDL_FillRect(surface, NULL, 0);
 		pixels = surface->pixels;
 	}
+	palette = NULL;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
@@ -47,6 +48,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
 									   rmask, gmask, bmask, amask );
 	SDL_FillRect(surface, NULL, 0);
 	pixels = surface->pixels;
+	palette = NULL;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -55,6 +57,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	// SDL_ConvertSurface should copy colorkey/palette/pixels/surface RLE
 	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
 	pixels = surface->pixels;
+	palette = NULL;
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
@@ -87,13 +90,16 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 /** Get the Palette of a Sprite */
 Palette* SDLSurfaceSprite2D::GetPalette() const
 {
-	if (surface->format->BytesPerPixel != 1) {
-		return NULL;
+	if (palette == NULL) {
+		if (surface->format->BytesPerPixel != 1) {
+			return NULL;
+		}
+		assert(surface->format->palette->ncolors <= 256);
+		palette = new Palette();
+		memcpy(palette->col, surface->format->palette->colors, surface->format->palette->ncolors * 4);
 	}
-	assert(surface->format->palette->ncolors <= 256);
-	Palette* pal = new Palette();
-	memcpy(pal->col, surface->format->palette->colors, surface->format->palette->ncolors * 4);
-	return pal;
+	palette->acquire();
+	return palette;
 }
 
 const Color* SDLSurfaceSprite2D::GetPaletteColors() const
@@ -103,12 +109,23 @@ const Color* SDLSurfaceSprite2D::GetPaletteColors() const
 
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
-	SetPalette(pal->col);
+	if (pal == palette)
+		return;
+
+	if (palette) {
+		palette->release();
+		palette = NULL;
+	}
+
+	if (pal && SetPalette(pal->col) == 0) {
+		palette = pal;
+		palette->acquire();
+	}
 }
 
-void SDLSurfaceSprite2D::SetPalette(Color* pal)
+int SDLSurfaceSprite2D::SetPalette(const Color* pal)
 {
-	SDLVideoDriver::SetSurfacePalette(surface, (SDL_Color*)pal, 0x01 << Bpp);
+	return SDLVideoDriver::SetSurfacePalette(surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << Bpp);
 }
 
 ieDword SDLSurfaceSprite2D::GetColorKey() const
@@ -234,7 +251,7 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 	if (dirty) {
 		SDL_DestroyTexture(texture);
 		texture = SDL_CreateTextureFromSurface(renderer, GetSurface());
-		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+		assert(texture);
 		dirty = false;
 	}
 	return texture;
@@ -242,6 +259,9 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 
 void SDLTextureSprite2D::SetPalette(Palette *pal)
 {
+	if (pal == GetPalette())
+		return;
+
 	dirty = true;
 	SDLSurfaceSprite2D::SetPalette(pal);
 }

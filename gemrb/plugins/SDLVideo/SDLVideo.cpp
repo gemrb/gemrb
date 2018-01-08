@@ -1004,15 +1004,17 @@ void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, co
 
 // static class methods
 
-void SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, SDL_Color* pal, int numcolors)
+int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
 {
 	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-		SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		return SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
 #else
-		SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, pal, 0, numcolors );
+		// const_cast because SDL doesnt alter this and we want our interface to be const correct
+		return SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, const_cast<SDL_Color*>(pal), 0, numcolors );
 #endif
 	}
+	return -1;
 }
 
 template <typename T>
