@@ -118,7 +118,11 @@ bool BAMImporter::Open(DataStream* stream)
 		str->Read( &palette->col[i].b, 1 );
 		str->Read( &palette->col[i].g, 1 );
 		str->Read( &palette->col[i].r, 1 );
-		str->Read( &palette->col[i].a, 1 );
+		unsigned char a;
+		str->Read( &a, 1 );
+
+		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
+		palette->col[i].a = (a) ? a : 255;
 	}
 	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
 	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
