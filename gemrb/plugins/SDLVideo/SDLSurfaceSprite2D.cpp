@@ -127,7 +127,9 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// SDL 2 will enforce SDL_RLEACCEL
 	SDL_SetColorKey(surface, SDL_TRUE, ck);
-	SDL_SetSurfaceRLE(surface, SDL_TRUE);
+	// don't RLE with SDL 2
+	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
+	//SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #else
 	SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
 #endif

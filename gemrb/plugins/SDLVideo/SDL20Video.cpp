@@ -480,9 +480,9 @@ bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alph
 	if (ret == GEM_OK) {
 		ret = SDL_SetSurfaceAlphaMod(surface, alpha);
 	}
-	if (ret == GEM_OK) {
-		SDL_SetSurfaceRLE(surface, SDL_TRUE);
-	}
+	// don't RLE with SDL 2
+	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
+	// SDL_SetSurfaceRLE(surface, SDL_TRUE);
 	return ret;
 }
 
