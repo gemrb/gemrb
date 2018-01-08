@@ -122,7 +122,7 @@ private:
 	float ScaleCoordinateVertical(float y);
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
-	int UpdateRenderTarget();
+	int UpdateRenderTarget(const Color* color = NULL);
 
 	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
 	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);

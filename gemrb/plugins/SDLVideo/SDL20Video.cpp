@@ -131,52 +131,52 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
 	return static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
 }
 
-int SDL20VideoDriver::UpdateRenderTarget()
+int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 {
 	SDL_Texture* target = CurrentRenderBuffer();
 
 	assert(target);
-	SDL_SetTextureBlendMode(target, SDL_BLENDMODE_NONE);
 	int ret = SDL_SetRenderTarget(renderer, target);
-	//SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	if (ret != 0) {
 		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		return ret;
 	}
-	return ret;
+
+	if (color) {
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		return SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
+	}
+
+	return 0;
 }
 
 void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
-	UpdateRenderTarget();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
 	SDL_RenderDrawPoints(renderer, &points[0], points.size());
 }
 
 void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color)
 {
-	UpdateRenderTarget();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	UpdateRenderTarget(&color);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
 void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
-	UpdateRenderTarget();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
 	SDL_RenderDrawLines(renderer, &points[0], points.size());
 }
 
 void SDL20VideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color)
 {
-	UpdateRenderTarget();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	UpdateRenderTarget(&color);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
 void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
 {
-	UpdateRenderTarget();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	UpdateRenderTarget(&color);
 	if (fill) {
 		SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
 	} else {
