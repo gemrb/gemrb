@@ -179,6 +179,7 @@ public:
 	bool RenderOnDisplay(void* display) const {
 		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		int ret = SDL_RenderCopy(renderer, texture, NULL, &dst);
 		if (ret != 0) {
 			Log(ERROR, "SDLVideo", "%s", SDL_GetError());

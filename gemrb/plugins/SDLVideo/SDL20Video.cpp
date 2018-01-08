@@ -78,7 +78,10 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, 0);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+	Log(DEBUG, "SDL20Video", "Renderer: %s", info.name);
 
 	if (renderer == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create renderer:%s", SDL_GetError());
@@ -101,11 +104,18 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		return NULL;
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
+	if (format == RGBA8888)
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+
 	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
 }
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
+	SDL_SetRenderTarget(renderer, NULL);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(renderer);
+
 	VideoBuffers::iterator it;
 	it = buffers.begin();
 	for (; it != buffers.end(); ++it) {
