@@ -119,7 +119,7 @@ void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL
 			break;
 		}
 		Point p2 = *it++;
-		DrawLine(p1.x, p1.y, p2.x, p2.y, reinterpret_cast<const Color&>(color));
+		DrawLine(p1, p2, reinterpret_cast<const Color&>(color));
 	}
 }
 
@@ -153,11 +153,12 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
-void SDL12VideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color)
+void SDL12VideoDriver::DrawLine(const Point& p, const Point& p2, const Color& color)
 {
+	Point p1 = p;
 	bool yLonger = false;
-	int shortLen = y2 - y1;
-	int longLen = x2 - x1;
+	int shortLen = p2.y - p1.y;
+	int longLen = p2.x - p1.x;
 	if (abs( shortLen ) > abs( longLen )) {
 		int swap = shortLen;
 		shortLen = longLen;
@@ -176,32 +177,32 @@ void SDL12VideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Co
 	do { // TODO: rewrite without loop
 		if (yLonger) {
 			if (longLen > 0) {
-				longLen += y1;
-				for (int j = 0x8000 + ( x1 << 16 ); y1 <= longLen; ++y1) {
-					points.push_back(Point( j >> 16, y1 ));
+				longLen += p1.y;
+				for (int j = 0x8000 + ( p1.x << 16 ); p1.y <= longLen; ++p1.y) {
+					points.push_back(Point( j >> 16, p1.y ));
 					j += decInc;
 				}
 				break;
 			}
-			longLen += y1;
-			for (int j = 0x8000 + ( x1 << 16 ); y1 >= longLen; --y1) {
-				points.push_back(Point( j >> 16, y1 ));
+			longLen += p1.y;
+			for (int j = 0x8000 + ( p1.x << 16 ); p1.y >= longLen; --p1.y) {
+				points.push_back(Point( j >> 16, p1.y ));
 				j -= decInc;
 			}
 			break;
 		}
 
 		if (longLen > 0) {
-			longLen += x1;
-			for (int j = 0x8000 + ( y1 << 16 ); x1 <= longLen; ++x1) {
-				points.push_back(Point( x1, j >> 16 ));
+			longLen += p1.x;
+			for (int j = 0x8000 + ( p1.y << 16 ); p1.x <= longLen; ++p1.x) {
+				points.push_back(Point( p1.x, j >> 16 ));
 				j += decInc;
 			}
 			break;
 		}
-		longLen += x1;
-		for (int j = 0x8000 + ( y1 << 16 ); x1 >= longLen; --x1) {
-			points.push_back(Point( x1, j >> 16 ));
+		longLen += p1.x;
+		for (int j = 0x8000 + ( p1.y << 16 ); p1.x >= longLen; --p1.x) {
+			points.push_back(Point( p1.x, j >> 16 ));
 			j -= decInc;
 		}
 	} while (false);

@@ -343,19 +343,20 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 		}
 	}
 
+	p = p - vpOrigin;
 	// TODO: 0.5 and 0.7 are pretty much random values
 	// right segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - vpOrigin.x, p.y - vpOrigin.y, xradius,
-								yradius, color, -0.5, 0.5 );
+	core->GetVideoDriver()->DrawEllipseSegment( p + Point(step, 0),
+											   xradius, yradius, color, -0.5, 0.5 );
 	// top segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - vpOrigin.x, p.y - step - vpOrigin.y, xradius,
-								yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2 );
+	core->GetVideoDriver()->DrawEllipseSegment( p - Point(0, step),
+											   xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2 );
 	// left segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - step - vpOrigin.x, p.y - vpOrigin.y, xradius,
-								yradius, color, -0.5 - M_PI, 0.5 - M_PI );
+	core->GetVideoDriver()->DrawEllipseSegment( p - Point(step, 0),
+											   xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI );
 	// bottom segment
-	core->GetVideoDriver()->DrawEllipseSegment( p.x - vpOrigin.x, p.y + step - vpOrigin.y, xradius,
-								yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
+	core->GetVideoDriver()->DrawEllipseSegment( p + Point(0, step),
+											   xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
 }
 	
 void GameControl::WillDraw()
@@ -586,13 +587,13 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		while (true) {
 			Point p( ( node-> x*16) + 8, ( node->y*12 ) + 6 );
 			if (!node->Parent) {
-				video->DrawCircle( p.x, p.y, 2, ColorRed );
+				video->DrawCircle( p, 2, ColorRed );
 			} else {
 				short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
-				video->DrawLine( oldX, oldY, p.x, p.y, ColorGreen );
+				video->DrawLine( Point(oldX, oldY), p, ColorGreen );
 			}
 			if (!node->Next) {
-				video->DrawCircle( p.x, p.y, 2, ColorGreen );
+				video->DrawCircle( p, 2, ColorGreen );
 				break;
 			}
 			node = node->Next;

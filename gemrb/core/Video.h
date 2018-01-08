@@ -203,16 +203,16 @@ public:
 
 	virtual void DrawPoint(const Point&, const Color& color) = 0;
 	/** Draws a circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color) = 0;
+	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color) = 0;
 	/** Draws an Ellipse Segment */
-	virtual void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
+	virtual void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
 									double anglefrom, double angleto, bool drawlines = true) = 0;
 	/** Draws an ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color) = 0;
+	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color) = 0;
 	/** Draws a polygon on the screen */
 	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false) = 0;
 	/** Draws a line segment */
-	virtual void DrawLine(short x1, short y1, short x2, short y2, const Color& color) = 0;
+	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color) = 0;
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */

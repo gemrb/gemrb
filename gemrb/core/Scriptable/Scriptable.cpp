@@ -1740,7 +1740,7 @@ void Selectable::DrawCircle(const Region &vp)
 		// for size == 1, radii are 12, 9
 		int csize = (size - 1) * 4;
 		if (csize < 4) csize = 3;
-		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
+		core->GetVideoDriver()->DrawEllipse( Pos - vp.Origin(),
 		(ieWord) (csize * 4), (ieWord) (csize * 3), *col );
 	}
 }

@@ -676,14 +676,21 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	spr->UnlockSprite();
 }
 
+// SetPixel is in screen coordinates
 #if SDL_VERSION_ATLEAST(1,3,0)
-#define SetPixel(x,y) { SDL_Point p = {x,y}; points.push_back(p); }
+#define SetPixel(buffer, _x, _y) { \
+Region r = buffer->Rect(); \
+Point p(_x - r.x, _y - r.x); \
+if (r.PointInside(p)) { SDL_Point p2 = {p.x,p.y}; points.push_back(p2); } }
 #else
-#define SetPixel(x,y) { points.push_back(SDL_Point(x,y)); }
+#define SetPixel(buffer, _x, _y) { \
+Region r = buffer->Rect(); \
+Point p(_x - r.x, _y - r.x); \
+if (r.PointInside(p)) { points.push_back(p); } }
 #endif
 
 /** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Color& color)
+void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& color)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -697,14 +704,14 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, const Colo
 	std::vector<SDL_Point> points;
 
 	while (x >= y) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy - ( short ) y );
-		SetPixel( cx + ( short ) x, cy - ( short ) y );
-		SetPixel( cx + ( short ) y, cy + ( short ) x );
-		SetPixel( cx - ( short ) y, cy + ( short ) x );
-		SetPixel( cx - ( short ) y, cy - ( short ) x );
-		SetPixel( cx + ( short ) y, cy - ( short ) x );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) y, c.y + ( short ) x );
+		SetPixel( drawingBuffer, c.x - ( short ) y, c.y + ( short ) x );
+		SetPixel( drawingBuffer, c.x - ( short ) y, c.y - ( short ) x );
+		SetPixel( drawingBuffer, c.x + ( short ) y, c.y - ( short ) x );
 
 		y++;
 		re += yc;
@@ -727,7 +734,7 @@ static double ellipseradius(unsigned short xr, unsigned short yr, double angle) 
 }
 
 /** This functions Draws an Ellipse Segment */
-void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
+void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines)
 {
 	/* beware, dragons and clockwise angles be here! */
@@ -739,8 +746,8 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 	long yto = (long)round(radiusto * sin(angleto));
 
 	if (drawlines) {
-		DrawLine(cx, cy, cx + xfrom, cy + yfrom, color);
-		DrawLine(cx, cy, cx + xto, cy + yto, color);
+		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color);
+		DrawLine(c, Point(c.x + xto, c.y + yto), color);
 	}
 
 	// *Attempt* to calculate the correct x/y boundaries.
@@ -774,13 +781,13 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 	while (sx >= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx + ( short ) x, cy + ( short ) y );
+			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx - ( short ) x, cy + ( short ) y );
+			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx - ( short ) x, cy - ( short ) y );
+			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y );
+			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -803,13 +810,13 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 	while (sx <= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx + ( short ) x, cy + ( short ) y );
+			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( cx - ( short ) x, cy + ( short ) y );
+			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx - ( short ) x, cy - ( short ) y );
+			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y );
+			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -827,7 +834,7 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 
 
 /** This functions Draws an Ellipse */
-void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
+void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 								 unsigned short yr, const Color& color)
 {
 	//Uses Bresenham's Ellipse Algorithm
@@ -846,10 +853,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	std::vector<SDL_Point> points;
 
 	while (sx >= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy - ( short ) y );
-		SetPixel( cx + ( short ) x, cy - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -871,10 +878,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	sy = tas * yr;
 
 	while (sx <= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy + ( short ) y );
-		SetPixel( cx - ( short ) x, cy - ( short ) y );
-		SetPixel( cx + ( short ) x, cy - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -935,19 +942,19 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 				if (lt >= rt) { continue; } // clipped
 
 				// Draw a line from (y,lt) to (y,rt)
-				SetPixel(lt, y);
-				SetPixel(rt, y);
+				SetPixel(drawingBuffer, lt, y);
+				SetPixel(drawingBuffer, rt, y);
 			}
 		}
 	} else {
-		SetPixel(poly->points[0].x - origin.x, poly->points[0].y - origin.y);
+		SetPixel(drawingBuffer, poly->points[0].x - origin.x, poly->points[0].y - origin.y);
 
 		for (unsigned int i = 1; i < poly->count; i++) {
-			SetPixel(poly->points[i].x - origin.x, poly->points[i].y - origin.y);
-			SetPixel(poly->points[i].x - origin.x, poly->points[i].y - origin.y);
+			SetPixel(drawingBuffer, poly->points[i].x - origin.x, poly->points[i].y - origin.y);
+			SetPixel(drawingBuffer, poly->points[i].x - origin.x, poly->points[i].y - origin.y);
 		}
 		// reconnect with start point
-		SetPixel(poly->points[0].x - origin.x, poly->points[0].y - origin.y);
+		SetPixel(drawingBuffer, poly->points[0].x - origin.x, poly->points[0].y - origin.y);
 	}
 
 	// TODO: if our points were compatible with SDL_Point we could just pass poly->points
@@ -1041,15 +1048,10 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 	it = points.begin();
 	for (; it != points.end(); ++it) {
 		SDL_Point p = *it;
-		if (p.x > surface->w - 1 || p.y > surface->h - 1 || p.x < 0 || p.y < 0) {
-			// FIXME: this is a low level private method that should be able to assume the points are clipped for performance reasons
-			// some of our primitive operations don't clip their points so we dont log the warning
-			//Log(WARNING, "SDLVideo", "Attempting to draw a point outside the surface")
-			continue;
-		}
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
 		unsigned char* pixel = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
+		// NOTICE: we assume the points were clipped by the caller for performance reasons
 		assert(pixel <= start + (surface->pitch * surface->h));
 
 		switch (fmt->BytesPerPixel) {

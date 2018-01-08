@@ -256,8 +256,7 @@ void Particles::Draw(const Region &vp)
 			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos.x - p.x,
-				points[i].pos.y - p.y, 2, clr);
+			video->DrawCircle (points[i].pos - p, 2, clr);
 			break;
 		case SP_TYPE_POINT:
 		default:
@@ -266,10 +265,7 @@ void Particles::Draw(const Region &vp)
 		// this is more like a raindrop
 		case SP_TYPE_LINE:
 			if (length) {
-				video->DrawLine (points[i].pos.x - p.x,
-					points[i].pos.y - p.y,
-					(points[i].pos.x - p.x) + (i&1),
-					(points[i].pos.y - p.y) + length, clr);
+				video->DrawLine (points[i].pos - p, points[i].pos - p + Point((i&1), length), clr);
 			}
 			break;
 		}

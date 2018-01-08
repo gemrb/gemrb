@@ -182,7 +182,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
 			Point pos = ConvertPointFromGame(actor->Pos);
-			video->DrawEllipse( pos.x, pos.y, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
+			video->DrawEllipse( pos, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -204,7 +204,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (anim) {
 				video->BlitSprite( anim, pos.x - anim->Width/2, pos.y - anim->Height/2, &rgn );
 			} else {
-				video->DrawEllipse( pos.x, pos.y, 6, 5, colors[mn.color&7] );
+				video->DrawEllipse( pos, 6, 5, colors[mn.color&7] );
 			}
 		}
 	}

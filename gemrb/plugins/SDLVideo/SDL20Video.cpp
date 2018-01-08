@@ -168,10 +168,10 @@ void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL
 	SDL_RenderDrawLines(renderer, &points[0], points.size());
 }
 
-void SDL20VideoDriver::DrawLine(short x1, short y1, short x2, short y2, const Color& color)
+void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color)
 {
 	UpdateRenderTarget(&color);
-	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 }
 
 void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)

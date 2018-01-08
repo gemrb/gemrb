@@ -95,7 +95,7 @@ public:
 	void HideSoftKeyboard();
 	bool TouchInputEnabled();
 
-	void DrawLine(short x1, short y1, short x2, short y2, const Color& color);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color);
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	void DrawPoint(const Point& p, const Color& color);
 

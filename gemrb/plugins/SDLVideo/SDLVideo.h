@@ -99,12 +99,12 @@ public:
 								SpriteCover* cover, const Region* clip = NULL);
 
 	/** This functions Draws a Circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color);
+	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color);
 	/** This functions Draws an Ellipse Segment */
-	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
+	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
 		double anglefrom, double angleto, bool drawlines = true);
 	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color);
+	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color);
 	/** This function Draws a Polygon on the Screen */
 	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false);
 
