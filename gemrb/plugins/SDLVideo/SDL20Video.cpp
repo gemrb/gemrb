@@ -123,7 +123,8 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
 
 int SDL20VideoDriver::UpdateRenderTarget()
 {
-	SDL_Texture* target = CurrentRednderBuffer();
+	SDL_Texture* target = CurrentRenderBuffer();
+
 	assert(target);
 	SDL_SetTextureBlendMode(target, SDL_BLENDMODE_NONE);
 	int ret = SDL_SetRenderTarget(renderer, target);
