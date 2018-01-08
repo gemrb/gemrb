@@ -82,13 +82,8 @@ public:
 	}
 
 	void Clear() {
-		Uint32 ck = 0;
-#if SDL_VERSION_ATLEAST(1,3,0)
-		if (SDL_GetColorKey(buffer, &ck) == 0) {
-#else
-		ck = buffer->format->colorkey;
+		Uint32 ck = buffer->format->colorkey;
 		if (ck) {
-#endif
 			SDL_FillRect(buffer, NULL, ck);
 		} else {
 			SDL_FillRect(buffer, NULL, SDL_MapRGBA(buffer->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT));
@@ -125,11 +120,7 @@ public:
 				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
 				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-#if SDL_VERSION_ATLEAST(1,3,0)
-				sprite->format->palette->colors[i].a = 0;
-#else
 				sprite->format->palette->colors[i].unused = 0;
-#endif
 			}
 			va_end(args);
 		}
