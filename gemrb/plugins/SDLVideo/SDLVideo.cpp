@@ -1024,6 +1024,7 @@ void BlendPixel(const Color& srcc, SDL_PixelFormat* fmt, Uint8* pixel)
 	Color dstc;
 	SDL_GetRGB( dst, fmt, &dstc.r, &dstc.g, &dstc.b );
 
+	// dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
 	dstc.r = (srcc.r * srcc.a/255) + (dstc.r * (1 - srcc.a/255));
 	dstc.g = (srcc.g * srcc.a/255) + (dstc.g * (1 - srcc.a/255));
 	dstc.b = (srcc.b * srcc.a/255) + (dstc.b * (1 - srcc.a/255));
@@ -1040,14 +1041,17 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 	it = points.begin();
 	for (; it != points.end(); ++it) {
 		SDL_Point p = *it;
-		if (p.x > surface->w || p.y > surface->h || p.x < 0 || p.y < 0) {
+		if (p.x > surface->w - 1 || p.y > surface->h - 1 || p.x < 0 || p.y < 0) {
+			// FIXME: this is a low level private method that should be able to assume the points are clipped for performance reasons
 			// some of our primitive operations don't clip their points so we dont log the warning
 			//Log(WARNING, "SDLVideo", "Attempting to draw a point outside the surface")
 			continue;
 		}
-		unsigned char* pixel = ( ( unsigned char * ) surface->pixels ) + ( ( p.y * surface->w + p.x) * fmt->BytesPerPixel );
 
-		// dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
+		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
+		unsigned char* pixel = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
+		assert(pixel <= start + (surface->pitch * surface->h));
+
 		switch (fmt->BytesPerPixel) {
 			case 1:
 				BlendPixel<Uint8>(srcc, surface->format, pixel);
