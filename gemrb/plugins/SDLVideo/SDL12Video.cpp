@@ -131,6 +131,11 @@ void SDL12VideoDriver::DrawHLine(short x1, short y, short x2, const Color& color
 		x2 = tmpx;
 	}
 
+	short min = screenClip.x;
+	short max = min + screenClip.w;
+	x1 = Clamp(x1, min, max);
+	x2 = Clamp(x2, min, max);
+
 	std::vector<SDL_Point> points;
 	for (; x1 <= x2 ; x1++ )
 		points.push_back(Point(x1, y));
@@ -146,6 +151,11 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 		y2 = tmpy;
 	}
 
+	short min = screenClip.y;
+	short max = min + screenClip.h;
+	y1 = Clamp(y1, min, max);
+	y2 = Clamp(y2, min, max);
+
 	std::vector<SDL_Point> points;
 	for (; y1 <= y2 ; y1++ )
 		points.push_back(Point(x, y1));
@@ -153,9 +163,17 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
-void SDL12VideoDriver::DrawLine(const Point& p, const Point& p2, const Color& color)
+void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color)
 {
-	Point p1 = p;
+	if (start.y == end.y) return DrawHLine(start.x, start.y, end.x, color);
+	if (start.x == end.x) return DrawVLine(start.x, start.y, end.y, color);
+
+	// clamp the points to screenClip
+	Point min = screenClip.Origin();
+	Point max = min + Point(screenClip.w, screenClip.h);
+	Point p1 = Clamp(start, min, max);
+	Point p2 = Clamp(end, min, max);
+	
 	bool yLonger = false;
 	int shortLen = p2.y - p1.y;
 	int longLen = p2.x - p1.x;

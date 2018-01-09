@@ -255,6 +255,15 @@ inline T Clamp(const T& n, const T& lower, const T& upper)
 	return std::max(lower, std::min(n, upper));
 }
 
+template <>
+inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
+{
+	Point ret;
+	ret.x = std::max(lower.x, std::min(p.x, upper.x));
+	ret.y = std::max(lower.y, std::min(p.y, upper.y));
+	return ret;
+}
+
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40
