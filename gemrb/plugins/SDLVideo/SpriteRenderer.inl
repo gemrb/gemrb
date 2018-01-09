@@ -306,7 +306,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             bool yflip,
             Region clip,
             Uint8 transindex,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
@@ -317,8 +317,8 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx, covery;
 	if (COVER) {
-		coverx = cover->GetMask()->XPos - spr->XPos;
-		covery = cover->GetMask()->YPos - spr->YPos;
+		coverx = cover->XPos - spr->XPos;
+		covery = cover->YPos - spr->YPos;
 	}
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
@@ -333,8 +333,8 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	if (COVER) {
 		assert(tx >= tx - coverx);
 		assert(ty >= ty - coverx);
-		assert(tx + spr->Width <= tx - coverx + cover->GetMask()->Width);
-		assert(ty + spr->Height <= ty - covery + cover->GetMask()->Height);
+		assert(tx + spr->Width <= tx - coverx + cover->Width);
+		assert(ty + spr->Height <= ty - covery + cover->Height);
 	}
 
 
@@ -366,12 +366,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->GetMask()->LockSprite() + covery*cover->GetMask()->Width;
+			coverline = (Uint8*)cover->LockSprite() + covery*cover->Width;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->GetMask()->LockSprite() + (covery+height-1)*cover->GetMask()->Width;
+			coverline = (Uint8*)cover->LockSprite() + (covery+height-1)*cover->Width;
 	}
 	if (!XFLIP) {
 		pix = line + tx;
@@ -479,12 +479,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += yfactor * cover->GetMask()->Width - xfactor * width;
+			coverpix += yfactor * cover->Width - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
 	if (COVER)
-		cover->GetMask()->UnlockSprite();
+		cover->UnlockSprite();
 }
 
 // non-RLE, palette
@@ -496,7 +496,7 @@ static void BlitSprite_internal(SDL_Surface* target,
             bool yflip,
             Region clip,
             int transindex,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
@@ -507,8 +507,8 @@ static void BlitSprite_internal(SDL_Surface* target,
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx, covery;
 	if (COVER) {
-		coverx = cover->GetMask()->XPos - spr->XPos;
-		covery = cover->GetMask()->YPos - spr->YPos;
+		coverx = cover->XPos - spr->XPos;
+		covery = cover->YPos - spr->YPos;
 	}
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
@@ -523,8 +523,8 @@ static void BlitSprite_internal(SDL_Surface* target,
 	if (COVER) {
 		assert(tx >= tx - coverx);
 		assert(ty >= ty - coverx);
-		assert(tx + spr->Width <= tx - coverx + cover->GetMask()->Width);
-		assert(ty + spr->Height <= ty - covery + cover->GetMask()->Height);
+		assert(tx + spr->Width <= tx - coverx + cover->Width);
+		assert(ty + spr->Height <= ty - covery + cover->Height);
 	}
 
 
@@ -536,13 +536,13 @@ static void BlitSprite_internal(SDL_Surface* target,
 		end = line + clip.h*pitch;
 		srcdata += (clip.y - ty)*spr->Width;
 		if (COVER)
-			coverpix = (Uint8*)cover->GetMask()->LockSprite() + (clip.y - ty + covery)*cover->GetMask()->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + covery)*cover->Width;
 	} else {
 		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 		end = line - clip.h*pitch;
 		srcdata += (ty + spr->Height - (clip.y + clip.h))*spr->Width;
 		if (COVER)
-			coverpix = (Uint8*)cover->GetMask()->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->GetMask()->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->Width;
 	}
 
 	PTYPE *pix, *endpix;
@@ -599,11 +599,11 @@ static void BlitSprite_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * cover->GetMask()->Width - xfactor * clip.w;
+			coverpix += yfactor * cover->Width - xfactor * clip.w;
 	}
 
 	if (COVER)
-		cover->GetMask()->UnlockSprite();
+		cover->UnlockSprite();
 
 }
 
@@ -615,7 +615,7 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
             int width, int /*height*/,
             bool yflip,
             Region clip,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
@@ -626,8 +626,8 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx, covery;
 	if (COVER) {
-		coverx = cover->GetMask()->XPos - spr->XPos;
-		covery = cover->GetMask()->YPos - spr->YPos;
+		coverx = cover->XPos - spr->XPos;
+		covery = cover->YPos - spr->YPos;
 	}
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
@@ -642,8 +642,8 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 	if (COVER) {
 		assert(tx >= tx - coverx);
 		assert(ty >= ty - coverx);
-		assert(tx + spr->Width <= tx - coverx + cover->GetMask()->Width);
-		assert(ty + spr->Height <= ty - covery + cover->GetMask()->Height);
+		assert(tx + spr->Width <= tx - coverx + cover->Width);
+		assert(ty + spr->Height <= ty - covery + cover->Height);
 	}
 
 
@@ -655,13 +655,13 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 		end = line + clip.h*pitch;
 		srcdata += (clip.y - ty)*spr->Width;
 		if (COVER)
-			coverpix = (Uint8*)cover->GetMask()->LockSprite() + (clip.y - ty + covery)*cover->GetMask()->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + covery)*cover->Width;
 	} else {
 		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 		end = line - clip.h*pitch;
 		srcdata += (ty + spr->Height - (clip.y + clip.h))*spr->Width;
 		if (COVER)
-			coverpix = (Uint8*)cover->GetMask()->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->GetMask()->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->Width;
 	}
 
 	PTYPE *pix, *endpix;
@@ -715,11 +715,11 @@ static void BlitSpriteRGB_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * cover->GetMask()->Width - xfactor * clip.w;
+			coverpix += yfactor * cover->Width - xfactor * clip.w;
 	}
 
 	if (COVER)
-		cover->GetMask()->UnlockSprite();
+		cover->UnlockSprite();
 
 }
 
@@ -736,7 +736,7 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             bool yflip,
             const Region& clip,
             int transindex,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
@@ -791,7 +791,7 @@ static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
             bool yflip,
             const Region& clip,
             int transindex,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& /*dummy*/)
 {
@@ -818,7 +818,7 @@ static void BlitSpriteRGB_dispatch2(bool COVER, bool XFLIP,
             int width, int height,
             bool yflip,
             const Region& clip,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
@@ -850,7 +850,7 @@ static void BlitSpriteRGB_dispatch(bool COVER, bool XFLIP,
             int width, int height,
             bool yflip,
             const Region& clip,
-            const SpriteCover* cover,
+            const Sprite2D* cover,
             const Sprite2D* spr, unsigned int flags,
             const Tinter& tint, const Blender& /*dummy*/)
 {
