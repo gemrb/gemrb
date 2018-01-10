@@ -104,6 +104,9 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 
 const Color* SDLSurfaceSprite2D::GetPaletteColors() const
 {
+	if (surface->format->BytesPerPixel != 1) {
+		return NULL;
+	}
 	return reinterpret_cast<const Color*>(surface->format->palette->colors);
 }
 
