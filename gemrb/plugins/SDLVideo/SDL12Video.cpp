@@ -24,6 +24,9 @@
 #include "Interface.h"
 #include "SDLSurfaceSprite2D.h"
 
+#include "TileRenderer.inl"
+#include "SpriteRenderer.inl"
+
 using namespace GemRB;
 
 SDL12VideoDriver::SDL12VideoDriver(void)
@@ -91,6 +94,404 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		SDL_FreeSurface(tmp);
 		return new SDLSurfaceVideoBuffer(buf, r.Origin());
 	}
+}
+
+void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask,
+											const Region& src, const Region& dst,
+											unsigned int flags, const Color* t)
+{
+	/*
+	const Uint8* srcdata = (const Uint8*)spr->LockSprite();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+
+	SDL_LockSurface(currentBuf);
+
+	Palette* pal = spr->GetPalette();
+
+	SRShadow_Regular shadow;
+
+	// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
+	// We will compensate by tricking them by manipulating the location and size of the blit
+	// then using dst as a clipping rect to achieve the effect of a partial src copy
+
+	int x = dst.x - src.x;
+	int y = dst.y - src.y;
+	int w = spr->Width;
+	int h = spr->Height;
+
+	if (pal->alpha) {
+		SRTinter_NoTint<true> tinter;
+		SRBlender_Alpha blender;
+
+		BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
+							   currentBuf, srcdata, pal->col, x, y, w, h,
+							   (spr->renderFlags&BLIT_MIRRORY), dst,
+							   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+	} else {
+		SRTinter_NoTint<false> tinter;
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
+							   currentBuf, srcdata, pal->col, x, y, w, h,
+							   (spr->renderFlags&BLIT_MIRRORY), dst,
+							   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
+	}
+
+	SDL_UnlockSurface(currentBuf);
+	spr->UnlockSprite();
+*/
+
+	Color tint(255,255,255,255);
+	if (t) {
+		tint = *t;
+	}
+
+	assert(spr->BAM);
+	Palette* palette = spr->GetPalette();
+
+	// global tint is handled by the callers
+
+	// implicit flags:
+	const unsigned int blit_TINTALPHA =    0x40000000U;
+	const unsigned int blit_PALETTEALPHA = 0x80000000U;
+
+	// NB: blit_TINTALPHA isn't directly used or checked, but its presence
+	// affects the special case checks below
+	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
+
+	if (palette->alpha) flags |= blit_PALETTEALPHA;
+
+	// flag combinations which are often used:
+	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
+
+	// most game sprites:
+	// covered, BLIT_TINTED
+	// covered, BLIT_TINTED | BLIT_TRANSSHADOW
+	// covered, BLIT_TINTED | BLIT_NOSHADOW
+
+	// area-animations?
+	// BLIT_TINTED
+
+	// (hopefully) most video overlays:
+	// BLIT_HALFTRANS
+	// covered, BLIT_HALFTRANS
+	// covered
+	// none
+
+	// other combinations use general case
+
+
+	// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
+	// We will compensate by tricking them by manipulating the location and size of the blit
+	// then using dst as a clipping rect to achieve the effect of a partial src copy
+
+	int x = dst.x - src.x;
+	int y = dst.y - src.y;
+	int w = spr->Width;
+	int h = spr->Height;
+
+	//int tx = dst.x - spr->XPos;
+	//int ty = dst.y - spr->YPos;
+
+	const Uint8* srcdata = (const Uint8*)spr->LockSprite();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+	SDL_LockSurface(currentBuf);
+
+	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
+	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
+	if (flags & BLIT_MIRRORX) hflip = !hflip;
+	if (flags & BLIT_MIRRORY) vflip = !vflip;
+
+	// remove already handled flags and incompatible combinations
+	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
+	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
+	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
+
+
+	if (remflags == BLIT_TINTED) {
+
+		SRShadow_Regular shadow;
+		SRTinter_Tint<false, false> tinter(tint);
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+
+	} else if (remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
+
+		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
+		SRTinter_Tint<false, false> tinter(tint);
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+
+	} else if (remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
+
+		SRShadow_None shadow;
+		SRTinter_Tint<false, false> tinter(tint);
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+
+	} else if (remflags == BLIT_HALFTRANS) {
+
+		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
+		SRTinter_NoTint<false> tinter;
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+
+	} else if (remflags == 0) {
+
+		SRShadow_Regular shadow;
+		SRTinter_NoTint<false> tinter;
+		SRBlender_NoAlpha blender;
+
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+
+	} else {
+		// handling the following effects with conditionals:
+		// halftrans
+		// noshadow
+		// transshadow
+		// grey (TODO)
+		// sepia (TODO)
+		// glow (not yet)
+		// blended (not yet)
+		// vflip
+
+		// handling the following effects by repeated calls:
+		// palettealpha
+		// tinted
+		// covered
+		// hflip
+
+		if (!(remflags & BLIT_TINTED)) tint.a = 255;
+
+		SRShadow_Flags shadow; // for halftrans, noshadow, transshadow
+		SRBlender_Alpha blender;
+		if (remflags & blit_PALETTEALPHA) {
+			if (remflags & BLIT_TINTED) {
+				SRTinter_Flags<true> tinter(tint);
+
+				BlitSpritePAL_dispatch(mask, hflip,
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+			} else {
+				SRTinter_FlagsNoTint<true> tinter;
+
+				BlitSpritePAL_dispatch(mask, hflip,
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+			}
+		} else {
+			if (remflags & BLIT_TINTED) {
+				SRTinter_Flags<false> tinter(tint);
+
+				BlitSpritePAL_dispatch(mask, hflip,
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+			} else {
+				SRTinter_FlagsNoTint<false> tinter;
+
+				BlitSpritePAL_dispatch(mask, hflip,
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+			}
+
+		}
+	}
+
+	spr->UnlockSprite();
+	palette->release();
+	SDL_UnlockSurface(currentBuf);
+}
+
+void SDL12VideoDriver::BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SDL_Rect& drect)
+{
+	// since we should already be clipped we can call SDL_LowerBlit directly
+	SDL_LowerBlit(surf, &srect, CurrentRenderBuffer(), &drect);
+}
+
+void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask,
+											   const SDL_Rect& srect, const SDL_Rect& drect,
+											   unsigned int flags, const SDL_Color* tint)
+{
+	/*
+	const Uint8* data = (const Uint8*)spr->LockSprite();
+	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
+
+	const Uint8* mask_data = NULL;
+	Uint32 ck = 0;
+	if (mask) {
+		mask_data = (Uint8*) mask->LockSprite();
+		ck = mask->GetColorKey();
+	}
+
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+#define DO_BLIT \
+if (currentBuf->format->BytesPerPixel == 4) \
+BlitTile_internal<Uint32>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.w, drect.h, data, pal, mask_data, ck, T, B); \
+else \
+BlitTile_internal<Uint16>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.w, drect.h, data, pal, mask_data, ck, T, B); \
+
+	if (flags & TILE_GREY) {
+
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(currentBuf->format);
+
+			TRTinter_Grey T(*reinterpret_cast<const Color*>(tint));
+			DO_BLIT
+		} else {
+			TRBlender_Opaque B(currentBuf->format);
+
+			TRTinter_Grey T(*reinterpret_cast<const Color*>(tint));
+			DO_BLIT
+		}
+
+	} else if (flags & TILE_SEPIA) {
+
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(currentBuf->format);
+
+			TRTinter_Sepia T(*reinterpret_cast<const Color*>(tint));
+			DO_BLIT
+		} else {
+			TRBlender_Opaque B(currentBuf->format);
+
+			TRTinter_Sepia T(*reinterpret_cast<const Color*>(tint));
+			DO_BLIT
+		}
+
+	} else {
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(currentBuf->format);
+
+			if (tint) {
+				TRTinter_Tint T(*reinterpret_cast<const Color*>(tint));
+				DO_BLIT
+			} else {
+				TRTinter_NoTint T;
+				DO_BLIT
+			}
+		} else {
+			if (tint) {
+				TRBlender_Opaque B(currentBuf->format);
+				TRTinter_Tint T(*reinterpret_cast<const Color*>(tint));
+				DO_BLIT
+			} else {
+				// no blending/tinting
+				SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
+				SDL_Rect s = srect;
+				SDL_Rect d = drect;
+				BlitSurfaceClipped(surf, s, d);
+			}
+		}
+
+	}
+
+#undef DO_BLIT
+
+	if (mask) {
+		mask->UnlockSprite();
+	}
+
+	spr->UnlockSprite();
+*/
+
+	// non-BAM Blitting
+
+	// handling the following effects with conditionals:
+	// halftrans
+	// grey
+	// sepia
+	// glow (not yet)
+	// blended (not yet)
+	// yflip
+
+	// handling the following effects by repeated inclusion:
+	// tinted
+	// covered
+	// xflip
+
+	// not handling the following effects at all:
+	// noshadow
+	// transshadow
+	// palettealpha
+
+	//		print("Unoptimized blit: %04X", flags);
+
+	Color c;
+	if (tint){
+		c = Color(tint->r, tint->g, tint->b, tint->unused);
+	}
+	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
+	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
+	if (flags & BLIT_MIRRORX) hflip = !hflip;
+	if (flags & BLIT_MIRRORY) vflip = !vflip;
+
+	// remove already handled flags and incompatible combinations
+	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
+	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
+	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
+
+	if (remflags & BLIT_HALFTRANS) {
+		// handle halftrans with 50% alpha tinting
+		if (!(remflags & BLIT_TINTED)) {
+			c.r = c.g = c.b = c.a = 255;
+			remflags |= BLIT_TINTED;
+		}
+		c.a >>= 1;
+	}
+
+	const SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+	const Region finalclip = Region(drect.x, drect.y, drect.w, drect.h);
+
+	int x = drect.x - srect.x;
+	int y = drect.y - srect.y;
+	int w = spr->Width;
+	int h = spr->Height;
+
+	if (surf->format->BytesPerPixel == 1) {
+		const Color* pal = spr->GetPaletteColors();
+
+		if (remflags & BLIT_TINTED)
+			c.a = 255;
+
+		const Uint8 *data = (const Uint8*)spr->LockSprite();
+
+		SRBlender_Alpha blender;
+		SRShadow_NOP shadow;
+		if (remflags & BLIT_TINTED) {
+			SRTinter_Flags<false> tinter(c);
+
+			BlitSpritePAL_dispatch(mask, hflip,
+								   currentBuf, data, pal, x, y, w, h, vflip, finalclip, -1, mask, spr, remflags, shadow, tinter, blender);
+		} else {
+			// no blending/tinting
+			SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
+			SDL_Rect s = srect;
+			SDL_Rect d = drect;
+			BlitSurfaceClipped(surf, s, d);
+		}
+
+	} else {
+
+		const Uint32 *data = (const Uint32*)spr->LockSprite();
+
+		SRBlender_Alpha blender;
+		if (remflags & BLIT_TINTED) {
+			SRTinter_Flags<true> tinter(c);
+
+			BlitSpriteRGB_dispatch(mask, hflip,
+								   currentBuf, data, x, y, w, h, vflip, finalclip, mask, spr, remflags, tinter, blender);
+		} else {
+			// no blending/tinting
+			SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
+			SDL_Rect s = srect;
+			SDL_Rect d = drect;
+			BlitSurfaceClipped(surf, s, d);
+		}
+
+	}
+
+	spr->UnlockSprite();
 }
 
 void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color)
@@ -245,7 +646,10 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 			SDL_Color c = {color.r, color.g, color.b, color.a};
 			SetSurfacePalette(rectsurf, &c, 1);
 			SetSurfaceAlpha(rectsurf, color.a);
-			BlitSurfaceClipped(rectsurf, Region(0, 0, rgn.w, rgn.h), rgn);
+
+			SDL_Rect srect = {0, 0, rgn.w, rgn.h};
+			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
+			BlitSurfaceClipped(rectsurf, srect, drect);
 			SDL_FreeSurface( rectsurf );
 		}
 	} else {

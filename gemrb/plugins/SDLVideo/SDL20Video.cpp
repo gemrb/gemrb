@@ -150,6 +150,36 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 	return 0;
 }
 
+void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+{
+	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
+	SDL_Texture* tex = texSprite->GetTexture(renderer);
+
+	int ret = UpdateRenderTarget();
+
+	// TODO: implement the mask/flags/tint
+	if (flags & BLIT_GREY) {
+
+	} else if (flags & BLIT_SEPIA) {
+
+	}
+
+	if (flags & BLIT_HALFTRANS) {
+		SDL_SetTextureAlphaMod(tex, 255/2);
+	} else {
+		SDL_SetTextureAlphaMod(tex, SDL_ALPHA_OPAQUE);
+	}
+
+	if (tint) {
+		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
+	}
+	
+	ret = SDL_RenderCopy(renderer, tex, &srect, &drect);
+	if (ret != 0) {
+		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+	}
+}
+
 void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
@@ -186,6 +216,8 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 
 Sprite2D* SDL20VideoDriver::GetScreenshot( Region /*r*/ )
 {
+	// TODO: implement this
+	//SDL_RenderReadPixels(renderer, <#const SDL_Rect *rect#>, <#Uint32 format#>, <#void *pixels#>, <#int pitch#>)
 	return NULL;
 }
 

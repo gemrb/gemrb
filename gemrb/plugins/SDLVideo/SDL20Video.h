@@ -126,6 +126,10 @@ private:
 
 	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
 	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
+
+	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Sprite2D* /*mask*/, const Region& /*src*/, const Region& /*dst*/,
+					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
+	void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
 };
 	
 class SDLTextureVideoBuffer : public VideoBuffer {

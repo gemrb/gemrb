@@ -181,7 +181,7 @@ public:
 						  const Region* clip, unsigned int flags) = 0;
 	void BlitSprite(const Sprite2D* spr, int x, int y,
 					const Region* clip = NULL);
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst) = 0;
+	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) = 0;
 
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)

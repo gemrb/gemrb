@@ -94,7 +94,7 @@ public:
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
 						  const Region* clip, unsigned int flags);
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst);
+	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								SpriteCover* cover, const Region* clip = NULL);
 
@@ -126,10 +126,12 @@ protected:
 
 	virtual inline vid_buf_t* CurrentRenderBuffer()=0;
 
-	void BlitSurfaceClipped(SDL_Surface*, const Region& src, const Region& dst);
-
 	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
 	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
+
+	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
+	void BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
 
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	int PollEvents();

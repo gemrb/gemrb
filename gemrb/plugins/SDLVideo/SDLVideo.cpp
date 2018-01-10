@@ -20,9 +20,6 @@
 
 #include "SDLVideo.h"
 
-#include "TileRenderer.inl"
-#include "SpriteRenderer.inl"
-
 #include "AnimationFactory.h"
 #include "Game.h" // for GetGlobalTint
 #include "GameData.h"
@@ -283,403 +280,35 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixe
 
 void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
-	if (spr->BAM) {
-		Log(ERROR, "SDLVideo", "Tile blit not supported for this sprite");
-		return;
-	}
+	assert(spr->BAM == false);
 
 	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
+	Region srect(0,0,64,64);
 
-	const Uint8* data = static_cast<const Uint8*>(spr->LockSprite());
-	const SDL_Color* pal = reinterpret_cast<const SDL_Color*>(spr->GetPaletteColors());
-
-	const Uint8* mask_data = NULL;
-	Uint32 ck = 0;
-	if (mask) {
-		mask_data = static_cast<const Uint8*>(mask->LockSprite());
-		ck = mask->GetColorKey();
-	}
-
-	bool tint = false;
-	Color tintcol(255, 255, 255, 0);
+	const Color* tintcol = NULL;
 
 	if (core->GetGame()) {
-		const Color* totint = core->GetGame()->GetGlobalTint();
-		if (totint) {
-			tintcol = *totint;
-			tint = true;
-		}
+		tintcol = core->GetGame()->GetGlobalTint();
 	}
 
-	SDL_Surface* currentBuf = CurrentRenderBuffer();
-#define DO_BLIT \
-		if (currentBuf->format->BytesPerPixel == 4) \
-			BlitTile_internal<Uint32>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
-		else \
-			BlitTile_internal<Uint16>(currentBuf, x, y, fClip.x - x, fClip.y - y, fClip.w, fClip.h, data, pal, mask_data, ck, T, B); \
-
-	if (flags & TILE_GREY) {
-
-		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(currentBuf->format);
-
-			TRTinter_Grey T(tintcol);
-			DO_BLIT
-		} else {
-			TRBlender_Opaque B(currentBuf->format);
-
-			TRTinter_Grey T(tintcol);
-			DO_BLIT
-		}
-
-	} else if (flags & TILE_SEPIA) {
-
-		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(currentBuf->format);
-
-			TRTinter_Sepia T(tintcol);
-			DO_BLIT
-		} else {
-			TRBlender_Opaque B(currentBuf->format);
-
-			TRTinter_Sepia T(tintcol);
-			DO_BLIT
-		}
-
-	} else {
-
-		if (flags & TILE_HALFTRANS) {
-			TRBlender_HalfTrans B(currentBuf->format);
-
-			if (tint) {
-				TRTinter_Tint T(tintcol);
-				DO_BLIT
-			} else {
-				TRTinter_NoTint T;
-				DO_BLIT
-			}
-		} else {
-			TRBlender_Opaque B(currentBuf->format);
-
-			if (tint) {
-				TRTinter_Tint T(tintcol);
-				DO_BLIT
-			} else {
-				TRTinter_NoTint T;
-				DO_BLIT
-			}
-		}
-
-	}
-
-	if (mask)
-		mask->UnlockSprite();
-
-	spr->UnlockSprite();
-
-#undef DO_BLIT
-
+	BlitSpriteClipped(spr, mask, srect, fClip, flags, tintcol);
 }
 
-void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst)
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region dst)
 {
-	if (dst.w <= 0 || dst.h <= 0)
-		return; // we already know blit fails
-
-	if (!spr->BAM) {
-		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
-		BlitSurfaceClipped(surf, src, dst);
-	} else {
-		const Uint8* srcdata = static_cast<const Uint8*>(spr->LockSprite());
-		SDL_Surface* currentBuf = CurrentRenderBuffer();
-
-		SDL_LockSurface(currentBuf);
-
-		Palette* pal = spr->GetPalette();
-		SRShadow_Regular shadow;
-
-		// FIXME: our BAM blitters dont let us start at an arbitrary point in the source
-		// We will compensate by tricking them by manipulating the location and size of the blit
-		// then using dst as a clipping rect to achieve the effect of a partial src copy
-
-		int x = dst.x - src.x;
-		int y = dst.y - src.y;
-		int w = spr->Width;
-		int h = spr->Height;
-
-		if (pal->alpha) {
-			SRTinter_NoTint<true> tinter;
-			SRBlender_Alpha blender;
-
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
-								   currentBuf, srcdata, pal->col, x, y, w, h,
-								   (spr->renderFlags&BLIT_MIRRORY), dst,
-								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
-		} else {
-			SRTinter_NoTint<false> tinter;
-			SRBlender_NoAlpha blender;
-
-			BlitSpritePAL_dispatch(false, (spr->renderFlags&BLIT_MIRRORX),
-								   currentBuf, srcdata, pal->col, x, y, w, h,
-								   (spr->renderFlags&BLIT_MIRRORY), dst,
-								   (Uint8)spr->GetColorKey(), 0, spr, 0, shadow, tinter, blender);
-		}
-
-		pal->release();
-		SDL_UnlockSurface(currentBuf);
-		spr->UnlockSprite();
-	}
+	dst.x -= spr->XPos;
+	dst.y -= spr->YPos;
+	BlitSpriteClipped(spr, NULL, src, dst);
 }
 
-//cannot make const reference from tint, it is modified locally
 void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, const Region* clip)
 {
-	assert(spr);
-
-	if (!spr->BAM) {
-		SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
-		if (surf->format->BytesPerPixel != 4 && surf->format->BytesPerPixel != 1) {
-			// TODO...
-			Log(ERROR, "SDLVideo", "BlitGameSprite not supported for this sprite");
-			Video::BlitSprite(spr, x, y, clip);
-			return;
-		}
-	}
-
-	Palette* palette = spr->GetPalette();
-
-	// global tint is handled by the callers
-
-	// implicit flags:
-	const unsigned int blit_TINTALPHA =    0x40000000U;
-	const unsigned int blit_PALETTEALPHA = 0x80000000U;
-
-	// NB: blit_TINTALPHA isn't directly used or checked, but its presence
-	// affects the special case checks below
-	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
-
-	if (spr->BAM && palette->alpha) flags |= blit_PALETTEALPHA;
-
-	// flag combinations which are often used:
-	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
-
-	// most game sprites:
-	// covered, BLIT_TINTED
-	// covered, BLIT_TINTED | BLIT_TRANSSHADOW
-	// covered, BLIT_TINTED | BLIT_NOSHADOW
-
-	// area-animations?
-	// BLIT_TINTED
-
-	// (hopefully) most video overlays:
-	// BLIT_HALFTRANS
-	// covered, BLIT_HALFTRANS
-	// covered
-	// none
-
-	// other combinations use general case
-
-
-	const Uint8* srcdata = static_cast<const Uint8*>(spr->LockSprite());
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
-
-	Region finalclip = ClippedDrawingRect(Region(tx, ty, spr->Width, spr->Height), clip);
-	if (finalclip.w <= 0 || finalclip.h <= 0)
-		return;
-
+	Region srect(0, 0, spr->Width, spr->Height);
+	Region drect = (clip) ? *clip : Region(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
 	const Sprite2D* mask = (cover) ? cover->GetMask() : NULL;
-	SDL_Surface* currentBuf = CurrentRenderBuffer();
-	SDL_LockSurface(currentBuf);
-
-	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
-	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
-	if (flags & BLIT_MIRRORX) hflip = !hflip;
-	if (flags & BLIT_MIRRORY) vflip = !vflip;
-
-	// remove already handled flags and incompatible combinations
-	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
-	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
-	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
-
-	if (spr->BAM && remflags == BLIT_TINTED) {
-
-		SRShadow_Regular shadow;
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
-
-		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
-
-		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
-
-		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (spr->BAM && remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
-
-		SRShadow_None shadow;
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
-
-		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (spr->BAM && remflags == BLIT_HALFTRANS) {
-
-		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
-		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha blender;
-
-		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (spr->BAM && remflags == 0) {
-
-		SRShadow_Regular shadow;
-		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha blender;
-
-		BlitSpritePAL_dispatch(cover, hflip, currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (spr->BAM) {
-		// handling the following effects with conditionals:
-		// halftrans
-		// noshadow
-		// transshadow
-		// grey (TODO)
-		// sepia (TODO)
-		// glow (not yet)
-		// blended (not yet)
-		// vflip
-
-		// handling the following effects by repeated calls:
-		// palettealpha
-		// tinted
-		// covered
-		// hflip
-
-		if (!(remflags & BLIT_TINTED)) tint.a = 255;
-
-		SRShadow_Flags shadow; // for halftrans, noshadow, transshadow
-		SRBlender_Alpha blender;
-		if (remflags & blit_PALETTEALPHA) {
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<true> tinter(tint);
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-			} else {
-				SRTinter_FlagsNoTint<true> tinter;
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-			}
-		} else {
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<false> tinter(tint);
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-			} else {
-				SRTinter_FlagsNoTint<false> tinter;
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, srcdata, palette->col, tx, ty, spr->Width, spr->Height, vflip, finalclip, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-			}
-
-		}
-	} else {
-		// non-BAM Blitting
-
-		// handling the following effects with conditionals:
-		// halftrans
-		// grey
-		// sepia
-		// glow (not yet)
-		// blended (not yet)
-		// yflip
-
-		// handling the following effects by repeated inclusion:
-		// tinted
-		// covered
-		// xflip
-
-		// not handling the following effects at all:
-		// noshadow
-		// transshadow
-		// palettealpha
-
-//		print("Unoptimized blit: %04X", flags);
-
-		if (remflags & BLIT_HALFTRANS) {
-			// handle halftrans with 50% alpha tinting
-			if (!(remflags & BLIT_TINTED)) {
-				tint.r = tint.g = tint.b = tint.a = 255;
-				remflags |= BLIT_TINTED;
-			}
-			tint.a >>= 1;
-
-		}
-
-		Sprite2D* mask = (cover) ? mask : NULL;
-		const Color *col = 0;
-		const SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
-		if (surf->format->BytesPerPixel == 1) {
-
-			if (remflags & BLIT_TINTED)
-				tint.a = 255;
-
-			// NB: GemRB::Color has exactly the same layout as SDL_Color
-			if (!palette)
-				col = reinterpret_cast<const Color*>(surf->format->palette->colors);
-			else
-				col = palette->col;
-
-			const Uint8 *data = srcdata;
-
-			SRBlender_Alpha blender;
-			SRShadow_NOP shadow;
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<false> tinter(tint);
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, mask, spr, remflags, shadow, tinter, blender);
-			} else {
-				SRTinter_FlagsNoTint<false> tinter;
-
-				BlitSpritePAL_dispatch(cover, hflip,
-				    currentBuf, data, col, tx, ty, spr->Width, spr->Height, vflip, finalclip, -1, mask, spr, remflags, shadow, tinter, blender);
-			}
-
-		} else {
-
-			const Uint32 *data = (const Uint32*)srcdata;
-
-			SRBlender_Alpha blender;
-			if (remflags & BLIT_TINTED) {
-				SRTinter_Flags<true> tinter(tint);
-
-				BlitSpriteRGB_dispatch(cover, hflip,
-				    currentBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, mask, spr, remflags, tinter, blender);
-			} else {
-				SRTinter_FlagsNoTint<true> tinter;
-
-				BlitSpriteRGB_dispatch(cover, hflip,
-				    currentBuf, data, tx, ty, spr->Width, spr->Height, vflip, finalclip, mask, spr, remflags, tinter, blender);
-			}
-
-		}
-
-	}
-
-	if (palette)
-		palette->release();
-	SDL_UnlockSurface(currentBuf);
-
-	spr->UnlockSprite();
+	BlitSpriteClipped(spr, mask, srect, drect, flags, &tint);
 }
 
 // SetPixel is in screen coordinates
@@ -991,28 +620,36 @@ void SDLVideoDriver::SetFadePercent(int percent)
 	fadeColor.a = (255 * percent ) / 100;
 }
 
-void SDLVideoDriver::BlitSurfaceClipped(SDL_Surface* surf, const Region& src, const Region& dst)
+void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags, const Color* tint)
 {
-	SDL_Rect srect = RectFromRegion(src); // FIXME: this may not be clipped
+	// FIXME?: srect isn't verified
 	Region dclipped = ClippedDrawingRect(dst);
 	int trim = dst.h - dclipped.h;
 	if (trim) {
-		srect.h -= trim;
+		src.h -= trim;
 		if (dclipped.y > dst.y) { // top clipped
-			srect.y += trim;
+			src.y += trim;
 		} // already have appropriate y for bottom clip
 	}
 	trim = dst.w - dclipped.w;
 	if (trim) {
-		srect.w -= trim;
+		src.w -= trim;
 		if (dclipped.x > dst.x) { // left clipped
-			srect.x += trim;
+			src.x += trim;
 		}
 	} // already have appropriate y for right clip
 
-	SDL_Rect drect = RectFromRegion(dclipped);
-	// since we should already be clipped we can call SDL_LowerBlit directly
-	SDL_LowerBlit(surf, &srect, CurrentRenderBuffer(), &drect);
+	if (dclipped.Dimensions().IsEmpty() || src.Dimensions().IsEmpty()) {
+		return;
+	}
+
+	if (spr->BAM) {
+		BlitSpriteBAMClipped(spr, mask, src, dclipped, flags, tint);
+	} else {
+		SDL_Rect srect = RectFromRegion(src);
+		SDL_Rect drect = RectFromRegion(dclipped);
+		BlitSpriteNativeClipped(spr, mask, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+	}
 }
 
 // static class methods

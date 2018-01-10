@@ -62,6 +62,15 @@ private:
 	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
 	void DrawHLine(short x1, short y, short x2, const Color& color);
 	void DrawVLine(short x, short y1, short y2, const Color& color);
+
+	void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask,
+					   const Region& src, const Region& dst,
+					   unsigned int flags = 0, const Color* tint = NULL);
+	void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask,
+								 const SDL_Rect& src, const SDL_Rect& dst,
+								 unsigned int flags = 0, const SDL_Color* tint = NULL);
+
+	void BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SDL_Rect& drect);
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {
