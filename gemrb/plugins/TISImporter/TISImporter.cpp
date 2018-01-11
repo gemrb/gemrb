@@ -121,7 +121,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		Palette[i].r = Col[i].b;
 		Palette[i].g = Col[i].g;
 		Palette[i].b = Col[i].r;
-		Palette[i].a = Col[i].a;
+		Palette[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
 		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
 			if (transparent) {
 				Log(ERROR, "TISImporter", "Tile has two green (transparent) palette entries");
