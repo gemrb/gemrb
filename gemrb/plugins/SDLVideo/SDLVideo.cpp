@@ -262,7 +262,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 		return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
 	} else {
 		// an alpha only sprite. used by SpriteCover or as a mask passed to BlitTile
-		return new sprite_t(w, h, bpp, pixels, 0, 0, 0, 0xff);
+		return new sprite_t(w, h, 8, pixels, 0, 0, 0, 0xff);
 	}
 }
 
