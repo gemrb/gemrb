@@ -218,26 +218,16 @@ public:
 			// SDL_ConvertPixels doesn't support palettes... must do it ourselves
 			va_list args;
 			va_start(args, pitch);
+			Palette* pal = va_arg(args, Palette*);
+			va_end(args);
 
-			ieByte* pal = va_arg(args, ieByte*);
 			Uint32* dst = static_cast<Uint32*>(conversionBuffer);
 			SDL_PixelFormat* pxfmt = SDL_AllocFormat(nativeFormat);
 			bool hasalpha = SDL_ISPIXELFORMAT_ALPHA(nativeFormat);
 
-			Palette* palette = new Palette();
-			for (int i = 0; i < 256; i++) {
-				// FIXME: this should have been converted to a Palette in MVEPlayer
-				// currently this is useless for other uses
-				palette->col[i].r = ( *pal++ ) << 2;
-				palette->col[i].g = ( *pal++ ) << 2;
-				palette->col[i].b = ( *pal++ ) << 2;
-				palette->col[i].a = (hasalpha) ? SDL_ALPHA_OPAQUE : SDL_ALPHA_TRANSPARENT;
-			}
-			va_end(args);
-
 			const Uint8* src = static_cast<const Uint8*>(pixelBuf);
 			for (int xy = 0; xy < bufDest.w * bufDest.h; ++xy) {
-				const Color& c = palette->col[*src++];
+				const Color& c = pal->col[*src++];
 				*dst++ = (c.r << pxfmt->Rshift) | (c.g << pxfmt->Gshift) | (c.b << pxfmt->Bshift) | (c.a << pxfmt->Ashift);
 				if (hasalpha == false) {
 					dst = (Uint32*)((Uint8*)dst - 1);

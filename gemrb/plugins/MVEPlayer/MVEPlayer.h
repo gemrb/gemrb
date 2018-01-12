@@ -36,6 +36,7 @@ class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
 	MVEPlayer decoder;
 	VideoBuffer* vidBuf;
+	Palette* g_palette;
 
 private:
 	Video *video;

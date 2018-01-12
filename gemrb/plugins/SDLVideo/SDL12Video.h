@@ -122,15 +122,8 @@ public:
 			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
 			va_list args;
 			va_start(args, pitch);
-			ieByte* pal = va_arg(args, ieByte*);
-			for (int i = 0; i < 256; i++) {
-				// FIXME: this should have been converted to a Palette in MVEPlayer
-				// currently this is useless for other uses
-				sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-				sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-				sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-				sprite->format->palette->colors[i].unused = 0;
-			}
+			Palette* pal = va_arg(args, Palette*);
+			memcpy(sprite->format->palette->colors, pal->col, sprite->format->palette->ncolors * 4);
 			va_end(args);
 		}
 
