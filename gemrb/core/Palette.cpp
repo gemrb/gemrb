@@ -46,8 +46,9 @@ Palette::Palette(const Color &color, const Color &back)
 		( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
 		col[i].b = back.b +
 		( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
-		col[i].a = back.a +
-		( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
+		// FIXME: alpha value changed to opaque to fix these palettes on SDL 2
+		// I'm not sure if the previous implementation had a purpose, but historically the alpha is ignored in IE
+		col[i].a = 0xff;
 	}
 }
 
