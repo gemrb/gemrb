@@ -155,7 +155,24 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 	SDL_Texture* tex = texSprite->GetTexture(renderer);
 
-	int ret = UpdateRenderTarget();
+	if (mask) {
+		// FIXME: this is a massive performance hit (went from 120 -> 90)
+		// 2 things:
+		// 1. SDLTextureSprite2D could cache this (but how do we know when we don't need it to discard it?)
+		// 2. it seems like we frequently get passed useless masks by BlitGameSprite. can we fix that?
+
+		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
+		SDL_Texture* tmp = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, spr->Width, spr->Height);
+		SDL_SetRenderTarget(renderer, tmp);
+		SDL_SetTextureBlendMode(tmp, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(maskTex, SDL_BLENDMODE_BLEND);
+		SDL_RenderCopy(renderer, tex, NULL, NULL);
+		SDL_RenderCopy(renderer, maskTex, NULL, NULL);
+
+		tex = tmp;
+	}
+
+	UpdateRenderTarget();
 
 	// TODO: implement the mask/flags/tint
 	if (flags & BLIT_GREY) {
@@ -171,10 +188,15 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 
 	if (tint) {
-		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
+		//SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
 	}
 	
-	ret = SDL_RenderCopy(renderer, tex, &srect, &drect);
+	int ret = SDL_RenderCopy(renderer, tex, &srect, &drect);
+
+	if (mask) {
+		SDL_DestroyTexture(tex);
+	}
+
 	if (ret != 0) {
 		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
 	}
