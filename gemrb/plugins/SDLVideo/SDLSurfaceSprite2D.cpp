@@ -55,9 +55,21 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	: Sprite2D(obj)
 {
 	// SDL_ConvertSurface should copy colorkey/palette/pixels/surface RLE
-	surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
+	// FIXME: our software renderer assumes the pitch is the width*BPP
+	// since our sprite class has no Pitch member we have to manually copy the pixels from
+	// obj to our own pixel buffer so the pitch will be as expected
+	//surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
+	SDL_PixelFormat* fmt = obj.surface->format;
+	size_t numPx = obj.Width * obj.Height * fmt->BytesPerPixel;
+	pixels = malloc(numPx);
+	memcpy(pixels, obj.pixels, numPx);
+	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
+									   fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask );
+	memcpy(surface->format->palette->colors, obj.surface->format->palette->colors, surface->format->palette->ncolors);
+	freePixels = true;
 	pixels = surface->pixels;
 	palette = NULL;
+	SetColorKey(obj.GetColorKey());
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
