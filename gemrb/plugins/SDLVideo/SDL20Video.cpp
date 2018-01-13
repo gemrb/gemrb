@@ -164,6 +164,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
 		SDL_Texture* tmp = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, spr->Width, spr->Height);
 		SDL_SetRenderTarget(renderer, tmp);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
 		SDL_SetTextureBlendMode(tmp, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureBlendMode(maskTex, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopy(renderer, tex, NULL, NULL);
