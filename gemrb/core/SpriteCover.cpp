@@ -116,11 +116,11 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 
 				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
 				for (; pix < end; pix += 2)
-				*pix = 1;
+				*pix = 0xff;
 			} else {
 				// we hope memset is faster
 				// condition: lt < rt is true
-				memset (line+lt, 1, rt-lt);
+				memset (line+lt, 0xff, rt-lt);
 			}
 			line += mask->Width;
 		}

@@ -157,9 +157,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 
 	if (mask) {
 		// FIXME: this is a massive performance hit (went from 120 -> 90)
-		// 2 things:
-		// 1. SDLTextureSprite2D could cache this (but how do we know when we don't need it to discard it?)
-		// 2. it seems like we frequently get passed useless masks by BlitGameSprite. can we fix that?
+		// I think we can address this by implementing a screensize transparent texture to act as a global temporary surface
+		// we then "blit" this surface in SwapBuffers
+		// this assumes we wont need the intermediate result for anything
+		static SDL_BlendMode blender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
 		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
 		SDL_Texture* tmp = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, spr->Width, spr->Height);
@@ -167,7 +168,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 		SDL_SetTextureBlendMode(tmp, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureBlendMode(maskTex, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(maskTex, blender);
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopy(renderer, tex, NULL, NULL);
 		SDL_RenderCopy(renderer, maskTex, NULL, NULL);
 
