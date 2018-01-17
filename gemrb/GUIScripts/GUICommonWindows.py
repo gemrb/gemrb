@@ -646,12 +646,15 @@ def UpdateActionsWindow ():
 
 	Selected = GemRB.GetSelectedSize()
 
+	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		if GameCheck.IsBG1():
 			color = {'r' : 0, 'g' : 254, 'b' :0, 'a' : 255}
 			Button.SetBorder (0, color, 0, 0, Button.GetInsetFrame(6,6,4,4))
 
+		color = {'r' : 50, 'g' : 30, 'b' :10, 'a' : 120}
+		Button.SetBorder (1, color, 0, 1)
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 		Button.SetTooltip("")
