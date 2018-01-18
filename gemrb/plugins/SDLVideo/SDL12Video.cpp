@@ -647,7 +647,8 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 			SetSurfacePalette(rectsurf, &c, 1);
 			SetSurfaceAlpha(rectsurf, color.a);
 
-			SDL_Rect srect = {0, 0, rgn.w, rgn.h};
+			assert(rgn.w > 0 && rgn.h > 0);
+			SDL_Rect srect = {0, 0, (unsigned short)rgn.w, (unsigned short)rgn.h};
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			BlitSurfaceClipped(rectsurf, srect, drect);
 			SDL_FreeSurface( rectsurf );
