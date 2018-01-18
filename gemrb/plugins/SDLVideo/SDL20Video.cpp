@@ -123,6 +123,11 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 
 	SDL_RenderPresent( renderer );
+
+	it = buffers.begin();
+	for (; it != buffers.end(); ++it) {
+		static_cast<SDLTextureVideoBuffer*>(*it)->ClearMaskLayer();
+	}
 }
 
 SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
@@ -155,26 +160,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 	SDL_Texture* tex = texSprite->GetTexture(renderer);
 
-	if (mask) {
-		// FIXME: this is a massive performance hit (went from 120 -> 90)
-		// I think we can address this by implementing a screensize transparent texture to act as a global temporary surface
-		// we then "blit" this surface in SwapBuffers
-		// this assumes we wont need the intermediate result for anything
-		static SDL_BlendMode blender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-
-		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
-		SDL_Texture* tmp = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, spr->Width, spr->Height);
-		SDL_SetRenderTarget(renderer, tmp);
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-		SDL_SetTextureBlendMode(tmp, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureBlendMode(maskTex, blender);
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-		SDL_RenderCopy(renderer, tex, NULL, NULL);
-		SDL_RenderCopy(renderer, maskTex, NULL, NULL);
-
-		tex = tmp;
-	}
 
 	UpdateRenderTarget();
 
@@ -194,11 +179,25 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	if (tint) {
 		//SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
 	}
-	
-	int ret = SDL_RenderCopy(renderer, tex, &srect, &drect);
 
+	int ret = 0;
 	if (mask) {
-		SDL_DestroyTexture(tex);
+		// FIXME: this is a massive performance hit (went from 120 -> 90)
+		// I think we can address this by implementing a screensize transparent texture to act as a global temporary surface
+		// we then "blit" this surface in SwapBuffers
+		// this assumes we wont need the intermediate result for anything
+		static SDL_BlendMode blender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
+		SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
+		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
+		SDL_SetRenderTarget(renderer, maskLayer);
+		SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(maskTex, blender);
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+		SDL_RenderCopy(renderer, tex, &srect, &drect);
+		ret = SDL_RenderCopy(renderer, maskTex, &srect, &drect);
+	} else {
+		ret = SDL_RenderCopy(renderer, tex, &srect, &drect);
 	}
 
 	if (ret != 0) {

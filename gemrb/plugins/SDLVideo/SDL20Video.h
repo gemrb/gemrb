@@ -134,6 +134,7 @@ private:
 	
 class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Texture* texture;
+	SDL_Texture* maskLayer;
 	SDL_Renderer* renderer;
 
 	 // the format of the pixel data the client thinks we use, we may have to convert in CopyPixels()
@@ -157,6 +158,7 @@ public:
 	{
 		assert(texture);
 		assert(renderer);
+		maskLayer = NULL;
 
 		SDL_QueryTexture(texture, &nativeFormat, NULL, NULL, NULL);
 
@@ -171,6 +173,7 @@ public:
 	
 	~SDLTextureVideoBuffer() {
 		SDL_DestroyTexture(texture);
+		SDL_DestroyTexture(maskLayer);
 		operator delete(conversionBuffer);
 	}
 	
@@ -178,6 +181,16 @@ public:
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 		SDL_RenderClear(renderer);
+
+		ClearMaskLayer();
+	}
+
+	void ClearMaskLayer() {
+		if (maskLayer) {
+			SDL_SetRenderTarget(renderer, maskLayer);
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+			SDL_RenderClear(renderer);
+		}
 	}
 	
 	bool RenderOnDisplay(void* display) const {
@@ -185,6 +198,12 @@ public:
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		int ret = SDL_RenderCopy(renderer, texture, NULL, &dst);
+
+		if (maskLayer && ret == 0) {
+			SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
+			ret = SDL_RenderCopy(renderer, maskLayer, NULL, &dst);
+		}
+
 		if (ret != 0) {
 			Log(ERROR, "SDLVideo", "%s", SDL_GetError());
 		}
@@ -250,6 +269,12 @@ public:
 				Log(ERROR, "SDL20Video", "%s", SDL_GetError());
 			}
 		}
+	}
+
+	SDL_Texture* GetMaskLayer() {
+		if (maskLayer == NULL)
+			maskLayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+		return maskLayer;
 	}
 
 	SDL_Texture* GetTexture() const
