@@ -329,6 +329,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// some gestures would want to continue while some would want to end/abort
 	// currently finger up clears the gesture and finger down does not
 	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
+	Event e;
 	switch (event.type) {
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
@@ -428,11 +429,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			 TODO: need a preference for inverting these
 			 sdl 2.0.4 autodetects (SDL_MOUSEWHEEL_FLIPPED in SDL_MouseWheelEvent)
 			 */
-			/*short scrollX;
-			scrollX= event.wheel.x * -1;
-			short scrollY;
-			scrollY= event.wheel.y * -1;*/
-			//EvntManager->MouseWheelScroll( scrollX, scrollY );
+			e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x, event.wheel.y));
+			EvntManager->DispatchEvent(e);
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
