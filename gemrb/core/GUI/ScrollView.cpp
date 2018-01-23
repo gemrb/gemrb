@@ -180,10 +180,10 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 	const Point& origin = contentView.Origin();
 	
 	if (sb == hscroll) {
-		Point p(-sb->GetValue(), origin.y);
+		Point p(-short(sb->GetValue()), origin.y);
 		ScrollTo(p);
 	} else if (sb == vscroll) {
-		Point p(origin.x, -sb->GetValue());
+		Point p(origin.x, -short(sb->GetValue()));
 		ScrollTo(p);
 	} else {
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");

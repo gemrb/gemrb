@@ -73,38 +73,35 @@ int ScrollBar::GetFrameHeight(int frame) const
 void ScrollBar::ScrollDelta(const Point& delta)
 {
 	Point p = Point(-delta.x, -delta.y);
-	short* xy = (State&SLIDER_HORIZONTAL) ? &p.x : &p.y;
-	if (*xy == 0) return;
+	short xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
+	if (xy == 0) return;
 
-	ieDword oldval = GetValue();
-	*xy += GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
-	ScrollTo(p + AxisPosFromValue());
-	if (oldval == GetValue()) {
-		// just in case delta wasn't enough to move us. we want to force one in that case.
-		ScrollBySteps((delta.y) < 0 ? 1 : -1);
+	if (p.y > 0) {
+		// flip the reference point to the bottom of the slider
+		p.y += GetFrameHeight(IMAGE_SLIDER);
 	}
+	ScrollTo(p + AxisPosFromValue());
+	return;
 }
 
 // FIXME: horizontal broken
 void ScrollBar::ScrollTo(const Point& p)
 {
-	int y = p.y - GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
-
 	int pxRange = SliderPxRange();
-	float percent = Clamp<float>(y, 0, pxRange) / pxRange;
+	double percent = Clamp<double>(p.y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
-	ieDword newPos = (round(percent * (range.second - range.first)) + range.first);
+	ieDword newPos = round(double((percent * (range.second - range.first)) + range.first));
 	SetValue(newPos);
 }
 
 Point ScrollBar::AxisPosFromValue() const
 {
 	const ValueRange& range = GetValueRange();
-	if (range.second == range.first) return Point();
+	if (range.second <= range.first) return Point();
 	
 	Point p;
-	short xy = (SliderPxRange() / double(range.second - range.first)) * GetValue();
+	short xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
 	if (State&SLIDER_HORIZONTAL) {
 		p.x = xy;
 	} else {
@@ -212,6 +209,14 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		Frames[IMAGE_SLIDER]->YPos = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
 		return true;
 	}
+	// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
+	int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+	if (State&SLIDER_HORIZONTAL) {
+		p.x -= offset;
+	} else {
+		p.y -= offset;
+	}
+
 	ScrollTo(p);
 	return true;
 }
@@ -240,8 +245,15 @@ bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		Point offset(Frames[IMAGE_SLIDER]->XPos, Frames[IMAGE_SLIDER]->YPos);
-		ScrollTo(p - offset);
+		Point slideroffset(Frames[IMAGE_SLIDER]->XPos, Frames[IMAGE_SLIDER]->YPos);
+		// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
+		int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
+		if (State&SLIDER_HORIZONTAL) {
+			p.x -= offset;
+		} else {
+			p.y -= offset;
+		}
+		ScrollTo(p - slideroffset);
 	}
 	return true;
 }
