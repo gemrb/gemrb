@@ -34,6 +34,7 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 
 	GenderWindow = GemRB.LoadWindow(1, "GUICG")
+	GenderWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	CharGenCommon.PositionCharGenWin(GenderWindow)
 
 	BackButton = GenderWindow.GetControl(6)
