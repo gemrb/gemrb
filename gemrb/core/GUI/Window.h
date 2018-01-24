@@ -115,6 +115,7 @@ public:
 	
 	bool InHandler() const;
 	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }
+	bool HitTest(const Point& p) const;
 
 private: // Private attributes
 	std::set<Control*> Controls;
