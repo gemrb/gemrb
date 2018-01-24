@@ -61,7 +61,7 @@ def OnLoad():
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 
 	TextAreaControl = RaceWindow.GetControl(12)
 	TextAreaControl.SetText(17237)
@@ -74,7 +74,7 @@ def OnLoad():
 def RacePress():
 	Race = GemRB.GetVar("Race")
 	TextAreaControl.SetText(CommonTables.Races.GetValue(Race,1) )
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():

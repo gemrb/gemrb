@@ -28,10 +28,7 @@ MyChar = 0
 
 def RedrawSkills():
 	ProfsPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
-	if not ProfsPointsLeft:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(ProfsPointsLeft > 0)
 	return
 
 def OnLoad():

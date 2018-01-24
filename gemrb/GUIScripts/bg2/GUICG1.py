@@ -59,18 +59,18 @@ def OnLoad():
 	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 	GenderWindow.Focus()
 	return
 
 def ClickedMale():
 	TextAreaControl.SetText(13083)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def ClickedFemale():
 	TextAreaControl.SetText(13084)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():

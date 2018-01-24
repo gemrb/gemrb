@@ -70,14 +70,14 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 	AlignmentWindow.Focus()
 	return
 
 def AlignmentPress():
 	Alignment = GemRB.GetVar("Alignment")
 	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	GemRB.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment, 3))
 	return
 

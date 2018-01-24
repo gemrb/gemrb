@@ -264,7 +264,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Palette* ppoi = normal_palette;
 		int align = 0;
 
-		if (State == IE_GUI_BUTTON_DISABLED)
+		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled())
 			ppoi = disabled_palette;
 		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label

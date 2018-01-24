@@ -101,10 +101,10 @@ def OnLoad():
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	if ClassName == "":
 		TextAreaControl.SetText(17242)
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetDisabled(True)
 	else:
 		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetDisabled(False)
 
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
