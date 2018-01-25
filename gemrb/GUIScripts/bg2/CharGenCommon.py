@@ -325,10 +325,6 @@ def CancelPress():
 def ImportPress():
 	"""Opens the character import window."""
 
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
-
 	step = GemRB.GetVar ("Step")
 	# TODO: check why this is handled differently
 	if step == 1:

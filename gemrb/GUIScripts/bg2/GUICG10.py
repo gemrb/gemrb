@@ -18,6 +18,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
+import CharGenCommon
 import GUICommon
 import CommonTables
 from ie_stats import *
@@ -35,6 +36,7 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, MyChar, ButtonCount, MCRowIndices
 	
 	ClassWindow = GemRB.LoadWindow(10, "GUICG")
+	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	ClassCount = CommonTables.Classes.GetRowCount()+1
@@ -77,7 +79,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 	RedrawMCs()
 	ClassWindow.Focus()
 	return
@@ -86,7 +88,7 @@ def ClassPress():
 	GUICG2.SetClass()
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():

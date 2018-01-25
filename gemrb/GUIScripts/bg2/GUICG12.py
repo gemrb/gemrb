@@ -160,10 +160,10 @@ def LargeCustomPortrait():
 	Button = Window.GetControl (6)
 	if Portrait=="":
 		Portrait = "NOPORTMD"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetDisabled (True)
 	else:
 		if PortraitList2.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled (False)
 
 	Button = Window.GetControl (0)
 	Button.SetPicture (Portrait, "NOPORTMD")
@@ -183,10 +183,10 @@ def SmallCustomPortrait():
 	Button = Window.GetControl (6)
 	if Portrait=="":
 		Portrait = "NOPORTSM"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetDisabled (True)
 	else:
 		if PortraitList1.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled (False)
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (Portrait, "NOPORTSM")
@@ -211,7 +211,7 @@ def CustomPress():
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetDisabled (True)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)

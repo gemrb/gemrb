@@ -33,8 +33,7 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 
 	ClassWindow = GemRB.LoadWindow(10, "GUICG")
-
-	GUICommon.CloseOtherWindow (ClassWindow.Unload)
+	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )

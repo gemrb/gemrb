@@ -19,6 +19,7 @@
 #character generation, sounds (GUICG19)
 from ie_restype import *
 import GemRB
+import CharGenCommon
 
 VoiceList = 0
 CharSoundWindow = 0
@@ -33,6 +34,7 @@ def OnLoad():
 	global CharSoundWindow, VoiceList
 	
 	CharSoundWindow=GemRB.LoadWindow(19, "GUICG")
+	CharGenCommon.PositionCharGenWin(CharSoundWindow)
 
 	VoiceList = CharSoundWindow.GetControl (45)
 	VoiceList.ListResources(CHR_SOUNDS)
