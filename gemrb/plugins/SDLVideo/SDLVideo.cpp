@@ -325,13 +325,13 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 // SetPixel is in screen coordinates
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SetPixel(buffer, _x, _y) { \
-Region r = buffer->Rect(); \
-Point p(_x - r.x, _y - r.x); \
+Region r = Region(Point(0,0), buffer->Size()); \
+Point p(_x, _y); \
 if (r.PointInside(p)) { SDL_Point p2 = {p.x,p.y}; points.push_back(p2); } }
 #else
 #define SetPixel(buffer, _x, _y) { \
-Region r = buffer->Rect(); \
-Point p(_x - r.x, _y - r.x); \
+Region r = Region(Point(0,0), buffer->Size()); \
+Point p(_x, _y); \
 if (r.PointInside(p)) { points.push_back(p); } }
 #endif
 
