@@ -361,7 +361,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 
 	PTYPE *line, *end, *pix;
-	Uint8 *coverline, *coverpix;
+	Uint8 *coverline, *coverpix = NULL;
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
@@ -444,7 +444,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 							coverpix -= count;
 					}
 				} else {
-					if (!COVER || !*coverpix) {
+					if (!COVER || *coverpix < 0xff) {
 						int extra_alpha = 0;
 						if (!shadow(*pix, p, extra_alpha, flags)) {
 							Uint8 r = col[p].r;
@@ -452,6 +452,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 							Uint8 b = col[p].b;
 							Uint8 a = col[p].a;
 							tint(r, g, b, a, flags);
+							a = (coverpix) ? a - *coverpix : a;
 							blend(*pix, r, g, b, a >> extra_alpha);
 							*pix |= amask; // color keyed surface is 100% opaque
 						}

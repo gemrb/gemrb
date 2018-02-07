@@ -207,12 +207,13 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
+	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
 	if (remflags == BLIT_TINTED) {
 
 		SRShadow_Regular shadow;
 		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
+		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
 
@@ -220,7 +221,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 
 		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
 		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
+		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
 
@@ -228,7 +229,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 
 		SRShadow_None shadow;
 		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_NoAlpha blender;
+		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
 
@@ -236,7 +237,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 
 		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
 		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha blender;
+		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
 
@@ -244,7 +245,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 
 		SRShadow_Regular shadow;
 		SRTinter_NoTint<false> tinter;
-		SRBlender_NoAlpha blender;
+		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
 
