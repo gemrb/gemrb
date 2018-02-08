@@ -217,10 +217,8 @@ public:
 	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Flips sprite vertically, returns new sprite */
-	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
-	/** Flips sprite horizontally, returns new sprite */
-	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
+	/** Flips sprite, returns new sprite */
+	Sprite2D *MirrorSprite(const Sprite2D *sprite, unsigned int flags, bool MirrorAnchor);
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 

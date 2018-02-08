@@ -1050,52 +1050,52 @@ int Interface::LoadSprites()
 	FogSprites[2] = anim->GetFrame( 1, 0 );
 	FogSprites[3] = anim->GetFrame( 2, 0 );
 
-	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
+	FogSprites[4] = video->MirrorSprite( FogSprites[1], BLIT_MIRRORY, false );
 
+	assert(FogSprites[4]->renderFlags&BLIT_MIRRORY);
 	FogSprites[5] = NULL;
 
-	FogSprites[6] = video->MirrorSpriteVertical( FogSprites[3], false );
+	FogSprites[6] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORY, false );
 
 	FogSprites[7] = NULL;
 
-	FogSprites[8] = video->MirrorSpriteHorizontal( FogSprites[2], false );
-
-	FogSprites[9] = video->MirrorSpriteHorizontal( FogSprites[3], false );
+	FogSprites[8] = video->MirrorSprite( FogSprites[2], BLIT_MIRRORX, false );
+	assert(FogSprites[8]->renderFlags&BLIT_MIRRORX);
+	FogSprites[9] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORX, false );
 
 	FogSprites[10] = NULL;
 	FogSprites[11] = NULL;
 
-	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
+	FogSprites[12] = video->MirrorSprite( FogSprites[6], BLIT_MIRRORX, false );
+	assert(FogSprites[12]->renderFlags&BLIT_MIRRORX);
 
 	FogSprites[16] = anim->GetFrame( 3, 0 );
 	FogSprites[17] = anim->GetFrame( 4, 0 );
 	FogSprites[18] = anim->GetFrame( 5, 0 );
 	FogSprites[19] = anim->GetFrame( 6, 0 );
 
-	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
+	FogSprites[20] = video->MirrorSprite( FogSprites[17], BLIT_MIRRORY, false );
+	assert(FogSprites[20]->renderFlags&BLIT_MIRRORY);
 
 	FogSprites[21] = NULL;
 
 	FogSprites[23] = NULL;
 
-	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
+	FogSprites[24] = video->MirrorSprite( FogSprites[18], BLIT_MIRRORX, false );
+	assert(FogSprites[24]->renderFlags&BLIT_MIRRORX);
 
 	FogSprites[25] = anim->GetFrame( 7, 0 );
 
-	{
-		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
-		FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		Sprite2D::FreeSprite( tmpsprite );
-	}
+	FogSprites[22] = video->MirrorSprite( FogSprites[25], BLIT_MIRRORX|BLIT_MIRRORY, false );
+	assert(FogSprites[22]->renderFlags&BLIT_MIRRORX);
+	assert(FogSprites[22]->renderFlags&BLIT_MIRRORY);
 
 	FogSprites[26] = NULL;
 	FogSprites[27] = NULL;
 
-	{
-		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
-		FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		Sprite2D::FreeSprite( tmpsprite );
-	}
+	FogSprites[28] = video->MirrorSprite( FogSprites[19], BLIT_MIRRORX|BLIT_MIRRORY, false );
+	assert(FogSprites[28]->renderFlags&BLIT_MIRRORX);
+	assert(FogSprites[28]->renderFlags&BLIT_MIRRORY);
 
 	i = 0;
 	vars->Lookup("3D Acceleration", i);

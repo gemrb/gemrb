@@ -169,85 +169,27 @@ void Video::SetEventMgr(EventMgr* evnt)
 	EvntManager = evnt;
 }
 
-// Flips given sprite vertically (up-down). If MirrorAnchor=true,
-// flips its anchor (i.e. origin//base point) as well
+// Flips given sprite according to the flags. If MirrorAnchor=true,
+// flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
+Sprite2D* Video::MirrorSprite(const Sprite2D* sprite, unsigned int flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
 
 	Sprite2D* dest = sprite->copy();
 
-	const void* src = sprite->LockSprite();
-	void* buffer = dest->LockSprite();
-
-	if (src != buffer) {
-		assert(!sprite->BAM);
-		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
-		for (int x = 0; x < dest->Width; x++) {
-			unsigned char * dst = ( unsigned char * )buffer  + x;
-			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
-			for (int y = 0; y < dest->Height / 2; y++) {
-				unsigned char swp = *dst;
-				*dst = *src;
-				*src = swp;
-				dst += dest->Width;
-				src -= dest->Width;
-			}
-		}
-	} else {
-		// if the pixel buffers are the same then either there are no pixels (NULL)
-		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= BLIT_MIRRORY;
-	}
-
-	sprite->UnlockSprite();
-	dest->UnlockSprite();
-
-	if (MirrorAnchor)
-		dest->YPos = sprite->Height - sprite->YPos;
-
-	return dest;
-}
-
-// Flips given sprite horizontally (left-right). If MirrorAnchor=true,
-//   flips its anchor (i.e. origin//base point) as well
-Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAnchor)
-{
-	if (!sprite)
-		return NULL;
-
-	Sprite2D* dest = sprite->copy();
-
-	const void* src = sprite->LockSprite();
-	void* buffer = dest->LockSprite();
-
-	if (src != buffer) {
-		assert(!sprite->BAM);
-		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
-		for (int y = 0; y < dest->Height; y++) {
-			unsigned char * dst = (unsigned char *) buffer + ( y * dest->Width );
-			unsigned char * src = dst + dest->Width - 1;
-			for (int x = 0; x < dest->Width / 2; x++) {
-				unsigned char swp=*dst;
-				*dst++ = *src;
-				*src-- = swp;
-			}
-		}
-	} else {
-		// if the pixel buffers are the same then either there are no pixels (NULL)
-		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		// toggle the bit because it could be a mirror of a mirror
+	if (flags&BLIT_MIRRORX) {
 		dest->renderFlags ^= BLIT_MIRRORX;
+		if (MirrorAnchor)
+			dest->XPos = sprite->Width - sprite->XPos;
 	}
 
-	sprite->UnlockSprite();
-	dest->UnlockSprite();
-
-	if (MirrorAnchor)
-		dest->XPos = sprite->Width - sprite->XPos;
+	if (flags&BLIT_MIRRORY) {
+		dest->renderFlags ^= BLIT_MIRRORY;
+		if (MirrorAnchor)
+			dest->YPos = sprite->Height - sprite->YPos;
+	}
 
 	return dest;
 }

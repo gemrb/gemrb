@@ -218,8 +218,8 @@ void Animation::MirrorAnimation()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		Sprite2D * tmp = frames[i];
-		frames[i] = video->MirrorSpriteHorizontal( tmp, true );
+		Sprite2D* tmp = frames[i];
+		frames[i] = video->MirrorSprite( tmp, BLIT_MIRRORX, true );
 		tmp->release();
 	}
 
@@ -232,8 +232,8 @@ void Animation::MirrorAnimationVert()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		Sprite2D * tmp = frames[i];
-		frames[i] = video->MirrorSpriteVertical( tmp, true );
+		Sprite2D* tmp = frames[i];
+		frames[i] = video->MirrorSprite( tmp, BLIT_MIRRORY, true );
 		tmp->release();
 	}
 

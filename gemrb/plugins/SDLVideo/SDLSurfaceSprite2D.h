@@ -21,6 +21,7 @@
 #ifndef SDLSURFACESPRITE2D_H
 #define SDLSURFACESPRITE2D_H
 
+#include "Holder.h"
 #include "Sprite2D.h"
 
 #include <SDL.h>
@@ -29,8 +30,20 @@ namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
 private:
-	SDL_Surface* surface;
-	mutable Palette* palette; // simpley a cache for comparing against calls to SetPalette for performance reasons.
+	struct SurfaceHolder : public Held<SurfaceHolder>
+	{
+		SDL_Surface* surface;
+
+		SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
+		~SurfaceHolder() { SDL_FreeSurface(surface); }
+
+		SDL_Surface* operator->() { return surface; }
+
+		operator SDL_Surface* () { return surface; }
+	};
+
+	Holder<SurfaceHolder> surface;
+	mutable Palette* palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
@@ -39,7 +52,6 @@ public:
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
 	SDLSurfaceSprite2D* copy() const;
-	~SDLSurfaceSprite2D();
 
 	const void* LockSprite() const;
 	void* LockSprite();
@@ -56,7 +68,7 @@ public:
 	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 						 ieDword bmask, ieDword amask);
 
-	SDL_Surface* GetSurface() const { return surface; };
+	SDL_Surface* GetSurface() const { return *surface; };
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
