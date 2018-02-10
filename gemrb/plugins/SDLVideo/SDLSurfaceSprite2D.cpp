@@ -135,9 +135,13 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 		palette = NULL;
 	}
 
+	ieDword ck = GetColorKey();
 	if (pal && SetPalette(pal->col) == 0) {
 		palette = pal;
 		palette->acquire();
+
+		// must reset the color key or SDL 2 wont render properly
+		SetColorKey(ck);
 	}
 }
 
