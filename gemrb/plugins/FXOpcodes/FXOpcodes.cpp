@@ -7466,7 +7466,7 @@ int fx_set_concealment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x200 - can't be flanked (sneak attacked) unless the assailant is 4+ levels higher
 int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	print("fx_uncanny_dodge(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+//	print("fx_uncanny_dodge(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword mask = 0xff;
 	ieDword stat = target->GetSafeStat(IE_UNCANNY_DODGE);
 	ieDword high = stat >> 8; // the "bitsy" part
