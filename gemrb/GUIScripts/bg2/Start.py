@@ -54,7 +54,7 @@ def OnLoad():
 	ToBButton.SetText(73248)
 	ExitButton = StartWindow.GetControl(4)
 	ExitButton.SetText(13731)
-	ExitButton.MakeDefault()
+	ExitButton.MakeEscape()
 	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoAPress)
 	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ToBPress)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
