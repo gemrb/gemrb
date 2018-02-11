@@ -1243,9 +1243,9 @@ def OpenLevelUpWindow ():
 
 		# disable monks/paladins due to order restrictions?
 		specflag = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
-		if specflag&8 and i == 7: # SPECF_MONKOFF
+		if specflag&SPECF_MONKOFF and i == 7:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-		elif specflag&4 and i == 8: # SPECF_PALADINOFF
+		elif specflag&SPECF_PALADINOFF and i == 8:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
