@@ -33,8 +33,9 @@ private:
 	struct SurfaceHolder : public Held<SurfaceHolder>
 	{
 		SDL_Surface* surface;
+		Palette* palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
-		SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
+		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
 		~SurfaceHolder() { SDL_FreeSurface(surface); }
 
 		SDL_Surface* operator->() { return surface; }
@@ -42,8 +43,7 @@ private:
 		operator SDL_Surface* () { return surface; }
 	};
 
-	Holder<SurfaceHolder> surface;
-	mutable Palette* palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
+	mutable Holder<SurfaceHolder> surface;
 
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
@@ -76,23 +76,36 @@ public:
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
-	mutable SDL_Texture* texture;
-	mutable bool dirty;
+	struct TextureHolder : public Held<TextureHolder>
+	{
+		SDL_Texture* texture;
+		bool dirty;
+		unsigned int texVersion;
+
+		TextureHolder(SDL_Texture* tex) : texture(tex), dirty(false), texVersion(0) {}
+		~TextureHolder() { SDL_DestroyTexture(texture); }
+
+		SDL_Texture* operator->() { return texture; }
+
+		operator SDL_Texture* () { return texture; }
+	};
+
+	mutable Holder<TextureHolder> texture;
 
 public:
 	SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLTextureSprite2D(int Width, int Height, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLTextureSprite2D(const SDLSurfaceSprite2D &obj);
+	SDLTextureSprite2D(const SDLTextureSprite2D& obj);
 	SDLTextureSprite2D* copy() const;
-	~SDLTextureSprite2D();
 
 	using SDLSurfaceSprite2D::SetPalette;
 	void SetPalette(Palette *pal);
 	void SetColorKey(ieDword pxvalue);
 
-	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
+	SDL_Texture* GetTexture(SDL_Renderer* renderer, unsigned int version) const;
+	unsigned int GetVersion() const { return (texture) ? texture->texVersion : 0; }
 };
 #endif
 

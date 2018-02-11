@@ -36,7 +36,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Width, Height, Bpp < 8 ? 8 : Bpp, rmask, gmask, bmask, amask));
 		SDL_FillRect(*surface, NULL, 0);
 	}
-	palette = NULL;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
@@ -46,7 +45,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
 	surface = new SurfaceHolder(SDL_CreateRGBSurface( Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask ));
 	SDL_FillRect(*surface, NULL, 0);
-	palette = NULL;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -74,7 +72,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 
 	// all copies now share underlying. AFIK we don't have actual need for modifying pixels,
 	// but just in case something comes up the code above can be used in a pinch
-	palette = NULL;
+
 	surface = obj.surface;
 }
 
@@ -103,6 +101,7 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 /** Get the Palette of a Sprite */
 Palette* SDLSurfaceSprite2D::GetPalette() const
 {
+	Palette* palette = surface->palette;
 	if (palette == NULL) {
 		SDL_PixelFormat* fmt = (*surface)->format;
 		if (fmt->BytesPerPixel != 1) {
@@ -113,6 +112,7 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 		memcpy(palette->col, fmt->palette->colors, fmt->palette->ncolors * 4);
 	}
 	palette->acquire();
+	surface->palette = palette;
 	return palette;
 }
 
@@ -127,6 +127,7 @@ const Color* SDLSurfaceSprite2D::GetPaletteColors() const
 
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
+	Palette* palette = surface->palette;
 	if (pal == palette)
 		return;
 
@@ -143,6 +144,7 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 		// must reset the color key or SDL 2 wont render properly
 		SetColorKey(ck);
 	}
+	surface->palette = palette;
 }
 
 int SDLSurfaceSprite2D::SetPalette(const Color* pal)
@@ -239,7 +241,6 @@ SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp, void* pix
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
 : SDLSurfaceSprite2D(Width, Height, Bpp, pixels, rmask, gmask, bmask, amask)
 {
-	dirty = true;
 	texture = NULL;
 }
 
@@ -247,15 +248,13 @@ SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
 : SDLSurfaceSprite2D(Width, Height, Bpp, rmask, gmask, bmask, amask)
 {
-	dirty = true;
 	texture = NULL;
 }
 
-SDLTextureSprite2D::SDLTextureSprite2D(const SDLSurfaceSprite2D &obj)
+SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& obj)
 : SDLSurfaceSprite2D(obj)
 {
-	dirty = true;
-	texture = NULL;
+	texture = obj.texture;
 }
 
 SDLTextureSprite2D* SDLTextureSprite2D::copy() const
@@ -263,20 +262,13 @@ SDLTextureSprite2D* SDLTextureSprite2D::copy() const
 	return new SDLTextureSprite2D(*this);
 }
 
-SDLTextureSprite2D::~SDLTextureSprite2D()
+SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer, unsigned int version) const
 {
-	SDL_DestroyTexture(texture);
-}
-
-SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
-{
-	if (dirty) {
-		SDL_DestroyTexture(texture);
-		texture = SDL_CreateTextureFromSurface(renderer, GetSurface());
-		assert(texture);
-		dirty = false;
+	if (texture == NULL || texture->dirty || texture->texVersion != version) {
+		texture = new TextureHolder(SDL_CreateTextureFromSurface(renderer, GetSurface()));
+		texture->texVersion = version;
 	}
-	return texture;
+	return *texture;
 }
 
 void SDLTextureSprite2D::SetPalette(Palette *pal)
@@ -284,13 +276,13 @@ void SDLTextureSprite2D::SetPalette(Palette *pal)
 	if (pal == GetPalette())
 		return;
 
-	dirty = true;
+	if (texture) texture->dirty = true;
 	SDLSurfaceSprite2D::SetPalette(pal);
 }
 
 void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 {
-	dirty = true;
+	if (texture) texture->dirty = true;
 	SDLSurfaceSprite2D::SetColorKey(pxvalue);
 }
 #endif
