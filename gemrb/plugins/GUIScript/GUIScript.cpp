@@ -2999,7 +2999,7 @@ PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
 
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
-	char hotkey;
+	unsigned char hotkey;
 	unsigned int mods;
 	int global = false;
 	PARSE_ARGS4(args, "Oc|Ki", &self, &hotkey, &mods, &global);
