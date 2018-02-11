@@ -455,15 +455,15 @@ BlitTile_internal<Uint16>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.
 		if (remflags & BLIT_TINTED)
 			c.a = 255;
 
-		const Uint8 *data = (const Uint8*)spr->LockSprite();
-
 		SRBlender_Alpha blender;
 		SRShadow_NOP shadow;
 		if (remflags & BLIT_TINTED) {
+			const Uint8 *data = (const Uint8*)spr->LockSprite();
 			SRTinter_Flags<false> tinter(c);
 
 			BlitSpritePAL_dispatch(mask, hflip,
 								   currentBuf, data, pal, x, y, w, h, vflip, finalclip, -1, mask, spr, remflags, shadow, tinter, blender);
+			spr->UnlockSprite();
 		} else {
 			// no blending/tinting
 			SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
@@ -473,15 +473,14 @@ BlitTile_internal<Uint16>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.
 		}
 
 	} else {
-
-		const Uint32 *data = (const Uint32*)spr->LockSprite();
-
 		SRBlender_Alpha blender;
 		if (remflags & BLIT_TINTED) {
+			const Uint32 *data = (const Uint32*)spr->LockSprite();
 			SRTinter_Flags<true> tinter(c);
 
 			BlitSpriteRGB_dispatch(mask, hflip,
 								   currentBuf, data, x, y, w, h, vflip, finalclip, mask, spr, remflags, tinter, blender);
+			spr->UnlockSprite();
 		} else {
 			// no blending/tinting
 			SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
@@ -491,8 +490,6 @@ BlitTile_internal<Uint16>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.
 		}
 
 	}
-
-	spr->UnlockSprite();
 }
 
 void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color)
