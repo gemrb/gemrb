@@ -261,11 +261,20 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 	}
 }
 
-Sprite2D* SDL20VideoDriver::GetScreenshot( Region /*r*/ )
+Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 {
-	// TODO: implement this
-	//SDL_RenderReadPixels(renderer, <#const SDL_Rect *rect#>, <#Uint32 format#>, <#void *pixels#>, <#int pitch#>)
-	return NULL;
+	SDL_Rect rect = RectFromRegion(r);
+
+	unsigned int Width = r.w ? r.w : screenSize.w;
+	unsigned int Height = r.h ? r.h : screenSize.h;
+
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Width, Height, 24,
+															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+
+	SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_RGB24, screenshot->LockSprite(), Width);
+	screenshot->UnlockSprite();
+
+	return screenshot;
 }
 
 void SDL20VideoDriver::ClearFirstTouch()
