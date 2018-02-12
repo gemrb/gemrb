@@ -29,7 +29,7 @@
 namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
-private:
+protected:
 	struct SurfaceHolder : public Held<SurfaceHolder>
 	{
 		SDL_Surface* surface;
@@ -79,10 +79,9 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	struct TextureHolder : public Held<TextureHolder>
 	{
 		SDL_Texture* texture;
-		bool dirty;
-		unsigned int texVersion;
+		unsigned int version;
 
-		TextureHolder(SDL_Texture* tex) : texture(tex), dirty(false), texVersion(0) {}
+		TextureHolder(SDL_Texture* tex) : texture(tex), version(0) {}
 		~TextureHolder() { SDL_DestroyTexture(texture); }
 
 		SDL_Texture* operator->() { return texture; }
@@ -90,6 +89,8 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 		operator SDL_Texture* () { return texture; }
 	};
 
+	mutable unsigned int texVersion;
+	Holder<SurfaceHolder> original;
 	mutable Holder<TextureHolder> texture;
 
 public:
@@ -104,8 +105,10 @@ public:
 	void SetPalette(Palette *pal);
 	void SetColorKey(ieDword pxvalue);
 
-	SDL_Texture* GetTexture(SDL_Renderer* renderer, unsigned int version) const;
-	unsigned int GetVersion() const { return (texture) ? texture->texVersion : 0; }
+	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
+
+	SDL_Surface* NewVersion(unsigned int version) const;
+	unsigned int GetVersion() const { return texVersion; }
 };
 #endif
 

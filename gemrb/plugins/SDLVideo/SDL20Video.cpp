@@ -157,37 +157,42 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
+	UpdateRenderTarget();
+
 	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	unsigned int version = (BLIT_GREY|BLIT_SEPIA) & flags;
 
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 	unsigned int currentVer = texSprite->GetVersion();
-	SDL_Texture* tex = texSprite->GetTexture(renderer, version);
+	SDL_Texture* tex = NULL;
 
-	UpdateRenderTarget();
+	if (currentVer == version) {
+		tex = texSprite->GetTexture(renderer);
+	}
 
-	// TODO: handle "shadow". I'm not even sure when "shadow" is used.
+	// TODO: handle "shadow" (BLIT_NOSHADOW|BLIT_TRANSSHADOW). I'm not even sure when "shadow" is used.
 	// regular lightmap shadows are actually handled via tinting
 	// its part of blending, not tinting, so maybe we could handle them with the SpriteCover
 	// and simplify things at the same time (now that SpriteCover supports full alpha)
 
-	if (tint && flags&BLIT_TINTED) {
-		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
-		//SDL_SetTextureAlphaMod(tex, tint->a);
-	} else if (currentVer != version) {
+	if (currentVer != version) {
 		// WARNING: software fallback == slow
-		Uint32 fmt;
-		SDL_QueryTexture(tex, &fmt, NULL, NULL, NULL);
-		SDL_Surface* tmp = SDL_ConvertSurfaceFormat(texSprite->GetSurface(), fmt, 0);
-		SDL_LockSurface(tmp);
-		if (flags & BLIT_GREY) {
 
+		// TODO: this is still an extra blit
+		// making a new surface and tinting pixels while we manually copy them would be cheaper
+		SDL_Surface* newV = texSprite->NewVersion(version);
+		SDL_LockSurface(newV);
+		if (flags & BLIT_GREY) {
+			
 		} else if (flags & BLIT_SEPIA) {
 
 		}
-		SDL_UpdateTexture(tex, NULL, tmp->pixels, tmp->pitch);
-		SDL_UnlockSurface(tmp);
-		SDL_FreeSurface(tmp);
+		SDL_UnlockSurface(newV);
+
+		tex = texSprite->GetTexture(renderer);
+	} else if (tint && flags&BLIT_TINTED) {
+		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
+		//SDL_SetTextureAlphaMod(tex, tint->a);
 	} else {
 		SDL_SetTextureColorMod(tex, 0xff, 0xff, 0xff);
 	}
@@ -206,7 +211,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		static SDL_BlendMode blender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
 		SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
-		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer, 0);
+		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
 		SDL_SetRenderTarget(renderer, maskLayer);
 		SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureBlendMode(maskTex, blender);

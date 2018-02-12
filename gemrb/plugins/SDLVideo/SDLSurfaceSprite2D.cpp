@@ -242,6 +242,8 @@ SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp, void* pix
 : SDLSurfaceSprite2D(Width, Height, Bpp, pixels, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
+	original = surface;
+	texVersion = 0;
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
@@ -249,12 +251,16 @@ SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
 : SDLSurfaceSprite2D(Width, Height, Bpp, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
+	original = surface;
+	texVersion = 0;
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& obj)
 : SDLSurfaceSprite2D(obj)
 {
+	original = obj.original;
 	texture = obj.texture;
+	texVersion = obj.texVersion;
 }
 
 SDLTextureSprite2D* SDLTextureSprite2D::copy() const
@@ -262,11 +268,28 @@ SDLTextureSprite2D* SDLTextureSprite2D::copy() const
 	return new SDLTextureSprite2D(*this);
 }
 
-SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer, unsigned int version) const
+SDL_Surface* SDLTextureSprite2D::NewVersion(unsigned int version) const
 {
-	if (texture == NULL || texture->dirty || texture->texVersion != version) {
+	if (version == texVersion) {
+		return NULL;
+	}
+
+	texture = NULL;
+	texVersion = version;
+
+	SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
+	surface = new SurfaceHolder(newVersion);
+	return newVersion;
+}
+
+SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
+{
+	if (texture == NULL) {
+		// TODO: we could make this even more efficient
+		// by saving a map of all textures keyed off their original + version
+		// however, there probably arent a lot of situations where we are both blitting the same image and using software fallback
+		// palettes might make the effort worthwhile if we are using the same image with different palettes
 		texture = new TextureHolder(SDL_CreateTextureFromSurface(renderer, GetSurface()));
-		texture->texVersion = version;
 	}
 	return *texture;
 }
@@ -276,13 +299,13 @@ void SDLTextureSprite2D::SetPalette(Palette *pal)
 	if (pal == GetPalette())
 		return;
 
-	if (texture) texture->dirty = true;
+	texture = NULL;
 	SDLSurfaceSprite2D::SetPalette(pal);
 }
 
 void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 {
-	if (texture) texture->dirty = true;
+	texture = NULL;
 	SDLSurfaceSprite2D::SetColorKey(pxvalue);
 }
 #endif
