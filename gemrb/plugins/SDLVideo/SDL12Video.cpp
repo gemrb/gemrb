@@ -703,8 +703,7 @@ Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	void* pixels = malloc( Width * Height * 3 );
-	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24, pixels,
+	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 	SDL_Surface* screenshotSurface = SDL_DisplayFormat(disp);
 	SDL_Surface* tmp = disp;
