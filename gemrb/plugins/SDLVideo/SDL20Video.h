@@ -52,30 +52,8 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 	}
 }
 
-enum MultiGestureType {
-	GESTURE_NONE = 0,
-	GESTURE_FORMATION_ROTATION = 1
-};
-
-struct MultiGesture {
-	MultiGestureType type;
-	Point endPoint;
-	ieWord endButton;
-	// for future consideration
-	// float theta;
-	// int dx;
-	// int dy;
-};
-
 class SDL20VideoDriver : public SDLVideoDriver {
 private:
-	// touch input vars
-	int ignoreNextFingerUp;
-	SDL_TouchFingerEvent firstFingerDown;
-	unsigned long firstFingerDownTime;
-	MultiGesture currentGesture;
-
-protected:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
@@ -105,21 +83,6 @@ private:
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);
-	// the first finger touch of a gesture is delayed until another touch event or until
-	// enough time passes for it to become a right click
-	bool ProcessFirstTouch( int mouseButton );
-	void ClearFirstTouch();
-	void BeginMultiGesture(MultiGestureType type);
-	void EndMultiGesture(bool success = false);
-
-	// temporary methods to scale input coordinates from the renderer to the backbuf
-	// once we have a real SDL2 render pipeline in place we shouldnt require this.
-	// this should only apply to devices where the window size cannot be guaranteed
-	// to match the render size (iOS, Android)
-
-	// TODO: probably need to apply this to mouse input
-	float ScaleCoordinateHorizontal(float x);
-	float ScaleCoordinateVertical(float y);
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
 	int UpdateRenderTarget(const Color* color = NULL);

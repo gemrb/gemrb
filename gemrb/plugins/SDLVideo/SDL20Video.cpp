@@ -30,17 +30,8 @@ using namespace GemRB;
 
 SDL20VideoDriver::SDL20VideoDriver(void)
 {
-	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
-	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
-	assert( core->NumFingScroll != core->NumFingKboard );
-
 	renderer = NULL;
 	window = NULL;
-
-	// touch input
-	ignoreNextFingerUp = 0;
-	ClearFirstTouch();
-	EndMultiGesture();
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -277,67 +268,6 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 	return screenshot;
 }
 
-void SDL20VideoDriver::ClearFirstTouch()
-{
-	firstFingerDown = SDL_TouchFingerEvent();
-	firstFingerDown.fingerId = -1;
-	firstFingerDownTime = 0;
-}
-
-void SDL20VideoDriver::BeginMultiGesture(MultiGestureType type)
-{
-	assert(type != GESTURE_NONE);
-	assert(currentGesture.type == GESTURE_NONE);
-	// warning: we are assuming this is a "virgin" gesture initialized by EndGesture
-	currentGesture.type = type;
-	switch (type) {
-		case GESTURE_FORMATION_ROTATION:
-			currentGesture.endButton = GEM_MB_MENU;
-			break;
-		default:
-			currentGesture.endButton = GEM_MB_ACTION;
-			break;
-	}
-}
-
-void SDL20VideoDriver::EndMultiGesture(bool success)
-{
-	if (success && currentGesture.type) {
-		if (!currentGesture.endPoint.isempty()) {
-			// dont send events for invalid coordinates
-			// we assume this means the gesture doesnt want an up event
-			/*
-			EvntManager->MouseUp(currentGesture.endPoint.x,
-								 currentGesture.endPoint.y,
-								 currentGesture.endButton, GetModState(SDL_GetModState()) );
-			 */
-		}
-	}
-
-	currentGesture = MultiGesture();
-	currentGesture.endPoint.empty();
-}
-
-bool SDL20VideoDriver::ProcessFirstTouch( int /*mouseButton*/ )
-{
-	/*
-	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
-		// do an actual mouse move first! this is important for things such as ground piles to work!
-		// also ensure any referencing of the cursor is accurate
-		MouseMovement(firstFingerDown.x, firstFingerDown.y);
-
-		// no need to scale these coordinates. they were scaled previously for us.
-		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
-								mouseButton, GetModState() );
-
-		ClearFirstTouch();
-		ignoreNextFingerUp--;
-		return true;
-	}
-	 */
-	return false;
-}
-
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Control* focusCtrl = NULL; //used for contextual touch events.
@@ -364,96 +294,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
-			if (currentGesture.type) {
-				// continuingGesture = false;
-				break; // finger motion has no further power over multigestures
-			}
-			if (numFingers > 1) {
-				ignoreNextFingerUp = numFingers;
-			}
 			break;
 		case SDL_FINGERDOWN:
-			if (!finger0) numFingers++;
-			// continuingGesture = false;
-
-			if (numFingers == 1
-				// this test is for when multiple fingers begin the first touch
-				// commented out because we dont care right now, but if we need it i want it documented
-				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
-				) {
-				/*lastMouseDownTime = EvntManager->GetRKDelay();
-				if (ignoreNextFingerUp <= 0 && lastMouseDownTime != (unsigned long) ~0) {
-					lastMouseDownTime += lastMouseDownTime + lastTime;
-				}*/
-				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
-				firstFingerDown = event.tfinger;
-				firstFingerDownTime = GetTickCount();
-				// ensure we get the coords for the actual first finger
-				if (finger0) {
-					firstFingerDown.x = ScaleCoordinateHorizontal(finger0->x);
-					firstFingerDown.y = ScaleCoordinateVertical(finger0->y);
-				} else {
-					// rare case where the touch has
-					// been removed before processing
-					firstFingerDown.x = ScaleCoordinateHorizontal(event.tfinger.x);
-					firstFingerDown.y = ScaleCoordinateVertical(event.tfinger.y);
-				}
-			} else if (currentGesture.type == GESTURE_NONE) {
-				if (EvntManager && numFingers == core->NumFingInfo) {
-					//EvntManager->OnSpecialKeyPress( GEM_TAB );
-					//EvntManager->OnSpecialKeyPress( GEM_ALT );
-				}
-				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
-					/*&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL*/) {
-					// scrolling cancels previous action
-				}
-			}
 			break;
 		case SDL_FINGERUP:
-			{
-				if (numFingers) numFingers--;
-
-				// we need to get mouseButton before calling ProcessFirstTouch
-				// int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
-				// continuingGesture = false;
-				EndMultiGesture(true);
-				/*
-				if (numFingers == 0) { // this event was the last finger that was in contact
-					ProcessFirstTouch(mouseButton);
-					if (ignoreNextFingerUp <= 0) {
-						ignoreNextFingerUp = 1; // set to one because we decrement unconditionally later
-
-						// move cursor to ensure any referencing of the cursor is accurate
-						MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
-									  ScaleCoordinateVertical(event.tfinger.y));
-
-						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
-											 ScaleCoordinateVertical(event.tfinger.y),
-											 mouseButton, GetModState());
-					} else {
-						focusCtrl = EvntManager->GetFocusedControl();
-						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)
-							// these are repeat events so the control should stay pressed
-							((Button*)focusCtrl)->SetState(IE_GUI_BUTTON_UNPRESSED);
-					}
-				}
-				if (numFingers != core->NumFingInfo) {
-					// FIXME: this is "releasing" the ALT key even when it hadn't been previously "pushed"
-					// this isn't causing a problem currently
-					EvntManager->KeyRelease( GEM_ALT, 0 );
-				}
-				*/
-				ignoreNextFingerUp--;
-			}
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
-			{
-				/* formation rotation gesture:
-				first touch with a single finger to obtain the pivot
-				then touch and drag with a second finger (while maintaining contact with first)
-				to move the application point
-				*/
-			}
 			break;
 		case SDL_MOUSEWHEEL:
 			/*
@@ -484,10 +330,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 reset all input variables as if no events have happened yet
 					 restoring from "minimized state" should be a clean slate.
 					 */
-					ClearFirstTouch();
-					EndMultiGesture();
-					ignoreNextFingerUp = 0;
-					// should we reset the lastMouseTime vars?
+
 #if TARGET_OS_IPHONE
 					// FIXME:
 					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
@@ -581,40 +424,6 @@ bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alph
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
 	// SDL_SetSurfaceRLE(surface, SDL_TRUE);
 	return ret;
-}
-
-float SDL20VideoDriver::ScaleCoordinateHorizontal(float /*x*/)
-{
-	float scaleX;
-	SDL_RenderGetScale(renderer, &scaleX, NULL);
-
-	int winW, winH;
-	// float xoffset = 0.0;
-	SDL_GetWindowSize(window, &winW, &winH);
-	// float winWf = winW, winHf = winH;
-	// only need to scale if they do not have the same ratio
-	/*if ((winWf / winHf) != ((float)width / height)) {
-		xoffset = ((winWf - (width * scaleX)) / 2) / winWf;
-		return ((x - xoffset) * (winWf / scaleX));
-	}*/
-	return winW; //x * width;
-}
-
-float SDL20VideoDriver::ScaleCoordinateVertical(float /*y*/)
-{
-	float scaleY;
-	SDL_RenderGetScale(renderer, NULL, &scaleY);
-
-	int winW, winH;
-	// float yoffset = 0.0;
-	SDL_GetWindowSize(window, &winW, &winH);
-	// float winWf = winW, winHf = winH;
-	// only need to scale if they do not have the same ratio
-	/* if ((winWf / winHf) != ((float)width / height)) {
-		yoffset = ((winHf - (height * scaleY)) / 2) / winHf;
-		return ((y - yoffset) * (winHf / scaleY));
-	}*/
-	return winH; //y * height;
 }
 
 #ifndef USE_OPENGL
