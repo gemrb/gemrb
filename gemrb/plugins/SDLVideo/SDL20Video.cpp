@@ -292,6 +292,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		/* not user input events */
+
+		// TODO: these events will be sent by the D3D renderer and we will need to handle them
+		case SDL_RENDER_DEVICE_RESET:
+			// TODO: must destroy all SDLTextureSprite2D textures
+
+			// fallthough
+		case SDL_RENDER_TARGETS_RESET:
+			// TODO: must destroy all SDLTextureVideoBuffer textures
+			break;
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
