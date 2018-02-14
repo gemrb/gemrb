@@ -24,10 +24,6 @@
 
 using namespace GemRB;
 
-//touch gestures
-#define MIN_GESTURE_DELTA_PIXELS 5
-#define TOUCH_RC_NUM_TICKS 500
-
 SDL20VideoDriver::SDL20VideoDriver(void)
 {
 	renderer = NULL;
@@ -270,26 +266,6 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
-	Control* focusCtrl = NULL; //used for contextual touch events.
-	static int numFingers = 0;
-	// static bool continuingGesture = false; // resets when numFingers changes
-
-	// beware that this may be removed before all events it created are processed!
-	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
-
-	if (finger0) {
-		numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
-	}
-	// need 2 separate tests.
-	// sometimes finger0 will become null while we are still processig its touches
-	if (numFingers) {
-		focusCtrl = NULL;//EvntManager->GetFocusedControl();
-	}
-
-	// TODO: we need a method to process gestures when numFingers changes
-	// some gestures would want to continue while some would want to end/abort
-	// currently finger up clears the gesture and finger down does not
-	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	Event e;
 	switch (event.type) {
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
