@@ -242,7 +242,7 @@ CachePath=@DEFAULT_CACHE_DIR@
 #PluginsPath=@DEFAULT_PLUGINS_DIR@
 
 #####################################################
-#  Custom Font Path [String]           		    #
+#  Custom Font Path [String]                        #
 #                                                   #
 #  This is the path where GemRB looks for non-BAM   #
 #  fonts (ex TTF)                                   #
@@ -296,14 +296,14 @@ CachePath=@DEFAULT_CACHE_DIR@
 #TouchScrollAreas=1
 
 #####################################################
-#  MouseFeedback		                    #
+#  MouseFeedback                                    #
 #  Bitfield with reserved bits for disabling        #
 #  the mouse. Those bits cannot be set via config   #
 #                                                   #
-#  Show mouse+tooltips = 0			    #
-#  Hide mouse 	       = 1			    #
-#  Hide tooltips       = 2			    #
-#  Hide mouse+tooltips = 3			    #  
+#  Show mouse+tooltips = 0                          #
+#  Hide mouse          = 1                          #
+#  Hide tooltips       = 2                          #
+#  Hide mouse+tooltips = 3                          #
 #####################################################
 
 # For a strictly touchscreen device we recommend
@@ -314,7 +314,7 @@ CachePath=@DEFAULT_CACHE_DIR@
 
 #####################################################
 #  Touch Gesture Input Parameters                   #
-#  Requires SDL 1.3 or later			    #
+#  Requires SDL 1.3 or later                        #
 #  All "NumFing" settings must be > 1 and < 5       #
 #  NumFingScroll and NumFingKboard cannot be equal  #
 #####################################################
