@@ -96,7 +96,7 @@ safe to leave it commented out.
 
 .TP
 .BR GUIEnhancements =INT
-The value is a bitfield. Setit to 1 to enable a few GUI enhancements, mostly in BG2. 
+The value is a bitfield. Set it to 1 to enable a few GUI enhancements, mostly in BG2. 
 Set to 2 or 3 to try to autoidentify items on transfer (if the character has enough lore). 
 Disabled by default.
 
