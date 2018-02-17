@@ -32,7 +32,7 @@ bool EventMgr::TouchInputEnabled = true;
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
 EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
-TouchEvent::Finger EventMgr::fingerStates[FINGER_MAX] = {};
+std::map<unsigned short, TouchEvent::Finger> EventMgr::fingerStates;
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
@@ -86,35 +86,53 @@ void EventMgr::DispatchEvent(Event& e)
 				return;
 			}
 		}
-	} else if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
-		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask)) {
+	} else if (e.EventMaskFromType(e.type) & (Event::AllMouseMask | Event::AllTouchMask)) {
+		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
+										   | Event::TouchUp | Event::TouchDown)
+		) {
+			// WARNING: these are shared between mouse and touch
+			// it is assumed we wont be using both simultaniously
 			static unsigned long lastMouseDown = 0;
 			static unsigned char repeatCount = 0;
 			static EventButton repeatButton = 0;
 			static Point repeatPos;
 
-			if (e.type == Event::MouseDown) {
-				if (e.mouse.button == repeatButton
+			ScreenEvent& se = (e.type == Event::MouseDown) ? static_cast<ScreenEvent&>(e.mouse) : static_cast<ScreenEvent&>(e.touch);
+			EventButton btn = (e.type == Event::MouseDown) ? e.mouse.button : 0;
+
+			if (e.type == Event::MouseDown || e.type == Event::TouchDown) {
+				if (btn == repeatButton
 					&& e.time <= lastMouseDown + DCDelay
-					&& repeatPos.isWithinRadius(5, e.mouse.Pos())
+					&& repeatPos.isWithinRadius(5, se.Pos())
 				) {
 					repeatCount++;
 				} else {
 					repeatCount = 1;
 				}
-				repeatPos = e.mouse.Pos();
-				repeatButton = e.mouse.button;
+				repeatPos = se.Pos();
+				repeatButton = btn;
 				lastMouseDown = GetTickCount();
 			}
 
-			e.mouse.repeats = repeatCount;
+			se.repeats = repeatCount;
 		}
 
-		// set/clear the appropriate buttons
-		mouseButtonFlags = e.mouse.buttonStates;
-		mousePos = e.mouse.Pos();
+		if (e.EventMaskFromType(e.type) & (Event::AllMouseMask)) {
+			// set/clear the appropriate buttons
+			mouseButtonFlags = e.mouse.buttonStates;
+			mousePos = e.mouse.Pos();
+		} else { // touch
+			TouchEvent& te = (e.type == Event::TouchGesture) ? static_cast<TouchEvent&>(e.gesture) : static_cast<TouchEvent&>(e.touch);
+			for (int i = 0; i < FINGER_MAX; ++i) {
+				if (i < te.numFingers) {
+					fingerStates[i] = te.fingers[i];
+				} else {
+					fingerStates.erase(i);
+				}
+			}
+		}
 	} else {
-		// TODO: implement touch events and controller events
+		// TODO: implement controller events
 	}
 
 	// no hot keys or their listeners refused the event...

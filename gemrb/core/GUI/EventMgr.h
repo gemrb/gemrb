@@ -226,7 +226,7 @@ private:
 	static buttonbits modKeys;
 	static Point mousePos;
 
-	static TouchEvent::Finger fingerStates[FINGER_MAX];
+	static std::map<unsigned short, TouchEvent::Finger> fingerStates;
 
 public:
 	void DispatchEvent(Event& e);
@@ -237,7 +237,7 @@ public:
 	static bool MouseDown();
 	static Point MousePos() { return mousePos; }
 
-	static const TouchEvent::Finger* FingerState(unsigned short idx) { return (idx < FINGER_MAX) ? &fingerStates[idx] : NULL; };
+	static const TouchEvent::Finger* FingerState(unsigned short idx) { return (fingerStates.count(idx)) ? &fingerStates[idx] : NULL; };
 };
 
 }
