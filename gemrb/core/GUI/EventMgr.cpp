@@ -41,7 +41,7 @@ bool EventMgr::ModState(unsigned short mod)
 	return (modKeys & buttonbits(mod)).any();
 }
 
-bool EventMgr::ButtonState(unsigned short btn)
+bool EventMgr::MouseButtonState(unsigned short btn)
 {
 	return (mouseButtonFlags & buttonbits(btn)).any();
 }

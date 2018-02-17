@@ -348,7 +348,7 @@ bool ScrollView::OnMouseWheelScroll(const Point& delta)
 
 bool ScrollView::OnMouseDrag(const MouseEvent& me)
 {
-	if (EventMgr::ButtonState(GEM_MB_ACTION)) {
+	if (EventMgr::MouseButtonState(GEM_MB_ACTION)) {
 		ScrollDelta(me.Delta());
 		return true;
 	}

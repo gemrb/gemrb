@@ -238,7 +238,7 @@ void MapControl::UpdateCursor()
 			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			Sprite2D* cursor = (EventMgr::ButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_PRESSED] : NULL;
+			Sprite2D* cursor = (EventMgr::MouseButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_PRESSED] : NULL;
 			SetCursor(cursor);
 			break;
 	}
