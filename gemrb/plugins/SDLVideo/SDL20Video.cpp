@@ -268,14 +268,57 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	Event e;
 	switch (event.type) {
+		case SDL_FINGERDOWN: // fallthough
+		case SDL_FINGERUP:
+			{
+				TouchEvent::Finger fingers[1] = { };
+				fingers[0].x = event.tfinger.x;
+				fingers[0].y = event.tfinger.y;
+				fingers[0].deltaX = event.tfinger.dx;
+				fingers[0].deltaY = event.tfinger.dy;
+
+				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
+			}
+			break;
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
+			{
+				TouchEvent::Finger fingers[1] = { };
+				fingers[0].x = event.tfinger.x;
+				fingers[0].y = event.tfinger.y;
+				fingers[0].deltaX = event.tfinger.dx;
+				fingers[0].deltaY = event.tfinger.dy;
+
+				Event touch = EvntManager->CreateTouchEvent(fingers, 1, true, event.tfinger.pressure);
+				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
+				e = EvntManager->CreateTouchGesture(touch.touch, 0.0, 0.0);
+			}
 			break;
-		case SDL_FINGERDOWN:
-			break;
-		case SDL_FINGERUP:
+		case SDL_DOLLARGESTURE:
+			// TODO: this could be useful for predefining gestures
+			// might work better than manually programming everything
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
+			{
+				Uint16 numf = Clamp<Uint16>(event.mgesture.numFingers, 0, FINGER_MAX);
+
+				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				for (Uint16 i = 0; i < numf; ++i) {
+					SDL_Finger* finger = SDL_GetTouchFinger(event.mgesture.touchId, i);
+					fingers[i].x = finger->x;
+					fingers[i].y = finger->y;
+
+					const TouchEvent::Finger* current = EvntManager->FingerState(i);
+					if (current) {
+						fingers[i].deltaX = finger->x - current->x;
+						fingers[i].deltaY = finger->y - current->y;
+					}
+				}
+
+				// TODO: it may make more sense to calculate the pressure as an avg?
+				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, 0.0);
+				e = EvntManager->CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
+			}
 			break;
 		case SDL_MOUSEWHEEL:
 			/*
@@ -333,8 +376,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 			}
 			break;
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_MOUSEMOTION: // fallthough
+		case SDL_MOUSEBUTTONUP: // fallthough
 		case SDL_MOUSEBUTTONDOWN:
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
 				// ignoring mouse events from touch devices

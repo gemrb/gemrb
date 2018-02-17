@@ -32,6 +32,7 @@ bool EventMgr::TouchInputEnabled = true;
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
 EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
+TouchEvent::Finger EventMgr::fingerStates[FINGER_MAX] = {};
 
 std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
@@ -216,6 +217,43 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 		}
 	}
 	e.keyboard.character = character;
+	return e;
+}
+
+Event EventMgr::CreateTouchEvent(ScreenEvent fingers[], int numFingers, bool down, float pressure)
+{
+	if (numFingers > FINGER_MAX) {
+		Log(ERROR, "EventManager", "cannot create a touch event with %d fingers; max is %d.", numFingers, FINGER_MAX);
+		return Event();
+	}
+
+	Event e = {};
+	e.isScreen = true;
+	e.mod = 0;
+	e.type = (down) ? Event::TouchDown : Event::TouchUp;
+
+	for (int i = 0; i < numFingers; ++i) {
+		// TODO: calculate the mid point of all fingers and assign to e.touch.pos
+		// do the same for the delta using FingerState() to compare
+		e.touch.fingers[i] = fingers[i];
+	}
+
+	e.touch.numFingers = numFingers;
+	e.touch.pressure = pressure;
+
+	return e;
+}
+
+Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch)
+{
+	Event e = {};
+	e.isScreen = true;
+	e.mod = 0;
+	e.type = Event::TouchGesture;
+	e.touch = touch;
+	e.gesture.dTheta = rotation;
+	e.gesture.dDist = pinch;
+
 	return e;
 }
 

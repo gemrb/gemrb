@@ -71,6 +71,8 @@ class Window;
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4
 
+#define FINGER_MAX 5
+
 typedef unsigned char EventButton;
 typedef unsigned short KeyboardKey;
 typedef unsigned short ButtonMask;
@@ -108,12 +110,17 @@ struct GEM_EXPORT ControllerEvent : public EventBase {
 	EventButton button;
 };
 
-// TODO: Unused event type...
 struct GEM_EXPORT TouchEvent : public ScreenEvent {
-	ScreenEvent fingers[5];
+	typedef ScreenEvent Finger;
+	Finger fingers[FINGER_MAX];
 
-	ButtonMask numFingers;
+	int numFingers;
 	float pressure;
+};
+
+struct GEM_EXPORT GestureEvent : public TouchEvent {
+	float dTheta;
+	float dDist;
 };
 
 struct GEM_EXPORT Event {
@@ -124,9 +131,13 @@ struct GEM_EXPORT Event {
 		MouseScroll,
 
 		KeyUp,
-		KeyDown
+		KeyDown,
 
-		// TODO: need types for touch and controller
+		TouchGesture,
+		TouchUp,
+		TouchDown
+
+		// TODO: need types for controller
 		// leaving off types for unused events
 	};
 
@@ -145,6 +156,12 @@ struct GEM_EXPORT Event {
 
 		AllKeyMask = KeyUpMask | KeyDownMask,
 
+		TouchGestureMask = 1 << TouchGesture,
+		TouchUpMask = 1 << TouchUp,
+		TouchDownMask = 1 << TouchDown,
+
+		AllTouchMask = TouchGestureMask | TouchUpMask | TouchDownMask,
+
 		AllEventsMask = 0xffffffffU
 	};
 
@@ -154,7 +171,8 @@ struct GEM_EXPORT Event {
 		MouseEvent mouse;
 		//ControllerEvent; unused currently
 		KeyboardEvent keyboard;
-		//TouchEvent touch; unused currently
+		TouchEvent touch;
+		GestureEvent gesture;
 	};
     
     typedef unsigned short EventMods;
@@ -184,7 +202,11 @@ public:
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
 	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
 	static Event CreateMouseWheelEvent(const Point& vec, int mod = 0);
+
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
+
+	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
+	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
 
 	// TODO/FIXME: need to be able to unregister hotkeys/monitors
 	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
@@ -204,13 +226,18 @@ private:
 	static buttonbits modKeys;
 	static Point mousePos;
 
+	static TouchEvent::Finger fingerStates[FINGER_MAX];
+
 public:
 	void DispatchEvent(Event& e);
 
 	static bool ModState(unsigned short mod);
-	static bool ButtonState(unsigned short btn);
+
+	static bool MouseButtonState(unsigned short btn);
 	static bool MouseDown();
 	static Point MousePos() { return mousePos; }
+
+	static const TouchEvent::Finger* FingerState(unsigned short idx) { return (idx < FINGER_MAX) ? &fingerStates[idx] : NULL; };
 };
 
 }
