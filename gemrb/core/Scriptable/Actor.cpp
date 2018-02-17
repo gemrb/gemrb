@@ -5835,8 +5835,9 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	wi.critrange = core->GetCriticalRange(item->ItemType);
 
 	//select first weapon header
+	// except you can never dualwield two ranged (thrown) weapons
 	ITMExtHeader *which;
-	if (GetAttackStyle() == WEAPON_RANGED) {
+	if (!leftorright && GetAttackStyle() == WEAPON_RANGED) {
 		which = item->GetWeaponHeader(true);
 		if (which) {
 			wi.backstabbing = which->RechargeFlags & IE_ITEM_BACKSTAB;
