@@ -319,8 +319,8 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 
 bool WindowManager::DispatchEvent(const Event& event)
 {
-	if (eventMgr.MouseDown() == false) {
-		if (event.type == Event::MouseUp) {
+	if (eventMgr.MouseDown() == false && eventMgr.FingerDown() == false) {
+		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
 			if (trackingWin) {
 				trackingWin->DispatchEvent(event);
 				return true;
@@ -360,7 +360,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 		if (target->IsDisabled() || target->DispatchEvent(event)) {
 			if (event.isScreen && target->IsVisible()) {
 				hoverWin = target;
-				if (event.type == Event::MouseDown) {
+				if (event.type == Event::MouseDown || event.type == Event::TouchDown) {
 					trackingWin = target;
 				}
 			}

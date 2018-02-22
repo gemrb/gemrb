@@ -52,6 +52,11 @@ bool EventMgr::MouseDown()
 	return mouseButtonFlags.any();
 }
 
+bool EventMgr::FingerDown()
+{
+	return fingerStates.size() > 0;
+}
+
 void EventMgr::DispatchEvent(Event& e)
 {
 	e.time = GetTickCount();
@@ -86,7 +91,7 @@ void EventMgr::DispatchEvent(Event& e)
 				return;
 			}
 		}
-	} else if (e.EventMaskFromType(e.type) & (Event::AllMouseMask | Event::AllTouchMask)) {
+	} else if (e.isScreen) {
 		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
 										   | Event::TouchUp | Event::TouchDown)
 		) {

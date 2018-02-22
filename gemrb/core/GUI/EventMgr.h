@@ -238,6 +238,7 @@ public:
 	static Point MousePos() { return mousePos; }
 
 	static const TouchEvent::Finger* FingerState(unsigned short idx) { return (fingerStates.count(idx)) ? &fingerStates[idx] : NULL; };
+	static bool FingerDown();
 };
 
 }
