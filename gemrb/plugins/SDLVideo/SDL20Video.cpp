@@ -305,6 +305,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
 				for (Uint16 i = 0; i < numf; ++i) {
 					SDL_Finger* finger = SDL_GetTouchFinger(event.mgesture.touchId, i);
+					if (finger == NULL) {
+						// FIXME: not sure the best way to handle this
+						// it does happen and for now we assume it means the touch ended between the event being enqued and now
+						// im not sure the impact to UX by discarding this
+						numf = i;
+						break;
+					}
+					
 					fingers[i].x = finger->x;
 					fingers[i].y = finger->y;
 
