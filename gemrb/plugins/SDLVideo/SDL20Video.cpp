@@ -190,8 +190,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		SDL_SetTextureAlphaMod(tex, SDL_ALPHA_OPAQUE);
 	}
 
-	SDL_RendererFlip flipflags = (spr->renderFlags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
-	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((spr->renderFlags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
 	int ret = 0;
 	if (mask) {

@@ -197,10 +197,8 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	SDL_LockSurface(currentBuf);
 
-	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
-	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
-	if (flags & BLIT_MIRRORX) hflip = !hflip;
-	if (flags & BLIT_MIRRORY) vflip = !vflip;
+	bool hflip = bool(spr->renderFlags&BLIT_MIRRORX);
+	bool vflip = bool(spr->renderFlags&BLIT_MIRRORY);
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
@@ -421,10 +419,9 @@ BlitTile_internal<Uint16>(currentBuf, drect.x, drect.y, srect.x, srect.y, drect.
 	if (tint){
 		c = Color(tint->r, tint->g, tint->b, tint->unused);
 	}
-	bool hflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORX) : false;
-	bool vflip = spr->BAM ? (spr->renderFlags&BLIT_MIRRORY) : false;
-	if (flags & BLIT_MIRRORX) hflip = !hflip;
-	if (flags & BLIT_MIRRORY) vflip = !vflip;
+
+	bool hflip = bool(flags&BLIT_MIRRORX);
+	bool vflip = bool(flags&BLIT_MIRRORY);
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);

@@ -654,6 +654,14 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask
 		return;
 	}
 
+	if (spr->renderFlags&BLIT_MIRRORX) {
+		flags ^= BLIT_MIRRORX;
+	}
+
+	if (spr->renderFlags&BLIT_MIRRORY) {
+		flags ^= BLIT_MIRRORY;
+	}
+
 	if (spr->BAM) {
 		BlitSpriteBAMClipped(spr, mask, src, dclipped, flags, tint);
 	} else {
