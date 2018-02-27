@@ -670,10 +670,11 @@ void SDL12VideoDriver::SetGamma(int brightness, int /*contrast*/)
 bool SDL12VideoDriver::SetFullscreenMode(bool set)
 {
 	if (fullscreen != set) {
+		Uint32 flags = disp->flags;
+		flags ^= SDL_FULLSCREEN;
+		disp = SDL_SetVideoMode(disp->w, disp->h, disp->format->BitsPerPixel, flags);
+
 		fullscreen=set;
-		// FIXME: SDL_WM_ToggleFullScreen only works on X11. use SDL_SetVideoMode()
-		SDL_WM_ToggleFullScreen( disp );
-		//synchronise internal variable
 		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
 		return true;
 	}
