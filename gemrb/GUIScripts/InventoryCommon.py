@@ -773,6 +773,7 @@ def OpenItemWindow ():
 	slot = GemRB.GetVar ("ItemButton") #get this before closing win
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
+	import GUIINV
 	GUIINV.OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, slot)
