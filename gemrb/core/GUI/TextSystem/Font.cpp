@@ -127,12 +127,14 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 			// memcpy(pixels, GlyphPageData, size);
 		}
 		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, pal, true, 0);
+		SpriteSheet<ieWord>::Draw(chr, dest);
+	} else {
+		Palette* oldPal = Sheet->GetPalette();
+		Sheet->SetPalette(pal);
+		SpriteSheet<ieWord>::Draw(chr, dest);
+		Sheet->SetPalette(oldPal);
+		oldPal->release();
 	}
-	Palette* oldPal = Sheet->GetPalette();
-	Sheet->SetPalette(pal);
-	SpriteSheet<ieWord>::Draw(chr, dest);
-	Sheet->SetPalette(oldPal);
-	oldPal->release();
 }
 
 #if DEBUG_FONT
