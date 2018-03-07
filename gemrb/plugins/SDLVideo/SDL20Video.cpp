@@ -177,7 +177,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		SDL_UnlockSurface(newV);
 
 		tex = texSprite->GetTexture(renderer);
-	} else if (tint && flags&BLIT_TINTED) {
+	}
+
+	if (tint && flags&BLIT_TINTED) {
 		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
 		//SDL_SetTextureAlphaMod(tex, tint->a);
 	} else {
