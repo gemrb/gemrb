@@ -21,7 +21,7 @@
 // For debugging:
 //#define HIGHLIGHTCOVER
 
-
+using namespace GemRB;
 
 // For pixel formats:
 // We hardcode a single pixel format per bit depth.

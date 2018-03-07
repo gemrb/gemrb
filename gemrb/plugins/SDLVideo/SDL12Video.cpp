@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "SDLSurfaceSprite2D.h"
 
-#include "TileRenderer.inl"
 #include "SpriteRenderer.inl"
 
 using namespace GemRB;

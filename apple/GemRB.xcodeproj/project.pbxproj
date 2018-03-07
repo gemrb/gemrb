@@ -1769,7 +1769,6 @@
 		A2D672E01B30F40C00264D16 /* WindowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowManager.h; sourceTree = "<group>"; };
 		A2D72B181B671329009F4D33 /* SpriteSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteSheet.h; sourceTree = "<group>"; };
 		A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = SpriteRenderer.inl; sourceTree = "<group>"; };
-		A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = TileRenderer.inl; sourceTree = "<group>"; };
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlc.5.dylib; path = /Applications/VLC.app/Contents/MacOS/lib/libvlc.5.dylib; sourceTree = "<absolute>"; };
@@ -2865,7 +2864,6 @@
 				A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */,
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
 				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
-				A2DB6D5815D9ECB300D70E88 /* TileRenderer.inl */,
 				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
 			);
 			path = SDLVideo;
