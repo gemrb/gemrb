@@ -22,6 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "Pixels.h"
 #include "SDLSurfaceSprite2D.h"
 
 #include "SpriteRenderer.inl"

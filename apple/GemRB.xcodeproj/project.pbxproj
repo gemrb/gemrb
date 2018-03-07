@@ -44,6 +44,7 @@
 		A20A278B1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278C1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278D1A71E3200077077C /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = A20A278A1A71E3200077077C /* View.h */; };
+		A20B119A204F70F600B10A0C /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A20B1199204F70F600B10A0C /* Pixels.h */; };
 		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
@@ -1245,6 +1246,7 @@
 		A20574F919994967007FF22C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		A20A27891A71E3200077077C /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View.cpp; sourceTree = "<group>"; };
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
+		A20B1199204F70F600B10A0C /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
 		A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG_SFMT.cpp; sourceTree = "<group>"; };
 		A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG_SFMT.h; sourceTree = "<group>"; };
@@ -2843,6 +2845,7 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A20B1199204F70F600B10A0C /* Pixels.h */,
 				A2E5A4B619992CC000CCE6D8 /* Shaders */,
 				A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */,
 				A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */,
@@ -3494,6 +3497,7 @@
 				A2E66394139E883E00310FC8 /* IniSpawn.h in Headers */,
 				A2E66396139E883E00310FC8 /* Interface.h in Headers */,
 				A2E66398139E883E00310FC8 /* Inventory.h in Headers */,
+				A20B119A204F70F600B10A0C /* Pixels.h in Headers */,
 				A2E6639A139E883E00310FC8 /* Item.h in Headers */,
 				A2E6639C139E883E00310FC8 /* ItemMgr.h in Headers */,
 				A2E6639E139E883E00310FC8 /* LRUCache.h in Headers */,
