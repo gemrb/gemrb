@@ -316,7 +316,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, const Region* clip)
 {
-	Region srect(0, 0, spr->Width, spr->Height);
+	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Width, spr->Height));
 	Region drect = (clip) ? *clip : Region(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
 	const Sprite2D* mask = (cover) ? cover->GetMask() : NULL;
 	BlitSpriteClipped(spr, mask, srect, drect, flags, &tint);
