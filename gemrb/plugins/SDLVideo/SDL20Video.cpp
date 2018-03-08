@@ -179,17 +179,19 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		tex = texSprite->GetTexture(renderer);
 	}
 
-	if (tint && flags&BLIT_TINTED) {
-		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
-		//SDL_SetTextureAlphaMod(tex, tint->a);
-	} else {
-		SDL_SetTextureColorMod(tex, 0xff, 0xff, 0xff);
-	}
-
 	if (flags & BLIT_HALFTRANS) {
 		SDL_SetTextureAlphaMod(tex, 255/2);
 	} else {
 		SDL_SetTextureAlphaMod(tex, SDL_ALPHA_OPAQUE);
+	}
+
+	if (tint && flags&BLIT_TINTED) {
+		if (tint->a != 0xff) {
+			SDL_SetTextureAlphaMod(tex, 255-tint->a);
+		}
+		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
+	} else {
+		SDL_SetTextureColorMod(tex, 0xff, 0xff, 0xff);
 	}
 
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
