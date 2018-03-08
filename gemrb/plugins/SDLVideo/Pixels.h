@@ -111,7 +111,7 @@ public:
 
 	void operator()(const Color& src, Color& dst, Uint8 mask) const {
 		Color c = src;
-		//c.a *= mask;
+		c.a *= mask; // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		if (c.a == 0) {
 			return;
@@ -256,22 +256,56 @@ struct PixelIterator : IPixelIterator
 	}
 };
 
-// an endless iterator that always returns 'value' when dereferenced
-template <typename PIXEL>
-struct StaticIterator : public PixelIterator<PIXEL>
+struct IColorIterator
 {
-	typedef PixelIterator<PIXEL> BaseType;
+	virtual const Color& operator*() const=0;
+	virtual const Color* operator->() const=0;
 
-	mutable PIXEL value;
+	virtual IColorIterator& operator++()=0;
+};
 
-	StaticIterator(PIXEL val) : BaseType(NULL, BaseType::Forward, BaseType::Forward, 0, 0), value(val) {}
+struct PaletteIterator : public IColorIterator
+{
+	Color* pal;
+	Uint8* pixel;
 
-	PIXEL& operator*() const {
-		return value;
+	PaletteIterator(Color* c, Uint8* p) {
+		assert(c && p);
+		pal = c;
+		pixel = p;
 	}
 
-	PIXEL* operator->() const {
-		return &value;
+	const Color& operator*() const {
+		return pal[*pixel];
+	}
+
+	const Color* operator->() const {
+		return &pal[*pixel];
+	}
+
+	IColorIterator& operator++() {
+		++pixel;
+		return *this;
+	}
+};
+
+// an endless iterator that always returns 'color' when dereferenced
+struct StaticIterator : public IColorIterator
+{
+	Color color;
+
+	StaticIterator(const Color& c) : color(c) {}
+
+	const Color& operator*() const {
+		return color;
+	}
+
+	const Color* operator->() const {
+		return &color;
+	}
+
+	IColorIterator& operator++() {
+		return *this;
 	}
 };
 
@@ -477,7 +511,7 @@ public:
 template<class BLENDER>
 static void Blit(SDLPixelIterator src,
 				 SDLPixelIterator dst, SDLPixelIterator dstend,
-				 PixelIterator<Uint8>& mask,
+				 IColorIterator& mask,
 				 BLENDER blender)
 {
 	int i = 0;
@@ -488,7 +522,7 @@ static void Blit(SDLPixelIterator src,
 		src.ReadRGBA(srcc.r, srcc.g, srcc.b, srcc.a);
 		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 
-		blender(srcc, dstc, *mask);
+		blender(srcc, dstc, mask->a);
 
 		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 	}
@@ -518,11 +552,12 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 		SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
 
 		if (mask) {
-			SDLPixelIterator alpha(srcrgn, mask);
-			PixelIterator<Uint8> it = alpha;
-			Blit(srcbeg, dstbeg, dstend, it, blender);
+			SDL_LockSurface(mask);
+			PaletteIterator alpha(reinterpret_cast<Color*>(mask->format->palette->colors), static_cast<Uint8*>(mask->pixels));
+			Blit(srcbeg, dstbeg, dstend, alpha, blender);
+			SDL_UnlockSurface(mask);
 		} else {
-			StaticIterator<Uint8> alpha(0xff);
+			StaticIterator alpha(Color(0,0,0,0));
 			Blit(srcbeg, dstbeg, dstend, alpha, blender);
 		}
 
