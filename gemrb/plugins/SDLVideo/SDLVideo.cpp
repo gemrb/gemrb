@@ -25,6 +25,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "Pixels.h"
 
 #include "GUI/Button.h"
 #include "GUI/Console.h"
@@ -686,21 +687,6 @@ int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, i
 	return -1;
 }
 
-template <typename T>
-void BlendPixel(const Color& srcc, SDL_PixelFormat* fmt, Uint8* pixel)
-{
-	T dst = *(T*)pixel;
-	Color dstc;
-	SDL_GetRGB( dst, fmt, &dstc.r, &dstc.g, &dstc.b );
-
-	// dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
-	dstc.r = (srcc.r * srcc.a/255) + (dstc.r * (1 - srcc.a/255));
-	dstc.g = (srcc.g * srcc.a/255) + (dstc.g * (1 - srcc.a/255));
-	dstc.b = (srcc.b * srcc.a/255) + (dstc.b * (1 - srcc.a/255));
-
-	*(T*)pixel = SDL_MapRGB(fmt, dstc.r, dstc.g, dstc.b);
-}
-
 void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SDL_Point>& points, const Color& srcc)
 {
 	SDL_PixelFormat* fmt = surface->format;
@@ -712,21 +698,27 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 		SDL_Point p = *it;
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
-		unsigned char* pixel = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
+		unsigned char* dst = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
 		// NOTICE: we assume the points were clipped by the caller for performance reasons
-		assert(pixel <= start + (surface->pitch * surface->h));
+		assert(dst < start + (surface->pitch * surface->h));
 
+		Color dstc;
 		switch (fmt->BytesPerPixel) {
 			case 1:
-				BlendPixel<Uint8>(srcc, surface->format, pixel);
+				SDL_GetRGB( *dst, surface->format, &dstc.r, &dstc.g, &dstc.b );
+				ShaderBlend<false>(srcc, dstc);
+				*dst = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
 				break;
 			case 2:
-				BlendPixel<Uint16>(srcc, surface->format, pixel);
+				SDL_GetRGB( *reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
+				ShaderBlend<false>(srcc, dstc);
+				*reinterpret_cast<Uint16*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
 				break;
 			case 3:
 			{
 				// FIXME: implement alpha blending for this... or nix it
 				// is this even used?
+				/*
 				Uint32 val = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 				pixel[0] = val & 0xff;
@@ -737,10 +729,13 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 				pixel[1] = (val >> 8) & 0xff;
 				pixel[0] = (val >> 16) & 0xff;
 	#endif
+				*/
 			}
 				break;
 			case 4:
-				BlendPixel<Uint32>(srcc, surface->format, pixel);
+				SDL_GetRGB( *reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
+				ShaderBlend<false>(srcc, dstc);
+				*reinterpret_cast<Uint32*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
 				break;
 			default:
 				Log(ERROR, "sprite_t", "Working with unknown pixel format: %s", SDL_GetError());
