@@ -78,6 +78,19 @@ inline void ShaderSepia(Color& c) {
 	c.b = avg < 32 ? 0 : avg - 32;
 }
 
+template <bool ALPHA>
+inline void ShaderBlend(const Color& src, Color& dst) {
+	// macro for a fast approximation for division by 255 (more accurate than >> 8)
+	// TODO: this is probably only faster on old CPUs, should #ifdef on arch
+#define DIV255(x) ((x + 1 + (x>>8)) >> 8) //((x)/255)
+	dst.r = DIV255(src.a * src.r) + DIV255((255 - src.a) * dst.r);
+	dst.g = DIV255(src.a * src.g) + DIV255((255 - src.a) * dst.g);
+	dst.b = DIV255(src.a * src.b) + DIV255((255 - src.a) * dst.b);
+#undef DIV255
+	if (ALPHA)
+		dst.a = src.a + dst.a * (255 - src.a);
+}
+
 enum SHADER {
 	NONE,
 	TINT,
@@ -156,16 +169,7 @@ public:
 		else
 			c.a = tint.a;
 */
-		// now blend with dst
-		// macro for a fast approximation for division by 255 (more accurate than >> 8)
-		// TODO: this is probably only faster on old CPUs, should #ifdef on arch
-#define DIV255(x) ((x + 1 + (x>>8)) >> 8)
-		//((x)/255)
-		dst.r = DIV255(c.a * c.r) + DIV255((255 - c.a) * dst.r);
-		dst.g = DIV255(c.a * c.g) + DIV255((255 - c.a) * dst.g);
-		dst.b = DIV255(c.a * c.b) + DIV255((255 - c.a) * dst.b);
-#undef DIV255
-		dst.a = c.a + dst.a * (255 - c.a);
+		ShaderBlend<false>(c, dst);
 	}
 };
 
