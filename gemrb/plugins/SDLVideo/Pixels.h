@@ -456,8 +456,16 @@ public:
 				r = format->palette->colors[pixel].r;
 				g = format->palette->colors[pixel].g;
 				b = format->palette->colors[pixel].b;
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+				// FIXME: I guess we dont support this (no surface to query)... do we need it?
+				//Uint32 ck;
+				//if (SDL_GetColorKey(surface, &ck) != -1 && ck == pixel) c.a = SDL_ALPHA_TRANSPARENT;
+				a = SDL_ALPHA_OPAQUE;
+#else
 				if (format->colorkey == pixel) a = SDL_ALPHA_TRANSPARENT;
 				else a = SDL_ALPHA_OPAQUE;
+#endif
 				return;
 			default:
 				assert(false);
