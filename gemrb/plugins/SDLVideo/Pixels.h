@@ -190,6 +190,15 @@ struct IPixelIterator
 
 	virtual IPixelIterator* Clone() const=0;
 	virtual void Advance(int)=0;
+
+	IPixelIterator& operator++() {
+		Advance(1);
+		return *this;
+	}
+
+	bool operator!=(const IPixelIterator& rhs) const {
+		return pixel != rhs.pixel;
+	}
 };
 
 template <typename PIXEL>
@@ -207,15 +216,6 @@ struct PixelIterator : IPixelIterator
 	: IPixelIterator(p, pitch, x, y), w(w) {
 		assert(pitch >= w);
 		xpos = (x == Reverse) ? w-1 : 0;
-	}
-
-	PixelIterator& operator++() {
-		Advance(1);
-		return *this;
-	}
-
-	bool operator!=(const PixelIterator& rhs) const {
-		return *(*this) != *rhs;
 	}
 
 	virtual PIXEL& operator*() const {
@@ -349,13 +349,13 @@ public:
 	~SDLPixelIterator() {
 		delete imp;
 	}
-
+/*
 	template <typename PIXEL>
 	operator PixelIterator<PIXEL>() const {
 		assert(format->BytesPerPixel == sizeof(PIXEL));
 		return *static_cast<const PixelIterator<PIXEL>*>(imp);
 	}
-/*
+
 	template <typename PIXEL>
 	PixelIterator<PIXEL> Imp() const {
 		assert(format->BytesPerPixel == sizeof(PIXEL));
