@@ -426,7 +426,7 @@ void SDL12VideoDriver::DrawHLine(short x1, short y, short x2, const Color& color
 	}
 
 	short min = screenClip.x;
-	short max = min + screenClip.w;
+	short max = min + screenClip.w - 1;
 	x1 = Clamp(x1, min, max);
 	x2 = Clamp(x2, min, max);
 
@@ -446,7 +446,7 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 	}
 
 	short min = screenClip.y;
-	short max = min + screenClip.h;
+	short max = min + screenClip.h - 1;
 	y1 = Clamp(y1, min, max);
 	y2 = Clamp(y2, min, max);
 
@@ -464,7 +464,7 @@ void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Colo
 
 	// clamp the points to screenClip
 	Point min = screenClip.Origin();
-	Point max = min + Point(screenClip.w, screenClip.h);
+	Point max = min + Point(screenClip.w - 1, screenClip.h - 1);
 	Point p1 = Clamp(start, min, max);
 	Point p2 = Clamp(end, min, max);
 	
