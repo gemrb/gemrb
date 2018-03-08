@@ -1115,10 +1115,10 @@ void Map::DrawMap(const Region& viewport)
 		int rain, flags;
 
 		if (game->IsTimestopActive()) {
-			flags = TILE_GREY;
+			flags = BLIT_GREY;
 		}
 		else if (AreaFlags&AF_DREAM) {
-			flags = TILE_SEPIA;
+			flags = BLIT_SEPIA;
 		} else flags = 0;
 
 		if (HasWeather()) {

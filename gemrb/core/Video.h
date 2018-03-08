@@ -60,13 +60,6 @@ enum SpriteBlitFlags {
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
-// TILE_GREY overrides TILE_SEPIA
-enum TileBlitFlags {
-	TILE_HALFTRANS = 1,
-	TILE_GREY = 2,
-	TILE_SEPIA = 4
-};
-
 // !!! Keep this synchronized with GUIDefines.py !!!
 // used for calculating the tooltip delay limit and the real tooltip delay
 #define TOOLTIP_DELAY_FACTOR 250

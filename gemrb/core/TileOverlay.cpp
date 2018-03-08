@@ -96,7 +96,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 											   mask,
 											   ( x * 64 ) - viewport.x,
 											   ( y * 64 ) - viewport.y,
-											   NULL, TILE_HALFTRANS | flags );
+											   NULL, BLIT_HALFTRANS | flags );
 							}
 						}
 					}
