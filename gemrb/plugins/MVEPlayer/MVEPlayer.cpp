@@ -101,8 +101,8 @@ void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw, unsigned int bufh
 
 void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 {
-	p = p + start * 3;
-	for (unsigned int i = start; i < count; i++) {
+	p = p + (start * 3);
+	for (unsigned int i = start; i < start+count; i++) {
 		g_palette->col[i].r = ( *p++ ) << 2;
 		g_palette->col[i].g = ( *p++ ) << 2;
 		g_palette->col[i].b = ( *p++ ) << 2;
