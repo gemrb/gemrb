@@ -536,34 +536,28 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	assert(src && dst);
 	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
 
-	if (flags == 0 && mask == NULL) {
-		SDL_Rect s = srcrgn;
-		SDL_Rect d = dstrgn;
-		SDL_LowerBlit(src, &s, dst, &d);
+	SDL_LockSurface(src);
+	SDL_LockSurface(dst);
+
+	SDLPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+	SDLPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+
+	SDLPixelIterator dstbeg(SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn, dst);
+	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
+	SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
+
+	if (mask) {
+		SDL_LockSurface(mask);
+		PaletteIterator alpha(reinterpret_cast<Color*>(mask->format->palette->colors), static_cast<Uint8*>(mask->pixels));
+		Blit(srcbeg, dstbeg, dstend, alpha, blender);
+		SDL_UnlockSurface(mask);
 	} else {
-		SDL_LockSurface(src);
-		SDL_LockSurface(dst);
-
-		SDLPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
-		SDLPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
-
-		SDLPixelIterator dstbeg(SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn, dst);
-		SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
-		SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
-
-		if (mask) {
-			SDL_LockSurface(mask);
-			PaletteIterator alpha(reinterpret_cast<Color*>(mask->format->palette->colors), static_cast<Uint8*>(mask->pixels));
-			Blit(srcbeg, dstbeg, dstend, alpha, blender);
-			SDL_UnlockSurface(mask);
-		} else {
-			StaticIterator alpha(Color(0,0,0,0));
-			Blit(srcbeg, dstbeg, dstend, alpha, blender);
-		}
-
-		SDL_UnlockSurface(dst);
-		SDL_UnlockSurface(src);
+		StaticIterator alpha(Color(0,0,0,0));
+		Blit(srcbeg, dstbeg, dstend, alpha, blender);
 	}
+
+	SDL_UnlockSurface(dst);
+	SDL_UnlockSurface(src);
 }
 
 }

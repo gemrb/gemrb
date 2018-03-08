@@ -370,9 +370,13 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	} else if (remflags&BLIT_SEPIA) {
 		RGBBlendingPipeline<SEPIA, true> blender;
 		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
-	} else {
+	} else if (mask) {
 		RGBBlendingPipeline<NONE, true> blender;
 		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+	} else {
+		SDL_Rect s = srect;
+		SDL_Rect d = drect;
+		SDL_LowerBlit(surf, &s, currentBuf, &d);
 	}
 
 	if (paloptimization) {
