@@ -3983,8 +3983,10 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
 		covered = false;
 
-	if (Flags&A_ANI_NO_WALL)
-		covered = false;
+	// always provide a cover, even if it is 100% transparent
+	// SDL2 depends on AreaAnimations being drawn to the mask layer
+	//if (Flags&A_ANI_NO_WALL)
+		//covered = false;
 
 	if (covered && !covers) {
 		covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );

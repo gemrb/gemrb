@@ -93,10 +93,10 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 							if (tile->anim[1]) {
 								mask = tile->anim[1]->NextFrame();
 								vid->BlitTile( ovtile->anim[0]->NextFrame(),
-						                   mask,
-							               ( x * 64 ) - viewport.x,
-							               ( y * 64 ) - viewport.y,
-							               NULL, TILE_HALFTRANS | flags );
+											   mask,
+											   ( x * 64 ) - viewport.x,
+											   ( y * 64 ) - viewport.y,
+											   NULL, TILE_HALFTRANS | flags );
 							}
 						}
 					}
