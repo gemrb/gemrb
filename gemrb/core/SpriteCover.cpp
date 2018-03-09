@@ -59,7 +59,6 @@ bool SpriteCover::Covers(int x, int y, int xpos, int ypos,
 //	2 - always dither
 void SpriteCover::AddPolygon(Wall_Polygon* poly)
 {
-
 	// possible TODO: change the cover to use a set of intervals per line?
 	// advantages: faster
 	// disadvantages: makes the blitter much more complex
