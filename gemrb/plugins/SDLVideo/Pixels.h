@@ -524,7 +524,7 @@ template<class BLENDER>
 static void Blit(SDLPixelIterator src,
 				 SDLPixelIterator dst, SDLPixelIterator dstend,
 				 IColorIterator& mask,
-				 BLENDER blender)
+				 const BLENDER& blender)
 {
 	int i = 0;
 	for (; dst != dstend; ++dst, ++src, ++mask) {
