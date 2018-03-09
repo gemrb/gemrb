@@ -124,7 +124,7 @@ public:
 
 	void operator()(const Color& src, Color& dst, Uint8 mask) const {
 		Color c = src;
-		c.a *= mask; // FIXME: not sure this is 100% correct, but it passes my known tests
+		c.a = (255-mask) + (c.a * mask); // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		if (c.a == 0) {
 			return;
