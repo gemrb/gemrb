@@ -376,6 +376,11 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	} else {
 		SDL_Rect s = srect;
 		SDL_Rect d = drect;
+		if (remflags&BLIT_HALFTRANS) {
+			SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
+		} else {
+			SDL_SetAlpha(surf, 0, 0xff);
+		}
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
 	}
 
