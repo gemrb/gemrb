@@ -21,6 +21,7 @@
 #include "SDL20Video.h"
 
 #include "Interface.h"
+#include "Pixels.h"
 
 using namespace GemRB;
 
@@ -144,6 +145,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
+	flags|=BLIT_GREY;
 	UpdateRenderTarget();
 
 	// we need to isolate flags that require software rendering to use as the "version"
@@ -169,10 +171,18 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		// making a new surface and tinting pixels while we manually copy them would be cheaper
 		SDL_Surface* newV = texSprite->NewVersion(version);
 		SDL_LockSurface(newV);
-		if (flags & BLIT_GREY) {
-			
-		} else if (flags & BLIT_SEPIA) {
 
+		SDL_Rect r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg(r, newV);
+		SDLPixelIterator end = SDLPixelIterator::end(beg);
+		StaticIterator alpha(Color(0,0,0,0xff));
+
+		if (flags & BLIT_GREY) {
+			RGBBlendingPipeline<GREYSCALE, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		} else if (flags & BLIT_SEPIA) {
+			RGBBlendingPipeline<SEPIA, true> blender;
+			Blit(beg, beg, end, alpha, blender);
 		}
 		SDL_UnlockSurface(newV);
 
