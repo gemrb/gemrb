@@ -145,7 +145,6 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
-	flags|=BLIT_GREY;
 	UpdateRenderTarget();
 
 	// we need to isolate flags that require software rendering to use as the "version"

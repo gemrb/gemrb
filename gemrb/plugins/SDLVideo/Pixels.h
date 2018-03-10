@@ -526,9 +526,7 @@ static void Blit(SDLPixelIterator src,
 				 IColorIterator& mask,
 				 const BLENDER& blender)
 {
-	int i = 0;
 	for (; dst != dstend; ++dst, ++src, ++mask) {
-		++i;
 		assert(dst.imp->pixel < dstend.imp->pixel);
 		Color srcc, dstc;
 		src.ReadRGBA(srcc.r, srcc.g, srcc.b, srcc.a);
