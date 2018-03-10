@@ -127,7 +127,7 @@ private:
 
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
-		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
+		void Draw(ieWord chr, const Region& dest);
 #if DEBUG_FONT
 		void DumpToScreen(const Region&);
 #endif
@@ -152,7 +152,7 @@ private:
 	GlyphAtlas Atlas;
 
 protected:
-	Palette* palette;
+	mutable Palette* palette;
 
 public:
 	const int LineHeight;
@@ -161,11 +161,13 @@ public:
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL
-	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
+	size_t RenderText(const String&, Region&, ieByte alignment,
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 	// render a single line of text. called by RenderText()
-	size_t RenderLine(const String& string, const Region& rgn, Palette* hicolor,
+	size_t RenderLine(const String& string, const Region& rgn,
 					  Point& dp, ieByte** canvas = NULL) const;
+
+	void SetAtlasPalette(Palette* pal) const;
 
 public:
 	Font(Palette*, ieWord lineheight, ieWord baseline);
@@ -185,7 +187,7 @@ public:
 	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
-								 Palette* pal = NULL, size_t* numPrinted = NULL, Point* = NULL) const;
+								 size_t* numPrinted = NULL, Point* = NULL) const;
 
 	// return the number of glyphs printed
 	// the "point" parameter can be passed with a start point for rendering

@@ -32,13 +32,16 @@ namespace GemRB {
 template <typename KeyType>
 class SpriteSheet {
 protected:
-	Sprite2D* Sheet;
 	Region SheetRegion;
 	std::map<KeyType, Region> RegionMap;
 
 	SpriteSheet() {
 		Sheet = NULL;
 	}
+
+public:
+	Sprite2D* Sheet;
+
 public:
 	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
 		Sheet->acquire();

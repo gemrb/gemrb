@@ -110,12 +110,8 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	return blank;
 }
 
-void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
+void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
 {
-	if (!pal) {
-		pal = font->GetPalette().get();
-	}
-
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		void* pixels = pageData;
@@ -126,15 +122,10 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, Palette* pal)
 			// pixels = malloc(size);
 			// memcpy(pixels, GlyphPageData, size);
 		}
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, pal, true, 0);
-		SpriteSheet<ieWord>::Draw(chr, dest);
-	} else {
-		Palette* oldPal = Sheet->GetPalette();
-		Sheet->SetPalette(pal);
-		SpriteSheet<ieWord>::Draw(chr, dest);
-		Sheet->SetPalette(oldPal);
-		oldPal->release();
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, font->GetPalette().get(), true, 0);
 	}
+
+	SpriteSheet<ieWord>::Draw(chr, dest);
 }
 
 #if DEBUG_FONT
@@ -228,8 +219,7 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 	return blank;
 }
 
-size_t Font::RenderText(const String& string, Region& rgn,
-						Palette* color, ieByte alignment,
+size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 						Point* point, ieByte** canvas, bool grow) const
 {
 	// NOTE: vertical alignment is not handled here.
@@ -332,7 +322,7 @@ size_t Font::RenderText(const String& string, Region& rgn,
 				core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 #endif
-				linePos = RenderLine(line, lineRgn, color, linePoint, canvas);
+				linePos = RenderLine(line, lineRgn, linePoint, canvas);
 			}
 			if (linePos == 0) {
 				break; // if linePos == 0 then we would loop till we are out of bounds so just stop here
@@ -385,9 +375,8 @@ size_t Font::RenderText(const String& string, Region& rgn,
 }
 
 size_t Font::RenderLine(const String& line, const Region& lineRgn,
-						Palette* color, Point& dp, ieByte** canvas) const
+						Point& dp, ieByte** canvas) const
 {
-	assert(color); // must have a palette
 	assert(lineRgn.h == LineHeight);
 
 	// NOTE: alignment is not handled here.
@@ -453,7 +442,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				GlyphAtlasPage* page = Atlas[pageIdx];
-				page->Draw(currChar, Region(blitPoint, curGlyph.size), color);
+				page->Draw(currChar, Region(blitPoint, curGlyph.size));
 			}
 			dp.x += curGlyph.size.w;
 		}
@@ -465,7 +454,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 }
 
 Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
-								   ieByte alignment, Palette* color, size_t* numPrinted, Point* endPoint) const
+								   ieByte alignment, size_t* numPrinted, Point* endPoint) const
 {
 	Size canvasSize = StringSize(string); // same as size(0, 0)
 	// if the string is larger than the region shrink the canvas
@@ -520,16 +509,13 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
 
 	Region rgn = Region(Point(0,0), canvasSize);
-	size_t ret = RenderText(string, rgn, palette, alignment, endPoint, &canvasPx, (size.h) ? false : true);
+	size_t ret = RenderText(string, rgn, alignment, endPoint, &canvasPx, (size.h) ? false : true);
 	if (numPrinted) {
 		*numPrinted = ret;
 	}
-	Palette* pal = color;
-	if (!pal)
-		pal = palette;
+
 	// must ue rgn! the canvas height might be changed in RenderText()
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h,
-															 canvasPx, pal, true, 0);
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h, canvasPx, palette, true, 0);
 	if (alignment&IE_FONT_ALIGN_CENTER) {
 		canvas->XPos = (size.w - rgn.w) / 2;
 	} else if (alignment&IE_FONT_ALIGN_RIGHT) {
@@ -543,15 +529,21 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	return canvas;
 }
 
+void Font::SetAtlasPalette(Palette* pal) const
+{
+	GlyphAtlas::const_iterator it;
+	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
+		Sprite2D* sheet = (*it)->Sheet;
+		if (sheet)
+			sheet->SetPalette(palette);
+	}
+}
+
 size_t Font::Print(Region rgn, const String& string,
 				   Palette* color, ieByte alignment, Point* point) const
 {
 	if (rgn.Dimensions().IsEmpty()) return 0;
 
-	Palette* pal = color;
-	if (!pal) {
-		pal = palette;
-	}
 	Point p = (point) ? *point : Point();
 	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
 		// we assume that point will be an offset from midde/bottom position
@@ -578,7 +570,21 @@ size_t Font::Print(Region rgn, const String& string,
 		}
 	}
 
-	size_t ret = RenderText(string, rgn, pal, alignment, &p);
+	Palette* restore = NULL;
+	if (color) {
+		// we set palette in this way because we want all the Atlas pages to inherit the change
+		restore = palette;
+		palette = color;
+		SetAtlasPalette(palette);
+	}
+
+	size_t ret = RenderText(string, rgn, alignment, &p);
+
+	if (color) {
+		palette = restore;
+		SetAtlasPalette(palette);
+	}
+
 	if (point) {
 		*point = p;
 	}
