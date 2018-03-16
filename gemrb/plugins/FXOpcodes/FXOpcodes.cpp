@@ -5051,6 +5051,8 @@ int fx_castingspeed_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_castingspeed_modifier(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_MOD( IE_MENTALSPEED );
+	// BGEE2 has param2==2: Set casting time of spells with casting
+	// time higher than param1 to param1 ... which we handle in the user
 	return FX_APPLIED;
 }
 

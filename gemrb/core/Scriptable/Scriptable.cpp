@@ -1360,6 +1360,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 }
 
 static EffectRef fx_force_surge_modifier_ref = { "ForceSurgeModifier", -1 };
+static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant, Scriptable *target)
@@ -1382,8 +1383,18 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 	// how does this work for non-actors exactly?
 	if (actor) {
 		// The mental speed effect can shorten or lengthen the casting time.
-		casting_time -= (int)actor->Modified[IE_MENTALSPEED];
-		// maybe also add a random lucky roll as for weapon speed / initiative
+		// But first check if a special maximum is set
+		Effect *fx = actor->fxqueue.HasEffectWithParam(fx_castingspeed_modifier_ref, 2);
+		int max = 1000;
+		if (fx) {
+			max = fx->Parameter1;
+		}
+		if (max < 10 && casting_time > max) {
+			casting_time = max;
+		} else {
+			casting_time -= (int)actor->Modified[IE_MENTALSPEED];
+		}
+
 		if (casting_time < 0) {
 			casting_time = 0;
 		} else if (casting_time > 10) {
