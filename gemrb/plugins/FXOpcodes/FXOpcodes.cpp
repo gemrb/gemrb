@@ -4809,9 +4809,13 @@ int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_remove_spell(%2d): Resource: %s Type:%d", fx->Opcode, fx->Resource, fx->Parameter2);
+	bool onlyknown;
+
 	switch (fx->Parameter2) {
 	default:
-		target->spellbook.RemoveSpell(fx->Resource);
+		// in yet another poor IE design decision ...
+		onlyknown = strnlen(fx->Resource, sizeof(ieResRef)) == 8;
+		target->spellbook.RemoveSpell(fx->Resource, onlyknown);
 		break;
 	case 1: //forget all spells of Resource
 		do {} while(target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE ));
