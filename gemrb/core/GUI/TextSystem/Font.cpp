@@ -535,7 +535,7 @@ void Font::SetAtlasPalette(Palette* pal) const
 	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
 		Sprite2D* sheet = (*it)->Sheet;
 		if (sheet)
-			sheet->SetPalette(palette);
+			sheet->SetPalette(pal);
 	}
 }
 
