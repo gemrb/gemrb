@@ -36,6 +36,9 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Width, Height, Bpp < 8 ? 8 : Bpp, rmask, gmask, bmask, amask));
 		SDL_FillRect(*surface, NULL, 0);
 	}
+
+	original = surface;
+	version = 0;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
@@ -45,6 +48,8 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
 	surface = new SurfaceHolder(SDL_CreateRGBSurface( Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
 									   rmask, gmask, bmask, amask ));
 	SDL_FillRect(*surface, NULL, 0);
+	original = surface;
+	version = 0;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -73,7 +78,11 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	// all copies now share underlying. AFIK we don't have actual need for modifying pixels,
 	// but just in case something comes up the code above can be used in a pinch
 
+	// a copy does not retain the original
+	// it is as if it is a new sprite of version 0
 	surface = obj.surface;
+	original = surface;
+	version = 0;
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
@@ -136,6 +145,8 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 		palette = NULL;
 	}
 
+	Restore();
+
 	ieDword ck = GetColorKey();
 	if (pal && SetPalette(pal->col) == 0) {
 		palette = pal;
@@ -147,7 +158,7 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 	surface->palette = palette;
 }
 
-int SDLSurfaceSprite2D::SetPalette(const Color* pal)
+int SDLSurfaceSprite2D::SetPalette(const Color* pal) const
 {
 	return SDLVideoDriver::SetSurfacePalette(*surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << Bpp);
 }
@@ -236,14 +247,43 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 	return false;
 }
 
+void SDLSurfaceSprite2D::Restore() const
+{
+	version = 0;
+	surface = original;
+	if (Bpp == 8) {
+		SetPalette(surface->palette->col);
+	}
+}
+
+void* SDLSurfaceSprite2D::NewVersion(unsigned int newversion) const
+{
+	version = newversion;
+
+	if (version == 0) {
+		Restore();
+	}
+
+	if (Bpp == 8) {
+		GetPalette(); // generate the backup
+		// we just allow overwritting the palette
+		return surface->surface->format->palette;
+	} else if (version != newversion) {
+		SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
+		surface = new SurfaceHolder(newVersion);
+
+		return newVersion;
+	} else {
+		return surface->surface;
+	}
+}
+
 #if SDL_VERSION_ATLEAST(1,3,0)
 SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
 : SDLSurfaceSprite2D(Width, Height, Bpp, pixels, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
-	original = surface;
-	texVersion = 0;
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
@@ -251,16 +291,12 @@ SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
 : SDLSurfaceSprite2D(Width, Height, Bpp, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
-	original = surface;
-	texVersion = 0;
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& obj)
 : SDLSurfaceSprite2D(obj)
 {
-	original = obj.original;
 	texture = obj.texture;
-	texVersion = obj.texVersion;
 }
 
 SDLTextureSprite2D* SDLTextureSprite2D::copy() const
@@ -268,45 +304,30 @@ SDLTextureSprite2D* SDLTextureSprite2D::copy() const
 	return new SDLTextureSprite2D(*this);
 }
 
-SDL_Surface* SDLTextureSprite2D::NewVersion(unsigned int version) const
-{
-	if (version == texVersion) {
-		return NULL;
-	}
-
-	texture = NULL;
-	texVersion = version;
-
-	SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
-	surface = new SurfaceHolder(newVersion);
-	return newVersion;
-}
-
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 {
 	if (texture == NULL) {
-		// TODO: we could make this even more efficient
-		// by saving a map of all textures keyed off their original + version
-		// however, there probably arent a lot of situations where we are both blitting the same image and using software fallback
-		// palettes might make the effort worthwhile if we are using the same image with different palettes
 		texture = new TextureHolder(SDL_CreateTextureFromSurface(renderer, GetSurface()));
 	}
 	return *texture;
-}
-
-void SDLTextureSprite2D::SetPalette(Palette *pal)
-{
-	if (pal == GetPalette())
-		return;
-
-	texture = NULL;
-	SDLSurfaceSprite2D::SetPalette(pal);
 }
 
 void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 {
 	texture = NULL;
 	SDLSurfaceSprite2D::SetColorKey(pxvalue);
+}
+
+void* SDLTextureSprite2D::NewVersion(unsigned int version) const
+{
+	texture = NULL;
+	return SDLSurfaceSprite2D::NewVersion(version);
+}
+
+void SDLTextureSprite2D::Restore() const
+{
+	texture = NULL;
+	SDLSurfaceSprite2D::Restore();
 }
 #endif
 

@@ -21,7 +21,6 @@
 #include "SDL20Video.h"
 
 #include "Interface.h"
-#include "Pixels.h"
 
 using namespace GemRB;
 
@@ -154,10 +153,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	unsigned int currentVer = texSprite->GetVersion();
 	SDL_Texture* tex = NULL;
 
-	if (currentVer == version) {
-		tex = texSprite->GetTexture(renderer);
-	}
-
 	// TODO: handle "shadow" (BLIT_NOSHADOW|BLIT_TRANSSHADOW). I'm not even sure when "shadow" is used.
 	// regular lightmap shadows are actually handled via tinting
 	// its part of blending, not tinting, so maybe we could handle them with the SpriteCover
@@ -165,28 +160,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 
 	if (currentVer != version) {
 		// WARNING: software fallback == slow
-
-		// TODO: this is still an extra blit
-		// making a new surface and tinting pixels while we manually copy them would be cheaper
-		SDL_Surface* newV = texSprite->NewVersion(version);
-		SDL_LockSurface(newV);
-
-		SDL_Rect r = {0, 0, newV->w, newV->h};
-		SDLPixelIterator beg(r, newV);
-		SDLPixelIterator end = SDLPixelIterator::end(beg);
-		StaticIterator alpha(Color(0,0,0,0xff));
-
-		if (flags & BLIT_GREY) {
-			RGBBlendingPipeline<GREYSCALE, true> blender;
-			Blit(beg, beg, end, alpha, blender);
-		} else if (flags & BLIT_SEPIA) {
-			RGBBlendingPipeline<SEPIA, true> blender;
-			Blit(beg, beg, end, alpha, blender);
-		}
-		SDL_UnlockSurface(newV);
-
-		tex = texSprite->GetTexture(renderer);
+		RenderSpriteVersion(texSprite, version);
 	}
+
+	tex = texSprite->GetTexture(renderer);
 
 	if (flags & BLIT_HALFTRANS) {
 		SDL_SetTextureAlphaMod(tex, 255/2);

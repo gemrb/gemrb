@@ -672,6 +672,49 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask
 	}
 }
 
+void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* tint)
+{
+	if (renderflags != spr->GetVersion()) {
+		if (spr->Bpp == 8) {
+			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(renderflags));
+
+			for (size_t i = 0; i < 256; ++i) {
+				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
+
+				if (renderflags&BLIT_TINTED) {
+					assert(tint);
+					ShaderTint(*tint, dstc);
+				}
+
+				if (renderflags&BLIT_GREY) {
+					ShaderGreyscale(dstc);
+				} else if (renderflags&BLIT_SEPIA) {
+					ShaderSepia(dstc);
+				}
+			}
+		} else {
+			// FIXME: this should technically support BLIT_TINTED; we just dont use it
+
+			SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(renderflags);
+			SDL_LockSurface(newV);
+
+			SDL_Rect r = {0, 0, newV->w, newV->h};
+			SDLPixelIterator beg(r, newV);
+			SDLPixelIterator end = SDLPixelIterator::end(beg);
+			StaticIterator alpha(Color(0,0,0,0xff));
+
+			if (renderflags & BLIT_GREY) {
+				RGBBlendingPipeline<GREYSCALE, true> blender;
+				Blit(beg, beg, end, alpha, blender);
+			} else if (renderflags & BLIT_SEPIA) {
+				RGBBlendingPipeline<SEPIA, true> blender;
+				Blit(beg, beg, end, alpha, blender);
+			}
+			SDL_UnlockSurface(newV);
+		}
+	}
+}
+
 // static class methods
 
 int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)

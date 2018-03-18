@@ -311,7 +311,8 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		c.a >>= 1;
 	}
 
-	SDL_Surface* surf = ((SDLSurfaceSprite2D*)spr)->GetSurface();
+	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
+	SDL_Surface* surf = sdlspr->GetSurface();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 	SDL_Surface* masksurf = NULL;
@@ -319,38 +320,14 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		masksurf = ((SDLSurfaceSprite2D*)mask)->GetSurface();
 	}
 
-	bool paloptimization = false;
 	if (surf->format->BytesPerPixel == 1) {
 		c.a = 255; // FIXME: this is probably actually contigent on something else...
 
 		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
-
-		// if the image is large we can shade it faster by copying the pallette and shading it instead
-		// an educated guess is larger than the number of colors in the palette plus the time to copy it
-		// to keep it simple ill say number of colors x 2
-		if (bool(remflags&shaderflags) && srect.w * srect.h > 256*2) {
-			paloptimization = true;
-
-			// TODO: this could be made even more efficient by utilizing palette versioning similar to what we do for textures in SDL2
-			// this way we only have to execute this when the "shader" changes rather than every frame
-			// at that point we dont even need a check for the size of the blit either
-			for (size_t i = 0; i < 256; ++i) {
-				Color& dstc = reinterpret_cast<Color&>(surf->format->palette->colors[i]);
-
-				if (remflags&BLIT_TINTED) {
-					ShaderTint(c, dstc);
-				}
-
-				if (remflags&BLIT_GREY) {
-					ShaderGreyscale(dstc);
-				} else { // BLIT_SEPIA
-					ShaderSepia(dstc);
-				}
-			}
-
-			// since the "shading" has been done we clear the flags
-			remflags &= ~shaderflags;
-		}
+		unsigned int version = remflags&shaderflags;
+		RenderSpriteVersion(sdlspr, version, &c);
+		// since the "shading" has been done we clear the flags
+		remflags &= ~shaderflags;
 	}
 
 	if (remflags&BLIT_TINTED) {
@@ -382,13 +359,6 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 			SDL_SetAlpha(surf, 0, 0xff);
 		}
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
-	}
-
-	if (paloptimization) {
-		// undo our optimization hack
-		Palette* pal = spr->GetPalette();
-		((SDLSurfaceSprite2D*)spr)->SetPalette(pal->col);
-		pal->release();
 	}
 }
 

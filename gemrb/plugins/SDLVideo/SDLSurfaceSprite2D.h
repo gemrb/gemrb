@@ -39,11 +39,12 @@ protected:
 		~SurfaceHolder() { SDL_FreeSurface(surface); }
 
 		SDL_Surface* operator->() { return surface; }
-
 		operator SDL_Surface* () { return surface; }
 	};
 
+	Holder<SurfaceHolder> original;
 	mutable Holder<SurfaceHolder> surface;
+	mutable unsigned int version;
 
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
@@ -59,7 +60,7 @@ public:
 
 	Palette *GetPalette() const;
 	const Color* GetPaletteColors() const;
-	int SetPalette(const Color* pal);
+	int SetPalette(const Color* pal) const;
 	void SetPalette(Palette *pal);
 	ieDword GetColorKey() const;
 	void SetColorKey(ieDword pxvalue);
@@ -69,6 +70,14 @@ public:
 						 ieDword bmask, ieDword amask);
 
 	SDL_Surface* GetSurface() const { return *surface; };
+
+	// return a copy of the surface or the palette if 8 bit
+	// this copy is what is returned from GetSurface for rendering
+	virtual void* NewVersion(unsigned int version) const;
+	// restore the sprite to version 0 (aka original) and free the versioned resources
+	// an 8 bit sprite will be also implicitly restored by SetPalette()
+	virtual void Restore() const;
+	unsigned int GetVersion() const { return version; }
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -85,12 +94,9 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 		~TextureHolder() { SDL_DestroyTexture(texture); }
 
 		SDL_Texture* operator->() { return texture; }
-
 		operator SDL_Texture* () { return texture; }
 	};
 
-	mutable unsigned int texVersion;
-	Holder<SurfaceHolder> original;
 	mutable Holder<TextureHolder> texture;
 
 public:
@@ -102,13 +108,12 @@ public:
 	SDLTextureSprite2D* copy() const;
 
 	using SDLSurfaceSprite2D::SetPalette;
-	void SetPalette(Palette *pal);
 	void SetColorKey(ieDword pxvalue);
 
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 
-	SDL_Surface* NewVersion(unsigned int version) const;
-	unsigned int GetVersion() const { return texVersion; }
+	void* NewVersion(unsigned int version) const;
+	void Restore() const;
 };
 #endif
 
