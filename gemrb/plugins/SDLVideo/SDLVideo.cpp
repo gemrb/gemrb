@@ -565,7 +565,7 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 			int y_bot = iter->y2 - origin.y; // exclusive
 
 			if (y_top < 0) y_top = 0;
-			if (y_bot > screenSize.h) y_bot = screenSize.h;
+			if (y_bot >= screenSize.h) y_bot = screenSize.h - 1;
 			if (y_top >= y_bot) continue; // clipped
 
 			int ledge = iter->left_edge;
@@ -585,7 +585,7 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 				rt -= origin.x;
 
 				if (lt < 0) lt = 0;
-				if (rt > screenSize.w) rt = screenSize.w;
+				if (rt >= screenSize.w) rt = screenSize.w - 1;
 				if (lt >= rt) { continue; } // clipped
 
 				// Draw a line from (y,lt) to (y,rt)
@@ -594,17 +594,20 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 			}
 		}
 	} else {
-		SetPixel(drawingBuffer, poly->points[0].x - origin.x, poly->points[0].y - origin.y);
+		Size size = drawingBuffer->Size();
+		Point p = Clamp(poly->points[0] - origin, Point(0,0), Point(size.w, size.h));
+		SetPixel(drawingBuffer, p.x, p.y);
 
 		for (unsigned int i = 1; i < poly->count; i++) {
-			SetPixel(drawingBuffer, poly->points[i].x - origin.x, poly->points[i].y - origin.y);
-			SetPixel(drawingBuffer, poly->points[i].x - origin.x, poly->points[i].y - origin.y);
+			// this is not a typo. one point ends the previous line, the next begins the next line
+			Point p = Clamp(poly->points[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
+			SetPixel(drawingBuffer, p.x, p.y);
+			SetPixel(drawingBuffer, p.x, p.y);
 		}
 		// reconnect with start point
-		SetPixel(drawingBuffer, poly->points[0].x - origin.x, poly->points[0].y - origin.y);
+		SetPixel(drawingBuffer, p.x, p.y);
 	}
 
-	// TODO: if our points were compatible with SDL_Point we could just pass poly->points
 	DrawLines(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
