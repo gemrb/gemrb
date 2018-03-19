@@ -326,14 +326,14 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 // SetPixel is in screen coordinates
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SetPixel(buffer, _x, _y) { \
-Region r = Region(Point(0,0), buffer->Size()); \
-Point p(_x, _y); \
-if (r.PointInside(p)) { SDL_Point p2 = {p.x,p.y}; points.push_back(p2); } }
+Region _r = Region(Point(0,0), buffer->Size()); \
+Point _p(_x, _y); \
+if (_r.PointInside(_p)) { SDL_Point _p2 = {_p.x,_p.y}; points.push_back(_p2); } }
 #else
 #define SetPixel(buffer, _x, _y) { \
-Region r = Region(Point(0,0), buffer->Size()); \
-Point p(_x, _y); \
-if (r.PointInside(p)) { points.push_back(p); } }
+Region _r = Region(Point(0,0), buffer->Size()); \
+Point _p(_x, _y); \
+if (_r.PointInside(_p)) { points.push_back(_p); } }
 #endif
 
 /** This functions Draws a Circle */
