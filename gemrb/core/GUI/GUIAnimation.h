@@ -32,20 +32,23 @@ public:
 	GUIAnimation() : begintime(0), endtime(0) {}
 	GUIAnimation(unsigned long duration);
 	
-	operator bool() const;
+	virtual operator bool() const=0;
 };
 
 class PointAnimation : public GUIAnimation {
 public:
-	Point begin, end;
+	Point begin, end, current;
 	
 public:
 	PointAnimation() : GUIAnimation() {}
 	
 	PointAnimation(const Point& begin, const Point& end, unsigned long duration)
-	: GUIAnimation(duration), begin(begin), end(end) {}
+	: GUIAnimation(duration), begin(begin), end(end), current(begin) {}
 	
-	Point NextPoint() const;
+	Point NextPoint();
+	Point CurrentPoint() const;
+
+	operator bool() const;
 };
 
 }

@@ -28,12 +28,11 @@ GUIAnimation::GUIAnimation(unsigned long duration)
 	endtime = begintime + duration;
 }
 
-GUIAnimation::operator bool() const {
-	unsigned long curTime = GetTickCount();
-	return (curTime < endtime);
+PointAnimation::operator bool() const {
+	return current != end;
 }
 	
-Point PointAnimation::NextPoint() const {
+Point PointAnimation::NextPoint() {
 	unsigned long curTime = GetTickCount();
 	if (curTime < endtime) {
 		int deltax = end.x - begin.x;
@@ -42,9 +41,17 @@ Point PointAnimation::NextPoint() const {
 		Point p;
 		p.x = deltax * double(curTime - begintime) / deltaT;
 		p.y = deltay * double(curTime - begintime) / deltaT;
-		return begin + p;
+
+		current = begin + p;
+	} else {
+		current = end;
 	}
-	return end;
+	return current;
+}
+
+Point PointAnimation::CurrentPoint() const
+{
+	return current;
 }
 
 }
