@@ -189,9 +189,11 @@ def UpdateMageWindow (MageWindow):
 
 def MageSelectionChanged (Window):
 	def SelectionChanged ():
+		pc = GemRB.GameGetSelectedPCSingle()
 		# start from scratch because its easier
 		Window.Close()
 		ToggleSpellWindow()
+		GemRB.GameSelectPCSingle (pc)
 
 	GUICommonWindows.SetSelectionChangeHandler(SelectionChanged)
 
