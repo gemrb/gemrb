@@ -688,7 +688,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 			SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(renderflags);
 			SDL_LockSurface(newV);
 
-			SDL_Rect r = {0, 0, newV->w, newV->h};
+			SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
 			SDLPixelIterator beg(r, newV);
 			SDLPixelIterator end = SDLPixelIterator::end(beg);
 			StaticIterator alpha(Color(0,0,0,0xff));
