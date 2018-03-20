@@ -37,6 +37,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 		SDL_FillRect(*surface, NULL, 0);
 	}
 
+	assert(*surface);
 	original = surface;
 	version = 0;
 }
@@ -45,9 +46,11 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
 										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
 : Sprite2D(Width, Height, Bpp, NULL)
 {
-	surface = new SurfaceHolder(SDL_CreateRGBSurface( Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
-									   rmask, gmask, bmask, amask ));
+	surface = new SurfaceHolder(SDL_CreateRGBSurface( 0, Width, Height, Bpp < 8 ? 8 : Bpp,
+													 rmask, gmask, bmask, amask ));
 	SDL_FillRect(*surface, NULL, 0);
+
+	assert(*surface);
 	original = surface;
 	version = 0;
 }
