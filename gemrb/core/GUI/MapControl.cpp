@@ -86,17 +86,18 @@ void MapControl::DrawFog(const Region& rgn)
 	Video *video = core->GetVideoDriver();
 	const Size mapsize = MyMap->GetSize();
 	Point p;
+	Point gameP = p;
 
 	for (; p.y < rgn.h; ++p.y) {
-		for (; p.x < rgn.w; ++p.x) {
-			Point gameP = p;
-			gameP.x *= double(mapsize.w) / mosRgn.w;
-			gameP.y *= double(mapsize.h) / mosRgn.h;
+		gameP.y = p.y * double(mapsize.h) / mosRgn.h;
+
+		for (p.x = 0; p.x < rgn.w; ++p.x) {
+			gameP.x = p.x * double(mapsize.w) / mosRgn.w;
 			
 			bool visible = MyMap->IsVisible( gameP, true );
 			if (!visible) {
-				Region rgn = Region ( ConvertPointToScreen(p), Size(1, 1) );
-				video->DrawRect( rgn, colors[black] );
+				Region px = Region ( p + rgn.Origin(), Size(1, 1) );
+				video->DrawRect( px, colors[black] );
 			}
 		}
 	}
