@@ -104,10 +104,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					key = GEM_GRAB;
 					break;
 				default:
+#if SDL_VERSION_ATLEAST(1,3,0)
+					// SDL2 has SDL_TEXTINPUT event
+					return GEM_OK;
+#else
 					if (sym < 256) {
 						key = sym;
 					}
 					break;
+#endif
 			}
 			if (key != 0) {
 				Event e = EvntManager->CreateKeyEvent(key, false, modstate);
@@ -115,9 +120,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_KEYDOWN:
-#if SDL_VERSION_ATLEAST(1,3,0)
-			key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-#endif
 			// reenable special numpad keys unless numlock is off
 			if (SDL_GetModState() & KMOD_NUM) {
 				switch (sym) {
@@ -209,8 +211,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					//also, there is no need to ever produce more than 12
 					key = GEM_FUNCTIONX(1) + sym-SDLK_F1;
 					break;
-				default: break;
+				default:
+#if SDL_VERSION_ATLEAST(1,3,0)
+					// SDL2 has SDL_TEXTINPUT event
+					return GEM_OK;
+#else
+					break;
+#endif
 			}
+
 			e = EvntManager->CreateKeyEvent(key, true, modstate);
 			if (e.keyboard.character) {
 #if SDL_VERSION_ATLEAST(1,3,0)

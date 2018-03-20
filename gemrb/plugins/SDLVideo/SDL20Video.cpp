@@ -256,7 +256,9 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
+	int modstate = GetModState(SDL_GetModState());
 	Event e;
+
 	switch (event.type) {
 		case SDL_FINGERDOWN: // fallthough
 		case SDL_FINGERUP:
@@ -328,8 +330,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
-			for (size_t i=0; i < strlen(event.text.text); i++) {
+			for (size_t i=0; event.text.text[i]; i++) {
 				//EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
+				e = EvntManager->CreateKeyEvent(event.text.text[i], true, modstate);
+				EvntManager->DispatchEvent(e);
+				e = EvntManager->CreateKeyEvent(event.text.text[i], false, modstate);
+				EvntManager->DispatchEvent(e);
 			}
 			break;
 		/* not user input events */
