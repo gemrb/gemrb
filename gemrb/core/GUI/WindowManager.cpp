@@ -539,6 +539,10 @@ void WindowManager::DrawWindows() const
 		} else {
 			win->Draw();
 		}
+
+		if (FadeColor.a > 0) {
+			video->DrawRect(screen, FadeColor);
+		}
 	}
 
 	if (modalWin || drawFrame) {

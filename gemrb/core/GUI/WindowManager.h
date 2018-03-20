@@ -45,6 +45,8 @@ public:
 	static Holder<Sprite2D> CursorMouseUp;
 	static Holder<Sprite2D> CursorMouseDown;
 
+	Color FadeColor;
+
 private:
 	bool drawCursor;
 

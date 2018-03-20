@@ -209,14 +209,14 @@ end:
 
 
 void GlobalTimer::DoFadeStep(ieDword count) {
-	Video *video = core->GetVideoDriver();
+	WindowManager* wm = core->GetWindowManager();
 	if (fadeToCounter) {
 		fadeToCounter-=count;
 		if (fadeToCounter<0) {
 			fadeToCounter=0;
 			fadeToFactor = 1;
 		}
-		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax / fadeToFactor);
+		wm->FadeColor.a = 255 * (( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 		//bug/patch #1837747 made this unneeded
 		//goto end; //hmm, freeze gametime?
 	}
@@ -235,13 +235,13 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeToCounter=fadeFromMax;
 				fadeToFactor = 1;
 			}
-			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax / fadeFromFactor);
+			wm->FadeColor.a = 255 * (( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 			//bug/patch #1837747 made this unneeded
 			//goto end; //freeze gametime?
 		}
 	}
 	if (fadeFromCounter==fadeFromMax) {
-		video->SetFadePercent( 0 );
+		wm->FadeColor.a = 0;
 	}
 }
 

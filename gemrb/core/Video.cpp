@@ -33,7 +33,6 @@ namespace GemRB {
 const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
-	: fadeColor()
 {
 	drawingBuffer = NULL;
 	EvntManager = NULL;

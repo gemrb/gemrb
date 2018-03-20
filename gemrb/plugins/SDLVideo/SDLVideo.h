@@ -111,9 +111,6 @@ public:
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 
-	void SetFadeColor(int r, int g, int b);
-	void SetFadePercent(int percent);
-
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
 	typedef SDL_Texture vid_buf_t;

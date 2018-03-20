@@ -5375,7 +5375,8 @@ void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetGlobalTint(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetVideoDriver()->SetFadeColor(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	Color c(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter, 0xff);
+	core->GetWindowManager()->FadeColor = c;
 }
 
 void GameScript::SetArmourLevel(Scriptable* Sender, Action* parameters)

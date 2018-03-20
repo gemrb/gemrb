@@ -113,8 +113,6 @@ protected:
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
 
-	Color fadeColor;
-
 	typedef std::deque<VideoBuffer*> VideoBuffers;
 
 	// collection of all existing video buffers
@@ -215,10 +213,6 @@ public:
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
-	/** Sets the Fading Color */
-	virtual void SetFadeColor(int r, int g, int b) = 0;
-	/** Sets the Fading to Color Percentage */
-	virtual void SetFadePercent(int percent) = 0;
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */

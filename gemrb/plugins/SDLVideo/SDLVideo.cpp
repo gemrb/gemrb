@@ -613,28 +613,6 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 
 #undef SetPixel
 
-void SDLVideoDriver::SetFadeColor(int r, int g, int b)
-{
-	if (r>255) r=255;
-	else if(r<0) r=0;
-	fadeColor.r=r;
-	if (g>255) g=255;
-	else if(g<0) g=0;
-	fadeColor.g=g;
-	if (b>255) b=255;
-	else if(b<0) b=0;
-	fadeColor.b=b;
-	//long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
-	//SDL_FillRect( extra, NULL, val );
-}
-
-void SDLVideoDriver::SetFadePercent(int percent)
-{
-	if (percent>100) percent = 100;
-	else if (percent<0) percent = 0;
-	fadeColor.a = (255 * percent ) / 100;
-}
-
 void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags, const Color* tint)
 {
 	// FIXME?: srect isn't verified
