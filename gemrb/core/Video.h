@@ -67,9 +67,12 @@ enum SpriteBlitFlags {
 class GEM_EXPORT VideoBuffer {
 protected:
 	Region rect;
+
+public:
+	bool blend;
 	
 public:
-	VideoBuffer(const Region& r) : rect(r) {}
+	VideoBuffer(const Region& r) : rect(r), blend(true) {}
 	virtual ~VideoBuffer() {}
 	
 	::GemRB::Size Size() const { return rect.Dimensions(); }

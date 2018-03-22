@@ -135,7 +135,12 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 	}
 
 	if (color) {
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		if (drawingBuffer->blend) {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		} else {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+		}
+
 		return SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
 	}
 
