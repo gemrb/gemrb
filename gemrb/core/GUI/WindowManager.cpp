@@ -539,10 +539,6 @@ void WindowManager::DrawWindows() const
 		} else {
 			win->Draw();
 		}
-
-		if (FadeColor.a > 0) {
-			video->DrawRect(screen, FadeColor);
-		}
 	}
 
 	if (modalWin || drawFrame) {
@@ -554,6 +550,9 @@ void WindowManager::DrawWindows() const
 		if (modalWin) {
 			modalWin->Draw();
 		}
+	} else if (FadeColor.a > 0) {
+		video->PushDrawingBuffer(winFrameBuf);
+		video->DrawRect(screen, FadeColor);
 	}
 
 	DrawMouse();
