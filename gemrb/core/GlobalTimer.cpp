@@ -216,7 +216,7 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 			fadeToCounter=0;
 			fadeToFactor = 1;
 		}
-		wm->FadeColor.a = 255 * (( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
+		wm->FadeColor.a = 255 * (double( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 		//bug/patch #1837747 made this unneeded
 		//goto end; //hmm, freeze gametime?
 	}
@@ -235,7 +235,7 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeToCounter=fadeFromMax;
 				fadeToFactor = 1;
 			}
-			wm->FadeColor.a = 255 * (( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
+			wm->FadeColor.a = 255 * (double( fadeFromMax - fadeFromCounter ) / fadeFromMax / fadeFromFactor);
 			//bug/patch #1837747 made this unneeded
 			//goto end; //freeze gametime?
 		}
