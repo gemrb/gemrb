@@ -106,7 +106,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				default:
 #if SDL_VERSION_ATLEAST(1,3,0)
 					// SDL2 has SDL_TEXTINPUT event
-					return GEM_OK;
+					if (modstate <= GEM_MOD_SHIFT) return GEM_OK;
 #else
 					if (sym < 256) {
 						key = sym;
@@ -214,7 +214,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				default:
 #if SDL_VERSION_ATLEAST(1,3,0)
 					// SDL2 has SDL_TEXTINPUT event
-					return GEM_OK;
+					if (modstate <= GEM_MOD_SHIFT) return GEM_OK;
 #else
 					break;
 #endif
