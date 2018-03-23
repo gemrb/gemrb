@@ -302,15 +302,6 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
-	if (remflags & BLIT_HALFTRANS) {
-		// handle halftrans with 50% alpha tinting
-		if (!(remflags & BLIT_TINTED)) {
-			c.r = c.g = c.b = c.a = 255;
-			remflags |= BLIT_TINTED;
-		}
-		c.a >>= 1;
-	}
-
 	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
 	SDL_Surface* surf = sdlspr->GetSurface();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
@@ -328,6 +319,25 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		RenderSpriteVersion(sdlspr, version, &c);
 		// since the "shading" has been done we clear the flags
 		remflags &= ~shaderflags;
+	}
+
+	// must be checked afer palette versioning is done
+	if (remflags == BLIT_HALFTRANS) {
+		// we can only use SDL_SetAlpha if we dont need our general purpose blitter for another reason
+		SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
+		remflags &= ~BLIT_HALFTRANS;
+	} else {
+		SDL_SetAlpha(surf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+	}
+
+	// more than BLIT_HALFTRANS is still set
+	if (remflags & BLIT_HALFTRANS) {
+		// handle halftrans with 50% alpha tinting
+		if (!(remflags & BLIT_TINTED)) {
+			c.r = c.g = c.b = c.a = 255;
+			remflags |= BLIT_TINTED;
+		}
+		c.a >>= 1;
 	}
 
 	if (remflags&BLIT_TINTED) {
