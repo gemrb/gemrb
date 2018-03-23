@@ -641,9 +641,11 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 void TextArea::ClearText()
 {
 	delete scrollview.RemoveSubview(textContainer);
+	Size textSize = scrollview.ContentRegion().Dimensions();
+	textSize.h = 0; // auto grow
 
 	parser.Reset(); // reset in case any tags were left open from before
-	textContainer = new TextContainer(Region(Point(), Size(frame.w, 0)), ftext, palettes[PALETTE_NORMAL]);
+	textContainer = new TextContainer(Region(Point(), textSize), ftext, palettes[PALETTE_NORMAL]);
 	textContainer->SetMargin(0, 3);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
