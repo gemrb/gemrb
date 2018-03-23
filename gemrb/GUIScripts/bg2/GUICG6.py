@@ -32,9 +32,9 @@ MyChar = 0
 def RedrawSkills():
 	PointsLeft = GemRB.GetVar ("SkillPointsLeft")
 	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetDisabled(False)
 	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetDisabled(True)
 	return
 
 def OnLoad():
@@ -67,7 +67,7 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 
 	RedrawSkills ()
 	SkillWindow.Focus()

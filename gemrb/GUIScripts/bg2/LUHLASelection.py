@@ -71,9 +71,9 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	HLADoneButton.SetText(11973)
 	HLADoneButton.MakeDefault()
 	if HLACount:
-		HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		HLADoneButton.SetDisabled(True)
 	else:
-		HLADoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		HLADoneButton.SetDisabled(False)
 
 	# setup our text area
 	HLATextArea = HLAWindow.GetControl(26)
@@ -157,11 +157,11 @@ def HLAShowAbilities ():
 			break
 		SpellButton = HLAWindow.GetControl (i)
 		if i + j >= len (HLAAbilities):
-			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
+			SpellButton.SetDisabled(True)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 		else:
-			SpellButton.SetState(IE_GUI_BUTTON_ENABLED)
+			SpellButton.SetDisabled(False)
 			SpellButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 		# fill in the button with the spell data
@@ -225,7 +225,7 @@ def HLASelectPress ():
 			HLACount += 1
 			HLANewAbilities[i] = 0
 			HLAAbilities[i][2] -= 1 # internal counter
-			HLADoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+			HLADoneButton.SetDisabled (True)
 		else: # selecting
 			# we don't have any picks left
 			if HLACount == 0:
@@ -237,7 +237,7 @@ def HLASelectPress ():
 			HLANewAbilities[i] = 1
 			HLAAbilities[i][2] += 1 # increment internal counter
 			if HLACount == 0:
-				HLADoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+				HLADoneButton.SetDisabled (False)
 
 		# recheck internal exclusions and prereqs
 		HLARecheckPrereqs (i)

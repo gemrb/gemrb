@@ -42,10 +42,10 @@ def DisplayRaces():
 		Val = RaceTable.GetValue(i+TopIndex,0)
 		if Val==0:
 			Button.SetText("")
-			Button.SetState(IE_GUI_BUTTON_DISABLED)
+			Button.SetDisabled(True)
 		else:
 			Button.SetText(Val)
-			Button.SetState(IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled(False)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 			Button.SetVarAssoc("HatedRace",RaceTable.GetValue(i+TopIndex,1) )
 	return

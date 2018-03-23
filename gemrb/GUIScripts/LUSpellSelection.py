@@ -167,7 +167,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		Class = LUClassID
 
 	# the done button also doubles as a next button
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsDonePress)
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
@@ -293,7 +293,7 @@ def SpellsDonePress ():
 
 				# show the spells and set the done button to off
 				ShowSpells ()
-				DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+				DoneButton.SetDisabled(True)
 				return
 
 		# bg1 lets you memorize spells too (iwd too, but it does it by itself)
@@ -304,7 +304,7 @@ def SpellsDonePress ():
 			if KitMask != 0x4000:
 				# specialists get an extra spell per level
 				SpellsSelectPointsLeft[SpellLevel] += 1
-			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+			DoneButton.SetDisabled (True)
 			Memorization = 1
 			ShowKnownSpells()
 			return
@@ -402,7 +402,7 @@ def MemorizePress ():
 	if MemoBook[i]: # already picked -- unselecting
 		SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] + 1
 		MemoBook[i] = 0
-		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetDisabled (True)
 	else: # selecting
 		# we don't have any picks left
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
@@ -413,7 +413,7 @@ def MemorizePress ():
 		SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] - 1
 		MemoBook[i] = Spellbook.HasSpell(pc, SpellBookType, SpellLevel, Spells[SpellLevel][i][0]) + 1 # so all values are above 0
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
-			DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+			DoneButton.SetDisabled (False)
 
 	# show selected spells
 	ShowSelectedSpells ()
@@ -498,7 +498,7 @@ def SpellsSelectPress ():
 		if SpellBook[i]: # already picked -- unselecting
 			SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] + 1
 			SpellBook[i] = 0
-			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+			DoneButton.SetDisabled (True)
 		else: # selecting
 			# we don't have any picks left
 			if SpellsSelectPointsLeft[SpellLevel] == 0:
@@ -517,7 +517,7 @@ def SpellsSelectPress ():
 			SpellsSelectPointsLeft[SpellLevel] = SpellsSelectPointsLeft[SpellLevel] - 1
 			SpellBook[i] = 1
 			if SpellsSelectPointsLeft[SpellLevel] == 0:
-				DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+				DoneButton.SetDisabled (False)
 
 	# show selected spells
 	ShowSelectedSpells ()
@@ -626,7 +626,7 @@ def SpellsPickPress ():
 
 	# if we don't have any points left, we can enable the done button
 	if not SpellsSelectPointsLeft[SpellLevel]:
-		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetDisabled (False)
 
 	return
 
