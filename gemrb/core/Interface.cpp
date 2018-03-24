@@ -579,6 +579,7 @@ void Interface::HandleFlags()
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
+		winmgr->CloseAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
