@@ -163,13 +163,8 @@ public:
 			default:
 				break;
 		}
-/*
-		if (SRCALPHA)
-			c.a = (tint.a * c.a) >> 8;
-		else
-			c.a = tint.a;
-*/
-		ShaderBlend<false>(c, dst);
+
+		ShaderBlend<SRCALPHA>(c, dst);
 	}
 };
 
