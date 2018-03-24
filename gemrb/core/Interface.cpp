@@ -584,7 +584,9 @@ void Interface::HandleFlags()
 		if (game) {
 			EventFlag|=EF_EXPANSION;
 			timer->Init();
+			timer->SetFadeFromColor(10);
 
+			winmgr->FadeColor = ColorBlack;
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
 			guiscript->RunFunction( "Game", "EnterGame" );
