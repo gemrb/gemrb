@@ -84,6 +84,38 @@ def OnLoad():
 
 	UpdateControlStatus(True)
 
+# or if we are going to do this a lot maybe add a view flag for automatically resizing to the assigned background
+# TODO: add a GUIScript function to return a dict with a CObject<Sprite2D> + dimensions for a given resref
+WinSizes = {GS_SMALLDIALOG : 45,
+			GS_MEDIUMDIALOG : 109,
+			GS_LARGEDIALOG : 237}
+
+def MWinBG(size):
+	width = GemRB.GetSystemVariable (SV_WIDTH)
+
+	bg = None
+	if size == GS_SMALLDIALOG:
+		if width == 640:
+			bg = "guiwbtp2"
+		else:
+			bg = "guwbtp2"
+	elif size == GS_MEDIUMDIALOG:
+		bg = "guiwdmb"
+	elif size == GS_LARGEDIALOG:
+		if width == 640:
+			bg = "guiwbtp3"
+		else:
+			bg = "guwbtp3"
+	else:
+		raise ValueError('Invalid size for MWinBG')
+
+	if width >= 800 and width < 1024:
+		bg = bg + "8"
+	elif width >= 1024:
+		bg = bg + "0"
+
+	return bg
+
 MinimizedWindows = {}
 def ToggleWindowMinimize(win, GSFlag = 0):
 	key = win.ID
@@ -129,16 +161,6 @@ def UpdateControlStatus(init = False):
 		return (GSFlags, Expand)
 
 	def SetMWSize(size, GSFlags):
-		# or if we are going to do this a lot maybe add a view flag for automatically resizing to the assigned background
-		WinSizes = {GS_SMALLDIALOG : 45,
-					GS_MEDIUMDIALOG : 109,
-					GS_LARGEDIALOG : 237}
-		
-		# FIXME: these are for 800x600. we need to do something like in GUICommon.GetWindowPack()
-		WinBG = {GS_SMALLDIALOG : "guwbtp28",
-				GS_MEDIUMDIALOG : "guiwdmb8",
-				GS_LARGEDIALOG : "guwbtp38"}
-		
 		if size not in WinSizes:
 			return
 		
@@ -152,7 +174,7 @@ def UpdateControlStatus(init = False):
 		frame['y'] += diff
 		frame['h'] = WinSizes[size]
 		MessageWindow.SetFrame(frame)
-		MessageWindow.SetBackground(WinBG[size])
+		MessageWindow.SetBackground(MWinBG(size))
 
 		GemRB.GameSetScreenFlags(size + GSFlags, OP_SET)
 
