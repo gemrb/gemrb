@@ -4071,7 +4071,7 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 
 	//returns only the pointer
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
-		return PyString_FromString( "" );
+		Py_RETURN_NONE;
 	}
 
 	return PyString_FromString( value );
