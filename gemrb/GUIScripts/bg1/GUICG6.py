@@ -40,12 +40,6 @@ def RedrawSkills():
 def OnLoad():
 	global SkillWindow, DoneButton
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(SkillWindow):
-			SkillWindow.Unload()
-			SkillWindow = None
-		return
-
 	SkillWindow = GemRB.LoadWindow(6, "GUICG")
 
 	MyChar = GemRB.GetVar ("Slot")
@@ -57,7 +51,7 @@ def OnLoad():
 	
 	BackButton = SkillWindow.GetControl(25)
 	BackButton.SetText(15416)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
@@ -70,6 +64,7 @@ def OnLoad():
 	return
 
 def NextPress():
+	SkillWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	LUSkillsSelection.SkillsSave(MyChar)
 	CharGenCommon.next()

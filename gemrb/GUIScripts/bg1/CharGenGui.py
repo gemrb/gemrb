@@ -375,9 +375,7 @@ def setAccept():
 
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
-	
-	GUICommon.CloseOtherWindow(None)
-	
+		
 	if playmode >=0:
 		CharGenCommon.close()
 		if GemRB.GetVar("GUIEnhancements"):

@@ -41,8 +41,6 @@ def OnLoad():
 	
 	SkillWindow = GemRB.LoadWindow(9, "GUICG")
 
-	GUICommon.CloseOtherWindow(SkillWindow.Unload)
-
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
@@ -51,7 +49,7 @@ def OnLoad():
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
 	BackButton.MakeEscape()
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
@@ -63,6 +61,7 @@ def OnLoad():
 	return
 
 def NextPress():
+	SkillWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	LUProfsSelection.ProfsSave(MyChar, LUProfsSelection.LUPROFS_TYPE_CHARGEN)
 	CharGenCommon.next()

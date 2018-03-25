@@ -32,12 +32,6 @@ DoneButton = 0
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AlignmentWindow):
-			AlignmentWindow.Unload()
-			AlignmentWindow = None
-		return
-
 	MyChar = GemRB.GetVar ("Slot")
 
 	GemRB.SetVar("Alignment",-1)
@@ -78,7 +72,7 @@ def OnLoad():
 	TextAreaControl.SetText(9602)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -91,6 +85,7 @@ def AlignmentPress():
 	return
 
 def NextPress():
+	AlignmentWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	Alignment = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)

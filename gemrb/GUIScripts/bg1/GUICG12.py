@@ -42,11 +42,6 @@ def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AppearanceWindow):
-			AppearanceWindow.Unload()
-		return
-
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
 	
 	#Load the Gender
@@ -81,7 +76,7 @@ def OnLoad():
 
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	
@@ -227,6 +222,7 @@ def CustomPress():
 	return
 
 def NextPress():
+	AppearanceWindow.Close()
 	PortraitTable = GemRB.LoadTable ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")

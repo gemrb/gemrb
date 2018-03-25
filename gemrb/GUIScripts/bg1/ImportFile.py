@@ -31,8 +31,6 @@ def OnLoad():
 
 	ImportWindow = GemRB.LoadWindow(20, "GUICG")
 
-	GUICommon.CloseOtherWindow(ImportWindow.Unload)
-
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
 
@@ -68,6 +66,5 @@ def DonePress():
 	return
 
 def CancelPress():
-	GUICommon.CloseOtherWindow(None)
 	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return

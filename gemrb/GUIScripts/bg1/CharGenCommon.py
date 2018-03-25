@@ -79,7 +79,7 @@ class CharGen:
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
 					button.MakeDefault()
-					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.next)
+					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.next())
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
 			i = i + 1
@@ -182,7 +182,6 @@ class CharGen:
 
 	def back(self):
 		"""Moves to the previous step. Unsets last"""
-		GUICommon.CloseOtherWindow(None)
 		self.unset(self.step)
 		if len(self.stages[self.step]) == 3:
 			#short, return to other short
@@ -202,7 +201,6 @@ class CharGen:
 	
 	def next(self):
 		"""Calls the next setter."""
-		GUICommon.CloseOtherWindow(None)
 		self.step = self.step + 1
 		while(not self.setScript()):
 			self.step = self.step + 1
@@ -230,7 +228,6 @@ class CharGen:
 			return
 		else:
 			raise ValueError("bad arg type: "+str(type(to)) + " " + str(to))
-		GUICommon.CloseOtherWindow(None)
 		while(not self.setScript()):
 			self.step = self.step + 1
 					 	

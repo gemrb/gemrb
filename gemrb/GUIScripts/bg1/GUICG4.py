@@ -112,12 +112,6 @@ def OnLoad():
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AbilityWindow):
-			AbilityWindow.Unload()
-			AbilityWindow = None
-		return
-
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	#Abclsmod = GemRB.LoadTable("ABCLSMOD")
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
@@ -276,7 +270,8 @@ def RecallPress():
 def BackPress():
 	CharGenCommon.back()
 
-def NextPress():	
+def NextPress():
+	AbilityWindow.Close()
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	

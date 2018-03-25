@@ -581,7 +581,7 @@ def SpellsCancelPress ():
 		GemRB.SetNextScript("CharGen6") #haterace
 	elif GameCheck.IsBG1():
 		import CharGenCommon
-		CharGenCommon.BackPress()
+		CharGenCommon.back()
 	elif IWD2:
 		if SpellsWindow:
 			SpellsWindow.Unload()

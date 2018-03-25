@@ -35,12 +35,6 @@ def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global SchoolList, ClassName
 
-	if GUICommon.CloseOtherWindow(OnLoad):
-		if(KitWindow):
-			KitWindow.Unload()
-			KitWindow = None
-		return
-
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	KitTable = GemRB.LoadTable("kittable")
@@ -101,7 +95,7 @@ def OnLoad():
 	TextAreaControl.SetText(17245)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	#KitPress()
 	KitWindow.ShowModal(MODAL_SHADOW_NONE)
 	return

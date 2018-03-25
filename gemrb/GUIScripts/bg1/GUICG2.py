@@ -32,12 +32,6 @@ DoneButton = 0
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(ClassWindow):
-			ClassWindow.Unload()
-			ClassWindow = None
-		return
-
 	MyChar = GemRB.GetVar ("Slot")
 	
 	GemRB.SetVar("Class",0)
@@ -113,7 +107,7 @@ def OnLoad():
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
 	SpecialistButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpecialistPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -135,6 +129,7 @@ def ClassPress():
 	return
 
 def NextPress():
+	ClassWindow.Close()
 	# find the class from the class table
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")

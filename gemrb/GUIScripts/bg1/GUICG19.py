@@ -30,12 +30,6 @@ SoundIndex = 0
 
 def OnLoad():
 	global CharSoundWindow, VoiceList
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(CharSoundWindow):
-			CharSoundWindow.Unload()
-			CharSoundWindow = None
-		return
 	
 	CharSoundWindow=GemRB.LoadWindow(19, "GUICG")
 
@@ -62,7 +56,7 @@ def OnLoad():
 
 	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, ChangeVoice)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -91,7 +85,7 @@ def ChangeVoice():
 	return
 
 def NextPress():
-	global CharSoundWindow
+	CharSoundWindow.Close()
 	CharSound = VoiceList.QueryText ()
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerSound(MyChar,CharSound)

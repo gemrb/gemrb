@@ -53,12 +53,6 @@ def DisplayRaces():
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RacialEnemyTable, RaceCount, TopIndex
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(RaceWindow):
-			RaceWindow.Unload()
-			RaceWindow = None
-		return
 	
 	GemRB.SetVar ("HatedRace",0)
 	
@@ -92,7 +86,7 @@ def OnLoad():
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	DisplayRaces()
 	return

@@ -46,7 +46,6 @@ def OnLoad():
 	global HairColor, SkinColor, MinorColor, MajorColor
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
-	GUICommon.CloseOtherWindow (ColorWindow.Unload)
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
@@ -96,7 +95,7 @@ def OnLoad():
 	DoneButton.MakeDefault()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -197,6 +196,7 @@ def MinorPress():
 
 
 def NextPress():
+	ColorWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, HairColor )
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, SkinColor )

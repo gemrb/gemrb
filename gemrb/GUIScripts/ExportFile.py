@@ -32,9 +32,6 @@ def OnLoad():
 
 	ExportWindow = GemRB.LoadWindow (21, "GUICG")
 
-	if GameCheck.IsBG1():
-		GUICommon.CloseOtherWindow (ExportWindow.Unload)
-
 	TextAreaControl = ExportWindow.GetControl (4)
 	TextAreaControl.SetText (10962)
 
@@ -77,14 +74,9 @@ def DonePress ():
 	FileName = FileNameEditBox.QueryText ()
 	Slot = GemRB.GetVar ("Slot")
 	GemRB.SaveCharacter (Slot, FileName)
-	if GameCheck.IsBG1():
-		GUICommon.CloseOtherWindow (None)
-		CharGenCommon.close()
-		GemRB.SetNextScript ("Start")
-	else:
-		if ExportWindow:
-			ExportWindow.Unload ()
-		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
+	if ExportWindow:
+		ExportWindow.Unload ()
+	GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
 
 def CancelPress ():

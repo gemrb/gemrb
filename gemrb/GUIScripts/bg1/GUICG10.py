@@ -80,7 +80,7 @@ def OnLoad():
 	TextAreaControl.SetText(17244)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
