@@ -527,7 +527,7 @@ ieWord TextArea::LineHeight() const
 }
 
 /** Will scroll y pixels over duration */
-void TextArea::ScrollToY(int y, short duration)
+void TextArea::ScrollToY(int y, ieDword duration)
 {
 	scrollview.ScrollTo(Point(0, y), duration);
 }

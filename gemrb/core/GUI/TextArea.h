@@ -113,7 +113,7 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, short lineduration = 0);
+	void ScrollToY(int y, ieDword lineduration = 0);
 	int ContentHeight() const;
 
 	ieDword LineCount() const;
