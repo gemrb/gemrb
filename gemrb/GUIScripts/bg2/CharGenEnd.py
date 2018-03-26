@@ -115,10 +115,16 @@ def OnLoad():
 		if GemRB.GetVar("GUIEnhancements"):
 			GemRB.SaveCharacter ( MyChar, "gembak" )
 		#LETS PLAY!!
-		import CharGenCommon
+		import CharGenCommon, CommonWindow
 		CharGenCommon.CharGenWindow.Close ()
+
+		CommonWindow.SetGameGUIHidden(True)
+		# fade with some number longer than it takes to get everything setup and running
+		# eventually another fade call is executed which will cancel the remaining time
+		GemRB.ExecuteString ("FadeFromColor(100000)", MyChar)
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
+
 	else:
 		#when export is done, go to start
 		if GameCheck.HasTOB():
