@@ -51,7 +51,7 @@ def DisplayOverview(step):
 	PortraitButton = CharGenWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitName = GemRB.GetToken ("LargePortrait")
-	if PortraitName != "":
+	if PortraitName != None:
 		if GemRB.HasResource (PortraitName, RES_BMP, 1) or GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
 			PortraitButton.SetPicture (PortraitName, "NOPORTMD")
 	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
