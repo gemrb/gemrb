@@ -100,7 +100,7 @@ public:
 	enum BufferFormat {
 		DISPLAY, // whatever format the video driver thinks is best for the display
 		RGBPAL8,	// 8 bit palettized
-		RGB565, // 16 bit RGB (truecolor)
+		RGB555, // 16 bit RGB (truecolor)
 		RGBA8888, // Standard 8 bits per channel with alpha
 		YV12    // YUV format for BIK videos
 	};

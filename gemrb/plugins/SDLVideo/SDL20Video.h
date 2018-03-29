@@ -28,8 +28,8 @@ namespace GemRB {
 	
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* renderer = NULL) {
 	switch (fmt) {
-		case Video::RGB565:
-			return SDL_PIXELFORMAT_RGB565;
+		case Video::RGB555:
+			return SDL_PIXELFORMAT_RGB555;
 		case Video::RGBA8888:
 			return SDL_PIXELFORMAT_RGBA8888;
 		case Video::YV12:

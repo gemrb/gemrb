@@ -83,15 +83,19 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	if (fmt == YV12) {
 		return new SDLOverlayVideoBuffer(r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
 	} else {
-		SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 		SDL_Surface* buf = NULL;
-		if (fmt == RGBA8888) {
+		if (fmt == RGB555) {
+			buf = SDL_CreateRGBSurface(0, r.w, r.h, 16, 0x7C00, 0x03E0, 0x001F, 0);
+		} else if (fmt == RGBA8888) {
+			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 			buf = SDL_DisplayFormatAlpha(tmp);
+			SDL_FreeSurface(tmp);
 		} else {
+			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 			buf = SDL_DisplayFormat(tmp);
+			SDL_FreeSurface(tmp);
 		}
-		
-		SDL_FreeSurface(tmp);
+
 		return new SDLSurfaceVideoBuffer(buf, r.Origin());
 	}
 }
