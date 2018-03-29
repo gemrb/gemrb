@@ -25,7 +25,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#ifdef __APPLE_CC__
+#if defined __APPLE_CC__ || defined __MINGW64__
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #endif
 #include <vorbis/vorbisfile.h>
