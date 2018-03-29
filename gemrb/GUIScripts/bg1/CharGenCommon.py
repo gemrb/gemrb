@@ -66,7 +66,7 @@ class CharGen:
 		PortraitButton = CharGenWindow.GetControl (12)
 		PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 		PortraitName = GemRB.GetToken ("LargePortrait")
-		PortraitButton.SetPicture (PortraitName)
+		PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 		PortraitButton.SetState(IE_GUI_BUTTON_LOCKED)
 		
 		#set stage buttons
