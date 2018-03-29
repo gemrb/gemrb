@@ -552,8 +552,16 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadResRef( Script );
 		str->ReadWord( &PosX);
 		str->ReadWord( &PosY);
-		//maybe we have to store this
-		str->Seek( 36, GEM_CURRENT_POS );
+		/* ARE 9.1: 4B per position after that, but let's just try the lower two ones. */
+		if (16 == map->version) {
+			str->ReadWord(&PosX);
+			str->Seek(2, GEM_CURRENT_POS);
+			str->ReadWord(&PosY);
+			str->Seek(30, GEM_CURRENT_POS);
+		} else {
+			//maybe we have to store this
+			str->Seek( 36, GEM_CURRENT_POS );
+		}
 
 		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
 			str->ReadResRef( WavResRef );
@@ -1916,10 +1924,18 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 			stream->Write( filling, 8);
 		}
 		tmpWord = (ieWord) ip->UsePoint.x;
+		ieDword tmpDword2 = ip->UsePoint.x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->UsePoint.y;
+		tmpDword = ip->UsePoint.y;
 		stream->WriteWord( &tmpWord);
-		stream->Write( filling, 36); //unknown
+		if (16 == map->version) {
+			stream->WriteDword(&tmpDword2);
+			stream->WriteDword(&tmpDword);
+			stream->Write(filling, 28); //unknown
+		} else {
+			stream->Write(filling, 36); //unknown
+		}
 		//these are probably only in PST
 		stream->WriteResRef( ip->EnterWav);
 		tmpWord = (ieWord) ip->TalkPos.x;
