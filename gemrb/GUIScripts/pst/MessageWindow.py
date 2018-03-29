@@ -40,10 +40,6 @@ MessageTA = 0
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
 
-	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
-	GemRB.GameSetProtagonistMode(0)
-	GemRB.SetInfoTextColor({'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255})
-
 	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
 	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)
