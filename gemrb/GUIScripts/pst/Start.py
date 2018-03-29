@@ -44,14 +44,6 @@ def OnLoad():
 	QuitWindow = GemRB.LoadWindow(3, "START")
 	QuitTextArea = QuitWindow.GetControl(0)
 	QuitTextArea.SetText(20582)
-	ConfirmButton = QuitWindow.GetControl(1)
-	ConfirmButton.SetText(23787)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
-	ConfirmButton.MakeDefault()
-	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetText(23789)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
-	CancelButton.MakeEscape()
 
 #main window
 	StartWindow = GemRB.LoadWindow(0)
@@ -62,6 +54,15 @@ def OnLoad():
 	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ResumeLifePress)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitWindow.Focus)
 	ExitButton.MakeEscape()
+
+	ConfirmButton = QuitWindow.GetControl(1)
+	ConfirmButton.SetText(23787)
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
+	ConfirmButton.MakeDefault()
+	CancelButton = QuitWindow.GetControl(2)
+	CancelButton.SetText(23789)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
+	CancelButton.MakeEscape()
 
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GemRB.GEMRB_VERSION)
