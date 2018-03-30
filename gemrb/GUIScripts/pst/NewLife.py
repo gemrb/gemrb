@@ -208,12 +208,6 @@ def UpdateLabels():
 	HpLabel.SetText(str(HpPoints))
 	return
 
-
-def OkButton():
-	QuitWindow.SetVisible(False)
-	NewLifeWindow.Focus()
-	return
-
 def AcceptPress():
 	if TotPoints:
 		# Setting up the error window
@@ -227,15 +221,10 @@ def AcceptPress():
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
 		Button.MakeDefault()
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
-		NewLifeWindow.SetDisabled (True) #go dark
-		QuitWindow.Focus()
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+		QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	if NewLifeWindow:
-		NewLifeWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	#set my character up
 	if not LevelUp:
 		MyChar = GemRB.CreatePlayer ("charbase", 1)
@@ -295,10 +284,9 @@ def CancelPress():
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
 	Button.MakeDefault()
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 
-	NewLifeWindow.SetDisabled(True) #go dark
-	QuitWindow.Focus()
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def YesButton():
