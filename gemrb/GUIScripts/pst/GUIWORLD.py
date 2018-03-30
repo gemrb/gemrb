@@ -51,15 +51,15 @@ def CloseContinueWindow ():
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 
 def NextDialogState ():
-	if not MessageWindow.MessageWindow:
+	if not MessageWindow.MWindow:
 		return
 
-	Button = MessageWindow.MessageWindow.GetControl (0)
+	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText(28082)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.MWindow.Close())
 
 def OpenEndMessageWindow ():
-	Button = MessageWindow.MessageWindow.GetControl (0)
+	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()
@@ -67,7 +67,7 @@ def OpenEndMessageWindow ():
 
 def OpenContinueMessageWindow ():
 	#continue
-	Button = MessageWindow.MessageWindow.GetControl (0)
+	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault()

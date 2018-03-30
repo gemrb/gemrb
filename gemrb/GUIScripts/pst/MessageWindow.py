@@ -31,14 +31,14 @@ import GUIWORLD
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
-MessageWindow = 0
+MWindow = 0
 ActionsWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
 MessageTA = 0
 
 def OnLoad():
-	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
+	global MWindow, ActionsWindow, PortraitWindow, OptionsWindow
 
 	# TODO: we can uncomment the "HIDE_CUT" lines below to hide the windows for cutscenes
 	# the original doesn't hide them and it looks like there is a map drawing bug at the bottom of the screen due to the bottom
@@ -56,11 +56,11 @@ def OnLoad():
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	MessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	MessageWindow.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND)
-	MessageWindow.AddAlias("MSGWIN")
-	MessageWindow.AddAlias("HIDE_CUT", 0)
-	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	MWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	MWindow.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND)
+	MWindow.AddAlias("MSGWIN")
+	MWindow.AddAlias("HIDE_CUT", 0)
+	MWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1, WINDOW_BOTTOM|WINDOW_HCENTER)
 	PortraitWindow.AddAlias("PORTWIN")
@@ -72,18 +72,18 @@ def OnLoad():
 	pframe['x'] -= 16
 	PortraitWindow.SetFrame(pframe)
 
-	MessageTA = MessageWindow.GetControl (1)
+	MessageTA = MWindow.GetControl (1)
 	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	MessageTA.AddAlias("MsgSys", 0)
 
-	CloseButton= MessageWindow.GetControl (0)
+	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
-	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.Close())
+	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Close())
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.Focus())
+	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
 
 	# Select all
 	Button = ActionsWindow.GetControl (1)
@@ -103,8 +103,8 @@ def OnLoad():
 
 def UpdateControlStatus ():
 	if GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG):
-		Label = MessageWindow.GetControl (0x10000003)
+		Label = MWindow.GetControl (0x10000003)
 		Label.SetText (str (GemRB.GameGetPartyGold ()))
 
-		MessageWindow.Focus()
+		MWindow.Focus()
 
