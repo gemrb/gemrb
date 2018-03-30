@@ -36,8 +36,6 @@ ReformPartyWindow = None
 def DialogStarted ():
 	global ContinueWindow
 
-	# try to force-close anything which is open
-	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
@@ -59,9 +57,7 @@ def NextDialogState ():
 
 	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText(28082)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-
-	MessageWindow.MessageTA.Focus()
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.Close())
 
 def OpenEndMessageWindow ():
 	Button = MessageWindow.MessageWindow.GetControl (0)

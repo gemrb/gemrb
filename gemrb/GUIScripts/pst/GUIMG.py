@@ -34,20 +34,9 @@ MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
 
-def OpenMageWindow ():
+def InitMageWindow (Window):
 	global MageWindow
-
-	if GUICommon.CloseOtherWindow (OpenMageWindow):
-		if MageWindow:
-			MageWindow.Unload ()
-		MageWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	MageWindow = Window = GemRB.LoadWindow (3, "GUIMG")
-	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+	MageWindow = Window
 
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
@@ -61,16 +50,17 @@ def OpenMageWindow ():
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0,  color,  0, 1)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdateMageWindow)
-	UpdateMageWindow ()
+	return
 
-def UpdateMageWindow ():
+def UpdateMageWindow (Window=None):
 	global MageMemorizedSpellList, MageKnownSpellList
+
+	if Window == None:
+		Window = MageWindow
 
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
 
-	Window = MageWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
@@ -137,6 +127,9 @@ def UpdateMageWindow ():
 
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 #	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+
+ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow)
+OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel
