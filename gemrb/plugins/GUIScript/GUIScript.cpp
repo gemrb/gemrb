@@ -1907,17 +1907,23 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 
 	View* view = GetView<View>(pyView);
 	if (view) {
-		// invalidate the reference
-		PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
-		
 		if (view->RemoveFromSuperview() == NULL) {
 			// might be a window
 			Window* win = dynamic_cast<Window*>(view);
 			if (win) {
 				win->Close();
 				view = NULL; // so that delete has no effect, window manager will dispose of it
+
+				if (win->Flags()&Window::DestroyOnClose) {
+					// invalidate the reference
+					PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
+				}
 			}
+		} else {
+			// invalidate the reference
+			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
 		}
+
 		if (del) {
 			delete view;
 		}
