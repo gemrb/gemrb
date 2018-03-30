@@ -1512,14 +1512,14 @@ def OpenInventoryWindowClick (pcID):
 	GUIINV.OpenInventoryWindow ()
 	return
 
-def OpenPortraitWindow (needcontrols=0):
+def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	global PortraitWindow
 
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
+		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), pos)
 	else:
-		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_VCENTER)
+		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), pos)
 
 	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 

@@ -36,13 +36,12 @@ ReformPartyWindow = None
 def DialogStarted ():
 	global ContinueWindow
 
+	GUICommonWindows.CloseTopWindow()
 	CommonWindow.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
-
-	MessageWindow.UpdateControlStatus()
 
 def DialogEnded ():
 	pass

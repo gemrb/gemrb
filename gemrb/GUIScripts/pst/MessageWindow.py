@@ -40,33 +40,43 @@ MessageTA = 0
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
 
-	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
+	# TODO: we can uncomment the "HIDE_CUT" lines below to hide the windows for cutscenes
+	# the original doesn't hide them and it looks like there is a map drawing bug at the bottom of the screen due to the bottom
+	# row of tiles getting squished for not fitting perfectly on screen (tho I havent seen this in BG2, but maybe wasnt paying attention)
+
+	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_LEFT)
 	ActionsWindow.AddAlias("ACTWIN")
-	ActionsWindow.AddAlias("HIDE_CUT", 1)
+	#ActionsWindow.AddAlias("HIDE_CUT", 1)
 	ActionsWindow.AddAlias("NOT_DLG", 0)
+	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	OptionsWindow = GemRB.LoadWindow(2)
+	OptionsWindow = GemRB.LoadWindow(2, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_RIGHT)
 	OptionsWindow.AddAlias("OPTWIN")
-	OptionsWindow.AddAlias("HIDE_CUT", 2)
+	#OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
+	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	MessageWindow = GemRB.LoadWindow(7)
+	MessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND)
 	MessageWindow.AddAlias("MSGWIN")
 	MessageWindow.AddAlias("HIDE_CUT", 0)
+	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1, WINDOW_BOTTOM|WINDOW_HCENTER)
 	PortraitWindow.AddAlias("PORTWIN")
-	PortraitWindow.AddAlias("HIDE_CUT", 3)
+	#PortraitWindow.AddAlias("HIDE_CUT", 3)
 	PortraitWindow.AddAlias("NOT_DLG", 2)
+	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	pframe = PortraitWindow.GetFrame()
+	pframe['x'] -= 16
+	PortraitWindow.SetFrame(pframe)
 
 	MessageTA = MessageWindow.GetControl (1)
 	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	MessageTA.AddAlias("MsgSys", 0)
-	
-	GemRB.GameSetScreenFlags (0, OP_SET)
-	
+
 	CloseButton= MessageWindow.GetControl (0)
 	CloseButton.SetText(28082)
 	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.Close())
@@ -95,4 +105,6 @@ def UpdateControlStatus ():
 	if GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG):
 		Label = MessageWindow.GetControl (0x10000003)
 		Label.SetText (str (GemRB.GameGetPartyGold ()))
+
+		MessageWindow.Focus()
 
