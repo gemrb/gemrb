@@ -487,6 +487,12 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
+
+		if (VarName[0] != 0) {
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt( VarName, val );
+			window->RedrawControls( VarName, val );
+		}
 	}
 	return Control::OnMouseDown(me, mod);
 }
