@@ -260,6 +260,12 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 void TextArea::SetAnimPicture(Sprite2D* pic)
 {
+	if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+		// FIXME: there isnt a specific reason why animatied dialog couldnt also use pics
+		// However, PST does not and the animation makes the picture spaz currently
+		return;
+	}
+
 	Control::SetAnimPicture(pic);
 
 	assert(textContainer);
@@ -298,20 +304,28 @@ void TextArea::UpdateScrollview()
 		assert(textContainer && selectOptions);
 
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-
 		int optH = OptionsHeight();
-		int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
-		if (blankH > 0) {
-			optH += blankH;
-			selectOptions->SetFrameSize(Size(textFrame.w, optH));
+		ieDword anim = 0;
+		int y = 0;
+
+		if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+			anim = 500;
+			y = -9999999; // FIXME: properly calculate the "bottom"?
+		} else {
+			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
+			if (blankH > 0) {
+				optH += blankH;
+				selectOptions->SetFrameSize(Size(textFrame.w, optH));
+			}
+
+			// now scroll dialogBeginNode to the top less a blank line
+			y = nodeBounds.y - LineHeight();
 		}
 
-		// now scroll dialogBeginNode to the top less a blank line
-		int y = nodeBounds.y - LineHeight();
 		// FIXME: must update before the scroll, but this should be automaticly done as a reaction to changing sizes/origins of subviews
 		scrollview.Update();
-		scrollview.ScrollTo(Point(0, -y), 0);
-	} else {
+		scrollview.ScrollTo(Point(0, -y), anim);
+	} else if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
 		scrollview.Update();
 	}
 }
