@@ -26,7 +26,6 @@ import GemRB
 import GUIClasses
 import LoadScreen
 import GUIOPT
-from GameCheck import PARTY_SIZE
 from GUIDefines import *
 
 SaveWindow = None
@@ -250,6 +249,7 @@ def OpenSaveDetailWindow ():
 	Button.SetSprite2D(GemRB.GetGamePreview())
 
 	# PC portraits
+	from GameCheck import PARTY_SIZE
 	for j in range (PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
 		Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
