@@ -77,7 +77,6 @@ def OnLoad():
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
 	if Button:
-		Button = OptionsWindow.GetControl (10)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
 		Button = PortraitWindow.GetControl (8)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
