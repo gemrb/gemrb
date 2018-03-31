@@ -25,19 +25,6 @@ def OnLoad():
 #	ActionsWindow = GemRB.LoadWindow(3)
 #	OptionsWindow = GemRB.LoadWindow(0)
 #	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
-
-#	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
-#	GemRB.SetVar("ActionsWindow", ActionsWindow.ID)
-#	GemRB.SetVar("OptionsWindow", OptionsWindow.ID)
-	GemRB.SetVar("TopWindow", -1)
-	GemRB.SetVar("OtherWindow", -1)
-	GemRB.SetVar("FloatWindow", -1)
-	GemRB.SetVar("PortraitPosition", 2) #Right
-	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
-	GemRB.SetVar("OptionsPosition", 0) #Left
-	GemRB.SetVar("MessagePosition", 4) #BottomAdded
-	GemRB.SetVar("OtherPosition", 5) #Inactivating
-	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
 #	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 #	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)

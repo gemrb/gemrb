@@ -150,7 +150,6 @@ def OpenContainerWindow ():
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
-		GUIWORLD.OldPortraitWindow = GUIClasses.GWindow( GemRB.GetVar ("PortraitWindow") )
 		GUICommonWindows.DisableAnimatedWindows ()
 
 	Container = GemRB.GetContainer(0)

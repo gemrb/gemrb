@@ -39,17 +39,6 @@ def OnLoad():
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	ActionsWindow = PortraitWindow = GUICommonWindows.OpenPortraitWindow()
 
-	GemRB.SetVar ("ActionsWindow", 12345) # dummy so the EF_ACTION callback works
-	GemRB.SetVar ("TopWindow", -1)
-	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVar ("FloatWindow", -1)
-	GemRB.SetVar ("ActionsPosition", -1) #already handled in portraitwindow
-	GemRB.SetVar ("OptionsPosition", -1) #already handled in messagewindow
-	GemRB.SetVar ("MessagePosition", 4)
-	GemRB.SetVar ("PortraitPosition", 4)
-	GemRB.SetVar ("OtherPosition", 5) #Inactivating
-	GemRB.SetVar ("TopPosition", 5) #Inactivating
-
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
 	MessageWindow.Focus()

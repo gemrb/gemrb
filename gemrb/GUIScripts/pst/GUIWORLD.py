@@ -81,12 +81,10 @@ def OpenReformPartyWindow ():
 			ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
 
-		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
 		return
 
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
-	GemRB.SetVar ("OtherWindow", Window.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove

@@ -98,12 +98,10 @@ def OpenReformPartyWindow ():
 			ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
 
-		GemRB.SetVar ("OtherWindow", -1)
 		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
-	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# Remove
 	Button = Window.GetControl (15)

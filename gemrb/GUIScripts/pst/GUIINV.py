@@ -419,12 +419,10 @@ def OpenItemAmountWindow ():
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]

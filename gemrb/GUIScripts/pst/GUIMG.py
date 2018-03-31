@@ -153,12 +153,10 @@ def OpenMageSpellInfoWindow ():
 		if MageSpellInfoWindow:
 			MageSpellInfoWindow.Unload ()
 		MageSpellInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	MageSpellInfoWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", MageSpellInfoWindow.ID)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
@@ -209,12 +207,10 @@ def OpenMageSpellUnmemorizeWindow ():
 		if MageSpellUnmemorizeWindow:
 			MageSpellUnmemorizeWindow.Unload ()
 		MageSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("FloatWindow", MageSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)

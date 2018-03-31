@@ -132,14 +132,12 @@ def WorldMapWindowCommon (Travel):
 		if WorldMapWindow:
 			WorldMapWindow.Unload ()
 		WorldMapWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
 		return
 
 	GUICommonWindows.DisableAnimatedWindows ()
 	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 	MapWindow = None
-	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
 
 	WMap = Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0x84, 0x4a, 0x2c, 0x00)

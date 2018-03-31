@@ -59,7 +59,6 @@ def OpenInventoryWindow ():
 			PortraitWindow.Unload ()
 
 		InventoryWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		GUICommonWindows.UpdatePortraitWindow ()
 		OldPortraitWindow = None
@@ -69,7 +68,6 @@ def OpenInventoryWindow ():
 		return
 
 	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
-	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	#TODO: Setup the MessageLabel here if needed
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

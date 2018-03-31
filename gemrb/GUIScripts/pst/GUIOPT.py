@@ -114,8 +114,6 @@ def OpenVideoOptionsWindow ():
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
-
 
 	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
 
@@ -159,8 +157,6 @@ def OpenAudioOptionsWindow ():
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
-	
 
 	# save values, so we can restore them on cancel
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
@@ -202,8 +198,6 @@ def OpenGameplayOptionsWindow ():
 		return
 
 	SubOptionsWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
-	
 
 	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
 
@@ -244,7 +238,6 @@ def OpenFeedbackOptionsWindow ():
 		return
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("FloatWindow", SubSubOptionsWindow.ID)
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 
@@ -282,8 +275,6 @@ def OpenAutopauseOptionsWindow ():
 
 	
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("FloatWindow", SubSubOptionsWindow.ID)
-
 
 	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 1, 31214)
 
@@ -311,13 +302,11 @@ def OpenLoadMsgWindow ():
 		if LoadMsgWindow:
 			LoadMsgWindow.Unload ()
 		LoadMsgWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		return
 		
 	LoadMsgWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("FloatWindow", LoadMsgWindow.ID)
-	
+
 	# Load
 	Button = Window.GetControl (0)
 	Button.SetText (28648)
@@ -352,14 +341,12 @@ def OpenQuitMsgWindow ():
 		if QuitMsgWindow:
 			QuitMsgWindow.Unload ()
 		QuitMsgWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 		GemRB.SetVar ("AskAndExit", 0)
 		
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", QuitMsgWindow.ID)
-	
+
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (28645)
@@ -426,11 +413,9 @@ def OpenKeyboardMappingsWindow ():
 
 	if SubOptionsWindow:
 		CloseSubOptionsWindow ()
-		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 		return
 		
 	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIKEYS")
-	GemRB.SetVar ("OtherWindow", SubOptionsWindow.ID)
 
 	# Default
 	Button = Window.GetControl (3)
@@ -521,7 +506,6 @@ def OpenMoviesWindow ():
 		return
 		
 	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIMOVIE")
-	GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 
 	# Play Movie
 	Button = Window.GetControl (2)
@@ -571,7 +555,6 @@ def CloseSubOptionsWindow ():
 	if SubOptionsWindow:
 		SubOptionsWindow.Unload ()
 		SubOptionsWindow = None
-	GemRB.SetVar ("FloatWindow", -1)
 	return
 
 def CloseSubSubOptionsWindow ():
@@ -582,7 +565,6 @@ def CloseSubSubOptionsWindow ():
 		SubSubOptionsWindow = None
 	if SubOptionsWindow:
 		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
-		GemRB.SetVar ("FloatWindow", SubOptionsWindow.ID)
 	return
 
 def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):

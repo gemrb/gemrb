@@ -158,12 +158,10 @@ def OpenPriestSpellInfoWindow ():
 		if PriestSpellInfoWindow:
 			PriestSpellInfoWindow.Unload ()
 		PriestSpellInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow.ID)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
@@ -214,12 +212,10 @@ def OpenPriestSpellUnmemorizeWindow ():
 		if PriestSpellUnmemorizeWindow:
 			PriestSpellUnmemorizeWindow.Unload ()
 		PriestSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)

@@ -636,12 +636,7 @@ def UpdateActionsWindow ():
 	if CurrentWindow == None:
 		return
 
-	#fully redraw the side panes to cover the actions window
-	#do this only when there is no 'otherwindow'
-	if GameCheck.IsIWD2():
-		if GemRB.GetVar ("OtherWindow") != -1:
-			return
-	else:
+	if not GameCheck.IsIWD2():
 		UpdateClock ()
 
 	Selected = GemRB.GetSelectedSize()
@@ -1930,13 +1925,11 @@ def OpenWaitForDiscWindow ():
 	if DiscWindow:
 		if DiscWindow:
 			DiscWindow.Unload ()
-		GemRB.SetVar ("OtherWindow", -1)
 		EnableAnimatedWindows ()
 		DiscWindow = None
 		return
 
 	DiscWindow = Window = GemRB.LoadWindow (0, "GUIID")
-	GemRB.SetVar ("OtherWindow", Window.ID)
 	label = DiscWindow.GetControl (0)
 
 	disc_num = GemRB.GetVar ("WaitForDisc")

@@ -101,14 +101,11 @@ def OpenQuestsWindow ():
 		if QuestsWindow:
 			QuestsWindow.Unload()
 		QuestsWindow = None
-		
-		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
-		
+
 		return
 	
 	QuestsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("OtherWindow", Window.ID)
-	
+
 	# Assigned
 	Button = Window.GetControl (8)
 	Button.SetText (39433)
@@ -263,13 +260,10 @@ def OpenBeastsWindow ():
 		if BeastsWindow:
 			BeastsWindow.Unload()
 		BeastsWindow = None
-		
-		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
-		
+
 		return
 	
 	BeastsWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", BeastsWindow.ID)
 
 	# PC
 	Button = BeastsWindow.GetControl (5)
@@ -365,13 +359,10 @@ def OpenLogWindow ():
 		if LogWindow:
 			LogWindow.Unload()
 		LogWindow = None
-		
-		GemRB.SetVar ("OtherWindow", JournalWindow.ID)
-		
+
 		return
 	
 	LogWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# Back
 	Button = Window.GetControl (1)

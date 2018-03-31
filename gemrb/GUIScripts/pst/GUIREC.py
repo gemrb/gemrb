@@ -676,12 +676,10 @@ def OpenInformationWindow ():
 		if InformationWindow:
 			InformationWindow.Unload ()
 		InformationWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 
 	# Biography
 	Button = Window.GetControl (1)
@@ -784,13 +782,11 @@ def OpenBiographyWindow ():
 		if BiographyWindow:
 			BiographyWindow.Unload ()
 		BiographyWindow = None
-		GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
-	GemRB.SetVar ("FloatWindow", BiographyWindow.ID)
 
 	# These are used to get the bio
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -852,12 +848,10 @@ def OpenLevelUpWindow ():
 		if LevelUpWindow:
 			LevelUpWindow.Unload ()
 		LevelUpWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
-	GemRB.SetVar ("FloatWindow", LevelUpWindow.ID)
 
 	# Accept
 	Button = Window.GetControl (0)

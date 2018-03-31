@@ -207,12 +207,10 @@ def OpenConfirmWindow ():
 	if ConfirmWindow != None:
 		ConfirmWindow.Unload ()
 		ConfirmWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 		return
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 	ConfirmWindow = GemRB.LoadWindow (1)
-	GemRB.SetVar ("FloatWindow", ConfirmWindow.ID)
 
 	# Slot name
 	if Pos < len(Games):
@@ -333,7 +331,6 @@ def CloseSaveWindow ():
 	if SaveWindow:
 		SaveWindow.Unload ()
 		SaveWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()

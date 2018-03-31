@@ -45,13 +45,11 @@ def OpenSaveWindow ():
 			SaveWindow.Unload ()
 		SaveWindow = None
 		# FIXME: LOAD GUIOPT?
-		GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 
 		return
 
 	SaveWindow = Window = GemRB.LoadWindow (0, "GUISAVE")
-	OptionsWindow = GUIClasses.GWindow ( GemRB.GetVar ("OtherWindow") )
-	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
+	OptionsWindow = GemRB.GetView("OPTWIN")
 
 	# Cancel button
 	CancelButton = Window.GetControl (46)
@@ -201,13 +199,10 @@ def OpenSaveDetailWindow ():
 		if SaveDetailWindow:
 			SaveDetailWindow.Unload ()
 		SaveDetailWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
 		return
 
 	SaveDetailWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("FloatWindow", SaveDetailWindow.ID)
-
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 

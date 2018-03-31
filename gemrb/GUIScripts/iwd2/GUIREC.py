@@ -72,12 +72,10 @@ def OpenRecordsWindow ():
 			PortraitWindow.Unload ()
 
 		RecordsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
-	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
 	if not BonusSpellTable:
 		BonusSpellTable = GemRB.LoadTable ("mxsplbon")

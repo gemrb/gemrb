@@ -57,13 +57,11 @@ def OpenSpellBookWindow ():
 			PortraitWindow.Unload ()
 
 		SpellBookWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	SpellBookWindow = Window = GemRB.LoadWindow (2, "GUISPL")
-	GemRB.SetVar ("OtherWindow", SpellBookWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()

@@ -56,7 +56,6 @@ def OpenJournalWindow ():
 		if PortraitWindow:
 			PortraitWindow.Unload ()
 		JournalWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
 
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -66,7 +65,6 @@ def OpenJournalWindow ():
 		return
 		
 	JournalWindow = Window = GemRB.LoadWindow (2, "GUIJRNL")
-	GemRB.SetVar("OtherWindow", JournalWindow.ID)
 
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
