@@ -36,6 +36,7 @@ def CreateScrollbarARGs(bam = None):
 		bam = bam if bam else 'GBTNSCRL'
 	else:
 		bam = bam if bam else 'GUIWSBR'
+		bamframes = [0,1,2,3,6,7]
 
 	return (bam, bamframes)
 
