@@ -162,17 +162,22 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
+	assert(windows.size()); // win should be contained in windows
 	win->SetVisible(true);
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
 bool WindowManager::OrderBack(Window* win)
 {
+	assert(windows.size()); // win should be contained in windows
 	return OrderRelativeTo(win, windows.back(), false);
 }
 
 bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
+	if (win == NULL) {
+		return false;
+	}
 	// FIXME: this should probably account for modal windows
 	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
 	
@@ -215,6 +220,8 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 // this is a caching mechanisim in case the window is reopened
 void WindowManager::CloseWindow(Window* win)
 {
+	assert(win);
+
 	WindowList::iterator it = WIN_IT(win);
 	if (it == windows.end()) return;
 
