@@ -41,13 +41,6 @@ import GUIOPTControls
 from GUIDefines import *
 
 ###################################################
-OptionsWindow = None
-SubOptionsWindow = None
-SubSubOptionsWindow = None
-LoadMsgWindow = None
-QuitMsgWindow = None
-
-###################################################
 def InitOptionsWindow (Window):
 	"""Open main options window (peacock tail)"""
 
@@ -106,19 +99,18 @@ def TrySavingConfiguration():
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global SubOptionsWindow, VideoHelpText
+	global VideoHelpText
 
-	if SubOptionsWindow:
-		CloseSubOptionsWindow ()
+	def OnClose(Window):
 		TrySavingConfiguration()
-		return
 
-	SubOptionsWindow = Window = GemRB.LoadWindow (1)
+	Window = GemRB.LoadWindow (1, "GUIOPT")
+	Window.SetOnClose(OnClose)
 
 	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
 
-	GUIOPTControls.OptDone (OpenVideoOptionsWindow, Window, 7)
-	GUIOPTControls.OptCancel (OpenVideoOptionsWindow, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
 	GUIOPTControls.OptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", lambda: GammaFeedback(31459))
@@ -141,11 +133,11 @@ saved_audio_options = {}
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global SubOptionsWindow, AudioHelpText
+	global AudioHelpText
 
-	if SubOptionsWindow:
-		CloseSubOptionsWindow ()
+	Window = GemRB.LoadWindow (5, "GUIOPT")
 
+	def OnClose(Window):
 		# Restore values in case of cancel
 		if GemRB.GetVar ("Cancel") == 1:
 			for k, v in saved_audio_options.items ():
@@ -154,9 +146,8 @@ def OpenAudioOptionsWindow ():
 			UpdateVolume (31210)
 
 		TrySavingConfiguration()
-		return
 
-	SubOptionsWindow = Window = GemRB.LoadWindow (5)
+	Window.SetOnClose(OnClose)
 
 	# save values, so we can restore them on cancel
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
@@ -165,8 +156,8 @@ def OpenAudioOptionsWindow ():
 
 	AudioHelpText = GUIOPTControls.OptHelpText ('AudioOptions', Window, 9, 31210)
 
-	GUIOPTControls.OptDone (OpenAudioOptionsWindow, Window, 7)
-	GUIOPTControls.OptCancel (OpenAudioOptionsWindow, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
 	GUIOPTControls.OptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", lambda: UpdateVolume(31228))
@@ -192,17 +183,17 @@ def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global SubOptionsWindow, GameplayHelpText
 
-	if SubOptionsWindow:
-		CloseSubOptionsWindow ()
-		TrySavingConfiguration()
-		return
+	Window = GemRB.LoadWindow (6, "GUIOPT")
 
-	SubOptionsWindow = Window = GemRB.LoadWindow (6)
+	def OnClose(Window):
+		TrySavingConfiguration()
+
+	Window.SetOnClose(OnClose)
 
 	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
 
-	GUIOPTControls.OptDone (OpenGameplayOptionsWindow, Window, 10)
-	GUIOPTControls.OptCancel (OpenGameplayOptionsWindow, Window, 11)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 10)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 11)
 
 	GUIOPTControls.OptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
 	GUIOPTControls.OptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
@@ -231,20 +222,16 @@ def UpdateMouseSpeed ():
 	
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global SubSubOptionsWindow, FeedbackHelpText
-	
-	if SubSubOptionsWindow:
-		CloseSubSubOptionsWindow ()
-		return
+	global FeedbackHelpText
 
-	SubSubOptionsWindow = Window = GemRB.LoadWindow (8)
+	Window = GemRB.LoadWindow (8, "GUIOPT")
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
 
 	FeedbackHelpText = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 9, 37410)
 
-	GUIOPTControls.OptDone (OpenFeedbackOptionsWindow, Window, 7)
-	GUIOPTControls.OptCancel (OpenFeedbackOptionsWindow, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
 	GUIOPTControls.OptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
@@ -267,19 +254,14 @@ def UpdateMarkerFeedback ():
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global SubSubOptionsWindow, AutopauseHelpText
+	global AutopauseHelpText
 	
-	if SubSubOptionsWindow:
-		CloseSubSubOptionsWindow ()
-		return
-
-	
-	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
+	Window = GemRB.LoadWindow (9, "GUIOPT")
 
 	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 1, 31214)
 
-	GUIOPTControls.OptDone (OpenAutopauseOptionsWindow, Window, 16)
-	GUIOPTControls.OptCancel (OpenAutopauseOptionsWindow, Window, 17)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 16)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 17)
 
 	# checkboxes OR the values if they associate to the same variable
 	GUIOPTControls.OptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
@@ -296,16 +278,7 @@ def OpenAutopauseOptionsWindow ():
 ###################################################
 
 def OpenLoadMsgWindow ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:		
-		if LoadMsgWindow:
-			LoadMsgWindow.Unload ()
-		LoadMsgWindow = None
-
-		return
-		
-	LoadMsgWindow = Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3, "GUIOPT")
 
 	# Load
 	Button = Window.GetControl (0)
@@ -315,7 +288,7 @@ def OpenLoadMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -325,8 +298,6 @@ def OpenLoadMsgWindow ():
 
 
 def LoadGame ():
-	OpenLoadMsgWindow () ##close self
-	OpenOptionsWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ('GUILOAD')
 
@@ -335,17 +306,7 @@ def LoadGame ():
 ###################################################
 
 def OpenQuitMsgWindow ():
-	global QuitMsgWindow
-
-	if QuitMsgWindow:		
-		if QuitMsgWindow:
-			QuitMsgWindow.Unload ()
-		QuitMsgWindow = None
-		GemRB.SetVar ("AskAndExit", 0)
-		
-		return
-		
-	QuitMsgWindow = Window = GemRB.LoadWindow (4)
+	Window = GemRB.LoadWindow (4, "GUIOPT")
 
 	# Save
 	Button = Window.GetControl (0)
@@ -360,7 +321,7 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	# The game has not been saved ....
@@ -371,16 +332,11 @@ def OpenQuitMsgWindow ():
 	return
 
 def QuitGame ():
-	OpenQuitMsgWindow ()
-	OpenOptionsWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ('Start')
 
 def SaveGame ():
 	GemRB.SetVar ("QuitAfterSave", 1)
-	OpenQuitMsgWindow ()
-	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		OpenOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 
 ###################################################
@@ -406,16 +362,11 @@ KEYS_PAGE_SIZE = 60
 KEYS_PAGE_COUNT = ((len (key_list) - 1) / KEYS_PAGE_SIZE)+ 1
 
 def OpenKeyboardMappingsWindow ():
-	global SubOptionsWindow
 	global last_key_action
 
 	last_key_action = None
-
-	if SubOptionsWindow:
-		CloseSubOptionsWindow ()
-		return
 		
-	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIKEYS")
+	Window = GemRB.LoadWindow (0, "GUIKEYS")
 
 	# Default
 	Button = Window.GetControl (3)
@@ -425,20 +376,18 @@ def OpenKeyboardMappingsWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKeyboardMappingsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKeyboardMappingsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
-	keys_setup_page (0)
+	keys_setup_page (Window, 0)
 
-def keys_setup_page (pageno):
-	Window = SubOptionsWindow
-
+def keys_setup_page (Window, pageno):
 	# Page n of n
 	Label = Window.GetControl (0x10000001)
 	#txt = GemRB.ReplaceVarsInText (49053, {'PAGE': str (pageno + 1), 'NUMPAGES': str (KEYS_PAGE_COUNT)})
@@ -465,12 +414,12 @@ def keys_setup_page (pageno):
 		else:
 			Label = Window.GetControl (0x10000005 + i)
 			Label.SetText (key)
-			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, OnActionLabelPress)
+			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, lambda: OnActionLabelPress(Window))
 			Label.SetVarAssoc ("KeyAction", i)	
 			
 			Label = Window.GetControl (0x10000041 + i)
 			Label.SetText (label)
-			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, OnActionLabelPress)
+			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, lambda: OnActionLabelPress(Window))
 			Label.SetVarAssoc ("KeyAction", i)	
 
 
@@ -478,7 +427,6 @@ last_key_action = None
 def OnActionLabelPress ():
 	global last_key_action
 	
-	Window = SubOptionsWindow
 	i = GemRB.GetVar ("KeyAction")
 
 	if last_key_action != None:
@@ -499,13 +447,7 @@ def OnActionLabelPress ():
 ###################################################
 
 def OpenMoviesWindow ():
-	global SubOptionsWindow
-
-	if SubOptionsWindow:
-		CloseSubOptionsWindow ()
-		return
-		
-	SubOptionsWindow = Window = GemRB.LoadWindow (0, "GUIMOVIE")
+	Window = GemRB.LoadWindow (0, "GUIMOVIE")
 
 	# Play Movie
 	Button = Window.GetControl (2)
@@ -520,7 +462,7 @@ def OpenMoviesWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMoviesWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	# movie list
 	List = Window.GetControl (0)
@@ -548,24 +490,6 @@ def OnCreditsPress ():
 	GemRB.PlayMovie ("CREDITS")
 
 ###################################################
-
-def CloseSubOptionsWindow ():
-	global SubOptionsWindow
-
-	if SubOptionsWindow:
-		SubOptionsWindow.Unload ()
-		SubOptionsWindow = None
-	return
-
-def CloseSubSubOptionsWindow ():
-	global SubSubOptionsWindow, SubOptionsWindow
-
-	if SubSubOptionsWindow:
-		SubSubOptionsWindow.Unload ()
-		SubSubOptionsWindow = None
-	if SubOptionsWindow:
-		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
 
 def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""

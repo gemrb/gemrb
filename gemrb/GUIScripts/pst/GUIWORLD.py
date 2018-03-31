@@ -76,15 +76,8 @@ def OpenContinueMessageWindow ():
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	if GUICommon.CloseOtherWindow(OpenReformPartyWindow):
-		if ReformPartyWindow:
-			ReformPartyWindow.Unload ()
-		ReformPartyWindow = None
-
-		GUICommonWindows.EnableAnimatedWindows ()
-		return
-
-	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	ReformPartyWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove
@@ -96,7 +89,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ReformPartyWindow.Close())
 
 
 last_formation = None
