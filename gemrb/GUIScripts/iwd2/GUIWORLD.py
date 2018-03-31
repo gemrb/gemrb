@@ -39,8 +39,6 @@ OldMessageWindow = None
 def DialogStarted ():
 	global ContinueWindow
 
-	# try to force-close anything which is open
-	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window

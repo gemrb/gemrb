@@ -25,31 +25,23 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 import CommonWindow
 
-MessageWindow = None
-PortraitWindow = None
-TMessageTA = None # for dialog code
-
 def OnLoad():
-	global MessageWindow, PortraitWindow
-
-	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
-	GemRB.GameSetProtagonistMode(2)
-	GemRB.SetDefaultActions(1,14,16,17)
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
-	ActionsWindow = PortraitWindow = GUICommonWindows.OpenPortraitWindow()
-
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
+	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	OptionsWindow.AddAlias("OPTWIN")
+	OptionsWindow.AddAlias("HIDE_CUT", 2)
+	OptionsWindow.AddAlias("NOT_DLG", 1)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-	MessageWindow.Focus()
-	PortraitWindow.Focus()
+	ActionsWindow = GUICommonWindows.OpenPortraitWindow()
+	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	ActionsWindow.AddAlias("ACTWIN")
+	ActionsWindow.AddAlias("HIDE_CUT", 1)
+	ActionsWindow.AddAlias("NOT_DLG", 0)
+
 	return
 
 def UpdateControlStatus():
-	global MessageWindow, TMessageTA
-
-	TMessageWindow = None
-	TMessageTA = None
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
@@ -59,50 +51,37 @@ def UpdateControlStatus():
 	if Override:
 		Expand = GS_LARGEDIALOG
 
-	MessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
-	hideflag = CommonWindow.IsGameGUIHidden()
-
 	if Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindow(7)
-		TMessageTA = TMessageWindow.GetControl (1)
+		MessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	else:
-		TMessageWindow = MessageWindow
-		# cheat code editbox; only causes redraw issues if you click on the lower left
-		TMessageWindow.DeleteControl (3)
-		TMessageTA = TMessageWindow.GetControl (1)
-		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
+		MessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+		MessageWindow.AddAlias("OPTWIN")
+		GUICommonWindows.SetupMenuWindowControls (MessageWindow, 1, None)
+
+	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	MessageWindow.AddAlias("MSGWIN")
+	MessageWindow.AddAlias("HIDE_CUT", 0)
 
 	MessageTA = MessageWindow.GetControl(1)
-
-	if MessageWindow > 0 and MessageWindow.ID != TMessageWindow.ID:
-		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
-		GUIClasses.GWindow(MessageWindow).Unload()
-		
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	MessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
+	MessageTA.AddAlias("MsgSys", 0)
 
 	if Override:
-		TMessageTA.Focus()
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
 			Portrait = GemRB.GetPlayerPortrait(pc, 1)["Sprite"]
 		else:
 			Portrait = None
-		Button = TMessageWindow.GetControl(11)
+		Button = MessageWindow.GetControl(11)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if not Portrait:
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
 		
-	CommonWindow.SetGameGUIHidden(hideflag)
 	return
 
-#upgrade savegame to next version
-def GameExpansion():
-	#the original savegames got 0, but the engine upgrades all saves to 3
-	#this is a good place to perform one-time adjustments if needed
-	GemRB.GameSetExpansion(3)
-	return
+
 

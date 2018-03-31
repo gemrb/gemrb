@@ -296,8 +296,10 @@ def AIPress (toggle=1):
 	"""Toggles the party AI or refreshes the button state if toggle = 0"""
 
 	if GameCheck.IsPST() or GameCheck.IsIWD2():
+		OptionsWindow = GemRB.GetView("OPTWIN")
 		Button = OptionsWindow.GetControl (OptionControl['AI'])
 	else:
+		PortraitWindow = GemRB.GetView("PORTWIN")
 		Button = PortraitWindow.GetControl (OptionControl['AI'])
 
 	#print "AIPress: GS_PARTYAI was:", GemRB.GetGUIFlags () & GS_PARTYAI, "at toggle:", toggle

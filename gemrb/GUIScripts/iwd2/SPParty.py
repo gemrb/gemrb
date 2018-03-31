@@ -33,9 +33,6 @@ def OnLoad():
 	
 	PartySelectWindow = GemRB.LoadWindow(10, "GUISP")
 	TextArea = PartySelectWindow.GetControl(6)
-	ScrollBar = PartySelectWindow.GetControl(8)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBar.SetVarAssoc("TopIndex", PartyCount)
 	
 	ModifyButton = PartySelectWindow.GetControl(12)
 	ModifyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyPress)

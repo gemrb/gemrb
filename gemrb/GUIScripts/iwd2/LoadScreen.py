@@ -22,7 +22,6 @@
 ###################################################
 
 import GemRB
-import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
@@ -59,8 +58,9 @@ def StartLoadScreen ():
 	
 	def EndLoadScreen ():
 		GemRB.SetVar ("Progress", 0)
-		MessageWindow.UpdateControlStatus()
-		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+		TMessageTA = GemRB.GetView("MsgSys", 0)
+		# FIXME somehow we get here before the MTA is created... that shouldn't happen (and BG2 works)
+		# TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
 		Skull = LoadScreen.GetControl (3)
 		Skull.SetMOS ("GTRBPSK2")

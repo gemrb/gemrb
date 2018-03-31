@@ -79,7 +79,7 @@ def OnLoad ():
 		DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
-	PartyFormationWindow.Focus()
+	PartyFormationWindow.ShowModal (MODAL_SHADOW_NONE)
 	return
 
 def ExitPress ():
