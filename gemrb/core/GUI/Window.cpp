@@ -226,7 +226,7 @@ bool Window::HitTest(const Point& p) const
 		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
 		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 			Control* ctrl = *c;
-			if (ctrl->HitTest(ctrl->ConvertPointFromWindow(p))) {
+			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
 				hit = true;
 				break;
 			}
