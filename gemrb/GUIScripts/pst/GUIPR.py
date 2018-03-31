@@ -36,21 +36,7 @@ PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 
 
-def OpenPriestWindow ():
-	global PriestWindow
-
-	if GUICommon.CloseOtherWindow (OpenPriestWindow):
-		if PriestWindow:
-			PriestWindow.Unload ()
-		PriestWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	PriestWindow = Window = GemRB.LoadWindow (3, "GUIPR")
-	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
-
+def InitPriestWindow (Window):
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
 
@@ -63,16 +49,17 @@ def OpenPriestWindow ():
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0,  color,  0, 1)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
-	UpdatePriestWindow ()
+	return
 
-def UpdatePriestWindow ():
+def UpdatePriestWindow (Window=None):
 	global PriestMemorizedSpellList, PriestKnownSpellList
+
+	if Window == None:
+		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
 
-	Window = PriestWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
@@ -143,6 +130,10 @@ def UpdatePriestWindow ():
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
+	return
+
+TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP)
+OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP)
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel

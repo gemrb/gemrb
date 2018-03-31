@@ -128,8 +128,8 @@ def UpdateMageWindow (Window=None):
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 #	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
-ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow)
-OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow)
+ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow, WINDOW_TOP)
+OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow, WINDOW_TOP)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel

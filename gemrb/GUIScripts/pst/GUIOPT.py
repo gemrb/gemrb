@@ -48,22 +48,13 @@ LoadMsgWindow = None
 QuitMsgWindow = None
 
 ###################################################
-def OpenOptionsWindow ():
+def InitOptionsWindow (Window):
 	"""Open main options window (peacock tail)"""
-	global OptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.EnableAnimatedWindows ()
-		
-		return
 
 	GemRB.GamePause (1, 1)
 	TrySavingConfiguration ()
 
 	CommonWindow.CloseContainerWindow ()
-	OptionsWindow = Window = GemRB.LoadWindow (0, "GUIOPT")
-	GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 	
 	def ConfigOptButton(button, strref, action):
@@ -72,7 +63,7 @@ def OpenOptionsWindow ():
 		button.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
 	
 	# Return to Game
-	ConfigOptButton(Window.GetControl (0), 28638, OpenOptionsWindow)
+	ConfigOptButton(Window.GetControl (0), 28638, lambda: Window.Close())
 
 	# Quit Game
 	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
@@ -101,6 +92,11 @@ def OpenOptionsWindow ():
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GemRB.GEMRB_VERSION)
+
+	return
+
+ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
+OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow)
 	
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():

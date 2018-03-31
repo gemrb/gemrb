@@ -59,31 +59,12 @@ BeastImage = None
 StartTime = 0
 
 ###################################################
-def OpenJournalWindow ():
-	global JournalWindow, PortraitWindow, ActionsWindow
+def InitJournalWindow (JournalWindow):
 	global StartTime
 
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE")
-	
-	if GUICommon.CloseOtherWindow (OpenJournalWindow):
-		if LogWindow: OpenLogWindow()
-		if BeastsWindow: OpenBeastsWindow()
-		if QuestsWindow: OpenQuestsWindow()
-				
-		if JournalWindow:
-			JournalWindow.Unload()
-		#making the portraitwindow visible again
-		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.SetVar ("OtherWindow", -1)
-		PortraitWindow = None
-		ActionsWindow = None
-		JournalWindow = None
-
-		return
 		
-	JournalWindow = GemRB.LoadWindow (0, "GUIJRNL")
-	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Quests
@@ -104,12 +85,13 @@ def OpenJournalWindow ():
 	# Done
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: JournalWindow.Close())
 	Button.MakeEscape()
-	Button.Focus()
 
-	#JournalWindow.Focus()	
+	return
 
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow)
 
 ###################################################
 def OpenQuestsWindow ():

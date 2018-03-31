@@ -80,26 +80,9 @@ InformationWindow = None
 BiographyWindow = None
 
 ###################################################
-def OpenRecordsWindow ():
-	global RecordsWindow
+def InitRecordsWindow (Window):
 	global StatTable
-
 	StatTable = GemRB.LoadTable("abcomm")
-
-	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-		if InformationWindow: OpenInformationWindow ()
-
-		if RecordsWindow:
-			RecordsWindow.Unload ()
-		RecordsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.SetSelectionChangeHandler (None)
-
-		return
-
-	RecordsWindow = Window = GemRB.LoadWindow (3, "GUIREC")
-	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
-
 
 	# Information
 	Button = Window.GetControl (7)
@@ -143,9 +126,7 @@ def OpenRecordsWindow ():
 	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpHitPoints)
 	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
 
-
-	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
-	UpdateRecordsWindow ()
+	return
 
 
 stats_overview = None
@@ -153,13 +134,8 @@ faction_help = ''
 alignment_help = ''
 avatar_header = {'PrimClass': "", 'SecoClass': "", 'PrimLevel': 0, 'SecoLevel': 0, 'XP': 0, 'PrimNextLevXP': 0, 'SecoNextLevXP': 0}
 
-def UpdateRecordsWindow ():
+def UpdateRecordsWindow (Window):
 	global stats_overview, faction_help, alignment_help
-
-	Window = RecordsWindow
-	if not RecordsWindow:
-		print "SelectionChange handler points to non existing window\n"
-		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -295,6 +271,9 @@ def UpdateRecordsWindow ():
 	Text = Window.GetControl (0)
 	Text.SetText (stats_overview)
 	return
+
+ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, WINDOW_TOP)
+OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, WINDOW_TOP)
 
 # puts default info to textarea (overview of PC's bonuses, saves, etc.
 def OnRecordsButtonLeave ():

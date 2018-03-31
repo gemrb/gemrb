@@ -33,21 +33,7 @@ PosX = 0
 PosY = 0
 
 ###################################################
-def OpenMapWindow ():
-	global MapWindow
-
-	if GUICommon.CloseOtherWindow (OpenMapWindow):
-		if WorldMapWindow: OpenWorldMapWindowInside ()
-		
-		if MapWindow:
-			MapWindow.Unload ()
-		MapWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		
-		return
-
-	MapWindow = Window = GemRB.LoadWindow (3, "GUIMA")
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
+def InitMapWindow (Window):
 
 	# World Map
 	Button = Window.GetControl (0)
@@ -67,8 +53,7 @@ def OpenMapWindow ():
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
-	# 4 is the Label's control ID
-	Map = Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE", "RONOTE")
+	Map = Window.CreateMapControl (3, 24, 23, 480, 360, Text, "USERNOTE", "RONOTE")
 	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
@@ -87,9 +72,13 @@ def OpenMapWindow ():
 	# Done
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
-	Button.Focus()
+
+	return
+
+ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.ToggleWindow, InitMapWindow, None, WINDOW_TOP)
+OpenMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.OpenWindowOnce, InitMapWindow, None, WINDOW_TOP)
 
 def NoteChanged ():
 	#shift focus to the static label

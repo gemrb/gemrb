@@ -31,8 +31,6 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 
-
-InventoryWindow = None
 ItemAmountWindow = None
 OverSlot = None
 
@@ -58,24 +56,14 @@ ItemHash = {}
 # 0x10000000 + 63 - class
 
 
-def OpenInventoryWindow ():
+def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	global AvSlotsTable
-	global InventoryWindow
+
+	Window.AddAlias("WIN_INV")
 
 	AvSlotsTable = GemRB.LoadTable ('avslots')
-
-	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		if InventoryWindow:
-			InventoryWindow.Unload ()
-		InventoryWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	InventoryWindow = Window = GemRB.LoadWindow (3, "GUIINV")
-	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
 
 	# inventory slots
@@ -88,7 +76,7 @@ def OpenInventoryWindow ():
 		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
 		Button.SetBorder (0,color,0,1)
 		color['r'], color['b'] = color['b'], color['r']
-		Button.SetBorde (1,color,0,1)
+		Button.SetBorder (1,color,0,1)
 
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
@@ -109,7 +97,7 @@ def OpenInventoryWindow ():
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 
 	ScrollBar = Window.GetControl (45)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RefreshInventoryWindow(Window))
 
 	for i in range (57, 64):
 		Label = Window.GetControl (0x10000000 + i)
@@ -143,20 +131,16 @@ def OpenInventoryWindow ():
 	Label = Window.GetControl (0x1000003d)
 	Label.SetTextColor(255, 255, 255)
 	Label.SetText ("")
-	GemRB.SetVar ("TopIndex", 0)
-	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-	UpdateInventoryWindow ()
 
-	GUICommonWindows.PortraitWindow.Focus()
-	GUICommonWindows.OptionsWindow.Focus()
 	return
 
-def UpdateInventoryWindow ():
+def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
 	global ItemHash
 	global slot_list
 
-	Window = InventoryWindow
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
 
 	GUICommonWindows.UpdateAnimation ()
 
@@ -168,7 +152,7 @@ def UpdateInventoryWindow ():
 	if Count<1:
 		Count=1
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
-	RefreshInventoryWindow ()
+	RefreshInventoryWindow (Window)
 	# And now for the items ....
 
 	ItemHash = {}
@@ -181,12 +165,13 @@ def UpdateInventoryWindow ():
 	for i in range (46):
 		UpdateSlot (pc, i)
 
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP)
+
 InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
-def RefreshInventoryWindow ():
+def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
-
-	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -199,7 +184,9 @@ def RefreshInventoryWindow ():
 	Button = Window.GetControl (44)
 	Button.SetPicture (GUICommonWindows.GetActorPortrait (pc, 'INVENTORY'))
 
+	Label = Window.GetControl (0x1000003a)
 	GUICommon.SetEncumbranceLabels (Window, 46, None, pc, True)
+	Label = Window.GetControl (0x1000003a)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
@@ -270,7 +257,7 @@ def RefreshInventoryWindow ():
  	return
 
 def UpdateSlot (pc, i):
-	Window = InventoryWindow
+	Window = GemRB.GetView("WIN_INV")
 
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	# used to assign powers and protections
