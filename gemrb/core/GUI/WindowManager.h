@@ -90,7 +90,7 @@ public:
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);
-	void CloseAllWindows();
+	void DestroyAllWindows();
 
 	bool OrderFront(Window* win);
 	bool OrderBack(Window* win);

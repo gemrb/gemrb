@@ -267,11 +267,12 @@ void WindowManager::CloseWindow(Window* win)
 	win->SetDisabled(true);
 }
 
-void WindowManager::CloseAllWindows()
+void WindowManager::DestroyAllWindows()
 {
 	WindowList::iterator it = windows.begin();
 	for (; it != windows.end(); ++it) {
 		Window* win = *it;
+		win->SetFlags(Window::DestroyOnClose, OP_OR); // force delete
 		win->Close();
 	}
 }

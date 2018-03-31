@@ -561,7 +561,7 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
-		winmgr->CloseAllWindows();
+		winmgr->DestroyAllWindows();
 		gamectrl->SetDisabled(true);
 		
 		// when reaching this, quitflag should be 1 or 2
@@ -579,7 +579,7 @@ void Interface::HandleFlags()
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
-		winmgr->CloseAllWindows();
+		winmgr->DestroyAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
