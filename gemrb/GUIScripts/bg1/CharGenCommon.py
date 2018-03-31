@@ -109,7 +109,7 @@ class CharGen:
 		ImportButton = CharGenWindow.GetControl (13)
 		ImportButton.SetText (13955)
 		ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.imprt)
+		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.imprt())
 
 		#set cancel and start over
 		CancelButton = CharGenWindow.GetControl (15)

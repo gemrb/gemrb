@@ -57,6 +57,7 @@ def SelectPress():
 	return
 
 def DonePress():
+	ImportWindow.Close()
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
@@ -66,5 +67,6 @@ def DonePress():
 	return
 
 def CancelPress():
+	ImportWindow.Close()
 	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return
