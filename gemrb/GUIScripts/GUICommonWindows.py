@@ -1350,9 +1350,9 @@ def TopWindowClosed(window):
 
 	SelectionChanged()
 
-def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None):
+def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = WINDOW_CENTER):
 	def ret ():
-		window = loader(id, pack)
+		window = loader(id, pack, pos)
 
 		if window:
 			if initer:
@@ -1390,21 +1390,21 @@ def SetTopWindow (window, selectionHandler = None):
 	else:
 		SetSelectionChangeHandler (None)
 
-def OpenWindowOnce(id, pack):
+def OpenWindowOnce(id, pack, pos=WINDOW_CENTER):
 	window = GemRB.GetView(pack, id)
 	if window:
 		window.Focus()
 		return None
 	else:
-		return GemRB.LoadWindow(id, pack)
+		return GemRB.LoadWindow(id, pack, pos)
 
-def ToggleWindow(id, pack):
+def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 	window = GemRB.GetView(pack, id)
 	if window:
 		window.Close()
 		return None
 	else:
-		return GemRB.LoadWindow(id, pack)
+		return GemRB.LoadWindow(id, pack, pos)
 
 # returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
