@@ -612,7 +612,9 @@ void TextArea::ClearSelectOptions()
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
 
-	UpdateScrollview();
+	if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
+		UpdateScrollview();
+	}
 }
 
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
