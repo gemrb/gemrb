@@ -1518,6 +1518,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	else:
 		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), pos)
 
+	PortraitWindow.AddAlias("PORTWIN")
 	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst

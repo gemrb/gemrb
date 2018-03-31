@@ -70,7 +70,6 @@ def OnLoad():
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
-	PortraitWindow.AddAlias("PORTWIN")
 	PortraitWindow.AddAlias("HIDE_CUT", 3)
 	PortraitWindow.AddAlias("NOT_DLG", 2)
 

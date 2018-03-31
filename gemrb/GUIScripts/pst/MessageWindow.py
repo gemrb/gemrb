@@ -63,7 +63,6 @@ def OnLoad():
 	MWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1, WINDOW_BOTTOM|WINDOW_HCENTER)
-	PortraitWindow.AddAlias("PORTWIN")
 	#PortraitWindow.AddAlias("HIDE_CUT", 3)
 	PortraitWindow.AddAlias("NOT_DLG", 2)
 	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
