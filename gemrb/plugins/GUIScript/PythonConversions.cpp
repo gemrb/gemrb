@@ -39,8 +39,15 @@ Color ColorFromPy(PyObject* obj) {
 		c.g = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
 		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "b"));
 		c.b = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
-		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "a"));
-		c.a = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
+
+		PyObject* alpha = PyDict_GetItemString(obj, "a");
+		if (alpha) {
+			pyVal = PyInt_AsLong(alpha);
+			c.a = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
+		} else {
+			c.a = 0xff;
+		}
+
 		return c;
 	}
 	return Color();
