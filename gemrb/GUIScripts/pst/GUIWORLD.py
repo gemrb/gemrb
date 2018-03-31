@@ -106,24 +106,14 @@ last_formation = None
 def OpenFormationWindow ():
 	global FormationWindow
 
-	if GUICommon.CloseOtherWindow(OpenFormationWindow):
-		if FormationWindow:
-			FormationWindow.Unload ()
-		FormationWindow = None
-
-		GemRB.GameSetFormation (last_formation, 0)
-		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.SetVar ("OtherWindow", -1)
-		return
-
-	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack())
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	FormationWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenFormationWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: FormationWindow.Close())
 
 	tooltips = (
 		44957,  # Follow
