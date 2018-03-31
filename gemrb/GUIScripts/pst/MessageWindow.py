@@ -107,4 +107,6 @@ def UpdateControlStatus ():
 		Label.SetText (str (GemRB.GameGetPartyGold ()))
 
 		MWindow.Focus()
+	else:
+		MWindow.Close()
 
