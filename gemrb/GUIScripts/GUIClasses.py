@@ -83,6 +83,7 @@ class GView:
     'SetBackground': _GemRB.View_SetBackground,
     'SetFlags': _GemRB.View_SetFlags,
 	'SetResizeFlags': _GemRB.View_SetResizeFlags,
+	'SetTooltip': _GemRB.View_SetTooltip,
 	'Focus': _GemRB.View_Focus
 	}
 
@@ -210,7 +211,6 @@ class GControl(GView):
     'SetAnimation': _GemRB.Control_SetAnimation,
     'QueryText': _GemRB.Control_QueryText,
     'SetText': _GemRB.Control_SetText,
-    'SetTooltip': _GemRB.Control_SetTooltip,
     'SetAction': _GemRB.Control_SetAction,
     'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus,

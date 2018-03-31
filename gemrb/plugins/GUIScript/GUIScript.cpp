@@ -1484,14 +1484,14 @@ static inline void SetViewTooltipFromRef(View* view, ieStrRef ref)
 	delete string;
 }
 
-PyDoc_STRVAR( GemRB_Control_SetTooltip__doc,
+PyDoc_STRVAR( GemRB_View_SetTooltip__doc,
 "===== Control_SetTooltip =====\n\
 \n\
-**Prototype:** GemRB.SetTooltip (WindowIndex, ControlIndex, String|Strref[, Function])\n\
+**Prototype:** GemRB.SetTooltip (GView, String|Strref[, Function])\n\
 \n\
 **Metaclass Prototype:** SetTooltip (String|Strref[, Function])\n\
 \n\
-**Description:** Sets control's tooltip. Any control may have a tooltip.\n\
+**Description:** Sets view's tooltip. Any view may have a tooltip.\n\
 \n\
 The tooltip's visual properties must be set in the gemrb.ini file:\n\
   * TooltipFont - Font used to display tooltips\n\
@@ -1499,7 +1499,7 @@ The tooltip's visual properties must be set in the gemrb.ini file:\n\
   * TooltipMargin - Space between tooltip text and sides of TooltipBack (x2)\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
+  * GView - the view's reference\n\
   * String - an arbitrary string\n\
   * Strref - a string index from the dialog.tlk table.\n\
   * Function - (optional) function key to prepend\n\
@@ -1509,26 +1509,26 @@ The tooltip's visual properties must be set in the gemrb.ini file:\n\
 **See also:** [[guiscript:Control_SetText]]"
 );
 
-static PyObject* GemRB_Control_SetTooltip(PyObject* self, PyObject* args)
+static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 {
 	PyObject* str;
 	PARSE_ARGS2( args, "OO", &self, &str);
 
-	Control* ctrl = GetView<Control>(self);
-	if (!ctrl) {
-		return RuntimeError("Cannot find control!");
+	View* view = GetView<View>(self);
+	if (!view) {
+		return RuntimeError("Cannot find view!");
 	}
 
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
 		char* cstring = PyString_AsString( str );
 		String* string = StringFromCString(cstring);
 		if (string) {
-			ctrl->SetTooltip(*string);
+			view->SetTooltip(*string);
 			delete string;
 		}
 	} else {
 		ieStrRef StrRef = ieStrRef(PyInt_AsLong( str ));
-		SetViewTooltipFromRef(ctrl, StrRef);
+		SetViewTooltipFromRef(view, StrRef);
 	}
 
 	Py_RETURN_NONE;
@@ -11493,7 +11493,7 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 **Parameters:**\n\
   * time - 0-10\n\
 \n\
-**See also:** [[guiscript:Control_SetTooltip]], [[guiscript:SetMouseScrollSpeed]]\n\
+**See also:** [[guiscript:View_SetTooltip]], [[guiscript:SetMouseScrollSpeed]]\n\
 "
 );
 
@@ -12965,7 +12965,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetActionInterval, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
-	METHOD(Control_SetTooltip, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Control_SubstituteForControl, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
@@ -13002,6 +13001,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetFrame, METH_VARARGS),
 	METHOD(View_SetFlags, METH_VARARGS),
 	METHOD(View_SetResizeFlags, METH_VARARGS),
+	METHOD(View_SetTooltip, METH_VARARGS),
 	METHOD(View_Focus, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),

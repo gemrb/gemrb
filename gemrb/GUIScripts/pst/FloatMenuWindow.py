@@ -139,6 +139,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	Window.SetFlags (WF_DRAGGABLE|WF_BORDERLESS|WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetPos (x, y)
+	Window.SetTooltip (8199)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
@@ -173,10 +174,8 @@ def OpenFloatMenuWindow (x=0, y=0):
 	# Menu Anchors/Handles
 	Handle = Window.GetControl (CID_HANDLE1)
 	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	Handle.SetTooltip (8199)
 	Handle = Window.GetControl (CID_HANDLE2)
 	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	Handle.SetTooltip (8199)
 	
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (CID_PREV)
@@ -437,7 +436,7 @@ def UpdateFloatMenuSpell (pc, i):
 	if i == float_menu_selected:
 		Button.SetBAM ('AMHILITE', 0, 0)
 	else:
-		Button.SetPicture('')
+		Button.SetPicture(None)
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	if i + float_menu_index < len (spell_list):
@@ -463,7 +462,7 @@ def UpdateFloatMenuSpell (pc, i):
 def ClearSlot (i):
 	Button = FloatMenuWindow.GetControl (CID_SLOTS + i)
 	Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
-	Button.SetPicture ('')
+	Button.SetPicture (None)
 	Button.SetText ('')
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
