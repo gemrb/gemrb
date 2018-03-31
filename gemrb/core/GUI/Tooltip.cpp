@@ -51,8 +51,12 @@ TooltipBackground::TooltipBackground(const TooltipBackground& bg)
 
 void TooltipBackground::Reset()
 {
-	// the animation starts with the curls side by side
-	animationPos = leftbg->Width + rightbg->Width;
+	if (animationSpeed) {
+		// the animation starts with the curls side by side
+		animationPos = leftbg->Width + rightbg->Width;
+	} else {
+		animationPos = 9999; // will get clamped at draw times
+	}
 }
 
 void TooltipBackground::SetMargin(int m)
