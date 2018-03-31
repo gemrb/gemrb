@@ -20,6 +20,7 @@
 #include "PythonErrors.h"
 
 #include "GameData.h"
+#include "Interface.h"
 #include "ImageMgr.h"
 
 namespace GemRB {
@@ -83,15 +84,28 @@ ResRef ResRefFromPy(PyObject* obj) {
 Holder<TableMgr> GetTable(PyObject* obj) {
 	Holder<TableMgr> tm;
 
-	PyObject* attr = PyObject_GetAttrString(obj, "ID");
-	if (!attr) {
+	PyObject* id = PyObject_GetAttrString(obj, "ID");
+	if (!id) {
 		RuntimeError("Invalid Table reference, no ID attribute.");
 	} else {
-		tm = gamedata->GetTable( PyInt_AsLong( attr ) );
+		tm = gamedata->GetTable( PyInt_AsLong( id ) );
 	}
 	return tm;
 }
-	
+
+Holder<SymbolMgr> GetSymbols(PyObject* obj)
+{
+	Holder<SymbolMgr> sm;
+
+	PyObject* id = PyObject_GetAttrString(obj, "ID");
+	if (!id) {
+		RuntimeError("Invalid Table reference, no ID attribute.");
+	} else {
+		sm = core->GetSymbol( PyInt_AsLong( id ) );
+	}
+	return sm;
+}
+
 Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
 	Holder<Sprite2D> pic = NULL;

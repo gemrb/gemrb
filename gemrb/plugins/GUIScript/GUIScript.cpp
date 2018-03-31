@@ -1166,33 +1166,32 @@ The above example will find the symbolic name of the player's alignment.\n\
 **See also:** [[guiscript:LoadSymbol]], [[guiscript:Table_GetValue]]"
 );
 
-static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 {
-	PyObject* si, * sym;
+	PyObject* sym;
 
-	if (PyArg_UnpackTuple( args, "ref", 2, 2, &si, &sym )) {
-		if (!PyObject_TypeCheck( si, &PyInt_Type )) {
-			return NULL;
-		}
-		long SymbolIndex = PyInt_AsLong( si );
-		if (PyObject_TypeCheck( sym, &PyString_Type )) {
-			char* syms = PyString_AsString( sym );
-			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
-			if (!sm)
-				return NULL;
-			long val = sm->GetValue( syms );
-			return PyInt_FromLong( val );
-		}
-		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
-			long symi = PyInt_AsLong( sym );
-			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
-			if (!sm)
-				return NULL;
-			const char* str = sm->GetValue( symi );
-			return PyString_FromString( str );
-		}
+	PARSE_ARGS2( args, "OO", &self, &sym );
+
+	Holder<SymbolMgr> sm = GetSymbols(self);
+
+	if (sm == NULL) {
+		return AttributeError("No such symbols");
 	}
-	return NULL;
+
+	if (PyObject_TypeCheck( sym, &PyString_Type )) {
+		char* syms = PyString_AsString( sym );
+
+		long val = sm->GetValue( syms );
+		return PyInt_FromLong( val );
+	}
+	if (PyObject_TypeCheck( sym, &PyInt_Type )) {
+		long symi = PyInt_AsLong( sym );
+
+		const char* str = sm->GetValue( symi );
+		return PyString_FromString( str );
+	}
+
+	return RuntimeError("Invalid ags");
 }
 
 PyDoc_STRVAR( GemRB_View_AddSubview__doc,
