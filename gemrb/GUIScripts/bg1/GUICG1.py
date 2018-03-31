@@ -54,7 +54,7 @@ def OnLoad():
 	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedMale)
 	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(GenderWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	GenderWindow.ShowModal(MODAL_SHADOW_NONE)
 	return

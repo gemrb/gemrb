@@ -56,7 +56,7 @@ def OnLoad():
 
 	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, ChangeVoice)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(CharSoundWindow))
 	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

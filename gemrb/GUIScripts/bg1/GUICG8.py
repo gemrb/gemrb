@@ -60,7 +60,7 @@ def OnLoad():
 	TextAreaControl.SetText(17237)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(RaceWindow))
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

@@ -91,7 +91,7 @@ class CharGen:
 			BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.back)
+		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.back())
 		BackButton.MakeEscape()
 
 		AcceptButton = CharGenWindow.GetControl (8)
@@ -233,10 +233,13 @@ class CharGen:
 					 	
 CharGenMaster = None
 
-def back():
+def back(Window=None):
 	"""Moves to the previous step."""
 	global CharGenMaster
 	CharGenMaster.back()
+
+	if (Window):
+		Window.Close()
 
 def next():
 	"""Moves to the next step."""

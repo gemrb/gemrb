@@ -176,7 +176,7 @@ def OnLoad():
 	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AbilityWindow))
 	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -266,9 +266,6 @@ def RecallPress():
 
 	PointsLeft = GemRB.GetVar("Ability -1")
 	return
-
-def BackPress():
-	CharGenCommon.back()
 
 def NextPress():
 	AbilityWindow.Close()

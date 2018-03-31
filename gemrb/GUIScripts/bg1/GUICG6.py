@@ -51,7 +51,7 @@ def OnLoad():
 	
 	BackButton = SkillWindow.GetControl(25)
 	BackButton.SetText(15416)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.back)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(SkillWindow))
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
