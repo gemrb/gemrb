@@ -110,12 +110,9 @@ def OpenFloatMenuWindow (x=0, y=0):
 	global float_menu_mode, float_menu_index, float_menu_selected
 
 	if FloatMenuWindow:
-		if FloatMenuWindow:
-			FloatMenuWindow.Unload ()
-		FloatMenuWindow = None
+		FloatMenuWindow.Close ()
 
 		GemRB.GamePause (False, 0)
-		GemRB.SetVar ("FloatWindow", -1)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
 
 		if float_menu_selected==None:
@@ -141,7 +138,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	FloatMenuWindow = Window = GemRB.LoadWindow (3, "GUIWORLD")
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
-	Window.SetFlags (WF_DRAGGABLE, OP_OR)
+	Window.SetFlags (WF_DRAGGABLE|WF_BORDERLESS, OP_OR)
 	Window.SetPos (x, y)
 
 	# portrait button
@@ -175,9 +172,12 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
-	Window.DeleteControl (CID_HANDLE1)
-	Window.DeleteControl (CID_HANDLE2)
-	Window.SetTooltip (8199)
+	Handle = Window.GetControl (CID_HANDLE1)
+	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	Handle.SetTooltip (8199)
+	Handle = Window.GetControl (CID_HANDLE2)
+	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	Handle.SetTooltip (8199)
 	
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (CID_PREV)
@@ -191,8 +191,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	# 6 - 10 - items/spells/other
 	for i in range (6, 11):
-		Button = Window.GetControl (i)
-		Button.SetPos (65535, 65535)
+		Window.DeleteControl (i)
 
 	# 15 - 19 - empty item slot
 	for i in range (SLOT_COUNT):
@@ -321,7 +320,7 @@ def UpdateFloatMenuSingleAction (i):
 	Button = Window.GetControl (CID_SLOTS + i)
 
 	Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
-	Button.SetPicture('')
+	Button.SetPicture(None)
 	Button.SetTooltip (butts[i][1])
 	Button.SetText ('')
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
