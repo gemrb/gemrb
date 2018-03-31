@@ -281,8 +281,8 @@ static const int arrow_orientations[16]={
 void GameControl::DrawArrowMarker(Point p, const Color& color)
 {
 	ieDword draw = 0;
-	if (p.x < vpOrigin.x) {
-		p.x = vpOrigin.x;
+	if (p.x < vpOrigin.x + 64) {
+		p.x = vpOrigin.x + 64;
 		draw|= D_LEFT;
 	}
 	if (p.y < vpOrigin.y) {
@@ -291,24 +291,24 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 	}
 
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
-	int tmp = spr->Width;
-
-	if (p.x > vpOrigin.x + frame.w - tmp) {
-		p.x = vpOrigin.x + frame.w;//-tmp;
+	int tmp = 64;
+	if (p.x > vpOrigin.x + frame.w - (tmp + spr->Width)) {
+		p.x = vpOrigin.x + frame.w - tmp;
 		draw |= D_RIGHT;
 	}
 
-	tmp = spr->Height;
-	//tmp = core->ArrowSprites[0]->Height;
+	Region mwinframe = core->GetMessageTextArea()->GetWindow()->Frame();
 
-	if (p.y > vpOrigin.y + frame.h - tmp) {
-		p.y = vpOrigin.y + frame.h;//-tmp;
+	tmp = mwinframe.h + 48;
+	if (p.y > vpOrigin.y + frame.h - (tmp + spr->Height)) {
+		p.y = vpOrigin.y + frame.h - tmp;
 		draw |= D_BOTTOM;
 	}
+
 	if (arrow_orientations[draw]>=0) {
 		Video* video = core->GetVideoDriver();
 		Sprite2D *arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
-		video->BlitGameSprite(arrow, p.x + frame.x, p.y + frame.y, BLIT_TINTED, color, NULL);
+		video->BlitGameSprite(arrow, p.x - vpOrigin.x, p.y - vpOrigin.y, BLIT_TINTED, color, NULL);
 		arrow->release();
 	}
 	spr->release();
