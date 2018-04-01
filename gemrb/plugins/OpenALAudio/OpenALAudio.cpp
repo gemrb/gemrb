@@ -821,7 +821,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			switch (state) {
 				default:
 					Log(ERROR, "OpenAL", "Unhandled Music state '%d'.", state);
-				//no break, fall through intentionally
+				// fall through
 				case AL_PAUSED:
 					driver->MusicPlaying = false;
 					return -1;
@@ -926,7 +926,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 {
 	streams[stream].delete_buffers = true;
 	streams[stream].ClearProcessedBuffers();
-	
+
 	ALuint Buffer;
 	alGenBuffers(1, &Buffer);
 	if (checkALError("Unable to create buffer", ERROR)) {

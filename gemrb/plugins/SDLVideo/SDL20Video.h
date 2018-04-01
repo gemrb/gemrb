@@ -39,7 +39,8 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 			if (renderer == NULL) {
 				return SDL_PIXELFORMAT_INDEX8;
 			}
-			// fall-through because the renderer will throw an error for such a format
+			// the renderer will throw an error for such a format
+			// fall-through
 		case Video::DISPLAY:
 			if (renderer) {
 				// I looked at the SDL source code to determine that the format at index 0 is the default
@@ -47,7 +48,8 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 				SDL_GetRendererInfo(renderer, &info);
 				return info.texture_formats[0];
 			}
-			// fall-through; no "display" to query
+			// no "display" to query
+			// fall-through
 		default:
 			return SDL_PIXELFORMAT_UNKNOWN;
 	}
