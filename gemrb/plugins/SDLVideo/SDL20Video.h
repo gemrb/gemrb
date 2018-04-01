@@ -184,7 +184,7 @@ public:
 			va_list args;
 			va_start(args, pitch);
 
-			enum {Y, U, V};
+			enum Planes {Y, U, V};
 			const ieByte* planes[3];
 			unsigned int strides[3];
 
@@ -196,7 +196,7 @@ public:
 			strides[V] = *va_arg(args, int*);
 			va_end(args);
 
-			SDL_UpdateYUVTexture(texture, &dest, planes[Y], strides[Y], planes[U], strides[U], planes[V], strides[V]);
+			SDL_UpdateYUVTexture(texture, &dest, planes[Y], strides[Y], planes[V], strides[V], planes[U], strides[U]);
 		} else if (nativeFormat == inputFormat) {
 			SDL_UpdateTexture(texture, &dest, pixelBuf, (pitch) ? *pitch : sdlpitch);
 		} else if (inputFormat == SDL_PIXELFORMAT_INDEX8) {
