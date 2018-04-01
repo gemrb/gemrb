@@ -25,7 +25,8 @@
 #include "SDLSurfaceSprite2D.h"
 
 namespace GemRB {
-	
+
+Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat, SDL_Renderer*);
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* renderer = NULL) {
 	switch (fmt) {
 		case Video::RGB555:
@@ -38,7 +39,7 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 			if (renderer == NULL) {
 				return SDL_PIXELFORMAT_INDEX8;
 			}
-			// fallthough because the renderer will throw an error for such a format
+			// fall-through because the renderer will throw an error for such a format
 		case Video::DISPLAY:
 			if (renderer) {
 				// I looked at the SDL source code to determine that the format at index 0 is the default
@@ -46,7 +47,7 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 				SDL_GetRendererInfo(renderer, &info);
 				return info.texture_formats[0];
 			}
-			// fallthough; no "display" to query
+			// fall-through; no "display" to query
 		default:
 			return SDL_PIXELFORMAT_UNKNOWN;
 	}
@@ -94,7 +95,7 @@ private:
 					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
 	void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
 };
-	
+
 class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Texture* texture;
 	SDL_Texture* maskLayer;
@@ -107,14 +108,14 @@ class SDLTextureVideoBuffer : public VideoBuffer {
 	// if the inputFormat is different than the actual texture format we will allocate a buffer to handle conversion
 	// this has significant memory overhead, but is much faster than dynamic allocation every frame
 	void* conversionBuffer;
-	
+
 private:
 	static Region TextureRegion(SDL_Texture* tex, const Point& p) {
 		int w, h;
 		SDL_QueryTexture(tex, NULL, NULL, &w, &h);
 		return Region(p, ::GemRB::Size(w, h));
 	}
-	
+
 public:
 	SDLTextureVideoBuffer(const Point& p, SDL_Texture* texture, Video::BufferFormat fmt, SDL_Renderer* renderer)
 	: VideoBuffer(TextureRegion(texture, p)), texture(texture), renderer(renderer), inputFormat(SDLPixelFormatFromBufferFormat(fmt, NULL))
@@ -133,13 +134,13 @@ public:
 
 		Clear();
 	}
-	
+
 	~SDLTextureVideoBuffer() {
 		SDL_DestroyTexture(texture);
 		SDL_DestroyTexture(maskLayer);
 		operator delete(conversionBuffer);
 	}
-	
+
 	void Clear() {
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
@@ -155,7 +156,7 @@ public:
 			SDL_RenderClear(renderer);
 		}
 	}
-	
+
 	bool RenderOnDisplay(void* display) const {
 		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
@@ -172,7 +173,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
 		int sdlpitch = bufDest.w * SDL_BYTESPERPIXEL(nativeFormat);
 		SDL_Rect dest = RectFromRegion(bufDest);
@@ -180,11 +181,11 @@ public:
 		if (nativeFormat == SDL_PIXELFORMAT_YV12) {
 			va_list args;
 			va_start(args, pitch);
-			
-			enum PLANES {Y, U, V};
+
+			enum {Y, U, V};
 			const ieByte* planes[3];
 			unsigned int strides[3];
-			
+
 			planes[Y] = static_cast<const ieByte*>(pixelBuf);
 			strides[Y] = *pitch;
 			planes[U] = va_arg(args, ieByte*);
@@ -192,7 +193,7 @@ public:
 			planes[V] = va_arg(args, ieByte*);
 			strides[V] = *va_arg(args, int*);
 			va_end(args);
-			
+
 			SDL_UpdateYUVTexture(texture, &dest, planes[Y], strides[Y], planes[U], strides[U], planes[V], strides[V]);
 		} else if (nativeFormat == inputFormat) {
 			SDL_UpdateTexture(texture, &dest, pixelBuf, (pitch) ? *pitch : sdlpitch);
