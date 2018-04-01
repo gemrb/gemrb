@@ -31,6 +31,11 @@
 
 #include "Plugin.h"
 
+/* WinAPI conflict. */
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
 namespace GemRB {
 
 class DataStream;
@@ -42,7 +47,7 @@ protected:
 	ResRef winPack;
 	WindowManager* winmgr;
 
-public: 
+public:
 	GUIFactory()
 	: winmgr(NULL) {};
 	virtual ~GUIFactory() {};
