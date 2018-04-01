@@ -337,10 +337,6 @@ static const ieDword gemrbDoorFlags[6] = { DOOR_TRANSPARENT, DOOR_KEY, DOOR_SLID
 static const ieDword iwd2DoorFlags[6] = { DOOR_LOCKEDINFOTEXT, DOOR_TRANSPARENT, DOOR_WARNINGINFOTEXT, DOOR_KEY, 0, 0 };
 inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 {
-	if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-		return Flags;
-	}
-
 	ieDword bit, otherbit, maskOff = 0, maskOn= 0;
 	for (int i=0; i < 6; i++) {
 		if (!reverse) {
@@ -768,7 +764,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		LongName[32] = 0;
 		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
-		Flags = FixIWD2DoorFlags(Flags, false);
+		if (map->version == 16) {
+			Flags = FixIWD2DoorFlags(Flags, false);
+		}
 		if (AreaType & AT_OUTDOOR) Flags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
@@ -1658,7 +1656,9 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 
 		stream->Write( d->GetScriptName(), 32);
 		stream->WriteResRef( d->ID);
-		d->Flags = FixIWD2DoorFlags(d->Flags, true);
+		if (map->version == 16) {
+			d->Flags = FixIWD2DoorFlags(d->Flags, true);
+		}
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
 		tmpWord = (ieWord) d->open->count;
