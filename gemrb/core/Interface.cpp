@@ -585,6 +585,9 @@ void Interface::HandleFlags()
 			EventFlag|=EF_EXPANSION;
 			timer->Init();
 
+			Log(MESSAGE, "Core", "Setting up the Console...");
+			CreateConsole();
+
 			winmgr->FadeColor = ColorBlack;
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
@@ -1857,9 +1860,6 @@ int Interface::Init(InterfaceConfig* config)
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize keymaps.");
 	}
-
-	Log(MESSAGE, "Core", "Setting up the Console...");
-	CreateConsole();
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 	return GEM_OK;
