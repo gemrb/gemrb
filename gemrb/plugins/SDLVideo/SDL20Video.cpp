@@ -211,6 +211,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 
 void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
+	if (points.empty()) {
+		return;
+	}
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
 	SDL_RenderDrawPoints(renderer, &points[0], points.size());
 }

@@ -629,7 +629,7 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 
 bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 {
-	if (streams[stream].free || !streams[stream].locked)
+	if (stream < 0 || streams[stream].free || !streams[stream].locked)
 		return false;
 	streams[stream].locked = false;
 	if (!HardStop) {

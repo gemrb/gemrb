@@ -254,8 +254,8 @@ void SDLSurfaceSprite2D::Restore() const
 {
 	version = 0;
 	surface = original;
-	if (Bpp == 8) {
-		SetPalette(surface->palette->col);
+	if (Bpp == 8 && original->palette) {
+		SetPalette(original->palette->col);
 	}
 }
 

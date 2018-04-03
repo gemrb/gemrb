@@ -711,7 +711,8 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 	mode_list[list_end++] = ( 3 << 2) | 3;
 
 	bits = v_gb.get_bits(4) - 1;
-	for (mask = 1 << bits; bits >= 0; mask >>= 1, bits--) {
+	while (bits >= 0) {
+		mask = 1 << bits;
 		list_pos = list_start;
 		while (list_pos < list_end) {
 			if (!mode_list[list_pos] || !v_gb.get_bits(1)) {
@@ -767,6 +768,8 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 				break;
 			}
 		}
+		mask >>= 1;
+		bits--;
 	}
 
 	quant_idx = v_gb.get_bits(4);

@@ -28,7 +28,7 @@ namespace GemRB {
 // private inlines
 inline unsigned int Cache::MyHashKey(const char* key) const
 {
-	int nHash = tolower(key[0]);
+	unsigned int nHash = tolower(key[0]);
 	for (int i=1;(i<KEYSIZE) && key[i];i++) {
 		nHash = (nHash << 5) ^ tolower(key[i]);
 	}
