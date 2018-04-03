@@ -245,7 +245,7 @@ struct PixelIterator : IPixelIterator
 
 			xpos = tmp - w;
 			ptr += pitch * ydir; // shift rows
-			ptr += (amt - w) * sizeof(PIXEL);
+			ptr += int((amt - w) * sizeof(PIXEL));
 		} else {
 			xpos += amt;
 			ptr += amt * sizeof(PIXEL);
