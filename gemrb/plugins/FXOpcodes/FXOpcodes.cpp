@@ -4433,7 +4433,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 2:
 			//automatic secret door detection
 			detecttraps = false;
-			//fall through is intentional here
+			//fall through
 		default:
 			//automatic find traps
 			skill = 256;
@@ -5531,7 +5531,7 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			fx->Duration = game->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
 		}
 	}
-	
+
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_MAZE);
 	return FX_APPLIED;

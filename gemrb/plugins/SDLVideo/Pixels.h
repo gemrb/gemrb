@@ -350,7 +350,7 @@ public:
 	SDL_Rect clip;
 
 	SDLPixelIterator(const SDL_Rect& clip, SDL_Surface* surf)
-	: IPixelIterator(NULL, surf->pitch, Forward, Forward), format(surf->format), clip(clip)
+	: IPixelIterator(NULL, surf->pitch, Forward, Forward), imp(NULL), format(surf->format), clip(clip)
 	{
 		Uint8* pixels = static_cast<Uint8*>(surf->pixels);
 		pixels = FindStart(pixels, surf->pitch, format->BytesPerPixel, clip, xdir, ydir);
@@ -439,7 +439,7 @@ public:
 	}
 
 	void ReadRGBA(Uint8& r, Uint8& g, Uint8& b, Uint8& a) const {
-		Uint32 pixel;
+		Uint32 pixel = 0;
 		switch (format->BytesPerPixel) {
 			case 4:
 				pixel = *reinterpret_cast<Uint32*>(imp->pixel);

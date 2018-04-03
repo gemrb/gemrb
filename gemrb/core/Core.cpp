@@ -44,11 +44,13 @@
 #include <crtdbg.h>
 #endif
 
+BOOL WINAPI DllEntryPoint(HINSTANCE, DWORD, LPVOID);
 BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 	LPVOID /*lpvReserved*/)
 {
 	return true;
 }
+
 #endif
 
 namespace GemRB {
