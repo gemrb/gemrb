@@ -275,6 +275,7 @@ void WindowManager::DestroyAllWindows()
 		win->SetFlags(Window::DestroyOnClose, OP_OR); // force delete
 		win->Close();
 	}
+	windows.clear();
 }
 
 bool WindowManager::HotKey(const Event& event)
