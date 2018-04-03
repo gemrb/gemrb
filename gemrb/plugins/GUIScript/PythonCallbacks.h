@@ -24,6 +24,11 @@
 
 #include "win32def.h" // For Logging
 
+/* WinAPI collision. */
+#ifdef GetObject
+#undef GetObject
+#endif
+
 #include "Callback.h"
 #include "Interface.h"
 
@@ -129,7 +134,7 @@ void PythonControlCallback::operator() (Control* ctrl) const
 	Py_DECREF(co_argcount);
 	CallPython(Function, args);
 }
-	
+
 }
 
 #endif

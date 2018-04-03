@@ -21,6 +21,12 @@ IF(UNIX)
 	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
 ENDIF()
 
+IF(HAVE_MALLOC_H)
+	CHECK_FUNCTION_EXISTS("_aligned_malloc" HAVE_ALIGNED_MALLOC)
+	CHECK_FUNCTION_EXISTS("memalign" HAVE_MEMALIGN)
+	CHECK_FUNCTION_EXISTS("posix_memalign" HAVE_POSIX_MEMALIGN)
+ENDIF()
+
 #Unneeded on windows
 IF(NOT WIN32)
 	INCLUDE (CheckCXXSourceCompiles)

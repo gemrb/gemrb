@@ -1522,7 +1522,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 	} else {
 		const Size& bufsize = buf.Size();
 		int dest_x = unsigned(bufsize.w - header.width) >> 1;
-		int dest_y = unsigned(bufsize.w - header.height) >> 1;
+		int dest_y = unsigned(bufsize.h - header.height) >> 1;
 
 		buf.CopyPixels(Region(dest_x, dest_y, header.width, header.height),
 					   c_pic->data[0], &c_pic->linesize[0], // Y

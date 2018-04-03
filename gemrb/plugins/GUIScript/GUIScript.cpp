@@ -69,7 +69,7 @@
 #include <cstdio>
 
 // MIPSPro fix for IRIX
-size_t strlcpy(char *, const char *, size_t);
+GEM_EXPORT size_t strlcpy(char *, const char *, size_t);
 
 using namespace GemRB;
 
@@ -1286,7 +1286,7 @@ static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
 
 	View::Scrollable* scroller = GetView<View::Scrollable>(self);
 	ABORT_IF_NULL(scroller);
-	
+
 	if (relative) {
 		scroller->ScrollDelta(p);
 	} else {
@@ -2057,9 +2057,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 				}
 			}
-			
+
 			map->LinkedLabel = GetView<Label>(pylabel);
-			
+
 			view = map;
 		}
 			break;
@@ -2105,7 +2105,7 @@ static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
 {
 	PyObject* pyView = NULL;
 	PyArg_ParseTuple( args,  "OO", &self, &pyView);
-	
+
 	View* target = GetView<View>(self);
 	ABORT_IF_NULL(target);
 	View* proxy = NULL;
@@ -2114,7 +2114,7 @@ static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
 		ABORT_IF_NULL(proxy);
 	}
 	target->SetEventProxy(proxy);
-	
+
 	Py_RETURN_NONE;
 }
 
@@ -2163,12 +2163,12 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
-	
+
 	if (pypic == Py_None) {
 		view->SetBackground(NULL);
 	} else {
 		Holder<Sprite2D> pic = SpriteFromPy(pypic);
-		
+
 		if (pic == NULL) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
@@ -2202,7 +2202,7 @@ static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
 	unsigned int flags;
 	int op = OP_SET;
 	PARSE_ARGS3( args, "OI|i", &self, &flags, &op );
-	
+
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
 	RETURN_BOOL(view->SetAutoResizeFlags( flags, op ));
@@ -2215,14 +2215,14 @@ PyDoc_STRVAR( GemRB_View_Focus__doc,
 static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS1( args, "O", &self );
-	
+
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
 	Window* win = view->GetWindow();
 	ABORT_IF_NULL(win);
-	
+
 	win->SetFocused(view);
-	
+
 	Py_RETURN_NONE;
 }
 
@@ -3409,22 +3409,22 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 	if (!btn) {
 		return RuntimeError("Cannot find the button!\n");
 	}
-	
+
 	if (pypic == Py_None) {
 		// clear the picture by passing None
 		btn->SetPicture(NULL);
 	} else {
 		Holder<Sprite2D> pic = SpriteFromPy(pypic);
-		
+
 		if (!pic && pydefaultPic) {
 			// use default pic
 			pic = SpriteFromPy(pydefaultPic);
 		}
-		
+
 		if (!pic) {
 			return RuntimeError("Picture resource not found!\n");
 		}
-		
+
 		btn->SetPicture(pic.get());
 	}
 
@@ -4723,7 +4723,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 		delete string;
 	}
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
-	
+
 	return MakePyList<const std::string&, PyString_FromStringObj>(strings);
 }
 
@@ -10773,8 +10773,8 @@ jump_label2:
 				tmp = (i+1)%3;
 				goto jump_label;
 			}
-			// fall through as a synonym
 			// should eventually get replaced with proper +0-9 recognition
+			// fall through
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;
