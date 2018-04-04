@@ -146,7 +146,10 @@ def OpenContainerWindow ():
 
 	hideflag = IsGameGUIHidden()
 
-	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack())
+	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM)
+	Window.SetFlags (WF_BORDERLESS)
+	import MessageWindow
+	MessageWindow.ToggleWindowMinimize (GemRB.GetView ("MSGWIN"))
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
@@ -249,6 +252,8 @@ def CloseContainerWindow ():
 	hideflag = IsGameGUIHidden()
 
 	ContainerWindow.Unload ()
+	import MessageWindow
+	MessageWindow.ToggleWindowMinimize (GemRB.GetView ("MSGWIN"))
 
 	if GameCheck.IsPST():
 		GUICommonWindows.EnableAnimatedWindows ()
