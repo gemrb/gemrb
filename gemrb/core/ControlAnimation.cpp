@@ -76,7 +76,6 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 void ControlAnimation::UpdateAnimation(bool paused)
 {
 	unsigned long time;
-	int Cycle = cycle;
 
 	if (paused && !(control->Flags & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later
@@ -94,11 +93,9 @@ void ControlAnimation::UpdateAnimation(bool paused)
 			// but not the full range.
 			time = 500 + 500 * RAND(0, 19);
 			cycle&=~1;
-			Cycle=cycle;
 		} else if (anim_phase == 1) {
 			if (!RAND(0,29)) {
 				cycle|=1;
-				Cycle=cycle;
 			}
 			anim_phase = 2;
 			time = 100;
@@ -115,7 +112,12 @@ void ControlAnimation::UpdateAnimation(bool paused)
 		}
 	}
 
-	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) Cycle );
+	UpdateAnimationSprite();
+	core->timer->AddAnimation( this, time );
+}
+
+void ControlAnimation::UpdateAnimationSprite () {
+	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
 
 	if (pic == NULL) {
 		//stopping at end frame
@@ -126,7 +128,7 @@ void ControlAnimation::UpdateAnimation(bool paused)
 		}
 		anim_phase = 0;
 		frame = 0;
-		pic = bam->GetFrame( 0, (unsigned char) Cycle );
+		pic = bam->GetFrame( 0, (unsigned char) cycle );
 	}
 
 	if (pic == NULL) {
@@ -151,13 +153,13 @@ void ControlAnimation::UpdateAnimation(bool paused)
 	}
 
 	control->SetAnimPicture( pic );
-	core->timer->AddAnimation( this, time );
 }
 
 void ControlAnimation::SetPaletteGradients(ieDword *col)
 {
 	memcpy(colors, col, 8*sizeof(ieDword));
 	has_palette = true;
+	UpdateAnimationSprite();
 }
 
 void ControlAnimation::SetBlend(bool b)

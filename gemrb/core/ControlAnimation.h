@@ -42,6 +42,8 @@ private:
 	bool has_palette;
 	bool is_blended;
 	ieDword colors[8];
+
+	void UpdateAnimationSprite();
 public:
 	ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle = 0);
 	~ControlAnimation(void);
