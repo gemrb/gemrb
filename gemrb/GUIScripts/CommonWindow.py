@@ -152,6 +152,10 @@ def OpenContainerWindow ():
 	Window.SetFlags (WF_BORDERLESS)
 	GemRB.GetView ("MSGWIN").SetVisible(False)
 
+	# container window shouldnt be in front
+	GemRB.GetView("OPTWIN").Focus()
+	GemRB.GetView("PORTWIN").Focus()
+
 	#stop gears from interfering
 	if GameCheck.IsPST():
 		GUICommonWindows.DisableAnimatedWindows ()
