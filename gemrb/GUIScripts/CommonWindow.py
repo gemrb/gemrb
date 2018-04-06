@@ -151,12 +151,17 @@ def OpenContainerWindow ():
 
 	global HideOnClose
 	HideOnClose = IsGameGUIHidden()
-	SetGameGUIHidden(False)
+
+	if HideOnClose:
+		SetGameGUIHidden(False)
+		# must use a timed event because SetGameGUIHidden(False) sets a flag to unhide the gui next frame
+		# AFIK not needed, commented out in case it turns out there are conditions we will need it
+		# GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
+	else:
+		GemRB.GetView ("MSGWIN").SetVisible(False)
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	Window.SetFlags (WF_BORDERLESS)
-
-	GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
 
 	# container window shouldnt be in front
 	GemRB.GetView("OPTWIN").Focus()
