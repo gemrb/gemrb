@@ -149,17 +149,18 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
+	global HideOnClose
+	HideOnClose = IsGameGUIHidden()
+	SetGameGUIHidden(False)
+
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	Window.SetFlags (WF_BORDERLESS)
-	GemRB.GetView ("MSGWIN").SetVisible(False)
+
+	GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
 
 	# container window shouldnt be in front
 	GemRB.GetView("OPTWIN").Focus()
 	GemRB.GetView("PORTWIN").Focus()
-
-	global HideOnClose
-	HideOnClose = IsGameGUIHidden()
-	SetGameGUIHidden(False)
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
