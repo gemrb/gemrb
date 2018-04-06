@@ -155,7 +155,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	unsigned int version = (BLIT_GREY|BLIT_SEPIA) & flags;
 
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
-	unsigned int currentVer = texSprite->GetVersion();
 	SDL_Texture* tex = NULL;
 
 	// TODO: handle "shadow" (BLIT_NOSHADOW|BLIT_TRANSSHADOW). I'm not even sure when "shadow" is used.
@@ -163,10 +162,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	// its part of blending, not tinting, so maybe we could handle them with the SpriteCover
 	// and simplify things at the same time (now that SpriteCover supports full alpha)
 
-	if (currentVer != version) {
-		// WARNING: software fallback == slow
-		RenderSpriteVersion(texSprite, version);
-	}
+	// WARNING: software fallback == slow
+	RenderSpriteVersion(texSprite, version);
 
 	tex = texSprite->GetTexture(renderer);
 

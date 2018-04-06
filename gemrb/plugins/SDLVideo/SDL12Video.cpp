@@ -318,7 +318,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	if (surf->format->BytesPerPixel == 1) {
 		c.a = 255; // FIXME: this is probably actually contigent on something else...
 
-		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
+		const short int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
 		unsigned int version = remflags&shaderflags;
 		RenderSpriteVersion(sdlspr, version, &c);
 		// since the "shading" has been done we clear the flags

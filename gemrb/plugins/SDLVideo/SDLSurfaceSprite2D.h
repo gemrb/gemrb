@@ -29,11 +29,19 @@
 namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
+public:
+	typedef unsigned long long version_t;
+
+	enum VersionMask {
+		PalMask = 0xffffffff00000000,
+		FlagMask = 0x00000000ffffffff,
+	};
+
 protected:
 	struct SurfaceHolder : public Held<SurfaceHolder>
 	{
 		SDL_Surface* surface;
-		Palette* palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
+		Holder<Palette> palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
 		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
 		~SurfaceHolder() { SDL_FreeSurface(surface); }
@@ -44,7 +52,7 @@ protected:
 
 	Holder<SurfaceHolder> original;
 	mutable Holder<SurfaceHolder> surface;
-	mutable unsigned int version;
+	mutable version_t version;
 
 public:
 	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
@@ -77,7 +85,7 @@ public:
 	// restore the sprite to version 0 (aka original) and free the versioned resources
 	// an 8 bit sprite will be also implicitly restored by SetPalette()
 	virtual void Restore() const;
-	unsigned int GetVersion() const { return version; }
+	version_t GetVersion(bool includePal = true) const;
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -88,9 +96,8 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	struct TextureHolder : public Held<TextureHolder>
 	{
 		SDL_Texture* texture;
-		unsigned int version;
 
-		TextureHolder(SDL_Texture* tex) : texture(tex), version(0) {}
+		TextureHolder(SDL_Texture* tex) : texture(tex) {}
 		~TextureHolder() { SDL_DestroyTexture(texture); }
 
 		SDL_Texture* operator->() { return texture; }

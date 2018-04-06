@@ -31,6 +31,7 @@ Palette::Palette(const Color &color, const Color &back)
 {
 	alpha = false;
 	refcount = 1;
+	version = 0;
 	named = false;
 
 	front = color;
@@ -72,6 +73,7 @@ void Palette::CreateShadedAlphaChannel()
 		}
 	}
 	alpha = true;
+	version++;
 }
 
 void Palette::Brighten()
@@ -82,6 +84,7 @@ void Palette::Brighten()
 		col[i].b = (col[i].b+256)/2;
 		col[i].a = (col[i].a+256)/2;
 	}
+	version++;
 }
 
 Palette* Palette::Copy()
@@ -133,6 +136,8 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 	for (i = 0xB8; i < 0xFF; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+
+	version++;
 }
 
 
@@ -263,6 +268,8 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 		applyMod(src->col[0xB0+i],col[0xB0+i],tmods[3]);
 	for (i = 0; i < 72; ++i)
 		applyMod(src->col[0xB8+i],col[0xB8+i],tmods[4]);
+
+	version++;
 }
 
 void Palette::SetupGlobalRGBModification(const Palette* src,
@@ -275,6 +282,8 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 
 	for (i = 2; i < 256; ++i)
 		applyMod(src->col[i],col[i],mod);
+
+	version++;
 }
 
 }

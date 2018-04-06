@@ -83,6 +83,8 @@ public:
 		return (refcount > 1);
 	}
 
+	unsigned short GetVersion() const { return version; }
+
 	void CreateShadedAlphaChannel();
 	void Brighten();
 
@@ -96,7 +98,9 @@ public:
 
 private:
 	unsigned int refcount;
-
+	unsigned short version;
+	// FIXME: version is not enough since `col` is public
+	// must make it private to fully capture changes to it
 };
 
 }

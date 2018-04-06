@@ -113,7 +113,7 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 /** Get the Palette of a Sprite */
 Palette* SDLSurfaceSprite2D::GetPalette() const
 {
-	Palette* palette = surface->palette;
+	Palette* palette = surface->palette.get();
 	if (palette == NULL) {
 		SDL_PixelFormat* fmt = (*surface)->format;
 		if (fmt->BytesPerPixel != 1) {
@@ -125,6 +125,7 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 	}
 	palette->acquire();
 	surface->palette = palette;
+
 	return palette;
 }
 
@@ -139,16 +140,27 @@ const Color* SDLSurfaceSprite2D::GetPaletteColors() const
 
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
-	Palette* palette = surface->palette;
-	if (pal == palette)
-		return;
+	Palette* palette = surface->palette.get();
+	version_t palv = ((GetVersion()&VersionMask::PalMask) >> 16);
+
+	if (pal == palette) {
+		if (pal->GetVersion() != palv) {
+			Restore();
+		} else {
+			return;
+		}
+	}
 
 	if (palette) {
 		palette->release();
 		palette = NULL;
 	}
 
-	Restore();
+	if (version == 0) {
+		original->palette = palette;
+	} else {
+		Restore();
+	}
 
 	ieDword ck = GetColorKey();
 	if (pal && SetPalette(pal->col) == 0) {
@@ -259,16 +271,29 @@ void SDLSurfaceSprite2D::Restore() const
 	}
 }
 
+SDLSurfaceSprite2D::version_t SDLSurfaceSprite2D::GetVersion(bool includePal) const
+{
+	if (Bpp == 8 && includePal) {
+		Palette* pal = GetPalette();
+		version_t v = pal->GetVersion();
+		v = (v << 16) & version;
+		pal->release();
+		return v;
+	}
+	return version;
+}
+
 void* SDLSurfaceSprite2D::NewVersion(unsigned int newversion) const
 {
-	version = newversion;
-
-	if (version == 0) {
+	if (newversion == 0) {
 		Restore();
 	}
 
+	version = newversion;
+
 	if (Bpp == 8) {
-		GetPalette(); // generate the backup
+		Palette* pal = GetPalette(); // generate the backup
+		pal->release();
 		// we just allow overwritting the palette
 		return surface->surface->format->palette;
 	} else if (version != newversion) {

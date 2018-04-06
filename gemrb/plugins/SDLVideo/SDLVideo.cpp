@@ -664,7 +664,9 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask
 
 void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* tint)
 {
-	if (renderflags != spr->GetVersion()) {
+	SDLSurfaceSprite2D::version_t version = spr->GetVersion(false);
+
+	if (renderflags != version) {
 		if (spr->Bpp == 8) {
 			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(renderflags));
 
