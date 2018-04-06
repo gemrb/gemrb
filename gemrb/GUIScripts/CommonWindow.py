@@ -43,6 +43,7 @@ import GUIWORLD
 from ie_stats import *
 from GUIDefines import *
 
+HideOnClose = False
 ContainerWindow = None
 Container = None
 if GameCheck.IsIWD2():
@@ -156,6 +157,10 @@ def OpenContainerWindow ():
 	GemRB.GetView("OPTWIN").Focus()
 	GemRB.GetView("PORTWIN").Focus()
 
+	global HideOnClose
+	HideOnClose = IsGameGUIHidden()
+	SetGameGUIHidden(False)
+
 	#stop gears from interfering
 	if GameCheck.IsPST():
 		GUICommonWindows.DisableAnimatedWindows ()
@@ -254,6 +259,7 @@ def CloseContainerWindow ():
 
 	ContainerWindow.Unload ()
 	GemRB.GetView ("MSGWIN").SetVisible(True)
+	SetGameGUIHidden(HideOnClose)
 
 	if GameCheck.IsPST():
 		GUICommonWindows.EnableAnimatedWindows ()
