@@ -28,6 +28,10 @@ def SetGameGUIHidden(hide):
 def IsGameGUIHidden():
 	return GemRB.GetGUIFlags() & GS_HIDEGUI
 
+# for keymap.2da
+def ToggleGUIHidden():
+	SetGameGUIHidden(not IsGameGUIHidden())
+
 
 ##################################################################
 # functions dealing with containers
