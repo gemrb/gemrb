@@ -144,12 +144,9 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
-	hideflag = IsGameGUIHidden()
-
-	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM)
+	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	Window.SetFlags (WF_BORDERLESS)
-	import MessageWindow
-	MessageWindow.ToggleWindowMinimize (GemRB.GetView ("MSGWIN"))
+	GemRB.GetView ("MSGWIN").SetVisible(False)
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
@@ -231,9 +228,9 @@ def OpenContainerWindow ():
 	if GameCheck.IsPST():
 		Button.SetText (1403)
 	elif GameCheck.IsIWD2():
-		Button.SetText ("")
-	else:
 		Button.SetText (11973)
+	else:
+		Button.SetText ("")
 	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 
@@ -241,19 +238,14 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
 
-	SetGameGUIHidden(hideflag)
-
 def CloseContainerWindow ():
 	global ContainerWindow
 
 	if not ContainerWindow:
 		return
 
-	hideflag = IsGameGUIHidden()
-
 	ContainerWindow.Unload ()
-	import MessageWindow
-	MessageWindow.ToggleWindowMinimize (GemRB.GetView ("MSGWIN"))
+	GemRB.GetView ("MSGWIN").SetVisible(True)
 
 	if GameCheck.IsPST():
 		GUICommonWindows.EnableAnimatedWindows ()
@@ -268,8 +260,6 @@ def CloseContainerWindow ():
 	#play closing sound if applicable
 	if tmp!='*':
 		GemRB.PlaySound (tmp)
-
-	SetGameGUIHidden(hideflag)
 
 #doing this way it will inform the core system too, which in turn will call
 #CloseContainerWindow ()
