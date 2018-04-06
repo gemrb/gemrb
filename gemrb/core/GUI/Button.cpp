@@ -310,7 +310,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			const Region& frRect = fr->rect;
 			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
-			if (pulseBorder) {
+			if (pulseBorder && !fr->filled) {
 				Color mix;
 				unsigned long step = GetTickCount();
 				step = tp_steps[(step >> 7) & 7] * 2;
