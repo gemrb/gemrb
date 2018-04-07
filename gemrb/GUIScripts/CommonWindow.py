@@ -263,7 +263,8 @@ def CloseContainerWindow ():
 	if not ContainerWindow:
 		return
 
-	ContainerWindow.Unload ()
+	ContainerWindow.Close ()
+	ContainerWindow = None
 	GemRB.GetView ("MSGWIN").SetVisible(True)
 	SetGameGUIHidden(HideOnClose)
 
