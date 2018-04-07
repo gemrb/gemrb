@@ -104,6 +104,7 @@ bool BMPImporter::Open(DataStream* stream)
 			str->Read( &Palette[i].g, 1 );
 			str->Read( &Palette[i].r, 1 );
 			str->Read( &Palette[i].a, 1 );
+			Palette[i].a = (Palette[i].a == 0) ? 0xff : Palette[i].a;
 		}
 	}
 	str->Seek( DataOffset, GEM_STREAM_START );
