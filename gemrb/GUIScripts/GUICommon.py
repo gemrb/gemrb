@@ -65,6 +65,11 @@ def AliasControls (win, map):
 	for alias, cid in map.iteritems():
 		win.GetControl(cid).AddAlias(alias)
 
+def LocationPressed ():
+	AreaInfo = GemRB.GetAreaInfo()
+	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
+	return
+
 def SelectFormation ():
 	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
 	return

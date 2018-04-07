@@ -135,7 +135,6 @@ private:
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
-	Point GameMousePos() const;
 	void Scroll(const Point& amt);
 
 	//containers
@@ -186,6 +185,7 @@ public:
 	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	void ClearMouseState();
+	Point GameMousePos() const;
 
 	void MoveViewportTo(Point, bool center, int speed = 0);
 	Region Viewport();

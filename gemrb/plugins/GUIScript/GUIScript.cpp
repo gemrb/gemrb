@@ -12651,6 +12651,25 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+
+PyDoc_STRVAR( GemRB_GetAreaInfo__doc,
+"GetAreaInfo()=>mapping\n\n"
+"Returns important values about the current area.\n");
+
+static PyObject* GemRB_GetAreaInfo(PyObject* /*self*/, PyObject* /*args*/)
+{
+	GET_GAME();
+	GET_GAMECONTROL();
+
+	PyObject* info = PyDict_New();
+	PyDict_SetItemString(info, "CurrentArea", PyString_FromResRef( game->CurrentArea ) );
+	Point mouse = gc->GameMousePos();
+	PyDict_SetItemString(info, "PositionX", PyInt_FromLong (mouse.x));
+	PyDict_SetItemString(info, "PositionY", PyInt_FromLong (mouse.y));
+
+	return info;
+}
+
 PyDoc_STRVAR( GemRB_Log__doc,
 "===== Log =====\n\
 \n\
@@ -12808,6 +12827,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetPartySize, METH_VARARGS),
 	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
+	METHOD(GetAreaInfo, METH_NOARGS),
 	METHOD(GetAvatarsValue, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
 	METHOD(GetCombatDetails, METH_VARARGS),
