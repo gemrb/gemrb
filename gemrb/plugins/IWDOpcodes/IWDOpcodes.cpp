@@ -1253,6 +1253,8 @@ int fx_remove_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->fxqueue.RemoveAllEffects(fx->Resource, FX_DURATION_INSTANT_LIMITED);
 			break;
 		default:
+			// NOTE: if this turns out to be too agressive and the original ignored permanent effects,
+			// use a similar RemoveAllEffects call as above, only looking at live effects
 			target->fxqueue.RemoveAllEffects(fx->Resource);
 	}
 	return FX_NOT_APPLIED;
@@ -3273,7 +3275,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	for(int i=0;i<32;i++) {
 		int stat = target->GetSkillStat(i);
 		if (stat<0) break;
-		STAT_SUB(stat, 1);
+		STAT_SUB(stat, penalty);
 	}
 	return FX_APPLIED;
 }

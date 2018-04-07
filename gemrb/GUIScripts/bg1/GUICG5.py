@@ -42,6 +42,8 @@ def OnLoad():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	NameField = NameWindow.GetControl(2)
+	NameField.SetText (GemRB.GetToken ("CHARNAME"))
+	EditChange ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(NameWindow))
@@ -57,6 +59,7 @@ def NextPress():
 	#seems like a good idea to store it here for the time being
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerName (MyChar, Name, 0)
+	GemRB.SetToken ("CHARNAME", Name)
 	CharGenCommon.next()
 	return
 

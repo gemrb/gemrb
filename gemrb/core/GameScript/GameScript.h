@@ -626,6 +626,7 @@ public: //Script Functions
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int CreatureHidden( Scriptable* Sender, Trigger* parameters);
+	static int CurrentAmmo(Scriptable* Sender, Trigger* parameters);
 	static int CurrentAreaIs(Scriptable* Sender, Trigger* parameters);
 	static int DamageTaken(Scriptable* Sender, Trigger* parameters);
 	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
@@ -887,6 +888,7 @@ public: //Script Functions
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int StealFailed(Scriptable* Sender, Trigger* parameters);
 	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);
+	static int StoryModeOn(Scriptable* Sender, Trigger* /*parameters*/);
 	static int StuffGlobalRandom(Scriptable* Sender, Trigger* parameters);
 	static int SubRace(Scriptable* Sender, Trigger* parameters);
 	static int SummoningLimit(Scriptable* Sender, Trigger* parameters);
@@ -948,6 +950,7 @@ public:
 	static void AddSpecialAbility(Scriptable* Sender, Action* parameters);
 	static void AddSuperKit(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
+	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
@@ -1250,6 +1253,7 @@ public:
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveSpell(Scriptable* Sender, Action* parameters);
 	static void RemoveTraps(Scriptable* Sender, Action* parameters);
+	static void RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);
@@ -1306,6 +1310,7 @@ public:
 	static void SetHPPercent(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetInterrupt(Scriptable* Sender, Action* parameters);
+	static void SetItemFlags(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMarkedSpell(Scriptable* Sender, Action* parameters);
 	static void SetMasterArea(Scriptable* Sender, Action* parameters);

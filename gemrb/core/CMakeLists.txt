@@ -53,6 +53,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	LRUCache.cpp
 	Map.cpp
 	MapMgr.cpp
+	MapReverb.cpp
 	MoviePlayer.cpp
 	MusicMgr.cpp
 	Palette.cpp

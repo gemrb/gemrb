@@ -173,6 +173,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/StoreMgr.cpp \
 		    main/gemrb/core/Animation.cpp \
 		    main/gemrb/core/ResourceSource.cpp \
+		    main/gemrb/core/MapReverb.cpp \
 		    main/gemrb/core/Map.cpp \
 		    main/gemrb/core/Variables.cpp \
 		    main/gemrb/core/FactoryObject.cpp \
@@ -246,7 +247,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 LOCAL_SHARED_LIBRARIES := SDL2 openal ogg vorbis python
 LOCAL_STATIC_LIBRARIES := freetype2-static png gnustl_static
 
-LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF -DHAVE_UNISTD_H
+LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF -DHAVE_UNISTD_H -DSFMT_MEXP=19937
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog -lz -ldl
 # LOCAL_LDLIBS += -L$(LOCAL_PATH)/../../../gemrb/obj/local/armeabi/ -logg -lvorbis -lSDL_mixer -lpython2.7 -l freetype2-static -lpng -lgnustl_static

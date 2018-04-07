@@ -434,7 +434,7 @@ int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectDesc effectnames[] = {
 	EffectDesc("*Crash*", fx_crash, EFFECT_NO_ACTOR, -1 ),
-	EffectDesc("AcidResistanceModifier", fx_acid_resistance_modifier, 0, -1 ),
+	EffectDesc("AcidResistanceModifier", fx_acid_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ACVsCreatureType", fx_generic_effect, 0, -1 ), //0xdb
 	EffectDesc("ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0, -1 ),
 	EffectDesc("ACVsDamageTypeModifier2", fx_ac_vs_damage_type_modifier, 0, -1 ), // used in IWD
@@ -486,9 +486,9 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ChantBadNonCumulative", fx_set_chantbad_state, 0, -1 ),
 	EffectDesc("ChantNonCumulative", fx_set_chant_state, 0, -1 ),
 	EffectDesc("ChaosShieldModifier", fx_chaos_shield_modifier, 0, -1 ),
-	EffectDesc("CharismaModifier", fx_charisma_modifier, 0, -1 ),
+	EffectDesc("CharismaModifier", fx_charisma_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("CheckForBerserkModifier", fx_checkforberserk_modifier, 0, -1 ),
-	EffectDesc("ColdResistanceModifier", fx_cold_resistance_modifier, 0, -1 ),
+	EffectDesc("ColdResistanceModifier", fx_cold_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Color:BriefRGB", fx_brief_rgb, 0, -1 ),
 	EffectDesc("Color:GlowRGB", fx_glow_rgb, 0, -1 ),
 	EffectDesc("Color:DarkenRGB", fx_darken_rgb, 0, -1 ),
@@ -497,11 +497,11 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Color:SetRGBGlobal", fx_set_color_rgb_global, 0, -1 ), //08
 	EffectDesc("Color:PulseRGB", fx_set_color_pulse_rgb, 0, -1 ), //9
 	EffectDesc("Color:PulseRGBGlobal", fx_set_color_pulse_rgb_global, 0, -1 ), //9
-	EffectDesc("ConstitutionModifier", fx_constitution_modifier, 0, -1 ),
+	EffectDesc("ConstitutionModifier", fx_constitution_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ControlCreature", fx_set_charmed_state, 0, -1 ), //0xf1 same as charm
 	EffectDesc("CreateContingency", fx_create_contingency, 0, -1 ),
 	EffectDesc("CriticalHitModifier", fx_critical_hit_modifier, 0, -1 ),
-	EffectDesc("CrushingResistanceModifier", fx_crushing_resistance_modifier, 0, -1 ),
+	EffectDesc("CrushingResistanceModifier", fx_crushing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Cure:Berserk", fx_cure_berserk_state, 0, -1 ),
 	EffectDesc("Cure:Blind", fx_cure_blind_state, 0, -1 ),
 	EffectDesc("Cure:CasterHold", fx_unpause_caster, 0, -1 ),
@@ -538,7 +538,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Death3", fx_death, 0, -1 ), //(iwd2 effect too, Banish)
 	EffectDesc("DetectAlignment", fx_detect_alignment, 0, -1 ),
 	EffectDesc("DetectIllusionsModifier", fx_detect_illusion_modifier, 0, -1 ),
-	EffectDesc("DexterityModifier", fx_dexterity_modifier, 0, -1 ),
+	EffectDesc("DexterityModifier", fx_dexterity_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("DimensionDoor", fx_dimension_door, 0, -1 ),
 	EffectDesc("DisableButton", fx_disable_button, 0, -1 ), //sets disable button flag
 	EffectDesc("DisableChunk", fx_disable_chunk_modifier, 0, -1 ),
@@ -556,18 +556,18 @@ static EffectDesc effectnames[] = {
 	EffectDesc("DrainItems", fx_drain_items, 0, -1 ),
 	EffectDesc("DrainSpells", fx_drain_spells, 0, -1 ),
 	EffectDesc("DropWeapon", fx_drop_weapon, 0, -1 ),
-	EffectDesc("ElectricityResistanceModifier", fx_electricity_resistance_modifier, 0, -1 ),
+	EffectDesc("ElectricityResistanceModifier", fx_electricity_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ExistanceDelayModifier", fx_existance_delay_modifier , 0, -1 ), //unknown
 	EffectDesc("ExperienceModifier", fx_experience_modifier, 0, -1 ),
 	EffectDesc("ExploreModifier", fx_explore_modifier, 0, -1 ),
 	EffectDesc("FamiliarBond", fx_familiar_constitution_loss, 0, -1 ),
 	EffectDesc("FamiliarMarker", fx_familiar_marker, 0, -1 ),
 	EffectDesc("Farsee", fx_farsee, 0, -1 ),
-	EffectDesc("FatigueModifier", fx_fatigue_modifier, 0, -1 ),
+	EffectDesc("FatigueModifier", fx_fatigue_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("FindFamiliar", fx_find_familiar, 0, -1 ),
 	EffectDesc("FindTraps", fx_find_traps, 0, -1 ),
-	EffectDesc("FindTrapsModifier", fx_find_traps_modifier, 0, -1 ),
-	EffectDesc("FireResistanceModifier", fx_fire_resistance_modifier, 0, -1 ),
+	EffectDesc("FindTrapsModifier", fx_find_traps_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("FireResistanceModifier", fx_fire_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("FistDamageModifier", fx_fist_damage_modifier, 0, -1 ),
 	EffectDesc("FistHitModifier", fx_fist_to_hit_modifier, 0, -1 ),
 	EffectDesc("ForceSurgeModifier", fx_force_surge_modifier, 0, -1 ),
@@ -583,8 +583,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Icon:Remove", fx_remove_portrait_icon, 0, -1 ),
 	EffectDesc("Identify", fx_identify, 0, -1 ),
 	EffectDesc("IgnoreDialogPause", fx_ignore_dialogpause_modifier, 0, -1 ),
-	EffectDesc("IntelligenceModifier", fx_intelligence_modifier, 0, -1 ),
-	EffectDesc("IntoxicationModifier", fx_intoxication_modifier, 0, -1 ),
+	EffectDesc("IntelligenceModifier", fx_intelligence_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("IntoxicationModifier", fx_intoxication_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("InvisibleDetection", fx_see_invisible_modifier, 0, -1 ),
 	EffectDesc("Item:CreateDays", fx_create_item_days, 0, -1 ),
 	EffectDesc("Item:CreateInSlot", fx_create_item_in_slot, 0, -1 ),
@@ -596,17 +596,17 @@ static EffectDesc effectnames[] = {
 	EffectDesc("KillCreatureType", fx_kill_creature_type, 0, -1 ),
 	EffectDesc("LevelModifier", fx_level_modifier, 0, -1 ),
 	EffectDesc("LevelDrainModifier", fx_leveldrain_modifier, 0, -1 ),
-	EffectDesc("LoreModifier", fx_lore_modifier, 0, -1 ),
-	EffectDesc("LuckModifier", fx_luck_modifier, EFFECT_NO_LEVEL_CHECK, -1 ),
+	EffectDesc("LoreModifier", fx_lore_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("LuckModifier", fx_luck_modifier, EFFECT_NO_LEVEL_CHECK|EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("LuckCumulative", fx_luck_cumulative, 0, -1 ),
 	EffectDesc("LuckNonCumulative", fx_luck_non_cumulative, 0, -1 ),
-	EffectDesc("MagicalColdResistanceModifier", fx_magical_cold_resistance_modifier, 0, -1 ),
-	EffectDesc("MagicalFireResistanceModifier", fx_magical_fire_resistance_modifier, 0, -1 ),
+	EffectDesc("MagicalColdResistanceModifier", fx_magical_cold_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("MagicalFireResistanceModifier", fx_magical_fire_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("MagicalRest", fx_magical_rest, 0, -1 ),
 	EffectDesc("MagicDamageResistanceModifier", fx_magic_damage_resistance_modifier, 0, -1 ),
 	EffectDesc("MagicResistanceModifier", fx_magic_resistance_modifier, 0, -1 ),
 	EffectDesc("MassRaiseDead", fx_mass_raise_dead, EFFECT_NO_ACTOR, -1 ),
-	EffectDesc("MaximumHPModifier", fx_maximum_hp_modifier, EFFECT_DICED, -1 ),
+	EffectDesc("MaximumHPModifier", fx_maximum_hp_modifier, EFFECT_DICED|EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Maze", fx_maze, 0, -1 ),
 	EffectDesc("MeleeDamageModifier", fx_melee_damage_modifier, 0, -1 ),
 	EffectDesc("MeleeHitModifier", fx_melee_to_hit_modifier, 0, -1 ),
@@ -614,13 +614,13 @@ static EffectDesc effectnames[] = {
 	EffectDesc("MiscastMagicModifier", fx_miscast_magic_modifier, 0, -1 ),
 	EffectDesc("MissileDamageModifier", fx_missile_damage_modifier, 0, -1 ),
 	EffectDesc("MissileHitModifier", fx_missile_to_hit_modifier, 0, -1 ),
-	EffectDesc("MissilesResistanceModifier", fx_missiles_resistance_modifier, 0, -1 ),
+	EffectDesc("MissilesResistanceModifier", fx_missiles_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("MirrorImage", fx_mirror_image, 0, -1 ),
 	EffectDesc("MirrorImageModifier", fx_mirror_image_modifier, 0, -1 ),
 	EffectDesc("ModifyGlobalVariable", fx_modify_global_variable, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("ModifyLocalVariable", fx_modify_local_variable, 0, -1 ),
 	EffectDesc("MonsterSummoning", fx_monster_summoning, EFFECT_NO_ACTOR, -1 ),
-	EffectDesc("MoraleBreakModifier", fx_morale_break_modifier, 0, -1 ),
+	EffectDesc("MoraleBreakModifier", fx_morale_break_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("MoraleModifier", fx_morale_modifier, 0, -1 ),
 	EffectDesc("MovementRateModifier", fx_movement_modifier, 0, -1 ), //fast (7e)
 	EffectDesc("MovementRateModifier2", fx_movement_modifier, 0, -1 ),//slow (b0)
@@ -631,7 +631,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("NPCBump", fx_npc_bump, 0, -1 ),
 	EffectDesc("OffscreenAIModifier", fx_offscreenai_modifier, 0, -1 ),
 	EffectDesc("OffhandHitModifier", fx_left_to_hit_modifier, 0, -1 ),
-	EffectDesc("OpenLocksModifier", fx_open_locks_modifier, 0, -1 ),
+	EffectDesc("OpenLocksModifier", fx_open_locks_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Overlay:Entangle", fx_set_entangle_state, 0, -1 ),
 	EffectDesc("Overlay:Grease", fx_set_grease_state, 0, -1 ),
 	EffectDesc("Overlay:MinorGlobe", fx_set_minorglobe_state, 0, -1 ),
@@ -639,8 +639,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Overlay:ShieldGlobe", fx_set_shieldglobe_state, 0, -1 ),
 	EffectDesc("Overlay:Web", fx_set_web_state, 0, -1 ),
 	EffectDesc("PauseTarget", fx_pause_target, 0, -1 ), //also known as casterhold
-	EffectDesc("PickPocketsModifier", fx_pick_pockets_modifier, 0, -1 ),
-	EffectDesc("PiercingResistanceModifier", fx_piercing_resistance_modifier, 0, -1 ),
+	EffectDesc("PickPocketsModifier", fx_pick_pockets_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("PiercingResistanceModifier", fx_piercing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("PlayMovie", fx_play_movie, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("PlaySound", fx_playsound, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("PlayVisualEffect", fx_play_visual_effect, EFFECT_REINIT_ON_LOAD, -1 ),
@@ -688,11 +688,11 @@ static EffectDesc effectnames[] = {
 	EffectDesc("RestoreSpells", fx_restore_spell_level, 0, -1 ),
 	EffectDesc("RetreatFrom2", fx_turn_undead, 0, -1 ),
 	EffectDesc("RightHitModifier", fx_right_to_hit_modifier, 0, -1 ),
-	EffectDesc("SaveVsBreathModifier", fx_save_vs_breath_modifier, 0, -1 ),
-	EffectDesc("SaveVsDeathModifier", fx_save_vs_death_modifier, 0, -1 ),
-	EffectDesc("SaveVsPolyModifier", fx_save_vs_poly_modifier, 0, -1 ),
-	EffectDesc("SaveVsSpellsModifier", fx_save_vs_spell_modifier, 0, -1 ),
-	EffectDesc("SaveVsWandsModifier", fx_save_vs_wands_modifier, 0, -1 ),
+	EffectDesc("SaveVsBreathModifier", fx_save_vs_breath_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SaveVsDeathModifier", fx_save_vs_death_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SaveVsPolyModifier", fx_save_vs_poly_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SaveVsSpellsModifier", fx_save_vs_spell_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SaveVsWandsModifier", fx_save_vs_wands_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ScreenShake", fx_screenshake, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("ScriptingState", fx_scripting_state, 0, -1 ),
 	EffectDesc("Sequencer:Activate", fx_activate_spell_sequencer, EFFECT_PRESET_TARGET, -1 ),
@@ -706,7 +706,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SetTrap", fx_set_area_effect, 0, -1 ),
 	EffectDesc("SetTrapsModifier", fx_set_traps_modifier, 0, -1 ),
 	EffectDesc("SexModifier", fx_sex_modifier, 0, -1 ),
-	EffectDesc("SlashingResistanceModifier", fx_slashing_resistance_modifier, 0, -1 ),
+	EffectDesc("SlashingResistanceModifier", fx_slashing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Sparkle", fx_sparkle, 0, -1 ),
 	EffectDesc("SpellDurationModifier", fx_spell_duration_modifier, 0, -1 ),
 	EffectDesc("Spell:Add", fx_add_innate, 0, -1 ),
@@ -749,7 +749,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("StealthModifier", fx_stealth_modifier, 0, -1 ),
 	EffectDesc("StoneSkinModifier", fx_stoneskin_modifier, 0, -1 ),
 	EffectDesc("StoneSkin2Modifier", fx_golem_stoneskin_modifier, 0, -1 ),
-	EffectDesc("StrengthModifier", fx_strength_modifier, 0, -1 ),
+	EffectDesc("StrengthModifier", fx_strength_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("StrengthBonusModifier", fx_strength_bonus_modifier, 0, -1 ),
 	EffectDesc("SummonCreature", fx_summon_creature, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("RandomTeleport", fx_teleport_field, 0, -1 ),
@@ -757,10 +757,10 @@ static EffectDesc effectnames[] = {
 	EffectDesc("TimelessState", fx_timeless_modifier, 0, -1 ),
 	EffectDesc("Timestop", fx_timestop, 0, -1 ),
 	EffectDesc("TitleModifier", fx_title_modifier, 0, -1 ),
-	EffectDesc("ToHitModifier", fx_to_hit_modifier, 0, -1 ),
-	EffectDesc("ToHitBonusModifier", fx_to_hit_bonus_modifier, 0, -1 ),
+	EffectDesc("ToHitModifier", fx_to_hit_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("ToHitBonusModifier", fx_to_hit_bonus_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ToHitVsCreature", fx_generic_effect, 0, -1 ),
-	EffectDesc("TrackingModifier", fx_tracking_modifier, 0, -1 ),
+	EffectDesc("TrackingModifier", fx_tracking_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("TransparencyModifier", fx_transparency_modifier, 0, -1 ),
 	EffectDesc("TurnUndead", fx_turn_undead, 0, -1 ),
 	EffectDesc("UncannyDodge", fx_uncanny_dodge, 0, -1 ),
@@ -773,7 +773,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("VisualSpellHit", fx_visual_spell_hit, 0, -1 ),
 	EffectDesc("WildSurgeModifier", fx_wild_surge_modifier, 0, -1 ),
 	EffectDesc("WingBuffet", fx_wing_buffet, 0, -1 ),
-	EffectDesc("WisdomModifier", fx_wisdom_modifier, 0, -1 ),
+	EffectDesc("WisdomModifier", fx_wisdom_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("WizardSpellSlotsModifier", fx_bonus_wizard_spells, 0, -1 ),
 	EffectDesc(NULL, NULL, 0, 0 ),
 };
@@ -1034,7 +1034,7 @@ int fx_attacks_per_round_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 {
 	// print("fx_attacks_per_round_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	int tmp = (signed) fx->Parameter1;
-	if (fx->Parameter2!=2) {
+	if (fx->Parameter2 != MOD_PERCENT) {
 		if (tmp>10) tmp=10;
 		else if (tmp<-10) tmp=-10;
 		tmp <<= 1;
@@ -3397,7 +3397,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//equip the weapon
-	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
+	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
@@ -4059,11 +4059,13 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_BIT_OR(IE_DISABLEDBUTTON, (1<<ACT_CAST)|(1<<ACT_QSPELL1)|(1<<ACT_QSPELL2)|(1<<ACT_QSPELL3) );
 	}
 
-	for(int i=0;i<polystatcount;i++) {
-		//copy only the animation ID
-		if (fx->Parameter2 && polymorph_stats[i] != IE_ANIMATION_ID) continue;
-
-		target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+	if (fx->Parameter2) {
+		// copy only the animation ID (line 23 in polystat.2da)
+		target->SetStat(IE_ANIMATION_ID, target->polymorphCache->stats[23], 1);
+	} else {
+		for(int i=0; i<polystatcount; i++) {
+			target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+		}
 	}
 
 	return FX_APPLIED;
@@ -4807,9 +4809,14 @@ int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_remove_spell(%2d): Resource: %s Type:%d", fx->Opcode, fx->Resource, fx->Parameter2);
+
+	bool onlyknown;
+
 	switch (fx->Parameter2) {
 	default:
-		target->spellbook.RemoveSpell(fx->Resource);
+		// in yet another poor IE design decision ...
+		onlyknown = strnlen(fx->Resource, sizeof(ieResRef)) == 8;
+		target->spellbook.RemoveSpell(fx->Resource, onlyknown);
 		break;
 	case 1: //forget all spells of Resource
 		do {} while(target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE ));
@@ -5049,6 +5056,8 @@ int fx_castingspeed_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_castingspeed_modifier(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_MOD( IE_MENTALSPEED );
+	// BGEE2 has param2==2: Set casting time of spells with casting
+	// time higher than param1 to param1 ... which we handle in the user
 	return FX_APPLIED;
 }
 
@@ -5500,6 +5509,7 @@ int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_PRISON);
 	target->SendDiedTrigger();
+	target->Stop();
 	return FX_APPLIED;
 }
 
@@ -7463,7 +7473,7 @@ int fx_set_concealment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x200 - can't be flanked (sneak attacked) unless the assailant is 4+ levels higher
 int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	print("fx_uncanny_dodge(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+//	print("fx_uncanny_dodge(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword mask = 0xff;
 	ieDword stat = target->GetSafeStat(IE_UNCANNY_DODGE);
 	ieDword high = stat >> 8; // the "bitsy" part

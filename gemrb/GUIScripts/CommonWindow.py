@@ -246,10 +246,9 @@ def OpenContainerWindow ():
 	Button = Window.GetControl (51)
 	if GameCheck.IsPST():
 		Button.SetText (1403)
-	elif GameCheck.IsIWD2():
-		Button.SetText (11973)
 	else:
 		Button.SetText ("")
+
 	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 

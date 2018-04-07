@@ -624,6 +624,25 @@ void CharAnimations::InitAvatarsTable()
 			}
 		}
 	}
+
+	AutoTable avatarShadows("avatar_shadows");
+	if (avatarShadows) {
+		int rows = avatarShadows->GetRowCount();
+		for (int i = 0; i < rows; ++i) {
+			unsigned long id = 0;
+			valid_number(avatarShadows->GetRowName(i), (long &)id);
+
+			for (int j = 0; j < AvatarsCount; j++) {
+				if (id < AvatarTable[j].AnimID) {
+					break;
+				}
+				if (AvatarTable[j].AnimID == id) {
+					strnlwrcpy(AvatarTable[j].ShadowAnimation, avatarShadows->QueryField(i, 0), 4);
+					break;
+				}
+			}
+		}
+	}
 }
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
@@ -646,6 +665,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	for (i = 0; i < MAX_ANIMS; i++) {
 		for (j = 0; j < MAX_ORIENT; j++) {
 			Anims[i][j] = NULL;
+			shadowAnimations[i][j] = NULL;
 		}
 	}
 	ArmorType = 0;
@@ -726,6 +746,16 @@ CharAnimations::~CharAnimations(void)
 		gamedata->FreePalette(palette[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
+
+	for (i = 0; i < MAX_ANIMS; ++i) {
+		for (int j = 0; j < MAX_ORIENT; ++j) {
+			if (shadowAnimations[i][j]) {
+				delete shadowAnimations[i][j][0];
+				delete[] shadowAnimations[i][j];
+				j += 1;
+			}
+		}
+	}
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -1235,6 +1265,106 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	return Anims[StanceID][Orient];
 }
 
+Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned char orientation) {
+	if (GetTotalPartCount() <= 0 || IE_ANI_TWENTYTWO != GetAnimType()) {
+		return NULL;
+	}
+
+	unsigned char stanceID = MaybeOverrideStance(stance);
+
+	switch (stanceID) {
+		case IE_ANI_WALK:
+		case IE_ANI_RUN:
+		case IE_ANI_CAST:
+		case IE_ANI_SHOOT:
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_AWAKE:
+		case IE_ANI_HEAD_TURN:
+		case IE_ANI_DIE:
+		case IE_ANI_READY:
+		case IE_ANI_CONJURE:
+			break;
+		default:
+			return NULL;
+	}
+
+	if (shadowAnimations[stanceID][orientation]) {
+		return shadowAnimations[stanceID][orientation];
+	}
+
+	Animation** animations = NULL;
+
+	if (AvatarTable[AvatarsRowNum].ShadowAnimation[0]) {
+		int partCount = GetTotalPartCount();
+		animations = new Animation*[partCount];
+
+		char shadowName[12] = {0};
+		memcpy(shadowName, AvatarTable[AvatarsRowNum].ShadowAnimation, 4);
+
+		for (int i = 0; i < partCount; ++i) {
+			animations[i] = NULL;
+		}
+
+		EquipResRefData *dummy = NULL;
+		unsigned char cycle = 0;
+		AddMHRSuffix(shadowName, stanceID, cycle, orientation, dummy);
+		delete dummy;
+		shadowName[8] = 0;
+
+		AnimationFactory* af = static_cast<AnimationFactory*>(
+			gamedata->GetFactoryResource(shadowName, IE_BAM_CLASS_ID, IE_NORMAL));
+
+		if (!af) {
+			delete[] animations;
+			return NULL;
+		}
+
+		Animation *animation = af->GetCycle(cycle);
+		animations[0] = animation;
+
+		if (!animation) {
+			delete[] animations;
+			return NULL;
+		}
+
+		PaletteType paletteType = PAL_MAIN;
+		if (!palette[paletteType]) {
+			palette[paletteType] = animation->GetFrame(0)->GetPalette()->Copy();
+			SetupColors(paletteType);
+		}
+
+		switch (StanceID) {
+			case IE_ANI_DAMAGE:
+			case IE_ANI_TWITCH:
+			case IE_ANI_DIE:
+			case IE_ANI_HEAD_TURN:
+			case IE_ANI_CONJURE:
+			case IE_ANI_SHOOT:
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_JAB:
+			case IE_ANI_ATTACK_SLASH:
+			case IE_ANI_ATTACK_BACKSLASH:
+				animation->Flags |= A_ANI_PLAYONCE;
+				break;
+		}
+
+		animation->gameAnimation = true;
+		animation->SetPos(0);
+		animations[0]->AddAnimArea(animation);
+
+		orientation &= ~1;
+		shadowAnimations[stanceID][orientation] = animations;
+		shadowAnimations[stanceID][orientation + 1] = animations;
+
+		return shadowAnimations[stanceID][orientation];
+	}
+
+	return NULL;
+}
+
 static const int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
@@ -1571,6 +1701,7 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
+		case IE_ANI_HIDE:
 			strcat( ResRef, "g12" );
 			Cycle+=18;
 			break;
@@ -2493,6 +2624,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
+		case IE_ANI_HIDE:
 			strcat( ResRef, "g1" );
 			Cycle = Orient / 2;
 			break;

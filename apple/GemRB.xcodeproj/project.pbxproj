@@ -742,6 +742,8 @@
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
+		A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
+		A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */; };
 		A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 		A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
 		A2FE2C7D16F2316400DDC6C7 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -1817,6 +1819,8 @@
 		A2EDA0451F99B39600F0866A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
+		A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapReverb.cpp; sourceTree = "<group>"; };
+		A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapReverb.h; sourceTree = "<group>"; };
 		A2FCD5FB13A0366100271997 /* ACMReader.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ACMReader.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
 		A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NullSource.cpp; sourceTree = "<group>"; };
@@ -3111,6 +3115,8 @@
 				A2BFA0081395FF62006ADC12 /* Map.h */,
 				A2BFA0091395FF62006ADC12 /* MapMgr.cpp */,
 				A2BFA00A1395FF62006ADC12 /* MapMgr.h */,
+				A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */,
+				A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */,
 				A2BFA00B1395FF62006ADC12 /* MoviePlayer.cpp */,
 				A2BFA00C1395FF62006ADC12 /* MoviePlayer.h */,
 				A2BFA00D1395FF62006ADC12 /* MusicMgr.cpp */,
@@ -3486,6 +3492,7 @@
 				A2E66383139E883100310FC8 /* Font.h in Headers */,
 				A2E66385139E883100310FC8 /* Game.h in Headers */,
 				A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */,
+				A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */,
 				A2E66387139E883100310FC8 /* GameData.h in Headers */,
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
 				A2E6638A139E883E00310FC8 /* Holder.h in Headers */,
@@ -5356,6 +5363,7 @@
 				A2E663AB139E883E00310FC8 /* Particles.cpp in Sources */,
 				A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */,
 				A2E663AE139E883E00310FC8 /* Plugin.cpp in Sources */,
+				A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */,
 				A2E663B0139E883E00310FC8 /* PluginMgr.cpp in Sources */,
 				A2E663B2139E883E00310FC8 /* Polygon.cpp in Sources */,
 				A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,

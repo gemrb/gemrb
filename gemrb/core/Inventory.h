@@ -263,8 +263,6 @@ public:
 	/** count == ~0 means to destroy all */
 	/** returns the number of destroyed items */
 	unsigned int DestroyItem(const char *resref, ieDword flags, ieDword count);
-	/** flags: see ieCREItemFlagBits */
-	void SetItemFlags(CREItem* item, ieDword flags);
 	void SetSlotItem(CREItem* item, unsigned int slot);
 	int GetWeight() const {return Weight;}
 
@@ -293,6 +291,7 @@ public:
 	/** Returns the item's inventory flags */
 	ieDword GetItemFlag(unsigned int slot) const;
 	/** Changes the inventory flags */
+	/** flags: see ieCREItemFlagBits */
 	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);

@@ -38,6 +38,8 @@ def OnLoad():
 	DoneButton.SetDisabled(True)
 
 	NameField = NameWindow.GetControl(2)
+	NameField.SetText (GemRB.GetToken ("CHARNAME"))
+	EditChange ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)

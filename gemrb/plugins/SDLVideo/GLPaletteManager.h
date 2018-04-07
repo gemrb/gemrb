@@ -3,7 +3,9 @@
 
 #include <map>
 
-namespace GemRB 
+#define PALETTE_INVALID_INDEX 256
+
+namespace GemRB
 {
 	class Palette;
 

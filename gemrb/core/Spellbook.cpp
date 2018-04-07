@@ -483,7 +483,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 }
 
 //removes spell from both memorized/book
-void Spellbook::RemoveSpell(const ieResRef ResRef)
+void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -496,7 +496,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 				}
 				delete *ks;
 				(*sm)->known_spells.erase(ks);
-				RemoveMemorization(*sm, ResRef);
+				if (!onlyknown) RemoveMemorization(*sm, ResRef);
 				ks--;
 				ClearSpellInfo();
 			}

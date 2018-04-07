@@ -141,6 +141,9 @@ def HLADonePress ():
 	# so redraw skills knows we're done
 	GemRB.SetVar ("HLACount", 0)
 
+	import LevelUp
+	LevelUp.LevelUpWindow.Invalidate ()
+
 	return
 
 def HLAShowAbilities ():

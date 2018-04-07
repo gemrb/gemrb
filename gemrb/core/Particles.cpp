@@ -196,8 +196,8 @@ void Particles::Draw(const Region &vp)
 {
 	Video *video=core->GetVideoDriver();
 	Game *game = core->GetGame();
-
 	Point p = vp.Origin();
+
 	if (owner) {
 		p.x-=pos.x;
 		p.y-=pos.y;

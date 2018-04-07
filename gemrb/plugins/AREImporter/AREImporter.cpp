@@ -337,10 +337,6 @@ static const ieDword gemrbDoorFlags[6] = { DOOR_TRANSPARENT, DOOR_KEY, DOOR_SLID
 static const ieDword iwd2DoorFlags[6] = { DOOR_LOCKEDINFOTEXT, DOOR_TRANSPARENT, DOOR_WARNINGINFOTEXT, DOOR_KEY, 0, 0 };
 inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 {
-	if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-		return Flags;
-	}
-
 	ieDword bit, otherbit, maskOff = 0, maskOn= 0;
 	for (int i=0; i < 6; i++) {
 		if (!reverse) {
@@ -478,6 +474,15 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
+
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		str->Seek(SongHeader + 80, GEM_STREAM_START);
+		str->ReadDword(&map->SongHeader.reverbID);
+	} else {
+		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
+	}
+	map->SetupReverbInfo();
+
 	str->Seek( RestHeader + 32, GEM_STREAM_START );
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->RestHeader.Strref + i );
@@ -547,8 +552,16 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadResRef( Script );
 		str->ReadWord( &PosX);
 		str->ReadWord( &PosY);
-		//maybe we have to store this
-		str->Seek( 36, GEM_CURRENT_POS );
+		/* ARE 9.1: 4B per position after that, but let's just try the lower two ones. */
+		if (16 == map->version) {
+			str->ReadWord(&PosX);
+			str->Seek(2, GEM_CURRENT_POS);
+			str->ReadWord(&PosY);
+			str->Seek(30, GEM_CURRENT_POS);
+		} else {
+			//maybe we have to store this
+			str->Seek( 36, GEM_CURRENT_POS );
+		}
 
 		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
 			str->ReadResRef( WavResRef );
@@ -759,7 +772,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		LongName[32] = 0;
 		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
-		Flags = FixIWD2DoorFlags(Flags, false);
+		if (map->version == 16) {
+			Flags = FixIWD2DoorFlags(Flags, false);
+		}
 		if (AreaType & AT_OUTDOOR) Flags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
@@ -1026,9 +1041,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
-			//TODO: script order
-			memset(Scripts,0,sizeof(Scripts));
 
+			memset(Scripts, 0, sizeof(Scripts));
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
 			str->ReadResRef( Scripts[SCR_GENERAL] );
 			str->ReadResRef( Scripts[SCR_CLASS] );
@@ -1245,18 +1259,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//add autonote.ini entries
 		if( INInote ) {
 			color = 1; //read only note
-			int count = INInote->GetKeyAsInt( map->GetScriptName(), "count", 0);
+			const char *scriptName = map->GetScriptName();
+			int count = INInote->GetKeyAsInt(scriptName, "count", 0);
 			while (count) {
 				char key[32];
 				int value;
 				sprintf(key, "xPos%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.x = value;
 				sprintf(key, "yPos%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.y = value;
 				sprintf(key, "text%d",count);
-				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
+				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				map->AddMapNote( point, color, value);
 				count--;
 			}
@@ -1649,7 +1664,9 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 
 		stream->Write( d->GetScriptName(), 32);
 		stream->WriteResRef( d->ID);
-		d->Flags = FixIWD2DoorFlags(d->Flags, true);
+		if (map->version == 16) {
+			d->Flags = FixIWD2DoorFlags(d->Flags, true);
+		}
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
 		tmpWord = (ieWord) d->open->count;
@@ -1907,10 +1924,18 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 			stream->Write( filling, 8);
 		}
 		tmpWord = (ieWord) ip->UsePoint.x;
+		ieDword tmpDword2 = ip->UsePoint.x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->UsePoint.y;
+		tmpDword = ip->UsePoint.y;
 		stream->WriteWord( &tmpWord);
-		stream->Write( filling, 36); //unknown
+		if (16 == map->version) {
+			stream->WriteDword(&tmpDword2);
+			stream->WriteDword(&tmpDword);
+			stream->Write(filling, 28); //unknown
+		} else {
+			stream->Write(filling, 36); //unknown
+		}
 		//these are probably only in PST
 		stream->WriteResRef( ip->EnterWav);
 		tmpWord = (ieWord) ip->TalkPos.x;

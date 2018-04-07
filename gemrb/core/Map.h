@@ -41,6 +41,7 @@ class CREItem;
 class GameControl;
 class Image;
 class IniSpawn;
+class MapReverb;
 class Palette;
 class Particles;
 struct PathNode;
@@ -60,7 +61,7 @@ class Wall_Polygon;
 #define SPF_WAIT		0x0004	//spawn temporarily disabled
 
 //area flags (pst uses them only for resting purposes!)
-#define AF_NOSAVE         1 // unused in pst
+#define AF_NOSAVE         1
 #define AF_TUTORIAL       2 // pst: "You cannot rest here."
 #define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
 //                        6 // pst: "You must obtain permission to rest here."
@@ -121,6 +122,7 @@ class Wall_Polygon;
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
+	ieDword reverbID;
 };
 
 struct RestHeaderType {
@@ -311,6 +313,7 @@ public:
 	Sprite2D *Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
+	MapReverb *reverb;
 
 private:
 	ieStrRef trackString;
@@ -318,6 +321,7 @@ private:
 	ieWord trackDiff;
 	unsigned short* MapSet;
 	unsigned short* SrchMap; //internal searchmap
+	unsigned short* MaterialMap;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
@@ -554,6 +558,7 @@ public:
 	unsigned short GetInternalSearchMap(int x, int y) const;
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
+	void SetupReverbInfo();
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

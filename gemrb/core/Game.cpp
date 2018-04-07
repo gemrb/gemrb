@@ -41,6 +41,8 @@
 #include "GUI/GameControl.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
+#include "Video.h"
+#include "MapReverb.h"
 
 #include <algorithm>
 #include <iterator>
@@ -533,7 +535,7 @@ int Game::JoinParty(Actor* actor, int join)
 				CopyResRef(actor->LargePortrait, ptab->QueryField(actor->LargePortrait, "REPLACEMENT"));
 			}
 		}
-		
+
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
@@ -948,6 +950,10 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	PlacePersistents(newMap, ResRef);
 	newMap->InitActors();
+
+	if (newMap->reverb) {
+		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
+	}
 
 failedload:
 	core->LoadProgress(100);
@@ -1991,23 +1997,36 @@ bool Game::TimeStoppedFor(const Actor* target)
 //recalculate the party's infravision state
 void Game::Infravision()
 {
-	ieDword tmp = 0;
 	hasInfra = false;
-	core->GetDictionary()->Lookup("infravision", tmp);
-	if (!tmp) return;
 	Map *map = GetCurrentArea();
 	if (!map) return;
+
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("infravision", tmp);
+
+	bool someoneWithInfravision = false;
+	bool allSelectedWithInfravision = true;
+	bool someoneSelected = false;
+
 	for(size_t i=0;i<PCs.size();i++) {
 		Actor *actor = PCs[i];
 		if (!IsAlive(actor)) continue;
 		if (actor->GetCurrentArea()!=map) continue;
-		//Group infravision overrides this???
-		if (!actor->Selected) continue;
-		if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) {
-			hasInfra = true;
-			return;
+
+		bool hasInfravision = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
+		someoneWithInfravision |= hasInfravision;
+
+		someoneSelected |= actor->Selected;
+		if (actor->Selected) {
+			allSelectedWithInfravision &= hasInfravision;
+		}
+
+		if ((someoneWithInfravision && tmp) || (!tmp && !allSelectedWithInfravision)) {
+			break;
 		}
 	}
+
+	hasInfra = (tmp && someoneWithInfravision) || (allSelectedWithInfravision && someoneSelected);
 }
 
 //returns the colour which should be applied onto the whole game area viewport

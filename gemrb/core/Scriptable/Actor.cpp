@@ -84,10 +84,8 @@ static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
-static int *skillstats = NULL;
-static int *skillabils = NULL;
-static int *skilltraining = NULL;
-static int skillcount = -1;
+static std::map<int, std::vector<int> > skillstats;
+static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
@@ -430,6 +428,7 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
+	shadowAnimations = NULL;
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
@@ -747,59 +746,60 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
-static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove)
+static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
 	AutoTable table(clab);
-	if (table) {
-		int row = table->GetRowCount();
-		for(int i=0;i<level;i++) {
-			for (int j=0;j<row;j++) {
-				const char *res = table->QueryField(j,i);
-				if (res[0]=='*') continue;
+	if (!table) return;
 
-				if (!memcmp(res,"AP_",3)) {
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+	int row = table->GetRowCount();
+	int maxLevel = level;
+	// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
+	// permanent effects like the charisma degradation in the oozemaster
+	if (remove) maxLevel -= diff;
+	for(int i=0; i<maxLevel; i++) {
+		for (int j=0; j<row; j++) {
+			const char *res = table->QueryField(j,i);
+			if (res[0]=='*') continue;
+
+			if (!memcmp(res,"AP_",3)) {
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"GA_",3)) {
-					if (remove) {
-						actor->spellbook.RemoveSpell(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_MEMO);
-					}
+			} else if (!memcmp(res,"GA_",3)) {
+				if (remove) {
+					actor->spellbook.RemoveSpell(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_MEMO);
 				}
-				else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
-					//memorize these?
-					// we now learn them just to get the feedback string out
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
-						actor->spellbook.RemoveSpell(res+3);
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+			} else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
+				//memorize these?
+				// we now learn them just to get the feedback string out
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
-					//don't memorize these?
-					if (remove) {
-						actor->fxqueue.RemoveAllEffects(res+3);
-					} else {
-						actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
-						actor->spellbook.RemoveSpell(res+3);
-						core->ApplySpell(res+3, actor, actor, 0);
-					}
+			} else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
+				//don't memorize these?
+				if (remove) {
+					actor->fxqueue.RemoveAllEffects(res+3);
+				} else {
+					actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
+					actor->spellbook.RemoveSpell(res+3);
+					core->ApplySpell(res+3, actor, actor, 0);
 				}
-				else if (!memcmp(res,"RA_",3)) {//iwd2 only
-					//remove ability
-					int x=atoi(res+3);
-					actor->spellbook.RemoveSpell(x);
-				}
+			} else if (!memcmp(res,"RA_",3)) {//iwd2 only
+				//remove ability
+				int x=atoi(res+3);
+				actor->spellbook.RemoveSpell(x);
 			}
 		}
 	}
+
 }
 
 #define BG2_KITMASK  0xffffc000
@@ -862,7 +862,7 @@ static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
 
 //applies a kit on the character
 // iwd2 has support for multikit characters, so we have more work
-bool Actor::ApplyKit(bool remove, ieDword baseclass)
+bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
@@ -889,6 +889,9 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 		}
 	}
 
+	// a negative level diff happens when dualclassing due to three level stats being used and switched around
+	if (diff < 0) diff = 0;
+
 	//multi class
 	if (multiclass) {
 		ieDword msk = 1;
@@ -896,10 +899,16 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 			if (multiclass & msk) {
 				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
-				if (i==kitclass && !IsDualClassed()) {
-					ApplyClab(clab, max, remove);
+				if (i == kitclass && !IsDualInactive()) {
+					// in case of dc reactivation, we already removed the clabs on activation of new class
+					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
+					if (IsDualClassed()) {
+						ApplyClab(clab, max, 2, 0);
+					} else {
+						ApplyClab(clab, max, remove, diff);
+					}
 				} else {
-					ApplyClab(classabilities[i], max, remove);
+					ApplyClab(classabilities[i], max, remove, diff);
 				}
 			}
 			msk+=msk;
@@ -913,21 +922,23 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass)
 	max = GetLevelInClass(cls);
 	// iwd2 has clabs for kits and classes in the same table
 	if (kitclass==cls || iwd2class) {
-		ApplyClab(clab, max, remove);
+		ApplyClab(clab, max, remove, diff);
 	} else {
-		ApplyClab(classabilities[cls], max, remove);
+		ApplyClab(classabilities[cls], max, remove, diff);
 	}
 	return true;
 }
 
-void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
+void Actor::ApplyClab(const char *clab, ieDword max, int remove, int diff)
 {
 	if (clab && clab[0]!='*') {
 		if (max) {
 			//singleclass
-			ApplyClab_internal(this, clab, max, true);
-			if (!remove) {
-				ApplyClab_internal(this, clab, max, false);
+			if (remove != 2) {
+				ApplyClab_internal(this, clab, max, true, diff);
+			}
+			if (remove != 1) {
+				ApplyClab_internal(this, clab, max, false, 0);
 			}
 		}
 	}
@@ -986,7 +997,7 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
 	if (newValue!=oldValue) {
-		actor->ApplyKit(false, baseClass);
+		actor->ApplyKit(false, baseClass, newValue-oldValue);
 	}
 	actor->GotLUFeedback = false;
 	if (third && actor->PCStats) {
@@ -1417,7 +1428,7 @@ static unsigned int maximum_values[MAX_STATS]={
 32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,200,200,//0f
 200,200,200,200,200,100,100,100,100,100,255,255,255,255,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
-200,255,200,100,100,200,200,25,5,100,1,1,255,1,1,0,//3f
+200,255,200,100,100,200,200,25,10,100,1,1,255,1,1,0,//3f
 1023,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,200,200,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
@@ -1543,12 +1554,12 @@ void Actor::ReleaseMemory()
 			xpbonuslevels = -1;
 			xpbonustypes = -1;
 		}
-		
+
 		if (xpcap) {
 			free(xpcap);
 			xpcap = NULL;
 		}
-		
+
 		if (levelslots) {
 			for (i=0; i<classcount; i++) {
 				if (levelslots[i]) {
@@ -1570,18 +1581,7 @@ void Actor::ReleaseMemory()
 			free(maxLevelForHpRoll);
 			maxLevelForHpRoll=NULL;
 		}
-		if (skillstats) {
-			free(skillstats);
-			skillstats=NULL;
-		}
-		if (skillabils) {
-			free(skillabils);
-			skillabils=NULL;
-		}
-		if (skilltraining) {
-			free(skilltraining);
-			skilltraining=NULL;
-		}
+		skillstats.clear();
 
 		if (afcomments) {
 			for(i=0;i<afcount;i++) {
@@ -2040,7 +2040,7 @@ static void InitActorTables()
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
-	
+
 	tm.load("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
@@ -2404,15 +2404,21 @@ static void InitActorTables()
 	tm.load("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
-		skillcount = rowcount;
-		if (rowcount) {
-			skillstats = (int *) malloc(rowcount * sizeof(int) );
-			skillabils = (int *) malloc(rowcount * sizeof(int) );
-			skilltraining = (int *) malloc(rowcount * sizeof(int) );
-			while(rowcount--) {
-				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-				skilltraining[rowcount] = atoi(tm->QueryField(rowcount, 2));
+		int colcount = tm->GetColumnCount();
+		for (i = 0; i < rowcount; i++) {
+			skillstats[i] = std::vector<int>();
+			int j, val;
+			for(j = 0; j < colcount; j++) {
+				// the stat and ability columns need conversion into numbers
+				if (j < 2) {
+					val = core->TranslateStat(tm->QueryField(i, j));
+					if (j == 0) {
+						stat2skill[val] = i;
+					}
+				} else {
+					val = atoi(tm->QueryField(i, j));
+				}
+				skillstats[i].push_back (val);
 			}
 		}
 	}
@@ -3984,7 +3990,7 @@ bool Actor::OverrideActions()
 void Actor::Panic(Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
-		print("Already paniced");
+		print("Already panicked");
 		//already in panic
 		return;
 	}
@@ -4420,13 +4426,22 @@ void Actor::PlayWalkSound()
 	area->ResolveTerrainSound(Sound, Pos);
 
 	if (Sound[0] != '*') {
-		if (cnt) {
-			int l = strlen(Sound);
+		int l = strlen(Sound);
+		/* IWD2 sometimes appends numbers here, not letters. */
+		if (core->HasFeature(GF_3ED_RULES) && 0 == memcmp(Sound, "FS_", 3)) {
 			if (l < 8) {
-				Sound[l] = cnt + 0x60; // append 'a'-'g'
+				Sound[l] = cnt + 0x31;
 				Sound[l+1] = 0;
 			}
+		} else {
+			if (cnt) {
+				if (l < 8) {
+					Sound[l] = cnt + 0x60; // append 'a'-'g'
+					Sound[l+1] = 0;
+				}
+			}
 		}
+
 		unsigned int len = 0;
 		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
 		nextWalk = thisTime + len;
@@ -5530,7 +5545,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 }
 
 //if dual stuff needs to be handled on load too, improve this method with it
-int Actor::GetHpAdjustment(int multiplier) const
+int Actor::GetHpAdjustment(int multiplier, bool modified) const
 {
 	int val;
 
@@ -5539,11 +5554,18 @@ int Actor::GetHpAdjustment(int multiplier) const
 		return 0;
 	}
 
+	const ieDword *stats;
+	if (modified) {
+		stats = Modified;
+	} else {
+		stats = BaseStats;
+	}
+
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
-		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, stats[IE_CON]);
 	} else {
-		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL, stats[IE_CON]);
 	}
 
 	// ensure the change does not kill the actor
@@ -5793,8 +5815,9 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	wi.critrange = core->GetCriticalRange(item->ItemType);
 
 	//select first weapon header
+	// except you can never dualwield two ranged (thrown) weapons
 	ITMExtHeader *which;
-	if (GetAttackStyle() == WEAPON_RANGED) {
+	if (!leftorright && GetAttackStyle() == WEAPON_RANGED) {
 		which = item->GetWeaponHeader(true);
 		if (which) {
 			wi.backstabbing = which->RechargeFlags & IE_ITEM_BACKSTAB;
@@ -6745,6 +6768,9 @@ int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
 
 void Actor::PerformAttack(ieDword gameTime)
 {
+	// don't let imprisoned or otherwise missing actors continue their attack
+	if (Modified[IE_AVATARREMOVAL]) return;
+
 	if (InParty) {
 		// TODO: this is temporary hack
 		Game *game = core->GetGame();
@@ -7616,6 +7642,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
+
 	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
 	Game* game = core->GetGame();
@@ -7710,6 +7737,7 @@ void Actor::UpdateAnimations()
 	if (!anims) {
 		return;
 	}
+	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 
 	//If you find a better place for it, I'll really be glad to put it there
 	//IN BG1 and BG2, this is at the ninth frame...
@@ -7722,9 +7750,15 @@ void Actor::UpdateAnimations()
 	if (Immobile()) {
 		// update animation, continue last-displayed frame
 		anims[0]->LastFrame();
+		if (shadowAnimations) {
+			shadowAnimations[0]->LastFrame();
+		}
 	} else {
 		// update animation, maybe advance a frame (if enough time has passed)
 		anims[0]->NextFrame();
+		if (shadowAnimations) {
+			shadowAnimations[0]->NextFrame();
+		}
 	}
 
 	// update all other animation parts, in sync with the first part
@@ -7739,6 +7773,11 @@ void Actor::UpdateAnimations()
 			// restart animation
 			anims[0]->endReached = false;
 			anims[0]->SetPos(0);
+
+			if (shadowAnimations) {
+				shadowAnimations[0]->endReached = false;
+				shadowAnimations[0]->SetPos(0);
+			}
 		}
 	} else {
 		//check if walk sounds need to be played
@@ -8031,16 +8070,35 @@ void Actor::Draw(const Region& vp)
 			}
 		}
 
-		//infravision tint
+		Game* game = core->GetGame();
+		ieDword flags = !ca->lockPalette ? BLIT_TINTED : 0;
+		game->ApplyGlobalTint(tint, flags);
+
+		// infravision, independent of light map and global light
 		if ( HasBodyHeat() &&
-			(area->GetLightLevel(Pos)<128) &&
-			core->GetGame()->PartyHasInfravision()) {
-			tint.r=255;
+			game->PartyHasInfravision() &&
+			!game->IsDay() &&
+			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+			tint.r = 255;
+
+			/* IWD2: infravision is white, not red. */
+			if(core->HasFeature(GF_3ED_RULES)) {
+				tint.g = tint.b = 255;
+			} else {
+				tint.g = tint.b = 120;
+			}
+		}
+
+		newsc = sc = GetSpriteCover();
+
+		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
+		if (shadowAnimations) {
+			DrawActorSprite(vp, cx, cy, BBox, newsc, shadowAnimations, Face, tint);
 		}
 
 		// actor itself
-		newsc = sc = GetSpriteCover();
 		DrawActorSprite(vp, cx, cy, BBox, newsc, anims, Face, tint);
+
 		if (newsc != sc) SetSpriteCover(newsc);
 
 		// blur sprites in front of the actor
@@ -8688,7 +8746,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
 	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
-	int multiplier = BaseStats[IE_BACKSTABDAMAGEMULTIPLIER];
+	int multiplier = Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
 
 	if (third) {
@@ -9346,31 +9404,27 @@ int Actor::GetAbilityBonus(unsigned int ability, int value) const
 
 int Actor::GetSkillStat(unsigned int skill) const
 {
-	if (skill>=(unsigned int) skillcount) return -1;
-	return skillstats[skill];
+	if (skill >= skillstats.size()) return -1;
+	return skillstats[skill][0];
 }
 
 int Actor::GetSkill(unsigned int skill, bool ids) const
 {
 	if (!ids) {
-		// FIXME: inefficient
-		bool found = false;
-		for (int i=0; i<skillcount; i++) {
-			if ((signed)skill == skillstats[i]) {
-				found = true;
-				skill = i;
-				break;
-			}
-		}
-		if (!found) return -1;
+		// called with a stat, not a skill index
+		skill = stat2skill[skill];
 	}
-	if (skill>=(unsigned int) skillcount) return -1;
-	int ret = GetStat(skillstats[skill]);
-	int base = GetBase(skillstats[skill]);
+	if (skill >= skillstats.size()) return -1;
+	int ret = GetStat(skillstats[skill][0]);
+	int base = GetBase(skillstats[skill][0]);
+	int modStat = skillstats[skill][1];
 	// only give other boni for trained skills or those that don't require it
 	// untrained trained skills are not usable!
-	if (base > 0 || skilltraining[skill]) {
-		ret += GetAbilityBonus(skillabils[skill]);
+	// DEX is handled separately by GetSkillBonus and applied directly after effects
+	if (base > 0 || skillstats[skill][2]) {
+		if (modStat != IE_DEX) {
+			ret += GetAbilityBonus(modStat);
+		}
 	} else {
 		ret = 0;
 	}
@@ -9461,10 +9515,9 @@ void Actor::CreateDerivedStatsBG()
 		} else {
 			AutoTable tm("backstab");
 			//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
-			//TODO: AP_SPCL332 (increase backstab by one) seems to not be effecting this at all
-			//for assassins perhaps the effect is being called prior to this, and this overwrites it;
-			//stalkers work correctly, which is even more odd, considering as they use the same
-			//effect and backstabmultiplier would be 0 for them
+			// assassin's AP_SPCL332 (increase backstab by one) is not effecting this at all,
+			// it's just applied later
+			// stalkers work by just using the effect, since they're not thieves
 			if (tm)	{
 				ieDword cols = tm->GetColumnCount();
 				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;

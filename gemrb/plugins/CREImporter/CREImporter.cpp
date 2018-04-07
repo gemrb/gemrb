@@ -1956,7 +1956,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_SPECIFIC]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_SEX]=tmpByte;
-	str->Seek( 5, GEM_CURRENT_POS );
+	str->Seek( 5, GEM_CURRENT_POS ); // object.ids references that we don't save
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
@@ -2411,7 +2411,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
 	//decrease the hp back to the one without constitution bonus
 	// (but only player classes can have it)
-	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false)));
+	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false), false));
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);

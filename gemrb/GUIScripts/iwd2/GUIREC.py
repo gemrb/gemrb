@@ -48,6 +48,11 @@ OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
 
+if not BonusSpellTable:
+	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
+if not HateRaceTable:
+	HateRaceTable = GemRB.LoadTable ("haterace")
+
 # class level stats
 Classes = IDLUCommon.Levels
 
@@ -76,11 +81,6 @@ def OpenRecordsWindow ():
 		return
 
 	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
-
-	if not BonusSpellTable:
-		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
-	if not HateRaceTable:
-		HateRaceTable = GemRB.LoadTable ("haterace")
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -218,7 +218,7 @@ def HasClassFeatures (pc):
 		return True
 	return False
 
-def DisplayFavouredEnemy (pc, RangerLevel, second=-1):
+def DisplayFavouredEnemy (pc, RangerLevel, second, RecordsTextArea):
 	RaceID = 0
 	if second == -1:
 		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE)
@@ -275,7 +275,7 @@ def DisplayCommon (pc):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-def DisplaySavingThrows (pc):
+def DisplaySavingThrows (pc, RecordsTextArea):
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(17379) + "[/color]\n")
 
 	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
@@ -294,8 +294,9 @@ def GNZS(pc, s1, st, force=False):
 		RecordsTextArea.Append (DelimitedText(s1, value, 0))
 	return
 
-def DisplayGeneral (pc):
-	Window = RecordsWindow
+def DisplayGeneral (pc, targetTextArea):
+	global RecordsTextArea
+	RecordsTextArea = targetTextArea
 
 	#levels
 	# get special level penalty for subrace
@@ -371,7 +372,7 @@ def DisplayGeneral (pc):
 	RecordsTextArea.Append ("[p]" + Align + "[/p]")
 
 	#saving throws
-	DisplaySavingThrows (pc)
+	DisplaySavingThrows (pc, RecordsTextArea)
 
 	#class features
 	if HasClassFeatures(pc):
@@ -404,9 +405,9 @@ def DisplayGeneral (pc):
 		else:
 			RangerString += GemRB.GetString (15897)
 		RecordsTextArea.Append (RangerString + "[/color]\n")
-		DisplayFavouredEnemy (pc, RangerLevel)
+		DisplayFavouredEnemy (pc, RangerLevel, -1, RecordsTextArea)
 		for i in range (7):
-			DisplayFavouredEnemy (pc, RangerLevel, i)
+			DisplayFavouredEnemy (pc, RangerLevel, i, RecordsTextArea)
 
 	#bonus spells
 	bonusSpells, classes = GetBonusSpells(pc)
@@ -660,12 +661,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		RecordsTextArea.Append ("\n")
 
 def DisplayWeapons (pc):
-	Window = RecordsWindow
-
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
-	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
-	# maybe add an iwd2 mode to GemRB.GetAbilityBonus
-	GA = lambda s, pc=pc: int((GS(s)-10)/2)
 
 	###################
 	# Attack Roll Modifiers
@@ -674,7 +670,6 @@ def DisplayWeapons (pc):
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	combatdet2 = combatdet # placeholder for the potential offhand numbers
 	ac = combatdet["AC"]
-	tohit = combatdet["ToHitStats"]
 	dualwielding = GemRB.IsDualWielding(pc)
 	if dualwielding:
 		combatdet2 = GemRB.GetCombatDetails(pc, 1)
@@ -799,7 +794,7 @@ def DisplayWeapons (pc):
 	if dualwielding:
 		WeaponOfHand(pc, combatdet2, dualwielding, 1)
 
-	DisplaySavingThrows (pc)
+	DisplaySavingThrows (pc, RecordsTextArea)
 
 	return
 
@@ -825,16 +820,14 @@ def DisplaySkills (pc, SkillsArea):
 				items.append (value)
 			elif not feats:
 				value = GemRB.GetPlayerStat (pc, item)
-				modStat = itemTab.GetValue (i, 1, GTV_STAT)
-				if modStat != IE_DEX: # already handled in core
-					value += GemRB.GetPlayerStat(pc, modStat)/2 - 5
 				base = GemRB.GetPlayerStat (pc, item, 1)
 				untrained = nameTab.GetValue (i, 3)
-				
-				# only show (modified) skills that either don't require training or had it already
-				if (value and untrained) or (not untrained and base):
+				# only show positive (modified) skills that either don't require training or had it already
+				if (untrained and value == base and value > 0):
+					items.append((name, str(value),))
+				elif (value>0 and untrained) or (not untrained and base):
 					items.append((name, str(value) + " (" + str(base) + ")",))
-			
+
 		items.sort()
 		for item in items:
 			if len(item) > 1:
@@ -1037,7 +1030,7 @@ def UpdateRecordsWindow ():
 
 	SelectWindow = GemRB.GetVar ("SelectWindow")
 	if SelectWindow == 1:
-		DisplayGeneral (pc)
+		DisplayGeneral (pc, RecordsTextArea)
 	elif SelectWindow == 2:
 		DisplayWeapons (pc)
 	elif SelectWindow == 3:
@@ -1104,7 +1097,7 @@ def UpdateHelpWindow ():
 		GemRB.SetVar ("Selected",0)
 
 	for i in range(11):
-		Button = Window.GetControl (i+27)
+		#Button = Window.GetControl (i+27)
 		Label = Window.GetControl (i+0x10000004)
 		if Topic==i:
 			Label.SetTextColor (255,255,0)
@@ -1229,9 +1222,9 @@ def OpenLevelUpWindow ():
 
 		# disable monks/paladins due to order restrictions?
 		specflag = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
-		if specflag&8 and i == 7: # SPECF_MONKOFF
+		if specflag&SPECF_MONKOFF and i == 7:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-		elif specflag&4 and i == 8: # SPECF_PALADINOFF
+		elif specflag&SPECF_PALADINOFF and i == 8:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1288,6 +1281,57 @@ def LUClassPress ():
 		level = GemRB.GetPlayerStat (pc, Classes[i])
 		Label.SetText (str(level + LevelDiff))
 
+# if the pc is a paladin or a monk, multiclassing is limited;
+# only their school's favoured class is fair game, otherwise
+# they lose access to further paladin/monk progression
+def HandleSpecFlagExclusion(pc, lucls, lukit):
+	# RESEARCH: it's unclear what happened if you multiclassed into a (monk) from a bad class
+	monkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
+	paladinLevel = GemRB.GetPlayerStat (pc, IE_LEVELPALADIN)
+	if monkLevel == 0 and paladinLevel == 0 and lucls != 6 and lucls != 7:
+		return
+
+	# TODO: unhardcode this kit->kit/class dict
+	# paladins: ilmater, helm->fighter, mystra->wizard
+	# monks: old->rogue, broken->ilmater, dark moon->sorcerer
+	orderFavs = { 1: 0x8000, 2: 5, 4: 11, 8: 9, 0x10: 0x8000, 0x20: 10 }
+	kit = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+
+	# the most common level-up paths - same class
+	if GemRB.GetPlayerStat (pc, IDLUCommon.Levels[lucls-1]) > 0:
+		if lukit == 0:
+			# kitless class, matching current one(s)
+			# not going to happen with vanilla data
+			return
+		else:
+			# picked kit, matching current one(s)
+			if lukit&kit:
+				return
+			else:
+				raise RuntimeError, "Picked second or non-existing kit (%d) of same class (%d)!?" %(lukit, lucls)
+	else: # picked a new class
+		kitBits = [((kit >> x) & 1)<<x  for x in range(31, -1, -1)]
+		kitBits = filter(lambda v: v > 0, kitBits)
+		# check all the current kits - kit bits
+		for k in kitBits:
+			if k not in orderFavs:
+				continue
+			# picked a new kitless class
+			if lukit == 0 and orderFavs[k] == lucls:
+				return
+			# picked a new kit
+			if lukit > 0 and orderFavs[k] == lukit:
+				return
+
+	# only bad combinations remain
+	# disable further level-ups in the base class
+	specFlags = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
+	if monkLevel:
+		specFlags |= SPECF_MONKOFF
+	if paladinLevel:
+		specFlags |= SPECF_PALADINOFF
+	GemRB.SetPlayerStat (pc, IE_SPECFLAGS, specFlags)
+
 def OpenLUKitWindow ():
 	global LUKitWindow
 
@@ -1302,6 +1346,11 @@ def OpenLUKitWindow ():
 	hasKits = CommonTables.Classes.FindValue ("CLASS", LUClassID)
 	kitIndex = GUICommonWindows.GetKitIndex (pc, LUClass)
 	if hasKits == -1 or kitIndex > 0:
+		kitName = CommonTables.Classes.GetRowName (kitIndex)
+		kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
+		if hasKits == -1:
+			kitID = 0
+		HandleSpecFlagExclusion(pc, LUClassID, kitID)
 		LUNextPress ()
 		return
 
@@ -1369,6 +1418,8 @@ def LUKitPress ():
 	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
 	pc = GemRB.GameGetSelectedPCSingle ()
+	HandleSpecFlagExclusion(pc, LUClassID, kitID)
+
 	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
 	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|kitID)
 

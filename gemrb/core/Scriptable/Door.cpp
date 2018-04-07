@@ -175,7 +175,8 @@ void Door::SetDoorLocked(int Locked, int playsound)
 	if (Locked) {
 		if (Flags & DOOR_LOCKED) return;
 		Flags|=DOOR_LOCKED;
-		SetDoorOpen(false, playsound, 0);
+		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
+		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && ( LockSound[0] != '\0' ))
 			core->GetAudioDrv()->Play( LockSound );
 	}

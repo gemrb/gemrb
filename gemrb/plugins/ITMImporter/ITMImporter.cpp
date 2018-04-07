@@ -25,12 +25,20 @@
 #include "EffectMgr.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "SymbolMgr.h"
 #include "TableMgr.h" //needed for autotable
+
+#include <map>
 
 using namespace GemRB;
 
 int *profs = NULL;
 int profcount = -1;
+
+static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
+static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
+static EffectRef zzRefs[] = { fx_tohit_vs_creature_ref, fx_damage_vs_creature_ref };
+std::map<char,int> zzmap;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
@@ -49,6 +57,26 @@ static void Initializer()
 	profs = (int *) calloc( profcount, sizeof(int) );
 	for (int i = 0; i < profcount; i++) {
 		profs[i] = atoi(tm->QueryField( i, 0 ) );
+	}
+
+	// check for iwd1 zz-weapon bonus table
+	AutoTable tm2("zzweaps");
+	int indR = core->LoadSymbol("race");
+	Holder<SymbolMgr> sm = core->GetSymbol(indR);
+	if (!tm2 || !sm || indR == -1) {
+		return;
+	}
+	// resolve table into directly usable form
+	int zzcount = tm2->GetRowCount();
+	for (int i = 0; i < zzcount; i++) {
+		const char *rowname = tm2->GetRowName(i);
+		const char *field = tm2->QueryField(i, 0);
+		long val = atoi(field);
+		if (val == 0) {
+			// not numeric, do an IDS lookup
+			val = sm->GetValue(field);
+		}
+		zzmap[*rowname] = val;
 	}
 }
 
@@ -104,6 +132,42 @@ bool ITMImporter::Open(DataStream* stream)
 	}
 
 	return true;
+}
+
+// iwd1 has hardcoded bonuses (weapons named ZZ*) vs race or alignment mask
+// bg1 already handled it with external effects, so this was actually not necessary
+// Example: ZZ05WE, +1 bonus vs lawful alignments or Giant Killer (+1, +4 vs. Giants)
+// NOTE: the original did not increment enchantment level nor weapon speed
+static void AddZZFeatures(Item *s)
+{
+	// the targeting code (3rd char) is: digit = align(ment), letter = race
+	char targetIDS = toupper(s->Name[2]);
+	ieByte IDSval = zzmap[targetIDS];
+	ieByte IDSfile = 4;
+	if (atoi(&targetIDS)) {
+		IDSfile = 8;
+	}
+
+	// the numeric code (4th char) is translated to attack bonus with this pattern:
+	// 0: -5, 1: -4, 2: -3, 3: -2, 4: -1,
+	// 5: +1, 6:+2 ... 9: +5
+	// this bonus is on top of the default one, so less descriptions are wrong than it may seem
+	int bonus = atoi(&s->Name[3]);
+	if (bonus < 5) {
+		bonus -= 5;
+	} else {
+		bonus -= 4;
+	}
+
+	// append the new equipping effects (tohit+damage)
+	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
+		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
+		fx->Parameter3 = bonus;
+		CopyResRef(fx->Source, s->Name);
+		// use the space reserved earlier
+		memcpy(s->equipping_features + (s->EquippingFeatureCount - 1 - i), fx, sizeof(Effect));
+		delete fx;
+	}
 }
 
 Item* ITMImporter::GetItem(Item *s)
@@ -218,8 +282,17 @@ Item* ITMImporter::GetItem(Item *s)
 		}
 	}
 
+	// handle iwd1 weapon "peculiarity"
+	bool zzWeapon = false;
+	int extraFeatureCount = 0;
+	if (!strnicmp(s->Name, "ZZ", 2) && version == 10) {
+		zzWeapon = true;
+		// reserve space in the effect array
+		extraFeatureCount = 2;
+	}
+
 	//48 is the size of the feature block
-	s->equipping_features = new  Effect[s->EquippingFeatureCount];
+	s->equipping_features = new Effect[s->EquippingFeatureCount + extraFeatureCount];
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
@@ -227,6 +300,10 @@ Item* ITMImporter::GetItem(Item *s)
 		GetFeature(s->equipping_features+i, s);
 	}
 
+	// add remaining features
+	if (zzWeapon) {
+		AddZZFeatures(s);
+	}
 
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(ERROR, "ITMImporter", "No BAM Importer available!");

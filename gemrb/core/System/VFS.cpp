@@ -31,6 +31,11 @@
 #include <unistd.h>
 #endif
 
+// in case unistd isn't there or nonconformant
+#ifndef R_OK
+#define R_OK 04
+#endif
+
 #if defined(__sgi)
 #  include <stdarg.h>
 #else

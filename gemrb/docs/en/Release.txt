@@ -23,11 +23,10 @@ Preparing and testing GIT
 
 * Update NEWS with highlights since the last release 
 
-* Make sure that GemRB GIT is in compilable and runnable state
-  - download a clean GIT tree and test it.
-  - the minimal test should not fail
-  - Make distribution .tar.gz (see Source release below) and test it as well -
-    especially make sure all needed files are included.
+* Make distribution .tar.gz (see Source release below) and test it
+  - make sure all needed files are included
+  - the minimal test should not fail:
+    gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample
 
 * Tag current GIT to version number e.g. v0.9.0
   i.e. in the gemrb root directory do
@@ -48,31 +47,13 @@ Source release
   if you've pushed the new tagged release already, github will have generated
   a clean tarball for you at https://github.com/gemrb/gemrb/releases
 
-Linux binary release
-====================
+Binary releases
+===============
+Check Travis and Appveyor build bots — the builds are automatically uploaded
+to Sourceforge. Grab the commit hash and then mark the correct windows build
+as the default download (see below).
 
-  ./autogen.sh
-  ./configure --prefix=/usr/local
-  make
-  make install DESTDIR=/tmp/fakeroot
-  cd /tmp/fakeroot/usr/local
-  copy ~/GemRB-binary.cfg over etc/GemRB.cfg, rename to etc/gemrb.cfg
-  strip bin/gemrb lib/* lib/gemrb/*
-  sudo chown -R 0:0 *
-  sudo tar cvzf ../gemrb-0.2.5-linux_i386.tar.gz *
-
-
-Windows binary release
-======================
-
-If gembot is around on IRC, ask tomprince to make a build for the tagged revision:
-  gembot: force build --revision=701453842c7cb5783 nmake-msvc++10 release build
-  gembot: watch nmake-msvc++10
-
-It will tell you where to see the report and on the last (upload) step,
-there will also be a link for the binary download. Rename it, upload
-it to the main sourceforge windows directory and mark it as default for
-the platform.
+If there's time/interest, manually generate an android build.
 
 Release and Announcements
 =========================
@@ -97,6 +78,8 @@ options should also be mentioned here if they're not part of the changelog.
     - homepages: sidebar (versions and news), news, start (version), changelog (status
       and log swap), old_changelogs
     - our Google+ page: https://plus.google.com/+GemrbOrg
+    - github: go to the Releases tab and promote the new tag to a release, then add
+      a link to the release notes
 
 * Run admin/restart_news.sh to restart the NEWS cycle
 

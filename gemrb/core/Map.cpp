@@ -32,6 +32,7 @@
 #include "GameData.h"
 #include "IniSpawn.h"
 #include "MapMgr.h"
+#include "MapReverb.h"
 #include "MusicMgr.h"
 #include "ImageMgr.h"
 #include "Palette.h"
@@ -368,6 +369,9 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
+	SongHeader.reverbID = 0;
+	reverb = NULL;
+	MaterialMap = NULL;
 }
 
 Map::~Map(void)
@@ -376,6 +380,7 @@ Map::~Map(void)
 
 	free( MapSet );
 	free( SrchMap );
+	free( MaterialMap );
 
 	//close the current container if it was owned by this map, this avoids a crash
 	Container *c = core->GetCurrentContainer();
@@ -434,6 +439,10 @@ Map::~Map(void)
 		delete ambients[i];
 	}
 
+	if (reverb) {
+		delete reverb;
+	}
+
 	//malloc-d in AREImp
 	free( ExploredBitmap );
 	free( VisibleBitmap );
@@ -471,10 +480,14 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	//Internal Searchmap
 	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
+	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
 		int x=sr->GetWidth();
 		while(x--) {
-			SrchMap[y*Width+x] = Passable[sr->GetAt(x,y)&PATH_MAP_AREAMASK];
+			unsigned short value = sr->GetAt(x,y) & PATH_MAP_AREAMASK;
+			size_t index = y * Width + x;
+			SrchMap[index] = Passable[value];
+			MaterialMap[index] = value;
 		}
 	}
 
@@ -885,7 +898,7 @@ void Map::UpdateScripts()
 void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	for(int i=0;i<tsndcount;i++) {
 		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
-			int type = GetInternalSearchMap( Pos.x/16, Pos.y/12 )&PATH_MAP_AREAMASK;
+			int type = MaterialMap[Pos.x/16 + Pos.y/12 * Width];
 			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
 			return;
 		}
@@ -3548,6 +3561,12 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 				int skipped = count;
 				while (count) {
 					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
+					if (slot == -1) {
+						// probably an inventory bug, shouldn't happen
+						Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+						skipped--;
+						continue;
+					}
 					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
 					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
 						// already full (or nonstackable), nothing to do here
@@ -3584,7 +3603,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 		while (count) {
 			int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
-			assert (slot != -1);
+			if (slot == -1) continue;
 			// containers don't really care about position, so every new item is placed at the last spot
 			CREItem *item = othercontainer->RemoveItem(slot, 0);
 			othercontainer->AddItem(item);
@@ -4087,6 +4106,12 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
+}
+
+void Map::SetupReverbInfo() {
+	if (!reverb) {
+		reverb = new MapReverb(*this);
+	}
 }
 
 }

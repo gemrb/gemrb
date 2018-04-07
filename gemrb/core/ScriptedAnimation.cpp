@@ -683,15 +683,15 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 		flag |= BLIT_SEPIA;
 	}
 
-	if (Transparency & BLIT_TINTED) {
-		flag |= BLIT_TINTED;
-	}
-
 	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
 		tint = p_tint;
 	}
+
 	ieDword flags = flag;
-	if (game) game->ApplyGlobalTint(tint, flags);
+	if (Transparency & BLIT_TINTED) {
+		flags = flag |= BLIT_TINTED;
+		if (game) game->ApplyGlobalTint(tint, flags);
+	}
 
 	int cx = Pos.x + XPos;
 	int cy = Pos.y - ZPos + YPos;

@@ -1649,7 +1649,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter, 0)) {
 			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 		}
 	}
@@ -4124,6 +4124,39 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 }
 
+void GameScript::SetItemFlags(Scriptable *Sender, Action* parameters)
+{
+	Scriptable* tar;
+	if (parameters->objects[1]) {
+		tar = GetActorFromObject(Sender, parameters->objects[1]);
+	} else {
+		tar = Sender;
+	}
+	if (!tar) return;
+
+	Inventory *myinv;
+	switch(tar->Type) {
+		case ST_ACTOR:
+			myinv = &((Actor *) tar)->inventory;
+			break;
+		case ST_CONTAINER:
+			myinv = &((Container *) tar)->inventory;
+			break;
+		default:
+			return;
+	}
+
+	int slot = myinv->FindItem(parameters->string0Parameter, 0);
+	if (slot == -1) {
+		Log(ERROR, "GameScript", "Item %s not found in inventory of %s", parameters->string0Parameter, tar->GetScriptName());
+		return;
+	}
+
+	int op = OP_NAND;
+	if (parameters->int1Parameter) op = OP_OR;
+	myinv->ChangeItemFlag(slot, parameters->int0Parameter, op);
+}
+
 void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4809,6 +4842,24 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_NAND);
 }
 
+void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	WorldMap *worldmap = core->GetWorldMap();
+	if (!worldmap) {
+		error("GameScript", "Can't find worldmap!\n");
+	}
+	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, OP_OR);
+}
+
+void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	WorldMap *worldmap = core->GetWorldMap();
+	if (!worldmap) {
+		error("GameScript", "Can't find worldmap!\n");
+	}
+	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, OP_NAND);
+}
+
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
@@ -5056,9 +5107,9 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	AttackCore(Sender, tar, 0);
 
-	if (Sender->CurrentActionState) {
-		Sender->CurrentActionState--;
-	} else {
+	Sender->CurrentActionState--;
+	if (Sender->CurrentActionState <= 0) {
+		Sender->CurrentActionState = 0;
 		Sender->ReleaseCurrentAction();
 	}
 }

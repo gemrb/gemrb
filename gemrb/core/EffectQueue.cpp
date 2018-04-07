@@ -36,6 +36,7 @@
 #include "System/StringBuffer.h"
 
 #include <cstdio>
+#include "GameData.h"
 
 namespace GemRB {
 
@@ -1391,6 +1392,44 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
+
+	if (!Owner || (Owner->Type != ST_ACTOR)) return;
+
+	// we didn't catch effects that don't persist — they still need to be undone
+	// FX_PERMANENT returners aren't part of the queue, so permanent stat mods can't be detected
+	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
+	Spell *spell = gamedata->GetSpell(Removed, true);
+	if (spell->ExtHeaderCount > 1) {
+		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
+	}
+	SPLExtHeader *sph = spell->GetExtHeader(0);
+	for (int i=0; i < sph->FeatureCount; i++) {
+		Effect *origfx = sph->features+i;
+
+		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
+		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
+
+		// unapply the effect by applying the reverse — if feasible
+		// but don't alter the spell itself or other users won't get what they asked for
+		Effect *fx = CreateEffectCopy(origfx, origfx->Opcode, origfx->Parameter1, origfx->Parameter2);
+
+		// state setting effects are idempotent, so wouldn't cause problems during clab reapplication
+		// ...they would during disabled dualclass levels, but it would be too annoying to try, since
+		// not all have cure variants (eg. fx_set_blur_state) and if there were two sources, we'd kill
+		// the effect just the same.
+
+		// further ignore a few more complicated-to-undo opcodes
+		// fx_ac_vs_damage_type_modifier, fx_ac_vs_damage_type_modifier_iwd2, fx_ids_modifier, fx_attacks_per_round_modifier
+
+		// fx_pause_target is a one-tick shot pony, nothing to do
+
+		fx->Parameter1 = -fx->Parameter1;
+
+		Log(DEBUG, "EffectQueue", "Manually removing effect %d (from %s)", fx->Opcode, Removed);
+		ApplyEffect((Actor *)Owner, fx, 1, 0);
+		delete fx;
+	}
+	gamedata->FreeSpell(spell, Removed, false);
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x

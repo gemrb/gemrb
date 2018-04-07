@@ -3461,6 +3461,17 @@ int GameScript::NightmareModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+int GameScript::StoryModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	ieDword mode;
+
+	core->GetDictionary()->Lookup("Story Mode", mode);
+	if (mode) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	ieDword diff;
@@ -4632,5 +4643,27 @@ int GameScript::LT(Scriptable* /*Sender*/, Trigger* parameters)
 /*
  * End TobEx triggers
  */
+
+int GameScript::CurrentAmmo(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+
+	int eqslot = actor->inventory.GetEquippedSlot();
+	int effect = core->QuerySlotEffects(eqslot);
+	if (effect != SLOT_EFFECT_MISSILE) {
+		return 0;
+	}
+
+	int ammoslot = core->FindSlot(eqslot);
+	if (ammoslot == -1) {
+		return 0;
+	}
+
+	return actor->inventory.HasItemInSlot(parameters->string0Parameter, ammoslot);
+}
 
 }

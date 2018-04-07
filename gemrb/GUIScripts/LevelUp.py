@@ -285,15 +285,16 @@ def OpenLevelUpWindow():
 					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
 				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
 
-		# setup class bonuses for this class
-		if IsMulti or IsDual or Kit == 0:
-			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
-		else: # single-classed with a kit
-			ABTable = CommonTables.KitList.GetValue (str(Kit), "ABILITIES")
-
-		# add the abilites if we have a table to ref
-		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
-			GUICommon.AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
+# this is handled by core
+#		# setup class bonuses for this class
+#		if IsMulti or IsDual or Kit == 0:
+#			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
+#		else: # single-classed with a kit
+#			ABTable = CommonTables.KitList.GetValue (str(Kit), "ABILITIES")
+#
+#		# add the abilites if we have a table to ref
+#		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
+#			GUICommon.AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
 	print "Actor CurrentLevels:",actor.Levels()
 	print "Levels:",Level,"Actor NextLevels:",actor.NextLevels()
@@ -735,13 +736,3 @@ def ReactivateBaseClass ():
 				if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 					GemRB.LearnSpell(pc, Learnable[k])
 
-	# setup class bonuses for this class
-	if KitIndex == 0: # no kit
-		ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
-	else: # kit
-		ABTable = CommonTables.KitList.GetValue (KitIndex, 4, GTV_STR)
-	print "ABTable:",ABTable
-
-	# add the abilites if we have a table to ref
-	if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
-		GUICommon.AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites

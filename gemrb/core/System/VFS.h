@@ -49,10 +49,6 @@
 #include <windows.h>
 #endif
 
-#ifndef R_OK
-#define R_OK 04
-#endif
-
 namespace GemRB {
 
 #ifdef WIN32

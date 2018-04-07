@@ -79,6 +79,7 @@ static const TriggerLink triggernames[] = {
 	{"charname", GameScript::CharName, 0}, //not scripting name
 	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
+	{"checkitemslot", GameScript::HasItemSlot, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
 	{"checkpartylevel", GameScript::CheckPartyLevel, 0},
 	{"checkskill", GameScript::CheckSkill, 0},
@@ -99,6 +100,7 @@ static const TriggerLink triggernames[] = {
 	{"combatcountergt", GameScript::CombatCounterGT, 0},
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
 	{"contains", GameScript::Contains, 0},
+	{"currentammo", GameScript::CurrentAmmo, 0},
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
 	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
@@ -264,6 +266,7 @@ static const TriggerLink triggernames[] = {
 	{"los", GameScript::LOS, 0},
 	{"lt", GameScript::LT, 0},
 	{"modalstate", GameScript::ModalState, 0},
+	{"modalstateobject", GameScript::ModalState, 0},
 	{"morale", GameScript::Morale, 0},
 	{"moralegt", GameScript::MoraleGT, 0},
 	{"moralelt", GameScript::MoraleLT, 0},
@@ -394,6 +397,7 @@ static const TriggerLink triggernames[] = {
 	{"statecheck", GameScript::StateCheck, 0},
 	{"stealfailed", GameScript::StealFailed, 0},
 	{"storehasitem", GameScript::StoreHasItem, 0},
+	{"storymodeon", GameScript::StoryModeOn, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace, 0},
 	{"summoninglimit", GameScript::SummoningLimit, 0},
@@ -461,6 +465,7 @@ static const ActionLink actionnames[] = {
 	{"addspecialability", GameScript::AddSpecialAbility, 0},
 	{"addsuperkit", GameScript::AddSuperKit, 0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
+	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
 	{"addxpvar", GameScript::AddXP2DA, 0},
@@ -811,6 +816,7 @@ static const ActionLink actionnames[] = {
 	{"removerangerhood", GameScript::RemoveRangerHood, 0},
 	{"removespell", GameScript::RemoveSpell, 0},
 	{"removetraps", GameScript::RemoveTraps, AF_BLOCKING},
+	{"removeworldmapareaflag", GameScript::RemoveWorldmapAreaFlag, 0},
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
@@ -877,6 +883,7 @@ static const ActionLink actionnames[] = {
 	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},
 	{"setinterrupt", GameScript::SetInterrupt, 0},
+	{"setitemflags", GameScript::SetItemFlags, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setmarkedspell", GameScript::SetMarkedSpell, 0},

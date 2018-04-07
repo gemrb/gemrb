@@ -74,7 +74,7 @@ def OpenInventoryWindow ():
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, OpenInventoryWindow)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)

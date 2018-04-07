@@ -30,6 +30,7 @@ GLVideoDriver::~GLVideoDriver()
 	if (programRect) programRect->Release();
 	if (programEllipse) programEllipse->Release();
 	delete paletteManager;
+	FreeBackgroundBuffer();
 	SDL_GL_DeleteContext(context);
 }
 
@@ -88,6 +89,7 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 
 	Viewport.w = width;
 	Viewport.h = height;
+	GLViewport = Region(0, 0, width, height);
 
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
@@ -125,7 +127,7 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 #endif
 	if (!createPrograms()) return GEM_ERROR;
 	paletteManager = new GLPaletteManager();
-	glViewport(0, 0, width, height);
+	glViewport(GLViewport.x, GLViewport.y, GLViewport.w, GLViewport.h);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_SCISSOR_TEST);
@@ -358,6 +360,14 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 	program->SetUniformValue("u_tint", COLOR_SIZE, (GLfloat)colorTint.r/255, (GLfloat)colorTint.g/255, (GLfloat)colorTint.b/255, (GLfloat)colorTint.a/255);
 	program->SetUniformValue("u_alphaModifier", 1, alphaModifier);
 
+	GLint shadowMode = 1;
+	if (flags & BLIT_NOSHADOW) {
+		shadowMode = 0;
+	} else if (flags & BLIT_TRANSSHADOW) {
+		shadowMode = 2;
+	}
+	program->SetUniformValue("u_shadowMode", 1, shadowMode);
+
 	GLint a_position = program->GetAttribLocation("a_position");
 	GLint a_texCoord = program->GetAttribLocation("a_texCoord");
 
@@ -399,7 +409,7 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 {
 	if (SDL_ALPHA_TRANSPARENT == color.a) return;
 	useProgram(programRect);
-	glViewport(0, 0, width, height);
+	glViewport(GLViewport.x, GLViewport.y, GLViewport.w, GLViewport.h);
 	Region scissorRect = ClippedDrawingRect(Region(0, 0, width, height));
 	glScissor(scissorRect.x, height - scissorRect.y - scissorRect.h, scissorRect.w, scissorRect.h);
 	GLfloat* data = new GLfloat[count*VERTEX_SIZE];
@@ -433,8 +443,32 @@ void GLVideoDriver::drawPolygon(Point* points, unsigned int count, const Color& 
 	glDeleteBuffers(1, &buffer);
 }
 
+void GLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped) {
+	if (clipped) {
+		x += xCorr;
+		y += yCorr;
+		if (( x >= ( xCorr + Viewport.w ) ) || ( y >= ( yCorr + Viewport.h ) )) {
+			return;
+		}
+		if (( x < xCorr ) || ( y < yCorr )) {
+			return;
+		}
+	} else {
+		if (( x >= disp->w ) || ( y >= disp->h )) {
+			return;
+		}
+		if (( x < 0 ) || ( y < 0 )) {
+			return;
+		}
+	}
+
+	Region region(x, y, 1, 1);
+	clearRect(region, color);
+}
+
 void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned short xr, unsigned short yr, float thickness, const Color& color)
 {
+	glDisable(GL_SCISSOR_TEST);
 	const float support = 0.75;
 	useProgram(programEllipse);
     if (thickness < 1.0) thickness = 1.0;
@@ -472,6 +506,29 @@ void GLVideoDriver::drawEllipse(int cx /*center*/, int cy /*center*/, unsigned s
 	glDisableVertexAttribArray(a_position);
 
 	glDeleteBuffers(1, &buffer);
+	glEnable(GL_SCISSOR_TEST);
+}
+
+static Region ClipSprite(const Sprite2D &sprite, const Region &clip, const int tx, const int ty) {
+	Region r(0, 0, sprite.Width, sprite.Height);
+
+	if (tx - clip.x < 0) {
+		r.w = sprite.Width + (tx - clip.x);
+		r.x = sprite.Width - r.w;
+	}
+	if (tx + sprite.Width > clip.x + clip.w) {
+		r.w = sprite.Width - (tx + sprite.Width - (clip.x + clip.w));
+	}
+
+	if (ty - clip.y < 0) {
+		r.h = sprite.Height + (ty - clip.y);
+		r.y = sprite.Height - r.h;
+	}
+	if (ty + sprite.Height > clip.y + clip.h) {
+		r.h = sprite.Height - (ty + sprite.Height - (clip.y + clip.h));
+	}
+
+	return r;
 }
 
 void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
@@ -485,19 +542,31 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	if (flags & TILE_GREY) blitFlags |= BLIT_GREY;
 	if (flags & TILE_SEPIA) blitFlags |= BLIT_SEPIA;
 
-	Region dst(tx, ty, spr->Width, spr->Height);
-	if(clip)
-	{
-		dst = dst.Intersect(*clip);
+	int w = spr->Width, h = spr->Height, dx = 0, dy = 0;
+	if (clip) {
+		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
+		w = clippedTile.w;
+		h = clippedTile.h;
+		dx = clippedTile.x;
+		dy = clippedTile.y;
 	}
 
+	Region src(dx, dy, w, h);
+	Region dst(tx + dx, ty + dy, w, h);
+
 	const Color* totint = NULL;
-	if (core->GetGame()) 
-	{
+	Color tileTint;
+
+	if (core->GetGame()) {
 		totint = core->GetGame()->GetGlobalTint();
+		if (totint) {
+			tileTint = *totint;
+			tileTint.a = 0xFF;
+		}
 	}
-	return GLBlitSprite((GLTextureSprite2D*)spr, Region(0, 0, spr->Width, spr->Height), dst,
-						NULL, blitFlags, totint, (GLTextureSprite2D*)mask);
+
+	GLBlitSprite((GLTextureSprite2D*)spr, src, dst,
+						NULL, blitFlags, (totint ? &tileTint : NULL), (GLTextureSprite2D*)mask);
 }
 
 void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
@@ -549,12 +618,19 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		}
 	}
 
-	Region src(0, 0, glSprite->Width, glSprite->Height);
-	Region dst(tx, ty, glSprite->Width, glSprite->Height);
+	int w = glSprite->Width, h = glSprite->Height, dx = 0, dy = 0;
 	if (clip) {
-		dst = dst.Intersect(*clip);
+		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
+		w = clippedTile.w;
+		h = clippedTile.h;
+		dx = clippedTile.x;
+		dy = clippedTile.y;
 	}
-	if (tint.r == 0 && tint.g == 0 && tint.b == 0)
+
+	Region src(dx, dy, w, h);
+	Region dst(tx + dx, ty + dy, w, h);
+
+	if (!(flags & BLIT_TINTED) || (tint.r == 0 && tint.g == 0 && tint.b == 0))
 		GLBlitSprite(glSprite, src, dst, palette, flags);
 	else
 		GLBlitSprite(glSprite, src, dst, palette, flags, &tint);
@@ -729,6 +805,25 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 	return screenshot;
 }
 
+void GLVideoDriver::DrawBackgroundBuffer() {
+	if (!backgroundBuffer) {
+		return;
+	}
+
+	GLBlitSprite(backgroundBuffer, GLViewport, GLViewport);
+}
+
+void GLVideoDriver::FreeBackgroundBuffer() {
+	if (NULL != backgroundBuffer) {
+		delete backgroundBuffer;
+		backgroundBuffer = NULL;
+	}
+}
+
+void GLVideoDriver::TakeBackgroundBuffer() {
+	FreeBackgroundBuffer();
+	backgroundBuffer = static_cast<GLTextureSprite2D*>(GetScreenshot(GLViewport));
+}
 
 #include "plugindef.h"
 

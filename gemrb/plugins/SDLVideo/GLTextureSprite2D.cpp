@@ -16,14 +16,14 @@ static Uint8 GetShiftValue(Uint32 value)
 	return 24;
 }
 
-GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixels,	Uint32 rmask, Uint32 gmask, 
+GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixels,	Uint32 rmask, Uint32 gmask,
 										Uint32 bmask, Uint32 amask) : Sprite2D(Width, Height, Bpp, pixels)
 {
 	currentPalette = NULL;
 	glTexture = 0;
 	glPaletteTexture = 0;
 	glMaskTexture = 0;
-	colorKeyIndex = 0; // invalid index
+	colorKeyIndex = PALETTE_INVALID_INDEX;
 	rMask = rmask;
 	gMask = gmask;
 	bMask = bmask;

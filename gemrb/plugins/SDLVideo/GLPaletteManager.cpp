@@ -40,13 +40,12 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 		{
 			for (unsigned int i=0; i<256; i++)
 			{
-				if (colors[i].a == 0)
-				{
-					colors[i].a = 0xFF;
-				}
+				colors[i].a = 0xFF;
 			}
 		}
-		colors[colorKey].a = 0;
+		if (PALETTE_INVALID_INDEX != colorKey) {
+			colors[colorKey].a = 0;
+		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 #ifdef USE_GL
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);

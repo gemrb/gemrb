@@ -469,7 +469,7 @@ def ClearSlot (i):
 def FloatMenuSelectPreviousPC ():
 	sel = GemRB.GameGetFirstSelectedPC ()
 	if sel == 0:
-		GUICommon.OpenFloatMenuWindow ()
+		OpenFloatMenuWindow ()
 		return
 
 	previous = sel % GemRB.GetPartySize () - 1
@@ -484,7 +484,7 @@ def FloatMenuSelectPreviousPC ():
 def FloatMenuSelectNextPC ():
 	sel = GemRB.GameGetFirstSelectedPC ()
 	if sel == 0:
-		GUICommon.OpenFloatMenuWindow ()
+		OpenFloatMenuWindow ()
 		return
 
 	GemRB.GameSelectPC (sel % GemRB.GetPartySize () + 1, 1, SELECT_REPLACE)

@@ -351,6 +351,7 @@ public:
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
+	CharAnimations *shadowAnimations;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
 	// true when command has been played after select
@@ -578,9 +579,9 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(bool remove, ieDword baseclass=0);
+	bool ApplyKit(bool remove, ieDword baseclass=0, int diff=0);
 	/* applies the class abilities*/
-	void ApplyClab(const char *clab, ieDword max, bool remove);
+	void ApplyClab(const char *clab, ieDword max, int remove, int diff);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
@@ -657,7 +658,7 @@ public:
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* returns the hp adjustment based on constitution */
-	int GetHpAdjustment(int multiplier) const;
+	int GetHpAdjustment(int multiplier, bool modified=true) const;
 	/* does all the housekeeping after loading the actor from file */
 	void InitStatsOnLoad();
 	/* sets a colour gradient stat, handles location */

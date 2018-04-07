@@ -286,6 +286,20 @@ static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 	return dc;
 }
 
+static bool StatIsASkill(unsigned int StatID) {
+	// traps, lore, stealth, lockpicking, pickpocket
+	if (StatID >= IE_LORE && StatID <= IE_PICKPOCKET) return true;
+
+	// alchemy, animals, bluff, concentration, diplomacy, intimidate, search, spellcraft, magicdevice
+	// NOTE: change if you want to use IE_EXTRAPROFICIENCY1..., as they use the same values
+	if (StatID >= IE_ALCHEMY && StatID <= IE_MAGICDEVICE) return true;
+
+	// Hide, Wilderness_Lore
+	if (StatID == IE_HIDEINSHADOWS || StatID == IE_TRACKING) return true;
+
+	return false;
+}
+
 static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 {
 	//this is a hack, if more PCStats fields are needed, improve it
@@ -299,7 +313,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 		return ps->ExtraSettings[StatID];
 	}
 	if (Mod) {
-		return actor->GetStat( StatID );
+		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
+			return actor->GetSkill(StatID);
+		} else {
+			return actor->GetStat(StatID);
+		}
 	}
 	return actor->GetBase( StatID );
 }
@@ -3740,7 +3758,7 @@ being visible, selectable, dead, etc.\n\
 \n\
 **Parameters:** \n\
   * PartyID - party ID or global ID of the actor to check\n\
-  * flags   - bits to check agains (see GameControlSetTargetMode)\n\
+  * flags   - bits to check against (see GameControlSetTargetMode)\n\
 \n\
 **See also:** [[guiscript:GameControlSetTargetMode]]\n\
 \n\
@@ -6060,7 +6078,7 @@ PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 **Prototype:** GemRB.GetPlayerStat(globalID, StatID[, Base])\n\
 \n\
 **Description:** Queries a stat of the player character. The stats are \n\
-listed in ie_stats.py.\n\
+listed in ie_stats.py. For IWD2 skills, it takes all bonuses into account.\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
@@ -6232,7 +6250,7 @@ must be called once after a character was created and before EnterGame().\n\
   * Portrait2 - small portrait\n\
   * clear - clear all the quickslot/spell/item fields?\n\
 \n\
-avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
+avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cumulative values to the animationID. \n\
 \n\
 **For example:**\n\
 avprefix.2da\n\
@@ -8241,7 +8259,7 @@ parameter matches the arguments.\n\
 **Parameters:** \n\
   * globalID  - party ID or global ID of the actor to use\n\
   * EffectName - effect reference name (eg. 'State:Helpless')\n\
-  * Parameter2 - parameter2 of targetted effect\n\
+  * Parameter2 - parameter2 of targeted effect\n\
 \n\
 **Return value:** N/A"
 );
@@ -10441,7 +10459,7 @@ static bool CanUseActionButton(Actor *pcc, int type)
 			capability = pcc->GetSkill(IE_LOCKPICKING) + pcc->GetSkill(IE_PICKPOCKET);
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	} else {
 		// use levels instead, so inactive dualclasses work as expected
@@ -10453,7 +10471,7 @@ static bool CanUseActionButton(Actor *pcc, int type)
 			capability = pcc->GetThiefLevel() + pcc->GetBardLevel();
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	}
 	return capability > 0;
@@ -11680,7 +11698,7 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 
 	if (useup) {
 		//use the found item's first usage
-		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT|UI_FAKE);
+		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT|UI_FAKE|UI_NOAURA);
 	} else {
 		CREItem *si = actor->inventory.GetSlotItem( slot );
 		if (si->Usages[0]) useup = 1;
@@ -12295,7 +12313,7 @@ PyDoc_STRVAR( GemRB_SetTimer__doc,
 This is useful for things like running a twisted reactor.\n\
 \n\
 **Parameters:**\n\
-  * callback - pyton function to run\n\
+  * callback - python function to run\n\
   * interval - time interval in ticks\n\
 \n\
 **Return value:** N/A"

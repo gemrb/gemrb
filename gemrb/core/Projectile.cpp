@@ -1688,7 +1688,10 @@ void Projectile::DrawTravel(const Region& viewport)
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
 	ieDword flags = flag;
-	if (game) game->ApplyGlobalTint(tint2, flags);
+
+	if (TFlags&PTF_TINT && game) {
+		game->ApplyGlobalTint(tint2, flags);
+	}
 
 	if (light) {
 		Draw(light, pos, flags^flag, tint2);

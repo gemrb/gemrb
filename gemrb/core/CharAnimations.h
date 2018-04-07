@@ -149,6 +149,8 @@ struct AvatarStruct {
 
 	/* comes from stances.2da */
 	unsigned char StanceOverride[MAX_ANIMS];
+
+	ieResRef ShadowAnimation;
 };
 
 struct EquipResRefData;
@@ -156,6 +158,7 @@ struct EquipResRefData;
 class GEM_EXPORT CharAnimations {
 private:
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
+	Animation** shadowAnimations[MAX_ANIMS][MAX_ORIENT];
 	char HelmetRef[2];
 	char WeaponRef[2];
 	char OffhandRef[2];
@@ -194,6 +197,7 @@ public:
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
 	int GetTotalPartCount() const;
 	const int* GetZOrder(unsigned char Orient);
+	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
 
 	// returns Palette for a given part (unlocked)
 	Palette* GetPartPalette(int part); // TODO: clean this up

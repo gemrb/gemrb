@@ -147,9 +147,8 @@ def ReviewPress ():
 	RightTextArea = ReviewWindow.GetControl (3)
 
 	MyChar = GemRB.GetVar ("Slot")
-	LeftTextArea.SetText (GemRB.GetPlayerName (MyChar))
-	# TODO: mimic original; reuse GUIREC/CharOverview to reduce duplication
 	import GUIREC
+	GUIREC.DisplayGeneral (MyChar, LeftTextArea)
 	GUIREC.DisplaySkills (MyChar, RightTextArea)
 
 	ReviewWindow.Focus()

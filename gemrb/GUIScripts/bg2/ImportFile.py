@@ -60,6 +60,7 @@ def DonePress():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1, 11) # 11 = force bg2
+	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
 	if ImportWindow:
 		ImportWindow.Unload()
 	# the medium portrait isn't available, so we copy the original hack

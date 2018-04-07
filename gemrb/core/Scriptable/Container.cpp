@@ -84,9 +84,7 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 	CreateGroundIconCover();
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
-			video->BlitGameSprite(groundicons[i],
-				Pos.x - vp.x, Pos.y - vp.y,
-				flags, tint, groundiconcover);
+			video->BlitGameSprite(groundicons[i], Pos.x - vp.x, Pos.y - vp.y, flags, tint, groundiconcover);
 		}
 	}
 }

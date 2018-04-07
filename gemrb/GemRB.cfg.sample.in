@@ -40,7 +40,7 @@
 #                                                   #
 #####################################################
 
-GameType=bg2
+GameType=auto
 
 #####################################################
 #  Game Name [String] Title for GemRB window, use   #
@@ -188,7 +188,7 @@ CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
 #  Cache directory.                                 #
 #####################################################
 
-CachePath=./Cache2/
+CachePath=@DEFAULT_CACHE_DIR@
 
 #####################################################
 #  GemRB Save Path [String]                         #
@@ -239,10 +239,10 @@ CachePath=./Cache2/
 #  GemRB from source directory on Linux.            #
 #####################################################
 
-#PluginsPath=@PLUGIN_DIR@
+#PluginsPath=@DEFAULT_PLUGINS_DIR@
 
 #####################################################
-#  Custom Font Path [String]           		    #
+#  Custom Font Path [String]                        #
 #                                                   #
 #  This is the path where GemRB looks for non-BAM   #
 #  fonts (ex TTF)                                   #
@@ -296,14 +296,14 @@ CachePath=./Cache2/
 #TouchScrollAreas=1
 
 #####################################################
-#  MouseFeedback		                    #
+#  MouseFeedback                                    #
 #  Bitfield with reserved bits for disabling        #
 #  the mouse. Those bits cannot be set via config   #
 #                                                   #
-#  Show mouse+tooltips = 0			    #
-#  Hide mouse 	       = 1			    #
-#  Hide tooltips       = 2			    #
-#  Hide mouse+tooltips = 3			    #  
+#  Show mouse+tooltips = 0                          #
+#  Hide mouse          = 1                          #
+#  Hide tooltips       = 2                          #
+#  Hide mouse+tooltips = 3                          #
 #####################################################
 
 # For a strictly touchscreen device we recommend
@@ -317,7 +317,7 @@ CachePath=./Cache2/
 
 #####################################################
 #  Touch Gesture Input Parameters                   #
-#  Requires SDL 1.3 or later			    #
+#  Requires SDL 1.3 or later                        #
 #  All "NumFing" settings must be > 1 and < 5       #
 #  NumFingScroll and NumFingKboard cannot be equal  #
 #####################################################
