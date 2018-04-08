@@ -235,7 +235,7 @@ def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
 
 	if GameCheck.IsIWD2():
-		WorldMapWindow = Window = GemRB.LoadWindow (2, "GUIWMAP")
+		WorldMapWindow = Window = GemRB.LoadWindow (2, "GUIWMAP", WINDOW_TOP|WINDOW_HCENTER)
 	else:
 		WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 

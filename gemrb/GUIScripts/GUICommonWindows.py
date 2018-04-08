@@ -1349,7 +1349,12 @@ def TopWindowClosed(window):
 
 	SelectionChanged()
 
-def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = WINDOW_CENTER):
+if GameCheck.IsIWD2():
+	DefaultWinPos = WINDOW_TOP|WINDOW_HCENTER
+else:
+	DefaultWinPos = WINDOW_CENTER
+
+def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos):
 	def ret ():
 		window = loader(id, pack, pos)
 
