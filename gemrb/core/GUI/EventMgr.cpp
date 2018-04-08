@@ -34,7 +34,7 @@ EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
 std::map<unsigned short, TouchEvent::Finger> EventMgr::fingerStates;
 
-std::map<int, EventMgr::EventCallback*> EventMgr::HotKeys = std::map<int, EventMgr::EventCallback*>();
+EventMgr::KeyMap EventMgr::HotKeys = KeyMap();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 bool EventMgr::ModState(unsigned short mod)
@@ -83,10 +83,10 @@ void EventMgr::DispatchEvent(Event& e)
 		flags |= e.keyboard.keycode;
 		modKeys = e.mod;
 
-		std::map<int, EventCallback*>::const_iterator hit;
-		hit = HotKeys.find(flags);
+		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
-			EventCallback* cb = hit->second;
+			KeyMap::value_type::second_type list = hit->second;
+			EventCallback* cb = hit->second.front();
 			if ((*cb)(e)) {
 				return;
 			}
@@ -155,24 +155,35 @@ void EventMgr::DispatchEvent(Event& e)
 
 bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
 {
-	// TODO: should we allow mutliple registrations and iterate them until one accepts the event...
 	int flags = mod << 16;
 	flags |= key;
 
-	if (HotKeys.count(flags)) {
-		return false;
+	KeyMap::iterator it = HotKeys.find(flags);
+	if (it != HotKeys.end()) {
+		it->second.push_front(cb);
+	} else {
+		HotKeys.insert(std::make_pair(flags, std::list<EventCallback*>(1, cb)));
 	}
 
-	HotKeys[flags] = cb;
 	return true;
 }
 
-void EventMgr::UnRegisterHotKeyCallback(KeyboardKey key, short mod)
+EventMgr::EventCallback* EventMgr::UnRegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
 {
 	int flags = mod << 16;
 	flags |= key;
 
-	HotKeys.erase(flags);
+	KeyMap::iterator it = HotKeys.find(flags);
+	if (it != HotKeys.end()) {
+		KeyMap::value_type::second_type::iterator cbit;
+		cbit = std::find(it->second.begin(), it->second.end(), cb);
+		if (cbit != it->second.end()) {
+			cb = *cbit;
+			it->second.erase(cbit);
+			return cb;
+		}
+	}
+	return NULL;
 }
 
 EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)

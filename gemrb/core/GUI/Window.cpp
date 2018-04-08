@@ -409,6 +409,16 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	return true;
 }
 
+bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
+{
+	KeyMap::iterator it = HotKeys.find(key);
+	if (it != HotKeys.end() && it->second == cb) {
+		HotKeys.erase(it);
+		return true;
+	}
+	return false;
+}
+
 bool Window::OnMouseDrag(const MouseEvent& me)
 {
 	assert(me.buttonStates);

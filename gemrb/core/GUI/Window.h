@@ -112,14 +112,17 @@ public:
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
+	bool UnRegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
 	
 	bool InHandler() const;
 	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const;
 
 private: // Private attributes
+	typedef std::map<KeyboardKey, EventMgr::EventCallback*> KeyMap;
+
 	std::set<Control*> Controls;
-	std::map<KeyboardKey, EventMgr::EventCallback*> HotKeys;
+	KeyMap HotKeys;
 
 	View* focusView; // keyboard focus
 	View* trackingView; // out of bounds mouse tracking

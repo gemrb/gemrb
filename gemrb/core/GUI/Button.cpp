@@ -40,6 +40,7 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
+	HotKeyCallback = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
 
 	hasText = false;
 	font = core->GetButtonFont();
@@ -70,16 +71,21 @@ Button::~Button()
 	gamedata->FreePalette( normal_palette);
 	gamedata->FreePalette( disabled_palette);
 
-	UnregisterHotKey();
+	if (hotKey.global) {
+		// only delete global callbacks
+		// Window must own non globals because it is destroyed before the subviews
+		UnregisterHotKey();
+		delete HotKeyCallback;
+	}
 }
 
 void Button::UnregisterHotKey()
 {
 	if (hotKey) {
 		if (hotKey.global) {
-			EventMgr::UnRegisterHotKeyCallback(hotKey.key, hotKey.mod);
+			EventMgr::UnRegisterHotKeyCallback(HotKeyCallback, hotKey.key, hotKey.mod);
 		} else {
-			// TODO
+			window->UnRegisterHotKeyCallback(HotKeyCallback, hotKey.key);
 		}
 	}
 }
@@ -747,21 +753,18 @@ bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 {
 	UnregisterHotKey();
 
-	EventMgr::EventCallback* cb = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
 	if (global) {
-		if (EventMgr::RegisterHotKeyCallback(cb, key, mod)) {
+		if (EventMgr::RegisterHotKeyCallback(HotKeyCallback, key, mod)) {
 			hotKey.key = key;
 			hotKey.mod = mod;
 			hotKey.global = true;
 			return true;
 		}
-		// FIXME: nothing is unregistering this
-	} else if (window->RegisterHotKeyCallback(cb, key)) { // FIXME: this doesnt respect mod param
+	} else if (window->RegisterHotKeyCallback(HotKeyCallback, key)) { // FIXME: this doesnt respect mod param
 		hotKey.key = key;
 		hotKey.mod = mod;
 		return true;
 	}
-	delete cb;
 	return false;
 }
 

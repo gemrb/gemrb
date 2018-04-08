@@ -704,6 +704,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->LoadWindow( WindowID, ref, pos );
 	ABORT_IF_NULL(win);
+	win->SetFlags(Window::AlphaChannel, OP_OR);
 	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
 }
 

@@ -199,6 +199,8 @@ private: // Private attributes
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 
+	EventMgr::EventCallback* HotKeyCallback;
+
 	struct HotKey {
 		KeyboardKey key;
 		short mod;
