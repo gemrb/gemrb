@@ -1870,7 +1870,8 @@ PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 \n\
 **Metaclass Prototype:** SetVarAssoc (VariableName, LongValue)\n\
 \n\
-**Description:** It associates a variable name and value with a control. \n\
+**Description:** It associates a variable name and an optionally bounded \n
+value with a control. \n\
 The control uses this associated value differently, depending on the \n\
 control. See more about this in 'data_exchange'.\n\
 \n\
@@ -1878,6 +1879,8 @@ control. See more about this in 'data_exchange'.\n\
   * WindowIndex, ControlIndex  - the control's reference\n\
   * Variablename - string, a Global Dictionary Name associated with the control\n\
   * LongValue - numeric, a value associated with the control\n\
+  * min - numeric, minimum range value (optional)\n\
+  * max - numeric, maximum range value (optional)\n\
 \n\
 **Return value:** N/A\n\
 \n\
