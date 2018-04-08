@@ -98,28 +98,28 @@ def InitRecordsWindow (Window):
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#weapons and armour
 	Button = Window.GetControl (61)
 	Button.SetTooltip (40317)
 	Button.SetVarAssoc ("SelectWindow", 2)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#skills and feats
 	Button = Window.GetControl (62)
 	Button.SetTooltip (40318)
 	Button.SetVarAssoc ("SelectWindow", 3)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#miscellaneous
 	Button = Window.GetControl (63)
 	Button.SetTooltip (33500)
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#level up
 	Button = Window.GetControl (37)
@@ -1032,7 +1032,7 @@ def CloseHelpWindow ():
 	global DescTable, InformationWindow
 
 	if InformationWindow:
-		InformationWindow.Unload ()
+		InformationWindow.Close ()
 		InformationWindow = None
 	if DescTable:
 		DescTable = None
@@ -1043,6 +1043,7 @@ def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
 	InformationWindow = Window = GemRB.LoadWindow (57)
+	InformationWindow.SetFlags (WF_BORDERLESS)
 
 	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)
@@ -1084,26 +1085,26 @@ def UpdateHelpWindow ():
 		#Button = Window.GetControl (i+27)
 		Label = Window.GetControl (i+0x10000004)
 		if Topic==i:
-			Label.SetTextColor (255,255,0)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor (255,255,255)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 	resource = HelpTable.GetValue (Topic, 1)
 	if DescTable:
 		DescTable = None
 
-	DescTable = GemRB.LoadTable (resource)
-
-	ScrollBar = Window.GetControl (4)
+	if resource:
+		DescTable = GemRB.LoadTable (resource)
 
 	startrow = HelpTable.GetValue (Topic, 4)
 	if startrow<0:
 		i=-startrow-10
-	else:
+	elif DescTable:
 		i = DescTable.GetRowCount ()-10-startrow
 
 	if i<1: i=1
 
+	ScrollBar = Window.GetControl (4)
 	ScrollBar.SetVarAssoc ("TopIndex", i)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshHelpWindow)
 
@@ -1122,16 +1123,15 @@ def RefreshHelpWindow ():
 	if startrow<0: startrow = 0
 
 	for i in range(11):
-		title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
-
 		Button = Window.GetControl (i+71)
 		Label = Window.GetControl (i+0x10000030)
 
 		if i+TopIndex==Selected:
-			Label.SetTextColor (255,255,0)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor (255,255,255)
-		if title>0:
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		if DescTable:
+			title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
@@ -1140,7 +1140,7 @@ def RefreshHelpWindow ():
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	if Selected<0:
+	if Selected<0 or DescTable == None:
 		desc=""
 	else:
 		desc = DescTable.GetValue (Selected+startrow, desccol)
