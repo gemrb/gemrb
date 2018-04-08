@@ -33,11 +33,17 @@ def OnLoad():
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-	ActionsWindow = GUICommonWindows.OpenPortraitWindow()
+	ActionsWindow = GUICommonWindows.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)
 	ActionsWindow.AddAlias("NOT_DLG", 0)
+
+	actframe = ActionsWindow.GetFrame()
+	optframe = OptionsWindow.GetFrame()
+
+	actframe['y'] -= optframe['h']
+	ActionsWindow.SetFrame(actframe)
 
 	return
 
