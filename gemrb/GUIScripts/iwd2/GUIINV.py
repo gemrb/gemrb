@@ -33,48 +33,12 @@ from ie_spells import *
 from ie_restype import RES_BAM
 
 InventoryWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 
-def OpenInventoryWindow ():
-	global InventoryWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
+def InitInventoryWindow (Window):
+	global InventoryWindow
 
-	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem () == 1:
-			pc = GemRB.GameGetSelectedPCSingle ()
-			#store the item in the inventory before window is closed
-			GemRB.DropDraggedItem (pc, -3)
-			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem () == 1:
-				GemRB.DropDraggedItem (pc, -2)
-
-		if InventoryWindow:
-			InventoryWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		InventoryWindow = None
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		GUICommonWindows.UpdatePortraitWindow ()
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	InventoryWindow = Window = GemRB.LoadWindow (2, "GUIINV")
-	#TODO: Setup the MessageLabel here if needed
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, OpenInventoryWindow)
+	Window.AddAlias("WIN_INV")
+	InventoryWindow = Window
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -163,9 +127,6 @@ def OpenInventoryWindow ():
 		#Why they mess up .chu's i don't know
 		Button.SetSprites("INVBUT3", i, 0, 1, 2, 3)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-
-	UpdateInventoryWindow ()
 	return
 
 def ChangeWeaponPressed ():
@@ -175,9 +136,7 @@ def ChangeWeaponPressed ():
 	return
 
 #complete update
-def UpdateInventoryWindow ():
-	Window = InventoryWindow
-
+def UpdateInventoryWindow (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
@@ -198,6 +157,9 @@ def UpdateInventoryWindow ():
 	return
 
 InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
+
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
 
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
@@ -295,8 +257,6 @@ def RefreshInventoryWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
-	PortraitWindow.Focus()
-	OptionsWindow.Focus()
 	return
 
 ###################################################

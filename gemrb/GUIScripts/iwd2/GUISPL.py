@@ -34,40 +34,17 @@ SpellBookWindow = None
 SpellBookSpellInfoWindow = None
 SpellBookSpellLevel = 0
 SpellBookSpellUnmemorizeWindow = None
-PortraitWindow = None
-OldPortraitWindow = None
-OptionsWindow = None
-OldOptionsWindow = None
+
 ActiveSpellBooks = []
 BookCount = 0
 BookTopIndex = 0
 SelectedBook = 0
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
 
-def OpenSpellBookWindow ():
-	global SpellBookWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
+def InitSpellBookWindow (Window):
+	global SpellBookWindow
 
-	if GUICommon.CloseOtherWindow (OpenSpellBookWindow):
-		if SpellBookWindow:
-			SpellBookWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		SpellBookWindow = None
-
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	SpellBookWindow = Window = GemRB.LoadWindow (2, "GUISPL")
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenSpellBookWindow)
+	SpellBookWindow = Window
 
 	Button = Window.GetControl (92)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellBookPrevPress)
@@ -97,15 +74,12 @@ def OpenSpellBookWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellIndex", i)
 
-	GUICommonWindows.SetSelectionChangeHandler (SelectedNewPlayer)
-	SelectedNewPlayer ()
 	return
 
-def SelectedNewPlayer ():
+def SelectedNewPlayer (Window):
 	global ActiveSpellBooks
 	global BookTopIndex, BookCount, SelectedBook
 
-	Window = SpellBookWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ActiveSpellBooks=[]
 
@@ -122,6 +96,9 @@ def SelectedNewPlayer ():
 	GemRB.SetVar ("SelectedBook",SelectedBook)
 	UpdateSpellBook ()
 	return
+
+ToggleSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.ToggleWindow, InitSpellBookWindow, SelectedNewPlayer)
+OpenSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.OpenWindowOnce, InitSpellBookWindow, SelectedNewPlayer)
 
 def ResetScrollBar ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -247,8 +224,6 @@ def UpdateSpellBookWindow ():
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
-	PortraitWindow.Focus()
-	OptionsWindow.Focus()
 	return
 
 def GetMemorizedSpellsCount (total=False):

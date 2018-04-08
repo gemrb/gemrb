@@ -41,10 +41,7 @@ DescTable = None
 RecordsWindow = None
 RecordsTextArea = None
 InformationWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
+
 BonusSpellTable = None
 HateRaceTable = None
 
@@ -63,24 +60,11 @@ def Exportable(pc):
 	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
 	return True
 
-def OpenRecordsWindow ():
-	global RecordsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow, SelectWindow
+def InitRecordsWindow (Window):
+	global RecordsWindow, SelectWindow
 	global BonusSpellTable, HateRaceTable
 
-	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-		if RecordsWindow:
-			RecordsWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		RecordsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	RecordsWindow = Window = GemRB.LoadWindow (2, "GUIREC")
+	RecordsWindow = Window
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -142,25 +126,25 @@ def OpenRecordsWindow ():
 	Button.SetText (7175)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
-
-	UpdateRecordsWindow ()
 	return
 
 def ColorDiff (Window, Label, diff):
+	Color = {'r' : 0, 'g' : 0, 'b' : 0}
 	if diff>0:
-		Label.SetTextColor (0, 255, 0)
+		Color['g'] = 255
 	elif diff<0:
-		Label.SetTextColor (255, 0, 0)
+		Color['r'] = 255
 	else:
-		Label.SetTextColor (255, 255, 255)
+		Color = {'r' : 255, 'g' : 255, 'b' : 255}
+
+	Label.SetTextColor (Color)
 	return
 
 def ColorDiff2 (Window, Label, diff):
 	if diff:
-		Label.SetTextColor (255, 255, 0)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	else:
-		Label.SetTextColor (255, 255, 255)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	return
 
 def GetBonusSpells (pc):
@@ -916,10 +900,8 @@ def DisplayMisc (pc):
 
 	return
 
-def UpdateRecordsWindow ():
+def UpdateRecordsWindow (Window):
 	global RecordsTextArea
-
-	Window = RecordsWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -1040,9 +1022,11 @@ def UpdateRecordsWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, 0)
-	PortraitWindow.Focus()
-	OptionsWindow.Focus()
+
 	return
+
+ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow)
+OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow)
 
 def CloseHelpWindow ():
 	global DescTable, InformationWindow
@@ -1489,9 +1473,7 @@ def FinishLevelUp():
 	GemRB.SetVar ("LevelDiff", 0)
 	GemRB.SetVar ("LUClass", -1)
 	GemRB.SetVar ("LUKit", 0)
-	# DisplayGeneral (pc) is not enough for a refresh refresh
-	OpenRecordsWindow ()
-	OpenRecordsWindow ()
+
 
 ###################################################
 # End of file GUIREC.py
