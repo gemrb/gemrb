@@ -74,7 +74,7 @@ def OnLoad ():
 	Games=GemRB.GetSaveGames()
 	TopIndex = max (0, len(Games) - 5)
 
-	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	ScrollBarPress ()
 	LoadWindow.Focus()
 	return
