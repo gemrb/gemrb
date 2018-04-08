@@ -588,7 +588,8 @@ void Interface::HandleFlags()
 			Log(MESSAGE, "Core", "Setting up the Console...");
 			CreateConsole();
 
-			winmgr->FadeColor = ColorBlack;
+			winmgr->FadeColor = Color();
+
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
 			guiscript->RunFunction( "Game", "EnterGame" );
