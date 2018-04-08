@@ -525,7 +525,7 @@ void WindowManager::DrawWindows() const
 		const Region& frame = win->Frame();
 
 		// FYI... this only checks if the front window obscures... could be covered by another window too
-		if (frontWin->IsVisible() && win != frontWin && win->NeedsDraw()) {
+		if ((frontWin->Flags()&(Window::AlphaChannel|View::Invisible)) == 0 && win != frontWin && win->NeedsDraw()) {
 			Region intersect = frontWinFrame.Intersect(frame);
 			if (intersect == frame) {
 				// this window is completely obscured by the front window
