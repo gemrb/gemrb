@@ -1870,7 +1870,7 @@ PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 \n\
 **Metaclass Prototype:** SetVarAssoc (VariableName, LongValue)\n\
 \n\
-**Description:** It associates a variable name and an optionally bounded \n
+**Description:** It associates a variable name and an optionally bounded \n\
 value with a control. \n\
 The control uses this associated value differently, depending on the \n\
 control. See more about this in 'data_exchange'.\n\
