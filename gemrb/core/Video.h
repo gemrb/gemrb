@@ -196,6 +196,8 @@ public:
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true) = 0;
 
 	virtual void DrawPoint(const Point&, const Color& color) = 0;
+	virtual void DrawPoints(const std::vector<Point>& points, const Color& color)=0;
+
 	/** Draws a circle */
 	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color) = 0;
 	/** Draws an Ellipse Segment */
@@ -207,6 +209,7 @@ public:
 	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false) = 0;
 	/** Draws a line segment */
 	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color) = 0;
+	virtual void DrawLines(const std::vector<Point>& points, const Color& color)=0;
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */

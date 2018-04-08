@@ -553,6 +553,32 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
+void SDLVideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints(points.size());
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+}
+
+void SDLVideoDriver::DrawLines(const std::vector<Point>& points, const Color& color)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints(points.size());
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+}
+
 void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill)
 {
 	Region bbox = poly->BBox;
