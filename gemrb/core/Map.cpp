@@ -1254,6 +1254,9 @@ void Map::DrawMap(const Region& viewport)
 		}
 	}
 
+	// flush composited drawing operations
+	video->Flush();
+
 	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
 		DrawSearchMap(viewport);
 	} else {

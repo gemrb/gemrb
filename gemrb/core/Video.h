@@ -189,6 +189,8 @@ public:
 				   SpriteCover* cover,
 				   const Region* clip = NULL);
 
+	virtual void Flush()=0;
+
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;

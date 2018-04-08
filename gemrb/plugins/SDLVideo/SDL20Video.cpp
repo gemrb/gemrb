@@ -147,6 +147,15 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 	return 0;
 }
 
+void SDL20VideoDriver::Flush()
+{
+	SDLTextureVideoBuffer* buffer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer);
+
+	UpdateRenderTarget();
+	buffer->RenderOnDisplay(renderer);
+	buffer->ClearMaskLayer();
+}
+
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
 	UpdateRenderTarget();

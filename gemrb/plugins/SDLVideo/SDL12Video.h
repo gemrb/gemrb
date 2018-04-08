@@ -50,6 +50,8 @@ public:
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	void DrawPoint(const Point& p, const Color& color);
 
+	void Flush() {};
+
 private:
 	void SwapBuffers(VideoBuffers&);
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();

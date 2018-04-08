@@ -80,6 +80,8 @@ public:
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
 	void DrawPoint(const Point& p, const Color& color);
 
+	void Flush();
+
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
 
