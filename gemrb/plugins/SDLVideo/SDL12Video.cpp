@@ -382,9 +382,19 @@ void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color)
 	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, color);
 }
 
+void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color)
+{
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+}
+
 void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
 	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, reinterpret_cast<const Color&>(color));
+}
+
+void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color)
+{
+	DrawLines(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
 void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)

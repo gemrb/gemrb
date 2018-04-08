@@ -215,6 +215,21 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 }
 
+void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+}
+
 void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
 {
 	if (points.empty()) {
@@ -228,6 +243,21 @@ void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color)
 {
 	UpdateRenderTarget(&color);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
+}
+
+void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
 }
 
 void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)

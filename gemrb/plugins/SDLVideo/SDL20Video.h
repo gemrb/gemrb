@@ -77,8 +77,12 @@ public:
 	bool TouchInputEnabled();
 
 	void DrawLine(const Point& p1, const Point& p2, const Color& color);
+	void DrawLines(const std::vector<Point>& points, const Color& color);
+
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
+	
 	void DrawPoint(const Point& p, const Color& color);
+	void DrawPoints(const std::vector<Point>& points, const Color& color);
 
 	void Flush();
 
