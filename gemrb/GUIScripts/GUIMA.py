@@ -234,8 +234,12 @@ def MoveToNewArea ():
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
 
-	WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
+	if GameCheck.IsIWD2():
+		WorldMapWindow = Window = GemRB.LoadWindow (2, "GUIWMAP")
+	else:
+		WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
+	WorldMapWindow.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 	placeholder = Window.GetControl (4)
 	frame = placeholder.GetFrame()
 	Window.DeleteControl (placeholder)
