@@ -580,7 +580,7 @@ void SDLVideoDriver::DrawLines(const std::vector<Point>& points, const Color& co
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
 }
 
 void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill)
@@ -594,6 +594,7 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 	}
 
 	std::vector<SDL_Point> points;
+	points.reserve(poly->trapezoids.size());
 
 	if (fill) {
 		std::list<Trapezoid>::iterator iter;
@@ -613,6 +614,8 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 			const Point& b = poly->points[(ledge+1)%(poly->count)];
 			const Point& c = poly->points[redge];
 			const Point& d = poly->points[(redge+1)%(poly->count)];
+
+			points.reserve(points.size() + (y_bot*2));
 
 			for (int y = y_top; y < y_bot; ++y) {
 				int py = y + origin.y;
@@ -636,6 +639,8 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 		Size size = drawingBuffer->Size();
 		Point p = Clamp(poly->points[0] - origin, Point(0,0), Point(size.w, size.h));
 		SetPixel(drawingBuffer, p.x, p.y);
+
+		points.reserve(points.size() + (poly->count*2));
 
 		for (unsigned int i = 1; i < poly->count; i++) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
