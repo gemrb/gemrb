@@ -556,7 +556,9 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 void SDLVideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color)
 {
 	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints(points.size());
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
 	for (size_t i = 0; i < points.size(); ++i) {
 		const Point& point = points[i];
 		SDL_Point sdlpoint = {point.x, point.y};
@@ -569,7 +571,9 @@ void SDLVideoDriver::DrawPoints(const std::vector<Point>& points, const Color& c
 void SDLVideoDriver::DrawLines(const std::vector<Point>& points, const Color& color)
 {
 	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints(points.size());
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
 	for (size_t i = 0; i < points.size(); ++i) {
 		const Point& point = points[i];
 		SDL_Point sdlpoint = {point.x, point.y};

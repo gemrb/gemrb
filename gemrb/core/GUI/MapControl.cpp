@@ -89,6 +89,7 @@ void MapControl::DrawFog(const Region& rgn)
 	Point gameP = p;
 
 	std::vector<Point> points;
+	points.reserve(rgn.w * rgn.h);
 
 	for (; p.y < rgn.h; ++p.y) {
 		gameP.y = p.y * double(mapsize.h) / mosRgn.h;
