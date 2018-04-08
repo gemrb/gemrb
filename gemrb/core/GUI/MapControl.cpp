@@ -88,6 +88,8 @@ void MapControl::DrawFog(const Region& rgn)
 	Point p;
 	Point gameP = p;
 
+	std::vector<Point> points;
+
 	for (; p.y < rgn.h; ++p.y) {
 		gameP.y = p.y * double(mapsize.h) / mosRgn.h;
 
@@ -96,11 +98,12 @@ void MapControl::DrawFog(const Region& rgn)
 			
 			bool visible = MyMap->IsVisible( gameP, true );
 			if (!visible) {
-				Region px = Region ( p + rgn.Origin(), Size(1, 1) );
-				video->DrawRect( px, colors[black] );
+				points.push_back(p + rgn.Origin());
 			}
 		}
 	}
+
+	video->DrawPoints(points, colors[black]);
 }
 
 void MapControl::UpdateState(unsigned int Sum)
