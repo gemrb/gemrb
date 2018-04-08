@@ -155,12 +155,24 @@ void EventMgr::DispatchEvent(Event& e)
 
 bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
 {
-	// TODO: return false if something already claimed this hot key combo?
-	// or maybe should we allow mutliple registrations and iterate them until one accepts the event...
+	// TODO: should we allow mutliple registrations and iterate them until one accepts the event...
 	int flags = mod << 16;
 	flags |= key;
+
+	if (HotKeys.count(flags)) {
+		return false;
+	}
+
 	HotKeys[flags] = cb;
 	return true;
+}
+
+void EventMgr::UnRegisterHotKeyCallback(KeyboardKey key, short mod)
+{
+	int flags = mod << 16;
+	flags |= key;
+
+	HotKeys.erase(flags);
 }
 
 EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)

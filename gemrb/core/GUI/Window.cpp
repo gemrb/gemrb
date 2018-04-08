@@ -400,7 +400,11 @@ bool Window::InHandler() const
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
 {
-	// FIXME: check if something already registerd and either return false or delete the old
+	if (HotKeys.count(key)) {
+		// something already registered
+		return false;
+	}
+
 	HotKeys[key] = cb;
 	return true;
 }

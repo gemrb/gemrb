@@ -170,7 +170,7 @@ public:
 	void SetPushOffset(ieWord x, ieWord y);
 
 	bool SetHotKey(KeyboardKey key, short mod = 0, bool global = false);
-	KeyboardKey HotKey() { return hotKey; }
+	//KeyboardKey GetHotKey() { return hotKey.key; }
 
 private: // Private attributes
 	String Text;
@@ -198,7 +198,24 @@ private: // Private attributes
 	Point PushOffset;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
-	KeyboardKey hotKey;
+
+	struct HotKey {
+		KeyboardKey key;
+		short mod;
+		bool global;
+
+		HotKey() {
+			key = '\0';
+			mod = 0;
+			global = false;
+		}
+
+		operator bool() const {
+			return key != '\0';
+		}
+	} hotKey;
+
+	void UnregisterHotKey();
 
 	bool HandleHotKey(const Event&);
 	bool HitTest (const Point&) const;

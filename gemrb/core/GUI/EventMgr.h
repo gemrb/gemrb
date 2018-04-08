@@ -208,8 +208,8 @@ public:
 	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
 	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
 
-	// TODO/FIXME: need to be able to unregister hotkeys/monitors
 	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
+	static void UnRegisterHotKeyCallback(KeyboardKey key, short mod = 0);
 	static TapMonitorId RegisterEventMonitor(EventCallback*, Event::EventTypeMask mask = Event::AllEventsMask);
 	static void UnRegisterEventMonitor(TapMonitorId monitor);
 

@@ -40,7 +40,6 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	hotKey = 0;
 
 	hasText = false;
 	font = core->GetButtonFont();
@@ -70,6 +69,19 @@ Button::~Button()
 
 	gamedata->FreePalette( normal_palette);
 	gamedata->FreePalette( disabled_palette);
+
+	UnregisterHotKey();
+}
+
+void Button::UnregisterHotKey()
+{
+	if (hotKey) {
+		if (hotKey.global) {
+			EventMgr::UnRegisterHotKeyCallback(hotKey.key, hotKey.mod);
+		} else {
+			// TODO
+		}
+	}
 }
 
 /** Sets the 'type' Image of the Button to 'img'.
@@ -390,7 +402,7 @@ String Button::TooltipText() const
 
 	if (showHotkeys && hotKey) {
 		String s;
-		switch (hotKey) {
+		switch (hotKey.key) {
 			// FIXME: these arent localized...
 			case GEM_ESCAPE:
 				s += L"Esc";
@@ -406,10 +418,10 @@ String Button::TooltipText() const
 				break;
 			default:
 				// TODO: check if there are more possible keys
-				if (hotKey >= GEM_FUNCTIONX(1) && hotKey <= GEM_FUNCTIONX(16)) {
+				if (hotKey.key >= GEM_FUNCTIONX(1) && hotKey.key <= GEM_FUNCTIONX(16)) {
 					s.push_back(L'F');
-					int offset = hotKey - GEM_FUNCTIONX(0);
-					if (hotKey > GEM_FUNCTIONX(9)) {
+					int offset = hotKey.key - GEM_FUNCTIONX(0);
+					if (hotKey.key > GEM_FUNCTIONX(9)) {
 						s.push_back(L'1');
 						offset -= 10;
 					}
@@ -733,15 +745,20 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 
 bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 {
-	// FIXME: nothing is unregistering these
+	UnregisterHotKey();
+
 	EventMgr::EventCallback* cb = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
 	if (global) {
 		if (EventMgr::RegisterHotKeyCallback(cb, key, mod)) {
-			hotKey = key;
+			hotKey.key = key;
+			hotKey.mod = mod;
+			hotKey.global = true;
 			return true;
 		}
+		// FIXME: nothing is unregistering this
 	} else if (window->RegisterHotKeyCallback(cb, key)) { // FIXME: this doesnt respect mod param
-		hotKey = key;
+		hotKey.key = key;
+		hotKey.mod = mod;
 		return true;
 	}
 	delete cb;
