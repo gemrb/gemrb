@@ -67,7 +67,14 @@ def AliasControls (win, map):
 
 def LocationPressed ():
 	AreaInfo = GemRB.GetAreaInfo()
-	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
+	TMessageTA = GemRB.GetView("MsgSys", 0)
+	if TMessageTA:
+		message = "[color=ff0000]Mouse:[/color] x={0}, y={1}\n[color=ff0000]Area:[/color] {2}\n"
+		message = message.format(AreaInfo["PositionX"], AreaInfo["PositionY"], AreaInfo["CurrentArea"])
+		TMessageTA.Append(message)
+	else:
+		print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
+
 	return
 
 def SelectFormation ():
