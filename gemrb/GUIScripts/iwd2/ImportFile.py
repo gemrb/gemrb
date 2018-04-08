@@ -91,10 +91,11 @@ def SelectFile():
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
-	Portrait = GemRB.GetPlayerPortrait (Slot,0)
-	PortraitButton.SetPicture (Portrait, "NOPORTLG")
-	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1))
-	GemRB.SetToken ("LargePortrait", Portrait)
+	Portrait = GemRB.GetPlayerPortrait (Slot, 0)
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1)["ResRef"])
+	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
+
+	PortraitButton.SetPicture (Portrait["Sprite"], "NOPORTLG")
 	ImportWindow.Focus() #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
