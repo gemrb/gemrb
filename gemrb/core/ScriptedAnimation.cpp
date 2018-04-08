@@ -404,7 +404,13 @@ ScriptedAnimation::~ScriptedAnimation(void)
 			delete( anims[i] );
 		}
 	}
-	gamedata->FreePalette(palette, PaletteName);
+
+	if (gamedata) {
+		gamedata->FreePalette(palette, PaletteName);
+	} else if (palette) {
+		// we have some static data that doesnt die until after gamedata
+		palette->release();
+	}
 
 	if (cover) {
 		SetSpriteCover(NULL);
