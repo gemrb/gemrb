@@ -431,14 +431,14 @@ def OnActionLabelPress ():
 
 	if last_key_action != None:
 		Label = Window.GetControl (0x10000005 + last_key_action)
-		Label.SetTextColor (255, 255, 255)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		Label = Window.GetControl (0x10000041 + last_key_action)
-		Label.SetTextColor (255, 255, 255)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		
 	Label = Window.GetControl (0x10000005 + i)
-	Label.SetTextColor (255, 255, 0)
+	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	Label = Window.GetControl (0x10000041 + i)
-	Label.SetTextColor (255, 255, 0)
+	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 
 	last_key_action = i
 

@@ -207,9 +207,9 @@ def UpdateRecordsWindow (Window):
 	for i in range (6):
 		Label = Window.GetControl (0x1000000e + i)
 		if stats[i]!=basestats[i]:
-			Label.SetTextColor (255, 0, 0)
+			Label.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		else:
-			Label.SetTextColor (255, 255, 255)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		Label.SetText (str (stats[i]))
 
 	# race
@@ -747,30 +747,30 @@ def OpenInformationWindow ():
 	Label = Window.GetControl (0x10000009)
 	Label.SetText (str (stat['KillsTotalCount']))
 
-
+	White = {'r' : 255, 'g' : 255, 'b' : 255}
 	Label = Window.GetControl (0x1000000B)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x1000000C)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x1000000D)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x1000000E)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x1000000F)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x10000010)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x10000011)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Label = Window.GetControl (0x10000012)
-	Label.SetTextColor (255, 255, 255)
+	Label.SetTextColor (White)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
