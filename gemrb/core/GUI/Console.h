@@ -69,6 +69,8 @@ public:
 	void SetFocus();
 	bool SetEvent(int eventType, ControlEventHandler handler);
 
+	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+
 private:
 	void HistoryBack();
 	void HistoryForward();
@@ -77,6 +79,7 @@ private:
 
 	/** Draws the Console on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
+	int DrawingShift(ieWord textw) const;
 	
 protected:
 	/** Key Press Event */

@@ -65,6 +65,38 @@ bool Console::HandleHotKey(const Event& e)
 	return true;
 }
 
+int Console::DrawingShift(ieWord textw) const
+{
+	Sprite2D* cursor = Cursor();
+
+	int shift = 0;
+	if (textw + cursor->Width > frame.w) {
+		// shift left so the cursor remains visible
+		shift = (textw + cursor->Width) - frame.w;
+	}
+	return shift;
+}
+
+void Console::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+
+	Font* font = core->GetTextFont();
+	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
+	int shift = -DrawingShift(w);
+
+	Size size(p.x + shift, font->LineHeight);
+	Font::StringSizeMetrics metrics = {size, 0, true};
+	if (shift) {
+		w = font->StringSize(Buffer.substr(CurPos, String::npos), &metrics).w;
+	} else {
+		w = font->StringSize(Buffer, &metrics).w;
+	}
+
+	CurPos = metrics.numChars;
+	MarkDirty();
+}
+
 /** Draws the Console on the Output Display */
 void Console::DrawSelf(Region drawFrame, const Region& clip)
 {
@@ -75,12 +107,10 @@ void Console::DrawSelf(Region drawFrame, const Region& clip)
 	video->DrawRect( clip, ColorBlack );
 
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
-	if (w + cursor->Width > drawFrame.w) {
-		// shift left so the cursor remains visible
-		int shift = (w + cursor->Width) - drawFrame.w;
-		drawFrame.x -= shift;
-		drawFrame.w += shift;
-	}
+	int shift = DrawingShift(w);
+	drawFrame.x -= shift;
+	drawFrame.w += shift;
+
 	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
 
 	ieWord vcenter = (drawFrame.h / 2) + (cursor->Height / 2);
