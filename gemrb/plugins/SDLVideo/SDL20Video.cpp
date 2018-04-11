@@ -161,7 +161,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	UpdateRenderTarget();
 
 	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA) & flags;
+	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
 
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 	SDL_Texture* tex = NULL;

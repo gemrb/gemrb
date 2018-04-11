@@ -124,7 +124,9 @@ protected:
 	virtual inline vid_buf_t* CurrentRenderBuffer()=0;
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* = NULL);
 
+	using Video::DrawPoints;
 	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
+	using Video::DrawLines;
 	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)=0;
 
 	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
