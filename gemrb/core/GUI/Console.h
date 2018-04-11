@@ -47,16 +47,11 @@ class Console : public Control {
 public:
 	Console(const Region& frame);
 	~Console(void);
-	/** Set Cursor */
-	void SetCursor(Sprite2D* cur);
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 
 private:
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */

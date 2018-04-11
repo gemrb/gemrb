@@ -47,8 +47,6 @@ class Palette;
 
 class GEM_EXPORT TextEdit : public Control {
 private:
-    /** Text Editing Cursor Sprite */
-    Sprite2D* Cursor;
     /** Text Font */
     Font* font;
     unsigned char Alignment;
@@ -85,8 +83,6 @@ public:
 	/** Set Font */
 	void SetFont(Font* f);
 	Font *GetFont();
-	/** Set Cursor */
-	void SetCursor(Sprite2D* cur);
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);

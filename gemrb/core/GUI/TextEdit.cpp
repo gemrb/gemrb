@@ -36,7 +36,6 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	max = maxLength;
 	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
 	font = NULL;
-	Cursor = NULL;
 	CurPos = 0;
 	Text.reserve(max);
 
@@ -48,7 +47,6 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 TextEdit::~TextEdit(void)
 {
 	gamedata->FreePalette( palette );
-	Sprite2D::FreeSprite( Cursor );
 }
 
 void TextEdit::SetAlignment(unsigned char Alignment)
@@ -62,6 +60,7 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	ieWord yOff = FontPos.y;
 	Video* video = core->GetVideoDriver();
+	Sprite2D* cursor = Cursor();
 
 	if (!font)
 		return;
@@ -71,13 +70,13 @@ void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
 		font->Print( Region( rgn.Origin() + FontPos, frame.Dimensions() ),
 					Text, palette, Alignment );
 		int w = font->StringSize(Text.substr(0, CurPos)).w;
-		ieWord vcenter = (rgn.h / 2) + (Cursor->Height / 2);
+		ieWord vcenter = (rgn.h / 2) + (cursor->Height / 2);
 		if (w > rgn.w) {
 			int rows = (w / rgn.w);
 			vcenter += rows * font->LineHeight;
 			w = w - (rgn.w * rows);
 		}
-		video->BlitSprite(Cursor, w + rgn.x + FontPos.x, yOff + vcenter + rgn.y);
+		video->BlitSprite(cursor, w + rgn.x + FontPos.x, yOff + vcenter + rgn.y);
 	} else {
 		font->Print( Region( rgn.x + FontPos.x, rgn.y - yOff, rgn.w, rgn.h ), Text,
 				palette, Alignment );
@@ -96,16 +95,6 @@ void TextEdit::SetFont(Font* f)
 }
 
 Font *TextEdit::GetFont() { return font; }
-
-/** Set Cursor */
-void TextEdit::SetCursor(Sprite2D* cur)
-{
-	Sprite2D::FreeSprite( Cursor );
-	if (cur != NULL) {
-		Cursor = cur;
-	}
-	MarkDirty();
-}
 
 /** Key Press Event */
 bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)

@@ -35,7 +35,6 @@ namespace GemRB {
 Console::Console(const Region& frame)
 	: Control(frame), History(5)
 {
-	Cursor = NULL;
 	max = 128;
 	Buffer.reserve(max);
 	CurPos = 0;
@@ -51,7 +50,6 @@ Console::Console(const Region& frame)
 Console::~Console(void)
 {
 	palette->release();
-	Sprite2D::FreeSprite( Cursor );
 }
 
 bool Console::HandleHotKey(const Event& e)
@@ -71,29 +69,22 @@ bool Console::HandleHotKey(const Event& e)
 void Console::DrawSelf(Region drawFrame, const Region& clip)
 {
 	Font* font = core->GetTextFont();
+	Sprite2D* cursor = Cursor();
 
 	Video* video = core->GetVideoDriver();
 	video->DrawRect( clip, ColorBlack );
 
 	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
-	if (w + Cursor->Width > drawFrame.w) {
+	if (w + cursor->Width > drawFrame.w) {
 		// shift left so the cursor remains visible
-		int shift = (w + Cursor->Width) - drawFrame.w;
+		int shift = (w + cursor->Width) - drawFrame.w;
 		drawFrame.x -= shift;
 		drawFrame.w += shift;
 	}
 	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
 
-	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
-	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y);
-}
-
-/** Set Cursor */
-void Console::SetCursor(Sprite2D* cur)
-{
-	if (cur != NULL) {
-		Cursor = cur;
-	}
+	ieWord vcenter = (drawFrame.h / 2) + (cursor->Height / 2);
+	video->BlitSprite(cursor, w + drawFrame.x, vcenter + drawFrame.y);
 }
 
 /** Sets the Text of the current control */
