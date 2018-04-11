@@ -184,7 +184,7 @@ public:
 	Holder<Palette> GetPalette() const;
 	void SetPalette(Palette* pal);
 
-	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
+	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
 	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
 								 size_t* numPrinted = NULL, Point* = NULL) const;

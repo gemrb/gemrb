@@ -422,7 +422,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 				continue;
 			}
 			if (i > 0) { // kerning
-				dp.x -= KerningOffset(word[i-1], currChar);
+				dp.x -= GetKerningOffset(word[i-1], currChar);
 			}
 
 			const Glyph& curGlyph = GetGlyph(currChar);
@@ -612,7 +612,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		if (!ws) {
 			ieWord chrW = curGlyph.size.w;
 			if (lineW > 0) { // kerning
-				chrW -= KerningOffset(string[i-1], string[i]);
+				chrW -= GetKerningOffset(string[i-1], string[i]);
 			}
 			if (lineW == 0 && wordW > 0 && WILL_WRAP(wordW + chrW) && metrics->forceBreak && wordW <= stop->w) {
 				// the word is longer than the line allows, but we allow a break mid-word

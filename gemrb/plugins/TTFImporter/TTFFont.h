@@ -35,13 +35,13 @@ private:
 	FT_Face face;
 
 	const Glyph& AliasBlank(ieWord chr) const;
-protected:
-	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
+
 public:
 	TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline);
 	~TTFFont(void);
 
 	const Glyph& GetGlyph(ieWord chr) const;
+	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
 };
 
 }
