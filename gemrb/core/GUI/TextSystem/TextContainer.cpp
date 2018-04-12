@@ -54,7 +54,7 @@ inline const Font* TextSpan::LayoutFont() const
 {
 	if (font) return font;
 
-	TextContainer* container = dynamic_cast<TextContainer*>(parent);
+	TextContainer* container = static_cast<TextContainer*>(parent);
 	if (container) {
 		return container->TextFont();
 	}
@@ -232,7 +232,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		drawRect.y += offset.y;
 		const Font* printFont = font;
 		Holder<Palette> printPalette = palette;
-		TextContainer* container = dynamic_cast<TextContainer*>(parent);
+		TextContainer* container = static_cast<TextContainer*>(parent);
 		if (printFont == NULL && container) {
 			printFont = container->TextFont();
 		}
@@ -599,7 +599,7 @@ String TextContainer::Text() const
 	String text;
 	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
-		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {
+		if (const TextSpan* textSpan = static_cast<TextSpan*>(*it)) {
 			text.append(textSpan->Text());
 		}
 	}
