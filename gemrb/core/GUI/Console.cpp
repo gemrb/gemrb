@@ -40,6 +40,9 @@ Console::Console(const Region& frame)
 	CurPos = 0;
 	HistPos = 0;
 	palette = new Palette( ColorWhite, ColorBlack );
+	Sprite2D* cursor = core->GetCursorSprite();
+	SetCursor(cursor);
+	cursor->release();
 
 	EventMgr::EventCallback* cb = new MethodCallback<Console, const Event&, bool>(this, &Console::HandleHotKey);
 	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {

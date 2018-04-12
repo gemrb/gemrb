@@ -42,6 +42,10 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
 	palette = new Palette( ColorWhite, ColorBlack );
+
+	Sprite2D* cursor = core->GetCursorSprite();
+	SetCursor(cursor);
+	cursor->release();
 }
 
 TextEdit::~TextEdit(void)

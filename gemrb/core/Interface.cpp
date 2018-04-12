@@ -435,7 +435,6 @@ void Interface::CreateConsole()
 	Window* consoleWin = winmgr->MakeWindow(frame);
 	Console* console = new Console(frame);
 	consoleWin->AddSubviewInFrontOfView(console);
-	console->SetCursor(GetCursorSprite());
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);

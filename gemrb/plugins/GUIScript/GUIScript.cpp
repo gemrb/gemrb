@@ -1992,8 +1992,6 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			edit->Control::SetText( text );
 			delete text;
 
-			Sprite2D* spr = core->GetCursorSprite();
-			edit->SetCursor( spr );
 			view = edit;
 		}
 			break;
