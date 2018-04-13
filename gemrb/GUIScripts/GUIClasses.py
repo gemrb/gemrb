@@ -214,8 +214,7 @@ class GControl(GView):
     'SetText': _GemRB.Control_SetText,
     'SetAction': _GemRB.Control_SetAction,
     'SetActionInterval': _GemRB.Control_SetActionInterval,
-    'SetStatus': _GemRB.Control_SetStatus,
-    'SubstituteForControl': _GemRB.Control_SubstituteForControl
+    'SetStatus': _GemRB.Control_SetStatus
   }
 
   # backwards compatibility

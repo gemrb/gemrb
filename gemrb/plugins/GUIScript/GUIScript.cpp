@@ -2953,48 +2953,6 @@ static PyObject* GemRB_WorldMap_SetTextColor(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_SubstituteForControl__doc,
-"===== Control_SubstituteForControl =====\n\
-\n\
-**Prototype:** GemRB.SubstituteForControl (WindowIndex, ControlIndex, TWindowIndex, TControlIndex)\n\
-\n\
-**Metaclass Prototype:** SubstituteForControl (TControl)\n\
-\n\
-**Description:** Substitute a control with another control (even of \n\
-different type), keeping its ControlID, size and scrollbar.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex - the value returned from LoadWindow for the substitute control\n\
-  * ControlID - the substitute control's controlID\n\
-  * TWindowIndex - the value returned from LoadWindow for the target control\n\
-  * TControlID - the old control's controlID\n\
-  * TControl - target control object\n\
-\n\
-**Return value:** The new ControlID"
-);
-
-static PyObject* GemRB_Control_SubstituteForControl(PyObject* self, PyObject* args)
-{
-	PyObject* pytarget;
-	PARSE_ARGS2( args,  "OO", &self, &pytarget);
-
-	Control* substitute = GetView<Control>(self);
-	Control* target = GetView<Control>(pytarget);
-	if (!substitute || !target) {
-		return RuntimeError("Cannot find control!");
-	}
-	Window* subWin = substitute->GetWindow();
-	subWin->RemoveSubview(substitute);
-	Window* targetWin = target->GetWindow();
-	substitute->SetFrame(target->Frame());
-
-	substitute->ControlID = target->ControlID;
-
-	targetWin->AddSubviewInFrontOfView( substitute ); // deletes target!
-
-	return gs->ConstructObjectForScriptable( substitute->GetScriptingRef() );
-}
-
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
  "===== Label_SetFont =====\n\
  \n\
@@ -13015,7 +12973,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
-	METHOD(Control_SubstituteForControl, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
