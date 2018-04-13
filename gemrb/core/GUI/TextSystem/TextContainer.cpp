@@ -319,7 +319,18 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		const Layout& l = *it;
 		// TODO: pass the clip rect so we can skip non-intersecting regions
 		l.content->DrawContentsInRegions(l.regions, dp);
+
+		if (&l == cursorPos.layout) {
+			Sprite2D* cursor = core->GetCursorSprite();
+			const Region& rgn = l.regions[cursorPos.layoutIndex];
+			video->BlitSprite(cursor, cursorPos.regionPos.x + rgn.x + dp.x,
+							          cursorPos.regionPos.y + rgn.y + dp.y + cursor->YPos);
+			cursor->release();
+		}
 	}
+
+
+	//video->BlitSprite(cursor, drawFrame.x + cursorPos.x, drawFrame.y + cursorPos.y);
 }
 
 void ContentContainer::AppendContent(Content* content)
@@ -395,26 +406,40 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
+	const Layout* layout = LayoutAtPoint(p);
+	if (layout) {
+		// i know we are casting away const.
+		// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
+		return (Content*)(layout->content);
+	}
+	return NULL;
+}
+
+const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) const
+{
 	// attempting to optimize the search by assuming content is evenly distributed vertically
 	// we are also assuming that layout regions are always contiguous and ordered ltr-ttb
 	// we do know by definition that the content itself is ordered ltr-ttb
 	// based on the above a simple binary search should suffice
 
+	int index = 0;
 	ContentLayout::const_iterator it = layout.begin();
 	size_t count = layout.size();
 	while (count > 0) {
 		size_t step = count / 2;
 		std::advance(it, step);
+		index += step;
 		if (it->PointInside(p)) {
 			// i know we are casting away const.
 			// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
-			return (Content*)it->content;
+			return &(*it);
 		}
 		if (*it < p) {
 			it++;
 			count -= step + 1;
 		} else {
 			std::advance(it, -step);
+			index -= step;
 			count = step;
 		}
 	}
@@ -604,6 +629,54 @@ String TextContainer::Text() const
 		}
 	}
 	return text;
+}
+
+void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	// TODO: we need a flag for being editable.
+
+	Point p = ConvertPointFromScreen(me.Pos());
+	const Layout* layout = LayoutAtPoint(p);
+
+	if (layout) {
+		TextSpan* ts = (TextSpan*)layout->content;
+		const String& text = ts->Text();
+		const Font* printFont = ts->LayoutFont();
+		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
+		size_t numChars = 0;
+		cursorPos.layout = layout;
+		cursorPos.layoutIndex = 0;
+		cursorPos.regionPos = Point(0,0);
+
+		const Regions& regions = layout->regions;
+		Regions::const_iterator rit = regions.begin();
+		for (; rit != regions.end(); ++rit) {
+			const Region& rect = *rit;
+
+			if (rect.PointInside(p)) {
+				// find where inside
+				int lines = (p.y - rect.y) / printFont->LineHeight;
+				if (lines) {
+					metrics.size.w = rect.w;
+					metrics.size.h = lines * printFont->LineHeight;
+					cursorPos.regionPos.y = metrics.size.h;
+					printFont->StringSize(text.substr(numChars), &metrics);
+					numChars += metrics.numChars;
+				}
+				cursorPos.regionPos.x = printFont->StringSizeSimple(text.substr(numChars), p.x);
+				break;
+			} else {
+				// not in this one so we need to consume some text
+				// TODO: this could be faster if we stored it while calculating layout
+				metrics.size = rect.Dimensions();
+				printFont->StringSize(text.substr(numChars), &metrics);
+				numChars += metrics.numChars;
+			}
+			++cursorPos.layoutIndex;
+		}
+
+		MarkDirty();
+	}
 }
 
 }

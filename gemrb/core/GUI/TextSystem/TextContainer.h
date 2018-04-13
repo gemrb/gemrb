@@ -60,6 +60,7 @@ protected:
 // Content classes
 class TextSpan : public Content
 {
+friend class TextContainer;
 private:
 	String text;
 	const Font* font;
@@ -152,6 +153,12 @@ protected:
 		}
 	};
 
+	struct {
+		const Layout* layout;
+		size_t layoutIndex;
+		Point regionPos;
+	} cursorPos;
+
 	typedef std::deque<Layout> ContentLayout;
 	ContentLayout layout;
 	Point layoutPoint;
@@ -189,6 +196,7 @@ protected:
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
 	const Layout& LayoutForContent(const Content*) const;
+	const Layout* LayoutAtPoint(const Point& p) const;
 
 private:
 	void SizeChanged(const Size& oldSize);
@@ -213,6 +221,9 @@ public:
 	void SetPalette(Holder<Palette> pal);
 	Holder<Palette> TextPalette() const { return palette; }
 	const Font* TextFont() const { return font; }
+
+	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+
 };
 
 }
