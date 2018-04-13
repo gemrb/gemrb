@@ -230,12 +230,9 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		Region drawRect = *rit;
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
-		const Font* printFont = font;
+		const Font* printFont = LayoutFont();
 		Holder<Palette> printPalette = palette;
 		TextContainer* container = static_cast<TextContainer*>(parent);
-		if (printFont == NULL && container) {
-			printFont = container->TextFont();
-		}
 		if (printPalette == NULL && container) {
 			printPalette = container->TextPalette();
 		}
