@@ -591,6 +591,30 @@ size_t Font::Print(Region rgn, const String& string,
 	return ret;
 }
 
+size_t Font::StringSizeSimple(const String& string, size_t width) const
+{
+	size_t size = 0;
+	for (size_t i = 0; i < string.length(); ++i) {
+		wchar_t c = string[i];
+		if (c == L'\n') {
+			break;
+		}
+
+		const Glyph& curGlyph = GetGlyph(c);
+		ieWord chrW = curGlyph.size.w;
+		if (i > 0) {
+			chrW -= GetKerningOffset(string[i-1], string[i]);
+		}
+
+		if (size + chrW >= width) {
+			break;
+		}
+
+		size += chrW;
+	}
+	return size;
+}
+
 Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 {
 	if (!string.length()) return Size();
