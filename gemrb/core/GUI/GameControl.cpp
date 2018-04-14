@@ -1388,6 +1388,11 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		return true;
 	}
 
+	if (overDoor || overContainer || overInfoPoint) {
+		UpdateCursor();
+		return true;
+	}
+
 	if (me.ButtonState(GEM_MB_ACTION)) {
 		// PST uses alt + left click for formation rotation
 		// is there any harm in this being true in all games?
