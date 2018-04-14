@@ -44,4 +44,5 @@ def GameExpansion():
 	return
 
 def HasTOTSC ():
+	from ie_restype import RES_2DA
 	return GemRB.HasResource ("toscst", RES_2DA)

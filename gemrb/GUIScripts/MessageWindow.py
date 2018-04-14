@@ -88,8 +88,9 @@ WinSizes = {GS_SMALLDIALOG : 45,
 			GS_MEDIUMDIALOG : 109,
 			GS_LARGEDIALOG : 237}
 
-def MWinBG(size):
-	width = GemRB.GetSystemVariable (SV_WIDTH)
+def MWinBG(size, width=None):
+	if width is None:
+		width = GemRB.GetSystemVariable (SV_WIDTH)
 
 	bg = None
 	if size == GS_SMALLDIALOG:
@@ -111,6 +112,15 @@ def MWinBG(size):
 		bg = bg + "8"
 	elif width >= 1024:
 		bg = bg + "0"
+
+	# FIXME: infinite recursion possible
+	from ie_restype import RES_MOS
+	if not GemRB.HasResource(bg, RES_MOS):
+		if GameCheck.IsBG1() or GameCheck.IsPST():
+			return MWinBG(size, 640)
+		else:
+			return MWinBG(size, 800)
+		# FIXME: this may not cover all
 
 	return bg
 
