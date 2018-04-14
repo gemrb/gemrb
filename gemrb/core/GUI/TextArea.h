@@ -161,6 +161,7 @@ private: //internal functions
 	void SetPalette(const Color*, PALETTE_TYPE);
 
 	void UpdateScrollview();
+	Region UpdateTextFrame();
 	void SizeChanged(const Size&) { UpdateScrollview(); }
 	void FlagsChanged(unsigned int /*oldflags*/);
 

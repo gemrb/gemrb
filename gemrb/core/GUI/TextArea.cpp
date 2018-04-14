@@ -269,16 +269,7 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 	Control::SetAnimPicture(pic);
 
 	assert(textContainer);
-	Region tf = textContainer->Frame();
-	if (AnimPicture) {
-		// shrink and shift the container to accommodate the image
-		tf.x = AnimPicture->Width;
-		tf.w = frame.w - frame.x;
-	} else {
-		tf.x = 0;
-		tf.w = frame.w;
-	}
-	textContainer->SetFrame(tf);
+	UpdateTextFrame();
 }
 
 ieDword TextArea::LineCount() const
@@ -290,11 +281,29 @@ ieDword TextArea::LineCount() const
 		return 0;
 }
 
+Region TextArea::UpdateTextFrame()
+{
+	if (textContainer) {
+		Region r = textContainer->Frame();
+		r.w = scrollview.ContentRegion().Dimensions().w;
+		r.h = 0; // auto grow
+
+		if (AnimPicture) {
+			// shrink and shift the container to accommodate the image
+			r.x = AnimPicture->Width;
+			r.w -= r.x;
+		}
+
+		textContainer->SetFrame(r);
+		return textContainer->Frame();
+	}
+	return Region();
+}
+
 void TextArea::UpdateScrollview()
 {
-	const Region textFrame = (textContainer) ? textContainer->Frame() : Region();
-
 	if (selectOptions) {
+		Region textFrame = UpdateTextFrame();
 		Point p(textFrame.x, textFrame.h);
 		selectOptions->SetFrameOrigin(p);
 	}
@@ -315,7 +324,8 @@ void TextArea::UpdateScrollview()
 			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 			if (blankH > 0) {
 				optH += blankH;
-				selectOptions->SetFrameSize(Size(textFrame.w, optH));
+				int width = scrollview.ContentRegion().Dimensions().w;
+				selectOptions->SetFrameSize(Size(width, optH));
 			}
 
 			// now scroll dialogBeginNode to the top less a blank line
@@ -328,6 +338,7 @@ void TextArea::UpdateScrollview()
 	} else if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
 		scrollview.Update();
 	}
+	UpdateTextFrame();
 }
 
 void TextArea::FlagsChanged(unsigned int oldflags)
@@ -657,11 +668,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 void TextArea::ClearText()
 {
 	delete scrollview.RemoveSubview(textContainer);
-	Size textSize = scrollview.ContentRegion().Dimensions();
-	textSize.h = 0; // auto grow
 
 	parser.Reset(); // reset in case any tags were left open from before
-	textContainer = new TextContainer(Region(Point(), textSize), ftext, palettes[PALETTE_NORMAL]);
+	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext, palettes[PALETTE_NORMAL]);
 	textContainer->SetMargin(0, 3);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
