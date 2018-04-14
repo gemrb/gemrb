@@ -63,7 +63,11 @@ def GetWindowPack():
 
 def AliasControls (win, map):
 	for alias, cid in map.iteritems():
-		win.GetControl(cid).AddAlias(alias)
+		control = win.GetControl(cid)
+		if control:
+			control.AddAlias(alias)
+		else:
+			print "no control with id=" + str(cid)
 
 def LocationPressed ():
 	AreaInfo = GemRB.GetAreaInfo()
