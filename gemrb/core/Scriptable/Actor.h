@@ -77,6 +77,14 @@ namespace GemRB {
 #define MOD_ADDITIVE  0
 #define MOD_ABSOLUTE  1
 #define MOD_PERCENT   2
+#define MOD_MULTIPLICATIVE 3
+#define MOD_DIVISIVE  4
+#define MOD_MODULUS   5
+#define MOD_LOGAND    6
+#define MOD_LOGOR     7
+#define MOD_BITAND    8
+#define MOD_BITOR     9
+#define MOD_INVERSE   10
 
 //'do not jump' flags
 #define DNJ_FIT        1

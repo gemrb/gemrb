@@ -3510,6 +3510,30 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			//percentile
 			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue / 100, 1);
 			break;
+		case MOD_MULTIPLICATIVE:
+			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue, 1);
+			break;
+		case MOD_DIVISIVE:
+			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
+			break;
+		case MOD_MODULUS:
+			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
+			break;
+		case MOD_LOGAND:
+			SetStat(StatIndex, BaseStats[StatIndex] && ModifierValue, 1);
+			break;
+		case MOD_LOGOR:
+			SetStat(StatIndex, BaseStats[StatIndex] || ModifierValue, 1);
+			break;
+		case MOD_BITAND:
+			SetStat(StatIndex, BaseStats[StatIndex] & ModifierValue, 1);
+			break;
+		case MOD_BITOR:
+			SetStat(StatIndex, BaseStats[StatIndex] | ModifierValue, 1);
+			break;
+		case MOD_INVERSE:
+			SetStat(StatIndex, !BaseStats[StatIndex], 1);
+			break;
 		default:
 			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%s)!", ModifierType, LongName);
 	}
@@ -3532,6 +3556,30 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 		case MOD_PERCENT:
 			//percentile
 			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
+			break;
+		case MOD_MULTIPLICATIVE:
+			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue);
+			break;
+		case MOD_DIVISIVE:
+			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
+			break;
+		case MOD_MODULUS:
+			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
+			break;
+		case MOD_LOGAND:
+			SetBase(StatIndex, BaseStats[StatIndex] && ModifierValue);
+			break;
+		case MOD_LOGOR:
+			SetBase(StatIndex, BaseStats[StatIndex] || ModifierValue);
+			break;
+		case MOD_BITAND:
+			SetBase(StatIndex, BaseStats[StatIndex] & ModifierValue);
+			break;
+		case MOD_BITOR:
+			SetBase(StatIndex, BaseStats[StatIndex] | ModifierValue);
+			break;
+		case MOD_INVERSE:
+			SetBase(StatIndex, !BaseStats[StatIndex]);
 			break;
 		default:
 			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%s)!", ModifierType, LongName);
