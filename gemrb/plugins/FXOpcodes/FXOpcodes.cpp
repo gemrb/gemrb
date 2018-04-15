@@ -2773,16 +2773,16 @@ int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 0:
 			STAT_MOD(IE_DAMAGEBONUS);
 			break;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
+		case 1: // fire
+		case 2: // cold
+		case 3: // electricity
+		case 4: // acid
+		case 5: // magic
+		case 6: // poison
+		case 7: // slashing
+		case 8: // piercing
+		case 9: // crushing
+		case 10: // missile
 			// no stat to save to, so we handle it when dealing damage
 			break;
 		default:
