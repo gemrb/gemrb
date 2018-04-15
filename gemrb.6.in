@@ -2,7 +2,7 @@
 .TH GEMRB 6
 
 .\"###################################################
-.SH NAME 
+.SH NAME
 GemRB
 \- emulator for Infinity Engine-based games
 
@@ -37,17 +37,17 @@ settings in the engine configuration file below. A full install is recommended.
 Use the specified configuration file
 .IR FILE " instead"
 of the default
-.IR gemrb.cfg .  
+.IR gemrb.cfg .
 
 .B Note:
 You can also use the program's name as a mean to select the configuration file.
-For example, if the program's name is 
-.I torment 
+For example, if the program's name is
+.I torment
 instead of
 .IR gemrb ,
-the engine first searches for 
-.I torment.cfg 
-and only if it's not found it searches for 
+the engine first searches for
+.I torment.cfg
+and only if it's not found it searches for
 .IR gemrb.cfg .
 
 To use this feature, just create a symbolic link
@@ -63,15 +63,15 @@ instead.
 .PD 0
 A configuration file consists of pairs
 .IR PARAMETER=VALUE ,
-each on its own line. The case of PARAMETER is not significant, 
-GameType is the same as GAMETYPE. If the same PARAMETER is defined 
+each on its own line. The case of PARAMETER is not significant,
+GameType is the same as GAMETYPE. If the same PARAMETER is defined
 more than once, only the last occurrence is used.
 
 Empty lines and lines starting with `#' (hash sign) are ignored.
 
 At least the
 .I GameType
-and 
+and
 .I GamePath
 parameters need to be changed. That is often enough, so do not fiddle with the other paths too much.
 
@@ -79,7 +79,7 @@ parameters need to be changed. That is often enough, so do not fiddle with the o
 
 .TP
 .BR GameType =(auto|bg1|bg2|iwd|iwd2|how|pst)
-Type of the game. The value is a name of subdirectory in override/ 
+Type of the game. The value is a name of subdirectory in override/
 and GUIScripts/ directories
 with game type-specific files and scripts. It is at present also used
 for various tweaks hardcoded in the GemRB engine. To autodetect the game
@@ -96,8 +96,8 @@ safe to leave it commented out.
 
 .TP
 .BR GUIEnhancements =INT
-The value is a bitfield. Set it to 1 to enable a few GUI enhancements, mostly in BG2. 
-Set to 2 or 3 to try to autoidentify items on transfer (if the character has enough lore). 
+The value is a bitfield. Set it to 1 to enable a few GUI enhancements, mostly in BG2.
+Set to 2 or 3 to try to autoidentify items on transfer (if the character has enough lore).
 Disabled by default.
 
 .TP
@@ -202,16 +202,16 @@ Volume of PC or NPC voices in percents. The default is
 
 .TP
 .BR CaseSensitive =(0|1)
-When 
-this parameter is set to 
+When
+this parameter is set to
 .IR 1 ,
 the engine will try to find files regardless of their names' case at the cost
 of a slight speed penalty. This is especially important when using
-game files on CD-ROMs, where the files can't be renamed. Like 
+game files on CD-ROMs, where the files can't be renamed. Like
 many Windows programs, the original games use inconsistent mix
-of lower/upper case letters for naming and referencing their files. 
+of lower/upper case letters for naming and referencing their files.
 
-Set this parameter to 
+Set this parameter to
 .I 1
 on Unix-like systems.
 
@@ -221,7 +221,7 @@ Path to the directory where the original game is installed. If you can't
 install the game under MS Windows or with WINE, you can try to unpack the data files
 with the
 .I unshield
-program found at 
+program found at
 .IR http://synce.sourceforge.net .
 
 .TP
@@ -262,7 +262,7 @@ to the GemRB config.
 Path where GemRB looks for its unhardcoded engine data.
 It defaults to
 .IR GemRBPath .
-The original games hardcoded this information in the engine. 
+The original games hardcoded this information in the engine.
 The path is preset at build time.
 
 .TP
@@ -271,7 +271,7 @@ The path is preset at build time.
 .TP
 .BR SavePath =PATH
 Path to the directory with save games. Note that this directory has to
-contain 
+contain
 .I save/
 and/or eventually
 .I mpsave/
@@ -285,38 +285,38 @@ defaults to
 .TP
 .BR GameDataPath =PATH
 Path to the original game's installed data files, relative to GamePath.
-Usually it's 
+Usually it's
 .IR data .
 
 .TP
 .BR GameOverridePath =PATH
 Path to the original game's override dir, relative to GamePath.
-Usually it's 
+Usually it's
 .IR override .
 Original games use this directory to place last-minute patches.
 
 .TP
 .BR GameCharactersPath =PATH
 Path to the original game's installed data files, relative to GamePath.
-Usually it's 
+Usually it's
 .IR characters .
 
 .TP
 .BR GamePortraitsPath =PATH
 Path to the original game's installed data files, relative to GamePath.
-Usually it's 
+Usually it's
 .IR portraits .
 
 .TP
 .BR GameScriptsPath =PATH
 Path to the original game's installed data files, relative to GamePath.
-Usually it's 
+Usually it's
 .IR scripts .
 
 .TP
 .BR GameSoundsPath =PATH
 Path to the original game's installed data files, relative to GamePath.
-Usually it's 
+Usually it's
 .IR sounds .
 
 .TP
@@ -415,9 +415,9 @@ The default is
 .TP
 .BR DelayPlugin =FILENAME
 Named plugin will be loaded after other (nondelayed) plugins were loaded.
-.IR FILENAME 
+.IR FILENAME
 is a name without path, but with extension, for example
-.IR libNullSound.so 
+.IR libNullSound.so
 or
 .IR libNullSound.dll .
 You can use this parameter more than once.
@@ -425,9 +425,9 @@ You can use this parameter more than once.
 .TP
 .BR SkipPlugin =FILENAME
 Named plugin will not be loaded.
-.IR FILENAME 
+.IR FILENAME
 is a name without path, but with extension, for example
-.IR libNullSound.so 
+.IR libNullSound.so
 or
 .IR libNullSound.dll .
 You can use this parameter more than once.
@@ -461,7 +461,7 @@ system-wide configuration file
 
 .TP
 .B @DATA_DIR@/override/
-directory with 
+directory with
 .BR GemRB -distributed
 data files. These used to be hardcoded in the original engine. The files
 are sorted into directories for specific games.
@@ -487,10 +487,10 @@ cache directory
 .SH BUGS
 Many.
 .B GemRB
-is still in an early development stage and not nearly complete. 
+is still in an early development stage and not nearly complete.
 
 If you stumble over something which is supposed to work, either make a bug report
-at http://sourceforge.net/projects/gemrb or come to the official IRC channel 
+at http://sourceforge.net/projects/gemrb or come to the official IRC channel
 .I #GemRB
 at FreeNode.
 
