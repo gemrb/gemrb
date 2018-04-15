@@ -425,7 +425,7 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
-int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e ChangeWeather
+int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
 
