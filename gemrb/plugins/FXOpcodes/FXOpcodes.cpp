@@ -178,6 +178,7 @@ int fx_cure_nondetection_state (Scriptable* Owner, Actor* target, Effect* fx);//
 int fx_sex_modifier (Scriptable* Owner, Actor* target, Effect* fx);//47
 int fx_ids_modifier (Scriptable* Owner, Actor* target, Effect* fx);//48
 int fx_damage_bonus_modifier (Scriptable* Owner, Actor* target, Effect* fx);//49
+int fx_damage_bonus_modifier2 (Scriptable* Owner, Actor* target, Effect* fx);//49 (iwd, ee)
 int fx_set_blind_state (Scriptable* Owner, Actor* target, Effect* fx);//4a
 int fx_cure_blind_state (Scriptable* Owner, Actor* target, Effect* fx);//4b
 int fx_set_feebleminded_state (Scriptable* Owner, Actor* target, Effect* fx);//4c
@@ -531,6 +532,7 @@ static EffectDesc effectnames[] = {
 	{ "Damage", fx_damage, EFFECT_DICED, -1 },
 	{ "DamageAnimation", fx_damage_animation, 0, -1 },
 	{ "DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 },
+	{ "DamageBonusModifier2", fx_damage_bonus_modifier2, 0, -1 }, // override for iwd, eventually used in ees and for tobex
 	{ "DamageLuckModifier", fx_damageluck_modifier, 0, -1 },
 	{ "DamageVsCreature", fx_generic_effect, 0, -1 },
 	{ "Death", fx_death, 0, -1 },
@@ -2757,6 +2759,35 @@ int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	STAT_MOD( IE_DAMAGEBONUS );
 	//the basestat is not saved, so no FX_PERMANENT
+	return FX_APPLIED;
+}
+
+// 0x49 DamageBonusModifier(2)
+// iwd/iwd2 supports different damage types, but only flat and percentage boni
+// only the special type of 0 means a flat bonus
+int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if(0) print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	switch (fx->Parameter2) {
+		case 0:
+			STAT_MOD(IE_DAMAGEBONUS);
+			break;
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+			// no stat to save to, so we handle it when dealing damage
+			break;
+		default:
+			return FX_NOT_APPLIED;
+	}
 	return FX_APPLIED;
 }
 
