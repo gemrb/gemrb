@@ -2397,7 +2397,7 @@ static int al_switch_good[12]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x3
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_alignment_invert(%2d)", fx->Opcode);
-	register ieDword newalign = target->GetStat( IE_ALIGNMENT );
+	ieDword newalign = target->GetStat( IE_ALIGNMENT );
 	if (!newalign) {
 		// unset, so just do nothing;
 		return FX_APPLIED;
