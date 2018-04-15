@@ -2785,6 +2785,11 @@ int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 10: // missile
 			// no stat to save to, so we handle it when dealing damage
 			break;
+		// gemrb extensions for tobex
+		case 11: // magic fire
+		case 12: // magic cold
+		case 13: // stunning
+			break;
 		default:
 			return FX_NOT_APPLIED;
 	}
