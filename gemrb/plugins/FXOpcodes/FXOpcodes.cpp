@@ -426,6 +426,8 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
+int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
+//13f Usability:ItemUsability
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
@@ -719,6 +721,7 @@ static EffectDesc effectnames[] = {
 	{ "SpellFocus",fx_generic_effect , 0, -1 }, //to implement school specific saving throw penalty to opponent
 	{ "SpellResistance",fx_generic_effect , 0, -1 }, //to implement school specific saving throw bonus
 	{ "Spelltrap",fx_spelltrap , 0, -1 }, //overlay: spmagglo
+	{ "Stat:SetStat", fx_set_stat, 0, -1 },
 	{ "State:Berserk", fx_set_berserk_state, 0, -1 },
 	{ "State:Blind", fx_set_blind_state, 0, -1 },
 	{ "State:Blur", fx_set_blur_state, 0, -1 },
@@ -7523,6 +7526,53 @@ int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else if (val > mask) {
 		STAT_SET(IE_UNCANNY_DODGE, val|stat);
 	}
+	return FX_APPLIED;
+}
+
+/* only in tobex; it adds a bunch of new hard-coded stats, but the opcode can only set these:
+387 ACIDDAMAGEBONUS - percentage modifier to acid damage from item/spell ability effects
+388 COLDDAMAGEBONUS - percentage modifier to cold damage from item/spell ability effects
+389 CRUSHINGDAMAGEBONUS - percentage modifier to crushing damage from normal damage and item/spell ability effects
+390 ELECTRICITYDAMAGEBONUS - percentage modifier to electricity damage from item/spell ability effects
+391 FIREDAMAGEBONUS - percentage modifier to fire damage from item/spell ability effects
+392 PIERCINGDAMAGEBONUS - percentage modifier to piercing damage from normal damage and item/spell ability effects
+393 POISONDAMAGEBONUS - percentage modifier to poison damage from item/spell ability effects
+394 MAGICDAMAGEBONUS - percentage modifier to magic damage from item/spell ability effects
+395 MISSILEDAMAGEBONUS - percentage modifier to missile damage from normal damage and item/spell ability effects
+396 SLASHINGDAMAGEBONUS - percentage modifier to slashing damage from normal damage and item/spell ability effects
+397 MAGICFIREDAMAGEBONUS - percentage modifier to magic fire damage from item/spell ability effects
+398 MAGICCOLDDAMAGEBONUS - percentage modifier to magic colddamage from item/spell ability effects
+399 STUNNINGDAMAGEBONUS - percentage modifier to stunning damage from normal damage and item/spell ability effects
+400 WEIGHTALLOWANCEMOD - custom stat that modiifies by sum the amount a character is allowed to carry (total weight allowance = StrMod value + StrModEx value + WeightAllowanceMod)
+
+we allow also setting the normal stats, below index 256
+*/
+static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
+static int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	ieWord stat = fx->Parameter2 & 0x0000ffff;
+	ieWord type = fx->Parameter2 >> 16;
+
+	if ((stat > 255 && stat < 387) || stat > 400) {
+		// we support only 256 real stats!
+		return FX_NOT_APPLIED;
+	}
+
+	// translate the stats to ours
+	if (stat == 400) {
+		stat = IE_ENCUMBRANCE;
+	} else if (stat >= 387) {
+		stat = damage_mod_map[stat-387];
+		// replace effect with the appropriate one
+		Effect *myfx = new Effect;
+		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
+		myfx->Parameter2 = type;
+		return fx_damage_bonus_modifier2(Owner, target, fx);
+	}
+
+	target->NewStat(stat, fx->Parameter1, type);
+
 	return FX_APPLIED;
 }
 
