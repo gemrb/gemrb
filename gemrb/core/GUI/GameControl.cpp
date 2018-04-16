@@ -1887,7 +1887,6 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		}
 
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
-			CommandSelectedMovement(p);
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
@@ -1933,11 +1932,15 @@ void GameControl::PerformSelectedAction(const Point& p)
 
 	//add a check if you don't want some random monster handle doors and such
 	if (overDoor) {
+		CommandSelectedMovement(p);
 		HandleDoor(overDoor, selectedActor);
 	} else if (overContainer) {
+		CommandSelectedMovement(p);
 		HandleContainer(overContainer, selectedActor);
 	} else if (overInfoPoint) {
 		if (overInfoPoint->Type==ST_TRAVEL) {
+			CommandSelectedMovement(p);
+
 			ieDword exitID = overInfoPoint->GetGlobalID();
 			if (core->HasFeature(GF_TEAM_MOVEMENT)) {
 				// pst forces everyone to travel (eg. ar0201 outside_portal)
