@@ -231,6 +231,8 @@ void View::Draw()
 					 id, ref->ScriptingGroup().CString(), flags);
 			Region r = drawFrame;
 			r.h = fnt->LineHeight;
+			r.w = (int)fnt->StringSizeSimple(string, 640);
+			video->SetScreenClip(NULL);
 			video->DrawRect(r, ColorBlack, true);
 			fnt->Print(r, string, NULL, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
 		}
