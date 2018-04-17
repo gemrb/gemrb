@@ -116,11 +116,10 @@ def MWinBG(size, width=None):
 	# FIXME: infinite recursion possible
 	from ie_restype import RES_MOS
 	if not GemRB.HasResource(bg, RES_MOS):
-		if GameCheck.IsBG1() or GameCheck.IsPST():
-			return MWinBG(size, 640)
-		else:
+		if GameCheck.IsBG2() or GameCheck.IsIWD2():
 			return MWinBG(size, 800)
-		# FIXME: this may not cover all
+		else:
+			return MWinBG(size, 640)
 
 	return bg
 
