@@ -82,6 +82,8 @@ private:
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 		bool KeyEvent(const Event& event);
 
+		void SizeChanged(const Size&);
+
 	public:
 		// FIXME: we get messed up is SetMargin is called. there is no notification that they have changed and so our subviews are overflowing.
 		// working around that by passing them in the ctor, but its a poor fix.

@@ -53,6 +53,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
+		selOption->SetAutoResizeFlags(ResizeHorizontal, OP_SET);
+
 		if (numbered) {
 			wchar_t optNum[6];
 			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", i+1);
@@ -85,6 +87,27 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 TextArea::SpanSelector::~SpanSelector()
 {
 	EventMgr::UnRegisterEventMonitor(id);
+}
+
+void TextArea::SpanSelector::SizeChanged(const Size&)
+{
+	// NOTE: this wouldnt be needed if we used TextSpans (layout) for the options, but then we would have to
+	// write more complex code for the hover effects and selection
+
+	std::list<View*>::reverse_iterator it = subViews.rbegin();
+
+	Point origin(margin.left, margin.top);
+	for (; it != subViews.rend(); ++it) {
+		View* selOption = *it;
+
+		selOption->SetFrameOrigin(origin);
+
+		if (EventMgr::TouchInputEnabled) {
+			// keeping the options spaced out (for touch screens)
+			origin.y += ta.LineHeight();
+		}
+		origin.y += selOption->Dimensions().h; // FIXME: this can overflow the height
+	}
 }
 
 bool TextArea::SpanSelector::KeyEvent(const Event& event)
@@ -292,20 +315,24 @@ Region TextArea::UpdateTextFrame()
 			// shrink and shift the container to accommodate the image
 			r.x = AnimPicture->Width;
 			r.w -= r.x;
+		} else {
+			r.x = 0;
 		}
 
 		textContainer->SetFrame(r);
 		return textContainer->Frame();
 	}
-	return Region();
+	return Region(Point(0,0), Size(scrollview.ContentRegion().Dimensions().w, 0));
 }
 
 void TextArea::UpdateScrollview()
 {
 	if (selectOptions) {
 		Region textFrame = UpdateTextFrame();
-		Point p(textFrame.x, textFrame.h);
-		selectOptions->SetFrameOrigin(p);
+		textFrame.y = textFrame.h;
+		textFrame.h = selectOptions->Frame().h;
+
+		selectOptions->SetFrame(textFrame);
 	}
 
 	if (Flags()&IE_GUI_TEXTAREA_AUTOSCROLL
@@ -324,7 +351,7 @@ void TextArea::UpdateScrollview()
 			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 			if (blankH > 0) {
 				optH += blankH;
-				int width = scrollview.ContentRegion().Dimensions().w;
+				int width = selectOptions->Frame().w;
 				selectOptions->SetFrameSize(Size(width, optH));
 			}
 
@@ -652,7 +679,10 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	ContentContainer::Margin m;
 	size_t selectIdx = -1;
 	if (dialogBeginNode) {
-		m = ContentContainer::Margin(LineHeight(), 40, 0);
+		if (AnimPicture)
+			m = ContentContainer::Margin(10, 3);
+		else
+			m = ContentContainer::Margin(LineHeight(), 40, 0);
 	} else {
 		m = ContentContainer::Margin(0, 3);
 		selectIdx = GetValue();
