@@ -292,8 +292,8 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Width, Height, 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 
-	SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_RGB24, screenshot->LockSprite(), Width);
-	screenshot->UnlockSprite();
+	SDL_Surface* surface = screenshot->GetSurface();
+	SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_BGR24, surface->pixels, surface->pitch);
 
 	return screenshot;
 }
