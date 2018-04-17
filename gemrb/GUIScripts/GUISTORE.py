@@ -401,19 +401,19 @@ def InitStoreIdentifyWindow (Window):
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		GUICommon.AliasControls (Window,  { 'IDSBAR' : 5, 'IDLBTN' : 4, 'IDTA' : 14,
-											'IDPRICE' : 0x10000001, '' : 0x10000000,
-											'' : 0x0fffffff, '' : 0x10000002
+											'IDPRICE' : 0x10000001, 'STOGOLD' : 0x10000000,
+											'STOTITLE' : 0x0fffffff, 'STONAME' : 0x10000002
 										  } )
 		GUICommon.AliasControls (Window,  {'IDBTN' + str(x) : 9-x for x in range(ItemButtonCount)} )
 	else:
 		GUICommon.AliasControls (Window,  { 'IDSBAR' : 7, 'IDLBTN' : 5, 'IDTA' : 23,
-											'IDPRICE' : 0x10000003, '' : 0x10000001,
-											'' : 0x10000000, '' : 0x10000005
+											'IDPRICE' : 0x10000003, 'STOGOLD' : 0x10000001,
+											'STOTITLE' : 0x10000000, 'STONAME' : 0x10000005
 										  } )
 		GUICommon.AliasControls (Window,  {'IDBTN' + str(x) : 11-x for x in range(ItemButtonCount)} )
 
 	ScrollBar = GemRB.GetView ('IDSBAR')
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreIdentifyWindow(Window))
 
 	TextArea = GemRB.GetView ('IDTA')
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -570,13 +570,15 @@ ToggleStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"],
 OpenStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreStealWindow, UpdateStoreStealWindow, WINDOW_HCENTER|WINDOW_TOP)
 
 def InitStoreDonateWindow (Window):
+	Window.AddAlias('WINDONAT')
+
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
-		GUICommon.AliasControls (Window,  { 'STODONAT' : 2, 'STOTEDIT' : 3, 'STOPLUS' : 4,
+		GUICommon.AliasControls (Window,  { 'DONATE' : 2, 'STOTEDIT' : 3, 'STOPLUS' : 4,
 								 			'STOMINUS' : 5, 'STOTITLE' : 0x10000005, 'STOGOLD' : 0x10000006
 										  } )
 	else:
-		GUICommon.AliasControls (Window,  { 'STODONAT' : 3, 'STOTEDIT' : 5, 'STOPLUS' : 6,
+		GUICommon.AliasControls (Window,  { 'DONATE' : 3, 'STOTEDIT' : 5, 'STOPLUS' : 6,
 								 			'STOMINUS' : 7, 'STOTITLE' : 0x10000007, 'STOGOLD' : 0x10000008
 										  } )
 
@@ -587,7 +589,7 @@ def InitStoreDonateWindow (Window):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Donate
-	Button = GemRB.GetView ('STODONAT')
+	Button = GemRB.GetView ('DONATE')
 	Button.SetText (strrefs["donate"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
 	Button.MakeDefault()
@@ -595,16 +597,18 @@ def InitStoreDonateWindow (Window):
 	# Entry
 	Field = GemRB.GetView ('STOTEDIT')
 	Field.SetText ("0")
-	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
+	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, lambda: UpdateStoreDonateWindow(Window))
 	Field.SetStatus (IE_GUI_EDIT_NUMBER)
 	Field.Focus()
 
 	# +
 	Button = GemRB.GetView ('STOPLUS')
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncrementDonation)
+	Button.SetActionInterval (50)
 	# -
 	Button = GemRB.GetView ('STOMINUS')
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecrementDonation)
+	Button.SetActionInterval (50)
 	return
 
 def UpdateStoreDonateWindow (Window):
@@ -616,11 +620,8 @@ def UpdateStoreDonateWindow (Window):
 		donation = gold
 		Field.SetText (str(gold) )
 
-	Button = GemRB.GetView ("STORBTN")
-	if donation:
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-	else:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button = GemRB.GetView ("DONATE")
+	Button.SetDisabled(not donation)
 	return
 
 ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreDonateWindow, UpdateStoreDonateWindow, WINDOW_HCENTER|WINDOW_TOP)
@@ -664,7 +665,7 @@ def InitStoreHealWindow (Window):
 	Button = GemRB.GetView ('HEALBTN')
 	Button.SetText (strrefs["heal"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetDisabled (True)
 
 	Count = Store['StoreCureCount']
 	if Count>4:
@@ -702,7 +703,7 @@ def UpdateStoreHealWindow (Window):
 							 (dead and Spell["SpellTargetType"] != 3) or \
 							 (not dead and Spell["SpellTargetType"] == 3)):
 				# locked and shaded
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
+				Button.SetDisabled (True)
 				color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
 				Button.SetBorder (0, color, 1,1)
 			else:
@@ -713,7 +714,7 @@ def UpdateStoreHealWindow (Window):
 			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
 			Label.SetText (strrefs["itemnamecost"])
 		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetDisabled (True)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetBorder (0, None, 0,0)
@@ -797,7 +798,7 @@ def UpdateStoreRumourWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GulpDrink)
 		else:
 			Button.SetText ("")
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetDisabled (True)
 			if GameCheck.IsIWD2():
 				CostLabel = Window.GetControl (0x10000000+29+i)
 				CostLabel.SetText ("")
@@ -1627,7 +1628,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 	return price * mod / 100
 
 def IncrementDonation ():
-	Window = StoreDonateWindow
+	Window = GemRB.GetView('WINDONAT')
 
 	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
@@ -1635,11 +1636,11 @@ def IncrementDonation ():
 		Field.SetText (str(donation+1) )
 	else:
 		Field.SetText (str(GemRB.GameGetPartyGold ()) )
-	UpdateStoreDonateWindow ()
+	UpdateStoreDonateWindow (Window)
 	return
 
 def DecrementDonation ():
-	Window = StoreDonateWindow
+	Window = GemRB.GetView('WINDONAT')
 
 	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
@@ -1647,11 +1648,11 @@ def DecrementDonation ():
 		Field.SetText (str(donation-1) )
 	else:
 		Field.SetText (str(0) )
-	UpdateStoreDonateWindow ()
+	UpdateStoreDonateWindow (Window)
 	return
 
 def DonateGold ():
-	Window = StoreDonateWindow
+	Window = GemRB.GetView('WINDONAT')
 
 	TextArea = Window.GetControl (0)
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -1666,12 +1667,12 @@ def DonateGold ():
 	if GemRB.IncreaseReputation (donation):
 		TextArea.Append (strrefs['donorgood'])
 		GemRB.PlaySound (DEF_DONATE1)
-		UpdateStoreDonateWindow ()
+		UpdateStoreDonateWindow (Window)
 		return
 
 	TextArea.Append (strrefs['donorfail'])
 	GemRB.PlaySound (DEF_DONATE2)
-	UpdateStoreDonateWindow ()
+	UpdateStoreDonateWindow (Window)
 	return
 
 def InfoHealWindow ():
