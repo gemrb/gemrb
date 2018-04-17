@@ -213,7 +213,7 @@ def UpdateControlStatus(init = False):
 			ToggleWindowMinimize(win)
 	else:
 		if Expand == GS_LARGEDIALOG:
-			if MTARestoreSize and (GSFlags&GS_DIALOG) == 0:
+			if MTARestoreSize is not None and (GSFlags&GS_DIALOG) == 0:
 				SetMWSize(MTARestoreSize, GSFlags)
 				MTARestoreSize = None
 			else:
