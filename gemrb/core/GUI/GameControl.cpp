@@ -209,7 +209,6 @@ void GameControl::ClearMouseState()
 	isDoubleClick = false;
 	
 	SetCursor(NULL);
-	UpdateCursor();
 }
 
 // generate an action to do the actual movement
@@ -361,6 +360,8 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	
 void GameControl::WillDraw()
 {
+	UpdateCursor();
+
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 	
 	// handle keeping the actor in the spotlight, but only when unpaused
@@ -1251,12 +1252,11 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	}
 
 	SetLastActor(lastActor);
-	UpdateCursor(lastActor);
 
 	return true;
 }
 
-void GameControl::UpdateCursor(Actor* lastActor)
+void GameControl::UpdateCursor()
 {
 	Map *area = CurrentArea();
 	if (area == NULL) {
@@ -1306,6 +1306,7 @@ void GameControl::UpdateCursor(Actor* lastActor)
 		return;
 	}
 
+	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 	if (lastActor) {
 		ieDword type = lastActor->GetStat(IE_EA);
 		if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
@@ -1389,7 +1390,6 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 	}
 
 	if (overDoor || overContainer || overInfoPoint) {
-		UpdateCursor();
 		return true;
 	}
 
@@ -2153,7 +2153,6 @@ void GameControl::SetTargetMode(int mode) {
 void GameControl::ResetTargetMode() {
 	target_types = GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED;
 	SetTargetMode(TARGET_MODE_NONE);
-	UpdateCursor();
 }
 
 void GameControl::UpdateTargetMode() {
