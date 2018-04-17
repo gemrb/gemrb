@@ -331,7 +331,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 	if (eventMgr.MouseDown() == false && eventMgr.FingerDown() == false) {
 		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
 			if (trackingWin) {
-				trackingWin->DispatchEvent(event);
+				if (trackingWin->IsDisabled() == false) {
+					trackingWin->DispatchEvent(event);
+				}
 				return true;
 			} else {
 				// we don't deliver mouse up events if there isn't a corresponding mouse down.
