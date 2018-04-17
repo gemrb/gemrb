@@ -1692,7 +1692,7 @@ def UpdatePortraitWindow ():
 		elif GameCheck.IsIWD1():
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetText (ratio_str)
-			HPLabel.SetTextColor (*color)
+			HPLabel.SetTextColor (color)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (pcID)

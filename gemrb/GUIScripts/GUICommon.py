@@ -730,19 +730,19 @@ def SetupDamageInfo (pc, Button, Window):
 
 	if ratio == 1:
 		band = 0
-		color = (255, 255, 255)  # white
+		color = {'r' : 255, 'g' : 255, 'b' : 255}  # white
 	elif ratio >= 0.75:
 		band = 1
-		color = (0, 255, 0)  # green
+		color = {'r' : 0, 'g' : 255, 'b' : 0}  # green
 	elif ratio >= 0.50:
 		band = 2
-		color = (255, 255, 0)  # yellow
+		color = {'r' : 255, 'g' : 255, 'b' : 0}  # yellow
 	elif ratio >= 0.25:
 		band = 3
-		color = (255, 128, 0)  # orange
+		color = {'r' : 255, 'g' : 128, 'b' : 0}  # orange
 	else:
 		band = 4
-		color = (255, 0, 0)  # red
+		color = {'r' : 255, 'g' : 0, 'b' : 0}  # red
 
 	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
 		# draw the blood overlay
