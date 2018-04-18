@@ -121,10 +121,10 @@ def RedrawFeats():
 	SumLabel = FeatWindow.GetControl(0x1000000c)
 	if PointsLeft == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SumLabel.SetTextColor(255, 255, 255)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 	else:
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-		SumLabel.SetTextColor(255, 255, 0)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 0})
 
 	SumLabel.SetText(str(PointsLeft) )
 
@@ -144,17 +144,17 @@ def RedrawFeats():
 			# check if feat is usable - can be taken
 			if IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
-				Label.SetTextColor(255, 255, 255)
+				Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 			else:
 				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-				Label.SetTextColor(150, 150, 150)
+				Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
 			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-			Label.SetTextColor(150, 150, 150)
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 			# check for maximum if there are more feat levels
 			if MultiLevelFeat(FeatName) > FeatValue and IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
-				Label.SetTextColor(255, 255, 255)
+				Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 
 			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 			if FeatValue > BaseValue:
@@ -164,7 +164,7 @@ def RedrawFeats():
 
 		if PointsLeft == 0:
 			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-			Label.SetTextColor(150, 150, 150)
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 
 		levels = FeatReqTable.GetValue(FeatName, "MAX_LEVEL")
 		FeatValueCounter = FeatValue

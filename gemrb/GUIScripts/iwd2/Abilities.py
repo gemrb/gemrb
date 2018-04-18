@@ -232,7 +232,7 @@ def LeftPress(btn, Abidx):
 	PointsLeft = PointsLeft - 1
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	if PointsLeft == 0:
-		SumLabel.SetTextColor(255, 255, 255)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 	SumLabel.SetText(str(PointsLeft) )
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
 	Label.SetText(str(Ability) )
