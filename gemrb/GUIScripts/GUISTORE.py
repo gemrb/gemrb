@@ -762,15 +762,16 @@ def InitStoreRumourWindow (Window):
 		Button.SetSprites (BAM, 0, 0, 0, 0, 0)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-# FIXME: must recreate this scrollbar if it doesnt exist (BG1) because it is erroniouslhy liked to the TA in the CHU it is deleted
-#	ScrollBar = Window.GetControl (5)
-#	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreRumourWindow(Window))
-#	Count = Store['StoreDrinkCount']
-#	if Count>5:
-#		Count = Count-5
-#	else:
-#		Count = 0
-#	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	# this scrollbar must be unhidden because it is falsely linked to a TextArea
+	ScrollBar = Window.GetControl (5)
+	ScrollBar.SetVisible(True)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreRumourWindow(Window))
+	Count = Store['StoreDrinkCount']
+	if Count>5:
+		Count = Count-5
+	else:
+		Count = 0
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	return
 
 def UpdateStoreRumourWindow (Window):
