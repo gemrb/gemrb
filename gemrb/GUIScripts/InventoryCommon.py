@@ -355,15 +355,28 @@ def DisplayItem (itemresref, type):
 
 	# in pst one can cycle through all the items from the description window
 	if GameCheck.IsPST():
-		import GUIINV
+		def DisplayNext(dir):
+			import GUIINV
+
+			id = GemRB.GetVar('ItemButton') + dir;
+			while id not in GUIINV.ItemHash or not GUIINV.ItemHash[id][1]:
+				id += dir;
+				if id < 0:
+					id = 43
+				elif id > 43:
+					id = 0
+
+			GemRB.SetVar('ItemButton', id)
+			CloseItemInfoWindow()
+			OpenItemInfoWindow(None, GUIINV.ItemHash[id][0])
 
 		#left scroll
 		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.LeftItemScroll)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(-1))
 
 		#right scroll
 		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.RightItemScroll)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(1))
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return

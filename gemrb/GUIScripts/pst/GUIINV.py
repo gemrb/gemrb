@@ -273,6 +273,7 @@ def UpdateSlot (pc, i):
 		#PST displays the default weapon in the first slot if nothing else was equipped
 		if slot_item == None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc)==10:
 			slot_item = GemRB.GetSlotItem (pc, 0)
+			slot = 0
 
 	ControlID = SlotType["ID"]
 	if ControlID<0:
@@ -313,7 +314,7 @@ def UpdateSlot (pc, i):
 
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenItemInfoWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InventoryCommon.OpenItemInfoWindow(None, slot=slot))
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
 	else:
@@ -460,36 +461,6 @@ def OpenItemAmountWindow ():
 	# 6 text
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def LeftItemScroll ():
-	tmp = GemRB.GetVar ('ItemButton') - 1
-	if tmp < 0:
-		tmp = 43
-
-	while tmp not in ItemHash or not ItemHash[tmp][1]:
-		tmp = tmp - 1
-		if tmp < 0:
-			tmp = 43
-
-	GemRB.SetVar ('ItemButton', tmp)
-	InventoryCommon.CloseItemInfoWindow ()
-	InventoryCommon.OpenItemInfoWindow ()
-	return
-
-def RightItemScroll ():
-	tmp = GemRB.GetVar ('ItemButton') + 1
-	if tmp > 43:
-		tmp = 0
-
-	while tmp not in ItemHash or not ItemHash[tmp][1]:
-		tmp = tmp + 1
-		if tmp > 43:
-			tmp = 0
-
-	GemRB.SetVar ('ItemButton', tmp)
-	InventoryCommon.CloseItemInfoWindow ()
-	InventoryCommon.OpenItemInfoWindow ()
-	return
 
 def MouseEnterSlot ():
 	global OverSlot
