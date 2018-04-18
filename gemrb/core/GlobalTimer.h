@@ -73,6 +73,9 @@ public:
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();
+
+private:
+	bool UpdateViewport(unsigned long time);
 };
 
 }

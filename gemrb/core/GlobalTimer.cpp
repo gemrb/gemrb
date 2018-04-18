@@ -61,25 +61,20 @@ void GlobalTimer::Init()
 void GlobalTimer::Freeze()
 {
 	unsigned long thisTime;
-	unsigned long advance;
 
 	UpdateAnimations(true);
 
 	thisTime = GetTickCount();
-	advance = thisTime - startTime;
-	if ( advance < interval) {
+	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
+
 	startTime = thisTime;
 	Game* game = core->GetGame();
 	if (!game) {
 		return;
 	}
 	game->RealTime++;
-
-	ieDword count = advance/interval;
-	// pst/bg2 do this, if you fix it for another game, wrap it in a check
-	DoFadeStep(count);
 }
 
 bool GlobalTimer::ViewportIsMoving()
@@ -152,34 +147,41 @@ void GlobalTimer::DoStep(int count)
 	gc->MoveViewportTo(p, false);
 }
 
+bool GlobalTimer::UpdateViewport(unsigned long thisTime)
+{
+	unsigned long advance = thisTime - startTime;
+	if ( advance < interval) {
+		return false;
+	}
+
+	ieDword count = ieDword(advance/interval);
+	DoStep(count);
+	DoFadeStep(count);
+	return true;
+}
+
 bool GlobalTimer::Update()
 {
 	Map *map;
 	Game *game;
 	GameControl* gc;
-	unsigned long thisTime;
-	unsigned long advance;
+	unsigned long thisTime = GetTickCount();
 
 	UpdateAnimations(false);
 
-	thisTime = GetTickCount();
-
 	if (!startTime) {
-		startTime = thisTime;
-		return false;
+		goto end;
 	}
 
-	advance = thisTime - startTime;
-	if ( advance < interval) {
-		return false;
-	}
-	ieDword count = advance/interval;
-	DoStep(count);
-	DoFadeStep(count);
 	gc = core->GetGameControl();
 	if (!gc) {
 		goto end;
 	}
+
+	if (UpdateViewport(thisTime) == false) {
+		return false;
+	}
+
 	game = core->GetGame();
 	if (!game) {
 		goto end;
