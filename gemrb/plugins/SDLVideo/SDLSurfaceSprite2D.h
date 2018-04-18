@@ -34,7 +34,7 @@ public:
 
 	enum VersionMask {
 		PalMask = 0xffffffff00000000,
-		FlagMask = 0x00000000ffffffff,
+		FlagMask = 0x00000000ffffffff
 	};
 
 protected:
