@@ -163,13 +163,13 @@ def OpenContainerWindow ():
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	Window.SetFlags (WF_BORDERLESS)
 
-	# container window shouldnt be in front
-	GemRB.GetView("OPTWIN").Focus()
-	GemRB.GetView("PORTWIN").Focus()
-
 	#stop gears from interfering
 	if GameCheck.IsPST():
 		GUICommonWindows.DisableAnimatedWindows ()
+	else:
+		# container window shouldnt be in front
+		GemRB.GetView("OPTWIN").Focus()
+		GemRB.GetView("PORTWIN").Focus()
 
 	Container = GemRB.GetContainer(0)
 
@@ -207,10 +207,12 @@ def OpenContainerWindow ():
 
 	# left scrollbar (container)
 	ScrollBar = Window.GetControl (52)
+	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 
 	# right scrollbar (inventory)
 	ScrollBar = Window.GetControl (53)
+	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 
 	# encumbrance and inventory icon
