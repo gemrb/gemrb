@@ -141,7 +141,7 @@ const Color* SDLSurfaceSprite2D::GetPaletteColors() const
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
 	Palette* palette = surface->palette.get();
-	version_t palv = ((GetVersion()&VersionMask::PalMask) >> 16);
+	version_t palv = ((GetVersion()&PalMask) >> 16);
 
 	if (pal == palette) {
 		if (pal->GetVersion() != palv) {

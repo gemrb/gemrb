@@ -172,7 +172,7 @@ struct IPixelIterator
 {
 	enum Direction {
 		Reverse = -1,
-		Forward = 1,
+		Forward = 1
 	};
 
 	void* pixel;
