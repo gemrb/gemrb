@@ -206,7 +206,7 @@ public:
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;
 
 	// like StringSize, but single line and doens't take whitespace into consideration
-	size_t StringSizeSimple(const String&, size_t width) const;
+	size_t StringSizeWidth(const String&, size_t width, size_t* numChars = NULL) const;
 };
 
 }

@@ -319,15 +319,12 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 		if (&l == cursorPos.layout) {
 			Sprite2D* cursor = core->GetCursorSprite();
-			const Region& rgn = l.regions[cursorPos.layoutIndex];
-			video->BlitSprite(cursor, cursorPos.regionPos.x + rgn.x + dp.x,
-							          cursorPos.regionPos.y + rgn.y + dp.y + cursor->YPos);
+			const Region* rgn = cursorPos.rgn;
+			video->BlitSprite(cursor, cursorPos.regionPos.x + rgn->x + dp.x,
+							          cursorPos.regionPos.y + rgn->y + dp.y + cursor->YPos);
 			cursor->release();
 		}
 	}
-
-
-	//video->BlitSprite(cursor, drawFrame.x + cursorPos.x, drawFrame.y + cursorPos.y);
 }
 
 void ContentContainer::AppendContent(Content* content)
@@ -399,6 +396,17 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		return content;
 	}
 	return NULL;
+}
+
+ContentContainer::ContentList::const_iterator
+ContentContainer::EraseContent(ContentList::const_iterator it)
+{
+	Content* content = *it;
+	content->parent = NULL;
+	layout.erase(std::find(layout.begin(), layout.end(), content));
+	delete content;
+
+	return contents.erase(it);
 }
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
@@ -617,9 +625,22 @@ void TextContainer::SetPalette(Holder<Palette> pal)
 
 String TextContainer::Text() const
 {
+	return TextFrom(contents.begin());
+}
+
+String TextContainer::TextFrom(const Content* content) const
+{
+	return TextFrom(std::find(contents.begin(), contents.end(), content));
+}
+
+String TextContainer::TextFrom(ContentList::const_iterator it) const
+{
+	if (it == contents.end()) {
+		return L""; // must bail or things will get screwed up!
+	}
+
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string
 	String text;
-	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
 		if (const TextSpan* textSpan = static_cast<TextSpan*>(*it)) {
 			text.append(textSpan->Text());
@@ -628,11 +649,8 @@ String TextContainer::Text() const
 	return text;
 }
 
-void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+void TextContainer::MoveCursorToPoint(const Point& p)
 {
-	// TODO: we need a flag for being editable.
-
-	Point p = ConvertPointFromScreen(me.Pos());
 	const Layout* layout = LayoutAtPoint(p);
 
 	if (layout) {
@@ -642,7 +660,6 @@ void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
 		size_t numChars = 0;
 		cursorPos.layout = layout;
-		cursorPos.layoutIndex = 0;
 		cursorPos.regionPos = Point(0,0);
 
 		const Regions& regions = layout->regions;
@@ -660,7 +677,10 @@ void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 					printFont->StringSize(text.substr(numChars), &metrics);
 					numChars += metrics.numChars;
 				}
-				cursorPos.regionPos.x = printFont->StringSizeSimple(text.substr(numChars), p.x);
+				size_t len = 0;
+				cursorPos.regionPos.x = printFont->StringSizeWidth(text.substr(numChars), p.x, &len);
+				cursorPos.charIndex = numChars + len;
+				cursorPos.rgn = &rect;
 				break;
 			} else {
 				// not in this one so we need to consume some text
@@ -669,11 +689,43 @@ void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 				printFont->StringSize(text.substr(numChars), &metrics);
 				numChars += metrics.numChars;
 			}
-			++cursorPos.layoutIndex;
 		}
 
 		MarkDirty();
 	}
+}
+
+void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	// TODO: we need a flag for being editable.
+
+	Point p = ConvertPointFromScreen(me.Pos());
+	MoveCursorToPoint(p);
+}
+
+bool TextContainer::KeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
+{
+	if (key.character) {
+		// TODO: handle delete and arrow keys
+
+		const TextSpan* content = static_cast<const TextSpan*>(cursorPos.layout->content);
+		Point newPoint = cursorPos.rgn->Origin() + cursorPos.regionPos;
+		const Font* printFont = content->LayoutFont();
+
+		ContentList::const_iterator it = std::find(contents.begin(), contents.end(), content);
+		String newtext = TextFrom(it);
+		newtext.insert(cursorPos.charIndex, 1, key.character);
+
+		EraseContent(it);
+		AppendText(newtext);
+
+		size_t charw = printFont->StringSizeWidth(String(1, key.character), 0);
+		newPoint.x += charw*2;
+		MoveCursorToPoint(newPoint);
+
+		return true;
+	}
+	return false;
 }
 
 }

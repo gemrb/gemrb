@@ -154,9 +154,10 @@ protected:
 	};
 
 	struct {
-		const Layout* layout;
-		size_t layoutIndex;
-		Point regionPos;
+		const Layout* layout; // the layout struct the cursor is inside
+		const Region* rgn; // the Region in layout->Regions
+		Point regionPos; // the drawing point relative to the Region
+		size_t charIndex; // the index of the character string contained in Layout
 	} cursorPos;
 
 	typedef std::deque<Layout> ContentLayout;
@@ -195,6 +196,8 @@ protected:
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
+	ContentList::const_iterator EraseContent(ContentList::const_iterator);
+
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
 
@@ -211,11 +214,17 @@ private:
 	Font* font;
 	Holder<Palette> palette;
 
+private:
+	String TextFrom(ContentList::const_iterator) const;
+
+	void MoveCursorToPoint(const Point& p);
+
 public:
 	TextContainer(const Region& frame, Font* font, Holder<Palette>);
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, Font* fnt, Holder<Palette> pal);
+	String TextFrom(const Content*) const;
 	String Text() const;
 
 	void SetPalette(Holder<Palette> pal);
@@ -223,6 +232,7 @@ public:
 	const Font* TextFont() const { return font; }
 
 	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 };
 

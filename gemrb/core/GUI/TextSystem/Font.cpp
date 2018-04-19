@@ -591,10 +591,10 @@ size_t Font::Print(Region rgn, const String& string,
 	return ret;
 }
 
-size_t Font::StringSizeSimple(const String& string, size_t width) const
+size_t Font::StringSizeWidth(const String& string, size_t width, size_t* numChars) const
 {
-	size_t size = 0;
-	for (size_t i = 0; i < string.length(); ++i) {
+	size_t size = 0, i = 0;
+	for (; i < string.length(); ++i) {
 		wchar_t c = string[i];
 		if (c == L'\n') {
 			break;
@@ -606,11 +606,15 @@ size_t Font::StringSizeSimple(const String& string, size_t width) const
 			chrW -= GetKerningOffset(string[i-1], string[i]);
 		}
 
-		if (size + chrW >= width) {
+		if (width > 0 && size + chrW >= width) {
 			break;
 		}
 
 		size += chrW;
+	}
+
+	if (numChars) {
+		*numChars = i;
 	}
 	return size;
 }
