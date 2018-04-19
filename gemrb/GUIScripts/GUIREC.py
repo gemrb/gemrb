@@ -170,27 +170,27 @@ def UpdateRecordsWindow (Window):
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (sstr)
-	Label.SetTextColor (cstr[0], cstr[1], cstr[2])
+	Label.SetTextColor (cstr)
 
 	Label = Window.GetControl (0x10000009)
 	Label.SetText (sdex)
-	Label.SetTextColor (cdex[0], cdex[1], cdex[2])
+	Label.SetTextColor (cdex)
 
 	Label = Window.GetControl (0x1000000a)
 	Label.SetText (scon)
-	Label.SetTextColor (ccon[0], ccon[1], ccon[2])
+	Label.SetTextColor (ccon)
 
 	Label = Window.GetControl (0x1000000b)
 	Label.SetText (sint)
-	Label.SetTextColor (cint[0], cint[1], cint[2])
+	Label.SetTextColor (cint)
 
 	Label = Window.GetControl (0x1000000c)
 	Label.SetText (swis)
-	Label.SetTextColor (cwis[0], cwis[1], cwis[2])
+	Label.SetTextColor (cwis)
 
 	Label = Window.GetControl (0x1000000d)
 	Label.SetText (schr)
-	Label.SetTextColor (cchr[0], cchr[1], cchr[2])
+	Label.SetTextColor (cchr)
 
 	# class
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
@@ -243,10 +243,10 @@ def GetStatColor (pc, stat):
 	a = GemRB.GetPlayerStat (pc, stat)
 	b = GemRB.GetPlayerStat (pc, stat, 1)
 	if a==b:
-		return (255,255,255)
+		return {'r' : 255, 'g' : 255, 'b' : 255}
 	if a<b:
-		return (255,255,0)
-	return (0,255,0)
+		return {'r' : 255, 'g' : 255, 'b' : 0}
+	return {'r' : 0, 'g' : 255, 'b' : 0}
 
 # GemRB.GetPlayerStat wrapper that only returns nonnegative values
 def GSNN (pc, stat):

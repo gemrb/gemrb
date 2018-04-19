@@ -2258,7 +2258,7 @@ PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
  \n\
  **Parameters:**\n\
  * GLabel - the control's reference\n\
- * color - the control's desired text color\n\
+ * color - the control's desired text color as a rgb dict\n\
  * swap - use color as the back color for the palette\n\
  \n\
  **Return value:** N/A\n\
@@ -2575,7 +2575,7 @@ for fonts with swapped background and text colors.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
-  * red, green, blue - the rgb color values\n\
+  * red, green, blue - the rgb color values as a rgb dict\n\
   * invert - swap background and text colors?\n\
 \n\
 **Return value:** N/A\n\
@@ -2931,9 +2931,7 @@ selects the color affected.\n\
     * IE_GUI_WMAP_COLOR_NORMAL - main text color\n\
     * IE_GUI_WMAP_COLOR_SELECTED - color of hovered on text\n\
     * IE_GUI_WMAP_COLOR_NOTVISITED - color of unvisited entries\n\
-  * red - red value\n\
-  * green - green value\n\
-  * blue - blue value\n\
+  * color - rgb dict\n\
 \n\
 **Return value:** N/A"
 );

@@ -248,7 +248,7 @@ def WorldMapWindowCommon (Travel):
 		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "floattxt")
 	elif GameCheck.IsBG1():
 		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "toolfont", 1)
-		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
+		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0xa4, 'g' : 0x6a, 'b' : 0x4c})
 	else:
 		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "infofont")
 

@@ -1766,7 +1766,7 @@ def UpdateAnimatedPortrait (Window,i):
 	g = int (255 * ratio)
 
 	ButtonHP.SetText ("%d / %d" %(hp, hp_max))
-	ButtonHP.SetTextColor (r, g, 0, False)
+	ButtonHP.SetTextColor ({'r' : r, 'g' : g, 'b' : 0}, False)
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)
 

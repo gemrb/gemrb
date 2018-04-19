@@ -409,8 +409,7 @@ def keys_setup_page (Window, pageno):
 
 			Label = Window.GetControl (0x10000041 + i)
 			Label.SetText (label)
-			Label.SetTextColor (0, 255, 255)
-
+			Label.SetTextColor ({'r' : 0, 'g' : 255, 'b' : 255})
 		else:
 			Label = Window.GetControl (0x10000005 + i)
 			Label.SetText (key)
