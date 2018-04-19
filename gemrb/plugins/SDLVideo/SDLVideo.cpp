@@ -751,8 +751,11 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
 		unsigned char* dst = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
-		// NOTICE: we assume the points were clipped by the caller for performance reasons
-		assert(dst < start + (surface->pitch * surface->h));
+
+		if (dst >= start + (surface->pitch * surface->h)) {
+			// points cannot be relied upon to be clipped because we allow public access to DrawPoints
+			continue;
+		}
 
 		Color dstc;
 		switch (fmt->BytesPerPixel) {
