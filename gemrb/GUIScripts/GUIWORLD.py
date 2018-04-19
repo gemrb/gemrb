@@ -95,7 +95,7 @@ def OpenEndMessageWindow ():
 	Button.SetVisible(True)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetHotKey(chr(0x86), 0, True)
+	Button.MakeDefault(True)
 
 def OpenContinueMessageWindow ():
 	#continue
@@ -103,7 +103,7 @@ def OpenContinueMessageWindow ():
 	Button.SetVisible(True)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetHotKey(chr(0x86), 0, True)
+	Button.MakeDefault(True)
 
 def UpdateReformWindow ():
 	Window = ReformPartyWindow

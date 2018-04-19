@@ -295,13 +295,13 @@ class GButton(GControl):
     'SetActionIcon': _GemRB.Button_SetActionIcon
   }
 
-  def MakeDefault(self):
+  def MakeDefault(self, glob=False):
 	  # return key
-	  return self.SetHotKey(chr(0x86), 0)
+	  return self.SetHotKey(chr(0x86), 0, glob)
 
-  def MakeEscape(self):
+  def MakeEscape(self, glob=False):
 	  # escape key
-	  return self.SetHotKey(chr(0x8c), 0)
+	  return self.SetHotKey(chr(0x8c), 0, glob)
 
   def SetMOS(self, mos):
 	  self.SetPicture(mos) # backwards compatibility

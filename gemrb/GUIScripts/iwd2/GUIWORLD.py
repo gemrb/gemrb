@@ -73,14 +73,14 @@ def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetHotKey(chr(0x86), 0, True)
+	Button.MakeDefault(True)
 
 def OpenContinueMessageWindow ():
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetHotKey(chr(0x86), 0, True)
+	Button.MakeDefault(True)
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
