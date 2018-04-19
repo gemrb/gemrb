@@ -230,7 +230,7 @@ void View::Draw()
 			swprintf(string, sizeof(string), L"id: %lu  grp: %s  flgs: %lu",
 					 id, ref->ScriptingGroup().CString(), flags);
 			Region r = drawFrame;
-			r.w = win->Frame().w - r.x;
+			r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
 			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, true};
 			fnt->StringSize(string, &metrics);
 			r.h = metrics.size.h;
