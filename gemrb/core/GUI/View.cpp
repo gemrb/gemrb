@@ -227,11 +227,14 @@ void View::Draw()
 			id &= 0x00000000ffffffff; // control id is lower 32bits
 			
 			wchar_t string[256];
-			swprintf(string, sizeof(string), L"id: %lu    group: %s    flags: %lu",
+			swprintf(string, sizeof(string), L"id: %lu  grp: %s  flgs: %lu",
 					 id, ref->ScriptingGroup().CString(), flags);
 			Region r = drawFrame;
-			r.h = fnt->LineHeight;
-			r.w = (int)fnt->StringSizeSimple(string, 640);
+			r.w = win->Frame().w - r.x;
+			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, true};
+			fnt->StringSize(string, &metrics);
+			r.h = metrics.size.h;
+			r.w = metrics.size.w;
 			video->SetScreenClip(NULL);
 			video->DrawRect(r, ColorBlack, true);
 			fnt->Print(r, string, NULL, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
