@@ -124,7 +124,7 @@ public:
 
 	void operator()(const Color& src, Color& dst, Uint8 mask) const {
 		Color c = src;
-		c.a = (255-mask) + (c.a * mask); // FIXME: not sure this is 100% correct, but it passes my known tests
+		c.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		if (c.a == 0) {
 			return;
@@ -457,13 +457,15 @@ public:
 				b = format->palette->colors[pixel].b;
 
 #if SDL_VERSION_ATLEAST(1,3,0)
-				// FIXME: I guess we dont support this (no surface to query)... do we need it?
+				// FIXME: I guess we dont support colorkey? (no surface to query)... do we need it?
 				//Uint32 ck;
 				//if (SDL_GetColorKey(surface, &ck) != -1 && ck == pixel) c.a = SDL_ALPHA_TRANSPARENT;
-				a = SDL_ALPHA_OPAQUE;
+				a = format->palette->colors[pixel].a;
 #else
-				if (format->colorkey == pixel) a = SDL_ALPHA_TRANSPARENT;
-				else a = SDL_ALPHA_OPAQUE;
+				// For now we are ignoring colorkeys
+				//if (format->colorkey == pixel) a = SDL_ALPHA_TRANSPARENT;
+				//else
+				a = format->palette->colors[pixel].unused; // unused is alpha
 #endif
 				return;
 			default:
