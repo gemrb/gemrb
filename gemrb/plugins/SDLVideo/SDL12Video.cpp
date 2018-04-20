@@ -423,6 +423,7 @@ void SDL12VideoDriver::DrawHLine(short x1, short y, short x2, const Color& color
 	short max = min + screenClip.w - 1;
 	x1 = Clamp(x1, min, max);
 	x2 = Clamp(x2, min, max);
+	y = Clamp<short>(y, screenClip.y, screenClip.h - 1);
 
 	std::vector<SDL_Point> points;
 	for (; x1 <= x2 ; x1++ )
@@ -443,6 +444,7 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 	short max = min + screenClip.h - 1;
 	y1 = Clamp(y1, min, max);
 	y2 = Clamp(y2, min, max);
+	x = Clamp<short>(x, screenClip.x, screenClip.w - 1);
 
 	std::vector<SDL_Point> points;
 	for (; y1 <= y2 ; y1++ )
