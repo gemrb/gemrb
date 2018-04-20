@@ -400,9 +400,12 @@ bool Window::InHandler() const
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
 {
-	if (HotKeys.count(key)) {
+	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it;
+	it = HotKeys.find(key);
+	if (it != HotKeys.end()) {
 		// something already registered
-		return false;
+		delete it->second;
+		HotKeys.erase(it);
 	}
 
 	HotKeys[key] = cb;
