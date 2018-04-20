@@ -132,7 +132,7 @@ def OpenVideoOptionsWindow ():
 	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
 
@@ -198,7 +198,7 @@ def OpenAudioOptionsWindow ():
 	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (7, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, Window, 24)
@@ -240,7 +240,7 @@ def OpenCharacterSoundsWindow ():
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (12, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
@@ -285,7 +285,7 @@ def OpenGameplayOptionsWindow ():
 
 	#gameplayoptions
 	Window = GemRB.LoadWindow (8, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
 
@@ -339,7 +339,7 @@ def OpenFeedbackOptionsWindow ():
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (9, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# same as HelpTextArea if not BG1
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
@@ -386,7 +386,7 @@ def OpenAutopauseOptionsWindow ():
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (10, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
@@ -438,7 +438,7 @@ def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
 	SubOptionsWindow = Window = GemRB.LoadWindow(2, "GUIMOVIE")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	TextAreaControl = Window.GetControl(0)
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)
@@ -493,7 +493,7 @@ def OpenLoadMsgWindow ():
 		return
 
 	LoadMsgWindow = Window = GemRB.LoadWindow (4, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# Load
 	Button = Window.GetControl (0)
@@ -562,7 +562,7 @@ def OpenQuitMsgWindow ():
 		return
 
 	QuitMsgWindow = Window = GemRB.LoadWindow (5, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# Save
 	Button = Window.GetControl (0)

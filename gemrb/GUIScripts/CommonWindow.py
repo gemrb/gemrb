@@ -161,7 +161,7 @@ def OpenContainerWindow ():
 		GemRB.GetView ("MSGWIN").SetVisible(False)
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	Window.SetFlags (WF_BORDERLESS)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
