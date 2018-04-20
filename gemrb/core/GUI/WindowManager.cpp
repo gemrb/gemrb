@@ -546,7 +546,8 @@ void WindowManager::DrawWindows() const
 			// controls on greyed out windows shouldnt be updating anyway
 			win->Draw();
 			static const Color fill(0, 0, 0, 128);
-			video->DrawRect(screen, fill);
+			Region winrgn(Point(), win->Dimensions());
+			video->DrawRect(winrgn, fill);
 		} else {
 			win->Draw();
 		}
