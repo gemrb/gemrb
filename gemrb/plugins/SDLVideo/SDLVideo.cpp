@@ -733,7 +733,7 @@ int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, i
 		return SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
 #else
 		// const_cast because SDL doesnt alter this and we want our interface to be const correct
-		return SDL_SetPalette( surf, SDL_LOGPAL | SDL_RLEACCEL, const_cast<SDL_Color*>(pal), 0, numcolors );
+		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );
 #endif
 	}
 	return -1;

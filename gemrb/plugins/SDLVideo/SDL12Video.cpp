@@ -531,7 +531,6 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 			SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
 			SDL_Color c = {color.r, color.g, color.b, color.a};
 			SetSurfacePalette(rectsurf, &c, 1);
-			SetSurfaceAlpha(rectsurf, color.a);
 
 			assert(rgn.w > 0 && rgn.h > 0);
 			SDL_Rect srect = {0, 0, (unsigned short)rgn.w, (unsigned short)rgn.h};
@@ -669,13 +668,6 @@ void SDL12VideoDriver::HideSoftKeyboard()
 bool SDL12VideoDriver::TouchInputEnabled()
 {
     return core->MouseFeedback > 0;
-}
-
-// Private methods
-
-bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
-{
-	return (SDL_SetAlpha( surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha ) == 0);
 }
 
 #include "plugindef.h"

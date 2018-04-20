@@ -89,8 +89,6 @@ public:
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
 
-	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
-
 	int ProcessEvent(const SDL_Event & event);
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();

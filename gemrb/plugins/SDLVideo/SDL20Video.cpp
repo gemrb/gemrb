@@ -497,20 +497,6 @@ bool SDL20VideoDriver::ToggleGrabInput()
 	return (isGrabbed != SDL_GetWindowGrab(window));
 }
 
-// Private methods
-
-bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
-{
-	bool ret = SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
-	if (ret == GEM_OK) {
-		ret = SDL_SetSurfaceAlphaMod(surface, alpha);
-	}
-	// don't RLE with SDL 2
-	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
-	// SDL_SetSurfaceRLE(surface, SDL_TRUE);
-	return ret;
-}
-
 #ifndef USE_OPENGL
 #include "plugindef.h"
 

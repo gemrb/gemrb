@@ -60,7 +60,6 @@ private:
 	void SwapBuffers(VideoBuffers&);
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt);
-	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 
 	int ProcessEvent(const SDL_Event & event);
 

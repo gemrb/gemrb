@@ -133,7 +133,6 @@ protected:
 	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
 
-	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
