@@ -525,8 +525,8 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 		SDL_Surface* currentBuf = CurrentRenderBuffer();
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
-		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
-			Uint32 val = SDL_MapRGB( currentBuf->format, color.r, color.g, color.b );
+		} else if ( SDL_ALPHA_OPAQUE == color.a || drawingBuffer->blend == false) {
+			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
 		} else {
