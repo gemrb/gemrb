@@ -247,7 +247,7 @@ void Video::BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
 		spr->SetPalette(pal);
 		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
 		spr->SetPalette(oldpal);
-		oldpal->release();
+		if (oldpal) oldpal->release();
 	} else {
 		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
 	}
