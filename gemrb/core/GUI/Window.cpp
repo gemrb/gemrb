@@ -44,11 +44,6 @@ Window::~Window()
 {
 	// Dont Close() the window. WindowManager owns the window, so it will be deleting it
 	core->GetVideoDriver()->DestroyBuffer(backBuffer);
-
-	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.begin();
-	for (; it != HotKeys.end(); ++it) {
-		delete it->second;
-	}
 }
 
 void Window::Close()
@@ -404,7 +399,6 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	it = HotKeys.find(key);
 	if (it != HotKeys.end()) {
 		// something already registered
-		delete it->second;
 		HotKeys.erase(it);
 	}
 

@@ -72,11 +72,9 @@ Button::~Button()
 	gamedata->FreePalette( disabled_palette);
 
 	if (hotKey.global) {
-		// only delete global callbacks
-		// Window must own non globals because it is destroyed before the subviews
 		UnregisterHotKey();
-		delete HotKeyCallback;
 	}
+	delete HotKeyCallback;
 }
 
 void Button::UnregisterHotKey()
