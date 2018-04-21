@@ -89,10 +89,12 @@ def NextDialogState ():
 		return
 
 	ContinueWindow.GetControl(0).SetVisible(False)
+	ContinueWindow.GetControl(0).SetDisabled(True)
 
 def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
@@ -101,6 +103,7 @@ def OpenContinueMessageWindow ():
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
