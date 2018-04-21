@@ -5704,6 +5704,7 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
+		if (Modified[IE_EA] > EA_CONTROLLABLE) return false;
 	}
 	return true;
 }
