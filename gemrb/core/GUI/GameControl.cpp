@@ -1118,7 +1118,7 @@ String GameControl::TooltipText() const {
 			strindex = displaymsg->GetStringReference(strindex);
 			String* injuredstring = core->GetString(strindex, 0);
 			assert(injuredstring); // we just "checked" for these (by checking for STR_UNINJURED)
-			tip += *injuredstring;
+			tip += L"\n" + *injuredstring;
 			delete injuredstring;
 		}
 	}
