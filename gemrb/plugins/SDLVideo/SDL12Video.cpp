@@ -536,8 +536,9 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 
 			assert(rectsurf->format->palette->colors[0].unused == color.a);
 			assert(rgn.w > 0 && rgn.h > 0);
-			SDL_Rect srect = {0, 0, (unsigned short)rgn.w, (unsigned short)rgn.h};
-			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
+			Region clippedrgn = ClippedDrawingRect(rgn);
+			SDL_Rect srect = {0, 0, (unsigned short)clippedrgn.w, (unsigned short)clippedrgn.h};
+			SDL_Rect drect = RectFromRegion(clippedrgn);
 
 			// use our RGBBlendingPipeline because SDL 1.2 apprently doesnt support blending 8bit surface + SDL_SRCALPHA to 32bit RGBA (seems like a bug)
 			RGBBlendingPipeline<NONE, false> blender;
