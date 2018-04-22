@@ -362,21 +362,21 @@ def GroupControls ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GameCheck.IsBG2():
-		Button.SetActionIcon (globals(), 7) #talk icon
+		Button.SetActionIcon (globals(), 7, 1) #talk icon
 	else:
-		Button.SetActionIcon (globals(), 14)#guard icon
+		Button.SetActionIcon (globals(), 14, 1)#guard icon
 	Button = CurrentWindow.GetControl (1+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 15)
+	Button.SetActionIcon (globals(), 15, 2)
 	Button = CurrentWindow.GetControl (2+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 21)
+	Button.SetActionIcon (globals(), 21, 3)
 	Button = CurrentWindow.GetControl (3+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), -1)
+	Button.SetActionIcon (globals(), -1, 4)
 	Button = CurrentWindow.GetControl (4+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), -1)
+	Button.SetActionIcon (globals(), -1, 5)
 	Button = CurrentWindow.GetControl (5+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), -1)
+	Button.SetActionIcon (globals(), -1, 6)
 	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
-	Button.SetActionIcon (globals(), -1)
+	Button.SetActionIcon (globals(), -1, 7)
 	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
 	for i in range (5):
 		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
@@ -391,7 +391,7 @@ def GroupControls ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
 		Button.SetTooltip (4935)
 		# 0x90 = F1 key
-		Button.SetHotKey (chr(7+i+0x90))
+		Button.SetHotKey (chr(7+i+0x90), 0, True)
 	return
 
 def OpenActionsWindowControls (Window):

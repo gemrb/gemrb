@@ -6359,7 +6359,7 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 	}
 	if (tooltip) {
 		SetViewTooltipFromRef(btn, spell->SpellName);
-		btn->SetHotKey(Function);
+		btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
 	}
 	gamedata->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
@@ -6504,7 +6504,7 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 	if (tooltip) {
 		//later getitemname could also return tooltip stuff
 		SetViewTooltipFromRef(btn, item->GetItemName(tooltip==2));
-		btn->SetHotKey(Function);
+		btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -10250,7 +10250,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		SetViewTooltipFromRef(btn, GUITooltip[Index]);
 	}
 
-	btn->SetHotKey(Function);
+	btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
 
 	//no incref
 	return Py_None;
