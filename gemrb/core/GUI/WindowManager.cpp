@@ -127,6 +127,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	win->SetDisabled(false);
 	win->SetFlags(Window::Modal, OP_OR);
 	modalWin = win;
+	winFrameBuf->Clear();
 
 	if (Shadow != ShadowNone) {
 		Color shieldColor;
