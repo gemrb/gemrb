@@ -473,8 +473,9 @@ void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Colo
 		longLen = swap;
 		yLonger = true;
 	}
+
 	int decInc;
-	if (longLen == 0) {
+	if (longLen == 0 || shortLen < 0) {
 		decInc = 0;
 	} else {
 		decInc = ( shortLen << 16 ) / longLen;
