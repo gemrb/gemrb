@@ -541,32 +541,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		break;
 	}
 
-	if (flags & IE_GUI_BUTTON_CHECKBOX) {
-		//checkbox
-		ToggleState = !ToggleState;
-		if (ToggleState)
-			SetState( IE_GUI_BUTTON_SELECTED );
-		else
-			SetState( IE_GUI_BUTTON_UNPRESSED );
-		if (VarName[0] != 0) {
-			ieDword tmp = 0;
-			core->GetDictionary()->Lookup( VarName, tmp );
-			tmp ^= GetValue();
-			core->GetDictionary()->SetAt( VarName, tmp );
-			window->RedrawControls( VarName, tmp );
-		}
-	} else {
-		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
-			//radio button
-			ToggleState = true;
-			SetState( IE_GUI_BUTTON_SELECTED );
-		}
-		if (VarName[0] != 0) {
-			ieDword val = GetValue();
-			core->GetDictionary()->SetAt( VarName, val );
-			window->RedrawControls( VarName, val );
-		}
-	}
+	DoToggle();
     return Control::OnMouseUp(me, mod);
 }
 
@@ -653,6 +628,37 @@ void Button::UpdateState(unsigned int Sum)
 		SetState(IE_GUI_BUTTON_UNPRESSED);
 	}
 }
+
+void Button::DoToggle()
+{
+	if (flags & IE_GUI_BUTTON_CHECKBOX) {
+		//checkbox
+		ToggleState = !ToggleState;
+		if (ToggleState)
+			SetState( IE_GUI_BUTTON_SELECTED );
+		else
+			SetState( IE_GUI_BUTTON_UNPRESSED );
+		if (VarName[0] != 0) {
+			ieDword tmp = 0;
+			core->GetDictionary()->Lookup( VarName, tmp );
+			tmp ^= GetValue();
+			core->GetDictionary()->SetAt( VarName, tmp );
+			window->RedrawControls( VarName, tmp );
+		}
+	} else {
+		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
+			//radio button
+			ToggleState = true;
+			SetState( IE_GUI_BUTTON_SELECTED );
+		}
+		if (VarName[0] != 0) {
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt( VarName, val );
+			window->RedrawControls( VarName, val );
+		}
+	}
+}
+
 /** Sets the Picture */
 void Button::SetPicture(Sprite2D* newpic)
 {
@@ -771,6 +777,7 @@ bool Button::HandleHotKey(const Event& e)
 	if (e.type == Event::KeyDown) {
 		// only run once on keypress (or should it be KeyRelease?)
 		// we could support both; key down = left mouse down, key up = left mouse up
+		DoToggle();
 		return PerformAction();
 	}
 	return false;

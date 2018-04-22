@@ -222,6 +222,7 @@ private: // Private attributes
 	bool HandleHotKey(const Event&);
 	bool HitTest (const Point&) const;
 	void CloseUpColor();
+	void DoToggle();
 
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
