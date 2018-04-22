@@ -99,9 +99,9 @@ static bool FindFiles( char* path, std::list<char*> &files )
 {
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
-	long hFile;
+	intptr_t hFile;
 	strcat( path, "*.dll" );
-	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
+	if (( hFile = _findfirst( path, &c_file ) ) == -1L) {
 		//If there is no file matching our search
 		Log(ERROR, "PluginLoader", "Error looking up dlls.");
 		return false;
