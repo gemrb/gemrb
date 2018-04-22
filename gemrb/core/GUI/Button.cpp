@@ -755,6 +755,10 @@ void Button::SetPushOffset(ieWord x, ieWord y)
 
 bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 {
+	if (key < ' ') {
+		return false;
+	}
+
 	UnregisterHotKey();
 
 	if (global) {
