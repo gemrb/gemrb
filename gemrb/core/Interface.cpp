@@ -3516,7 +3516,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 		char extension[9];
 		ExtFilter(const char* ext) {
-			memcpy(extension, ext, sizeof(extension));
+			strncpy(extension, ext, sizeof(extension));
 		}
 
 		bool operator()(const char* fname) const {
