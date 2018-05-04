@@ -3604,14 +3604,14 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 			ResolveStringConstant(soundref, start+count);
 			GetSoundFolder(chrsound, 1, soundref);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
-				DisplayStringCore((Scriptable *const) this, start + RAND(0, count), flags|DS_CONST);
+				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				break;
 			}
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		ieStrRef str = GetVerbalConstant(start, count);
 		if (str != ieStrRef(-1)) {
-			DisplayStringCore((Scriptable *const) this, str, flags);
+			DisplayStringCore((Scriptable *) this, str, flags);
 		}
 	}
 }
@@ -3619,7 +3619,7 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
 	int strref = displaymsg->GetStringReference(str);
 	if (strref != -1) {
-		DisplayStringCore((Scriptable *const) this, strref, DS_CONSOLE);
+		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE);
 	} else {
 		VerbalConstant(vcstat, vccount);
 	}
