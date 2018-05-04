@@ -46,6 +46,7 @@ class Scriptable;
 struct Element {
 	int state;
 	Point pos;
+	Element(): state(-1) {};
 };
 
 /**

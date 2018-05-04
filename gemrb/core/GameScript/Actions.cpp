@@ -3615,8 +3615,13 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 //this will be a global change, fixme if it should be local
 void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
 {
-	Color c;
-	memcpy(&c,&parameters->int0Parameter,4);
+	int& int0p = parameters->int0Parameter;
+	unsigned char r, g, b, a;
+	a = (int0p >> 24) & 0xff;
+	b = (int0p >> 16) & 0xff;
+	g = (int0p >> 8) & 0xff;
+	r = int0p & 0xff;
+	Color c = Color(r, g, b, a);
 	core->SetInfoTextColor(c);
 }
 
