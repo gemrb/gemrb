@@ -73,6 +73,8 @@ public:
 
 	const String& Text() const { return text; };
 
+	unsigned char Alignment;
+
 protected:
 	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
 	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
@@ -153,13 +155,6 @@ protected:
 		}
 	};
 
-	struct {
-		const Layout* layout; // the layout struct the cursor is inside
-		const Region* rgn; // the Region in layout->Regions
-		Point regionPos; // the drawing point relative to the Region
-		size_t charIndex; // the index of the character string contained in Layout
-	} cursorPos;
-
 	typedef std::deque<Layout> ContentLayout;
 	ContentLayout layout;
 	Point layoutPoint;
@@ -196,15 +191,18 @@ protected:
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
-	ContentList::const_iterator EraseContent(ContentList::const_iterator);
+	ContentList::const_iterator EraseContent(ContentList::const_iterator it);
+	ContentList::const_iterator EraseContent(ContentList::const_iterator beg, ContentList::const_iterator end);
 
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
 
+	void DrawSelf(Region drawFrame, const Region& clip);
+	virtual void DrawContents(const Layout& layout, const Point& point);
+
 private:
 	void SizeChanged(const Size& oldSize);
-
-	void DrawSelf(Region drawFrame, const Region& clip);
+	virtual void ContentRemoved(const Content* /*content*/) {};
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
@@ -213,11 +211,33 @@ private:
 	// default font/palette for adding plain text
 	Font* font;
 	Holder<Palette> palette;
+	unsigned char alignment;
+
+	size_t textLen;
+	size_t cursorPos, printPos;
 
 private:
 	String TextFrom(ContentList::const_iterator) const;
 
+	void ContentRemoved(const Content* content);
+
 	void MoveCursorToPoint(const Point& p);
+	void CursorHome();
+	void CursorEnd();
+	void AdvanceCursor(int);
+
+	// relative to cursor pos
+	void InsertText(const String& text);
+	void DeleteText(size_t len);
+
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+
+	void DrawSelf(Region drawFrame, const Region& clip);
+	virtual void DrawContents(const Layout& layout, const Point& point);
+
+	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
+	ContentIndex FindContentForChar(size_t idx);
 
 public:
 	TextContainer(const Region& frame, Font* font, Holder<Palette>);
@@ -229,11 +249,9 @@ public:
 
 	void SetPalette(Holder<Palette> pal);
 	Holder<Palette> TextPalette() const { return palette; }
+	void SetFont(Font* fnt) { font = fnt; }
 	const Font* TextFont() const { return font; }
-
-	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-
+	void SetAlignment(unsigned char align) { alignment = align; }
 };
 
 }

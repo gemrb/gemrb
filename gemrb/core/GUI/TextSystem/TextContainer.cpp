@@ -48,7 +48,9 @@ Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Holder<Palette> pal, const Size* frame)
 	: Content((frame) ? *frame : Size()), text(string), font(fnt), palette(pal)
-{}
+{
+	Alignment = IE_FONT_ALIGN_LEFT;
+}
 
 inline const Font* TextSpan::LayoutFont() const
 {
@@ -244,7 +246,9 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		assert(charsPrinted < text.length());
 		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
 #endif
-		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette.get(), IE_FONT_ALIGN_LEFT);
+		// FIXME: layout assumes left alignment, so alignment is mostly broken
+		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
+		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette.get(), Alignment);
 #if (DEBUG_TEXT)
 		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 #endif
@@ -293,11 +297,13 @@ void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte
 	SetMargin(Margin(top, right, bottom, left));
 }
 
-void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 {
 	Video* video = core->GetVideoDriver();
 #if DEBUG_TEXT
 	video->DrawRect(clip, ColorGreen, true);
+#else
+	(void)clip;
 #endif
 
 	// layout shouldn't be empty unless there is no content anyway...
@@ -314,17 +320,15 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
 		const Layout& l = *it;
-		// TODO: pass the clip rect so we can skip non-intersecting regions
-		l.content->DrawContentsInRegions(l.regions, dp);
 
-		if (&l == cursorPos.layout) {
-			Sprite2D* cursor = core->GetCursorSprite();
-			const Region* rgn = cursorPos.rgn;
-			video->BlitSprite(cursor, cursorPos.regionPos.x + rgn->x + dp.x,
-							          cursorPos.regionPos.y + rgn->y + dp.y + cursor->YPos);
-			cursor->release();
-		}
+		// TODO: pass the clip rect so we can skip non-intersecting regions
+		DrawContents(l, dp);
 	}
+}
+
+void ContentContainer::DrawContents(const Layout& layout, const Point& point)
+{
+	layout.content->DrawContentsInRegions(layout.regions, point);
 }
 
 void ContentContainer::AppendContent(Content* content)
@@ -393,6 +397,8 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		if (doLayout) {
 			LayoutContentsFrom(it);
 		}
+
+		ContentRemoved(content);
 		return content;
 	}
 	return NULL;
@@ -404,9 +410,20 @@ ContentContainer::EraseContent(ContentList::const_iterator it)
 	Content* content = *it;
 	content->parent = NULL;
 	layout.erase(std::find(layout.begin(), layout.end(), content));
+	layoutPoint = Point(); // reset cached layoutPoint
+	ContentRemoved(content);
 	delete content;
 
 	return contents.erase(it);
+}
+
+ContentContainer::ContentList::const_iterator
+ContentContainer::EraseContent(ContentList::const_iterator beg, ContentList::const_iterator end)
+{
+	for (; beg != end;) {
+		beg = EraseContent(beg);
+	}
+	return end;
 }
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
@@ -604,6 +621,8 @@ TextContainer::TextContainer(const Region& frame, Font* fnt, Holder<Palette> pal
 	: ContentContainer(frame), font(fnt)
 {
 	SetPalette(pal);
+	alignment = IE_FONT_ALIGN_LEFT;
+	textLen = 0;
 }
 
 void TextContainer::AppendText(const String& text)
@@ -614,8 +633,17 @@ void TextContainer::AppendText(const String& text)
 void TextContainer::AppendText(const String& text, Font* fnt, Holder<Palette> pal)
 {
 	if (text.length()) {
-		AppendContent(new TextSpan(text, fnt, pal));
+		TextSpan* span = new TextSpan(text, fnt, pal);
+		span->Alignment = alignment;
+		AppendContent(span);
+		textLen += text.length();
 	}
+}
+
+void TextContainer::ContentRemoved(const Content* content)
+{
+	const TextSpan* ts = static_cast<const TextSpan*>(content);
+	textLen -= ts->Text().length();
 }
 
 void TextContainer::SetPalette(Holder<Palette> pal)
@@ -649,6 +677,69 @@ String TextContainer::TextFrom(ContentList::const_iterator it) const
 	return text;
 }
 
+void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
+{
+	printPos = 0;
+	ContentContainer::DrawSelf(drawFrame, clip);
+}
+
+void TextContainer::DrawContents(const Layout& layout, const Point& dp)
+{
+	ContentContainer::DrawContents(layout, dp);
+
+	const TextSpan* ts = (const TextSpan*)layout.content;
+	const String& text = ts->Text();
+	size_t textLen = ts->Text().length();
+
+	if (printPos < cursorPos && printPos + textLen >= cursorPos) {
+		const Font* printFont = ts->LayoutFont();
+		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
+
+		// diff is the length of the TextSpan we want however, it may fall inside of a word
+		size_t diff = cursorPos - printPos;
+		size_t start = 0;
+		size_t stop = text.find_last_of(WHITESPACE_STRING, diff);
+		if (stop == String::npos)
+			stop = 0;
+
+		Point p;
+		Regions::const_iterator rit = layout.regions.begin();
+		for (; rit != layout.regions.end(); ++rit) {
+			const Region& rect = *rit;
+			p = rect.Origin();
+			metrics.size = rect.Dimensions();
+
+			const String& substr = text.substr(start, stop);
+			printFont->StringSize(substr, &metrics);
+
+			if (metrics.numChars == stop) {
+				if (text[start+stop] == '\n') {
+					// FIXME: technically ought to use the next rect rather then assume we can jump down a line
+					p.y += printFont->LineHeight;
+					++start;
+				} else if (metrics.numChars > 0) {
+					p.x += metrics.size.w;
+				}
+				// found it
+				if (stop < diff) {
+					// inside a word
+					const String& substr = text.substr(start + stop, diff - start - metrics.numChars);
+					p.x += printFont->StringSizeWidth(substr, 0);
+				}
+				break;
+			}
+			start += metrics.numChars;
+			stop -= metrics.numChars;
+		}
+
+		Video* video = core->GetVideoDriver();
+		Sprite2D* cursor = core->GetCursorSprite();
+		video->BlitSprite(cursor, p.x + dp.x, p.y + dp.y + cursor->YPos);
+		cursor->release();
+	}
+	printPos += textLen;
+}
+
 void TextContainer::MoveCursorToPoint(const Point& p)
 {
 	const Layout* layout = LayoutAtPoint(p);
@@ -659,8 +750,6 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 		const Font* printFont = ts->LayoutFont();
 		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
 		size_t numChars = 0;
-		cursorPos.layout = layout;
-		cursorPos.regionPos = Point(0,0);
 
 		const Regions& regions = layout->regions;
 		Regions::const_iterator rit = regions.begin();
@@ -673,14 +762,12 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 				if (lines) {
 					metrics.size.w = rect.w;
 					metrics.size.h = lines * printFont->LineHeight;
-					cursorPos.regionPos.y = metrics.size.h;
 					printFont->StringSize(text.substr(numChars), &metrics);
 					numChars += metrics.numChars;
 				}
 				size_t len = 0;
-				cursorPos.regionPos.x = printFont->StringSizeWidth(text.substr(numChars), p.x, &len);
-				cursorPos.charIndex = numChars + len;
-				cursorPos.rgn = &rect;
+				printFont->StringSizeWidth(text.substr(numChars), p.x, &len);
+				cursorPos = numChars + len;
 				break;
 			} else {
 				// not in this one so we need to consume some text
@@ -691,41 +778,118 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 			}
 		}
 
+		core->GetVideoDriver()->ShowSoftKeyboard();
+		MarkDirty();
+	} else {
+		// FIXME: this isnt _always_ the end (it works out that way for left alignment tho)
+		CursorEnd();
+	}
+}
+
+bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+	MoveCursorToPoint(p);
+	return true;
+}
+
+bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
+{
+	switch (key.keycode) {
+		case GEM_HOME:
+			CursorHome();
+			return true;
+		case GEM_END:
+			CursorEnd();
+			return true;
+		case GEM_LEFT:
+			AdvanceCursor(-1);
+			return true;
+		case GEM_RIGHT:
+			AdvanceCursor(1);
+			return true;
+		case GEM_DELETE:
+			AdvanceCursor(1);
+			DeleteText(1);
+			return true;
+		case GEM_BACKSP:
+			DeleteText(1);
+			return true;
+		case GEM_RETURN:
+			InsertText(String(1, '\n'));
+			return true;
+	}
+	if (key.character) {
+		InsertText(String(1, key.character));
+		return true;
+	}
+	return false;
+}
+
+// move cursor to beginning of text
+void TextContainer::CursorHome()
+{
+	// top right of first region in first layout area
+	cursorPos = 0;
+	MarkDirty();
+}
+
+// move cursor to end of text
+void TextContainer::CursorEnd()
+{
+	// bottom left of last region in last layout area
+	cursorPos = textLen;
+	MarkDirty();
+}
+
+void TextContainer::AdvanceCursor(int delta)
+{
+	cursorPos += delta;
+	if (int(cursorPos) < 0) {
+		CursorHome();
+	} else if (cursorPos >= textLen) {
+		CursorEnd();
+	} else {
 		MarkDirty();
 	}
 }
 
-void TextContainer::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 {
-	// TODO: we need a flag for being editable.
-
-	Point p = ConvertPointFromScreen(me.Pos());
-	MoveCursorToPoint(p);
+	size_t charCount = 0;
+	ContentList::iterator it = contents.begin();
+	while (it != contents.end()) {
+		TextSpan* ts = static_cast<TextSpan*>(*it);
+		size_t textLen = ts->Text().length();
+		if (charCount + textLen >= idx) {
+			break;
+		}
+		charCount += textLen;
+		++it;
+	}
+	return std::make_pair(charCount, it);
 }
 
-bool TextContainer::KeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
+void TextContainer::InsertText(const String& text)
 {
-	if (key.character) {
-		// TODO: handle delete and arrow keys
+	ContentIndex idx = FindContentForChar(cursorPos);
+	String newtext = TextFrom(idx.second);
+	newtext.insert(cursorPos - idx.first, text);
 
-		const TextSpan* content = static_cast<const TextSpan*>(cursorPos.layout->content);
-		Point newPoint = cursorPos.rgn->Origin() + cursorPos.regionPos;
-		const Font* printFont = content->LayoutFont();
+	EraseContent(idx.second, contents.end());
+	AppendText(newtext);
+	AdvanceCursor(1);
+}
 
-		ContentList::const_iterator it = std::find(contents.begin(), contents.end(), content);
-		String newtext = TextFrom(it);
-		newtext.insert(cursorPos.charIndex, 1, key.character);
+void TextContainer::DeleteText(size_t len)
+{
+	ContentIndex idx = FindContentForChar(cursorPos);
+	String newtext = TextFrom(idx.second);
+	newtext.erase(cursorPos - idx.first, len);
 
-		EraseContent(it);
-		AppendText(newtext);
-
-		size_t charw = printFont->StringSizeWidth(String(1, key.character), 0);
-		newPoint.x += charw*2;
-		MoveCursorToPoint(newPoint);
-
-		return true;
-	}
-	return false;
+	EraseContent(idx.second, contents.end());
+	AppendText(newtext);
+	AdvanceCursor(-int(len));
 }
 
 }
