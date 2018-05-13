@@ -335,7 +335,7 @@ void TextArea::UpdateScrollview()
 		selectOptions->SetFrame(textFrame);
 	}
 
-	if (Flags()&IE_GUI_TEXTAREA_AUTOSCROLL
+	if (Flags()&AutoScroll
 		&& dialogBeginNode) {
 		assert(textContainer && selectOptions);
 
@@ -420,7 +420,7 @@ void TextArea::TrimHistory(size_t lines)
 
 void TextArea::AppendText(const String& text)
 {
-	if ((flags&IE_GUI_TEXTAREA_HISTORY)) {
+	if ((flags&ClearHistory)) {
 		if (historyTimer) {
 			historyTimer->Invalidate();
 			historyTimer = NULL;
@@ -489,7 +489,7 @@ void TextArea::AppendText(const String& text)
 
 	UpdateScrollview();
 
-	if (flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
+	if (flags&AutoScroll && !selectOptions)
 	{
 		// scroll to the bottom
 		int bottom = ContentHeight() - frame.h;
@@ -509,7 +509,7 @@ int TextArea::InsertText(const char* text, int pos)
 /** Key Press Event */
 bool TextArea::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
-	if (flags & IE_GUI_TEXTAREA_EDITABLE) {
+	if (flags & Editable) {
 		if (Key.character) {
 			MarkDirty();
 			// TODO: implement this! currently does nothing

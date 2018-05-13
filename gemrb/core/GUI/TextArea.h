@@ -34,12 +34,6 @@
 
 namespace GemRB {
 
-// TextArea flags, keep these in sync too
-// the control type is intentionally left out
-#define IE_GUI_TEXTAREA_AUTOSCROLL   1
-#define IE_GUI_TEXTAREA_HISTORY      2	// message window
-#define IE_GUI_TEXTAREA_EDITABLE     4
-
 typedef std::pair<int, String> SelectOption;
 
 /**
@@ -177,6 +171,13 @@ public: //Events
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
 		static const Control::Action Select = ACTION_CUSTOM(0); // selection event such as dialog or a listbox
+	};
+
+	enum TextAreaFlags {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		AutoScroll = 1,   // TextArea will automatically scroll when new text is appended
+		ClearHistory = 2, // TextArea will automatically purge old data as new data is added
+		Editable = 4      // TextArea text is editable
 	};
 
 	/** Key Press Event */
