@@ -155,6 +155,10 @@ void EventMgr::DispatchEvent(Event& e)
 
 bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
 {
+	if (key < ' ') {
+		return false;
+	}
+
 	int flags = mod << 16;
 	flags |= key;
 

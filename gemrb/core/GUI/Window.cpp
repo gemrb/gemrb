@@ -395,6 +395,10 @@ bool Window::InHandler() const
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
 {
+	if (key < ' ') {
+		return false;
+	}
+
 	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it;
 	it = HotKeys.find(key);
 	if (it != HotKeys.end()) {
