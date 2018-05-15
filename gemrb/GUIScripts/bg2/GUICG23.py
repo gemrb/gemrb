@@ -31,6 +31,7 @@ def OnLoad ():
 	EditTextArea = BioWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL")
 	EditTextArea.SetFrame(placeholder.GetFrame())
 	EditTextArea.AddAlias("BIO")
+	EditTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	BioWindow.DeleteControl(placeholder)
 
 	if BIO:

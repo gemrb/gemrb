@@ -185,12 +185,8 @@ public: //Events
 		Editable = 4      // TextArea text is editable
 	};
 
-	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	/** Mousewheel scroll */
 	bool OnMouseWheelScroll(const Point& delta);
-
-	void SetFocus();
 
 	void ClearSelectOptions();
 };

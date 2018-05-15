@@ -375,6 +375,14 @@ void TextArea::FlagsChanged(unsigned int oldflags)
 	} else if (oldflags&View::IgnoreEvents) {
 		scrollview.SetFlags(View::IgnoreEvents, OP_NAND);
 	}
+
+	if (Flags()&Editable) {
+		assert(textContainer);
+		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+	} else if (oldflags&Editable) {
+		assert(textContainer);
+		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+	}
 }
 
 /** Sets the Actual Text */
@@ -506,72 +514,6 @@ int TextArea::InsertText(const char* text, int pos)
 	return pos;
 }
 */
-/** Key Press Event */
-bool TextArea::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
-{
-	if (flags & Editable) {
-		if (Key.character) {
-			MarkDirty();
-			// TODO: implement this! currently does nothing
-			size_t CurPos = 0, len = 0;
-			switch (Key.keycode) {
-				case GEM_HOME:
-					CurPos = 0;
-					break;
-				case GEM_UP:
-					break;
-				case GEM_DOWN:
-					break;
-				case GEM_END:
-					break;
-				case GEM_LEFT:
-					if (CurPos > 0) {
-						CurPos--;
-					} else {
-
-					}
-					break;
-				case GEM_RIGHT:
-					if (CurPos < len) {
-						CurPos++;
-					} else {
-
-					}
-					break;
-				case GEM_DELETE:
-					if (CurPos>=len) {
-						break;
-					}
-					break;
-				case GEM_BACKSP:
-					if (CurPos != 0) {
-						if (len<1) {
-							break;
-						}
-						CurPos--;
-					} else {
-
-					}
-					break;
-				case GEM_RETURN:
-					//add an empty line after CurLine
-					// TODO: implement this
-					//copy the text after the cursor into the new line
-
-					//truncate the current line
-					
-					//move cursor to next line beginning
-					CurPos=0;
-					break;
-			}
-
-			PerformAction(Action::Change);
-		}
-		return true;
-	}
-
-	return false;
-}
 
 ieWord TextArea::LineHeight() const
 {
@@ -709,17 +651,10 @@ void TextArea::ClearText()
 	textContainer->SetMargin(0, 3);
 	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextArea, TextContainer&>(this, &TextArea::TextChanged);
 	textContainer->callback = cb;
+	textContainer->SetFlags(View::IgnoreEvents, (Flags()&Editable) ? OP_NAND : OP_OR);
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
-}
-
-void TextArea::SetFocus()
-{
-	Control::SetFocus();
-	if (IsFocused() && flags & IE_GUI_TEXTAREA_EDITABLE) {
-		core->GetVideoDriver()->ShowSoftKeyboard();
-	}
 }
 
 }
