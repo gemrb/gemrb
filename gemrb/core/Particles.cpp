@@ -89,7 +89,7 @@ static void InitSparks()
 
 Particles::Particles(int s)
 {
-	points = (Element *) malloc(s*sizeof(Element) );
+	points = (Element *) calloc(s, sizeof(Element) );
 	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		bitmap[i]=NULL;
