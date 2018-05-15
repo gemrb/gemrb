@@ -809,11 +809,15 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 			AdvanceCursor(1);
 			return true;
 		case GEM_DELETE:
-			AdvanceCursor(1);
-			DeleteText(1);
+			if (cursorPos < textLen) {
+				AdvanceCursor(1);
+				DeleteText(1);
+			}
 			return true;
 		case GEM_BACKSP:
-			DeleteText(1);
+			if (cursorPos > 0) {
+				DeleteText(1);
+			}
 			return true;
 		case GEM_RETURN:
 			InsertText(String(1, '\n'));
@@ -885,7 +889,7 @@ void TextContainer::DeleteText(size_t len)
 {
 	ContentIndex idx = FindContentForChar(cursorPos);
 	String newtext = TextFrom(idx.second);
-	newtext.erase(cursorPos - idx.first, len);
+	newtext.erase(cursorPos - idx.first - 1, len);
 
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
