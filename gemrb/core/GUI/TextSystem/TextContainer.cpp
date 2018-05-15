@@ -733,9 +733,14 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		}
 
 		Video* video = core->GetVideoDriver();
+		Region sc = video->GetScreenClip();
+		video->SetScreenClip(NULL);
+
 		Sprite2D* cursor = core->GetCursorSprite();
 		video->BlitSprite(cursor, p.x + dp.x, p.y + dp.y + cursor->YPos);
 		cursor->release();
+
+		video->SetScreenClip(&sc);
 	}
 	printPos += textLen;
 }
