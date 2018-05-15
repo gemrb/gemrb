@@ -204,16 +204,16 @@ public:
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
-	virtual bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-	virtual bool KeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	bool KeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
-	virtual void MouseEnter(const MouseEvent& /*me*/, const DragOp*);
-	virtual void MouseLeave(const MouseEvent& /*me*/, const DragOp*);
-	virtual void MouseOver(const MouseEvent& /*me*/);
-	virtual void MouseDrag(const MouseEvent& /*me*/);
-	virtual void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	virtual void MouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	virtual void MouseWheelScroll(const Point&);
+	void MouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	void MouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	void MouseOver(const MouseEvent& /*me*/);
+	void MouseDrag(const MouseEvent& /*me*/);
+	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void MouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void MouseWheelScroll(const Point&);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
