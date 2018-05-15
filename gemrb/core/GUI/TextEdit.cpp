@@ -30,154 +30,112 @@
 namespace GemRB {
 
 TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
-	: Control(frame), FontPos(p)
+: Control(frame), textContainer(Region(p.x, p.y, 0, frame.h - (p.y*2)), core->GetTextFont(), NULL)
 {
 	ControlType = IE_GUI_EDIT;
-	max = maxLength;
-	Alignment = IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT;
-	font = NULL;
-	CurPos = 0;
-	Text.reserve(max);
+
+	// FIXME: should we set IE_FONT_SINGLE_LINE?
+	textContainer.SetAlignment(IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT);
+	AddSubviewInFrontOfView(&textContainer);
+
+	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextEdit, TextContainer&>(this, &TextEdit::TextChanged);
+	textContainer.callback = cb;
 
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	palette = new Palette( ColorWhite, ColorBlack );
+	Palette* palette = new Palette( ColorWhite, ColorBlack );
+	textContainer.SetPalette(palette);
+	palette->release();
+	max = maxLength;
 
-	Sprite2D* cursor = core->GetCursorSprite();
-	SetCursor(cursor);
-	cursor->release();
+	SetFlags(Alpha|Numeric, OP_OR);
 }
 
-TextEdit::~TextEdit(void)
+TextEdit::~TextEdit()
 {
-	gamedata->FreePalette( palette );
+	RemoveSubview(&textContainer);
 }
 
-void TextEdit::SetAlignment(unsigned char Alignment)
+void TextEdit::SetAlignment(unsigned char align)
 {
-    this->Alignment = Alignment;
-    MarkDirty();
-}
-
-/** Draws the Control on the Output Display */
-void TextEdit::DrawSelf(Region rgn, const Region& /*clip*/)
-{
-	ieWord yOff = FontPos.y;
-	Video* video = core->GetVideoDriver();
-	Sprite2D* cursor = Cursor();
-
-	if (!font)
-		return;
-
-	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
-	if (IsFocused()) {
-		font->Print( Region( rgn.Origin() + FontPos, frame.Dimensions() ),
-					Text, palette, Alignment );
-		int w = font->StringSize(Text.substr(0, CurPos)).w;
-		ieWord vcenter = (rgn.h / 2) + (cursor->Height / 2);
-		if (w > rgn.w) {
-			int rows = (w / rgn.w);
-			vcenter += rows * font->LineHeight;
-			w = w - (rgn.w * rows);
-		}
-		video->BlitSprite(cursor, w + rgn.x + FontPos.x, yOff + vcenter + rgn.y);
-	} else {
-		font->Print( Region( rgn.x + FontPos.x, rgn.y - yOff, rgn.w, rgn.h ), Text,
-				palette, Alignment );
-	}
+	textContainer.SetAlignment(align);
 }
 
 /** Set Font */
 void TextEdit::SetFont(Font* f)
 {
-	if (f != NULL) {
-		font = f;
-		MarkDirty();
-		return;
-	}
-	Log(ERROR, "TextEdit", "Invalid font set!");
+	textContainer.SetFont(f);
 }
-
-Font *TextEdit::GetFont() { return font; }
 
 /** Key Press Event */
-bool TextEdit::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
+bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	MarkDirty();
-	switch (Key.keycode) {
-		case GEM_HOME:
-			CurPos = 0;
-			break;
-		case GEM_END:
-			CurPos = Text.length();
-			break;
-		case GEM_LEFT:
-			if (CurPos > 0)
-				CurPos--;
-			break;
-		case GEM_RIGHT:
-			if (CurPos < Text.length()) {
-				CurPos++;
-			}
-			break;
-		case GEM_DELETE:
-			if (CurPos < Text.length()) {
-				Text.erase(CurPos, 1);
-			}
-			break;		
-		case GEM_BACKSP:
-			if (CurPos != 0) {
-				Text.erase(--CurPos, 1);
-			}
-			break;
-		case GEM_RETURN:
-            {
-				PerformAction(Action::Done);
-            }
-			break;
-		default:
-			if (Key.character) {
-				if (Text.length() < max) {
-					Text.insert(CurPos++, 1, Key.character);
-				}
-				break;
-			}
-			return false;
+	if (key.keycode == GEM_RETURN) {
+		PerformAction(Action::Done);
+		return true;
 	}
-	PerformAction(Action::Change);
-	return true;
+
+	if (QueryText().length() < max) {
+
+		if (isalpha(key.character) && (Flags()&Alpha) == 0) {
+			return false;
+		} else if (isnumber(key.character && (Flags()&Numeric) == 0)) {
+			return false;
+		}
+
+		textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
+		if (textContainer.KeyPress(key, mod)) {
+			textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+			PerformAction(Action::Change);
+			return true;
+		}
+		textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+	}
+	return false;
 }
 
-void TextEdit::SetFocus()
+bool TextEdit::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	Control::SetFocus();
-	if (IsFocused()) {
-		core->GetVideoDriver()->ShowSoftKeyboard();
-	}
+	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
+	textContainer.MouseDown(me, mod);
+	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+	return true;
 }
 
 /** Sets the Text of the current control */
 void TextEdit::SetText(const String& string)
 {
-	Text = string;
-	if (Text.length() > max) CurPos = max + 1;
-	else CurPos = Text.length();
-	MarkDirty();
+	Region rect(Point(), Dimensions());
+	textContainer.DeleteContentsInRect(rect);
+
+	if (string.length() > max) {
+		textContainer.AppendText(string.substr(0, max));
+	} else {
+		textContainer.AppendText(string);
+	}
+	textContainer.CursorEnd();
 }
 
-void TextEdit::SetBufferLength(ieWord buflen)
+void TextEdit::SetBufferLength(size_t buflen)
 {
-	if(buflen<1) return;
-	if(buflen!=max) {
-		Text.resize(buflen);
+	const String& text = QueryText();
+	if (buflen < text.length()) {
+		max = buflen;
+		SetText(textContainer.Text());
+	} else {
 		max = buflen;
 	}
+}
+
+void TextEdit::TextChanged(TextContainer& /*tc*/)
+{
+	PerformAction(Action::Change);
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
 String TextEdit::QueryText() const
 {
-	return Text;
+	return textContainer.Text();
 }
 
 }

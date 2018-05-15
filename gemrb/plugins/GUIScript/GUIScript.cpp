@@ -1377,18 +1377,13 @@ cannot be more than 65535.\n\
 
 static PyObject* GemRB_TextEdit_SetBufferLength(PyObject* self, PyObject* args)
 {
-	int Length;
-	PARSE_ARGS2( args, "Oi", &self, &Length);
+	int length;
+	PARSE_ARGS2( args, "Oi", &self, &length);
 
 	TextEdit* te = GetView<TextEdit>(self);
-	if (!te)
-		return NULL;
+	ABORT_IF_NULL(te);
 
-	if ((ieDword) Length>0xffff) {
-		return NULL;
-	}
-
-	te->SetBufferLength((ieWord) Length );
+	te->SetBufferLength(length);
 
 	Py_RETURN_NONE;
 }

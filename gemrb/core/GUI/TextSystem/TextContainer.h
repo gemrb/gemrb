@@ -222,9 +222,6 @@ private:
 	void ContentRemoved(const Content* content);
 
 	void MoveCursorToPoint(const Point& p);
-	void CursorHome();
-	void CursorEnd();
-	void AdvanceCursor(int);
 
 	// relative to cursor pos
 	void InsertText(const String& text);
@@ -255,6 +252,10 @@ public:
 	void SetFont(Font* fnt) { font = fnt; }
 	const Font* TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }
+
+	void CursorHome();
+	void CursorEnd();
+	void AdvanceCursor(int);
 
 	typedef Callback<TextContainer&> EditCallback;
 	Holder<EditCallback> callback;
