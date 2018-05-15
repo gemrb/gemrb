@@ -623,6 +623,7 @@ TextContainer::TextContainer(const Region& frame, Font* fnt, Holder<Palette> pal
 	SetPalette(pal);
 	alignment = IE_FONT_ALIGN_LEFT;
 	textLen = 0;
+	cursorPos = 0;
 }
 
 void TextContainer::AppendText(const String& text)
@@ -637,6 +638,8 @@ void TextContainer::AppendText(const String& text, Font* fnt, Holder<Palette> pa
 		span->Alignment = alignment;
 		AppendContent(span);
 		textLen += text.length();
+
+		MarkDirty();
 	}
 }
 
@@ -681,6 +684,18 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 {
 	printPos = 0;
 	ContentContainer::DrawSelf(drawFrame, clip);
+
+	if (layout.empty()) {
+		Video* video = core->GetVideoDriver();
+		Region sc = video->GetScreenClip();
+		video->SetScreenClip(NULL);
+
+		Sprite2D* cursor = core->GetCursorSprite();
+		video->BlitSprite(cursor, drawFrame.x, drawFrame.y + cursor->YPos);
+		cursor->release();
+
+		video->SetScreenClip(&sc);
+	}
 }
 
 void TextContainer::DrawContents(const Layout& layout, const Point& dp)
