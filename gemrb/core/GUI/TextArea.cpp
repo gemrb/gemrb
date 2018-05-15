@@ -695,6 +695,11 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	UpdateScrollview();
 }
 
+void TextArea::TextChanged(TextContainer& /*tc*/)
+{
+	PerformAction(Action::Change);
+}
+
 void TextArea::ClearText()
 {
 	delete scrollview.RemoveSubview(textContainer);
@@ -702,6 +707,8 @@ void TextArea::ClearText()
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext, palettes[PALETTE_NORMAL]);
 	textContainer->SetMargin(0, 3);
+	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextArea, TextContainer&>(this, &TextArea::TextChanged);
+	textContainer->callback = cb;
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();

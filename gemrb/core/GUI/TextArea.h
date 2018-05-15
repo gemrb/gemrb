@@ -57,6 +57,8 @@ private:
 				assert(superView);
 				superView->MouseOver(me);
 			}
+
+			bool Editable() const { return false; }
 		};
 	private:
 		TextArea& ta;
@@ -77,6 +79,8 @@ private:
 		bool KeyEvent(const Event& event);
 
 		void SizeChanged(const Size&);
+
+		bool Editable() const { return false; }
 
 	public:
 		// FIXME: we get messed up is SetMargin is called. there is no notification that they have changed and so our subviews are overflowing.
@@ -165,6 +169,7 @@ private: //internal functions
 	int OptionsHeight() const;
 
 	void TrimHistory(size_t lines);
+	void TextChanged(TextContainer& tc);
 
 public: //Events
 	struct Action {

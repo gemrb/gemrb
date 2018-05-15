@@ -236,6 +236,8 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 	virtual void DrawContents(const Layout& layout, const Point& point);
 
+	virtual bool Editable() const { return true; }
+
 	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
 	ContentIndex FindContentForChar(size_t idx);
 
@@ -252,6 +254,9 @@ public:
 	void SetFont(Font* fnt) { font = fnt; }
 	const Font* TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }
+
+	typedef Callback<TextContainer&> EditCallback;
+	Holder<EditCallback> callback;
 };
 
 }

@@ -691,7 +691,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 	const String& text = ts->Text();
 	size_t textLen = ts->Text().length();
 
-	if (printPos < cursorPos && printPos + textLen >= cursorPos) {
+	if (Editable() && printPos < cursorPos && printPos + textLen >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
 		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
 
@@ -742,6 +742,9 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 
 void TextContainer::MoveCursorToPoint(const Point& p)
 {
+	if (Editable() == false)
+		return;
+
 	const Layout* layout = LayoutAtPoint(p);
 
 	if (layout) {
@@ -795,6 +798,9 @@ bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 
 bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 {
+	if (Editable() == false)
+		return false;
+
 	switch (key.keycode) {
 		case GEM_HOME:
 			CursorHome();
@@ -883,6 +889,10 @@ void TextContainer::InsertText(const String& text)
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
 	AdvanceCursor(1);
+
+	if (callback) {
+		(*callback)(*this);
+	}
 }
 
 void TextContainer::DeleteText(size_t len)
@@ -894,6 +904,10 @@ void TextContainer::DeleteText(size_t len)
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
 	AdvanceCursor(-int(len));
+
+	if (callback) {
+		(*callback)(*this);
+	}
 }
 
 }
