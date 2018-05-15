@@ -74,7 +74,6 @@ Button::~Button()
 	if (hotKey.global) {
 		UnregisterHotKey();
 	}
-	delete HotKeyCallback;
 }
 
 void Button::UnregisterHotKey()

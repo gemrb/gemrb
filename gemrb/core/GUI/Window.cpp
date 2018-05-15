@@ -300,7 +300,7 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 bool Window::DispatchKey(View* keyView, const Event& event)
 {
 	// hotkeys first
-	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it = HotKeys.find(event.keyboard.keycode);
+	std::map<KeyboardKey, Holder<EventMgr::EventCallback> >::iterator it = HotKeys.find(event.keyboard.keycode);
 	if (it != HotKeys.end()) {
 		return (*it->second)(event);
 	}
@@ -393,13 +393,13 @@ bool Window::InHandler() const
 	return false;
 }
 
-bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
+bool Window::RegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, KeyboardKey key)
 {
 	if (key < ' ') {
 		return false;
 	}
 
-	std::map<KeyboardKey, EventMgr::EventCallback*>::iterator it;
+	std::map<KeyboardKey, Holder<EventMgr::EventCallback> >::iterator it;
 	it = HotKeys.find(key);
 	if (it != HotKeys.end()) {
 		// something already registered
@@ -410,7 +410,7 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key
 	return true;
 }
 
-bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback* cb, KeyboardKey key)
+bool Window::UnRegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, KeyboardKey key)
 {
 	KeyMap::iterator it = HotKeys.find(key);
 	if (it != HotKeys.end() && it->second == cb) {

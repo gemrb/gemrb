@@ -111,15 +111,15 @@ public:
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
 	bool DispatchEvent(const Event&);
-	bool RegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
-	bool UnRegisterHotKeyCallback(EventMgr::EventCallback*, KeyboardKey key);
+	bool RegisterHotKeyCallback(Holder<EventMgr::EventCallback>, KeyboardKey key);
+	bool UnRegisterHotKeyCallback(Holder<EventMgr::EventCallback>, KeyboardKey key);
 	
 	bool InHandler() const;
 	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const;
 
 private: // Private attributes
-	typedef std::map<KeyboardKey, EventMgr::EventCallback*> KeyMap;
+	typedef std::map<KeyboardKey, Holder<EventMgr::EventCallback> > KeyMap;
 
 	std::set<Control*> Controls;
 	KeyMap HotKeys;

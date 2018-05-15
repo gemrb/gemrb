@@ -86,7 +86,7 @@ void EventMgr::DispatchEvent(Event& e)
 		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
 			KeyMap::value_type::second_type list = hit->second;
-			EventCallback* cb = hit->second.front();
+			Holder<EventCallback> cb = hit->second.front();
 			if ((*cb)(e)) {
 				return;
 			}
@@ -153,7 +153,7 @@ void EventMgr::DispatchEvent(Event& e)
 	}
 }
 
-bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
+bool EventMgr::RegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key, short mod)
 {
 	if (key < ' ') {
 		return false;
@@ -166,13 +166,13 @@ bool EventMgr::RegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short 
 	if (it != HotKeys.end()) {
 		it->second.push_front(cb);
 	} else {
-		HotKeys.insert(std::make_pair(flags, std::list<EventCallback*>(1, cb)));
+		HotKeys.insert(std::make_pair(flags, std::list<Holder<EventCallback> >(1, cb)));
 	}
 
 	return true;
 }
 
-EventMgr::EventCallback* EventMgr::UnRegisterHotKeyCallback(EventCallback* cb, KeyboardKey key, short mod)
+void EventMgr::UnRegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key, short mod)
 {
 	int flags = mod << 16;
 	flags |= key;
@@ -184,13 +184,11 @@ EventMgr::EventCallback* EventMgr::UnRegisterHotKeyCallback(EventCallback* cb, K
 		if (cbit != it->second.end()) {
 			cb = *cbit;
 			it->second.erase(cbit);
-			return cb;
 		}
 	}
-	return NULL;
 }
 
-EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback* cb, Event::EventTypeMask mask)
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(Holder<EventCallback> cb, Event::EventTypeMask mask)
 {
 	static size_t id = 0;
 	Taps[id] = std::make_pair(mask, cb);

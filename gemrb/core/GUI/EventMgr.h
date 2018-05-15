@@ -209,9 +209,9 @@ public:
 	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
 	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
 
-	static bool RegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
-	static EventCallback* UnRegisterHotKeyCallback(EventCallback*, KeyboardKey key, short mod = 0);
-	static TapMonitorId RegisterEventMonitor(EventCallback*, Event::EventTypeMask mask = Event::AllEventsMask);
+	static bool RegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);
+	static void UnRegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);
+	static TapMonitorId RegisterEventMonitor(Holder<EventCallback>, Event::EventTypeMask mask = Event::AllEventsMask);
 	static void UnRegisterEventMonitor(TapMonitorId monitor);
 
 private:
@@ -219,7 +219,7 @@ private:
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
 	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, Holder<EventCallback> > > EventTaps;
-	typedef std::map<int, std::list<EventCallback*> > KeyMap;
+	typedef std::map<int, std::list<Holder<EventCallback> > > KeyMap;
 
 	static EventTaps Taps;
 	static KeyMap HotKeys;
