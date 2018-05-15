@@ -231,6 +231,7 @@ private:
 	void DeleteText(size_t len);
 
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 
 	void DrawSelf(Region drawFrame, const Region& clip);

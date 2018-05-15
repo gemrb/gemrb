@@ -796,6 +796,14 @@ bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	return true;
 }
 
+bool TextContainer::OnMouseDrag(const MouseEvent& me)
+{
+	// TODO: should be able to highlight a range
+	Point p = ConvertPointFromScreen(me.Pos());
+	MoveCursorToPoint(p);
+	return true;
+}
+
 bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 {
 	if (Editable() == false)
