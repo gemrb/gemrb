@@ -29,6 +29,7 @@
 
 #include "CircularBuffer.h"
 #include "GUI/Control.h"
+#include "GUI/TextSystem/TextContainer.h"
 
 namespace GemRB {
 
@@ -44,32 +45,21 @@ class Palette;
  */
 
 class Console : public Control {
+private:
+	/** History Buffer */
+	CircularBuffer<String> History;
+	/** History Position and size */
+	int HistPos;
+
+	TextContainer textContainer;
+
 public:
 	Console(const Region& frame);
-	~Console(void);
+	~Console();
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
-
-private:
-	/** Max Edit Text Length */
-	unsigned short max;
-	/** Text Buffer */
-	String Buffer;
-	/** History Buffer */
-	CircularBuffer<String> History;
-	/** Cursor Position */
-	unsigned short CurPos;
-	/** History Position and size */
-	int HistPos;
-	/** Color Palette */
-	Palette* palette;
-
-public:
-	void SetFocus();
 	bool SetEvent(int eventType, ControlEventHandler handler);
-
-	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 
 private:
 	void HistoryBack();
@@ -79,11 +69,11 @@ private:
 
 	/** Draws the Console on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
-	int DrawingShift(ieWord textw) const;
 	
 protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 };
 
 }

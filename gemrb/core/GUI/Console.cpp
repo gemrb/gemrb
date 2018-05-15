@@ -33,26 +33,26 @@
 namespace GemRB {
 
 Console::Console(const Region& frame)
-	: Control(frame), History(5)
+: Control(frame), History(5), textContainer(Region(0,0,0,frame.h), core->GetTextFont(), NULL)
 {
-	max = 128;
-	Buffer.reserve(max);
-	CurPos = 0;
 	HistPos = 0;
-	palette = new Palette( ColorWhite, ColorBlack );
-	Sprite2D* cursor = core->GetCursorSprite();
-	SetCursor(cursor);
-	cursor->release();
 
 	EventMgr::EventCallback* cb = new MethodCallback<Console, const Event&, bool>(this, &Console::HandleHotKey);
 	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {
 		delete cb;
 	}
+
+	Palette* palette = new Palette( ColorWhite, ColorBlack );
+	textContainer.SetPalette(palette);
+	palette->release();
+
+	textContainer.SetAlignment(IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
+	AddSubviewInFrontOfView(&textContainer);
 }
 
-Console::~Console(void)
+Console::~Console()
 {
-	palette->release();
+	RemoveSubview(&textContainer);
 }
 
 bool Console::HandleHotKey(const Event& e)
@@ -68,135 +68,75 @@ bool Console::HandleHotKey(const Event& e)
 	return true;
 }
 
-int Console::DrawingShift(ieWord textw) const
+bool Console::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	Sprite2D* cursor = Cursor();
-
-	int shift = 0;
-	if (textw + cursor->Width > frame.w) {
-		// shift left so the cursor remains visible
-		shift = (textw + cursor->Width) - frame.w;
-	}
-	return shift;
-}
-
-void Console::MouseDown(const MouseEvent& me, unsigned short /*Mod*/)
-{
-	Point p = ConvertPointFromScreen(me.Pos());
-
-	Font* font = core->GetTextFont();
-	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
-	int shift = -DrawingShift(w);
-
-	Size size(p.x + shift, font->LineHeight);
-	Font::StringSizeMetrics metrics = {size, 0, true};
-	if (shift) {
-		w = font->StringSize(Buffer.substr(CurPos, String::npos), &metrics).w;
-	} else {
-		w = font->StringSize(Buffer, &metrics).w;
-	}
-
-	CurPos = metrics.numChars;
-	MarkDirty();
+	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
+	textContainer.MouseDown(me, mod);
+	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+	return true;
 }
 
 /** Draws the Console on the Output Display */
-void Console::DrawSelf(Region drawFrame, const Region& clip)
+void Console::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
-	Font* font = core->GetTextFont();
-	Sprite2D* cursor = Cursor();
-
 	Video* video = core->GetVideoDriver();
-	video->DrawRect( clip, ColorBlack );
-
-	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
-	int shift = DrawingShift(w);
-	drawFrame.x -= shift;
-	drawFrame.w += shift;
-
-	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
-
-	ieWord vcenter = (drawFrame.h / 2) + (cursor->Height / 2);
-	video->BlitSprite(cursor, w + drawFrame.x, vcenter + drawFrame.y);
+	video->DrawRect( drawFrame, ColorBlack );
 }
 
 /** Sets the Text of the current control */
 void Console::SetText(const String& string)
 {
-	Buffer = string;
+	Region rect(Point(), Dimensions());
+	textContainer.DeleteContentsInRect(rect);
+	textContainer.AppendText(string);
 }
+
 /** Key Press Event */
-bool Console::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
+bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	switch (Key.keycode) {
-		case GEM_BACKSP:
-			if (CurPos != 0) {
-				Buffer.erase(--CurPos, 1);
-			}
-			break;
-		case GEM_HOME:
-			CurPos = 0;
-			break;
-		case GEM_END:
-			CurPos = Buffer.length();
-			break;
+	switch (key.keycode) {
 		case GEM_UP:
 			HistoryBack();
 			break;
 		case GEM_DOWN:
 			HistoryForward();
 			break;
-		case GEM_LEFT:
-			if (CurPos > 0)
-				CurPos--;
-			break;
-		case GEM_RIGHT:
-			if (CurPos < Buffer.length()) {
-				CurPos++;
-			}
-			break;
-		case GEM_DELETE:
-			if (CurPos < Buffer.length()) {
-				Buffer.erase(CurPos, 1);
-			}
-			break;			
 		case GEM_RETURN:
 			{
-				if (Buffer.length()) {
-					char* cBuf = MBCStringFromString(Buffer);
+				String text = textContainer.Text();
+				if (text.length()) {
+					char* cBuf = MBCStringFromString(text);
 					assert(cBuf);
 					ScriptEngine::FunctionParameters params;
 					params.push_back(ScriptEngine::Parameter(cBuf));
 					core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
 					free(cBuf);
 					HistoryAdd();
-					Buffer.erase();
-					CurPos = 0;
 					HistPos = 0;
+
+					SetText(L"");
+					MarkDirty();
 				}
 			}
 			break;
 		default:
-			if (Key.character) {
-				if (Buffer.length() < max) {
-					Buffer.insert(CurPos++, 1, Key.character);
-				}
-				break;
+			if (textContainer.KeyPress(key, mod)) {
+				return true;
 			}
-			return false;
+			break;
 	}
-	MarkDirty();
-	return true;
+	return false;
 }
 
 void Console::HistoryBack()
 {
-	if (Buffer[0] && HistPos == 0 && History.Retrieve(HistPos) != Buffer) {
+	String text = textContainer.Text();
+	if (text.length() && HistPos == 0 && History.Retrieve(HistPos) != text) {
 		HistoryAdd();
 		HistPos++;
 	}
-	Buffer = History.Retrieve(HistPos);
-	CurPos = Buffer.length();
+
+	SetText(History.Retrieve(HistPos));
 	if (++HistPos >= (int)History.Size()) {
 		HistPos--;
 	}
@@ -205,26 +145,18 @@ void Console::HistoryBack()
 void Console::HistoryForward()
 {
 	if (--HistPos < 0) {
-		Buffer.erase();
+		SetText(L"");
 		HistPos++;
 	} else {
-		Buffer = History.Retrieve(HistPos);
+		SetText(History.Retrieve(HistPos));
 	}
-	CurPos = Buffer.length();
 }
 
 void Console::HistoryAdd(bool force)
 {
-	if (force || Buffer.length()) {
-		History.Append(Buffer, !force);
-	}
-}
-
-void Console::SetFocus()
-{
-	Control::SetFocus();
-	if (IsFocused()) {
-		core->GetVideoDriver()->ShowSoftKeyboard();
+	String text = textContainer.Text();
+	if (force || text.length()) {
+		History.Append(text, !force);
 	}
 }
 
