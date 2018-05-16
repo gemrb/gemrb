@@ -430,7 +430,7 @@ String Button::TooltipText() const
 					}
 					s.push_back(L'0' + offset);
 				} else {
-					s.push_back(hotKey);
+					s.push_back(toupper(hotKey.key));
 				}
 				break;
 		}
