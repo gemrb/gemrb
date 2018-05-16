@@ -912,7 +912,13 @@ void TextContainer::InsertText(const String& text)
 {
 	ContentIndex idx = FindContentForChar(cursorPos);
 	String newtext = TextFrom(idx.second);
-	newtext.insert(cursorPos - idx.first, text);
+
+	if (cursorPos < textLen) {
+		size_t pos = cursorPos - idx.first;
+		newtext.insert(pos, text);
+	} else {
+		newtext.append(text);
+	}
 
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
@@ -927,7 +933,10 @@ void TextContainer::DeleteText(size_t len)
 {
 	ContentIndex idx = FindContentForChar(cursorPos);
 	String newtext = TextFrom(idx.second);
-	newtext.erase(cursorPos - idx.first - 1, len);
+
+	if (newtext.length()) {
+		newtext.erase(cursorPos - idx.first - 1, len);
+	}
 
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
