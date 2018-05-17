@@ -28,6 +28,16 @@ namespace GemRB {
 
 class Variables;
 
+class Function {
+public:
+	ieVariable module;
+	ieVariable function;
+	int group;
+	int key;
+
+	Function(const char *m, const char *f, int g, int key);
+};
+
 class GEM_EXPORT KeyMap {
 private:
 	Variables keymap;
@@ -36,17 +46,10 @@ public:
 	~KeyMap();
 	bool InitializeKeyMap(const char *inifile, const char *keyfile);
 	bool ResolveKey(int key, int group);
+	bool ResolveName(const char* name, int group);
+
+	Function* LookupFunction(const char* name);
 };
-
-class Function {
-public:
-	ieVariable module;
-	ieVariable function;
-	int group;
-
-	Function(const char *m, const char *f, int g);
-};
-
 }
 
 #endif

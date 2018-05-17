@@ -37,6 +37,7 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"
+#include "KeyMap.h"
 #include "Map.h"
 #include "MusicMgr.h"
 #include "Palette.h"
@@ -2985,12 +2986,46 @@ PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
 	unsigned char hotkey;
-	unsigned int mods;
+	unsigned int mods = 0;
 	int global = false;
-	PARSE_ARGS4(args, "Oc|Ii", &self, &hotkey, &mods, &global);
+	Button* btn = NULL;
+	PyObject* arg1 = PyTuple_GetItem(args, 1);
 
-	Button* btn = GetView<Button>(self);
-	assert(btn);
+	// work around a bug in cpython where PyArg_ParseTuple doesnt return as expected when 'c' format doesn't match
+	if (PyObject_TypeCheck(arg1, &PyString_Type) && PyString_Size(arg1) == 1) {
+		PARSE_ARGS4(args, "Oc|Ii", &self, &hotkey, &mods, &global);
+		btn = GetView<Button>(self);
+		assert(btn);
+	} else {
+		char* keymap = NULL;
+		PARSE_ARGS3(args,  "Os|i", &self, &keymap, &global);
+
+		Function* func = core->GetKeyMap()->LookupFunction(keymap);
+		ABORT_IF_NULL(func);
+
+		btn = GetView<Button>(self);
+		assert(btn);
+
+		PyObject* module = PyImport_ImportModule(func->module);
+		if (module == NULL) {
+			PyErr_Print();
+			return NULL;
+		}
+		PyObject* dict = PyModule_GetDict(module);
+
+		PyObject* pFunc = PyDict_GetItemString(dict, func->function);
+		/* pFunc: Borrowed reference */
+		if (!PyCallable_Check(pFunc)) {
+			Py_DECREF(module);
+			return NULL;
+		}
+
+		btn->SetAction(new PythonControlCallback(pFunc));
+		Py_DECREF(module);
+
+		hotkey = func->key;
+	}
+
 	btn->SetHotKey(hotkey, mods, global);
 
 	Py_RETURN_NONE;

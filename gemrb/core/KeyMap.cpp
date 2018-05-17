@@ -29,12 +29,13 @@ namespace GemRB {
 
 #define KEYLENGTH 64
 
-Function::Function(const char *m, const char *f, int g)
+Function::Function(const char *m, const char *f, int g, int k)
 {
 	//make sure the module an function names are no longer than 32 characters, or they will be truncated
 	strlcpy(module, m, sizeof(module));
 	strlcpy(function, f, sizeof(function));
 	group = g;
+	key = k;
 }
 
 KeyMap::KeyMap()
@@ -124,8 +125,11 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			group = kmtable->QueryField("Default","GROUP");
 			print("Adding key %s with function %s::%s", value, module, function);
 		}
-		fun = new Function(module, function, atoi(group));
+		fun = new Function(module, function, atoi(group), tolower(value[0]));
+
+		// lookup by either key or name
 		keymap.SetAt(value, fun);
+		keymap.SetAt(name, fun);
 	}
 	delete config;
 	return true;
@@ -135,26 +139,22 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 //main gamecontrol
 bool KeyMap::ResolveKey(int key, int group)
 {
-	Function *fun;
-	void *tmp;
-	char keystr[2];
-
-	keystr[0]=(char) key;
-	keystr[1]=0;
-
+	char keystr[2] = {key, NULL};
 	Log(MESSAGE, "KeyMap", "Looking up key: %c(%s) ", key, keystr);
 
-	if (!keymap.Lookup(keystr, tmp) ) {
-		return false;
-	}
-	fun = (Function *) tmp;
-	
-	if (fun->group!=group) {
+	return ResolveName(keystr, group);
+}
+
+bool KeyMap::ResolveName(const char* name, int group)
+{
+	void *tmp;
+	if (!keymap.Lookup(name, tmp) ) {
 		return false;
 	}
 
-	// disable hotkeys in stores
-	if (core->GetCurrentStore()) {
+	Function* fun = (Function *)tmp;
+
+	if (fun->group!=group) {
 		return false;
 	}
 
@@ -163,5 +163,19 @@ bool KeyMap::ResolveKey(int key, int group)
 	return true;
 }
 
+Function* KeyMap::LookupFunction(const char* name)
+{
+	char* key = strdup(name);
+	strlwr(key);
+
+	void *tmp;
+	if (!keymap.Lookup(name, tmp) ) {
+		free(key);
+		return NULL;
+	}
+
+	free(key);
+	return (Function *)tmp;
+}
 
 }
