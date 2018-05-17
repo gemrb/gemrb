@@ -304,7 +304,9 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	assert(spr->BAM == false);
 
 	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
-	Region srect(64 - fClip.w, 64 - fClip.h, fClip.w, fClip.h);
+	Region srect(0, 0, fClip.w, fClip.h);
+	srect.x -= x - fClip.x;
+	srect.y -= y - fClip.y;
 
 	const Color* tintcol = NULL;
 
