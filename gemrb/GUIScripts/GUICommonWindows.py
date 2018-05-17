@@ -50,6 +50,7 @@ ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
+#the dictionary keys match entries in keymap.2da
 AITip = {"Deactivate" : 15918, "Enable" : 15917}
 if GameCheck.IsPST(): #Torment
 	import GUIClasses
@@ -60,49 +61,48 @@ if GameCheck.IsPST(): #Torment
 	DiscWindow = None
 	AITip = {	"Deactivate" : 41631,	"Enable" : 41646 }
 	OptionTip = { #dictionary to the stringrefs in each games dialog.tlk
-	'Inventory' : 41601,'Map': 41625,'Mage': 41624,'Priest': 4709,'Stats': 4707,'Journal': 41623,
-	'Options' : 41626,'Rest': 41628,'Follow': 41647,'Expand': 41660,'AI' : 1,'Game' : 1,'Party' : 1
+	'Inventory' : 41601,'Map': 41625,'Mage_Spells': 41624,'Priest_Spells': 4709,'Character_Stats': 4707,'Journal': 41623,
+	'Options' : 41626,'Rest': 41628,'Follow': 41647,'Expand': 41660,'Toggle_AI' : 1,'Return_To_Game' : 1,'Party' : 1
 	}
 	OptionControl = { #dictionary to the control indexes in the window (.CHU)
-	'Inventory' : 1, 'Map' : 2, 'Mage': 3, 'Priest': 7, 'Stats': 5, 'Journal': 6,
-	'Options' : 8, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 4,
-	'Game': 0, 'Party' : 8 , 'Time': 9 #not in pst
+	'Inventory' : 1, 'Map' : 2, 'Mage_Spells': 3, 'Priest_Spells': 7, 'Character_Stats': 5, 'Journal': 6,
+	'Options' : 8, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 4,
+	'Return_To_Game': 0, 'Party' : 8 , 'Time': 9 #not in pst
 	}
 elif GameCheck.IsIWD2(): #Icewind Dale 2
 	OptionTip = {
-	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
-	'Options' : 16311, 'Rest': 11942, 'Follow': 41647, 'Expand': 41660, 'AI' : 1,'Game' : 16313,  'Party' : 16312,
-	'SpellBook': 16309, 'SelectAll': 10485
+	'Inventory' : 16307, 'Map': 16310, 'Wizard_Spells': 16309, 'Priest_Spells': 14930, 'Character_Stats': 16306, 'Journal': 16308,
+	'Options' : 16311, 'Rest': 11942, 'Follow': 41647, 'Expand': 41660, 'Toggle_AI' : 1,'Return_To_Game' : 16313,  'Party' : 16312,
+	'Wizard_Spells': 16309, 'SelectAll': 10485
 	}
 	OptionControl = {
-	'Inventory' : 5, 'Map' : 7, 'Mage': 5, 'Priest': 6, 'Stats': 8, 'Journal': 6,
-	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'AI': 14,
-	'Game': 0, 'Party' : 13,  'Time': 10, #not in pst
-	'SpellBook': 4, 'SelectAll': 11
+	'Inventory' : 5, 'Map' : 7, 'Wizard_Spells': 5, 'Priest_Spells': 6, 'Character_Stats': 8, 'Journal': 6,
+	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 14,
+	'Return_To_Game': 0, 'Party' : 13,  'Time': 10, #not in pst
+	'Wizard_Spells': 4, 'SelectAll': 11
 	}
 else: # Baldurs Gate, Icewind Dale
 	OptionTip = {
-	'Inventory' : 16307, 'Map': 16310, 'Mage': 16309, 'Priest': 14930, 'Stats': 16306, 'Journal': 16308,
-	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'AI' : 1, 'Game' : 16313, 'Party' : 16312
+	'Inventory' : 16307, 'Map': 16310, 'Wizard_Spells': 16309, 'Priest_Spells': 14930, 'Character_Record': 16306, 'Journal': 16308,
+	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'Toggle_AI' : 1, 'Return_To_Game' : 16313, 'Party' : 16312
 	}
 	OptionControl = {
-	'Inventory' : 3, 'Map' : 1, 'Mage': 5, 'Priest': 6, 'Stats': 4, 'Journal': 2,
-	'Options' : 7, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'AI': 6,
-	'Game': 0, 'Party' : 8, 'Time': 9 #not in pst
+	'Inventory' : 3, 'Map' : 1, 'Wizard_Spells': 5, 'Priest_Spells': 6, 'Character_Record': 4, 'Journal': 2,
+	'Options' : 7, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 6,
+	'Return_To_Game': 0, 'Party' : 8, 'Time': 9 #not in pst
 	}
 
 # Generic option button init. Pass it the options window. Index is a key to the dicts,
 # IsPage means whether the game should mark the button selected
-def InitOptionButton(Window, Index, Action=0,IsPage=1):
+def InitOptionButton(Window, Index, IsPage=True, HotKey=True):
 	Button = Window.GetControl (OptionControl[Index])
 	if not Button:
 		print "InitOptionButton cannot find the button: " + Index
 		return
 
-	# FIXME: add "(key)" to tooltips!
 	Button.SetTooltip (OptionTip[Index])
-	if Action:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Action)
+	if HotKey:
+		Button.SetHotKey (Index, True)
 	if IsPage:
 		Button.SetVarAssoc ("SelectedWindow", OptionControl[Index])
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
@@ -140,27 +140,30 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
 
-		Button = InitOptionButton(Window, 'SpellBook', GUISPL.OpenSpellBookWindow, True)
+		Button = InitOptionButton(Window, 'Wizard_Spells', True)
 
 		# AI
-		Button = InitOptionButton(Window, 'AI', AIPress)
+		Button = InitOptionButton(Window, 'Toggle_AI')
 		AIPress (0) #this initialises the state and tooltip
 
 		# Select All
-		Button = InitOptionButton(Window, 'SelectAll', GUICommon.SelectAllOnPress)
+		Button = InitOptionButton(Window, 'SelectAll', True, False)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 	elif pst: #pst has these three controls here instead of portrait pane
 		# (Un)Lock view on character
-		Button = InitOptionButton(Window, 'Follow', OnLockViewPress)  # or 41648 Unlock ...
+		Button = InitOptionButton(Window, 'Follow', True, False)  # or 41648 Unlock ...
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
 		# AI
-		Button = InitOptionButton(Window, 'AI', AIPress)
+		Button = InitOptionButton(Window, 'Toggle_AI')
 		AIPress(0) #this initialises the state and tooltip
 
 		# Message popup FIXME disable on non game screen...
-		Button = InitOptionButton(Window,'Expand')# or 41661 Close ...
+		Button = InitOptionButton(Window, 'Expand', True, False)# or 41661 Close ...
 
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
-		Button = InitOptionButton(Window,'Game', CloseTopWindow, True)
+		Button = InitOptionButton(Window,'Return_To_Game', True, False)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
 		Button.MakeEscape()
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
@@ -180,28 +183,28 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetTooltip (OptionTip['Party'])
 
 	# Map
-	Button = InitOptionButton(Window, 'Map', GUIMA.OpenMapWindow, True)
+	Button = InitOptionButton(Window, 'Map', True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = InitOptionButton(Window, 'Journal', GUIJRNL.OpenJournalWindow, True)
+	Button = InitOptionButton(Window, 'Journal', True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
-	Button = InitOptionButton(Window, 'Inventory', GUIINV.OpenInventoryWindow, True)
+	Button = InitOptionButton(Window, 'Inventory', True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = InitOptionButton(Window, 'Stats', GUIREC.OpenRecordsWindow, True)
+	Button = InitOptionButton(Window, 'Character_Record', True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
 	if iwd1:
@@ -209,21 +212,21 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
-		Button = InitOptionButton(Window, 'Mage', GUIMG.ToggleSpellWindow, True)
+		Button = InitOptionButton(Window, 'Wizard_Spells', True)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 		# Priest
-		Button = InitOptionButton(Window, 'Priest', GUIPR.OpenPriestWindow, True)
+		Button = InitOptionButton(Window, 'Priest_Spells', True)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = InitOptionButton(Window, 'Options', GUIOPT.OpenOptionsWindow, True)
+	Button = InitOptionButton(Window, 'Options', True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if iwd1:
@@ -299,10 +302,10 @@ def AIPress (toggle=1):
 
 	if GameCheck.IsPST() or GameCheck.IsIWD2():
 		OptionsWindow = GemRB.GetView("OPTWIN")
-		Button = OptionsWindow.GetControl (OptionControl['AI'])
+		Button = OptionsWindow.GetControl (OptionControl['Toggle_AI'])
 	else:
 		PortraitWindow = GemRB.GetView("PORTWIN")
-		Button = PortraitWindow.GetControl (OptionControl['AI'])
+		Button = PortraitWindow.GetControl (OptionControl['Toggle_AI'])
 
 	#print "AIPress: GS_PARTYAI was:", GemRB.GetGUIFlags () & GS_PARTYAI, "at toggle:", toggle
 	if toggle:
@@ -1555,7 +1558,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		Button = InitOptionButton(Window, 'AI', AIPress)
+		Button = InitOptionButton(Window, 'Toggle_AI', AIPress)
 		AIPress(0) #this initialises the state and tooltip
 
 		#Select All
