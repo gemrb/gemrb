@@ -77,7 +77,7 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 
 	if (QueryText().length() < max) {
 
-		if (isalpha(key.character) && (Flags()&Alpha) == 0) {
+		if ((isalpha(key.character) || ispunct(key.character)) && (Flags()&Alpha) == 0) {
 			return false;
 		} else if (isnumber(key.character && (Flags()&Numeric) == 0)) {
 			return false;
