@@ -685,7 +685,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 	printPos = 0;
 	ContentContainer::DrawSelf(drawFrame, clip);
 
-	if (layout.empty()) {
+	if (layout.empty() && Editable()) {
 		Video* video = core->GetVideoDriver();
 		Region sc = video->GetScreenClip();
 		video->SetScreenClip(NULL);
