@@ -137,9 +137,10 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 //group can be:
 //main gamecontrol
-bool KeyMap::ResolveKey(int key, int group)
+bool KeyMap::ResolveKey(unsigned short key, int group)
 {
-	char keystr[2] = {key, NULL};
+	assert(key <= CHAR_MAX);
+	char keystr[2] = {(char)key, 0};
 	Log(MESSAGE, "KeyMap", "Looking up key: %c(%s) ", key, keystr);
 
 	return ResolveName(keystr, group);

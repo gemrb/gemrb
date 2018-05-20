@@ -45,7 +45,7 @@ public:
 	KeyMap();
 	~KeyMap();
 	bool InitializeKeyMap(const char *inifile, const char *keyfile);
-	bool ResolveKey(int key, int group);
+	bool ResolveKey(unsigned short key, int group);
 	bool ResolveName(const char* name, int group);
 
 	Function* LookupFunction(const char* name);
