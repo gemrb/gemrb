@@ -155,7 +155,7 @@ void EventMgr::DispatchEvent(Event& e)
 
 bool EventMgr::RegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key, short mod)
 {
-	if (!iswprint(key)) {
+	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
 	}
 

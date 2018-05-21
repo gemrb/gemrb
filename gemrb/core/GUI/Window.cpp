@@ -395,7 +395,7 @@ bool Window::InHandler() const
 
 bool Window::RegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, KeyboardKey key)
 {
-	if (!iswprint(key)) {
+	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
 	}
 
