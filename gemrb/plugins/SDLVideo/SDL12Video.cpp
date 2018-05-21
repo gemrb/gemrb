@@ -468,17 +468,15 @@ void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Colo
 	int shortLen = p2.y - p1.y;
 	int longLen = p2.x - p1.x;
 	if (abs( shortLen ) > abs( longLen )) {
-		int swap = shortLen;
-		shortLen = longLen;
-		longLen = swap;
+		std::swap(shortLen, longLen);
 		yLonger = true;
 	}
 
 	int decInc;
-	if (longLen == 0 || shortLen < 0) {
+	if (longLen == 0) {
 		decInc = 0;
 	} else {
-		decInc = ( shortLen << 16 ) / longLen;
+		decInc = ( shortLen * 65536 ) / longLen;
 	}
 
 	std::vector<SDL_Point> points;
