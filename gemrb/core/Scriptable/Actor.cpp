@@ -9198,7 +9198,7 @@ void Actor::SetUsedShield(const char* AnimationType, int wt)
 
 void Actor::SetUsedHelmet(const char* AnimationType)
 {
-	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
+	strncpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)
 		return;
 	anims->SetHelmetRef(AnimationType);

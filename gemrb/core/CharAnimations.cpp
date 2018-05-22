@@ -238,8 +238,7 @@ void CharAnimations::SetWeaponType(int wt)
 
 void CharAnimations::SetHelmetRef(const char* ref)
 {
-	HelmetRef[0] = ref[0];
-	HelmetRef[1] = ref[1];
+	strncpy(HelmetRef, ref, sizeof(HelmetRef));
 
 	// TODO: Only drop helmet anims?
 	// Note: this doesn't happen "often", so this isn't a performance
