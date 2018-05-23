@@ -775,10 +775,10 @@ public:
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
-	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
+	void SetUsedWeapon(const char (&AnimationType)[2], ieWord *MeleeAnimation,
 		int WeaponType=-1);
-	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
-	void SetUsedHelmet(const char *AnimationType);
+	void SetUsedShield(const char (&AnimationType)[2], int WeaponType=-1);
+	void SetUsedHelmet(const char (&AnimationType)[2]);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;

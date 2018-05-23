@@ -424,7 +424,7 @@ void Inventory::KillSlot(unsigned int index)
 			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_HEAD:
-			Owner->SetUsedHelmet("");
+			Owner->SetUsedHelmet("\0");
 			break;
 		case SLOT_EFFECT_ITEM:
 			//remove the armor type only if this item is responsible for it
