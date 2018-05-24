@@ -178,6 +178,7 @@ int fx_cure_nondetection_state (Scriptable* Owner, Actor* target, Effect* fx);//
 int fx_sex_modifier (Scriptable* Owner, Actor* target, Effect* fx);//47
 int fx_ids_modifier (Scriptable* Owner, Actor* target, Effect* fx);//48
 int fx_damage_bonus_modifier (Scriptable* Owner, Actor* target, Effect* fx);//49
+int fx_damage_bonus_modifier2 (Scriptable* Owner, Actor* target, Effect* fx);//49 (iwd, ee)
 int fx_set_blind_state (Scriptable* Owner, Actor* target, Effect* fx);//4a
 int fx_cure_blind_state (Scriptable* Owner, Actor* target, Effect* fx);//4b
 int fx_set_feebleminded_state (Scriptable* Owner, Actor* target, Effect* fx);//4c
@@ -425,7 +426,9 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
-int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e ChangeWeather
+int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
+//13f Usability:ItemUsability
+int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
 
@@ -531,6 +534,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Damage", fx_damage, EFFECT_DICED, -1 ),
 	EffectDesc("DamageAnimation", fx_damage_animation, 0, -1 ),
 	EffectDesc("DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 ),
+	EffectDesc("DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1), //49 (iwd, ee)
 	EffectDesc("DamageLuckModifier", fx_damageluck_modifier, 0, -1 ),
 	EffectDesc("DamageVsCreature", fx_generic_effect, 0, -1 ),
 	EffectDesc("Death", fx_death, 0, -1 ),
@@ -2397,7 +2401,7 @@ static int al_switch_good[12]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x3
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_alignment_invert(%2d)", fx->Opcode);
-	register ieDword newalign = target->GetStat( IE_ALIGNMENT );
+	ieDword newalign = target->GetStat( IE_ALIGNMENT );
 	if (!newalign) {
 		// unset, so just do nothing;
 		return FX_APPLIED;
@@ -2757,6 +2761,40 @@ int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	STAT_MOD( IE_DAMAGEBONUS );
 	//the basestat is not saved, so no FX_PERMANENT
+	return FX_APPLIED;
+}
+
+// 0x49 DamageBonusModifier(2)
+// iwd/iwd2 supports different damage types, but only flat and percentage boni
+// only the special type of 0 means a flat bonus
+int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if(0) print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	switch (fx->Parameter2) {
+		case 0:
+			STAT_MOD(IE_DAMAGEBONUS);
+			break;
+		case 1: // fire
+		case 2: // cold
+		case 3: // electricity
+		case 4: // acid
+		case 5: // magic
+		case 6: // poison
+		case 7: // slashing
+		case 8: // piercing
+		case 9: // crushing
+		case 10: // missile
+			// no stat to save to, so we handle it when dealing damage
+			break;
+		// gemrb extensions for tobex
+		case 11: // magic fire
+		case 12: // magic cold
+		case 13: // stunning
+			break;
+		default:
+			return FX_NOT_APPLIED;
+	}
 	return FX_APPLIED;
 }
 
@@ -7488,6 +7526,53 @@ int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else if (val > mask) {
 		STAT_SET(IE_UNCANNY_DODGE, val|stat);
 	}
+	return FX_APPLIED;
+}
+
+/* only in tobex; it adds a bunch of new hard-coded stats, but the opcode can only set these:
+387 ACIDDAMAGEBONUS - percentage modifier to acid damage from item/spell ability effects
+388 COLDDAMAGEBONUS - percentage modifier to cold damage from item/spell ability effects
+389 CRUSHINGDAMAGEBONUS - percentage modifier to crushing damage from normal damage and item/spell ability effects
+390 ELECTRICITYDAMAGEBONUS - percentage modifier to electricity damage from item/spell ability effects
+391 FIREDAMAGEBONUS - percentage modifier to fire damage from item/spell ability effects
+392 PIERCINGDAMAGEBONUS - percentage modifier to piercing damage from normal damage and item/spell ability effects
+393 POISONDAMAGEBONUS - percentage modifier to poison damage from item/spell ability effects
+394 MAGICDAMAGEBONUS - percentage modifier to magic damage from item/spell ability effects
+395 MISSILEDAMAGEBONUS - percentage modifier to missile damage from normal damage and item/spell ability effects
+396 SLASHINGDAMAGEBONUS - percentage modifier to slashing damage from normal damage and item/spell ability effects
+397 MAGICFIREDAMAGEBONUS - percentage modifier to magic fire damage from item/spell ability effects
+398 MAGICCOLDDAMAGEBONUS - percentage modifier to magic colddamage from item/spell ability effects
+399 STUNNINGDAMAGEBONUS - percentage modifier to stunning damage from normal damage and item/spell ability effects
+400 WEIGHTALLOWANCEMOD - custom stat that modiifies by sum the amount a character is allowed to carry (total weight allowance = StrMod value + StrModEx value + WeightAllowanceMod)
+
+we allow also setting the normal stats, below index 256
+*/
+static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
+static int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	ieWord stat = fx->Parameter2 & 0x0000ffff;
+	ieWord type = fx->Parameter2 >> 16;
+
+	if ((stat > 255 && stat < 387) || stat > 400) {
+		// we support only 256 real stats!
+		return FX_NOT_APPLIED;
+	}
+
+	// translate the stats to ours
+	if (stat == 400) {
+		stat = IE_ENCUMBRANCE;
+	} else if (stat >= 387) {
+		stat = damage_mod_map[stat-387];
+		// replace effect with the appropriate one
+		Effect *myfx = new Effect;
+		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
+		myfx->Parameter2 = stat;
+		return fx_damage_bonus_modifier2(Owner, target, fx);
+	}
+
+	target->NewStat(stat, fx->Parameter1, type);
+
 	return FX_APPLIED;
 }
 

@@ -22,7 +22,11 @@
 #define GemRB_OpenGLEnv_h
 
 #if USE_GL
-	#include <GL/glew.h>
+	#if __APPLE__
+		#include <GLEW/glew.h>
+	#else
+		#include <GL/glew.h>
+	#endif
 #else
 	#if __APPLE__
 		#include <OpenGLES/ES2/gl.h>

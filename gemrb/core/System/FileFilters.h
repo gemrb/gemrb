@@ -26,8 +26,7 @@ namespace GemRB {
 struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 	char extension[9];
 	ExtFilter(const char* ext) {
-		strncpy(extension, ext, sizeof(extension)-1);
-		extension[sizeof(extension)-1] = '\0';
+		strncpy(extension, ext, sizeof(extension));
 	}
 
 	bool operator()(const char* fname) const {

@@ -88,7 +88,7 @@ bool Gem_Polygon::PointIn(const Point &p) const
 
 bool Gem_Polygon::PointIn(int tx, int ty) const
 {
-	register int   j, yflag0, yflag1, xflag0 , index;
+	int   j, yflag0, yflag1, xflag0 , index;
 	bool inside_flag = false;
 	Point* vtx0, * vtx1;
 
