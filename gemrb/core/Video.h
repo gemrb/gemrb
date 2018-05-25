@@ -156,9 +156,8 @@ public:
 	virtual bool ToggleGrabInput() = 0;
 	const Size& GetScreenSize() { return screenSize; }
 
-	/** Displays or hides a virtual (software) keyboard*/
-	virtual void ShowSoftKeyboard() = 0;
-	virtual void HideSoftKeyboard() = 0;
+	virtual void StartTextInput() = 0;
+	virtual void StopTextInput() = 0;
 
 	virtual bool TouchInputEnabled() = 0;
 

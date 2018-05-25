@@ -79,11 +79,6 @@ public:
 
 	virtual bool SetFullscreenMode(bool set)=0;
 
-	virtual bool ToggleGrabInput()=0;
-	virtual void ShowSoftKeyboard()=0;
-	virtual void HideSoftKeyboard()=0;
-	virtual bool TouchInputEnabled()=0;
-
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);

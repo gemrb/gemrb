@@ -730,7 +730,7 @@ public:
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, DrawFPS;
-	bool UseSoftKeyboard;
+	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
 	int TouchInput;

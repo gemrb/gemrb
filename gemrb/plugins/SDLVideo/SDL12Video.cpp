@@ -658,19 +658,11 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 	return SDLVideoDriver::ProcessEvent(event);
 }
 
-void SDL12VideoDriver::ShowSoftKeyboard()
-{
-	if(core->UseSoftKeyboard){
-		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
-	}
-}
+void SDL12VideoDriver::StartTextInput()
+{}
 
-void SDL12VideoDriver::HideSoftKeyboard()
-{
-	if(core->UseSoftKeyboard){
-		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
-	}
-}
+void SDL12VideoDriver::StopTextInput()
+{}
 
 bool SDL12VideoDriver::TouchInputEnabled()
 {

@@ -72,8 +72,8 @@ public:
 	bool SetFullscreenMode(bool set);
 	void SetGamma(int brightness, int contrast);
 	bool ToggleGrabInput();
-	void ShowSoftKeyboard();
-	void HideSoftKeyboard();
+	void StartTextInput();
+	void StopTextInput();
 	bool TouchInputEnabled();
 
 	void DrawLine(const Point& p1, const Point& p2, const Color& color);

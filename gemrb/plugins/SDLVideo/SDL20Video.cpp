@@ -439,29 +439,23 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-/*
- This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
- */
-void SDL20VideoDriver::HideSoftKeyboard()
+void SDL20VideoDriver::StopTextInput()
 {
-	/*
-	if(core->UseSoftKeyboard){
-		SDL_StopTextInput();
-		if(core->ConsolePopped) core->PopupConsole();
-	}
-	*/
+	SDL_StopTextInput();
 }
 
-/*
- This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
- */
-void SDL20VideoDriver::ShowSoftKeyboard()
+void SDL20VideoDriver::StartTextInput()
 {
-	/*
-	if(core->UseSoftKeyboard){
+	// FIXME: we probably dont need this ANDROID code
+	// UseSoftKeyboard probably has no effect since SDL delegates SDL_StartTextInput to the OS
+	// on iOS this is going to be a user preference and depends on a physical keyboard presence
+#if ANDROID
+	if (core->UseSoftKeyboard){
 		SDL_StartTextInput();
 	}
-	*/
+#else
+	SDL_StartTextInput();
+#endif
 }
 
 bool SDL20VideoDriver::TouchInputEnabled()

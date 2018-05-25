@@ -801,7 +801,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 			}
 		}
 
-		core->GetVideoDriver()->ShowSoftKeyboard();
+		core->GetVideoDriver()->StartTextInput();
 		MarkDirty();
 	} else {
 		// FIXME: this isnt _always_ the end (it works out that way for left alignment tho)
