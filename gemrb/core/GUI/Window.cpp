@@ -113,6 +113,12 @@ void Window::FlagsChanged(unsigned int oldflags)
 	if ((flags&AlphaChannel) != (oldflags&AlphaChannel)) {
 		RecreateBuffer();
 	}
+
+	if ((flags&View::Invisible) && focusView) {
+		focusView->DidUnFocus();
+	} else if ((oldflags&View::Invisible) && focusView) {
+		focusView->DidFocus();
+	}
 }
 
 void Window::RecreateBuffer()
