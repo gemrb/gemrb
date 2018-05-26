@@ -691,7 +691,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 		video->SetScreenClip(NULL);
 
 		Sprite2D* cursor = core->GetCursorSprite();
-		video->BlitSprite(cursor, drawFrame.x, drawFrame.y + cursor->YPos);
+		video->BlitSprite(cursor, drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->YPos);
 		cursor->release();
 
 		video->SetScreenClip(&sc);
