@@ -54,6 +54,7 @@ private:
 
 	// this forwards to textContainer. only needed because we set View::IgnoreEvents on textContainer in order to interpose key events
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void OnTextInput(const TextEvent& /*te*/);
 
 	void TextChanged(TextContainer& tc);
 
@@ -85,6 +86,9 @@ public:
 	void SetBufferLength(size_t buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
+
+	void DidFocus() { textContainer.DidFocus(); }
+	void DidUnFocus() { textContainer.DidUnFocus(); }
 };
 
 }

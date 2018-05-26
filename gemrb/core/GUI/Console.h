@@ -61,6 +61,9 @@ public:
 	void SetText(const String& string);
 	bool SetEvent(int eventType, ControlEventHandler handler);
 
+	void DidFocus() { textContainer.DidFocus(); }
+	void DidUnFocus() { textContainer.DidUnFocus(); }
+
 private:
 	void HistoryBack();
 	void HistoryForward();
@@ -74,6 +77,7 @@ protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void OnTextInput(const TextEvent& /*te*/);
 };
 
 }

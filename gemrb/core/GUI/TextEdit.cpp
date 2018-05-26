@@ -102,6 +102,11 @@ bool TextEdit::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	return true;
 }
 
+void TextEdit::OnTextInput(const TextEvent& te)
+{
+	textContainer.TextInput(te);
+}
+
 /** Sets the Text of the current control */
 void TextEdit::SetText(const String& string)
 {

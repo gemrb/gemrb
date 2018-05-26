@@ -223,9 +223,6 @@ private:
 
 	void MoveCursorToPoint(const Point& p);
 
-	void DidFocus();
-	void DidUnFocus();
-
 	// relative to cursor pos
 	void InsertText(const String& text);
 	void DeleteText(size_t len);
@@ -250,6 +247,9 @@ public:
 	void AppendText(const String& text, Font* fnt, Holder<Palette> pal);
 	String TextFrom(const Content*) const;
 	String Text() const;
+
+	void DidFocus();
+	void DidUnFocus();
 
 	void SetPalette(Holder<Palette> pal);
 	Holder<Palette> TextPalette() const { return palette; }

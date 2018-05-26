@@ -45,6 +45,8 @@ Console::Console(const Region& frame)
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);
 	palette->release();
+	textContainer.SetMargin(3);
+	textContainer.SetFrameSize(Dimensions());
 
 	textContainer.SetAlignment(IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
 	AddSubviewInFrontOfView(&textContainer);
@@ -74,6 +76,11 @@ bool Console::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	textContainer.MouseDown(me, mod);
 	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
 	return true;
+}
+
+void Console::OnTextInput(const TextEvent& te)
+{
+	textContainer.TextInput(te);
 }
 
 /** Draws the Console on the Output Display */
