@@ -212,6 +212,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 
 			e = EvntManager->CreateKeyEvent(key, true, modstate);
 			if (e.keyboard.character) {
+				if (InTextInput() && modstate == 0) {
+					return GEM_OK;
+				}
 #if SDL_VERSION_ATLEAST(1,3,0)
 				e.keyboard.character = SDL_GetKeyFromScancode(event.key.keysym.scancode);
 #else
@@ -219,7 +222,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 #endif
 			}
 
-			assert(InTextInput() == false);
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:

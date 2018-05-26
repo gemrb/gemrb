@@ -657,10 +657,14 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 	}
 
 	if (event.type == SDL_KEYDOWN && InTextInput()) {
-		char text[2] = { event.key.keysym.unicode, '\0' };
-		Event e = EventMgr::CreateTextEvent(text);
-		EvntManager->DispatchEvent(e);
-		return GEM_OK;
+		int modstate = GetModState(SDL_GetModState());
+
+		if (modstate == 0) {
+			char text[2] = { event.key.keysym.unicode, '\0' };
+			Event e = EventMgr::CreateTextEvent(text);
+			EvntManager->DispatchEvent(e);
+			return GEM_OK;
+		}
 	}
 
 	return SDLVideoDriver::ProcessEvent(event);
