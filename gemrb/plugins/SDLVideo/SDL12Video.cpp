@@ -32,6 +32,7 @@ using namespace GemRB;
 SDL12VideoDriver::SDL12VideoDriver(void)
 {
 	disp = NULL;
+	inTextInput = false;
 }
 
 int SDL12VideoDriver::Init(void)
@@ -655,14 +656,30 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 		return GEM_OK;
 	}
 
+	if (event.type == SDL_KEYDOWN && InTextInput()) {
+		char text[2] = { event.key.keysym.unicode, '\0' };
+		Event e = EventMgr::CreateTextEvent(text);
+		EvntManager->DispatchEvent(e);
+		return GEM_OK;
+	}
+
 	return SDLVideoDriver::ProcessEvent(event);
 }
 
 void SDL12VideoDriver::StartTextInput()
-{}
+{
+	inTextInput = true;
+}
 
 void SDL12VideoDriver::StopTextInput()
-{}
+{
+	inTextInput = false;
+}
+
+bool SDL12VideoDriver::InTextInput()
+{
+	return inTextInput;
+}
 
 bool SDL12VideoDriver::TouchInputEnabled()
 {

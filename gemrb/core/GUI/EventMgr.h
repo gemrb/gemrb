@@ -32,6 +32,7 @@
 
 #include "Callback.h"
 #include "Region.h"
+#include "System/String.h"
 
 #include <bitset>
 #include <climits>
@@ -105,6 +106,10 @@ struct GEM_EXPORT KeyboardEvent : public EventBase {
 	KeyboardKey character; // the translated character
 };
 
+struct GEM_EXPORT TextEvent : public EventBase {
+	String text; // activate the soft keyboard and disable hot keys until next (non TextEvent) event
+};
+
 // TODO: Unused event type...
 struct GEM_EXPORT ControllerEvent : public EventBase {
 	ButtonMask buttonStates;
@@ -136,8 +141,9 @@ struct GEM_EXPORT Event {
 
 		TouchGesture,
 		TouchUp,
-		TouchDown
+		TouchDown,
 
+		TextInput // clipboard or faux event sent to signal the soft keyboard+temp disable hotkeys
 		// TODO: need types for controller
 		// leaving off types for unused events
 	};
@@ -163,6 +169,8 @@ struct GEM_EXPORT Event {
 
 		AllTouchMask = TouchGestureMask | TouchUpMask | TouchDownMask,
 
+		TextInputMask = 1 << TextInput,
+
 		AllEventsMask = 0xffffffffU
 	};
 
@@ -175,6 +183,8 @@ struct GEM_EXPORT Event {
 		TouchEvent touch;
 		GestureEvent gesture;
 	};
+
+	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
     
     typedef unsigned short EventMods;
 
@@ -208,6 +218,9 @@ public:
 
 	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
 	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
+
+	static Event CreateTextEvent(const char* text);
+	static Event CreateTextEvent(const String& text);
 
 	static bool RegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);
 	static void UnRegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);

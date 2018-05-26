@@ -791,6 +791,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 				size_t len = 0;
 				printFont->StringSizeWidth(text.substr(numChars), p.x, &len);
 				cursorPos = numChars + len;
+				MarkDirty();
 				break;
 			} else {
 				// not in this one so we need to consume some text
@@ -800,9 +801,6 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 				numChars += metrics.numChars;
 			}
 		}
-
-		core->GetVideoDriver()->StartTextInput();
-		MarkDirty();
 	} else {
 		// FIXME: this isnt _always_ the end (it works out that way for left alignment tho)
 		CursorEnd();
@@ -839,6 +837,8 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 	if (Editable() == false)
 		return false;
 
+	core->GetVideoDriver()->StartTextInput();
+
 	switch (key.keycode) {
 		case GEM_HOME:
 			CursorHome();
@@ -866,12 +866,16 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 		case GEM_RETURN:
 			InsertText(String(1, '\n'));
 			return true;
+		default:
+			assert(key.character == 0);
+			return false;
 	}
-	if (key.character) {
-		InsertText(String(1, key.character));
-		return true;
-	}
-	return false;
+}
+
+void TextContainer::OnTextInput(const TextEvent& te)
+{
+	InsertText(te.text);
+	core->GetVideoDriver()->StartTextInput();
 }
 
 // move cursor to beginning of text

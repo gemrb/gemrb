@@ -81,6 +81,8 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
 	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
+	SDL_StopTextInput(); // for some reason this is enabled from start
+
 	return GEM_OK;
 }
 
@@ -374,13 +376,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
-			for (size_t i=0; event.text.text[i]; i++) {
-				//EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
-				e = EvntManager->CreateKeyEvent(event.text.text[i], true, modstate);
-				EvntManager->DispatchEvent(e);
-				e = EvntManager->CreateKeyEvent(event.text.text[i], false, modstate);
-				EvntManager->DispatchEvent(e);
-			}
+			e = EvntManager->CreateTextEvent(event.text.text);
+			EvntManager->DispatchEvent(e);
 			break;
 		/* not user input events */
 
@@ -424,6 +421,24 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 			}
 			break;
+
+		case SDL_KEYDOWN:
+			if (SDL_GetModState() & KMOD_CTRL) {
+				switch (event.key.keysym.sym) {
+					case SDLK_v:
+						if (SDL_HasClipboardText()) {
+							char* text = SDL_GetClipboardText();
+							e = EvntManager->CreateTextEvent(text);
+							SDL_free(text);
+							EvntManager->DispatchEvent(e);
+							return GEM_OK;
+						}
+						break;
+					default:
+						break;
+				}
+			}
+			return SDLVideoDriver::ProcessEvent(event);
 		case SDL_MOUSEMOTION: // fallthough
 		case SDL_MOUSEBUTTONUP: // fallthough
 		case SDL_MOUSEBUTTONDOWN:
@@ -452,10 +467,18 @@ void SDL20VideoDriver::StartTextInput()
 #if ANDROID
 	if (core->UseSoftKeyboard){
 		SDL_StartTextInput();
+	} else {
+		Event e = EvntManager->CreateTextEvent(L"");
+		EvntManager->DispatchEvent(e);
 	}
 #else
 	SDL_StartTextInput();
 #endif
+}
+
+bool SDL20VideoDriver::InTextInput()
+{
+	return SDL_IsTextInputActive();
 }
 
 bool SDL20VideoDriver::TouchInputEnabled()

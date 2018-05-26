@@ -158,6 +158,7 @@ public:
 
 	virtual void StartTextInput() = 0;
 	virtual void StopTextInput() = 0;
+	virtual bool InTextInput() = 0;
 
 	virtual bool TouchInputEnabled() = 0;
 

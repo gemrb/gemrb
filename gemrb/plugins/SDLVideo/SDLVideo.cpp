@@ -104,15 +104,10 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					key = GEM_GRAB;
 					break;
 				default:
-#if SDL_VERSION_ATLEAST(1,3,0)
-					// SDL2 has SDL_TEXTINPUT event
-					if (modstate <= GEM_MOD_SHIFT) return GEM_OK;
-#else
 					if (sym < 256) {
 						key = sym;
 					}
 					break;
-#endif
 			}
 			if (key != 0) {
 				Event e = EvntManager->CreateKeyEvent(key, false, modstate);
@@ -212,12 +207,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					key = GEM_FUNCTIONX(1) + sym-SDLK_F1;
 					break;
 				default:
-#if SDL_VERSION_ATLEAST(1,3,0)
-					// SDL2 has SDL_TEXTINPUT event
-					if (modstate <= GEM_MOD_SHIFT) return GEM_OK;
-#else
 					break;
-#endif
 			}
 
 			e = EvntManager->CreateKeyEvent(key, true, modstate);
@@ -228,6 +218,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				e.keyboard.character = event.key.keysym.unicode;
 #endif
 			}
+
+			assert(InTextInput() == false);
 			EvntManager->DispatchEvent(e);
 			break;
 		case SDL_MOUSEMOTION:

@@ -233,6 +233,7 @@ private:
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	bool OnMouseDrag(const MouseEvent& /*me*/);
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	void OnTextInput(const TextEvent& /*te*/);
 
 	void DrawSelf(Region drawFrame, const Region& clip);
 	virtual void DrawContents(const Layout& layout, const Point& point);

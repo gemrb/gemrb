@@ -132,6 +132,7 @@ protected:
 	// these events make no sense to forward
 	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {}
 	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {}
+	virtual void OnTextInput(const TextEvent& /*te*/) {}
 	
 	// default view implementation does nothing but ignore the event
 	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
@@ -209,6 +210,8 @@ public:
 
 	bool KeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
 	bool KeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+
+	void TextInput(const TextEvent& /*te*/);
 
 	void MouseEnter(const MouseEvent& /*me*/, const DragOp*);
 	void MouseLeave(const MouseEvent& /*me*/, const DragOp*);

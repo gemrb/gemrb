@@ -593,6 +593,11 @@ bool View::KeyRelease(const KeyboardEvent& key, unsigned short mod)
 	return OnKeyRelease(key, mod);
 }
 
+void View::TextInput(const TextEvent& te)
+{
+	OnTextInput(te);
+}
+
 void View::MouseEnter(const MouseEvent& me, const DragOp* op)
 {
 #if DEBUG_VIEWS

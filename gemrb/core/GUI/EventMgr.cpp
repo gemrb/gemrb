@@ -19,6 +19,8 @@
  */
 
 #include "GUI/EventMgr.h"
+#include "Interface.h"
+#include "Video.h"
 
 #include "globals.h"
 #include "win32def.h"
@@ -59,10 +61,16 @@ bool EventMgr::FingerDown()
 
 void EventMgr::DispatchEvent(Event& e)
 {
+	Video* video = core->GetVideoDriver();
+
 	e.time = GetTickCount();
 
-	// first check for hot key listeners
-	if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
+	if (e.type == Event::TextInput) {
+		if (e.text.text.length() == 0) {
+			return;
+		}
+	} else if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
+		// first check for hot key listeners
 		static unsigned long lastKeyDown = 0;
 		static unsigned char repeatCount = 0;
 		static KeyboardKey repeatKey = 0;
@@ -76,7 +84,7 @@ void EventMgr::DispatchEvent(Event& e)
 			repeatKey = e.keyboard.keycode;
 			lastKeyDown = GetTickCount();
 		}
-		
+
 		e.keyboard.repeats = repeatCount;
 
 		int flags = e.mod << 16;
@@ -106,6 +114,9 @@ void EventMgr::DispatchEvent(Event& e)
 			EventButton btn = (e.type == Event::MouseDown) ? e.mouse.button : 0;
 
 			if (e.type == Event::MouseDown || e.type == Event::TouchDown) {
+				if (video->InTextInput())
+					video->StopTextInput();
+
 				if (btn == repeatButton
 					&& e.time <= lastMouseDown + DCDelay
 					&& repeatPos.isWithinRadius(5, se.Pos())
@@ -138,6 +149,8 @@ void EventMgr::DispatchEvent(Event& e)
 		}
 	} else {
 		// TODO: implement controller events
+		if (video->InTextInput())
+			video->StopTextInput();
 	}
 
 	// no hot keys or their listeners refused the event...
@@ -301,6 +314,27 @@ Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, floa
 	e.touch = touch;
 	e.gesture.dTheta = rotation;
 	e.gesture.dDist = pinch;
+
+	return e;
+}
+
+Event EventMgr::CreateTextEvent(const char* text)
+{
+	Event e = {};
+	String* string = StringFromCString(text);
+	if (string) {
+		e = EventMgr::CreateTextEvent(*string);
+	}
+	delete string;
+
+	return e;
+}
+
+Event EventMgr::CreateTextEvent(const String& text)
+{
+	Event e = {};
+	e.type = Event::TextInput;
+	e.text.text = text;
 
 	return e;
 }

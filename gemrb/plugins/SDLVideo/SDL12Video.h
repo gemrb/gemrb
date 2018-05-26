@@ -28,6 +28,7 @@ namespace GemRB {
 class SDL12VideoDriver : public SDLVideoDriver {
 private:
 	SDL_Surface* disp;
+	bool inTextInput;
 
 public:
 	SDL12VideoDriver(void);
@@ -39,8 +40,11 @@ public:
 	bool SetFullscreenMode(bool set);
 
 	bool ToggleGrabInput();
+
 	void StartTextInput();
 	void StopTextInput();
+	bool InTextInput();
+
 	bool TouchInputEnabled();
 	void SetGamma(int brightness, int contrast);
 
