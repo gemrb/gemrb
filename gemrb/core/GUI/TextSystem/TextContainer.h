@@ -223,6 +223,9 @@ private:
 
 	void MoveCursorToPoint(const Point& p);
 
+	void DidFocus();
+	void DidUnFocus();
+
 	// relative to cursor pos
 	void InsertText(const String& text);
 	void DeleteText(size_t len);

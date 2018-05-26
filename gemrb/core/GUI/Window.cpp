@@ -92,6 +92,7 @@ void Window::SubviewRemoved(View* subview, View* parent)
 	}
 
 	if (subview->ContainsView(focusView)) {
+		focusView->DidUnFocus();
 		focusView = NULL;
 		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 			Control* ctrl = *c;
@@ -208,9 +209,16 @@ View* Window::TrySetFocus(View* target)
 	} else if (focusView && !focusView->CanUnlockFocus()) {
 		// current focus unwilling to reliquish
 	} else {
+		if (focusView)
+			focusView->DidUnFocus();
+
 		newFocus = target;
+
+		if (newFocus)
+			newFocus->DidFocus();
 	}
 	focusView = newFocus;
+
 	return newFocus;
 }
 
@@ -324,6 +332,11 @@ bool Window::DispatchKey(View* keyView, const Event& event)
 bool Window::DispatchEvent(const Event& event)
 {
 	View* target = NULL;
+
+	if (event.type == Event::TextInput) {
+		focusView->TextInput(event.text);
+		return true;
+	}
 
 	if (event.isScreen) {
 		Point screenPos = event.mouse.Pos();

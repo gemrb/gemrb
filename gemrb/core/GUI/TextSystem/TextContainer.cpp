@@ -809,6 +809,16 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 	}
 }
 
+void TextContainer::DidFocus()
+{
+	core->GetVideoDriver()->StartTextInput();
+}
+
+void TextContainer::DidUnFocus()
+{
+	core->GetVideoDriver()->StopTextInput();
+}
+
 bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());

@@ -198,6 +198,9 @@ public:
 
 	virtual bool CanLockFocus() const { return true; };
 	virtual bool CanUnlockFocus() const { return true; };
+	virtual void DidFocus() {}
+	virtual void DidUnFocus() {}
+
 	virtual bool TracksMouseDown() const { return false; }
 
 	virtual Holder<DragOp> DragOperation() { return Holder<DragOp>(NULL); }
