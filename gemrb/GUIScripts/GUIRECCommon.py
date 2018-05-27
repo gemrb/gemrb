@@ -75,6 +75,7 @@ def OpenCustomizeWindow ():
 	GUIREC.ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	CustomizeWindow = GemRB.LoadWindow (17)
+	CustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)
 	PortraitSelectButton.SetText (11961)
@@ -146,6 +147,7 @@ def OpenPortraitSelectWindow ():
 	global PortraitPictureButton, SubCustomizeWindow
 
 	SubCustomizeWindow = GemRB.LoadWindow (18)
+	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
 	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -214,6 +216,7 @@ def OpenCustomPortraitWindow ():
 	global RowCount1, RowCount2
 
 	SubSubCustomizeWindow = GemRB.LoadWindow (19)
+	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	CustomPortraitDoneButton = SubSubCustomizeWindow.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -313,6 +316,7 @@ def OpenSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
+	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.ListResources(CHR_SOUNDS)
@@ -384,6 +388,7 @@ def OpenScriptWindow ():
 	global ScriptTextArea, SelectedTextArea
 
 	SubCustomizeWindow = GemRB.LoadWindow (11)
+	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
