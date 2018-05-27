@@ -145,4 +145,12 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	return spr;
 }
 
+int AnimationFactory::GetCycleSize(size_t idx) const
+{
+	if (idx >= cycles.size())
+		return 0;
+
+	return cycles[idx].FramesCount;
+}
+
 }

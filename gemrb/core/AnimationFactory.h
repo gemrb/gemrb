@@ -50,7 +50,7 @@ public:
 	Sprite2D* GetFrameWithoutCycle(unsigned short index) const;
 	size_t GetCycleCount() const { return cycles.size(); }
 	size_t GetFrameCount() const { return frames.size(); }
-	int GetCycleSize(int idx) const { return cycles[idx].FramesCount; }
+	int GetCycleSize(size_t idx) const;
 	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
 		unsigned int type) const;
 
