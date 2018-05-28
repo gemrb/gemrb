@@ -444,7 +444,7 @@ def SetupClockWindowControls (Window):
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
 	Button.SetTooltip (41627)
 
 	# Select all characters
@@ -1988,15 +1988,7 @@ def UpdateClock ():
 	global ActionsWindow, OptionsWindow
 
 	if GameCheck.IsPST ():
-		#used to update the pst clock tooltip
-		ActionsWindow = GemRB.LoadWindow(0)
-		Button = ActionsWindow.GetControl (0)
 		SetPSTGamedaysAndHourToken ()
-		# The check prevents the tooltip being set on a wrong control
-		#   when switching windows, e.g. GUIOPT's 'Return to Game' button
-		if Button.HasAnimation('WMTIME'):
-			Button.SetTooltip (GemRB.GetString(65027))
-		#this function does update the clock tip, but the core fails to display it
 
 	else:
 		Clock = None
