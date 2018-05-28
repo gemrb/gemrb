@@ -1738,7 +1738,7 @@ def UpdateAnimatedPortrait (Window,i):
 	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
 	Button = Window.GetControl (i)
 	ButtonHP = Window.GetControl (6 + i)
-	pic = GemRB.GetPlayerPortrait (i+1, 0)["Sprite"]
+	pic = GemRB.GetPlayerPortrait (i+1, 0)["ResRef"]
 	if not pic:
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
