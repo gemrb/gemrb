@@ -47,6 +47,8 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	textContainer.SetPalette(palette);
 	palette->release();
 	max = maxLength;
+	textContainer.SetMargin(3);
+	textContainer.SetFrameSize(Dimensions());
 
 	SetFlags(Alpha|Numeric, OP_OR);
 }
