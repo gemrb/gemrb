@@ -613,14 +613,16 @@ void Button::SetText(const String& string)
 void Button::UpdateState(unsigned int Sum)
 {
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
+		//radio button, exact value
 		ToggleState = ( Sum == GetValue() );
-	}   	//radio button, exact value
-	else if (flags & IE_GUI_BUTTON_CHECKBOX) {
+	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
+		//checkbox, bitvalue
 		ToggleState = !!( Sum & GetValue() );
-	} //checkbox, bitvalue
-	else {
+	} else {
+		//other buttons, nothing to redraw
 		return;
-	} //other buttons, nothing to redraw
+	}
+
 	if (ToggleState) {
 		SetState(IE_GUI_BUTTON_SELECTED);
 	} else {
