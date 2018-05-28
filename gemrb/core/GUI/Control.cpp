@@ -211,6 +211,13 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 		void operator()() const {
 			// update the timer to use the actual repeatDelay
 			ctrl->SetActionInterval(ctrl->repeatDelay);
+
+			if (ctrl->VarName[0] != 0) {
+				ieDword val = ctrl->GetValue();
+				core->GetDictionary()->SetAt( ctrl->VarName, val );
+				ctrl->window->RedrawControls( ctrl->VarName, val );
+			}
+
 			return action(ctrl);
 		}
 	};
