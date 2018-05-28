@@ -968,6 +968,7 @@ def OpenColorWindow ():
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	GUIRECCommon.SubCustomizeWindow = GemRB.LoadWindow (21)
+	GUIRECCommon.SubCustomizeWindow.SetFlags (WF_BORDERLESS, OP_OR)
 
 	PaperdollButton = GUIRECCommon.SubCustomizeWindow.GetControl (0)
 	PaperdollButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
