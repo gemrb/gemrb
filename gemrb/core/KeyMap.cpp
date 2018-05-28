@@ -129,7 +129,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 		// lookup by either key or name
 		keymap.SetAt(value, fun);
-		keymap.SetAt(name, fun);
+		keymap.SetAt(name, new Function(*fun));
 	}
 	delete config;
 	return true;
