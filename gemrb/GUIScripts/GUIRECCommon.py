@@ -119,28 +119,10 @@ def OpenCustomizeWindow ():
 	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPortraitSelectWindow)
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
-	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeDonePress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeCancelPress)
+	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CustomizeWindow.Close())
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  lambda: CustomizeWindow.Close())
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CustomizeDonePress ():
-	CloseCustomizeWindow ()
-	return
-
-def CustomizeCancelPress ():
-	CloseCustomizeWindow ()
-	return
-
-def CloseCustomizeWindow ():
-	import GUIREC
-	global CustomizeWindow
-	if CustomizeWindow:
-		CustomizeWindow.Unload ()
-		CustomizeWindow = None
-		# FIXME: we need a generic way to refresh to top window
-		# GUIREC.UpdateRecordsWindow ()
 	return
 
 def OpenPortraitSelectWindow ():
