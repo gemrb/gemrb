@@ -256,7 +256,17 @@ bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	}
 	return true; // always handled
 }
-	
+
+void Control::OnMouseEnter(const MouseEvent& /*me*/, const DragOp*)
+{
+	PerformAction(HoverBegin);
+}
+
+void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
+{
+	PerformAction(HoverEnd);
+}
+
 ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
 {
 	return new ControlScriptingRef(this, id, group);

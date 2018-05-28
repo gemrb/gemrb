@@ -553,8 +553,10 @@ bool Button::OnMouseOver(const MouseEvent& me)
 	return Control::OnMouseOver(me);
 }
 
-void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
+void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 {
+	Control::OnMouseEnter(me, dop);
+
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
@@ -575,8 +577,10 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* /*dop*/)
 	}
 }
 
-void Button::OnMouseLeave(const MouseEvent& /*me*/, const DragOp* dop)
+void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
+	Control::OnMouseLeave(me, dop);
+
 	if (State == IE_GUI_BUTTON_PRESSED && dop == NULL) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
 	}

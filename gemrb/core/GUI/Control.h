@@ -192,6 +192,8 @@ protected:
 	
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
 
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
