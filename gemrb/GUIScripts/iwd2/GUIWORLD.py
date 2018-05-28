@@ -34,7 +34,12 @@ FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
 ReformPartyWindow = None
-OldMessageWindow = None
+
+def OpenDialogButton(id):
+	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	return window
 
 def DialogStarted ():
 	global ContinueWindow
@@ -47,16 +52,14 @@ def DialogStarted ():
 
 	MessageWindow.UpdateControlStatus()
 
-	ContinueWindow = Window = GemRB.LoadWindow (9, GUICommon.GetWindowPack())
+	ContinueWindow = OpenDialogButton(9)
 
 def DialogEnded ():
 	global ContinueWindow
 
-	# TODO: why is this being called at game start?!
-	if not ContinueWindow:
-		return
+	GUICommonWindows.UpdateActionsWindow()
 
-	ContinueWindow.Unload ()
+	ContinueWindow.Close ()
 	ContinueWindow = None
 
 def CloseContinueWindow ():
@@ -67,20 +70,27 @@ def NextDialogState ():
 	if not ContinueWindow:
 		return
 
-	ContinueWindow.SetVisible(False)
+	ContinueWindow.GetControl(0).SetVisible(False)
+	ContinueWindow.GetControl(0).SetDisabled(True)
 
 def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
+	ContinueWindow.Focus()
 
 def OpenContinueMessageWindow ():
 	#continue
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
+	ContinueWindow.Focus()
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
