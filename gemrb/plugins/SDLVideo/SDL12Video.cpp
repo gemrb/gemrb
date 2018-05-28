@@ -658,9 +658,10 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 
 	if (event.type == SDL_KEYDOWN && InTextInput()) {
 		int modstate = GetModState(SDL_GetModState());
+		Uint16 chr = event.key.keysym.unicode;
 
-		if (modstate == 0) {
-			char text[2] = { event.key.keysym.unicode, '\0' };
+		if (isprint(chr) && modstate <= GEM_MOD_SHIFT) {
+			char text[2] = { chr, '\0' };
 			Event e = EventMgr::CreateTextEvent(text);
 			EvntManager->DispatchEvent(e);
 			return GEM_OK;
