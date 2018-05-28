@@ -43,8 +43,14 @@ def DialogStarted ():
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
+	MWin = GemRB.GetView("MSGWIN")
+	CloseButton= MWin.GetControl (0)
+	CloseButton.SetDisabled(True)
+
 def DialogEnded ():
-	pass
+	Button = MessageWindow.MWindow.GetControl (0)
+	Button.MakeDefault(True)
+	Button.SetDisabled(False)
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open
@@ -63,6 +69,7 @@ def OpenEndMessageWindow ():
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
+	Button.SetDisabled(False)
 
 def OpenContinueMessageWindow ():
 	#continue
@@ -70,6 +77,7 @@ def OpenContinueMessageWindow ():
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.MakeDefault(True)
+	Button.SetDisabled(False)
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow

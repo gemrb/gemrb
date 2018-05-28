@@ -79,6 +79,7 @@ def OnLoad():
 	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
 	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Close())
+	CloseButton.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
