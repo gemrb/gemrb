@@ -88,9 +88,10 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 	if handler:
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
 	else:
-		# create an anonymous callback, so we don't need to create a separate function for each string
-		# FIXME: IE_GUI_MOUSE_ENTER_BUTTON would be more UX-sensible, but interferes with toggling
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda s=ctlhelp, ta=help_ta: ta.SetText (s))
+		def callback():
+			help_ta.SetText(ctlhelp)
+
+		button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, callback)
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
 
