@@ -52,6 +52,8 @@ def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_str
 		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, lambda s=ctlhelp, ta=help_ta: ta.SetText (s))
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
+	slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlhelp))
+	slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winhelp))
 
 	return slider
 
