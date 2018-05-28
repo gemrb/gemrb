@@ -759,7 +759,7 @@ def SetupDamageInfo (pc, Button, Window):
 		hpBar.SetPictureClipping (ratio)
 		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
-	ratio_str = "\n%d/%d" %(hp, hp_max)
+	ratio_str = "%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
 	return ratio_str, color

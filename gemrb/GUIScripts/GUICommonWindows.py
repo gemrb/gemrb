@@ -1611,11 +1611,10 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, pcID))
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, ButtonIndexBinder(InventoryCommon.OnDropItemToPC, pcID))
 
-		if GameCheck.IsIWD1():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
-			Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
-			HPLabel = Window.GetControl (100+i)
+			HPLabel = Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
 			HPLabel.SetUseRGB (True)
 
 		# unlike other buttons, this one lacks extra frames for a selection effect
@@ -1683,7 +1682,6 @@ def UpdatePortraitWindow ():
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle
 		talk = store = flag = blank = ' '
@@ -1702,7 +1700,8 @@ def UpdatePortraitWindow ():
 
 		if LUCommon.CanLevelUp (pcID):
 			flag = flag + blank + chr(255)
-		elif GameCheck.IsIWD1():
+		elif GameCheck.IsIWD1() or GameCheck.IsIWD2():
+			ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetText (ratio_str)
 			HPLabel.SetTextColor (color)
