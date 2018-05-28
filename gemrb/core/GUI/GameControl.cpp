@@ -1048,9 +1048,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 	}
 	switch (Key.keycode) {
 //FIXME: move these to guiscript
-		case 'h': //hard pause
-			core->SetPause(PAUSE_ON);
-			break;
 		case ' ': //soft pause
 			core->TogglePause();
 			break;
