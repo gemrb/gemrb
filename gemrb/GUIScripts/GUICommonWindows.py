@@ -48,6 +48,16 @@ CurrentWindow = None
 ActionBarControlOffset = 0
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
+if GameCheck.IsIWD2():
+	MageSpellsKey = 'Spellbook'
+	CharacterStatsKey = 'Character_Record'
+elif GameCheck.IsPST():
+	MageSpellsKey = 'Mage_Spells'
+	CharacterStatsKey = 'Character_Stats'
+else:
+	MageSpellsKey = 'Wizard_Spells'
+	CharacterStatsKey = 'Character_Record'
+
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
 #the dictionary keys match entries in keymap.2da
@@ -61,33 +71,33 @@ if GameCheck.IsPST(): #Torment
 	DiscWindow = None
 	AITip = {	"Deactivate" : 41631,	"Enable" : 41646 }
 	OptionTip = { #dictionary to the stringrefs in each games dialog.tlk
-	'Inventory' : 41601,'Map': 41625,'Mage_Spells': 41624,'Priest_Spells': 4709,'Character_Stats': 4707,'Journal': 41623,
+	'Inventory' : 41601,'Map': 41625, MageSpellsKey : 41624, 'Priest_Spells': 4709, CharacterStatsKey : 4707,'Journal': 41623,
 	'Options' : 41626,'Rest': 41628,'Follow': 41647,'Expand': 41660,'Toggle_AI' : 1,'Return_To_Game' : 1,'Party' : 1
 	}
 	OptionControl = { #dictionary to the control indexes in the window (.CHU)
-	'Inventory' : 1, 'Map' : 2, 'Mage_Spells': 3, 'Priest_Spells': 7, 'Character_Stats': 5, 'Journal': 6,
+	'Inventory' : 1, 'Map' : 2, MageSpellsKey : 3, 'Priest_Spells': 7, CharacterStatsKey : 5, 'Journal': 6,
 	'Options' : 8, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 4,
 	'Return_To_Game': 0, 'Party' : 8 , 'Time': 9 #not in pst
 	}
 elif GameCheck.IsIWD2(): #Icewind Dale 2
 	OptionTip = {
-	'Inventory' : 16307, 'Map': 16310, 'Wizard_Spells': 16309, 'Priest_Spells': 14930, 'Character_Stats': 16306, 'Journal': 16308,
+	'Inventory' : 16307, 'Map': 16310, MageSpellsKey : 16309, CharacterStatsKey : 16306, 'Journal': 16308,
 	'Options' : 16311, 'Rest': 11942, 'Follow': 41647, 'Expand': 41660, 'Toggle_AI' : 1,'Return_To_Game' : 16313,  'Party' : 16312,
-	'Wizard_Spells': 16309, 'SelectAll': 10485
+	'SelectAll': 10485
 	}
 	OptionControl = {
-	'Inventory' : 5, 'Map' : 7, 'Wizard_Spells': 5, 'Priest_Spells': 6, 'Character_Stats': 8, 'Journal': 6,
+	'Inventory' : 5, 'Map' : 7, CharacterStatsKey : 8, 'Journal': 6,
 	'Options' : 9, 'Rest': 12, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 14,
 	'Return_To_Game': 0, 'Party' : 13,  'Time': 10, #not in pst
-	'Wizard_Spells': 4, 'SelectAll': 11
+	MageSpellsKey: 4, 'SelectAll': 11
 	}
 else: # Baldurs Gate, Icewind Dale
 	OptionTip = {
-	'Inventory' : 16307, 'Map': 16310, 'Wizard_Spells': 16309, 'Priest_Spells': 14930, 'Character_Record': 16306, 'Journal': 16308,
+	'Inventory' : 16307, 'Map': 16310, MageSpellsKey : 16309, 'Priest_Spells': 14930, CharacterStatsKey : 16306, 'Journal': 16308,
 	'Options' : 16311, 'Rest': 11942, 'Follow': 41647,  'Expand': 41660, 'Toggle_AI' : 1, 'Return_To_Game' : 16313, 'Party' : 16312
 	}
 	OptionControl = {
-	'Inventory' : 3, 'Map' : 1, 'Wizard_Spells': 5, 'Priest_Spells': 6, 'Character_Record': 4, 'Journal': 2,
+	'Inventory' : 3, 'Map' : 1, MageSpellsKey : 5, 'Priest_Spells': 6, CharacterStatsKey : 4, 'Journal': 2,
 	'Options' : 7, 'Rest': 9, 'Follow': 0, 'Expand': 10, 'Toggle_AI': 6,
 	'Return_To_Game': 0, 'Party' : 8, 'Time': 9 #not in pst
 	}
@@ -140,7 +150,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
 
-		Button = InitOptionButton(Window, 'Wizard_Spells', True)
+		Button = InitOptionButton(Window, MageSpellsKey, True)
 
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
@@ -204,7 +214,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = InitOptionButton(Window, 'Character_Record', True)
+	Button = InitOptionButton(Window, CharacterStatsKey, True)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
 	if iwd1:
@@ -212,7 +222,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
-		Button = InitOptionButton(Window, 'Wizard_Spells', True)
+		Button = InitOptionButton(Window, MageSpellsKey, True)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		if iwd1:

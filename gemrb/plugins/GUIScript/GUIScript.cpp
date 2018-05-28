@@ -3003,7 +3003,9 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		PARSE_ARGS3(args,  "Os|i", &self, &keymap, &global);
 
 		Function* func = core->GetKeyMap()->LookupFunction(keymap);
-		ABORT_IF_NULL(func);
+		if (func == NULL) {
+			Py_RETURN_NONE;
+		}
 
 		btn = GetView<Button>(self);
 		assert(btn);
