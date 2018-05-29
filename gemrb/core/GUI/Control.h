@@ -186,6 +186,8 @@ protected:
 			return key < ak.key;
 		}
 	};
+
+	void FlagsChanged(unsigned int /*oldflags*/);
 	
 	bool SupportsAction(const ActionKey&);
 	bool PerformAction(const ActionKey&);

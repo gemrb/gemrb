@@ -149,6 +149,14 @@ bool Control::PerformAction(const ActionKey& key)
 	return false;
 }
 
+void Control::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (actionTimer && (flags&Disabled)) {
+		actionTimer->Invalidate();
+		actionTimer = NULL;
+	}
+}
+
 void Control::UpdateState(const char* varname, unsigned int val)
 {
 	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
