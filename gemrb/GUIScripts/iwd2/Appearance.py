@@ -19,6 +19,7 @@
 #character generation, color (GUICG13)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 
 ColorTable = 0
@@ -57,6 +58,7 @@ def OnLoad():
 	global Color1, Color2, Color3, Color4, PDollResRef
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	CharOverview.PositionCharGenWin(ColorWindow)
 
 	Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race") )
 	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 5))
@@ -217,8 +219,6 @@ def GetColor():
 def HairPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(False)
 	ColorIndex = 0
 	PickedColor = Color1
 	GetColor()
@@ -227,8 +227,6 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(False)
 	ColorIndex = 1
 	PickedColor = Color2
 	GetColor()
@@ -237,8 +235,6 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(False)
 	ColorIndex = 2
 	PickedColor = Color3
 	GetColor()
@@ -247,8 +243,6 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(False)
 	ColorIndex = 3
 	PickedColor = Color4
 	GetColor()

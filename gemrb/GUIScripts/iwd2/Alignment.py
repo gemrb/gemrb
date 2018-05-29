@@ -19,6 +19,7 @@
 #character generation, alignment (GUICG3)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 
 AlignmentWindow = 0
@@ -34,6 +35,7 @@ def OnLoad():
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
+	CharOverview.PositionCharGenWin(AlignmentWindow)
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)

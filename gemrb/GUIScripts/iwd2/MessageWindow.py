@@ -48,6 +48,12 @@ def OnLoad():
 	return
 
 def UpdateControlStatus():
+	OptionsWindow = GemRB.GetView("OPTWIN")
+
+	if not OptionsWindow:
+		# exit if we get called from core without the right window pack being loaded
+		return
+
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG

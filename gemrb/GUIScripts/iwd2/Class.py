@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import CharOverview
 import CommonTables
 
 ClassWindow = 0
@@ -60,6 +61,7 @@ def OnLoad():
 	#this replaces help02.2da for class restrictions
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2, "GUICG")
+	CharOverview.PositionCharGenWin(ClassWindow)
 	rid = CommonTables.Races.FindValue(3, GemRB.GetVar('BaseRace'))
 	RaceName = CommonTables.Races.GetRowName(rid)
 

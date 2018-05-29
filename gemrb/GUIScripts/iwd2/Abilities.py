@@ -19,6 +19,7 @@
 #character generation, ability (GUICG4)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 from ie_stats import IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR
 
@@ -138,6 +139,8 @@ def OpenAbilitiesWindow(chargen, points):
 		AbilityWindow = GemRB.LoadWindow (4, "GUICG")
 	else:
 		AbilityWindow = GemRB.LoadWindow (7, "GUIREC")
+
+	CharOverview.PositionCharGenWin(AbilityWindow)
 
 	RollPress ()
 	for i in range(0,6):

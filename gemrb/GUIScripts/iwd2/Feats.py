@@ -19,6 +19,7 @@
 # character generation, feats (GUICG6)
 import GemRB
 import GUICommon
+import CharOverview
 import CommonTables
 import IDLUCommon
 from GUIDefines import *
@@ -299,6 +300,8 @@ def OpenFeatsWindow(chargen=0):
 		FeatWindow = GemRB.LoadWindow (55, "GUICG")
 	else:
 		FeatWindow = GemRB.LoadWindow (56, "GUIREC")
+
+	CharOverview.PositionCharGenWin(FeatWindow)
 
 	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)

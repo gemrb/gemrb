@@ -113,8 +113,14 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	# load our window
 	if chargen:
 		SpellsWindow = GemRB.LoadWindow (7, "GUICG")
-		import CharGenCommon
-		CharGenCommon.PositionCharGenWin (SpellsWindow)
+
+		if GameCheck.IsBG2():
+			import CharGenCommon
+			CharGenCommon.PositionCharGenWin (SpellsWindow)
+		elif GameCheck.IsIWD2():
+			import CharOverview
+			CharOverview.PositionCharGenWin (SpellsWindow)
+
 		if not recommend:
 			GUICommon.CloseOtherWindow (SpellsWindow.Unload)
 		DoneButton = SpellsWindow.GetControl (0)
@@ -374,7 +380,7 @@ def ShowKnownSpells ():
 	GemRB.SetToken("number", str(SpellsSelectPointsLeft[SpellLevel]))
 	SpellsTextArea.SetText(17253)
 
-	if SpellsPickButton == 0:
+	if SpellsPickButton == None:
 		# no recommendations at all
 		return
 

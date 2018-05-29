@@ -19,6 +19,7 @@
 #character generation, SubRaces (GUICG54)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 
 RaceWindow = 0
@@ -31,6 +32,7 @@ def OnLoad():
 	global SubRacesTable
 	
 	RaceWindow = GemRB.LoadWindow(54, "GUICG")
+	CharOverview.PositionCharGenWin(RaceWindow)
 
 	RaceCount = CommonTables.Races.GetRowCount()
 	

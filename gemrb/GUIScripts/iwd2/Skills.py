@@ -19,6 +19,7 @@
 #character generation, skills (GUICG6)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 import IDLUCommon
 from ie_stats import IE_INT, IE_UNUSED_SKILLPTS, IE_CLASSLEVELSUM
@@ -175,6 +176,8 @@ def OpenSkillsWindow(chargen, level=0):
 	else:
 		SkillWindow = GemRB.LoadWindow (55, "GUIREC")
 		ButtonCount = 9
+
+	CharOverview.PositionCharGenWin(SkillWindow)
 
 	for i in range(ButtonCount):
 		Button = SkillWindow.GetControl(i+93)

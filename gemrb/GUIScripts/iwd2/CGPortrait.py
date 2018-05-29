@@ -18,6 +18,7 @@
 #
 #character generation, appearance (GUICG12)
 import GemRB
+import CharOverview
 from GUIDefines import *
 
 AppearanceWindow = 0
@@ -40,6 +41,7 @@ def OnLoad ():
 	Gender=GemRB.GetVar ("Gender")
 
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
+	CharOverview.PositionCharGenWin(AppearanceWindow)
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable ("PICTURES")

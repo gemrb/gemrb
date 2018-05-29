@@ -44,6 +44,14 @@ def AddText(strref, newlines=0):
 	TextAreaControl.Append ("\n" * newlines)
 ### End utility functions
 
+def PositionCharGenWin(window, offset = 0):
+	global CharGenWindow
+
+	CGFrame = CharGenWindow.GetFrame()
+	WFrame = window.GetFrame()
+	window.SetPos(CGFrame['x'] + CGFrame['w'] - WFrame['w'] - 18,
+				  offset + CGFrame['y'] + (CGFrame['h'] - WFrame['h'] - 24))
+
 def UpdateOverview(CurrentStep):
 	global CharGenWindow, TextAreaControl, StartOverWindow, PortraitButton
 	global StepButtons, Steps, PersistButtons, GlobalStep
@@ -51,6 +59,8 @@ def UpdateOverview(CurrentStep):
 	GlobalStep = CurrentStep
 	
 	CharGenWindow = GemRB.LoadWindow(0, "GUICG")
+	CharGenWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
 	PortraitButton = CharGenWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	
@@ -127,7 +137,8 @@ def UpdateOverview(CurrentStep):
 		Tables.append(GemRB.LoadTable(tbl))
 	
 	if GemRB.GetVar('Gender') > 0:
-		if GemRB.GetToken('CHARNAME') == '':
+		name = GemRB.GetToken('CHARNAME')
+		if not name:
 			TextAreaControl.SetText(12135)
 		else:
 			TextAreaControl.SetText(1047)
@@ -252,8 +263,6 @@ def UpdateOverview(CurrentStep):
 	return
 
 def NextPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
 	if StartOverWindow:
 		StartOverWindow.Unload()
 	if len(Steps) > GlobalStep - 1:
@@ -301,8 +310,6 @@ def RestartGen():
 	return
 
 def BackPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
 	if StartOverWindow:
 		StartOverWindow.Unload()
 	

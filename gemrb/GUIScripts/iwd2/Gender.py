@@ -18,6 +18,7 @@
 #
 #character generation, gender (GUICG1)
 import GemRB
+import CharOverview
 from GUIDefines import *
 
 GenderWindow = 0
@@ -26,27 +27,9 @@ DoneButton = 0
 
 def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton
-	
-	#this hack will redraw the base CG window
-	GenderWindow = GemRB.LoadWindow(0, "GUICG")
-	PortraitButton = GenderWindow.GetControl(12)
-	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	ImportButton = GenderWindow.GetControl(13)
-	ImportButton.SetText(13955)
-	ImportButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GenderWindow.GetControl(15)
-	CancelButton.SetText(13727)
-	CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	BiographyButton = GenderWindow.GetControl(16)
-	BiographyButton.SetText(18003)
-	BiographyButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	GenderWindow.Focus()
-	if GenderWindow:
-		GenderWindow.Unload()
-	GenderWindow = GemRB.LoadWindow(1)
+	GenderWindow = GemRB.LoadWindow(1, "GUICG", WINDOW_BOTTOM|WINDOW_CENTER)
+	CharOverview.PositionCharGenWin(GenderWindow)
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)
