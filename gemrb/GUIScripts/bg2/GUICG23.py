@@ -18,6 +18,7 @@
 #
 #character generation, biography (GUICG23)
 import GemRB
+import CharGenCommon
 
 BioWindow = 0
 
@@ -25,6 +26,7 @@ def OnLoad ():
 	global BioWindow
 
 	BioWindow = GemRB.LoadWindow (23, "GUICG")
+	CharGenCommon.PositionCharGenWin(BioWindow)
 
 	placeholder = BioWindow.GetControl (3)
 	BIO = GemRB.GetToken("BIO")

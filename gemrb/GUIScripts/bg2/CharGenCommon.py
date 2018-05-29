@@ -372,7 +372,5 @@ def NextPress():
 
 def BiographyPress():
 	"""Opens the biography window."""
-	if CharGenWindow:
-		CharGenWindow.Unload()
 	GemRB.SetNextScript("GUICG23") #biography
 	return
