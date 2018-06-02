@@ -16074,14 +16074,14 @@ PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 	strncat(classname, type, _MAX_PATH - 2);
 	if (!pGUIClasses) {
 		char buf[256];
-		snprintf(buf, sizeof(buf), "Tried to use an object (%s) before script compiled!", classname);
+		snprintf(buf, sizeof(buf), "Tried to use an object (%.50s) before script compiled!", classname);
 		return RuntimeError(buf);
 	}
 
 	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
 	if (!cobj) {
 		char buf[256];
-		snprintf(buf, sizeof(buf), "Failed to lookup name '%s'", classname);
+		snprintf(buf, sizeof(buf), "Failed to lookup name '%.50s'", classname);
 		return RuntimeError(buf);
 	}
 	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);
