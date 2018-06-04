@@ -493,7 +493,7 @@ def OpenBiographyEditWindow ():
 	placeholder = SubCustomizeWindow.GetControl (4)
 	TextArea = SubCustomizeWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL")
 	TextArea.SetFrame(placeholder.GetFrame())
-	TextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE)
+	TextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	TextArea.SetText (BioStrRef)
 	SubCustomizeWindow.DeleteControl(placeholder)
 
