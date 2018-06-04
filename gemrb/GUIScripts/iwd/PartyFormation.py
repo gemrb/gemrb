@@ -104,7 +104,6 @@ def OnLoad ():
 def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	PartyFormationWindow.SetVisible(False)
 	CreateCharWindow = GemRB.LoadWindow (3)
 
 	CreateButton = CreateCharWindow.GetControl (0)
@@ -124,7 +123,6 @@ def CreateCharPress ():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	CreateCharWindow.Focus()
 	return
 
 def CreateCharCreatePress ():
