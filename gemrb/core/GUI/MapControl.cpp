@@ -167,6 +167,9 @@ Region MapControl::GetViewport() const
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
+	if (MyMap == NULL)
+		return;
+
 	Video* video = core->GetVideoDriver();
 	video->DrawRect(rgn, ColorBlack, true);
 
@@ -252,6 +255,9 @@ void MapControl::UpdateCursor()
 /** Mouse Button Down */
 bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
+	if (MyMap == NULL)
+		return false;
+
 	if (me.ButtonState(GEM_MB_ACTION)) {
 		UpdateViewport(ConvertPointFromScreen(me.Pos()));
 	}
@@ -262,6 +268,9 @@ bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 /** Mouse Over Event */
 bool MapControl::OnMouseOver(const MouseEvent& me)
 {
+	if (MyMap == NULL)
+		return false;
+
 	Point p = ConvertPointFromScreen(me.Pos());
 	
 	ieDword val = GetValue();
