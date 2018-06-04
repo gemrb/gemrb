@@ -98,6 +98,9 @@ def StartTextScreen ():
 	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
 	TextArea = TextScreen.GetControl (2)
 
+	GameWin = GemRB.GetView("GAMEWIN")
+	GameWin.SetDisabled(True)
+
 	if GameCheck.IsBG1():
 		#these suckers couldn't use a fix row
 		FindTextRow (Table)
@@ -148,6 +151,8 @@ def EndTextScreen ():
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
 
+	GameWin = GemRB.GetView("GAMEWIN")
+	GameWin.SetDisabled(False)
 	GemRB.GamePause (0, 3)
 
 	if TableName == "25ecred":

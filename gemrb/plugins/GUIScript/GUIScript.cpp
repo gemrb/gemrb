@@ -545,7 +545,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 		// insert enough newlines to push the text offscreen
 		int rowHeight = ta->LineHeight();
 		int h = ta->Dimensions().h;
-		size_t lines = h / rowHeight;
+		ieDword lines = (h / rowHeight) + 1;
 		ta->AppendText(String(lines, L'\n'));
 		ta->AppendText(*chapText);
 		// append again after the chtext so it will scroll out of view
