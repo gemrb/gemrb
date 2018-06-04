@@ -522,8 +522,10 @@ void WindowManager::DrawWindows() const
 		if (!win->IsVisible())
 			continue;
 
-		if (win == modalWin)
+		if (win == modalWin) {
+			drawFrame = drawFrame || !(win->Flags()&Window::Borderless);
 			continue; // will draw this later
+		}
 
 		const Region& frame = win->Frame();
 
