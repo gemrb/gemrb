@@ -46,7 +46,7 @@ def StartLoadScreen ():
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK")
-	LoadScreen.Focus()
+	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def EndLoadScreen ():

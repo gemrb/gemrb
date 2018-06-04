@@ -63,7 +63,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	if screen_type == LS_TYPE_SAVING:
 		SetGameGUIHidden(False)
 
-	Window.Focus()
+	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 
 
 def EndLoadScreen ():

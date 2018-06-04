@@ -81,6 +81,6 @@ def StartLoadScreen ():
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
-	LoadScreen.Focus()
+	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 
 
