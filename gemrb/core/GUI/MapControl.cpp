@@ -200,14 +200,14 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
-			Sprite2D *anim = Flag[mn.color&7];
-			
-			Point pos = ConvertPointFromGame(mn.Pos);
 			
 			//Skip unexplored map notes
-			bool visible = MyMap->IsVisible( pos, true );
+			bool visible = MyMap->IsVisible( mn.Pos, true );
 			if (!visible)
 				continue;
+
+			Sprite2D *anim = Flag[mn.color&7];
+			Point pos = ConvertPointFromGame(mn.Pos);
 
 			if (anim) {
 				video->BlitSprite( anim, pos.x - anim->Width/2, pos.y - anim->Height/2, &rgn );
