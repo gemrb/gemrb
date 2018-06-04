@@ -117,22 +117,6 @@ OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindow
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 
-def QueryText ():
-	if not GameCheck.IsIWD2():
-		return  NoteLabel.QueryText ()
-
-	Data = ""
-	row = 0
-	while 1:
-		GemRB.SetVar ("row", row)
-		NoteLabel.SetVarAssoc ("row", row)
-		line = NoteLabel.QueryText ()
-		if len(line)<=0:
-			break
-		Data += line+"\n"
-		row += 1
-	return Data
-
 def SetMapNote (Text):
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
@@ -146,16 +130,31 @@ def AddNoteWindow ():
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
-	NoteWindow = GemRB.LoadWindow (5)
+	if Text == "":
+		Text = "Note"
+
+	NoteWindow = GemRB.LoadWindow (5, "GUIMAP")
 	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
-	NoteLabel = NoteWindow.GetControl (1)
+
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
 		#0 is the default Scrollbar ID
-		NoteTA = MapWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
-		NoteLabel = NoteTA.SubstituteForControl(NoteLabel)
+		placeholder = NoteWindow.GetControl (1)
+		frame = placeholder.GetFrame()
+		NoteWindow.DeleteControl(placeholder)
+		NoteLabel = NoteWindow.CreateTextArea(100, frame['x'], frame['y'], frame['w'], frame['h'], "NORMAL")
+		NoteLabel.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+
+		# center relative to map
+		mapframe = MapWindow.GetFrame()
+		noteframe = NoteWindow.GetFrame()
+		noteframe['x'] = mapframe['x'] + mapframe['w']/2 - noteframe['w']/2 - 60
+		noteframe['y'] = mapframe['y'] + mapframe['h']/2 - noteframe['h']/2
+		NoteWindow.SetFrame(noteframe)
 	else:
+		NoteLabel = NoteWindow.GetControl (1)
 		NoteLabel.SetBackground (None)
+
 	NoteLabel.SetText (Text)
 
 	for i in range(8):
@@ -168,7 +167,7 @@ def AddNoteWindow ():
 
 	#set
 	Label = NoteWindow.GetControl (0)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(QueryText()))
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(NoteLabel.QueryText()))
 	Label.SetText (11973)
 	Label.MakeDefault()
 
