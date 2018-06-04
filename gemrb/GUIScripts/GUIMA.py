@@ -194,6 +194,9 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea (1)
+	if tmp is None:
+		return
+
 	hours = tmp["Distance"]
 	OpenWorldMapWindow ()
 
