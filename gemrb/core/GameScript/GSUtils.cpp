@@ -278,7 +278,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 	if (idx == (unsigned int) -1) return false;
 
 	STOItem *si = store->GetItem(idx, false);
-	memcpy( &item, si, sizeof( CREItem ) );
+	item.CopySTOItem(si);
 	if (item.MaxStackAmount) {
 		item.Usages[0] = count;
 	}
