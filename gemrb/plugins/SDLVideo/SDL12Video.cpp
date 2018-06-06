@@ -661,7 +661,7 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 		Uint16 chr = event.key.keysym.unicode;
 
 		if (isprint(chr) && modstate <= GEM_MOD_SHIFT) {
-			char text[2] = { chr, '\0' };
+			char text[2] = { (char)chr, '\0' };
 			Event e = EventMgr::CreateTextEvent(text);
 			EvntManager->DispatchEvent(e);
 			return GEM_OK;
