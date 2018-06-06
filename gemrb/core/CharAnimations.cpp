@@ -238,9 +238,9 @@ void CharAnimations::SetWeaponType(int wt)
 
 void CharAnimations::SetHelmetRef(const char* ref)
 {
-	strncpy(HelmetRef, ref, sizeof(HelmetRef));
+	strlcpy(HelmetRef, ref, sizeof(HelmetRef)+1);
 
-	// TODO: Only drop helmet anims?
+	// Only drop helmet anims?
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
@@ -527,7 +527,7 @@ void CharAnimations::InitAvatarsTable()
 
 		if (resdata) {
 			char section[12];
-			snprintf(section,10,"%d", i);
+			snprintf(section, 10, "%d", i%100000); // the mod is just to silent warnings, since we know i is small enough
 
 			if (!resdata->GetKeysCount(section)) continue;
 
@@ -1875,7 +1875,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], Part+1,
+	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], (Part+1)%100,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
