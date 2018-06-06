@@ -79,7 +79,9 @@ struct GEM_EXPORT STOItem {
 	Condition *triggers;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
-	
+
+	STOItem();
+	STOItem(CREItem *item);
 	~STOItem();
 };
 

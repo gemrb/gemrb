@@ -186,7 +186,20 @@ public:
 		MaxStackAmount=0;
 		Flags = 0;
 		Expired = 0;
-	}
+	};
+	CREItem(STOItem *item)
+	{
+		CopySTOItem(item);
+	};
+	void CopySTOItem(STOItem *item)
+	{
+		CopyResRef(ItemResRef, item->ItemResRef);
+		Expired = 0; // PurchasedAmount in STOItem
+		memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
+		Flags = item->Flags;
+		Weight = item->Weight;
+		MaxStackAmount = item->MaxStackAmount;
+	};
 };
 
 /**

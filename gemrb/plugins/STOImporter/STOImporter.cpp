@@ -129,7 +129,6 @@ Store* STOImporter::GetStore(Store *s)
 
 	for(size=0;size<s->ItemsCount;size++) {
 		STOItem *si = new STOItem();
-		memset(si, 0, sizeof(STOItem) );
 		s->items.push_back( si );
 	}
 

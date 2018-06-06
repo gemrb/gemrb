@@ -642,8 +642,8 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 	// just set up STOItem)
 	while (item->PurchasedAmount) {
 		//the first part of a STOItem is essentially a CREItem
-		temp = new CREItem();
-		memcpy( temp, item, sizeof( CREItem ) );
+		temp = new CREItem(item);
+
 		//except the Expired flag
 		temp->Expired=0;
 		if (action==STA_STEAL && !core->HasFeature(GF_PST_STATE_FLAGS)) {
