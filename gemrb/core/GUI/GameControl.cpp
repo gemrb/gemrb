@@ -627,9 +627,10 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 // it's used both for tooltips everywhere and hp display on game control
 bool GameControl::DispatchEvent(const Event& event)
 {
+	Game *game = core->GetGame();
+	if (!game) return false;
+
 	if (event.keyboard.keycode == GEM_TAB) {
-		Game *game = core->GetGame();
-		if (!game) return false;
 		// show partymember hp/maxhp as overhead text
 		for (int pm=0; pm < game->GetPartySize(false); pm++) {
 			Actor *pc = game->GetPC(pm, true);
@@ -637,6 +638,8 @@ bool GameControl::DispatchEvent(const Event& event)
 			pc->DisplayHeadHPRatio();
 		}
 		return true;
+	} else if (event.keyboard.keycode == GEM_ESCAPE) {
+		core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 	}
 	return false;
 }
@@ -671,12 +674,10 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 #endif
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			break;
-		case GEM_TAB:
-			// show partymember hp/maxhp as overhead text
-			// this is handled in DispatchEvent due to tab having two functions
-			break;
-		case GEM_ESCAPE:
-			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+		case GEM_TAB: // show partymember hp/maxhp as overhead text
+		// fallthrough
+		case GEM_ESCAPE: // redraw actionbar
+			// do nothing; these are handled in DispatchEvent due to tab having two functions
 			break;
 		case '0':
 			game->SelectActor( NULL, false, SELECT_NORMAL );
@@ -1813,6 +1814,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 	}
 	return false;
 }
+
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
