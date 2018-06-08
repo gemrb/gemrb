@@ -197,8 +197,9 @@ def MoveToNewArea ():
 	if tmp is None:
 		return
 
+	WorldMapWindow.Close()
+
 	hours = tmp["Distance"]
-	OpenWorldMapWindow ()
 
 	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
