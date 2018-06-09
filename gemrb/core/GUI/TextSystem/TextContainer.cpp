@@ -867,7 +867,6 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 			InsertText(String(1, '\n'));
 			return true;
 		default:
-			assert(key.character == 0);
 			return false;
 	}
 }
