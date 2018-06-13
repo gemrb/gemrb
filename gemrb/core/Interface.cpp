@@ -475,6 +475,7 @@ void Interface::HandleEvents()
 
 		Window* win = GetWindow(0, "ACTWIN");
 		if (win) {
+			vars->SetAt("ActionLevel", 0, false);
 			guiscript->RunFunction( "GUICommonWindows", "UpdateActionsWindow" );
 		}
 	}

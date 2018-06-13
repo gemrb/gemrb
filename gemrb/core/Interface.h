@@ -38,7 +38,6 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
-#include "Variables.h"
 
 #include <map>
 #include <string>
@@ -761,10 +760,6 @@ public:
 	inline void SetEventFlag(int Flag)
 	{
 		EventFlag|=Flag;
-
-		if (Flag&EF_ACTION) {
-			vars->SetAt("ActionLevel", 0, false);
-		}
 	}
 	inline void ResetEventFlag(int Flag)
 	{
