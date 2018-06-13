@@ -8501,10 +8501,10 @@ void Actor::SetSoundFolder(const char *soundset)
 		if (dirIt) {
 			do {
 				const char* name = dirIt.GetName();
-				// need to truncate the "01" from the name
-				size_t len = strlen(name) - 2;
-				if(len < sizeof(ieResRef)) {
-					strnlwrcpy(PCStats->SoundSet, name, int(len));
+				const char* end = strchr(name, '.');
+				if (end != NULL) {
+					// need to truncate the "01" from the name
+					strnlwrcpy(PCStats->SoundSet, name, int(end - 2 - name));
 					break;
 				}
 			} while (++dirIt);
