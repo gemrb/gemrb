@@ -377,31 +377,35 @@ def OpenScriptWindow ():
 	defaultCount = ScriptsTable.GetRowCount ()
 
 	options = []
-	i = 0
 	for script in scripts:
-		if i < defaultCount:
-			GemRB.SetToken ("script", ScriptsTable.GetRowName (i))
+		scriptindex = -1
+		for i in range(defaultCount):
+			name = ScriptsTable.GetRowName (i)
+			GemRB.SetToken ("script", name)
+			if name.lower() == script.lower():
+				scriptindex = i
+				break;
+
+		GemRB.SetToken ("script", script)
+		if scriptindex == -1:
+			# custom
+			options.append (17167)
+		else:
 			title = ScriptsTable.GetValue (i,0)
 			if title!=-1:
-				  desc = ScriptsTable.GetValue (i,1)
-				  txt = GemRB.GetString (title)
-				  if (desc!=-1):
-					  txt += GemRB.GetString (desc) + "\n"
-				  options.append(txt)
+				desc = ScriptsTable.GetValue (i,1)
+				txt = GemRB.GetString (title)
+				if (desc!=-1):
+					txt += GemRB.GetString (desc) + "\n"
+				options.append(txt)
 			else:
-				  options.append (ScriptsTable.GetRowName (i) + "\n")
-		else:
-			GemRB.SetToken ("script", script)
-			options.append (17167)
-
-		i += 1
+				options.append (ScriptsTable.GetRowName (i) + "\n")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
 	if script == None:
-		script = "None"
+		script = "NONE"
 
-	# FIXME: this doesnt seem to work with "None", returns -1
 	scriptindex = ScriptsTable.GetRowIndex (script)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
