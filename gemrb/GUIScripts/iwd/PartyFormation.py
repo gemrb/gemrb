@@ -157,7 +157,6 @@ def EnterGamePress ():
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
-	PartyFormationWindow.SetVisible(False)
 	ExitWindow = GemRB.LoadWindow (7, "GUISP")
 
 	ExitButton = ExitWindow.GetControl (1)
@@ -173,7 +172,7 @@ def ExitPress ():
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)
 
-	ExitWindow.Focus()
+	ExitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ExitCancelPress ():

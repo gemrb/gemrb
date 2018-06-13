@@ -118,7 +118,7 @@ class CharGen:
 		else:
 			CancelButton.SetText (8159) # Start over
 		CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, self.cancel)
+		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.cancel())
 
 		#set and fill overview
 		TextAreaControl = CharGenWindow.GetControl (9)

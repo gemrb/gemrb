@@ -79,7 +79,6 @@ def OnLoad():
 
 def ExitPress():
 	global PartyFormationWindow, ExitWindow
-	PartyFormationWindow.SetVisible(False)
 	ExitWindow = GemRB.LoadWindow(7)
 
 	TextArea = ExitWindow.GetControl(0)

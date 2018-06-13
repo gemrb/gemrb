@@ -84,7 +84,6 @@ def OnLoad ():
 
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
-	PartyFormationWindow.SetVisible(False)
 	ExitWindow = GemRB.LoadWindow (7)
 
 	TextArea = ExitWindow.GetControl (0)
@@ -100,7 +99,7 @@ def ExitPress ():
 	DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
 
-	ExitWindow.Focus()
+	ExitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ExitDonePress ():
@@ -134,8 +133,7 @@ def EnterGamePress ():
 def ReviewPress ():
 	global PartyFormationWindow, ReviewWindow
 
-	PartyFormationWindow.SetVisible(False)
-	ReviewWindow = GemRB.LoadWindow (8)
+	ReviewWindow = GemRB.LoadWindow (8, "GUISP")
 
 	DoneButton = ReviewWindow.GetControl (1)
 	DoneButton.SetText (11973)
@@ -151,7 +149,7 @@ def ReviewPress ():
 	GUIREC.DisplayGeneral (MyChar, LeftTextArea)
 	GUIREC.DisplaySkills (MyChar, RightTextArea)
 
-	ReviewWindow.Focus()
+	ReviewWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ReviewDonePress ():
