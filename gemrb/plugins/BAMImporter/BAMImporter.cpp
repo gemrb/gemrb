@@ -18,9 +18,6 @@
  *
  */
 
-#ifdef ANDROID
-#include "swab.h"
-#endif
 
 #include "BAMImporter.h"
 
@@ -36,7 +33,10 @@
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#undef swab
 #endif
+
+#include "System/swab.h"
 
 using namespace GemRB;
 
@@ -244,15 +244,11 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 	if (count == 0) return NULL;
 
 	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
-	ieWord * FLT2 = ( ieWord * ) calloc( count, sizeof(ieWord) );
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * sizeof(ieWord) );
 	if( DataStream::IsEndianSwitch() ) {
-		//msvc likes it as char *
-		swab( (char*) FLT, (char*) FLT2, count * sizeof(ieWord) );
-		FLT = FLT2;
+		swabs(FLT, count * sizeof(ieWord));
 	}
-	free(FLT2);
 	return FLT;
 }
 
