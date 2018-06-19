@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 void swab(const void *bfrom, void *bto, ssize_t n);
+void swabs(void *buf, ssize_t n);
 
 #if defined(__cplusplus)
 }  /* extern "C" */
