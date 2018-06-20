@@ -707,7 +707,7 @@ def UpdateStoreHealWindow (Window):
 				color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
 				Button.SetBorder (0, color, 1,1)
 			else:
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
+				Button.SetDisabled (False)
 				Button.SetBorder (0, None, 0,0)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
@@ -726,7 +726,7 @@ def UpdateStoreHealWindow (Window):
 			Label = Window.GetControl (0x10000003)
 			Label.SetText (str(Cure['Price']) )
 			Button = Window.GetControl (5)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled (False)
 	return
 
 ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreHealWindow, UpdateStoreHealWindow, WINDOW_HCENTER|WINDOW_TOP)
