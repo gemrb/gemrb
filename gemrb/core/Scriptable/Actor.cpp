@@ -8249,7 +8249,7 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
+void Actor::GetSoundFrom2DA(ieResRef& Sound, unsigned int index) const
 {
 	if (!anims) return;
 
@@ -8286,7 +8286,7 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
+void Actor::GetSoundFromINI(ieResRef& Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -8325,7 +8325,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 	Sound[count]=0;
 }
 
-void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
+void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 {
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
