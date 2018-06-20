@@ -549,7 +549,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 				cont = !IsDirectory();
 			}
 			if (cont == false && entrySkipFlags&Hidden) {
-				cont = name[0] == '.';
+				cont = name[0] == '.' && name[1] != PathDelimiter;
 			}
 			if (cont == false && predicate) {
 				cont = !(*predicate)(name);
