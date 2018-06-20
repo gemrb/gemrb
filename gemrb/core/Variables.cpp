@@ -68,6 +68,8 @@ inline unsigned int Variables::MyCompareKey(const char* key, const char *str) co
 
 inline unsigned int Variables::MyHashKey(const char* key) const
 {
+	assert(key != NULL);
+
 	unsigned int nHash = 0;
 	for (int i = 0; key[i] && i < MAX_VARIABLE_LENGTH; i++) {
 		//the original engine ignores spaces in variable names
@@ -249,6 +251,10 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) const
 	// find association (or return NULL)
 {
+	if (key == NULL) {
+		return NULL;
+	}
+
 	nHash = MyHashKey( key ) % m_nHashTableSize;
 
 	if (m_pHashTable == NULL) {
