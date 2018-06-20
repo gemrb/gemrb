@@ -52,7 +52,7 @@ before_script:
   - cmake --version
   
 after_failure:
-  - COREFILE=$(find . -maxdepth 2 -name "*core*" | head -n 1) # find core file
+  - for i in $(find ./ -maxdepth 2 -name 'core*' -print); do gdb $(pwd)/gemrb core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done; # find core file
   - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" gemrb/gemrb -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 script:
