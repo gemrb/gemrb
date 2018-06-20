@@ -404,8 +404,8 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 	return NULL;
 }
 
-ContentContainer::ContentList::const_iterator
-ContentContainer::EraseContent(ContentList::const_iterator it)
+ContentContainer::ContentList::iterator
+ContentContainer::EraseContent(ContentList::iterator it)
 {
 	Content* content = *it;
 	content->parent = NULL;
@@ -417,8 +417,8 @@ ContentContainer::EraseContent(ContentList::const_iterator it)
 	return contents.erase(it);
 }
 
-ContentContainer::ContentList::const_iterator
-ContentContainer::EraseContent(ContentList::const_iterator beg, ContentList::const_iterator end)
+ContentContainer::ContentList::iterator
+ContentContainer::EraseContent(ContentList::iterator beg, ContentList::iterator end)
 {
 	for (; beg != end;) {
 		beg = EraseContent(beg);

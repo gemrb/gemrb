@@ -191,8 +191,8 @@ protected:
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
-	ContentList::const_iterator EraseContent(ContentList::const_iterator it);
-	ContentList::const_iterator EraseContent(ContentList::const_iterator beg, ContentList::const_iterator end);
+	ContentList::iterator EraseContent(ContentList::iterator it);
+	ContentList::iterator EraseContent(ContentList::iterator beg, ContentList::iterator end);
 
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
