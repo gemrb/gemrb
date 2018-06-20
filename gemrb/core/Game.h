@@ -33,6 +33,7 @@
 #include "ie_types.h"
 
 #include "Callback.h"
+#include "Resource.h"
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
@@ -253,7 +254,7 @@ private:
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
-	std::vector<std::vector<char *> > npclevels;
+	std::vector<std::vector<ResRef> > npclevels;
 	int *bntchnc;
 	int bntrows;
 	CRRow *crtable;

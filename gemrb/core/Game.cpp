@@ -159,15 +159,12 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int i, j;
 		npclevels.reserve(rows);
 		for (i = 0; i < rows; i++) {
-			npclevels.push_back (std::vector<char *>(cols+1));
+			npclevels.push_back (std::vector<ResRef>(cols+1));
 			for(j = -1; j < cols; j++) {
-				char *ref = new char[9];
 				if (j == -1) {
-					CopyResRef(ref, table->GetRowName(i));
-					npclevels[i][j+1] = ref;
+					npclevels[i][j+1] = table->GetRowName(i);
 				} else {
-					CopyResRef(ref, table->QueryField(i, j));
-					npclevels[i][j+1] = ref;
+					npclevels[i][j+1] = table->QueryField(i, j);
 				}
 			}
 		}
@@ -226,14 +223,6 @@ Game::~Game(void)
 	i=planepositions.size();
 	while(i--) {
 		free (planepositions[i]);
-	}
-
-	i = npclevels.size();
-	while (i--) {
-		size_t j = npclevels[i].size();
-		while(j--) {
-			delete [] npclevels[i][j];
-		}
 	}
 }
 
@@ -971,7 +960,7 @@ bool Game::CheckForReplacementActor(int i)
 	ieDword level = GetPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
-		std::vector<std::vector<char *> >::iterator it;
+		std::vector<std::vector<ResRef> >::iterator it;
 		for (it = npclevels.begin(); it != npclevels.end(); it++) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				// the tables have entries only up to level 24
