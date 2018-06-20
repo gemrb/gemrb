@@ -409,7 +409,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
 					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
 					// it could be this bug affects only the simulator.
-					sleep(1);
+					SDL_Delay(1000);
 #endif
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
