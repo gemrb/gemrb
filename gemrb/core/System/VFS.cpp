@@ -525,6 +525,7 @@ bool DirectoryIterator::IsDirectory()
 
 const char* DirectoryIterator::GetName()
 {
+	if (Entry == NULL) return NULL;
 	return static_cast<dirent*>(Entry)->d_name;
 }
 
