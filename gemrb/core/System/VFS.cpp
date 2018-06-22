@@ -555,6 +555,8 @@ DirectoryIterator& DirectoryIterator::operator++()
 			if (cont == false && predicate) {
 				cont = !(*predicate)(name);
 			}
+		} else {
+			Log(WARNING, "DirectoryIterator", "Cannot readdir: %s\nError: %s", Path, strerror(errno));
 		}
 	} while (cont);
 
@@ -566,10 +568,12 @@ void DirectoryIterator::Rewind()
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
 	Directory = opendir(Path);
-	if (Directory == NULL)
+	if (Directory == NULL) {
 		Entry = NULL;
-	else
+		Log(WARNING, "DirectoryIterator", "Cannot open directory: %s\nError: %s", Path, strerror(errno));
+	} else {
 		this->operator++();
+	}
 }
 
 
