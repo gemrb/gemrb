@@ -8528,7 +8528,7 @@ void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
 		if (full) {
 			strcat(soundset,"/");
-			strncat(soundset, set, 8);
+			strncat(soundset, set, 9);
 		}
 	}
 	else {
