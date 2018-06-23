@@ -146,7 +146,9 @@ public:
 
 	~SDLTextureVideoBuffer() {
 		SDL_DestroyTexture(texture);
-		SDL_DestroyTexture(maskLayer);
+		if (maskLayer) {
+			SDL_DestroyTexture(maskLayer);
+		}
 		operator delete(conversionBuffer);
 	}
 
