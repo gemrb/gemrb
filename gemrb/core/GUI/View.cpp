@@ -641,6 +641,16 @@ void View::MouseWheelScroll(const Point& delta)
 {
 	HandleEvent1(MouseWheelScroll, delta);
 }
+
+void View::TouchDown(const TouchEvent& te, unsigned short mod)
+{
+	HandleEvent2(TouchDown, te, mod);
+}
+
+void View::TouchUp(const TouchEvent& te, unsigned short mod)
+{
+	HandleEvent2(TouchUp, te, mod);
+}
 	
 void View::ClearScriptingRefs()
 {

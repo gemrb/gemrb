@@ -310,7 +310,39 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 	drag = NULL;
 	trackingView = NULL;
 }
-	
+
+void Window::DispatchTouchDown(View* target, const TouchEvent& te, unsigned short mod)
+{
+	assert(target);
+
+	if (te.numFingers == 1
+		&& !(Flags() & View::IgnoreEvents)) {
+		Focus();
+	}
+
+	TrySetFocus(target);
+	target->TouchDown(te, mod);
+	trackingView = target; // all views track the mouse within their bounds
+}
+
+void Window::DispatchTouchUp(View* target, const TouchEvent& te, unsigned short mod)
+{
+	assert(target);
+
+	if (drag && te.numFingers == 1) {
+		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+			target->CompleteDragOperation(*drag);
+		}
+	} else if (trackingView) {
+		if (trackingView == target || trackingView->TracksMouseDown())
+			trackingView->TouchUp(te, mod);
+	} else if (target) {
+		target->TouchUp(te, mod);
+	}
+	drag = NULL;
+	trackingView = NULL;
+}
+
 bool Window::DispatchKey(View* keyView, const Event& event)
 {
 	// hotkeys first
@@ -391,7 +423,17 @@ bool Window::DispatchEvent(const Event& event)
 			case Event::MouseUp:
 				DispatchMouseUp(target, event.mouse, event.mod);
 				break;
-			default: return false; // we dont handle touch events yet...
+			case Event::TouchDown:
+				DispatchTouchDown(target, event.touch, event.mod);
+				break;
+			case Event::TouchUp:
+				DispatchTouchUp(target, event.touch, event.mod);
+				break;
+			case Event::TouchGesture:
+				// TODO: handle gestures
+				break;
+			default:
+				assert(false); // others should be handled above
 		}
 		// absorb other screen events i guess
 		return true;

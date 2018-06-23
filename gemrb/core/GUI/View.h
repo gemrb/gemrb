@@ -143,6 +143,9 @@ protected:
 	virtual bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnMouseWheelScroll(const Point&) { return false; }
 
+	virtual bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) { return false; }
+
 public:
 	#include "ViewInterfaces.h"
 
@@ -220,6 +223,9 @@ public:
 	void MouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void MouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void MouseWheelScroll(const Point&);
+
+	void TouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	void TouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }

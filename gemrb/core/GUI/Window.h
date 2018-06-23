@@ -80,6 +80,9 @@ private:
 	inline void DispatchMouseMotion(View*, const MouseEvent&);
 	inline void DispatchMouseDown(View*, const MouseEvent& me, unsigned short /*Mod*/);
 	inline void DispatchMouseUp(View*, const MouseEvent& me, unsigned short /*Mod*/);
+
+	inline void DispatchTouchDown(View*, const TouchEvent& te, unsigned short /*Mod*/);
+	inline void DispatchTouchUp(View*, const TouchEvent& te, unsigned short /*Mod*/);
 	
 	inline bool DispatchKey(View*, const Event&);
 	
