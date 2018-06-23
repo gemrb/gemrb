@@ -323,12 +323,12 @@ enum ConfigTableSection {
 		}
 		if (newConfig) {
 			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+			[newConfig appendFormat:@"\nGamePath = %@", gamePath];
 			// No need for CD paths
-			[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nSavePath = %@", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
+			[newConfig appendFormat:@"\nSavePath = %@", savePath];
 
-			[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
+			[newConfig appendFormat:@"\nCustomFontPath = %@", docDir];
 
 			NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
 			if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
