@@ -44,7 +44,7 @@ bool Logger::SetLogLevel(log_level level)
 		myLevel = level;
 		static const char* fmt = "Log Level set to %d";
 		char msg[25];
-		snprintf(msg, 25, fmt, level);
+		snprintf(msg, 25, fmt, level%100);
 		// careful to use our log function and not the global one to prevent this message form
 		// propagating to other loggers.
 		LogInternal(INTERNAL, "Logger", msg, DEFAULT);

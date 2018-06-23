@@ -3334,7 +3334,7 @@ int Interface::LoadSymbol(const char* ResRef)
 		return -1;
 	}
 	Symbol s;
-	strncpy( s.ResRef, ResRef, 8 );
+	strlcpy(s.ResRef, ResRef, sizeof(s.ResRef));
 	s.sm = sm;
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
