@@ -538,6 +538,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 {
 	bool cont = false;
 	do {
+		errno = 0;
 		Entry = readdir(static_cast<DIR*>(Directory));
 		cont = false;
 		if (Entry) {
@@ -555,7 +556,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 			if (cont == false && predicate) {
 				cont = !(*predicate)(name);
 			}
-		} else {
+		} else if (errno) {
 			Log(WARNING, "DirectoryIterator", "Cannot readdir: %s\nError: %s", Path, strerror(errno));
 		}
 	} while (cont);
