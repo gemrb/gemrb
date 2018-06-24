@@ -656,8 +656,7 @@ bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
 	if (te.numFingers == 1) {
 		MouseEvent me = MouseEventFromTouch(te, true);
-		OnMouseDown(me, mod);
-		return true;
+		return OnMouseDown(me, mod);
 	}
 	return false;
 }
@@ -666,8 +665,7 @@ bool View::OnTouchUp(const TouchEvent& te, unsigned short mod)
 {
 	if (te.numFingers == 1) {
 		MouseEvent me = MouseEventFromTouch(te, false);
-		OnMouseUp(me, mod);
-		return true;
+		return OnMouseUp(me, mod);
 	}
 	return false;
 }
