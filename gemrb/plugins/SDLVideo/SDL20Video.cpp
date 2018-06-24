@@ -298,8 +298,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				TouchEvent::Finger fingers[1] = { };
 				fingers[0].x = event.tfinger.x * screenSize.w;
 				fingers[0].y = event.tfinger.y * screenSize.h;
-				fingers[0].deltaX = event.tfinger.dx;
-				fingers[0].deltaY = event.tfinger.dy;
+				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
+				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
 
 				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
 				e.mod = modstate;
@@ -310,10 +310,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERMOTION:
 			{
 				TouchEvent::Finger fingers[1] = { };
-				fingers[0].x = event.tfinger.x;
-				fingers[0].y = event.tfinger.y;
-				fingers[0].deltaX = event.tfinger.dx;
-				fingers[0].deltaY = event.tfinger.dy;
+				fingers[0].x = event.tfinger.x * screenSize.w;
+				fingers[0].y = event.tfinger.y * screenSize.h;
+				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
+				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
 
 				Event touch = EvntManager->CreateTouchEvent(fingers, 1, true, event.tfinger.pressure);
 				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
@@ -349,6 +349,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 						fingers[i].deltaX = finger->x - current->x;
 						fingers[i].deltaY = finger->y - current->y;
 					}
+				}
+
+				if (numf == 0) {
+					// see FIXME above
+					break;
 				}
 
 				// TODO: it may make more sense to calculate the pressure as an avg?
