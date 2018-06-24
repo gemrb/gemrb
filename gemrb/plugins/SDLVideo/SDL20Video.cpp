@@ -492,7 +492,7 @@ bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
 	Uint32 flags = 0;
 	if (set) {
-	flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	flags = SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_BORDERLESS;
 	}
 	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 		fullscreen = set;
