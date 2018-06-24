@@ -80,8 +80,11 @@ public:
 
 class GEM_EXPORT Control : public View {
 private:
-	Timer* StartActionTimer(const ControlEventHandler& action);
+	void ClearActionTimer();
+	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+
+	void HandleTouchActionTimer(Control*);
     
 public: // Public attributes
 	enum Action {
@@ -196,6 +199,9 @@ protected:
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
 	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+
+	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay

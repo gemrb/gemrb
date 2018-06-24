@@ -57,8 +57,7 @@ Control::~Control()
 {
 	assert(InHandler() == false);
 
-	if (actionTimer)
-		actionTimer->Invalidate();
+	ClearActionTimer();
 
 	delete animation;
 }
@@ -152,8 +151,7 @@ bool Control::PerformAction(const ActionKey& key)
 void Control::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (actionTimer && (flags&Disabled)) {
-		actionTimer->Invalidate();
-		actionTimer = NULL;
+		ClearActionTimer();
 	}
 }
 
@@ -206,7 +204,15 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	MarkDirty();
 }
 
-Timer* Control::StartActionTimer(const ControlEventHandler& action)
+void Control::ClearActionTimer()
+{
+	if (actionTimer) {
+		actionTimer->Invalidate();
+		actionTimer = NULL;
+	}
+}
+
+Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int delay)
 {
 	class RepeatControlEventHandler : public Callback<void, void> {
 		const ControlEventHandler action;
@@ -233,7 +239,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action)
 	EventHandler h = new RepeatControlEventHandler(action, this);
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
-	return &core->SetTimer(h, ActionRepeatDelay);
+	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
 }
 	
 bool Control::HitTest(const Point& p) const
@@ -249,10 +255,7 @@ bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	ActionKey key(Click, mod, me.button, me.repeats);
 	if (SupportsAction(key)) {
 		PerformAction(key);
-		if (actionTimer) {
-			actionTimer->Invalidate();
-			actionTimer = NULL;
-		}
+		ClearActionTimer();
 	} else if (me.repeats > 1) {
 		// also try a single-click in case there is no doubleclick handler
 		// and there is never a triple+ click handler
@@ -280,6 +283,40 @@ void Control::OnMouseEnter(const MouseEvent& /*me*/, const DragOp*)
 void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 {
 	PerformAction(HoverEnd);
+}
+
+bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
+{
+	MethodCallback<Control, Control*, void>* cb = new MethodCallback<Control, Control*, void>(this, &Control::HandleTouchActionTimer);
+	ControlEventHandler ceh(cb);
+	actionTimer = StartActionTimer(ceh, 500); // TODO: this time value should be configurable
+	return true; // always handled
+}
+
+bool Control::OnTouchUp(const TouchEvent& te, unsigned short mod)
+{
+	if (actionTimer) {
+		// touch up before timer triggered
+		// send the touch down+up events
+		ClearActionTimer();
+		View::OnTouchDown(te, mod);
+		View::OnTouchUp(te, mod);
+		return true;
+	}
+	return false; // touch was already handled as a long press
+}
+
+void Control::HandleTouchActionTimer(Control* ctrl)
+{
+	assert(ctrl == this);
+	assert(actionTimer);
+
+	ClearActionTimer();
+
+	// long press action (GEM_MB_MENU)
+	// TODO: we could save the mod value from OnTouchDown to support modifiers to the touch, but we dont have a use ATM
+	ActionKey key(Click, 0, GEM_MB_MENU, 1);
+	PerformAction(key);
 }
 
 ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
