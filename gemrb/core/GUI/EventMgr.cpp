@@ -294,10 +294,14 @@ Event EventMgr::CreateTouchEvent(ScreenEvent fingers[], int numFingers, bool dow
 	e.type = (down) ? Event::TouchDown : Event::TouchUp;
 
 	for (int i = 0; i < numFingers; ++i) {
-		// TODO: calculate the mid point of all fingers and assign to e.touch.pos
-		// do the same for the delta using FingerState() to compare
+		// TODO: calculate the mid point of all e.touch.delta using FingerState() to compare
+		e.touch.x += fingers[i].x;
+		e.touch.y += fingers[i].y;
 		e.touch.fingers[i] = fingers[i];
 	}
+
+	e.touch.x /= numFingers;
+	e.touch.y /= numFingers;
 
 	e.touch.numFingers = numFingers;
 	e.touch.pressure = pressure;

@@ -301,8 +301,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERUP:
 			{
 				TouchEvent::Finger fingers[1] = { };
-				fingers[0].x = event.tfinger.x;
-				fingers[0].y = event.tfinger.y;
+				fingers[0].x = event.tfinger.x * screenSize.w;
+				fingers[0].y = event.tfinger.y * screenSize.h;
 				fingers[0].deltaX = event.tfinger.dx;
 				fingers[0].deltaY = event.tfinger.dy;
 
