@@ -83,6 +83,7 @@ private:
 
 	inline void DispatchTouchDown(View*, const TouchEvent& te, unsigned short /*Mod*/);
 	inline void DispatchTouchUp(View*, const TouchEvent& te, unsigned short /*Mod*/);
+	inline void DispatchTouchGesture(View*, const GestureEvent& gesture);
 	
 	inline bool DispatchKey(View*, const Event&);
 	

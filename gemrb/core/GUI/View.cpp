@@ -652,8 +652,14 @@ void View::TouchUp(const TouchEvent& te, unsigned short mod)
 	HandleEvent2(TouchUp, te, mod);
 }
 
+void View::TouchGesture(const GestureEvent& gesture)
+{
+	HandleEvent1(TouchGesture, gesture);
+}
+
 bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
+	// default acts as left mouse down
 	if (te.numFingers == 1) {
 		MouseEvent me = MouseEventFromTouch(te, true);
 		return OnMouseDown(me, mod);
@@ -663,9 +669,20 @@ bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
 
 bool View::OnTouchUp(const TouchEvent& te, unsigned short mod)
 {
+	// default acts as left mouse up
 	if (te.numFingers == 1) {
 		MouseEvent me = MouseEventFromTouch(te, false);
 		return OnMouseUp(me, mod);
+	}
+	return false;
+}
+
+bool View::OnTouchGesture(const GestureEvent& gesture)
+{
+	// default acts as mouse drag
+	if (gesture.numFingers == 1) {
+		MouseEvent me = MouseEventFromTouch(gesture, true);
+		return OnMouseDrag(me);
 	}
 	return false;
 }

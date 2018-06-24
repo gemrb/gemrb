@@ -343,6 +343,16 @@ void Window::DispatchTouchUp(View* target, const TouchEvent& te, unsigned short 
 	trackingView = NULL;
 }
 
+void Window::DispatchTouchGesture(View* target, const GestureEvent& gesture)
+{
+	// FIXME: this is incomplete
+	// this should be a bit closer to DispatchMouseMotion
+	// drag and drop for example wont function
+
+	//trackingView = target;
+	target->TouchGesture(gesture);
+}
+
 bool Window::DispatchKey(View* keyView, const Event& event)
 {
 	// hotkeys first
@@ -430,7 +440,7 @@ bool Window::DispatchEvent(const Event& event)
 				DispatchTouchUp(target, event.touch, event.mod);
 				break;
 			case Event::TouchGesture:
-				// TODO: handle gestures
+				DispatchTouchGesture(target, event.gesture);
 				break;
 			default:
 				assert(false); // others should be handled above
