@@ -58,9 +58,7 @@ int SDL12VideoDriver::CreateDriverDisplay(const Size& s, int b, const char* titl
 
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
-	if (fullscreen) {
-		flags |= SDL_FULLSCREEN;
-	}
+
 	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
 	disp = SDL_SetVideoMode( s.w, s.h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );

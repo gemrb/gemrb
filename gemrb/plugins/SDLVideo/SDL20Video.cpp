@@ -48,17 +48,8 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
-	winFlags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
-	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
-	// don't know if Android makes use of this.
-	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
+	winFlags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP;
 #endif
-	if (fullscreen) {
-		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		//This is needed to remove the status bar on Android/iOS.
-		//since we are in fullscreen this has no effect outside Android/iOS
-		winFlags |= SDL_WINDOW_BORDERLESS;
-	}
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
