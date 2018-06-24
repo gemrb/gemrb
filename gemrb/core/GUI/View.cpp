@@ -679,10 +679,13 @@ bool View::OnTouchUp(const TouchEvent& te, unsigned short mod)
 
 bool View::OnTouchGesture(const GestureEvent& gesture)
 {
-	// default acts as mouse drag
+	// default acts as mouse drag for 1 finger
+	// or a mousewheel event for 2
 	if (gesture.numFingers == 1) {
 		MouseEvent me = MouseEventFromTouch(gesture, true);
 		return OnMouseDrag(me);
+	} else if (gesture.numFingers == 2) {
+		return OnMouseWheelScroll(gesture.Delta());
 	}
 	return false;
 }
