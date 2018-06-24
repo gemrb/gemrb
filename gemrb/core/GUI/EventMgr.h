@@ -194,6 +194,8 @@ struct GEM_EXPORT Event {
 	bool isScreen; // event coresponsds to location on screen
 };
 
+MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
+
 /**
  * @class EventMgr
  * Class distributing events from input devices to GUI windows.

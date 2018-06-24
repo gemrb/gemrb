@@ -143,8 +143,8 @@ protected:
 	virtual bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnMouseWheelScroll(const Point&) { return false; }
 
-	virtual bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) { return false; }
-	virtual bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) { return false; }
+	virtual bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	virtual bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 
 public:
 	#include "ViewInterfaces.h"

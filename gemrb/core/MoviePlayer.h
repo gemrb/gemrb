@@ -119,11 +119,6 @@ private:
 		return true;
 	}
 
-	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/) {
-		player.Stop();
-		return true;
-	}
-
 public:
 	MoviePlayerControls(MoviePlayer& player)
 	: View(Region(Point(), player.Dimensions())), player(player) {}

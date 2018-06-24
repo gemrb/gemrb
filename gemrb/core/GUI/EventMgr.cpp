@@ -39,6 +39,20 @@ std::map<unsigned short, TouchEvent::Finger> EventMgr::fingerStates;
 EventMgr::KeyMap EventMgr::HotKeys = KeyMap();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
+MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
+{
+	MouseEvent me;
+	me.x = te.x;
+	me.y = te.y;
+	me.deltaX = te.deltaX;
+	me.deltaY = te.deltaY;
+
+	me.buttonStates = (down) ? GEM_MB_ACTION : 0;
+	me.button = GEM_MB_ACTION;
+
+	return me;
+}
+
 bool EventMgr::ModState(unsigned short mod)
 {
 	return (modKeys & buttonbits(mod)).any();

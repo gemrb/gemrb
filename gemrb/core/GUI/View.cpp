@@ -651,6 +651,26 @@ void View::TouchUp(const TouchEvent& te, unsigned short mod)
 {
 	HandleEvent2(TouchUp, te, mod);
 }
+
+bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
+{
+	if (te.numFingers == 1) {
+		MouseEvent me = MouseEventFromTouch(te, true);
+		OnMouseDown(me, mod);
+		return true;
+	}
+	return false;
+}
+
+bool View::OnTouchUp(const TouchEvent& te, unsigned short mod)
+{
+	if (te.numFingers == 1) {
+		MouseEvent me = MouseEventFromTouch(te, false);
+		OnMouseUp(me, mod);
+		return true;
+	}
+	return false;
+}
 	
 void View::ClearScriptingRefs()
 {
