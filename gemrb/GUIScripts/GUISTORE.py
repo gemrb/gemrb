@@ -147,6 +147,7 @@ def OpenStoreWindow ():
 	GemRB.SetVar ("Action", 0)
 
 	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", WINDOW_HCENTER|WINDOW_BOTTOM)
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
 	#this window is static and grey, but good to stick the frame onto
 
 	if GameCheck.IsPST():
@@ -1127,6 +1128,8 @@ def OpenItemAmountWindow ():
 		return
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
+
 	Index = GemRB.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Amount = Slot['Purchased']
@@ -1359,6 +1362,7 @@ def InfoWindow (Slot, Item):
 	Identify = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
 
 	Window = GemRB.LoadWindow (windowIDs["iteminfo"], "GUISTORE", WINDOW_HCENTER|WINDOW_TOP)
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
 
 	# TODO: check if we can simplify bg2 vs non-pst games to see which label is which
 	if GameCheck.IsBG2():
@@ -1685,6 +1689,7 @@ def InfoHealWindow ():
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
 	Window = GemRB.LoadWindow (windowIDs["cureinfo"], "GUISTORE", WINDOW_HCENTER|WINDOW_TOP)
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
 
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (Spell['SpellName'])
@@ -1802,6 +1807,8 @@ def RentRoom ():
 		return
 
 	RentConfirmWindow = Window = GemRB.LoadWindow (windowIDs["rentconfirm"], "GUISTORE")
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
+
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["rest"])
@@ -1823,6 +1830,7 @@ def RentRoom ():
 
 def ErrorWindow (strref):
 	Window = GemRB.LoadWindow (windowIDs["error"])
+	Window.SetFlags(WF_BORDERLESS, OP_OR)
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)
