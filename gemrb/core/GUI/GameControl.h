@@ -240,6 +240,11 @@ protected:
 	/** Mouse Over Event */
 	bool OnMouseOver(const MouseEvent&);
 	bool OnMouseDrag(const MouseEvent& /*me*/);
+
+	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	bool OnTouchGesture(const GestureEvent& gesture);
+
 	/** Currently only deals with the GEM_TAB exception */
 	bool DispatchEvent(const Event& event);
 	

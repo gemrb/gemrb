@@ -661,6 +661,7 @@ bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
 	// default acts as left mouse down
 	if (te.numFingers == 1) {
+		// TODO: use touch pressure to toggle tooltips
 		MouseEvent me = MouseEventFromTouch(te, true);
 		return OnMouseDown(me, mod);
 	}

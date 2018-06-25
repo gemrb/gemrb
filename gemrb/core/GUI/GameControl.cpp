@@ -28,6 +28,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
+#include "GUIScriptInterface.h"
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "KeyMap.h"
@@ -1415,6 +1416,100 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		SetCursor(core->Cursors[IE_CURSOR_PRESSED]);
 	}
 	return true;
+}
+
+bool GameControl::OnTouchDown(const TouchEvent& te, unsigned short mod)
+{
+	if (te.numFingers == 2) {
+		// container highlights
+		DebugFlags |= DEBUG_SHOW_CONTAINERS;
+	}
+
+	// TODO: check pressure to distinguish between tooltip and HP modes
+	if (View::OnTouchDown(te, mod)) {
+		if (te.numFingers == 1) {
+			screenMousePos = te.Pos();
+
+			// if an actor is being touched show HP
+			Actor* actor = GetLastActor();
+			if (actor) {
+				actor->DisplayHeadHPRatio();
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+bool GameControl::OnTouchUp(const TouchEvent& te, unsigned short mod)
+{
+	if (EventMgr::ModState(GEM_ALT) == false) {
+		DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+	}
+
+	return View::OnTouchUp(te, mod);
+}
+
+bool GameControl::OnTouchGesture(const GestureEvent& gesture)
+{
+	if (gesture.numFingers == 1) {
+		if (target_mode != TARGET_MODE_NONE) {
+			// we are in a target mode; nothing here applies
+			return true;
+		}
+
+		if (overDoor || overContainer || overInfoPoint) {
+			return true;
+		}
+
+		screenMousePos = gesture.Pos();
+		isSelectionRect = true;
+	} else if (gesture.numFingers == 2) {
+		if (gesture.dTheta < -0.2 || gesture.dTheta > 0.2) { // TODO: actually figure out a good number
+			if (EventMgr::ModState(GEM_ALT) == false) {
+				DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+			}
+
+			isSelectionRect = false;
+
+			if (core->GetGame()->selected.size() <= 1) {
+				isFormationRotation = false;
+			} else {
+				isFormationRotation = true;
+				screenMousePos = gesture.fingers[1].Pos();
+			}
+		}
+	} else if (gesture.numFingers == 3) {
+		// keyboard/console
+
+		Video* video = core->GetVideoDriver();
+
+		enum SWIPE {DOWN = -1, NONE = 0, UP = 1};
+		SWIPE swipe = NONE; // TODO: calculate this
+
+		Window* consoleWin = GemRB::GetWindow(0, "WIN_CON");
+		assert(consoleWin);
+
+		switch (swipe) {
+			case DOWN:
+				consoleWin->Close();
+				video->StopTextInput();
+				break;
+			case UP:
+				if (video->InTextInput()) {
+					consoleWin->Focus();
+				} else {
+					video->StartTextInput();
+				}
+				break;
+			case NONE:
+				break;
+		}
+
+
+		video->InTextInput();
+	}
+	return View::OnTouchGesture(gesture);
 }
 
 Point GameControl::GameMousePos() const
