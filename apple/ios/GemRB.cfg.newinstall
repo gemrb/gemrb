@@ -57,9 +57,7 @@ UseSoftKeyboard=1
 
 # default is 0
 MouseFeedback=3
-
-# force enable touch input (in case autodetection fails or for hybrids)
-#TouchInput=1
+TouchInput=1
 
 #####################################################
 #  Touch Gesture Input Parameters                   #
