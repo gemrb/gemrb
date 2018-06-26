@@ -75,6 +75,10 @@ bool EventMgr::FingerDown()
 
 void EventMgr::DispatchEvent(Event& e)
 {
+	if (TouchInputEnabled == false && e.EventMaskFromType(e.type) & Event::AllTouchMask) {
+		return;
+	}
+
 	Video* video = core->GetVideoDriver();
 
 	e.time = GetTickCount();
