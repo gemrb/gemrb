@@ -1377,7 +1377,8 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 	
 			if selectionHandler:
 				selectionHandler(window)
-	
+
+			window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 			SetTopWindow (window, selectionHandler)
 			window.SetOnClose(TopWindowClosed)
 			GameWin = GemRB.GetView("GAMEWIN")
