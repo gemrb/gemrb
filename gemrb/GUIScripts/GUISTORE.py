@@ -117,6 +117,16 @@ def CloseStoreWindow ():
 	GUICommonWindows.CloseTopWindow()
 	return
 
+def PositionRelativeToStore(win):
+	storewin = GemRB.GetView("WIN_STORE")
+	storeframe = storewin.GetFrame()
+
+	winframe = win.GetFrame()
+	winframe['x'] = storeframe['x']
+	winframe['y'] = storeframe['y'] + storeframe['h']
+
+	win.SetFrame(winframe)
+
 def OpenStoreWindow ():
 	global Store
 	global StoreWindow, MenuWindow
@@ -146,8 +156,8 @@ def OpenStoreWindow ():
 
 	GemRB.SetVar ("Action", 0)
 
-	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", WINDOW_HCENTER|WINDOW_BOTTOM)
-	Window.SetFlags(WF_BORDERLESS, OP_OR)
+	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", WINDOW_HCENTER|WINDOW_TOP)
+	Window.AddAlias("WIN_STORE")
 	#this window is static and grey, but good to stick the frame onto
 
 	if GameCheck.IsPST():
@@ -201,6 +211,7 @@ def InitStoreShoppingWindow (Window):
 	global LeftButton, RightButton
 
 	Window.AddAlias('WINSHOP')
+	PositionRelativeToStore(Window)
 
 	GemRB.SetVar ("LeftIndex", 0) # reset the shopkeeps list
 	GemRB.SetVar ("LeftTopIndex", 0)
@@ -396,6 +407,8 @@ OpenStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"],
 def InitStoreIdentifyWindow (Window):
 	global LeftButton
 
+	PositionRelativeToStore(Window)
+
 	GemRB.SetVar ("Index", -1)
 	GemRB.SetVar ("TopIndex", 0)
 
@@ -468,6 +481,8 @@ OpenStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"]
 
 def InitStoreStealWindow (Window):
 	global LeftButton
+
+	PositionRelativeToStore(Window)
 
 	GemRB.SetVar ("RightIndex", 0)
 	GemRB.SetVar ("LeftIndex", 0)
@@ -573,6 +588,8 @@ OpenStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "
 def InitStoreDonateWindow (Window):
 	Window.AddAlias('WINDONAT')
 
+	PositionRelativeToStore(Window)
+
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		GUICommon.AliasControls (Window,  { 'DONATE' : 2, 'STOTEDIT' : 3, 'STOPLUS' : 4,
@@ -633,6 +650,8 @@ def InitStoreHealWindow (Window):
 	GemRB.SetVar ("TopIndex", 0)
 
 	Window.AddAlias('WINHEAL')
+
+	PositionRelativeToStore(Window)
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
@@ -738,6 +757,8 @@ def InitStoreRumourWindow (Window):
 
 	Window.AddAlias('WINRUMOR')
 
+	PositionRelativeToStore(Window)
+
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		GUICommon.AliasControls (Window,  { 'STOTITLE' : 0x1000000a, 'STOGOLD' : 0x1000000b} )
@@ -811,6 +832,8 @@ OpenStoreRumourWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rumour"],
 
 def InitStoreRentWindow (Window):
 	Window.AddAlias('WINRENT')
+
+	PositionRelativeToStore(Window)
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
