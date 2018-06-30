@@ -1509,7 +1509,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 
 		video->InTextInput();
 	}
-	return View::OnTouchGesture(gesture);
+	return true;
 }
 
 Point GameControl::GameMousePos() const
