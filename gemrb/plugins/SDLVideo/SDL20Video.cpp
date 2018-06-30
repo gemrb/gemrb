@@ -300,6 +300,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				fingers[0].y = event.tfinger.y * screenSize.h;
 				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
 				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
+				fingers[0].id = event.tfinger.fingerId;
 
 				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
 				e.mod = modstate;
@@ -314,6 +315,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				fingers[0].y = event.tfinger.y * screenSize.h;
 				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
 				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
+				fingers[0].id = event.tfinger.fingerId;
 
 				Event touch = EvntManager->CreateTouchEvent(fingers, 1, true, event.tfinger.pressure);
 				// TODO: it may make more sense to calculate a pinch/rotation from screen center?

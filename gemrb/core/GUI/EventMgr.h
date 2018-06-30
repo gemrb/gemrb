@@ -117,7 +117,10 @@ struct GEM_EXPORT ControllerEvent : public EventBase {
 };
 
 struct GEM_EXPORT TouchEvent : public ScreenEvent {
-	typedef ScreenEvent Finger;
+	struct Finger : public ScreenEvent {
+		uint64_t id;
+	};
+
 	Finger fingers[FINGER_MAX];
 
 	int numFingers;
@@ -243,7 +246,7 @@ private:
 	static buttonbits modKeys;
 	static Point mousePos;
 
-	static std::map<unsigned short, TouchEvent::Finger> fingerStates;
+	static std::map<uint64_t, TouchEvent::Finger> fingerStates;
 
 public:
 	void DispatchEvent(Event& e);
@@ -254,7 +257,7 @@ public:
 	static bool MouseDown();
 	static Point MousePos() { return mousePos; }
 
-	static const TouchEvent::Finger* FingerState(unsigned short idx) { return (fingerStates.count(idx)) ? &fingerStates[idx] : NULL; };
+	static const TouchEvent::Finger* FingerState(uint64_t id) { return (fingerStates.count(id)) ? &fingerStates[id] : NULL; };
 	static bool FingerDown();
 };
 

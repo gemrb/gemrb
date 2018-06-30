@@ -34,7 +34,7 @@ bool EventMgr::TouchInputEnabled = true;
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
 EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
-std::map<unsigned short, TouchEvent::Finger> EventMgr::fingerStates;
+std::map<uint64_t, TouchEvent::Finger> EventMgr::fingerStates;
 
 EventMgr::KeyMap EventMgr::HotKeys = KeyMap();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
@@ -299,7 +299,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 	return e;
 }
 
-Event EventMgr::CreateTouchEvent(ScreenEvent fingers[], int numFingers, bool down, float pressure)
+Event EventMgr::CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure)
 {
 	if (numFingers > FINGER_MAX) {
 		Log(ERROR, "EventManager", "cannot create a touch event with %d fingers; max is %d.", numFingers, FINGER_MAX);
@@ -315,7 +315,8 @@ Event EventMgr::CreateTouchEvent(ScreenEvent fingers[], int numFingers, bool dow
 		e.touch.x += fingers[i].x;
 		e.touch.y += fingers[i].y;
 
-		const TouchEvent::Finger* current = FingerState(i);
+		uint64_t id = fingers[i].id;
+		const TouchEvent::Finger* current = FingerState(id);
 		if (current) {
 			e.touch.deltaX += fingers[i].x - current->x;
 			e.touch.deltaY += fingers[i].y - current->y;
