@@ -390,6 +390,14 @@ bool Window::DispatchEvent(const Event& event)
 	}
 
 	if (event.isScreen) {
+		if (event.type == Event::TouchGesture) {
+			if (trackingView) {
+				DispatchTouchGesture(trackingView, event.gesture);
+
+			}
+			return true;
+		}
+
 		Point screenPos = event.mouse.Pos();
 		if (!frame.PointInside(screenPos) && trackingView == NULL) {
 			// this can hapen if the window is modal since it will absorb all events
@@ -441,9 +449,6 @@ bool Window::DispatchEvent(const Event& event)
 				break;
 			case Event::TouchUp:
 				DispatchTouchUp(target, event.touch, event.mod);
-				break;
-			case Event::TouchGesture:
-				DispatchTouchGesture(target, event.gesture);
 				break;
 			default:
 				assert(false); // others should be handled above
