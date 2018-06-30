@@ -157,12 +157,31 @@ void EventMgr::DispatchEvent(Event& e)
 			mousePos = e.mouse.Pos();
 		} else { // touch
 			TouchEvent& te = (e.type == Event::TouchGesture) ? static_cast<TouchEvent&>(e.gesture) : static_cast<TouchEvent&>(e.touch);
-			for (int i = 0; i < FINGER_MAX; ++i) {
-				if (i < te.numFingers) {
-					fingerStates[i] = te.fingers[i];
-				} else {
-					fingerStates.erase(i);
-				}
+			uint64_t id = te.fingers[0].id;
+
+			switch (e.type) {
+				case Event::TouchDown:
+					fingerStates[id] = te.fingers[0];
+					break;
+
+				case Event::TouchUp:
+					fingerStates.erase(id);
+					break;
+
+				case Event::TouchGesture:
+					fingerStates.clear();
+					for (int i = 0; i < te.numFingers; ++i) {
+						id = te.fingers[i].id;
+						fingerStates[id] = te.fingers[i];
+					}
+					break;
+
+				default:
+					break;
+			}
+
+			if (te.numFingers == 1) {
+				mousePos = e.touch.Pos();
 			}
 		}
 	} else {

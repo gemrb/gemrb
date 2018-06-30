@@ -286,6 +286,28 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 	return screenshot;
 }
 
+int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const
+{
+	int numf = SDL_GetNumTouchFingers(device);
+
+	for (int i = 0; i < numf; ++i) {
+		SDL_Finger* finger = SDL_GetTouchFinger(device, i);
+		assert(finger);
+
+		fingers[i].id = finger->id;
+		fingers[i].x = finger->x * screenSize.w;
+		fingers[i].y = finger->y * screenSize.h;
+
+		const TouchEvent::Finger* current = EvntManager->FingerState(finger->id);
+		if (current) {
+			fingers[i].deltaX = finger->x - current->x;
+			fingers[i].deltaY = finger->y - current->y;
+		}
+	}
+
+	return numf;
+}
+
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	int modstate = GetModState(SDL_GetModState());
@@ -330,33 +352,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			{
-				Uint16 numf = Clamp<Uint16>(event.mgesture.numFingers, 0, FINGER_MAX);
-
 				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
-				for (Uint16 i = 0; i < numf; ++i) {
-					SDL_Finger* finger = SDL_GetTouchFinger(event.mgesture.touchId, i);
-					if (finger == NULL) {
-						// FIXME: not sure the best way to handle this
-						// it does happen and for now we assume it means the touch ended between the event being enqued and now
-						// im not sure the impact to UX by discarding this
-						numf = i;
-						break;
-					}
-					
-					fingers[i].x = finger->x;
-					fingers[i].y = finger->y;
-
-					const TouchEvent::Finger* current = EvntManager->FingerState(i);
-					if (current) {
-						fingers[i].deltaX = finger->x - current->x;
-						fingers[i].deltaY = finger->y - current->y;
-					}
-				}
-
-				if (numf == 0) {
-					// see FIXME above
-					break;
-				}
+				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
 				// TODO: it may make more sense to calculate the pressure as an avg?
 				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, 0.0);
