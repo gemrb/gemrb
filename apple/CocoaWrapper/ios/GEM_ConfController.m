@@ -557,6 +557,9 @@ enum ConfigTableSection {
 	// GemRB is diffrent and our wrapper interface makes that impossible.
 	SDL_iPhoneSetEventPump(SDL_TRUE);
 
+	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_OVERRIDE);
+	SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengles", SDL_HINT_OVERRIDE);
+
 	// Note: use NSRunLoop over NSObject performSelector!
 	NSArray* modes = [NSArray arrayWithObject:NSDefaultRunLoopMode];
 	[[NSRunLoop mainRunLoop] performSelector:@selector(setupComplete:)
