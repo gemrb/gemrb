@@ -56,6 +56,9 @@ void Window::Close()
 		manager.OrderBack(this);
 		SetVisible(false);
 	}
+
+	trackingView = NULL;
+	hoverView = NULL;
 }
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
