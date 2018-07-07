@@ -75,6 +75,42 @@ PCStatsStruct::PCStatsStruct(std::list<int> levels)
 	UpdateClassLevels(levels);
 }
 
+// because of the levels list, the class isn't trivially copiable
+PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
+{
+	BestKilledName = source.BestKilledName;
+	BestKilledXP = source.BestKilledXP;
+	KillsChapterXP = source.KillsChapterXP;
+	KillsChapterCount = source.KillsChapterCount;
+	KillsTotalXP = source.KillsTotalXP;
+	KillsTotalCount = source.KillsTotalCount;
+	memcpy(FavouriteSpells, source.FavouriteSpells, sizeof(FavouriteSpells));
+	memcpy(FavouriteSpellsCount, source.FavouriteSpellsCount, sizeof(FavouriteSpellsCount));
+	memcpy(FavouriteWeapons, source.FavouriteWeapons, sizeof(FavouriteWeapons));
+	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
+	memcpy(QSlots, source.QSlots, sizeof(QSlots));
+	memcpy(QuickSpells, source.QuickSpells, sizeof(QuickSpells));
+	memcpy(QuickSpellClass, source.QuickSpellClass, sizeof(QuickSpellClass));
+	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
+	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));
+	memcpy(QuickWeaponSlots, source.QuickWeaponSlots, sizeof(QuickWeaponSlots));
+	memcpy(QuickWeaponHeaders, source.QuickWeaponHeaders, sizeof(QuickWeaponHeaders));
+	memcpy(ExtraSettings, source.ExtraSettings, sizeof(ExtraSettings));
+	JoinDate = source.JoinDate;
+	AwayTime = source.AwayTime;
+	unknown10 = source.unknown10;
+	Happiness = source.Happiness;
+	strlcpy(SoundSet, source.SoundSet, sizeof(ieResRef));
+	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
+	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
+	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
+	memcpy(PortraitIconString, source.PortraitIconString, sizeof(PortraitIconString));
+	LastLeft = source.LastLeft;
+	LastJoined = source.LastJoined;
+	UpdateClassLevels(source.ClassLevels);
+	return *this;
+}
+
 void PCStatsStruct::UpdateClassLevels(std::list<int> levels) {
 	ClassLevels = levels;
 }
