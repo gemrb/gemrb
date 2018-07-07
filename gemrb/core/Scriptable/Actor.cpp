@@ -9704,7 +9704,7 @@ Actor *Actor::CopySelf(bool mislead) const
 		newActor->inventory.CopyFrom(this);
 		if (PCStats) {
 			newActor->CreateStats();
-			memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));
+			newActor->PCStats = PCStats;
 		}
 	}
 

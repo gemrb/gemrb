@@ -132,6 +132,7 @@ private:
 public:
 	PCStatsStruct();
 	PCStatsStruct(std::list<int> levels);
+	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void Init(bool all=true);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
