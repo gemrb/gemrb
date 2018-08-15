@@ -452,6 +452,7 @@ empty:
 		}
 		str->ReadWord( &type );
 		str->ReadResRef( SoundResRef );
+		// volume and pitch variance fields are known to be unused at minimum in bg1
 		str->ReadDword( &Volume );
 		str->ReadDword( &Pitch );
 		str->ReadDword( &StrOffset );
