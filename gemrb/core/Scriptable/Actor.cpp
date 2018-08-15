@@ -4024,9 +4024,8 @@ void Actor::PlayExistenceSounds()
 					}
 				}
 			}
-			// default in the original is around 30s, which roughly corresponds to a 400 delay (skellytz)
 			if (delay == 0) {
-				delay = 400;
+				delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
 			}
 			nextComment = time + RAND(delay*1/4, delay*7/4);
 		}

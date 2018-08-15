@@ -61,6 +61,24 @@ static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square
 // while it looks too big, it is needed this big in at least pst (help())
 static const unsigned int VOODOO_SHOUT_RANGE = 400;
 
+// existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
+// while it should clearly always be delayed at least a bit. The engine uses randomization.
+// Estimates from bg1 research:
+/*
+ 75 = avg.  5 s
+150 = avg. 10 s
+225 = avg. 15 s
+300 = avg. 20 s <- BG1 default
+375 = avg. 25 s
+450 = avg. 30 s
+525 = avg. 35 s
+600 = avg. 40 s
+675 = avg. 45 s
+750 = avg. 50 s
+825 = avg. 55 s
+900 = avg. 60 s*/
+static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
+
 // NearLocation range multiplier (currently the same for pst and iwd2/how)
 // arbitrary, started as 20 and has no effect for callers that want exact position
 static const int VOODOO_NEARLOC_F = 10;
