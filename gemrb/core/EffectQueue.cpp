@@ -38,6 +38,8 @@
 #include <cstdio>
 #include "GameData.h"
 
+#define KIT_BASECLASS 0x4000
+
 namespace GemRB {
 
 static struct {
@@ -1135,6 +1137,27 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,caster);
 		//saving throw could be made difficult by caster's school specific bonus
 		bonus -= caster->fxqueue.BonusForParam2(fx_spell_focus_ref, fx->PrimaryType);
+	}
+
+	// handle modifiers of specialist mages
+	if (!core->HasFeature(GF_PST_STATE_FLAGS)) {
+		int specialist = KIT_BASECLASS;
+		if (caster) specialist = caster->GetStat(IE_KIT);
+		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
+			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
+			if (specialist & (1 << (fx->PrimaryType+5))) {
+				bonus -= 2;
+			}
+		}
+
+		// specialist mages get a +2 bonus to saves to spells of the same school used against them
+		specialist = actor->GetStat(IE_KIT);
+		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
+			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
+			if (specialist & (1 << (fx->PrimaryType+5))) {
+				bonus += 2;
+			}
+		}
 	}
 
 	bool saved = false;
