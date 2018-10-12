@@ -38,6 +38,9 @@ namespace GemRB {
 // (fireball to the door in the targos attack is a good test case)
 static const int VOODOO_SPL_RANGE_F = 9;
 
+// ... similarly for items
+static const int VOODOO_ITM_RANGE_F = 15;
+
 // factors for our guess for proper weapon ranges
 // long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
 // 400 units is about the normal sight range

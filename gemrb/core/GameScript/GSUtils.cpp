@@ -2477,7 +2477,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 	if (dist>0xff000000) {
 		return dist;
 	}
-	return dist*15;
+	return dist*VOODOO_ITM_RANGE_F;
 }
 
 //read the wish 2da
