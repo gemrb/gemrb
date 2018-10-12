@@ -2499,6 +2499,13 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 	selects = (int *) malloc(picks*sizeof(int));
 	count = tm->GetRowCount();
+	// handle the unused SetupWishObject, which passes WIS instead of a column
+	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
+	int cols = tm->GetColumnCount();
+	if (column > cols) {
+		column = (column-1)/6;
+		if (column == 4) column = RAND(0, 3);
+	}
 
 	for(i=0;i<99;i++) {
 		snprintf(varname,32, "wishpower%02d", i);
