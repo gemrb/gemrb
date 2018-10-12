@@ -2488,7 +2488,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	int *selects;
 	int i,j;
 
-	//FIXME: find out what the original really used the picks parameter for
+	// in the original, picks was at first the number of wish choices to set up,
+	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
 	AutoTable tm("wish");
