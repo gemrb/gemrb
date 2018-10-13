@@ -184,8 +184,6 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 {
 	const char *s;
 	int ps;
-	
-	memset(&critter,0,sizeof(critter));
 
 	//first assume it is a simple numeric value
 	critter.TimeOfDay = (ieDword) inifile->GetKeyAsInt(crittername,"time_of_day", 0xffffffff);
@@ -531,7 +529,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	s = inifile->GetKeyAsString(entryname,"critters","");
 	int crittercount = CountElements(s,',');
 	entry.crittercount=crittercount;
-	entry.critters=new CritterEntry[crittercount];
+	entry.critters = new CritterEntry[crittercount]();
 	ieVariable *critters = new ieVariable[crittercount];
 	GetElements(s, critters, crittercount);
 	while(crittercount--) {
