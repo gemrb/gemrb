@@ -4533,7 +4533,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 	i=tab->GetRowCount();
 	for(j=0;j<i;j++) {
 		if (Prefix) {
-			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, j+1);
+			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, (j+1)%100);
 		} else {
 			strnlwrcpy(ItemName,tab->GetRowName(j), 8);
 		}
