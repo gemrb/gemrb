@@ -11811,7 +11811,6 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	//the animation is cloned by AddAnimation, so we can keep the original on
 	//the stack
 	AreaAnimation anim;
-	memset(&anim,0,sizeof(anim));
 
 	if (!PyArg_ParseTuple( args, "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height)) {
 		return AttributeError( GemRB_SetMapAnimation__doc );

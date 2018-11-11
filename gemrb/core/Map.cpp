@@ -1345,10 +1345,7 @@ void Map::DrawSearchMap(const Region &screen)
 void Map::AddAnimation(AreaAnimation* panim)
 {
 	//copy external memory to core memory for msvc's sake
-	AreaAnimation *anim = new AreaAnimation();
-	memcpy(anim, panim, sizeof(AreaAnimation) );
-
-	anim->InitAnimation();
+	AreaAnimation *anim = new AreaAnimation(panim);
 
 	aniIterator iter;
 
@@ -3877,6 +3874,35 @@ AreaAnimation::AreaAnimation()
 	PaletteRef[0] = 0;
 }
 
+AreaAnimation::AreaAnimation(AreaAnimation *src)
+{
+	animcount = src->animcount;
+	sequence = src->sequence;
+	animation = NULL;
+	Flags = src->Flags;
+	Pos.x = src->Pos.x;
+	Pos.y = src->Pos.y;
+	appearance = src->appearance;
+	frame = src->frame;
+	transparency = src->transparency;
+	height = src->height;
+	startFrameRange = src->startFrameRange;
+	skipcycle = src->skipcycle;
+	startchance = src->startchance;
+	unknown48 = 0;
+
+	memcpy(PaletteRef, src->PaletteRef, sizeof(PaletteRef));
+	memcpy(Name, src->Name, sizeof(ieVariable));
+	memcpy(BAM, src->BAM, sizeof(ieResRef));
+
+	palette = src->palette ? new Palette(src->palette->col, src->palette->alpha) : NULL;
+	// covers will get built once we try to draw it
+	covers = NULL;
+
+	// handles the rest: animation, resets animcount
+	InitAnimation();
+}
+
 AreaAnimation::~AreaAnimation()
 {
 	for(int i=0;i<animcount;i++) {
@@ -3928,9 +3954,7 @@ void AreaAnimation::InitAnimation()
 
 	//freeing up the previous animation
 	for(int i=0;i<animcount;i++) {
-		if (animation[i]) {
-			delete (animation[i]);
-		}
+		delete animation[i];
 	}
 	free(animation);
 

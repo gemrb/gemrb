@@ -265,6 +265,7 @@ public:
 	Palette* palette;
 	SpriteCover** covers;
 	AreaAnimation();
+	AreaAnimation(AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
