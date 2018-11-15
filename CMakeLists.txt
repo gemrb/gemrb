@@ -157,6 +157,13 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith ")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long")
+	# only later c++ standards conditionally allow function/object pointer casts
+	# gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+	elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+	endif ()
 	# mark chars explicitly signed (ARM defaults to unsigned)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 	# only export symbols explicitly marked to be exported.
