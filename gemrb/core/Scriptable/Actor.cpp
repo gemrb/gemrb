@@ -274,6 +274,7 @@ static void InitActorTables();
 //TODO: externalise
 #define TURN_PANIC_LVL_MOD 3
 #define TURN_DEATH_LVL_MOD 7
+#define REPUTATION_FALL 7
 
 static ieResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
@@ -986,6 +987,18 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	actor->SetCircleSize();
 }
 
+// make paladins and rangers fallen if the reputations drops enough
+static void pcf_reputation(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	if (newValue <= REPUTATION_FALL) {
+		if (actor->GetRangerLevel()) {
+			GameScript::RemoveRangerHood(actor, NULL);
+		} else if (actor->GetPaladinLevel()) {
+			GameScript::RemovePaladinHood(actor, NULL);
+		}
+	}
+}
+
 static void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//needs for new color
@@ -1474,7 +1487,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
 NULL,NULL,pcf_level_fighter,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
 pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+pcf_reputation,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
