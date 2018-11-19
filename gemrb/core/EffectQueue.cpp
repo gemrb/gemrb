@@ -97,7 +97,7 @@ static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 //weapon immunity
 static EffectRef fx_weapon_immunity_ref = { "Protection:Weapons", -1 };
 
-bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
+bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 {
 	if( value == 0) {
 		return true;
@@ -428,7 +428,7 @@ EffectQueue *EffectQueue::CopySelf() const
 //only opcode and parameters are changed
 //This is used mostly inside effects, when an effect needs to spawn
 //other effects with the same coordinates, source, duration, etc.
-Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
+Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if( opcode==0xffffffff) {
 		return NULL;
@@ -444,7 +444,7 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword par
 	return fx;
 }
 
-Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
+Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -453,7 +453,7 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference
 	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
 
-Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
+Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 {
 	Effect *newfx = NULL;
 	if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
@@ -475,7 +475,7 @@ Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 	return newfx;
 }
 
-void EffectQueue::AddEffect(Effect* fx, bool insert)
+void EffectQueue::AddEffect(const Effect* fx, bool insert)
 {
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
@@ -488,7 +488,7 @@ void EffectQueue::AddEffect(Effect* fx, bool insert)
 
 //This method can remove an effect described by a pointer to it, or
 //an exact matching effect
-bool EffectQueue::RemoveEffect(Effect* fx)
+bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
@@ -786,7 +786,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 }
 
 //resisted effect based on level
-static inline bool check_level(Actor *target, Effect *fx)
+static inline bool check_level(const Actor *target, Effect *fx)
 {
 	//skip non level based effects
 	//check if an effect has no level based resistance, but instead the dice sizes/count
@@ -840,7 +840,7 @@ static inline bool check_level(Actor *target, Effect *fx)
 
 //roll for the effect probability, there is a high and a low treshold, the d100
 //roll should hit in the middle
-static inline bool check_probability(Effect* fx)
+static inline bool check_probability(const Effect* fx)
 {
 	//random value is 0-99
 	if (fx->random_value<fx->ProbabilityRangeMin || fx->random_value>fx->ProbabilityRangeMax) {
@@ -854,13 +854,13 @@ static inline int DecreaseEffect(Effect *efx)
 {
 	if (efx->Parameter1) {
 		efx->Parameter1--;
-	return true;
+		return true;
 	}
 	return false;
 }
 
 //lower decreasing immunities/bounces
-static int check_type(Actor* actor, Effect* fx)
+static int check_type(Actor* actor, const Effect* fx)
 {
 	//the protective effect (if any)
 	Effect *efx;
@@ -1052,7 +1052,7 @@ static int check_type(Actor* actor, Effect* fx)
 }
 
 // pure magic resistance
-static inline int check_magic_res(Actor *actor, Effect *fx, Actor *caster)
+static inline int check_magic_res(const Actor *actor, const Effect *fx, const Actor *caster)
 {
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
@@ -1802,7 +1802,7 @@ int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amo
 static const int ids_stats[9]={IE_FACTION, IE_TEAM, IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
 //0,1 and 9 are only in GemRB
-int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
+int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 {
 	int sum = 0;
 	std::list< Effect* >::const_iterator f;
@@ -1843,7 +1843,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 	return sum;
 }
 
-int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const
+int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, const Actor *actor) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -2103,7 +2103,7 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 */
 
 //returns true if the effect supports simplified duration
-bool EffectQueue::HasDuration(Effect *fx)
+bool EffectQueue::HasDuration(const Effect *fx)
 {
 	switch(fx->TimingMode) {
 	case FX_DURATION_INSTANT_LIMITED: //simple duration
@@ -2115,7 +2115,7 @@ bool EffectQueue::HasDuration(Effect *fx)
 }
 
 //returns true if the effect must be saved
-bool EffectQueue::Persistent(Effect* fx)
+bool EffectQueue::Persistent(const Effect* fx)
 {
 	// local variable effects self-destruct if they were processed already
 	// but if they weren't processed, e.g. in a global actor, we must save them
@@ -2139,7 +2139,7 @@ bool EffectQueue::Persistent(Effect* fx)
 }
 
 //alter the color effect in case the item is equipped in the shield slot
-void EffectQueue::HackColorEffects(Actor *Owner, Effect *fx)
+void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 {
 	if( fx->InventorySlot!=Owner->inventory.GetShieldSlot()) return;
 
@@ -2265,8 +2265,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	return 0;
 }
 
-void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue,
-		unsigned int range, Actor *except)
+void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
+		unsigned int range, const Actor *except)
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {
@@ -2290,7 +2290,7 @@ void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int 
 	}
 }
 
-bool EffectQueue::OverrideTarget(Effect *fx)
+bool EffectQueue::OverrideTarget(const Effect *fx)
 {
 	if (!fx) return false;
 	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);

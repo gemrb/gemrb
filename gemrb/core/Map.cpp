@@ -1815,7 +1815,7 @@ void Map::PurgeArea(bool items)
 	}
 }
 
-Actor* Map::GetActor(int index, bool any)
+Actor* Map::GetActor(int index, bool any) const
 {
 	if (any) {
 		return actors[index];
@@ -1997,7 +1997,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
-unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
+unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 {
 	if (y>=Height || x>=Width) {
 		return 0;
@@ -2012,7 +2012,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 	return ret;
 }
 
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
+bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2038,7 +2038,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	return false;
 }
 
-unsigned int Map::GetBlocked(const Point &c)
+unsigned int Map::GetBlocked(const Point &c) const
 {
 	return GetBlocked(c.x/16, c.y/12);
 }
@@ -3039,7 +3039,7 @@ bool Map::IsVisible(const Point &pos, int explored)
 }
 
 //point a is visible from point b (searchmap)
-bool Map::IsVisibleLOS(const Point &s, const Point &d)
+bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 {
 	int sX=s.x/16;
 	int sY=s.y/12;

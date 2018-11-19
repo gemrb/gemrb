@@ -400,9 +400,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
-	unsigned int GetBlocked(unsigned int x, unsigned int y);
-	unsigned int GetBlocked(const Point &p);
+	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	unsigned int GetBlocked(const Point &p) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -412,7 +412,7 @@ public:
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
 	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
-	Actor* GetActor(int i, bool any);
+	Actor* GetActor(int i, bool any) const;
 	Scriptable* GetActorByDialog(const char* resref);
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
@@ -507,7 +507,7 @@ public:
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisibleLOS(const Point &s, const Point &d);
+	bool IsVisibleLOS(const Point &s, const Point &d) const;
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
