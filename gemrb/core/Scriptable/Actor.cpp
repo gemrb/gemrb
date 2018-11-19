@@ -274,7 +274,7 @@ static void InitActorTables();
 //TODO: externalise
 #define TURN_PANIC_LVL_MOD 3
 #define TURN_DEATH_LVL_MOD 7
-#define REPUTATION_FALL 7
+#define REPUTATION_FALL 60
 
 static ieResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
