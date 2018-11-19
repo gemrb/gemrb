@@ -395,6 +395,7 @@ def GetActorClassTitle (actor):
 		KitIndex = GetKitIndex (actor)
 		Multi = HasMultiClassBits (actor)
 		Dual = IsDualClassed (actor, 1)
+		MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 
 		if Multi and Dual[0] == 0: # true multi class
 			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
@@ -409,6 +410,11 @@ def GetActorClassTitle (actor):
 					ClassTitle = GemRB.GetString (ClassTitle)
 				ClassTitle += " / "
 				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+			elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
+				ClassTitle = 10369
+				if MCFlags & MC_FALLEN_PALADIN:
+					ClassTitle = 10371
+				ClassTitle = GemRB.GetString (ClassTitle)
 			else: # ordinary class or kit
 				if KitIndex:
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
