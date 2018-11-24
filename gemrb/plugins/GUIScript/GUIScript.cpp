@@ -5275,9 +5275,14 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
+	// NOTE: it seems nobody actually wants to use external palettes!
+	// the only users with external plts are in bg2, but they don't match the bam:
+	//   lvl9 shapeshift targets: troll, golem, fire elemental, illithid, wolfwere
+	// 1pp deliberately breaks palettes for the bam to be used (so the original did support)
+	// TODO: if this turns out to be resiliently true, also remove-revert useCorrupt
+	//ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
 
-	if (im == NULL ) {
+//	if (im == NULL) {
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
@@ -5296,13 +5301,13 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 			Log(ERROR, "Button_SetPLT", "PD Picture == NULL (%s)", ResRef);
 			return NULL;
 		}
-	} else {
+/*	} else {
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
 			Log(ERROR, "Button_SetPLT", "Picture == NULL (%s)", ResRef);
 			return NULL;
 		}
-	}
+	}*/
 
 	if (type == 0)
 		btn->ClearPictureList();
