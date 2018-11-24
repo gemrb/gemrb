@@ -23,7 +23,7 @@ import GemRB
 import GameCheck
 import GUIClasses
 import CommonTables
-from ie_restype import RES_CHU, RES_2DA
+from ie_restype import RES_CHU, RES_2DA, RES_BAM
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
@@ -109,7 +109,11 @@ def GetActorPaperDoll (actor):
 	which = "LEVEL%d" %(level+1)
 	doll = CommonTables.Pdolls.GetValue (row, which)
 	if doll == "*":
-		print "GetActorPaperDoll: Missing paper doll for animation", row, which
+		# guess a name
+		import GUICommonWindows
+		doll = GUICommonWindows.GetActorPaperDoll (actor) + "INV"
+		if not GemRB.HasResource (doll, RES_BAM):
+			print "GetActorPaperDoll: Missing paper doll for animation", row, which, doll
 	return doll
 
 def SelectAllOnPress ():
