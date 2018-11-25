@@ -5405,8 +5405,11 @@ bool Actor::CheckOnDeath()
 	// from effects and dropping items might change effects!
 
 	// disintegration destroys normal items if difficulty level is high enough (the stat hack is just for differentiation)
-	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
-		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC)) {
+		if  (GameDifficulty > DIFF_CORE) {
+			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+		}
+		return true;
 	}
 	// ignore TNO, as he needs to keep his gear
 	Game *game = core->GetGame();
