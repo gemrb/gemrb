@@ -5438,7 +5438,9 @@ bool Actor::CheckOnDeath()
 	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
-	if (LastDamageType&DAMAGE_CHUNKING) {
+	ieDword gore = 0;
+	core->GetDictionary()->Lookup("Gore", gore);
+	if (LastDamageType&DAMAGE_CHUNKING && gore) {
 		//play chunky animation
 		//chunks are projectiles
 		return true;
