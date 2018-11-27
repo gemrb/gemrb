@@ -127,6 +127,7 @@ bool TLKImporter::Open(DataStream* stream)
 	str->ReadWord( &Language ); // English is 0
 	str->ReadDword( &StrRefCount );
 	str->ReadDword( &Offset );
+	assert(StrRefCount < STRREF_START);
 	return true;
 }
 
