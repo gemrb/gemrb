@@ -29,6 +29,7 @@
 #define EVENTMGR_H
 
 #include "exports.h"
+#include "ie_types.h"
 
 #include "Callback.h"
 #include "Region.h"
