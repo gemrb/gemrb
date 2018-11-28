@@ -45,6 +45,11 @@ namespace GemRB {
 #define __int64 long long
 #endif
 
+// TODO: remove once we require c++11 support
+#ifndef HAVE_UINT64_T
+#define uint64_t __int64
+#endif
+
 typedef unsigned char ieByte;
 typedef signed char ieByteSigned;
 typedef unsigned short ieWord;
