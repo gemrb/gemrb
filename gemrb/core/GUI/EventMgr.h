@@ -40,6 +40,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <stdint.h>
 
 namespace GemRB {
 
