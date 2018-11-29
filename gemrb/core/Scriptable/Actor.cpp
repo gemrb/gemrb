@@ -990,7 +990,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 // make paladins and rangers fallen if the reputations drops enough
 static void pcf_reputation(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	if (newValue <= REPUTATION_FALL) {
+	if (actor->InParty && newValue <= REPUTATION_FALL) {
 		if (actor->GetRangerLevel()) {
 			GameScript::RemoveRangerHood(actor, NULL);
 		} else if (actor->GetPaladinLevel()) {
