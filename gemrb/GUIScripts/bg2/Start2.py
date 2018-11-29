@@ -88,7 +88,7 @@ def OnLoad():
 	BackButton = StartWindow.GetControl (5)
 	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label=StartWindow.GetControl (0x0fff0000)
-	Label.SetText (GEMRB_VERSION)
+	Label.SetText (GemRB.Version)
 	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)

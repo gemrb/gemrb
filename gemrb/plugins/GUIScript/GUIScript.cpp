@@ -15788,6 +15788,9 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
+	sprintf(string, "GemRB.Version = '%s'", VERSION_GEMRB);
+	PyRun_SimpleString(string);
+
 	// Detect GameType if it was set to auto
 	if (stricmp( core->GameType, "auto" ) == 0) {
 		Autodetect();

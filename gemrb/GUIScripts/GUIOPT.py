@@ -166,7 +166,7 @@ def OpenOptionsWindow ():
 
 	# game version, e.g. v1.1.0000
 	VersionLabel = Window.GetControl (0x1000000b)
-	VersionLabel.SetText (GEMRB_VERSION)
+	VersionLabel.SetText (GemRB.Version)
 
 	if GameCheck.IsIWD2():
 		# Keyboard shortcuts

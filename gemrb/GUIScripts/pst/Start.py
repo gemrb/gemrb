@@ -66,7 +66,7 @@ def OnLoad():
 
 	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label=StartWindow.GetControl(0x0fff0000)
-	Label.SetText(GEMRB_VERSION)
+	Label.SetText(GemRB.Version)
 	
 	QuitWindow.SetVisible(WINDOW_INVISIBLE)
 	StartWindow.SetVisible(WINDOW_VISIBLE)
