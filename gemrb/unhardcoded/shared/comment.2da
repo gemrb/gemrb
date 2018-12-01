@@ -5,4 +5,4 @@ FOREST     0x10       21         0
 DUNGEON    0x20       23         0          
 CITY       8          22         0          
 DAY        2          24         1          
-
+#NIGHT at VC25 has the same bit and is handled in code

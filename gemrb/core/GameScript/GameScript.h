@@ -74,7 +74,7 @@ class StringBuffer;
 #define VB_DAMAGE    18
 #define VB_DIE       19
 #define VB_HURT 20
-#define VB_AREA_FOREST 21
+#define VB_AREA_FOREST 21 // these are handled through comment.2da / Actor::GetAreaComment
 #define VB_AREA_CITY 22
 #define VB_AREA_DUNGEON 23
 #define VB_AREA_DAY 24
