@@ -1,9 +1,10 @@
-GemRB git (782578d1a):
+GemRB git (5a515e70396):
   New features:
     - 
 
   Improved features:
-    - 
+    - iwd2 levelup, infopoints
+    - verbal constants, tobex opcodes, falling, paperdolls
     - bugfixes
 
 GemRB v0.8.5 (2017-11-26):
