@@ -987,6 +987,22 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	actor->SetCircleSize();
 }
 
+static void UpdateHappiness(Actor *actor) {
+	if (!actor->InParty) return;
+
+	int newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
+	if (newHappiness == actor->PCStats->Happiness) return;
+
+	actor->PCStats->Happiness = newHappiness;
+	switch (newHappiness) {
+		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, true); break;
+		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, true); break;
+		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true); break;
+		case 80: actor->VerbalConstant(VB_HAPPY, 1, true); break;
+		default: break; // case 0
+	}
+}
+
 // make paladins and rangers fallen if the reputations drops enough
 static void pcf_reputation(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
@@ -997,6 +1013,7 @@ static void pcf_reputation(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 			GameScript::RemovePaladinHood(actor, NULL);
 		}
 	}
+	UpdateHappiness(actor);
 }
 
 static void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
@@ -1434,6 +1451,11 @@ static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
+static void pcf_alignment(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+{
+	UpdateHappiness(actor);
+}
+
 //spell casting or other buttons disabled/reenabled
 static void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
@@ -1513,7 +1535,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
-NULL,NULL,pcf_dbutton,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
+NULL, pcf_alignment, pcf_dbutton, pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
