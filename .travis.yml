@@ -41,6 +41,7 @@ before_script:
   - cmake --version
 
 script:
+  - set -e
   - mkdir build && cd build
   - if [ $TRAVIS_OS_NAME != osx ]; then static="-DSTATIC_LINK=1"; fi
   - cmake -DCMAKE_INSTALL_PREFIX=iprefix $static ..
