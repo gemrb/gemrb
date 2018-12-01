@@ -1191,7 +1191,7 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 	}
 }
 
-static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
@@ -1204,6 +1204,11 @@ static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 	if ((signed) hp<=0) {
 		actor->Die(NULL);
+	} else {
+		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
+		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
+			actor->VerbalConstant(VB_HURT, 1);
+		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
 	actor->Modified[IE_HITPOINTS]=hp;
