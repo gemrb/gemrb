@@ -41,7 +41,8 @@ before_script:
   - cmake --version
 
 script:
-  - mkdir build && cd build &&
+  - |
+    mkdir build && cd build &&
     if [ $TRAVIS_OS_NAME != osx ]; then
       static="-DSTATIC_LINK=1"
     fi &&
