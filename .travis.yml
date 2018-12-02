@@ -49,7 +49,7 @@ script:
     make &&
     if [ $TRAVIS_OS_NAME != osx ]; then
       sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&
-      gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample # minimal test
+      gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample
     fi &&
     make install
 
