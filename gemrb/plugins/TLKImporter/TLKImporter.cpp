@@ -127,7 +127,10 @@ bool TLKImporter::Open(DataStream* stream)
 	str->ReadWord( &Language ); // English is 0
 	str->ReadDword( &StrRefCount );
 	str->ReadDword( &Offset );
-	assert(StrRefCount < STRREF_START);
+	if (StrRefCount >= STRREF_START) {
+		Log(ERROR, "TLKImporter", "Too many strings, increase STRREF_START.");
+		return false;
+	}
 	return true;
 }
 
