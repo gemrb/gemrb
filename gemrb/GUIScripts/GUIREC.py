@@ -608,14 +608,13 @@ def GetWeaponProficiencies(pc):
 	for i in range (offset, RowCount):
 		# iwd has separate field for capitalised strings
 		if GameCheck.IsIWD1():
-			text = table.GetValue (i, 3)
+			text = table.GetValue (i, 3, GTV_REF)
 		else:
-			text = table.GetValue (i, 1)
+			text = table.GetValue (i, 1, GTV_REF)
 		stat = table.GetValue (i, 0)
 		if GameCheck.IsBG1():
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
-		if text < 0x20000:
-			stats.append ( (text, GS (pc, stat)&0x07, '+') )
+		stats.append ( (text, GS (pc, stat)&0x07, '+') )
 	stats.append ("\n")
 	return TypeSetStats (stats, pc)
 
@@ -793,7 +792,7 @@ def TypeSetStats(stats, pc=0):
 			if val == None:
 				val = str_None
 			if type == '+': #pluses
-				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+				res.append (strref + ' ' + '+' * val)
 			elif type == 'p': #a plus prefix if positive
 				if val > 0:
 					res.append (GemRB.GetString (strref) + ' +' + str (val) )
