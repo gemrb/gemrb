@@ -10082,12 +10082,8 @@ bool Actor::ModalSpellSkillCheck()
 {
 	switch(ModalState) {
 	case MS_BATTLESONG:
-		if (isclass[ISBARD]&(1<<Modified[IE_CLASS])) {
-			return true;
-		}
-		/* do we need this */
-		if (Modified[IE_STATE_ID]& STATE_SILENCED) {
-			return true;
+		if (GetBardLevel()) {
+			return !(Modified[IE_STATE_ID] & STATE_SILENCED);
 		}
 		return false;
 	case MS_DETECTTRAPS:
