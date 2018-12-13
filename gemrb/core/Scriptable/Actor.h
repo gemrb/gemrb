@@ -269,6 +269,14 @@ struct BABTable {
 	int apr; // attacks per round
 };
 
+struct ModalState {
+	ieDword State;
+	ieResRef Spell;             //apply this spell once per round
+	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
+	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
+	ieDword LastApplyTime;      //last time the modal effect used
+};
+
 extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
@@ -280,8 +288,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef ModalSpell;             //apply this spell once per round
-	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
 	ieResRef BackstabResRef;         //apply on successful backstab
 
@@ -312,10 +318,10 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-	ieDword ModalState;
 	int PathTries; //the # of previous tries to pick up a new walkpath
 	ArmorClass AC;
 	ToHitStats ToHit;
+	ModalState Modal;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
@@ -341,8 +347,6 @@ public:
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
-	ieDword modalTime;           //last time the modal effect used
-	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored

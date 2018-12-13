@@ -408,7 +408,7 @@ void Game::ConsolidateParty()
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		(*m)->RefreshEffects(NULL);
 		//TODO: how to set up bardsongs
-		(*m)->SetModalSpell((*m)->ModalState, 0);
+		(*m)->SetModalSpell((*m)->Modal.State, 0);
 	}
 }
 

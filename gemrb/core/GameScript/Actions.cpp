@@ -5720,7 +5720,7 @@ void GameScript::Unhide(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *actor = (Actor *) Sender;
 
-	if (actor->ModalState == MS_STEALTH) {
+	if (actor->Modal.State == MS_STEALTH) {
 		actor->SetModal(MS_NONE);
 	}
 	actor->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);

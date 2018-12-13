@@ -477,8 +477,6 @@ Actor::Actor()
 	attackProjectile = NULL;
 	lastInit = 0;
 	roundTime = 0;
-	modalTime = 0;
-	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
 	nextComment = 100 + RAND(0, 350); // 7-30s delay
 	nextBored = 0;
@@ -519,10 +517,12 @@ Actor::Actor()
 		BaseStats[IE_HATEDRACE2+i]=0xff;
 	}
 	//this one is saved only for PC's
-	ModalState = 0;
+	Modal.State = MS_NONE;
 	//set it to a neutral value
-	ModalSpell[0] = '*';
-	LingeringModalSpell[0] = '*';
+	Modal.Spell[0] = '*';
+	Modal.LingeringSpell[0] = '*';
+	Modal.LastApplyTime = 0;
+	Modal.LingeringCount = 0;
 	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
@@ -6123,46 +6123,46 @@ void Actor::SetModal(ieDword newstate, bool force)
 			return;
 	}
 
-	if (ModalState == MS_BATTLESONG && ModalState != newstate && HasFeat(FEAT_LINGERING_SONG)) {
-		strnlwrcpy(LingeringModalSpell, ModalSpell, 8);
-		modalSpellLingering = 2;
+	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
+		strnlwrcpy(Modal.LingeringSpell, Modal.Spell, 8);
+		Modal.LingeringCount = 2;
 	}
 
 	if (IsSelected()) {
 		// display the turning-off message
-		if (ModalState != MS_NONE) {
-			displaymsg->DisplayStringName(core->ModalStates[ModalState].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+		if (Modal.State != MS_NONE) {
+			displaymsg->DisplayStringName(core->ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
-		if (!force && ModalState == newstate) {
-			ModalState = MS_NONE;
+		if (!force && Modal.State == newstate) {
+			Modal.State = MS_NONE;
 		} else {
-			ModalState = newstate;
+			Modal.State = newstate;
 		}
 
 		//update the action bar
 		core->SetEventFlag(EF_ACTION);
 	} else {
-		ModalState = newstate;
+		Modal.State = newstate;
 	}
 }
 
 void Actor::SetModalSpell(ieDword state, const char *spell)
 {
 	if (spell) {
-		strnlwrcpy(ModalSpell, spell, 8);
+		strnlwrcpy(Modal.Spell, spell, 8);
 	} else {
 		if (state >= core->ModalStates.size()) {
-			ModalSpell[0] = 0;
+			Modal.Spell[0] = 0;
 		} else {
 			if (state==MS_BATTLESONG) {
 				if (BardSong[0]) {
-					strnlwrcpy(ModalSpell, BardSong, 8);
+					strnlwrcpy(Modal.Spell, BardSong, 8);
 					return;
 				}
 			}
-			strnlwrcpy(ModalSpell, core->ModalStates[state].spell, 8);
+			strnlwrcpy(Modal.Spell, core->ModalStates[state].spell, 8);
 		}
 	}
 }
@@ -7326,7 +7326,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
 static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 void Actor::UpdateActorState(ieDword gameTime) {
-	if (modalTime==gameTime) {
+	if (Modal.LastApplyTime == gameTime) {
 		return;
 	}
 
@@ -7399,18 +7399,18 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		lastattack = 0;
 	}
 
-	if (ModalState == MS_NONE && !modalSpellLingering) {
+	if (Modal.State == MS_NONE && !Modal.LingeringCount) {
 		return;
 	}
 
 	//apply the modal effect on the beginning of each round
 	if (roundFraction == 0) {
 		// handle lingering modal spells like bardsong in iwd2
-		if (modalSpellLingering && LingeringModalSpell[0]) {
-			modalSpellLingering--;
-			ApplyModal(LingeringModalSpell);
+		if (Modal.LingeringCount && Modal.LingeringSpell[0]) {
+			Modal.LingeringCount--;
+			ApplyModal(Modal.LingeringSpell);
 		}
-		if (ModalState == MS_NONE) {
+		if (Modal.State == MS_NONE) {
 			return;
 		}
 
@@ -7421,29 +7421,29 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		//we can set this to 0
-		modalTime = gameTime;
+		Modal.LastApplyTime = gameTime;
 
-		if (!ModalSpell[0]) {
+		if (!Modal.Spell[0]) {
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
-			ModalSpell[0]='*';
-		} else if(ModalSpell[0]!='*') {
+			Modal.Spell[0]='*';
+		} else if (Modal.Spell[0]!='*') {
 			if (ModalSpellSkillCheck()) {
-				ApplyModal(ModalSpell);
+				ApplyModal(Modal.Spell);
 
 				// some modals notify each round, some only initially
-				bool feedback = core->ModalStates[ModalState].repeat_msg;
+				bool feedback = core->ModalStates[Modal.State].repeat_msg;
 				// HACK: trying to stealth or bardsong?
-				Effect *bs = fxqueue.HasEffectWithSource(fx_display_portrait_icon_ref, ModalSpell);
-				Effect *s = fxqueue.HasEffectWithSource(fx_set_invisible_state_ref, ModalSpell);
+				Effect *bs = fxqueue.HasEffectWithSource(fx_display_portrait_icon_ref, Modal.Spell);
+				Effect *s = fxqueue.HasEffectWithSource(fx_set_invisible_state_ref, Modal.Spell);
 				feedback |= !((bs!=NULL) ^ (s!=NULL));
 				if (InParty && feedback) {
-					displaymsg->DisplayStringName(core->ModalStates[ModalState].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(core->ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {
 				if (InParty) {
-					displaymsg->DisplayStringName(core->ModalStates[ModalState].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(core->ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
-				ModalState = MS_NONE;
+				Modal.State = MS_NONE;
 			}
 		}
 
@@ -7455,7 +7455,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 void Actor::ApplyModal(ieResRef modalSpell)
 {
-	unsigned int aoe = core->ModalStates[ModalState].aoe_spell;
+	unsigned int aoe = core->ModalStates[Modal.State].aoe_spell;
 	if (aoe == 1) {
 		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
 	} else if (aoe == 2) {
@@ -10089,7 +10089,7 @@ int Actor::GetRacialEnemyBonus(Actor* target) const
 
 bool Actor::ModalSpellSkillCheck()
 {
-	switch(ModalState) {
+	switch(Modal.State) {
 	case MS_BATTLESONG:
 		if (GetBardLevel()) {
 			return !(Modified[IE_STATE_ID] & STATE_SILENCED);

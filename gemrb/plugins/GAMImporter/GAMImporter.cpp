@@ -514,7 +514,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	strcpy( actor->Area, pcInfo.Area );
 	actor->SetOrientation( pcInfo.Orientation,0 );
 	actor->TalkCount = pcInfo.TalkCount;
-	actor->ModalState = pcInfo.ModalState;
+	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(pcInfo.ModalState, 0);
 	ps->Happiness = pcInfo.Happiness;
 	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
@@ -917,7 +917,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	stream->WriteWord( &tmpWord);
 	tmpWord = ac->Pos.y-core->Height/2;
 	stream->WriteWord( &tmpWord);
-	tmpWord = (ieWord) ac->ModalState;
+	tmpWord = (ieWord) ac->Modal.State;
 	stream->WriteWord( &tmpWord);
 	tmpWord = ac->PCStats->Happiness;
 	stream->WriteWord( &tmpWord);

@@ -12978,7 +12978,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		}
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
-		ieDword modalstate = actor->ModalState;
+		ieDword modalstate = actor->Modal.State;
 		int type;
 		switch (action) {
 		case ACT_INNATE:
@@ -13281,7 +13281,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
+	if (!(actor->GetNextStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -13581,7 +13581,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
 	if (actor->ModalSpellSkillCheck()) {
-		actor->ApplyModal(actor->ModalSpell); // force immediate effect
+		actor->ApplyModal(actor->Modal.Spell); // force immediate effect
 	}
 
 	Py_RETURN_NONE;
