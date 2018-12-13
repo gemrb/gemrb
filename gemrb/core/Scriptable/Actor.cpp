@@ -7323,6 +7323,8 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 }
 
+static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
+static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 void Actor::UpdateActorState(ieDword gameTime) {
 	if (modalTime==gameTime) {
 		return;
@@ -7427,7 +7429,14 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		} else if(ModalSpell[0]!='*') {
 			if (ModalSpellSkillCheck()) {
 				ApplyModal(ModalSpell);
-				if (InParty) {
+
+				// some modals notify each round, some only initially
+				bool feedback = core->ModalStates[ModalState].repeat_msg;
+				// HACK: trying to stealth or bardsong?
+				Effect *bs = fxqueue.HasEffectWithSource(fx_display_portrait_icon_ref, ModalSpell);
+				Effect *s = fxqueue.HasEffectWithSource(fx_set_invisible_state_ref, ModalSpell);
+				feedback |= !((bs!=NULL) ^ (s!=NULL));
+				if (InParty && feedback) {
 					displaymsg->DisplayStringName(core->ModalStates[ModalState].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {

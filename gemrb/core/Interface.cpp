@@ -950,6 +950,7 @@ bool Interface::ReadModalStates()
 		ms.leaving_str = atoi(table->QueryField(i, 3));
 		ms.failed_str = atoi(table->QueryField(i, 4));
 		ms.aoe_spell = atoi(table->QueryField(i, 5));
+		ms.repeat_msg = atoi(table->QueryField(i, 6));
 		ModalStates.push_back(ms);
 	}
 

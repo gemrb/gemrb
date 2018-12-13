@@ -133,6 +133,7 @@ struct ModalStatesStruct {
 	unsigned int leaving_str;
 	unsigned int failed_str;
 	unsigned int aoe_spell;
+	unsigned int repeat_msg;
 };
 
 struct TimeStruct {
