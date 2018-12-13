@@ -4110,7 +4110,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 			// drop it at my feet
 			map->AddItemToLocation(tar->Pos, item);
 			if (act->InParty) {
-				act->VerbalConstant(VB_INVENTORY_FULL, 1);
+				act->VerbalConstant(VB_INVENTORY_FULL);
 				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 			}
 		} else {
@@ -4148,7 +4148,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
 			if (act->InParty) {
-				act->VerbalConstant(VB_INVENTORY_FULL, 1);
+				act->VerbalConstant(VB_INVENTORY_FULL);
 				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 			}
 		} else {
@@ -4571,7 +4571,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	if (ret == MIC_FULL && snd->InParty) {
-		snd->VerbalConstant(VB_INVENTORY_FULL, 1);
+		snd->VerbalConstant(VB_INVENTORY_FULL);
 		displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 	}
 	Sender->ReleaseCurrentAction();

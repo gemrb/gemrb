@@ -6532,7 +6532,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//success
 	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, DMC_WHITE, target);
-	target->VerbalConstant(VB_TRAP_SET, 1);
+	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));

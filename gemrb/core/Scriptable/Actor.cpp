@@ -1225,7 +1225,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(VB_HURT, 1);
+			actor->VerbalConstant(VB_HURT);
 		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
@@ -3462,7 +3462,7 @@ void Actor::UpdateFatigue()
 	if (FatigueComplaintDelay) {
 		FatigueComplaintDelay--;
 		if (!FatigueComplaintDelay) {
-			VerbalConstant(VB_TIRED, 1);
+			VerbalConstant(VB_TIRED);
 		}
 	}
 }
@@ -3793,7 +3793,7 @@ void Actor::GetAreaComment(int areaflag) const
 					vc++;
 				}
 			}
-			VerbalConstant(vc, 1);
+			VerbalConstant(vc);
 			return;
 		}
 	}
@@ -4026,7 +4026,7 @@ void Actor::IdleActions(bool nonidle)
 			int x = bored_time / 10;
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
-			VerbalConstant(VB_BORED, 1);
+			VerbalConstant(VB_BORED);
 		}
 	}
 }
@@ -4103,7 +4103,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	VerbalConstant(VB_PANIC, 1 );
+	VerbalConstant(VB_PANIC);
 
 	Action *action;
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
@@ -4149,12 +4149,12 @@ void Actor::DialogInterrupt()
 
 	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
-		VerbalConstant(VB_HOSTILE, 1 );
+		VerbalConstant(VB_HOSTILE);
 	} else {
 		if (TalkCount) {
-			VerbalConstant(VB_DIALOG, 1);
+			VerbalConstant(VB_DIALOG);
 		} else {
-			VerbalConstant(VB_INITIALMEET, 1);
+			VerbalConstant(VB_INITIALMEET);
 		}
 	}
 }
@@ -4163,7 +4163,7 @@ void Actor::GetHit(int damage, int spellLevel)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
 		SetStance( IE_ANI_DAMAGE );
-		VerbalConstant(VB_DAMAGE, 1);
+		VerbalConstant(VB_DAMAGE);
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
@@ -5111,7 +5111,7 @@ void Actor::Die(Scriptable *killer)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(STR_DEATH, DMC_WHITE, this);
-	VerbalConstant(VB_DIE, 1 );
+	VerbalConstant(VB_DIE);
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect *newfx;
@@ -6473,8 +6473,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	case ITEM_AT_BOW:
 		rangedheader = GetRangedWeapon(wi);
 		if (!rangedheader) {
-			//display out of ammo verbal constant if there is any???
-			//VerbalConstant(VB_OUTOFAMMO, 1 );
+			//display out of ammo verbal constant if there were any
+			//VerbalConstant(VB_OUTOFAMMO); // FUTURE: gemrb extension
 			//SetStance(IE_ANI_READY);
 			//set some trigger?
 			return false;
@@ -7069,7 +7069,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", buffer);
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
-		VerbalConstant(VB_CRITMISS, 1);
+		VerbalConstant(VB_CRITMISS);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
@@ -7143,7 +7143,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", buffer);
 		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
-		VerbalConstant(VB_CRITHIT, 1);
+		VerbalConstant(VB_CRITHIT);
 	} else {
 		//normal success
 		buffer.append("[Hit]");
@@ -7317,7 +7317,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (damage<=0) {
 		if (attacker && attacker->InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
+			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 	}
@@ -8879,7 +8879,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
+			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;
@@ -8898,7 +8898,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		} else {
 			//a critical surely raises the morale?
 			//only if it is successful it raises the morale of the attacker
-			VerbalConstant(VB_CRITHIT, 1);
+			VerbalConstant(VB_CRITHIT);
 			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
@@ -10230,7 +10230,7 @@ bool Actor::TryToHide()
 		HideFailed(this, 0, skill/7, roll);
 		return false;
 	}
-	if (!continuation) VerbalConstant(VB_HIDE, 1);
+	if (!continuation) VerbalConstant(VB_HIDE);
 	if (!third) return true;
 
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~

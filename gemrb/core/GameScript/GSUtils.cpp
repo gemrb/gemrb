@@ -672,7 +672,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		if (gotitem) {
 			if (target->Type == ST_ACTOR) {
 				if (((Actor *) target)->InParty) {
-					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL, 1);
+					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
 				}
 			}
 			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
