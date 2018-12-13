@@ -4104,13 +4104,17 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	if (tar->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
+		Actor *act = (Actor *) tar;
 		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			Map *map=tar->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(tar->Pos, item);
-			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+			if (act->InParty) {
+				act->VerbalConstant(VB_INVENTORY_FULL, 1);
+				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+			}
 		} else {
-			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+			if (act->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4138,13 +4142,17 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	if (Sender->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
+		Actor *act = (Actor *) Sender;
 		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+			if (act->InParty) {
+				act->VerbalConstant(VB_INVENTORY_FULL, 1);
+				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+			}
 		} else {
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+			if (act->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4563,6 +4571,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	if (ret == MIC_FULL && snd->InParty) {
+		snd->VerbalConstant(VB_INVENTORY_FULL, 1);
 		displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 	}
 	Sender->ReleaseCurrentAction();

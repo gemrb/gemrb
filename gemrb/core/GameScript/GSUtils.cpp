@@ -669,7 +669,14 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
-		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		if (gotitem) {
+			if (target->Type == ST_ACTOR) {
+				if (((Actor *) target)->InParty) {
+					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL, 1);
+				}
+			}
+			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		}
 		return MIC_FULL;
 	}
 	if (gotitem&&!lostitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);

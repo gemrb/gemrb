@@ -94,7 +94,7 @@ class StringBuffer;
 #define VB_CRITHIT   65
 #define VB_CRITMISS  66
 #define VB_TIMMUNE   67
-#define VB_INVENTORY 68
+#define VB_INVENTORY_FULL 68
 #define VB_PP_SUCC   69
 #define VB_EXISTENCE 69
 #define VB_HIDE      70
