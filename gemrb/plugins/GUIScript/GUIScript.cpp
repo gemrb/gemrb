@@ -13580,7 +13580,9 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
-	actor->ApplyModal(actor->ModalSpell); // force immediate effect
+	if (actor->ModalSpellSkillCheck()) {
+		actor->ApplyModal(actor->ModalSpell); // force immediate effect
+	}
 
 	Py_RETURN_NONE;
 }
