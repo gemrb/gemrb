@@ -5582,6 +5582,7 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_MAZE);
+	target->Stop();
 	return FX_APPLIED;
 }
 
