@@ -1004,8 +1004,9 @@ static void UpdateHappiness(Actor *actor) {
 }
 
 // make paladins and rangers fallen if the reputations drops enough
-static void pcf_reputation(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_reputation(Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (oldValue == newValue) return;
 	if (actor->InParty && newValue <= REPUTATION_FALL) {
 		if (actor->GetRangerLevel()) {
 			GameScript::RemoveRangerHood(actor, NULL);
