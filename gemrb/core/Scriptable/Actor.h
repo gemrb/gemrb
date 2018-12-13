@@ -275,6 +275,7 @@ struct ModalState {
 	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
 	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword LastApplyTime;      //last time the modal effect used
+	bool FirstApply;            //running for the first time?
 };
 
 extern void ReleaseMemoryActor();

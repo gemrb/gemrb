@@ -523,6 +523,7 @@ Actor::Actor()
 	Modal.LingeringSpell[0] = '*';
 	Modal.LastApplyTime = 0;
 	Modal.LingeringCount = 0;
+	Modal.FirstApply = 1;
 	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
@@ -6123,6 +6124,10 @@ void Actor::SetModal(ieDword newstate, bool force)
 			return;
 	}
 
+	if (Modal.State != newstate) {
+		Modal.FirstApply = 1;
+	}
+
 	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
 		strnlwrcpy(Modal.LingeringSpell, Modal.Spell, 8);
 		Modal.LingeringCount = 2;
@@ -7323,8 +7328,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 }
 
-static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
-static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 void Actor::UpdateActorState(ieDword gameTime) {
 	if (Modal.LastApplyTime == gameTime) {
 		return;
@@ -7431,11 +7434,8 @@ void Actor::UpdateActorState(ieDword gameTime) {
 				ApplyModal(Modal.Spell);
 
 				// some modals notify each round, some only initially
-				bool feedback = core->ModalStates[Modal.State].repeat_msg;
-				// HACK: trying to stealth or bardsong?
-				Effect *bs = fxqueue.HasEffectWithSource(fx_display_portrait_icon_ref, Modal.Spell);
-				Effect *s = fxqueue.HasEffectWithSource(fx_set_invisible_state_ref, Modal.Spell);
-				feedback |= !((bs!=NULL) ^ (s!=NULL));
+				bool feedback = core->ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
+				Modal.FirstApply = 0;
 				if (InParty && feedback) {
 					displaymsg->DisplayStringName(core->ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
