@@ -210,7 +210,7 @@ public:
 	 */
 	void AddEffect(const Effect* fx, bool insert=false);
 	/** Adds an Effect to the queue, subject to level and other checks.
-	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
+	 * Returns FX_ABORT if unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
 	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const;
 	/** Removes first Effect matching fx from the queue.
