@@ -10173,7 +10173,7 @@ bool Actor::TryToHide()
 
 	// iwd2 is like the others only when trying to hide for the first time
 	// TODO: once understood, the visual checks need syncing (not just lightness)
-	bool continuation = third && (Modified[IE_STATE_ID]&state_invisible);
+	bool continuation = Modified[IE_STATE_ID] & state_invisible;
 	if (third && continuation) {
 		return TryToHideIWD2();
 	}
@@ -10221,7 +10221,9 @@ bool Actor::TryToHide()
 		HideFailed(this, 0, skill/7, roll);
 		return false;
 	}
+	if (!continuation) VerbalConstant(VB_HIDE, 1);
 	if (!third) return true;
+
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
 	displaymsg->DisplayRollStringName(39299, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
 	return true;
