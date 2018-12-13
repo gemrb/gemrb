@@ -3063,7 +3063,7 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->BaseStats[IE_AVATARREMOVAL]=parameters->int0Parameter;
+	actor->SetBase(IE_AVATARREMOVAL, parameters->int0Parameter);
 }
 
 //i have absolutely no idea why this is needed when we have HideCreature
@@ -3077,7 +3077,7 @@ void GameScript::ForceHide(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->BaseStats[IE_AVATARREMOVAL]=1;
+	actor->SetBase(IE_AVATARREMOVAL, 1);
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
