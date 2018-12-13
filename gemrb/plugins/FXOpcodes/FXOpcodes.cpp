@@ -5576,10 +5576,14 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			int stat = target->GetSafeStat(IE_INT);
 			int size = core->GetIntelligenceBonus(3, stat);
 			int dice = core->GetIntelligenceBonus(4, stat);
-			fx->Duration = game->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
+			fx->Duration = game->GameTime + target->LuckyRoll(dice, size, 0, LR_NEGATIVE) * core->Time.round_size;
+
+			// fix the effect from being FX_DURATION_DELAY_PERMANENT to a non-oneshot
+			// needed for the bg2 version of the maze spell (spwi813)
+			fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		}
 	}
-	
+
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_MAZE);
 	target->Stop();
