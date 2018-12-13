@@ -392,8 +392,6 @@ Interface::~Interface(void)
 
 	DamageInfoMap.clear();
 
-	ModalStates.clear();
-
 	delete plugin_flags;
 
 	delete projserv;
@@ -931,27 +929,6 @@ bool Interface::ReadReputationModTable() {
 		for (int j=0; j<cols; j++) {
 			reputationmod[i][j] = atoi(tm->QueryField(i, j));
 		}
-	}
-
-	return true;
-}
-
-bool Interface::ReadModalStates()
-{
-	AutoTable table("modal");
-	if (!table)
-		return false;
-
-	ModalStatesStruct ms;
-	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		CopyResRef(ms.spell, table->QueryField(i, 0));
-		strlcpy(ms.action, table->QueryField(i, 1), 16);
-		ms.entering_str = atoi(table->QueryField(i, 2));
-		ms.leaving_str = atoi(table->QueryField(i, 3));
-		ms.failed_str = atoi(table->QueryField(i, 4));
-		ms.aoe_spell = atoi(table->QueryField(i, 5));
-		ms.repeat_msg = atoi(table->QueryField(i, 6));
-		ModalStates.push_back(ms);
 	}
 
 	return true;
@@ -1902,12 +1879,6 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Reading damage type table...");
 	if (!ret) {
 		Log(WARNING, "Core", "Reading damage type table...");
-	}
-
-	Log(MESSAGE, "Core", "Reading modal states table...");
-	ret = ReadModalStates();
-	if (!ret) {
-		Log(ERROR, "Core", "Failed to modal states table...");
 	}
 
 	Log(MESSAGE, "Core", "Reading game script tables...");

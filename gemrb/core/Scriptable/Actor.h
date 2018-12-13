@@ -269,6 +269,16 @@ struct BABTable {
 	int apr; // attacks per round
 };
 
+struct ModalStatesStruct {
+	ieResRef spell;
+	char action[16];
+	unsigned int entering_str;
+	unsigned int leaving_str;
+	unsigned int failed_str;
+	unsigned int aoe_spell;
+	unsigned int repeat_msg;
+};
+
 struct ModalState {
 	ieDword State;
 	ieResRef Spell;             //apply this spell once per round

@@ -330,6 +330,8 @@ std::map<char *, std::vector<BABTable> > IWD2HitTable;
 typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
 std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 
+std::vector<ModalStatesStruct> ModalStates;
+
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
 static int CheckAbilities=false;
@@ -1728,6 +1730,7 @@ void Actor::ReleaseMemory()
 		skillrac.clear();
 		IWD2HitTable.clear();
 		BABClassMap.clear();
+		ModalStates.clear();
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1777,6 +1780,24 @@ GEM_EXPORT void UpdateActorConfig()
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
+}
+
+static void ReadModalStates()
+{
+	AutoTable table("modal");
+	if (!table) return;
+
+	ModalStatesStruct ms;
+	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
+		CopyResRef(ms.spell, table->QueryField(i, 0));
+		strlcpy(ms.action, table->QueryField(i, 1), 16);
+		ms.entering_str = atoi(table->QueryField(i, 2));
+		ms.leaving_str = atoi(table->QueryField(i, 3));
+		ms.failed_str = atoi(table->QueryField(i, 4));
+		ms.aoe_spell = atoi(table->QueryField(i, 5));
+		ms.repeat_msg = atoi(table->QueryField(i, 6));
+		ModalStates.push_back(ms);
+	}
 }
 
 static void InitActorTables()
@@ -2617,6 +2638,9 @@ static void InitActorTables()
 			favoredMap.insert(std::make_pair(raceID, favClass));
 		}
 	}
+
+	// modal actions/state data
+	ReadModalStates();
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -6136,7 +6160,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	if (IsSelected()) {
 		// display the turning-off message
 		if (Modal.State != MS_NONE) {
-			displaymsg->DisplayStringName(core->ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
@@ -6158,7 +6182,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 	if (spell) {
 		strnlwrcpy(Modal.Spell, spell, 8);
 	} else {
-		if (state >= core->ModalStates.size()) {
+		if (state >= ModalStates.size()) {
 			Modal.Spell[0] = 0;
 		} else {
 			if (state==MS_BATTLESONG) {
@@ -6167,7 +6191,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 					return;
 				}
 			}
-			strnlwrcpy(Modal.Spell, core->ModalStates[state].spell, 8);
+			strnlwrcpy(Modal.Spell, ModalStates[state].spell, 8);
 		}
 	}
 }
@@ -7434,14 +7458,14 @@ void Actor::UpdateActorState(ieDword gameTime) {
 				ApplyModal(Modal.Spell);
 
 				// some modals notify each round, some only initially
-				bool feedback = core->ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
+				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = 0;
 				if (InParty && feedback) {
-					displaymsg->DisplayStringName(core->ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {
 				if (InParty) {
-					displaymsg->DisplayStringName(core->ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 				Modal.State = MS_NONE;
 			}
@@ -7455,7 +7479,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 void Actor::ApplyModal(ieResRef modalSpell)
 {
-	unsigned int aoe = core->ModalStates[Modal.State].aoe_spell;
+	unsigned int aoe = ModalStates[Modal.State].aoe_spell;
 	if (aoe == 1) {
 		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
 	} else if (aoe == 2) {

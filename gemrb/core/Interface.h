@@ -126,16 +126,6 @@ struct DamageInfoStruct {
 	// maybe also add the ac bonus and/or the DL_ constants
 };
 
-struct ModalStatesStruct {
-	ieResRef spell;
-	char action[16];
-	unsigned int entering_str;
-	unsigned int leaving_str;
-	unsigned int failed_str;
-	unsigned int aoe_spell;
-	unsigned int repeat_msg;
-};
-
 struct TimeStruct {
 	unsigned int round_sec;
 	unsigned int turn_sec;
@@ -437,7 +427,6 @@ public:
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	std::vector<ModalStatesStruct> ModalStates;
 	TimeStruct Time;
 	std::vector<SurgeSpell> SurgeSpells;
 public:
@@ -769,7 +758,6 @@ private:
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** handles the QuitFlag bits (main loop events) */
