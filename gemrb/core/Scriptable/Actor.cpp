@@ -3426,6 +3426,19 @@ void Actor::RefreshPCStats() {
 	}
 	Modified[IE_STEALTH] += GetSkillBonus(4);
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
+
+	if (third) {
+		ieDword LayOnHandsAmount = GetPaladinLevel();
+		if (LayOnHandsAmount) {
+			int mod = GetAbilityBonus(IE_CHR, Modified[IE_CHR]);
+			if (mod > 1) {
+				LayOnHandsAmount *= mod;
+			}
+		}
+		BaseStats[IE_LAYONHANDSAMOUNT] = LayOnHandsAmount;
+		Modified[IE_LAYONHANDSAMOUNT] = LayOnHandsAmount;
+	}
+
 }
 
 int Actor::GetConHealAmount() const
@@ -9701,19 +9714,6 @@ void Actor::CreateDerivedStatsIWD2()
 		backstabdamagemultiplier = (level + 1) / 2;
 	}
 
-	int layonhandsamount = 0;
-	level = GetPaladinLevel();
-	if (level) {
-		// when this is called for the first time, Modified is not set yet
-		// FIXME: move to RefreshEffects, since it relies on a volatile stat
-		int mod = GetAbilityBonus(IE_CHR, BaseStats[IE_CHR]);
-		if (mod < 1) {
-			layonhandsamount = level;
-		} else {
-			layonhandsamount = level * mod;
-		}
-	}
-
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
 
@@ -9729,7 +9729,6 @@ void Actor::CreateDerivedStatsIWD2()
 	}
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
-	BaseStats[IE_LAYONHANDSAMOUNT]=(ieDword) layonhandsamount;
 }
 
 //set up stuff here, like attack number, turn undead level
