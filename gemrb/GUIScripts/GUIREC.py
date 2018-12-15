@@ -557,8 +557,9 @@ def GetSkills(pc):
 	stats.append ( (12128, GS (pc, IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (pc, IE_TURNUNDEADLEVEL), '') )
 
-	#this hack only displays LOH if we know the spell
-	#TODO: the core should just not set LOH if the paladin can't learn it
+	# the original ignored layhands.2da, hardcoding the values and display
+	# the table has only a class entry, not kits
+	# the values are handled by the spell, but there is an unused stat too
 	if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 		stats.append ( (12127, GS (pc, IE_LAYONHANDSAMOUNT), '') )
 	return TypeSetStats (stats, pc)
