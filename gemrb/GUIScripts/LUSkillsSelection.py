@@ -379,7 +379,6 @@ def SkillScrollBarPress():
 	return
 
 # saves all the skills
-# TODO: change the layout of the iwd/how skills table to match the rest
 def SkillsSave (pc):
 	global SkillsTable
 	if not SkillsTable:
