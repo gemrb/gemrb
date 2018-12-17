@@ -7286,6 +7286,7 @@ int fx_can_use_any_item_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 }
 
 // 0x12f AlwaysBackstab
+// the two extra TobEx bits are handled in the user
 int fx_always_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_always_backstab_modifier(%2d): Value: %d", fx->Opcode, fx->Parameter2);
