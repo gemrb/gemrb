@@ -377,7 +377,13 @@ def GetClassTitles (pc,LevelDiff):
 		stats.append ( (19721,1,'c') )
 		for i in range (Multi[0]):
 			Class = GUICommon.GetClassRowName (Multi[i+1], "class")
-			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+			# level 1 npc mod kits some multiclasses
+			Kit = GUICommon.GetKitIndex (pc)
+			KitClass = CommonTables.KitList.GetValue (str(Kit), "CLASS", GTV_INT)
+			if Kit and KitClass == Multi[i+1]:
+				ClassTitle = CommonTables.KitList.GetValue (str(Kit), "MIXED", GTV_REF)
+			else:
+				ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 			GemRB.SetToken ("CLASS", ClassTitle)
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
