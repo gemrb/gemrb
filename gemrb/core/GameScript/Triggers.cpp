@@ -3482,7 +3482,7 @@ int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 	if (!mode) {
 		mode = EQUALS;
 	}
-	return DiffCore(diff, (ieDword) parameters->int0Parameter, mode);
+	return DiffCore(diff+1, (ieDword) parameters->int0Parameter, mode);
 }
 
 int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3490,7 +3490,7 @@ int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
 	ieDword diff;
 
 	core->GetDictionary()->Lookup("Difficulty Level", diff);
-	return diff>(ieDword) parameters->int0Parameter;
+	return diff+1>(ieDword) parameters->int0Parameter;
 }
 
 int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3498,7 +3498,7 @@ int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	ieDword diff;
 
 	core->GetDictionary()->Lookup("Difficulty Level", diff);
-	return diff<(ieDword) parameters->int0Parameter;
+	return diff+1<(ieDword) parameters->int0Parameter;
 }
 
 int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
