@@ -901,6 +901,12 @@ bool Inventory::EquipItem(ieDword slot)
 		//if weapon is bow, then find quarrel for it and equip that
 		weaponslot = GetWeaponQuickSlot(slot);
 		EquippedHeader = 0;
+		if (Owner->PCStats) {
+			int eheader = Owner->PCStats->GetHeaderForSlot(slot);
+			if (eheader >= 0) {
+				EquippedHeader = eheader;
+			}
+		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
 			ieDword equip;
