@@ -409,8 +409,13 @@ def GetClassTitles (pc,LevelDiff):
 
 		Levels[0] += LevelDiff[0]
 
-		Class = CommonTables.Classes.GetRowName (Dual[2])
-		ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+		if Dual[0] == 3:
+			ClassID = CommonTables.KitList.GetValue (Dual[2], 7)
+			Class = GUICommon.GetClassRowName (ClassID, "class")
+			ClassTitle = CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
+		else:
+			Class = GUICommon.GetClassRowName (Dual[2], "index")
+			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
@@ -426,14 +431,14 @@ def GetClassTitles (pc,LevelDiff):
 		# the first class (shown second)
 		if Dual[0] == 1:
 			ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2, GTV_REF)
-		elif Dual[0] == 2:
-			ClassTitle = GUICommon.GetClassRowName(Dual[1], "index")
-			ClassTitle = CommonTables.Classes.GetValue (ClassTitle, "CAP_REF", GTV_REF)
+		else:
+			Class = GUICommon.GetClassRowName (Dual[1], "index")
+			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
 		# the xp table contains only classes, so we have to determine the base class for kits
-		if Dual[0] == 2:
+		if Dual[0] > 1:
 			BaseClass = CommonTables.Classes.GetRowName (Dual[1])
 		else:
 			BaseClass = GUICommon.GetKitIndex (pc)
@@ -1009,12 +1014,15 @@ def OpenKitInfoWindow ():
 		if Dual[0]: # dual class
 			# first (previous) kit or class of the dual class
 			if Dual[0] == 1:
-				text = CommonTables.KitList.GetValue (Dual[1], 3)
-			elif Dual[0] == 2:
-				text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESC_REF")
+				text = CommonTables.KitList.GetValue (Dual[1], 3, GTV_REF)
+			else:
+				text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESC_REF", GTV_REF)
 	
 			text += "\n"
-			text += CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[2], "index"), "DESC_REF")
+			if Dual[0] == 3:
+				text += CommonTables.KitList.GetValue (Dual[2], 3, GTV_REF)
+			else:
+				text += CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[2], "index"), "DESC_REF", GTV_REF)
 	
 		else: # ordinary class or kit
 			if KitIndex:
