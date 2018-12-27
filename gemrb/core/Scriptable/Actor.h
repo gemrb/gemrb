@@ -919,6 +919,8 @@ public:
 	ieDword GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
 	bool WasClass(ieDword oldClassID) const;
+	ieDword GetActiveClass() const;
+	bool IsKitInactive() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
