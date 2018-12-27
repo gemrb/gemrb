@@ -163,6 +163,17 @@ def OnLoad():
 		HasStrExtra=1
 	else:
 		HasStrExtra=0
+		#half-warrior multiclasses are also allowed
+		Multi = CommonTables.Classes.GetValue(ClassName, "MULTI", GTV_INT)
+		if Multi != 0:
+			ID = CommonTables.Classes.GetColumnIndex("ID")
+			Row = CommonTables.Classes.FindValue("SAVE", "SAVEWAR")
+			while Row != -1:
+				ClassID = CommonTables.Classes.GetValue(Row, ID)
+				if Multi & (1 << (ClassID - 1)) != 0:
+					HasStrExtra = 1
+					break
+				Row = CommonTables.Classes.FindValue("SAVE", "SAVEWAR", Row + 1)
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
