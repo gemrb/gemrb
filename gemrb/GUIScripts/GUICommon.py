@@ -408,12 +408,15 @@ def GetActorClassTitle (actor):
 				# first (previous) kit or class of the dual class
 				if Dual[0] == 1:
 					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
-				elif Dual[0] == 2:
+				else:
 					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
 				if ClassTitle != "*":
 					ClassTitle = GemRB.GetString (ClassTitle)
 				ClassTitle += " / "
-				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+				if Dual[0] == 3:
+					ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
+				else:
+					ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
 			elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
 				ClassTitle = 10369
 				if MCFlags & MC_FALLEN_PALADIN:
@@ -486,7 +489,7 @@ def HasMultiClassBits(actor):
 def IsDualClassed(actor, verbose):
 	"""Returns an array containing the dual class information.
 
-	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 2 otherwise.
+	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 3 if the new class is a kit, 2 otherwise.
 	Return[1] contains either the kit or class index of the old class.
 	Return[2] contains the class index of the new class.
 	If verbose is false, only Return[0] contains useable data."""
@@ -502,35 +505,36 @@ def IsDualClassed(actor, verbose):
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 
 	if verbose:
-		DualInfo = []
 		KitIndex = GetKitIndex (actor)
+		if KitIndex:
+			KittedClass = CommonTables.KitList.GetValue (KitIndex, 7)
+			KittedClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
+		else:
+			KittedClassIndex = 0
 
 		if DualedFrom > 0: # first (previous) class of the dual class
 			FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
-			if KitIndex:
-				DualInfo.append (1)
-				DualInfo.append (KitIndex)
-			else:
-				DualInfo.append (2)
-				DualInfo.append (FirstClassIndex)
 
 			# use the first class of the multiclass bunch that isn't the same as the first class
-			Mask = 1
 			for i in range (1,16):
+				Mask = 1 << (i - 1)
 				if Multi & Mask:
 					ClassIndex = CommonTables.Classes.FindValue ("ID", i)
 					if ClassIndex == FirstClassIndex:
-						Mask = 1 << i
 						continue
-					DualInfo.append (ClassIndex)
+					SecondClassIndex = ClassIndex
 					break
-				Mask = 1 << i
-			if len(DualInfo) != 3:
+			else:
 				print "WARNING: Invalid dualclass combination, treating as a single class!"
-				print DualedFrom, Multi, KitIndex, DualInfo
+				print DualedFrom, Multi, KitIndex, FirstClassIndex
 				return (0,-1,-1)
 
-			return DualInfo
+			if KittedClassIndex == FirstClassIndex:
+				return (1, KitIndex, SecondClassIndex)
+			elif KittedClassIndex == SecondClassIndex:
+				return (3, FirstClassIndex, KitIndex)
+			else:
+				return (2, FirstClassIndex, SecondClassIndex)
 		else:
 			return (0,-1,-1)
 	else:
@@ -563,7 +567,7 @@ def IsDualSwap (actor, override=None):
 		Class = GetClassRowName(override["mc"], "class").split("_")
 
 	# get our old class name
-	if Dual[0] == 2:
+	if Dual[0] > 1:
 		BaseClass = GetClassRowName(Dual[1], "index")
 	else:
 		BaseClass = GetKitIndex (actor)

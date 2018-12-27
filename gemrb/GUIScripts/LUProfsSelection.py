@@ -198,6 +198,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	IsDual = GUICommon.IsDualClassed (pc, 1)
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
+	elif IsDual[0] == 3:
+		Class = CommonTables.KitList.GetValue (IsDual[2], 7)
 	elif IsDual[0]:
 		Class = GUICommon.GetClassRowName(IsDual[2], "index")
 		Class = CommonTables.Classes.GetValue (Class, "ID")
@@ -252,8 +254,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsColumn = ClassWeaponsTable.GetRowIndex (ClassName)
 	else:
 		Kit = GUICommon.GetKitIndex (pc)
-		if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and not IsDual[0]:
-			#if we do kit with dualclass, we'll get the old kit
+		if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and IsDual[0] in [0, 3]:
+			#if we do kit with dualclass, we'll get the old kit (usually)
 			#also don't want to worry about kitted multis
 			ProfsColumn = CommonTables.KitList.GetValue (Kit, 5)
 		else:
