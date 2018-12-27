@@ -531,7 +531,7 @@ Actor::Actor()
 	GotLUFeedback = false;
 	RollSaves();
 	WMLevelMod = 0;
-	TicksLastRested = 0;
+	TicksLastRested = LastFatigueCheck = 0;
 	speed = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
@@ -3463,38 +3463,46 @@ void Actor::UpdateFatigue()
 	if (!InParty || !game->GameTime) {
 		return;
 	}
-	// do icons here, so they persist for more than a tick
-	int LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
-	if (LuckMod) {
-		AddPortraitIcon(PI_FATIGUE);
-	} else {
-		DisablePortraitIcon(PI_FATIGUE);
+
+	bool updated = false;
+	if (!TicksLastRested) {
+		// just loaded the game; approximate last rest
+		TicksLastRested = game->GameTime - (2*core->Time.hour_size) * (2*GetBase(IE_FATIGUE)+1);
+		updated = true;
+	} else if (LastFatigueCheck) {
+		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
+		                    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+		if (FatigueDiff) {
+			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
+			updated = true;
+		}
+	}
+	LastFatigueCheck = game->GameTime;
+
+	if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+		// pst has TNO regeneration stored there
+		// shouldn't we check for our own flag, though?
+		// FIXME: the Con bonus is applied dynamically, but this doesn't appear to conform to
+		// the original engine behavior?  we should probably apply the bonus on rest
+		int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
+		if (Modified[IE_FATIGUE] >= FatigueBonus) {
+			Modified[IE_FATIGUE] -= FatigueBonus;
+		} else {
+			Modified[IE_FATIGUE] = 0;
+		}
 	}
 
-	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size);
-	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
-	// pst has TNO regeneration stored there
-	if (core->HasFeature(GF_AREA_OVERRIDE)) FatigueBonus = 0;
-	FatigueLevel = (signed)FatigueLevel - FatigueBonus >= 0 ? FatigueLevel - FatigueBonus : 0;
-	FatigueLevel = ClampStat(IE_FATIGUE, FatigueLevel);
-
-	// don't run on init or we automatically make the character supertired
-	if (FatigueLevel != BaseStats[IE_FATIGUE] && TicksLastRested) {
-		int OldLuckMod = LuckMod;
-		NewBase(IE_FATIGUE, FatigueLevel, MOD_ABSOLUTE);
-		LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
-		BaseStats[IE_LUCK] += LuckMod-OldLuckMod;
-		if (LuckMod < 0) {
+	int LuckMod = core->ResolveStatBonus(this, "fatigue"); // fatigmod.2da
+	Modified[IE_LUCK] += LuckMod;
+	if (LuckMod < 0) {
+		AddPortraitIcon(PI_FATIGUE);
+		if (updated) {
 			// stagger the complaint, so long travels don't cause a fatigue choir
 			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
-	} else if (!TicksLastRested) {
-		//if someone changed FatigueLevel, or loading a game, reset
-		TicksLastRested = game->GameTime - (4*core->Time.hour_size) * BaseStats[IE_FATIGUE];
+	} else {
+		DisablePortraitIcon(PI_FATIGUE);
 		FatigueComplaintDelay = 0;
-		if (LuckMod < 0) {
-			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
-		}
 	}
 
 	if (FatigueComplaintDelay) {
@@ -8786,7 +8794,8 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		TicksLastRested = core->GetGame()->GameTime;
+		TicksLastRested = LastFatigueCheck = core->GetGame()->GameTime;
+		SetBase (IE_FATIGUE, 0);
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();

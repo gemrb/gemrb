@@ -392,6 +392,7 @@ private:
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
+	ieDword LastFatigueCheck;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -917,7 +918,7 @@ public:
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	ieDword GetLastRested() { return TicksLastRested; }
-	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
+	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
 	bool IsKitInactive() const;
