@@ -65,7 +65,7 @@ def CanLevelUp(actor):
 			# if any class can level, return 1
 			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")
 			tmpNext = int(GetNextLevelExp (Levels[i], TmpClassName))
-			if tmpNext != 0 and tmpNext <= xp:
+			if (tmpNext != 0 or Levels[i] == 0) and tmpNext <= xp:
 				return 1
 
 		# didn't find a class that could level
@@ -78,7 +78,7 @@ def CanLevelUp(actor):
 
 	# check the class that can be level (single or dual)
 	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
-	return (tmpNext != 0 and tmpNext <= xp)
+	return ((tmpNext != 0 or Levels[0] == 0) and tmpNext <= xp)
 
 # expects a list of character levels of all classes
 # returns sparse list of class ids (of same length)
