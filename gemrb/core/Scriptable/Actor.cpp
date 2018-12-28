@@ -6778,12 +6778,12 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 	// add generic bonus
 	generic += GetStat(IE_HITBONUS);
 
-	// finally involve the Modified stat and add to it the rest of the generic bonus
+	// now this func is the only one to modify generic bonus, so no need to add
 	if (ReverseToHit) {
-		ToHit.SetGenericBonus(ToHit.GetGenericBonus()-generic);
+		ToHit.SetGenericBonus(-generic);
 		return ToHit.GetTotal();
 	} else {
-		ToHit.SetGenericBonus(ToHit.GetGenericBonus()+generic); // flat out cummulative
+		ToHit.SetGenericBonus(generic); // flat out cumulative
 		return ToHit.GetTotalForAttackNum(attacknum);
 	}
 }
