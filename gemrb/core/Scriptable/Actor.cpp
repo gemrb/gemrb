@@ -4238,7 +4238,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
 	// combat casting bonus only applies when injured
-	if (HasFeat(FEAT_COMBAT_CASTING) && BaseStats[IE_HITPOINTS] != Modified[IE_HITPOINTS]) {
+	if (HasFeat(FEAT_COMBAT_CASTING) && Modified[IE_MAXHITPOINTS] != Modified[IE_HITPOINTS]) {
 		bonus += 4;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
