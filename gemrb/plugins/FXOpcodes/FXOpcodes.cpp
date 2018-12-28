@@ -2367,7 +2367,29 @@ int fx_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	int percentage;
+	switch (fx->Parameter2) {
+	case MOD_ADDITIVE:
+	default:
+		target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		break;
+	case MOD_ABSOLUTE:
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			target->ToHit.SetBase(fx->Parameter1);
+		} else {
+			//FIXME: two such effects probably should not stack, but they do for now
+			target->ToHit.SetFxBonus(fx->Parameter1 - target->ToHit.GetBase(), MOD_ADDITIVE);
+		}
+		break;
+	case MOD_PERCENT:
+		percentage = target->ToHit.GetBase() * fx->Parameter1 / 100;
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			target->ToHit.SetBase(percentage);
+		} else {
+			target->ToHit.SetFxBonus(percentage - target->ToHit.GetBase(), MOD_ADDITIVE);
+		}
+		break;
+	}
 	return FX_PERMANENT;
 }
 
