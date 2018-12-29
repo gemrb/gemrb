@@ -1782,7 +1782,11 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	//FIXME: in bg2 this is hacked to set param1=10, param2=1, we might need some flag for this
+	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+		BASE_SET(IE_MORALE, 10);
+		return FX_NOT_APPLIED;
+	}
+
 	STAT_MOD( IE_MORALE );
 	return FX_APPLIED;
 }
