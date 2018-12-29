@@ -221,8 +221,10 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			# don't give too many points; exact formula unknown, but this works with f/m and f/m/t
 			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate
 		else:
-			# sum the levels, since the rate is for the combined multiclass
-			ProfsPointsLeft += (sum(level2) - sum(level1))/ProfsRate
+			# average the levels, since the rate is for the combined multiclass
+			# FIXME: should give points when the fasted-profs-rate class (f > c/t > m) levels,
+			# instead of using the average level
+			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate - sum(level1)/IsMulti[0]/ProfsRate
 	else:
 		if GUICommon.IsDualSwap (pc):
 			ProfIndex = 1
