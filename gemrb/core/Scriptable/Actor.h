@@ -372,6 +372,10 @@ public:
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
 	ieDword *spellStates;
+	// set after modifying maxhp, adjusts hp next tick
+	int checkHP;
+	// to determine that a tick has passed
+	ieDword checkHPTime;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;

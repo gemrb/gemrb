@@ -546,6 +546,8 @@ Actor::Actor()
 	DifficultyMargin = disarmTrap = 0;
 	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
 	weapSlotCount = 4;
+	// delay all maxhp checks until we completely load all effects
+	checkHP = 2;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -1279,6 +1281,8 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
+	if (actor->checkHP == 2) return;
+
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
 		hp=maxhp;
@@ -1301,12 +1305,11 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
-static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
-		actor->BaseStats[IE_HITPOINTS]=hp;
-		//passing 0 because it is ignored anyway
-		pcf_hitpoint(actor, 0, hp);
+	if (!actor->checkHP) {
+		actor->checkHP = 1;
+		actor->checkHPTime = core->GetGame()->GameTime;
 	}
 }
 
@@ -3284,6 +3287,16 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && pst_appearance == 0) {
 		UpdateAnimationID(true);
+	}
+
+	//delayed HP adjustment hack (after max HP modification)
+	//as it's triggered by PCFs from the previous tick, it should probably run before current PCFs
+	if (first && checkHP == 2) {
+		//could not set this in the constructor
+		checkHPTime = core->GetGame()->GameTime;
+	} else if (checkHP && checkHPTime != core->GetGame()->GameTime) {
+		checkHP = 0;
+		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
 	for (i=0;i<MAX_STATS;i++) {
