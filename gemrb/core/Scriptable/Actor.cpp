@@ -535,6 +535,8 @@ Actor::Actor()
 	speed = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
+	//delay all maxhp checks until we completely load all effects
+	checkHP = 2;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -1214,6 +1216,8 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
+	if (actor->checkHP == 2) return;
+
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
 		hp=maxhp;
@@ -1236,13 +1240,9 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
-static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
-		actor->BaseStats[IE_HITPOINTS]=hp;
-		//passing 0 because it is ignored anyway
-		pcf_hitpoint(actor, 0, hp);
-	}
+	if (!actor->checkHP) actor->checkHP = 1;
 }
 
 static void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
@@ -7445,6 +7445,12 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		lastattack = 0;
+	}
+
+	// delayed HP adjustment after max HP modification
+	if (checkHP) {
+		checkHP = 0;
+		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
 	if (Modal.State == MS_NONE && !Modal.LingeringCount) {

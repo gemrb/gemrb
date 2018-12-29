@@ -370,6 +370,8 @@ public:
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
+	//set after modifying maxhp, adjusts hp next tick
+	int checkHP;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
