@@ -6593,7 +6593,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			}
 		} else {
 			//it is not clear what is the penalty for non player classes
-			prof += 4;
+			prof -= 4;
 		}
 	}
 
