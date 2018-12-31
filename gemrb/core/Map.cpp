@@ -435,6 +435,15 @@ Map::~Map(void)
 		delete (*spi);
 	}
 
+	//currently we're the only populator for AmbientMgr,
+	//so if we're deleting the ambients (which it borrows from us by pointers),
+	//we may as well update it accordingly
+	//(this does prevent some crashes on quickload)
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	if (ambim) {
+		ambim->reset();
+	}
+
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
 	}
