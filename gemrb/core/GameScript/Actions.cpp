@@ -5243,18 +5243,17 @@ void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 	core->GetGame()->ResetPartyCommentTimes();
 }
 
-//advance at least one day, then stop at next day/dusk/night/morning
-//oops, not TimeODay is used but Time (this means we got hours)
-//i'm not sure if we should add a whole day either, needs more research
+// advance at the beginning of the specified hour (minus one tick? unsure)
+// the parameter is HOURS (time.ids, 0 to 23)
+// never advance a full day or more (in fact, duplicating this action does nothing)
 void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 {
-	// first, calculate the current number of hours.
-	int padding = core->Time.GetHour(core->GetGame()->GameTime);
-	// then, calculate the offset (in hours) required to take us to the desired hour.
-	int hoursInADay = core->Time.day_sec/core->Time.hour_sec;
-	padding = (hoursInADay + parameters->int0Parameter - padding) % hoursInADay;
-	// then, advance one day, plus the desired number of hours.
-	core->GetGame()->AdvanceTime(core->Time.day_size + padding*core->Time.hour_size, false);
+	int delta = parameters->int0Parameter * core->Time.hour_size
+	          - core->GetGame()->GameTime % core->Time.day_size;
+	if (delta < 0) {
+		delta += core->Time.day_size;
+	}
+	core->GetGame()->AdvanceTime(delta, false);
 }
 
 //implement pst style parameters:
