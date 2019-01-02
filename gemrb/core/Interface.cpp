@@ -2826,7 +2826,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		case WINDOW_GRAYED:
 			win->Invalidate();
 			win->DrawWindow();
-			//here is a fallthrough
+			// Intentional fallthrough
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
 			if (win->WindowID==65535) {
@@ -2839,7 +2839,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			if (win->WindowID==65535) {
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
 			}
-			//here is a fallthrough
+			// Intentional fallthrough
 		case WINDOW_FRONT:
 			if (win->Visible==WINDOW_VISIBLE) {
 				evntmgr->AddWindow( win );

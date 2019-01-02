@@ -13190,6 +13190,7 @@ jump_label2:
 			}
 			// fall through as a synonym
 			// should eventually get replaced with proper +0-9 recognition
+			// intentional fallthrough
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;

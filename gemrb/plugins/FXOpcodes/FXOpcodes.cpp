@@ -4474,7 +4474,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 2:
 			//automatic secret door detection
 			detecttraps = false;
-			//fall through is intentional here
+			//intentional fallthrough
 		default:
 			//automatic find traps
 			skill = 256;
