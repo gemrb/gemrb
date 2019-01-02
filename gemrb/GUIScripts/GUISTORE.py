@@ -888,7 +888,7 @@ def BuyPressed ():
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
-				Price = 1
+				Price = Slot['Purchased']
 
 			if GemRB.ChangeStoreItem (pc, i-1, SHOP_BUY):
 				GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-Price)
@@ -959,7 +959,7 @@ def RedrawStoreShoppingWindow ():
 			else:
 				Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
-				Price = 1
+				Price = Slot['Purchased']
 			BuySum = BuySum + Price
 
 	RightCount = len(inventory_slots)
@@ -1579,9 +1579,9 @@ def GetRealPrice (pc, mode, Item, Slot):
 			oc = count
 			# jewelry doesn't suffer from deprecation, at least in BG2
 			if Item['Type'] in [CommonTables.ItemType.GetRowIndex ("GEM"),
-                                            CommonTables.ItemType.GetRowIndex ("RING"),
-                                            CommonTables.ItemType.GetRowIndex ("AMULET")]:
-                                count = 0
+			                    CommonTables.ItemType.GetRowIndex ("RING"),
+			                    CommonTables.ItemType.GetRowIndex ("AMULET")]:
+				count = 0
 			if count > 2:
 				count = 2
 			mod -= count * Store['Depreciation']
@@ -1593,7 +1593,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 		if RepModTable:
 			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
-	return price * mod / 100
+	effprice = price * mod / 100
+	#in bg2 even 1gp items can be sold for at least 1gp
+	if effprice == 0 and Item['Price'] > 0:
+		effprice = 1
+	return effprice
 
 def UpdateStoreDonateWindow ():
 	Window = StoreDonateWindow
