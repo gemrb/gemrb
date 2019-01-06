@@ -147,6 +147,8 @@ static bool QuitOnError = false;
 static int CHUWidth = 0;
 static int CHUHeight = 0;
 
+static Store *rhstore = NULL;
+
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
 // Like PyString_FromString(), but for ResRef
@@ -8767,6 +8769,59 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_LoadRighthandStore__doc,
+"===== LoadRighthandStore =====\n\
+\n\
+**Prototype:** GemRB.LoadRighthandStore (StoreResRef)\n\
+\n\
+**Description:** Loads a secondary (right-hand) store.  Used for trading to/from\n\
+containers. The previous right-hand store, if any, is saved to cache.\n\
+\n\
+**Parameters:**\n\
+  * StoreResRef - the store's resource name\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:CloseRighthandStore]], [[guiscript:GetStore]], [[guiscript:GetStoreItem]], [[guiscript:SetPurchasedAmount]]\n\
+"
+);
+
+static PyObject* GemRB_LoadRighthandStore(PyObject * /*self*/, PyObject* args)
+{
+	const char* StoreResRef;
+	if (!PyArg_ParseTuple(args, "s", &StoreResRef)) {
+		return AttributeError(GemRB_LoadRighthandStore__doc);
+	}
+
+	Store *newrhstore = gamedata->GetStore(StoreResRef);
+	if (rhstore && rhstore != newrhstore) {
+		gamedata->SaveStore(rhstore);
+	}
+	rhstore = newrhstore;
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_CloseRighthandStore__doc,
+"===== CloseRighthandStore =====\n\
+\n\
+**Prototype:** GemRB.CloseRighthandStore ()\n\
+\n\
+**Description:** Unloads the current right-hand store and saves it to cache.\n\
+If there was no right-hand store opened, the function does nothing.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadRighthandStore]]\n\
+"
+);
+
+static PyObject* GemRB_CloseRighthandStore(PyObject * /*self*/, PyObject* /*args*/)
+{
+	gamedata->SaveStore(rhstore);
+	rhstore = NULL;
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_LeaveContainer__doc,
 "===== LeaveContainer =====\n\
 \n\
@@ -9084,12 +9139,13 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetStore__doc,
 "===== GetStore =====\n\
 \n\
-**Prototype:** GemRB.GetStore ()\n\
+**Prototype:** GemRB.GetStore ([righthand])\n\
 \n\
 **Description:** Gets the basic header information of the current store and \n\
 returns it in a dictionary.\n\
 \n\
-**Parameters:** N/A\n\
+**Parameters:**\n\
+  * righthand - set to non-zero to query the right-hand store (bag) instead\n\
 \n\
 **Return value:** dictionary\n\
   * 'StoreType'       - numeric (see IESDP)\n\
@@ -9132,11 +9188,17 @@ IE_STORE_CURE,IE_STORE_DONATE,IE_STORE_DRINK,IE_STORE_RENT};
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
-	if (!PyArg_ParseTuple( args, "" )) {
+	int rh = 0;
+	if (!PyArg_ParseTuple( args, "|i", &rh )) {
 		return AttributeError( GemRB_GetStore__doc );
 	}
 
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (rh) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -9213,6 +9275,7 @@ for buying, selling, identifying or stealing. If Type is 1, then this is a \n\
   * type - which inventory to look at?\n\
     * 0 - PC\n\
     * 1 - store\n\
+    * 2 - right-hand store (bag)\n\
 \n\
 **Return value:** bitfield\n\
   * 1 - valid for buy\n\
@@ -9244,7 +9307,12 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	ieDword Flags;
 
 	if (type) {
-		STOItem* si = store->GetItem( Slot, true );
+		STOItem* si = NULL;
+		if (type != 2) {
+			si = store->GetItem( Slot, true );
+		} else if (rhstore) {
+			si = rhstore->GetItem(Slot, true);
+		}
 		if (!si) {
 			return PyInt_FromLong(0);
 		}
@@ -9265,7 +9333,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong(0);
 	}
 
-	ret = store->AcceptableItemType( item->ItemType, Flags, !type );
+	ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
 
 	//don't allow putting a bag into itself
 	if (!strnicmp(ItemResRef, store->Name, sizeof(ieResRef)) ) {
@@ -9279,6 +9347,22 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	//don't allow overstuffing bags
 	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
 		ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_SELL;
+	}
+
+	//buying into bags respects bags' limitations
+	if (rhstore && type != 0) {
+		int accept = rhstore->AcceptableItemType(item->ItemType, Flags, 1);
+		if (!(accept & IE_STORE_SELL)) {
+			ret &= ~IE_STORE_BUY;
+		}
+		//probably won't happen in sane games, but doesn't hurt to check
+		if (!(accept & IE_STORE_BUY)) {
+			ret &= ~IE_STORE_SELL;
+		}
+
+		if (rhstore->Capacity && rhstore->Capacity<=rhstore->GetRealStockSize()) {
+			ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_BUY;
+		}
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -9334,7 +9418,7 @@ static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
 "===== SetPurchasedAmount =====\n\
 \n\
-**Prototype:** GemRB.SetPurchasedAmount (Index, Amount)\n\
+**Prototype:** GemRB.SetPurchasedAmount (Index, Amount[, type])\n\
 \n\
 **Description:** Sets the amount of purchased items of a type. If it is 0, \n\
 then the item will be deselected from the purchase list. This function \n\
@@ -9343,6 +9427,7 @@ works only with an active store.\n\
 **Parameters:**\n\
   * Index  - the store item's index\n\
   * Amount - a numeric value not less than 0\n\
+  * type - set to non-zero to affect right-hand store (bag)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -9354,12 +9439,18 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 {
 	int Slot, tmp;
 	ieDword amount;
+	int type = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &Slot, &tmp)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &Slot, &tmp, &type)) {
 		return AttributeError( GemRB_SetPurchasedAmount__doc );
 	}
 	amount = (ieDword) tmp;
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (type) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -9383,6 +9474,34 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+// a bunch of duplicated code moved from GemRB_ChangeStoreItem()
+static int SellBetweenStores(STOItem* si, int action, Store *store)
+{
+	CREItem ci = *reinterpret_cast<CREItem *>(si);
+	ci.Expired = 0;
+	ci.Flags &= ~IE_INV_ITEM_SELECTED;
+	if (action == IE_STORE_STEAL) {
+		ci.Flags |= IE_INV_ITEM_STOLEN;
+	}
+
+	while (si->PurchasedAmount) {
+		//store/bag is at full capacity
+		if (store->Capacity && (store->Capacity <= store->GetRealStockSize())) {
+			Log(MESSAGE, "GUIScript", "Store is full.");
+			return ASI_FAILED;
+		}
+		if (si->InfiniteSupply!=-1) {
+			if (!si->AmountInStock) {
+				break;
+			}
+			si->AmountInStock--;
+		}
+		si->PurchasedAmount--;
+		store->AddItem(&ci);
+	}
+	return ASI_SUCCESS;
+}
+
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 "===== ChangeStoreItem =====\n\
 \n\
@@ -9390,6 +9509,8 @@ PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 \n\
 **Description:** Performs a buy, sell, identify or steal action. It has the \n\
 same bit values as IsValidStoreItem. It can also toggle the selection of an item.\n\
+If a right-hand store is currently loaded, it will be acted upon instead of\n\
+the PC's inventory.\n\
 \n\
 **Parameters:**\n\
   * PartyID - the PC's position in the party\n\
@@ -9437,9 +9558,13 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (action == IE_STORE_STEAL) {
 			si->PurchasedAmount=1;
 		}
-		//the amount of items is stored in si->PurchasedAmount
-		//it will adjust AmountInStock/PurchasedAmount
-		actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
+		if (!rhstore) {
+			//the amount of items is stored in si->PurchasedAmount
+			//it will adjust AmountInStock/PurchasedAmount
+			actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
+		} else {
+			SellBetweenStores(si, action, rhstore);
+		}
 		if (si->PurchasedAmount) {
 			//was not able to buy it due to lack of space
 			res = ASI_FAILED;
@@ -9453,17 +9578,27 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			delete si;
 		}
 		//keep encumbrance labels up to date
-		actor->CalculateSpeed(false);
+		if (!rhstore) {
+			actor->CalculateSpeed(false);
+		}
 		res = ASI_SUCCESS;
 		break;
 	}
 	case IE_STORE_ID:
 	{
-		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+		if (!rhstore) {
+			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			si->Flags |= IE_INV_ITEM_IDENTIFIED;
+		} else {
+			STOItem* si = rhstore->GetItem( Slot, true );
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
-		si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -9486,12 +9621,25 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	case IE_STORE_SELECT|IE_STORE_SELL:
 	case IE_STORE_SELECT|IE_STORE_ID:
 	{
-		//this is not removeitem, because the item is just marked
-		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+		if (!rhstore) {
+			//this is not removeitem, because the item is just marked
+			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+		} else {
+			STOItem* si = rhstore->GetItem( Slot, true );
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+                        if (si->Flags & IE_INV_ITEM_SELECTED) {
+                                si->PurchasedAmount=1;
+                        } else {
+                                si->PurchasedAmount=0;
+                        }
 		}
-		si->Flags ^= IE_INV_ITEM_SELECTED;
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -9503,21 +9651,35 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 			break;
 		}
-		//this is removeitem, because the item leaves our inventory
-		CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+
+		if (rhstore) {
+			STOItem *si = rhstore->GetItem(Slot, true);
+			res = SellBetweenStores(si, action, store);
+
+			//if no item remained, remove it
+			if (si->AmountInStock) {
+				si->Flags &= ~IE_INV_ITEM_SELECTED;
+			} else {
+				rhstore->RemoveItem(si);
+				delete si;
+			}
+		} else {
+			//this is removeitem, because the item leaves our inventory
+			CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			//well, it shouldn't be sold at all, but if it is here
+			//it will vanish!!!
+			if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
+				si->Flags &= ~IE_INV_ITEM_SELECTED;
+				store->AddItem( si );
+			}
+			delete si;
+			//keep encumbrance labels up to date
+			actor->CalculateSpeed(false);
+			res = ASI_SUCCESS;
 		}
-		//well, it shouldn't be sold at all, but if it is here
-		//it will vanish!!!
-		if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
-			si->Flags &= ~IE_INV_ITEM_SELECTED;
-			store->AddItem( si );
-		}
-		delete si;
-		//keep encumbrance labels up to date
-		actor->CalculateSpeed(false);
-		res = ASI_SUCCESS;
 		break;
 	}
 	}
@@ -9527,7 +9689,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
 "===== GetStoreItem =====\n\
 \n\
-**Prototype:** GemRB.GetStoreItem (index)\n\
+**Prototype:** GemRB.GetStoreItem (index[, righthand])\n\
 \n\
 **Description:** Gets the item resref, price and other details of a store \n\
 item referenced by the index. In case of PST stores the item's availability \n\
@@ -9535,6 +9697,7 @@ is also checked against the availability triggers.\n\
 \n\
 **Parameters:**\n\
   * index - the number of the item in the store list\n\
+  * righthand - set to non-zero to query the right-hand store (bag) instead\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemResRef' - the ResRef of the item\n\
@@ -9555,11 +9718,17 @@ is also checked against the availability triggers.\n\
 static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int index;
+	int rh = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &index )) {
+	if (!PyArg_ParseTuple( args, "i|i", &index, &rh )) {
 		return AttributeError( GemRB_GetStoreItem__doc );
 	}
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (rh) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -15355,6 +15524,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CheckSpecialSpell, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
 	METHOD(ClearActions, METH_VARARGS),
+	METHOD(CloseRighthandStore, METH_NOARGS),
 	METHOD(CountEffects, METH_VARARGS),
 	METHOD(CountSpells, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
@@ -15482,6 +15652,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(LoadGame, METH_VARARGS),
 	METHOD(LoadMusicPL, METH_VARARGS),
+	METHOD(LoadRighthandStore, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
