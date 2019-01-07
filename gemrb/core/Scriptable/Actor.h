@@ -372,6 +372,8 @@ public:
 	ieByte DifficultyMargin;
 	//set after modifying maxhp, adjusts hp next tick
 	int checkHP;
+	// hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
+	ieDword fakeScriptingStates[7];
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;

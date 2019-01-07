@@ -3055,6 +3055,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
+	memset(fakeScriptingStates, 0, sizeof fakeScriptingStates);
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
@@ -3065,6 +3066,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//copy back the original stats, because the effects
 		//will be reapplied in ApplyAllEffects again
 		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		memset(fakeScriptingStates, 0, sizeof fakeScriptingStates);
 		//also clear the spell bonuses just given, they will be
 		//recalculated below again
 		spellbook.ClearBonus();

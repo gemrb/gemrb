@@ -169,9 +169,10 @@ namespace GemRB {
 #define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
 #define  GF_RANDOM_BANTER_DIALOGS       77 // bg1
 #define  GF_FIXED_MORALE_OPCODE         78 // bg2
+#define  GF_FAKE_SCRIPTING_STATES       79 // some bg2 mods require this
 
 //update this or bad things can happen
-#define GF_COUNT 79
+#define GF_COUNT 80
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
