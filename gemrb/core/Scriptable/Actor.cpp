@@ -3489,7 +3489,7 @@ void Actor::UpdateFatigue()
 		// FIXME: the Con bonus is applied dynamically, but this doesn't appear to conform to
 		// the original engine behavior?  we should probably apply the bonus on rest
 		int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
-		if (Modified[IE_FATIGUE] >= FatigueBonus) {
+		if ((signed) Modified[IE_FATIGUE] >= FatigueBonus) {
 			Modified[IE_FATIGUE] -= FatigueBonus;
 		} else {
 			Modified[IE_FATIGUE] = 0;
