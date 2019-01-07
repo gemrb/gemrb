@@ -601,11 +601,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);
 		ip->Flags = Flags;
-		// ensure repeating traps are armed, fix for bg2 ar1404 mirror trap to fire
-		// BUT probably not in PST, since that breaks the mausoleum portal in ar0200
-		if (ip->TrapResets() && !core->HasFeature(GF_PST_STATE_FLAGS)) {
-			ip->Trapped = true;
-		}
 		ip->UsePoint.x = PosX;
 		ip->UsePoint.y = PosY;
 		//FIXME: PST doesn't use this field
