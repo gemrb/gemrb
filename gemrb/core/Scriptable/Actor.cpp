@@ -1242,7 +1242,10 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 
 static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if (!actor->checkHP) actor->checkHP = 1;
+	if (!actor->checkHP) {
+		actor->checkHP = 1;
+		actor->checkHPTime = core->GetGame()->GameTime;
+	}
 }
 
 static void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
@@ -3156,6 +3159,16 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && pst_appearance == 0) {
 		UpdateAnimationID(true);
+	}
+
+	//delayed HP adjustment hack (after max HP modification)
+	//as it's triggered by PCFs from the previous tick, it should probably run before current PCFs
+	if (first && checkHP == 2) {
+		//could not set this in the constructor
+		checkHPTime = core->GetGame()->GameTime;
+	} else if (checkHP && checkHPTime != core->GetGame()->GameTime) {
+		checkHP = 0;
+		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
 	for (i=0;i<MAX_STATS;i++) {
@@ -7449,12 +7462,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		lastattack = 0;
-	}
-
-	// delayed HP adjustment after max HP modification
-	if (checkHP) {
-		checkHP = 0;
-		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
 	if (Modal.State == MS_NONE && !Modal.LingeringCount) {
