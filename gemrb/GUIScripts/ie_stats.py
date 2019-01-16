@@ -295,14 +295,17 @@ IE_TITLE1			= 172
 IE_TITLE2			= 173
 IE_DISABLEOVERLAY		= 174
 IE_DISABLEBACKSTAB		= 175
-#176-182 overwritten by us
+#the next two are overwritten by us in PST
 IE_XP_MAGE	 		= 176 # In PST this stores secondary level exp
 IE_XP_THIEF	 		= 177 # In PST this stores tertiary level exp
-IE_DIALOGRANGE                  = 178 # distance for dialogue
-IE_MOVEMENTRATE                 = 179
-IE_MORALE                       = 180
-IE_BOUNCE                       = 181
-IE_MIRRORIMAGES                 = 182
+#but in other games they're still used sometimes
+IE_SCRIPTINGSTATE21  		= 176
+IE_SCRIPTINGSTATE22  		= 177
+IE_SCRIPTINGSTATE23  		= 178
+IE_SCRIPTINGSTATE24  		= 179
+IE_SCRIPTINGSTATE25  		= 180
+IE_SCRIPTINGSTATE26  		= 181
+IE_SCRIPTINGSTATE27  		= 182
 #these are original
 IE_ENABLEOFFSCREENAI            = 183
 IE_EXISTANCEDELAY               = 184
@@ -364,8 +367,12 @@ IE_LEVELRANGER                  = 246
 IE_LEVELSORCERER                = 247
 #248 IE_LEVELCLASS12
 #249 IE_LEVELCLASS13
-#the remaining six stats are spell states
-IE_SPLSTATE_ID1                 = 250
+#the remaining stats are for our internal use now
+IE_DIALOGRANGE                  = 250 # distance for dialogue
+IE_MOVEMENTRATE                 = 251
+IE_MORALE                       = 252
+IE_BOUNCE                       = 253
+IE_MIRRORIMAGES                 = 254
 
 #these stats exist only in PC's (but we access only PCs anyway)
 IE_EXPERTISE                    = 0x1003

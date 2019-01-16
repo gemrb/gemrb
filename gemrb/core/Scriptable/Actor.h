@@ -374,6 +374,8 @@ public:
 	int checkHP;
 	//to determine that a tick has passed
 	ieDword checkHPTime;
+	//iwd2-specific bitfield, this used to be stored as stats 250+
+	ieDword *spellStates;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
