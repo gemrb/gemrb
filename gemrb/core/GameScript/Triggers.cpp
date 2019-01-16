@@ -2088,16 +2088,7 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	int stat;
-	// hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
-	if (core->HasFeature(GF_FAKE_SCRIPTING_STATES)
-	    && (parameters->int1Parameter >= IE_SCRIPTINGSTATE1 + 20)
-	    && (parameters->int1Parameter <= IE_SCRIPTINGSTATE1 + 26)) {
-		stat = actor->fakeScriptingStates[parameters->int1Parameter - IE_SCRIPTINGSTATE1 - 20];
-	} else {
-		stat = actor->GetStat(parameters->int1Parameter);
-	}
-	if (stat == parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2125,16 +2116,7 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int stat;
-	// hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
-	if (core->HasFeature(GF_FAKE_SCRIPTING_STATES)
-	    && (parameters->int1Parameter >= IE_SCRIPTINGSTATE1 + 20)
-	    && (parameters->int1Parameter <= IE_SCRIPTINGSTATE1 + 26)) {
-		stat = actor->fakeScriptingStates[parameters->int1Parameter - IE_SCRIPTINGSTATE1 - 20];
-	} else {
-		stat = actor->GetStat(parameters->int1Parameter);
-	}
-	if (stat > parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2162,16 +2144,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	int stat;
-	// hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
-	if (core->HasFeature(GF_FAKE_SCRIPTING_STATES)
-	    && (parameters->int1Parameter >= IE_SCRIPTINGSTATE1 + 20)
-	    && (parameters->int1Parameter <= IE_SCRIPTINGSTATE1 + 26)) {
-		stat = actor->fakeScriptingStates[parameters->int1Parameter - IE_SCRIPTINGSTATE1 - 20];
-	} else {
-		stat = actor->GetStat(parameters->int1Parameter);
-	}
-	if (stat < parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

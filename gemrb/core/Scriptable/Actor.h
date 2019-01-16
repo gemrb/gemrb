@@ -374,8 +374,6 @@ public:
 	int checkHP;
 	//to determine that a tick has passed
 	ieDword checkHPTime;
-	// hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
-	ieDword fakeScriptingStates[7];
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;

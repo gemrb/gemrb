@@ -7059,13 +7059,8 @@ int fx_scripting_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2>100) {
 		return FX_NOT_APPLIED;
 	}
-	if (core->HasFeature(GF_FAKE_SCRIPTING_STATES) && (fx->Parameter2 >= 20) && (fx->Parameter2 <= 26)) {
-		//hack for mods that reuse 'empty' stats 176-182, corresponding to scripting states 20-26
-		target->fakeScriptingStates[fx->Parameter2 - 20] = fx->Parameter1;
-	} else {
-		//original engine used only single byte value, we allow full dword
-		STAT_SET( IE_SCRIPTINGSTATE1+fx->Parameter2, fx->Parameter1 );
-	}
+	//original engine used only single byte value, we allow full dword
+	STAT_SET( IE_SCRIPTINGSTATE1+fx->Parameter2, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
