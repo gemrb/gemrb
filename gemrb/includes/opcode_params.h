@@ -211,8 +211,6 @@ namespace GemRB {
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179
 
-#define SS_MAX          192
-
 }
 
 #endif //IE_OPCODE_PARAMS_H
