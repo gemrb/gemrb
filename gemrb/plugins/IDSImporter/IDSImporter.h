@@ -48,6 +48,7 @@ public:
 	int FindString(char *str, int len) const;
 	int FindValue(int val) const;
 	int GetSize() const { return pairs.size(); }
+	int GetHighestValue() const;
 };
 
 #endif

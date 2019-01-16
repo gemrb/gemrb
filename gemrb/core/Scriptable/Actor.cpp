@@ -247,6 +247,7 @@ static int DeathOnZeroStat = true;
 static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
 static int ProjectileSize = 0; //the size of the projectile immunity bitfield (dwords)
+static unsigned int SpellStatesSize = 0; //and this is for the spellStates bitfield
 
 static const char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
@@ -535,6 +536,7 @@ Actor::Actor()
 	speed = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
+	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -572,6 +574,7 @@ Actor::~Actor(void)
 	delete polymorphCache;
 
 	free(projectileImmunity);
+	free(spellStates);
 }
 
 void Actor::SetFistStat(ieDword stat)
@@ -2641,6 +2644,17 @@ static void InitActorTables()
 		}
 	}
 
+	// IWD, IWD2 and BG:EE have this
+	int splstatetable = core->LoadSymbol("splstate");
+	if (splstatetable != -1) {
+		Holder<SymbolMgr> splstate = core->GetSymbol(splstatetable);
+		int numstates = splstate->GetHighestValue();
+		if (numstates > 0) {
+			//rounding up
+			SpellStatesSize = (numstates >> 5) + 1;
+		}
+	}
+
 	// modal actions/state data
 	ReadModalStates();
 }
@@ -3057,6 +3071,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
+	if (SpellStatesSize) {
+		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
+	}
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
@@ -3067,6 +3084,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//copy back the original stats, because the effects
 		//will be reapplied in ApplyAllEffects again
 		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		if (SpellStatesSize) {
+			memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
+		}
 		//also clear the spell bonuses just given, they will be
 		//recalculated below again
 		spellbook.ClearBonus();
@@ -9520,21 +9540,21 @@ void Actor::SetOverlay(unsigned int overlay)
 //returns true if spell state is already set or illegal
 bool Actor::SetSpellState(unsigned int spellstate)
 {
-	if (spellstate >= SS_MAX) return true;
-	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
-	unsigned int bit = 1<<(spellstate&31);
-	if (Modified[pos]&bit) return true;
-	Modified[pos]|=bit;
+	if (spellstate >= SpellStatesSize << 5) return true;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
+	spellStates[pos] |= bit;
 	return false;
 }
 
 //returns true if spell state is already set
 bool Actor::HasSpellState(unsigned int spellstate) const
 {
-	if (spellstate >= SS_MAX) return false;
-	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
-	unsigned int bit = 1<<(spellstate&31);
-	if (Modified[pos]&bit) return true;
+	if (spellstate >= SpellStatesSize << 5) return false;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
 	return false;
 }
 

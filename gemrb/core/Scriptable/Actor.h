@@ -370,6 +370,7 @@ public:
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
+	ieDword *spellStates;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;

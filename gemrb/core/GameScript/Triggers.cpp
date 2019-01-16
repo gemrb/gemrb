@@ -2442,7 +2442,7 @@ int GameScript::CheckSpellState(Scriptable* Sender, Trigger* parameters)
 	}
 	unsigned int position = parameters->int0Parameter>>5;
 	unsigned int bit = 1<<(parameters->int0Parameter&31);
-	if (actor->GetStat(IE_SPLSTATE_ID1+position) & bit) {
+	if (actor->spellStates[position] & bit) {
 		return 1;
 	}
 	return 0;
