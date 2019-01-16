@@ -223,13 +223,14 @@ def RefreshInventoryWindow ():
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	# disable coloring and equipment for non-humanoid dolls (shapes/morphs, mod additions)
 	# ... which doesn't include ogres and flinds, who are also clown-colored
+	# if one more exception needs to be added, rather externalise this to a new pdolls.2da flags column
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
-	if (anim_id < 0x5000 or anim_id >= 0x7000) and (anim_id != 0x8000 and anim_id != 0x9000):
+	if (anim_id < 0x5000 or anim_id >= 0x7000 or anim_id == 0x6404) and (anim_id != 0x8000 and anim_id != 0x9000):
 		Color1 = -1
 	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
-	# disable equipment for flinds and ogres
-	if anim_id == 0x8000 or anim_id == 0x9000:
+	# disable equipment for flinds and ogres and Sarevok (Recovery Mod)
+	if anim_id == 0x8000 or anim_id == 0x9000 or anim_id == 0x6404:
 		Color1 = -1
 
 	row = "0x%04X" %anim_id
