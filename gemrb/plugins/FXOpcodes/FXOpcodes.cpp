@@ -862,7 +862,7 @@ static void RegisterCoreOpcodes()
 }
 
 
-#define STONE_GRADIENT 14
+#define STONE_GRADIENT 14 // for stoneskin, not petrification
 #define ICE_GRADIENT 71
 
 static inline void SetGradient(Actor *target,const ieDword *gradients)
