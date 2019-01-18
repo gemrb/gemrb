@@ -1000,7 +1000,9 @@ static void UpdateHappiness(Actor *actor) {
 	switch (newHappiness) {
 		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, true); break;
 		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, true); break;
-		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true); break;
+		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true);
+			if (actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
+			break;
 		case 80: actor->VerbalConstant(VB_HAPPY, 1, true); break;
 		default: break; // case 0
 	}
