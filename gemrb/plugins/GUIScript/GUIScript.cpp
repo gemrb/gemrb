@@ -9477,8 +9477,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 // a bunch of duplicated code moved from GemRB_ChangeStoreItem()
 static int SellBetweenStores(STOItem* si, int action, Store *store)
 {
-	CREItem ci = *reinterpret_cast<CREItem *>(si);
-	ci.Expired = 0;
+	CREItem ci(si);
 	ci.Flags &= ~IE_INV_ITEM_SELECTED;
 	if (action == IE_STORE_STEAL) {
 		ci.Flags |= IE_INV_ITEM_STOLEN;
