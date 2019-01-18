@@ -1649,7 +1649,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			Button.EnableBorder (0, 0)
 
 		GemRB.SetToken ("ITEMNAME", Name)
-		if Inventory or type == ITEM_STORE and steal:
+		if Inventory or (type == ITEM_STORE and steal):
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				LabelText = GemRB.GetString (24890)
 			elif GameCheck.IsBG2():
@@ -1663,7 +1663,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
 		if GameCheck.IsPST():
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
-		if type == ITEM_STORE and not steal or type == ITEM_BAG:
+		if (type == ITEM_STORE and not steal) or type == ITEM_BAG:
 			if Slot["Amount"] != -1:
 				LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
 		Label.SetText (LabelText)
