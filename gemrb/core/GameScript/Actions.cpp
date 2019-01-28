@@ -3155,7 +3155,7 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
 	char * str = core->GetCString( parameters->int0Parameter);
-	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, str);
+	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, str);
 }
 
 //Assigns a numeric variable to the token
