@@ -479,7 +479,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	};
 
 	ieDword volume = 100;
-	ALint loop = (flags & GEM_SND_LOOPING ? 1 : 0);
+	ALint loop = (flags & GEM_SND_LOOPING) ? 1 : 0;
 
 	AudioStream* stream = NULL;
 
