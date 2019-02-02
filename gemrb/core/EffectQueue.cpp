@@ -2237,7 +2237,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		return 1;
 	}
 
-	if( effects.size() ) {
+	if (!effects.empty()) {
 		Effect* fx = *effects.begin();
 
 		//projectile immunity
