@@ -222,7 +222,6 @@ def OpenStoreWindow ():
 		Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
 	#based on shop type, these buttons will change
-	store_type = Store['StoreType']
 	store_buttons = Store['StoreButtons']
 	for i in range (StoreButtonCount):
 		Buttons[i] = Button = Window.GetControl (i+1)
