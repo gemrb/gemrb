@@ -13358,6 +13358,7 @@ jump_label2:
 			}
 			// fall through as a synonym
 			// should eventually get replaced with proper +0-9 recognition
+			// intentional fallthrough
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;
@@ -14795,7 +14796,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Armor", PyInt_FromLong (actor->ToHit.GetArmorBonus()));
 	PyDict_SetItemString(tohits, "Shield", PyInt_FromLong (actor->ToHit.GetShieldBonus()));
 	PyDict_SetItemString(tohits, "Proficiency", PyInt_FromLong (actor->ToHit.GetProficiencyBonus()));
-	PyDict_SetItemString(tohits, "Generic", PyInt_FromLong (actor->ToHit.GetGenericBonus()));
+	PyDict_SetItemString(tohits, "Generic", PyInt_FromLong (actor->ToHit.GetGenericBonus() + actor->ToHit.GetFxBonus()));
 	PyDict_SetItemString(tohits, "Ability", PyInt_FromLong (actor->ToHit.GetAbilityBonus()));
 	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);

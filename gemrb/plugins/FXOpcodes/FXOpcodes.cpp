@@ -862,7 +862,7 @@ static void RegisterCoreOpcodes()
 }
 
 
-#define STONE_GRADIENT 14
+#define STONE_GRADIENT 14 // for stoneskin, not petrification
 #define ICE_GRADIENT 71
 
 static inline void SetGradient(Actor *target,const ieDword *gradients)
@@ -2927,7 +2927,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_SECONDS:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2935,7 +2935,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_POINTS:
 		damage = fx->Parameter1;
 		// per second
-		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2975,7 +2975,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
 			return FX_APPLIED;
 		}
 		if (fx->Parameter1<1) {
@@ -4041,6 +4041,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_set_petrified_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	BASE_STATE_SET( STATE_PETRIFIED );
+	if (target->InParty) core->GetGame()->LeaveParty(target);
 	target->SendDiedTrigger();
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
@@ -4269,7 +4270,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		//simulate sparkle casting glows
 		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
 	}
-
+	// TODO: this opcode is also affected by slow/haste
 	return FX_NOT_APPLIED;
 }
 
@@ -4500,7 +4501,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 2:
 			//automatic secret door detection
 			detecttraps = false;
-			//fall through is intentional here
+			//intentional fallthrough
 		default:
 			//automatic find traps
 			skill = 256;
@@ -5574,6 +5575,7 @@ int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->AddPortraitIcon(PI_PRISON);
 	target->SendDiedTrigger();
 	target->Stop();
+	if (target->InParty) core->GetGame()->LeaveParty(target);
 	return FX_APPLIED;
 }
 
@@ -6884,24 +6886,24 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 2://param1 times every second
-			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter1;i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
 		case 3: //once every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter3;i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}

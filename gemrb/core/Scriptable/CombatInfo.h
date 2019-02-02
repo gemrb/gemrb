@@ -86,7 +86,7 @@ public:
 	int GetShieldBonus() const { return shieldBonus; };
 	int GetAbilityBonus() const { return abilityBonus; };
 	int GetProficiencyBonus() const { return proficiencyBonus; };
-	int GetGenericBonus() const { return genericBonus + fxBonus; };
+	int GetGenericBonus() const { return genericBonus; };
 	int GetFxBonus() const { return fxBonus; };
 
 	// returns the value of the cascade for the specified attack

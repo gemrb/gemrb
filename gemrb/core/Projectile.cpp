@@ -97,7 +97,13 @@ Projectile::~Projectile()
 	}
 	delete effects;
 
-	gamedata->FreePalette(palette, PaletteRes);
+	if (TFlags&PTF_COLOUR) {
+		// unnamed palette, but PaletteRes may be set (eg. pshammb.pro of the Hammers mod)
+		gamedata->FreePalette(palette, NULL);
+	} else {
+		gamedata->FreePalette(palette, PaletteRes);
+	}
+
 	ClearPath();
 
 	if (travel_handle) {

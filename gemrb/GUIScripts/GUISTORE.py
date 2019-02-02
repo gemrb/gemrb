@@ -981,7 +981,7 @@ def OpenBag ():
 	RightIndex = GemRB.GetVar ("RightIndex")
 	Slot = GemRB.GetSlotItem (pc, inventory_slots[RightIndex])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
-	if Item['Function'] & 4:
+	if Item['Function'] & ITM_F_CONTAINER:
 		GemRB.SetVar ("RightIndex", 0)
 		GemRB.SetVar ("RightTopIndex", 0)
 		GemRB.SetVar ("Index", 0)
@@ -1633,7 +1633,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
 				else:
 					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			elif Item['Function'] & 4 and not Bag and not Inventory:
+			elif Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
 				#containers are always clickable
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
