@@ -1605,7 +1605,10 @@ void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
 	if (Sender->Type==ST_ACTOR) {
 		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
 	} else {
-		DisplayStringCore( target, parameters->int0Parameter, DS_AREA|DS_NONAME);
+		// Virtue calls this from the global script, but maybe Pos is ok for areas
+		// set DS_CONSOLE only for ST_GLOBAL if it turns out areas don't care;
+		// could also be dependent on the subtitle setting, see DisplayStringCore
+		DisplayStringCore(target, parameters->int0Parameter, DS_AREA|DS_CONSOLE|DS_NONAME);
 	}
 }
 

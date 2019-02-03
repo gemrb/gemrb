@@ -117,6 +117,9 @@ int CValueUnpacker::get_bits(int bits)
 int CValueUnpacker::init_unpacker()
 {
 	//using malloc, supposed to be faster
+	if (amp_buffer) {
+		free(amp_buffer);
+	}
 	amp_buffer =(short *) malloc(sizeof(short)*0x10000);
 	if (!amp_buffer) {
 		return 0;

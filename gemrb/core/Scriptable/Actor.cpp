@@ -9569,10 +9569,10 @@ void Actor::SetOverlay(unsigned int overlay)
 bool Actor::SetSpellState(unsigned int spellstate)
 {
 	if (spellstate >= SpellStatesSize << 5) return true;
-	unsigned int pos = spellstate>>5;
-	unsigned int bit = 1<<(spellstate&31);
-	if (spellStates[pos]&bit) return true;
-	spellStates[pos]|=bit;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
+	spellStates[pos] |= bit;
 	return false;
 }
 
@@ -9580,9 +9580,9 @@ bool Actor::SetSpellState(unsigned int spellstate)
 bool Actor::HasSpellState(unsigned int spellstate) const
 {
 	if (spellstate >= SpellStatesSize << 5) return false;
-	unsigned int pos = spellstate>>5;
-	unsigned int bit = 1<<(spellstate&31);
-	if (spellStates[pos]&bit) return true;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
 	return false;
 }
 
