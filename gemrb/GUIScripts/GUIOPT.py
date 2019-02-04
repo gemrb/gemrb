@@ -501,6 +501,8 @@ def MovieCreditsPress():
 	SubOptionsWindow.Invalidate()
 	return
 
+# for iwd2 only, the rest use GUIMOVIE
+# TODO: investigate a merger, so it can get removed from GUIOPT
 def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
@@ -514,7 +516,8 @@ def OpenMovieWindow ():
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
-	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(0, MoviesTable.GetRowCount())],"MovieIndex",0)
+	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
