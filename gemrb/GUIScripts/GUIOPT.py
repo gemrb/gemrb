@@ -482,19 +482,9 @@ def OpenAutopauseOptionsWindow ():
 ###################################################
 
 def MoviePlayPress():
-	s = GemRB.GetVar("MovieIndex")
-	for i in range(0, MoviesTable.GetRowCount() ):
-		t = MoviesTable.GetRowName(i)
-		#temporarily out (change simultaneously with OpenMovieWindow)
-		#if GemRB.GetVar(t)==1:
-		if 1==1:
-			if s==0:
-				s = MoviesTable.GetRowName(i)
-				GemRB.PlayMovie(s, 1)
-				SubOptionsWindow.Invalidate()
-				return
-			s = s - 1
-	return
+	movie = MoviesTable.GetRowName (GemRB.GetVar ("MovieIndex"))
+	GemRB.PlayMovie (movie, 1)
+	SubOptionsWindow.Invalidate ()
 
 def MovieCreditsPress():
 	GemRB.PlayMovie("CREDITS")
