@@ -4078,17 +4078,21 @@ void Actor::IdleActions(bool nonidle)
 	}
 
 	//drop the bored one liner is there was no action for some time
-	if (nonidle || !nextBored || InMove() || Immobile()) {
-		//if bored timeout is disabled, don't bother to set the new time
-		if (bored_time) {
-			nextBored=time+core->Roll(1,30,bored_time);
-		}
+	//if bored timeout is disabled, don't bother to set the new time
+	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
+		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
-		if (nextBored<time) {
+		if (nextBored && nextBored < time) {
 			int x = bored_time / 10;
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
 			VerbalConstant(VB_BORED);
+		}
+
+		// display idle animation
+		int x = RAND(0, 25);
+		if (!x && (GetStance() == IE_ANI_AWAKE)) {
+			SetStance(IE_ANI_HEAD_TURN);
 		}
 	}
 }
@@ -8355,7 +8359,7 @@ bool Actor::HandleActorStance()
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
-	int x = RAND(0, 999);
+	int x = RAND(0, 25);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
