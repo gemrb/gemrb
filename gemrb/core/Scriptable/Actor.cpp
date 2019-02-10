@@ -1233,7 +1233,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(VB_HURT);
+			actor->VerbalConstant(VB_HURT, 1, true);
 		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
@@ -4435,11 +4435,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	// can be negative if we're healing on 100%+ resistance
-	if (damage != 0) {
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
-	}
-
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
 		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
@@ -4458,6 +4453,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
 		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
+	}
+
+	// can be negative if we're healing on 100%+ resistance
+	// do this after GetHit, so VB_HURT isn't overriden by VB_DAMAGE, just (dis)played later
+	if (damage != 0) {
+		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 	}
 
 	InternalFlags|=IF_ACTIVE;
