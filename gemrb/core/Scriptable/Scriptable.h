@@ -467,6 +467,7 @@ public:
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
 	PathNode *GetNextStep(int x);
+	PathNode *GetPath() { return path; };
 	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetNextStep() {
