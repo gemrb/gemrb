@@ -1348,6 +1348,24 @@ void Map::DrawSearchMap(const Region &screen)
 			}
 		}
 	}
+
+	// draw also pathfinding waypoints
+	Actor *act = core->GetFirstSelectedActor();
+	PathNode *path = act->GetPath();
+	if (!act || !path) return;
+	PathNode *step = path->Next;
+	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
+	int i = 0;
+	block.w = 8;
+	block.h = 6;
+	while (step) {
+		block.x = (step->x+4)*16 - rgn.x;
+		block.y = (step->y+1)*12 - rgn.y - 6;
+		print("Waypoint %d at roughly (%d, %d)", i, block.x, block.y);
+		vid->DrawRect(block, waypoint);
+		step = step->Next;
+		i++;
+	}
 }
 
 //adding animation in order, based on its height parameter
