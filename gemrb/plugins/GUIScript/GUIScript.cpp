@@ -13017,6 +13017,9 @@ static bool CanUseActionButton(Actor *pcc, int type)
 		case ACT_THIEVING:
 			capability = pcc->GetSkill(IE_LOCKPICKING) + pcc->GetSkill(IE_PICKPOCKET);
 			break;
+		case ACT_SEARCH:
+			capability = 1; // everyone can try to search
+			break;
 		default:
 			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
@@ -13028,6 +13031,9 @@ static bool CanUseActionButton(Actor *pcc, int type)
 			break;
 		case ACT_THIEVING:
 			capability = pcc->GetThiefLevel() + pcc->GetBardLevel();
+			break;
+		case ACT_SEARCH:
+			capability = pcc->GetThiefLevel();
 			break;
 		default:
 			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
@@ -13243,10 +13249,12 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_SEARCH:
 			//in IWD2 everyone can try to search, in bg2 only thieves get the icon
-			//so there is no problem, if you absolutely want to disable this button
-			//check the search skill
-			if (modalstate==MS_DETECTTRAPS) {
-				state = IE_GUI_BUTTON_SELECTED;
+			if (!CanUseActionButton(actor, action)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			} else {
+				if (modalstate == MS_DETECTTRAPS) {
+					state = IE_GUI_BUTTON_SELECTED;
+				}
 			}
 			break;
 		case ACT_THIEVING:
