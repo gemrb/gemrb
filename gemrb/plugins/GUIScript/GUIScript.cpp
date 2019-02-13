@@ -9580,6 +9580,22 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!rhstore) {
 			actor->CalculateSpeed(false);
 		}
+
+		// play the item's inventory sound
+		ieResRef Sound;
+		Item *item = gamedata->GetItem(si->ItemResRef);
+		if (item) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
+			} else {
+				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+			}
+			gamedata->FreeItem(item, si->ItemResRef, 0);
+			if (Sound[0]) {
+				// speech means we'll only play the last sound if multiple items were bought
+				core->GetAudioDrv()->Play(Sound, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
+			}
+		}
 		res = ASI_SUCCESS;
 		break;
 	}
