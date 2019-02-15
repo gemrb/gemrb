@@ -332,6 +332,7 @@ typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
 std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 
 std::vector<ModalStatesStruct> ModalStates;
+std::map<int, int> numWeaponSlots;
 
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
@@ -537,6 +538,7 @@ Actor::Actor()
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
 	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
+	weapSlotCount = 4;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -2130,6 +2132,7 @@ static void InitActorTables()
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
+	std::map<std::string, int> className2ID;
 
 	tm.load("classes");
 	if (!tm) {
@@ -2215,6 +2218,7 @@ static void InitActorTables()
 			tmpindex = atoi(tm->QueryField(classname, "ID"));
 			if (!tmpindex)
 				continue;
+			className2ID[classname] = tmpindex;
 			tmpindex--;
 
 			StringBuffer buffer;
@@ -2348,6 +2352,22 @@ static void InitActorTables()
 		}*/
 	}
 	Log(MESSAGE, "Actor", "Finished examining classes.2da");
+
+	// set the default weapon slot count for the inventory gui — if we're not in iwd2 already
+	if (!iwd2class) {
+		tm.load("numwslot", true);
+		if (tm) {
+			int rowcount = tm->GetRowCount();
+			for (i = 0; i < rowcount; i++) {
+				const char* cls = tm->GetRowName(i);
+				std::map<std::string, int >::iterator it = className2ID.find(cls);
+				int id = 0;
+				if (it != className2ID.end()) id = it->second;
+				numWeaponSlots[id] = std::min(4, atoi(tm->QueryField(i, 0)));
+			}
+		}
+	}
+	className2ID.clear();
 
 	//pre-cache hit/damage/speed bonuses for weapons
 	tm.load("wspecial");
@@ -5672,9 +5692,10 @@ void Actor::ReinitQuickSlots()
 	//these are always present
 	CheckWeaponQuickSlot(0);
 	CheckWeaponQuickSlot(1);
-	if (version==22) {
-		CheckWeaponQuickSlot(2);
-		CheckWeaponQuickSlot(3);
+	if (weapSlotCount > 2) {
+		for(i=2; i<weapSlotCount; i++) {
+			CheckWeaponQuickSlot(i);
+		}
 	} else {
 	//disabling quick weapon slots for certain classes
 		for(i=0;i<2;i++) {
@@ -9706,6 +9727,9 @@ void Actor::CreateDerivedStatsBG()
 			if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
 		}
 	}
+
+	weapSlotCount = numWeaponSlots[BaseStats[IE_CLASS]];
+	ReinitQuickSlots();
 
 	// monk's level dictated ac and ac vs missiles bonus
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr

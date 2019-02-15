@@ -377,6 +377,7 @@ private:
 	CharAnimations *shadowAnimations;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
+	ieByte weapSlotCount;
 	// true when command has been played after select
 	bool playedCommandSound;
 	//true every second round of attack
