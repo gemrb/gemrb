@@ -4102,7 +4102,7 @@ void Actor::IdleActions(bool nonidle)
 	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
 		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
-		if (nextBored && nextBored < time) {
+		if (bored_time && nextBored && nextBored < time) {
 			int x = bored_time / 10;
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
