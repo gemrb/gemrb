@@ -2360,7 +2360,7 @@ int AREImporter::PutSongHeader( DataStream *stream, Map *map)
 	stream->Write( filling,8);
 	stream->WriteDword( &tmpDword);
 	//song flag
-	stream->WriteDword( &tmpDword);
+	stream->WriteDword(&map->SongHeader.reverbID);
 	//lots of empty crap (15x4)
 	for(i=0;i<15;i++) {
 		stream->WriteDword( &tmpDword);
