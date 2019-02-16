@@ -1282,6 +1282,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
+	MaxPartySize = std::min(std::max(1, MaxPartySize), 10);
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
