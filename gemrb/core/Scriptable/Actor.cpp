@@ -4409,10 +4409,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	if (!(saveflags&SF_IGNORE_DIFFICULTY)) {
+	if (!(saveflags&SF_IGNORE_DIFFICULTY) && act) {
 		// adjust enemy damage according to difficulty settings:
 		// -50%, -25%, 0, 50%, 100%, 150%
-		if (Modified[IE_EA] < EA_GOODCUTOFF) {
+		if (act->GetStat(IE_EA) > EA_GOODCUTOFF) {
 			int adjustmentPercent = dmgadjustments[GameDifficulty];
 			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
 				damage += (damage * adjustmentPercent)/100;
