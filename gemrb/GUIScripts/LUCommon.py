@@ -31,7 +31,7 @@ def GetNextLevelExp (Level, Class):
 	"""Returns the amount of XP required to gain the next level."""
 	Row = CommonTables.NextLevel.GetRowIndex (Class)
 	if Level < CommonTables.NextLevel.GetColumnCount (Row):
-		return str (CommonTables.NextLevel.GetValue (Row, Level) )
+		return CommonTables.NextLevel.GetValue (Row, Level, GTV_STR)
 
 	# we could display the current level's max, but likely nobody cares
 	# if you change it, check that all callers can handle it
