@@ -70,6 +70,11 @@ def OpenLUStatsWindow(Type = 1):
 		GUICommonWindows.PortraitWindow.SetVisible (WINDOW_INVISIBLE)
 		GUICommonWindows.ActionsWindow.SetVisible (WINDOW_INVISIBLE)
 		GUIREC.RecordsWindow.SetVisible (WINDOW_INVISIBLE)
+		# only TNO gets the main stat boosts
+		pc = GemRB.GameGetFirstSelectedPC ()
+		if pc != 1:
+			GUIREC.OpenLevelUpWindow ()
+			return
 	else:
 		GemRB.LoadGame(None)  #loading the base game
 	StatTable = GemRB.LoadTable("abcomm")
