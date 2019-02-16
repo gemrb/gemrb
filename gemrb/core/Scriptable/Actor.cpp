@@ -4482,8 +4482,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	InternalFlags|=IF_ACTIVE;
-	int damagelevel = 0; //FIXME: this level is never used
+	int damagelevel;
 	if (damage<10) {
+		damagelevel = 0;
+	} else if (damage < 20) { // a guess; impacts what blood bam we play, while elemental damage types are unaffected
 		damagelevel = 1;
 	} else {
 		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
