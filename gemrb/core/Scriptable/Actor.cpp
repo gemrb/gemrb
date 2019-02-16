@@ -3426,7 +3426,7 @@ void Actor::RefreshPCStats() {
 					Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
 				}
 			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks); // TODO: check if this shouldn't get +wspattack[stars][0]
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks + wspattack[stars][0]);
 			}
 		} else {
 			// unproficient user - force defaultattacks
