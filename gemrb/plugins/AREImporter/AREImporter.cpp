@@ -325,7 +325,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		unsigned short *indices = tmm->GetDoorIndices(door->ID, &count, baseClosed);
 		door->SetTiles(indices, count);
 		// reset open state to the one in the old wed
-		door->SetDoorOpen(oldOpen, true, 0);
+		door->SetDoorOpen(oldOpen, false, 0);
 	}
 
 	return true;
