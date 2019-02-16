@@ -475,10 +475,18 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
 
+	str->ReadResRef(map->SongHeader.MainDayAmbient1);
+	str->ReadResRef(map->SongHeader.MainDayAmbient2);
+	str->ReadDword(&map->SongHeader.MainDayAmbientVol);
+
+	str->ReadResRef(map->SongHeader.MainNightAmbient1);
+	str->ReadResRef(map->SongHeader.MainNightAmbient2);
+	str->ReadDword(&map->SongHeader.MainNightAmbientVol);
+
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		str->Seek(SongHeader + 80, GEM_STREAM_START);
 		str->ReadDword(&map->SongHeader.reverbID);
 	} else {
+		// all data has it at 0, so we don't bother reading
 		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
 	}
 	map->SetupReverbInfo();
@@ -2352,13 +2360,13 @@ int AREImporter::PutSongHeader( DataStream *stream, Map *map)
 		stream->WriteDword( &map->SongHeader.SongList[i]);
 	}
 	//day
-	stream->Write( filling,8);
-	stream->Write( filling,8);
-	stream->WriteDword( &tmpDword);
+	stream->WriteResRef(map->SongHeader.MainDayAmbient1);
+	stream->WriteResRef(map->SongHeader.MainDayAmbient2);
+	stream->WriteDword(&map->SongHeader.MainDayAmbientVol);
 	//night
-	stream->Write( filling,8);
-	stream->Write( filling,8);
-	stream->WriteDword( &tmpDword);
+	stream->WriteResRef(map->SongHeader.MainNightAmbient1);
+	stream->WriteResRef(map->SongHeader.MainNightAmbient2);
+	stream->WriteDword(&map->SongHeader.MainNightAmbientVol);
 	//song flag
 	stream->WriteDword(&map->SongHeader.reverbID);
 	//lots of empty crap (15x4)
