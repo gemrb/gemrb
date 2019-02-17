@@ -122,9 +122,10 @@ class Wall_Polygon;
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
-	// used in bg1, maybe iwd1, pst; bg2 and iwd2 use the normal ARE ambients instead
-	ieResRef MainDayAmbient1; // play with IE_AMBI_MAIN
-	ieResRef MainDayAmbient2;
+	// used in bg1, set for a few copied areas in bg2 (but no files!)
+	// everyone else uses the normal ARE ambients instead
+	ieResRef MainDayAmbient1;
+	ieResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
 	ieDword MainDayAmbientVol;
 	ieResRef MainNightAmbient1;
 	ieResRef MainNightAmbient2;
