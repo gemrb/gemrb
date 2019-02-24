@@ -452,7 +452,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	ALuint Buffer;
 	unsigned int time_length;
 
-	if(ResRef == NULL) {
+	if (ResRef == NULL || !ResRef[0]) {
 		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
 			//So we want him to be quiet...
 			alSourceStop( speech.Source );
