@@ -523,7 +523,7 @@ public:
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
 	Ambient *GetAmbient(int i) { return ambients[i]; }
-	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
+	unsigned int GetAmbientCount(bool toSave=false);
 
 	//mapnotes
 	void AddMapNote(const Point &point, int color, String* text);

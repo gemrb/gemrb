@@ -36,6 +36,7 @@ namespace GemRB {
 #define IE_AMBI_MAIN    4	/* ignore origin/radius */
 #define IE_AMBI_RANDOM  8	/* random selection instead of sequential */
 #define IE_AMBI_HIMEM	16	/* skip on low-mem systems */
+#define IE_AMBI_NOSAVE	32	/* GemRB internal flag: don't save to area */
 
 class GEM_EXPORT Ambient {
 public:

@@ -3154,6 +3154,18 @@ void Map::SetupAmbients()
 	ambim->reset();
 	ambim->setAmbients( ambients );
 }
+
+unsigned int Map::GetAmbientCount(bool toSave)
+{
+	if (!toSave) return (unsigned int) ambients.size();
+
+	unsigned int ambiCount = 0;
+	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
+		if (!((*it)->flags & IE_AMBI_NOSAVE)) ambiCount++;
+	}
+	return ambiCount;
+}
+
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
 void Map::AddMapNote(const Point &point, int color, String* text)

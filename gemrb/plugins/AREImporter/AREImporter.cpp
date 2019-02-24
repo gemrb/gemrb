@@ -1503,7 +1503,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = (ieDword) map->GetAmbientCount();
+	AmbiCount = (ieDword) map->GetAmbientCount(true);
 	headersize += AmbiCount * 0xd4;
 	VariablesOffset = headersize;
 
@@ -2151,8 +2151,10 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 	ieWord tmpWord;
 
 	memset(filling,0,sizeof(filling) );
-	for (unsigned int i=0;i<AmbiCount;i++) {
+	unsigned int realCount = map->GetAmbientCount();
+	for (unsigned int i=0; i<realCount; i++) {
 		Ambient *am = map->GetAmbient(i);
+		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->Write( am->name, 32 );
 		tmpWord = (ieWord) am->origin.x;
 		stream->WriteWord( &tmpWord );
