@@ -355,6 +355,34 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 	return Flags = (Flags & ~maskOff) | maskOn;
 }
 
+static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
+	ieResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
+	ieResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
+	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
+	ieResRef mainAmbient = "";
+	if (main1[day_or_night][0]) {
+		CopyResRef(mainAmbient, *main1[day_or_night]);
+	}
+	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
+	// however that was implemented only for the normal ambients
+	// nowadays we can just skip the first
+	if (main2[day_or_night][0]) {
+		CopyResRef(mainAmbient, *main2[day_or_night]);
+	}
+	if (!mainAmbient[0]) return NULL;
+
+	Ambient *ambi = new Ambient();
+	ambi->flags = IE_AMBI_ENABLED | IE_AMBI_LOOPING | IE_AMBI_MAIN | IE_AMBI_NOSAVE;
+	ambi->gain = vol[day_or_night];
+	// sounds and name
+	char *sound = (char *) malloc(9);
+	memcpy(sound, mainAmbient, 9);
+	ambi->sounds.push_back(sound);
+	memcpy(ambi->name, sound, 9);
+	ambi->appearance = (1<<25) - 1; // default to all 24 bits enabled, one per hour
+	return ambi;
+}
+
 Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 {
 	unsigned int i,x;
@@ -469,6 +497,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
+	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (i = 0; i < MAX_RESCOUNT; i++) {
@@ -482,6 +511,24 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->ReadResRef(map->SongHeader.MainNightAmbient1);
 	str->ReadResRef(map->SongHeader.MainNightAmbient2);
 	str->ReadDword(&map->SongHeader.MainNightAmbientVol);
+
+	// check for existence of main ambients (bg1)
+	#define DAY_BITS (((1<<18) - 1) ^ ((1<<6) - 1)) // day: bits 6-18 per DLTCEP
+	Ambient *ambi = SetupMainAmbients(map, true);
+	if (ambi) {
+		// schedule for day/night
+		// if the two ambients are the same, just add one, so there's no restart
+		if (memcmp(map->SongHeader.MainDayAmbient2, map->SongHeader.MainNightAmbient2, 8)) {
+			ambi->appearance = DAY_BITS;
+			map->AddAmbient(ambi);
+			// night
+			ambi = SetupMainAmbients(map, false);
+			if (ambi) {
+				ambi->appearance ^= DAY_BITS; // night: bits 0-5 + 19-23, [dusk till dawn]
+			}
+		}
+		map->AddAmbient(ambi);
+	}
 
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		str->ReadDword(&map->SongHeader.reverbID);
