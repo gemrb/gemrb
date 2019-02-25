@@ -3837,6 +3837,17 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		sav_str = NULL;
 	}
 
+	// a fix to avoid dangling ambient pointer crash on quickload
+	// (which are deleted along with the maps)
+	// it can't be put in ~Map() because then it'll trigger on map change
+	// and erase the new ambients
+	{
+		AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+		if (ambim) {
+			ambim->reset();
+		}
+	}
+
 	// Let's assume that now is everything loaded OK and swap the objects
 
 	delete game;
