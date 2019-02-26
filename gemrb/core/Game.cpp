@@ -759,9 +759,9 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
-			area->SetupAmbients();
 			//change the tileset if needed
 			area->ChangeMap(IsDay());
+			area->SetupAmbients();
 			ChangeSong(false, true);
 			Infravision();
 
