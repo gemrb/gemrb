@@ -2200,7 +2200,7 @@ void Movable::AddWayPoint(const Point &Des)
 	while(endNode->Next) {
 		endNode = endNode->Next;
 	}
-	Point p(endNode->x, endNode->y);
+	Point p(endNode->x * 16, endNode->y * 12);
 	area->ClearSearchMapFor(this);
 	PathNode *path2 = area->FindPath( p, Des, size );
 	endNode->Next = path2;
