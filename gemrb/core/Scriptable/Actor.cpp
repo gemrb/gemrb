@@ -4036,9 +4036,10 @@ void Actor::PlaySelectionSound()
 #define SEL_ACTION_COUNT_ALL     7
 
 //call this when a PC receives a command from GUI
-void Actor::CommandActor(Action* action)
+void Actor::CommandActor(Action* action, bool clearPath)
 {
-	Stop(); // stop what you were doing
+	Scriptable::Stop(); // stop what you were doing
+	if (clearPath) ClearPath();
 	AddAction(action); // now do this new thing
 	switch (cmd_snd_freq) {
 		case 0:

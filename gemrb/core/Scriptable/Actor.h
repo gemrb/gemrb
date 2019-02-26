@@ -545,7 +545,7 @@ public:
 	/* call this on gui selects */
 	void PlaySelectionSound();
 	/* call this when adding actions via gui */
-	void CommandActor(Action* action);
+	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
 	bool OverrideActions();
 	/** handle idle actions, that shouldn't mess with scripting */
