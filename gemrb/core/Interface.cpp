@@ -3796,6 +3796,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 
 	if (!gam_str || !(wmp_str1 || wmp_str2) )
 		goto cleanup;
@@ -3838,8 +3839,12 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		sav_str = NULL;
 	}
 
-	// Let's assume that now is everything loaded OK and swap the objects
+	// rarely caused crashes while loading, so stop the ambients
+	if (ambim) {
+		ambim->reset();
+	}
 
+	// Let's assume that now is everything loaded OK and swap the objects
 	delete game;
 	delete worldmap;
 
