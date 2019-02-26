@@ -5911,7 +5911,11 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 	if (ga_flags&GA_SELECT) {
 		if (UnselectableTimer) return false;
 		if (Immobile()) return false;
-		if (Modified[IE_STATE_ID] & STATE_CONFUSED) return false;
+		if (Modified[IE_STATE_ID] & (STATE_MINDLESS ^ (STATE_CHARMED|STATE_BERSERK))) {
+			return false;
+		}
+		// charmed actors are only selectable if they were charmed by the party
+		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && BaseStats[IE_EA] <= EA_GOODCUTOFF) return false;
 		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
