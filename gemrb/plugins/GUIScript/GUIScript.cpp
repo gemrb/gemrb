@@ -13886,14 +13886,14 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 
 	print("Cast spell: %s", spelldata.spellname);
 	print("Slot: %d", spelldata.slot);
-	print("Type: %d", spelldata.type);
+	print("Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
 	//cannot make this const, because it will be freed
 	char *tmp = core->GetCString(spelldata.strref);
 	print("Spellname: %s", tmp);
 	core->FreeString(tmp);
 	print("Target: %d", spelldata.Target);
 	print("Range: %d", spelldata.Range);
-	if(!((1<<spelldata.type) & type)) {
+	if (type > 0 && !((1<<spelldata.type) & type)) {
 		return RuntimeError( "Wrong type of spell!");
 	}
 
