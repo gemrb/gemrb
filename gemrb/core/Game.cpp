@@ -1805,6 +1805,19 @@ bool Game::RestParty(int checks, int dream, int hp)
 			tar->PartyRested();
 	}
 
+	// also let familiars rest
+	i = GetNPCCount();
+	while (i--) {
+		Actor *tar = GetNPC(i);
+		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
+			tar->Stop();
+			tar->SetModal(MS_NONE, 0);
+			tar->Heal(hp);
+			tar->Rest(hours);
+			if (!hoursLeft) tar->PartyRested();
+		}
+	}
+
 	// abort the partial rest; we got what we wanted
 	if (hoursLeft) {
 		return false;
