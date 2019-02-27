@@ -5275,7 +5275,9 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		memcpy(fx->Resource, game->Familiars[alignment],sizeof(ieResRef) );
 		//ToB familiars
 		if (game->Expansion==5) {
-			strncat(fx->Resource,"25",8);
+			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
+			fx->Resource[6] = '2';
+			fx->Resource[7] = '5';
 		}
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
