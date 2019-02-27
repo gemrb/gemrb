@@ -13437,6 +13437,8 @@ jump_label:
 		ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
 		if (action<0 || (action <= ACT_SKILLS && (disabledbutton & (1<<action) ))) {
 			state = IE_GUI_BUTTON_DISABLED;
+		} else if (action >= ACT_QSPELL1 && action <= ACT_QSPELL3 && (disabledbutton & (1<<ACT_CAST))) {
+			state = IE_GUI_BUTTON_DISABLED;
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
