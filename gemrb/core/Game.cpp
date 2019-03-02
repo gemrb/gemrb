@@ -1300,7 +1300,7 @@ void Game::ShareXP(int xp, int flags)
 bool Game::EveryoneStopped() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->GetNextStep() ) return false;
+		if (PCs[i]->InMove()) return false;
 	}
 	return true;
 }

@@ -906,7 +906,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	// Impbile, dead, or actors in another map cant walk here
+	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return true;

@@ -7918,7 +7918,7 @@ bool Actor::ShouldHibernate() {
 		return false;
 	if (third && Modified[IE_MC_FLAGS]&MC_IGNORE_INHIBIT_AI)
 		return false;
-	if (GetNextStep())
+	if (InMove())
 		return false;
 	if (GetNextAction())
 		return false;
