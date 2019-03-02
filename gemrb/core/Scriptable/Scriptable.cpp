@@ -1009,7 +1009,8 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 
-	if (caster && caster->PCStats) {
+	// a candidate for favourite spell? Not if we're forced cast (eg. from fx_cast_spell)
+	if (caster && caster->PCStats && !no_stance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
@@ -1075,7 +1076,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 
-	if (caster && caster->PCStats) {
+	if (caster && caster->PCStats && !no_stance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
