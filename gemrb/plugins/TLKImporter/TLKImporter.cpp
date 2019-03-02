@@ -499,7 +499,7 @@ empty:
 			int ypos = 0;
 			unsigned int flag = GEM_SND_RELATIVE | (flags&(GEM_SND_SPEECH|GEM_SND_QUEUE));
 			//IE_STR_SPEECH will stop the previous sound source
-			core->GetAudioDrv()->Play( SoundResRef, xpos, ypos, flag);
+			core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, xpos, ypos, flag);
 		}
 	}
 	if (flags & IE_STR_STRREFON) {

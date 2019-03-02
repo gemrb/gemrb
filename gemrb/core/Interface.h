@@ -661,7 +661,7 @@ public:
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMapArray *NewWorldMapArray(int count);
 	/** plays stock gui sound referenced by index */
-	void PlaySound(int idx);
+	void PlaySound(int idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
@@ -758,6 +758,7 @@ private:
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
+	bool ReadSoundChannelsTable();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** handles the QuitFlag bits (main loop events) */

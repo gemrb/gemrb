@@ -938,7 +938,8 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
 {
-	core->GetAudioDrv()->Play(fx->Resource[0]?fx->Resource:defsound, target->Pos.x, target->Pos.y);
+	core->GetAudioDrv()->Play(fx->Resource[0] ? fx->Resource : defsound,
+			SFX_CHAN_ACTIONS, target->Pos.x, target->Pos.y);
 }
 
 //resurrect code used in many places
@@ -4912,9 +4913,9 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;

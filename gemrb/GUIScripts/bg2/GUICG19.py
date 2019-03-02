@@ -18,6 +18,7 @@
 #
 #character generation, sounds (GUICG19)
 from ie_restype import *
+from ie_sounds import CHAN_CHAR1
 import GemRB
 
 VoiceList = 0
@@ -73,7 +74,7 @@ def PlayPress():
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], CHAN_CHAR1, 0, 0, 4)
 	NextSound()
 	return
 

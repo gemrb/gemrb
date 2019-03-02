@@ -2189,24 +2189,24 @@ void Game::StartRainOrSnow(bool conditional, int w)
 		if (WeatherBits&WB_INCREASESTORM) {
 			//already raining
 			if (GameTime&1) {
-				core->PlaySound(DS_LIGHTNING1);
+				core->PlaySound(DS_LIGHTNING1, SFX_CHAN_AREA_AMB);
 			} else {
-				core->PlaySound(DS_LIGHTNING2);
+				core->PlaySound(DS_LIGHTNING2, SFX_CHAN_AREA_AMB);
 			}
 		} else {
 			//start raining (far)
-			core->PlaySound(DS_LIGHTNING3);
+			core->PlaySound(DS_LIGHTNING3, SFX_CHAN_AREA_AMB);
 		}
 	}
 	if (w&WB_SNOW) {
-		core->PlaySound(DS_SNOW);
+		core->PlaySound(DS_SNOW, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w&WB_RAIN) {
-		core->PlaySound(DS_RAIN);
+		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_STONE);

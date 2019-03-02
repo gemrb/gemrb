@@ -29,6 +29,7 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
+from ie_sounds import CHAN_HITS
 from GameCheck import MAX_PARTY_SIZE
 import GameCheck
 import GUICommon
@@ -987,7 +988,7 @@ def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
-	GemRB.PlaySound ("act_07")
+	GemRB.PlaySound ("act_07", CHAN_HITS)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return

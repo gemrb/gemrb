@@ -3863,7 +3863,8 @@ void Actor::ReactToDeath(const char * deadname)
 			resref[count]=0;
 
 			unsigned int len = 0;
-			core->GetAudioDrv()->Play( resref, &len );
+			unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
+			core->GetAudioDrv()->Play(resref, channel, &len);
 			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 			if (counter != 0)
 				SetWait( counter );
@@ -4649,7 +4650,8 @@ void Actor::PlayWalkSound()
 		}
 
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
+		unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
+		core->GetAudioDrv()->Play(Sound, channel, Pos.x, Pos.y, 0, &len);
 		nextWalk = thisTime + len;
 	}
 }
@@ -4725,7 +4727,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 			snprintf(Sound, 9, "HIT_0%d%c", type, suffix?'1':0);
 		}
 	}
-	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
+	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos.x, Pos.y);
 }
 
 //Just to quickly inspect debug maximum values
@@ -9220,7 +9222,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 			break;
 		case CHG_BREAK: //both
 			if (!silent) {
-				core->PlaySound(DS_ITEM_GONE);
+				core->PlaySound(DS_ITEM_GONE, SFX_CHAN_GUI);
 			}
 			//fall through
 		case CHG_NOSOUND: //remove item

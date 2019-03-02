@@ -453,6 +453,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	char Sound[_MAX_PATH] = "";
 	ieResRef soundRef = {};
+	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
@@ -485,6 +486,10 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (charactersubtitles) {
 			flags |= DS_CONSOLE;
 		}
+
+		if (actor->InParty > 0) {
+			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+		}
 	}
 
 	if ((Strref != -1) && !soundRef[0]) {
@@ -513,7 +518,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play( Sound,0,0,speech,&len );
+		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );

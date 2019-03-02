@@ -2466,7 +2466,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	core->PlaySound(DS_WINDOW_OPEN);
+	core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
 	Py_RETURN_NONE;
 }
 
@@ -2864,7 +2864,7 @@ static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Can't unload window!" );
 		}
 
-		core->PlaySound(DS_WINDOW_CLOSE);
+		core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 	}
 	Py_RETURN_NONE;
 }
@@ -5607,6 +5607,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, str;
 	char Sound[_MAX_PATH];
+	unsigned int channel;
 
 	if (!PyArg_ParseTuple( args, "ii", &globalID, &str )) {
 		return AttributeError( GemRB_VerbalConstant__doc );
@@ -5622,7 +5623,8 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	//get soundset based string constant
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
 		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
-	core->GetAudioDrv()->Play( Sound, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
+	core->GetAudioDrv()->Play(Sound, channel, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
 }
 
@@ -5630,8 +5632,8 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlaySound__doc,
 "===== PlaySound =====\n\
 \n\
-**Prototype:** GemRB.PlaySound (SoundResource[, xpos, ypos, type])\n\
-**Prototype:** GemRB.PlaySound (DefSoundIndex)\n\
+**Prototype:** GemRB.PlaySound (SoundResource[, channel, xpos, ypos, volume, type])\n\
+**Prototype:** GemRB.PlaySound (DefSoundIndex[, channel])\n\
 **Prototype:** GemRB.PlaySound (None)\n\
 \n\
 **Description:** Plays a sound identified by resource reference or \n\
@@ -5640,8 +5642,9 @@ sound as if it was said by that PC (EAX).\n\
 \n\
 **Parameters:**\n\
   * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
-  * x coordinate of the position where the sound should be played (optional)\n\
-  *  y coordinate of the position where the sound should be played (optional)\n\
+  * channel - the name of the channel the sound should be played on (optional, defaults to \"GUI\"\n\
+  * xpos - x coordinate of the position where the sound should be played (optional)\n\
+  * ypos - y coordinate of the position where the sound should be played (optional)\n\
   * type - defaults to 1, use 4 for speeches or other sounds that should stop the previous sounds (optional)\n\
 \n\
 **Return value:** N/A\n\
@@ -5652,20 +5655,29 @@ sound as if it was said by that PC (EAX).\n\
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char *ResRef;
+	char *channel_name = NULL;
 	int xpos = 0;
 	int ypos = 0;
-	unsigned int flags = 1; //GEM_SND_RELATIVE
+	unsigned int flags = GEM_SND_RELATIVE;
+	unsigned int channel = SFX_CHAN_GUI;
 	int index;
 
-	if (PyArg_ParseTuple( args, "i", &index) ) {
-		core->PlaySound(index);
+	if (PyArg_ParseTuple( args, "i|z", &index) ) {
+		if (channel_name != NULL) {
+			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		}
+		core->PlaySound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
-		if (!PyArg_ParseTuple( args, "z|iii", &ResRef, &xpos, &ypos, &flags )) {
+		if (!PyArg_ParseTuple(args, "z|ziii", &ResRef, &channel_name, &xpos, &ypos, &flags)) {
 			return AttributeError( GemRB_PlaySound__doc );
 		}
 
-		core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
+		if (channel_name != NULL) {
+			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		}
+
+		core->GetAudioDrv()->Play(ResRef, channel, xpos, ypos, flags);
 	}
 
 	Py_RETURN_NONE;
@@ -9125,7 +9137,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 
 	//keep weight up to date
@@ -9590,7 +9602,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			gamedata->FreeItem(item, si->ItemResRef, 0);
 			if (Sound[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
-				core->GetAudioDrv()->Play(Sound, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
+				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
 			}
 		}
 		res = ASI_SUCCESS;
@@ -11577,7 +11589,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 
 	//if res is positive, it is gold!
@@ -11665,7 +11677,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
-				core->GetAudioDrv()->Play(Sound);
+				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 			}
 		}
 		if (res == 2) {
@@ -11805,7 +11817,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 	return PyInt_FromLong( res );
 }

@@ -934,6 +934,27 @@ bool Interface::ReadReputationModTable() {
 	return true;
 }
 
+bool Interface::ReadSoundChannelsTable() {
+	AutoTable tm("sndchann");
+	if (!tm) {
+		return false;
+	}
+
+	int ivol = tm->GetColumnIndex("VOLUME");
+	int irev = tm->GetColumnIndex("REVERB");
+	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
+		const char *rowname = tm->GetRowName(i);
+		// translate some alternative names for the IWDs
+		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
+		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
+		AudioDriver->SetChannelVolume(rowname, atoi(tm->QueryField(i, ivol)));
+		if (irev != -1) {
+			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev)));
+		}
+	}
+	return true;
+}
+
 //Not a constant anymore, we let the caller set the entry to zero
 char *Interface::GetMusicPlaylist(int SongType) const {
 	if (SongType < 0 || (unsigned int)SongType >= musiclist.size())
@@ -1766,6 +1787,12 @@ int Interface::Init(InterfaceConfig* config)
 		if (!INIresdata->Open(ds)) {
 			Log(WARNING, "Core", "Failed to load resource data.");
 		}
+	}
+
+	Log(MESSAGE, "Core", "Setting up SFX channels...");
+	ret = ReadSoundChannelsTable();
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to read channel table.");
 	}
 
 	if (HasFeature( GF_HAS_PARTY_INI )) {
@@ -2795,7 +2822,7 @@ void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 			tooltip_sound.release();
 		}
 		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
-		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP]);
+		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP], SFX_CHAN_GUI);
 	}
 	tooltip_ctrl = ctrl;
 }
@@ -3443,7 +3470,7 @@ int Interface::PlayMovie(const char* ResRef)
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
-		sound_override = AudioDriver->Play(sound_resref);
+		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
 	}
 	mp->Play();
 	if (sound_override) {
@@ -4858,10 +4885,10 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-void Interface::PlaySound(int index)
+void Interface::PlaySound(int index, unsigned int channel)
 {
 	if (index<=DSCount) {
-		AudioDriver->Play(DefSound[index]);
+		AudioDriver->Play(DefSound[index], channel);
 	}
 }
 

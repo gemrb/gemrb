@@ -1883,20 +1883,21 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
-				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0 );
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CHAR0, Sender->Pos.x,
+				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter );
-	core->GetAudioDrv()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
+	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS,
+		parameters->pointParameter.x, parameters->pointParameter.y);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
-	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter );
-	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0);
+	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -2610,10 +2611,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
 
 			//playsound unsuccessful opening of door
-			if(door->IsOpen())
-				core->PlaySound(DS_CLOSE_FAIL);
-			else
-				core->PlaySound(DS_OPEN_FAIL);
+			core->PlaySound(door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL, SFX_CHAN_ACTIONS);
 			Sender->ReleaseCurrentAction();
 			actor->TargetDoor = 0;
 			return; //don't open door
@@ -2897,7 +2895,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 	//normally the second parameter is 0, but it may be handy to have control over that (See SX_* flags)
 	actor->AddExperience(xp, parameters->int1Parameter);
-	core->PlaySound(DS_GOTXP);
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -2926,13 +2924,13 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		//give xp everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
 	}
-	core->PlaySound(DS_GOTXP);
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP);
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 //this needs moncrate.2da, but otherwise independent from GF_CHALLENGERATING
@@ -2945,7 +2943,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 {
 	ieDword xp = CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP);
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
@@ -7021,8 +7019,8 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
-				Sender->Pos.y, 0 );
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CASTING,
+				Sender->Pos.x, Sender->Pos.y, 0);
 
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;

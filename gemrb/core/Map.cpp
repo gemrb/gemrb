@@ -884,7 +884,8 @@ void Map::UpdateScripts()
 		if (wasActive) {
 			//Play the PST specific enter sound
 			if (wasActive&_TRAP_USEPOINT) {
-				core->GetAudioDrv()->Play(ip->EnterWav, ip->TrapLaunch.x, ip->TrapLaunch.y);
+				core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
+					ip->TrapLaunch.x, ip->TrapLaunch.y);
 			}
 			ip->Update();
 		}

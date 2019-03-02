@@ -434,7 +434,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		}
 		SetState( IE_GUI_BUTTON_PRESSED );
 		if (Flags & IE_GUI_BUTTON_SOUND) {
-			core->PlaySound( DS_BUTTON_PRESSED );
+			core->PlaySound(DS_BUTTON_PRESSED, SFX_CHAN_GUI);
 		}
 		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
 			RunEventHandler( ButtonOnDoublePress );
