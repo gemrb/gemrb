@@ -8171,7 +8171,7 @@ void Actor::Draw(const Region &screen)
 	}
 	if (drawcircle) {
 		DrawCircle(vp);
-		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && GetPathLength());
+		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && InMove());
 	}
 	if (drawtarget) {
 		gc->DrawTargetReticle(Destination, (size - 1) * 4, true, Over, Selected); //we could set this to !paused if we wanted to only animate when not paused
