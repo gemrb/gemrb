@@ -750,7 +750,7 @@ def OpenInformationWindow ():
 		Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	Label = Window.GetControl (0x10000003)
-	GUICommon.SetCurrentDateTokens (stat)
+	GUICommon.SetCurrentDateTokens (stat, True)
 	Label.SetText (41277)
 
 	Label = Window.GetControl (0x10000004)

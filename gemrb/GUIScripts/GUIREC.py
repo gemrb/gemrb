@@ -907,10 +907,8 @@ def OpenInformationWindow ():
 	Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	Label = Window.GetControl (0x10000006)
-	GUICommon.SetCurrentDateTokens (stat)
-	#actually it is 16043 <DURATION>, but duration is translated to
-	#16041, hopefully this won't cause problem with international version
-	Label.SetText (16041)
+	time = GUICommon.SetCurrentDateTokens (stat)
+	Label.SetText (time)
 
 	#favourite spell
 	Label = Window.GetControl (0x10000007)

@@ -785,7 +785,7 @@ def SetupDamageInfo (pc, Button, Window):
 
 	return ratio_str, color
 
-def SetCurrentDateTokens (stat):
+def SetCurrentDateTokens (stat, plural=False):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
 	#   (script updates). In each case, there are 60 seconds
 	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
@@ -798,14 +798,27 @@ def SetCurrentDateTokens (stat):
 	days = party_time / 7200
 	hours = (party_time % 7200) / 300
 
-	# it is true, they changed the token
-	if GameCheck.IsBG2():
-		GemRB.SetToken ('GAMEDAY', str (days))
-	else:
-		GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
+	if plural:
+		return
 
-	return (days, hours)
+	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
+	if days == 1:
+		time = GemRB.GetString (10698)
+	else:
+		time = GemRB.GetString (10697)
+	time += " " + GemRB.GetString (10699) + " "
+	if days == 0:
+		# only display hours
+		time = ""
+
+	if hours == 1:
+		time += GemRB.GetString (10701)
+	else:
+		time += GemRB.GetString (10700)
+
+	return time
 
 # gray out window or mark it as visible depending on the actor's state
 # Always greys it out for actors that are: dead, berserking
