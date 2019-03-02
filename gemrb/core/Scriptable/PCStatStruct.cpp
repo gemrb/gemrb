@@ -305,6 +305,10 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 		if (!strnicmp(fav, respoi[pos], 8) ) {
 			//found an old favourite, just increase its usage count and done
 			if (cntpoi[pos]<0xffff) {
+				if (cntpoi[pos] == mincnt) {
+					// we'll beat the record, update the order too
+					break;
+				}
 				cntpoi[pos]++;
 			}
 			return;
