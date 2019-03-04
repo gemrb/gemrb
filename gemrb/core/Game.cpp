@@ -1032,6 +1032,11 @@ int Game::AddNPC(Actor* npc)
 	npc->SetPersistent(0);
 	NPCs.push_back( npc );
 
+	if (npc->Selected) {
+		npc->Selected = 0; // don't confuse SelectActor!
+		SelectActor(npc, true, SELECT_NORMAL);
+	}
+
 	return (int) NPCs.size() - 1;
 }
 
