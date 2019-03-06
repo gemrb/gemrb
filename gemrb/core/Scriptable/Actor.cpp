@@ -5137,6 +5137,7 @@ void Actor::Resurrect()
 	}
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
+	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
