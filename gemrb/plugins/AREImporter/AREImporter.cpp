@@ -527,7 +527,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				ambi->appearance ^= DAY_BITS; // night: bits 0-5 + 19-23, [dusk till dawn]
 			}
 		}
-		map->AddAmbient(ambi);
+		// bgt ar7300 has a nigth ambient only in the first slot
+		if (ambi) {
+			map->AddAmbient(ambi);
+		}
 	}
 
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
