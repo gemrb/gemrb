@@ -9167,10 +9167,12 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 				AttackEffect->IsVariable = flags&UI_CRITICAL;
 			}
 			pro->GetEffects()->AddEffect(AttackEffect, true);
-			if (ranged)
+			if (ranged) {
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
-			else
+			} else {
+				// TODO: EEs add a bit to fx_melee for only applying with monk fists: parameter2 of 4 (no other value supported)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref);
+			}
 			//AddEffect created a copy, the original needs to be scrapped
 			delete AttackEffect;
 			attackProjectile = pro;
