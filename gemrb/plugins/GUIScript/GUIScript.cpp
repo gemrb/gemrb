@@ -5632,7 +5632,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlaySound__doc,
 "===== PlaySound =====\n\
 \n\
-**Prototype:** GemRB.PlaySound (SoundResource[, channel, xpos, ypos, volume, type])\n\
+**Prototype:** GemRB.PlaySound (SoundResource[, channel, xpos, ypos, type])\n\
 **Prototype:** GemRB.PlaySound (DefSoundIndex[, channel])\n\
 **Prototype:** GemRB.PlaySound (None)\n\
 \n\
