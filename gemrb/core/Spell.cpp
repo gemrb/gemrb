@@ -260,6 +260,11 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			}
 		}
 
+		// item revisions uses a bunch of fx_cast_spell with spells that have effects with no target set
+		if (fx->Target == FX_TARGET_UNKNOWN) {
+			fx->Target = FX_TARGET_PRESET;
+		}
+
 		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
 			fx->Target = FX_TARGET_PRESET;
 		}
