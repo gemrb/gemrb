@@ -439,6 +439,7 @@ int Game::LeaveParty (Actor* actor)
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		// we must reset various existing scripts
+		actor->SetScript("", SCR_DEFAULT );
 		actor->SetScript("", SCR_CLASS, false);
 		actor->SetScript("", SCR_RACE, false);
 		actor->SetScript("WTASIGHT", SCR_GENERAL, false);
