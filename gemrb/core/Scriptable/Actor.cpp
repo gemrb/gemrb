@@ -1467,6 +1467,13 @@ static void pcf_alignment(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue
 	UpdateHappiness(actor);
 }
 
+static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	Map *map = actor->GetCurrentArea();
+	if (!map) return;
+	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_FREE : PATH_MAP_NPC);
+}
+
 //spell casting or other buttons disabled/reenabled
 static void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
@@ -1544,7 +1551,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
+NULL,pcf_avatarremoval,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL, pcf_alignment, pcf_dbutton, pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
