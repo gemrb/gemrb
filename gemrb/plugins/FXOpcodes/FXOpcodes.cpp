@@ -35,6 +35,7 @@
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "ScriptedAnimation.h"
+#include "ScriptEngine.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
 #include "VEFObject.h"
@@ -4044,6 +4045,19 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	BASE_STATE_SET( STATE_PETRIFIED );
 	if (target->InParty) core->GetGame()->LeaveParty(target);
 	target->SendDiedTrigger();
+
+	// end the game if everyone in the party gets petrified
+	Game *game = core->GetGame();
+	int partySize = game->GetPartySize(true);
+	int stoned = 0;
+	for (int j=0; j<partySize; j--) {
+		Actor *pc = game->GetPC(j, true);
+		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
+	}
+	if (stoned == partySize) {
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
+	}
+
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
 	return FX_NOT_APPLIED;
