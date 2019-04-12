@@ -455,7 +455,7 @@ private: //these seem to be sensitive, so get protection
 
 	PathNode* path; //whole path
 	PathNode* step; //actual step
-	unsigned int prevTicks = 0;
+	unsigned int prevTicks;
 protected:
 	ieDword timeStartStep;
 public:

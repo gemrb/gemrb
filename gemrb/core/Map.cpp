@@ -60,6 +60,8 @@
 #include <cmath>
 #include <cassert>
 
+#include <limits>
+
 namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
@@ -2799,14 +2801,9 @@ typedef Point SearchmapPoint;
 
 class PQNode {
 public:
-	PQNode(Point p, unsigned int l) {
-		first = p;
-		second = l;
-	}
-	PQNode () {
-		first = Point(0, 0);
-		second = 0;
-	}
+	PQNode(Point p, unsigned int l):first(p), second(l) {};
+	PQNode():first(Point(0, 0)), second(0) {};
+
 	Point first;
 	unsigned int second;
 
@@ -2826,11 +2823,13 @@ public:
  */
 PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 						unsigned int minDistance, bool sight) {
-	const char *logString = "PathFinderWIP";
+	static const char *logString = "PathFinderWIP";
 	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
 	static const size_t DEGREES_OF_FREEDOM = 8;
-	static const char dx[DEGREES_OF_FREEDOM]{1, 0, -1, 0, 1, 1, -1, -1};
-	static const char dy[DEGREES_OF_FREEDOM]{0, 1, 0, -1, 1, -1, 1, -1};
+	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
+	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
+	static const float weight = 1.5;	// Weighted heuristic. Finds sub-optimal paths
+										// but should be quite a bit faster
 	SearchmapPoint smptSource;
 	SearchmapPoint smptDest;
 	smptSource.x = s.x / 16;
@@ -2846,17 +2845,6 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	unsigned short *distFromStart = new unsigned short[Width * Height]();
 	int dxCross = smptDest.x - smptSource.x;
 	int dyCross = smptDest.y - smptSource.y;
-	auto Heuristic = [=](SearchmapPoint p) {
-		const float weight = 1.5;   // Weighted heuristic. Finds sub-optimal paths
-		// but should be quite a bit faster
-		int xDist = p.x - smptDest.x;
-		int yDist = p.y - smptDest.y;
-		// Tie-breaking used to smooth out the path
-		int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
-		int dist = Distance(p, smptDest);
-		float h = weight * (dist + (crossProduct >> 10));
-		return h;
-	};
 
 	if (size && GetBlocked(d.x, d.y, size)) {
 		AdjustPosition(smptDest);
@@ -2869,7 +2857,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	parents[smptSource.y * Width + smptSource.x] = smptSource;
 	open.emplace(PQNode(smptSource, 0));
 	unsigned int squaredMinDist = minDistance * minDistance;
-	unsigned short curParentDist;
+
+	// Avoid calling constructors by declaring object variables here
+	// Yes, there is an overhead in creating a Point a kajillion times
 	SearchmapPoint smptCurrent;
 	SearchmapPoint smptChild;
 	SearchmapPoint smptParent;
@@ -2878,13 +2868,6 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	NavmapPoint nmptCurrent;
 	NavmapPoint nmptAdjustedCurrent;
 	NavmapPoint nmptParent;
-	bool reachable;
-	bool childOutsideMap;
-	bool childBlocked;
-	unsigned short adjParentDist;
-	unsigned short oldDist;
-	unsigned short newDist;
-	unsigned short estDist;
 	PQNode newNode;
 	while (!open.empty()) {
 
@@ -2921,7 +2904,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 		smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
 		nmptParent.x = smptParent.x * 16;
 		nmptParent.y = smptParent.y * 12;
-		reachable = IsVisibleLOS(nmptCurrent, nmptParent, true);
+		bool reachable = IsVisibleLOS(nmptCurrent, nmptParent, true);
 		if (!reachable && smptCurrent != smptSource) {
 			smptBestParent.x = 0;
 			smptBestParent.y = 0;
@@ -2930,7 +2913,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 				smptCurNeighbor.x = smptCurrent.x + dx[i];
 				smptCurNeighbor.y = smptCurrent.y + dy[i];
 				if (isClosed[smptCurNeighbor.y * Width + smptCurNeighbor.x]) {
-					curParentDist = distFromStart[smptCurNeighbor.y * Width + smptCurNeighbor.x] +
+					unsigned short curParentDist = distFromStart[smptCurNeighbor.y * Width + smptCurNeighbor.x] +
 									Distance(smptCurrent, smptCurNeighbor);
 					if (curParentDist < distFromStart[smptCurrent.y * Width + smptCurrent.x]) {
 						smptBestParent = smptCurNeighbor;
@@ -2944,63 +2927,67 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + dx[i];
 			smptChild.y = smptCurrent.y + dy[i];
-			childOutsideMap = smptChild.x < 0 ||
+			bool childOutsideMap = smptChild.x < 0 ||
 							  smptChild.y < 0 ||
 							  (unsigned) smptChild.x >= Width ||
 							  (unsigned) smptChild.y >= Height;
-			childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
 				}
 				// Theta-star search
 				smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
-				adjParentDist = Distance(smptParent, smptChild);
-				oldDist = distFromStart[smptChild.y * Width + smptChild.x];
-				newDist = distFromStart[smptParent.y * Width + smptParent.x] + adjParentDist;
+				unsigned short adjParentDist = Distance(smptParent, smptChild);
+				unsigned short oldDist = distFromStart[smptChild.y * Width + smptChild.x];
+				unsigned short newDist = distFromStart[smptParent.y * Width + smptParent.x] + adjParentDist;
 				if (newDist < oldDist && newDist < MAX_PATH_COST) {
-
 					parents[smptChild.y * Width + smptChild.x] = smptParent;
 					distFromStart[smptChild.y * Width + smptChild.x] = newDist;
-					estDist = newDist + Heuristic(smptChild);
+					// Calculate heuristic
+					int xDist = smptChild.x - smptDest.x;
+					int yDist = smptChild.y - smptDest.y;
+					// Tie-breaking used to smooth out the path
+					int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
+					unsigned int heuristic = weight * (Distance(smptChild, smptDest) + (crossProduct >> 10));
+					unsigned int estDist = newDist + heuristic;
 					newNode.first = smptChild;
 					newNode.second = estDist;
 					open.emplace(newNode);
-
 				}
 			}
 		}
 	}
-	if (!foundPath) {    // Return empty path if smptDest is unreachable
-		Log(DEBUG, logString, "Pathfinder destination is unreachable");
-		return nullptr;
-	}
 
-	PathNode *resultPath = nullptr;
-	while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
-		Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
-		PathNode *newPathNode = resultPath;
-		auto *newStep = new PathNode;
-		newStep->x = smptDest.x;
-		newStep->y = smptDest.y;
-		newStep->Next = newPathNode;
-		if (newPathNode) {
-			newPathNode->Parent = newStep;
+	PathNode *resultPath = NULL;
+	if (foundPath) {
+		while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
+			Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
+			PathNode *newPathNode = resultPath;
+			PathNode *newStep = new PathNode;
+			newStep->x = smptDest.x;
+			newStep->y = smptDest.y;
+			newStep->Next = newPathNode;
+			if (newPathNode) {
+				newPathNode->Parent = newStep;
+			}
+			newPathNode = newStep;
+			resultPath = newPathNode;
+			smptDest = parents[smptDest.y * Width + smptDest.x];
 		}
-		newPathNode = newStep;
-		resultPath = newPathNode;
-		smptDest = parents[smptDest.y * Width + smptDest.x];
-	}
-	for (PathNode *rover = resultPath; rover; rover = rover->Next) {
-		if (rover->Next) {
-			const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
-			const SearchmapPoint &smptRover = Point(rover->x, rover->y);
-			rover->Next->orient = GetOrient(smptRoverNext, smptRover);
+		for (PathNode *rover = resultPath; rover; rover = rover->Next) {
+			if (rover->Next) {
+				const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
+				const SearchmapPoint &smptRover = Point(rover->x, rover->y);
+				rover->Next->orient = GetOrient(smptRoverNext, smptRover);
+			}
+			Log(DEBUG, logString, "Step: (%d %d)", rover->x, rover->y);
 		}
-		Log(DEBUG, logString, "Step: (%d %d)", rover->x, rover->y);
+		if (resultPath)
+			resultPath->orient = GetOrient(Point(resultPath->x, resultPath->y), smptSource);
+	} else {
+		Log(DEBUG, logString, "Pathfinder destination is unreachable");
 	}
-	if (resultPath)
-		resultPath->orient = GetOrient(Point(resultPath->x, resultPath->y), smptSource);
 	// Right proper memory management
 	delete[] isClosed;
 	delete[] parents;
@@ -3050,7 +3037,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability) co
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
 				//if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				auto blockStatus = GetBlocked(startx,
+				unsigned int blockStatus = GetBlocked(startx,
 											  sY - (int) ((sX - startx) / elevationy));
 				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
@@ -3065,7 +3052,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability) co
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
 				//if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				auto blockStatus = GetBlocked(startx,
+				unsigned int blockStatus = GetBlocked(startx,
 											  sY + (int) ((sX - startx) / elevationy));
 				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
@@ -3084,7 +3071,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability) co
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
 				//if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				auto blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx),
+				unsigned int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx),
 											  starty);
 				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
@@ -3099,7 +3086,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability) co
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
 				//if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				auto blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx),
+				unsigned int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx),
 											  starty);
 				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
