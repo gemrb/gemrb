@@ -2177,8 +2177,8 @@ bool Movable::DoStep(unsigned int walkAnimFrames, ieDword time) {
 	GetDeltas(dx, dy, ySign, xSign);
 	dxOrig = dx;
 	dyOrig = dy;
-	auto smPos = Point(Pos.x / 16, Pos.x / 12);
-	auto smStep = Point(step->x, step->y);
+	Point smPos = Point(Pos.x / 16, Pos.x / 12);
+	Point smStep = Point(step->x, step->y);
 
 	unsigned connectedWaypointsHeuristic = Distance(smPos, smStep);
 
@@ -2224,11 +2224,10 @@ bool Movable::DoStep(unsigned int walkAnimFrames, ieDword time) {
 }
 
 void Movable::GetDeltas(double &dx, double &dy, char &ySign, char &xSign) const {
-	auto sgn = [] (double t) { return (char)(t > 0 ? 1 : (t < 0 ? -1 : 0)); };
 	dx = step->x * 16 + 16 - Pos.x;
 	dy = step->y * 12 + 12 - Pos.y;
-	ySign = sgn(dy);
-	xSign = sgn(dx);
+	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
 	dx = std::abs(dx);
 	dy = std::abs(dy);
 }
