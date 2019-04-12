@@ -2972,10 +2972,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	}
 	if (!foundPath) {    // Return empty path if smptDest is unreachable
 		Log(DEBUG, logString, "Pathfinder destination is unreachable");
-		return nullptr;
+		return NULL;
 	}
 
-	PathNode *resultPath = nullptr;
+	PathNode *resultPath = NULL;
 	while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
 		Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
 		PathNode *newPathNode = resultPath;
