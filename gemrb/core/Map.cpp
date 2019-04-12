@@ -2971,6 +2971,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 		}
 	}
 	if (!foundPath) {    // Return empty path if smptDest is unreachable
+		// Right proper memory management
+		delete[] isClosed;
+		delete[] parents;
+		delete[] distFromStart;
 		Log(DEBUG, logString, "Pathfinder destination is unreachable");
 		return NULL;
 	}
