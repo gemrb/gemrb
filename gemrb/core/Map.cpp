@@ -2970,40 +2970,36 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 			}
 		}
 	}
-	if (!foundPath) {    // Return empty path if smptDest is unreachable
-		// Right proper memory management
-		delete[] isClosed;
-		delete[] parents;
-		delete[] distFromStart;
-		Log(DEBUG, logString, "Pathfinder destination is unreachable");
-		return NULL;
-	}
 
 	PathNode *resultPath = NULL;
-	while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
-		Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
-		PathNode *newPathNode = resultPath;
-		PathNode *newStep = new PathNode;
-		newStep->x = smptDest.x;
-		newStep->y = smptDest.y;
-		newStep->Next = newPathNode;
-		if (newPathNode) {
-			newPathNode->Parent = newStep;
+	if (foundPath) {
+		while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
+			Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
+			PathNode *newPathNode = resultPath;
+			PathNode *newStep = new PathNode;
+			newStep->x = smptDest.x;
+			newStep->y = smptDest.y;
+			newStep->Next = newPathNode;
+			if (newPathNode) {
+				newPathNode->Parent = newStep;
+			}
+			newPathNode = newStep;
+			resultPath = newPathNode;
+			smptDest = parents[smptDest.y * Width + smptDest.x];
 		}
-		newPathNode = newStep;
-		resultPath = newPathNode;
-		smptDest = parents[smptDest.y * Width + smptDest.x];
-	}
-	for (PathNode *rover = resultPath; rover; rover = rover->Next) {
-		if (rover->Next) {
-			const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
-			const SearchmapPoint &smptRover = Point(rover->x, rover->y);
-			rover->Next->orient = GetOrient(smptRoverNext, smptRover);
+		for (PathNode *rover = resultPath; rover; rover = rover->Next) {
+			if (rover->Next) {
+				const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
+				const SearchmapPoint &smptRover = Point(rover->x, rover->y);
+				rover->Next->orient = GetOrient(smptRoverNext, smptRover);
+			}
+			Log(DEBUG, logString, "Step: (%d %d)", rover->x, rover->y);
 		}
-		Log(DEBUG, logString, "Step: (%d %d)", rover->x, rover->y);
+		if (resultPath)
+			resultPath->orient = GetOrient(Point(resultPath->x, resultPath->y), smptSource);
+	} else {
+		Log(DEBUG, logString, "Pathfinder destination is unreachable");
 	}
-	if (resultPath)
-		resultPath->orient = GetOrient(Point(resultPath->x, resultPath->y), smptSource);
 	// Right proper memory management
 	delete[] isClosed;
 	delete[] parents;
