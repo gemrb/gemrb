@@ -455,6 +455,7 @@ private: //these seem to be sensitive, so get protection
 
 	PathNode* path; //whole path
 	PathNode* step; //actual step
+	unsigned int prevTicks = 0;
 protected:
 	ieDword timeStartStep;
 public:
@@ -497,7 +498,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetAttackMoveChances(ieWord *amc);
-	virtual bool DoStep(unsigned int walk_speed, ieDword time = 0);
+	virtual bool DoStep(unsigned int walkAnimFrames, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop, bool run);
@@ -511,6 +512,8 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;
+
+	void GetDeltas(double &dx, double &dy, char &ySign, char &xSign) const;
 };
 
 //Tiled objects are not used (and maybe not even implemented correctly in IE)

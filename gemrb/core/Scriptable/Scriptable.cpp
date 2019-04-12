@@ -38,6 +38,8 @@
 #include "GUI/TextSystem/Font.h"
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
+#include <cmath>
+#include <chrono>
 
 namespace GemRB {
 
@@ -2024,7 +2026,7 @@ int Movable::GetPathLength()
 PathNode *Movable::GetNextStep(int x)
 {
 	if (!step) {
-		DoStep((unsigned int) ~0);
+		DoStep((unsigned int) ~0);	// Called with max speed
 	}
 	PathNode *node = step;
 	while(node && x--) {
@@ -2108,7 +2110,7 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 	path = area->GetLine( p, steps, orient, Pass );
 }
 
-static void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
+/*static void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
 	if (destx > srcx)
 		Pos.x += ( unsigned short )
 			( ( ( ( ( destx * 16 ) + 8 ) - Pos.x ) * ( time_diff ) ) / walk_speed );
@@ -2121,7 +2123,7 @@ static void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int wa
 	else
 		Pos.y -= ( unsigned short )
 			( ( ( Pos.y - ( ( desty * 12 ) + 6 ) ) * ( time_diff ) ) / walk_speed );
-}
+}*/
 
 unsigned char Movable::GetNextFace()
 {
@@ -2143,49 +2145,92 @@ unsigned char Movable::GetNextFace()
 
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
-bool Movable::DoStep(unsigned int walk_speed, ieDword time)
-{
-	if (!path) {
-		return true;
+bool Movable::DoStep(unsigned int walkAnimFrames, ieDword time) {
+	int stepLength = 566;
+	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
+		stepLength = 425;
 	}
+	const double maxRadius = 2.0;
+	if (!path) return true;
 	if (!time) time = core->GetGame()->Ticks;
-	if (!walk_speed) {
+	if (!step) {
+		step = path;
+		timeStartStep = time;
+	}
+
+	if (!walkAnimFrames) {
 		// zero speed: no movement
 		timeStartStep = time;
 		StanceID = IE_ANI_READY;
 		return true;
 	}
-	if (!step) {
-		step = path;
-		timeStartStep = time;
-	} else if (step->Next && (( time - timeStartStep ) >= walk_speed)) {
-		//print("[New Step] : Orientation = %d", step->orient);
-		step = step->Next;
-		timeStartStep = timeStartStep + walk_speed;
-	}
-	SetOrientation (step->orient, true);
+
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
 	}
-	Pos.x = ( step->x * 16 ) + 8;
-	Pos.y = ( step->y * 12 ) + 6;
-	if (!step->Next) {
-		// we reached our destination, we are done
-		ClearPath();
-		NewOrientation = Orientation;
-		//since clearpath no longer sets currentaction to NULL
-		//we set it here
-		//no we don't, action is responsible for releasing itself
-		//ReleaseCurrentAction();
-		return true;
+
+	double dx, dxOrig;
+	double dy, dyOrig;
+	char ySign;
+	char xSign;
+	GetDeltas(dx, dy, ySign, xSign);
+	dxOrig = dx;
+	dyOrig = dy;
+	auto smPos = Point(Pos.x / 16, Pos.x / 12);
+	auto smStep = Point(step->x, step->y);
+
+	unsigned connectedWaypointsHeuristic = Distance(smPos, smStep);
+
+	unsigned timeDelta = time - timeStartStep;
+	if (timeDelta == 0) return true;
+
+	bool stepDoneWithWalkSpeed = timeDelta * connectedWaypointsHeuristic > walkAnimFrames;
+	if (stepDoneWithWalkSpeed) timeStartStep = time;
+
+	bool reachedStep = dx == 0 && dy == 0;
+	if (reachedStep) {
+		if (!step->Next) {
+			ClearPath();
+			NewOrientation = Orientation;
+			return true;
+		} else {
+			step = step->Next;
+			timeStartStep += walkAnimFrames;
+			return false;
+		}
 	}
-	if (( time - timeStartStep ) >= walk_speed) {
-		// we didn't finish all pending steps, yet
-		return false;
+
+	if (dx == 0) {
+		dy = maxRadius;
+	} else if (dy == 0) {
+		dx = maxRadius;
+	} else {
+		double squaredRadius = dx * dx + dy * dy;
+		double ratio = (maxRadius * maxRadius) / squaredRadius;
+		dx = sqrt(dx * dx * ratio);
+		dy = sqrt(dy * dy * ratio);
 	}
-	AdjustPositionTowards(Pos, time - timeStartStep, walk_speed, step->x, step->y, step->Next->x, step->Next->y);
-	return true;
+	dx = std::min(dx * stepLength / walkAnimFrames, dxOrig);
+	dy = std::min(dy * stepLength / walkAnimFrames, dyOrig);
+
+	//if (isInParty) Log(DEBUG, logString, "Moving by (%.2lf %.2lf)", dx, dy);
+
+	Pos.x += std::ceil(dx) * xSign;
+	Pos.y += std::ceil(dy) * ySign;
+
+	SetOrientation(step->orient, false);
+	return stepDoneWithWalkSpeed;
+}
+
+void Movable::GetDeltas(double &dx, double &dy, char &ySign, char &xSign) const {
+	auto sgn = [] (double t) { return (char)(t > 0 ? 1 : (t < 0 ? -1 : 0)); };
+	dx = step->x * 16 + 16 - Pos.x;
+	dy = step->y * 12 + 12 - Pos.y;
+	ySign = sgn(dy);
+	xSign = sgn(dx);
+	dx = std::abs(dx);
+	dy = std::abs(dy);
 }
 
 void Movable::AddWayPoint(const Point &Des)
@@ -2203,7 +2248,7 @@ void Movable::AddWayPoint(const Point &Des)
 	}
 	Point p(endNode->x * 16, endNode->y * 12);
 	area->ClearSearchMapFor(this);
-	PathNode *path2 = area->FindPath( p, Des, size );
+	PathNode *path2 = area->FindPath(p, Des, size);
 	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
 	path2->Parent = endNode;
@@ -2227,71 +2272,30 @@ void Movable::FixPosition()
 	Pos.y=Pos.y*12+6;
 }
 
-void Movable::WalkTo(const Point &Des, int distance)
-{
-	Point from;
+void Movable::WalkTo(const Point &Des, int distance) {
+	Log(DEBUG, "WalkToWIP", "curTime = %d, prevTicks = %d", Ticks, this->prevTicks);
+	// The rate limiting stuff is probably not optimal, since it requires lots of pathfinder calls
+	// An incremental pathfinding algorithm would be preferable, but LOS checks are slow
+	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
+	if (this->Ticks > this->prevTicks) { // Rate limiting
+		this->prevTicks = Ticks;
 
-	// maybe caller should be responsible for this
-	if ((Des.x/16 == Pos.x/16) && (Des.y/12 == Pos.y/12)) {
-		ClearPath();
-		return;
-	}
+		const int XEPS = 2;
+		const int YEPS = 1;
 
-	// the prev_step stuff is a naive attempt to allow re-pathing while moving
-	PathNode *prev_step = NULL;
-	unsigned char old_stance = StanceID;
-	if (step && step->Next) {
-		// don't interrupt in the middle of a step; path from the next one
-		prev_step = new PathNode(*step);
-		from.x = ( step->Next->x * 16 ) + 8;
-		from.y = ( step->Next->y * 12 ) + 6;
-	}
-
-	ClearPath();
-	if (!prev_step) {
-		FixPosition();
-		from = Pos;
-	}
-	area->ClearSearchMapFor(this);
-	if (distance) {
-		path = area->FindPathNear( from, Des, size, distance );
-	} else {
-		path = area->FindPath( from, Des, size, distance );
-	}
-	//ClearPath sets destination, so Destination must be set after it
-	//also we should set Destination only if there is a walkable path
-	if (path) {
-		Destination = Des;
-
-		if (prev_step) {
-			// we want to smoothly continue, please
-			// this all needs more thought! but it seems to work okay
-			StanceID = old_stance;
-
-			if (path->Next) {
-				// this is a terrible hack to make up for the
-				// pathfinder orienting the first node wrong
-				// should be fixed in pathfinder and not here!
-				Point next, follow;
-				next.x = path->x; next.y = path->y;
-				follow.x = path->Next->x;
-				follow.y = path->Next->y;
-				path->orient = GetOrient(follow, next);
-			}
-
-			// then put the prev_step at the beginning of the path
-			prev_step->Next = path;
-			path->Parent = prev_step;
-			path = prev_step;
-
-			step = path;
+		// Callers should definitely be responsible for this
+		// The sooner this is checked, the better
+		if (std::abs(Des.x / 16 - Pos.x / 16) <= XEPS &&
+			std::abs(Des.y / 12 - Pos.y / 12) <= YEPS) {
+			ClearPath();
+			return;
 		}
-	} else {
-		// pathing failed
-		if (prev_step) {
-			delete( prev_step );
-			FixPosition();
-		}
+
+		area->ClearSearchMapFor(this);
+		path = area->FindPath(Pos, Des, size, distance);
+
+		if (path) { Destination = Des; step = path; }
+		else { ClearPath(); FixPosition(); }
 	}
 }
 

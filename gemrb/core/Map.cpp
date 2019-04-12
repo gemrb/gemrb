@@ -493,6 +493,7 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 
 	//delete the original searchmap
 	delete sr;
+
 }
 
 void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor)
@@ -2793,246 +2794,218 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	return Return;
 }
 
+typedef Point NavmapPoint;
+typedef Point SearchmapPoint;
+
+class PQNode {
+public:
+	PQNode(Point p, unsigned int l) {
+		first = p;
+		second = l;
+	}
+	PQNode () {
+		first = Point(0, 0);
+		second = 0;
+	}
+	Point first;
+	unsigned int second;
+
+	friend bool operator< (const PQNode &lhs, const PQNode &rhs) { return lhs.second < rhs.second;}
+	friend bool operator> (const PQNode& lhs, const PQNode& rhs){ return rhs < lhs; }
+	friend bool operator<= (const PQNode& lhs, const PQNode& rhs){ return !(lhs > rhs); }
+	friend bool operator>= (const PQNode& lhs, const PQNode& rhs){ return !(lhs < rhs); }
+	friend bool operator == (const PQNode& lhs, const PQNode& rhs) { return lhs.first == rhs.first; }
+	friend bool operator != (const PQNode& lhs, const PQNode& rhs) { return !(lhs == rhs); }
+
+};
+
+
 /*
  * find a path from start to goal, ending at the specified distance from the
  * target (the goal must be in sight of the end, if 'sight' is specified)
- *
- * if you don't need to find an optimal path near the goal then use FindPath
- * instead, but don't change this one without testing with combat and dialog,
- * you can't predict the goal point for those, you *must* path!
  */
-PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance, bool sight)
-{
-	// adjust the start/goal points to be searchmap locations
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	Point orig_goal = goal;
+PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
+						unsigned int minDistance, bool sight) {
+	const char *logString = "PathFinderWIP";
+	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
+	static const size_t DEGREES_OF_FREEDOM = 8;
+	static const char dx[DEGREES_OF_FREEDOM]{1, 0, -1, 0, 1, 1, -1, -1};
+	static const char dy[DEGREES_OF_FREEDOM]{0, 1, 0, -1, 1, -1, 1, -1};
+	SearchmapPoint smptSource;
+	SearchmapPoint smptDest;
+	smptSource.x = s.x / 16;
+	smptSource.y = s.y / 12;
+	smptDest.x = d.x / 16;
+	smptDest.y = d.y / 12;
+	// Initialize data structures
+	//std::priority_queue<PQNode, std::vector<PQNode>, std::greater<PQNode>> open;
+	FibonacciHeap<PQNode> open;
+	bool *isClosed = new bool[Width * Height]();
 
-	// re-initialise the path finding structures
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
+	SearchmapPoint *parents = new SearchmapPoint[Width * Height];
+	unsigned short *distFromStart = new unsigned short[Width * Height]();
+	int dxCross = smptDest.x - smptSource.x;
+	int dyCross = smptDest.y - smptSource.y;
+	auto Heuristic = [=](SearchmapPoint p) {
+		const float weight = 1.5;   // Weighted heuristic. Finds sub-optimal paths
+		// but should be quite a bit faster
+		int xDist = p.x - smptDest.x;
+		int yDist = p.y - smptDest.y;
+		// Tie-breaking used to smooth out the path
+		int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
+		int dist = Distance(p, smptDest);
+		float h = weight * (dist + (crossProduct >> 10));
+		return h;
+	};
 
-	// set the start point in the path finding structures
-	unsigned int pos2 = ( goal.x << 16 ) | goal.y;
-	unsigned int pos = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[start.y * Width + start.x] = 1;
+	if (size && GetBlocked(d.x, d.y, size)) {
+		AdjustPosition(smptDest);
+	}
 
-	unsigned int squaredmindistance = MinDistance * MinDistance;
-	bool found_path = false;
-	while (InternalStack.size()) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
+	Log(DEBUG, logString, "FindPath((%d %d), (%d %d), minDist = %d, size = %d)",
+		smptSource.x, smptSource.y, smptDest.x, smptDest.y, minDistance, size);
 
-		if (pos == pos2) {
-			// we got all the way to the target!
-			found_path = true;
+	bool foundPath = false;
+	parents[smptSource.y * Width + smptSource.x] = smptSource;
+	open.emplace(PQNode(smptSource, 0));
+	unsigned int squaredMinDist = minDistance * minDistance;
+	unsigned short curParentDist;
+	SearchmapPoint smptCurrent;
+	SearchmapPoint smptChild;
+	SearchmapPoint smptParent;
+	SearchmapPoint smptBestParent;
+	SearchmapPoint smptCurNeighbor;
+	NavmapPoint nmptCurrent;
+	NavmapPoint nmptAdjustedCurrent;
+	NavmapPoint nmptParent;
+	bool reachable;
+	bool childOutsideMap;
+	bool childBlocked;
+	unsigned short adjParentDist;
+	unsigned short oldDist;
+	unsigned short newDist;
+	unsigned short estDist;
+	PQNode newNode;
+	while (!open.empty()) {
+
+		smptCurrent = open.top().first;
+		open.pop();
+
+		nmptCurrent.x = smptCurrent.x * 16;
+		nmptCurrent.y = smptCurrent.y * 12;
+		nmptAdjustedCurrent.x = nmptCurrent.x + 8;
+		nmptAdjustedCurrent.y = nmptCurrent.y + 6;
+
+
+		if (smptCurrent == smptDest) {
+			foundPath = true;
 			break;
-		} else if (MinDistance) {
-			/* check minimum distance:
-			 * as an obvious optimisation we only check squared distance: this is a
-			 * possible overestimate since the sqrt Distance() rounds down
-			 * (some other optimisations could be made here, but you'd be better off
-			 * fixing the pathfinder to do A* properly)
-			 * caller should have already done PersonalDistance adjustments, this is
-			 * simply between the specified points
-			 */
-
-			int distx = (x*16 + 8) - d.x;
-			int disty = (y*12 + 6) - d.y;
-			if ((unsigned int)(distx*distx + disty*disty) <= squaredmindistance) {
-				// we are within the minimum distance of the goal
-				Point ourpos(x*16 + 8, y*12 + 6);
-				// sight check is *slow* :(
-				if (!sight || IsVisibleLOS(ourpos, d)) {
-					// we got all the way to a suitable goal!
-					goal = Point(x, y);
-					found_path = true;
+		} else if (minDistance) {
+			int xDist = nmptAdjustedCurrent.x + 8 - d.x;
+			int yDist = nmptAdjustedCurrent.y + 6 - d.y;
+			unsigned int squaredDist = xDist * xDist + yDist * yDist;
+			if (parents[smptCurrent.y * Width + smptCurrent.x] != smptCurrent &&
+				squaredDist < squaredMinDist) {
+				if (!sight || IsVisibleLOS(nmptAdjustedCurrent, d, false)) {
+					Log(DEBUG, logString, "(%d %d) is close enough to (%d %d)", nmptCurrent.x, nmptCurrent.y,
+						d.x, d.y);
+					Log(DEBUG, logString, "MinDistance = %d", minDistance);
+					smptDest = smptCurrent;
+					foundPath = true;
 					break;
 				}
 			}
 		}
 
-		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
-		if (Cost > 65500) {
-			// cost is far too high, no path found
-			break;
-		}
-
-		// diagonal movements
-		SetupNode( x - 1, y - 1, size, Cost );
-		SetupNode( x + 1, y - 1, size, Cost );
-		SetupNode( x + 1, y + 1, size, Cost );
-		SetupNode( x - 1, y + 1, size, Cost );
-
-		// direct movements
-		Cost += AdditionalCost;
-		SetupNode( x, y - 1, size, Cost );
-		SetupNode( x + 1, y, size, Cost );
-		SetupNode( x, y + 1, size, Cost );
-		SetupNode( x - 1, y, size, Cost );
-	}
-
-	// find path from goal to start
-	PathNode* StartNode = new PathNode;
-	PathNode* Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
-	if (!found_path) {
-		// this is not really great, we should be finding the path that
-		// went nearest to where we wanted
-		StartNode->x = start.x;
-		StartNode->y = start.y;
-		StartNode->orient = GetOrient( goal, start );
-		return Return;
-	}
-	StartNode->x = goal.x;
-	StartNode->y = goal.y;
-	bool fixup_orient = false;
-	if (orig_goal != goal) {
-		StartNode->orient = GetOrient( orig_goal, goal );
-	} else {
-		// we pathed all the way to original goal!
-		// we don't know correct orientation until we find previous step
-		fixup_orient = true;
-		StartNode->orient = GetOrient( goal, start );
-	}
-	Point p = goal;
-	pos2 = start.y * Width + start.x;
-	while (( pos = p.y * Width + p.x ) != pos2) {
-		unsigned int level = MapSet[pos];
-		unsigned int diff = 0;
-		Point n;
-		Leveldown( p.x, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y, level, n, diff );
-		Leveldown( p.x - 1, p.y, level, n, diff );
-		Leveldown( p.x, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff)
-			return Return;
-
-		if (fixup_orient) {
-			// don't change orientation at end of path? this seems best
-			StartNode->orient = GetOrient( p, n );
-		}
-
-		Return = new PathNode;
-		Return->Next = StartNode;
-		Return->Next->Parent = Return;
-		StartNode = Return;
-
-		StartNode->x = n.x;
-		StartNode->y = n.y;
-		StartNode->orient = GetOrient( p, n );
-		p = n;
-	}
-
-	return Return;
-}
-
-PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance)
-{
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	if (GetBlocked( d.x, d.y, size )) {
-		AdjustPosition( goal );
-	}
-	unsigned int pos = ( goal.x << 16 ) | goal.y;
-	unsigned int pos2 = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[goal.y * Width + goal.x] = 1;
-
-	while (InternalStack.size()) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-
-		if (pos == pos2) {
-			//We've found _a_ path
-			//print("GOAL!!!");
-			break;
-		}
-		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
-		if (Cost > 65500) {
-			//print("Path not found!");
-			break;
-		}
-		SetupNode( x - 1, y - 1, size, Cost );
-		SetupNode( x + 1, y - 1, size, Cost );
-		SetupNode( x + 1, y + 1, size, Cost );
-		SetupNode( x - 1, y + 1, size, Cost );
-
-		Cost += AdditionalCost;
-		SetupNode( x, y - 1, size, Cost );
-		SetupNode( x + 1, y, size, Cost );
-		SetupNode( x, y + 1, size, Cost );
-		SetupNode( x - 1, y, size, Cost );
-	}
-
-	//find path from start to goal
-	PathNode* StartNode = new PathNode;
-	PathNode* Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
-	StartNode->x = start.x;
-	StartNode->y = start.y;
-	StartNode->orient = GetOrient( goal, start );
-	if (pos != pos2) {
-		return Return;
-	}
-	Point p = start;
-	pos2 = goal.y * Width + goal.x;
-	while (( pos = p.y * Width + p.x ) != pos2) {
-		StartNode->Next = new PathNode;
-		StartNode->Next->Parent = StartNode;
-		StartNode = StartNode->Next;
-		StartNode->Next = NULL;
-		unsigned int level = MapSet[pos];
-		unsigned int diff = 0;
-		Point n;
-		Leveldown( p.x, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y, level, n, diff );
-		Leveldown( p.x - 1, p.y, level, n, diff );
-		Leveldown( p.x, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff)
-			return Return;
-		StartNode->x = n.x;
-		StartNode->y = n.y;
-		StartNode->orient = GetOrient( n, p );
-		p = n;
-	}
-	//stepping back on the calculated path
-	if (MinDistance) {
-		while (StartNode->Parent) {
-			Point tar;
-
-			tar.x=StartNode->Parent->x*16;
-			tar.y=StartNode->Parent->y*12;
-			int dist = Distance(tar,d);
-			if (dist+14>=MinDistance) {
-				break;
+		// Lazy Theta-star optimization: does the LOS check after inserting a node
+		smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
+		nmptParent.x = smptParent.x * 16;
+		nmptParent.y = smptParent.y * 12;
+		reachable = IsVisibleLOS(nmptCurrent, nmptParent, true);
+		if (!reachable && smptCurrent != smptSource) {
+			smptBestParent.x = 0;
+			smptBestParent.y = 0;
+			distFromStart[smptCurrent.y * Width + smptCurrent.x] = MAX_PATH_COST;
+			for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
+				smptCurNeighbor.x = smptCurrent.x + dx[i];
+				smptCurNeighbor.y = smptCurrent.y + dy[i];
+				if (isClosed[smptCurNeighbor.y * Width + smptCurNeighbor.x]) {
+					curParentDist = distFromStart[smptCurNeighbor.y * Width + smptCurNeighbor.x] +
+									Distance(smptCurrent, smptCurNeighbor);
+					if (curParentDist < distFromStart[smptCurrent.y * Width + smptCurrent.x]) {
+						smptBestParent = smptCurNeighbor;
+						distFromStart[smptCurrent.y * Width + smptCurrent.x] = curParentDist;
+					}
+				}
+				parents[smptCurrent.y * Width + smptCurrent.x] = smptBestParent;
 			}
-			StartNode = StartNode->Parent;
-			delete StartNode->Next;
-			StartNode->Next = NULL;
+		}
+		isClosed[smptCurrent.y * Width + smptCurrent.x] = true;
+		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
+			smptChild.x = smptCurrent.x + dx[i];
+			smptChild.y = smptCurrent.y + dy[i];
+			childOutsideMap = smptChild.x < 0 ||
+							  smptChild.y < 0 ||
+							  (unsigned) smptChild.x >= Width ||
+							  (unsigned) smptChild.y >= Height;
+			childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
+				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
+					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
+				}
+				// Theta-star search
+				smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
+				adjParentDist = Distance(smptParent, smptChild);
+				oldDist = distFromStart[smptChild.y * Width + smptChild.x];
+				newDist = distFromStart[smptParent.y * Width + smptParent.x] + adjParentDist;
+				if (newDist < oldDist && newDist < MAX_PATH_COST) {
+
+					parents[smptChild.y * Width + smptChild.x] = smptParent;
+					distFromStart[smptChild.y * Width + smptChild.x] = newDist;
+					estDist = newDist + Heuristic(smptChild);
+					newNode.first = smptChild;
+					newNode.second = estDist;
+					open.emplace(newNode);
+
+				}
+			}
 		}
 	}
-	return Return;
+	if (!foundPath) {    // Return empty path if smptDest is unreachable
+		Log(DEBUG, logString, "Pathfinder destination is unreachable");
+		return nullptr;
+	}
+
+	PathNode *resultPath = nullptr;
+	while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
+		Log(DEBUG, logString, "Adding (%d %d) to path", smptDest.x, smptDest.y);
+		PathNode *newPathNode = resultPath;
+		auto *newStep = new PathNode;
+		newStep->x = smptDest.x;
+		newStep->y = smptDest.y;
+		newStep->Next = newPathNode;
+		if (newPathNode) {
+			newPathNode->Parent = newStep;
+		}
+		newPathNode = newStep;
+		resultPath = newPathNode;
+		smptDest = parents[smptDest.y * Width + smptDest.x];
+	}
+	for (PathNode *rover = resultPath; rover; rover = rover->Next) {
+		if (rover->Next) {
+			const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
+			const SearchmapPoint &smptRover = Point(rover->x, rover->y);
+			rover->Next->orient = GetOrient(smptRoverNext, smptRover);
+		}
+		Log(DEBUG, logString, "Step: (%d %d)", rover->x, rover->y);
+	}
+	if (resultPath)
+		resultPath->orient = GetOrient(Point(resultPath->x, resultPath->y), smptSource);
+	// Right proper memory management
+	delete[] isClosed;
+	delete[] parents;
+	delete[] distFromStart;
+	return resultPath;
 }
 
 //single point visible or not (visible/exploredbitmap)
@@ -3057,56 +3030,84 @@ bool Map::IsVisible(const Point &pos, int explored)
 	return (VisibleBitmap[by] & bi)!=0;
 }
 
+
 //point a is visible from point b (searchmap)
-bool Map::IsVisibleLOS(const Point &s, const Point &d) const
-{
-	int sX=s.x/16;
-	int sY=s.y/12;
-	int dX=d.x/16;
-	int dY=d.y/12;
+bool Map::IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability) const {
+	int sX = s.x / 16;
+	int sY = s.y / 12;
+	int dX = d.x / 16;
+	int dY = d.y / 12;
 	int diffx = sX - dX;
 	int diffy = sY - dY;
 
 	// we basically draw a 'line' from (sX, sY) to (dX, dY)
 	// we want to move along the larger axis, to make sure we don't miss anything
-	if (abs( diffx ) >= abs( diffy )) {
+	if (abs(diffx) >= abs(diffy)) {
 		// (sX - startX)/elevationy = (sX - startX)/fabs(diffx) * diffy
-		double elevationy = std::fabs((double)diffx ) / diffy;
+		double elevationy = std::fabs((double) diffx) / diffy;
 		if (sX > dX) {
 			// right to left
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
 				//if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
+				auto blockStatus = GetBlocked(startx,
+											  sY - (int) ((sX - startx) / elevationy));
+				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
+				if (checkWalkability) {
+					if (blockStatus != PATH_MAP_PASSABLE &&
+						blockStatus != PATH_MAP_TRAVEL)
+						return false;
+				}
 			}
 		} else {
 			// left to right
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
 				//if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
+				auto blockStatus = GetBlocked(startx,
+											  sY + (int) ((sX - startx) / elevationy));
+				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
+				if (checkWalkability) {
+					if (blockStatus != PATH_MAP_PASSABLE &&
+						blockStatus != PATH_MAP_TRAVEL)
+						return false;
+				}
 			}
 		}
 	} else {
 		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
-		double elevationx = std::fabs((double)diffy ) / diffx;
+		double elevationx = std::fabs((double) diffy) / diffx;
 		if (sY > dY) {
 			// bottom to top
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
 				//if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
+				auto blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx),
+											  starty);
+				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
+				if (checkWalkability) {
+					if (blockStatus != PATH_MAP_PASSABLE &&
+						blockStatus != PATH_MAP_TRAVEL)
+						return false;
+				}
 			}
 		} else {
 			// top to bottom
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
 				//if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
+				auto blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx),
+											  starty);
+				if (blockStatus & PATH_MAP_SIDEWALL)
 					return false;
+				if (checkWalkability) {
+					if (blockStatus != PATH_MAP_PASSABLE &&
+						blockStatus != PATH_MAP_TRAVEL)
+						return false;
+				}
 			}
 		}
 	}
