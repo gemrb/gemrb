@@ -2001,6 +2001,7 @@ Movable::Movable(ScriptableType type)
 	HomeLocation.x = 0;
 	HomeLocation.y = 0;
 	maxWalkDistance = 0;
+	prevTicks = 0;
 }
 
 Movable::~Movable(void)
