@@ -60,6 +60,8 @@
 #include <cmath>
 #include <cassert>
 
+#include <limits>
+
 namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
@@ -2799,14 +2801,9 @@ typedef Point SearchmapPoint;
 
 class PQNode {
 public:
-	PQNode(Point p, unsigned int l) {
-		first = p;
-		second = l;
-	}
-	PQNode () {
-		first = Point(0, 0);
-		second = 0;
-	}
+	PQNode(Point p, unsigned int l):first(p), second(l) {};
+	PQNode():first(Point(0, 0)), second(0) {};
+
 	Point first;
 	unsigned int second;
 
@@ -2829,8 +2826,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	static const char *logString = "PathFinderWIP";
 	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
 	static const size_t DEGREES_OF_FREEDOM = 8;
-	static const char dx[DEGREES_OF_FREEDOM]{1, 0, -1, 0, 1, 1, -1, -1};
-	static const char dy[DEGREES_OF_FREEDOM]{0, 1, 0, -1, 1, -1, 1, -1};
+	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
+	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
 	static const float weight = 1.5;	// Weighted heuristic. Finds sub-optimal paths
 										// but should be quite a bit faster
 	SearchmapPoint smptSource;
@@ -2860,7 +2857,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	parents[smptSource.y * Width + smptSource.x] = smptSource;
 	open.emplace(PQNode(smptSource, 0));
 	unsigned int squaredMinDist = minDistance * minDistance;
-	unsigned short curParentDist;
+
+	// Avoid calling constructors by declaring object variables here
+	// Yes, there is an overhead in creating a Point a kajillion times
 	SearchmapPoint smptCurrent;
 	SearchmapPoint smptChild;
 	SearchmapPoint smptParent;
@@ -2869,17 +2868,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 	NavmapPoint nmptCurrent;
 	NavmapPoint nmptAdjustedCurrent;
 	NavmapPoint nmptParent;
-	bool reachable;
-	bool childOutsideMap;
-	bool childBlocked;
-	unsigned short adjParentDist;
-	unsigned short oldDist;
-	unsigned short newDist;
-	unsigned short estDist;
 	PQNode newNode;
-	int xDist, yDist;
-	int crossProduct;
-	unsigned int heuristic;
 	while (!open.empty()) {
 
 		smptCurrent = open.top().first;
@@ -2915,7 +2904,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 		smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
 		nmptParent.x = smptParent.x * 16;
 		nmptParent.y = smptParent.y * 12;
-		reachable = IsVisibleLOS(nmptCurrent, nmptParent, true);
+		bool reachable = IsVisibleLOS(nmptCurrent, nmptParent, true);
 		if (!reachable && smptCurrent != smptSource) {
 			smptBestParent.x = 0;
 			smptBestParent.y = 0;
@@ -2924,7 +2913,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 				smptCurNeighbor.x = smptCurrent.x + dx[i];
 				smptCurNeighbor.y = smptCurrent.y + dy[i];
 				if (isClosed[smptCurNeighbor.y * Width + smptCurNeighbor.x]) {
-					curParentDist = distFromStart[smptCurNeighbor.y * Width + smptCurNeighbor.x] +
+					unsigned short curParentDist = distFromStart[smptCurNeighbor.y * Width + smptCurNeighbor.x] +
 									Distance(smptCurrent, smptCurNeighbor);
 					if (curParentDist < distFromStart[smptCurrent.y * Width + smptCurrent.x]) {
 						smptBestParent = smptCurNeighbor;
@@ -2938,34 +2927,33 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size,
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + dx[i];
 			smptChild.y = smptCurrent.y + dy[i];
-			childOutsideMap = smptChild.x < 0 ||
+			bool childOutsideMap = smptChild.x < 0 ||
 							  smptChild.y < 0 ||
 							  (unsigned) smptChild.x >= Width ||
 							  (unsigned) smptChild.y >= Height;
-			childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
 				}
 				// Theta-star search
 				smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
-				adjParentDist = Distance(smptParent, smptChild);
-				oldDist = distFromStart[smptChild.y * Width + smptChild.x];
-				newDist = distFromStart[smptParent.y * Width + smptParent.x] + adjParentDist;
+				unsigned short adjParentDist = Distance(smptParent, smptChild);
+				unsigned short oldDist = distFromStart[smptChild.y * Width + smptChild.x];
+				unsigned short newDist = distFromStart[smptParent.y * Width + smptParent.x] + adjParentDist;
 				if (newDist < oldDist && newDist < MAX_PATH_COST) {
 					parents[smptChild.y * Width + smptChild.x] = smptParent;
 					distFromStart[smptChild.y * Width + smptChild.x] = newDist;
 					// Calculate heuristic
-					xDist = smptChild.x - smptDest.x;
-					yDist = smptChild.y - smptDest.y;
+					int xDist = smptChild.x - smptDest.x;
+					int yDist = smptChild.y - smptDest.y;
 					// Tie-breaking used to smooth out the path
-					crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
-					heuristic = weight * (Distance(smptChild, smptDest) + (crossProduct >> 10));
-					estDist = newDist + heuristic;
+					int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
+					unsigned int heuristic = weight * (Distance(smptChild, smptDest) + (crossProduct >> 10));
+					unsigned int estDist = newDist + heuristic;
 					newNode.first = smptChild;
 					newNode.second = estDist;
 					open.emplace(newNode);
-
 				}
 			}
 		}
