@@ -39,7 +39,6 @@
 #include "RNG/RNG_SFMT.h"
 #include "Scriptable/InfoPoint.h"
 #include <cmath>
-#include <chrono>
 
 namespace GemRB {
 
