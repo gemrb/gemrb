@@ -247,6 +247,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
 	}
 
 	actor->CommandActor(action, !append);
+	actor->Destination = p; // just to force target reticle drawing if paused
 }
 
 // were we instructed to run and can handle it (no movement impairments)?
