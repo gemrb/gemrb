@@ -498,7 +498,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetAttackMoveChances(ieWord *amc);
-	virtual bool DoStep(unsigned int walkAnimFrames, ieDword time = 0);
+	virtual bool DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop, bool run);
@@ -513,7 +513,6 @@ public:
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;
 
-	void GetDeltas(double &dx, double &dy, char &ySign, char &xSign) const;
 };
 
 //Tiled objects are not used (and maybe not even implemented correctly in IE)

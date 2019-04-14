@@ -515,16 +515,13 @@ public:
 	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size,
-					   unsigned int minDistance = 0, bool sight = true);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true);
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
-
-	/* returns false if point d cannot be seen from point d due to searchmap */
-	/* If checkWalkability is true, also returns false if there are impassable
-	 * blocks between s and d */
-	bool IsVisibleLOS(const Point &s, const Point &d, bool checkWalkability = false) const;
+	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flag, bool checkImpassable = false) const;
+	bool IsVisibleLOS(const Point &s, const Point &d) const;
+	bool IsWalkableTo(const Point &s, const Point &d) const;
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
@@ -588,8 +585,8 @@ private:
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
-	void Leveldown(unsigned int x, unsigned int y, unsigned int &cost,
-				   Point &newPoint, unsigned int &costDiff);
+	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
+				   Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
