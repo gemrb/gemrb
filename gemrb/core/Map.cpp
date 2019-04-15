@@ -3037,7 +3037,7 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
 				unsigned int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy));
-				if (blockStatus == flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
 					return false;
 				}
 			}
