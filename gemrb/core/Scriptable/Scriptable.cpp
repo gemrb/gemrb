@@ -2162,6 +2162,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	double dy, dyOrig;
 	char ySign;
 	char xSign;
+	// Adjustments (+8/+6) are being made here, see Map::FindPath()
 	dx = step->x * 16 + 8 - Pos.x;
 	dy = step->y * 12 + 6 - Pos.y;
 	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
@@ -2255,8 +2256,10 @@ void Movable::FixPosition()
 
 void Movable::WalkTo(const Point &Des, int distance)
 {
-
-	if (this->Ticks < this->prevTicks + 2) return;  // Rate limiting
+	// Rate limiting
+	if (this->Ticks < this->prevTicks + 2) {
+		return;
+	}
 	// The rate limiting stuff is probably not optimal, since it requires lots of pathfinder calls
 	// An incremental pathfinding algorithm would be preferable, but LOS checks are slow
 	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
@@ -2278,8 +2281,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	if (path) {
 		Destination = Des;
 		step = path;
-	}
-	else {
+	} else {
 		ClearPath();
 		FixPosition();
 	}

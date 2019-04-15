@@ -2873,6 +2873,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		open.pop();
 		nmptCurrent.x = smptCurrent.x * 16;
 		nmptCurrent.y = smptCurrent.y * 12;
+		// This adjustment is needed to prevent quantum tunneling through walls
+		// Because the check is not made in the same place the character is rendered at
+		// It could look like actors can walk through impassable blocks (e.g. ar2600 [1483.379] in BG1)
+		// But the behavior is the same in the original game: actors are actually on the border
 		nmptCurrentAdjusted.x = nmptCurrent.x + 8;
 		nmptCurrentAdjusted.y = nmptCurrent.y + 6;
 
@@ -3033,23 +3037,21 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
 				unsigned int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy));
-				if (blockStatus == flag || (checkImpassable && (blockStatus != PATH_MAP_PASSABLE))) {
+				if (blockStatus == flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
 					return false;
 				}
 			}
-		}
-		else {
+		} else {
 			// left to right
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
 				unsigned int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy));
-				if (blockStatus & flag || (checkImpassable && (blockStatus != PATH_MAP_PASSABLE))) {
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
 					return false;
 				}
 			}
 		}
-	}
-	else {
+	} else {
 		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
 		double elevationx = std::fabs((double) diffy) / diffx;
 		if (sY > dY) {
@@ -3057,17 +3059,16 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
 				unsigned int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty);
-				if (blockStatus & flag || (checkImpassable && (blockStatus != PATH_MAP_PASSABLE))) {
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
 					return false;
 				}
 			}
-		}
-		else {
+		} else {
 			// top to bottom
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
 				unsigned int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty);
-				if (blockStatus & flag || (checkImpassable && (blockStatus != PATH_MAP_PASSABLE))) {
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
 					return false;
 				}
 			}
