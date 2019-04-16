@@ -4050,7 +4050,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Game *game = core->GetGame();
 	int partySize = game->GetPartySize(true);
 	int stoned = 0;
-	for (int j=0; j<partySize; j--) {
+	for (int j=0; j<partySize; j++) {
 		Actor *pc = game->GetPC(j, true);
 		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
 	}
