@@ -2179,8 +2179,8 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	unsigned timeDelta = time - timeStartStep;
 	if (timeDelta == 0) return true;
 
-	bool stepDoneWithWalkScale = timeDelta * connectedWaypointsHeuristic > walkScale;
-	if (stepDoneWithWalkScale) timeStartStep = time;
+	bool smNewCell = timeDelta * connectedWaypointsHeuristic > walkScale;
+	if (smNewCell) timeStartStep = time;
 
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
@@ -2212,7 +2212,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	Pos.y += std::ceil(dy) * ySign;
 
 	SetOrientation(step->orient, false);
-	return stepDoneWithWalkScale;
+	return smNewCell;
 }
 
 void Movable::AddWayPoint(const Point &Des)
