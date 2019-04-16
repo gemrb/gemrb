@@ -505,7 +505,7 @@ public:
 	/* Finds the nearest passable point */
 	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags);
+	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway);
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size);
 	/* returns true if there is enemy visible */
