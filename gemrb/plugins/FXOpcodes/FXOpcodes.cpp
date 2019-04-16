@@ -4951,6 +4951,7 @@ int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	target->SetSpellState(SS_HELD);
+	STATE_SET(STATE_HELPLESS);
 	STAT_SET( IE_HELD, 1);
 	return FX_APPLIED;
 }
