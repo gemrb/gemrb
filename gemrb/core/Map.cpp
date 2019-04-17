@@ -59,9 +59,7 @@
 
 #include <cmath>
 #include <cassert>
-
 #include <limits>
-#include <queue>
 
 namespace GemRB {
 
@@ -337,7 +335,6 @@ Map::Map(void)
 	LightMap = NULL;
 	HeightMap = NULL;
 	SmallMap = NULL;
-	MapSet = NULL;
 	SrchMap = NULL;
 	Walls = NULL;
 	WallCount = 0;
@@ -381,7 +378,6 @@ Map::~Map(void)
 {
 	unsigned int i;
 
-	free( MapSet );
 	free( SrchMap );
 	free( MaterialMap );
 
@@ -478,8 +474,6 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
-	//Filling Matrices
-	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 	//Internal Searchmap
 	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
@@ -2430,52 +2424,6 @@ void Map::dump(bool show_actors) const
 	Log(DEBUG, "Map", buffer);
 }
 
-/******************************************************************************/
-
-void Map::Leveldown(unsigned int px, unsigned int py, unsigned int& level, Point &n, unsigned int& diff)
-{
-	int pos;
-	unsigned int nlevel;
-
-	if (( px >= Width ) || ( py >= Height )) {
-		return;
-	} //walked off the map
-	pos = py * Width + px;
-	nlevel = MapSet[pos];
-	if (!nlevel) {
-		return;
-	} //not even considered
-	if (level <= nlevel) {
-		return;
-	}
-	unsigned int ndiff = level - nlevel;
-	if (ndiff > diff) {
-		level = nlevel;
-		diff = ndiff;
-		n.x = (ieWord) px;
-		n.y = (ieWord) py;
-	}
-}
-
-void Map::SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost)
-{
-	unsigned int pos;
-
-	if (( x >= Width ) || ( y >= Height )) {
-		return;
-	}
-	pos = y * Width + x;
-	if (MapSet[pos]) {
-		return;
-	}
-	if (GetBlocked(x*16+8,y*12+6,size)) {
-		MapSet[pos] = 65535;
-		return;
-	}
-	MapSet[pos] = (ieWord) Cost;
-	InternalStack.push( ( x << 16 ) | y );
-}
-
 bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	unsigned int minx = 0;
@@ -2566,26 +2514,6 @@ void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy
 	}
 }
 
-typedef Point NavmapPoint;
-typedef Point SearchmapPoint;
-
-class PQNode {
-public:
-	PQNode(Point p, unsigned int l):point(p), dist(l) {};
-	PQNode():point(Point(0, 0)), dist(0) {};
-
-	Point point;
-	unsigned int dist;
-
-	friend bool operator< (const PQNode &lhs, const PQNode &rhs) { return lhs.dist < rhs.dist;}
-	friend bool operator> (const PQNode& lhs, const PQNode& rhs){ return rhs < lhs; }
-	friend bool operator<= (const PQNode& lhs, const PQNode& rhs){ return !(lhs > rhs); }
-	friend bool operator>= (const PQNode& lhs, const PQNode& rhs){ return !(lhs < rhs); }
-	friend bool operator == (const PQNode& lhs, const PQNode& rhs) { return lhs.point == rhs.point; }
-	friend bool operator != (const PQNode& lhs, const PQNode& rhs) { return !(lhs == rhs); }
-
-};
-
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
 //the 5th parameter is controlling the orientation of the actor
 //0 - back away, 1 - face direction
@@ -2597,7 +2525,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
 	std::priority_queue<PQNode> open;
 	float *dist = new float[Width * Height]();
-	float diagWeight = 1.41F; // sqrt(2)
+	float diagWeight = sqrt(2);
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
 	open.push(PQNode(smptFleeFrom, 0));
 	SearchmapPoint smptCurrent;
@@ -2611,8 +2539,6 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + dx[i];
 			smptChild.y = smptCurrent.y + dy[i];
-			smptChild.x = smptCurrent.x + dx[i];
-			smptChild.y = smptCurrent.y + dy[i];
 			bool childOutsideMap =	smptChild.x < 0 ||
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
@@ -2621,7 +2547,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
-				float newDist = curDist + (dx && dy ? diagWeight : 1);
+				float newDist = curDist + (dx[i] && dy[i] ? diagWeight : 1);
 				if (newDist < PathLen && newDist > oldDist) {
 					if (newDist > farthestDist) {
 						farthestDist = newDist;
@@ -2637,49 +2563,14 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 		}
 	}
 	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
-	// TODO: Implement this
-	if (!noBackAway) {
-		Log(DEBUG, "RunAwayWIP", "This call should make the character back away.");
-	}
-	return this->FindPath(s, nmptFarthest, size);
+	// Right proper memory management
+	delete[] dist;
+	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
 {
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	if (GetBlocked( d.x, d.y, size )) {
-		return true;
-	}
-	if (GetBlocked( s.x, s.y, size )) {
-		return true;
-	}
-
-	unsigned int pos = ( goal.x << 16 ) | goal.y;
-	unsigned int pos2 = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[goal.y * Width + goal.x] = 1;
-
-	while (InternalStack.size() && pos!=pos2) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-
-		SetupNode( x - 1, y - 1, size, 1 );
-		SetupNode( x + 1, y - 1, size, 1 );
-		SetupNode( x + 1, y + 1, size, 1 );
-		SetupNode( x - 1, y + 1, size, 1 );
-		SetupNode( x, y - 1, size, 1 );
-		SetupNode( x + 1, y, size, 1 );
-		SetupNode( x, y + 1, size, 1 );
-		SetupNode( x - 1, y, size, 1 );
-	}
-	return pos!=pos2;
+	return this->FindPath(s, d, size) == NULL;
 }
 
 /* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
@@ -2778,7 +2669,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
  * find a path from start to goal, ending at the specified distance from the
  * target (the goal must be in sight of the end, if 'sight' is specified)
  */
-PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, bool sight)
+PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, bool sight, bool backAway)
 {
 	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
 	static const size_t DEGREES_OF_FREEDOM = 8;
@@ -2788,12 +2679,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	static const float weight = 1.5;
 	SearchmapPoint smptSource;
 	SearchmapPoint smptDest;
-	SearchmapPoint smptDestOrig;
 	smptSource.x = s.x / 16;
 	smptSource.y = s.y / 12;
 	smptDest.x = d.x / 16;
 	smptDest.y = d.y / 12;
-	smptDestOrig = smptDest;
 
 	if (size && GetBlocked(d.x, d.y, size)) {
 		AdjustPosition(smptDest);
@@ -2921,33 +2810,24 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 	PathNode *resultPath = NULL;
 	if (foundPath) {
-		while (!resultPath || smptDest != parents[smptDest.y * Width + smptDest.x]) {
-			Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptDest.x, smptDest.y);
-			PathNode *newPathNode = resultPath;
+		smptCurrent = smptDest;
+		while (!resultPath || smptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
+			Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptCurrent.x, smptCurrent.y);
 			PathNode *newStep = new PathNode;
-			newStep->x = smptDest.x;
-			newStep->y = smptDest.y;
-			newStep->Next = newPathNode;
+			newStep->x = smptCurrent.x;
+			newStep->y = smptCurrent.y;
+			newStep->Next = resultPath;
 			newStep->Parent = NULL;
-			if (newPathNode) {
-				newPathNode->Parent = newStep;
-			}
-			newPathNode = newStep;
-			resultPath = newPathNode;
-			smptDest = parents[smptDest.y * Width + smptDest.x];
-		}
-		for (PathNode *rover = resultPath; rover; rover = rover->Next) {
-			const SearchmapPoint &smptRover = Point(rover->x, rover->y);
-			if (rover->Next) {
-				const SearchmapPoint &smptRoverNext = Point(rover->Next->x, rover->Next->y);
-				rover->orient = GetOrient(smptRoverNext, smptRover);
-			} else if (rover->Parent) {
-				const SearchmapPoint &smptRoverParent = Point(rover->Parent->x, rover->Parent->y);
-				rover->orient = GetOrient(smptDestOrig, smptRoverParent);
+			if (backAway) {
+				newStep->orient = GetOrient(parents[smptCurrent.y * Width + smptCurrent.x], smptCurrent);
 			} else {
-				rover ->orient = GetOrient(smptDestOrig, smptSource);
+				newStep->orient = GetOrient(smptCurrent, parents[smptCurrent.y * Width + smptCurrent.x]);
 			}
-			Log(DEBUG, "PathFinderWIP", "Step: (%d %d)", rover->x, rover->y);
+			if (resultPath) {
+				resultPath->Parent = newStep;
+			}
+			resultPath = newStep;
+			smptCurrent = parents[smptCurrent.y * Width + smptCurrent.x];
 		}
 	} else {
 		Log(DEBUG, "PathFinderWIP", "Pathfinder destination is unreachable");

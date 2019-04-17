@@ -332,12 +332,8 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	unsigned short* MapSet;
-
-private:
 	unsigned short* SrchMap; //internal searchmap
 	unsigned short* MaterialMap;
-	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
@@ -515,7 +511,7 @@ public:
 	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true, bool backAway = false);
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
@@ -585,9 +581,7 @@ private:
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
-	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
-				   Point &p, unsigned int& diff);
-	void SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost);
+
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised */

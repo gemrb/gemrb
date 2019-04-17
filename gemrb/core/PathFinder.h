@@ -51,6 +51,26 @@ struct PathNode {
 	unsigned int orient;
 };
 
+typedef Point NavmapPoint;
+typedef Point SearchmapPoint;
+
+class PQNode {
+public:
+	PQNode(Point p, unsigned int l):point(p), dist(l) {};
+	PQNode():point(Point(0, 0)), dist(0) {};
+
+	Point point;
+	unsigned int dist;
+
+	friend bool operator< (const PQNode &lhs, const PQNode &rhs) { return lhs.dist < rhs.dist;}
+	friend bool operator> (const PQNode& lhs, const PQNode& rhs){ return rhs < lhs; }
+	friend bool operator<= (const PQNode& lhs, const PQNode& rhs){ return !(lhs > rhs); }
+	friend bool operator>= (const PQNode& lhs, const PQNode& rhs){ return !(lhs < rhs); }
+	friend bool operator == (const PQNode& lhs, const PQNode& rhs) { return lhs.point == rhs.point; }
+	friend bool operator != (const PQNode& lhs, const PQNode& rhs) { return !(lhs == rhs); }
+
+};
+
 /*
  Fibonacci Heap
  Copyright (c) 2010, Robin Message <Robin.Message@cl.cam.ac.uk>
