@@ -223,6 +223,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
+	// always refresh, as even if eqfx is null, other effects may have been selfapplied from the block
 	Owner->RefreshEffects(eqfx);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
