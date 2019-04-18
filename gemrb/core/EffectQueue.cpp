@@ -1390,15 +1390,18 @@ void EffectQueue::RemoveAllEffects(ieDword opcode) const
 }
 
 //removes all equipping effects that match slotcode
-void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
+bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
+	bool removed = false;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( !IsEquipped((*f)->TimingMode)) continue;
 		MATCH_SLOTCODE();
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		removed = true;
 	}
+	return removed;
 }
 
 //removes all effects that match projectile

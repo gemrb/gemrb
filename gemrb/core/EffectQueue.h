@@ -232,7 +232,7 @@ public:
 	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
 
 	/* removes equipping effects with specified inventory slot code */
-	void RemoveEquippingEffects(ieDwordSigned slotcode) const;
+	bool RemoveEquippingEffects(ieDwordSigned slotcode) const;
 
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(const ieResRef Removed) const;

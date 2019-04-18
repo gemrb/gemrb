@@ -234,11 +234,12 @@ void Inventory::AddSlotEffects(ieDword index)
 //is stored in them
 void Inventory::RemoveSlotEffects(ieDword index)
 {
-	Owner->fxqueue.RemoveEquippingEffects(index);
-	Owner->RefreshEffects(NULL);
-	//call gui for possible paperdoll animation changes
-	if (Owner->InParty) {
-		core->SetEventFlag(EF_UPDATEANIM);
+	if (Owner->fxqueue.RemoveEquippingEffects(index)) {
+		Owner->RefreshEffects(NULL);
+		//call gui for possible paperdoll animation changes
+		if (Owner->InParty) {
+			core->SetEventFlag(EF_UPDATEANIM);
+		}
 	}
 }
 
