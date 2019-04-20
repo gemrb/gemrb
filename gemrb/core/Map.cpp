@@ -2557,7 +2557,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 					newNode.point.x = smptChild.x;
 					newNode.point.y = smptChild.y;
 					newNode.dist = newDist;
-					open.emplace(newNode);
+					open.push(newNode);
 				}
 			}
 		}
