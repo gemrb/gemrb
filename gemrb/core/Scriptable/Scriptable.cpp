@@ -2138,17 +2138,17 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
 	}
-	const double maxRadius = 2.0;
 	if (!path) return true;
 	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
-		timeStartStep = time;
+		this->timeStartStep = time;
+		return true;
 	}
 
 	if (!walkScale) {
 		// zero speed: no movement
-		timeStartStep = time;
+		this->timeStartStep = time;
 		StanceID = IE_ANI_READY;
 		return true;
 	}
@@ -2172,19 +2172,10 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	dxOrig = dx;
 	dyOrig = dy;
 
-	unsigned connectedSearchmapCells = dx + dy;
-
-	unsigned timeDelta = time - timeStartStep;
-	if (timeDelta == 0) return true;
-
-	bool smNewCell = timeDelta * connectedSearchmapCells > walkScale;
-	if (smNewCell) timeStartStep = time;
-
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
 		if (step->Next) {
 			step = step->Next;
-			timeStartStep += walkScale;
 			return false;
 		} else {
 			ClearPath();
@@ -2192,26 +2183,27 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			return true;
 		}
 	}
-
-	if (dx == 0) {
-		dy = maxRadius;
-	} else if (dy == 0) {
-		dx = maxRadius;
-	} else {
-		double squaredRadius = dx * dx + dy * dy;
-		double ratio = (maxRadius * maxRadius) / squaredRadius;
-		dx = sqrt(dx * dx * ratio);
-		dy = sqrt(dy * dy * ratio);
+	if (time > this->timeStartStep) {
+		const double maxRadius = 2.0;
+		if (dx == 0) {
+			dy = maxRadius;
+		} else if (dy == 0) {
+			dx = maxRadius;
+		} else {
+			double squaredRadius = dx * dx + dy * dy;
+			double ratio = (maxRadius * maxRadius) / squaredRadius;
+			dx = sqrt(dx * dx * ratio);
+			dy = sqrt(dy * dy * ratio);
+		}
+		dx = std::min(dx * stepTime / walkScale, dxOrig);
+		// Speed on the y axis is downscaled like the searchmap (12 / 16) to avoid curved paths
+		dy = std::min(dy * stepTime / walkScale, dyOrig) * 0.75;
+		Pos.x += std::ceil(dx) * xSign;
+		Pos.y += std::ceil(dy) * ySign;
+		SetOrientation(step->orient, false);
+		this->timeStartStep = time;
 	}
-	dx = std::min(dx * stepTime / walkScale, dxOrig);
-	// Speed on the y axis is downscaled like the searchmap (12 / 16) to avoid curved paths
-	dy = std::min(dy * stepTime / walkScale, dyOrig) * 3.0 / 4.0;
-
-	Pos.x += std::ceil(dx) * xSign;
-	Pos.y += std::ceil(dy) * ySign;
-
-	SetOrientation(step->orient, false);
-	return smNewCell;
+	return true;
 }
 
 void Movable::AddWayPoint(const Point &Des)
