@@ -2171,15 +2171,13 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	dy = std::abs(dy);
 	dxOrig = dx;
 	dyOrig = dy;
-	Point smPos = Point(Pos.x / 16, Pos.x / 12);
-	Point smStep = Point(step->x, step->y);
 
-	unsigned connectedWaypointsHeuristic = Distance(smPos, smStep);
+	unsigned connectedSearchmapCells = dx + dy;
 
 	unsigned timeDelta = time - timeStartStep;
 	if (timeDelta == 0) return true;
 
-	bool smNewCell = timeDelta * connectedWaypointsHeuristic > walkScale;
+	bool smNewCell = timeDelta * connectedSearchmapCells > walkScale;
 	if (smNewCell) timeStartStep = time;
 
 	bool reachedStep = (dx == 0 && dy == 0);
@@ -2206,7 +2204,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = sqrt(dy * dy * ratio);
 	}
 	dx = std::min(dx * stepTime / walkScale, dxOrig);
-	dy = std::min(dy * stepTime / walkScale, dyOrig);
+	dy = std::min(dy * stepTime / walkScale, dyOrig) * 3.0 / 4.0;
 
 	Pos.x += std::ceil(dx) * xSign;
 	Pos.y += std::ceil(dy) * ySign;
