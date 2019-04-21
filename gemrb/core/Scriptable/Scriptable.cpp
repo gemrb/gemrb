@@ -2204,6 +2204,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = sqrt(dy * dy * ratio);
 	}
 	dx = std::min(dx * stepTime / walkScale, dxOrig);
+	// Speed on the y axis is downscaled like the searchmap (12 / 16) to avoid curved paths
 	dy = std::min(dy * stepTime / walkScale, dyOrig) * 3.0 / 4.0;
 
 	Pos.x += std::ceil(dx) * xSign;
