@@ -1208,7 +1208,7 @@ int Inventory::GetEquippedSlot() const
 	return Equipped+SLOT_MELEE;
 }
 
-bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
+bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 {
 	EquippedHeader = header;
 
@@ -1258,12 +1258,14 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects(newslot);
-
-		//in case of missiles also look for an appropriate launcher
-		if (effects == SLOT_EFFECT_MISSILE) {
-			newslot = FindRangedWeapon();
+		if (!noFX) {
 			AddSlotEffects(newslot);
+
+			//in case of missiles also look for an appropriate launcher
+			if (effects == SLOT_EFFECT_MISSILE) {
+				newslot = FindRangedWeapon();
+				AddSlotEffects(newslot);
+			}
 		}
 	}
 	UpdateWeaponAnimation();
