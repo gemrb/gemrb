@@ -456,7 +456,7 @@ public:
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
 typedef Targets* (* ObjectFunction)(Scriptable *, Targets*, int ga_flags);
-typedef int (* IDSFunction)(Actor *, int parameter);
+typedef int (* IDSFunction)(const Actor *, int parameter);
 
 #define TF_NONE		0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
@@ -567,18 +567,18 @@ private: //Internal variables
 	unsigned int lastAction;
 	int scriptlevel;
 public: //Script Functions
-	static int ID_Alignment(Actor *actor, int parameter);
-	static int ID_Allegiance(Actor *actor, int parameter);
-	static int ID_AVClass(Actor *actor, int parameter);
-	static int ID_Class(Actor *actor, int parameter);
-	static int ID_ClassMask(Actor *actor, int parameter);
-	static int ID_Faction(Actor *actor, int parameter);
-	static int ID_Gender(Actor *actor, int parameter);
-	static int ID_General(Actor *actor, int parameter);
-	static int ID_Race(Actor *actor, int parameter);
-	static int ID_Specific(Actor *actor, int parameter);
-	static int ID_Subrace(Actor *actor, int parameter);
-	static int ID_Team(Actor *actor, int parameter);
+	static int ID_Alignment(const Actor *actor, int parameter);
+	static int ID_Allegiance(const Actor *actor, int parameter);
+	static int ID_AVClass(const Actor *actor, int parameter);
+	static int ID_Class(const Actor *actor, int parameter);
+	static int ID_ClassMask(const Actor *actor, int parameter);
+	static int ID_Faction(const Actor *actor, int parameter);
+	static int ID_Gender(const Actor *actor, int parameter);
+	static int ID_General(const Actor *actor, int parameter);
+	static int ID_Race(const Actor *actor, int parameter);
+	static int ID_Specific(const Actor *actor, int parameter);
+	static int ID_Subrace(const Actor *actor, int parameter);
+	static int ID_Team(const Actor *actor, int parameter);
 
 	//Triggers
 	static int ActionListEmpty(Scriptable* Sender, Trigger* parameters);
