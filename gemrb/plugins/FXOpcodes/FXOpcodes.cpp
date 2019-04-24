@@ -3483,7 +3483,6 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//will destroy the first item
-print("Destroy Item: %s\n", fx->Resource);
 	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
 		target->ReinitQuickSlots();
 	}
