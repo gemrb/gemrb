@@ -27,6 +27,7 @@
 #include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
+#include "GameScript/GameScript.h" // only for ID_Allegiance
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
@@ -111,7 +112,8 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 1:
 		stat = IE_TEAM; break;
 	case 2: //EA
-		stat = IE_EA; break;
+		stat = IE_EA;
+		return GameScript::ID_Allegiance(target, value);
 	case 3: //GENERAL
 		//this is a hack to support dead only projectiles in PST
 		//if it interferes with something feel free to remove
