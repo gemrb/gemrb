@@ -2193,11 +2193,11 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			double squaredRadius = dx * dx + dy * dy;
 			double ratio = (maxRadius * maxRadius) / squaredRadius;
 			dx = sqrt(dx * dx * ratio);
-			dy = sqrt(dy * dy * ratio);
+			// Speed on the y axis is downscaled (12 / 16) in order to correct searchmap scaling and avoid curved paths
+			dy = sqrt(dy * dy * ratio) * 0.75;
 		}
 		dx = std::min(dx * stepTime / walkScale, dxOrig);
-		// Speed on the y axis is downscaled like the searchmap (12 / 16) to avoid curved paths
-		dy = std::min(dy * stepTime / walkScale, dyOrig) * 0.75;
+		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		Pos.x += std::ceil(dx) * xSign;
 		Pos.y += std::ceil(dy) * ySign;
 		SetOrientation(step->orient, false);
