@@ -248,6 +248,7 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
 	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ieResRef resource) const;
 	void RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword flags, ieDword match) const;
+	void DispelEffects(Effect *dispeller, ieDword level) const;
 
 	/* returns true if the timing method supports simplified duration */
 	static bool HasDuration(const Effect *fx);

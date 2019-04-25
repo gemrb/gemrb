@@ -2466,26 +2466,22 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieResRef Removed;
-	ieDword level;
 
 	switch (fx->Parameter2) {
 	case 0:
 	default:
-		level = 0xffffffff;
+		// dispel everything
+		target->fxqueue.RemoveLevelEffects(Removed, 0xffffffff, RL_DISPELLABLE, 0);
 		break;
 	case 1:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Power-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->CasterLevel);
 		break;
 	case 2:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Parameter1-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->Parameter1);
 		break;
 	}
-	//if signed would it be negative?
-	target->fxqueue.RemoveLevelEffects(Removed, level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
 }
 

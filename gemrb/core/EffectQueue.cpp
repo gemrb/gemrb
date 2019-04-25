@@ -1662,6 +1662,36 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 	}
 }
 
+void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
+{
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		if (*f == dispeller) continue;
+
+		// this should also ignore all equipping effects
+		if(!((*f)->Resistance & FX_CAN_DISPEL)) {
+			continue;
+		}
+
+		// 50% base chance of success; always at least 1% chance of failure or success
+		// positive level diff modifies the base chance by 5%, negative by -10%
+		int diff = level - (*f)->CasterLevel;
+		if (diff > 0) {
+			diff *= 5;
+		} else if (diff < 0) {
+			diff *= 10;
+		}
+		diff += 50;
+
+		int roll = core->Roll(1, 100, 0);
+		if (roll == 1) continue;
+		if (roll == 100 || roll < diff) {
+			// finally dispel
+			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		}
+	}
+}
+
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
 	std::list< Effect* >::const_iterator f;
