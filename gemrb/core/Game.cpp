@@ -1290,10 +1290,13 @@ void Game::ShareXP(int xp, int flags)
 		return;
 	}
 
-	if (xp>0) {
-		displaymsg->DisplayConstantStringValue( STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp); //you have gained ... xp
-	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp); //you have lost ... xp
+	//you have gained/lost ... xp
+	if (core->HasFeedback(FT_MISC)) {
+		if (xp > 0) {
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp);
+		} else {
+			displaymsg->DisplayConstantStringValue(STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp);
+		}
 	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -1397,9 +1400,9 @@ void Game::SetReputation(ieDword r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	if (Reputation>r) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
 	} else if (Reputation<r) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {

@@ -3465,7 +3465,7 @@ void Actor::RefreshPCStats() {
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 				String text = *core->GetString(28895) + L"1"; // FIXME
-				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
+				if (core->HasFeedback(FT_STATES)) displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
@@ -4568,6 +4568,8 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
 
+		if (core->HasFeedback(FT_STATES)) goto hitsound;
+
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
@@ -4633,6 +4635,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	}
 
+	hitsound:
 	//Play hit sounds, for pst, resdata contains the armor level
 	DataFileMgr *resdata = core->GetResDataINI();
 	PlayHitSound(resdata, damagetype, false);
@@ -5012,10 +5015,12 @@ int Actor::GetWildMod(int level)
 			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
 
 			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
-			if (WMLevelMod > 0) {
-				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
-			} else if (WMLevelMod < 0) {
-				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+			if (core->HasFeedback(FT_STATES)) {
+				if (WMLevelMod > 0) {
+					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
+				} else if (WMLevelMod < 0) {
+					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+				}
 			}
 		}
 		return WMLevelMod;
@@ -5073,13 +5078,12 @@ int Actor::CalculateSpeed(bool feedback)
 		return speed;
 	}
 	if(encumbrance<=maxweight*2) {
-		if (feedback) {
+		if (feedback && core->HasFeedback(FT_STATES)) {
 			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
-			//print slow speed
 		}
 		return speed/2;
 	}
-	if (feedback) {
+	if (feedback && core->HasFeedback(FT_STATES)) {
 		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
 	}
 	return 0;
@@ -6260,7 +6264,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 
 	if (IsSelected()) {
 		// display the turning-off message
-		if (Modal.State != MS_NONE) {
+		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
 			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
@@ -7167,7 +7171,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 				// Missed <TARGETNAME> due to concealment.
 				core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
-				displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
 				buffer.append("[Concealment Miss]");
 				Log(COMBAT, "Attack", buffer);
 				ResetState();
@@ -7198,7 +7202,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", buffer);
-		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		VerbalConstant(VB_CRITMISS);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
@@ -7270,7 +7274,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", buffer);
-		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		VerbalConstant(VB_CRITHIT);
 	} else {
 		//normal success
@@ -7445,7 +7449,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (damage<=0) {
 		if (attacker && attacker->InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 	}
@@ -7559,11 +7563,11 @@ void Actor::UpdateActorState(ieDword gameTime) {
 				// some modals notify each round, some only initially
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = 0;
-				if (InParty && feedback) {
+				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
 					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {
-				if (InParty) {
+				if (InParty && core->HasFeedback(FT_MISC)) {
 					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 				Modal.State = MS_NONE;
@@ -9008,7 +9012,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;
@@ -9022,7 +9026,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	if (critical) {
 		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
-			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
 			critical = false;
 		} else {
 			//a critical surely raises the morale?
@@ -9064,7 +9068,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			}
 		}
 		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity || dodgy) {
-			displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 			wi.backstabbing = false;
 		} else {
 			if (wi.backstabbing) {
@@ -9094,11 +9098,11 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 					sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 					// ~Sneak Attack for %d~
 					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
 				}
 			} else {
 				// weapon is unsuitable for sneak attack
-				displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 			}
 		}
 	}
@@ -9119,16 +9123,16 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 		if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
 			if (target->Modified[IE_DISABLEBACKSTAB]) {
 				// The backstab seems to have failed
-				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 				wi.backstabbing = false;
 			} else {
 				if (wi.backstabbing) {
 					backstabDamage = multiplier * damage;
 					// display a simple message instead of hardcoding multiplier names
-					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
 				} else {
 					// weapon is unsuitable for backstab
-					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 				}
 			}
 		}

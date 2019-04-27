@@ -916,6 +916,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 {
+	if (!core->HasFeedback(FT_CASTING)) return;
+
 	// caster - Casts spellname : target OR
 	// caster - spellname : target (repeating spells)
 	Scriptable *target = NULL;
@@ -1640,7 +1642,7 @@ bool Scriptable::AuraPolluted()
 		Actor *act = (Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
-			displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
+			if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
 			return false;
 		}
 	}
