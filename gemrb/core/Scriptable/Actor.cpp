@@ -129,6 +129,7 @@ static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword always_dither = 1;
+static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
@@ -1780,6 +1781,7 @@ GEM_EXPORT void UpdateActorConfig()
 	//FIXME: Drop all actors' SpriteCover.
 	//the actor will change dithering only after selected/moved (its spritecover was updated)
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
+	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
 	GameDifficulty = 0;
@@ -4038,6 +4040,11 @@ void Actor::PlaySelectionSound()
 			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS);
 		}
 	}
+}
+
+void Actor::PlayWarCry(int range) const
+{
+	if (war_cries) VerbalConstant(VB_ATTACK, range);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3

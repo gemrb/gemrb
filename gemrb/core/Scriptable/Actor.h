@@ -544,6 +544,8 @@ public:
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
 	void PlaySelectionSound();
+	/* play a roar if the setting isn't disabled */
+	void PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
 	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */

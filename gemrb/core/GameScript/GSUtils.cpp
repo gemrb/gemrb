@@ -1392,7 +1392,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			//play attack sound for party members
 			if (actor->InParty) {
 				//pick from all 5 possible verbal constants
-				actor->VerbalConstant(VB_ATTACK, 5);
+				actor->PlayWarCry(5);
 			}
 			//display attack message
 			if (target->GetGlobalID() != Sender->LastTarget) {
