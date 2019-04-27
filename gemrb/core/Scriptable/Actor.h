@@ -594,7 +594,7 @@ public:
 	/* play a random footstep sound */
 	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
-	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix);
+	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);

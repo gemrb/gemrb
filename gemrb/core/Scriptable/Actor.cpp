@@ -4685,7 +4685,7 @@ static const char *dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
 
 //Play hit sounds (HIT_0<dtype><armor>)
 //IWDs have H_<dmgtype>_<armor> (including level from 1 to max 5), eg H_ML_MM3
-void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
+void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const
 {
 	int type;
 	bool levels = true;
