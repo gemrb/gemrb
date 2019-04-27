@@ -7226,7 +7226,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	ieDword log = 0;
-	core->GetDictionary()->Lookup("Extra Feedback", log);
+	core->GetDictionary()->Lookup("Effect Text Level", log);
+	log &= 1;
 	if (log) {
 		// log the roll
 		// FIXME: Im sure there are string constants we should be using!
