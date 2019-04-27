@@ -7966,10 +7966,15 @@ void Actor::UpdateAnimations()
 	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 
 	//If you find a better place for it, I'll really be glad to put it there
-	//IN BG1 and BG2, this is at the ninth frame...
-	if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
-		GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-		attackProjectile = NULL;
+	//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+	// however some critters don't have that long animations (eg. squirrel 0xC400)
+	if (attackProjectile) {
+		unsigned int frameCount = anims[0]->GetFrameCount();
+		unsigned int currentFrame = anims[0]->GetCurrentFrame();
+		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			attackProjectile = NULL;
+		}
 	}
 
 	// advance first (main) animation by one frame (in sync)
