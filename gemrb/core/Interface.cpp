@@ -257,6 +257,7 @@ Interface::Interface()
 	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
+	FeedbackLevel = 0;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -4364,6 +4365,17 @@ TextArea *Interface::GetMessageTextArea() const
 		}
 	}
 	return NULL;
+}
+
+void Interface::SetFeedbackLevel(int level)
+{
+	FeedbackLevel = level;
+}
+
+
+bool Interface::HasFeedback(int type) const
+{
+	return FeedbackLevel & type;
 }
 
 static const char *saved_extensions[]={".are",".sto",0};

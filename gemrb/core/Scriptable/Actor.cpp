@@ -1773,9 +1773,15 @@ static int IsClassFromName (const char* name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
+	unsigned int tmp = 0;
 	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
+	core->GetDictionary()->Lookup("Effect Text Level", tmp);
+	core->SetFeedbackLevel(tmp);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
+	// only pst has the whole gamut for these two options
+	if (!(tmp & FT_SELECTION)) sel_snd_freq = 0;
+	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
 	//FIXME: Drop all actors' SpriteCover.
@@ -7232,10 +7238,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	ieDword log = 0;
-	core->GetDictionary()->Lookup("Effect Text Level", log);
-	log &= 1;
-	if (log) {
+	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
 		// FIXME: Im sure there are string constants we should be using!
 		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
