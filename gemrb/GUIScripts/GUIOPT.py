@@ -313,7 +313,7 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
 
 	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
-	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sound')
+	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sounds')
 	GUIOPTControls.OptCheckbox (18041, 18014, HelpTextArea2, Window, 7, 19, 17140, 'Footsteps')
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
