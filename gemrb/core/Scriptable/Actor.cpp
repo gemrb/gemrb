@@ -3617,6 +3617,23 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveB
 
 	if (!third) {
 		ret += modifier + GetStat(IE_LUCK);
+
+		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
+		static ieDword prevType = -1;
+		static int prevRoll = -1;
+		static Actor *prevActor = NULL;
+		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
+			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
+			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
+			wchar_t tmp[3];
+			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L" %d", ret);
+			String msg = *str + tmp;
+			delete str;
+			displaymsg->DisplayStringName(msg, DMC_WHITE, this);
+		}
+		prevType = type;
+		prevActor = this;
+		prevRoll = ret;
 		return ret > (int) GetStat(savingthrows[type]);
 	}
 
