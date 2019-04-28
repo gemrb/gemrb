@@ -891,7 +891,7 @@ void OpenALAudioDriver::clearBufferCache(bool force)
 	}
 }
 
-ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits)
+ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const
 {
 	switch (channels) {
 		case 1:
