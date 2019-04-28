@@ -7261,13 +7261,24 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
-		// FIXME: Im sure there are string constants we should be using!
 		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
-		wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));//Rolls
-		const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
-		swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
+		wchar_t rollLog[100];
+		const wchar_t *fmt = L"%ls %d %ls %d = %d : %ls";
+		String *leftRight, *hitMiss;
+		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
+			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL_L));
+		} else {
+			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL));
+		}
+		if (success) {
+			hitMiss = core->GetString(displaymsg->GetStringReference(STR_HIT));
+		} else {
+			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
+		}
+		swprintf(rollLog, 100, fmt, leftRight->c_str(), roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss->c_str());
 		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
-		free(rollLog);
+		delete leftRight;
+		delete hitMiss;
 	}
 	if (!success) {
 		//hit failed

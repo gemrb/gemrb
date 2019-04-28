@@ -222,8 +222,12 @@ namespace GemRB {
 #define STR_SAVE_POLY 187
 #define STR_SAVE_WANDS 188
 #define STR_SAVE_DEATH 189
+#define STR_ATTACK_ROLL 190
+#define STR_ATTACK_ROLL_L 191
+#define STR_HIT 192
+#define STR_MISS 193
 
-#define STRREF_COUNT 190
+#define STRREF_COUNT 194
 }
 
 #endif //! IE_STRINGS_H
