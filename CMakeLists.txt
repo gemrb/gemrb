@@ -151,7 +151,7 @@ MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations -Wno-error=stringop-truncation")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 			# clang ignores -Wno-error
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
