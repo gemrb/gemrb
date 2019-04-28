@@ -21,7 +21,6 @@
 #ifndef GUISCRIPT_H
 #define GUISCRIPT_H
 
-#undef HAVE_UINT64_T
 #include "GemPython.h"
 
 #include "ScriptEngine.h"

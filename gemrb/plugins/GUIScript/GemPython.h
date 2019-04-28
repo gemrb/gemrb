@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#undef HAVE_UINT64_T
+
 #if defined(WIN32) && defined(_DEBUG)
 #undef _DEBUG
 #include <Python.h>
