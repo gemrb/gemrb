@@ -102,12 +102,6 @@ else:
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
 Buttons = [-1] * StoreButtonCount
 
-	global Bag
-	if Bag:
-		UnselectBag ()
-		GemRB.CloseRighthandStore ()
-		Bag = None
-
 def CloseStoreWindow ():
 	import GUIINV
 	global StoreWindow
@@ -115,6 +109,12 @@ def CloseStoreWindow ():
 	GemRB.SetVar ("Inventory", 0)
 	if StoreWindow:
 		StoreWindow.Close ()
+
+	global Bag
+	if Bag:
+		UnselectBag ()
+		GemRB.CloseRighthandStore ()
+		Bag = None
 
 	GemRB.LeaveStore ()
 
@@ -990,7 +990,7 @@ def UpdateStoreShoppingWindow ():
 	if RightTopIndex>RightCount:
 		GemRB.SetVar ("RightTopIndex", RightCount)
 
-	RedrawStoreShoppingWindow ()
+	RedrawStoreShoppingWindow (Window)
 	return
 
 # Unselects all the selected buttons, so they are not preselected in other windows
@@ -1150,7 +1150,7 @@ def UnselectBag ():
 			GemRB.ChangeStoreItem (pc, Slot, SHOP_SELL|SHOP_SELECT)
 	return
 
-def RedrawStoreShoppingWindow ():
+def RedrawStoreShoppingWindow (Window):
 	global BuySum, SellSum
 
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
