@@ -2442,7 +2442,7 @@ int GameScript::CheckSpellState(Scriptable* Sender, Trigger* parameters)
 	}
 	unsigned int position = parameters->int0Parameter>>5;
 	unsigned int bit = 1<<(parameters->int0Parameter&31);
-	if (actor->GetStat(IE_SPLSTATE_ID1+position) & bit) {
+	if (actor->spellStates[position] & bit) {
 		return 1;
 	}
 	return 0;
@@ -3482,7 +3482,7 @@ int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 	if (!mode) {
 		mode = EQUALS;
 	}
-	return DiffCore(diff, (ieDword) parameters->int0Parameter, mode);
+	return DiffCore(diff+1, (ieDword) parameters->int0Parameter, mode);
 }
 
 int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3490,7 +3490,7 @@ int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
 	ieDword diff;
 
 	core->GetDictionary()->Lookup("Difficulty Level", diff);
-	return diff>(ieDword) parameters->int0Parameter;
+	return diff+1>(ieDword) parameters->int0Parameter;
 }
 
 int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3498,7 +3498,7 @@ int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	ieDword diff;
 
 	core->GetDictionary()->Lookup("Difficulty Level", diff);
-	return diff<(ieDword) parameters->int0Parameter;
+	return diff+1<(ieDword) parameters->int0Parameter;
 }
 
 int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
@@ -3804,7 +3804,7 @@ int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) scr;
 
-	if (actor->ModalState==(ieDword) parameters->int0Parameter) {
+	if (actor->Modal.State == (ieDword) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3818,7 +3818,7 @@ int GameScript::IsCreatureHiddenInShadows( Scriptable* Sender, Trigger* /*parame
 	}
 	Actor *actor = (Actor *) Sender;
 
-	if (actor->ModalState==MS_STEALTH) {
+	if (actor->Modal.State == MS_STEALTH) {
 		return 1;
 	}
 	return 0;

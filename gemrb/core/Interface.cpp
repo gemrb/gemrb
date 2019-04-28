@@ -227,6 +227,7 @@ Interface::Interface()
 	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
+	FeedbackLevel = 0;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -351,8 +352,6 @@ Interface::~Interface(void)
 	}
 
 	DamageInfoMap.clear();
-
-	ModalStates.clear();
 
 	delete plugin_flags;
 
@@ -894,23 +893,24 @@ bool Interface::ReadReputationModTable() {
 	return true;
 }
 
-bool Interface::ReadModalStates()
-{
-	AutoTable table("modal");
-	if (!table)
+bool Interface::ReadSoundChannelsTable() {
+	AutoTable tm("sndchann");
+	if (!tm) {
 		return false;
-
-	ModalStatesStruct ms;
-	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		CopyResRef(ms.spell, table->QueryField(i, 0));
-		strlcpy(ms.action, table->QueryField(i, 1), 16);
-		ms.entering_str = atoi(table->QueryField(i, 2));
-		ms.leaving_str = atoi(table->QueryField(i, 3));
-		ms.failed_str = atoi(table->QueryField(i, 4));
-		ms.aoe_spell = atoi(table->QueryField(i, 5));
-		ModalStates.push_back(ms);
 	}
 
+	int ivol = tm->GetColumnIndex("VOLUME");
+	int irev = tm->GetColumnIndex("REVERB");
+	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
+		const char *rowname = tm->GetRowName(i);
+		// translate some alternative names for the IWDs
+		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
+		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
+		AudioDriver->SetChannelVolume(rowname, atoi(tm->QueryField(i, ivol)));
+		if (irev != -1) {
+			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev)));
+		}
+	}
 	return true;
 }
 
@@ -1235,6 +1235,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
+	MaxPartySize = std::min(std::max(1, MaxPartySize), 10);
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
@@ -1732,6 +1733,12 @@ int Interface::Init(InterfaceConfig* config)
 		}
 	}
 
+	Log(MESSAGE, "Core", "Setting up SFX channels...");
+	ret = ReadSoundChannelsTable();
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to read channel table.");
+	}
+
 	if (HasFeature( GF_HAS_PARTY_INI )) {
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
@@ -1844,12 +1851,6 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Reading damage type table...");
 	if (!ret) {
 		Log(WARNING, "Core", "Reading damage type table...");
-	}
-
-	Log(MESSAGE, "Core", "Reading modal states table...");
-	ret = ReadModalStates();
-	if (!ret) {
-		Log(ERROR, "Core", "Failed to modal states table...");
 	}
 
 	Log(MESSAGE, "Core", "Reading game script tables...");
@@ -2050,7 +2051,7 @@ char* Interface::GetCString(ieStrRef strref, ieDword options) const
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
-	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+	if (strings2 && (signed)strref != -1 && strref & IE_STR_ALTREF) {
 		return strings2->GetCString(strref, flags | options);
 	} else {
 		return strings->GetCString(strref, flags | options);
@@ -2065,7 +2066,7 @@ String* Interface::GetString(ieStrRef strref, ieDword options) const
 		vars->Lookup( "Strref On", flags );
 	}
 
-	if ((signed)strref != -1 && strref & IE_STR_ALTREF) {
+	if (strings2 && (signed)strref != -1 && strref & IE_STR_ALTREF) {
 		return strings2->GetString(strref, flags | options);
 	} else {
 		return strings->GetString(strref, flags | options);
@@ -2166,6 +2167,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		"AnimatedDialog",	  //78GF_ANIMATED_DIALOG
+		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2903,7 +2905,7 @@ int Interface::PlayMovie(const char* resref)
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
-		sound_override = AudioDriver->Play(sound_resref);
+		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
 	}
 
 	// clear whatever is currently on screen
@@ -3231,6 +3233,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 
 	if (!gam_str || !(wmp_str1 || wmp_str2) )
 		goto cleanup;
@@ -3273,8 +3276,12 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		sav_str = NULL;
 	}
 
-	// Let's assume that now is everything loaded OK and swap the objects
+	// rarely caused crashes while loading, so stop the ambients
+	if (ambim) {
+		ambim->reset();
+	}
 
+	// Let's assume that now is everything loaded OK and swap the objects
 	delete game;
 	delete worldmap;
 
@@ -3698,6 +3705,17 @@ TextArea* Interface::GetMessageTextArea() const
 	return GetControl<TextArea>("MsgSys", 0);
 }
 
+void Interface::SetFeedbackLevel(int level)
+{
+	FeedbackLevel = level;
+}
+
+
+bool Interface::HasFeedback(int type) const
+{
+	return FeedbackLevel & type;
+}
+
 static const char *saved_extensions[]={".are",".sto",0};
 static const char *saved_extensions_last[]={".tot",".toh",0};
 
@@ -3865,7 +3883,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 	i=tab->GetRowCount();
 	for(j=0;j<i;j++) {
 		if (Prefix) {
-			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, j+1);
+			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, (j+1)%100);
 		} else {
 			strnlwrcpy(ItemName,tab->GetRowName(j), 8);
 		}
@@ -4188,10 +4206,10 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(int index)
+Holder<SoundHandle> Interface::PlaySound(int index, unsigned int channel)
 {
 	if (index<=DSCount) {
-		return AudioDriver->Play(DefSound[index]);
+		return AudioDriver->Play(DefSound[index], channel);
 	}
 	return NULL;
 }

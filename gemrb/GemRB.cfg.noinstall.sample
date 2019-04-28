@@ -167,11 +167,12 @@ GUIEnhancements = 15
 #####################################################
 
 GamePath=../gemrb/tests/minimal
-CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
-CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
-CD3=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD3/
-CD4=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD4/
-CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
+# only set these if the folders are not in your GamePath
+#CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+#CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
+#CD3=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD3/
+#CD4=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD4/
+#CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
 
 #####################################################
 #  GemRB Cache Path [String]                        #

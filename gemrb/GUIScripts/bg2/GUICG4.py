@@ -159,10 +159,7 @@ def OnLoad():
 		KitName = CommonTables.KitList.GetValue(Kit, 0)
 
 	#if the class uses the warrior table for saves, then it may have the extra strength
-	if CommonTables.Classes.GetValue(ClassName, "SAVE") == "SAVEWAR":
-		HasStrExtra=1
-	else:
-		HasStrExtra=0
+	HasStrExtra = CommonTables.Classes.GetValue(ClassName, "STREXTRA", GTV_INT)
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 

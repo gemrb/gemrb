@@ -342,8 +342,8 @@ def PlaySoundPressed():
 	global SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
+	pc = GemRB.GameGetSelectedPCSingle ()
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-		pc = GemRB.GameGetSelectedPCSingle ()
 		GemRB.SetPlayerSound (pc, CharSound)
 		VoiceSet = GemRB.GetPlayerSound (pc, 1)
 	else:
@@ -355,7 +355,7 @@ def PlaySoundPressed():
 			break
 	else:
 		NextSound()
-	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], 0, 0, 5)
+	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, 5)
 	return
 
 def NextSound():

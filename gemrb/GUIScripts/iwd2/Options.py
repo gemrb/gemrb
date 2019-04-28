@@ -40,7 +40,7 @@ def OnLoad():
 	OptionsWindow = GemRB.LoadWindow(13)
 
 	VersionLabel = OptionsWindow.GetControl(0x1000000B)
-	VersionLabel.SetText(GemRB.GEMRB_VERSION)
+	VersionLabel.SetText(GemRB.Version)
 
 	GraphicsButton = OptionsWindow.GetControl(7)
 	SoundButton = OptionsWindow.GetControl(8)

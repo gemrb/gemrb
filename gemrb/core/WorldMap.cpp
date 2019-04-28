@@ -344,7 +344,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 
 	std::list<int> pending;
 	pending.push_back(i);
-	while(pending.size()) {
+	while(!pending.empty()) {
 		i=pending.front();
 		pending.pop_front();
 		WMPAreaEntry* ae=area_entries[i];
@@ -458,7 +458,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	}
 
 	print("Walkpath size is: %d",(int) walkpath.size());
-	if (!walkpath.size()) {
+	if (walkpath.empty()) {
 		return NULL;
 	}
 	std::list<WMPAreaLink*>::reverse_iterator p=walkpath.rbegin();

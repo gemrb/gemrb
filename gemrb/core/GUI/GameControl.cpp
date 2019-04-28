@@ -214,7 +214,7 @@ void GameControl::ClearMouseState()
 
 // generate an action to do the actual movement
 // only PST supports RunToPoint
-void GameControl::CreateMovement(Actor *actor, const Point &p)
+void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
 {
 	char Tmp[256];
 	Action *action = NULL;
@@ -229,11 +229,16 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 			CanRun = false;
 	}
 	if (!action) {
-		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+		if (append) {
+			sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
+		} else {
+			sprintf(Tmp, "MoveToPoint([%d.%d])", p.x, p.y);
+		}
 		action = GenerateAction( Tmp );
 	}
 
-	actor->CommandActor(action);
+	actor->CommandActor(action, !append);
+	actor->Destination = p; // just to force target reticle drawing if paused
 }
 
 // were we instructed to run and can handle it (no movement impairments)?
@@ -2004,7 +2009,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	}
 
 	// handle movement/travel
-	CommandSelectedMovement(p);
+	CommandSelectedMovement(p, Mod);
 	ClearMouseState();
 	return true;
 }
@@ -2060,7 +2065,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 }
 
-void GameControl::CommandSelectedMovement(const Point& p)
+void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 {
 	Game* game = core->GetGame();
 
@@ -2098,13 +2103,16 @@ void GameControl::CommandSelectedMovement(const Point& p)
 
 	for(unsigned int i = 0; i < party.size(); i++) {
 		Actor* actor = party[i];
-		actor->Stop();
+			// don't stop the party if we're trying to add a waypoint
+			if (!(Mod & GEM_MOD_SHIFT)) {
+				actor->Stop();
+			}
 
 		if (i || party.size() > 1) {
 			Map* map = actor->GetCurrentArea();
 			move = GetFormationPoint(map, i, src, p);
 		}
-		CreateMovement(actor, move);
+			CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
 	}
 
 	// handle travel

@@ -100,7 +100,7 @@ def OnDragItem (btn, slot):
 			if slot_item:
 				item = GemRB.GetItem (slot_item["ItemResRef"])
 				#drag items into a bag
-				if item["Function"]&4:
+				if item["Function"] & ITM_F_CONTAINER:
 					#first swap them
 					GemRB.DropDraggedItem (pc, slot)
 					#enter the store
@@ -280,7 +280,7 @@ def DisplayItem (itemresref, type):
 
 	#left button
 	Button = Window.GetControl(8)
-	select = (type&1) and (item["Function"]&8)
+	select = (type&1) and (item["Function"]&ITM_F_ABILITIES)
 
 	if type&2:
 		Button.SetText (strrefs[1])
@@ -304,13 +304,13 @@ def DisplayItem (itemresref, type):
 
 	#right button
 	Button = Window.GetControl(9)
-	drink = (type&1) and (item["Function"]&1)
-	read = (type&1) and (item["Function"]&2)
+	drink = (type&1) and (item["Function"]&ITM_F_DRINK)
+	read = (type&1) and (item["Function"]&ITM_F_READ)
 	# sorcerers cannot learn spells
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if Spellbook.HasSorcererBook (pc):
 		read = 0
-	container = (type&1) and (item["Function"]&4)
+	container = (type&1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (type&1) and (item["Type"] == 38)
 	if drink:

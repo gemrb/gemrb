@@ -96,7 +96,7 @@ def InitOptionsWindow (Window):
 
 	# game version, e.g. v1.1.0000
 	VersionLabel = Window.GetControl (0x1000000b)
-	VersionLabel.SetText (GemRB.GEMRB_VERSION)
+	VersionLabel.SetText (GemRB.Version)
 
 	if GameCheck.IsIWD2():
 		# Keyboard shortcuts
@@ -247,7 +247,7 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
 
 	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
-	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sound')
+	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sounds')
 	GUIOPTControls.OptCheckbox (18041, 18014, HelpTextArea2, Window, 7, 19, 17140, 'Footsteps')
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 1)
@@ -352,12 +352,15 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptSlider (18043, 18024, HelpTextArea2, Window, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
 	GUIOPTControls.OptSlider (18043, 18025, HelpTextArea2, Window, 9, 31, 17769, 'Locator Feedback Level')
 
-	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Extra Feedback')
-	GUIOPTControls.OptCheckbox (18043, 18027, HelpTextArea2, Window, 11, 33, 17150, 'Combat Info')
-	GUIOPTControls.OptCheckbox (18043, 18028, HelpTextArea2, Window, 12, 34, 17151, 'Actions')
-	GUIOPTControls.OptCheckbox (18043, 18029, HelpTextArea2, Window, 13, 35, 17152, 'State Changes')
-	GUIOPTControls.OptCheckbox (18043, 18030, HelpTextArea2, Window, 14, 36, 17181, 'Selection Text')
-	GUIOPTControls.OptCheckbox (18043, 18031, HelpTextArea2, Window, 15, 37, 17153, 'Miscellaneous Text')
+	# to hit rolls (extra feedback), combat info, actions, state changes, selection text, miscellaneus
+	GUIOPTControls.OptCheckbox (18043, 18026, HelpTextArea2, Window, 10, 32, 17149, 'Effect Text Level', None, 1)
+	GUIOPTControls.OptCheckbox (18043, 18027, HelpTextArea2, Window, 11, 33, 17150, 'Effect Text Level', None, 2)
+	GUIOPTControls.OptCheckbox (18043, 18028, HelpTextArea2, Window, 12, 34, 17151, 'Effect Text Level', None, 4)
+	GUIOPTControls.OptCheckbox (18043, 18029, HelpTextArea2, Window, 13, 35, 17152, 'Effect Text Level', None, 8)
+	GUIOPTControls.OptCheckbox (18043, 18030, HelpTextArea2, Window, 14, 36, 17181, 'Effect Text Level', None, 16)
+	GUIOPTControls.OptCheckbox (18043, 18031, HelpTextArea2, Window, 15, 37, 17153, 'Effect Text Level', None, 32)
+	# pst adds bit 64, but it still has its own GUIOPT; let's just ensure it is set
+	GemRB.SetVar ('Effect Text Level', GemRB.GetVar ('Effect Text Level') | 64)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -421,19 +424,11 @@ def OpenAutopauseOptionsWindow ():
 ###################################################
 
 def MoviePlayPress():
-	s = GemRB.GetVar("MovieIndex")
-	for i in range(0, MoviesTable.GetRowCount() ):
-		t = MoviesTable.GetRowName(i)
-		#temporarily out (change simultaneously with OpenMovieWindow)
-		#if GemRB.GetVar(t)==1:
-		if 1==1:
-			if s==0:
-				s = MoviesTable.GetRowName(i)
-				GemRB.PlayMovie(s, 1)
-				return
-			s = s - 1
-	return
+	movie = MoviesTable.GetRowName (GemRB.GetVar ("MovieIndex"))
+	GemRB.PlayMovie (movie, 1)
 
+# for iwd2 only, the rest use GUIMOVIE
+# TODO: investigate a merger, so it can get removed from GUIOPT
 def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
@@ -444,7 +439,8 @@ def OpenMovieWindow ():
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
-	TextAreaControl.SetOptions([MoviesTable.GetValue(i, 0) for i in range(0, MoviesTable.GetRowCount())],"MovieIndex",0)
+	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)

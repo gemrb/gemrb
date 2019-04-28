@@ -168,14 +168,14 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		//check if bg1
 		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
 			ieResRef s;
-			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0xff, g);
+			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0x9, g);
 			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
+			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0x63);
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
-		caster->casting_sound = core->GetAudioDrv()->Play(Resource, caster->Pos.x, caster->Pos.y);
+		caster->casting_sound = core->GetAudioDrv()->Play(Resource, SFX_CHAN_CASTING, caster->Pos.x, caster->Pos.y);
 	}
 
 	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
@@ -258,6 +258,11 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 					}
 				}
 			}
+		}
+
+		// item revisions uses a bunch of fx_cast_spell with spells that have effects with no target set
+		if (fx->Target == FX_TARGET_UNKNOWN) {
+			fx->Target = FX_TARGET_PRESET;
 		}
 
 		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {

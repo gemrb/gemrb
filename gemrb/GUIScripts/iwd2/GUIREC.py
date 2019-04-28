@@ -859,23 +859,7 @@ def DisplayMisc (pc):
 	#most powerful vanquished, time spent, xp and kills
 	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName'], 0))
 
-	days, hours = GUICommon.SetCurrentDateTokens (stat)
-	# iwd2 is special here
-	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
-	if days == 1:
-		time = GemRB.GetString (10698)
-	else:
-		time = GemRB.GetString (10697)
-	time += " " + GemRB.GetString (10699) + " "
-	if days == 0:
-		# only display hours
-		time = ""
-
-	if hours == 1:
-		time += GemRB.GetString (10701)
-	else:
-		time += GemRB.GetString (10700)
-
+	time = GUICommon.SetCurrentDateTokens (stat)
 	RecordsTextArea.Append (DelimitedText (11948, time, 0))
 
 	# Experience Value of Kills

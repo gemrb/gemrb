@@ -1,0 +1,24 @@
+2DA V1.0
+4
+                    WEAPSLOTS
+MAGE                2
+FIGHTER             4
+CLERIC              2
+THIEF               2
+BARD                2
+PALADIN             3
+DRUID               2
+RANGER              3
+FIGHTER_MAGE        2
+FIGHTER_CLERIC      2
+FIGHTER_THIEF       2
+FIGHTER_MAGE_THIEF  2
+MAGE_THIEF          2
+CLERIC_MAGE         2
+CLERIC_THIEF        2
+FIGHTER_DRUID       2
+FIGHTER_MAGE_CLERIC 2
+CLERIC_RANGER       2
+MONK                3
+SORCERER            2
+BARBARIAN           4

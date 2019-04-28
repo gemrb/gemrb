@@ -1,21 +1,21 @@
 2DA V1.0
 *
-                    NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         USABILITY  MC_WAS_ID  HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC    
-FIGHTER             7201       9556       1076       SAVEWAR    0          2          HPWAR      0x800      0x0008     1          1          1          1          1          1          1          
-RANGER              7200       9557       1077       SAVEWAR    0          12         HPWAR      0x200000   0x0100     1          1          1          0          0          0          0          
-PALADIN             7217       9558       1078       SAVEWAR    0          6          HPWAR      0x100000   -1         1          0          1          0          0          0          0          
-CLERIC              7204       9559       1079       SAVEPRS    0          3          HPPRS      128        0x0020     1          1          1          1          1          1          1          
-DRUID               7210       9560       1080       SAVEPRS    0          11         HPPRS      0x40000000 0x0080     1          1          1          1          0          0          0          
-MAGE                7203       9563       1081       SAVEWIZ    0          1          HPWIZ      0x40000    0x0010     1          1          1          0          0          2          0          
-THIEF               7202       9561       1082       SAVEROG    0          4          HPROG      0x400000   0x0040     1          1          1          1          1          1          1          
-BARD                7206       9562       1083       SAVEROG    0          5          HPROG      64         -1         1          1          1          1          1          1          1          
-FIGHTER_THIEF       7205       9572       1052       *          10         9          *          0x20000    -1         0          1          1          1          1          1          1          
-FIGHTER_CLERIC      7211       9573       1053       *          6          8          *          0x4000     -1         0          1          1          1          1          1          1          
-FIGHTER_MAGE        7213       9574       1056       *          3          7          *          0x2000     -1         0          1          1          0          0          2          0          
-MAGE_THIEF          7216       9575       1057       *          9          13         *          0x80000    -1         0          1          1          0          0          2          0          
-CLERIC_MAGE         7207       9577       1058       *          5          14         *          256        -1         0          1          1          0          0          2          0          
-CLERIC_THIEF        7209       9578       1065       *          12         15         *          512        -1         0          1          1          1          1          1          1          
-FIGHTER_DRUID       7212       9579       1066       *          1026       16         *          0x1000     -1         0          1          1          0          0          0          0          
-CLERIC_RANGER       7208       9580       1073       *          2052       18         *          1024       -1         0          1          1          0          0          0          0          
-FIGHTER_MAGE_THIEF  7215       9576       1074       *          11         10         *          0x10000    -1         0          1          1          0          0          0          0          
-FIGHTER_MAGE_CLERIC 7214       9581       1075       *          7          17         *          0x8000     -1         0          1          1          0          0          0          0          
+                    NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         USABILITY  MC_WAS_ID  HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC  STREXTRA
+FIGHTER             7201       9556       1076       SAVEWAR    0          2          HPWAR      0x800      0x0008     1          1          1          1          1          1          1        1
+RANGER              7200       9557       1077       SAVEWAR    0          12         HPWAR      0x200000   0x0100     1          1          1          0          0          0          0        1
+PALADIN             7217       9558       1078       SAVEWAR    0          6          HPWAR      0x100000   -1         1          0          1          0          0          0          0        1
+CLERIC              7204       9559       1079       SAVEPRS    0          3          HPPRS      128        0x0020     1          1          1          1          1          1          1        0
+DRUID               7210       9560       1080       SAVEPRS    0          11         HPPRS      0x40000000 0x0080     1          1          1          1          0          0          0        0
+MAGE                7203       9563       1081       SAVEWIZ    0          1          HPWIZ      0x40000    0x0010     1          1          1          0          0          2          0        0
+THIEF               7202       9561       1082       SAVEROG    0          4          HPROG      0x400000   0x0040     1          1          1          1          1          1          1        0
+BARD                7206       9562       1083       SAVEROG    0          5          HPROG      64         -1         1          1          1          1          1          1          1        0
+FIGHTER_THIEF       7205       9572       1052       *          10         9          *          0x20000    -1         0          1          1          1          1          1          1        1
+FIGHTER_CLERIC      7211       9573       1053       *          6          8          *          0x4000     -1         0          1          1          1          1          1          1        1
+FIGHTER_MAGE        7213       9574       1056       *          3          7          *          0x2000     -1         0          1          1          0          0          2          0        1
+MAGE_THIEF          7216       9575       1057       *          9          13         *          0x80000    -1         0          1          1          0          0          2          0        0
+CLERIC_MAGE         7207       9577       1058       *          5          14         *          256        -1         0          1          1          0          0          2          0        0
+CLERIC_THIEF        7209       9578       1065       *          12         15         *          512        -1         0          1          1          1          1          1          1        0
+FIGHTER_DRUID       7212       9579       1066       *          1026       16         *          0x1000     -1         0          1          1          0          0          0          0        1
+CLERIC_RANGER       7208       9580       1073       *          2052       18         *          1024       -1         0          1          1          0          0          0          0        1
+FIGHTER_MAGE_THIEF  7215       9576       1074       *          11         10         *          0x10000    -1         0          1          1          0          0          0          0        1
+FIGHTER_MAGE_CLERIC 7214       9581       1075       *          7          17         *          0x8000     -1         0          1          1          0          0          0          0        1

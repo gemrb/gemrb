@@ -1257,7 +1257,7 @@ def AbilitiesPress():
 	PointsLeftLabel.SetUseRGB (1)
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
+	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
 
 	for i in range (6):
 		AbilitiesLabelButton = AbilitiesWindow.GetControl (30 + i)

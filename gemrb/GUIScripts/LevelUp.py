@@ -378,7 +378,7 @@ def OpenLevelUpWindow():
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
-	for c in range(len(Classes)):
+	for c in range(NumClasses):
 		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
 			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
 
@@ -457,13 +457,14 @@ def GetLevelUpNews():
 			BackstabMult = BackstabTable.GetValue (0, Level[i])
 
 		# lay on hands
-		if (CommonTables.ClassSkills.GetValue (TmpClassName, "LAYHANDS") != "*"):
+		LOHTable = CommonTables.ClassSkills.GetValue (TmpClassName, "LAYHANDS")
+		if LOHTable != "*":
 			# inquisitors and undead hunters don't get lay on hands out the chute, whereas cavaliers
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
 			if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
-				LOHTable = GemRB.LoadTable ("layhands")
+				LOHTable = GemRB.LoadTable (LOHTable)
 				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
 	# saving throws

@@ -91,6 +91,10 @@ class Wall_Polygon;
 #define A_ANI_PALETTE         0x400    //has own palette set
 #define A_ANI_MIRROR          0x800    //mirrored
 #define A_ANI_COMBAT          0x1000   //draw in combat too
+// TODO: BGEE extended flags:
+// 0x2000: Use WBM resref
+// 0x4000: Underground?
+// 0x8000: Use PVRZ resref
 
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
@@ -122,6 +126,14 @@ class Wall_Polygon;
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
+	// used in bg1, set for a few copied areas in bg2 (but no files!)
+	// everyone else uses the normal ARE ambients instead
+	ieResRef MainDayAmbient1;
+	ieResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
+	ieDword MainDayAmbientVol;
+	ieResRef MainNightAmbient1;
+	ieResRef MainNightAmbient2;
+	ieDword MainNightAmbientVol;
 	ieDword reverbID;
 };
 
@@ -265,6 +277,7 @@ public:
 	Palette* palette;
 	SpriteCover** covers;
 	AreaAnimation();
+	AreaAnimation(AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
@@ -399,9 +412,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
-	unsigned int GetBlocked(unsigned int x, unsigned int y);
-	unsigned int GetBlocked(const Point &p);
+	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	unsigned int GetBlocked(const Point &p) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -412,7 +425,7 @@ public:
 	int GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags);
 	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
 	Actor* GetActor(const char* Name, int flags);
-	Actor* GetActor(int i, bool any);
+	Actor* GetActor(int i, bool any) const;
 	Scriptable* GetActorByDialog(const char* resref);
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
@@ -507,7 +520,7 @@ public:
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisibleLOS(const Point &s, const Point &d);
+	bool IsVisibleLOS(const Point &s, const Point &d) const;
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
@@ -515,7 +528,7 @@ public:
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
 	Ambient *GetAmbient(int i) { return ambients[i]; }
-	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
+	unsigned int GetAmbientCount(bool toSave=false);
 
 	//mapnotes
 	void AddMapNote(const Point &point, int color, String* text);

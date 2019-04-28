@@ -448,12 +448,13 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	return Buffer;
 }
 
-Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, unsigned int flags, unsigned int *length)
+Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, int XPos, int YPos,
+	unsigned int flags, unsigned int *length)
 {
 	ALuint Buffer;
 	unsigned int time_length;
 
-	if(ResRef == NULL) {
+	if (ResRef == NULL || !ResRef[0]) {
 		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
 			//So we want him to be quiet...
 			alSourceStop( speech.Source );
@@ -480,7 +481,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	};
 
 	ieDword volume = 100;
-	ALint loop = (flags & GEM_SND_LOOPING ? 1 : 0);
+	ALint loop = (flags & GEM_SND_LOOPING) ? 1 : 0;
 
 	AudioStream* stream = NULL;
 
@@ -498,7 +499,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 			}
 		}
 
-		core->GetDictionary()->Lookup( "Volume Voices", volume );
+		core->GetDictionary()->Lookup("Volume Voices", volume);
 
 		loop = 0; // Speech ignores GEM_SND_LOOPING
 	} else {
@@ -511,7 +512,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 			}
 		}
 
-		core->GetDictionary()->Lookup( "Volume SFX", volume );
+		core->GetDictionary()->Lookup("Volume SFX", volume);
 
 		if (stream == NULL) {
 			// Failed to assign new sound.
@@ -534,7 +535,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 	alSourcefv( Source, AL_VELOCITY, SourceVel );
 	alSourcei( Source, AL_LOOPING, loop);
 	alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	alSourcef( Source, AL_GAIN, 0.01f * volume );
+	alSourcef( Source, AL_GAIN, 0.01f * (volume / 100.0f) * GetVolume(channel) );
 	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 	alSourcefv( Source, AL_POSITION, SourcePos );
 	checkALError("Unable to set audio parameters", WARNING);
@@ -929,7 +930,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			switch (state) {
 				default:
 					Log(ERROR, "OpenAL", "Unhandled Music state '%d'.", state);
-				// fall through
+				// intentional fallthrough
 				case AL_PAUSED:
 					driver->MusicPlaying = false;
 					return -1;

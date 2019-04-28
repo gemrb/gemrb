@@ -884,7 +884,8 @@ void Map::UpdateScripts()
 		if (wasActive) {
 			//Play the PST specific enter sound
 			if (wasActive&_TRAP_USEPOINT) {
-				core->GetAudioDrv()->Play(ip->EnterWav, ip->TrapLaunch.x, ip->TrapLaunch.y);
+				core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
+					ip->TrapLaunch.x, ip->TrapLaunch.y);
 			}
 			ip->Update();
 		}
@@ -906,7 +907,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
-	// Impbile, dead, or actors in another map cant walk here
+	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return true;
@@ -1334,16 +1335,31 @@ void Map::DrawSearchMap(const Region &vp)
 			}
 		}
 	}
+
+	// draw also pathfinding waypoints
+	Actor *act = core->GetFirstSelectedActor();
+	PathNode *path = act->GetPath();
+	if (!act || !path) return;
+	PathNode *step = path->Next;
+	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
+	int i = 0;
+	block.w = 8;
+	block.h = 6;
+	while (step) {
+		block.x = (step->x+4)*16 - vp.x;
+		block.y = (step->y+1)*12 - vp.y - 6;
+		print("Waypoint %d at roughly (%d, %d)", i, block.x, block.y);
+		vid->DrawRect(block, waypoint);
+		step = step->Next;
+		i++;
+	}
 }
 
 //adding animation in order, based on its height parameter
 void Map::AddAnimation(AreaAnimation* panim)
 {
 	//copy external memory to core memory for msvc's sake
-	AreaAnimation *anim = new AreaAnimation();
-	memcpy(anim, panim, sizeof(AreaAnimation) );
-
-	anim->InitAnimation();
+	AreaAnimation *anim = new AreaAnimation(panim);
 
 	aniIterator iter;
 
@@ -1813,7 +1829,7 @@ void Map::PurgeArea(bool items)
 	}
 }
 
-Actor* Map::GetActor(int index, bool any)
+Actor* Map::GetActor(int index, bool any) const
 {
 	if (any) {
 		return actors[index];
@@ -1987,7 +2003,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
-unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
+unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 {
 	if (y>=Height || x>=Width) {
 		return 0;
@@ -2002,7 +2018,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 	return ret;
 }
 
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
+bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2028,7 +2044,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	return false;
 }
 
-unsigned int Map::GetBlocked(const Point &c)
+unsigned int Map::GetBlocked(const Point &c) const
 {
 	return GetBlocked(c.x/16, c.y/12);
 }
@@ -3020,7 +3036,7 @@ bool Map::IsVisible(const Point &pos, int explored)
 }
 
 //point a is visible from point b (searchmap)
-bool Map::IsVisibleLOS(const Point &s, const Point &d)
+bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 {
 	int sX=s.x/16;
 	int sY=s.y/12;
@@ -3108,6 +3124,18 @@ void Map::SetupAmbients()
 	ambim->reset();
 	ambim->setAmbients( ambients );
 }
+
+unsigned int Map::GetAmbientCount(bool toSave)
+{
+	if (!toSave) return (unsigned int) ambients.size();
+
+	unsigned int ambiCount = 0;
+	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
+		if (!((*it)->flags & IE_AMBI_NOSAVE)) ambiCount++;
+	}
+	return ambiCount;
+}
+
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
 void Map::AddMapNote(const Point &point, int color, String* text)
@@ -3860,6 +3888,35 @@ AreaAnimation::AreaAnimation()
 	PaletteRef[0] = 0;
 }
 
+AreaAnimation::AreaAnimation(AreaAnimation *src)
+{
+	animcount = src->animcount;
+	sequence = src->sequence;
+	animation = NULL;
+	Flags = src->Flags;
+	Pos.x = src->Pos.x;
+	Pos.y = src->Pos.y;
+	appearance = src->appearance;
+	frame = src->frame;
+	transparency = src->transparency;
+	height = src->height;
+	startFrameRange = src->startFrameRange;
+	skipcycle = src->skipcycle;
+	startchance = src->startchance;
+	unknown48 = 0;
+
+	memcpy(PaletteRef, src->PaletteRef, sizeof(PaletteRef));
+	memcpy(Name, src->Name, sizeof(ieVariable));
+	memcpy(BAM, src->BAM, sizeof(ieResRef));
+
+	palette = src->palette ? new Palette(src->palette->col, src->palette->alpha) : NULL;
+	// covers will get built once we try to draw it
+	covers = NULL;
+
+	// handles the rest: animation, resets animcount
+	InitAnimation();
+}
+
 AreaAnimation::~AreaAnimation()
 {
 	for(int i=0;i<animcount;i++) {
@@ -3911,9 +3968,7 @@ void AreaAnimation::InitAnimation()
 
 	//freeing up the previous animation
 	for(int i=0;i<animcount;i++) {
-		if (animation[i]) {
-			delete (animation[i]);
-		}
+		delete animation[i];
 	}
 	free(animation);
 

@@ -1,8 +1,8 @@
 2DA V1.0
 *
-        	SPELL      ACTION       STR_ON     STR_OFF     STR_FAIL    AOESPELL
-NONE    	*          *            0          0           0           0
-BARDSONG	SPIN151    PlayBardSong 25138      25141       -1          2
-DETECTTRAPS	FINDTRAP   FindTraps    25085      25090       -1          0
-STEALTH    	SNEAK      Hide         19944      4188        17120       0
-TURNUNDEAD	TURN       Turn         25135      25136       -1          1
+             SPELL      ACTION       STR_ON     STR_OFF     STR_FAIL    AOESPELL  REPEAT_MSG
+NONE         *          *            0          0           0           0         0
+BARDSONG     SPIN151    PlayBardSong 25138      25141       -1          2         1
+DETECTTRAPS  FINDTRAP   FindTraps    25085      25090       -1          0         0
+STEALTH      SNEAK      Hide         19944      4188        17120       0         0
+TURNUNDEAD   TURN       Turn         25135      25136       -1          1         1

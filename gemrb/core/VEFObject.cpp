@@ -155,15 +155,15 @@ bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, Map
 					if ( (*iter).ptr ) {
 						break;
 					}
-					// fallback to VEF
-					// fall through
+					// fall back to VEF
+					// intentional fallthrough
 				case VEF_VEF: //vanilla engine implementation of composite video effects
 					(*iter).ptr = CreateObject( (*iter).resourceName, IE_VEF_CLASS_ID);
 					if ( (*iter).ptr ) {
 						break;
 					}
 					// fall back to BAM or VVC
-					// fall-through
+					// intentional fallthrough
 				case VEF_BAM: //just a BAM
 				case VEF_VVC: //videocell (can contain a BAM)
 					(*iter).ptr = CreateCell( (*iter).resourceName, (*iter).length, (*iter).start);

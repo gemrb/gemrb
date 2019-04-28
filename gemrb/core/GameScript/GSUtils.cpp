@@ -433,6 +433,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	char Sound[_MAX_PATH] = "";
 	ieResRef soundRef = {};
+	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
@@ -465,6 +466,10 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (charactersubtitles) {
 			flags |= DS_CONSOLE;
 		}
+
+		if (actor->InParty > 0) {
+			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+		}
 	}
 
 	if ((Strref != -1) && !soundRef[0]) {
@@ -493,7 +498,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play( Sound,0,0,speech,&len );
+		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
@@ -649,7 +654,14 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
-		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		if (gotitem) {
+			if (target->Type == ST_ACTOR) {
+				if (((Actor *) target)->InParty) {
+					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
+				}
+			}
+			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		}
 		return MIC_FULL;
 	}
 	if (gotitem&&!lostitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
@@ -1360,7 +1372,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			//play attack sound for party members
 			if (actor->InParty) {
 				//pick from all 5 possible verbal constants
-				actor->VerbalConstant(VB_ATTACK, 5);
+				actor->PlayWarCry(5);
 			}
 			//display attack message
 			if (target->GetGlobalID() != Sender->LastTarget) {
@@ -2457,7 +2469,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 	if (dist>0xff000000) {
 		return dist;
 	}
-	return dist*15;
+	return dist*VOODOO_ITM_RANGE_F;
 }
 
 //read the wish 2da
@@ -2468,7 +2480,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	int *selects;
 	int i,j;
 
-	//FIXME: find out what the original really used the picks parameter for
+	// in the original, picks was at first the number of wish choices to set up,
+	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
 	AutoTable tm("wish");
@@ -2479,6 +2492,13 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 	selects = (int *) malloc(picks*sizeof(int));
 	count = tm->GetRowCount();
+	// handle the unused SetupWishObject, which passes WIS instead of a column
+	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
+	int cols = tm->GetColumnCount();
+	if (column > cols) {
+		column = (column-1)/6;
+		if (column == 4) column = RAND(0, 3);
+	}
 
 	for(i=0;i<99;i++) {
 		snprintf(varname,32, "wishpower%02d", i);

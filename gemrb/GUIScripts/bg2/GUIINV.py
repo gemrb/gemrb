@@ -152,23 +152,31 @@ def RefreshInventoryWindow (Window):
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+	# disable coloring and equipment for non-humanoid dolls (shapes/morphs, mod additions)
+	# ... which doesn't include ogres and flinds, who are also clown-colored
+	# if one more exception needs to be added, rather externalise this to a new pdolls.2da flags column
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	if (anim_id < 0x5000 or anim_id >= 0x7000 or anim_id == 0x6404) and (anim_id != 0x8000 and anim_id != 0x9000):
+		Color1 = -1
 	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+	# disable equipment for flinds and ogres and Sarevok (Recovery Mod)
+	if anim_id == 0x8000 or anim_id == 0x9000 or anim_id == 0x6404:
+		Color1 = -1
 
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
 	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	# Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
-	if slot_item:
+	if slot_item and Color1 != -1:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 
 	# Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
-	if slot_item:
+	if slot_item and Color1 != -1:
 		itemname = slot_item["ItemResRef"]
 		item = GemRB.GetItem (itemname)
 		if (item['AnimationType'] != ''):
@@ -181,7 +189,7 @@ def RefreshInventoryWindow (Window):
 
 	# Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
-	if slot_item:
+	if slot_item and Color1 != -1:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)

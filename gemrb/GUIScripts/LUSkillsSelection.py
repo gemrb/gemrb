@@ -154,6 +154,11 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	else:
 		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
 
+	# also treat most mod-introduced kits as kitless for skills.2da
+	# lookups - unless they add the required columns
+	if SkillsTable.GetValue ("OPEN_LOCKS", SkillsKitName) == -1:
+		SkillsKitName = ClassName
+
 	#figure out the correct skills table
 	SkillIndex = -1
 	for i in range (NumClasses):
@@ -373,7 +378,6 @@ def SkillScrollBarPress():
 	return
 
 # saves all the skills
-# TODO: change the layout of the iwd/how skills table to match the rest
 def SkillsSave (pc):
 	global SkillsTable
 	if not SkillsTable:

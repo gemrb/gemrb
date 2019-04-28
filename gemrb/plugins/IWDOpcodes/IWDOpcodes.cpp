@@ -2308,7 +2308,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
-	core->GetAudioDrv()->Play(fx->Resource2, target->Pos.x, target->Pos.y);
+	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos.x, target->Pos.y);
 
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);

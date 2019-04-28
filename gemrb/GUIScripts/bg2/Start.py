@@ -42,7 +42,7 @@ def OnLoad():
 
 	StartWindow = GemRB.LoadWindow(7, "START")
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,0,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	Label.SetText(GemRB.GEMRB_VERSION)
+	Label.SetText(GemRB.Version)
 
 	TextArea = StartWindow.GetControl(0)
 	TextArea.SetText(73245)

@@ -91,7 +91,7 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 			msg += L"[/color]\n";
 		}
 		delete str;
-		displaymsg->DisplayMarkupString(msg);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMarkupString(msg);
 	}
 }
 

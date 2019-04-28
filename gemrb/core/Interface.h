@@ -126,15 +126,6 @@ struct DamageInfoStruct {
 	// maybe also add the ac bonus and/or the DL_ constants
 };
 
-struct ModalStatesStruct {
-	ieResRef spell;
-	char action[16];
-	unsigned int entering_str;
-	unsigned int leaving_str;
-	unsigned int failed_str;
-	unsigned int aoe_spell;
-};
-
 struct TimeStruct {
 	unsigned int round_sec;
 	unsigned int turn_sec;
@@ -309,6 +300,16 @@ enum RESOURCE_DIRECTORY {
 	DIRECTORY_CHR_SCRIPTS
 };
 
+enum FeedbackType {
+	FT_TOHIT = 1,
+	FT_COMBAT = 2,
+	FT_ACTIONS = 4, // handled by Actor::CommandActor
+	FT_STATES = 8,
+	FT_SELECTION = 16, // handled by Actor::PlaySelectionSound
+	FT_MISC = 32,
+	FT_CASTING = 64
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -408,7 +409,6 @@ public:
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	std::vector<ModalStatesStruct> ModalStates;
 	TimeStruct Time;
 	std::vector<SurgeSpell> SurgeSpells;
 public:
@@ -460,6 +460,9 @@ public:
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
+	void SetFeedbackLevel(int level);
+	/** returns true if the passed feedback type is enabled */
+	bool HasFeedback(int type) const;
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
@@ -590,7 +593,7 @@ public:
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
 	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(int idx);
+	Holder<SoundHandle> PlaySound(int idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
@@ -685,7 +688,7 @@ private:
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	bool ReadModalStates();
+	bool ReadSoundChannelsTable();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** handles the QuitFlag bits (main loop events) */
@@ -738,6 +741,7 @@ public:
 	bool KeepCache;
 	bool MultipleQuickSaves;
 	bool UseCorruptedHack;
+	int FeedbackLevel;
 
 	Variables *plugin_flags;
 	/** The Main program loop */

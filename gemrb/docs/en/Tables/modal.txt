@@ -8,6 +8,7 @@ Columns -
   STR_OFF - the string to display when disabling this state
   STR_FAILED - the string to display when enabling of this state fails
   AOESPELL - does the SPELL have an area of effect? (use 2 for area targettng)
+  REPEAT_MSG - should STR_ON be displayed each round?
 
 Rows - the modal actions have a somewhat determined order.
 The first row should be left blank.

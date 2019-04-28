@@ -87,6 +87,7 @@ public:
 	int GetAbilityBonus() const { return abilityBonus; };
 	int GetProficiencyBonus() const { return proficiencyBonus; };
 	int GetGenericBonus() const { return genericBonus; };
+	int GetFxBonus() const { return fxBonus; };
 
 	// returns the value of the cascade for the specified attack
 	// eg. one of +11/+6/+1 for 1,2,3
@@ -102,6 +103,7 @@ public:
 	void SetAbilityBonus(int bonus, int mod=1);
 	void SetWeaponBonus(int bonus, int mod=1);
 	void SetGenericBonus(int bonus, int mod=1);
+	void SetFxBonus(int bonus, int mod=1);
 
 	void SetBABDecrement(int decrement);
 	void HandleFxBonus(int mod, bool permanent);
@@ -120,6 +122,7 @@ private:
 	int abilityBonus;
 	int proficiencyBonus;
 	int genericBonus; // "other"
+	int fxBonus; // split off from the generic bonus for hacky reasons
 
 	void SetBonus(int &current, int bonus, int mod);
 	void RefreshTotal();

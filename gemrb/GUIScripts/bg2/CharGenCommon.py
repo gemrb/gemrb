@@ -166,13 +166,12 @@ def DisplayOverview(step):
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassName = GUICommon.GetClassRowName (MyChar)
-			hasextra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
 				v = AbilityTable.GetValue (i, 2, GTV_REF)
 				StatID = AbilityTable.GetValue (i, 3)
 				stat = GemRB.GetPlayerStat (MyChar, StatID)
-				if (i == 0) and hasextra and (stat==18):
+				if (i == 0) and (strextra > 0) and (stat==18):
 					TextAreaControl.Append (v + ": " + str(stat) + "/" + str(strextra) + "\n")
 				else:
 					TextAreaControl.Append (v + ": " + str(stat) + "\n")

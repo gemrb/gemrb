@@ -35,6 +35,7 @@
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "ScriptedAnimation.h"
+#include "ScriptEngine.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
 #include "VEFObject.h"
@@ -821,7 +822,7 @@ static EffectRef fx_movement_modifier_ref = { "MovementRateModifier2", -1 }; //0
 static EffectRef fx_familiar_constitution_loss_ref = { "FamiliarBond", -1 }; //0xc3
 static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 }; //0xc4
 static EffectRef fx_immunity_effect_ref = { "Protection:Spell", -1 }; //0xce
-static EffectRef fx_imprisonment_ref = { "Imprisonment", -1 }; //0xd3
+static EffectRef fx_imprisonment_ref = { "State:Imprisonment", -1 }; //0xd3
 static EffectRef fx_maze_ref = { "Maze", -1 }; //0xd5
 static EffectRef fx_leveldrain_ref = { "LevelDrainModifier", -1 }; //0xd8
 static EffectRef fx_contingency_ref = { "CastSpellOnCondition", -1 }; //0xe8
@@ -861,7 +862,7 @@ static void RegisterCoreOpcodes()
 }
 
 
-#define STONE_GRADIENT 14
+#define STONE_GRADIENT 14 // for stoneskin, not petrification
 #define ICE_GRADIENT 71
 
 static inline void SetGradient(Actor *target,const ieDword *gradients)
@@ -937,7 +938,8 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
 {
-	core->GetAudioDrv()->Play(fx->Resource[0]?fx->Resource:defsound, target->Pos.x, target->Pos.y);
+	core->GetAudioDrv()->Play(fx->Resource[0] ? fx->Resource : defsound,
+			SFX_CHAN_ACTIONS, target->Pos.x, target->Pos.y);
 }
 
 //resurrect code used in many places
@@ -1781,7 +1783,11 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	//FIXME: in bg2 this is hacked to set param1=10, param2=1, we might need some flag for this
+	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+		BASE_SET(IE_MORALE, 10);
+		return FX_NOT_APPLIED;
+	}
+
 	STAT_MOD( IE_MORALE );
 	return FX_APPLIED;
 }
@@ -2366,7 +2372,29 @@ int fx_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	int percentage;
+	switch (fx->Parameter2) {
+	case MOD_ADDITIVE:
+	default:
+		target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		break;
+	case MOD_ABSOLUTE:
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			target->ToHit.SetBase(fx->Parameter1);
+		} else {
+			//FIXME: two such effects probably should not stack, but they do for now
+			target->ToHit.SetFxBonus(fx->Parameter1 - target->ToHit.GetBase(), MOD_ADDITIVE);
+		}
+		break;
+	case MOD_PERCENT:
+		percentage = target->ToHit.GetBase() * fx->Parameter1 / 100;
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			target->ToHit.SetBase(percentage);
+		} else {
+			target->ToHit.SetFxBonus(percentage - target->ToHit.GetBase(), MOD_ADDITIVE);
+		}
+		break;
+	}
 	return FX_PERMANENT;
 }
 
@@ -2437,26 +2465,22 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieResRef Removed;
-	ieDword level;
 
 	switch (fx->Parameter2) {
 	case 0:
 	default:
-		level = 0xffffffff;
+		// dispel everything
+		target->fxqueue.RemoveLevelEffects(Removed, 0xffffffff, RL_DISPELLABLE, 0);
 		break;
 	case 1:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Power-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->CasterLevel);
 		break;
 	case 2:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Parameter1-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->Parameter1);
 		break;
 	}
-	//if signed would it be negative?
-	target->fxqueue.RemoveLevelEffects(Removed, level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -2900,7 +2924,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_SECONDS:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2908,7 +2932,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_POINTS:
 		damage = fx->Parameter1;
 		// per second
-		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2948,7 +2972,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
 			return FX_APPLIED;
 		}
 		if (fx->Parameter1<1) {
@@ -3435,7 +3459,11 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//equip the weapon
-	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0);
+	// but don't add new effects if there are none, which is an ugly workaround
+	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
+	Item *itm = gamedata->GetItem(fx->Resource, true);
+	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
+	gamedata->FreeItem(itm, fx->Resource);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
@@ -3450,7 +3478,6 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//will destroy the first item
-print("Destroy Item: %s\n", fx->Resource);
 	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
 		target->ReinitQuickSlots();
 	}
@@ -4014,7 +4041,21 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 	// print("fx_set_petrified_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	BASE_STATE_SET( STATE_PETRIFIED );
+	if (target->InParty) core->GetGame()->LeaveParty(target);
 	target->SendDiedTrigger();
+
+	// end the game if everyone in the party gets petrified
+	Game *game = core->GetGame();
+	int partySize = game->GetPartySize(true);
+	int stoned = 0;
+	for (int j=0; j<partySize; j++) {
+		Actor *pc = game->GetPC(j, true);
+		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
+	}
+	if (stoned == partySize) {
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
+	}
+
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
 	return FX_NOT_APPLIED;
@@ -4242,7 +4283,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		//simulate sparkle casting glows
 		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
 	}
-
+	// TODO: this opcode is also affected by slow/haste
 	return FX_NOT_APPLIED;
 }
 
@@ -4473,7 +4514,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 2:
 			//automatic secret door detection
 			detecttraps = false;
-			//fall through
+			//intentional fallthrough
 		default:
 			//automatic find traps
 			skill = 256;
@@ -4885,9 +4926,9 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;
@@ -4909,6 +4950,7 @@ int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	target->SetSpellState(SS_HELD);
+	STATE_SET(STATE_HELPLESS);
 	STAT_SET( IE_HELD, 1);
 	return FX_APPLIED;
 }
@@ -5248,7 +5290,9 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		memcpy(fx->Resource, game->Familiars[alignment],sizeof(ieResRef) );
 		//ToB familiars
 		if (game->Expansion==5) {
-			strncat(fx->Resource,"25",8);
+			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
+			fx->Resource[6] = '2';
+			fx->Resource[7] = '5';
 		}
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
@@ -5548,6 +5592,7 @@ int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	target->AddPortraitIcon(PI_PRISON);
 	target->SendDiedTrigger();
 	target->Stop();
+	if (target->InParty) core->GetGame()->LeaveParty(target);
 	return FX_APPLIED;
 }
 
@@ -5576,12 +5621,17 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			int stat = target->GetSafeStat(IE_INT);
 			int size = core->GetIntelligenceBonus(3, stat);
 			int dice = core->GetIntelligenceBonus(4, stat);
-			fx->Duration = game->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
+			fx->Duration = game->GameTime + target->LuckyRoll(dice, size, 0, LR_NEGATIVE) * core->Time.round_size;
+
+			// fix the effect from being FX_DURATION_DELAY_PERMANENT to a non-oneshot
+			// needed for the bg2 version of the maze spell (spwi813)
+			fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		}
 	}
 
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_MAZE);
+	target->Stop();
 	return FX_APPLIED;
 }
 
@@ -6527,10 +6577,11 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//success
 	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, DMC_WHITE, target);
+	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(target->Pos, fx->Resource, 0, 1, false);
+	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, 0, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -6852,24 +6903,24 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 2://param1 times every second
-			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter1;i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
 		case 3: //once every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
 				for (i=0;i<fx->Parameter3;i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
@@ -7280,6 +7331,7 @@ int fx_can_use_any_item_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 }
 
 // 0x12f AlwaysBackstab
+// the two extra TobEx bits are handled in the user
 int fx_always_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_always_backstab_modifier(%2d): Value: %d", fx->Opcode, fx->Parameter2);

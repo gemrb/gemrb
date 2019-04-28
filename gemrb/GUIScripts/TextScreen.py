@@ -20,6 +20,7 @@
 
 import GemRB
 from ie_restype import RES_2DA
+from ie_sounds import CHAN_GUI
 from GUIDefines import *
 import GameCheck
 import GUICommonWindows
@@ -149,7 +150,7 @@ def EndTextScreen ():
 
 	if TextScreen:
 		TextScreen.Unload ()
-		GemRB.PlaySound(None, 0, 0, 4)
+		GemRB.PlaySound(None, CHAN_GUI, 0, 0, 4)
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
@@ -163,7 +164,7 @@ def ReplayTextScreen ():
 	global TextArea, TableName, Row
 
 	# stop any current speech, flag of 5 = GEM_SND_RELATIVE|GEM_SND_SPEECH
-	GemRB.PlaySound(None, 0, 0, 5)
+	GemRB.PlaySound(None, CHAN_GUI, 0, 0, 5)
 
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)

@@ -367,3 +367,9 @@ UAW_QITEMS = 13
 # item extended header location field
 ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection
 ITEM_LOC_EQUIPMENT = 3 # show on quick item ability selection
+
+# item function types
+ITM_F_DRINK = 1
+ITM_F_READ = 2
+ITM_F_CONTAINER = 4
+ITM_F_ABILITIES = 8

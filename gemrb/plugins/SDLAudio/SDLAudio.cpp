@@ -127,7 +127,8 @@ void SDLAudio::channel_done_callback(int channel) {
 	SDL_mutexV(g_sdlaudio->OurMutex);
 }
 
-Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags, unsigned int *length)
+Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
+	int XPos, int YPos, unsigned int flags, unsigned int *length)
 {
 	// TODO: some panning
 	(void)XPos;
@@ -181,22 +182,23 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 		print("error loading chunk");
 		return Holder<SoundHandle>();
 	}
+	Mix_VolumeChunk(chunk, MIX_MAX_VOLUME * GetVolume(channel) / 100);
 
 	// play
-	int channel = -1;
+	int chan = -1;
 	if (flags & GEM_SND_SPEECH) {
-		channel = 0;
+		chan = 0;
 	}
 	SDL_mutexP(OurMutex);
-	channel = Mix_PlayChannel(channel, chunk, 0);
-	if (channel < 0) {
+	chan = Mix_PlayChannel(chan, chunk, 0);
+	if (chan < 0) {
 		SDL_mutexV(OurMutex);
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
 
-	assert((unsigned int)channel < channel_data.size());
-	channel_data[channel] = cvt.buf;
+	assert((unsigned int)chan < channel_data.size());
+	channel_data[chan] = cvt.buf;
 	SDL_mutexV(OurMutex);
 
 	// TODO

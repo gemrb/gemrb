@@ -718,7 +718,7 @@ def OpenInformationWindow ():
 		Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	Label = Window.GetControl (0x10000003)
-	GUICommon.SetCurrentDateTokens (stat)
+	GUICommon.SetCurrentDateTokens (stat, True)
 	Label.SetText (41277)
 
 	Label = Window.GetControl (0x10000004)
@@ -817,9 +817,9 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, SavThrows[2])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, SavThrows[3])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SavThrows[4])
-	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
+	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
-	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
+	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPGained+oldhp)
 	#increase weapon proficiency if needed
 	if WeapProfType!=-1:

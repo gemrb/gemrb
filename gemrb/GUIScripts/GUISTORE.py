@@ -43,9 +43,14 @@ CureTable = None
 
 ITEM_PC    = 0
 ITEM_STORE = 1
+ITEM_BAG   = 2
+
+STORE_MAIN = 0
+STORE_BAG  = 1
 
 Inventory = None
 Store = None
+Bag = None
 inventory_slots = ()
 total_price = 0
 total_income = 0
@@ -96,6 +101,12 @@ elif GameCheck.IsPST():
 else:
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
 Buttons = [-1] * StoreButtonCount
+
+	global Bag
+	if Bag:
+		UnselectBag ()
+		GemRB.CloseRighthandStore ()
+		Bag = None
 
 def CloseStoreWindow ():
 	import GUIINV
@@ -180,7 +191,6 @@ def OpenStoreWindow ():
 		Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
 	#based on shop type, these buttons will change
-	store_type = Store['StoreType']
 	store_buttons = Store['StoreButtons']
 	for i in range (StoreButtonCount):
 		Buttons[i] = Button = Window.GetControl (i+1)
@@ -315,6 +325,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
+			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenBag)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -350,11 +361,12 @@ def InitStoreShoppingWindow (Window):
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SellPressed)
 
-	# inactive button
+	# inactive button (close container)
 	if GameCheck.IsBG2():
 		Button = Window.GetControl (50)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBag)
 
 	#backpack
 	BackpackButton = Window.GetControl (44)
@@ -915,9 +927,12 @@ def UpdateStoreCommon (Window, title, name, gold):
 			Label.SetText (GemRB.GetString (Store['StoreName']).upper ())
 
 	if name:
-		pc = GemRB.GameGetSelectedPCSingle ()
 		Label = GemRB.GetView (name)
-		Label.SetText (GemRB.GetPlayerName (pc, 0) )
+		if Bag:
+			Label.SetText (Bag['StoreName'])
+		else:
+			pc = GemRB.GameGetSelectedPCSingle ()
+			Label.SetText (GemRB.GetPlayerName (pc, 0))
 
 	Label = GemRB.GetView (gold)
 	Label.SetText (str(GemRB.GameGetPartyGold ()))
@@ -935,12 +950,48 @@ def GetPC():
 			GemRB.SetVar ("RightTopIndex", 0)
 			GemRB.SetVar ("Index", 0)
 			GemRB.SetVar ("TopIndex", 0)
+			UnselectBag ()
+			GemRB.CloseRighthandStore ()
 			UnselectNoRedraw ()
 	else:
 		PreviousPC = GemRB.GameGetSelectedPCSingle ()
 		pc = PreviousPC
 
 	return pc
+
+def UpdateStoreShoppingWindow ():
+	global Store, Bag, inventory_slots
+
+	Window = StoreShoppingWindow
+	#reget store in case of a change
+	Store = GemRB.GetStore ()
+	pc = GetPC()
+	Bag = GemRB.GetStore (STORE_BAG)
+
+	LeftCount = Store['StoreItemCount'] - ItemButtonCount
+	if LeftCount<0:
+		LeftCount=0
+	ScrollBar = Window.GetControl (11)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	if LeftTopIndex>LeftCount:
+		GemRB.SetVar ("LeftTopIndex", LeftCount)
+
+	if Bag:
+		RightCount = Bag['StoreItemCount'] - ItemButtonCount
+	else:
+		inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
+		RightCount = len(inventory_slots) - ItemButtonCount
+	if RightCount<0:
+		RightCount=0
+	ScrollBar = Window.GetControl (12)
+	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
+	RightTopIndex = GemRB.GetVar ("RightTopIndex")
+	if RightTopIndex>RightCount:
+		GemRB.SetVar ("RightTopIndex", RightCount)
+
+	RedrawStoreShoppingWindow ()
+	return
 
 # Unselects all the selected buttons, so they are not preselected in other windows
 def UnselectNoRedraw ():
@@ -999,7 +1050,7 @@ def BuyPressed ():
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
-				Price = 1
+				Price = Slot['Purchased']
 
 			if GemRB.ChangeStoreItem (pc, i-1, SHOP_BUY):
 				GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-Price)
@@ -1010,8 +1061,12 @@ def BuyPressed ():
 def SelectSell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightIndex = GemRB.GetVar ("RightIndex")
-	GemRB.ChangeStoreItem (pc, inventory_slots[RightIndex], SHOP_SELL|SHOP_SELECT)
-	RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
+	if not Bag:
+		RightIndex = inventory_slots[RightIndex]
+	#bags may be clickable despite not being sellable
+	Flags = GemRB.IsValidStoreItem (pc, RightIndex, ITEM_BAG if Bag else ITEM_PC)
+	if Flags & SHOP_SELL:
+		GemRB.ChangeStoreItem (pc, RightIndex, SHOP_SELL|SHOP_SELECT)
 	return
 
 def ToBagPressed ():
@@ -1028,19 +1083,74 @@ def ToBagPressed ():
 
 def SellPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	RightCount = len (inventory_slots)
-	#no need to go reverse
-	for Slot in range (RightCount):
-		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
-		if Flags:
-			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
+	if Bag:
+		RightCount = Bag['StoreItemCount']
+		#going backwards because removed items shift the slots
+		for Slot in range (RightCount-1, -1, -1):
+			Flags = GemRB.IsValidStoreItem (pc, Slot, ITEM_BAG)
+			if Flags & SHOP_SELECT:
+				#NOTE: what if the transaction fails?
+				GemRB.ChangeStoreItem (pc, Slot, SHOP_SELL)
+	else:
+		RightCount = len (inventory_slots)
+		#no need to go reverse
+		for Slot in range (RightCount):
+			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
+			if Flags:
+				GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
 
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()+SellSum)
 	GemRB.PlaySound(DEF_SOLD)
 	UpdateStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
 
-def RedrawStoreShoppingWindow (Window):
+def OpenBag ():
+	if Bag:
+		#nested containers are not openable in bg2,
+		#but double-click has another function here
+		OpenItemAmountWindow (STORE_BAG)
+		return
+	if Inventory:
+		return
+	pc = GemRB.GameGetSelectedPCSingle ()
+	RightIndex = GemRB.GetVar ("RightIndex")
+	Slot = GemRB.GetSlotItem (pc, inventory_slots[RightIndex])
+	Item = GemRB.GetItem (Slot['ItemResRef'])
+	if Item['Function'] & ITM_F_CONTAINER:
+		GemRB.SetVar ("RightIndex", 0)
+		GemRB.SetVar ("RightTopIndex", 0)
+		GemRB.SetVar ("Index", 0)
+		GemRB.SetVar ("TopIndex", 0)
+		UnselectNoRedraw ()
+		GemRB.LoadRighthandStore (Slot['ItemResRef'])
+		UpdateStoreShoppingWindow ()
+	return
+
+def CloseBag ():
+	if not Bag:
+		return
+	GemRB.SetVar ("RightIndex", 0)
+	GemRB.SetVar ("RightTopIndex", 0)
+	GemRB.SetVar ("Index", 0)
+	GemRB.SetVar ("TopIndex", 0)
+	UnselectBag ()
+	GemRB.CloseRighthandStore ()
+	UnselectNoRedraw ()
+	UpdateStoreShoppingWindow ()
+	return
+
+def UnselectBag ():
+	if not Bag:
+		return
+	pc = GemRB.GameGetSelectedPCSingle ()
+	RightCount = Bag['StoreItemCount']
+	for Slot in range (RightCount):
+		Flags = GemRB.IsValidStoreItem (pc, Slot, ITEM_BAG)
+		if Flags & SHOP_SELECT:
+			GemRB.ChangeStoreItem (pc, Slot, SHOP_SELL|SHOP_SELECT)
+	return
+
+def RedrawStoreShoppingWindow ():
 	global BuySum, SellSum
 
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
@@ -1064,20 +1174,31 @@ def RedrawStoreShoppingWindow (Window):
 			else:
 				Price = GetRealPrice (pc, "sell", Item, Slot) * Slot['Purchased']
 			if Price <= 0:
-				Price = 1
+				Price = Slot['Purchased']
 			BuySum = BuySum + Price
 
-	RightCount = len(inventory_slots)
+	if Bag:
+		RightCount = Bag['StoreItemCount']
+	else:
+		RightCount = len(inventory_slots)
 	SellSum = 0
 	for i in range (RightCount):
-		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC)
+		if Bag:
+			Flags = GemRB.IsValidStoreItem (pc, i, ITEM_BAG)
+		else:
+			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC)
 		if Flags & SHOP_SELECT:
-			Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
+			if Bag:
+				Slot = GemRB.GetStoreItem (i, STORE_BAG)
+			else:
+				Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			if Inventory:
 				Price = 1
 			else:
 				Price = GetRealPrice (pc, "buy", Item, Slot)
+				if Bag:
+					Price *= Slot['Purchased']
 			if Flags & SHOP_ID:
 				Price = 1
 			SellSum = SellSum + Price
@@ -1113,6 +1234,17 @@ def RedrawStoreShoppingWindow (Window):
 	else:
 		RightButton.SetState (IE_GUI_BUTTON_DISABLED)
 
+	if GameCheck.IsBG2():
+		CloseBagButton = Window.GetControl (50)
+		if Bag:
+			CloseBagButton.SetText (37452)
+			CloseBagButton.SetState (IE_GUI_BUTTON_ENABLED)
+			CloseBagButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		else:
+			CloseBagButton.SetText (None)
+			CloseBagButton.SetState (IE_GUI_BUTTON_LOCKED)
+			CloseBagButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+
 	for i in range (ItemButtonCount):
 		if i+LeftTopIndex<LeftCount:
 			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
@@ -1124,13 +1256,16 @@ def RedrawStoreShoppingWindow (Window):
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
 		if i+RightTopIndex<RightCount:
-			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
+			if Bag:
+				Slot = GemRB.GetStoreItem (i+RightTopIndex, STORE_BAG)
+			else:
+				Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
 			Slot = None
 		Button = Window.GetControl (i+13)
 		Label = Window.GetControl (0x1000001e+i)
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx)
+		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
 
 	if GameCheck.IsPST():
 		GUICommon.SetEncumbranceLabels (Window, 25, None, pc, True)
@@ -1138,7 +1273,7 @@ def RedrawStoreShoppingWindow (Window):
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
-def OpenItemAmountWindow ():
+def OpenItemAmountWindow (store = STORE_MAIN):
 	global ItemAmountWindow
 	global MaxAmount
 
@@ -1155,9 +1290,11 @@ def OpenItemAmountWindow ():
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
 	Window.SetFlags(WF_BORDERLESS, OP_OR)
-
-	Index = GemRB.GetVar ("LeftIndex")
-	Slot = GemRB.GetStoreItem (Index)
+	if store == STORE_MAIN:
+		Index = GemRB.GetVar ("LeftIndex")
+	else:
+		Index = GemRB.GetVar ("RightIndex")
+	Slot = GemRB.GetStoreItem (Index, store)
 	Amount = Slot['Purchased']
 	if Amount == 0:
 		Amount = 1
@@ -1189,7 +1326,7 @@ def OpenItemAmountWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmItemAmount)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmItemAmount(store))
 	Button.MakeDefault ()
 
 	# Cancel
@@ -1223,7 +1360,7 @@ def IncreaseItemAmount ():
 	Text.SetText (str (Number))
 	return
 
-def ConfirmItemAmount ():
+def ConfirmItemAmount (store = STORE_MAIN):
 	global ItemAmountWindow
 	global MaxAmount
 
@@ -1234,8 +1371,11 @@ def ConfirmItemAmount ():
 		Number = MaxAmount
 	elif Number < 0:
 		Number = 0
-	Index = GemRB.GetVar ("LeftIndex")
-	GemRB.SetPurchasedAmount (Index, Number)
+	if store == STORE_MAIN:
+		Index = GemRB.GetVar ("LeftIndex")
+	else:
+		Index = GemRB.GetVar ("RightIndex")
+	GemRB.SetPurchasedAmount (Index, Number, store)
 
 	ItemAmountWindow.Unload ()
 	ItemAmountWindow = None
@@ -1375,12 +1515,16 @@ def InfoLeftWindow ():
 
 def InfoRightWindow ():
 	Index = GemRB.GetVar ("RightIndex")
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Count = len(inventory_slots)
-	if Index >= Count:
-		return
-	Slot = GemRB.GetSlotItem (pc, inventory_slots[Index])
-	Item = GemRB.GetItem (Slot['ItemResRef'])
+	if Bag:
+		Slot = GemRB.GetStoreItem (Index, STORE_BAG)
+		Item = GemRB.GetItem (Slot['ItemResRef'])
+	else:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Count = len(inventory_slots)
+		if Index >= Count:
+			return
+		Slot = GemRB.GetSlotItem (pc, inventory_slots[Index])
+		Item = GemRB.GetItem (Slot['ItemResRef'])
 	InfoWindow (Slot, Item)
 	return
 
@@ -1557,7 +1701,10 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 					if Price <= 0:
 						Price = 1
 		else:
-			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i+RightTopIndex], type)
+			index = RightTopIndex + i
+			if not Bag:
+				index = inventory_slots[index]
+			Flags = GemRB.IsValidStoreItem (pc, index, type)
 			if Flags & SHOP_STEAL:
 				if LeftIndex == LeftTopIndex + i:
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
@@ -1576,24 +1723,29 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
 				else:
 					Button.SetState (IE_GUI_BUTTON_ENABLED)
+			elif Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
+				#containers are always clickable
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if Flags & SHOP_ID:
 			Name = GemRB.GetString (Item['ItemName'])
 			Button.EnableBorder (0, 1)
-			if not steal and type == ITEM_PC:
+			if not steal and type != ITEM_STORE:
 				Price = 1
 		else:
 			Name = GemRB.GetString (Item['ItemNameIdentified'])
 			Button.EnableBorder (0, 0)
 
 		GemRB.SetToken ("ITEMNAME", Name)
-		if Inventory:
+		if Inventory or (type == ITEM_STORE and steal):
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				LabelText = GemRB.GetString (24890)
 			elif GameCheck.IsBG2():
 				LabelText = GemRB.GetString (28337)
+			elif steal:
+				LabelText = Name
 			else:
 				LabelText = ""
 		else:
@@ -1601,10 +1753,8 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
 		if GameCheck.IsPST():
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
-		if type == ITEM_STORE:
-			if steal:
-				LabelText = Name
-			elif Slot["Amount"] != -1:
+		if (type == ITEM_STORE and not steal) or type == ITEM_BAG:
+			if Slot["Amount"] != -1:
 				LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
 		Label.SetText (LabelText)
 	return
@@ -1642,9 +1792,9 @@ def GetRealPrice (pc, mode, Item, Slot):
 			oc = count
 			# jewelry doesn't suffer from deprecation, at least in BG2
 			if Item['Type'] in [CommonTables.ItemType.GetRowIndex ("GEM"),
-                                            CommonTables.ItemType.GetRowIndex ("RING"),
-                                            CommonTables.ItemType.GetRowIndex ("AMULET")]:
-                                count = 0
+			                    CommonTables.ItemType.GetRowIndex ("RING"),
+			                    CommonTables.ItemType.GetRowIndex ("AMULET")]:
+				count = 0
 			if count > 2:
 				count = 2
 			mod -= count * Store['Depreciation']
@@ -1656,7 +1806,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 		if RepModTable:
 			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
-	return price * mod / 100
+	effprice = price * mod / 100
+	#in bg2 even 1gp items can be sold for at least 1gp
+	if effprice == 0 and Item['Price'] > 0:
+		effprice = 1
+	return effprice
 
 def IncrementDonation ():
 	Window = GemRB.GetView('WINDONAT')

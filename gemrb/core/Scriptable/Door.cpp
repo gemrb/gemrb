@@ -134,11 +134,11 @@ void Door::ToggleTiles(int State, int playsound)
 	if (State) {
 		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
-			core->GetAudioDrv()->Play( OpenSound );
+			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS);
 	} else {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
-			core->GetAudioDrv()->Play( CloseSound );
+			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
 	}
 	for (i = 0; i < tilecount; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
@@ -178,13 +178,13 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && ( LockSound[0] != '\0' ))
-			core->GetAudioDrv()->Play( LockSound );
+			core->GetAudioDrv()->Play(LockSound, SFX_CHAN_ACTIONS);
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
 		if (playsound && ( UnLockSound[0] != '\0' ))
-			core->GetAudioDrv()->Play( UnLockSound );
+			core->GetAudioDrv()->Play(UnLockSound, SFX_CHAN_ACTIONS);
 	}
 }
 
@@ -295,7 +295,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 	if (Visible()) return;
 	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
-		core->PlaySound(DS_FOUNDSECRET);
+		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
 	}
 }
@@ -330,7 +330,7 @@ void Highlightable::SetTrapDetected(int x)
 		return;
 	TrapDetected = x;
 	if(TrapDetected) {
-		core->PlaySound(DS_FOUNDSECRET);
+		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
 		core->Autopause(AP_TRAP, this);
 	}
 }
@@ -371,7 +371,7 @@ void Highlightable::TryDisarm(Actor *actor)
 		Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
-		core->PlaySound(DS_DISARMED);
+		core->PlaySound(DS_DISARMED, SFX_CHAN_HITS);
 	} else {
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
@@ -408,14 +408,14 @@ void Door::TryPickLock(Actor *actor)
 	if (stat < (signed)LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL);
+		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS);
 		return;
 	}
 	SetDoorLocked( false, true);
 	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
-	core->PlaySound(DS_PICKLOCK);
+	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS);
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();

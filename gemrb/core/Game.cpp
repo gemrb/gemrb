@@ -398,7 +398,7 @@ void Game::ConsolidateParty()
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		(*m)->RefreshEffects(NULL);
 		//TODO: how to set up bardsongs
-		(*m)->SetModalSpell((*m)->ModalState, 0);
+		(*m)->SetModalSpell((*m)->Modal.State, 0);
 	}
 }
 
@@ -429,6 +429,7 @@ int Game::LeaveParty (Actor* actor)
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		// we must reset various existing scripts
+		actor->SetScript("", SCR_DEFAULT );
 		actor->SetScript("", SCR_CLASS, false);
 		actor->SetScript("", SCR_RACE, false);
 		actor->SetScript("WTASIGHT", SCR_GENERAL, false);
@@ -753,9 +754,9 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
-			area->SetupAmbients();
 			//change the tileset if needed
 			area->ChangeMap(IsDay());
+			area->SetupAmbients();
 			ChangeSong(false, true);
 			Infravision();
 
@@ -1007,6 +1008,11 @@ int Game::AddNPC(Actor* npc)
 	} //can't add as npc already in party
 	npc->SetPersistent(0);
 	NPCs.push_back( npc );
+
+	if (npc->Selected) {
+		npc->Selected = 0; // don't confuse SelectActor!
+		SelectActor(npc, true, SELECT_NORMAL);
+	}
 
 	return (int) NPCs.size() - 1;
 }
@@ -1264,10 +1270,13 @@ void Game::ShareXP(int xp, int flags)
 		return;
 	}
 
-	if (xp>0) {
-		displaymsg->DisplayConstantStringValue( STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp); //you have gained ... xp
-	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp); //you have lost ... xp
+	//you have gained/lost ... xp
+	if (core->HasFeedback(FT_MISC)) {
+		if (xp > 0) {
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp);
+		} else {
+			displaymsg->DisplayConstantStringValue(STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp);
+		}
 	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -1280,7 +1289,7 @@ void Game::ShareXP(int xp, int flags)
 bool Game::EveryoneStopped() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->GetNextStep() ) return false;
+		if (PCs[i]->InMove()) return false;
 	}
 	return true;
 }
@@ -1371,9 +1380,9 @@ void Game::SetReputation(ieDword r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	if (Reputation>r) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
 	} else if (Reputation<r) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
@@ -1788,6 +1797,19 @@ bool Game::RestParty(int checks, int dream, int hp)
 			tar->PartyRested();
 	}
 
+	// also let familiars rest
+	i = GetNPCCount();
+	while (i--) {
+		Actor *tar = GetNPC(i);
+		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
+			tar->Stop();
+			tar->SetModal(MS_NONE, 0);
+			tar->Heal(hp);
+			tar->Rest(hours);
+			if (!hoursLeft) tar->PartyRested();
+		}
+	}
+
 	// abort the partial rest; we got what we wanted
 	if (hoursLeft) {
 		return false;
@@ -2155,24 +2177,24 @@ void Game::StartRainOrSnow(bool conditional, int w)
 		if (WeatherBits&WB_INCREASESTORM) {
 			//already raining
 			if (GameTime&1) {
-				core->PlaySound(DS_LIGHTNING1);
+				core->PlaySound(DS_LIGHTNING1, SFX_CHAN_AREA_AMB);
 			} else {
-				core->PlaySound(DS_LIGHTNING2);
+				core->PlaySound(DS_LIGHTNING2, SFX_CHAN_AREA_AMB);
 			}
 		} else {
 			//start raining (far)
-			core->PlaySound(DS_LIGHTNING3);
+			core->PlaySound(DS_LIGHTNING3, SFX_CHAN_AREA_AMB);
 		}
 	}
 	if (w&WB_SNOW) {
-		core->PlaySound(DS_SNOW);
+		core->PlaySound(DS_SNOW, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w&WB_RAIN) {
-		core->PlaySound(DS_RAIN);
+		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_STONE);

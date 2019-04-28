@@ -588,7 +588,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 
 retry:
 		if (sounds[Phase][0] != 0) {
-			sound_handle = core->GetAudioDrv()->Play( sounds[Phase] );
+			sound_handle = core->GetAudioDrv()->Play(sounds[Phase], SFX_CHAN_HITS);
 		}
 
 		if (justCreated && !anims[P_ONSET*MAX_ORIENT+Orientation]) {

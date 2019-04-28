@@ -142,7 +142,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	}
 
 	if (win->Flags()&Window::Borderless) {
-		core->PlaySound(DS_WINDOW_OPEN);
+		core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
 	}
 
 	return true;
@@ -228,7 +228,7 @@ void WindowManager::CloseWindow(Window* win)
 
 	if (win == modalWin) {
 		if (win->Flags()&Window::Borderless) {
-			core->PlaySound(DS_WINDOW_CLOSE);
+			core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 		}
 
 		WindowList::iterator mit = it;
@@ -472,7 +472,7 @@ void WindowManager::DrawTooltip(const Point& mid) const
 				tooltip_sound.release();
 			}
 			if (text.length()) {
-				tooltip_sound = core->PlaySound(DS_TOOLTIP);
+				tooltip_sound = core->PlaySound(DS_TOOLTIP, SFX_CHAN_GUI);
 			}
 			reset = false;
 		}

@@ -223,6 +223,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
+	// always refresh, as even if eqfx is null, other effects may have been selfapplied from the block
 	Owner->RefreshEffects(eqfx);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
@@ -234,11 +235,12 @@ void Inventory::AddSlotEffects(ieDword index)
 //is stored in them
 void Inventory::RemoveSlotEffects(ieDword index)
 {
-	Owner->fxqueue.RemoveEquippingEffects(index);
-	Owner->RefreshEffects(NULL);
-	//call gui for possible paperdoll animation changes
-	if (Owner->InParty) {
-		core->SetEventFlag(EF_UPDATEANIM);
+	if (Owner->fxqueue.RemoveEquippingEffects(index)) {
+		Owner->RefreshEffects(NULL);
+		//call gui for possible paperdoll animation changes
+		if (Owner->InParty) {
+			core->SetEventFlag(EF_UPDATEANIM);
+		}
 	}
 }
 
@@ -901,6 +903,12 @@ bool Inventory::EquipItem(ieDword slot)
 		//if weapon is bow, then find quarrel for it and equip that
 		weaponslot = GetWeaponQuickSlot(slot);
 		EquippedHeader = 0;
+		if (Owner->PCStats) {
+			int eheader = Owner->PCStats->GetHeaderForSlot(slot);
+			if (eheader >= 0) {
+				EquippedHeader = eheader;
+			}
+		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
 			ieDword equip;
@@ -1200,7 +1208,7 @@ int Inventory::GetEquippedSlot() const
 	return Equipped+SLOT_MELEE;
 }
 
-bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
+bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 {
 	EquippedHeader = header;
 
@@ -1250,12 +1258,14 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects(newslot);
-
-		//in case of missiles also look for an appropriate launcher
-		if (effects == SLOT_EFFECT_MISSILE) {
-			newslot = FindRangedWeapon();
+		if (!noFX) {
 			AddSlotEffects(newslot);
+
+			//in case of missiles also look for an appropriate launcher
+			if (effects == SLOT_EFFECT_MISSILE) {
+				newslot = FindRangedWeapon();
+				AddSlotEffects(newslot);
+			}
 		}
 	}
 	UpdateWeaponAnimation();

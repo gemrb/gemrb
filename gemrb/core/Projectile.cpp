@@ -96,7 +96,13 @@ Projectile::~Projectile()
 	}
 	delete effects;
 
-	gamedata->FreePalette(palette, PaletteRes);
+	if (TFlags&PTF_COLOUR) {
+		// unnamed palette, but PaletteRes may be set (eg. pshammb.pro of the Hammers mod)
+		gamedata->FreePalette(palette, NULL);
+	} else {
+		gamedata->FreePalette(palette, PaletteRes);
+	}
+
 	ClearPath();
 
 	if (travel_handle) {
@@ -431,7 +437,8 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+	travel_handle = core->GetAudioDrv()->Play(SoundRes1, SFX_CHAN_MISSILE,
+				Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -648,7 +655,8 @@ void Projectile::UpdateSound()
 		StopSound();
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
+		travel_handle = core->GetAudioDrv()->Play(SoundRes2, SFX_CHAN_MISSILE,
+				Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}
 }
@@ -1415,7 +1423,7 @@ void Projectile::DrawExplosion(const Region& vp)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 		//play VVC in center
 		//FIXME: make it possible to play VEF too?
 		if (aoeflags&PAF_VVC) {
@@ -1448,7 +1456,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		
 		phase=P_EXPLODING2;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 	
 	//the spreading animation is in the first column

@@ -23,7 +23,7 @@ import GemRB
 import GameCheck
 import GUIClasses
 import CommonTables
-from ie_restype import RES_CHU, RES_2DA
+from ie_restype import RES_CHU, RES_2DA, RES_BAM
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
@@ -99,7 +99,11 @@ def GetActorPaperDoll (actor):
 	which = "LEVEL%d" %(level+1)
 	doll = CommonTables.Pdolls.GetValue (row, which)
 	if doll == "*":
-		print "GetActorPaperDoll: Missing paper doll for animation", row, which
+		# guess a name
+		import GUICommonWindows
+		doll = GUICommonWindows.GetActorPaperDoll (actor) + "INV"
+		if not GemRB.HasResource (doll, RES_BAM):
+			print "GetActorPaperDoll: Missing paper doll for animation", row, which, doll
 	return doll
 
 def SelectAllOnPress ():
@@ -381,6 +385,7 @@ def GetActorClassTitle (actor):
 		KitIndex = GetKitIndex (actor)
 		Multi = HasMultiClassBits (actor)
 		Dual = IsDualClassed (actor, 1)
+		MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 
 		if Multi and Dual[0] == 0: # true multi class
 			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
@@ -395,6 +400,11 @@ def GetActorClassTitle (actor):
 					ClassTitle = GemRB.GetString (ClassTitle)
 				ClassTitle += " / "
 				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+			elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
+				ClassTitle = 10369
+				if MCFlags & MC_FALLEN_PALADIN:
+					ClassTitle = 10371
+				ClassTitle = GemRB.GetString (ClassTitle)
 			else: # ordinary class or kit
 				if KitIndex:
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
@@ -669,7 +679,7 @@ def CanDualClass(actor):
 	for stat in range (6):
 		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
 		name = CurrentStatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
+		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
 			print "CannotDualClass: current class' stat limitations are too big"
 			return 1
 
@@ -681,7 +691,7 @@ def CanDualClass(actor):
 		for stat in range (6):
 			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
 			name = TargetStatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
+			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
 				bad += 1
 				break
 	if len(matches) == bad:
@@ -764,7 +774,7 @@ def SetupDamageInfo (pc, Button, Window):
 
 	return ratio_str, color
 
-def SetCurrentDateTokens (stat):
+def SetCurrentDateTokens (stat, plural=False):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
 	#   (script updates). In each case, there are 60 seconds
 	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
@@ -777,14 +787,27 @@ def SetCurrentDateTokens (stat):
 	days = party_time / 7200
 	hours = (party_time % 7200) / 300
 
-	# it is true, they changed the token
-	if GameCheck.IsBG2():
-		GemRB.SetToken ('GAMEDAY', str (days))
-	else:
-		GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
+	if plural:
+		return
 
-	return (days, hours)
+	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
+	if days == 1:
+		time = GemRB.GetString (10698)
+	else:
+		time = GemRB.GetString (10697)
+	time += " " + GemRB.GetString (10699) + " "
+	if days == 0:
+		# only display hours
+		time = ""
+
+	if hours == 1:
+		time += GemRB.GetString (10701)
+	else:
+		time += GemRB.GetString (10700)
+
+	return time
 
 # gray out window or mark it as visible depending on the actor's state
 # Always greys it out for actors that are: dead, berserking

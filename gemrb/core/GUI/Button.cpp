@@ -500,7 +500,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		}
 		SetState( IE_GUI_BUTTON_PRESSED );
 		if (flags & IE_GUI_BUTTON_SOUND) {
-			core->PlaySound( DS_BUTTON_PRESSED );
+			core->PlaySound(DS_BUTTON_PRESSED, SFX_CHAN_GUI);
 		}
 	}
 	return Control::OnMouseDown(me, mod);

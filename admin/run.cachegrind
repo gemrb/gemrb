@@ -1,0 +1,5 @@
+# meant to be run from the build dir
+# can be passed a different gemrb.cfg as parameter1
+# saves the log to the current dir as valgrind.log
+valgrind --tool=callgrind -v \
+  gemrb/gemrb -c ${1:-gemrb.cfg} &> valgrind.log

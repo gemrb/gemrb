@@ -320,7 +320,13 @@ def GetClassTitles (pc,LevelDiff):
 		stats.append ( (19721,1,'c') )
 		for i in range (Multi[0]):
 			Class = GUICommon.GetClassRowName (Multi[i+1], "class")
-			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+			# level 1 npc mod kits some multiclasses
+			Kit = GUICommon.GetKitIndex (pc)
+			KitClass = CommonTables.KitList.GetValue (str(Kit), "CLASS", GTV_INT)
+			if Kit and KitClass == Multi[i+1]:
+				ClassTitle = CommonTables.KitList.GetValue (str(Kit), "MIXED", GTV_REF)
+			else:
+				ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 			GemRB.SetToken ("CLASS", ClassTitle)
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
@@ -500,8 +506,9 @@ def GetSkills(pc):
 	stats.append ( (12128, GS (pc, IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (pc, IE_TURNUNDEADLEVEL), '') )
 
-	#this hack only displays LOH if we know the spell
-	#TODO: the core should just not set LOH if the paladin can't learn it
+	# the original ignored layhands.2da, hardcoding the values and display
+	# the table has only a class entry, not kits
+	# the values are handled by the spell, but there is an unused stat too
 	if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 		stats.append ( (12127, GS (pc, IE_LAYONHANDSAMOUNT), '') )
 	return TypeSetStats (stats, pc)
@@ -551,14 +558,13 @@ def GetWeaponProficiencies(pc):
 	for i in range (offset, RowCount):
 		# iwd has separate field for capitalised strings
 		if GameCheck.IsIWD1():
-			text = table.GetValue (i, 3)
+			text = table.GetValue (i, 3, GTV_REF)
 		else:
-			text = table.GetValue (i, 1)
+			text = table.GetValue (i, 1, GTV_REF)
 		stat = table.GetValue (i, 0)
 		if GameCheck.IsBG1():
 			stat = stat + IE_PROFICIENCYBASTARDSWORD
-		if text < 0x20000:
-			stats.append ( (text, GS (pc, stat)&0x07, '+') )
+		stats.append ( (text, GS (pc, stat)&0x07, '+') )
 	stats.append ("\n")
 	return TypeSetStats (stats, pc)
 
@@ -736,7 +742,7 @@ def TypeSetStats(stats, pc=0):
 			if val == None:
 				val = str_None
 			if type == '+': #pluses
-				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+				res.append (strref + ' ' + '+' * val)
 			elif type == 'p': #a plus prefix if positive
 				if val > 0:
 					res.append (GemRB.GetString (strref) + ' +' + str (val) )
@@ -844,10 +850,8 @@ def OpenInformationWindow ():
 	Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	Label = Window.GetControl (0x10000006)
-	GUICommon.SetCurrentDateTokens (stat)
-	#actually it is 16043 <DURATION>, but duration is translated to
-	#16041, hopefully this won't cause problem with international version
-	Label.SetText (16041)
+	time = GUICommon.SetCurrentDateTokens (stat)
+	Label.SetText (time)
 
 	#favourite spell
 	Label = Window.GetControl (0x10000007)

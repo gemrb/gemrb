@@ -269,6 +269,25 @@ struct BABTable {
 	int apr; // attacks per round
 };
 
+struct ModalStatesStruct {
+	ieResRef spell;
+	char action[16];
+	unsigned int entering_str;
+	unsigned int leaving_str;
+	unsigned int failed_str;
+	unsigned int aoe_spell;
+	unsigned int repeat_msg;
+};
+
+struct ModalState {
+	ieDword State;
+	ieResRef Spell;             //apply this spell once per round
+	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
+	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
+	ieDword LastApplyTime;      //last time the modal effect used
+	bool FirstApply;            //running for the first time?
+};
+
 extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
@@ -280,8 +299,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef ModalSpell;             //apply this spell once per round
-	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
 	ieResRef BackstabResRef;         //apply on successful backstab
 
@@ -313,10 +330,10 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-	ieDword ModalState;
 	int PathTries; //the # of previous tries to pick up a new walkpath
 	ArmorClass AC;
 	ToHitStats ToHit;
+	ModalState Modal;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
@@ -342,8 +359,6 @@ public:
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
-	ieDword modalTime;           //last time the modal effect used
-	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored
@@ -356,12 +371,14 @@ public:
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
+	ieDword *spellStates;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
+	ieByte weapSlotCount;
 	// true when command has been played after select
 	bool playedCommandSound;
 	//true every second round of attack
@@ -378,6 +395,7 @@ private:
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
+	ieDword LastFatigueCheck;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -524,8 +542,10 @@ public:
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
 	void PlaySelectionSound();
+	/* play a roar if the setting isn't disabled */
+	void PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
-	void CommandActor(Action* action);
+	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
 	bool OverrideActions();
 	/** handle idle actions, that shouldn't mess with scripting */
@@ -541,9 +561,9 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count, bool queue=false) const;
+	void VerbalConstant(int start, int count=1, bool queue=false) const;
 	/* display string or verbal constant depending on what is available */
-	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const;
+	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
@@ -572,7 +592,7 @@ public:
 	/* play a random footstep sound */
 	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
-	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix);
+	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
@@ -900,7 +920,7 @@ public:
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	ieDword GetLastRested() { return TicksLastRested; }
-	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
+	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;

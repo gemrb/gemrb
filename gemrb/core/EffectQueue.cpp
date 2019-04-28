@@ -27,6 +27,7 @@
 #include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
+#include "GameScript/GameScript.h" // only for ID_Allegiance
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
@@ -37,6 +38,8 @@
 
 #include <cstdio>
 #include "GameData.h"
+
+#define KIT_BASECLASS 0x4000
 
 namespace GemRB {
 
@@ -90,7 +93,7 @@ static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 //weapon immunity
 static EffectRef fx_weapon_immunity_ref = { "Protection:Weapons", -1 };
 
-bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
+bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 {
 	if( value == 0) {
 		return true;
@@ -104,7 +107,8 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	case 1:
 		stat = IE_TEAM; break;
 	case 2: //EA
-		stat = IE_EA; break;
+		stat = IE_EA;
+		return GameScript::ID_Allegiance(target, value);
 	case 3: //GENERAL
 		//this is a hack to support dead only projectiles in PST
 		//if it interferes with something feel free to remove
@@ -202,7 +206,7 @@ static inline int IsRemovable(ieByte timingmode)
 //change the timing method after the effect triggered
 static const ieByte fx_triggered[MAX_TIMING_MODE]={FX_DURATION_JUST_EXPIRED,FX_DURATION_INSTANT_PERMANENT,//0,1
 FX_DURATION_INSTANT_WHILE_EQUIPPED,FX_DURATION_INSTANT_LIMITED,//2,3
-FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
+FX_DURATION_INSTANT_PERMANENT,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAVED,//6,8
 FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
 
@@ -419,7 +423,7 @@ EffectQueue *EffectQueue::CopySelf() const
 //only opcode and parameters are changed
 //This is used mostly inside effects, when an effect needs to spawn
 //other effects with the same coordinates, source, duration, etc.
-Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
+Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if( opcode==0xffffffff) {
 		return NULL;
@@ -435,7 +439,7 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword par
 	return fx;
 }
 
-Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
+Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -444,7 +448,7 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference
 	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
 
-Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
+Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 {
 	Effect *newfx = NULL;
 	if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
@@ -466,7 +470,7 @@ Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 	return newfx;
 }
 
-void EffectQueue::AddEffect(Effect* fx, bool insert)
+void EffectQueue::AddEffect(const Effect* fx, bool insert)
 {
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
@@ -479,7 +483,7 @@ void EffectQueue::AddEffect(Effect* fx, bool insert)
 
 //This method can remove an effect described by a pointer to it, or
 //an exact matching effect
-bool EffectQueue::RemoveEffect(Effect* fx)
+bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
@@ -777,7 +781,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 }
 
 //resisted effect based on level
-static inline bool check_level(Actor *target, Effect *fx)
+static inline bool check_level(const Actor *target, Effect *fx)
 {
 	//skip non level based effects
 	//check if an effect has no level based resistance, but instead the dice sizes/count
@@ -831,7 +835,7 @@ static inline bool check_level(Actor *target, Effect *fx)
 
 //roll for the effect probability, there is a high and a low treshold, the d100
 //roll should hit in the middle
-static inline bool check_probability(Effect* fx)
+static inline bool check_probability(const Effect* fx)
 {
 	//random value is 0-99
 	if (fx->random_value<fx->ProbabilityRangeMin || fx->random_value>fx->ProbabilityRangeMax) {
@@ -845,13 +849,13 @@ static inline int DecreaseEffect(Effect *efx)
 {
 	if (efx->Parameter1) {
 		efx->Parameter1--;
-	return true;
+		return true;
 	}
 	return false;
 }
 
 //lower decreasing immunities/bounces
-static int check_type(Actor* actor, Effect* fx)
+static int check_type(Actor* actor, const Effect* fx)
 {
 	//the protective effect (if any)
 	Effect *efx;
@@ -1043,7 +1047,7 @@ static int check_type(Actor* actor, Effect* fx)
 }
 
 // pure magic resistance
-static inline int check_magic_res(Actor *actor, Effect *fx, Actor *caster)
+static inline int check_magic_res(const Actor *actor, const Effect *fx, const Actor *caster)
 {
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
@@ -1101,12 +1105,13 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 
 	//opcode immunity
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		Log(MESSAGE, "EffectQueue", "immune to effect: %s", (char*) Opcodes[fx->Opcode].Name);
+	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
+	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
+		Log(MESSAGE, "EffectQueue", "%s is immune to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		Log(MESSAGE, "EffectQueue", "immune2 to effect: %s", (char*) Opcodes[fx->Opcode].Name);
+	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
+		Log(MESSAGE, "EffectQueue", "%s is immune2 to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1128,6 +1133,27 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,caster);
 		//saving throw could be made difficult by caster's school specific bonus
 		bonus -= caster->fxqueue.BonusForParam2(fx_spell_focus_ref, fx->PrimaryType);
+	}
+
+	// handle modifiers of specialist mages
+	if (!core->HasFeature(GF_PST_STATE_FLAGS)) {
+		int specialist = KIT_BASECLASS;
+		if (caster) specialist = caster->GetStat(IE_KIT);
+		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
+			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
+			if (specialist & (1 << (fx->PrimaryType+5))) {
+				bonus -= 2;
+			}
+		}
+
+		// specialist mages get a +2 bonus to saves to spells of the same school used against them
+		specialist = actor->GetStat(IE_KIT);
+		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
+			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
+			if (specialist & (1 << (fx->PrimaryType+5))) {
+				bonus += 2;
+			}
+		}
 	}
 
 	bool saved = false;
@@ -1360,15 +1386,18 @@ void EffectQueue::RemoveAllEffects(ieDword opcode) const
 }
 
 //removes all equipping effects that match slotcode
-void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
+bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
+	bool removed = false;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( !IsEquipped((*f)->TimingMode)) continue;
 		MATCH_SLOTCODE();
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		removed = true;
 	}
+	return removed;
 }
 
 //removes all effects that match projectile
@@ -1627,6 +1656,36 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 	}
 }
 
+void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
+{
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		if (*f == dispeller) continue;
+
+		// this should also ignore all equipping effects
+		if(!((*f)->Resistance & FX_CAN_DISPEL)) {
+			continue;
+		}
+
+		// 50% base chance of success; always at least 1% chance of failure or success
+		// positive level diff modifies the base chance by 5%, negative by -10%
+		int diff = level - (*f)->CasterLevel;
+		if (diff > 0) {
+			diff *= 5;
+		} else if (diff < 0) {
+			diff *= 10;
+		}
+		diff += 50;
+
+		int roll = core->Roll(1, 100, 0);
+		if (roll == 1) continue;
+		if (roll == 100 || roll < diff) {
+			// finally dispel
+			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		}
+	}
+}
+
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1773,7 +1832,7 @@ int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amo
 static const int ids_stats[9]={IE_FACTION, IE_TEAM, IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
 //0,1 and 9 are only in GemRB
-int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
+int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 {
 	int sum = 0;
 	std::list< Effect* >::const_iterator f;
@@ -1814,7 +1873,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 	return sum;
 }
 
-int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const
+int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, const Actor *actor) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -2074,7 +2133,7 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 */
 
 //returns true if the effect supports simplified duration
-bool EffectQueue::HasDuration(Effect *fx)
+bool EffectQueue::HasDuration(const Effect *fx)
 {
 	switch(fx->TimingMode) {
 	case FX_DURATION_INSTANT_LIMITED: //simple duration
@@ -2086,7 +2145,7 @@ bool EffectQueue::HasDuration(Effect *fx)
 }
 
 //returns true if the effect must be saved
-bool EffectQueue::Persistent(Effect* fx)
+bool EffectQueue::Persistent(const Effect* fx)
 {
 	// local variable effects self-destruct if they were processed already
 	// but if they weren't processed, e.g. in a global actor, we must save them
@@ -2110,7 +2169,7 @@ bool EffectQueue::Persistent(Effect* fx)
 }
 
 //alter the color effect in case the item is equipped in the shield slot
-void EffectQueue::HackColorEffects(Actor *Owner, Effect *fx)
+void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 {
 	if( fx->InventorySlot!=Owner->inventory.GetShieldSlot()) return;
 
@@ -2208,7 +2267,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		return 1;
 	}
 
-	if( effects.size() ) {
+	if (!effects.empty()) {
 		Effect* fx = *effects.begin();
 
 		//projectile immunity
@@ -2236,8 +2295,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	return 0;
 }
 
-void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue,
-		unsigned int range, Actor *except)
+void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
+		unsigned int range, const Actor *except)
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {
@@ -2261,7 +2320,7 @@ void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int 
 	}
 }
 
-bool EffectQueue::OverrideTarget(Effect *fx)
+bool EffectQueue::OverrideTarget(const Effect *fx)
 {
 	if (!fx) return false;
 	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);

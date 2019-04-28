@@ -39,7 +39,8 @@ public:
 	SDLAudio(void);
 	~SDLAudio(void);
 	bool Init(void);
-	Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos,  unsigned int flags = 0, unsigned int *length = 0);
+	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
 	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();

@@ -222,8 +222,19 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			# don't give too many points; exact formula unknown, but this works with f/m and f/m/t
 			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate
 		else:
-			# sum the levels, since the rate is for the combined multiclass
-			ProfsPointsLeft += (sum(level2) - sum(level1))/ProfsRate
+			# just look at the fastest prof-gaining class in the bunch and consider their level
+			# eg. a m/t should get a point at 3/4 and 7/8 (rate of 4)
+			BestRate = 100
+			for cls in IsMulti[1:]:
+				if cls == 0:
+					break
+				ClsName = GUICommon.GetClassRowName (cls, "class")
+				Rate = ProfsTable.GetValue (ClsName, "RATE")
+				if Rate < BestRate:
+					BestRate = Rate
+					ProfIndex = IsMulti[1:].index(cls)
+
+			ProfsPointsLeft += level2[ProfIndex]/ProfsRate - level1[ProfIndex]/ProfsRate
 	else:
 		if GUICommon.IsDualSwap (pc):
 			ProfIndex = 1

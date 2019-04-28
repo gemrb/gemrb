@@ -288,7 +288,7 @@ public:
 	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc);
-	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header);
+	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
 	int GetEquipped() const;
 	int GetEquippedHeader() const;
 	ITMExtHeader *GetEquippedExtHeader(int header=0) const;

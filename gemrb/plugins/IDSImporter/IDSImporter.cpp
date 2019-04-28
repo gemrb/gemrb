@@ -142,6 +142,23 @@ int IDSImporter::FindValue(int val) const
 	return -1;
 }
 
+int IDSImporter::GetHighestValue() const
+{
+	int i = pairs.size();
+	if (!i) {
+		return -1;
+	}
+	//the highest value is likely at the last line
+	i--;
+	int max = pairs[i].val;
+	while (i--) {
+		if (pairs[i].val > max) {
+			max = pairs[i].val;
+		}
+	}
+	return max;
+}
+
 
 #include "plugindef.h"
 

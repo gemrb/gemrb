@@ -60,7 +60,7 @@ def OnLoad():
 	MoviesButton = StartWindow.GetControl (2)
 	BackButton = StartWindow.GetControl (5)
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	Label.SetText (GemRB.GEMRB_VERSION)
+	Label.SetText (GemRB.Version)
 	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)

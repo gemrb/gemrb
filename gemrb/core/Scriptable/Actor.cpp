@@ -112,6 +112,7 @@ static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword always_dither = 1;
+static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
@@ -230,6 +231,7 @@ static int DeathOnZeroStat = true;
 static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
 static int ProjectileSize = 0; //the size of the projectile immunity bitfield (dwords)
+static unsigned int SpellStatesSize = 0; //and this is for the spellStates bitfield
 
 static const char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
@@ -257,6 +259,7 @@ static void InitActorTables();
 //TODO: externalise
 #define TURN_PANIC_LVL_MOD 3
 #define TURN_DEATH_LVL_MOD 7
+#define REPUTATION_FALL 60
 
 static ieResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
@@ -311,6 +314,9 @@ std::map<unsigned int, int> favoredMap;
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
 typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
 std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
+
+std::vector<ModalStatesStruct> ModalStates;
+std::map<int, int> numWeaponSlots;
 
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
@@ -459,8 +465,6 @@ Actor::Actor()
 	attackProjectile = NULL;
 	lastInit = 0;
 	roundTime = 0;
-	modalTime = 0;
-	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
 	nextComment = 100 + RAND(0, 350); // 7-30s delay
 	nextBored = 0;
@@ -501,19 +505,24 @@ Actor::Actor()
 		BaseStats[IE_HATEDRACE2+i]=0xff;
 	}
 	//this one is saved only for PC's
-	ModalState = 0;
+	Modal.State = MS_NONE;
 	//set it to a neutral value
-	ModalSpell[0] = '*';
-	LingeringModalSpell[0] = '*';
+	Modal.Spell[0] = '*';
+	Modal.LingeringSpell[0] = '*';
+	Modal.LastApplyTime = 0;
+	Modal.LingeringCount = 0;
+	Modal.FirstApply = 1;
 	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
 	WMLevelMod = 0;
-	TicksLastRested = 0;
+	TicksLastRested = LastFatigueCheck = 0;
 	speed = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
+	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
+	weapSlotCount = 4;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -547,6 +556,7 @@ Actor::~Actor(void)
 	delete polymorphCache;
 
 	free(projectileImmunity);
+	free(spellStates);
 }
 
 void Actor::SetFistStat(ieDword stat)
@@ -964,6 +974,38 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	actor->SetCircleSize();
 }
 
+static void UpdateHappiness(Actor *actor) {
+	if (!actor->InParty) return;
+
+	int newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
+	if (newHappiness == actor->PCStats->Happiness) return;
+
+	actor->PCStats->Happiness = newHappiness;
+	switch (newHappiness) {
+		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, true); break;
+		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, true); break;
+		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true);
+			if (actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
+			break;
+		case 80: actor->VerbalConstant(VB_HAPPY, 1, true); break;
+		default: break; // case 0
+	}
+}
+
+// make paladins and rangers fallen if the reputations drops enough
+static void pcf_reputation(Actor *actor, ieDword oldValue, ieDword newValue)
+{
+	if (oldValue == newValue) return;
+	if (actor->InParty && newValue <= REPUTATION_FALL) {
+		if (actor->GetRangerLevel()) {
+			GameScript::RemoveRangerHood(actor, NULL);
+		} else if (actor->GetPaladinLevel()) {
+			GameScript::RemovePaladinHood(actor, NULL);
+		}
+	}
+	UpdateHappiness(actor);
+}
+
 static void pcf_berserk(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//needs for new color
@@ -1156,7 +1198,7 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 	}
 }
 
-static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
@@ -1169,6 +1211,11 @@ static void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	}
 	if ((signed) hp<=0) {
 		actor->Die(NULL);
+	} else {
+		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
+		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
+			actor->VerbalConstant(VB_HURT, 1, true);
+		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
 	actor->Modified[IE_HITPOINTS]=hp;
@@ -1394,6 +1441,18 @@ static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
+static void pcf_alignment(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+{
+	UpdateHappiness(actor);
+}
+
+static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	Map *map = actor->GetCurrentArea();
+	if (!map) return;
+	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_FREE : PATH_MAP_NPC);
+}
+
 //spell casting or other buttons disabled/reenabled
 static void pcf_dbutton(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
@@ -1452,7 +1511,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
 NULL,NULL,pcf_level_fighter,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
 pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+pcf_reputation,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
@@ -1471,9 +1530,9 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
+NULL,pcf_avatarremoval,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
-NULL,NULL,pcf_dbutton,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
+NULL, pcf_alignment, pcf_dbutton, pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
@@ -1664,6 +1723,7 @@ void Actor::ReleaseMemory()
 		skillrac.clear();
 		IWD2HitTable.clear();
 		BABClassMap.clear();
+		ModalStates.clear();
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1691,14 +1751,21 @@ static int IsClassFromName (const char* name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
+	unsigned int tmp = 0;
 	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
+	core->GetDictionary()->Lookup("Effect Text Level", tmp);
+	core->SetFeedbackLevel(tmp);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
+	// only pst has the whole gamut for these two options
+	if (!(tmp & FT_SELECTION)) sel_snd_freq = 0;
+	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
 	//FIXME: Drop all actors' SpriteCover.
 	//the actor will change dithering only after selected/moved (its spritecover was updated)
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
+	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
 	GameDifficulty = 0;
@@ -1713,6 +1780,24 @@ GEM_EXPORT void UpdateActorConfig()
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
+}
+
+static void ReadModalStates()
+{
+	AutoTable table("modal");
+	if (!table) return;
+
+	ModalStatesStruct ms;
+	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
+		CopyResRef(ms.spell, table->QueryField(i, 0));
+		strlcpy(ms.action, table->QueryField(i, 1), 16);
+		ms.entering_str = atoi(table->QueryField(i, 2));
+		ms.leaving_str = atoi(table->QueryField(i, 3));
+		ms.failed_str = atoi(table->QueryField(i, 4));
+		ms.aoe_spell = atoi(table->QueryField(i, 5));
+		ms.repeat_msg = atoi(table->QueryField(i, 6));
+		ModalStates.push_back(ms);
+	}
 }
 
 static void InitActorTables()
@@ -2040,6 +2125,7 @@ static void InitActorTables()
 	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
+	std::map<std::string, int> className2ID;
 
 	tm.load("classes");
 	if (!tm) {
@@ -2125,6 +2211,7 @@ static void InitActorTables()
 			tmpindex = atoi(tm->QueryField(classname, "ID"));
 			if (!tmpindex)
 				continue;
+			className2ID[classname] = tmpindex;
 			tmpindex--;
 
 			StringBuffer buffer;
@@ -2258,6 +2345,22 @@ static void InitActorTables()
 		}*/
 	}
 	Log(MESSAGE, "Actor", "Finished examining classes.2da");
+
+	// set the default weapon slot count for the inventory gui — if we're not in iwd2 already
+	if (!iwd2class) {
+		tm.load("numwslot", true);
+		if (tm) {
+			int rowcount = tm->GetRowCount();
+			for (i = 0; i < rowcount; i++) {
+				const char* cls = tm->GetRowName(i);
+				std::map<std::string, int >::iterator it = className2ID.find(cls);
+				int id = 0;
+				if (it != className2ID.end()) id = it->second;
+				numWeaponSlots[id] = std::min(4, atoi(tm->QueryField(i, 0)));
+			}
+		}
+	}
+	className2ID.clear();
 
 	//pre-cache hit/damage/speed bonuses for weapons
 	tm.load("wspecial");
@@ -2553,6 +2656,20 @@ static void InitActorTables()
 			favoredMap.insert(std::make_pair(raceID, favClass));
 		}
 	}
+
+	// IWD, IWD2 and BG:EE have this
+	int splstatetable = core->LoadSymbol("splstate");
+	if (splstatetable != -1) {
+		Holder<SymbolMgr> splstate = core->GetSymbol(splstatetable);
+		int numstates = splstate->GetHighestValue();
+		if (numstates > 0) {
+			//rounding up
+			SpellStatesSize = (numstates >> 5) + 1;
+		}
+	}
+
+	// modal actions/state data
+	ReadModalStates();
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2967,6 +3084,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
+	if (SpellStatesSize) {
+		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
+	}
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
@@ -2977,6 +3097,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//copy back the original stats, because the effects
 		//will be reapplied in ApplyAllEffects again
 		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		if (SpellStatesSize) {
+			memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
+		}
 		//also clear the spell bonuses just given, they will be
 		//recalculated below again
 		spellbook.ClearBonus();
@@ -3207,8 +3330,10 @@ void Actor::RefreshHP() {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
 
-	//toughness feat bonus (could be unhardcoded as a max hp bonus based on level if you want)
-	bonus += Modified[IE_FEAT_TOUGHNESS]*3;
+	if (third) {
+		//toughness feat bonus (could be unhardcoded as a max hp bonus based on level if you want)
+		bonus += Modified[IE_FEAT_TOUGHNESS]*3;
+	}
 
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
@@ -3294,7 +3419,7 @@ void Actor::RefreshPCStats() {
 					Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
 				}
 			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks); // TODO: check if this shouldn't get +wspattack[stars][0]
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks + wspattack[stars][0]);
 			}
 		} else {
 			// unproficient user - force defaultattacks
@@ -3340,6 +3465,19 @@ void Actor::RefreshPCStats() {
 	}
 	Modified[IE_STEALTH] += GetSkillBonus(4);
 	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
+
+	if (third) {
+		ieDword LayOnHandsAmount = GetPaladinLevel();
+		if (LayOnHandsAmount) {
+			int mod = GetAbilityBonus(IE_CHR, Modified[IE_CHR]);
+			if (mod > 1) {
+				LayOnHandsAmount *= mod;
+			}
+		}
+		BaseStats[IE_LAYONHANDSAMOUNT] = LayOnHandsAmount;
+		Modified[IE_LAYONHANDSAMOUNT] = LayOnHandsAmount;
+	}
+
 }
 
 int Actor::GetConHealAmount() const
@@ -3364,44 +3502,52 @@ void Actor::UpdateFatigue()
 	if (!InParty || !game->GameTime) {
 		return;
 	}
-	// do icons here, so they persist for more than a tick
-	int LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
-	if (LuckMod) {
-		AddPortraitIcon(PI_FATIGUE);
-	} else {
-		DisablePortraitIcon(PI_FATIGUE);
+
+	bool updated = false;
+	if (!TicksLastRested) {
+		// just loaded the game; approximate last rest
+		TicksLastRested = game->GameTime - (2*core->Time.hour_size) * (2*GetBase(IE_FATIGUE)+1);
+		updated = true;
+	} else if (LastFatigueCheck) {
+		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
+		                    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+		if (FatigueDiff) {
+			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
+			updated = true;
+		}
+	}
+	LastFatigueCheck = game->GameTime;
+
+	if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+		// pst has TNO regeneration stored there
+		// shouldn't we check for our own flag, though?
+		// FIXME: the Con bonus is applied dynamically, but this doesn't appear to conform to
+		// the original engine behavior?  we should probably apply the bonus on rest
+		int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
+		if ((signed) Modified[IE_FATIGUE] >= FatigueBonus) {
+			Modified[IE_FATIGUE] -= FatigueBonus;
+		} else {
+			Modified[IE_FATIGUE] = 0;
+		}
 	}
 
-	ieDword FatigueLevel = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size);
-	int FatigueBonus = core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]);
-	// pst has TNO regeneration stored there
-	if (core->HasFeature(GF_AREA_OVERRIDE)) FatigueBonus = 0;
-	FatigueLevel = (signed)FatigueLevel - FatigueBonus >= 0 ? FatigueLevel - FatigueBonus : 0;
-	FatigueLevel = ClampStat(IE_FATIGUE, FatigueLevel);
-
-	// don't run on init or we automatically make the character supertired
-	if (FatigueLevel != BaseStats[IE_FATIGUE] && TicksLastRested) {
-		int OldLuckMod = LuckMod;
-		NewBase(IE_FATIGUE, FatigueLevel, MOD_ABSOLUTE);
-		LuckMod = core->ResolveStatBonus(this, "fatigue") ; // fatigmod.2da
-		BaseStats[IE_LUCK] += LuckMod-OldLuckMod;
-		if (LuckMod < 0) {
+	int LuckMod = core->ResolveStatBonus(this, "fatigue"); // fatigmod.2da
+	Modified[IE_LUCK] += LuckMod;
+	if (LuckMod < 0) {
+		AddPortraitIcon(PI_FATIGUE);
+		if (updated) {
 			// stagger the complaint, so long travels don't cause a fatigue choir
 			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
-	} else if (!TicksLastRested) {
-		//if someone changed FatigueLevel, or loading a game, reset
-		TicksLastRested = game->GameTime - (4*core->Time.hour_size) * BaseStats[IE_FATIGUE];
+	} else {
+		DisablePortraitIcon(PI_FATIGUE);
 		FatigueComplaintDelay = 0;
-		if (LuckMod < 0) {
-			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
-		}
 	}
 
 	if (FatigueComplaintDelay) {
 		FatigueComplaintDelay--;
 		if (!FatigueComplaintDelay) {
-			VerbalConstant(VB_TIRED, 1);
+			VerbalConstant(VB_TIRED);
 		}
 	}
 }
@@ -3451,6 +3597,23 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveB
 
 	if (!third) {
 		ret += modifier + GetStat(IE_LUCK);
+
+		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
+		static ieDword prevType = -1;
+		static int prevRoll = -1;
+		static Actor *prevActor = NULL;
+		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
+			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
+			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
+			wchar_t tmp[3];
+			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L" %d", ret);
+			String msg = *str + tmp;
+			delete str;
+			displaymsg->DisplayStringName(msg, DMC_WHITE, this);
+		}
+		prevType = type;
+		prevActor = this;
+		prevRoll = ret;
 		return ret > (int) GetStat(savingthrows[type]);
 	}
 
@@ -3712,7 +3875,8 @@ void Actor::ReactToDeath(const char * deadname)
 			resref[count]=0;
 
 			unsigned int len = 0;
-			core->GetAudioDrv()->Play( resref, &len );
+			unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
+			core->GetAudioDrv()->Play(resref, channel, &len);
 			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 			if (counter != 0)
 				SetWait( counter );
@@ -3732,7 +3896,7 @@ void Actor::GetAreaComment(int areaflag) const
 					vc++;
 				}
 			}
-			VerbalConstant(vc, 1);
+			VerbalConstant(vc);
 			return;
 		}
 	}
@@ -3881,13 +4045,19 @@ void Actor::PlaySelectionSound()
 	}
 }
 
+void Actor::PlayWarCry(int range) const
+{
+	if (war_cries) VerbalConstant(VB_ATTACK, range);
+}
+
 #define SEL_ACTION_COUNT_COMMON  3
 #define SEL_ACTION_COUNT_ALL     7
 
 //call this when a PC receives a command from GUI
-void Actor::CommandActor(Action* action)
+void Actor::CommandActor(Action* action, bool clearPath)
 {
-	Stop(); // stop what you were doing
+	Scriptable::Stop(); // stop what you were doing
+	if (clearPath) ClearPath();
 	AddAction(action); // now do this new thing
 	switch (cmd_snd_freq) {
 		case 0:
@@ -3955,17 +4125,21 @@ void Actor::IdleActions(bool nonidle)
 	}
 
 	//drop the bored one liner is there was no action for some time
-	if (nonidle || !nextBored || InMove() || Immobile()) {
-		//if bored timeout is disabled, don't bother to set the new time
-		if (bored_time) {
-			nextBored=time+core->Roll(1,30,bored_time);
-		}
+	//if bored timeout is disabled, don't bother to set the new time
+	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
+		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
-		if (nextBored<time) {
+		if (bored_time && nextBored && nextBored < time) {
 			int x = bored_time / 10;
 			if (x<10) x = 10;
 			nextBored = time+core->Roll(1,30,x);
-			VerbalConstant(VB_BORED, 1);
+			VerbalConstant(VB_BORED);
+		}
+
+		// display idle animation
+		int x = RAND(0, 25);
+		if (!x && (GetStance() == IE_ANI_AWAKE)) {
+			SetStance(IE_ANI_HEAD_TURN);
 		}
 	}
 }
@@ -4004,9 +4178,8 @@ void Actor::PlayExistenceSounds()
 					}
 				}
 			}
-			// default in the original is around 30s, which roughly corresponds to a 400 delay (skellytz)
 			if (delay == 0) {
-				delay = 400;
+				delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
 			}
 			nextComment = time + RAND(delay*1/4, delay*7/4);
 		}
@@ -4043,7 +4216,7 @@ void Actor::Panic(Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	VerbalConstant(VB_PANIC, 1 );
+	VerbalConstant(VB_PANIC);
 
 	Action *action;
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
@@ -4089,12 +4262,12 @@ void Actor::DialogInterrupt()
 
 	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
-		VerbalConstant(VB_HOSTILE, 1 );
+		VerbalConstant(VB_HOSTILE);
 	} else {
 		if (TalkCount) {
-			VerbalConstant(VB_DIALOG, 1);
+			VerbalConstant(VB_DIALOG);
 		} else {
-			VerbalConstant(VB_INITIALMEET, 1);
+			VerbalConstant(VB_INITIALMEET);
 		}
 	}
 }
@@ -4103,7 +4276,7 @@ void Actor::GetHit(int damage, int spellLevel)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
 		SetStance( IE_ANI_DAMAGE );
-		VerbalConstant(VB_DAMAGE, 1);
+		VerbalConstant(VB_DAMAGE);
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
@@ -4140,7 +4313,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel)
 	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
 	// combat casting bonus only applies when injured
-	if (HasFeat(FEAT_COMBAT_CASTING) && BaseStats[IE_HITPOINTS] != Modified[IE_HITPOINTS]) {
+	if (HasFeat(FEAT_COMBAT_CASTING) && Modified[IE_MAXHITPOINTS] != Modified[IE_HITPOINTS]) {
 		bonus += 4;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
@@ -4263,10 +4436,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	if (!(saveflags&SF_IGNORE_DIFFICULTY)) {
+	if (!(saveflags&SF_IGNORE_DIFFICULTY) && act) {
 		// adjust enemy damage according to difficulty settings:
 		// -50%, -25%, 0, 50%, 100%, 150%
-		if (Modified[IE_EA] < EA_GOODCUTOFF) {
+		if (act->GetStat(IE_EA) > EA_GOODCUTOFF) {
 			int adjustmentPercent = dmgadjustments[GameDifficulty];
 			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
 				damage += (damage * adjustmentPercent)/100;
@@ -4309,11 +4482,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	// can be negative if we're healing on 100%+ resistance
-	if (damage != 0) {
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
-	}
-
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
 		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
@@ -4334,9 +4502,17 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
 	}
 
+	// can be negative if we're healing on 100%+ resistance
+	// do this after GetHit, so VB_HURT isn't overriden by VB_DAMAGE, just (dis)played later
+	if (damage != 0) {
+		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	}
+
 	InternalFlags|=IF_ACTIVE;
-	int damagelevel = 0; //FIXME: this level is never used
+	int damagelevel;
 	if (damage<10) {
+		damagelevel = 0;
+	} else if (damage < 20) { // a guess; impacts what blood bam we play, while elemental damage types are unaffected
 		damagelevel = 1;
 	} else {
 		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
@@ -4388,6 +4564,8 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
+
+		if (core->HasFeedback(FT_STATES)) goto hitsound;
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
@@ -4454,6 +4632,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	}
 
+	hitsound:
 	//Play hit sounds, for pst, resdata contains the armor level
 	DataFileMgr *resdata = core->GetResDataINI();
 	PlayHitSound(resdata, damagetype, false);
@@ -4491,7 +4670,8 @@ void Actor::PlayWalkSound()
 		}
 
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
+		unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
+		core->GetAudioDrv()->Play(Sound, channel, Pos.x, Pos.y, 0, &len);
 		nextWalk = thisTime + len;
 	}
 }
@@ -4502,7 +4682,7 @@ static const char *dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
 
 //Play hit sounds (HIT_0<dtype><armor>)
 //IWDs have H_<dmgtype>_<armor> (including level from 1 to max 5), eg H_ML_MM3
-void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
+void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const
 {
 	int type;
 	bool levels = true;
@@ -4567,7 +4747,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 			snprintf(Sound, 9, "HIT_0%d%c", type, suffix?'1':0);
 		}
 	}
-	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
+	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos.x, Pos.y);
 }
 
 //Just to quickly inspect debug maximum values
@@ -4622,7 +4802,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	buffer.appendFormatted("Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	buffer.appendFormatted("Fatigue: %d   Luck: %d\n\n", Modified[IE_FATIGUE], Modified[IE_LUCK]);
+	buffer.appendFormatted("Fatigue: %d (current: %d)   Luck: %d\n\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
 
 	//this works for both level slot style
 	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
@@ -4832,10 +5012,12 @@ int Actor::GetWildMod(int level)
 			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
 
 			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
-			if (WMLevelMod > 0) {
-				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
-			} else if (WMLevelMod < 0) {
-				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+			if (core->HasFeedback(FT_STATES)) {
+				if (WMLevelMod > 0) {
+					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
+				} else if (WMLevelMod < 0) {
+					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+				}
 			}
 		}
 		return WMLevelMod;
@@ -4893,13 +5075,12 @@ int Actor::CalculateSpeed(bool feedback)
 		return speed;
 	}
 	if(encumbrance<=maxweight*2) {
-		if (feedback) {
+		if (feedback && core->HasFeedback(FT_STATES)) {
 			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
-			//print slow speed
 		}
 		return speed/2;
 	}
-	if (feedback) {
+	if (feedback && core->HasFeedback(FT_STATES)) {
 		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
 	}
 	return 0;
@@ -4979,6 +5160,7 @@ void Actor::Resurrect()
 	}
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
+	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
@@ -5051,7 +5233,7 @@ void Actor::Die(Scriptable *killer)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(STR_DEATH, DMC_WHITE, this);
-	VerbalConstant(VB_DIE, 1 );
+	VerbalConstant(VB_DIE);
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect *newfx;
@@ -5373,8 +5555,11 @@ bool Actor::CheckOnDeath()
 	// from effects and dropping items might change effects!
 
 	// disintegration destroys normal items if difficulty level is high enough (the stat hack is just for differentiation)
-	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC) && (GameDifficulty>DIFF_CORE) ) {
-		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC)) {
+		if  (GameDifficulty > DIFF_CORE) {
+			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+		}
+		return true;
 	}
 	// ignore TNO, as he needs to keep his gear
 	Game *game = core->GetGame();
@@ -5403,7 +5588,9 @@ bool Actor::CheckOnDeath()
 	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
-	if (LastDamageType&DAMAGE_CHUNKING) {
+	ieDword gore = 0;
+	core->GetDictionary()->Lookup("Gore", gore);
+	if (LastDamageType&DAMAGE_CHUNKING && gore) {
 		//play chunky animation
 		//chunks are projectiles
 		return true;
@@ -5540,9 +5727,10 @@ void Actor::ReinitQuickSlots()
 	//these are always present
 	CheckWeaponQuickSlot(0);
 	CheckWeaponQuickSlot(1);
-	if (version==22) {
-		CheckWeaponQuickSlot(2);
-		CheckWeaponQuickSlot(3);
+	if (weapSlotCount > 2) {
+		for(i=2; i<weapSlotCount; i++) {
+			CheckWeaponQuickSlot(i);
+		}
 	} else {
 	//disabling quick weapon slots for certain classes
 		for(i=0;i<2;i++) {
@@ -5748,7 +5936,11 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 	if (ga_flags&GA_SELECT) {
 		if (UnselectableTimer) return false;
 		if (Immobile()) return false;
-		if (Modified[IE_STATE_ID] & STATE_CONFUSED) return false;
+		if (Modified[IE_STATE_ID] & (STATE_MINDLESS ^ (STATE_CHARMED|STATE_BERSERK))) {
+			return false;
+		}
+		// charmed actors are only selectable if they were charmed by the party
+		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && BaseStats[IE_EA] <= EA_GOODCUTOFF) return false;
 		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
@@ -6065,46 +6257,50 @@ void Actor::SetModal(ieDword newstate, bool force)
 			return;
 	}
 
-	if (ModalState == MS_BATTLESONG && ModalState != newstate && HasFeat(FEAT_LINGERING_SONG)) {
-		strnlwrcpy(LingeringModalSpell, ModalSpell, 8);
-		modalSpellLingering = 2;
+	if (Modal.State != newstate) {
+		Modal.FirstApply = 1;
+	}
+
+	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
+		strnlwrcpy(Modal.LingeringSpell, Modal.Spell, 8);
+		Modal.LingeringCount = 2;
 	}
 
 	if (IsSelected()) {
 		// display the turning-off message
-		if (ModalState != MS_NONE) {
-			displaymsg->DisplayStringName(core->ModalStates[ModalState].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
+			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
-		if (!force && ModalState == newstate) {
-			ModalState = MS_NONE;
+		if (!force && Modal.State == newstate) {
+			Modal.State = MS_NONE;
 		} else {
-			ModalState = newstate;
+			Modal.State = newstate;
 		}
 
 		//update the action bar
 		core->SetEventFlag(EF_ACTION);
 	} else {
-		ModalState = newstate;
+		Modal.State = newstate;
 	}
 }
 
 void Actor::SetModalSpell(ieDword state, const char *spell)
 {
 	if (spell) {
-		strnlwrcpy(ModalSpell, spell, 8);
+		strnlwrcpy(Modal.Spell, spell, 8);
 	} else {
-		if (state >= core->ModalStates.size()) {
-			ModalSpell[0] = 0;
+		if (state >= ModalStates.size()) {
+			Modal.Spell[0] = 0;
 		} else {
 			if (state==MS_BATTLESONG) {
 				if (BardSong[0]) {
-					strnlwrcpy(ModalSpell, BardSong, 8);
+					strnlwrcpy(Modal.Spell, BardSong, 8);
 					return;
 				}
 			}
-			strnlwrcpy(ModalSpell, core->ModalStates[state].spell, 8);
+			strnlwrcpy(Modal.Spell, ModalStates[state].spell, 8);
 		}
 	}
 }
@@ -6415,8 +6611,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	case ITEM_AT_BOW:
 		rangedheader = GetRangedWeapon(wi);
 		if (!rangedheader) {
-			//display out of ammo verbal constant if there is any???
-			//VerbalConstant(VB_OUTOFAMMO, 1 );
+			//display out of ammo verbal constant if there were any
+			//VerbalConstant(VB_OUTOFAMMO); // FUTURE: gemrb extension
 			//SetStance(IE_ANI_READY);
 			//set some trigger?
 			return false;
@@ -6493,7 +6689,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 			}
 		} else {
 			//it is not clear what is the penalty for non player classes
-			prof += 4;
+			prof -= 4;
 		}
 	}
 
@@ -6678,12 +6874,12 @@ int Actor::GetToHit(ieDword Flags, Actor *target)
 	// add generic bonus
 	generic += GetStat(IE_HITBONUS);
 
-	// finally involve the Modified stat and add to it the rest of the generic bonus
+	// now this func is the only one to modify generic bonus, so no need to add
 	if (ReverseToHit) {
-		ToHit.SetGenericBonus(ToHit.GetGenericBonus()-generic);
+		ToHit.SetGenericBonus(-generic);
 		return ToHit.GetTotal();
 	} else {
-		ToHit.SetGenericBonus(ToHit.GetGenericBonus()+generic); // flat out cummulative
+		ToHit.SetGenericBonus(generic); // flat out cumulative
 		return ToHit.GetTotalForAttackNum(attacknum);
 	}
 }
@@ -6979,7 +7175,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 				// Missed <TARGETNAME> due to concealment.
 				core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
-				displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
 				buffer.append("[Concealment Miss]");
 				Log(COMBAT, "Attack", buffer);
 				ResetState();
@@ -7010,8 +7206,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", buffer);
-		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
-		VerbalConstant(VB_CRITMISS, 1);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
+		VerbalConstant(VB_CRITMISS);
 		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
@@ -7050,9 +7246,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	ieDword log = 0;
-	core->GetDictionary()->Lookup("Extra Feedback", log);
-	if (log) {
+	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
 		// FIXME: Im sure there are string constants we should be using!
 		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
@@ -7084,8 +7278,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", buffer);
-		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
-		VerbalConstant(VB_CRITHIT, 1);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
+		VerbalConstant(VB_CRITHIT);
 	} else {
 		//normal success
 		buffer.append("[Hit]");
@@ -7259,14 +7453,14 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	if (damage<=0) {
 		if (attacker && attacker->InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 	}
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
-	if (modalTime==gameTime) {
+	if (Modal.LastApplyTime == gameTime) {
 		return;
 	}
 
@@ -7339,18 +7533,18 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		lastattack = 0;
 	}
 
-	if (ModalState == MS_NONE && !modalSpellLingering) {
+	if (Modal.State == MS_NONE && !Modal.LingeringCount) {
 		return;
 	}
 
 	//apply the modal effect on the beginning of each round
 	if (roundFraction == 0) {
 		// handle lingering modal spells like bardsong in iwd2
-		if (modalSpellLingering && LingeringModalSpell[0]) {
-			modalSpellLingering--;
-			ApplyModal(LingeringModalSpell);
+		if (Modal.LingeringCount && Modal.LingeringSpell[0]) {
+			Modal.LingeringCount--;
+			ApplyModal(Modal.LingeringSpell);
 		}
-		if (ModalState == MS_NONE) {
+		if (Modal.State == MS_NONE) {
 			return;
 		}
 
@@ -7361,22 +7555,26 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		//we can set this to 0
-		modalTime = gameTime;
+		Modal.LastApplyTime = gameTime;
 
-		if (!ModalSpell[0]) {
+		if (!Modal.Spell[0]) {
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
-			ModalSpell[0]='*';
-		} else if(ModalSpell[0]!='*') {
+			Modal.Spell[0]='*';
+		} else if (Modal.Spell[0]!='*') {
 			if (ModalSpellSkillCheck()) {
-				ApplyModal(ModalSpell);
-				if (InParty) {
-					displaymsg->DisplayStringName(core->ModalStates[ModalState].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+				ApplyModal(Modal.Spell);
+
+				// some modals notify each round, some only initially
+				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
+				Modal.FirstApply = 0;
+				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
+					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {
-				if (InParty) {
-					displaymsg->DisplayStringName(core->ModalStates[ModalState].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+				if (InParty && core->HasFeedback(FT_MISC)) {
+					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
-				ModalState = MS_NONE;
+				Modal.State = MS_NONE;
 			}
 		}
 
@@ -7388,7 +7586,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 void Actor::ApplyModal(ieResRef modalSpell)
 {
-	unsigned int aoe = core->ModalStates[ModalState].aoe_spell;
+	unsigned int aoe = ModalStates[Modal.State].aoe_spell;
 	if (aoe == 1) {
 		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
 	} else if (aoe == 2) {
@@ -7751,7 +7949,7 @@ bool Actor::ShouldHibernate() {
 		return false;
 	if (third && Modified[IE_MC_FLAGS]&MC_IGNORE_INHIBIT_AI)
 		return false;
-	if (GetNextStep())
+	if (InMove())
 		return false;
 	if (GetNextAction())
 		return false;
@@ -7789,10 +7987,15 @@ void Actor::UpdateAnimations()
 	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 
 	//If you find a better place for it, I'll really be glad to put it there
-	//IN BG1 and BG2, this is at the ninth frame...
-	if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
-		GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-		attackProjectile = NULL;
+	//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+	// however some critters don't have that long animations (eg. squirrel 0xC400)
+	if (attackProjectile) {
+		unsigned int frameCount = anims[0]->GetFrameCount();
+		unsigned int currentFrame = anims[0]->GetCurrentFrame();
+		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			attackProjectile = NULL;
+		}
 	}
 
 	// advance first (main) animation by one frame (in sync)
@@ -8001,7 +8204,7 @@ void Actor::Draw(const Region& vp)
 	}
 	if (drawcircle) {
 		DrawCircle(vp);
-		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && GetPathLength());
+		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
 	}
 	if (drawtarget) {
 		gc->DrawTargetReticle(Destination, (size - 1) * 4, true, Over, Selected); //we could set this to !paused if we wanted to only animate when not paused
@@ -8228,7 +8431,7 @@ bool Actor::HandleActorStance()
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
-	int x = RAND(0, 999);
+	int x = RAND(0, 25);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
@@ -8685,7 +8888,8 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		TicksLastRested = core->GetGame()->GameTime;
+		TicksLastRested = LastFatigueCheck = core->GetGame()->GameTime;
+		SetBase (IE_FATIGUE, 0);
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
@@ -8815,7 +9019,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE, 1);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			core->Autopause(AP_UNUSABLE, this);
 		}
 		return;
@@ -8829,12 +9033,12 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	if (critical) {
 		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
-			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
 			critical = false;
 		} else {
 			//a critical surely raises the morale?
 			//only if it is successful it raises the morale of the attacker
-			VerbalConstant(VB_CRITHIT, 1);
+			VerbalConstant(VB_CRITHIT);
 			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
@@ -8871,7 +9075,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			}
 		}
 		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity || dodgy) {
-			displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 			wi.backstabbing = false;
 		} else {
 			if (wi.backstabbing) {
@@ -8901,11 +9105,11 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 					sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 					// ~Sneak Attack for %d~
 					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
 				}
 			} else {
 				// weapon is unsuitable for sneak attack
-				displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 			}
 		}
 	}
@@ -8926,16 +9130,16 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 		if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
 			if (target->Modified[IE_DISABLEBACKSTAB]) {
 				// The backstab seems to have failed
-				displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
 				wi.backstabbing = false;
 			} else {
 				if (wi.backstabbing) {
 					backstabDamage = multiplier * damage;
 					// display a simple message instead of hardcoding multiplier names
-					displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
 				} else {
 					// weapon is unsuitable for backstab
-					displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
+					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 				}
 			}
 		}
@@ -8997,10 +9201,12 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 				AttackEffect->IsVariable = flags&UI_CRITICAL;
 			}
 			pro->GetEffects()->AddEffect(AttackEffect, true);
-			if (ranged)
+			if (ranged) {
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
-			else
+			} else {
+				// TODO: EEs add a bit to fx_melee for only applying with monk fists: parameter2 of 4 (no other value supported)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref);
+			}
 			//AddEffect created a copy, the original needs to be scrapped
 			delete AttackEffect;
 			attackProjectile = pro;
@@ -9052,7 +9258,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 			break;
 		case CHG_BREAK: //both
 			if (!silent) {
-				core->PlaySound(DS_ITEM_GONE);
+				core->PlaySound(DS_ITEM_GONE, SFX_CHAN_GUI);
 			}
 			//fall through
 		case CHG_NOSOUND: //remove item
@@ -9416,21 +9622,21 @@ void Actor::SetOverlay(unsigned int overlay)
 //returns true if spell state is already set or illegal
 bool Actor::SetSpellState(unsigned int spellstate)
 {
-	if (spellstate >= SS_MAX) return true;
-	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
-	unsigned int bit = 1<<(spellstate&31);
-	if (Modified[pos]&bit) return true;
-	Modified[pos]|=bit;
+	if (spellstate >= SpellStatesSize << 5) return true;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
+	spellStates[pos] |= bit;
 	return false;
 }
 
 //returns true if spell state is already set
 bool Actor::HasSpellState(unsigned int spellstate) const
 {
-	if (spellstate >= SS_MAX) return false;
-	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
-	unsigned int bit = 1<<(spellstate&31);
-	if (Modified[pos]&bit) return true;
+	if (spellstate >= SpellStatesSize << 5) return false;
+	unsigned int pos = spellstate >> 5;
+	unsigned int bit = 1 << (spellstate & 31);
+	if (spellStates[pos] & bit) return true;
 	return false;
 }
 
@@ -9578,6 +9784,9 @@ void Actor::CreateDerivedStatsBG()
 		}
 	}
 
+	weapSlotCount = numWeaponSlots[BaseStats[IE_CLASS]];
+	ReinitQuickSlots();
+
 	// monk's level dictated ac and ac vs missiles bonus
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
 	if (isclass[ISMONK]&(1<<classid)) {
@@ -9614,19 +9823,6 @@ void Actor::CreateDerivedStatsIWD2()
 		backstabdamagemultiplier = (level + 1) / 2;
 	}
 
-	int layonhandsamount = 0;
-	level = GetPaladinLevel();
-	if (level) {
-		// when this is called for the first time, Modified is not set yet
-		// FIXME: move to RefreshEffects, since it relies on a volatile stat
-		int mod = GetAbilityBonus(IE_CHR, BaseStats[IE_CHR]);
-		if (mod < 1) {
-			layonhandsamount = level;
-		} else {
-			layonhandsamount = level * mod;
-		}
-	}
-
 	for (i=0;i<ISCLASSES;i++) {
 		int tmp;
 
@@ -9642,7 +9838,6 @@ void Actor::CreateDerivedStatsIWD2()
 	}
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
-	BaseStats[IE_LAYONHANDSAMOUNT]=(ieDword) layonhandsamount;
 }
 
 //set up stuff here, like attack number, turn undead level
@@ -10026,14 +10221,10 @@ int Actor::GetRacialEnemyBonus(Actor* target) const
 
 bool Actor::ModalSpellSkillCheck()
 {
-	switch(ModalState) {
+	switch(Modal.State) {
 	case MS_BATTLESONG:
-		if (isclass[ISBARD]&(1<<Modified[IE_CLASS])) {
-			return true;
-		}
-		/* do we need this */
-		if (Modified[IE_STATE_ID]& STATE_SILENCED) {
-			return true;
+		if (GetBardLevel()) {
+			return !(Modified[IE_STATE_ID] & STATE_SILENCED);
 		}
 		return false;
 	case MS_DETECTTRAPS:
@@ -10123,7 +10314,7 @@ bool Actor::TryToHide()
 
 	// iwd2 is like the others only when trying to hide for the first time
 	// TODO: once understood, the visual checks need syncing (not just lightness)
-	bool continuation = third && (Modified[IE_STATE_ID]&state_invisible);
+	bool continuation = Modified[IE_STATE_ID] & state_invisible;
 	if (third && continuation) {
 		return TryToHideIWD2();
 	}
@@ -10171,7 +10362,9 @@ bool Actor::TryToHide()
 		HideFailed(this, 0, skill/7, roll);
 		return false;
 	}
+	if (!continuation) VerbalConstant(VB_HIDE);
 	if (!third) return true;
+
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
 	displaymsg->DisplayRollStringName(39299, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
 	return true;

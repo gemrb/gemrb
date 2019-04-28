@@ -1147,7 +1147,7 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -1487,7 +1487,7 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
 	act->BaseStats[IE_TRACKING]=tmpByte;
-	for (int i=0;i<100;i++) {
+	for (int i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	return 0;
@@ -1581,7 +1581,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -2119,7 +2119,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -2671,7 +2671,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 32);
-		for (i=0;i<100;i++) {
+		for (i=0; i<VCONST_COUNT; i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
 		tmpByte = actor->BaseStats[IE_LEVEL];

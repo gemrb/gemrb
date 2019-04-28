@@ -71,10 +71,10 @@ class SpriteCover;
 #define TRAP_RESET      2
 #define TRAVEL_PARTY    4
 #define TRAP_DETECTABLE 8
-//#define TRAP_16	 16
+//#define TRAP_ENEMY	 16 // "trap set off by enemy" in NI, unused
 #define TRAP_TUTORIAL	 32 //active only when in tutorial mode
-#define TRAP_NPC	64
-//#define TRAP_128	128
+#define TRAP_NPC	64 // "trap set off by NPC"
+//#define TRAP_SILENT	128 // "trigger silent", unused
 #define TRAP_DEACTIVATED  256
 #define _TRAVEL_NONPC      512
 #define _TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
@@ -467,6 +467,7 @@ public:
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
 	PathNode *GetNextStep(int x);
+	PathNode *GetPath() { return path; };
 	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetNextStep() {

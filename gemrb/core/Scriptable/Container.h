@@ -28,7 +28,10 @@ namespace GemRB {
 
 //container flags
 #define CONT_LOCKED      1
+//#define CONT_          2 // "disable if no owner" comment from original bg2 source
+//#define CONT_          4 // "magically locked", probably was meant to prevent lockpicking
 #define CONT_RESET       8
+//#define CONT_          16 // "Remove only"
 #define CONT_DISABLED    (32|128)   //bg2 and pst uses different bits, luckily they are not overlapping
 
 class GEM_EXPORT Container : public Highlightable {

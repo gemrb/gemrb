@@ -84,7 +84,7 @@ def InitOptionsWindow (Window):
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x10000007)
-	Label.SetText (GemRB.GEMRB_VERSION)
+	Label.SetText (GemRB.Version)
 
 	return
 
@@ -238,12 +238,15 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
 	GUIOPTControls.OptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
 
-	# TODO: once the pst overhead messaging system is in place, add the relevant game vars below
-	GUIOPTControls.OptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, "")
-	GUIOPTControls.OptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, "")
-	GUIOPTControls.OptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, "")
-	GUIOPTControls.OptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, "")
-	GUIOPTControls.OptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, "")
+	# others have: to hit rolls, combat info, [actions], state changes, [selection text], misc
+	# pst: states, misc, to hit rolls, combat info, [spell casting]; and separate sliders for selection and command
+	# we harmonize it across games by likely breaking compatibility with the original
+	# there's no need to disable values 4 and 16 (set by our defaults.ini), since their use takes the separate sliders into account
+	GUIOPTControls.OptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, 'Effect Text Level', None, 8)
+	GUIOPTControls.OptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, 'Effect Text Level', None, 32)
+	GUIOPTControls.OptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, 'Effect Text Level', None, 1)
+	GUIOPTControls.OptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, 'Effect Text Level', None, 2)
+	GUIOPTControls.OptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, 'Effect Text Level', None, 64)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	

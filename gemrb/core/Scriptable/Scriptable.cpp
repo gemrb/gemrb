@@ -906,6 +906,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 {
+	if (!core->HasFeedback(FT_CASTING)) return;
+
 	// caster - Casts spellname : target OR
 	// caster - spellname : target (repeating spells)
 	Scriptable *target = NULL;
@@ -999,7 +1001,8 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 
-	if (caster && caster->PCStats) {
+	// a candidate for favourite spell? Not if we're forced cast (eg. from fx_cast_spell)
+	if (caster && caster->PCStats && !no_stance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
@@ -1065,7 +1068,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 
-	if (caster && caster->PCStats) {
+	if (caster && caster->PCStats && !no_stance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
@@ -1629,7 +1632,7 @@ bool Scriptable::AuraPolluted()
 		Actor *act = (Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
-			displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
+			if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
 			return false;
 		}
 	}
@@ -2192,7 +2195,7 @@ void Movable::AddWayPoint(const Point &Des)
 	while(endNode->Next) {
 		endNode = endNode->Next;
 	}
-	Point p(endNode->x, endNode->y);
+	Point p(endNode->x * 16, endNode->y * 12);
 	area->ClearSearchMapFor(this);
 	PathNode *path2 = area->FindPath( p, Des, size );
 	endNode->Next = path2;
