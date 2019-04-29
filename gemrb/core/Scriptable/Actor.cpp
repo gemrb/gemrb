@@ -7244,7 +7244,6 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
-		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
 		wchar_t rollLog[100];
 		const wchar_t *fmt = L"%ls %d %ls %d = %d : %ls";
 		String *leftRight, *hitMiss;
