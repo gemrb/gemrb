@@ -8722,7 +8722,6 @@ void Actor::SetSoundFolder(const char *soundset)
 		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
 		char file[_MAX_PATH];
 
-		//TODO: this could be simpler with *
 		if (FileGlob(file, filepath, "??????01")) {
 			file[6] = '\0';
 		} else if (FileGlob(file, filepath, "?????01")) {
