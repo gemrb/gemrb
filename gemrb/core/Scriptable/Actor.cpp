@@ -7215,25 +7215,6 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (roll==1) {
-		//critical failure
-		buffer.append("[Critical Miss]");
-		Log(COMBAT, "Attack", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
-		VerbalConstant(VB_CRITMISS);
-		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
-		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
-			//break sword
-			// a random roll on-hit (perhaps critical failure too)
-			//  in 0,5% (1d20*1d10==1) cases
-			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,10,0) == 1) {
-				inventory.BreakItemSlot(wi.slot);
-			}
-		}
-		ResetState();
-		return;
-	}
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
@@ -7254,6 +7235,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		// autohit immobile enemies (true for atleast stun, sleep, timestop)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
 			success = true;
+		} else if (roll == 1) {
+			success = false;
 		} else {
 			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
 		}
@@ -7280,6 +7263,27 @@ void Actor::PerformAttack(ieDword gameTime)
 		delete leftRight;
 		delete hitMiss;
 	}
+
+	if (roll == 1) {
+		//critical failure
+		buffer.append("[Critical Miss]");
+		Log(COMBAT, "Attack", buffer);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
+		VerbalConstant(VB_CRITMISS);
+		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
+			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
+		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
+			//break sword
+			// a random roll on-hit (perhaps critical failure too)
+			//  in 0,5% (1d20*1d10==1) cases
+			if ((header->RechargeFlags & IE_ITEM_BREAKABLE) && core->Roll(1, 10, 0) == 1) {
+				inventory.BreakItemSlot(wi.slot);
+			}
+		}
+		ResetState();
+		return;
+	}
+
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
