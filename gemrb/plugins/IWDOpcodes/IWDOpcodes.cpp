@@ -2539,7 +2539,7 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		fx->Parameter1=1;
 	}
-	//TODO: damage reduction (all types)
+	// damage reduction (all types)
 	STAT_ADD(IE_RESISTFIRE,fx->Parameter1 );
 	STAT_ADD(IE_RESISTCOLD,fx->Parameter1 );
 	STAT_ADD(IE_RESISTELECTRICITY,fx->Parameter1 );
@@ -2549,6 +2549,9 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTCRUSHING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTPIERCING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTMISSILE,fx->Parameter1 );
+	STAT_ADD(IE_RESISTPOISON, fx->Parameter1);
+	STAT_ADD(IE_RESISTMAGICCOLD, fx->Parameter1);
+	STAT_ADD(IE_RESISTMAGICFIRE, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_FAITHARMOR);
 	}
