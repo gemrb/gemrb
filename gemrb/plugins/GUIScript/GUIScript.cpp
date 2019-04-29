@@ -5289,19 +5289,14 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
-			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s",
-				ResRef);
-			if (type == 0)
-				return NULL;
-			else {
-				Py_RETURN_NONE;
-			}
+			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s", ResRef);
+			Py_RETURN_NONE;
 		}
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			Log(ERROR, "Button_SetPLT", "PD Picture == NULL (%s)", ResRef);
-			return NULL;
+			Log(ERROR, "Button_SetPLT", "Paperdoll picture == NULL (%s)", ResRef);
+			Py_RETURN_NONE;
 		}
 /*	} else {
 		Picture = im->GetSprite2D(type, col);
