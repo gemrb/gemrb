@@ -4585,7 +4585,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
 
-		if (core->HasFeedback(FT_STATES)) goto hitsound;
+		if (!core->HasFeedback(FT_STATES)) goto hitsound;
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
