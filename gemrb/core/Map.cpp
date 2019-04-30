@@ -917,7 +917,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 
-		PathNode * step = actor->GetNextStep();
+		PathNode * step = actor->GetStep();
 		if (step && step->Next) {
 			//we should actually wait for a short time and check then
 			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {

@@ -599,7 +599,7 @@ bool Scriptable::InMove() const
 		return false;
 	}
 	Movable *me = (Movable *) this;
-	return me->GetNextStep()!=NULL;
+	return me->GetStep() != NULL;
 }
 
 void Scriptable::SetWait(unsigned long time)
