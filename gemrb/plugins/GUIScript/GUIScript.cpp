@@ -13446,7 +13446,7 @@ jump_label:
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
-		//FIXME: is this really state==IE_GUI_BUTTON_DISABLED ??? That means active border for a disabled button
+		// this state check looks bizzare, but without it most buttons get misrendered
 		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
 	Py_RETURN_NONE;
