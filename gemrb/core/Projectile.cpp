@@ -386,7 +386,10 @@ void Projectile::Setup()
 		Color tmpColor[PALSIZE];
 
 		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
-		StaticTint(tmpColor[PALSIZE/2]);
+		// PALSIZE is usually 12, but pst has it at 32, which is now the default, so make sure we're not trying to read an empty (black) entry
+		unsigned int idx = PALSIZE/2;
+		if (tmpColor[idx].r + tmpColor[idx].g + tmpColor[idx].b == 0) idx = 6;
+		StaticTint(tmpColor[idx]);
 	}
 
 	CreateAnimations(travel, BAMRes1, Seq1);
