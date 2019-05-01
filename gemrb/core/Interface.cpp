@@ -2403,7 +2403,11 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	if (index >= img->GetHeight()) {
 		index = 0;
 	}
+	int width = img->GetWidth();
 	for (int i = 0; i < colors; i++) {
+		if (i >= width) {
+			Log(WARNING, "Interface", "Trying to access invalid palette index (%d)! Using black instead", i);
+		}
 		pal[i] = img->GetPixel(i, index);
 	}
 	return pal;
