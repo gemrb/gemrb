@@ -155,6 +155,7 @@ namespace GemRB {
 #define APF_INVERT_TARGET 2048
 //tiled AoE animation
 #define APF_TILED 4096
+#define APF_PLAYONCE 8192
 
 struct ProjectileExtension
 {
