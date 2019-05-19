@@ -1784,6 +1784,10 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	if (STAT_GET(IE_STATE_ID) & STATE_BERSERK) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
 		BASE_SET(IE_MORALE, 10);
 		return FX_NOT_APPLIED;
