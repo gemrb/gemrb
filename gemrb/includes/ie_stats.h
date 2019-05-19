@@ -39,6 +39,7 @@ namespace GemRB {
 #define EA_ALLY			4
 #define EA_CONTROLLED  		5
 #define EA_CHARMED 		6
+//#define EA_REALLYCHARMED 		7 // added by EE for the charm opcode, while 6 is for shaman's spirits
 #define EA_CONTROLLABLE         15
 #define EA_GOODBUTRED  		28
 #define EA_GOODBUTBLUE 		29
@@ -51,7 +52,7 @@ namespace GemRB {
 #define EA_EVILCUTOFF  		200
 #define EA_EVILBUTGREEN		201
 #define EA_EVILBUTBLUE 		202
-#define EA_CHARMEDPC            254
+#define EA_CHARMEDPC            254 // EVILBYCHARM in the original
 #define EA_ENEMY   		255
 
 //GENERAL values
