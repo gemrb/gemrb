@@ -5190,9 +5190,8 @@ void Actor::Resurrect()
 	SetStance(IE_ANI_EMERGE);
 	Game *game = core->GetGame();
 	//readjust death variable on resurrection
+	ieVariable DeathVar;
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
-		ieVariable DeathVar;
-
 		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName);
 		if (len > sizeof(ieVariable)) {
 			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
@@ -5203,7 +5202,15 @@ void Actor::Resurrect()
 		if (value>0) {
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
+	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
+	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
+		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
+		if (len > 32) {
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals (on resurrect)!", scriptName, LongName);
+		}
+		game->locals->SetAt(DeathVar, 0, true);
 	}
+
 	ResetCommentTime();
 	//clear effects?
 }
