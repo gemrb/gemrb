@@ -396,7 +396,9 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 #define WEAPON_STYLEMASK   15
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
-#define WEAPON_FINESSE     64
+#define WEAPON_USESTRENGTH_DMG 64
+#define WEAPON_USESTRENGTH_HIT 128
+#define WEAPON_FINESSE     256
 #define WEAPON_BYPASS      0x10000
 #define WEAPON_KEEN        0x20000
 
@@ -6655,6 +6657,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//TODO easier copying of recharge flags into wflags
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_DMG) wi.wflags |= WEAPON_USESTRENGTH_DMG;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_HIT) wi.wflags |= WEAPON_USESTRENGTH_HIT;
 	// this flag is set in dagger/shortsword by the loader
 	if (header->RechargeFlags&IE_ITEM_USEDEXTERITY) wi.wflags|=WEAPON_FINESSE;
 	//also copy these flags (they match their WEAPON_ counterparts)
@@ -6908,7 +6912,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 {
 	int dexbonus = 0, strbonus = 0;
 	// add strength bonus (discarded for ranged weapons later)
-	if (Flags&WEAPON_USESTRENGTH) {
+	if (Flags&WEAPON_USESTRENGTH || Flags&WEAPON_USESTRENGTH_HIT) {
 		if (third) {
 			strbonus = GetAbilityBonus(IE_STR );
 		} else {
@@ -6940,7 +6944,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 			} else {
 				dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			}
-			// WEAPON_USESTRENGTH only affects weapon damage
+			// WEAPON_USESTRENGTH only affects weapon damage, WEAPON_USESTRENGTH_HIT unknown
 			strbonus = 0;
 			break;
 		// no ability tohit bonus for WEAPON_FIST
@@ -7339,7 +7343,7 @@ int Actor::GetWeaponRange(const WeaponInfo &wi) const
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
-	if (wi.wflags&WEAPON_USESTRENGTH) {
+	if (wi.wflags&WEAPON_USESTRENGTH || wi.wflags&WEAPON_USESTRENGTH_DMG) {
 		if (third) {
 			int bonus = GetAbilityBonus(IE_STR);
 			// 150% bonus for twohanders
