@@ -4214,17 +4214,27 @@ bool Actor::OverrideActions()
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	Action *action;
 	if ((Modified[IE_STATE_ID] & STATE_CHARMED) && (BaseStats[IE_EA] <= EA_GOODCUTOFF) && Modified[IE_EA] == EA_CHARMEDPC) {
-		if (fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 3) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1003) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 5) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1005)) {
-			action = GenerateAction("AttackReevaluate([GOODCUTOFF],10)");
-			if (action) {
-				AddActionInFront(action);
-				return true;
-			} else {
-				Log(ERROR, "Actor", "Cannot generate override action");
-			}
+		Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
+		if (!charm) return false;
+
+		// skip regular charm
+		switch (charm->Parameter2) {
+			case 2:
+			case 3:
+			case 5:
+			case 1002:
+			case 1003:
+			case 1005:
+				action = GenerateAction("AttackReevaluate([GOODCUTOFF],10)");
+				if (action) {
+					AddActionInFront(action);
+					return true;
+				} else {
+					Log(ERROR, "Actor", "Cannot generate override action");
+				}
+				break;
+			default:
+				break;
 		}
 	}
 	return false;
