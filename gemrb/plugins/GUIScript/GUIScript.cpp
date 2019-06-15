@@ -96,7 +96,6 @@ GUIScript *GemRB::gs = NULL;
 static int SpecialItemsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
-static int ItemSoundsCount = -1;
 
 //Check removal/equip/swap of item based on item name and actor's scriptname
 #define CRI_REMOVE 0
@@ -121,8 +120,6 @@ typedef char EventNameType[17];
 #define IS_DROP	0
 #define IS_GET	1
 
-typedef ieResRef ResRefPairs[2];
-
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *SpecialItems = NULL;
@@ -131,7 +128,6 @@ static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
-static ResRefPairs *ItemSounds = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -280,47 +276,6 @@ static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int 
 		core->FreeString(txt);
 	}
 	return core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "", -1);
-}
-
-static void ReadItemSounds()
-{
-	int table = gamedata->LoadTable( "itemsnd" );
-	if (table<0) {
-		ItemSoundsCount = 0;
-		ItemSounds = NULL;
-		return;
-	}
-	Holder<TableMgr> tab = gamedata->GetTable( table );
-	ItemSoundsCount = tab->GetRowCount();
-	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
-	for (int i = 0; i < ItemSoundsCount; i++) {
-		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
-		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
-	}
-	gamedata->DelTable( table );
-}
-
-static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
-{
-	Sound[0]=0;
-	if (Col>1) {
-		return;
-	}
-
-	if (ItemSoundsCount<0) {
-		ReadItemSounds();
-	}
-
-	if (ID[1]=='A') {
-		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
-		//item animation types
-		ItemType = ItemSoundsCount-4+ID[0]-'1';
-	}
-
-	if (ItemType>=(ieDword) ItemSoundsCount) {
-		return;
-	}
-	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
 }
 
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
@@ -9087,7 +9042,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -9117,7 +9072,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 				memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -9592,7 +9547,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef, 0);
 			if (Sound[0]) {
@@ -11579,7 +11534,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 			memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 		} else {
-			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+			gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
 		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
@@ -11668,7 +11623,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
@@ -11757,7 +11712,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		memcpy(Sound, item->ReplacementItem, 9);
 	} else {
-		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+		gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
 
 	//freeing the item before returning
@@ -15892,15 +15847,10 @@ GUIScript::~GUIScript(void)
 		free(UsedItems);
 		UsedItems=NULL;
 	}
-	if (ItemSounds) {
-		free(ItemSounds);
-		ItemSounds=NULL;
-	}
 
 	StoreSpellsCount = -1;
 	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
-	ItemSoundsCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;

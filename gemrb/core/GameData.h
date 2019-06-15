@@ -111,6 +111,9 @@ public:
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache
 	void SaveAllStores();
+
+	// itemsnd.2da functions
+	void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 private:
 	Cache ItemCache;
 	Cache SpellCache;

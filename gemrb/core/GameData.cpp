@@ -74,6 +74,10 @@ static void ReleasePalette(void *poi)
 
 GEM_EXPORT GameData* gamedata;
 
+static int ItemSoundsCount = -1;
+typedef ieResRef ResRefPairs[2];
+static ResRefPairs *ItemSounds = NULL;
+
 GameData::GameData()
 {
 	factory = new Factory();
@@ -82,6 +86,10 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
+	if (ItemSounds) {
+		free(ItemSounds);
+		ItemSounds = NULL;
+	}
 }
 
 void GameData::ClearCaches()
@@ -570,6 +578,47 @@ void GameData::SaveAllStores()
 	while (!stores.empty()) {
 		SaveStore(stores.begin()->second);
 	}
+}
+
+static void ReadItemSounds()
+{
+	int table = gamedata->LoadTable("itemsnd");
+	if (table < 0) {
+		ItemSoundsCount = 0;
+		ItemSounds = NULL;
+		return;
+	}
+	Holder<TableMgr> tab = gamedata->GetTable(table);
+	ItemSoundsCount = tab->GetRowCount();
+	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
+	for (int i = 0; i < ItemSoundsCount; i++) {
+		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
+		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
+	}
+	gamedata->DelTable(table);
+}
+
+void GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+{
+	Sound[0] = 0;
+	if (Col > 1) {
+		return;
+	}
+
+	if (ItemSoundsCount<0) {
+		ReadItemSounds();
+	}
+
+	if (ID[1] == 'A') {
+		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A' (pst)
+		//item animation types
+		ItemType = ItemSounds.size()-4 + ID[0]-'1';
+	}
+
+	if (ItemType>=(ieDword) ItemSoundsCount) {
+		return;
+	}
+	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
 }
 
 }
