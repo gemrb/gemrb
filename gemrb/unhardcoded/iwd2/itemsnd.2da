@@ -1,81 +1,81 @@
 2DA V1.0
 *
-           TAKE       DROP
-MISC       G_BOOK1    G_BOOK2
-AMULET     G_NECK1    G_NECK2
-ARMOR      G_CLOAK1   G_CLOAK2
-BELT       G_BELT1    G_BELT2
-BOOT       G_BOOT1    G_BOOT2
-ARROW      G_ARRW1    G_ARRW2
-BRACER     G_GLOVE1   G_GLOVE2
-HELMET     G_HELM1    G_HELM2
-KEY        G_KEY1     G_KEY2
-POTION     G_POTN1    G_POTN2
-RING       G_RING1    G_RING2
-SCROLL     G_SCROL1   G_SCROL2
-SHIELD     GAM_21A    GAM_21B
-FOOD       GAM_21A    GAM_21B
-BULLET     G_BULLT1   G_BULLT2
-BOW        G_BOW1     G_BOW2
-DAGGER     G_DAGGR1   G_DAGGR2
-MACE       G_MACE1    G_MACE2
-SLING      G_SLING1   G_SLING2
-SMSWORD    G_SMSWD1   G_SMSWD2
-BGSWORD    G_LGSWD1   G_LGSWD2
-HAMMER     G_HAMMR1   G_HAMMR2
-MSTAR      G_MSTAR1   G_MSTAR2
-FLAIL      G_FLAIL1   G_FLAIL2
-DART       G_DART1    G_DART2
-AXE        G_AXE1     G_AXE2
-STAFF      G_STAFF1   G_STAFF2
-XBOW       G_CROSB1   G_CROSB2
-FIST       GAM_21A    GAM_21B
-SPEAR      G_SPEAR1   G_SPEAR2
-POLEARM    G_HALB1    G_HALB2
-BOLT       G_BOLT1    G_BOLT2
-CLOAK      G_CLOAK1   G_CLOAK2
-COIN       G_GOLD1    G_GOLD2
-GEM        G_GEM1     G_GEM2
-WAND       G_WAND1    G_WAND2
-BROKEN1    G_B_ARM1   G_B_ARM2
-BROKEN2    G_B_SHD1   G_B_SHD2
-BROKEN3    G_B_WPN1   G_B_WPN2
-UNUSED1    GAM_21A    GAM_21B
-UNUSED2    G_BROKN1   G_BROKN2
-BUCKLER    G_BUCKR1   G_BUCKR2
-CANDLE     G_CAND1    G_CAND2
-CBODY      G_CHILD1   G_CHILD2
-CLUB       G_CLUB1    G_CLUB2
-FBODY      G_FEM1     G_FEM2
-KEY2       G_KEYS1    G_KEYS2
-LSHIELD    G_LGSLD1   G_LGSLD2
-MBODY      G_MALE1    G_MALE2
-MSHIELD    G_MDSLD1   G_MDSLD2
-NOTES      G_PAPR1    G_PAPR2
-ROD        G_ROD1     G_ROD2
-SKULL      G_SKULL1   G_SKULL2
-SSHIELD    G_SMSLD1   G_SMSLD2
-SPIDER     G_SPIDR1   G_SPIDR2
-TELESCOPE  G_TELE1    G_TELE2
-DRINK      G_WINE1    G_WINE2
-GTSWORD    G_LGSWD1   G_LGSWD2
-BAG        GAM_21A    GAM_21B
-FUR        G_LETHR1   G_LETHR2
-LARMOR     G_CLOAK1   G_CLOAK2
-SLARMOR    G_CLOAK1   G_CLOAK2
-CHARMOR    G_CLOAK1   G_CLOAK2
-SPARMOR    G_CLOAK1   G_CLOAK2
-HPARMOR    G_CLOAK1   G_CLOAK2
-FPARMOR    G_CLOAK1   G_CLOAK2
-HARMOR     G_CLOAK1   G_CLOAK2
-ROBE       G_CLOAK1   G_CLOAK2
-SCALE      G_CLOAK1   G_CLOAK2
-BTSWORD    G_LGSWD1   G_LGSWD2
-SCARF      G_GLOVE1   G_GLOVE2
-FOOD2      G_SLING1   G_SLING2
-HAT        G_GLOVE1   G_GLOVE2
-GAUNTLET   G_CAND1    G_CAND2
-DEFAULT    GAM_21A    GAM_21B
-LEATHER    G_LETHR1   G_LETHR2
-CHAIN      G_Chain1   G_Chain2
-PLATE      G_Plate1   G_Plate2
+           TAKE       DROP      SWING1    SWING2    SWING3    SWING4    SWING5    SWING6    SWING7
+MISC       G_BOOK1    G_BOOK2   *         *         *         *         *         *         *
+AMULET     G_NECK1    G_NECK2   *         *         *         *         *         *         *
+ARMOR      G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+BELT       G_BELT1    G_BELT2   *         *         *         *         *         *         *
+BOOT       G_BOOT1    G_BOOT2   *         *         *         *         *         *         *
+ARROW      G_ARRW1    G_ARRW2   *         *         *         *         *         *         *
+BRACER     G_GLOVE1   G_GLOVE2  *         *         *         *         *         *         *
+HELMET     G_HELM1    G_HELM2   *         *         *         *         *         *         *
+KEY        G_KEY1     G_KEY2    *         *         *         *         *         *         *
+POTION     G_POTN1    G_POTN2   *         *         *         *         *         *         *
+RING       G_RING1    G_RING2   *         *         *         *         *         *         *
+SCROLL     G_SCROL1   G_SCROL2  *         *         *         *         *         *         *
+SHIELD     GAM_21A    GAM_21B   *         *         *         *         *         *         *
+FOOD       GAM_21A    GAM_21B   *         *         *         *         *         *         *
+BULLET     G_BULLT1   G_BULLT2  *         *         *         *         *         *         *
+BOW        G_BOW1     G_BOW2    SW_MS01   SW_MS02   SW_MS03   SW_MS04   SW_MS05   *         *
+DAGGER     G_DAGGR1   G_DAGGR2  SW_SM01   SW_SM02   SW_SM03   SW_SM04   SW_SM05   SW_SM06   SW_SM07
+MACE       G_MACE1    G_MACE2   SW_SM01   SW_SM02   SW_SM03   SW_SM04   SW_SM05   SW_SM06   SW_SM07
+SLING      G_SLING1   G_SLING2  SW_SLG01  SW_SLG02  SW_SLG03  SW_SLG04  SW_SLG05  *         *
+SMSWORD    G_SMSWD1   G_SMSWD2  SW_SM01   SW_SM02   SW_SM03   SW_SM04   SW_SM05   SW_SM06   SW_SM07
+BGSWORD    G_LGSWD1   G_LGSWD2  SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+HAMMER     G_HAMMR1   G_HAMMR2  SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+MSTAR      G_MSTAR1   G_MSTAR2  SW_SM01   SW_SM02   SW_SM03   SW_SM04   SW_SM05   SW_SM06   SW_SM07
+FLAIL      G_FLAIL1   G_FLAIL2  SW_FLAL0  SW_FLAL1  SW_FLAL2  SW_FLAL3  SW_FLAL4  SW_FLAL5  *
+DART       G_DART1    G_DART2   *         *         *         *         *         *         *
+AXE        G_AXE1     G_AXE2    SW_SM01   SW_SM02   SW_SM03   SW_SM04   SW_SM05   SW_SM06   SW_SM07
+STAFF      G_STAFF1   G_STAFF2  SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+XBOW       G_CROSB1   G_CROSB2  SW_XBOW0  SW_XBOW1  SW_XBOW2  SW_XBOW3  SW_XBOW4  SW_XBOW5  *
+FIST       GAM_21A    GAM_21B   SW_FIST0  SW_FIST1  SW_FIST2  SW_FIST3  *         *         *
+SPEAR      G_SPEAR1   G_SPEAR2  SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+POLEARM    G_HALB1    G_HALB2   SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+BOLT       G_BOLT1    G_BOLT2   *         *         *         *         *         *         *
+CLOAK      G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+COIN       G_GOLD1    G_GOLD2   *         *         *         *         *         *         *
+GEM        G_GEM1     G_GEM2    *         *         *         *         *         *         *
+WAND       G_WAND1    G_WAND2   *         *         *         *         *         *         *
+BROKEN1    G_B_ARM1   G_B_ARM2  *         *         *         *         *         *         *
+BROKEN2    G_B_SHD1   G_B_SHD2  *         *         *         *         *         *         *
+BROKEN3    G_B_WPN1   G_B_WPN2  *         *         *         *         *         *         *
+UNUSED1    GAM_21A    GAM_21B   *         *         *         *         *         *         *
+UNUSED2    G_BROKN1   G_BROKN2  *         *         *         *         *         *         *
+BUCKLER    G_BUCKR1   G_BUCKR2  *         *         *         *         *         *         *
+CANDLE     G_CAND1    G_CAND2   *         *         *         *         *         *         *
+CBODY      G_CHILD1   G_CHILD2  *         *         *         *         *         *         *
+CLUB       G_CLUB1    G_CLUB2   SW_FIST0  SW_FIST1  SW_FIST2  SW_FIST3  *         *         *
+FBODY      G_FEM1     G_FEM2    *         *         *         *         *         *         *
+KEY2       G_KEYS1    G_KEYS2   *         *         *         *         *         *         *
+LSHIELD    G_LGSLD1   G_LGSLD2  *         *         *         *         *         *         *
+MBODY      G_MALE1    G_MALE2   *         *         *         *         *         *         *
+MSHIELD    G_MDSLD1   G_MDSLD2  *         *         *         *         *         *         *
+NOTES      G_PAPR1    G_PAPR2   *         *         *         *         *         *         *
+ROD        G_ROD1     G_ROD2    *         *         *         *         *         *         *
+SKULL      G_SKULL1   G_SKULL2  *         *         *         *         *         *         *
+SSHIELD    G_SMSLD1   G_SMSLD2  *         *         *         *         *         *         *
+SPIDER     G_SPIDR1   G_SPIDR2  *         *         *         *         *         *         *
+TELESCOPE  G_TELE1    G_TELE2   *         *         *         *         *         *         *
+DRINK      G_WINE1    G_WINE2   *         *         *         *         *         *         *
+GTSWORD    G_LGSWD1   G_LGSWD2  SW_LG01   SW_LG02   SW_LG03   SW_LG04   SW_LG05   SW_LG06   *
+BAG        GAM_21A    GAM_21B   *         *         *         *         *         *         *
+FUR        G_LETHR1   G_LETHR2  *         *         *         *         *         *         *
+LARMOR     G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+SLARMOR    G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+CHARMOR    G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+SPARMOR    G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+HPARMOR    G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+FPARMOR    G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+HARMOR     G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+ROBE       G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+SCALE      G_CLOAK1   G_CLOAK2  *         *         *         *         *         *         *
+BTSWORD    G_LGSWD1   G_LGSWD2  *         *         *         *         *         *         *
+SCARF      G_GLOVE1   G_GLOVE2  *         *         *         *         *         *         *
+FOOD2      G_SLING1   G_SLING2  *         *         *         *         *         *         *
+HAT        G_GLOVE1   G_GLOVE2  *         *         *         *         *         *         *
+GAUNTLET   G_CAND1    G_CAND2   *         *         *         *         *         *         *
+DEFAULT    GAM_21A    GAM_21B   *         *         *         *         *         *         *
+LEATHER    G_LETHR1   G_LETHR2  *         *         *         *         *         *         *
+CHAIN      G_Chain1   G_Chain2  *         *         *         *         *         *         *
+PLATE      G_Plate1   G_Plate2  *         *         *         *         *         *         *

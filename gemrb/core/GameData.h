@@ -115,6 +115,7 @@ public:
 	// itemsnd.2da functions
 	void ReadItemSounds();
 	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	int GetSwingCount(ieDword ItemType);
 private:
 	Cache ItemCache;
 	Cache SpellCache;

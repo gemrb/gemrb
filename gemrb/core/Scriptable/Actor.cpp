@@ -4782,6 +4782,24 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos.x, Pos.y);
 }
 
+// Play swing sounds
+// <wtype><n> in bgs, but it gets quickly complicated with iwds (SW_<wname>) and pst, which add a bunch of exceptions
+// ... so they're just fully stored in itemsnd.2da
+// iwds also have five sounds of hitting armor (SW_SWD01) that we ignore
+// pst has a lot of duplicates (1&3&6, 2&5, 8&9, 4, 7, 10) and little variation (all 6 entries for 8 are identical)
+void Actor::PlaySwingSound(WeaponInfo &wi) const
+{
+	ieResRef sound;
+	ieDword itemType = wi.itemtype;
+	int isCount = gamedata->GetSwingCount(itemType);
+
+	// swing sounds start at column 3 (index 2)
+	int isChoice = core->Roll(1, isCount, -1) + 2;
+	if (!gamedata->GetItemSound(sound, itemType, NULL, isChoice)) return;
+
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos.x, Pos.y);
+}
+
 //Just to quickly inspect debug maximum values
 #if 0
 void Actor::dumpMaxValues()
@@ -7178,6 +7196,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	SetStance(AttackStance);
+	PlaySwingSound(wi);
 
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta
@@ -7198,7 +7217,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
-		buffer.append("[Missed]");
+		buffer.append("[Missed (puppet)]");
 		Log(COMBAT, "Attack", buffer);
 		return;
 	}

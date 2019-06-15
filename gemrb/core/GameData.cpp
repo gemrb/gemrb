@@ -618,4 +618,14 @@ bool GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, i
 	return true;
 }
 
+int GameData::GetSwingCount(ieDword ItemType)
+{
+	if (ItemSounds.empty()) {
+		ReadItemSounds();
+	}
+
+	// everything but IS_GET and IS_DROP — keep updated!
+	return ItemSounds[ItemType].size() - 2;
+}
+
 }
