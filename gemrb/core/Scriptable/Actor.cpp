@@ -6041,6 +6041,7 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 		wi.enchantment = item->Enchantment;
 	}
 	wi.itemflags = wield->Flags;
+	//not resetting wi.itemtype, since we want it to remain the one of the launcher
 	//wi.range is not set, the projectile has no effect on range?
 
 	ITMExtHeader *which = item->GetWeaponHeader(true);
@@ -6088,6 +6089,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	}
 
 	wi.enchantment = item->Enchantment;
+	wi.itemtype = item->ItemType;
 	wi.itemflags = wield->Flags;
 	wi.prof = item->WeaProf;
 	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
