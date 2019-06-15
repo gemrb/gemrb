@@ -6674,6 +6674,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//also copy these flags (they match their WEAPON_ counterparts)
 	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_BYPASS);
 
+	if (wi.wflags & WEAPON_RANGED && (hittingheader->RechargeFlags&IE_ITEM_KEEN)) {
+		// all the previous checks were against the launcher, but ammo can be keen too (00arow87)
+		wi.critrange--;
+	}
+
 	// get our dual wielding modifier
 	if (dualwielding) {
 		if (leftorright) {
