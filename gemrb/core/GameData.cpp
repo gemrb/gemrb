@@ -74,10 +74,6 @@ static void ReleasePalette(void *poi)
 
 GEM_EXPORT GameData* gamedata;
 
-static int ItemSoundsCount = -1;
-typedef ieResRef ResRefPairs[2];
-static ResRefPairs *ItemSounds = NULL;
-
 GameData::GameData()
 {
 	factory = new Factory();
@@ -86,10 +82,7 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
-	if (ItemSounds) {
-		free(ItemSounds);
-		ItemSounds = NULL;
-	}
+	ItemSounds.clear();
 }
 
 void GameData::ClearCaches()
@@ -580,45 +573,49 @@ void GameData::SaveAllStores()
 	}
 }
 
-static void ReadItemSounds()
+void GameData::ReadItemSounds()
 {
-	int table = gamedata->LoadTable("itemsnd");
-	if (table < 0) {
-		ItemSoundsCount = 0;
-		ItemSounds = NULL;
+	AutoTable itemsnd("itemsnd");
+	if (!itemsnd) {
 		return;
 	}
-	Holder<TableMgr> tab = gamedata->GetTable(table);
-	ItemSoundsCount = tab->GetRowCount();
-	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
-	for (int i = 0; i < ItemSoundsCount; i++) {
-		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
-		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
+
+	int rowCount = itemsnd->GetRowCount();
+	int colCount = itemsnd->GetColumnCount();
+	for (int i = 0; i < rowCount; i++) {
+		ItemSounds[i] = std::vector<const char*>();
+		for (int j = 0; j < colCount; j++) {
+			ieResRef snd;
+			strnlwrcpy(snd, itemsnd->QueryField(i, j), 8);
+			if (!strcmp(snd, "*")) break;
+			ItemSounds[i].push_back(strdup(snd));
+		}
 	}
-	gamedata->DelTable(table);
 }
 
-void GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+bool GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
 	Sound[0] = 0;
-	if (Col > 1) {
-		return;
-	}
 
-	if (ItemSoundsCount<0) {
+	if (ItemSounds.empty()) {
 		ReadItemSounds();
 	}
 
-	if (ID[1] == 'A') {
+	if (Col >= ItemSounds[ItemType].size()) {
+		return false;
+	}
+
+	if (ID && ID[1] == 'A') {
 		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A' (pst)
 		//item animation types
 		ItemType = ItemSounds.size()-4 + ID[0]-'1';
 	}
 
-	if (ItemType>=(ieDword) ItemSoundsCount) {
-		return;
+	if (ItemType >= (ieDword) ItemSounds.size()) {
+		return false;
 	}
-	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
+	CopyResRef(Sound, ItemSounds[ItemType][Col]);
+	return true;
 }
 
 }

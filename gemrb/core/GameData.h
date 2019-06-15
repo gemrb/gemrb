@@ -113,7 +113,8 @@ public:
 	void SaveAllStores();
 
 	// itemsnd.2da functions
-	void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	void ReadItemSounds();
+	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -123,6 +124,7 @@ private:
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;
 	StoreMap stores;
+	std::map<ieDword, std::vector<const char*> > ItemSounds;
 };
 
 extern GEM_EXPORT GameData * gamedata;
