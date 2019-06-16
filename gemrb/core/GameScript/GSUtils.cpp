@@ -1451,11 +1451,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	int idsfile=core->LoadSymbol(idsname);
 	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
-		//FIXME:missing ids file!!!
-		if (InDebug&ID_TRIGGERS) {
-			Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!",
-				idsname, symbol);
-		}
+		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;
 	}
 	char *newsymbol;
