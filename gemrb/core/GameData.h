@@ -113,9 +113,10 @@ public:
 	void SaveAllStores();
 
 	// itemsnd.2da functions
-	void ReadItemSounds();
 	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
+private:
+	void ReadItemSounds();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
