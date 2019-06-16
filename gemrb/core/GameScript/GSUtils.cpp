@@ -690,16 +690,15 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	return MIC_GOTITEM;
 }
 
-/*FIXME: what is 'base'*/
-void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
+void PolymorphCopyCore(Actor *src, Actor *tar)
 {
 	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
-	if (!base) {
-		tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
-		for (int i=0;i<7;i++) {
-			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
-		}
+
+	tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
+	for (int i=0;i<7;i++) {
+		tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 	}
+
 	tar->SetName(src->GetName(0),0);
 	tar->SetName(src->GetName(1),1);
 	//add more attribute copying
@@ -798,7 +797,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (flags & CC_COPY) {
-		PolymorphCopyCore ( (Actor *) tmp, ab, false);
+		PolymorphCopyCore ( (Actor *) tmp, ab);
 	}
 }
 
