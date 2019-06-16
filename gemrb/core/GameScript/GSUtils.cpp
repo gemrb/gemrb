@@ -489,6 +489,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 		if (actor->InParty > 0) {
 			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+		} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+			channel = SFX_CHAN_MONSTER;
 		}
 	}
 
