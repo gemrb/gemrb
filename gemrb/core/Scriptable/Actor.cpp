@@ -8572,6 +8572,21 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 	}
 	snprintf(section,10,"%d", animid);
 
+	/* TODO: pst also has these, but we currently ignore them:
+	 * Another form of randomization or for different attack types, animations?
+	 *    1x at2sound for each at1sound
+	 *    2x at3sound
+	 * What are these for?
+	 *   33x cf1sound (?)
+	 *    2x ms1sound (misc; both hammers hitting metal; ambient sounds for idle animations? Likely doesn't fit here)
+	 *   19x sf1sound (?)
+	 * 
+	 * TODO: iwd:
+	 *   att2-att4
+	 *   btlcry
+	 *   fall
+	 *   fidget
+	 */
 	switch(index) {
 		case VB_ATTACK:
 			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att1":"at1sound","");
