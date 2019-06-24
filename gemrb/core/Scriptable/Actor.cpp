@@ -8532,6 +8532,11 @@ bool Actor::HandleActorStance()
 
 bool Actor::GetSoundFromFile(ieResRef Sound, unsigned int index) const
 {
+	// only dying ignores the incapacity to vocalize
+	if (index != VB_DIE) {
+		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
+	}
+
 	if (core->HasFeature(GF_RESDATA_INI)) {
 		return GetSoundFromINI(Sound, index);
 	} else {
