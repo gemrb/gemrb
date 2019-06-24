@@ -1390,10 +1390,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (!Sender->CurrentActionTicks) {
-			//play attack sound for party members
-			if (actor->InParty) {
-				//pick from all 5 possible verbal constants
-				actor->PlayWarCry(5);
+			// play the battle cry
+			// pick from all 5 possible verbal constants
+			if (!actor->PlayWarCry(5)) {
+				// for monsters also try their 2da/ini file sounds
+				if (!actor->InParty) {
+					ieResRef sound;
+					actor->GetSoundFromFile(sound, 200);
+					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos.x, actor->Pos.y);
+				}
 			}
 			//display attack message
 			if (target->GetGlobalID() != Sender->LastTarget) {
