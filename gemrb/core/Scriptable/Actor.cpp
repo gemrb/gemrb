@@ -8525,13 +8525,21 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
+bool Actor::GetSoundFromFile(ieResRef Sound, unsigned int index) const
 {
-	if (!anims) return;
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		return GetSoundFromINI(Sound, index);
+	} else {
+		return GetSoundFrom2DA(Sound, index);
+	}
+}
+
+bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
+{
+	if (!anims) return false;
 
 	AutoTable tab(anims->ResRef);
-	if (!tab)
-		return;
+	if (!tab) return false;
 
 	switch (index) {
 		case VB_ATTACK:
@@ -8552,17 +8560,18 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 			break;
 		default:
 			Log(WARNING, "Actor", "TODO:Cannot determine 2DA rowcount for index: %d", index);
-			return;
+			return false;
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
 		anims->ResRef, tab->GetRowName(index) );
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
+	return true;
 }
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
+bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -8603,9 +8612,14 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected","");
 			}
 			break;
+		case 200: // battle cry
+			if (IWDSound) {
+				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry", "");
+			}
+			break;
 	}
 	int count = CountElements(resource,',');
-	if (count<=0) return;
+	if (count <= 0) return false;
 	count = core->Roll(1,count,-1);
 	while(count--) {
 		while(*resource && *resource!=',') resource++;
@@ -8614,6 +8628,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 	CopyResRef(Sound, resource);
 	for(count=0;count<8 && Sound[count]!=',';count++) {};
 	Sound[count]=0;
+	return true;
 }
 
 void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const

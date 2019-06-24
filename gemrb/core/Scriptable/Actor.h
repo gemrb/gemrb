@@ -706,8 +706,9 @@ public:
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
-	void GetSoundFromINI(ieResRef Sound, unsigned int index) const;
-	void GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFromINI(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
