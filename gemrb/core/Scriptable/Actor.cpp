@@ -4798,9 +4798,17 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 	ieDword itemType = wi.itemtype;
 	int isCount = gamedata->GetSwingCount(itemType);
 
-	// swing sounds start at column 3 (index 2)
-	int isChoice = core->Roll(1, isCount, -1) + 2;
-	if (!gamedata->GetItemSound(sound, itemType, NULL, isChoice)) return;
+	if (isCount == -2) {
+		// monsters with non-standard items, none or something else
+		int stance = GetStance();
+		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
+			GetSoundFromFile(sound, 100+stance);
+		}
+	} else {
+		// swing sounds start at column 3 (index 2)
+		int isChoice = core->Roll(1, isCount, -1) + 2;
+		if (!gamedata->GetItemSound(sound, itemType, NULL, isChoice)) return;
+	}
 
 	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos.x, Pos.y);
 }
@@ -8552,6 +8560,7 @@ bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 	if (!tab) return false;
 
 	switch (index) {
+		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
 		case VB_ATTACK:
 			index = 0;
 			break;
@@ -8566,7 +8575,24 @@ bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 		case VB_SELECT:
 		case VB_SELECT+1:
 		case VB_SELECT+2:
-			index = 36;
+			index = 36; // Selection (yes, the row names are inconsistently capitalized)
+			break;
+		// entries without VB equivalents
+		case 100+IE_ANI_SHOOT:
+			index = 16; // SHOOT
+			break;
+		case 100+IE_ANI_ATTACK_SLASH:
+			index = 22; // ATTACK_SLASH
+			break;
+		case 100+IE_ANI_ATTACK_BACKSLASH:
+			index = 24; // ATTACK_BACKSLASH
+			break;
+		case 100+IE_ANI_ATTACK_JAB:
+			index = 26; // ATTACK_JAB
+			break;
+		// TODO: research whether this entry is ever different from ATTACK and what's the difference in use
+		case 200:
+			index = 34; // Battle_Cry
 			break;
 		default:
 			Log(WARNING, "Actor", "TODO:Cannot determine 2DA rowcount for index: %d", index);
@@ -8602,7 +8628,6 @@ bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 	 * 
 	 * TODO: iwd:
 	 *   att2-att4
-	 *   btlcry
 	 *   fall
 	 *   fidget
 	 */
@@ -8621,6 +8646,14 @@ bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 			if (IWDSound) {
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected","");
 			}
+			break;
+		// entries without VB equivalents
+		case 100+IE_ANI_SHOOT:
+		case 100+IE_ANI_ATTACK_SLASH:
+		case 100+IE_ANI_ATTACK_BACKSLASH:
+		case 100+IE_ANI_ATTACK_JAB:
+			// FIXME: complete guess
+			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att2":"at2sound","");
 			break;
 		case 200: // battle cry
 			if (IWDSound) {
