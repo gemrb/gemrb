@@ -3813,15 +3813,15 @@ ieStrRef Actor::GetVerbalConstant(int start, int count) const
 	return (ieStrRef) -1;
 }
 
-void Actor::VerbalConstant(int start, int count, bool queue) const
+bool Actor::VerbalConstant(int start, int count, bool queue) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
-		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
+		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return false;
 	}
 
 	if (count < 0) {
-		return;
+		return false;
 	}
 	int flags = DS_CONSOLE|DS_SPEECH;
 	if (queue) {
@@ -3829,6 +3829,7 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 	}
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
+	bool found = false;
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
 		char chrsound[256];
@@ -3838,6 +3839,7 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 			GetSoundFolder(chrsound, 1, soundref);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
+				found = true;
 				break;
 			}
 		} while (count > 0);
@@ -3845,8 +3847,10 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 		ieStrRef str = GetVerbalConstant(start, count);
 		if (str != (ieStrRef) -1) {
 			DisplayStringCore((Scriptable *) this, str, flags);
+			found = true;
 		}
 	}
+	return found;
 }
 
 void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
@@ -4067,9 +4071,10 @@ void Actor::PlaySelectionSound()
 	}
 }
 
-void Actor::PlayWarCry(int range) const
+bool Actor::PlayWarCry(int range) const
 {
-	if (war_cries) VerbalConstant(VB_ATTACK, range);
+	if (!war_cries) return false;
+	return VerbalConstant(VB_ATTACK, range);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3

@@ -546,7 +546,7 @@ public:
 	/* call this on gui selects */
 	void PlaySelectionSound();
 	/* play a roar if the setting isn't disabled */
-	void PlayWarCry(int range) const;
+	bool PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
 	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
@@ -564,7 +564,7 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count=1, bool queue=false) const;
+	bool VerbalConstant(int start, int count=1, bool queue=false) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
