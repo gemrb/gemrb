@@ -715,7 +715,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 // Gets sum of party level, if onlyalive is true, then counts only living PCs
 // If you need average party level, divide this with GetPartySize
-int Game::GetPartyLevel(bool onlyalive) const
+int Game::GetTotalPartyLevel(bool onlyalive) const
 {
 	int amount = 0;
 
@@ -982,7 +982,7 @@ bool Game::CheckForReplacementActor(int i)
 	}
 
 	Actor* act = NPCs[i];
-	ieDword level = GetPartyLevel(false) / GetPartySize(false);
+	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<char *> >::iterator it;
@@ -1255,7 +1255,7 @@ int Game::GetXPFromCR(int cr)
 	if (!size) return 0; // everyone just died anyway
 	// NOTE: this is an average of averages; if it turns out to be wrong,
 	// compute the party average directly
-	int level = GetPartyLevel(true) / size;
+	int level = GetTotalPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
 		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
