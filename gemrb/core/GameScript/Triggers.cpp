@@ -2950,7 +2950,7 @@ int GameScript::LevelPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	int count = core->GetGame()->GetPartySize(1);
 
 	if (count) {
-		return core->GetGame()->GetTotalPartyLevel(true) < parameters->int0Parameter;
+		return core->GetGame()->GetTotalPartyLevel(true) / count < parameters->int0Parameter;
 	}
 	return 0;
 }
@@ -2960,7 +2960,7 @@ int GameScript::LevelPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 	int count = core->GetGame()->GetPartySize(1);
 
 	if (count) {
-		return core->GetGame()->GetTotalPartyLevel(true) > parameters->int0Parameter;
+		return core->GetGame()->GetTotalPartyLevel(true) / count > parameters->int0Parameter;
 	}
 	return 0;
 }
