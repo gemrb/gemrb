@@ -5612,7 +5612,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	unsigned int channel = SFX_CHAN_GUI;
 	int index;
 
-	if (PyArg_ParseTuple( args, "i|z", &index) ) {
+	if (PyArg_ParseTuple( args, "i|z", &index, &channel_name) ) {
 		if (channel_name != NULL) {
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}

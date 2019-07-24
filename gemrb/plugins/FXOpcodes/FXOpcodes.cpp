@@ -7625,7 +7625,7 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 		Effect *myfx = new Effect;
 		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
 		myfx->Parameter2 = stat;
-		return fx_damage_bonus_modifier2(Owner, target, fx);
+		return fx_damage_bonus_modifier2(Owner, target, myfx);
 	}
 
 	target->NewStat(stat, fx->Parameter1, type);
