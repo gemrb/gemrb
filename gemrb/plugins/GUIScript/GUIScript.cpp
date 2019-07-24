@@ -9528,6 +9528,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 			break;
 		}
+		// save the resref, since the pointer may get freed
+		ieResRef itemResRef;
+		CopyResRef(itemResRef, si->ItemResRef);
 		//if no item remained, remove it
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
@@ -9542,14 +9545,14 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 		// play the item's inventory sound
 		ieResRef Sound;
-		Item *item = gamedata->GetItem(si->ItemResRef);
+		Item *item = gamedata->GetItem(itemResRef);
 		if (item) {
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			gamedata->FreeItem(item, si->ItemResRef, 0);
+			gamedata->FreeItem(item, itemResRef, 0);
 			if (Sound[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
 				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
@@ -9628,6 +9631,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 		if (rhstore) {
 			STOItem *si = rhstore->GetItem(Slot, true);
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
 			res = SellBetweenStores(si, action, store);
 
 			//if no item remained, remove it

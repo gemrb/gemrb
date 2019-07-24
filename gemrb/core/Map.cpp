@@ -369,7 +369,7 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
-	SongHeader.reverbID = 0;
+	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
 	MaterialMap = NULL;
 }
@@ -1343,8 +1343,9 @@ void Map::DrawSearchMap(const Region &screen)
 
 	// draw also pathfinding waypoints
 	Actor *act = core->GetFirstSelectedActor();
+	if (!act) return;
 	PathNode *path = act->GetPath();
-	if (!act || !path) return;
+	if (!path) return;
 	PathNode *step = path->Next;
 	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
 	int i = 0;
@@ -3984,7 +3985,7 @@ void AreaAnimation::InitAnimation()
 	}
 
 	//freeing up the previous animation
-	for(int i=0;i<animcount;i++) {
+	for (int i=0; i<animcount && animation; i++) {
 		delete animation[i];
 	}
 	free(animation);

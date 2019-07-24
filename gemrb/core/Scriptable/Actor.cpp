@@ -3679,9 +3679,17 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue, 1);
 			break;
 		case MOD_DIVISIVE:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
 			break;
 		case MOD_MODULUS:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
 			break;
 		case MOD_LOGAND:
@@ -3726,9 +3734,17 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue);
 			break;
 		case MOD_DIVISIVE:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
 			break;
 		case MOD_MODULUS:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
 			break;
 		case MOD_LOGAND:

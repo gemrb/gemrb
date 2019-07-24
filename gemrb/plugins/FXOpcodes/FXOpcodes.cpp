@@ -3467,6 +3467,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// but don't add new effects if there are none, which is an ugly workaround
 	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
 	Item *itm = gamedata->GetItem(fx->Resource, true);
+	if (!itm) return FX_NOT_APPLIED;
 	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
