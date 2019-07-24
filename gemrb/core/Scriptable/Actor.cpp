@@ -1141,7 +1141,7 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
-	actor->InitButtons(newValue, !iwd2class);
+	actor->InitButtons(actor->GetActiveClass(), !iwd2class);
 	actor->ChangeSorcererType(newValue);
 }
 
@@ -8732,7 +8732,7 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	//at this point, we need the stats for the action button row
 	//only controlled creatures (and pcs) get it
 	CreateStats();
-	InitButtons(GetStat(IE_CLASS), false);
+	InitButtons(GetActiveClass(), false);
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		ar[i] = IWD2GemrbQslot(i);
 	}
@@ -8790,7 +8790,7 @@ int Actor::IWD2GemrbQslot (int slotindex) const
 void Actor::dumpQSlots() const
 {
 	ActionButtonRow r;
-	memcpy(&r, GUIBTDefaults+GetStat(IE_CLASS), sizeof(ActionButtonRow));
+	memcpy(&r, GUIBTDefaults + GetActiveClass(), sizeof(ActionButtonRow));
 	StringBuffer buffer, buffer2, buffer3;
 
 	buffer.append("Current  default: ");
@@ -11007,6 +11007,29 @@ bool Actor::WasClass(ieDword oldClassID) const
 
 	int OldIsClassID = levelslotsbg[oldClassID];
 	return mcwasflags[OldIsClassID] == mcWas;
+}
+
+// returns effective class, accounting for possible inactive dual
+ieDword Actor::GetActiveClass() const
+{
+	if (!IsDualInactive()) return GetStat(IE_CLASS);
+
+	// should perhaps query for column numbers?  whatever, it works as is
+	const int ID = 5, MC_WAS_ID = 8;
+
+	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
+	int oldclass = ResolveTableValue("classes", mcwas, MC_WAS_ID, ID);
+	if (!oldclass) {
+		Log(ERROR, "Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
+		return 0;
+	}
+
+	int newclassmask = multiclass & ~(1 << (oldclass - 1));
+	for (int newclass = 1, mask = 1; mask <= newclassmask; newclass++, mask <<= 1)
+		if (newclassmask == mask) return newclass;
+
+	Log(ERROR, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
+	return 0;
 }
 
 // account for haste/slow affecting the metabolism (regeneration etc.)

@@ -927,6 +927,7 @@ public:
 	ieDword GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
+	ieDword GetActiveClass() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
