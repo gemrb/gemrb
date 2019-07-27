@@ -539,7 +539,7 @@ def IsDualClassed(actor, verbose):
 		else:
 			return (0,-1,-1)
 
-def IsDualSwap (actor):
+def IsDualSwap (actor, override=None):
 	"""Returns true if the dualed classes are reverse of expection.
 
 	This can happen, because the engine gives dualclass characters the same ID as
@@ -549,6 +549,8 @@ def IsDualSwap (actor):
 	example, the levels would actually be in reverse of expectation."""
 
 	Dual = IsDualClassed (actor, 1)
+	if override:
+		Dual = (2, override["old"], override["new"])
 
 	# not dual classed
 	if Dual[0] == 0:
@@ -557,6 +559,8 @@ def IsDualSwap (actor):
 	# split the full class name into its individual parts
 	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
 	Class = GetClassRowName(actor).split("_")
+	if override:
+		Class = GetClassRowName(override["mc"], "class").split("_")
 
 	# get our old class name
 	if Dual[0] == 2:

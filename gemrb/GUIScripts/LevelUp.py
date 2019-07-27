@@ -663,6 +663,11 @@ def ReactivateBaseClass ():
 	ClassName = GUICommon.GetClassRowName (Classes[1], "class")
 	KitIndex = GUICommon.GetKitIndex (pc)
 
+	# force reinitialization of the actionbar by forcing the PCF to run
+	ClassID = GemRB.GetPlayerStat (pc, IE_CLASS)
+	GemRB.SetPlayerStat (pc, IE_CLASS, 0, 0)
+	GemRB.SetPlayerStat (pc, IE_CLASS, ClassID)
+
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTable ("weapprof")
 	ProfsTableOffset = 0

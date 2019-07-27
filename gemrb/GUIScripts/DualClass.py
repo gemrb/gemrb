@@ -184,24 +184,45 @@ def DCMainDonePress ():
 	# save our thief skills if we have them
 	LUSkillsSelection.SkillsSave (pc)
 
-	# save our new class and say was multi
+	# NOTE: the ordering here is very deliberate, don't touch!
+	# for the dc detection code to work in core, some level and mc bits info has to be there
+	# 3 PCF functions (class, kit, level) all need more info
+	# testcase: dualclassing and checking how the actionbar evolves
+
+	# mark the actor as dualclassed
+	OldMCFlags = GemRB.GetPlayerStat (pc, IE_MC_FLAGS, 1)
+	NewMCBit = CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT)
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, OldMCFlags|NewMCBit)
+
+	# calculate new dc/mc class combo
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
 	MultClassId = CommonTables.Classes.FindValue ("MULTI", MultClassId)
 	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
 	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
+
+	# fake update our levels (no PCF), so the PCF can be ran later on correct values
+	# core only looks at the level difference when determining dc class order
+	DSOverride = { "old": OldClassId, "new": NewClassId, "mc": MultClassId }
+	Level1 = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	if GUICommon.IsDualSwap (pc, DSOverride):
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, 0, 0)
+	else:
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level1 - 1, 0)
+		GemRB.SetPlayerStat (pc, IE_LEVEL, 0, 0)
+
+	# finally set the new class
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	OldMCFlags = GemRB.GetPlayerStat (pc, IE_MC_FLAGS, 1)
-	NewMCBit = CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, OldMCFlags|NewMCBit)
 
 	# update our levels and xp
-	if GUICommon.IsDualSwap (pc):
+	if GUICommon.IsDualSwap (pc, DSOverride):
 		GemRB.SetPlayerStat (pc, IE_LEVEL2, 1)
 	else:
-		GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL), 0)
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level1, 0)
 		GemRB.SetPlayerStat (pc, IE_LEVEL, 1)
 	GemRB.SetPlayerStat (pc, IE_XP, 0)
+
+	# END of order matters NOTE
 
 	# new thac0
 	ThacoTable = GemRB.LoadTable ("THAC0")
