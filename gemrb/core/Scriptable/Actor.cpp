@@ -1141,6 +1141,8 @@ static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
+	// also ensure multiclass is set early, since GetActiveClass relies on it
+	actor->ResetMC();
 	actor->InitButtons(actor->GetActiveClass(), !iwd2class);
 	actor->ChangeSorcererType(newValue);
 }
@@ -9998,20 +10000,25 @@ void Actor::CreateDerivedStatsIWD2()
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 }
 
-//set up stuff here, like attack number, turn undead level
-//and similar derived stats that change with level
-void Actor::CreateDerivedStats()
+void Actor::ResetMC()
 {
 	if (iwd2class) {
 		multiclass = 0;
 	} else {
 		ieDword cls = BaseStats[IE_CLASS]-1;
-		if (cls>=(ieDword) classcount) {
+		if (cls >= (ieDword) classcount) {
 			multiclass = 0;
 		} else {
 			multiclass = multi[cls];
 		}
 	}
+}
+
+//set up stuff here, like attack number, turn undead level
+//and similar derived stats that change with level
+void Actor::CreateDerivedStats()
+{
+	ResetMC();
 
 	if (third) {
 		CreateDerivedStatsIWD2();
