@@ -124,7 +124,13 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 			// TODO: de-hardcode these (may not all be correct anyway)
 			ieDword idsStat[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT };
 			for (int i=0; i<7; i++) {
-				if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, source->Modified[idsStat[i]], i+2)) return false;
+				ieDword statValue = source->Modified[idsStat[i]];
+				if (idsStat[i] == IE_CLASS) {
+					statValue = source->GetActiveClass();
+				}
+				if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, statValue, i+2)) {
+					return false;
+				}
 			}
 		}
 	}

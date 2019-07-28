@@ -507,7 +507,7 @@ int Game::JoinParty(Actor* actor, int join)
 {
 	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
-	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), false); // init actor's action bar
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		InitActorPos(actor);

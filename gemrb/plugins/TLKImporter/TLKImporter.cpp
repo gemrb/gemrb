@@ -199,7 +199,7 @@ int TLKImporter::ClassStrRef(int slot)
 
 	act=GetActorFromSlot(slot);
 	if (act) {
-		clss=act->GetStat(IE_CLASS);
+		clss = act->GetActiveClass();
 	} else {
 		clss=0;
 	}

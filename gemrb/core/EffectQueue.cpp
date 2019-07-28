@@ -153,10 +153,11 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	default:
 		return false;
 	}
-	if( target->GetStat(stat)==value) {
-		return true;
+
+	if (stat == IE_CLASS) {
+		return target->GetActiveClass() == value;
 	}
-	return false;
+	return target->GetStat(stat) == value;
 }
 
 /*
@@ -1854,11 +1855,14 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 			case 2:
 			case 3:
 			case 4:
-			case 5:
 			case 6:
 			case 7:
 			case 8:
 				param1 = actor->GetStat(ids_stats[ids]);
+				MATCH_PARAM1();
+				break;
+			case 5:
+				param1 = actor->GetActiveClass();
 				MATCH_PARAM1();
 				break;
 			case 9:

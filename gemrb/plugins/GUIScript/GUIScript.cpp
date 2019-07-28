@@ -8411,7 +8411,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->SetOver( false );
-	actor->InitButtons(actor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), true); // force re-init of actor's action bar
 
 	//what about multiplayer?
 	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {

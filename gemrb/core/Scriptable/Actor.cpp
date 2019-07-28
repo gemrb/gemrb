@@ -7820,7 +7820,7 @@ void Actor::AddExperience(int exp, int combat)
 	bonus += GetFavoredPenalties();
 	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
 	if (xpcap != NULL) {
-		int classid = BaseStats[IE_CLASS] - 1;
+		int classid = GetActiveClass() - 1;
 		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
 			exp = xpcap[classid];
 		}
@@ -9949,7 +9949,7 @@ void Actor::CreateDerivedStatsBG()
 		}
 	}
 
-	weapSlotCount = numWeaponSlots[BaseStats[IE_CLASS]];
+	weapSlotCount = numWeaponSlots[GetActiveClass()];
 	ReinitQuickSlots();
 
 	// monk's level dictated ac and ac vs missiles bonus

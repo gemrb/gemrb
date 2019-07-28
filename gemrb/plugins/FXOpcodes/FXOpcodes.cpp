@@ -1474,7 +1474,7 @@ static int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
 
-	ieDword cls = STAT_GET(IE_CLASS);
+	ieDword cls = target->GetActiveClass();
 	if (!spell_abilities) {
 		AutoTable tab("clssplab");
 		if (!tab) {
