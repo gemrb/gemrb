@@ -11021,19 +11021,22 @@ ieDword Actor::GetActiveClass() const
 {
 	if (!IsDualInactive()) return GetStat(IE_CLASS);
 
-	// should perhaps query for column numbers?  whatever, it works as is
-	const int ID = 5, MC_WAS_ID = 8;
-
 	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
-	int oldclass = ResolveTableValue("classes", mcwas, MC_WAS_ID, ID);
+	int isclass = 0;
+	while (isclass < ISCLASSES) {
+		if (mcwas == mcwasflags[isclass]) break;
+		isclass++;
+	}
+	int oldclass = classesiwd2[isclass];
 	if (!oldclass) {
 		Log(ERROR, "Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
 		return 0;
 	}
 
 	int newclassmask = multiclass & ~(1 << (oldclass - 1));
-	for (int newclass = 1, mask = 1; mask <= newclassmask; newclass++, mask <<= 1)
+	for (int newclass = 1, mask = 1; mask <= newclassmask; newclass++, mask <<= 1) {
 		if (newclassmask == mask) return newclass;
+	}
 
 	Log(ERROR, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
 	return 0;
