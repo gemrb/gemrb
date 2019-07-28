@@ -6770,7 +6770,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative
 	if (stars == 0 && !third) {
-		ieDword clss = BaseStats[IE_CLASS];
+		ieDword clss = GetActiveClass();
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
@@ -9653,6 +9653,11 @@ int Actor::CheckUsability(Item *item) const
 				stat &= ~kitignore;
 				goto no_resolve;
 			}
+		}
+
+		if (!iwd2class && itemuse[i].stat == IE_CLASS) {
+			// account for inactive duals
+			stat = GetActiveClass();
 		}
 
 		if (iwd2class && itemuse[i].stat == IE_CLASS) {
