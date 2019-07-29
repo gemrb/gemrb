@@ -360,13 +360,13 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	ieResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
 	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
 	ieResRef mainAmbient = "";
-	if (main1[day_or_night][0]) {
+	if (*main1[day_or_night][0]) {
 		CopyResRef(mainAmbient, *main1[day_or_night]);
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
-	if (main2[day_or_night][0]) {
+	if (*main2[day_or_night][0]) {
 		CopyResRef(mainAmbient, *main2[day_or_night]);
 	}
 	if (!mainAmbient[0]) return NULL;
