@@ -7622,10 +7622,9 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 	} else if (stat >= 387) {
 		stat = damage_mod_map[stat-387];
 		// replace effect with the appropriate one
-		Effect *myfx = new Effect;
-		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
-		myfx->Parameter2 = stat;
-		return fx_damage_bonus_modifier2(Owner, target, myfx);
+		fx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
+		fx->Parameter2 = stat;
+		return fx_damage_bonus_modifier2(Owner, target, fx);
 	}
 
 	target->NewStat(stat, fx->Parameter1, type);
