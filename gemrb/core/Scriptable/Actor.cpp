@@ -11027,15 +11027,13 @@ ieDword Actor::GetActiveClass() const
 	if (!IsDualInactive()) return GetStat(IE_CLASS);
 
 	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
-	int isclass = 0;
-	while (isclass < ISCLASSES) {
+	int oldclass;
+	for (int isclass = 0; isclass < ISCLASSES; isclass++) {
+		oldclass = classesiwd2[isclass];
 		if (mcwas == mcwasflags[isclass]) break;
-		isclass++;
 	}
-	int oldclass = classesiwd2[isclass];
 	if (!oldclass) {
-		Log(ERROR, "Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
-		return 0;
+		Log(FATAL, "Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
 	}
 
 	int newclassmask = multiclass & ~(1 << (oldclass - 1));
@@ -11043,7 +11041,7 @@ ieDword Actor::GetActiveClass() const
 		if (newclassmask == mask) return newclass;
 	}
 
-	Log(ERROR, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
+	Log(FATAL, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
 	return 0;
 }
 
