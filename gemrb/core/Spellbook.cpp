@@ -410,7 +410,7 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResR
 			continue;
 		}
 		delete *ms;
-		sm->memorized_spells.erase(ms);
+		ms = sm->memorized_spells.erase(ms);
 		ms--;
 	}
 }
@@ -473,7 +473,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 
 				memcpy(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) );
 				delete *ks;
-				(*sm)->known_spells.erase(ks);
+				ks = (*sm)->known_spells.erase(ks);
 				RemoveMemorization(*sm, ResRef);
 				ks--;
 				ClearSpellInfo();
@@ -495,7 +495,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 					continue;
 				}
 				delete *ks;
-				(*sm)->known_spells.erase(ks);
+				ks = (*sm)->known_spells.erase(ks);
 				if (!onlyknown) RemoveMemorization(*sm, ResRef);
 				ks--;
 				ClearSpellInfo();
