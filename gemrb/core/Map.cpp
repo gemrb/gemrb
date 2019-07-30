@@ -2519,18 +2519,28 @@ void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy
 //0 - back away, 1 - face direction
 PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway)
 {
+	SearchmapPoint smptFarthest = FindFarthest(d, size, PathLen);
+	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
+	// Right proper memory management
+	delete[] dist;
+	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
+}
+
+Point &Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
+{
+	SearchmapPoint smptFarthest;
+	float *dist = new float[Width * Height]();
 	static const size_t DEGREES_OF_FREEDOM = 8;
 	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
 	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
 	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
 	std::priority_queue<PQNode> open;
-	float *dist = new float[Width * Height]();
 	float diagWeight = sqrt(2);
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
 	open.push(PQNode(smptFleeFrom, 0));
 	SearchmapPoint smptCurrent;
 	SearchmapPoint smptChild;
-	SearchmapPoint smptFarthest;
+
 	float farthestDist = 0;
 	PQNode newNode = PQNode();
 	while (!open.empty()) {
@@ -2541,8 +2551,8 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 			smptChild.y = smptCurrent.y + dy[i];
 			bool childOutsideMap =	smptChild.x < 0 ||
 									smptChild.y < 0 ||
-									(unsigned) smptChild.x >= Width ||
-									(unsigned) smptChild.y >= Height;
+									  (unsigned) smptChild.x >= Width ||
+									  (unsigned) smptChild.y >= Height;
 			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
@@ -2562,10 +2572,6 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 			}
 		}
 	}
-	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
-	// Right proper memory management
-	delete[] dist;
-	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
