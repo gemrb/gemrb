@@ -916,10 +916,10 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 		ClearSearchMapFor(actor);
 
 		PathNode * step = actor->GetNextStep();
-		if (!step) {
-			if (this->GetBlocked(actor->Pos.x, actor->Pos.y, actor->size)) {
-				// TODO: Avoid bumping and bumped actors moving the same way
-				actor->AddWayPoint(this->FindFarthest(actor->Pos, actor->size, actor->size * 4));
+		if (step && step->Next) {
+			//we should actually wait for a short time and check then
+			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
+				actor->NewPath();
 			}
 		}
 	}
@@ -2519,12 +2519,6 @@ void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy
 //0 - back away, 1 - face direction
 PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway)
 {
-	NavmapPoint nmptFarthest = FindFarthest(d, size, PathLen);
-	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
-}
-
-NavmapPoint Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
-{
 	static const size_t DEGREES_OF_FREEDOM = 8;
 	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
 	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
@@ -2547,8 +2541,8 @@ NavmapPoint Map::FindFarthest(const Point &d, unsigned int size, unsigned int Pa
 			smptChild.y = smptCurrent.y + dy[i];
 			bool childOutsideMap =	smptChild.x < 0 ||
 									smptChild.y < 0 ||
-									  (unsigned) smptChild.x >= Width ||
-									  (unsigned) smptChild.y >= Height;
+									(unsigned) smptChild.x >= Width ||
+									(unsigned) smptChild.y >= Height;
 			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
@@ -2568,10 +2562,10 @@ NavmapPoint Map::FindFarthest(const Point &d, unsigned int size, unsigned int Pa
 			}
 		}
 	}
+	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
 	// Right proper memory management
 	delete[] dist;
-	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
-	return nmptFarthest;
+	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
@@ -2933,7 +2927,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL | PATH_MAP_NPC, true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL, true);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary

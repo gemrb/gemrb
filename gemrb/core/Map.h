@@ -589,8 +589,6 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-
-	Point FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const;
 };
 
 }
