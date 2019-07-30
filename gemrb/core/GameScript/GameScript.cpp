@@ -749,8 +749,7 @@ static const ActionLink actionnames[] = {
 	{"movetopointnorecticle", GameScript::MoveToPointNoRecticle,AF_BLOCKING|AF_ALIVE},//the same until we know better
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_MERGESTRINGS|AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
-	//FIXME: why doesn't this have MERGESTRINGS like the above entry?
-	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
+	{"movetosavedlocationn", GameScript::MoveToSavedLocation, AF_MERGESTRINGS|AF_BLOCKING},
 	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
 	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},

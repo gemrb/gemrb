@@ -2940,7 +2940,7 @@ int GameScript::LevelParty(Scriptable* /*Sender*/, Trigger* parameters)
 	int count = core->GetGame()->GetPartySize(1);
 
 	if (count) {
-		return core->GetGame()->GetPartyLevel(1)/count==parameters->int0Parameter;
+		return core->GetGame()->GetTotalPartyLevel(true) / count == parameters->int0Parameter;
 	}
 	return 0;
 }
@@ -2950,7 +2950,7 @@ int GameScript::LevelPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	int count = core->GetGame()->GetPartySize(1);
 
 	if (count) {
-		return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+		return core->GetGame()->GetTotalPartyLevel(true) / count < parameters->int0Parameter;
 	}
 	return 0;
 }
@@ -2960,7 +2960,7 @@ int GameScript::LevelPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 	int count = core->GetGame()->GetPartySize(1);
 
 	if (count) {
-		return core->GetGame()->GetPartyLevel(1)>parameters->int0Parameter;
+		return core->GetGame()->GetTotalPartyLevel(true) / count > parameters->int0Parameter;
 	}
 	return 0;
 }
@@ -3382,17 +3382,6 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
-	int stat;
-	switch (parameters->int0Parameter) {
-		case 1: stat = IE_EA; break;
-		case 2: stat = IE_GENERAL; break;
-		case 3: stat = IE_RACE; break;
-		case 4: stat = IE_CLASS; break;
-		case 5: stat = IE_SPECIFIC; break;
-		case 6: stat = IE_SEX; break;
-		case 7: stat = IE_ALIGNMENT; break;
-		default: return 0;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		//a non actor checking for help?
@@ -3404,7 +3393,21 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 		//no help required
 		return 0;
 	}
-	if (actor->GetStat(stat)==help->GetStat(stat) ) {
+
+	int stat;
+	switch (parameters->int0Parameter) {
+		case 1: stat = IE_EA; break;
+		case 2: stat = IE_GENERAL; break;
+		case 3: stat = IE_RACE; break;
+		case 4: stat = IE_CLASS; break;
+		case 5: stat = IE_SPECIFIC; break;
+		case 6: stat = IE_SEX; break;
+		case 7: stat = IE_ALIGNMENT; break;
+		default: return 0;
+	}
+	if (stat == IE_CLASS) {
+		return actor->GetActiveClass() == help->GetActiveClass();
+	} else if (actor->GetStat(stat) == help->GetStat(stat)) {
 		// FIXME
 		//Sender->AddTrigger(&actor->LastHelp);
 		return 1;
@@ -3718,7 +3721,7 @@ int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
 // no idea if it checks only alive partymembers or if it is average or not
 int GameScript::CheckPartyLevel( Scriptable* /*Sender*/, Trigger* parameters)
 {
-	if (core->GetGame()->GetPartyLevel(false)<parameters->int0Parameter) {
+	if (core->GetGame()->GetTotalPartyLevel(false) < parameters->int0Parameter) {
 		return 0;
 	}
 	return 1;
@@ -3730,7 +3733,7 @@ int GameScript::CheckPartyAverageLevel( Scriptable* /*Sender*/, Trigger* paramet
 	Game *game = core->GetGame();
 
 	int count = game->GetPartySize(false);
-	int level = game->GetPartyLevel(false);
+	int level = game->GetTotalPartyLevel(false);
 
 	if (count) level/=count;
 

@@ -507,7 +507,7 @@ int Game::JoinParty(Actor* actor, int join)
 {
 	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
-	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), false); // init actor's action bar
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		InitActorPos(actor);
@@ -715,7 +715,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 // Gets sum of party level, if onlyalive is true, then counts only living PCs
 // If you need average party level, divide this with GetPartySize
-int Game::GetPartyLevel(bool onlyalive) const
+int Game::GetTotalPartyLevel(bool onlyalive) const
 {
 	int amount = 0;
 
@@ -982,7 +982,7 @@ bool Game::CheckForReplacementActor(int i)
 	}
 
 	Actor* act = NPCs[i];
-	ieDword level = GetPartyLevel(false) / GetPartySize(false);
+	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<char *> >::iterator it;
@@ -1255,7 +1255,7 @@ int Game::GetXPFromCR(int cr)
 	if (!size) return 0; // everyone just died anyway
 	// NOTE: this is an average of averages; if it turns out to be wrong,
 	// compute the party average directly
-	int level = GetPartyLevel(true) / size;
+	int level = GetTotalPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
 		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
@@ -1290,10 +1290,13 @@ void Game::ShareXP(int xp, int flags)
 		return;
 	}
 
-	if (xp>0) {
-		displaymsg->DisplayConstantStringValue( STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp); //you have gained ... xp
-	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp); //you have lost ... xp
+	//you have gained/lost ... xp
+	if (core->HasFeedback(FT_MISC)) {
+		if (xp > 0) {
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp);
+		} else {
+			displaymsg->DisplayConstantStringValue(STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp);
+		}
 	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -1397,9 +1400,9 @@ void Game::SetReputation(ieDword r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	if (Reputation>r) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
 	} else if (Reputation<r) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {

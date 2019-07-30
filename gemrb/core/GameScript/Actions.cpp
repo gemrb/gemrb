@@ -2886,11 +2886,13 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	int xp = parameters->int0Parameter;
-	if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
-		core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
-		displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, DMC_BG2XPGREEN, actor);
-	} else {
-		displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword)xp);
+	core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
+	if (core->HasFeedback(FT_MISC)) {
+		if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
+			displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, DMC_BG2XPGREEN, actor);
+		} else {
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword)xp);
+		}
 	}
 
 	//normally the second parameter is 0, but it may be handy to have control over that (See SX_* flags)
@@ -2908,7 +2910,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		xptable.load("xplist");
 	}
 
-	if (parameters->int0Parameter>0) {
+	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
 		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
 	}
 	if (!xptable) {
@@ -3960,7 +3962,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
 	delete fx;
-	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
+	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -3977,7 +3979,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
 	delete fx;
-	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
+	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4112,10 +4114,10 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 			map->AddItemToLocation(tar->Pos, item);
 			if (act->InParty) {
 				act->VerbalConstant(VB_INVENTORY_FULL);
-				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+				if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 			}
 		} else {
-			if (act->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+			if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4150,10 +4152,10 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 			map->AddItemToLocation(Sender->Pos, item);
 			if (act->InParty) {
 				act->VerbalConstant(VB_INVENTORY_FULL);
-				displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+				if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 			}
 		} else {
-			if (act->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+			if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4488,7 +4490,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (scr->GetStat(IE_EA)>EA_EVILCUTOFF) {
-		displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL, DMC_WHITE);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL, DMC_WHITE);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4521,7 +4523,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 	if (check) {
 		//noticed attempt
-		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, DMC_WHITE);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, DMC_WHITE);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
 			scr->AttackedBy(snd);
 		} else {
@@ -4553,7 +4555,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE, DMC_WHITE);
+			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE, DMC_WHITE);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -4569,11 +4571,11 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 	}
 
-	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
+	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	if (ret == MIC_FULL && snd->InParty) {
 		snd->VerbalConstant(VB_INVENTORY_FULL);
-		displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 	}
 	Sender->ReleaseCurrentAction();
 }
@@ -5571,7 +5573,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 		if (!container->TryUnlock(actor)) {
 			//playsound can't open container
 			//display string, etc
-			displaymsg->DisplayConstantString(STR_CONTLOCKED, DMC_LIGHTGREY, container);
+			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_CONTLOCKED, DMC_LIGHTGREY, container);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -5813,7 +5815,7 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	PolymorphCopyCore((Actor *) tar, (Actor *) Sender, false);
+	PolymorphCopyCore((Actor *) tar, (Actor *) Sender);
 }
 
 /* according to IESDP this only copies the animation ID */

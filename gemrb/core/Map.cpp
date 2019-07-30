@@ -369,7 +369,7 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
-	SongHeader.reverbID = 0;
+	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
 	MaterialMap = NULL;
 }
@@ -915,7 +915,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 
-		PathNode * step = actor->GetNextStep();
+		PathNode * step = actor->GetStep();
 		if (step && step->Next) {
 			//we should actually wait for a short time and check then
 			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
@@ -1341,8 +1341,9 @@ void Map::DrawSearchMap(const Region &screen)
 
 	// draw also pathfinding waypoints
 	Actor *act = core->GetFirstSelectedActor();
+	if (!act) return;
 	PathNode *path = act->GetPath();
-	if (!act || !path) return;
+	if (!path) return;
 	PathNode *step = path->Next;
 	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
 	int i = 0;
@@ -3039,7 +3040,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	SpawnGroup *sg = NULL;
 	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
-	int level = (difficulty ? *difficulty : core->GetGame()->GetPartyLevel(true));
+	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
 	int count = 1;
 
 	if (Spawns.Lookup(creResRef, lookup)) {
@@ -3107,7 +3108,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 		return;
 	}
 	//create spawns
-	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
+	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
 	unsigned int spawncount = 0, i = RAND(0, spawn->Count-1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
@@ -3167,7 +3168,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = (int) RAND(0, 99) < chance;
 	unsigned int spawncount = 0;
-	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
+	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
 		if (interrupt) {
@@ -3807,7 +3808,7 @@ void AreaAnimation::InitAnimation()
 	}
 
 	//freeing up the previous animation
-	for(int i=0;i<animcount;i++) {
+	for (int i=0; i<animcount && animation; i++) {
 		delete animation[i];
 	}
 	free(animation);

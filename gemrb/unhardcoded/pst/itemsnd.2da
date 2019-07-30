@@ -1,49 +1,49 @@
 2DA V1.0
 *
-	DROP		TAKE
-MISC	INT_12R1	INT_12R
-AMULET	INT_12M1	INT_12M
-ARMOR 	INT_12G1	INT_12G
-BELT 	INT_12R1	INT_12R
-BOOT 	INT_12R1	INT_12R
-ARROW 	INT_12R1	INT_12R
-PET 	INT_12A1	INT_12A
-HELMET 	INT_12R1	INT_12R
-KEY 	Z_KEY2		Z_KEY1
-POTION 	Z_DRINK2	Z_DRINK1
-RING 	INT_12C1	INT_12C
-SCROLL 	INT_12Q1	INT_12Q
-SHIELD 	INT_12R1	INT_12R
-FOOD 	INT_12R1	INT_12R
-BULLET 	INT_12R1	INT_12R
-BOW 	INT_12R1	INT_12R
-DAGGER 	Z_DAGGR2	Z_DAGGR1
-MACE 	INT_12F1	INT_12F
-SLING 	INT_12R1	INT_12R
-SMSWORD	Z_SWRD2		Z_SWRD1
-BGSWORD	Z_SWRD2		Z_SWRD1
-HAMMER 	Z_WEPN2		Z_WEPN1
-MSTAR 	INT_12R1	INT_12R
-FLAIL 	INT_12R1	INT_12R
-DART 	INT_12R1	INT_12R
-AXE 	INT_12B1	INT_12B
-STAFF 	INT_12R1	INT_12R
-XBOW	Z_NORD4		Z_NORD3
-FIST 	INT_12R1	INT_12R
-SPEAR 	INT_12R1	INT_12R
-POLEARM	INT_12R1	INT_12R
-BOLT 	Z_NORD2		Z_NORD1
-CLOAK 	INT_12R1	INT_12R
-COIN 	Z_COIN2		Z_COIN1
-GEM 	Z_GEM2B		Z_GEM2A
-WAND 	Z_GEM1B		Z_GEM1A
-EYE 	INT_12L1	INT_12L
-BRACER 	Z_METAL8	Z_METAL7
-EARRING	INT_12C1	INT_12C
-TATTOO 	INT_12K1	INT_12K
-LENS 	Z_METAL4	Z_METAL3
-TEETH	INT_12P1	INT_12P
-*
-*
-*
-*
+          DROP       TAKE      SWING1  SWING2   SWING3   SWING4  SWING5
+MISC      INT_12R1   INT_12R   *       *        *        *        *
+AMULET    INT_12M1   INT_12M   *       *        *        *        *
+ARMOR     INT_12G1   INT_12G   *       *        *        *        *
+BELT      INT_12R1   INT_12R   *       *        *        *        *
+BOOT      INT_12R1   INT_12R   *       *        *        *        *
+ARROW     INT_12R1   INT_12R   *       *        *        *        *
+PET       INT_12A1   INT_12A   *       *        *        *        *
+HELMET    INT_12R1   INT_12R   *       *        *        *        *
+KEY       Z_KEY2     Z_KEY1    *       *        *        *        *
+POTION    Z_DRINK2   Z_DRINK1  *       *        *        *        *
+RING      INT_12C1   INT_12C   *       *        *        *        *
+SCROLL    INT_12Q1   INT_12Q   *       *        *        *        *
+SHIELD    INT_12R1   INT_12R   *       *        *        *        *
+FOOD      INT_12R1   INT_12R   *       *        *        *        *
+BULLET    INT_12R1   INT_12R   *       *        *        *        *
+BOW       INT_12R1   INT_12R   SWI_10  SWI_10a  SWI_10b  SWI_10c  SWI_10d
+DAGGER    Z_DAGGR2   Z_DAGGR1  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+MACE      INT_12F1   INT_12F   SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+SLING     INT_12R1   INT_12R   SWI_07  SWI_07a  SWI_07b  SWI_07c  SWI_07d
+SMSWORD   Z_SWRD2    Z_SWRD1   SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+BGSWORD   Z_SWRD2    Z_SWRD1   SWI_02  SWI_02a  SWI_02b  SWI_02c  SWI_02d
+HAMMER    Z_WEPN2    Z_WEPN1   SWI_02  SWI_02a  SWI_02b  SWI_02c  SWI_02d
+MSTAR     INT_12R1   INT_12R   SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+FLAIL     INT_12R1   INT_12R   SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+DART      INT_12R1   INT_12R   *       *        *        *        *
+AXE       INT_12B1   INT_12B   SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+STAFF     INT_12R1   INT_12R   SWI_07  SWI_07a  SWI_07b  SWI_07c  SWI_07d
+XBOW      Z_NORD4    Z_NORD3   SWI_10  SWI_10a  SWI_10b  SWI_10c  SWI_10d
+FIST      INT_12R1   INT_12R   SWI_09  *        *        *        *
+SPEAR     INT_12R1   INT_12R   SWI_07  SWI_07a  SWI_07b  SWI_07c  SWI_07d
+POLEARM   INT_12R1   INT_12R   SWI_07  SWI_07a  SWI_07b  SWI_07c  SWI_07d
+BOLT      Z_NORD2    Z_NORD1   *       *        *        *        *
+CLOAK     INT_12R1   INT_12R   *       *        *        *        *
+COIN      Z_COIN2    Z_COIN1   *       *        *        *        *
+GEM       Z_GEM2B    Z_GEM2A   *       *        *        *        *
+WAND      Z_GEM1B    Z_GEM1A   *       *        *        *        *
+EYE       INT_12L1   INT_12L   *       *        *        *        *
+BRACER    Z_METAL8   Z_METAL7  *       *        *        *        *
+EARRING   INT_12C1   INT_12C   *       *        *        *        *
+TATTOO    INT_12K1   INT_12K   *       *        *        *        *
+LENS      Z_METAL4   Z_METAL3  *       *        *        *        *
+TEETH     INT_12P1   INT_12P   *       *        *        *        *
+*                              *       *        *        *        *
+*                              *       *        *        *        *
+*                              *       *        *        *        *
+*                              *       *        *        *        *

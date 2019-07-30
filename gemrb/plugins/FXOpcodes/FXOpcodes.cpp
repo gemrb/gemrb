@@ -35,6 +35,7 @@
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "ScriptedAnimation.h"
+#include "ScriptEngine.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
 #include "VEFObject.h"
@@ -1473,7 +1474,7 @@ static int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
 
-	ieDword cls = STAT_GET(IE_CLASS);
+	ieDword cls = target->GetActiveClass();
 	if (!spell_abilities) {
 		AutoTable tab("clssplab");
 		if (!tab) {
@@ -1782,6 +1783,10 @@ int fx_luck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	if (STAT_GET(IE_STATE_ID) & STATE_BERSERK) {
+		return FX_NOT_APPLIED;
+	}
 
 	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
 		BASE_SET(IE_MORALE, 10);
@@ -2465,26 +2470,22 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieResRef Removed;
-	ieDword level;
 
 	switch (fx->Parameter2) {
 	case 0:
 	default:
-		level = 0xffffffff;
+		// dispel everything
+		target->fxqueue.RemoveLevelEffects(Removed, 0xffffffff, RL_DISPELLABLE, 0);
 		break;
 	case 1:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Power-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->CasterLevel);
 		break;
 	case 2:
-		//same level: 50% success, each diff modifies it by 5%
-		level = core->Roll(1,20,fx->Parameter1-10);
-		if (level>=0x80000000) level = 0;
+		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
+		target->fxqueue.DispelEffects(fx, fx->Parameter1);
 		break;
 	}
-	//if signed would it be negative?
-	target->fxqueue.RemoveLevelEffects(Removed, level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -3350,7 +3351,7 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_experience_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_experience_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_MOD( IE_XP );
+	BASE_MOD(IE_XP);
 	return FX_NOT_APPLIED;
 }
 
@@ -3463,7 +3464,12 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//equip the weapon
-	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0);
+	// but don't add new effects if there are none, which is an ugly workaround
+	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
+	Item *itm = gamedata->GetItem(fx->Resource, true);
+	if (!itm) return FX_NOT_APPLIED;
+	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
+	gamedata->FreeItem(itm, fx->Resource);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
@@ -3478,7 +3484,6 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//will destroy the first item
-print("Destroy Item: %s\n", fx->Resource);
 	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
 		target->ReinitQuickSlots();
 	}
@@ -4044,6 +4049,19 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	BASE_STATE_SET( STATE_PETRIFIED );
 	if (target->InParty) core->GetGame()->LeaveParty(target);
 	target->SendDiedTrigger();
+
+	// end the game if everyone in the party gets petrified
+	Game *game = core->GetGame();
+	int partySize = game->GetPartySize(true);
+	int stoned = 0;
+	for (int j=0; j<partySize; j++) {
+		Actor *pc = game->GetPC(j, true);
+		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
+	}
+	if (stoned == partySize) {
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
+	}
+
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
 	return FX_NOT_APPLIED;
@@ -4937,6 +4955,7 @@ int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	target->SetSpellState(SS_HELD);
+	STATE_SET(STATE_HELPLESS);
 	STAT_SET( IE_HELD, 1);
 	return FX_APPLIED;
 }
@@ -7603,9 +7622,8 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 	} else if (stat >= 387) {
 		stat = damage_mod_map[stat-387];
 		// replace effect with the appropriate one
-		Effect *myfx = new Effect;
-		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
-		myfx->Parameter2 = stat;
+		fx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
+		fx->Parameter2 = stat;
 		return fx_damage_bonus_modifier2(Owner, target, fx);
 	}
 

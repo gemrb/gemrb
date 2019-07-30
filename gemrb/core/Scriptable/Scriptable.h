@@ -471,7 +471,7 @@ public:
 	PathNode *GetPath() { return path; };
 	int GetPathLength();
 //inliners to protect data consistency
-	inline PathNode * GetNextStep() {
+	inline PathNode * GetStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);
 		}

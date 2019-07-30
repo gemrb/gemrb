@@ -314,6 +314,16 @@ enum RESOURCE_DIRECTORY {
 	DIRECTORY_CHR_SCRIPTS
 };
 
+enum FeedbackType {
+	FT_TOHIT = 1,
+	FT_COMBAT = 2,
+	FT_ACTIONS = 4, // handled by Actor::CommandActor
+	FT_STATES = 8,
+	FT_SELECTION = 16, // handled by Actor::PlaySelectionSound
+	FT_MISC = 32,
+	FT_CASTING = 64
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -495,6 +505,9 @@ public:
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
+	void SetFeedbackLevel(int level);
+	/** returns true if the passed feedback type is enabled */
+	bool HasFeedback(int type) const;
 	/** returns the Window Visible Flag */
 	int GetVisible(unsigned short WindowIndex) const;
 	/** Set a Window Visible Flag */
@@ -810,6 +823,7 @@ public:
 	bool KeepCache;
 	bool MultipleQuickSaves;
 	bool UseCorruptedHack;
+	int FeedbackLevel;
 
 	Variables *plugin_flags;
 	/** The Main program loop */

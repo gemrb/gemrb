@@ -27,6 +27,7 @@
 #include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
+#include "GameScript/GameScript.h" // only for ID_Allegiance
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
@@ -111,7 +112,8 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 1:
 		stat = IE_TEAM; break;
 	case 2: //EA
-		stat = IE_EA; break;
+		stat = IE_EA;
+		return GameScript::ID_Allegiance(target, value);
 	case 3: //GENERAL
 		//this is a hack to support dead only projectiles in PST
 		//if it interferes with something feel free to remove
@@ -151,10 +153,11 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	default:
 		return false;
 	}
-	if( target->GetStat(stat)==value) {
-		return true;
+
+	if (stat == IE_CLASS) {
+		return target->GetActiveClass() == value;
 	}
-	return false;
+	return target->GetStat(stat) == value;
 }
 
 /*
@@ -1110,11 +1113,12 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 
 	//opcode immunity
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
+	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
+	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
-	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
+	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune2 to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
@@ -1389,15 +1393,18 @@ void EffectQueue::RemoveAllEffects(ieDword opcode) const
 }
 
 //removes all equipping effects that match slotcode
-void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
+bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
+	bool removed = false;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( !IsEquipped((*f)->TimingMode)) continue;
 		MATCH_SLOTCODE();
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		removed = true;
 	}
+	return removed;
 }
 
 //removes all effects that match projectile
@@ -1656,6 +1663,36 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 	}
 }
 
+void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
+{
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); f++) {
+		if (*f == dispeller) continue;
+
+		// this should also ignore all equipping effects
+		if(!((*f)->Resistance & FX_CAN_DISPEL)) {
+			continue;
+		}
+
+		// 50% base chance of success; always at least 1% chance of failure or success
+		// positive level diff modifies the base chance by 5%, negative by -10%
+		int diff = level - (*f)->CasterLevel;
+		if (diff > 0) {
+			diff *= 5;
+		} else if (diff < 0) {
+			diff *= 10;
+		}
+		diff += 50;
+
+		int roll = core->Roll(1, 100, 0);
+		if (roll == 1) continue;
+		if (roll == 100 || roll < diff) {
+			// finally dispel
+			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		}
+	}
+}
+
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1818,11 +1855,14 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 			case 2:
 			case 3:
 			case 4:
-			case 5:
 			case 6:
 			case 7:
 			case 8:
 				param1 = actor->GetStat(ids_stats[ids]);
+				MATCH_PARAM1();
+				break;
+			case 5:
+				param1 = actor->GetActiveClass();
 				MATCH_PARAM1();
 				break;
 			case 9:

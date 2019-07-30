@@ -63,9 +63,11 @@ class Projectile;
 
 
 //Extended header recharge flags
-#define IE_ITEM_USESTRENGTH  1          //weapon
+#define IE_ITEM_USESTRENGTH  1          //weapon, EE splits it in two
 #define IE_ITEM_BREAKABLE    2          //weapon
-#define IE_ITEM_USEDEXTERITY 4          //gemrb weapon (move this if tobex implements it elsewhere)
+#define IE_ITEM_USESTRENGTH_DMG  4      // EE
+#define IE_ITEM_USESTRENGTH_HIT  8      // EE
+#define IE_ITEM_USEDEXTERITY 16         //gemrb weapon finesse (move this if tobex implements it elsewhere)
 #define IE_ITEM_HOSTILE      0x400      //equipment
 #define IE_ITEM_RECHARGE     0x800      //equipment
 #define IE_ITEM_BYPASS       0x10000    //weapon (bypass shield and armor bonus)

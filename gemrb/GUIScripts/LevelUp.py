@@ -379,7 +379,7 @@ def OpenLevelUpWindow():
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
-	for c in range(len(Classes)):
+	for c in range(NumClasses):
 		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
 			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
 
@@ -662,6 +662,11 @@ def ReactivateBaseClass ():
 	# we construct the Classes array, so that the active class is always first and the base is second
 	ClassName = GUICommon.GetClassRowName (Classes[1], "class")
 	KitIndex = GUICommon.GetKitIndex (pc)
+
+	# force reinitialization of the actionbar by forcing the PCF to run
+	ClassID = GemRB.GetPlayerStat (pc, IE_CLASS)
+	GemRB.SetPlayerStat (pc, IE_CLASS, 0, 0)
+	GemRB.SetPlayerStat (pc, IE_CLASS, ClassID)
 
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTable ("weapprof")

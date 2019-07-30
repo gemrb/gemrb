@@ -257,6 +257,7 @@ Interface::Interface()
 	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
+	FeedbackLevel = 0;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -2402,7 +2403,11 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	if (index >= img->GetHeight()) {
 		index = 0;
 	}
+	int width = img->GetWidth();
 	for (int i = 0; i < colors; i++) {
+		if (i >= width) {
+			Log(WARNING, "Interface", "Trying to access invalid palette index (%d)! Using black instead", i);
+		}
 		pal[i] = img->GetPixel(i, index);
 	}
 	return pal;
@@ -3517,7 +3522,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 		char extension[9];
 		ExtFilter(const char* ext) {
-			strncpy(extension, ext, sizeof(extension));
+			strlcpy(extension, ext, sizeof(extension));
 		}
 
 		bool operator()(const char* fname) const {
@@ -4364,6 +4369,17 @@ TextArea *Interface::GetMessageTextArea() const
 		}
 	}
 	return NULL;
+}
+
+void Interface::SetFeedbackLevel(int level)
+{
+	FeedbackLevel = level;
+}
+
+
+bool Interface::HasFeedback(int type) const
+{
+	return FeedbackLevel & type;
 }
 
 static const char *saved_extensions[]={".are",".sto",0};
