@@ -410,7 +410,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
+	bool IsActor(unsigned int px, unsigned int py, unsigned int size) const;
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
+	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
 	unsigned int GetBlocked(const Point &p) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
@@ -590,7 +592,7 @@ private:
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 
-	Point &FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const;
+	Point FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const;
 };
 
 }

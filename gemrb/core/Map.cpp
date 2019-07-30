@@ -2030,7 +2030,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 	return ret;
 }
 
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
+bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2046,14 +2046,24 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
 	for (unsigned int i=0; i<size-1; i++) {
 		for (unsigned int j=0; j<size-1; j++) {
 			if (i*i+j*j <= r) {
-				if (!(GetBlocked(ppx+i,ppy+j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx+i,ppy-j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx-i,ppy+j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx-i,ppy-j)&PATH_MAP_PASSABLE)) return true;
+				if (!(GetBlocked(ppx+i,ppy+j)&flags)) return true;
+				if (!(GetBlocked(ppx+i,ppy-j)&flags)) return true;
+				if (!(GetBlocked(ppx-i,ppy+j)&flags)) return true;
+				if (!(GetBlocked(ppx-i,ppy-j)&flags)) return true;
 			}
 		}
 	}
 	return false;
+}
+
+bool Map::IsActor(unsigned int px, unsigned int py, unsigned int size) const
+{
+	return this->CheckSearchmapPointFlags(px, py, size, ~PATH_MAP_ACTOR);
+}
+
+bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
+{
+	return this->CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE);
 }
 
 unsigned int Map::GetBlocked(const Point &c) const
@@ -2522,12 +2532,11 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 {
 	SearchmapPoint smptFarthest = FindFarthest(d, size, PathLen);
 	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
-	// Right proper memory management
-	delete[] dist;
+
 	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
-Point &Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
+Point Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
 {
 	SearchmapPoint smptFarthest;
 	float *dist = new float[Width * Height]();
@@ -2573,6 +2582,9 @@ Point &Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen
 			}
 		}
 	}
+	// Right proper memory management
+	delete[] dist;
+	return smptFarthest;
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
@@ -2787,7 +2799,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
 									(unsigned) smptChild.y >= Height;
-			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size) || IsActor(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
@@ -2886,8 +2898,8 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// right to left
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
-				unsigned int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy));
-				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
+				int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy));
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE || blockStatus == ~PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
@@ -2895,8 +2907,8 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// left to right
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
-				unsigned int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy));
-				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
+				int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy));
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE || blockStatus == ~PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
@@ -2908,8 +2920,8 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// bottom to top
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
-				unsigned int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty);
-				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
+				int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty);
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE || blockStatus == ~PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
@@ -2917,8 +2929,8 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// top to bottom
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
-				unsigned int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty);
-				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE))) {
+				int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty);
+				if (blockStatus & flag || (checkImpassable && (blockStatus == PATH_MAP_IMPASSABLE || blockStatus == ~PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
@@ -2934,7 +2946,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL, true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|PATH_MAP_ACTOR, true);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
