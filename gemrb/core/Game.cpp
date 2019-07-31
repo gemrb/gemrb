@@ -517,7 +517,6 @@ int Game::JoinParty(Actor* actor, int join)
 		return slot;
 	}
 	size_t size = PCs.size();
-	//set the lastjoined trigger
 
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
@@ -536,6 +535,7 @@ int Game::JoinParty(Actor* actor, int join)
 			}
 		}
 
+		//set the lastjoined trigger
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {

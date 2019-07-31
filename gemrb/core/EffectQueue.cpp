@@ -1157,7 +1157,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		// specialist mages get a +2 bonus to saves to spells of the same school used against them
 		specialist = actor->GetStat(IE_KIT);
 		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
-			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
 			if (specialist & (1 << (fx->PrimaryType+5))) {
 				bonus += 2;
 			}
