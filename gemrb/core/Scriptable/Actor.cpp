@@ -868,10 +868,9 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 
 	if (kitindex == 0) {
 		baseclass = GetActiveClass();
-		std::vector<ieDword> kits = class2kits[baseclass].ids;
-		std::vector<ieDword>::iterator it = kits.begin();
-		for (int idx = 0; it != kits.end(); it++, idx++) {
-			if (kit & (*it)) return class2kits[baseclass].indices[idx];
+		kitindex = GetIWD2KitIndex(kit, baseclass);
+		if (kitindex < 0) {
+			kitindex = 0;
 		}
 	}
 
