@@ -2374,6 +2374,24 @@ static void InitActorTables()
 	}
 	className2ID.clear();
 
+	// slurp up kitlist.2da; only iwd2 has both class and kit info in the same table
+	if (!iwd2class) {
+		tm.load("kitlist", true);
+		if (!tm) {
+			error("Actor", "Missing kitlist.2da!");
+		}
+		for (unsigned int i=0; i < tm->GetRowCount(); i++) {
+			char rowName[6];
+			sprintf(rowName, "%d", i);
+			// kit usability is in hex and is sometimes used as the kit ID,
+			// while other times ID is the baseclass constant or-ed with the index
+			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
+			int classID = atoi(tm->QueryField(rowName, "CLASS"));
+			iwd2kits[classID].indices.push_back(i);
+			iwd2kits[classID].ids.push_back(kitUsability);
+		}
+	}
+
 	//pre-cache hit/damage/speed bonuses for weapons
 	tm.load("wspecial");
 	if (tm) {
