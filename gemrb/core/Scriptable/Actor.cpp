@@ -200,7 +200,7 @@ struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
 };
-static std::map<int, ClassKits> iwd2kits;
+static std::map<int, ClassKits> class2kits;
 
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
@@ -845,7 +845,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 {
-	std::vector<int> kits = iwd2kits[classesiwd2[baseclass]].indices;
+	std::vector<int> kits = class2kits[classesiwd2[baseclass]].indices;
 	std::vector<int>::iterator it = kits.begin();
 	for ( ; it != kits.end(); it++) {
 		if (kit & (*it)) return *it;
@@ -2155,8 +2155,8 @@ static void InitActorTables()
 			if (classcol) {
 				// kit ids are in hex
 				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
-				iwd2kits[classcol].indices.push_back(i);
-				iwd2kits[classcol].ids.push_back(classID);
+				class2kits[classcol].indices.push_back(i);
+				class2kits[classcol].ids.push_back(classID);
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
@@ -2387,8 +2387,8 @@ static void InitActorTables()
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
 			int classID = atoi(tm->QueryField(rowName, "CLASS"));
-			iwd2kits[classID].indices.push_back(i);
-			iwd2kits[classID].ids.push_back(kitUsability);
+			class2kits[classID].indices.push_back(i);
+			class2kits[classID].ids.push_back(kitUsability);
 		}
 	}
 
@@ -9685,7 +9685,7 @@ int Actor::CheckUsability(Item *item) const
 				if (Modified[levelslotsiwd2[j]] == 0) continue;
 				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
 
-				std::vector<ieDword> kits = iwd2kits[classesiwd2[j]].ids;
+				std::vector<ieDword> kits = class2kits[classesiwd2[j]].ids;
 				std::vector<ieDword>::iterator it = kits.begin();
 				for ( ; it != kits.end(); it++) {
 					kitignore |= *it;
