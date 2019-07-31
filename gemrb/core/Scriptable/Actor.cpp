@@ -195,7 +195,7 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 // map isClass -> (IWD2) class ID
 static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-// classis -> kits map
+// class -> kits map
 struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
@@ -845,10 +845,10 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 {
-	std::vector<int> kits = class2kits[classesiwd2[baseclass]].indices;
-	std::vector<int>::iterator it = kits.begin();
-	for ( ; it != kits.end(); it++) {
-		if (kit & (*it)) return *it;
+	std::vector<ieDword> kits = class2kits[baseclass].ids;
+	std::vector<ieDword>::iterator it = kits.begin();
+	for (int idx=0; it != kits.end(); it++, idx++) {
+		if (kit & (*it)) return class2kits[baseclass].indices[idx];
 	}
 
 	return -1;
