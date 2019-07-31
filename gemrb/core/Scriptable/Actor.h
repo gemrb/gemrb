@@ -431,6 +431,7 @@ private:
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
+	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 public:
 	Actor(void);
 	~Actor(void);

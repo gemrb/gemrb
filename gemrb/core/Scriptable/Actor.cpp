@@ -854,8 +854,7 @@ static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 	return -1;
 }
 
-//TODO: make kitlist column 6 stored internally
-static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword baseclass=0)
+ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 {
 	int kitindex = 0;
 
@@ -868,12 +867,11 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword b
 	}
 
 	if (kitindex == 0) {
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
-		if (tm) {
-			kitindex = tm->FindTableValue(6, kit);
-			if (kitindex < 0) {
-				kitindex = 0;
-			}
+		baseclass = GetActiveClass();
+		std::vector<ieDword> kits = class2kits[baseclass].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int idx = 0; it != kits.end(); it++, idx++) {
+			if (kit & (*it)) return class2kits[baseclass].indices[idx];
 		}
 	}
 
@@ -886,7 +884,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	ieDword row = GetKitIndex(kit, "kitlist", baseclass);
+	ieDword row = GetKitIndex(kit, baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
@@ -9651,7 +9649,7 @@ int Actor::CheckUsability(Item *item) const
 			if (!iwd2class) {
 				if (IsKitInactive()) continue;
 
-				stat = GetKitIndex(stat, itemuse[i].table);
+				stat = GetKitIndex(stat);
 				mcol = 0xff;
 			} else {
 				//iwd2 doesn't need translation from kit to usability, the kit value IS usability
