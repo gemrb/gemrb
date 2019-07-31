@@ -933,7 +933,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 			if (multiclass & msk) {
 				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
-				if (i == kitclass && !IsDualInactive()) {
+				if (i == kitclass && !IsKitInactive()) {
 					// in case of dc reactivation, we already removed the clabs on activation of new class
 					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
 					if (IsDualClassed()) {
@@ -9644,6 +9644,8 @@ int Actor::CheckUsability(Item *item) const
 		//if we have a kit, we just use its index for the lookup
 		if (itemuse[i].stat==IE_KIT) {
 			if (!iwd2class) {
+				if (IsKitInactive()) continue;
+
 				stat = GetKitIndex(stat, itemuse[i].table);
 				mcol = 0xff;
 			} else {
@@ -11043,6 +11045,22 @@ ieDword Actor::GetActiveClass() const
 
 	Log(FATAL, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
 	return 0;
+}
+
+// like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
+bool Actor::IsKitInactive() const
+{
+	if (!IsDualInactive()) return false;
+
+	const int CLASS = 7;
+
+	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+	if (tm) {
+		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
+		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));
+		if (kitclass == GetActiveClass()) return false;
+	}
+	return true;
 }
 
 // account for haste/slow affecting the metabolism (regeneration etc.)
