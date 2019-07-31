@@ -839,6 +839,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define BG2_KITMASK  0xffffc000
 #define KIT_BASECLASS 0x4000
 #define KIT_SWASHBUCKLER KIT_BASECLASS+12
+#define KIT_WILDMAGE KIT_BASECLASS+30
 #define KIT_BARBARIAN KIT_BASECLASS+31
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
@@ -5070,8 +5071,9 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 
 int Actor::GetWildMod(int level)
 {
-	if (GetStat(IE_KIT) == (KIT_BASECLASS|0x1e)) {
+	if (GetStat(IE_KIT) == KIT_WILDMAGE) {
 		// avoid rerolling the mod, since we get called multiple times per each cast
+		// TODO: also handle a reroll to 0
 		if (!WMLevelMod) {
 			if (level>=MAX_LEVEL) level=MAX_LEVEL;
 			if(level<1) level=1;
