@@ -838,8 +838,8 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 
 #define BG2_KITMASK  0xffffc000
 #define KIT_BASECLASS 0x4000
-#define KIT_SWASHBUCKLER 0x100000
-#define KIT_BARBARIAN 0x40000000
+#define KIT_SWASHBUCKLER KIT_BASECLASS+12
+#define KIT_BARBARIAN KIT_BASECLASS+31
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
@@ -877,21 +877,6 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword b
 	}
 
 	return (ieDword)kitindex;
-}
-
-// iwd2 kit usability matches kit ids, so this should never be used
-static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
-{
-	if (third) error("Actor", "Tried to look up iwd2 kit usability the bg2 way!\n");
-	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
-		int kitindex = kit&0xfff;
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
-		if (tm) {
-			return strtol(tm->QueryField(kitindex, 6), NULL, 0 );
-		}
-	}
-	if (kit&KIT_BASECLASS) return 0;
-	return kit;
 }
 
 //applies a kit on the character
@@ -9931,8 +9916,8 @@ void Actor::CreateDerivedStatsBG()
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
-		// HACK: swashbucklers can't backstab
-		if (GetKitUsability(BaseStats[IE_KIT])==KIT_SWASHBUCKLER) {
+		// swashbucklers can't backstab, but backstab.2da only has THIEF in it
+		if (BaseStats[IE_KIT] == KIT_SWASHBUCKLER) {
 			backstabdamagemultiplier = 1;
 		} else {
 			AutoTable tm("backstab");
@@ -10135,7 +10120,7 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if ( (isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (GetKitUsability(BaseStats[IE_KIT]) == KIT_BARBARIAN) ) {
+	if ((isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
 		return BaseStats[IE_LEVEL];
 	}
 
