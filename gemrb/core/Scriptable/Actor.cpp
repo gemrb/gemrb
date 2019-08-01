@@ -87,7 +87,6 @@ static int extraslots = -1;
 static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
-static char **classabilities = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
@@ -199,6 +198,8 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
+	std::vector<const char*> clabs;
+	const char* clab;
 };
 static std::map<int, ClassKits> class2kits;
 
@@ -925,7 +926,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 						ApplyClab(clab, max, remove, diff);
 					}
 				} else {
-					ApplyClab(classabilities[i], max, remove, diff);
+					ApplyClab(class2kits[i].clab, max, remove, diff);
 				}
 			}
 			msk+=msk;
@@ -941,7 +942,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	if (kitclass==cls || iwd2class) {
 		ApplyClab(clab, max, remove, diff);
 	} else {
-		ApplyClab(classabilities[cls], max, remove, diff);
+		ApplyClab(class2kits[cls].clab, max, remove, diff);
 	}
 	return true;
 }
@@ -1581,15 +1582,6 @@ void Actor::ReleaseMemory()
 			free(wizardspelltables);
 			wizardspelltables=NULL;
 		}
-		if (classabilities) {
-			for (i=0;i<classcount;i++) {
-				if (classabilities[i]) {
-					free (classabilities[i]);
-				}
-			}
-			free(classabilities);
-			classabilities=NULL;
-		}
 
 		if (defaultprof) {
 			free(defaultprof);
@@ -1871,7 +1863,6 @@ static void InitActorTables()
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
-		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
@@ -1950,7 +1941,8 @@ static void InitActorTables()
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
-			classabilities[i]=strdup(field);
+			// everyone but pst (none at all) and iwd2 (different table)
+			class2kits[i].clab = strdup(field);
 
 			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
@@ -2149,17 +2141,21 @@ static void InitActorTables()
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
 			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
+			const char *clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
 				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
+				class2kits[classcol].clabs.push_back(strdup(clab));
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
 				ieDword cid = atoi(tm->QueryField(isclassnames[i], "ID"));
 				classesiwd2[i] = cid;
+
+				class2kits[classID].clab = strdup(clab);
 			} else {
 				// new class out of order
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
@@ -2384,8 +2380,10 @@ static void InitActorTables()
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
 			int classID = atoi(tm->QueryField(rowName, "CLASS"));
+			const char *clab = tm->QueryField(rowName, "ABILITIES");
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
+			class2kits[classID].clabs.push_back(strdup(clab));
 		}
 	}
 
