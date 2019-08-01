@@ -867,7 +867,7 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 	}
 
 	if (kitindex == 0) {
-		baseclass = GetActiveClass();
+		if (!baseclass) baseclass = GetActiveClass();
 		kitindex = GetIWD2KitIndex(kit, baseclass);
 		if (kitindex < 0) {
 			kitindex = 0;
