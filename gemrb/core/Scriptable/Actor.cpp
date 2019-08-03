@@ -846,12 +846,28 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
 {
-	std::vector<ieDword> kits = class2kits[baseclass].ids;
-	std::vector<ieDword>::iterator it = kits.begin();
-	for (int idx=0; it != kits.end(); it++, idx++) {
-		if (kit & (*it)) return class2kits[baseclass].indices[idx];
+	if (baseclass != 0) {
+		std::vector<ieDword> kits = class2kits[baseclass].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int idx=0; it != kits.end(); it++, idx++) {
+			if (kit & (*it)) return class2kits[baseclass].indices[idx];
+		}
+		Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
 	}
 
+	// no class info passed, so infer it
+	std::map<int, ClassKits>::iterator clskit;
+	for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
+		std::vector<ieDword> kits = class2kits[cidx].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int kidx=0; it != kits.end(); it++, kidx++) {
+			if (kit & (*it)) {
+				return class2kits[cidx].indices[kidx];
+			}
+		}
+	}
+
+	Log(ERROR, "Actor", "GetIWD2KitIndex: didn't find kit %d for any class, ignoring!", kit);
 	return -1;
 }
 
