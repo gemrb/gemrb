@@ -9687,9 +9687,9 @@ int Actor::CheckUsability(Item *item) const
 				}
 			}
 			continue;
-		} else {
-			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		}
+
+		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 
 no_resolve:
 		if (stat&itemvalue) {
