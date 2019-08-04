@@ -907,44 +907,14 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	ieDword cls = GetStat(IE_CLASS);
 	Holder<TableMgr> tm;
 	if (iwd2class) {
+		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
+		assert(baseclass != 0);
 		ieDword row = GetIWD2KitIndex(kit, baseclass);
 		bool kitMatchesClass = row > 0;
 
-		if (!kit && baseclass == 0) {
-			// class and caller didn't pass a baseclass (only actions not present in iwd2: addkit and addsuperkit)
-			// except this is iwd2, so there could be several classes and cls holds only one
-			if (GetLevelInClass(cls) == BaseStats[IE_CLASSLEVELSUM]) {
-				// ok, go with cls
-				clab = class2kits[cls].clab;
-			} else {
-				// we don't know what to do, should never happen
-				Log(FATAL, "Actor", "ApplyKit: don't know what class you want!");
-			}
-		} else if (!kit || !kitMatchesClass) {
+		if (!kit || !kitMatchesClass) {
 			// pure class
 			clab = class2kits[baseclass].clab;
-			cls = baseclass;
-		} else if (baseclass == 0) {
-			// we have a kit, but no baseclass -> look it up
-			// NOTE: shouldn't happen, but also would just return the first kit found
-			bool found = false;
-			std::map<int, ClassKits>::iterator clskit;
-			for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
-				std::vector<ieDword> kits = class2kits[cidx].ids;
-				std::vector<ieDword>::iterator it = kits.begin();
-				for (int kidx=0; it != kits.end(); it++, kidx++) {
-					if (kit & (*it)) {
-						clab = class2kits[cidx].clabs[kidx];
-						cls = cidx;
-						found = true;
-						break;
-					}
-				}
-			}
-			if (!found) {
-				Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit (%d), skipping2!", kit);
-				return false;
-			}
 		} else {
 			// both kit and baseclass are fine and the kit is of this baseclass
 			std::vector<ieDword> kits = class2kits[baseclass].ids;
@@ -952,11 +922,12 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 			for (int idx=0; it != kits.end(); it++, idx++) {
 				if (kit & (*it)) {
 					clab = class2kits[baseclass].clabs[idx];
-					cls = baseclass;
 					break;
 				}
 			}
 		}
+		assert(clab != NULL);
+		cls = baseclass;
 	} else if (kit) {
 		// bg2 kit abilities
 		bool found = false;
