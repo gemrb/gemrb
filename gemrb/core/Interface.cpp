@@ -3268,6 +3268,17 @@ void Interface::DelAllWindows()
 	ModalWindow = NULL;
 }
 
+/**
+ * Delegates a pasting request of text to a fitting consumer, e.g. console,
+ * potentially text inputs, ...
+ */
+void Interface::RequestPasting(const String & string)
+{
+	if (ConsolePopped) {
+		console->InsertText(string);
+	}
+}
+
 /** Popup the Console */
 void Interface::PopupConsole()
 {

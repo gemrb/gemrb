@@ -528,6 +528,8 @@ public:
 	void RedrawAll();
 	/** Refreshes any control associated with the variable name with value*/
 	void RedrawControls(const char *varname, unsigned int value);
+	/** Attempts to paste text into the interface. */
+	void RequestPasting(const String&);
 	/** Popup the Console */
 	void PopupConsole();
 	/** Get the SaveGameIterator */
