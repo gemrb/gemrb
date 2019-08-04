@@ -731,8 +731,29 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				break;
 			}
 			else {
-				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
-				return SDLVideoDriver::ProcessEvent(event);
+				/**
+				 * As being SDL2-only, try to query the clipboard state to
+				 * paste when middle clicking the mouse.
+				 */
+				if (
+					   event.button.button == SDL_BUTTON_MIDDLE
+					&& event.type == SDL_MOUSEBUTTONDOWN
+					&& SDL_HasClipboardText()
+				) {
+					char *pasteValue = SDL_GetClipboardText();
+
+					if (pasteValue != NULL) {
+						String *pasteValueString = StringFromCString(pasteValue);
+						core->RequestPasting(*pasteValueString);
+						delete pasteValueString;
+						SDL_free(pasteValue);
+					}
+
+					break;
+				} else {
+					// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
+					return SDLVideoDriver::ProcessEvent(event);
+				}
 			}
 		case SDL_KEYDOWN:
 			{
