@@ -896,30 +896,86 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 
 //applies a kit on the character
 // iwd2 has support for multikit characters, so we have more work
+// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be choosen
+// even generalist mages are a kit the same way as in the older games
 bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	ieDword row = GetKitIndex(kit, baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
 	Holder<TableMgr> tm;
 	if (iwd2class) {
-		if ((signed)row == -1) { // baseclass or caller didn't pass a baseclass (a few actions)
-			row = baseclass - 1;
+		ieDword row = GetIWD2KitIndex(kit, baseclass);
+		bool kitMatchesClass = row > 0;
+
+		if (!kit && baseclass == 0) {
+			// class and caller didn't pass a baseclass (only actions not present in iwd2: addkit and addsuperkit)
+			// except this is iwd2, so there could be several classes and cls holds only one
+			if (GetLevelInClass(cls) == BaseStats[IE_CLASSLEVELSUM]) {
+				// ok, go with cls
+				clab = class2kits[cls].clab;
+			} else {
+				// we don't know what to do, should never happen
+				Log(FATAL, "Actor", "ApplyKit: don't know what class you want!");
+			}
+		} else if (!kit || !kitMatchesClass) {
+			// pure class
+			clab = class2kits[baseclass].clab;
+			cls = baseclass;
+		} else if (baseclass == 0) {
+			// we have a kit, but no baseclass -> look it up
+			// NOTE: shouldn't happen, but also would just return the first kit found
+			bool found = false;
+			std::map<int, ClassKits>::iterator clskit;
+			for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
+				std::vector<ieDword> kits = class2kits[cidx].ids;
+				std::vector<ieDword>::iterator it = kits.begin();
+				for (int kidx=0; it != kits.end(); it++, kidx++) {
+					if (kit & (*it)) {
+						clab = class2kits[cidx].clabs[kidx];
+						cls = cidx;
+						found = true;
+						break;
+					}
+				}
+			}
+			if (!found) {
+				Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit (%d), skipping2!", kit);
+				return false;
+			}
+		} else {
+			// both kit and baseclass are fine and the kit is of this baseclass
+			std::vector<ieDword> kits = class2kits[baseclass].ids;
+			std::vector<ieDword>::iterator it = kits.begin();
+			for (int idx=0; it != kits.end(); it++, idx++) {
+				if (kit & (*it)) {
+					clab = class2kits[baseclass].clabs[idx];
+					cls = baseclass;
+					break;
+				}
+			}
 		}
-		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
-		assert (tm);
-		//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
-		clab = tm->QueryField(row, 4);
-		cls = baseclass;
-	} else if (row) {
-		//kit abilities
-		tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
-		if (tm) {
-			kitclass = (ieDword) atoi(tm->QueryField(row, 7));
-			clab = tm->QueryField(row, 4);
+	} else if (kit) {
+		// bg2 kit abilities
+		bool found = false;
+		std::map<int, ClassKits>::iterator clskit;
+		for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
+			std::vector<ieDword> kits = class2kits[cidx].ids;
+			std::vector<ieDword>::iterator it = kits.begin();
+			for (int kidx=0; it != kits.end(); it++, kidx++) {
+				if (kit & (*it)) {
+					kitclass = cidx;
+					clab = class2kits[cidx].clabs[kidx];
+					found = true;
+					break;
+				}
+			}
+		}
+		if (!found) {
+			Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit (%d), skipping!", kit);
+			return false;
 		}
 	}
 
