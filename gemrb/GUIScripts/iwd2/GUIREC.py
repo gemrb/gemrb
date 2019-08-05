@@ -798,7 +798,7 @@ def DisplayWeapons (pc):
 			RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(5*failure["Shield"])+"%", 0))
 		if arcana:
 			AddIndent()
-			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(arcana)+"%", 0))
+			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(-arcana)+"%", 0))
 		# Other, just a guess to show the remainder
 		if other:
 			AddIndent()
