@@ -844,20 +844,23 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define KIT_BARBARIAN KIT_BASECLASS+31
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
-static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
+static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 {
+	if (!kit) return -1;
+
 	if (baseclass != 0) {
 		std::vector<ieDword> kits = class2kits[baseclass].ids;
 		std::vector<ieDword>::iterator it = kits.begin();
 		for (int idx=0; it != kits.end(); it++, idx++) {
 			if (kit & (*it)) return class2kits[baseclass].indices[idx];
 		}
+		if (strict) return -1;
 		Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
 	}
 
 	// no class info passed, so infer it
-	std::map<int, ClassKits>::iterator clskit;
-	for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
+	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+	for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
 		std::vector<ieDword> kits = class2kits[cidx].ids;
 		std::vector<ieDword>::iterator it = kits.begin();
 		for (int kidx=0; it != kits.end(); it++, kidx++) {
@@ -895,21 +898,24 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 }
 
 //applies a kit on the character
-// iwd2 has support for multikit characters, so we have more work
-// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be choosen
-// even generalist mages are a kit the same way as in the older games
 bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
+	int row = GetKitIndex(kit, baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
 	Holder<TableMgr> tm;
+
+	// iwd2 has support for multikit characters, so we have more work
+	// at the same time each baseclass has its own level stat, so the logic is cleaner
+	// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be choosen
+	// even generalist mages are a kit the same way as in the older games
 	if (iwd2class) {
 		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
 		assert(baseclass != 0);
-		ieDword row = GetIWD2KitIndex(kit, baseclass);
+		row = GetIWD2KitIndex(kit, baseclass, true);
 		bool kitMatchesClass = row > 0;
 
 		if (!kit || !kitMatchesClass) {
@@ -928,18 +934,25 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 		}
 		assert(clab != NULL);
 		cls = baseclass;
-	} else if (kit) {
+	} else if (row) {
 		// bg2 kit abilities
+		// this doesn't do a kitMatchesClass like above, since it is handled when applying the clab below
+		// NOTE: a fighter/illusionist multiclass and illusionist/fighter dualclass would be good test cases, but they don't have any clabs
+		// NOTE: multiclass characters will get the clabs applied for all classes at once, so up to three times, since there are three level stats
+		// we can't rely on baseclass, since it will match only for combinations of fighters, mages and thieves.
+		// TODO: fix it — one application ensures no problems with stacking permanent effects
+		// NOTE: it can happen in normal play that we are leveling two classes at once, as some of the xp thresholds are shared (f/m at 250,000 xp).
 		bool found = false;
-		std::map<int, ClassKits>::iterator clskit;
-		for (int cidx=1; clskit != class2kits.end(); clskit++, cidx++) {
-			std::vector<ieDword> kits = class2kits[cidx].ids;
-			std::vector<ieDword>::iterator it = kits.begin();
+		std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+		for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
+			std::vector<int> kits = class2kits[cidx].indices;
+			std::vector<int>::iterator it = kits.begin();
 			for (int kidx=0; it != kits.end(); it++, kidx++) {
-				if (kit & (*it)) {
+				if (row == *it) {
 					kitclass = cidx;
 					clab = class2kits[cidx].clabs[kidx];
 					found = true;
+					clskit = --class2kits.end(); // break out of the outer loop too
 					break;
 				}
 			}
