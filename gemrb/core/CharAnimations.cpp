@@ -479,6 +479,10 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[type];
 }
 
+Palette* CharAnimations::GetShadowPalette() const {
+	return shadowPalette;
+}
+
 static inline int compare_avatars(const void *a, const void *b)
 {
 	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
@@ -653,6 +657,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
+	shadowPalette = NULL;
 	nextStanceID = 0;
 	StanceID = 0;
 	autoSwitchOnEnd = false;
@@ -745,6 +750,10 @@ CharAnimations::~CharAnimations(void)
 		gamedata->FreePalette(palette[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
+
+	if (shadowPalette) {
+		gamedata->FreePalette(shadowPalette, 0);
+	}
 
 	for (i = 0; i < MAX_ANIMS; ++i) {
 		for (int j = 0; j < MAX_ORIENT; ++j) {
@@ -1329,10 +1338,8 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 			return NULL;
 		}
 
-		PaletteType paletteType = PAL_MAIN;
-		if (!palette[paletteType]) {
-			palette[paletteType] = animation->GetFrame(0)->GetPalette()->Copy();
-			SetupColors(paletteType);
+		if (!shadowPalette) {
+			shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
 		}
 
 		switch (StanceID) {
