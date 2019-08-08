@@ -399,7 +399,7 @@ private:
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint);
+				unsigned char Face, const Color& tint, bool useShadowPalette = false);
 
 	/** fixes the palette */
 	void SetupColors();
