@@ -4123,9 +4123,9 @@ void Actor::PlaySelectionSound()
 {
 	playedCommandSound = false;
 	switch (sel_snd_freq) {
-		case 0:
-			return;
 		case 1:
+			return;
+		case 2:
 			if (core->Roll(1,100,0) > 20) return;
 		default:;
 	}
@@ -4160,13 +4160,13 @@ void Actor::CommandActor(Action* action, bool clearPath)
 	if (clearPath) ClearPath();
 	AddAction(action); // now do this new thing
 	switch (cmd_snd_freq) {
-		case 0:
-			return;
 		case 1:
+			return;
+		case 2:
 			if (playedCommandSound) return;
 			playedCommandSound = true;
 			// intentional fallthrough
-		case 2:
+		case 3:
 			//PST has 4 states and rare sounds
 			if (raresnd) {
 				if (core->Roll(1,100,0)>50) return;
