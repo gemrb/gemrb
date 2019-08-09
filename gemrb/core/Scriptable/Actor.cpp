@@ -8065,7 +8065,7 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 
 void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, const Color& tint)
+			unsigned char Face, const Color& tint, bool useShadowPalette)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -8100,8 +8100,9 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 			}
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
+			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
 			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
+				flags, tint, newsc, palette, &screen);
 		}
 	}
 }
@@ -8526,7 +8527,7 @@ void Actor::Draw(const Region &screen)
 		newsc = sc = GetSpriteCover();
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(screen, cx, cy, BBox, newsc, shadowAnimations, Face, tint);
+			DrawActorSprite(screen, cx, cy, BBox, newsc, shadowAnimations, Face, tint, true);
 		}
 
 		// actor itself
