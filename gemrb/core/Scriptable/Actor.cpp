@@ -4122,11 +4122,22 @@ bool Actor::GetPartyComment()
 void Actor::PlaySelectionSound()
 {
 	playedCommandSound = false;
-	switch (sel_snd_freq) {
+	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
+	unsigned int frequency = sel_snd_freq + pstflags;
+	if (!pstflags && frequency > 2) frequency = 5;
+	switch (frequency) {
 		case 1:
 			return;
 		case 2:
 			if (core->Roll(1,100,0) > 20) return;
+			break;
+		// pst-only
+		case 3:
+			if (core->Roll(1, 100, 0) > 50) return;
+			break;
+		case 4:
+			if (core->Roll(1, 100, 0) > 80) return;
+			break;
 		default:;
 	}
 
@@ -4159,7 +4170,9 @@ void Actor::CommandActor(Action* action, bool clearPath)
 	Scriptable::Stop(); // stop what you were doing
 	if (clearPath) ClearPath();
 	AddAction(action); // now do this new thing
-	switch (cmd_snd_freq) {
+
+	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
+	switch (cmd_snd_freq + pstflags) {
 		case 1:
 			return;
 		case 2:
@@ -4171,8 +4184,15 @@ void Actor::CommandActor(Action* action, bool clearPath)
 			if (raresnd) {
 				if (core->Roll(1,100,0)>50) return;
 			}
+			break;
+		case 4:
+			if (raresnd) {
+				if (core->Roll(1, 100, 0) > 80) return;
+			}
+			break;
 		default:;
 	}
+
 	if (core->GetFirstSelectedPC(false) == this) {
 		//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
 		VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
