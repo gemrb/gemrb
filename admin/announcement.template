@@ -12,6 +12,10 @@ Full changelog digest:
 NEWS entry
 [/code]
 
+Thanks to everyone that contributed their time, including:
+git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
+https://github.com/mntnr/name-your-contributors is preferred
+
 (Optionally link or copy also the release notes)
 
 ******************* MODDING RING ********************
