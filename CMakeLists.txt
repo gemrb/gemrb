@@ -153,6 +153,9 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 			# clang ignores -Wno-error
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
+		else()
+			# hit in python2 includes
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-register")
 		endif ()
 	endif ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith ")
