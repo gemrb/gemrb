@@ -6210,6 +6210,7 @@ PyDoc_STRVAR( GemRB_SaveConfig__doc,
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
+	UpdateActorConfig(); // Button doesn't trigger this in its OnMouseUp handler where it calls SetVar
 	return PyBool_FromLong(core->SaveConfig());
 }
 
