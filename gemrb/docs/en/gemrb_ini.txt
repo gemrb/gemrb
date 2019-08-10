@@ -491,7 +491,9 @@ rather than explicitly scripted (as in BG2).
 
 RareActionSounds = <bool>
 - - - - - - - - - - - - -
-Toggles whether to use all the available verbal constants or not.
+Toggles the count of available verbal constants for commands. Most games
+had 3, but bg2 increased it to 7 by decreasing the amount of rare select
+sounds.
 
 
 ReverseDoor = <bool>

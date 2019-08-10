@@ -4182,12 +4182,12 @@ void Actor::CommandActor(Action* action, bool clearPath)
 			// intentional fallthrough
 		case 3:
 			//PST has 4 states and rare sounds
-			if (raresnd) {
+			if (pstflags) {
 				if (core->Roll(1,100,0)>50) return;
 			}
 			break;
 		case 4:
-			if (raresnd) {
+			if (pstflags) {
 				if (core->Roll(1, 100, 0) > 80) return;
 			}
 			break;
@@ -4196,7 +4196,7 @@ void Actor::CommandActor(Action* action, bool clearPath)
 
 	if (core->GetFirstSelectedPC(false) == this) {
 		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
-		VerbalConstant(VB_COMMAND, core->HasFeature(GF_FIXED_MORALE_OPCODE) ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
+		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
 	}
 }
 
