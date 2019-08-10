@@ -4195,8 +4195,8 @@ void Actor::CommandActor(Action* action, bool clearPath)
 	}
 
 	if (core->GetFirstSelectedPC(false) == this) {
-		//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
-		VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
+		VerbalConstant(VB_COMMAND, core->HasFeature(GF_FIXED_MORALE_OPCODE) ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
 	}
 }
 
