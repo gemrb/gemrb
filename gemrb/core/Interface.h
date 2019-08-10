@@ -688,6 +688,7 @@ public:
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;
+	int GetRareSelectSoundCount() const;
 	int GetMaximumAbility() const;
 	int GetStrengthBonus(int column, int value, int ex) const;
 	int GetIntelligenceBonus(int column, int value) const;

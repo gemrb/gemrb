@@ -110,6 +110,7 @@ static ieWordSigned *wisbon = NULL;
 static int **reputationmod = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+static int NumRareSelectSounds = 2;
 
 static ieWord IDT_FAILURE = 0;
 static ieWord IDT_CRITRANGE = 1;
@@ -2300,7 +2301,7 @@ bool Interface::LoadGemRBINI()
 		strlcpy(INIConfig, s, sizeof(INIConfig));
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-
+	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
 
 	for (int i=0;i<GF_COUNT;i++) {
@@ -5257,6 +5258,8 @@ int Interface::CompressSave(const char *folder)
 	}
 	return 0;
 }
+
+int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }
 
 int Interface::GetMaximumAbility() const { return MaximumAbility; }
 

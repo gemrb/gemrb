@@ -134,7 +134,7 @@ static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
-#define NUM_RARE_SELECT_SOUNDS 2 //in bg and pst it is actually 4 TODO: check
+static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
 #define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
@@ -1888,6 +1888,7 @@ static void InitActorTables()
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 	IWDSound = core->HasFeature(GF_SOUNDS_INI);
+	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists various level based xp bonuses
 	AutoTable tm("xpbonus", true);
