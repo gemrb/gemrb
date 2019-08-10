@@ -4305,7 +4305,12 @@ void Actor::PlayExistenceSounds()
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
 						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
 						if (stream != -1) {
-							audio->QueueAmbient(stream, sb.Sound);
+							int audioLength = audio->QueueAmbient(stream, sb.Sound);
+
+							if (audioLength > 0) {
+								SetAnimatedTalking(audioLength);
+							}
+
 							audio->ReleaseStream(stream, false);
 						}
 					}
