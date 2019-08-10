@@ -1698,6 +1698,7 @@ Selectable::Selectable(ScriptableType type)
 	Selected = false;
 	Over = false;
 	size = 0;
+	sizeFactor = 1.0f;
 	cover = NULL;
 	circleBitmap[0] = NULL;
 	circleBitmap[1] = NULL;
@@ -1764,8 +1765,9 @@ void Selectable::DrawCircle(const Region &vp)
 		// for size == 1, radii are 12, 9
 		int csize = (size - 1) * 4;
 		if (csize < 4) csize = 3;
+
 		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
-		(ieWord) (csize * 4), (ieWord) (csize * 3), *col );
+		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col );
 	}
 }
 
@@ -1809,9 +1811,10 @@ void Selectable::Select(int Value)
 	SetSpriteCover(NULL);
 }
 
-void Selectable::SetCircle(int circlesize, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)
+void Selectable::SetCircle(int circlesize, float factor, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)
 {
 	size = circlesize;
+	sizeFactor = factor;
 	selectedColor = color;
 	overColor.r = color.r >> 1;
 	overColor.g = color.g >> 1;

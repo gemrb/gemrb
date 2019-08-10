@@ -396,6 +396,8 @@ private:
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
 	ieDword LastFatigueCheck;
+	unsigned int remainingTalkSoundTime;
+	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -936,6 +938,7 @@ public:
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
+	void SetAnimatedTalking(unsigned int);
 };
 }
 
