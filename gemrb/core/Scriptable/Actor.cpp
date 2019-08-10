@@ -57,6 +57,8 @@
 #include "System/StringBuffer.h"
 #include "StringMgr.h"
 
+#include <cmath>
+
 namespace GemRB {
 
 //configurable?
@@ -539,6 +541,7 @@ Actor::Actor()
 	WMLevelMod = 0;
 	TicksLastRested = LastFatigueCheck = 0;
 	speed = 0;
+	remainingTalkSoundTime = lastTalkTimeCheckAt = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
 	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
@@ -733,6 +736,8 @@ void Actor::SetCircleSize()
 		return;
 
 	GameControl *gc = core->GetGameControl();
+	float oscillationFactor = 1.0f;
+
 	if (UnselectableTimer) {
 		color = &magenta;
 		color_index = 4;
@@ -742,9 +747,17 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_CHECKFORBERSERK]) {
 		color = &yellow;
 		color_index = 5;
-	} else if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
+	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
 		color = &white;
 		color_index = 3; //?? made up
+
+		if (remainingTalkSoundTime > 0) {
+			/**
+			 * Approximation: pulsating at about 2Hz over a notable radius growth.
+			 * Maybe check this relation for dragons and rats, too.
+			 */
+			oscillationFactor = 1.1f + std::sin(remainingTalkSoundTime * (4 * M_PI) / 1000) * 0.1f;
+		}
 	} else {
 		switch (Modified[IE_EA]) {
 			case EA_PC:
@@ -778,7 +791,7 @@ void Actor::SetCircleSize()
 	if (csize >= MAX_CIRCLE_SIZE)
 		csize = MAX_CIRCLE_SIZE - 1;
 
-	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+	SetCircle( anims->GetCircleSize(), oscillationFactor, *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
@@ -4293,7 +4306,12 @@ void Actor::PlayExistenceSounds()
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
 						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
 						if (stream != -1) {
-							audio->QueueAmbient(stream, sb.Sound);
+							int audioLength = audio->QueueAmbient(stream, sb.Sound);
+
+							if (audioLength > 0) {
+								SetAnimatedTalking(audioLength);
+							}
+
 							audio->ReleaseStream(stream, false);
 						}
 					}
@@ -8386,6 +8404,20 @@ void Actor::Draw(const Region &screen)
 			drawcircle = markerfeedback >= 5;
 		}
 	}
+
+	if (remainingTalkSoundTime > 0) {
+		unsigned int currentTick = GetTickCount();
+		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
+		lastTalkTimeCheckAt = currentTick;
+
+		if (diffTime >= remainingTalkSoundTime) {
+			remainingTalkSoundTime = 0;
+		} else {
+			remainingTalkSoundTime -= diffTime;
+		}
+		SetCircleSize();
+	}
+
 	if (drawcircle) {
 		DrawCircle(vp);
 		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
@@ -11157,6 +11189,11 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 
 ieDword Actor::GetClassID (const ieDword isclass) {
 	return classesiwd2[isclass];
+}
+
+void Actor::SetAnimatedTalking (unsigned int length) {
+	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
+	lastTalkTimeCheckAt = GetTickCount();
 }
 
 }
