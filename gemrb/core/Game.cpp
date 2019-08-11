@@ -1766,7 +1766,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			}
 		} else {
 			//you may not rest here, find an inn
-			if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS)))
 			{
 				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 				return false;

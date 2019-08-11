@@ -72,9 +72,9 @@ void GameScript::SetAreaRestFlag(Scriptable* Sender, Action* parameters)
 	Map *map=Sender->GetCurrentArea();
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
-		map->AreaType|=AT_CAN_REST;
+		map->AreaType |= AT_CAN_REST_INDOORS;
 	} else {
-		map->AreaType&=~AT_CAN_REST;
+		map->AreaType &= ~AT_CAN_REST_INDOORS;
 	}
 }
 
