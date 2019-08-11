@@ -1712,7 +1712,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
-		if RepModTable:
+		if RepModTable and not (Store['StoreFlags'] & SHOP_NOREPADJ):
 			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
 	effprice = price * mod / 100

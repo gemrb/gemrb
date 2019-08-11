@@ -55,7 +55,7 @@ class Projectile;
 #define IE_ITEM_STOLEN       0x00000400
 #define IE_ITEM_CONVERSABLE  0x00000800
 #define IE_ITEM_PULSATING    0x00001000
-#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
+#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN ) // beware: IE_STORE_BUYCRITS may override the first half
 //tobex modder extensions, please note, these are not copied into the local slot bits
 #define IE_ITEM_NO_DISPEL    0x01000000 //disables destruction by dispelling
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
