@@ -66,6 +66,11 @@ class Wall_Polygon;
 #define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
 //                        6 // pst: "You must obtain permission to rest here."
 #define AF_DREAM          8 // unused in pst
+/* TODO: implement these EE bits (plus PST:EE merged both worlds, bleargh)
+#define AF_NOFATALITY    16 // Player1 death does not end the game
+#define AF_NOREST        32 // Resting not allowed
+#define AF_NOTRAVEL      64 // Travel not allowed
+*/
 
 //area types
 #define AT_OUTDOOR        1

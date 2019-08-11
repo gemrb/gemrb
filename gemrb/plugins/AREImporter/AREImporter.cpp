@@ -194,6 +194,11 @@ bool AREImporter::Open(DataStream* stream)
 	str->ReadWord( &WSnow );
 	str->ReadWord( &WFog );
 	str->ReadWord( &WLightning );
+	// unused wind speed, TODO: EEs use it for transparency
+	// a single byte was re-purposed to control the alpha on the stencil water for more or less transparency.
+	// If you set it to 0, then the water should be appropriately 50% transparent.
+	// If you set it to any other number, it will be that transparent.
+	// It's 1 byte, so setting it to 128 you'll have the same as the default of 0
 	str->ReadWord( &WUnknown );
 	AreaDifficulty = 0;
 	if (bigheader) {
