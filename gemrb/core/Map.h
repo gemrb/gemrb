@@ -227,6 +227,7 @@ public:
 	ieWord DayChance;
 	ieWord NightChance;
 	ieDword NextSpawn;
+	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 	Spawn();
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
@@ -279,6 +280,7 @@ public:
 	ieVariable Name;
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
+	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	Palette* palette;
 	SpriteCover** covers;
 	AreaAnimation();

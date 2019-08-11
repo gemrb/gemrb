@@ -33,8 +33,14 @@ namespace GemRB {
 #define IE_DLG_TR_ACTION   0x04
 #define IE_DLG_TR_FINAL    0x08
 #define IE_DLG_TR_JOURNAL  0x10
+// unknown 0x20 (interrupt?)
 #define IE_DLG_UNSOLVED    0x40
+#define IE_DLG_ADDJOURNAL  0x80 // Add Journal note (works implicitly — bg2Sections[0] is the default)
 #define IE_DLG_SOLVED      0x100
+// TODO: implement EE extensions
+// bit 9: 1=Immediate execution of script actions, 0=Delayed execution of script actions (BGEE)
+// bit 10: Clear actions (BGEE)
+
 #define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
 
 class Condition;
