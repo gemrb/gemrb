@@ -132,6 +132,7 @@ public: //struct members
 	ieDword unknown1;
 	ieDword unknown2;
 	ieResRef MapIconResRef;
+	ieDword Flags;
 
 	AnimationFactory *bam;
 private: //non-struct members
