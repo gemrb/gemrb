@@ -1162,7 +1162,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		} else {
 			casterenemy = true; //target->GetStat(IE_EA)>EA_GOODCUTOFF;
 		}
-		fx->DiceThrown=casterenemy;
+		if (!fx->DiceThrown) fx->DiceThrown = casterenemy;
 
 		playercharmed = target->InParty;
 		fx->DiceSides = playercharmed;
@@ -1407,6 +1407,8 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_CRUSHING;
 		break;
 	case 8:
+		// TODO: also play "GORE.WAV" / "GORE2.WAV"
+		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		break;
 	case 16:
@@ -1716,6 +1718,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
+	// TODO: EE case 2: weak invisibility (check IESDP)
 	default:
 		break;
 	}
@@ -1788,6 +1791,8 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// EEs toggle this with fx->Special, but 0 stands for bg2, so we can't use it
+	// they will just use the same game flag instead
 	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
 		BASE_SET(IE_MORALE, 10);
 		return FX_NOT_APPLIED;
@@ -1798,6 +1803,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x18 State:Panic
+// TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect)
 int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_panic_state(%2d)", fx->Opcode);
