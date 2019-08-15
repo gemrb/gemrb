@@ -66,6 +66,7 @@ def DonePress():
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
 	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
 	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
+	GemRB.SetVar ("ImportedChar", 1)
 	CharGenCommon.jumpTo("appearance")
 	return
 

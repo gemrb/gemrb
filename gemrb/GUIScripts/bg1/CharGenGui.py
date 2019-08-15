@@ -337,8 +337,9 @@ def setAccept():
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
 	#lore, thac0, hp, and saves
-	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
-	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
+	if not GemRB.GetVar ("ImportedChar"):
+		GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+		GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
 	LUCommon.SetupSavingThrows (MyChar)
 	LUCommon.SetupThaco (MyChar)
 	LUCommon.SetupLore (MyChar)
@@ -375,6 +376,7 @@ def setAccept():
 
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
+	GemRB.SetVar ("ImportedChar", 0)
 	
 	GUICommon.CloseOtherWindow(None)
 	
