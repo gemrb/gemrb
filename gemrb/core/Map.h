@@ -517,7 +517,7 @@ public:
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
-	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flag, bool checkImpassable = false) const;
+	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false) const;
 	bool IsVisibleLOS(const Point &s, const Point &d) const;
 	bool IsWalkableTo(const Point &s, const Point &d) const;
 	/* returns edge direction of map boundary, only worldmap regions */
