@@ -554,7 +554,9 @@ def IsDualSwap (actor, override=None):
 
 	Dual = IsDualClassed (actor, 1)
 	if override:
-		Dual = (2, override["old"], override["new"])
+		CI1 = CommonTables.Classes.FindValue ("ID", override["old"])
+		CI2 = CommonTables.Classes.FindValue ("ID", override["new"])
+		Dual = (2, CI1, CI2) # TODO: support IsDualClassed mode 3 once a gui for it is added
 
 	# not dual classed
 	if Dual[0] == 0:
