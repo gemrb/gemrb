@@ -6895,8 +6895,6 @@ The repeating effect itself internally uses a counter to store how often it has 
 // 0x110 ApplyEffectRepeat
 int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieDword i; //moved here because msvc6 cannot handle it otherwise
-
 	if(0) print("fx_apply_effect_repeat(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	Point p(fx->PosX, fx->PosY);
@@ -6922,7 +6920,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 2://param1 times every second
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
-				for (i=0;i<fx->Parameter1;i++) {
+				for (ieDword i=0; i < fx->Parameter1; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
@@ -6934,7 +6932,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
-				for (i=0;i<fx->Parameter3;i++) {
+				for (ieDword i=0; i < fx->Parameter3; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}

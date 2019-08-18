@@ -1046,8 +1046,6 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 
 int Interface::LoadSprites()
 {
-	ieDword i;
-	int size;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		Log(ERROR, "Core", "No 2DA Importer Available.");
 		return GEM_ERROR;
@@ -1135,7 +1133,7 @@ int Interface::LoadSprites()
 		Sprite2D::FreeSprite( tmpsprite );
 	}
 
-	i = 0;
+	ieDword i = 0;
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
@@ -1148,9 +1146,8 @@ int Interface::LoadSprites()
 	}
 
 	// Load ground circle bitmaps (PST only)
-	//block required due to msvc6.0 incompatibility
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
-	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
