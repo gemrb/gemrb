@@ -10,10 +10,16 @@ Axioms of Style
 
 Where to start
 If you don't know what to work on, check out the FIXMEs
-and TODOs spread throughout the code, the more detailed todo on our wiki at
-http://gemrb.org/wiki/doku.php?id=todo or ask either on the forums or IRC.
+and TODOs spread throughout the code, ask either on the forums or chat
+or directly check the list on the bugtracker:
+https://github.com/gemrb/gemrb/issues
+
+Simpler issues to get started:
+https://github.com/gemrb/gemrb/labels/good%20first%20issue
+
 Alternatively, just start playing one of the games and see what annoys you, 
 then start fixing it.
+
 
 Useful tools
 - gdb
