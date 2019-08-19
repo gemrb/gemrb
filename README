@@ -1,14 +1,13 @@
 Introduction
 ------------
-GemRB (Game Engine Made with preRendered Background) is a "port"
-(actually a new implementation) of the original Infinity Engine (the one
-of Baldur's Gate, Icewind Dale, Planescape: Torment, ...) to
-Linux/Unix, MacOS X and Windows with some enhancements. Would you like to
-create a game like Baldur's Gate?
+GemRB (Game Engine Made with preRendered Background) is a portable open-source
+reimplementation of the Infinity Engine that underpinned Baldur's Gate,
+Icewind Dale and Planescape: Torment. It sports a cleaner design, greater
+extensibility and several innovations.
+Would you like to create a game like Baldur's Gate?
 
-It means that you either need some of the ORIGINAL game's data
-somewhere on your harddisk, or you can try to use the data from the
-Dragonlance Total Conversion project - see the link below.
+To try it out you either need some of the ORIGINAL game's data or you can
+get a tiny sneak peek by running the included trivial game demo.
 
 The original game data has to be installed on a windows
 partition and mounted or copied to your (Linux/Unix) filesystem, installed
@@ -24,7 +23,7 @@ Linux x86, x86-64, ppc
 FreeBSD x86
 MS Windows
 various Macintosh systems (even pre x86) also should work ...
-some smart phones (Symbian, Android, other Linux-based, Ios)
+some smart phones (Symbian, Android, other Linux-based, iOS)
 some consoles (OpenPandora, Dingoo)
 some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS)
 
@@ -39,28 +38,31 @@ Contacts
 Our homepage:
 http://gemrb.org
 
-Our project at sourceforge.net:
-http://sourceforge.net/projects/gemrb
-
-New GemRB forum (users):
+GemRB forum (users):
 http://gibberlings3.net/forums/index.php?showforum=91
 
 IRC channel:
-The best way to talk with us is by joining the #GemRB channel
+The second best way to talk with us is by joining the #GemRB channel
 on the FreeNode IRC network. There's somebody to talk with most of
 the time.
+
+Discord channel (Gibberlings3 server):
+https://discord.gg/64rEVAk
 
 
 Useful links
 ------------
 IESDP, documentation for the Infinity Engine file formats and more:
-http://iesdp.gibberlings3.net/
+https://gibberlings3.github.io/iesdp/
 
 Near Infinity, Java viewer and editor for data files of the original games:
-http://www.idi.ntnu.no/~joh/ni/index.html
+https://github.com/NearInfinityBrowser/NearInfinity/wiki
 
 DLTCEP, MS Windows viewer and editor for data files of the original games:
 http://forums.gibberlings3.net/index.php?showforum=137
+
+iesh, IE python library and shell (for exploring data files):
+https://github.com/gemrb/iesh
 
 Unshield, extractor for .CAB files created by InstallShield
 http://synce.sourceforge.net/synce/unshield.php
