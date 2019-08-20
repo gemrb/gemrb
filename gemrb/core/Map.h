@@ -96,6 +96,7 @@ class Wall_Polygon;
 #define A_ANI_PALETTE         0x400    //has own palette set
 #define A_ANI_MIRROR          0x800    //mirrored
 #define A_ANI_COMBAT          0x1000   //draw in combat too
+#define A_ANI_PSTBIT14        0x2000   // PST-only: unknown and rare, see #163 for area list
 // TODO: BGEE extended flags:
 // 0x2000: Use WBM resref
 // 0x4000: Underground?
