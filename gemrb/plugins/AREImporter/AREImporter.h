@@ -70,6 +70,7 @@ public:
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map);
 private:
+	void AdjustPSTFlags(AreaAnimation*);
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, Map *map);

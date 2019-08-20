@@ -3912,6 +3912,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	sequence = src->sequence;
 	animation = NULL;
 	Flags = src->Flags;
+	originalFlags = src->originalFlags;
 	Pos.x = src->Pos.x;
 	Pos.y = src->Pos.y;
 	appearance = src->appearance;
