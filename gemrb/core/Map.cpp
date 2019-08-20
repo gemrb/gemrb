@@ -3899,7 +3899,7 @@ AreaAnimation::AreaAnimation()
 	palette=NULL;
 	covers=NULL;
 	appearance = sequence = frame = transparency = height = 0;
-	Flags = startFrameRange = skipcycle = startchance = 0;
+	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
 	Name[0] = 0;
 	BAM[0] = 0;
@@ -3912,6 +3912,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	sequence = src->sequence;
 	animation = NULL;
 	Flags = src->Flags;
+	originalFlags = src->originalFlags;
 	Pos.x = src->Pos.x;
 	Pos.y = src->Pos.y;
 	appearance = src->appearance;

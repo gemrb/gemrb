@@ -1190,6 +1190,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+
 	core->LoadProgress(90);
 	Log(DEBUG, "AREImporter", "Loading animations");
 	str->Seek( AnimOffset, GEM_STREAM_START );
@@ -1209,6 +1211,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
+			anim->originalFlags = anim->Flags;
 			str->ReadWordSigned( &anim->height );
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &startFrameRange );
@@ -1223,6 +1226,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
+
+			if (pst) {
+				AdjustPSTFlags(anim);
+			}
 
 			//set up the animation, it cannot be done here
 			//because a StaticSequence action can change
@@ -1309,7 +1316,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ieDword color = 0;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst && !NoteCount) {
 		if( !INInote ) {
 			ReadAutonoteINI();
@@ -1479,6 +1485,22 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	return map;
+}
+
+void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
+	/**
+	 * For PST, map animation flags work differently to a degree that they
+	 * should not be mixed together with the rest as they even tend to
+	 * break things (like stopping early, hiding under FoW).
+	 *
+	 * So far, a better approximation towards handling animations is:
+	 * - always set A_ANI_BLEND, A_ANI_SYNC,
+	 * - unset A_ANI_PLAYONCE, A_ANI_NOT_IN_FOG, A_ANI_BACKGROUND.
+	 *
+	 * The actual use of bits in PST map anims isn't fully solved here.
+	 */
+	areaAnim->Flags |= (A_ANI_BLEND | A_ANI_SYNC);
+	areaAnim->Flags &= ~(A_ANI_PLAYONCE | A_ANI_NOT_IN_FOG | A_ANI_BACKGROUND);
 }
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
@@ -2145,7 +2167,7 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
-		stream->WriteDword( &an->Flags);
+		stream->WriteDword( &an->originalFlags);
 		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START

@@ -266,6 +266,8 @@ public:
 	Point Pos;
 	ieDword appearance;
 	ieDword Flags;
+	// flags that must not be overriden for writing back the original value
+	ieDword originalFlags;
 	//these are on one dword
 	ieWord sequence;
 	ieWord frame;
