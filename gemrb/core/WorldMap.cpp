@@ -470,7 +470,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 			encounter=true;
 			break;
 		}
-		p++;
+		++p;
 	}
 	while(p!=walkpath.rend() );
 	return lastpath;

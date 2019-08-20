@@ -391,7 +391,7 @@ Map::~Map(void)
 	delete TMap;
 	delete INISpawn;
 	aniIterator aniidx;
-	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
+	for (aniidx = animations.begin(); aniidx != animations.end(); ++aniidx) {
 		delete (*aniidx);
 	}
 
@@ -1370,7 +1370,7 @@ void Map::AddAnimation(AreaAnimation* panim)
 	aniIterator iter;
 
 	int Height = anim->GetHeight();
-	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
+	for (iter = animations.begin(); (iter != animations.end()) && ((*iter)->GetHeight() < Height); ++iter) ;
 	animations.insert(iter, anim);
 }
 
@@ -2293,7 +2293,7 @@ AreaAnimation* Map::GetAnimation(const char* Name)
 {
 	aniIterator iter;
 
-	for(iter=animations.begin();iter!=animations.end();iter++) {
+	for (iter = animations.begin(); iter != animations.end(); ++iter) {
 		AreaAnimation *anim = *iter;
 
 		if (anim->Name[0] && (strnicmp(anim->Name, Name, 32) == 0)) {

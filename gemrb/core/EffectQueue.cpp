@@ -495,7 +495,7 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
-	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx2 = *f;
 
 		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
@@ -532,7 +532,7 @@ void EffectQueue::Cleanup()
 			delete *f;
 			effects.erase(f++);
 		} else {
-			f++;
+			++f;
 		}
 	}
 }
@@ -2341,7 +2341,7 @@ bool EffectQueue::HasHostileEffects() const
 	bool hostile = false;
 
 	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx = *f;
 		if (fx->SourceFlags&SF_HOSTILE) {
 			hostile = true;

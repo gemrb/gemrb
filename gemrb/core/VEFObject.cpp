@@ -72,7 +72,7 @@ void VEFObject::Init()
 {
 	std::list<ScheduleEntry>::iterator iter;
 
-	for(iter=entries.begin();iter!=entries.end();iter++) {
+	for(iter = entries.begin(); iter != entries.end(); ++iter) {
 		if (!(*iter).ptr) continue;
 		switch((*iter).type) {
 			case VEF_BAM:
@@ -137,7 +137,7 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 
 	std::list<ScheduleEntry>::iterator iter;
 
-	for(iter=entries.begin();iter!=entries.end();iter++) {
+	for (iter = entries.begin(); iter != entries.end(); ++iter) {
 		//don't render the animation if it is outside of the cycle
 		if ( (*iter).start>GameTime) continue;
 		if ( (*iter).length<GameTime) continue;

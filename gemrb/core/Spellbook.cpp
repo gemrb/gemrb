@@ -405,13 +405,13 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResR
 {
 	std::vector< CREMemorizedSpell* >::iterator ms;
 
-	for (ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ms++) {
+	for (ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ++ms) {
 		if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ieResRef) ) ) {
 			continue;
 		}
 		delete *ms;
 		ms = sm->memorized_spells.erase(ms);
-		ms--;
+		--ms;
 	}
 }
 
@@ -490,14 +490,14 @@ void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 		for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
 			std::vector< CREKnownSpell* >::iterator ks;
 
-			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
 				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) ) ) {
 					continue;
 				}
 				delete *ks;
 				ks = (*sm)->known_spells.erase(ks);
 				if (!onlyknown) RemoveMemorization(*sm, ResRef);
-				ks--;
+				--ks;
 				ClearSpellInfo();
 			}
 		}
@@ -799,7 +799,7 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[i].begin(); sm != spells[i].end(); sm++) {
+		for (sm = spells[i].begin(); sm != spells[i].end(); ++sm) {
 			std::vector< CREMemorizedSpell* >::iterator s;
 			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
 				if (*s == spell) {
@@ -819,9 +819,9 @@ bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete, bool onlyde
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
 			std::vector< CREMemorizedSpell* >::iterator s;
-			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
+			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
 				if (strnicmp(ResRef, (*s)->SpellResRef, sizeof(ieResRef) ) ) {
 					continue;
 				}

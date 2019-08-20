@@ -1283,7 +1283,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 			}
 			index--;
 		}
-		m++;
+		++m;
 	}
 	return NULL;
 }
@@ -1514,7 +1514,7 @@ void InitializeIEScript()
 			triggerflags[i] |= TF_CONDITION;
 	}
 
-	for (l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
+	for (l = missing_triggers.begin(); l != missing_triggers.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
@@ -1665,7 +1665,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_actions.begin(); l!=missing_actions.end();l++) {
+	for (l = missing_actions.begin(); l != missing_actions.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = actionsTable->GetValueIndex( j );
@@ -1725,7 +1725,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_objects.begin(); l!=missing_objects.end();l++) {
+	for (l = missing_objects.begin(); l != missing_objects.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );

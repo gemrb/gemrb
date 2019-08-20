@@ -986,7 +986,7 @@ bool Game::CheckForReplacementActor(int i)
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<char *> >::iterator it;
-		for (it = npclevels.begin(); it != npclevels.end(); it++) {
+		for (it = npclevels.begin(); it != npclevels.end(); ++it) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				// the tables have entries only up to level 24
 				ieDword safeLevel = npclevels[0].size();

@@ -715,7 +715,7 @@ bool Scriptable::MatchTriggerWithObject(unsigned short id, class Object *obj, ie
 }
 
 const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned int notflags) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
 		TriggerEntry &trigger = *m;
 		if (trigger.triggerID != id)
 			continue;

@@ -311,7 +311,7 @@ bool SaveGameIterator::RescanSaveGames()
 		}
 	} while (++dir);
 
-	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); i++) {
+	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); ++i) {
 		save_slots.push_back(BuildSaveGame(*i));
 		free(*i);
 	}
@@ -330,7 +330,7 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
 {
 	RescanSaveGames();
 
-	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); i++) {
+	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); ++i) {
 		if (strcmp(name, (*i)->GetName()) == 0)
 			return *i;
 	}
@@ -378,7 +378,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
-	for (charlist::iterator m = save_slots.begin();m!=save_slots.end();m++) {
+	for (charlist::iterator m = save_slots.begin(); m != save_slots.end(); ++m) {
 		int tmp = IsQuickSaveSlot(folder, (*m)->GetSlotName() );
 		if (tmp) {
 			size_t pos = myslots.size();
