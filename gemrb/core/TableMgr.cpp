@@ -50,6 +50,7 @@ AutoTable::AutoTable(const AutoTable& other)
 
 AutoTable& AutoTable::operator=(const AutoTable& other)
 {
+	if (&other == this) return *this;
 	if (other.table) {
 		tableref = other.tableref;
 		table = gamedata->GetTable(tableref);
