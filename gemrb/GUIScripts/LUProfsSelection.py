@@ -88,18 +88,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsTableOffset = profTableOffset
 	ProfsType = type
 
-	if type == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG2(): #chargen
-		ProfsOffsetSum = 9
-		ProfsOffsetButton1 = 11
-		ProfsOffsetStar = 27
-		ProfsOffsetLabel = 1
-		ProfsOffsetPress = 69
-		ProfsNumButtons = 8
-		ProfsTextArea = ProfsWindow.GetControl (68)
-		ProfsTextArea.SetText (9588)
-		if (scroll):
-			ProfsScrollBar = ProfsWindow.GetControl (78)
-	elif type == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG1(): #chargen
+	if type == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2()): #chargen
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
 		ProfsOffsetStar = 27
