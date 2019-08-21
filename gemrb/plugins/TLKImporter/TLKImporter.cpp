@@ -56,7 +56,7 @@ TLKImporter::TLKImporter(void)
 		charname=0;
 	}
 	str = NULL;
-	override = NULL;
+	OverrideTLK = NULL;
 	StrRefCount = Offset = Language = 0;
 
 	AutoTable tm("gender");
@@ -93,18 +93,18 @@ TLKImporter::~TLKImporter(void)
 
 void TLKImporter::CloseAux()
 {
-	if (override) {
-		delete override;
+	if (OverrideTLK) {
+		delete OverrideTLK;
 	}
-	override = NULL;
+	OverrideTLK = NULL;
 }
 
 void TLKImporter::OpenAux()
 {
 	CloseAux();
-	override = new CTlkOverride();
-	if (override) {
-		if (!override->Init()) {
+	OverrideTLK = new CTlkOverride();
+	if (OverrideTLK) {
+		if (!OverrideTLK->Init()) {
 			CloseAux();
 			Log(ERROR, "TlkImporter", "Cannot open tlk override!");
 		}
@@ -410,12 +410,12 @@ bool TLKImporter::GetNewStringLength(char* string, int& Length)
 
 ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 {
-	if (!override) {
+	if (!OverrideTLK) {
 		Log(ERROR, "TLKImporter", "Custom string is not supported by this game format.");
 		return 0xffffffff;
 	}
 
-	return override->UpdateString(strref, newvalue);
+	return OverrideTLK->UpdateString(strref, newvalue);
 }
 
 String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
@@ -439,8 +439,8 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 
 	if((strref>=STRREF_START) || (strref>=BIO_START && strref<=BIO_END) ) {
 empty:
-		if (override) {
-			string = override->ResolveAuxString(strref, Length);
+		if (OverrideTLK) {
+			string = OverrideTLK->ResolveAuxString(strref, Length);
 		} else {
 			string = (char *) malloc(1);
 			Length = 0;

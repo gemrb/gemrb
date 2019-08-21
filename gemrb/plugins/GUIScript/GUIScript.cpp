@@ -15134,7 +15134,7 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m2;
 	switch(index) {
 		case ME_OVERRIDE:
-			m->override = value;
+			m->me_override = value;
 			break;
 		default:
 		case ME_VALID:
@@ -15331,7 +15331,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
-	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
+	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->me_override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
 	if (m->trapped) {

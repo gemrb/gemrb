@@ -176,7 +176,7 @@ struct GAMLocationEntry {
 
 //pst maze data structures (TODO: create a separate class?)
 struct maze_entry {
-	ieDword override;
+	ieDword me_override;
 	ieDword accessible;
 	ieDword valid;
 	ieDword trapped;
