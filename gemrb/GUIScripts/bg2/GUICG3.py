@@ -43,7 +43,6 @@ def OnLoad():
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	CommonTables.Aligns = CommonTables.Aligns
 	AlignmentWindow = GemRB.LoadWindow(3)
 
 	for i in range(9):
