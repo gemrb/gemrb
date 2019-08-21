@@ -1,14 +1,15 @@
-GemRB git (435b73d5a):
+GemRB git (72aae8ff7):
   New features:
     - 
     - using bags in stores, NPC breaking points
     - sndchann.2da support
-    - more audio, especially in bg1
+    - more audio, especially in bg1 and pst
 
   Improved features:
     - better megamod and detectable spells compatibility
-    - iwd2 and pst levelup, infopoints, gui feedback
+    - iwd2 and pst levelup, infopoints, gui feedback, dualclassing
     - verbal constants, (tobex) opcodes, falling, paperdolls
+    - pst area animations
     - bugfixes
 
 GemRB v0.8.5 (2017-11-26):
