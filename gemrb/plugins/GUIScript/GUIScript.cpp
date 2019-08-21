@@ -15140,7 +15140,6 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 		case ME_VALID:
 		case ME_ACCESSIBLE:
 			return AttributeError( GemRB_SetMazeEntry__doc );
-			break;
 		case ME_TRAP: //trapped/traptype
 			if (value==-1) {
 				m->trapped = 0;

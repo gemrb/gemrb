@@ -899,14 +899,12 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const
 				return AL_FORMAT_MONO8;
 			else
 				return AL_FORMAT_MONO16;
-			break;
 
 		case 2:
 			if (bits == 8)
 				return AL_FORMAT_STEREO8;
 			else
 				return AL_FORMAT_STEREO16;
-			break;
 	}
 	return AL_FORMAT_MONO8;
 }

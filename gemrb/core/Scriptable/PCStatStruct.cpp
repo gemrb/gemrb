@@ -296,7 +296,6 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 		default:
 			print("Illegal RegisterFavourite call...");
 			abort();
-			return;
 	}
 	//least favourite candidate position and count
 	int minpos = 0;

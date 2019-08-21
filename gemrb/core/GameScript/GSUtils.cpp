@@ -1572,7 +1572,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				//str++;
 				delete newAction;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -1932,7 +1931,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				//str++;
 				delete newTrigger;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
