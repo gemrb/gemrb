@@ -354,7 +354,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 	//maximum pathlength == 240, without 8+3 filenames
 	if ( (cnt != 2) || (strlen(Path)>240) ) {
-		Log(WARNING, "SaveGame" "Invalid savegame directory '%s' in %s.", slotname, Path );
+		Log(WARNING, "SaveGame", "Invalid savegame directory '%s' in %s.", slotname, Path );
 		return NULL;
 	}
 
