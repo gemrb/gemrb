@@ -325,17 +325,18 @@ bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 			CRESpellMemorization* sm = spells[i][j];
 			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
 				CREMemorizedSpell* ms = sm->memorized_spells[k];
-				if (ms->Flags) {
-					if (resref[0] && stricmp(ms->SpellResRef, resref) ) {
-						continue;
-					}
-					if (flags&HS_DEPLETE) {
-						if (DepleteSpell(ms) && (sorcerer & (1<<i) ) ) {
-							DepleteLevel (sm, ms->SpellResRef);
-						}
-					}
-					return true;
+
+				if (!ms->Flags) continue;
+				if (resref[0] && stricmp(ms->SpellResRef, resref)) {
+					continue;
 				}
+
+				if (flags&HS_DEPLETE) {
+					if (DepleteSpell(ms) && (sorcerer & (1<<i))) {
+						DepleteLevel(sm, ms->SpellResRef);
+					}
+				}
+				return true;
 			}
 		}
 	}
