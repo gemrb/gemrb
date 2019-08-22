@@ -17,21 +17,25 @@ Would you like to create a game like Baldur's Gate?
 To try it out you either need some of the ORIGINAL game's data or you can
 get a tiny sneak peek by running the included trivial game demo.
 
-The original game data has to be installed on a windows
-partition and mounted or copied to your (Linux/Unix) filesystem, installed
-with WINE or extracted manually from the CDs using the tool `unshield'.
+The original game data has to be installed if you want to see anything but
+the included trivial demo. On non-windows systems either copy it over from
+a windows install, use a compatible installer, WINE or extract it manually
+from the CDs using the unshield tool.
 
 Documentation can be found converted on the [website](http://www.gemrb.org/wiki/doku.php?id=documentation), 
 while the sources are in gemrb/docs/en/ and the 
 [gemrb.6 man page](http://www.gemrb.org/wiki/doku.php?id=docs:manpage).
 
+If you want to help out, start by reading this
+[list of ideas and tips](https://github.com/gemrb/gemrb/blob/master/CONTRIBUTING.md).
+
 ## Supported platforms
 
 Supported systems (i.e. we got reports about successfully running GemRB):
-* Linux x86, x86-64, ppc
+* Linux x86, x86-64, ppc, (mips and s390x build, but no running info)
 * FreeBSD x86
 * MS Windows
-* various Macintosh systems (even pre x86) also should work ...
+* various Macintosh systems (even pre x86)
 * some smart phones (Symbian, Android, other Linux-based, iOS)
 * some consoles (OpenPandora, Dingoo)
 * some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS)
