@@ -2327,8 +2327,6 @@ int ResponseSet::Execute(Scriptable* Sender)
 		Response* rE = responses[i];
 		if (rE->weight > randWeight) {
 			return rE->Execute(Sender);
-			/* this break is only symbolic */
-			break;
 		}
 		randWeight-=rE->weight;
 	}

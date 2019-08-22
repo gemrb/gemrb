@@ -960,7 +960,6 @@ int OpenALAudioDriver::MusicManager(void* arg)
 						driver->MusicPlaying = false;
 						return -1;
 					}
-					break;
 				case AL_STOPPED:
 					Log(MESSAGE, "OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback");
 					if (driver->MusicSource && alIsSource( driver->MusicSource )) {

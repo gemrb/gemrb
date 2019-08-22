@@ -355,7 +355,6 @@ int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 			}
 			return 1;
 	}
-	return 0;
 }
 
 int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)

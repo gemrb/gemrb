@@ -361,7 +361,6 @@ void Inventory::KillSlot(unsigned int index)
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		error("Inventory", "Invalid item: %s!", item->ItemResRef);
-		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
