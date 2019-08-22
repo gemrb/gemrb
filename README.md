@@ -21,8 +21,9 @@ The original game data has to be installed on a windows
 partition and mounted or copied to your (Linux/Unix) filesystem, installed
 with WINE or extracted manually from the CDs using the tool `unshield'.
 
-What little documentation exists is mostly in gemrb/docs/en/ and
-subdirectories, the gemrb.6 man page, this file and the website.
+Documentation can be found converted on the [website](http://www.gemrb.org/wiki/doku.php?id=documentation), 
+while the sources are in gemrb/docs/en/ and the 
+[gemrb.6 man page](http://www.gemrb.org/wiki/doku.php?id=docs:manpage).
 
 ## Supported platforms
 
