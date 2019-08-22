@@ -11158,7 +11158,7 @@ ieDword Actor::GetActiveClass() const
 		if (mcwas == mcwasflags[isclass]) break;
 	}
 	if (!oldclass) {
-		Log(FATAL, "Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
+		error("Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
 	}
 
 	int newclassmask = multiclass & ~(1 << (oldclass - 1));
@@ -11166,8 +11166,7 @@ ieDword Actor::GetActiveClass() const
 		if (newclassmask == mask) return newclass;
 	}
 
-	Log(FATAL, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass);
-	return 0;
+	error("Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass); // return 0 if this ever needs to be hit only as a warning
 }
 
 // like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
