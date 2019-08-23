@@ -50,7 +50,7 @@ See the INSTALL [file](https://github.com/gemrb/gemrb/blob/master/INSTALL).
 
 There are several ways you can get in touch:
 * [homepage](http://gemrb.org)
-* [GemRB forum](http://gibberlings3.net/forums/index.php?showforum=91)
+* [GemRB forum](https://www.gibberlings3.net/forums/forum/91-gemrb/)
 * [IRC channel](http://webchat.freenode.net/?channels=GemRB), #GemRB on the FreeNode IRC network
 * [Discord channel](https://discord.gg/64rEVAk) (Gibberlings3 server)
 * [Bug tracker](https://github.com/gemrb/gemrb/issues/new/choose)
@@ -61,7 +61,7 @@ There are several ways you can get in touch:
 Original engine research and data manipulation software:
 * [IESDP](https://gibberlings3.github.io/iesdp/), documentation for the Infinity Engine file formats and more
 * [Near Infinity](https://github.com/NearInfinityBrowser/NearInfinity/wiki), Java viewer and editor for data files
-* [DLTCEP](http://forums.gibberlings3.net/index.php?showforum=137), MS Windows viewer and editor for data files
+* [DLTCEP](https://www.gibberlings3.net/forums/forum/137-dltcep/), MS Windows viewer and editor for data files
 * [iesh](https://github.com/gemrb/iesh), IE python library and shell (for exploring data files)
 
 Tools that can help with data installation:

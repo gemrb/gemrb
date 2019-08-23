@@ -1095,7 +1095,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
 			str->ReadWord( &MaxDistance );
-			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused http://gibberlings3.net/forums/index.php?showtopic=21724
+			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused https://gibberlings3.net/forums/topic/21724-a
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
