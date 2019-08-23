@@ -3587,6 +3587,49 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
 	}
 }
 
+// merges pile 1 into pile 2
+static void MergePiles(Container *donorPile, Container *pile)
+{
+	unsigned int i = donorPile->inventory.GetSlotCount();
+	while (i--) {
+		CREItem *item = donorPile->RemoveItem(i, 0);
+		int count = pile->inventory.CountItems(item->ItemResRef, 0);
+		if (count == 0) {
+			pile->AddItem(item);
+			continue;
+		}
+
+		// ensure slots are stacked fully before adding new ones
+		int skipped = count;
+		while (count) {
+			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
+			if (slot == -1) {
+				// probably an inventory bug, shouldn't happen
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+				skipped--;
+				continue;
+			}
+			CREItem *otheritem = pile->inventory.GetSlotItem(slot);
+			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
+				// already full (or nonstackable), nothing to do here
+				skipped--;
+				continue;
+			}
+			if (pile->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
+				// the merge either failed (add whole) or went over the limit (add remainder)
+				pile->AddItem(item);
+			}
+			skipped = 1; // just in case we would be eligible for the safety net below
+			break;
+		}
+
+		// all found slots were already unsuitable, so just dump the item to a new one
+		if (!skipped) {
+			pile->AddItem(item);
+		}
+	}
+}
+
 void Map::MoveVisibleGroundPiles(const Point &Pos)
 {
 	//creating the container at the given position
@@ -3598,42 +3641,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 		Container * c = TMap->GetContainer( containercount);
 		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
 			//transfer the pile to the other container
-			unsigned int i=c->inventory.GetSlotCount();
-			while (i--) {
-				CREItem *item = c->RemoveItem(i, 0);
-				int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
-				if (count == 0) {
-					othercontainer->AddItem(item);
-					continue;
-				}
-				// ensure slots are stacked fully before adding new ones
-				int skipped = count;
-				while (count) {
-					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
-					if (slot == -1) {
-						// probably an inventory bug, shouldn't happen
-						Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
-						skipped--;
-						continue;
-					}
-					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
-					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
-						// already full (or nonstackable), nothing to do here
-						skipped--;
-						continue;
-					}
-					if (othercontainer->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
-						// the merge either failed (add whole) or went over the limit (add remainder)
-						othercontainer->AddItem(item);
-					}
-					skipped = 1; // just in case we would be eligible for the safety net below
-					break;
-				}
-				// all found slots were already unsuitable, so just dump the item to a new one
-				if (!skipped) {
-					othercontainer->AddItem(item);
-				}
-			}
+			MergePiles(c, othercontainer);
 		}
 	}
 
