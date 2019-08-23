@@ -10165,7 +10165,11 @@ bool Actor::IsMultiClassed() const
 /* Checks if the actor is dualclassed */
 bool Actor::IsDualClassed() const
 {
-	return (Modified[IE_MC_FLAGS] & MC_WAS_ANY) > 0;
+	// exclude the non-player classes
+	if (BaseStats[IE_CLASS] > (ieDword) classcount) return false;
+
+	// make sure only one bit is set, as critters like kuo toa have garbage in the mc bits
+	return core->CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
 }
 
 Actor *Actor::CopySelf(bool mislead) const
