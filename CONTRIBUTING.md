@@ -18,6 +18,8 @@ This file is a non-exhaustive set of soft guidelines and ideas for contributing 
   - [Useful tools](#useful-tools)
   - [Version tracking](#version-tracking)
   - [For maintainers](#for-maintainers)
+  - [Development priorities](#development-priorities)
+    + [Roadmap](#roadmap)
 
 Please stay friendly and constructive, we are not robots. I promise.
 
@@ -31,11 +33,13 @@ If you don't trust your skills, take a look at the `good first issue`
 Instructions on building and IDE setup can be found in INSTALL.
 
 If you don't know what to work on:
-- try playing a game with GemRB and make note of any bugs, annoyances or missing features ... then report and fix them
+- try playing a game with GemRB and make note of any bugs, annoyances
+or missing features ... then report and fix them,
 - check the list on the [bugtracker](https://github.com/gemrb/gemrb/issues),
+- check the [Roadmap](#roadmap) to see what priorities we are currently working on,
 - check out the FIXMEs and TODOs spread throughout the code,
-- write one of the [missing file format plugins](https://github.com/gemrb/gemrb/issues/164) (doesn't require any game!)
-- pick some of the [janitorial](https://github.com/gemrb/gemrb/labels/janitorial) tasks (eg. refactoring)
+- write one of the [missing file format plugins](https://github.com/gemrb/gemrb/issues/164) (doesn't require any game!),
+- pick some of the [janitorial](https://github.com/gemrb/gemrb/labels/janitorial) tasks (eg. refactoring),
 - ask either on the forums or chat.
 
 You can also help by:
@@ -155,6 +159,53 @@ All of this makes reviewing and bisecting for regressions easier.
 
 ## For maintainers
 
-1. Squash merge only if the history is a mess or it makes more sense (eg. consecutive commits through the github website). 
+1. Squash merge only if the history is a mess or it makes more
+sense (eg. consecutive commits through the github website). 
 2. For release planning check the milestones and gemrb/docs/Release.txt.
+3. Releases are usually made when larger pieces of work land or many smaller
+fixes have accrued.
+4. Versioning is semantic, but also ad-hoc. We want 1.0 to be the classic
+polished release (feature complete or not), so we will start with 0.9.0 once
+something major happens, like full iwd2 playability (you can finish the game)
+or some of the larger refactors (see the [End of all rewrites](https://github.com/gemrb/gemrb/milestone/1)
+milestone) lands. Until then, we'll be bumping the patchlevel version number.
 
+
+## Development priorities
+
+The project has roughly two main priorities:
+1. Fixing the known bugs and adding missing features
+
+This is mainly what is on the bug tracker(s), most of the time not requiring
+invasive changes.
+
+2. Finishing larger missing pieces
+
+This is represented by the "big picture" problems that remain to be solved.
+It includes the [End of all rewrites](https://github.com/gemrb/gemrb/milestone/1)
+milestone, the bigger PST bugs on the tracker, deciding what to do with the
+incomplete OpenGL renderers and so on.
+
+Generally each release tackles at least one item from #2 and a bag-of-holding
+worth of #1.
+
+### Roadmap
+
+As noted in the previous section, most releases don't have very specific goals.
+You can check what we're working towards in the current release by reading the
+NEWS file and, as far as bugtracker backlog goes, by looking at the version's
+[milestone](https://github.com/gemrb/gemrb/milestones).
+
+The plan for 0.8.6 was to **finish the [subviews](https://github.com/gemrb/gemrb/issues/95)
+work**, but the process got interrupted and stalled. Due to user encouragement,
+the focus for 0.8.6 shifted to audio, pathfinder and lots of polishing work.
+
+0.8.7 will therefore start with a renewed focus on the subviews branch.
+It will also mark the switch to the C++11 standard. Once the branch is
+merged, we can also start working on the port to python3.
+
+Since it is in a branch, the subviews windowing rewrite (and more) is not
+bound to any release, so work can continue independently. Due to the volume
+of changes and the merge&refactoring problems they introduce,
+making it ready for prime time is the **single most important TODO item**.
+Any help in stabilising the branch is greatly appreciated!
