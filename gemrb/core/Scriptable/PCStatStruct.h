@@ -125,7 +125,7 @@ public:
 	ieDword   LastLeft;   //trigger
 	ieDword   LastJoined; //trigger
 	ieDword   Interact[MAX_INTERACT];
-	ieWord    Happiness;
+	ieWordSigned Happiness;
 	std::list<int> ClassLevels;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);

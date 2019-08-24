@@ -136,7 +136,7 @@ struct PCStruct {
 	ieWord   ViewXPos;
 	ieWord   ViewYPos;
 	ieWord   ModalState;
-	ieWord   Happiness;
+	ieWordSigned   Happiness;
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
