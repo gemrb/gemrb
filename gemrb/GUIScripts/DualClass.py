@@ -441,7 +441,7 @@ def CanDualInto (index):
 	for stat in range (6): # loop through each stat
 		minimum = StatTable.GetValue (ClassStatIndex, stat)
 		name = StatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (pc, eval("IE_" + name[4:])) < minimum: # see if we're under the minimum
+		if GemRB.GetPlayerStat (pc, GUICommon.SafeStatEval ("IE_" + name[4:])) < minimum:
 			return 0
 
 	# if we made it here, we can dual to the class

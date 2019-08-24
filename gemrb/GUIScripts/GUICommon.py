@@ -703,7 +703,7 @@ def CanDualClass(actor):
 	for stat in range (6):
 		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
 		name = CurrentStatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
+		if GemRB.GetPlayerStat (actor, SafeStatEval ("IE_" + name[4:]), 1) < minimum:
 			print "CannotDualClass: current class' stat limitations are too big"
 			return 1
 
@@ -715,7 +715,7 @@ def CanDualClass(actor):
 		for stat in range (6):
 			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
 			name = TargetStatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
+			if GemRB.GetPlayerStat (actor, SafeStatEval ("IE_" + name[4:]), 1) < minimum:
 				bad += 1
 				break
 	if len(matches) == bad:
@@ -856,6 +856,17 @@ def ceildiv (n, d):
 # a placeholder for unimplemented and hardcoded key actions
 def ResolveKey():
 	return
+
+# eval that only accepts alphanumerics and "_"
+# used for converting constructed stat names to their values, eg. IE_STR to 36
+def SafeStatEval (expression):
+	# if we ever import string: string.ascii_letters + "_" + string.digits
+	alnum = 'abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	for chr in expression:
+		if chr not in alnum:
+			raise ValueError("Invalid input! Bad data encountered, check the GemRB install's integrity!")
+
+	return eval(expression)
 
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)
