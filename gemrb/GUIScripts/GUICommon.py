@@ -394,12 +394,15 @@ def GetActorClassTitle (actor):
 				# first (previous) kit or class of the dual class
 				if Dual[0] == 1:
 					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
-				elif Dual[0] == 2:
+				else:
 					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
 				if ClassTitle != "*":
 					ClassTitle = GemRB.GetString (ClassTitle)
 				ClassTitle += " / "
-				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+				if Dual[0] == 3:
+					ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
+				else:
+					ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
 			elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
 				ClassTitle = 10369
 				if MCFlags & MC_FALLEN_PALADIN:
@@ -472,7 +475,7 @@ def HasMultiClassBits(actor):
 def IsDualClassed(actor, verbose):
 	"""Returns an array containing the dual class information.
 
-	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 2 otherwise.
+	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 3 if the new class is a kit, 2 otherwise.
 	Return[1] contains either the kit or class index of the old class.
 	Return[2] contains the class index of the new class.
 	If verbose is false, only Return[0] contains useable data."""
@@ -488,35 +491,36 @@ def IsDualClassed(actor, verbose):
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 
 	if verbose:
-		DualInfo = []
 		KitIndex = GetKitIndex (actor)
+		if KitIndex:
+			KittedClass = CommonTables.KitList.GetValue (KitIndex, 7)
+			KittedClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
+		else:
+			KittedClassIndex = 0
 
 		if DualedFrom > 0: # first (previous) class of the dual class
 			FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
-			if KitIndex:
-				DualInfo.append (1)
-				DualInfo.append (KitIndex)
-			else:
-				DualInfo.append (2)
-				DualInfo.append (FirstClassIndex)
 
 			# use the first class of the multiclass bunch that isn't the same as the first class
-			Mask = 1
 			for i in range (1,16):
+				Mask = 1 << (i - 1)
 				if Multi & Mask:
 					ClassIndex = CommonTables.Classes.FindValue ("ID", i)
 					if ClassIndex == FirstClassIndex:
-						Mask = 1 << i
 						continue
-					DualInfo.append (ClassIndex)
+					SecondClassIndex = ClassIndex
 					break
-				Mask = 1 << i
-			if len(DualInfo) != 3:
+			else:
 				print "WARNING: Invalid dualclass combination, treating as a single class!"
-				print DualedFrom, Multi, KitIndex, DualInfo
+				print DualedFrom, Multi, KitIndex, FirstClassIndex
 				return (0,-1,-1)
 
-			return DualInfo
+			if KittedClassIndex == FirstClassIndex and KitIndex:
+				return (1, KitIndex, SecondClassIndex)
+			elif KittedClassIndex == SecondClassIndex:
+				return (3, FirstClassIndex, KitIndex)
+			else:
+				return (2, FirstClassIndex, SecondClassIndex)
 		else:
 			return (0,-1,-1)
 	else:
@@ -525,7 +529,7 @@ def IsDualClassed(actor, verbose):
 		else:
 			return (0,-1,-1)
 
-def IsDualSwap (actor):
+def IsDualSwap (actor, override=None):
 	"""Returns true if the dualed classes are reverse of expection.
 
 	This can happen, because the engine gives dualclass characters the same ID as
@@ -535,6 +539,10 @@ def IsDualSwap (actor):
 	example, the levels would actually be in reverse of expectation."""
 
 	Dual = IsDualClassed (actor, 1)
+	if override:
+		CI1 = CommonTables.Classes.FindValue ("ID", override["old"])
+		CI2 = CommonTables.Classes.FindValue ("ID", override["new"])
+		Dual = (2, CI1, CI2) # TODO: support IsDualClassed mode 3 once a gui for it is added
 
 	# not dual classed
 	if Dual[0] == 0:
@@ -543,9 +551,11 @@ def IsDualSwap (actor):
 	# split the full class name into its individual parts
 	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
 	Class = GetClassRowName(actor).split("_")
+	if override:
+		Class = GetClassRowName(override["mc"], "class").split("_")
 
 	# get our old class name
-	if Dual[0] == 2:
+	if Dual[0] > 1:
 		BaseClass = GetClassRowName(Dual[1], "index")
 	else:
 		BaseClass = GetKitIndex (actor)
@@ -679,7 +689,7 @@ def CanDualClass(actor):
 	for stat in range (6):
 		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
 		name = CurrentStatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
+		if GemRB.GetPlayerStat (actor, SafeStatEval ("IE_" + name[4:]), 1) < minimum:
 			print "CannotDualClass: current class' stat limitations are too big"
 			return 1
 
@@ -691,7 +701,7 @@ def CanDualClass(actor):
 		for stat in range (6):
 			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
 			name = TargetStatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:]), 1) < minimum:
+			if GemRB.GetPlayerStat (actor, SafeStatEval ("IE_" + name[4:]), 1) < minimum:
 				bad += 1
 				break
 	if len(matches) == bad:
@@ -835,6 +845,17 @@ def ceildiv (n, d):
 # a placeholder for unimplemented and hardcoded key actions
 def ResolveKey():
 	return
+
+# eval that only accepts alphanumerics and "_"
+# used for converting constructed stat names to their values, eg. IE_STR to 36
+def SafeStatEval (expression):
+	# if we ever import string: string.ascii_letters + "_" + string.digits
+	alnum = 'abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	for chr in expression:
+		if chr not in alnum:
+			raise ValueError("Invalid input! Bad data encountered, check the GemRB install's integrity!")
+
+	return eval(expression)
 
 GameWindow = GUIClasses.GWindow(ID=0, SCRIPT_GROUP="GAMEWIN")
 GameControl = GUIClasses.GView(ID=0, SCRIPT_GROUP="GC")

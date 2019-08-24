@@ -309,7 +309,7 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 	// Animation refs for given control are not physically removed,
 	// but just marked by erasing ptr to the control. They will be
 	// collected when they get to the front of the vector
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
+	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
 		if ((*it)->ctlanim == ctlanim) {
 			(*it)->ctlanim = NULL;
 		}

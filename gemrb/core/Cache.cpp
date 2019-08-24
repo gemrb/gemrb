@@ -73,13 +73,14 @@ void Cache::RemoveAll(ReleaseFun fun)
 	if (m_pHashTable) {
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
 		{
-			MyAssoc* pAssoc;
-			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
-				pAssoc = pAssoc->pNext)
+			MyAssoc* pAssoc, *pAssocTmp;
+			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; )
 			{
 				if (fun)
 					fun(pAssoc->data);
+				pAssocTmp = pAssoc->pNext;
 				pAssoc->MyAssoc::~MyAssoc();
+				pAssoc = pAssocTmp;
 			}
 		}
 		// free hash table

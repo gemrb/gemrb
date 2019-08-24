@@ -59,6 +59,8 @@
 #include "System/StringBuffer.h"
 #include "StringMgr.h"
 
+#include <cmath>
+
 namespace GemRB {
 
 //configurable?
@@ -70,7 +72,6 @@ static int extraslots = -1;
 static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
-static char **classabilities = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
@@ -118,7 +119,7 @@ static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
-#define NUM_RARE_SELECT_SOUNDS 2 //in bg and pst it is actually 4 TODO: check
+static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
 #define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
@@ -178,12 +179,14 @@ static const int levelslotsbg[BGCLASSCNT]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERI
 // map isClass -> (IWD2) class ID
 static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-// classis -> kits map
+// class -> kits map
 struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
+	std::vector<const char*> clabs;
+	const char* clab;
 };
-static std::map<int, ClassKits> iwd2kits;
+static std::map<int, ClassKits> class2kits;
 
 //this map could probably be auto-generated (isClass -> IWD2 book ID)
 static const int booksiwd2[ISCLASSES]={-1, IE_IWD2_SPELL_WIZARD, -1, -1,
@@ -379,7 +382,9 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 #define WEAPON_STYLEMASK   15
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
-#define WEAPON_FINESSE     64
+#define WEAPON_USESTRENGTH_DMG 64
+#define WEAPON_USESTRENGTH_HIT 128
+#define WEAPON_FINESSE     256
 #define WEAPON_BYPASS      0x10000
 #define WEAPON_KEEN        0x20000
 
@@ -519,10 +524,13 @@ Actor::Actor()
 	WMLevelMod = 0;
 	TicksLastRested = LastFatigueCheck = 0;
 	speed = 0;
+	remainingTalkSoundTime = lastTalkTimeCheckAt = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
 	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
 	weapSlotCount = 4;
+	// delay all maxhp checks until we completely load all effects
+	checkHP = 2;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -711,6 +719,8 @@ void Actor::SetCircleSize()
 		return;
 
 	GameControl *gc = core->GetGameControl();
+	float oscillationFactor = 1.0f;
+
 	if (UnselectableTimer) {
 		color = ColorMagenta;
 		color_index = 4;
@@ -720,9 +730,17 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_CHECKFORBERSERK]) {
 		color = ColorYellow;
 		color_index = 5;
-	} else if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
+	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
 		color = ColorWhite;
 		color_index = 3; //?? made up
+
+		if (remainingTalkSoundTime > 0) {
+			/**
+			 * Approximation: pulsating at about 2Hz over a notable radius growth.
+			 * Maybe check this relation for dragons and rats, too.
+			 */
+			oscillationFactor = 1.1f + std::sin(remainingTalkSoundTime * (4 * M_PI) / 1000) * 0.1f;
+		}
 	} else {
 		switch (Modified[IE_EA]) {
 			case EA_PC:
@@ -753,7 +771,7 @@ void Actor::SetCircleSize()
 	}
 
 	int csize = Clamp(anims->GetCircleSize() - 1, 0, MAX_CIRCLE_SIZE-1);
-	SetCircle( anims->GetCircleSize(), color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+	SetCircle( anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
@@ -814,23 +832,42 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 
 #define BG2_KITMASK  0xffffc000
 #define KIT_BASECLASS 0x4000
-#define KIT_SWASHBUCKLER 0x100000
-#define KIT_BARBARIAN 0x40000000
+#define KIT_SWASHBUCKLER KIT_BASECLASS+12
+#define KIT_WILDMAGE KIT_BASECLASS+30
+#define KIT_BARBARIAN KIT_BASECLASS+31
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
-static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0)
+static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 {
-	std::vector<int> kits = iwd2kits[classesiwd2[baseclass]].indices;
-	std::vector<int>::iterator it = kits.begin();
-	for ( ; it != kits.end(); it++) {
-		if (kit & (*it)) return *it;
+	if (!kit) return -1;
+
+	if (baseclass != 0) {
+		std::vector<ieDword> kits = class2kits[baseclass].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int idx=0; it != kits.end(); it++, idx++) {
+			if (kit & (*it)) return class2kits[baseclass].indices[idx];
+		}
+		if (strict) return -1;
+		Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
 	}
 
+	// no class info passed, so infer it
+	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+	for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
+		std::vector<ieDword> kits = class2kits[cidx].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int kidx=0; it != kits.end(); it++, kidx++) {
+			if (kit & (*it)) {
+				return class2kits[cidx].indices[kidx];
+			}
+		}
+	}
+
+	Log(ERROR, "Actor", "GetIWD2KitIndex: didn't find kit %d for any class, ignoring!", kit);
 	return -1;
 }
 
-//TODO: make kitlist column 6 stored internally
-static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword baseclass=0)
+ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 {
 	int kitindex = 0;
 
@@ -843,59 +880,79 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist", ieDword b
 	}
 
 	if (kitindex == 0) {
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
-		if (tm) {
-			kitindex = tm->FindTableValue(6, kit);
-			if (kitindex < 0) {
-				kitindex = 0;
-			}
+		if (!baseclass) baseclass = GetActiveClass();
+		kitindex = GetIWD2KitIndex(kit, baseclass);
+		if (kitindex < 0) {
+			kitindex = 0;
 		}
 	}
 
 	return (ieDword)kitindex;
 }
 
-// iwd2 kit usability matches kit ids, so this should never be used
-static ieDword GetKitUsability(ieDword kit, const char *resref="kitlist")
-{
-	if (third) error("Actor", "Tried to look up iwd2 kit usability the bg2 way!\n");
-	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
-		int kitindex = kit&0xfff;
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
-		if (tm) {
-			return strtol(tm->QueryField(kitindex, 6), NULL, 0 );
-		}
-	}
-	if (kit&KIT_BASECLASS) return 0;
-	return kit;
-}
-
 //applies a kit on the character
-// iwd2 has support for multikit characters, so we have more work
 bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	ieDword row = GetKitIndex(kit, "kitlist", baseclass);
+	int row = GetKitIndex(kit, baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
 	Holder<TableMgr> tm;
+
+	// iwd2 has support for multikit characters, so we have more work
+	// at the same time each baseclass has its own level stat, so the logic is cleaner
+	// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be choosen
+	// even generalist mages are a kit the same way as in the older games
 	if (iwd2class) {
-		if ((signed)row == -1) { // baseclass or caller didn't pass a baseclass (a few actions)
-			row = baseclass - 1;
+		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
+		assert(baseclass != 0);
+		row = GetIWD2KitIndex(kit, baseclass, true);
+		bool kitMatchesClass = row > 0;
+
+		if (!kit || !kitMatchesClass) {
+			// pure class
+			clab = class2kits[baseclass].clab;
+		} else {
+			// both kit and baseclass are fine and the kit is of this baseclass
+			std::vector<ieDword> kits = class2kits[baseclass].ids;
+			std::vector<ieDword>::iterator it = kits.begin();
+			for (int idx=0; it != kits.end(); it++, idx++) {
+				if (kit & (*it)) {
+					clab = class2kits[baseclass].clabs[idx];
+					break;
+				}
+			}
 		}
-		tm = gamedata->GetTable(gamedata->LoadTable("classes"));
-		assert (tm);
-		//kitclass = (ieDword) atoi(tm->QueryField(row, 3));
-		clab = tm->QueryField(row, 4);
+		assert(clab != NULL);
 		cls = baseclass;
 	} else if (row) {
-		//kit abilities
-		tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
-		if (tm) {
-			kitclass = (ieDword) atoi(tm->QueryField(row, 7));
-			clab = tm->QueryField(row, 4);
+		// bg2 kit abilities
+		// this doesn't do a kitMatchesClass like above, since it is handled when applying the clab below
+		// NOTE: a fighter/illusionist multiclass and illusionist/fighter dualclass would be good test cases, but they don't have any clabs
+		// NOTE: multiclass characters will get the clabs applied for all classes at once, so up to three times, since there are three level stats
+		// we can't rely on baseclass, since it will match only for combinations of fighters, mages and thieves.
+		// TODO: fix it — one application ensures no problems with stacking permanent effects
+		// NOTE: it can happen in normal play that we are leveling two classes at once, as some of the xp thresholds are shared (f/m at 250,000 xp).
+		bool found = false;
+		std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+		for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
+			std::vector<int> kits = class2kits[cidx].indices;
+			std::vector<int>::iterator it = kits.begin();
+			for (int kidx=0; it != kits.end(); it++, kidx++) {
+				if (row == *it) {
+					kitclass = cidx;
+					clab = class2kits[cidx].clabs[kidx];
+					found = true;
+					clskit = --class2kits.end(); // break out of the outer loop too
+					break;
+				}
+			}
+		}
+		if (!found) {
+			Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit (%d), skipping!", kit);
+			return false;
 		}
 	}
 
@@ -909,7 +966,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 			if (multiclass & msk) {
 				max = GetLevelInClass(i);
 				// don't apply/remove the old kit clab if the kit is disabled
-				if (i == kitclass && !IsDualInactive()) {
+				if (i == kitclass && !IsKitInactive()) {
 					// in case of dc reactivation, we already removed the clabs on activation of new class
 					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
 					if (IsDualClassed()) {
@@ -918,7 +975,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 						ApplyClab(clab, max, remove, diff);
 					}
 				} else {
-					ApplyClab(classabilities[i], max, remove, diff);
+					ApplyClab(class2kits[i].clab, max, remove, diff);
 				}
 			}
 			msk+=msk;
@@ -934,7 +991,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	if (kitclass==cls || iwd2class) {
 		ApplyClab(clab, max, remove, diff);
 	} else {
-		ApplyClab(classabilities[cls], max, remove, diff);
+		ApplyClab(class2kits[cls].clab, max, remove, diff);
 	}
 	return true;
 }
@@ -1050,74 +1107,76 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISFIGHTER]);
-	//actor->ChangeSorcererType(ISFIGHTER); // not a caster
+	//actor->ChangeSorcererType(classesiwd2[ISFIGHTER]); // not a caster
 }
 
 static void pcf_level_mage (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMAGE]);
-	actor->ChangeSorcererType(ISMAGE);
+	actor->ChangeSorcererType(classesiwd2[ISMAGE]);
 }
 
 static void pcf_level_thief (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISTHIEF]);
-	actor->ChangeSorcererType(ISTHIEF); // not a caster
+	//actor->ChangeSorcererType(classesiwd2[ISTHIEF]); // not a caster
 }
 
 static void pcf_level_barbarian (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARBARIAN]);
-	//actor->ChangeSorcererType(ISBARBARIAN); // not a caster
+	//actor->ChangeSorcererType(classesiwd2[ISBARBARIAN]); // not a caster
 }
 
 static void pcf_level_bard (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARD]);
-	actor->ChangeSorcererType(ISBARD);
+	actor->ChangeSorcererType(classesiwd2[ISBARD]);
 }
 
 static void pcf_level_cleric (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISCLERIC]);
-	actor->ChangeSorcererType(ISCLERIC);
+	actor->ChangeSorcererType(classesiwd2[ISCLERIC]);
 }
 
 static void pcf_level_druid (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISDRUID]);
-	actor->ChangeSorcererType(ISDRUID);
+	actor->ChangeSorcererType(classesiwd2[ISDRUID]);
 }
 
 static void pcf_level_monk (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMONK]);
-	//actor->ChangeSorcererType(ISMONK); // not a caster
+	//actor->ChangeSorcererType(classesiwd2[ISMONK]); // not a caster
 }
 
 static void pcf_level_paladin (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISPALADIN]);
-	actor->ChangeSorcererType(ISPALADIN);
+	actor->ChangeSorcererType(classesiwd2[ISPALADIN]);
 }
 
 static void pcf_level_ranger (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISRANGER]);
-	actor->ChangeSorcererType(ISRANGER);
+	actor->ChangeSorcererType(classesiwd2[ISRANGER]);
 }
 
 static void pcf_level_sorcerer (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISSORCERER]);
-	actor->ChangeSorcererType(ISSORCERER);
+	actor->ChangeSorcererType(classesiwd2[ISSORCERER]);
 }
 
 static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	//Call forced initbuttons in old style systems, and soft initbuttons
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
-	actor->InitButtons(newValue, !iwd2class);
+	// also ensure multiclass is set early, since GetActiveClass relies on it
+	actor->ResetMC();
+	actor->InitButtons(actor->GetActiveClass(), !iwd2class);
 	actor->ChangeSorcererType(newValue);
 }
 
@@ -1200,6 +1259,8 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
+	if (actor->checkHP == 2) return;
+
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
 		hp=maxhp;
@@ -1222,12 +1283,11 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
-static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
+static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
-		actor->BaseStats[IE_HITPOINTS]=hp;
-		//passing 0 because it is ignored anyway
-		pcf_hitpoint(actor, 0, hp);
+	if (!actor->checkHP) {
+		actor->checkHP = 1;
+		actor->checkHPTime = core->GetGame()->GameTime;
 	}
 }
 
@@ -1572,15 +1632,6 @@ void Actor::ReleaseMemory()
 			free(wizardspelltables);
 			wizardspelltables=NULL;
 		}
-		if (classabilities) {
-			for (i=0;i<classcount;i++) {
-				if (classabilities[i]) {
-					free (classabilities[i]);
-				}
-			}
-			free(classabilities);
-			classabilities=NULL;
-		}
 
 		if (defaultprof) {
 			free(defaultprof);
@@ -1831,6 +1882,7 @@ static void InitActorTables()
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 	IWDSound = core->HasFeature(GF_SOUNDS_INI);
+	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists various level based xp bonuses
 	AutoTable tm("xpbonus", true);
@@ -1862,7 +1914,6 @@ static void InitActorTables()
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
-		classabilities = (char **) calloc(classcount, sizeof(char*));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
@@ -1941,7 +1992,8 @@ static void InitActorTables()
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
-			classabilities[i]=strdup(field);
+			// everyone but pst (none at all) and iwd2 (different table)
+			class2kits[i].clab = strdup(field);
 
 			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
@@ -2140,17 +2192,21 @@ static void InitActorTables()
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
 			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
+			const char *clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
 				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
-				iwd2kits[classcol].indices.push_back(i);
-				iwd2kits[classcol].ids.push_back(classID);
+				class2kits[classcol].indices.push_back(i);
+				class2kits[classcol].ids.push_back(classID);
+				class2kits[classcol].clabs.push_back(strdup(clab));
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
 				ieDword cid = atoi(tm->QueryField(isclassnames[i], "ID"));
 				classesiwd2[i] = cid;
+
+				class2kits[classID].clab = strdup(clab);
 			} else {
 				// new class out of order
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
@@ -2361,6 +2417,26 @@ static void InitActorTables()
 		}
 	}
 	className2ID.clear();
+
+	// slurp up kitlist.2da; only iwd2 has both class and kit info in the same table
+	if (!iwd2class) {
+		tm.load("kitlist", true);
+		if (!tm) {
+			error("Actor", "Missing kitlist.2da!");
+		}
+		for (unsigned int i=0; i < tm->GetRowCount(); i++) {
+			char rowName[6];
+			sprintf(rowName, "%d", i);
+			// kit usability is in hex and is sometimes used as the kit ID,
+			// while other times ID is the baseclass constant or-ed with the index
+			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
+			int classID = atoi(tm->QueryField(rowName, "CLASS"));
+			const char *clab = tm->QueryField(rowName, "ABILITIES");
+			class2kits[classID].indices.push_back(i);
+			class2kits[classID].ids.push_back(kitUsability);
+			class2kits[classID].clabs.push_back(strdup(clab));
+		}
+	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
 	tm.load("wspecial");
@@ -3191,6 +3267,16 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		UpdateAnimationID(true);
 	}
 
+	//delayed HP adjustment hack (after max HP modification)
+	//as it's triggered by PCFs from the previous tick, it should probably run before current PCFs
+	if (first && checkHP == 2) {
+		//could not set this in the constructor
+		checkHPTime = core->GetGame()->GameTime;
+	} else if (checkHP && checkHPTime != core->GetGame()->GameTime) {
+		checkHP = 0;
+		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
+	}
+
 	for (i=0;i<MAX_STATS;i++) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
@@ -3657,9 +3743,17 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue, 1);
 			break;
 		case MOD_DIVISIVE:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
 			break;
 		case MOD_MODULUS:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
 			break;
 		case MOD_LOGAND:
@@ -3704,9 +3798,17 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue);
 			break;
 		case MOD_DIVISIVE:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
 			break;
 		case MOD_MODULUS:
+			if (ModifierValue == 0) {
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				break;
+			}
 			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
 			break;
 		case MOD_LOGAND:
@@ -3791,15 +3893,15 @@ ieStrRef Actor::GetVerbalConstant(int start, int count) const
 	return (ieStrRef) -1;
 }
 
-void Actor::VerbalConstant(int start, int count, bool queue) const
+bool Actor::VerbalConstant(int start, int count, bool queue) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
-		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return;
+		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return false;
 	}
 
 	if (count < 0) {
-		return;
+		return false;
 	}
 	int flags = DS_CONSOLE|DS_SPEECH;
 	if (queue) {
@@ -3807,6 +3909,7 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 	}
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
+	bool found = false;
 	if (PCStats && PCStats->SoundSet[0]) {
 		ieResRef soundref;
 		char chrsound[256];
@@ -3816,6 +3919,7 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 			GetSoundFolder(chrsound, 1, soundref);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
+				found = true;
 				break;
 			}
 		} while (count > 0);
@@ -3823,8 +3927,10 @@ void Actor::VerbalConstant(int start, int count, bool queue) const
 		ieStrRef str = GetVerbalConstant(start, count);
 		if (str != ieStrRef(-1)) {
 			DisplayStringCore((Scriptable *) this, str, flags);
+			found = true;
 		}
 	}
+	return found;
 }
 
 void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
@@ -4023,11 +4129,22 @@ bool Actor::GetPartyComment()
 void Actor::PlaySelectionSound()
 {
 	playedCommandSound = false;
-	switch (sel_snd_freq) {
-		case 0:
-			return;
+	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
+	unsigned int frequency = sel_snd_freq + pstflags;
+	if (!pstflags && frequency > 2) frequency = 5;
+	switch (frequency) {
 		case 1:
+			return;
+		case 2:
 			if (core->Roll(1,100,0) > 20) return;
+			break;
+		// pst-only
+		case 3:
+			if (core->Roll(1, 100, 0) > 50) return;
+			break;
+		case 4:
+			if (core->Roll(1, 100, 0) > 80) return;
+			break;
 		default:;
 	}
 
@@ -4045,9 +4162,10 @@ void Actor::PlaySelectionSound()
 	}
 }
 
-void Actor::PlayWarCry(int range) const
+bool Actor::PlayWarCry(int range) const
 {
-	if (war_cries) VerbalConstant(VB_ATTACK, range);
+	if (!war_cries) return false;
+	return VerbalConstant(VB_ATTACK, range);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
@@ -4059,23 +4177,32 @@ void Actor::CommandActor(Action* action, bool clearPath)
 	Scriptable::Stop(); // stop what you were doing
 	if (clearPath) ClearPath();
 	AddAction(action); // now do this new thing
-	switch (cmd_snd_freq) {
-		case 0:
-			return;
+
+	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
+	switch (cmd_snd_freq + pstflags) {
 		case 1:
+			return;
+		case 2:
 			if (playedCommandSound) return;
 			playedCommandSound = true;
 			// intentional fallthrough
-		case 2:
+		case 3:
 			//PST has 4 states and rare sounds
-			if (raresnd) {
+			if (pstflags) {
 				if (core->Roll(1,100,0)>50) return;
 			}
+			break;
+		case 4:
+			if (pstflags) {
+				if (core->Roll(1, 100, 0) > 80) return;
+			}
+			break;
 		default:;
 	}
+
 	if (core->GetFirstSelectedPC(false) == this) {
-		//if GF_RARE_ACTION_VB is set, don't select the last 4 options frequently
-		VerbalConstant(VB_COMMAND,(raresnd && core->Roll(1, 100,0)<75)?SEL_ACTION_COUNT_COMMON:SEL_ACTION_COUNT_ALL);
+		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
+		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
 	}
 }
 
@@ -4172,7 +4299,12 @@ void Actor::PlayExistenceSounds()
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
 						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
 						if (stream != -1) {
-							audio->QueueAmbient(stream, sb.Sound);
+							int audioLength = audio->QueueAmbient(stream, sb.Sound);
+
+							if (audioLength > 0) {
+								SetAnimatedTalking(audioLength);
+							}
+
 							audio->ReleaseStream(stream, false);
 						}
 					}
@@ -4191,18 +4323,28 @@ bool Actor::OverrideActions()
 	//TODO:: implement forced actions that mess with scripting (panic, confusion, etc)
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	Action *action;
-	if (fxqueue.HasEffect(fx_set_charmed_state_ref)) {
-		if (fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 3) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1003) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 5) ||
-			fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1005)) {
-			action = GenerateAction("AttackReevaluate(NearestEnemyOf(Myself))");
-			if (action) {
-				AddActionInFront(action);
-				return true;
-			} else {
-				Log(ERROR, "Actor", "Cannot generate override action");
-			}
+	if ((Modified[IE_STATE_ID] & STATE_CHARMED) && (BaseStats[IE_EA] <= EA_GOODCUTOFF) && Modified[IE_EA] == EA_CHARMEDPC) {
+		Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
+		if (!charm) return false;
+
+		// skip regular charm
+		switch (charm->Parameter2) {
+			case 2:
+			case 3:
+			case 5:
+			case 1002:
+			case 1003:
+			case 1005:
+				action = GenerateAction("AttackReevaluate([GOODCUTOFF],10)");
+				if (action) {
+					AddActionInFront(action);
+					return true;
+				} else {
+					Log(ERROR, "Actor", "Cannot generate override action");
+				}
+				break;
+			default:
+				break;
 		}
 	}
 	return false;
@@ -4565,7 +4707,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
 
-		if (core->HasFeedback(FT_STATES)) goto hitsound;
+		if (!core->HasFeedback(FT_STATES)) goto hitsound;
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
@@ -4748,6 +4890,33 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		}
 	}
 	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos.x, Pos.y);
+}
+
+// Play swing sounds
+// <wtype><n> in bgs, but it gets quickly complicated with iwds (SW_<wname>) and pst, which add a bunch of exceptions
+// ... so they're just fully stored in itemsnd.2da
+// iwds also have five sounds of hitting armor (SW_SWD01) that we ignore
+// pst has a lot of duplicates (1&3&6, 2&5, 8&9, 4, 7, 10) and little variation (all 6 entries for 8 are identical)
+void Actor::PlaySwingSound(WeaponInfo &wi) const
+{
+	ieResRef sound;
+	ResRef sound2;
+	ieDword itemType = wi.itemtype;
+	int isCount = gamedata->GetSwingCount(itemType);
+
+	if (isCount == -2) {
+		// monsters with non-standard items, none or something else
+		int stance = GetStance();
+		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
+			GetSoundFromFile(sound, 100+stance);
+		}
+	} else {
+		// swing sounds start at column 3 (index 2)
+		int isChoice = core->Roll(1, isCount, -1) + 2;
+		if (!gamedata->GetItemSound(sound2, itemType, NULL, isChoice)) return;
+	}
+
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos.x, Pos.y);
 }
 
 //Just to quickly inspect debug maximum values
@@ -5004,8 +5173,9 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 
 int Actor::GetWildMod(int level)
 {
-	if (GetStat(IE_KIT) == (KIT_BASECLASS|0x1e)) {
+	if (GetStat(IE_KIT) == KIT_WILDMAGE) {
 		// avoid rerolling the mod, since we get called multiple times per each cast
+		// TODO: also handle a reroll to 0
 		if (!WMLevelMod) {
 			if (level>=MAX_LEVEL) level=MAX_LEVEL;
 			if(level<1) level=1;
@@ -5170,9 +5340,8 @@ void Actor::Resurrect()
 	SetStance(IE_ANI_EMERGE);
 	Game *game = core->GetGame();
 	//readjust death variable on resurrection
+	ieVariable DeathVar;
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
-		ieVariable DeathVar;
-
 		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName);
 		if (len > sizeof(ieVariable)) {
 			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
@@ -5183,7 +5352,15 @@ void Actor::Resurrect()
 		if (value>0) {
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
+	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
+	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
+		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
+		if (len > 32) {
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals (on resurrect)!", scriptName, LongName);
+		}
+		game->locals->SetAt(DeathVar, 0, true);
 	}
+
 	ResetCommentTime();
 	//clear effects?
 }
@@ -6003,6 +6180,7 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 		wi.enchantment = item->Enchantment;
 	}
 	wi.itemflags = wield->Flags;
+	//not resetting wi.itemtype, since we want it to remain the one of the launcher
 	//wi.range is not set, the projectile has no effect on range?
 
 	ITMExtHeader *which = item->GetWeaponHeader(true);
@@ -6050,6 +6228,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	}
 
 	wi.enchantment = item->Enchantment;
+	wi.itemtype = item->ItemType;
 	wi.itemflags = wield->Flags;
 	wi.prof = item->WeaProf;
 	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
@@ -6635,10 +6814,17 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//TODO easier copying of recharge flags into wflags
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_DMG) wi.wflags |= WEAPON_USESTRENGTH_DMG;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_HIT) wi.wflags |= WEAPON_USESTRENGTH_HIT;
 	// this flag is set in dagger/shortsword by the loader
 	if (header->RechargeFlags&IE_ITEM_USEDEXTERITY) wi.wflags|=WEAPON_FINESSE;
 	//also copy these flags (they match their WEAPON_ counterparts)
 	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_BYPASS);
+
+	if (wi.wflags & WEAPON_RANGED && (hittingheader->RechargeFlags&IE_ITEM_KEEN)) {
+		// all the previous checks were against the launcher, but ammo can be keen too (00arow87)
+		wi.critrange--;
+	}
 
 	// get our dual wielding modifier
 	if (dualwielding) {
@@ -6680,7 +6866,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative
 	if (stars == 0 && !third) {
-		ieDword clss = BaseStats[IE_CLASS];
+		ieDword clss = GetActiveClass();
 		//Is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
@@ -6888,7 +7074,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 {
 	int dexbonus = 0, strbonus = 0;
 	// add strength bonus (discarded for ranged weapons later)
-	if (Flags&WEAPON_USESTRENGTH) {
+	if (Flags&WEAPON_USESTRENGTH || Flags&WEAPON_USESTRENGTH_HIT) {
 		if (third) {
 			strbonus = GetAbilityBonus(IE_STR );
 		} else {
@@ -6920,7 +7106,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 			} else {
 				dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			}
-			// WEAPON_USESTRENGTH only affects weapon damage
+			// WEAPON_USESTRENGTH only affects weapon damage, WEAPON_USESTRENGTH_HIT unknown
 			strbonus = 0;
 			break;
 		// no ability tohit bonus for WEAPON_FIST
@@ -7137,6 +7323,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	SetStance(AttackStance);
+	PlaySwingSound(wi);
 
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta
@@ -7157,7 +7344,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
-		buffer.append("[Missed]");
+		buffer.append("[Missed (puppet)]");
 		Log(COMBAT, "Attack", buffer);
 		return;
 	}
@@ -7202,25 +7389,6 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (roll==1) {
-		//critical failure
-		buffer.append("[Critical Miss]");
-		Log(COMBAT, "Attack", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
-		VerbalConstant(VB_CRITMISS);
-		if (wi.wflags&WEAPON_RANGED) {//no need for this with melee weapon!
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
-		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
-			//break sword
-			// a random roll on-hit (perhaps critical failure too)
-			//  in 0,5% (1d20*1d10==1) cases
-			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,10,0) == 1) {
-				inventory.BreakItemSlot(wi.slot);
-			}
-		}
-		ResetState();
-		return;
-	}
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
@@ -7241,6 +7409,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		// autohit immobile enemies (true for atleast stun, sleep, timestop)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
 			success = true;
+		} else if (roll == 1) {
+			success = false;
 		} else {
 			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
 		}
@@ -7248,14 +7418,45 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
-		// FIXME: Im sure there are string constants we should be using!
-		// FIXME: the values dont seem to match between GemRB and original (BG2). is our above calculation accurate?
-		wchar_t* rollLog = (wchar_t*)malloc(40 * sizeof(wchar_t));//Rolls
-		const wchar_t* fmt = L"Attack Roll %d %ls %d = %d : %ls";
-		swprintf( rollLog, 40, fmt, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, (success) ? L"Hit" : L"Miss" );
+		wchar_t rollLog[100];
+		const wchar_t *fmt = L"%ls %d %ls %d = %d : %ls";
+		String *leftRight, *hitMiss;
+		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
+			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL_L));
+		} else {
+			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL));
+		}
+		if (success) {
+			hitMiss = core->GetString(displaymsg->GetStringReference(STR_HIT));
+		} else {
+			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
+		}
+		swprintf(rollLog, 100, fmt, leftRight->c_str(), roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss->c_str());
 		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
-		free(rollLog);
+		delete leftRight;
+		delete hitMiss;
 	}
+
+	if (roll == 1) {
+		//critical failure
+		buffer.append("[Critical Miss]");
+		Log(COMBAT, "Attack", buffer);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
+		VerbalConstant(VB_CRITMISS);
+		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
+			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
+		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
+			//break sword
+			// a random roll on-hit (perhaps critical failure too)
+			//  in 0,5% (1d20*1d10==1) cases
+			if ((header->RechargeFlags & IE_ITEM_BREAKABLE) && core->Roll(1, 10, 0) == 1) {
+				inventory.BreakItemSlot(wi.slot);
+			}
+		}
+		ResetState();
+		return;
+	}
+
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
@@ -7305,7 +7506,7 @@ int Actor::GetWeaponRange(const WeaponInfo &wi) const
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
 {
-	if (wi.wflags&WEAPON_USESTRENGTH) {
+	if (wi.wflags&WEAPON_USESTRENGTH || wi.wflags&WEAPON_USESTRENGTH_DMG) {
 		if (third) {
 			int bonus = GetAbilityBonus(IE_STR);
 			// 150% bonus for twohanders
@@ -7715,7 +7916,7 @@ void Actor::AddExperience(int exp, int combat)
 	bonus += GetFavoredPenalties();
 	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
 	if (xpcap != NULL) {
-		int classid = BaseStats[IE_CLASS] - 1;
+		int classid = GetActiveClass() - 1;
 		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
 			exp = xpcap[classid];
 		}
@@ -7884,7 +8085,7 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 
 void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox,
 							SpriteCover*& newsc, Animation** anims,
-							unsigned char Face, const Color& tint)
+							unsigned char Face, const Color& tint, bool useShadowPalette)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -7921,7 +8122,8 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 			}
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
-			video->BlitGameSpriteWithPalette(nextFrame, ca->GetPartPalette(partnum),
+			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
+			video->BlitGameSpriteWithPalette(nextFrame, palette,
 											 cx - vp.x, cy - vp.y, flags, tint2, newsc);
 		}
 	}
@@ -8202,6 +8404,20 @@ void Actor::Draw(const Region& vp)
 			drawcircle = markerfeedback >= 5;
 		}
 	}
+
+	if (remainingTalkSoundTime > 0) {
+		unsigned int currentTick = GetTickCount();
+		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
+		lastTalkTimeCheckAt = currentTick;
+
+		if (diffTime >= remainingTalkSoundTime) {
+			remainingTalkSoundTime = 0;
+		} else {
+			remainingTalkSoundTime -= diffTime;
+		}
+		SetCircleSize();
+	}
+
 	if (drawcircle) {
 		DrawCircle(vp);
 		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
@@ -8345,7 +8561,7 @@ void Actor::Draw(const Region& vp)
 
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(vp, cx, cy, BBox, newsc, shadowAnimations, Face, tint);
+			DrawActorSprite(vp, cx, cy, BBox, newsc, shadowAnimations, Face, tint, true);
 		}
 
 		// actor itself
@@ -8452,15 +8668,29 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-void Actor::GetSoundFrom2DA(ieResRef& Sound, unsigned int index) const
+bool Actor::GetSoundFromFile(ieResRef &Sound, unsigned int index) const
 {
-	if (!anims) return;
+	// only dying ignores the incapacity to vocalize
+	if (index != VB_DIE) {
+		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
+	}
+
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		return GetSoundFromINI(Sound, index);
+	} else {
+		return GetSoundFrom2DA(Sound, index);
+	}
+}
+
+bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
+{
+	if (!anims) return false;
 
 	AutoTable tab(anims->ResRef);
-	if (!tab)
-		return;
+	if (!tab) return false;
 
 	switch (index) {
+		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
 		case VB_ATTACK:
 			index = 0;
 			break;
@@ -8475,21 +8705,39 @@ void Actor::GetSoundFrom2DA(ieResRef& Sound, unsigned int index) const
 		case VB_SELECT:
 		case VB_SELECT+1:
 		case VB_SELECT+2:
-			index = 36;
+			index = 36; // Selection (yes, the row names are inconsistently capitalized)
+			break;
+		// entries without VB equivalents
+		case 100+IE_ANI_SHOOT:
+			index = 16; // SHOOT
+			break;
+		case 100+IE_ANI_ATTACK_SLASH:
+			index = 22; // ATTACK_SLASH
+			break;
+		case 100+IE_ANI_ATTACK_BACKSLASH:
+			index = 24; // ATTACK_BACKSLASH
+			break;
+		case 100+IE_ANI_ATTACK_JAB:
+			index = 26; // ATTACK_JAB
+			break;
+		// TODO: research whether this entry is ever different from ATTACK and what's the difference in use
+		case 200:
+			index = 34; // Battle_Cry
 			break;
 		default:
 			Log(WARNING, "Actor", "TODO:Cannot determine 2DA rowcount for index: %d", index);
-			return;
+			return false;
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
 		anims->ResRef, tab->GetRowName(index) );
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
+	return true;
 }
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-void Actor::GetSoundFromINI(ieResRef& Sound, unsigned int index) const
+bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -8499,6 +8747,20 @@ void Actor::GetSoundFromINI(ieResRef& Sound, unsigned int index) const
 	}
 	snprintf(section,10,"%d", animid);
 
+	/* TODO: pst also has these, but we currently ignore them:
+	 * Another form of randomization or for different attack types, animations?
+	 *    1x at2sound for each at1sound
+	 *    2x at3sound
+	 * What are these for?
+	 *   33x cf1sound (?)
+	 *    2x ms1sound (misc; both hammers hitting metal; ambient sounds for idle animations? Likely doesn't fit here)
+	 *   19x sf1sound (?)
+	 * 
+	 * TODO: iwd:
+	 *   att2-att4
+	 *   fall
+	 *   fidget
+	 */
 	switch(index) {
 		case VB_ATTACK:
 			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att1":"at1sound","");
@@ -8515,9 +8777,22 @@ void Actor::GetSoundFromINI(ieResRef& Sound, unsigned int index) const
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected","");
 			}
 			break;
+		// entries without VB equivalents
+		case 100+IE_ANI_SHOOT:
+		case 100+IE_ANI_ATTACK_SLASH:
+		case 100+IE_ANI_ATTACK_BACKSLASH:
+		case 100+IE_ANI_ATTACK_JAB:
+			// FIXME: complete guess
+			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att2":"at2sound","");
+			break;
+		case 200: // battle cry
+			if (IWDSound) {
+				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry", "");
+			}
+			break;
 	}
 	int count = CountElements(resource,',');
-	if (count<=0) return;
+	if (count <= 0) return false;
 	count = core->Roll(1,count,-1);
 	while(count--) {
 		while(*resource && *resource!=',') resource++;
@@ -8526,6 +8801,7 @@ void Actor::GetSoundFromINI(ieResRef& Sound, unsigned int index) const
 	CopyResRef(Sound, resource);
 	for(count=0;count<8 && Sound[count]!=',';count++) {};
 	Sound[count]=0;
+	return true;
 }
 
 void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
@@ -8570,7 +8846,7 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	//at this point, we need the stats for the action button row
 	//only controlled creatures (and pcs) get it
 	CreateStats();
-	InitButtons(GetStat(IE_CLASS), false);
+	InitButtons(GetActiveClass(), false);
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		ar[i] = IWD2GemrbQslot(i);
 	}
@@ -8628,7 +8904,7 @@ int Actor::IWD2GemrbQslot (int slotindex) const
 void Actor::dumpQSlots() const
 {
 	ActionButtonRow r;
-	memcpy(&r, GUIBTDefaults+GetStat(IE_CLASS), sizeof(ActionButtonRow));
+	memcpy(&r, GUIBTDefaults + GetActiveClass(), sizeof(ActionButtonRow));
 	StringBuffer buffer, buffer2, buffer3;
 
 	buffer.append("Current  default: ");
@@ -9484,7 +9760,9 @@ int Actor::CheckUsability(Item *item) const
 		//if we have a kit, we just use its index for the lookup
 		if (itemuse[i].stat==IE_KIT) {
 			if (!iwd2class) {
-				stat = GetKitIndex(stat, itemuse[i].table);
+				if (IsKitInactive()) continue;
+
+				stat = GetKitIndex(stat);
 				mcol = 0xff;
 			} else {
 				//iwd2 doesn't need translation from kit to usability, the kit value IS usability
@@ -9493,6 +9771,11 @@ int Actor::CheckUsability(Item *item) const
 				stat &= ~kitignore;
 				goto no_resolve;
 			}
+		}
+
+		if (!iwd2class && itemuse[i].stat == IE_CLASS) {
+			// account for inactive duals
+			stat = GetActiveClass();
 		}
 
 		if (iwd2class && itemuse[i].stat == IE_CLASS) {
@@ -9513,16 +9796,16 @@ int Actor::CheckUsability(Item *item) const
 				if (Modified[levelslotsiwd2[j]] == 0) continue;
 				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
 
-				std::vector<ieDword> kits = iwd2kits[classesiwd2[j]].ids;
+				std::vector<ieDword> kits = class2kits[classesiwd2[j]].ids;
 				std::vector<ieDword>::iterator it = kits.begin();
 				for ( ; it != kits.end(); it++) {
 					kitignore |= *it;
 				}
 			}
 			continue;
-		} else {
-			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		}
+
+		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 
 no_resolve:
 		if (stat&itemvalue) {
@@ -9764,8 +10047,8 @@ void Actor::CreateDerivedStatsBG()
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
-		// HACK: swashbucklers can't backstab
-		if (GetKitUsability(BaseStats[IE_KIT])==KIT_SWASHBUCKLER) {
+		// swashbucklers can't backstab, but backstab.2da only has THIEF in it
+		if (BaseStats[IE_KIT] == KIT_SWASHBUCKLER) {
 			backstabdamagemultiplier = 1;
 		} else {
 			AutoTable tm("backstab");
@@ -9784,7 +10067,7 @@ void Actor::CreateDerivedStatsBG()
 		}
 	}
 
-	weapSlotCount = numWeaponSlots[BaseStats[IE_CLASS]];
+	weapSlotCount = numWeaponSlots[GetActiveClass()];
 	ReinitQuickSlots();
 
 	// monk's level dictated ac and ac vs missiles bonus
@@ -9840,20 +10123,25 @@ void Actor::CreateDerivedStatsIWD2()
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 }
 
-//set up stuff here, like attack number, turn undead level
-//and similar derived stats that change with level
-void Actor::CreateDerivedStats()
+void Actor::ResetMC()
 {
 	if (iwd2class) {
 		multiclass = 0;
 	} else {
 		ieDword cls = BaseStats[IE_CLASS]-1;
-		if (cls>=(ieDword) classcount) {
+		if (cls >= (ieDword) classcount) {
 			multiclass = 0;
 		} else {
 			multiclass = multi[cls];
 		}
 	}
+}
+
+//set up stuff here, like attack number, turn undead level
+//and similar derived stats that change with level
+void Actor::CreateDerivedStats()
+{
+	ResetMC();
 
 	if (third) {
 		CreateDerivedStatsIWD2();
@@ -9870,7 +10158,11 @@ bool Actor::IsMultiClassed() const
 /* Checks if the actor is dualclassed */
 bool Actor::IsDualClassed() const
 {
-	return (Modified[IE_MC_FLAGS] & MC_WAS_ANY) > 0;
+	// exclude the non-player classes
+	if (BaseStats[IE_CLASS] > (ieDword) classcount) return false;
+
+	// make sure only one bit is set, as critters like kuo toa have garbage in the mc bits
+	return CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
 }
 
 Actor *Actor::CopySelf(bool mislead) const
@@ -9963,7 +10255,7 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if ( (isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (GetKitUsability(BaseStats[IE_KIT]) == KIT_BARBARIAN) ) {
+	if ((isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
 		return BaseStats[IE_LEVEL];
 	}
 
@@ -10507,7 +10799,7 @@ int Actor::GetBookMask() const
 {
 	int bookmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {
-		if (Modified[levelslotsiwd2[i]] > 0) {
+		if (Modified[levelslotsiwd2[i]] > 0 && booksiwd2[i] >= 0) {
 			bookmask |= 1 << booksiwd2[i];
 		}
 	}
@@ -10851,6 +11143,45 @@ bool Actor::WasClass(ieDword oldClassID) const
 	return mcwasflags[OldIsClassID] == mcWas;
 }
 
+// returns effective class, accounting for possible inactive dual
+ieDword Actor::GetActiveClass() const
+{
+	if (!IsDualInactive()) return GetStat(IE_CLASS);
+
+	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
+	int oldclass;
+	for (int isclass = 0; isclass < ISCLASSES; isclass++) {
+		oldclass = classesiwd2[isclass];
+		if (mcwas == mcwasflags[isclass]) break;
+	}
+	if (!oldclass) {
+		error("Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
+	}
+
+	int newclassmask = multiclass & ~(1 << (oldclass - 1));
+	for (int newclass = 1, mask = 1; mask <= newclassmask; newclass++, mask <<= 1) {
+		if (newclassmask == mask) return newclass;
+	}
+
+	error("Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass); // return 0 if this ever needs to be hit only as a warning
+}
+
+// like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
+bool Actor::IsKitInactive() const
+{
+	if (!IsDualInactive()) return false;
+
+	const int CLASS = 7;
+
+	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+	if (tm) {
+		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
+		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));
+		if (kitclass == GetActiveClass()) return false;
+	}
+	return true;
+}
+
 // account for haste/slow affecting the metabolism (regeneration etc.)
 // handled by AdjustedTicks in the original
 unsigned int Actor::GetAdjustedTime(unsigned int time) const
@@ -10867,6 +11198,11 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 
 ieDword Actor::GetClassID (const ieDword isclass) {
 	return classesiwd2[isclass];
+}
+
+void Actor::SetAnimatedTalking (unsigned int length) {
+	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
+	lastTalkTimeCheckAt = GetTickCount();
 }
 
 }

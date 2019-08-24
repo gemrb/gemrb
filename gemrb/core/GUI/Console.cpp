@@ -90,6 +90,13 @@ void Console::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	video->DrawRect( drawFrame, ColorBlack );
 }
 
+/* Inserts the given text right behind the cursor position. */
+void Console::InsertText(const String& string)
+{
+	// FIXME: ignores cursor position?
+	textContainer.AppendText(string);
+}
+
 /** Sets the Text of the current control */
 void Console::SetText(const String& string)
 {

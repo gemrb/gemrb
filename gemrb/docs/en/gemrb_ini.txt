@@ -440,6 +440,11 @@ NoNewVariables = <bool>
 Toggles whether the engine can create new variables in the Game structure.
 
 
+NumRareSelectSounds = <number>
+- - - - - - - - - - - -
+Data derived setting describing how many rare select sounds a game uses.
+
+
 OneByteAnimationID = <bool>
 - - - - - - - - - - - - - -
 If set to 1, then only the lower byte of the animation ID will be used 
@@ -486,7 +491,9 @@ rather than explicitly scripted (as in BG2).
 
 RareActionSounds = <bool>
 - - - - - - - - - - - - -
-Toggles whether to use all the available verbal constants or not.
+Toggles the count of available verbal constants for commands. Most games
+had 3, but bg2 increased it to 7 by decreasing the amount of rare select
+sounds.
 
 
 ReverseDoor = <bool>

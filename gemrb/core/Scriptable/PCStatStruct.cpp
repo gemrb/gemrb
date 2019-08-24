@@ -78,6 +78,7 @@ PCStatsStruct::PCStatsStruct(std::list<int> levels)
 // because of the levels list, the class isn't trivially copiable
 PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 {
+	if (&source == this) return *this;
 	BestKilledName = source.BestKilledName;
 	BestKilledXP = source.BestKilledXP;
 	KillsChapterXP = source.KillsChapterXP;
@@ -295,7 +296,6 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 		default:
 			print("Illegal RegisterFavourite call...");
 			abort();
-			return;
 	}
 	//least favourite candidate position and count
 	int minpos = 0;

@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-#ifndef _SSIZE_T_DEFINED_
-# define _SSIZE_T_DEFINED_
+#ifndef HAVE_SIZEOF_SSIZE_T
+# define HAVE_SIZEOF_SSIZE_T
  typedef long int ssize_t;
 #endif
 

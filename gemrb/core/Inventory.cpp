@@ -361,7 +361,6 @@ void Inventory::KillSlot(unsigned int index)
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		error("Inventory", "Invalid item: %s!", item->ItemResRef);
-		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
@@ -1807,10 +1806,8 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
 				return STR_NOT_IN_OFFHAND;
 			}
-		} else {
-			if (slot==SLOT_LEFT) {
-				return STR_NOT_IN_OFFHAND;
-			}
+		} else if (slot == SLOT_LEFT) {
+			return STR_NOT_IN_OFFHAND;
 		}
 		if (IsSlotBlocked(slot)) {
 		//cannot equip two handed while shield slot is in use?

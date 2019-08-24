@@ -235,7 +235,7 @@ def GetMemorizedSpellsCount (total=False):
 	if total:
 		count = 'KnownCount' # all
 
-	counts = map (lambda x: (x[count] & x[count]) or 1, MemorizedSpellList)
+	counts = map (lambda x: max(x[count], 1), MemorizedSpellList)
 	return sum(counts)
 
 def SpellBookPrevPress ():

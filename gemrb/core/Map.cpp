@@ -369,7 +369,7 @@ Map::Map(void)
 	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
-	SongHeader.reverbID = 0;
+	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
 	MaterialMap = NULL;
 }
@@ -391,7 +391,7 @@ Map::~Map(void)
 	delete TMap;
 	delete INISpawn;
 	aniIterator aniidx;
-	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
+	for (aniidx = animations.begin(); aniidx != animations.end(); ++aniidx) {
 		delete (*aniidx);
 	}
 
@@ -917,7 +917,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 
-		PathNode * step = actor->GetNextStep();
+		PathNode * step = actor->GetStep();
 		if (step && step->Next) {
 			//we should actually wait for a short time and check then
 			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
@@ -1338,8 +1338,9 @@ void Map::DrawSearchMap(const Region &vp)
 
 	// draw also pathfinding waypoints
 	Actor *act = core->GetFirstSelectedActor();
+	if (!act) return;
 	PathNode *path = act->GetPath();
-	if (!act || !path) return;
+	if (!path) return;
 	PathNode *step = path->Next;
 	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
 	int i = 0;
@@ -1364,7 +1365,7 @@ void Map::AddAnimation(AreaAnimation* panim)
 	aniIterator iter;
 
 	int Height = anim->GetHeight();
-	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
+	for (iter = animations.begin(); (iter != animations.end()) && ((*iter)->GetHeight() < Height); ++iter) ;
 	animations.insert(iter, anim);
 }
 
@@ -2270,7 +2271,7 @@ AreaAnimation* Map::GetAnimation(const char* Name)
 {
 	aniIterator iter;
 
-	for(iter=animations.begin();iter!=animations.end();iter++) {
+	for (iter = animations.begin(); iter != animations.end(); ++iter) {
 		AreaAnimation *anim = *iter;
 
 		if (anim->Name[0] && (strnicmp(anim->Name, Name, 32) == 0)) {
@@ -2390,7 +2391,7 @@ void Map::dump(bool show_actors) const
 	buffer.appendFormatted( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
 	buffer.appendFormatted( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
 	buffer.appendFormatted( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
-	buffer.appendFormatted( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
+	buffer.appendFormatted( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST_INDOORS) );
 
 	if (show_actors) {
 		buffer.append("\n");
@@ -3194,7 +3195,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	SpawnGroup *sg = NULL;
 	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
-	int level = (difficulty ? *difficulty : core->GetGame()->GetPartyLevel(true));
+	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
 	int count = 1;
 
 	if (Spawns.Lookup(creResRef, lookup)) {
@@ -3262,7 +3263,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 		return;
 	}
 	//create spawns
-	int difficulty = spawn->Difficulty * core->GetGame()->GetPartyLevel(true);
+	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
 	unsigned int spawncount = 0, i = RAND(0, spawn->Count-1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
@@ -3322,7 +3323,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = (int) RAND(0, 99) < chance;
 	unsigned int spawncount = 0;
-	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
+	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
 		if (interrupt) {
@@ -3569,6 +3570,49 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
 	}
 }
 
+// merges pile 1 into pile 2
+static void MergePiles(Container *donorPile, Container *pile)
+{
+	unsigned int i = donorPile->inventory.GetSlotCount();
+	while (i--) {
+		CREItem *item = donorPile->RemoveItem(i, 0);
+		int count = pile->inventory.CountItems(item->ItemResRef, 0);
+		if (count == 0) {
+			pile->AddItem(item);
+			continue;
+		}
+
+		// ensure slots are stacked fully before adding new ones
+		int skipped = count;
+		while (count) {
+			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
+			if (slot == -1) {
+				// probably an inventory bug, shouldn't happen
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+				skipped--;
+				continue;
+			}
+			CREItem *otheritem = pile->inventory.GetSlotItem(slot);
+			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
+				// already full (or nonstackable), nothing to do here
+				skipped--;
+				continue;
+			}
+			if (pile->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
+				// the merge either failed (add whole) or went over the limit (add remainder)
+				pile->AddItem(item);
+			}
+			skipped = 1; // just in case we would be eligible for the safety net below
+			break;
+		}
+
+		// all found slots were already unsuitable, so just dump the item to a new one
+		if (!skipped) {
+			pile->AddItem(item);
+		}
+	}
+}
+
 void Map::MoveVisibleGroundPiles(const Point &Pos)
 {
 	//creating the container at the given position
@@ -3580,42 +3624,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 		Container * c = TMap->GetContainer( containercount);
 		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
 			//transfer the pile to the other container
-			unsigned int i=c->inventory.GetSlotCount();
-			while (i--) {
-				CREItem *item = c->RemoveItem(i, 0);
-				int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
-				if (count == 0) {
-					othercontainer->AddItem(item);
-					continue;
-				}
-				// ensure slots are stacked fully before adding new ones
-				int skipped = count;
-				while (count) {
-					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
-					if (slot == -1) {
-						// probably an inventory bug, shouldn't happen
-						Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
-						skipped--;
-						continue;
-					}
-					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
-					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
-						// already full (or nonstackable), nothing to do here
-						skipped--;
-						continue;
-					}
-					if (othercontainer->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
-						// the merge either failed (add whole) or went over the limit (add remainder)
-						othercontainer->AddItem(item);
-					}
-					skipped = 1; // just in case we would be eligible for the safety net below
-					break;
-				}
-				// all found slots were already unsuitable, so just dump the item to a new one
-				if (!skipped) {
-					othercontainer->AddItem(item);
-				}
-			}
+			MergePiles(c, othercontainer);
 		}
 	}
 
@@ -3881,7 +3890,7 @@ AreaAnimation::AreaAnimation()
 	palette=NULL;
 	covers=NULL;
 	appearance = sequence = frame = transparency = height = 0;
-	Flags = startFrameRange = skipcycle = startchance = 0;
+	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
 	Name[0] = 0;
 	BAM[0] = 0;
@@ -3894,6 +3903,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	sequence = src->sequence;
 	animation = NULL;
 	Flags = src->Flags;
+	originalFlags = src->originalFlags;
 	Pos.x = src->Pos.x;
 	Pos.y = src->Pos.y;
 	appearance = src->appearance;
@@ -3967,7 +3977,7 @@ void AreaAnimation::InitAnimation()
 	}
 
 	//freeing up the previous animation
-	for(int i=0;i<animcount;i++) {
+	for (int i=0; i<animcount && animation; i++) {
 		delete animation[i];
 	}
 	free(animation);

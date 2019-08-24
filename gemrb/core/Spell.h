@@ -39,11 +39,12 @@ class Projectile;
 
 //values for Spell usability Flags
 
+#define SF_BREAK_SANCTUARY	0x200 // TODO: EE bit to force the removal of any fx_set_sanctuary_state effects
 #define SF_HOSTILE	0x400 // bit 18
 #define SF_NO_LOS	0x800
 // unknown Allow spotting  0x1000
 #define SF_NOT_INDOORS	0x2000
-#define SF_HLA  	0x4000 // probably this means a nonmagical ability
+#define SF_HLA  	0x4000 // this means a nonmagical ability (also ignores dead-magic and wild surge effect)
 #define SF_TRIGGER	0x8000
 #define SF_NOT_IN_COMBAT 0x10000 // bit 24 unused, but tobex repurposes it
 #define SF_TARGETS_INVISIBLE 0x10000 // tobex: can target invisible creatures

@@ -126,7 +126,7 @@ static bool LoadPlugin(const char* pluginpath)
 
 	//using C bindings, so we don't need to jump through extra hoops
 	//with the symbol name
-	Version_t LibVersion = ( Version_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
+	Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
 	if (LibVersion==NULL) {
 		Log(ERROR, "PluginLoader", "Skipping invalid plugin \"%s\".", pluginpath);
 		FREE_PLUGIN( hMod );
@@ -138,7 +138,7 @@ static bool LoadPlugin(const char* pluginpath)
 		return false;
 	}
 
-	Description_t Description = ( Description_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
+	Description_t Description = ( Description_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
 	ID_t ID = ( ID_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
 	Register_t Register = ( Register_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
 

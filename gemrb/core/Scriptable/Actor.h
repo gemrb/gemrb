@@ -252,6 +252,7 @@ struct WeaponInfo {
 	int slot;
 	ieDword enchantment;
 	unsigned int range;
+	ieDword itemtype;
 	ieDword itemflags;
 	ieDword prof;
 	bool backstabbing;
@@ -260,7 +261,7 @@ struct WeaponInfo {
 	int critrange; // the lower value of the critical range (eg. 19 in 19-20/x3)
 	int profdmgbon;
 	int launcherdmgbon;
-	WeaponInfo(): slot(0), enchantment(0), range(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
+	WeaponInfo(): slot(0), enchantment(0), range(0), itemtype(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
 };
 
 struct BABTable {
@@ -372,6 +373,10 @@ public:
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
 	ieDword *spellStates;
+	// set after modifying maxhp, adjusts hp next tick
+	int checkHP;
+	// to determine that a tick has passed
+	ieDword checkHPTime;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -396,10 +401,12 @@ private:
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
 	ieDword LastFatigueCheck;
+	unsigned int remainingTalkSoundTime;
+	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint);
+				unsigned char Face, const Color& tint, bool useShadowPalette = false);
 
 	/** fixes the palette */
 	void SetupColors();
@@ -431,6 +438,7 @@ private:
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
+	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -543,7 +551,7 @@ public:
 	/* call this on gui selects */
 	void PlaySelectionSound();
 	/* play a roar if the setting isn't disabled */
-	void PlayWarCry(int range) const;
+	bool PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
 	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
@@ -561,7 +569,7 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count=1, bool queue=false) const;
+	bool VerbalConstant(int start, int count=1, bool queue=false) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
@@ -593,6 +601,7 @@ public:
 	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
 	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
+	void PlaySwingSound(WeaponInfo &wi) const;
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
@@ -702,8 +711,9 @@ public:
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef& sound, unsigned int index) const;
-	void GetSoundFromINI(ieResRef& Sound, unsigned int index) const;
-	void GetSoundFrom2DA(ieResRef& Sound, unsigned int index) const;
+	bool GetSoundFromFile(ieResRef &Sound, unsigned int index) const;
+	bool GetSoundFromINI(ieResRef &Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
@@ -824,6 +834,8 @@ public:
 	void ApplyExtraSettings();
 	/* Set up all the missing stats on load time, chargen, or after level up */
 	void CreateDerivedStats();
+	/* Resets the internal multiclass bitfield */
+	void ResetMC();
 	/* Checks if the actor is multiclassed (excluding dualclassed actors)) */
 	bool IsMultiClassed() const;
 	/* Checks if the actor is dualclassed */
@@ -922,10 +934,13 @@ public:
 	ieDword GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
+	ieDword GetActiveClass() const;
+	bool IsKitInactive() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
+	void SetAnimatedTalking(unsigned int);
 };
 }
 

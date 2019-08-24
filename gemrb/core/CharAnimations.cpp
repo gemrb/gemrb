@@ -479,6 +479,10 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[type];
 }
 
+Palette* CharAnimations::GetShadowPalette() const {
+	return shadowPalette;
+}
+
 static inline int compare_avatars(const void *a, const void *b)
 {
 	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
@@ -653,6 +657,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
+	shadowPalette = NULL;
 	nextStanceID = 0;
 	StanceID = 0;
 	autoSwitchOnEnd = false;
@@ -745,6 +750,10 @@ CharAnimations::~CharAnimations(void)
 		gamedata->FreePalette(palette[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
+
+	if (shadowPalette) {
+		gamedata->FreePalette(shadowPalette, 0);
+	}
 
 	for (i = 0; i < MAX_ANIMS; ++i) {
 		for (int j = 0; j < MAX_ORIENT; ++j) {
@@ -1329,10 +1338,8 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 			return NULL;
 		}
 
-		PaletteType paletteType = PAL_MAIN;
-		if (!palette[paletteType]) {
-			palette[paletteType] = animation->GetFrame(0)->GetPalette()->Copy();
-			SetupColors(paletteType);
+		if (!shadowPalette) {
+			shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
 		}
 
 		switch (StanceID) {
@@ -1504,7 +1511,6 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 			break;
 		default:
 			error("CharAnimations", "Unsupported animation type for equipment animation.\n");
-		break;
 	}
 }
 
@@ -1662,7 +1668,6 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 }
 
@@ -1734,7 +1739,6 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "VHR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 }
 
@@ -1797,7 +1801,6 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	size_t last = strnlen(ResRef, 6);
@@ -1861,7 +1864,6 @@ void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames 2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	size_t last = strnlen(ResRef, 6);
@@ -2003,7 +2005,6 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "VHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	EquipData->Cycle = Cycle;
 }
@@ -2080,7 +2081,6 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	if (Orient>9) {
@@ -2129,7 +2129,6 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient>=4) {
 		strcat( ResRef, "g1e" );
@@ -2251,7 +2250,6 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient>=5) {
 		strcat( ResRef, "e" );
@@ -2440,7 +2438,6 @@ void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2501,7 +2498,6 @@ void CharAnimations::AddTwoPieceSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "Two-piece Animation: unhandled stance: %s %d", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2571,7 +2567,6 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2645,7 +2640,6 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2719,7 +2713,6 @@ void CharAnimations::AddMMR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2797,7 +2790,6 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (!mirror && Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2855,7 +2847,6 @@ void CharAnimations::AddHLSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "HL Animation: unhandled stance: %s %d", ResRef, StanceID);
-			break;
 	}
 	strcat(ResRef, offset ? "hg1" : "lg1");
 	if (Orient > 9) {

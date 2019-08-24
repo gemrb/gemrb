@@ -194,6 +194,11 @@ bool AREImporter::Open(DataStream* stream)
 	str->ReadWord( &WSnow );
 	str->ReadWord( &WFog );
 	str->ReadWord( &WLightning );
+	// unused wind speed, TODO: EEs use it for transparency
+	// a single byte was re-purposed to control the alpha on the stencil water for more or less transparency.
+	// If you set it to 0, then the water should be appropriately 50% transparent.
+	// If you set it to any other number, it will be that transparent.
+	// It's 1 byte, so setting it to 128 you'll have the same as the default of 0
 	str->ReadWord( &WUnknown );
 	AreaDifficulty = 0;
 	if (bigheader) {
@@ -360,13 +365,13 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	ieResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
 	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
 	ieResRef mainAmbient = "";
-	if (main1[day_or_night][0]) {
+	if (*main1[day_or_night][0]) {
 		CopyResRef(mainAmbient, *main1[day_or_night]);
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
-	if (main2[day_or_night][0]) {
+	if (*main2[day_or_night][0]) {
 		CopyResRef(mainAmbient, *main2[day_or_night]);
 	}
 	if (!mainAmbient[0]) return NULL;
@@ -1090,7 +1095,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
 			str->ReadWord( &MaxDistance );
-			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused http://gibberlings3.net/forums/index.php?showtopic=21724
+			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused https://gibberlings3.net/forums/topic/21724-a
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -1185,6 +1190,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+
 	core->LoadProgress(90);
 	Log(DEBUG, "AREImporter", "Loading animations");
 	str->Seek( AnimOffset, GEM_STREAM_START );
@@ -1204,6 +1211,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
+			anim->originalFlags = anim->Flags;
 			str->ReadWordSigned( &anim->height );
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &startFrameRange );
@@ -1218,6 +1226,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
+
+			if (pst) {
+				AdjustPSTFlags(anim);
+			}
 
 			//set up the animation, it cannot be done here
 			//because a StaticSequence action can change
@@ -1304,7 +1316,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ieDword color = 0;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst && !NoteCount) {
 		if( !INInote ) {
 			ReadAutonoteINI();
@@ -1474,6 +1485,22 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	return map;
+}
+
+void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
+	/**
+	 * For PST, map animation flags work differently to a degree that they
+	 * should not be mixed together with the rest as they even tend to
+	 * break things (like stopping early, hiding under FoW).
+	 *
+	 * So far, a better approximation towards handling animations is:
+	 * - always set A_ANI_BLEND, A_ANI_SYNC,
+	 * - unset A_ANI_PLAYONCE, A_ANI_NOT_IN_FOG, A_ANI_BACKGROUND.
+	 *
+	 * The actual use of bits in PST map anims isn't fully solved here.
+	 */
+	areaAnim->Flags |= (A_ANI_BLEND | A_ANI_SYNC);
+	areaAnim->Flags &= ~(A_ANI_PLAYONCE | A_ANI_NOT_IN_FOG | A_ANI_BACKGROUND);
 }
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
@@ -2140,7 +2167,7 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
-		stream->WriteDword( &an->Flags);
+		stream->WriteDword( &an->originalFlags);
 		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START

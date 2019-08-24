@@ -71,13 +71,12 @@ options should also be mentioned here if they're not part of the changelog.
 
 * Test the downloads from sourceforge.net
 
-* Announce on SF, #GemRB in channel and title, LGDB and Gibberlings3:
+* Announce on SF, #GemRB in channel and title, Discord channel, LGDB and Gibberlings3:
     - our forum
     - modding news (Lynx, Avenger, Mike1072, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
   (a template is available in admin/announcement.template)
     - homepages: sidebar (versions and news), news, start (version), changelog (status
       and log swap), old_changelogs
-    - our Google+ page: https://plus.google.com/+GemrbOrg
     - github: go to the Releases tab and promote the new tag to a release, then add
       a link to the release notes
 

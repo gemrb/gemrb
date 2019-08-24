@@ -110,6 +110,7 @@ static ieWordSigned *wisbon = NULL;
 static int **reputationmod = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+static int NumRareSelectSounds = 2;
 
 static ieWord IDT_FAILURE = 0;
 static ieWord IDT_CRITRANGE = 1;
@@ -1014,8 +1015,6 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 
 int Interface::LoadSprites()
 {
-	ieDword i;
-	int size;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		Log(ERROR, "Core", "No 2DA Importer Available.");
 		return GEM_ERROR;
@@ -1103,7 +1102,7 @@ int Interface::LoadSprites()
 	assert(FogSprites[28]->renderFlags&BLIT_MIRRORX);
 	assert(FogSprites[28]->renderFlags&BLIT_MIRRORY);
 
-	i = 0;
+	ieDword i = 0;
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
@@ -1116,9 +1115,8 @@ int Interface::LoadSprites()
 	}
 
 	// Load ground circle bitmaps (PST only)
-	//block required due to msvc6.0 incompatibility
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
-	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
@@ -2248,7 +2246,7 @@ bool Interface::LoadGemRBINI()
 		strlcpy(INIConfig, s, sizeof(INIConfig));
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-
+	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
 
 	for (int i=0;i<GF_COUNT;i++) {
@@ -2351,7 +2349,11 @@ Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 	if (index >= img->GetHeight()) {
 		index = 0;
 	}
+	int width = img->GetWidth();
 	for (int i = 0; i < colors; i++) {
+		if (i >= width) {
+			Log(WARNING, "Interface", "Trying to access invalid palette index (%d)! Using black instead", i);
+		}
 		pal[i] = img->GetPixel(i, index);
 	}
 	return pal;
@@ -2679,6 +2681,19 @@ Tooltip Interface::CreateTooltip(const String& text)
 		bg = new TooltipBackground(*TooltipBG);
 	}
 	return Tooltip(text, GetFont( TooltipFontResRef ), bg);
+}
+
+/**
+ * Delegates a pasting request of text to a fitting consumer, e.g. console,
+ * potentially text inputs, ...
+ */
+void Interface::RequestPasting(const String & string)
+{
+	/* FIXME: port to current system #subviews
+	if (console->IsFocused()) {
+		console->InsertText(string);
+	}*/
+	(void) string;
 }
 
 /** Get the Sound Manager */
@@ -4549,6 +4564,8 @@ int Interface::CompressSave(const char *folder)
 	}
 	return 0;
 }
+
+int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }
 
 int Interface::GetMaximumAbility() const { return MaximumAbility; }
 

@@ -148,10 +148,11 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	default:
 		return false;
 	}
-	if( target->GetStat(stat)==value) {
-		return true;
+
+	if (stat == IE_CLASS) {
+		return target->GetActiveClass() == value;
 	}
-	return false;
+	return target->GetStat(stat) == value;
 }
 
 /*
@@ -487,7 +488,7 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
-	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx2 = *f;
 
 		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
@@ -524,7 +525,7 @@ void EffectQueue::Cleanup()
 			delete *f;
 			effects.erase(f++);
 		} else {
-			f++;
+			++f;
 		}
 	}
 }
@@ -1149,7 +1150,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		// specialist mages get a +2 bonus to saves to spells of the same school used against them
 		specialist = actor->GetStat(IE_KIT);
 		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
-			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
 			if (specialist & (1 << (fx->PrimaryType+5))) {
 				bonus += 2;
 			}
@@ -1428,6 +1428,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	// FX_PERMANENT returners aren't part of the queue, so permanent stat mods can't be detected
 	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
 	Spell *spell = gamedata->GetSpell(Removed, true);
+	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
 	if (spell->ExtHeaderCount > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
@@ -1848,11 +1849,14 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 			case 2:
 			case 3:
 			case 4:
-			case 5:
 			case 6:
 			case 7:
 			case 8:
 				param1 = actor->GetStat(ids_stats[ids]);
+				MATCH_PARAM1();
+				break;
+			case 5:
+				param1 = actor->GetActiveClass();
 				MATCH_PARAM1();
 				break;
 			case 9:
@@ -2331,7 +2335,7 @@ bool EffectQueue::HasHostileEffects() const
 	bool hostile = false;
 
 	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx = *f;
 		if (fx->SourceFlags&SF_HOSTILE) {
 			hostile = true;

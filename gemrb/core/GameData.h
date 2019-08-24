@@ -28,6 +28,7 @@
 
 #include "Cache.h"
 #include "Holder.h"
+#include "Resource.h"
 #include "ResourceManager.h"
 
 #include <map>
@@ -111,6 +112,12 @@ public:
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache
 	void SaveAllStores();
+
+	// itemsnd.2da functions
+	bool GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	int GetSwingCount(ieDword ItemType);
+private:
+	void ReadItemSounds();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -120,6 +127,7 @@ private:
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;
 	StoreMap stores;
+	std::map<ieDword, std::vector<const char*> > ItemSounds;
 };
 
 extern GEM_EXPORT GameData * gamedata;

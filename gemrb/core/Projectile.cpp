@@ -187,6 +187,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
+// FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
 void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq)
 {
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
@@ -385,7 +386,10 @@ void Projectile::Setup()
 		Color tmpColor[PALSIZE];
 
 		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
-		StaticTint(tmpColor[PALSIZE/2]);
+		// PALSIZE is usually 12, but pst has it at 32, which is now the default, so make sure we're not trying to read an empty (black) entry
+		unsigned int idx = PALSIZE/2;
+		if (tmpColor[idx].r + tmpColor[idx].g + tmpColor[idx].b == 0) idx = 6;
+		StaticTint(tmpColor[idx]);
 	}
 
 	CreateAnimations(travel, BAMRes1, Seq1);
@@ -1566,7 +1570,18 @@ void Projectile::DrawExplosion(const Region& vp)
 			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
 				pro->ExtFlags|=PEF_RANDOM;
 			}
+
 			pro->Setup();
+
+			// currently needed by bg2/how Web (less obvious in bg1)
+			// TODO: original behaviour was: play once, wait in final frame, hide, wait, repeat
+			if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
+				// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
+				for (int i=0; i<MAX_ORIENT; i++) {
+					if (pro->travel[i]) pro->travel[i]->Flags |= A_ANI_PLAYONCE;
+				}
+			}
+
 			children[i]=pro;
 		}
 	}

@@ -457,7 +457,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			return &(*it);
 		}
 		if (*it < p) {
-			it++;
+			++it;
 			count -= step + 1;
 		} else {
 			std::advance(it, -step);

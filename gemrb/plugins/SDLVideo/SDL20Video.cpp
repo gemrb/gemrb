@@ -418,6 +418,41 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 
+		// conditionally handle mouse events
+		// discard them if they are produced by touch events
+		// do NOT discard mouse wheel events
+		case SDL_MOUSEMOTION:
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			if (event.button.which == SDL_TOUCH_MOUSEID) {
+				// ignoring mouse events from touch devices
+				// because we handle touch input at th
+				break;
+			} else {
+				/**
+				 * As being SDL2-only, try to query the clipboard state to
+				 * paste when middle clicking the mouse.
+				 */
+				if (
+					   event.button.button == SDL_BUTTON_MIDDLE
+					&& event.type == SDL_MOUSEBUTTONDOWN
+					&& SDL_HasClipboardText()
+				) {
+					char *pasteValue = SDL_GetClipboardText();
+
+					if (pasteValue != NULL) {
+						String *pasteValueString = StringFromCString(pasteValue);
+						core->RequestPasting(*pasteValueString);
+						delete pasteValueString;
+						SDL_free(pasteValue);
+					}
+
+					break;
+				} else {
+					// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
+					return SDLVideoDriver::ProcessEvent(event);
+				}
+			}
 		case SDL_KEYDOWN:
 			if (SDL_GetModState() & KMOD_CTRL) {
 				switch (event.key.keysym.sym) {
@@ -435,15 +470,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			return SDLVideoDriver::ProcessEvent(event);
-		case SDL_MOUSEMOTION: // fallthough
-		case SDL_MOUSEBUTTONUP: // fallthough
-		case SDL_MOUSEBUTTONDOWN:
-			if (event.button.which == SDL_TOUCH_MOUSEID) {
-				// ignoring mouse events from touch devices
-				// because we handle touch input at the view level
-				break;
-			}
-			// fallthrough
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}

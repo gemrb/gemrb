@@ -469,6 +469,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 		if (actor->InParty > 0) {
 			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+		} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+			channel = SFX_CHAN_MONSTER;
 		}
 	}
 
@@ -500,6 +502,11 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		unsigned int len = 0;
 		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+
+		if (Sender->Type == ST_ACTOR && len > 0) {
+			reinterpret_cast<Actor*>(Sender)->SetAnimatedTalking(len);
+		}
+
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
 	}
@@ -668,16 +675,15 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	return MIC_GOTITEM;
 }
 
-/*FIXME: what is 'base'*/
-void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
+void PolymorphCopyCore(Actor *src, Actor *tar)
 {
 	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
-	if (!base) {
-		tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
-		for (int i=0;i<7;i++) {
-			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
-		}
+
+	tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
+	for (int i=0;i<7;i++) {
+		tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 	}
+
 	tar->SetName(src->GetName(0),0);
 	tar->SetName(src->GetName(1),1);
 	//add more attribute copying
@@ -776,7 +782,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (flags & CC_COPY) {
-		PolymorphCopyCore ( (Actor *) tmp, ab, false);
+		PolymorphCopyCore ( (Actor *) tmp, ab);
 	}
 }
 
@@ -1369,10 +1375,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (!Sender->CurrentActionTicks) {
-			//play attack sound for party members
-			if (actor->InParty) {
-				//pick from all 5 possible verbal constants
-				actor->PlayWarCry(5);
+			// play the battle cry
+			// pick from all 5 possible verbal constants
+			if (!actor->PlayWarCry(5)) {
+				// for monsters also try their 2da/ini file sounds
+				if (!actor->InParty) {
+					ieResRef sound;
+					actor->GetSoundFromFile(sound, 200);
+					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos.x, actor->Pos.y);
+				}
 			}
 			//display attack message
 			if (target->GetGlobalID() != Sender->LastTarget) {
@@ -1429,11 +1440,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	int idsfile=core->LoadSymbol(idsname);
 	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
-		//FIXME:missing ids file!!!
-		if (InDebug&ID_TRIGGERS) {
-			Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!",
-				idsname, symbol);
-		}
+		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;
 	}
 	char *newsymbol;
@@ -1545,7 +1552,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				//str++;
 				delete newAction;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -1905,7 +1911,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				//str++;
 				delete newTrigger;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();

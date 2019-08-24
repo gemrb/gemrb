@@ -158,7 +158,7 @@ private:
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
-	ALenum GetFormatEnum(int channels, int bits);
+	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
 	bool stayAlive;
 	short* music_memory;

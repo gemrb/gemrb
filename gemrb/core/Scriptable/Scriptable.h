@@ -386,6 +386,7 @@ public:
 	Color overColor;
 	Sprite2D *circleBitmap[2];
 	int size;
+	float sizeFactor;
 private:
 	// current SpriteCover for wallgroups
 	SpriteCover* cover;
@@ -396,7 +397,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
+	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
 	/* store SpriteCover */
 	void SetSpriteCover(SpriteCover* c);
@@ -470,7 +471,7 @@ public:
 	PathNode *GetPath() { return path; };
 	int GetPathLength();
 //inliners to protect data consistency
-	inline PathNode * GetNextStep() {
+	inline PathNode * GetStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);
 		}

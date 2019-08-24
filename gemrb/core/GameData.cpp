@@ -82,6 +82,7 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
+	ItemSounds.clear();
 }
 
 void GameData::ClearCaches()
@@ -570,6 +571,61 @@ void GameData::SaveAllStores()
 	while (!stores.empty()) {
 		SaveStore(stores.begin()->second);
 	}
+}
+
+void GameData::ReadItemSounds()
+{
+	AutoTable itemsnd("itemsnd");
+	if (!itemsnd) {
+		return;
+	}
+
+	int rowCount = itemsnd->GetRowCount();
+	int colCount = itemsnd->GetColumnCount();
+	for (int i = 0; i < rowCount; i++) {
+		ItemSounds[i] = std::vector<const char*>();
+		for (int j = 0; j < colCount; j++) {
+			ieResRef snd;
+			strnlwrcpy(snd, itemsnd->QueryField(i, j), 8);
+			if (!strcmp(snd, "*")) break;
+			ItemSounds[i].push_back(strdup(snd));
+		}
+	}
+}
+
+bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+{
+	Sound = 0;
+
+	if (ItemSounds.empty()) {
+		ReadItemSounds();
+	}
+
+	if (Col >= ItemSounds[ItemType].size()) {
+		return false;
+	}
+
+	if (ID && ID[1] == 'A') {
+		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A' (pst)
+		//item animation types
+		ItemType = ItemSounds.size()-4 + ID[0]-'1';
+	}
+
+	if (ItemType >= (ieDword) ItemSounds.size()) {
+		return false;
+	}
+	Sound = ItemSounds[ItemType][Col];
+	return true;
+}
+
+int GameData::GetSwingCount(ieDword ItemType)
+{
+	if (ItemSounds.empty()) {
+		ReadItemSounds();
+	}
+
+	// everything but IS_GET and IS_DROP — keep updated!
+	return ItemSounds[ItemType].size() - 2;
 }
 
 }

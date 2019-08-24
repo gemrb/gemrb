@@ -497,7 +497,7 @@ int Game::JoinParty(Actor* actor, int join)
 {
 	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
-	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), false); // init actor's action bar
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		InitActorPos(actor);
@@ -507,7 +507,6 @@ int Game::JoinParty(Actor* actor, int join)
 		return slot;
 	}
 	size_t size = PCs.size();
-	//set the lastjoined trigger
 
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
@@ -526,6 +525,7 @@ int Game::JoinParty(Actor* actor, int join)
 			}
 		}
 
+		//set the lastjoined trigger
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
@@ -709,7 +709,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 // Gets sum of party level, if onlyalive is true, then counts only living PCs
 // If you need average party level, divide this with GetPartySize
-int Game::GetPartyLevel(bool onlyalive) const
+int Game::GetTotalPartyLevel(bool onlyalive) const
 {
 	int amount = 0;
 
@@ -958,11 +958,11 @@ bool Game::CheckForReplacementActor(int i)
 	}
 
 	Actor* act = NPCs[i];
-	ieDword level = GetPartyLevel(false) / GetPartySize(false);
+	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<ResRef> >::iterator it;
-		for (it = npclevels.begin(); it != npclevels.end(); it++) {
+		for (it = npclevels.begin(); it != npclevels.end(); ++it) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				// the tables have entries only up to level 24
 				ieDword safeLevel = npclevels[0].size();
@@ -1235,7 +1235,7 @@ int Game::GetXPFromCR(int cr)
 	if (!size) return 0; // everyone just died anyway
 	// NOTE: this is an average of averages; if it turns out to be wrong,
 	// compute the party average directly
-	int level = GetPartyLevel(true) / size;
+	int level = GetTotalPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
 		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
@@ -1749,7 +1749,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			}
 		} else {
 			//you may not rest here, find an inn
-			if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS)))
 			{
 				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 				return false;

@@ -97,8 +97,7 @@ void Container::CreateGroundIconCover()
 	int width = 0;
 	int height = 0;
 
-	int i; //msvc6.0
-	for (i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			if (xpos < spr.XPos) {

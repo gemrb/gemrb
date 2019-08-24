@@ -1161,7 +1161,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		} else {
 			casterenemy = true; //target->GetStat(IE_EA)>EA_GOODCUTOFF;
 		}
-		fx->DiceThrown=casterenemy;
+		if (!fx->DiceThrown) fx->DiceThrown = casterenemy;
 
 		playercharmed = target->InParty;
 		fx->DiceSides = playercharmed;
@@ -1406,6 +1406,8 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_CRUSHING;
 		break;
 	case 8:
+		// TODO: also play "GORE.WAV" / "GORE2.WAV"
+		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		break;
 	case 16:
@@ -1473,7 +1475,7 @@ static int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
 
-	ieDword cls = STAT_GET(IE_CLASS);
+	ieDword cls = target->GetActiveClass();
 	if (!spell_abilities) {
 		AutoTable tab("clssplab");
 		if (!tab) {
@@ -1715,6 +1717,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
+	// TODO: EE case 2: weak invisibility (check IESDP)
 	default:
 		break;
 	}
@@ -1783,6 +1786,12 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	if (STAT_GET(IE_STATE_ID) & STATE_BERSERK) {
+		return FX_NOT_APPLIED;
+	}
+
+	// EEs toggle this with fx->Special, but 0 stands for bg2, so we can't use it
+	// they will just use the same game flag instead
 	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
 		BASE_SET(IE_MORALE, 10);
 		return FX_NOT_APPLIED;
@@ -1793,6 +1802,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x18 State:Panic
+// TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect)
 int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_panic_state(%2d)", fx->Opcode);
@@ -3346,7 +3356,7 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_experience_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_experience_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_MOD( IE_XP );
+	BASE_MOD(IE_XP);
 	return FX_NOT_APPLIED;
 }
 
@@ -3462,6 +3472,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// but don't add new effects if there are none, which is an ugly workaround
 	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
 	Item *itm = gamedata->GetItem(fx->Resource, true);
+	if (!itm) return FX_NOT_APPLIED;
 	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
@@ -4373,6 +4384,7 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x91 DisableSpellCasting
 //bg2:  (-1 item), 0 - mage, 1 - cleric, 2 - innate, 3 - class
 //iwd2: (-1 item), 0 - all, 1 - mage+cleric, 2 - mage, 3 - cleric , 4 - innate,( 5 - class)
+//EE: Innate (4), but only 'magical' abilities (SPL flags bit 14 "Ignore dead/wild magic" unset)
 
 /*internal representation of disabled spells in IE_CASTING (bitfield):
 1 - items (SPIT)
@@ -4401,6 +4413,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCERER, 0)) display_warning = true;
 				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
 				break;
+			// TODO case 3: // EE, like 4 (Innate), but only 'magical' abilities (SPL flags SF_HLA unset)
 		}
 		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_iwd2[tmp] );
@@ -6882,8 +6895,6 @@ The repeating effect itself internally uses a counter to store how often it has 
 // 0x110 ApplyEffectRepeat
 int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieDword i; //moved here because msvc6 cannot handle it otherwise
-
 	// print("fx_apply_effect_repeat(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	Point p(fx->PosX, fx->PosY);
@@ -6909,7 +6920,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 2://param1 times every second
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
-				for (i=0;i<fx->Parameter1;i++) {
+				for (ieDword i=0; i < fx->Parameter1; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
@@ -6921,7 +6932,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
-				for (i=0;i<fx->Parameter3;i++) {
+				for (ieDword i=0; i < fx->Parameter3; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
@@ -7617,9 +7628,8 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 	} else if (stat >= 387) {
 		stat = damage_mod_map[stat-387];
 		// replace effect with the appropriate one
-		Effect *myfx = new Effect;
-		myfx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
-		myfx->Parameter2 = stat;
+		fx->Opcode = EffectQueue::ResolveEffect(fx_damage_bonus_modifier2_ref);
+		fx->Parameter2 = stat;
 		return fx_damage_bonus_modifier2(Owner, target, fx);
 	}
 

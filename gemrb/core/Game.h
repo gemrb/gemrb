@@ -177,7 +177,7 @@ struct GAMLocationEntry {
 
 //pst maze data structures (TODO: create a separate class?)
 struct maze_entry {
-	ieDword override;
+	ieDword me_override;
 	ieDword accessible;
 	ieDword valid;
 	ieDword trapped;
@@ -348,7 +348,7 @@ public:
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 
 	/** Return current party level count for xp calculations */
-	int GetPartyLevel(bool onlyalive) const;
+	int GetTotalPartyLevel(bool onlyalive) const;
 	/** Reassigns inparty numbers, call it after party creation */
 	void ConsolidateParty();
 	/** Removes actor from party (if in there) */

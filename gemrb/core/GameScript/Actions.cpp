@@ -72,9 +72,9 @@ void GameScript::SetAreaRestFlag(Scriptable* Sender, Action* parameters)
 	Map *map=Sender->GetCurrentArea();
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
-		map->AreaType|=AT_CAN_REST;
+		map->AreaType |= AT_CAN_REST_INDOORS;
 	} else {
-		map->AreaType&=~AT_CAN_REST;
+		map->AreaType &= ~AT_CAN_REST_INDOORS;
 	}
 }
 
@@ -5812,7 +5812,7 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	PolymorphCopyCore((Actor *) tar, (Actor *) Sender, false);
+	PolymorphCopyCore((Actor *) tar, (Actor *) Sender);
 }
 
 /* according to IESDP this only copies the animation ID */

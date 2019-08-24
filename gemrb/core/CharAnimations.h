@@ -171,6 +171,7 @@ public:
 	bool change[PAL_MAX];
 	Palette* palette[PAL_MAX];
 	Palette* modifiedPalette[PAL_MAX];
+	Palette* shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
@@ -201,6 +202,7 @@ public:
 
 	// returns Palette for a given part (unlocked)
 	Palette* GetPartPalette(int part); // TODO: clean this up
+	Palette* GetShadowPalette() const;
 
 public: //attribute functions
 	static int GetAvatarsCount();

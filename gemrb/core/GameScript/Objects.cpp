@@ -1073,7 +1073,7 @@ static const int all_iwd2_classes[] = { 202, 203, 204, 205, 209, 206, 207, 208 }
 inline bool idclass(const Actor *actor, int parameter, bool iwd2) {
 	int value = 0;
 	if (parameter < 202 || parameter > 209) {
-		value = actor->GetStat(IE_CLASS);
+		value = actor->GetActiveClass();
 		return parameter==value;
 	}
 
@@ -1145,7 +1145,7 @@ int GameScript::ID_Class(const Actor *actor, int parameter)
 int GameScript::ID_ClassMask(const Actor *actor, int parameter)
 {
 	// maybe we're lucky...
-	int value = actor->GetStat(IE_CLASS);
+	int value = actor->GetActiveClass();
 	if (parameter&(1<<(value-1))) return 1;
 
 	// otherwise iterate over all the classes

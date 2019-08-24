@@ -93,7 +93,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			/* Quit event originated from outside GemRB so ask the user if we should exit */
 			core->AskAndExit();
 			return GEM_OK;
-			break;
 		case SDL_KEYUP:
 			switch(sym) {
 				case SDLK_LALT:

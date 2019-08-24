@@ -59,7 +59,7 @@ void RemoveLogger(Logger* logger)
 			if (*itr == logger) {
 				itr = theLogger.erase(itr);
 			} else {
-				itr++;
+				++itr;
 			}
 		}
 		logger->destroy();

@@ -44,7 +44,6 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	CommonTables.Aligns = CommonTables.Aligns
 	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
 	CharGenCommon.PositionCharGenWin(AlignmentWindow)
 

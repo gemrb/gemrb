@@ -144,13 +144,13 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		ret &= ~IE_STORE_BUY;
 
 	if (pc && (Type<STT_BG2CONT) ) {
-		//can't sell critical items
+		//don't allow selling of non destructible items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
 			ret &= ~IE_STORE_SELL;
 		}
-		//don't allow selling of non destructible items
-		//don't allow selling of critical items (they could still be put in bags)
-		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_CRITICAL))!=IE_INV_ITEM_DESTRUCTIBLE) {
+
+		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
+		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
 			ret &= ~IE_STORE_SELL;
 		}
 

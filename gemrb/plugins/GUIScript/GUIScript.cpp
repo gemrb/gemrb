@@ -82,7 +82,6 @@ GUIScript *GemRB::gs = NULL;
 static int SpecialItemsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
-static int ItemSoundsCount = -1;
 
 //Check removal/equip/swap of item based on item name and actor's scriptname
 #define CRI_REMOVE 0
@@ -107,8 +106,6 @@ typedef char EventNameType[17];
 #define IS_DROP	0
 #define IS_GET	1
 
-typedef ieResRef ResRefPairs[2];
-
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *SpecialItems = NULL;
@@ -117,7 +114,6 @@ static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
-static ResRefPairs *ItemSounds = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -234,47 +230,6 @@ static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 template <class RETURN>
 static RETURN* GetView(PyObject* obj) {
 	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
-}
-
-static void ReadItemSounds()
-{
-	int table = gamedata->LoadTable( "itemsnd" );
-	if (table<0) {
-		ItemSoundsCount = 0;
-		ItemSounds = NULL;
-		return;
-	}
-	Holder<TableMgr> tab = gamedata->GetTable( table );
-	ItemSoundsCount = tab->GetRowCount();
-	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
-	for (int i = 0; i < ItemSoundsCount; i++) {
-		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
-		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
-	}
-	gamedata->DelTable( table );
-}
-
-static void GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
-{
-	Sound = ResRef();
-	if (Col>1) {
-		return;
-	}
-
-	if (ItemSoundsCount<0) {
-		ReadItemSounds();
-	}
-
-	if (ID[1]=='A') {
-		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
-		//item animation types
-		ItemType = ItemSoundsCount-4+ID[0]-'1';
-	}
-
-	if (ItemType>=(ieDword) ItemSoundsCount) {
-		return;
-	}
-	Sound = ItemSounds[ItemType][Col];
 }
 
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
@@ -3514,19 +3469,14 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
-			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s",
-				ResRef);
-			if (type == 0)
-				return NULL;
-			else {
-				Py_RETURN_NONE;
-			}
+			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s", ResRef);
+			Py_RETURN_NONE;
 		}
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			Log(ERROR, "Button_SetPLT", "PD Picture == NULL (%s)", ResRef);
-			return NULL;
+			Log(ERROR, "Button_SetPLT", "Paperdoll picture == NULL (%s)", ResRef);
+			Py_RETURN_NONE;
 		}
 /*	} else {
 		Picture = im->GetSprite2D(type, col);
@@ -3747,6 +3697,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject* self, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
+	if (!anim->HasControl()) Py_RETURN_NONE;
 
 	if (Blend) {
 		anim->SetBlend(true);
@@ -3859,7 +3810,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	unsigned int channel = SFX_CHAN_GUI;
 	int index;
 
-	if (PyArg_ParseTuple( args, "i|z", &index) ) {
+	if (PyArg_ParseTuple( args, "i|z", &index, &channel_name) ) {
 		if (channel_name != NULL) {
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
@@ -4402,6 +4353,7 @@ PyDoc_STRVAR( GemRB_SaveConfig__doc,
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
+	UpdateActorConfig(); // Button doesn't trigger this in its OnMouseUp handler where it calls SetVar
 	return PyBool_FromLong(core->SaveConfig());
 }
 
@@ -6336,7 +6288,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->SetOver( false );
-	actor->InitButtons(actor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), true); // force re-init of actor's action bar
 
 	//what about multiplayer?
 	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {
@@ -6938,7 +6890,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				Sound = item->ReplacementItem;
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -6968,7 +6920,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 				Sound = item->DescriptionIcon;
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -7415,6 +7367,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 			break;
 		}
+		// save the resref, since the pointer may get freed
+		ieResRef itemResRef;
+		CopyResRef(itemResRef, si->ItemResRef);
 		//if no item remained, remove it
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
@@ -7429,16 +7384,16 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 		// play the item's inventory sound
 		ieResRef Sound;
-		Item *item = gamedata->GetItem(si->ItemResRef);
+		ResRef Sound2;
+		Item *item = gamedata->GetItem(itemResRef);
 		if (item) {
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
+				Sound2 = Sound;
 			} else {
-				ResRef Sound2;
-				GetItemSound(Sound2, item->ItemType, item->AnimationType, IS_DROP);
-				memcpy(Sound, Sound2.CString(), sizeof(ieResRef));
+				gamedata->GetItemSound(Sound2, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			gamedata->FreeItem(item, si->ItemResRef, 0);
+			gamedata->FreeItem(item, itemResRef, 0);
 			if (Sound[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
 				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
@@ -7517,6 +7472,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 		if (rhstore) {
 			STOItem *si = rhstore->GetItem(Slot, true);
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
 			res = SellBetweenStores(si, action, store);
 
 			//if no item remained, remove it
@@ -9311,7 +9269,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 			Sound = item->DescriptionIcon;
 		} else {
-			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+			gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
 		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
@@ -9395,7 +9353,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				Sound = item->ReplacementItem;
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
@@ -9484,7 +9442,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		Sound = item->ReplacementItem;
 	} else {
-		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+		gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
 
 	//freeing the item before returning
@@ -11077,7 +11035,7 @@ jump_label:
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
-		//FIXME: is this really state==IE_GUI_BUTTON_DISABLED ??? That means active border for a disabled button
+		// this state check looks bizzare, but without it most buttons get misrendered
 		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
 	Py_RETURN_NONE;
@@ -11107,7 +11065,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Log(MESSAGE, "GuiScript","Cannot break action!");
 		Py_RETURN_NONE;
 	}
-	if (!(actor->GetNextStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
+	if (!(actor->GetStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_RETURN_NONE;
 	}
@@ -12641,7 +12599,7 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m2;
 	switch(index) {
 		case ME_OVERRIDE:
-			m->override = value;
+			m->me_override = value;
 			break;
 		default:
 		case ME_VALID:
@@ -12832,7 +12790,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
-	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
+	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->me_override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
 	if (m->trapped) {
@@ -13318,15 +13276,10 @@ GUIScript::~GUIScript(void)
 		free(UsedItems);
 		UsedItems=NULL;
 	}
-	if (ItemSounds) {
-		free(ItemSounds);
-		ItemSounds=NULL;
-	}
 
 	StoreSpellsCount = -1;
 	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
-	ItemSoundsCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;
