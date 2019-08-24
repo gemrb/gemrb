@@ -548,6 +548,7 @@ Actor::Actor()
 	weapSlotCount = 4;
 	// delay all maxhp checks until we completely load all effects
 	checkHP = 2;
+	checkHPTime = 0;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
