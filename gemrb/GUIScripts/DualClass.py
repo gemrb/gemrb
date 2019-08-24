@@ -145,6 +145,28 @@ def DualClassWindow ():
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def DumpUnusableItems (pc):
+	"""Dumps everything in the inventory that is now unusable."""
+
+	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
+	for type in SlotTypes:
+		Slots = GemRB.GetSlots (pc, type)
+		if not len(Slots):
+			# nothing there
+			continue
+
+		for slot in Slots:
+			SlotType = GemRB.GetSlotType (slot, pc)
+			CREItem = GemRB.GetSlotItem (pc, slot)
+
+			if not GemRB.CanUseItemType (SlotType["Type"], CREItem["ItemResRef"], pc):
+				# move it to a free inventory slot by mimicking dragging
+				Item = GemRB.GetItem (CREItem["ItemResRef"])
+				GemRB.DragItem (pc, slot, Item["ItemIcon"])
+				if not GemRB.DropDraggedItem (pc, -3): # ASI_FAILED
+					# inventory was probably too full, drop to ground
+					GemRB.DropDraggedItem (pc, -2)
+
 def DCMainDonePress ():
 	"""Saves our dualclass changes and closes the window.
 
@@ -235,22 +257,7 @@ def DCMainDonePress ():
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
 
 	# dump any equipped items that are now unusable
-	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
-	for type in SlotTypes:
-		Slots = GemRB.GetSlots (pc, type)
-		if not len(Slots):
-			# nothing there
-			continue
-		for slot in Slots:
-			SlotType = GemRB.GetSlotType (slot, pc)
-			CREItem = GemRB.GetSlotItem (pc, slot)
-			if not GemRB.CanUseItemType (SlotType["Type"], CREItem["ItemResRef"], pc):
-				# move it to a free inventory slot by mimicking dragging
-				Item = GemRB.GetItem (CREItem["ItemResRef"])
-				GemRB.DragItem (pc, slot, Item["ItemIcon"])
-				if not GemRB.DropDraggedItem (pc, -3): # ASI_FAILED
-					# inventory was probably too full, drop to ground
-					GemRB.DropDraggedItem (pc, -2)
+	DumpUnusableItems (pc)
 
 	# close our window
 	if DCMainWindow:
