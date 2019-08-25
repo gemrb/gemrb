@@ -140,6 +140,20 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 	if(AvatarsRowNum==~0u) return stance;
 	return AvatarTable[AvatarsRowNum].StanceOverride[stance];
 }
+/*
+ * For some actors (Arundel, FFG, fire giants) a new stance requires a
+ * different palette to use. Presumably, this is relevant for PAL_MAIN only.
+ */
+void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
+	if (previousStanceID != StanceID) {
+		// Test if the palette in question is actually different to the one loaded.
+		if (*palette[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
+			gamedata->FreePalette(palette[PAL_MAIN], 0);
+			palette[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
+			SetupColors(PAL_MAIN);
+		}
+	}
+}
 
 static ieResRef EmptySound={0};
 
@@ -658,7 +672,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		palette[i] = NULL;
 	}
 	shadowPalette = NULL;
-	nextStanceID = 0;
+	previousStanceID = nextStanceID = 0;
 	StanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
@@ -1011,6 +1025,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	Animation** anims = Anims[StanceID][Orient];
 
 	if (anims) {
+		MaybeUpdateMainPalette(anims);
+		previousStanceID = StanceID;
+
 		return anims;
 	}
 
@@ -1120,6 +1137,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				palette[ptype] = a->GetFrame(0)->GetPalette()->Copy();
 				// ...and setup the colours properly
 				SetupColors(ptype);
+			} else if (ptype == PAL_MAIN) {
+				MaybeUpdateMainPalette(anims);
 			}
 		} else if (part == actorPartCount) {
 			if (!palette[PAL_WEAPON]) {
@@ -1269,6 +1288,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			error("CharAnimations", "Unknown animation type\n");
 	}
 	delete equipdat;
+	previousStanceID = StanceID;
 
 	return Anims[StanceID][Orient];
 }

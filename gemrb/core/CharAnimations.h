@@ -176,7 +176,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
 	ieResRef PaletteResRef[5];
-	unsigned char nextStanceID, StanceID;
+	unsigned char previousStanceID, nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
 public:
@@ -272,6 +272,7 @@ private:
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		char* ResRef, unsigned char& Cycle, EquipResRefData* equip);
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
+	void MaybeUpdateMainPalette(Animation**);
 };
 
 }
