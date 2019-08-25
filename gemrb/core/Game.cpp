@@ -128,7 +128,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		mastarea.reserve(i);
 		while(i--) {
 			char *tmp = (char *) malloc(9);
-			strnuprcpy (tmp,table->QueryField(i,0),8);
+			strnuprcpy(tmp, table->GetRowName(i), 8);
 			mastarea.push_back( tmp );
 		}
 	}
@@ -785,7 +785,7 @@ bool Game::MasterArea(const char *area)
 {
 	unsigned int i=(int) mastarea.size();
 	while(i--) {
-		if (strnicmp(mastarea[i], area, 8) ) {
+		if (!strnicmp(mastarea[i], area, 8)) {
 			return true;
 		}
 	}
