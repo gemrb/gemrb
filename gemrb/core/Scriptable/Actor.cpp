@@ -7265,6 +7265,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
+	// also start CombatCounter if a pc is attacked
+	if (!InParty && target->IsPartyMember()) {
+		core->GetGame()->PartyAttack = true;
+	}
+
 	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));
 	target->AttackedBy(this);
 	ieDword state = GetStat(IE_STATE_ID);
