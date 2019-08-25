@@ -367,6 +367,8 @@ public:
 	bool MasterArea(const char *area);
 	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const char *area);
+	/** Guess the master area of the given area*/
+	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/
 	void PlacePersistents(Map *map, const char *ResRef);
 	/** Returns slot of the map, if it was already loaded,
