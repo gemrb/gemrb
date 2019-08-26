@@ -790,9 +790,7 @@ void Actor::SetCircleSize()
 		}
 	}
 
-	int csize = anims->GetCircleSize() - 1;
-	if (csize >= MAX_CIRCLE_SIZE)
-		csize = MAX_CIRCLE_SIZE - 1;
+	int csize = std::min(anims->GetCircleSize(), MAX_CIRCLE_SIZE) - 1;
 
 	SetCircle( anims->GetCircleSize(), oscillationFactor, *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
