@@ -2004,8 +2004,8 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	// for subareas fall back to the main list
 	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
 	// it's not the correct music, perhaps it needs the one from the master area
-	// it would match for ar2607 and ar2600, but very annoying
-	if (!poi && !MasterArea) {
+	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
+	if (!poi && !MasterArea && SongType == SONG_BATTLE) {
 		poi = core->GetMusicPlaylist(SongType);
 	}
 	if (!poi) return;
