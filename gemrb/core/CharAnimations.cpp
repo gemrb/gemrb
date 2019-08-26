@@ -300,6 +300,7 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 }
 
+// NOTE: change if MAX_ANIMS is increased
 //                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
 static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
 static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','0','0','0','1','1','1','1','1'};
@@ -1391,7 +1392,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 	return NULL;
 }
 
-static const int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
+static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 					 unsigned char Orient,
