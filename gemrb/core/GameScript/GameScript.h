@@ -59,6 +59,7 @@ class StringBuffer;
 #define DS_SPEECH  64
 #define DS_AREA    128
 #define DS_QUEUE   256
+#define DS_CIRCLE  512
 
 //verbal constant (bg2), we have a lookup table (vcremap) for other games
 #define VB_INITIALMEET 0

@@ -3923,7 +3923,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		return false;
 	}
 
-	flags ^= DS_CONSOLE|DS_SPEECH;
+	flags ^= DS_CONSOLE|DS_SPEECH|DS_CIRCLE;
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	bool found = false;
@@ -3953,7 +3953,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
 	int strref = displaymsg->GetStringReference(str);
 	if (strref != -1) {
-		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE);
+		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
 	} else {
 		VerbalConstant(vcstat, vccount);
 	}
@@ -4168,13 +4168,13 @@ void Actor::PlaySelectionSound()
 	//drop the rare selection comment 5% of the time
 	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
 		//rare select on main character for BG1 won't work atm
-		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS);
+		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
 		if (PCStats && PCStats->SoundSet[0]) {
-			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS);
+			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
-			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS);
+			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS, DS_CIRCLE);
 		}
 	}
 }
@@ -4182,7 +4182,7 @@ void Actor::PlaySelectionSound()
 bool Actor::PlayWarCry(int range) const
 {
 	if (!war_cries) return false;
-	return VerbalConstant(VB_ATTACK, range);
+	return VerbalConstant(VB_ATTACK, range, DS_CIRCLE);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
@@ -4219,7 +4219,7 @@ void Actor::CommandActor(Action* action, bool clearPath)
 
 	if (core->GetFirstSelectedPC(false) == this) {
 		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
-		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
+		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON, DS_CIRCLE);
 	}
 }
 
