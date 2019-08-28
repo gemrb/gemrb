@@ -1060,12 +1060,12 @@ static void UpdateHappiness(Actor *actor) {
 
 	actor->PCStats->Happiness = newHappiness;
 	switch (newHappiness) {
-		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, true); break;
-		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, true); break;
-		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true);
+		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, DS_QUEUE); break;
+		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, DS_QUEUE); break;
+		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, DS_QUEUE);
 			if (actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
 			break;
-		case 80: actor->VerbalConstant(VB_HAPPY, 1, true); break;
+		case 80: actor->VerbalConstant(VB_HAPPY, 1, DS_QUEUE); break;
 		default: break; // case 0
 	}
 }
@@ -1296,7 +1296,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(VB_HURT, 1, true);
+			actor->VerbalConstant(VB_HURT, 1, DS_QUEUE);
 		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
@@ -3884,7 +3884,7 @@ void Actor::Interact(int type)
 		//BG1 style random slots
 		count = 3;
 	}
-	VerbalConstant(start, count, queue);
+	VerbalConstant(start, count, queue ? DS_QUEUE : 0);
 }
 
 ieStrRef Actor::GetVerbalConstant(int index) const
@@ -3912,7 +3912,7 @@ ieStrRef Actor::GetVerbalConstant(int start, int count) const
 	return (ieStrRef) -1;
 }
 
-bool Actor::VerbalConstant(int start, int count, bool queue) const
+bool Actor::VerbalConstant(int start, int count, int flags) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
@@ -3922,10 +3922,8 @@ bool Actor::VerbalConstant(int start, int count, bool queue) const
 	if (count < 0) {
 		return false;
 	}
-	int flags = DS_CONSOLE|DS_SPEECH;
-	if (queue) {
-		flags |= DS_QUEUE;
-	}
+
+	flags ^= DS_CONSOLE|DS_SPEECH;
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	bool found = false;
@@ -3980,10 +3978,10 @@ void Actor::ReactToDeath(const char * deadname)
 	const char *value = tm->QueryField (scriptName, deadname);
 	switch (value[0]) {
 	case '0':
-		VerbalConstant(VB_REACT, 1, true);
+		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		break;
 	case '1':
-		VerbalConstant(VB_REACT_S, 1, true);
+		VerbalConstant(VB_REACT_S, 1, DS_QUEUE);
 		break;
 	default:
 		{
