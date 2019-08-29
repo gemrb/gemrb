@@ -531,6 +531,7 @@ Actor::Actor()
 	weapSlotCount = 4;
 	// delay all maxhp checks until we completely load all effects
 	checkHP = 2;
+	checkHPTime = 0;
 
 	polymorphCache = NULL;
 	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
@@ -770,7 +771,8 @@ void Actor::SetCircleSize()
 		}
 	}
 
-	int csize = Clamp(anims->GetCircleSize() - 1, 0, MAX_CIRCLE_SIZE-1);
+	int csize = std::min(anims->GetCircleSize(), MAX_CIRCLE_SIZE) - 1;
+
 	SetCircle( anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
@@ -1039,12 +1041,12 @@ static void UpdateHappiness(Actor *actor) {
 
 	actor->PCStats->Happiness = newHappiness;
 	switch (newHappiness) {
-		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, true); break;
-		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, true); break;
-		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, true);
+		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, DS_QUEUE); break;
+		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, DS_QUEUE); break;
+		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, DS_QUEUE);
 			if (actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
 			break;
-		case 80: actor->VerbalConstant(VB_HAPPY, 1, true); break;
+		case 80: actor->VerbalConstant(VB_HAPPY, 1, DS_QUEUE); break;
 		default: break; // case 0
 	}
 }
@@ -1275,7 +1277,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(VB_HURT, 1, true);
+			actor->VerbalConstant(VB_HURT, 1, DS_QUEUE);
 		}
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
@@ -3865,7 +3867,7 @@ void Actor::Interact(int type)
 		//BG1 style random slots
 		count = 3;
 	}
-	VerbalConstant(start, count, queue);
+	VerbalConstant(start, count, queue ? DS_QUEUE : 0);
 }
 
 ieStrRef Actor::GetVerbalConstant(int index) const
@@ -3893,7 +3895,7 @@ ieStrRef Actor::GetVerbalConstant(int start, int count) const
 	return (ieStrRef) -1;
 }
 
-bool Actor::VerbalConstant(int start, int count, bool queue) const
+bool Actor::VerbalConstant(int start, int count, int flags) const
 {
 	if (start!=VB_DIE) {
 		//can't talk when dead
@@ -3903,10 +3905,8 @@ bool Actor::VerbalConstant(int start, int count, bool queue) const
 	if (count < 0) {
 		return false;
 	}
-	int flags = DS_CONSOLE|DS_SPEECH;
-	if (queue) {
-		flags |= DS_QUEUE;
-	}
+
+	flags ^= DS_CONSOLE|DS_SPEECH|DS_CIRCLE;
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	bool found = false;
@@ -3936,7 +3936,7 @@ bool Actor::VerbalConstant(int start, int count, bool queue) const
 void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
 	int strref = displaymsg->GetStringReference(str);
 	if (strref != -1) {
-		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE);
+		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
 	} else {
 		VerbalConstant(vcstat, vccount);
 	}
@@ -3961,10 +3961,10 @@ void Actor::ReactToDeath(const char * deadname)
 	const char *value = tm->QueryField (scriptName, deadname);
 	switch (value[0]) {
 	case '0':
-		VerbalConstant(VB_REACT, 1, true);
+		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		break;
 	case '1':
-		VerbalConstant(VB_REACT_S, 1, true);
+		VerbalConstant(VB_REACT_S, 1, DS_QUEUE);
 		break;
 	default:
 		{
@@ -4151,13 +4151,13 @@ void Actor::PlaySelectionSound()
 	//drop the rare selection comment 5% of the time
 	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
 		//rare select on main character for BG1 won't work atm
-		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS);
+		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
 		if (PCStats && PCStats->SoundSet[0]) {
-			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS);
+			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
-			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS);
+			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS, DS_CIRCLE);
 		}
 	}
 }
@@ -4165,7 +4165,7 @@ void Actor::PlaySelectionSound()
 bool Actor::PlayWarCry(int range) const
 {
 	if (!war_cries) return false;
-	return VerbalConstant(VB_ATTACK, range);
+	return VerbalConstant(VB_ATTACK, range, DS_CIRCLE);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
@@ -4202,7 +4202,7 @@ void Actor::CommandActor(Action* action, bool clearPath)
 
 	if (core->GetFirstSelectedPC(false) == this) {
 		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
-		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON);
+		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON, DS_CIRCLE);
 	}
 }
 
@@ -7250,6 +7250,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (!target) {
 		Log(WARNING, "Actor", "Attack without valid target!");
 		return;
+	}
+
+	// also start CombatCounter if a pc is attacked
+	if (!InParty && target->IsPartyMember()) {
+		core->GetGame()->PartyAttack = true;
 	}
 
 	assert(!(target->IsInvisibleTo((Scriptable *) this) || (target->GetSafeStat(IE_STATE_ID) & STATE_DEAD)));

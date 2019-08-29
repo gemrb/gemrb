@@ -63,6 +63,7 @@ namespace GemRB {
 #define IE_ANI_SLEEP			16
 #define IE_ANI_GET_UP			17
 #define IE_ANI_PST_START		18
+// NOTE: update MAX_ANIMS if you add more!
 
 //BG2, IWD animation types
 #define IE_ANI_CODE_MIRROR		0
@@ -176,7 +177,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
 	ieResRef PaletteResRef[5];
-	unsigned char nextStanceID, StanceID;
+	unsigned char previousStanceID, nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
 public:
@@ -272,6 +273,7 @@ private:
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		char* ResRef, unsigned char& Cycle, EquipResRefData* equip);
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
+	void MaybeUpdateMainPalette(Animation**);
 };
 
 }

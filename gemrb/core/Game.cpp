@@ -129,7 +129,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		mastarea.reserve(i);
 		while(i--) {
 			char *tmp = (char *) malloc(9);
-			strnuprcpy (tmp,table->QueryField(i,0),8);
+			strnuprcpy(tmp, table->GetRowName(i), 8);
 			mastarea.push_back( tmp );
 		}
 	}
@@ -779,12 +779,46 @@ bool Game::MasterArea(const char *area)
 {
 	unsigned int i=(int) mastarea.size();
 	while(i--) {
-		if (strnicmp(mastarea[i], area, 8) ) {
+		if (!strnicmp(mastarea[i], area, 8)) {
 			return true;
 		}
 	}
 	return false;
 }
+
+// guess the master area by comparing the area name to entries in mastarea.2da
+// returns the area numerically closest to the passed one
+// pst has also areas named arNNNNc, bgt araNNNN (which we mishandle)
+// TODO: consider caching with an internal field or even a separate table to map the relation
+/*
+Map* Game::GetMasterArea(const char *area)
+{
+	unsigned int areaNum;
+	unsigned int masterNum;
+	unsigned int prevDiff = 0;
+	ieResRef prevArea;
+	sscanf(area, "%*c%*c%u%*c", &areaNum);
+
+	// mastarea.2da is not sorted, so make sure to check all the rows/areas
+	unsigned int i=(int) mastarea.size();
+	while(i--) {
+		sscanf(mastarea[i], "%*c%*c%u%*c", &masterNum);
+		if (areaNum > masterNum) {
+			continue;
+		} else if (areaNum == masterNum) {
+			return NULL; // optimisation, should never be called with a masterarea already
+		}
+		if (prevDiff == 0 || (prevDiff > masterNum - areaNum && masterNum < areaNum)) {
+			// first master bigger than us or
+			// this area is numerically closer than the last choice, but still smaller
+			CopyResRef(prevArea, mastarea[i+1]);
+			prevDiff = masterNum - areaNum;
+		}
+	}
+	// this could be slow, loading a full map!
+	// luckily when queried from subareas, it should already be cached and fast
+	return GetMap(prevArea, false);
+}*/
 
 void Game::SetMasterArea(const char *area)
 {

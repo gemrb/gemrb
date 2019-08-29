@@ -569,7 +569,7 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	bool VerbalConstant(int start, int count=1, bool queue=false) const;
+	bool VerbalConstant(int start, int count=1, int flags=0) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */

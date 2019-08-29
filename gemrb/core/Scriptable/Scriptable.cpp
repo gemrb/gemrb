@@ -1731,7 +1731,7 @@ void Selectable::DrawCircle(const Region &vp)
 	Color* col = &selectedColor;
 	Sprite2D* sprite = circleBitmap[0];
 
-	if (Selected) {
+	if (Selected && !Over) {
 		sprite = circleBitmap[1];
 	} else if (Over) {
 		//doing a time dependent flashing of colors

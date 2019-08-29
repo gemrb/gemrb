@@ -146,6 +146,7 @@ WorldMap::WorldMap(void)
 	encounterArea = -1;
 	Width = Height = 0;
 	MapNumber = AreaName = 0;
+	Flags = 0;
 	unknown1 = unknown2 = 0;
 }
 

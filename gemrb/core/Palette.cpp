@@ -286,4 +286,12 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 	version++;
 }
 
+bool Palette::operator==(const Palette& other) const {
+	return memcmp(col, other.col, sizeof(col)) == 0;
+}
+
+bool Palette::operator!=(const Palette& other) const {
+	return !(*this == other);
+}
+
 }

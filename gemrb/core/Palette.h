@@ -96,6 +96,8 @@ public:
 
 	Palette* Copy();
 
+	bool operator==(const Palette&) const;
+	bool operator!=(const Palette&) const;
 private:
 	unsigned int refcount;
 	unsigned short version;

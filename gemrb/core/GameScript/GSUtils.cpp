@@ -503,7 +503,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 
-		if (Sender->Type == ST_ACTOR && len > 0) {
+		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
 			reinterpret_cast<Actor*>(Sender)->SetAnimatedTalking(len);
 		}
 

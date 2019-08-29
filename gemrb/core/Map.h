@@ -196,8 +196,13 @@ public:
 		if (text) {
 			//update custom strref
 			char* mbstring = MBCStringFromString(*text);
-			strref = core->UpdateString( strref, mbstring);
-			free(mbstring);
+			if (mbstring) {
+				strref = core->UpdateString( strref, mbstring);
+				free(mbstring);
+			} else {
+				strref = core->UpdateString(strref, "?");
+				Log(WARNING, "Map", "Failed to update string from map note, possibly an enconding issue.");
+			}
 		}
 	}
 	MapNote(const ieStrRef ref, ieWord color)
