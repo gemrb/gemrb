@@ -1342,7 +1342,7 @@ void Map::DrawSearchMap(const Region &vp)
 	PathNode *path = act->GetPath();
 	if (!path) return;
 	PathNode *step = path->Next;
-	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
+	Color waypoint(0, 64, 128, 128); // darker blue-ish
 	int i = 0;
 	block.w = 8;
 	block.h = 6;
