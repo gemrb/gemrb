@@ -133,7 +133,7 @@ public:
 	void GetListenerPos( int &XPos, int &YPos );
 	bool ReleaseStream(int stream, bool HardStop);
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
-					ieWord gain, bool point, bool Ambient );
+					ieWord gain, bool point, int ambientRange);
 	int QueueAmbient(int stream, const char* sound);
 	void SetAmbientStreamVolume(int stream, int volume);
 	void SetAmbientStreamPitch(int stream, int pitch);
