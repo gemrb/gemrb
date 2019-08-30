@@ -166,7 +166,7 @@ void GLPaletteManager::Clear()
 	}
 	indexes.clear();
 
-	it = a_textures.begin()
+	it = a_textures.begin();
 	while (it != a_textures.end())
 	{
 		it->first.palette->release();
