@@ -4314,7 +4314,7 @@ void Actor::PlayExistenceSounds()
 					if (sb.Sound[0]) {
 						unsigned int vol = 100;
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
-						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
+						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
 						if (stream != -1) {
 							int audioLength = audio->QueueAmbient(stream, sb.Sound);
 
