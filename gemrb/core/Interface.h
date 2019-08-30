@@ -463,8 +463,6 @@ public:
 	void SetFeedbackLevel(int level);
 	/** returns true if the passed feedback type is enabled */
 	bool HasFeedback(int type) const;
-	/** Attempts to paste text into the interface. */
-	void RequestPasting(const String&);
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */

@@ -441,9 +441,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					char *pasteValue = SDL_GetClipboardText();
 
 					if (pasteValue != NULL) {
-						String *pasteValueString = StringFromCString(pasteValue);
-						core->RequestPasting(*pasteValueString);
-						delete pasteValueString;
+						e = EvntManager->CreateTextEvent(pasteValue);
+						EvntManager->DispatchEvent(e);
 						SDL_free(pasteValue);
 					}
 

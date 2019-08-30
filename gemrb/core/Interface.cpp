@@ -2683,19 +2683,6 @@ Tooltip Interface::CreateTooltip(const String& text)
 	return Tooltip(text, GetFont( TooltipFontResRef ), bg);
 }
 
-/**
- * Delegates a pasting request of text to a fitting consumer, e.g. console,
- * potentially text inputs, ...
- */
-void Interface::RequestPasting(const String & string)
-{
-	/* FIXME: port to current system #subviews
-	if (console->IsFocused()) {
-		console->InsertText(string);
-	}*/
-	(void) string;
-}
-
 /** Get the Sound Manager */
 SaveGameIterator* Interface::GetSaveGameIterator() const
 {
