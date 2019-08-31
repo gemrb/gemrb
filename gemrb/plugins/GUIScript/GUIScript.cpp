@@ -4062,7 +4062,7 @@ ignored).\n\
   * ControlID   - the new control will be available via this controlID\n\
   * x,y,w,h     - X position, Y position, Width and Height of the control\n\
   * direction   - travel direction (-1 to ignore)\n\
-  * font        - font uused to display names of map locations\n\
+  * font        - font used to display names of map locations\n\
   * recolor     - recolor map icons (bg1)\n\
 \n\
 **Return value:** N/A\n\
