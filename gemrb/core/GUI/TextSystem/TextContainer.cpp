@@ -935,7 +935,7 @@ void TextContainer::InsertText(const String& text)
 
 	EraseContent(idx.second, contents.end());
 	AppendText(newtext);
-	AdvanceCursor(1);
+	AdvanceCursor(int(text.length()));
 
 	if (callback) {
 		(*callback)(*this);
