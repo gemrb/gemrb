@@ -45,8 +45,6 @@ class Palette;
  */
 
 class Console : public Control {
-	/** Inserts text at the current cursor position */
-	void InsertText(const String&);
 private:
 	/** History Buffer */
 	CircularBuffer<String> History;
