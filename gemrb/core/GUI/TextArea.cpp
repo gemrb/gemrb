@@ -379,9 +379,11 @@ void TextArea::FlagsChanged(unsigned int oldflags)
 	if (Flags()&Editable) {
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		textContainer->SetEventProxy(NULL);
 	} else if (oldflags&Editable) {
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetEventProxy(&scrollview);
 	}
 }
 
@@ -651,7 +653,12 @@ void TextArea::ClearText()
 	textContainer->SetMargin(0, 3);
 	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextArea, TextContainer&>(this, &TextArea::TextChanged);
 	textContainer->callback = cb;
-	textContainer->SetFlags(View::IgnoreEvents, (Flags()&Editable) ? OP_NAND : OP_OR);
+	if (Flags()&Editable) {
+		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+	} else {
+		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetEventProxy(&scrollview);
+	}
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
