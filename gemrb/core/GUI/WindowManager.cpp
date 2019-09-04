@@ -62,7 +62,7 @@ WindowManager::WindowManager(Video* vid)
 	vid->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(Window::Borderless, OP_OR);
+	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	gameWin->SetFrame(screen);
 
 	// FIXME: need to recreate these if resolution changes
