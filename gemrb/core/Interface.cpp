@@ -411,19 +411,12 @@ Interface::~Interface(void)
 
 GameControl* Interface::StartGameControl()
 {
-	Window* gamewin = winmgr->GetGameWindow();
-	gamewin->SetDisabled(false);
+	assert(gamectrl == NULL);
 
-	if (gamectrl) {
-		gamectrl->SetDisabled(false);
-	} else {
-		gamedata->DelTable(0xffffu); //dropping ALL tables
-		Region screen(0,0, Width, Height);
-		gamectrl = new GameControl(screen);
-		gamewin->AddSubviewInFrontOfView(gamectrl);
-		gamectrl->AssignScriptingRef(0, "GC");
-		RegisterScriptableWindow(gamewin, "GAMEWIN", 0);
-	}
+	gamedata->DelTable(0xffffu); //dropping ALL tables
+	Region screen(0,0, Width, Height);
+	gamectrl = new GameControl(screen);
+	gamectrl->AssignScriptingRef(0, "GC");
 
 	return gamectrl;
 }
@@ -562,7 +555,9 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		winmgr->DestroyAllWindows();
-		gamectrl->SetDisabled(true);
+		delete gamectrl;
+		gamectrl = NULL;
+		winmgr->GetGameWindow()->SetVisible(false);
 		
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
@@ -602,6 +597,11 @@ void Interface::HandleFlags()
 
 			//rearrange party slots
 			game->ConsolidateParty();
+
+			Window* gamewin = winmgr->GetGameWindow();
+			gamewin->AddSubviewInFrontOfView(gc);
+			gamewin->SetDisabled(false);
+			gamewin->SetVisible(true);
 		} else {
 			Log(ERROR, "Core", "No game to enter...");
 			QuitFlag = QF_QUITGAME;
@@ -1442,6 +1442,8 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	winmgr = new WindowManager(video.get());
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma(brightness, contrast);
