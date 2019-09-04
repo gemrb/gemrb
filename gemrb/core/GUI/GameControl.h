@@ -115,6 +115,8 @@ private:
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
 
+	EventMgr::TapMonitorId eventMonitors[2];
+
 public:
 	DialogHandler *dialoghandler;
 	//the name of the spell to cast

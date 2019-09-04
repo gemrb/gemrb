@@ -119,9 +119,23 @@ GameControl::GameControl(const Region& frame)
 	updateVPTimer = true;
 
 	EventMgr::EventCallback* cb = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::OnGlobalMouseMove);
-	EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
+	eventMonitors[0] = EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
 	EventMgr::EventCallback *cb2 = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::DispatchEvent);
-	EventMgr::RegisterEventMonitor(cb2, Event::KeyDownMask);
+	eventMonitors[1] = EventMgr::RegisterEventMonitor(cb2, Event::KeyDownMask);
+}
+
+GameControl::~GameControl()
+{
+	for (size_t i = 0; i < 2; ++i) {
+		EventMgr::UnRegisterEventMonitor(eventMonitors[i]);
+	}
+
+	if (formations)	{
+		free( formations );
+		formations = NULL;
+	}
+	delete dialoghandler;
+	delete DisplayText;
 }
 
 //TODO:
@@ -250,16 +264,6 @@ bool GameControl::ShouldRun(Actor *actor) const
 		return false;
 	}
 	return (isDoubleClick || AlwaysRun);
-}
-
-GameControl::~GameControl(void)
-{
-	if (formations)	{
-		free( formations );
-		formations = NULL;
-	}
-	delete dialoghandler;
-	delete DisplayText;
 }
 
 // ArrowSprite cycles
