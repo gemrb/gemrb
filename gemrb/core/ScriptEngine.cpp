@@ -38,9 +38,11 @@ bool ScriptEngine::UnregisterScriptingRef(ScriptingRefBase* ref)
 {
 	if (ref == NULL) return false;
 
-	// TODO: error if not found
-	GUIDict[ref->ScriptingGroup()].erase(ref->Id);
-	return true;
+	ScriptEngine::ScriptingDict::iterator it = GUIDict.find(ref->ScriptingGroup());
+	if (it == GUIDict.end()) {
+		return false;
+	}
+	return (it->second.erase(ref->Id) > 0) ? true : false;
 }
 
 }
