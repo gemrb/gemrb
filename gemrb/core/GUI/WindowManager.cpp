@@ -599,6 +599,15 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 Sprite2D* WindowManager::WinFrameEdge(int edge) const
 {
 	std::string refstr = "STON";
+
+	// FIXME: This probably doesnt work with widescreen mod
+	// we probably need a HasResource("CSTON" + width + height) call
+	// to check for a custom resource
+
+	// TODO: once we switch to c++11 lets just change this
+	// to std::to_string(screen.w).substr(0, 2)
+	// this should work for all standard resulutions plus any custom ones
+
 	switch (screen.w) {
 		case 800:
 			refstr += "08";
@@ -607,6 +616,7 @@ Sprite2D* WindowManager::WinFrameEdge(int edge) const
 			refstr += "10";
 			break;
 	}
+
 	switch (edge) {
 		case 0:
 			refstr += "L";

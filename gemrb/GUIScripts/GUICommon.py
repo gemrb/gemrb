@@ -45,16 +45,22 @@ def GetWindowPack():
 	if GemRB.HasResource (gui, RES_CHU, 1):
 		return gui
 
-	gui = None
-	if width == 640:
-		gui = default
-	elif width == 800:
-		gui = "GUIW08"
-	elif width == 1024:
-		gui = "GUIW10"
-	elif width == 1280:
+	# select this based on height
+	# we do this because:
+	# 1. windows are never the entire width,
+	#    but the can be the entire height
+	# 2. the originals were for 4:3 screens,
+	#    but modern screens are usually a wider aspect
+	if height >= 960:
 		gui = "GUIW12"
-	if gui:
+		if GemRB.HasResource (gui, RES_CHU, 1):
+			return gui
+	elif height >= 768:
+		gui = "GUIW10"
+		if GemRB.HasResource (gui, RES_CHU, 1):
+			return gui
+	elif height >= 600:
+		gui = "GUIW08"
 		if GemRB.HasResource (gui, RES_CHU, 1):
 			return gui
 
