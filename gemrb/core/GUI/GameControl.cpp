@@ -1452,7 +1452,7 @@ bool GameControl::OnTouchDown(const TouchEvent& te, unsigned short mod)
 
 bool GameControl::OnTouchUp(const TouchEvent& te, unsigned short mod)
 {
-	if (EventMgr::ModState(GEM_ALT) == false) {
+	if (EventMgr::ModState(GEM_MOD_ALT) == false) {
 		DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 	}
 
@@ -1475,7 +1475,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 		isSelectionRect = true;
 	} else if (gesture.numFingers == 2) {
 		if (gesture.dTheta < -0.2 || gesture.dTheta > 0.2) { // TODO: actually figure out a good number
-			if (EventMgr::ModState(GEM_ALT) == false) {
+			if (EventMgr::ModState(GEM_MOD_ALT) == false) {
 				DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			}
 
