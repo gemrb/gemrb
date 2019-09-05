@@ -231,6 +231,17 @@ View* Window::TrySetFocus(View* target)
 	return newFocus;
 }
 
+bool Window::IsDragable() const
+{
+	if (trackingView != this)
+	{
+		return false;
+	}
+
+	return (flags&Draggable) ||
+	       (EventMgr::ModState(GEM_MOD_CTRL) && EventMgr::MouseButtonState(GEM_MB_ACTION));
+}
+
 bool Window::HitTest(const Point& p) const
 {
 	bool hit = View::HitTest(p);
@@ -409,6 +420,10 @@ bool Window::DispatchEvent(const Event& event)
 		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
 		assert(target == NULL || target->IsVisible());
 
+		if (IsDragable() && target == NULL) {
+			target = this;
+		}
+
 		// special event handling
 		switch (event.type) {
 			case Event::MouseScroll:
@@ -424,7 +439,13 @@ bool Window::DispatchEvent(const Event& event)
 				}
 			case Event::MouseMove:
 				// allows NULL and disabled targets
-				DispatchMouseMotion(target, event.mouse);
+				if (target == this) {
+					// skip the usual dispatch
+					// this is so that we can move windows that otherwise ignore events
+					OnMouseDrag(event.mouse);
+				} else {
+					DispatchMouseMotion(target, event.mouse);
+				}
 				return true;
 			default:
 				if (target == NULL) {
@@ -503,7 +524,7 @@ bool Window::OnMouseDrag(const MouseEvent& me)
 {
 	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
-	if ((flags&Draggable) && me.ButtonState(GEM_MB_ACTION) && trackingView == this) {
+	if (IsDragable()) {
 		Point newOrigin = frame.Origin() - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {
