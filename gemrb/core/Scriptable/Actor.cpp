@@ -4909,6 +4909,7 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 		int stance = GetStance();
 		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
 			GetSoundFromFile(sound, 100+stance);
+			sound2 = sound;
 		}
 	} else {
 		// swing sounds start at column 3 (index 2)
@@ -4916,7 +4917,7 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 		if (!gamedata->GetItemSound(sound2, itemType, NULL, isChoice)) return;
 	}
 
-	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos.x, Pos.y);
+	core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos.x, Pos.y);
 }
 
 //Just to quickly inspect debug maximum values
