@@ -624,6 +624,7 @@ TextContainer::TextContainer(const Region& frame, Font* fnt, Holder<Palette> pal
 	alignment = IE_FONT_ALIGN_LEFT;
 	textLen = 0;
 	cursorPos = 0;
+	printPos = 0;
 }
 
 void TextContainer::AppendText(const String& text)

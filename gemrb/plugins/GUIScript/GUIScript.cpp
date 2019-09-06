@@ -1933,6 +1933,10 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				&id, &type,
 				&pyRect, &constructArgs);
 
+	if (type > IE_GUI_INVALID) {
+		return AttributeError("type is out of range.");
+	}
+
 	Region rgn = RectFromPy(pyRect);
 	View* view = NULL;
 	switch (type) {
@@ -9234,7 +9238,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		actor = game->FindPC( globalID );
 	}
 
-	if (!actor && globalID) {
+	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
 

@@ -306,7 +306,11 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 		draw |= D_RIGHT;
 	}
 
-	Region mwinframe = core->GetMessageTextArea()->GetWindow()->Frame();
+	Region mwinframe;
+	TextArea* mta = core->GetMessageTextArea();
+	if (mta) {
+		mwinframe = mta->GetWindow()->Frame();
+	}
 
 	tmp = mwinframe.h + 48;
 	if (p.y > vpOrigin.y + frame.h - (tmp + spr->Height)) {
@@ -1090,6 +1094,7 @@ String GameControl::TooltipText() const {
 	String* wname = StringFromCString(name);
 	if (wname) {
 		tip = *wname;
+		delete wname;
 	}
 
 	int hp = actor->GetStat(IE_HITPOINTS);
@@ -1239,6 +1244,10 @@ Sprite2D* GameControl::Cursor() const
 bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
 	Map* area = CurrentArea();
+	if (area == NULL) {
+		return false;
+	}
+
 	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 	if (lastActor) {
 		lastActor->SetOver( false );
@@ -2080,6 +2089,7 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 	int max = game->GetPartySize(false);
 	for(int idx = 1; idx<=max; idx++) {
 		Actor *act = game->FindPC(idx);
+		assert(act);
 		if(act->IsSelected()) {
 			party.push_back(act);
 		}

@@ -31,6 +31,7 @@ MoviePlayer::MoviePlayer(void)
 {
 	framePos = 0;
 	subtitles = NULL;
+	isPlaying = false;
 }
 
 MoviePlayer::~MoviePlayer(void)
