@@ -77,6 +77,7 @@ public:
 
 private:
 	bool isPlaying;
+	bool showSubtitles;
 	SubtitleSet* subtitles;
 
 protected:
@@ -100,6 +101,8 @@ public:
 	virtual void Stop();
 
 	void SetSubtitles(SubtitleSet* subs);
+	void EnableSubtitles(bool set);
+	bool SubtitlesEnabled() const;
 };
 
 class MoviePlayerControls : public View {
@@ -109,8 +112,17 @@ private:
 	// currently dont have any real controls
 	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {}
 	
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) {
-		player.Stop();
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) {
+		KeyboardKey keycode = Key.keycode;
+		switch (keycode) {
+			case 's':
+				player.EnableSubtitles(!player.SubtitlesEnabled());
+				break;
+			default:
+				player.Stop();
+				break;
+		}
+
 		return true;
 	}
 	

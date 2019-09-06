@@ -32,6 +32,7 @@ MoviePlayer::MoviePlayer(void)
 	framePos = 0;
 	subtitles = NULL;
 	isPlaying = false;
+	showSubtitles = false;
 }
 
 MoviePlayer::~MoviePlayer(void)
@@ -44,6 +45,16 @@ void MoviePlayer::SetSubtitles(SubtitleSet* subs)
 {
 	delete subtitles;
 	subtitles = subs;
+}
+
+void MoviePlayer::EnableSubtitles(bool set)
+{
+	showSubtitles = set;
+}
+
+bool MoviePlayer::SubtitlesEnabled() const
+{
+	return showSubtitles && subtitles;
 }
 
 void MoviePlayer::Play(Window* win)
@@ -89,7 +100,7 @@ void MoviePlayer::Play(Window* win)
 			Stop(); // error / end
 		}
 		
-		if (subtitles) {
+		if (subtitles && showSubtitles) {
 			assert(subBuf);
 			// we purposely draw on the window, which may be larger than the video
 			video->PushDrawingBuffer(subBuf);

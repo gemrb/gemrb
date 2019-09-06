@@ -2830,75 +2830,75 @@ int Interface::PlayMovie(const char* resref)
 		vars->Lookup("Display Subtitles", subtitles);
 	}
 
-	if (subtitles) {
-		class IESubtitles : public MoviePlayer::SubtitleSet {
-			typedef std::map<size_t, ieStrRef> FrameMap;
-			FrameMap subs;
-			mutable size_t nextSubFrame;
-			mutable String* cachedSub;
+	mp->EnableSubtitles(subtitles);
 
-		public:
-			IESubtitles(class Font* fnt, ResRef resref, Color fore = ColorWhite, Color bg = ColorBlack)
-			: MoviePlayer::SubtitleSet(fnt, fore, bg)
-			{
-				AutoTable sttable(resref);
-				cachedSub = NULL;
-				nextSubFrame = 0;
+	class IESubtitles : public MoviePlayer::SubtitleSet {
+		typedef std::map<size_t, ieStrRef> FrameMap;
+		FrameMap subs;
+		mutable size_t nextSubFrame;
+		mutable String* cachedSub;
 
-				for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
-					const char* frameField = sttable->QueryField(i, 0);
-					const char* strField = sttable->QueryField(i, 1);
-					if (frameField && strField) { // this skips the initial palette rows
-						subs[atoi(frameField)] = atoi(strField);
-					}
+	public:
+		IESubtitles(class Font* fnt, ResRef resref, Color fore = ColorWhite, Color bg = ColorBlack)
+		: MoviePlayer::SubtitleSet(fnt, fore, bg)
+		{
+			AutoTable sttable(resref);
+			cachedSub = NULL;
+			nextSubFrame = 0;
+
+			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
+				const char* frameField = sttable->QueryField(i, 0);
+				const char* strField = sttable->QueryField(i, 1);
+				if (frameField && strField) { // this skips the initial palette rows
+					subs[atoi(frameField)] = atoi(strField);
 				}
 			}
-			
-			~IESubtitles() {
-				delete cachedSub;
-			}
-			
-			size_t NextSubtitleFrame() const {
-				return nextSubFrame;
-			}
-
-			const String& SubtitleAtFrame(size_t frameNum) const {
-				// FIXME: we cant go backwards now... we dont need to, but this is ugly
-				if (frameNum >= NextSubtitleFrame()) {
-					FrameMap::const_iterator it;
-					it = subs.upper_bound(frameNum);
-					nextSubFrame = it->first;
-					if (it != subs.begin()) {
-						--it;
-					}
-					delete cachedSub;
-					cachedSub = core->GetString(it->second);
-				}
-				
-				assert(cachedSub);
-				return *cachedSub;
-			}
-		};
-
-		AutoTable sttable(resref);
-		if (sttable) {
-			Font* font = GetFont(MovieFontResRef);
-			Holder<Palette> pal = font->GetPalette();
-			Color fore = pal->front;
-			Color bg = pal->back;
-
-			int r = atoi(sttable->QueryField("red", "frame"));
-			int g = atoi(sttable->QueryField("green", "frame"));
-			int b = atoi(sttable->QueryField("blue", "frame"));
-			
-			if (r || g || b) {
-				// FIXME: this doesn't look very good (IWD2), wrong font?
-				bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
-				fore = Color(0, 0, 0, 0xff);
-			}
-
-			mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));
 		}
+
+		~IESubtitles() {
+			delete cachedSub;
+		}
+
+		size_t NextSubtitleFrame() const {
+			return nextSubFrame;
+		}
+
+		const String& SubtitleAtFrame(size_t frameNum) const {
+			// FIXME: we cant go backwards now... we dont need to, but this is ugly
+			if (frameNum >= NextSubtitleFrame()) {
+				FrameMap::const_iterator it;
+				it = subs.upper_bound(frameNum);
+				nextSubFrame = it->first;
+				if (it != subs.begin()) {
+					--it;
+				}
+				delete cachedSub;
+				cachedSub = core->GetString(it->second);
+			}
+
+			assert(cachedSub);
+			return *cachedSub;
+		}
+	};
+
+	AutoTable sttable(resref);
+	if (sttable) {
+		Font* font = GetFont(MovieFontResRef);
+		Holder<Palette> pal = font->GetPalette();
+		Color fore = pal->front;
+		Color bg = pal->back;
+
+		int r = atoi(sttable->QueryField("red", "frame"));
+		int g = atoi(sttable->QueryField("green", "frame"));
+		int b = atoi(sttable->QueryField("blue", "frame"));
+
+		if (r || g || b) {
+			// FIXME: this doesn't look very good (IWD2), wrong font?
+			bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
+			fore = Color(0, 0, 0, 0xff);
+		}
+
+		mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));
 	}
 
 	//shutting down music and ambients before movie
