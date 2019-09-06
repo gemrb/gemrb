@@ -539,6 +539,12 @@ bool View::SetFlags(unsigned int arg_flags, int opcode)
 	if (flags != oldflags) {
 		FlagsChanged(oldflags);
 		MarkDirty();
+
+		if (window && window->FocusedView() == this) {
+			if (CanLockFocus() == false) {
+				window->SetFocused(NULL);
+			}
+		}
 	}
 
 	return ret;

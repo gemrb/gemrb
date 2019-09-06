@@ -201,7 +201,7 @@ public:
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
 
-	virtual bool CanLockFocus() const { return true; };
+	virtual bool CanLockFocus() const { return (flags&(IgnoreEvents|Disabled)) == 0; };
 	virtual bool CanUnlockFocus() const { return true; };
 	virtual void DidFocus() {}
 	virtual void DidUnFocus() {}
