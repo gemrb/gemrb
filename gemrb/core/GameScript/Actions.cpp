@@ -1738,7 +1738,9 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->CurrentActionState = 1;
 	// parameters->int2Parameter is unused here so hijack it to store the wait time
-	parameters->int2Parameter = gt + target->GetWait();
+	// and make sure we wait at least one round, so strings without audio have some time to display
+	unsigned long waitCounter = target->GetWait();
+	parameters->int2Parameter = gt + waitCounter > 0 ? waitCounter : core->Time.round_size;
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
