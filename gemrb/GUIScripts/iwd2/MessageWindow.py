@@ -83,6 +83,11 @@ def UpdateControlStatus():
 	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	MessageTA.AddAlias("MsgSys", 0)
 
+	# compensate for the bogus scrollbar on the CHU BG
+	frame = MessageTA.GetFrame()
+	frame['w'] += 10
+	MessageTA.SetFrame(frame)
+
 	if Override:
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
