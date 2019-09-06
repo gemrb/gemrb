@@ -85,7 +85,9 @@ def UpdateControlStatus():
 
 	# compensate for the bogus scrollbar on the CHU BG
 	frame = MessageTA.GetFrame()
-	frame['w'] += 10
+	frame['w'] += 12
+	frame['h'] += 4;
+	frame['y'] -= 4;
 	MessageTA.SetFrame(frame)
 
 	if Override:
