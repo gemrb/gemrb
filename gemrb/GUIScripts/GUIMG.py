@@ -306,7 +306,9 @@ def OpenMageSpellRemoveWindow ():
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
 	else:
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
+
 	Window = MageSpellUnmemorizeWindow
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)

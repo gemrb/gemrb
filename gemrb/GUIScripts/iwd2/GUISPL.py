@@ -345,6 +345,7 @@ def OpenSpellBookSpellRemoveWindow ():
 		return
 
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
