@@ -74,6 +74,10 @@ def UpdateControlStatus():
 	MessageWindow.AddAlias("MSGWIN")
 	MessageWindow.AddAlias("HIDE_CUT", 0)
 
+	# FIXME: I dont know what this TextEdit is for
+	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
+	MessageWindow.RemoveSubview(MessageWindow.GetControl(3))
+
 	MessageTA = MessageWindow.GetControl(1)
 	MessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
