@@ -47,6 +47,7 @@ def OnLoad():
 	frame['h'] += 4
 	frame['y'] -= 4
 	smallMTA.SetFrame(frame)
+	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 
 	# FIXME: I dont know what this TextEdit is for
 	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
