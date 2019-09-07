@@ -5675,6 +5675,10 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xd7 PlayVisualEffect
+// Known values for Parameter2 are:
+// 0 Play on target (not attached)
+// 1 Play on target (attached)
+// 2 Play on point
 int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_play_visual_effect(%2d): Resource: %s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
@@ -5724,8 +5728,21 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//not sticky
 	if (fx->Parameter2 == 2) {
-		sca->XPos = fx->PosX;
-		sca->YPos = fx->PosY;
+		// if source is set use that instead
+		// used for example in Horror, where you want only one screaming face at the target location, not all secondaries #198
+		// (both the main and secondary projectiles carry this effect with the same resource)
+		// BUT child pros shouldn't actually draw this, since their timing is not in sync and the last few frames will then flicker, as each copy ends
+		if (fx->SourceX != 0 || fx->SourceY != 0) {
+			if (map->HasVVCCell(fx->Resource, Point(fx->SourceX, fx->SourceY))) {
+				delete sca;
+				return FX_NOT_APPLIED;
+			}
+			sca->XPos = fx->SourceX;
+			sca->YPos = fx->SourceY;
+		} else {
+			sca->XPos = fx->PosX;
+			sca->YPos = fx->PosY;
+		}
 	} else {
 		sca->XPos = target->Pos.x;
 		sca->YPos = target->Pos.y;
