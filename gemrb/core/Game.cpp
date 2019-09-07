@@ -520,7 +520,12 @@ int Game::JoinParty(Actor* actor, int join)
 
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
-		actor->ApplyKit(false);
+		ieDword baseclass = 0;
+		if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+			// get the class for iwd2; luckily there are no NPCs, everyone joins at level 1, so multi-kit annoyances can be ignored
+			baseclass = actor->GetBase(IE_CLASS);
+		}
+		actor->ApplyKit(false, baseclass);
 		//update the quickslots
 		actor->ReinitQuickSlots();
 		//set the joining date
