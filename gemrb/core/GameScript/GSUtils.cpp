@@ -158,9 +158,7 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	}
 	Actor* ab = ( Actor* ) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
-	if (reputation > 200) {
-		reputation = 200;
-	}
+	reputation = Clamp(reputation, 10, 200);
 	return happiness[alignment-1][reputation/10-1];
 }
 
