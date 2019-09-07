@@ -288,7 +288,7 @@ void Projectile::SetBlend(int brighten)
 void Projectile::CreateIteration()
 {
 	Projectile *pro = server->GetProjectileByIndex(type-1);
-	pro->SetEffectsCopy(effects);
+	pro->SetEffectsCopy(effects, Pos);
 	pro->SetCaster(Caster, Level);
 	if (ExtFlags&PEF_CURVE) {
 		pro->bend=bend+1;
@@ -1079,7 +1079,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq)
+void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
 {
 	if(effects) delete effects;
 	if(!eq) {
@@ -1087,6 +1087,7 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 		return;
 	}
 	effects = eq->CopySelf();
+	effects->ModifyAllEffectSources(source);
 }
 
 void Projectile::LineTarget()
@@ -1194,7 +1195,7 @@ void Projectile::SecondaryTarget()
 		}
 
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects);
+		pro->SetEffectsCopy(effects, Pos);
 		//copy the additional effects reference to the child projectile
 		//but only when there is a spell to copy
 		if (SuccSpell[0])

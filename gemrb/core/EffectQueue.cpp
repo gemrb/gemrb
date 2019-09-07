@@ -402,6 +402,16 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
+void EffectQueue::ModifyAllEffectSources(Point &source)
+{
+	std::list< Effect* >::const_iterator f;
+
+	for (f = effects.begin(); f != effects.end(); ++f) {
+		(*f)->SourceX = source.x;
+		(*f)->SourceY = source.y;
+	}
+}
+
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing)
 {
 	ResolveEffectRef(effect_reference);
