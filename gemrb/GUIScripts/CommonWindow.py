@@ -166,7 +166,7 @@ def OpenContainerWindow ():
 	#stop gears from interfering
 	if GameCheck.IsPST():
 		GUICommonWindows.DisableAnimatedWindows ()
-	else:
+	elif not GameCheck.IsIWD2():
 		# container window shouldnt be in front
 		GemRB.GetView("OPTWIN").Focus()
 		GemRB.GetView("PORTWIN").Focus()
