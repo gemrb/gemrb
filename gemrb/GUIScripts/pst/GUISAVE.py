@@ -244,8 +244,8 @@ def OpenSaveDetailWindow ():
 	Button.SetSprite2D(GemRB.GetGamePreview())
 
 	# PC portraits
-	from GameCheck import PARTY_SIZE
-	for j in range (PARTY_SIZE):
+	from GameCheck import MAX_PARTY_SIZE
+	for j in range (MAX_PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
 		Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
 
@@ -285,7 +285,8 @@ def ConfirmedSaveGame ():
 
 	# We have to close floating window first
 	OpenSaveDetailWindow ()
-	LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
+	#FIXME: make this work
+	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
 	CloseSaveWindow ()
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname)
