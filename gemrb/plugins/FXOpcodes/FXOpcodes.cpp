@@ -1403,7 +1403,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 2:
 		damagetype = DAMAGE_CRUSHING;
 		break;
-	case 4:
+	case 4: // "normal" death
 		damagetype = DAMAGE_CRUSHING;
 		break;
 	case 8:

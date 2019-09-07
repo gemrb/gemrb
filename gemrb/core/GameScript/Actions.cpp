@@ -6146,7 +6146,7 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		}
 */
 		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
-		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
+		core->ApplySpell(spellres, (Actor *) tar, NULL, parameters->int1Parameter);
 	} else {
 		//apply spell on point
 		Point d;
