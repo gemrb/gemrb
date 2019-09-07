@@ -76,7 +76,9 @@ def UpdateControlStatus():
 
 	# FIXME: I dont know what this TextEdit is for
 	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
-	MessageWindow.RemoveSubview(MessageWindow.GetControl(3))
+	te = MessageWindow.GetControl(3)
+	if te != None:
+		MessageWindow.RemoveSubview(te)
 
 	MessageTA = MessageWindow.GetControl(1)
 	MessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
