@@ -171,7 +171,7 @@ def UpdateControlStatus(init = False):
 		if size not in WinSizes:
 			return
 		
-		frame = ContractButton.GetFrame();
+		frame = ContractButton.GetFrame()
 		if size != GS_SMALLDIALOG:
 			frame['y'] -= (frame['h'] + 6)
 		ExpandButton.SetFrame(frame)

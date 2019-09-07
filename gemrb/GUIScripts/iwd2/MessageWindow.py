@@ -25,13 +25,32 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 import CommonWindow
 
+MTASize = GS_SMALLDIALOG
+
 def OnLoad():
-	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack())
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	OptionsWindow.AddAlias("OPTWIN")
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
+
+	# this also has the small MTA window
+	OptionsWindow.AddAlias("MSGWIN")
+	# compensate for the bogus scrollbar on the CHU BG
+	smallMTA = OptionsWindow.GetControl(1)
+	smallMTA.AddAlias("MsgSys", 0)
+	smallMTA.AddAlias("MTA_SM", 0)
+
+	frame = smallMTA.GetFrame()
+	frame['w'] += 12
+	frame['h'] += 4
+	frame['y'] -= 4
+	smallMTA.SetFrame(frame)
+
+	# FIXME: I dont know what this TextEdit is for
+	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
+	OptionsWindow.RemoveSubview(OptionsWindow.GetControl(3))
 
 	ActionsWindow = GUICommonWindows.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
@@ -45,53 +64,56 @@ def OnLoad():
 	actframe['y'] -= optframe['h']
 	ActionsWindow.SetFrame(actframe)
 
+	DialogWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	DialogWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS|IE_GUI_VIEW_INVISIBLE, OP_OR)
+	DialogWindow.AddAlias("MSGWINLG")
+	DialogWindow.AddAlias("HIDE_CUT", 0)
+	DialogWindow.AddAlias("NOT_DLG", 2)
+
+	largeMTA = DialogWindow.GetControl(1)
+	largeMTA.AddAlias("MTA_LG", 0)
+
 	return
 
 def UpdateControlStatus():
-	OptionsWindow = GemRB.GetView("OPTWIN")
-
-	if not OptionsWindow:
-		# exit if we get called from core without the right window pack being loaded
-		return
+	global MTASize
 
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 
+	largeMW = GemRB.GetView("MSGWINLG")
+
 	#a dialogue is running, setting messagewindow size to maximum
 	if Override:
 		Expand = GS_LARGEDIALOG
-
-	if Expand == GS_LARGEDIALOG:
-		MessageWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+		largeMW.SetVisible(True)
+		largeMW.SetDisabled(False)
 	else:
-		MessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-		MessageWindow.AddAlias("OPTWIN")
-		GUICommonWindows.SetupMenuWindowControls (MessageWindow, 1, None)
+		largeMW.SetVisible(False)
 
-	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	MessageWindow.AddAlias("MSGWIN")
-	MessageWindow.AddAlias("HIDE_CUT", 0)
+	if MTASize == Expand:
+		return
 
-	# FIXME: I dont know what this TextEdit is for
-	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
-	te = MessageWindow.GetControl(3)
-	if te != None:
-		MessageWindow.RemoveSubview(te)
+	MTASize = Expand
 
-	MessageTA = MessageWindow.GetControl(1)
-	MessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
-	MessageTA.AddAlias("MsgSys", 0)
+	smallMW = GemRB.GetView("MSGWIN")
+	smallMTA = GemRB.GetView("MTA_SM", 0)
+	smallFrame = smallMTA.GetFrame()
 
-	# compensate for the bogus scrollbar on the CHU BG
-	frame = MessageTA.GetFrame()
-	frame['w'] += 12
-	frame['h'] += 4;
-	frame['y'] -= 4;
-	MessageTA.SetFrame(frame)
+	largeMTA = GemRB.GetView("MTA_LG", 0)
+	largeFrame = largeMTA.GetFrame()
 
+	# swap the 2 TextAreas
+	largeMW.AddSubview(smallMTA)
+	smallMTA.SetFrame(largeFrame)
+	smallMTA.AddAlias("MTA_LG", 0)
+	
+	smallMW.AddSubview(largeMTA)
+	largeMTA.SetFrame(smallFrame)
+	largeMTA.AddAlias("MTA_SM", 0)
+	
 	if Override:
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
@@ -99,7 +121,7 @@ def UpdateControlStatus():
 			Portrait = GemRB.GetPlayerPortrait(pc, 1)["Sprite"]
 		else:
 			Portrait = None
-		Button = MessageWindow.GetControl(11)
+		Button = largeMW.GetControl(11)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if not Portrait:
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -107,6 +129,4 @@ def UpdateControlStatus():
 			Button.SetPicture(Portrait, "NOPORTSM")
 		
 	return
-
-
 
