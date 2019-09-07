@@ -72,9 +72,11 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 	Control* ctrl = dynamic_cast<Control*>(view);
 	if (ctrl) {
 		Controls.insert(ctrl);
-		if (focusView == NULL) {
-			TrySetFocus(ctrl);
-		}
+	}
+
+	// MoviePlayer at least relies on this
+	if (focusView == NULL) {
+		TrySetFocus(view);
 	}
 }
 
