@@ -1740,7 +1740,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	// parameters->int2Parameter is unused here so hijack it to store the wait time
 	// and make sure we wait at least one round, so strings without audio have some time to display
 	unsigned long waitCounter = target->GetWait();
-	parameters->int2Parameter = gt + waitCounter > 0 ? waitCounter : core->Time.round_size;
+	parameters->int2Parameter = gt + (waitCounter > 0 ? waitCounter : core->Time.round_size);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
