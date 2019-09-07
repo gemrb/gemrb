@@ -1180,8 +1180,7 @@ void Projectile::SecondaryTarget()
 			//int width = (*poi)->GetAnims()->GetCircleSize();
 
 			if (ydiff) {
-				deg = (int) (std::atan(xdiff/ydiff)*180/M_PI);
-				if(ydiff>0) deg+=180;
+				deg = (int) (std::atan2(xdiff, ydiff) * 180/M_PI) + 180;
 			} else {
 				if (xdiff<0) deg=90;
 				else deg = 270;
