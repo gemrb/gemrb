@@ -74,6 +74,12 @@ def OnLoad():
 	largeMTA = DialogWindow.GetControl(1)
 	largeMTA.AddAlias("MTA_LG", 0)
 
+	frame = largeMTA.GetFrame()
+	frame['w'] += 34
+	frame['h'] += 3
+	frame['y'] -= 2
+	largeMTA.SetFrame(frame)
+
 	return
 
 def UpdateControlStatus():
