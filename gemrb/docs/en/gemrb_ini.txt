@@ -247,6 +247,12 @@ FlexibleWorldmap = <bool>
 Toggles whether the game supports worldmap extensions.
 
 
+Happiness = <bool>
+- - - - - - - - - - -
+Whether the game supports NPC happiness. All come with happy.2da, even though
+PST and IWD2 don't use it.
+
+
 HasBeastsINI = <bool>
 - - - - - - - - - - -
 Whether original game data contains beasts.ini and quests.ini files

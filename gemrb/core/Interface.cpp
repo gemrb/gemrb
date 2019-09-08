@@ -2230,6 +2230,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		"FixedMoraleOpcode",  //78GF_FIXED_MORALE_OPCODE
+		"Happiness",          //79GF_HAPPINESS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
