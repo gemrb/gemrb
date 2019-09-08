@@ -2112,10 +2112,12 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		actor->LastTarget = 0;
+		actor->LastTargetPersistent = 0;
 		return;
 	}
 	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
+	actor->LastTargetPersistent = tar->GetGlobalID();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -5144,7 +5146,14 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, 0);
+	// if same target as before, don't play the war cry again, as they'd pop up too often
+	int flags = 0;
+	if (Sender->LastTargetPersistent == Sender->CurrentActionTarget) {
+		flags = AC_NO_SOUND;
+	}
+
+	AttackCore(Sender, tar, flags);
+	parameters->int2Parameter = 1;
 
 	Sender->CurrentActionState--;
 	if (Sender->CurrentActionState <= 0) {

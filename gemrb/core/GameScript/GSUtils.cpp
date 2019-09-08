@@ -1438,6 +1438,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	actor->FaceTarget(target);
 
 	Sender->LastTarget = target->GetGlobalID();
+	Sender->LastTargetPersistent = Sender->LastTarget;
 	actor->PerformAttack(core->GetGame()->GameTime);
 }
 
