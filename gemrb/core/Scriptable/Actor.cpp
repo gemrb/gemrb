@@ -1035,6 +1035,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 
 static void UpdateHappiness(Actor *actor) {
 	if (!actor->InParty) return;
+	if (!core->HasFeature(GF_HAPPINESS)) return;
 
 	int newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
 	if (newHappiness == actor->PCStats->Happiness) return;
@@ -4297,7 +4298,7 @@ void Actor::PlayExistenceSounds()
 					if (sb.Sound[0]) {
 						unsigned int vol = 100;
 						core->GetDictionary()->Lookup("Volume Ambients", vol);
-						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, true);
+						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
 						if (stream != -1) {
 							int audioLength = audio->QueueAmbient(stream, sb.Sound);
 

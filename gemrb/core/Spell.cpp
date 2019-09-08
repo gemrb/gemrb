@@ -233,12 +233,12 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		if (pst_hostile) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
-		fx->CasterID = self->GetGlobalID(); // needed early for check_type, reset later
+		fx->CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
 		fx->CasterLevel = level;
 		fx->SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
-		if (self->Type == ST_ACTOR) {
+		if (self && self->Type == ST_ACTOR) {
 			Actor *caster = (Actor *) self;
 			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
@@ -285,7 +285,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			selfqueue->AddEffect( fx );
 		}
 	}
-	if (selfqueue) {
+	if (self && selfqueue) {
 		Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 		core->ApplyEffectQueue(selfqueue, target, self);
 		delete selfqueue;

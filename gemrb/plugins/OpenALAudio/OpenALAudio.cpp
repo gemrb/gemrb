@@ -755,7 +755,7 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 
 //This one is used for movies and ambients.
 int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
-		            ieWord gain, bool point, bool Ambient )
+		            ieWord gain, bool point, int ambientRange)
 {
 	// Find a free (or finished) stream for this sound
 	int stream = -1;
@@ -781,7 +781,8 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	alSourcef( source, AL_PITCH, 1.0f );
 	alSourcefv( source, AL_POSITION, position );
 	alSourcef( source, AL_GAIN, 0.01f * gain );
-	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+	// AL_REFERENCE_DISTANCE is the distance under which the volume would normally drop by half
+	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? ambientRange : REFERENCE_DISTANCE);
 	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
 	alSourcei( source, AL_LOOPING, 0 );
 	checkALError("Unable to set stream parameters", WARNING);
@@ -789,7 +790,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	streams[stream].Buffer = 0;
 	streams[stream].Source = source;
 	streams[stream].free = false;
-	streams[stream].ambient = Ambient;
+	streams[stream].ambient = ambientRange > 0;
 	streams[stream].locked = true;
 
 	return stream;

@@ -162,6 +162,8 @@ All of this makes reviewing and bisecting for regressions easier.
 1. Squash merge only if the history is a mess or it makes more
 sense (eg. consecutive commits through the github website). 
 2. For release planning check the milestones and gemrb/docs/Release.txt.
+2.1. When starting the final approach, use `admin/github_release.checklist`
+as a template to track progress in a dedicated issue.
 3. Releases are usually made when larger pieces of work land or many smaller
 fixes have accrued.
 4. Versioning is semantic, but also ad-hoc. We want 1.0 to be the classic

@@ -43,7 +43,7 @@ public:
 	void GetListenerPos(int& XPos, int& YPos);
 	void UpdateVolume(unsigned int) {}
 
-	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, bool Ambient);
+	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange);
 	int QueueAmbient(int stream, const char* sound);
 	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);

@@ -247,7 +247,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, 0, v * totalgain / 100, !(ambient->getFlags() & IE_AMBI_MAIN), true);
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, 0, v * totalgain / 100, !(ambient->getFlags() & IE_AMBI_MAIN), ambient->radius);
 
 		if (stream == -1) {
 			// no streams available...

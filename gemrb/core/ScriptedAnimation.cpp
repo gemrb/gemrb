@@ -182,6 +182,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			c<<=1;
 			if (gettwin) c++;
 			//this is needed for PST twin animations that contain 2 or 3 phases
+			assert(p < 3);
 			p*=MAX_ORIENT;
 		} else if (type&FIVE) {
 			c=SixteenToFive[c];
@@ -190,6 +191,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			c=SixteenToNine[c];
 			if ((i&15)>=9) mirror = true;
 		} else if (!(type&SEVENEYES)) {
+			assert(p < 3);
 			p*=MAX_ORIENT;
 		}
 

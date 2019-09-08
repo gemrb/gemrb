@@ -1734,7 +1734,9 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->CurrentActionState = 1;
 	// parameters->int2Parameter is unused here so hijack it to store the wait time
-	parameters->int2Parameter = gt + target->GetWait();
+	// and make sure we wait at least one round, so strings without audio have some time to display
+	unsigned long waitCounter = target->GetWait();
+	parameters->int2Parameter = gt + (waitCounter > 0 ? waitCounter : core->Time.round_size);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -2106,10 +2108,12 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		actor->LastTarget = 0;
+		actor->LastTargetPersistent = 0;
 		return;
 	}
 	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
+	actor->LastTargetPersistent = tar->GetGlobalID();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -5138,7 +5142,14 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, 0);
+	// if same target as before, don't play the war cry again, as they'd pop up too often
+	int flags = 0;
+	if (Sender->LastTargetPersistent == Sender->CurrentActionTarget) {
+		flags = AC_NO_SOUND;
+	}
+
+	AttackCore(Sender, tar, flags);
+	parameters->int2Parameter = 1;
 
 	Sender->CurrentActionState--;
 	if (Sender->CurrentActionState <= 0) {
@@ -6141,7 +6152,7 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		}
 */
 		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
-		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
+		core->ApplySpell(spellres, (Actor *) tar, NULL, parameters->int1Parameter);
 	} else {
 		//apply spell on point
 		Point d;

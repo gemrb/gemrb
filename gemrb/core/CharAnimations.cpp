@@ -149,6 +149,8 @@ void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*palette[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
 			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef[PAL_MAIN]);
+			PaletteResRef[PAL_MAIN][0] = 0;
+
 			palette[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
 			SetupColors(PAL_MAIN);
 		}

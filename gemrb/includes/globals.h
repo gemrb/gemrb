@@ -174,9 +174,10 @@ namespace GemRB {
 #define  GF_RANDOM_BANTER_DIALOGS       77 // bg1
 #define  GF_ANIMATED_DIALOG             78 // pst
 #define  GF_FIXED_MORALE_OPCODE         79 // bg2
+#define  GF_HAPPINESS                   80 // all except pst and iwd2
 
 //update this or bad things can happen
-#define GF_COUNT 80
+#define GF_COUNT 81
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

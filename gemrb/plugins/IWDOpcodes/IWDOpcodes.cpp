@@ -3356,6 +3356,7 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->attackcount=fx->Parameter1;
 			target->FaceTarget(enemy);
 			target->LastTarget=target->LastSeen;
+			target->LastTargetPersistent = target->LastSeen;
 			//linger around for more
 			return FX_APPLIED;
 		}

@@ -48,6 +48,7 @@ static void TranslateColor(const char *value, Color &color)
 		int r = 0;
 		int g = 0;
 		int b = 0;
+
 		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
 		color.r=r;
 		color.g=g;

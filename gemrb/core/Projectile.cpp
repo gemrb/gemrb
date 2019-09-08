@@ -287,7 +287,7 @@ void Projectile::SetBlend(int brighten)
 void Projectile::CreateIteration()
 {
 	Projectile *pro = server->GetProjectileByIndex(type-1);
-	pro->SetEffectsCopy(effects);
+	pro->SetEffectsCopy(effects, Pos);
 	pro->SetCaster(Caster, Level);
 	if (ExtFlags&PEF_CURVE) {
 		pro->bend=bend+1;
@@ -1078,7 +1078,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq)
+void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
 {
 	if(effects) delete effects;
 	if(!eq) {
@@ -1086,6 +1086,7 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 		return;
 	}
 	effects = eq->CopySelf();
+	effects->ModifyAllEffectSources(source);
 }
 
 void Projectile::LineTarget()
@@ -1127,11 +1128,28 @@ void Projectile::SecondaryTarget()
 	bool fail= !!(Extension->APFlags&APF_SPELLFAIL) && !(ExtFlags&PEF_DEFSPELL);
 	int mindeg = 0;
 	int maxdeg = 0;
+	int degOffset = 0;
+	char saneOrientation = Orientation;
 
 	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
-		mindeg=(Orientation*45-Extension->ConeWidth)/2;
-		maxdeg=mindeg+Extension->ConeWidth;
+		// see CharAnimations.cpp for a nice visualization of the orientation directions
+		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
+		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
+		saneOrientation = 12 - Orientation;
+		if (saneOrientation < 0) saneOrientation = MAX_ORIENT + saneOrientation;
+
+		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
+		// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations
+		mindeg = (saneOrientation * (720 / MAX_ORIENT) - Extension->ConeWidth) / 2;
+		if (mindeg < 0) {
+			degOffset = -mindeg;
+			//mindeg = 0;
+		} else if (mindeg + Extension->ConeWidth > 360) {
+			degOffset = -(mindeg - 360 + Extension->ConeWidth);
+		}
+		mindeg += degOffset;
+		maxdeg = mindeg + Extension->ConeWidth;
 	}
 
 	int radius = Extension->ExplosionRadius;
@@ -1176,15 +1194,21 @@ void Projectile::SecondaryTarget()
 
 			//unsigned int dist = (unsigned int) sqrt(xdiff*xdiff+ydiff*ydiff);
 			//int width = (*poi)->GetAnims()->GetCircleSize();
-
+			//int deg0=0;
 			if (ydiff) {
-				deg = (int) (std::atan(xdiff/ydiff)*180/M_PI);
-				if(ydiff>0) deg+=180;
+				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
+				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
+				//deg0 = deg;
+				deg = ((deg % 360) + 360 + degOffset) % 360;
 			} else {
-				if (xdiff<0) deg=90;
-				else deg = 270;
+				if (xdiff < 0) {
+					deg = 180;
+				} else {
+					deg = 0;
+				}
 			}
 
+			//Log(DEBUG, "Projectile", "Target %s at angle %d (%d to %d), ignoring? %d %d, %d -> %d, %d", (*poi)->GetName(1), deg, mindeg, maxdeg, mindeg>deg || maxdeg<deg, degOffset, Orientation, saneOrientation, deg0);
 			//not in the right sector of circle
 			if (mindeg>deg || maxdeg<deg) {
 				poi++;
@@ -1193,7 +1217,7 @@ void Projectile::SecondaryTarget()
 		}
 
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects);
+		pro->SetEffectsCopy(effects, Pos);
 		//copy the additional effects reference to the child projectile
 		//but only when there is a spell to copy
 		if (SuccSpell[0])

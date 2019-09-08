@@ -280,6 +280,7 @@ public:
 	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
 
 	ieDword LastTarget, LastSpellTarget;
+	ieDword LastTargetPersistent; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
 	Point LastTargetPos;
 	int SpellHeader;
 	ieResRef SpellResRef;

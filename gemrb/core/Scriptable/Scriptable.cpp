@@ -115,6 +115,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.y = 0;
 
 	LastTarget = 0;
+	LastTargetPersistent = 0;
 	LastSpellOnMe = 0xffffffff;
 	ResetCastingState(NULL);
 	InterruptCasting = false;
@@ -511,6 +512,7 @@ void Scriptable::ClearActions()
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
+	// intentionally not resetting LastTargetPersistent
 	LastSpellTarget = 0;
 
 	if (Type == ST_ACTOR) {
