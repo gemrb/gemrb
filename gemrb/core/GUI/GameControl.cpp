@@ -412,6 +412,27 @@ void GameControl::WillDraw()
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);
 	}
+
+	Map* area = CurrentArea();
+	assert(area);
+
+	Actor **ab;
+	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL;
+	int count = area->GetActorsInRect(ab, SelectionRect(), flags);
+
+	std::vector<Actor*>::iterator it = highlighted.begin();
+	for (; it != highlighted.end(); ++it) {
+		Actor* act = *it;
+		act->SetOver(false);
+	}
+
+	highlighted.clear();
+	for (int i = 0; i < count; i++) {
+		Actor* actor = ab[i];
+		actor->SetOver(true);
+		highlighted.push_back(actor);
+	}
+	free( ab );
 }
 
 /** Draws the Control on the Output Display */
@@ -1381,10 +1402,8 @@ void GameControl::UpdateCursor()
 				nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 			}
 		}
-		goto end_function;
 	}
 
-end_function:
 	if (nextCursor >= 0) {
 		lastCursor = nextCursor ;
 	}
@@ -1954,8 +1973,6 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	core->CloseCurrentContainer();
 
 	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
-	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
@@ -1998,24 +2015,15 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 		}
 
-		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
-			PerformSelectedAction(p);
+		// handle selections
+		if (isSelectionRect || lastActorID) {
+			MakeSelection(Mod&GEM_MOD_SHIFT);
 			ClearMouseState();
 			return true;
 		}
-		
-		// handle selections
-		Actor* targetActor = area->GetActor(p, target_types);
-		if (isSelectionRect) {
-			MakeSelection(SelectionRect(), Mod&GEM_MOD_SHIFT);
-			ClearMouseState();
-			return true;
-		} else if (targetActor) {
-			if (Mod & GEM_MOD_SHIFT) {
-				game->SelectActor(targetActor, true, SELECT_NORMAL);
-			} else {
-				game->SelectActor(targetActor, true, SELECT_REPLACE);
-			}
+
+		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
+			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
 		}
@@ -2277,38 +2285,27 @@ void GameControl::UpdateTargetMode() {
 
 Region GameControl::SelectionRect() const
 {
+	Point pos = GameMousePos();
 	if (isSelectionRect) {
-		return Region::RegionFromPoints(GameMousePos(), gameClickPoint);
+		return Region::RegionFromPoints(pos, gameClickPoint);
 	}
-	return Region();
+	return Region(pos.x, pos.y, 1, 1);
 }
 
-void GameControl::MakeSelection(const Region &r, bool extend)
+void GameControl::MakeSelection(bool extend)
 {
 	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
 
-	Actor **ab;
-	int count = area->GetActorsInRect(ab, r, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL);
-	if (!extend && count > 0) {
-		std::set<Actor*>::iterator it = highlighted.begin();
-		for (; it != highlighted.end(); ++it) {
-			Actor* act = *it;
-			act->SetOver(false);
-		}
-
-		highlighted.clear();
+	if (!extend && highlighted.size() > 0) {
 		game->SelectActor( NULL, false, SELECT_NORMAL );
 	}
 
-	for (int i = 0; i < count; i++) {
-		Actor* actor = ab[i];
-		if (highlighted.insert( actor ).second == true) {
-			actor->SetOver( true );
-			game->SelectActor( actor, true, SELECT_NORMAL );
-		}
+	std::vector<Actor*>::iterator it = highlighted.begin();
+	for (; it != highlighted.end(); ++it) {
+		Actor* act = *it;
+		act->SetOver(false);
+		game->SelectActor(act, true, SELECT_NORMAL);
 	}
-	free( ab );
 }
 
 void GameControl::SetCutSceneMode(bool active)

@@ -1959,7 +1959,8 @@ int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags
 		Actor* actor = actors[i];
 		if (!actor->ValidTarget(excludeFlags))
 			continue;
-		if (!rgn.PointInside(actor->Pos))
+		if (!rgn.PointInside(actor->Pos)
+			&& !actor->IsOver(rgn.Origin())) // imagine drawing a tiny box inside the circle, but not over the center
 			continue;
 
 		actorlist[count++] = actor;

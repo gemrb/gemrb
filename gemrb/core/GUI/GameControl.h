@@ -34,7 +34,7 @@
 #include "Dialog.h"
 #include "Map.h"
 
-#include <set>
+#include <vector>
 
 namespace GemRB {
 
@@ -82,7 +82,7 @@ private:
 	ieDword lastActorID;
 	ieDword trackerID;
 	ieDword distance;  //tracking distance
-	std::set<Actor*> highlighted;
+	std::vector<Actor*> highlighted;
 
 	bool isSelectionRect;
 	bool isFormationRotation;
@@ -212,7 +212,7 @@ public:
 
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 
-	void MakeSelection(const Region&, bool extend = false);
+	void MakeSelection(bool extend = false);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	Point GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p);
 	/** calls MoveToPoint or RunToPoint */
