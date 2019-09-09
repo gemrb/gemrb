@@ -186,7 +186,7 @@ public:
 		va_list args;
 		va_start(args, pitch);
 
-		enum PLANES {Y, U, V};
+		enum {Y, U, V};
 		const ieByte* planes[3];
 		unsigned int strides[3];
 
