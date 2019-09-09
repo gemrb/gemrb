@@ -27,6 +27,8 @@
 
 #if DEBUG_VIEWS
 #include "GUI/TextSystem/Font.h"
+
+#include <typeinfo>
 #endif
 
 namespace GemRB {
@@ -227,8 +229,8 @@ void View::Draw()
 			id &= 0x00000000ffffffff; // control id is lower 32bits
 			
 			wchar_t string[256];
-			swprintf(string, sizeof(string), L"id: %lu  grp: %s  flgs: %lu",
-					 id, ref->ScriptingGroup().CString(), flags);
+			swprintf(string, sizeof(string), L"id: %lu  grp: %s  \nflgs: %lu\ntype:%s",
+					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 			Region r = drawFrame;
 			r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
 			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, true};
