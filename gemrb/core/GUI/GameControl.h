@@ -161,6 +161,7 @@ private:
 	void WillDraw();
 	bool NeedsDraw() const { return !IsDisabled(); };
 
+	bool CanLockFocus() const { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/);
 
 public:

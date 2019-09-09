@@ -2367,6 +2367,10 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		MoveViewportTo( pc->Pos, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
+
+	if (window) {
+		window->Focus();
+	}
 }
 
 void GameControl::FlagsChanged(unsigned int /*oldflags*/)

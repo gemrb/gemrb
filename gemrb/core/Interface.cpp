@@ -602,6 +602,7 @@ void Interface::HandleFlags()
 			gamewin->AddSubviewInFrontOfView(gc);
 			gamewin->SetDisabled(false);
 			gamewin->SetVisible(true);
+			gamewin->Focus();
 		} else {
 			Log(ERROR, "Core", "No game to enter...");
 			QuitFlag = QF_QUITGAME;
