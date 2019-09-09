@@ -2015,14 +2015,13 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 		}
 
-		// handle selections
-		if (isSelectionRect || lastActorID) {
-			MakeSelection(Mod&GEM_MOD_SHIFT);
-			ClearMouseState();
-			return true;
-		}
-
-		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
+		if (target_mode == TARGET_MODE_NONE) {
+			if (isSelectionRect || lastActorID) {
+				MakeSelection(Mod&GEM_MOD_SHIFT);
+				ClearMouseState();
+				return true;
+			}
+		} else {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
