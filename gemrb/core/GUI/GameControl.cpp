@@ -2361,15 +2361,15 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags|=SF_CENTERONACTOR;
 		
 		SetDisabled(false);
+
+		if (window) {
+			window->Focus();
+		}
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
 		MoveViewportTo( pc->Pos, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
-	}
-
-	if (window) {
-		window->Focus();
 	}
 }
 
