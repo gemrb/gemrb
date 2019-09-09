@@ -5504,6 +5504,25 @@ void Actor::Die(Scriptable *killer)
 		}
 	}
 
+	// INVENTORY management ... unless disintegration is happening
+	// dump non-equipped inventory #213
+	// it's too late to do it in CheckOnDeath(), but we also can't dump everything right away (see comment there)
+	// NOTE: IE_INV_ITEM_EQUIPPED only marks equipped weapons, but we need to ignore anything
+	// that has equipping effects, so all but the quick and main inventory slots
+	if (!((BaseStats[IE_SPELLDURATIONMODPRIEST] == 1) && (LastDamageType & DAMAGE_MAGIC))) {
+		bool dump = true;
+		// ignore TNO, as he needs to keep his gear
+		if (game->protagonist == PM_NO && (GetScriptName() == game->GetPC(0, false)->GetScriptName())) {
+			dump = false;
+		}
+		int slot = inventory.GetSlotCount();
+		while(dump && slot--) {
+			if (!core->QuerySlotEffects(slot)) {
+				DropItem(slot, 0);
+			}
+		}
+	}
+
 	// XP seems to be handed at out at the moment of death
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
@@ -5755,7 +5774,7 @@ bool Actor::CheckOnDeath()
 		}
 		return true;
 	}
-	// ignore TNO, as he needs to keep his gear
+	// drop everything remaining, but ignore TNO, as he needs to keep his gear
 	Game *game = core->GetGame();
 	if (game->protagonist == PM_NO) {
 		if (GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
