@@ -1751,6 +1751,7 @@ void Selectable::DrawCircle(const Region &vp)
 	}
 
 	if (sprite) {
+		// FIXME: we probably need to generate and pass a SpriteCover. issue #224
 		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y );
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
@@ -1759,7 +1760,7 @@ void Selectable::DrawCircle(const Region &vp)
 		if (csize < 4) csize = 3;
 
 		core->GetVideoDriver()->DrawEllipse( Pos - vp.Origin(),
-		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col );
+		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col, true );
 	}
 }
 
