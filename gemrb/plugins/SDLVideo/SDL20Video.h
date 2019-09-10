@@ -60,6 +60,8 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
+	SDL_BlendMode maskBlender;
+
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
@@ -79,13 +81,13 @@ public:
 	
 	bool TouchInputEnabled();
 
-	void DrawLine(const Point& p1, const Point& p2, const Color& color);
-	void DrawLines(const std::vector<Point>& points, const Color& color);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask = false);
+	void DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask = false);
 
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool needsMask = false);
 	
-	void DrawPoint(const Point& p, const Color& color);
-	void DrawPoints(const std::vector<Point>& points, const Color& color);
+	void DrawPoint(const Point& p, const Color& color, bool needsMask = false);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask = false);
 
 	void Flush();
 
@@ -96,9 +98,10 @@ private:
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
 	int UpdateRenderTarget(const Color* color = NULL);
+	int SetRendererForMask(const SDL_Color& mask);
 
-	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
-	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
 
 	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Sprite2D* /*mask*/, const Region& /*src*/, const Region& /*dst*/,
 					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this

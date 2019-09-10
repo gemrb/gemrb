@@ -341,7 +341,7 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 #endif
 
 /** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& color)
+void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& color, bool needsMask)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -375,7 +375,7 @@ void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& c
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
 static double ellipseradius(unsigned short xr, unsigned short yr, double angle) {
@@ -386,7 +386,7 @@ static double ellipseradius(unsigned short xr, unsigned short yr, double angle) 
 
 /** This functions Draws an Ellipse Segment */
 void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
-	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines)
+	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, bool needsMask)
 {
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
@@ -397,8 +397,8 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 	long yto = (long)round(radiusto * sin(angleto));
 
 	if (drawlines) {
-		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color);
-		DrawLine(c, Point(c.x + xto, c.y + yto), color);
+		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color, needsMask);
+		DrawLine(c, Point(c.x + xto, c.y + yto), color, needsMask);
 	}
 
 	// *Attempt* to calculate the correct x/y boundaries.
@@ -480,13 +480,13 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
 
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
-								 unsigned short yr, const Color& color)
+								 unsigned short yr, const Color& color, bool needsMask)
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -545,12 +545,12 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
 
 
-void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill)
+void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, bool needsMask)
 {
 	Region bbox = poly->BBox;
 	bbox.x -= origin.x;
@@ -619,7 +619,7 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 		SetPixel(drawingBuffer, p.x, p.y);
 	}
 
-	DrawLines(points, reinterpret_cast<const SDL_Color&>(color));
+	DrawLines(points, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
 #undef SetPixel

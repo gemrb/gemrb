@@ -28,6 +28,10 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 {
 	renderer = NULL;
 	window = NULL;
+
+	maskBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+											 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+											 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -135,6 +139,28 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 	return 0;
 }
 
+int SDL20VideoDriver::SetRendererForMask(const SDL_Color& mask)
+{
+	SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
+	assert(maskLayer);
+
+	int ret = SDL_SetRenderTarget(renderer, maskLayer);
+	if (ret != 0) {
+		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		return ret;
+	}
+
+	ret = SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
+	if (ret != 0) {
+		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		return ret;
+	}
+
+	SDL_SetRenderDrawBlendMode(renderer, maskBlender);
+	// yes, mask.a is the correct value to pass!
+	return SDL_SetRenderDrawColor(renderer, mask.a, mask.a, mask.a, SDL_ALPHA_OPAQUE);
+}
+
 void SDL20VideoDriver::Flush()
 {
 	SDLTextureVideoBuffer* buffer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer);
@@ -184,13 +210,11 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 
 	int ret = 0;
 	if (mask) {
-		static SDL_BlendMode blender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-
 		SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
 		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
 		SDL_SetRenderTarget(renderer, maskLayer);
 		SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureBlendMode(maskTex, blender);
+		SDL_SetTextureBlendMode(maskTex, maskBlender);
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 		ret = SDL_RenderCopyEx(renderer, maskTex, &srect, &drect, 0.0, NULL, flipflags);
@@ -203,7 +227,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color)
+void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -215,25 +239,35 @@ void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color&
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color)
+void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask)
 {
 	if (points.empty()) {
 		return;
 	}
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
-	SDL_RenderDrawPoints(renderer, &points[0], points.size());
+	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
+
+	if (needsMask) {
+		SetRendererForMask(color);
+		SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
+	}
 }
 
-void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color)
+void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color, bool needsMask)
 {
 	UpdateRenderTarget(&color);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
+
+	if (needsMask) {
+		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
+		SDL_RenderDrawPoint(renderer, p.x, p.y);
+	}
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color)
+void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -245,28 +279,47 @@ void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& 
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color));
+	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), needsMask);
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color)
+void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask)
 {
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
-	SDL_RenderDrawLines(renderer, &points[0], points.size());
+	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
+
+	if (needsMask) {
+		SetRendererForMask(color);
+		SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
+	}
 }
 
-void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color)
+void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask)
 {
 	UpdateRenderTarget(&color);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
+
+	if (needsMask) {
+		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
+		SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
+	}
 }
 
-void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill)
+void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool needsMask)
 {
 	UpdateRenderTarget(&color);
 	if (fill) {
 		SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
 	} else {
 		SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
+	}
+
+	if (needsMask) {
+		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
+		if (fill) {
+			SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
+		} else {
+			SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
+		}
 	}
 }
 

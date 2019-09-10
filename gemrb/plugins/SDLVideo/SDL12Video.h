@@ -50,13 +50,13 @@ public:
 
 	bool SupportsBAMSprites() { return true; }
 
-	void DrawLine(const Point& p1, const Point& p2, const Color& color);
-	void DrawLines(const std::vector<Point>& points, const Color& color);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask = false);
+	void DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask = false);
 
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool needsMask = false);
 
-	void DrawPoint(const Point& p, const Color& color);
-	void DrawPoints(const std::vector<Point>& points, const Color& color);
+	void DrawPoint(const Point& p, const Color& color, bool needsMask = false);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask = false);
 
 	void Flush() {};
 
@@ -67,8 +67,8 @@ private:
 
 	int ProcessEvent(const SDL_Event & event);
 
-	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color);
-	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color);
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
 	void DrawHLine(short x1, short y, short x2, const Color& color);
 	void DrawVLine(short x, short y1, short y2, const Color& color);
 
