@@ -360,16 +360,16 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	// TODO: 0.5 and 0.7 are pretty much random values
 	// right segment
 	core->GetVideoDriver()->DrawEllipseSegment( p + Point(step, 0),
-											   xradius, yradius, color, -0.5, 0.5 );
+											   xradius, yradius, color, -0.5, 0.5, true, true);
 	// top segment
 	core->GetVideoDriver()->DrawEllipseSegment( p - Point(0, step),
-											   xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2 );
+											   xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2, true, true);
 	// left segment
 	core->GetVideoDriver()->DrawEllipseSegment( p - Point(step, 0),
-											   xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI );
+											   xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI, true, true);
 	// bottom segment
 	core->GetVideoDriver()->DrawEllipseSegment( p + Point(0, step),
-											   xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
+											   xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2, true, true);
 }
 	
 void GameControl::WillDraw()
