@@ -2021,7 +2021,8 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				ClearMouseState();
 				return true;
 			}
-		} else {
+		}
+		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
