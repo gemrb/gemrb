@@ -5772,6 +5772,7 @@ bool Actor::CheckOnDeath()
 		if  (GameDifficulty > DIFF_CORE) {
 			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 		}
+		SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 		return true;
 	}
 	// drop everything remaining, but ignore TNO, as he needs to keep his gear
