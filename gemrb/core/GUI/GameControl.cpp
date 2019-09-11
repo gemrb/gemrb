@@ -1693,9 +1693,14 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 {
 	char Tmp[40];
 
+	if ((target_types&GA_POINT) == false) {
+		ResetTargetMode();
+		return; // not allowed to target point
+	}
+
 	if (!spellCount) {
 		ResetTargetMode();
-		return; //not casting or using an own item
+		return; // not casting or using an own item
 	}
 	source->Stop();
 
