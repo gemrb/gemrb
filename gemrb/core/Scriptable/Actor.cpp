@@ -4260,10 +4260,8 @@ void Actor::IdleActions(bool nonidle)
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
-		if (nextComment && !Immobile()) {
-			if (!GetPartyComment()) {
-				GetAreaComment(map->AreaType);
-			}
+		if (nextComment && !Immobile() && !GetPartyComment()) {
+			GetAreaComment(map->AreaType);
 		}
 		nextComment = time+core->Roll(5,1000,bored_time/2);
 		return;
@@ -4275,8 +4273,7 @@ void Actor::IdleActions(bool nonidle)
 		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
 		if (bored_time && nextBored && nextBored < time) {
-			int x = bored_time / 10;
-			if (x<10) x = 10;
+			int x = std::max(10U, bored_time / 10);
 			nextBored = time+core->Roll(1,30,x);
 			VerbalConstant(VB_BORED);
 		}
