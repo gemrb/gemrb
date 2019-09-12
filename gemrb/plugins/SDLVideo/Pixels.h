@@ -24,36 +24,6 @@ struct RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, Uint8 mask) const=0;
 };
 
-/*
-struct RGBBlend : RGBBlender {
-	void operator()(const Color& src, Color& dst, Uint8 mask) const {
-
-	}
-};
-
-struct RGBTint : RGBBlender {
-	Color tint;
-
-	RGBTint(const Color& c) : tint(c) {}
-
-	void operator()(const Color& src, Color& dst, Uint8 mask) const {
-
-	}
-};
-
-struct RGBGreyscale : RGBBlender {
-	void operator()(const Color& src, Color& dst, Uint8 mask) const {
-
-	}
-};
-
-struct RGBSepia : RGBBlender {
-	void operator()(const Color& src, Color& dst, Uint8 mask) const {
-
-	}
-};
-*/
-
 inline void ShaderTint(const Color& tint, Color& c) {
 	c.r = (tint.r * c.r) >> 8;
 	c.g = (tint.g * c.g) >> 8;
@@ -382,19 +352,7 @@ public:
 	~SDLPixelIterator() {
 		delete imp;
 	}
-/*
-	template <typename PIXEL>
-	operator PixelIterator<PIXEL>() const {
-		assert(format->BytesPerPixel == sizeof(PIXEL));
-		return *static_cast<const PixelIterator<PIXEL>*>(imp);
-	}
 
-	template <typename PIXEL>
-	PixelIterator<PIXEL> Imp() const {
-		assert(format->BytesPerPixel == sizeof(PIXEL));
-		return *static_cast<const PixelIterator<PIXEL>*>(imp);
-	}
-*/
 	static SDLPixelIterator end(const SDLPixelIterator& beg)
 	{
 		Direction xdir = (beg.xdir == Forward) ? Reverse : Forward;
