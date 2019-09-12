@@ -305,6 +305,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 	if (core->GetGame()) {
 		tintcol = core->GetGame()->GetGlobalTint();
+		flags |= BLIT_TINTED;
 	}
 
 	BlitSpriteClipped(spr, mask, srect, fClip, flags, tintcol);
