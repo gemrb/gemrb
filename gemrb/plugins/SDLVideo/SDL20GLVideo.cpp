@@ -531,7 +531,7 @@ static Region ClipSprite(const Sprite2D &sprite, const Region &clip, const int t
 	return r;
 }
 
-void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
+void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
 {
 	int tx = x - spr->XPos;
 	int ty = y - spr->YPos;

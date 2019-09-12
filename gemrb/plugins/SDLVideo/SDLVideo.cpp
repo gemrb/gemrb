@@ -20,16 +20,10 @@
 
 #include "SDLVideo.h"
 
-#include "AnimationFactory.h"
-#include "Game.h" // for GetGlobalTint
-#include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "Pixels.h"
 
-#include "GUI/Button.h"
-#include "GUI/Console.h"
-#include "GUI/Window.h"
 
 #if defined(__sgi)
 #  include <math.h>
@@ -292,7 +286,7 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixe
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
+void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
 {
 	assert(spr->BAM == false);
 
@@ -301,16 +295,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	srect.x -= x - fClip.x;
 	srect.y -= y - fClip.y;
 
-	const Color* tintcol = NULL;
-
-	if (core->GetGame()) {
-		tintcol = core->GetGame()->GetGlobalTint();
-		if (tintcol) {
-			flags |= BLIT_TINTED;
-		}
-	}
-
-	BlitSpriteClipped(spr, mask, srect, fClip, flags, tintcol);
+	BlitSpriteClipped(spr, mask, srect, fClip, flags, tint);
 }
 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region dst)

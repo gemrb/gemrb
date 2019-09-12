@@ -172,7 +172,7 @@ public:
 	virtual bool SupportsBAMSprites() { return false; }
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
-						  const Region* clip, unsigned int flags) = 0;
+						  const Region* clip, unsigned int flags, const Color* tint = NULL) = 0;
 	void BlitSprite(const Sprite2D* spr, int x, int y,
 					const Region* clip = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) = 0;

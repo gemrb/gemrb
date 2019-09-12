@@ -88,7 +88,7 @@ public:
 								   Color* palette, bool cK = false, int index = 0);
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
-						  const Region* clip, unsigned int flags);
+						  const Region* clip, unsigned int flags, const Color* tint = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								SpriteCover* cover, const Region* clip = NULL);

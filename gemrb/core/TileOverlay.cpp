@@ -20,7 +20,7 @@
 
 #include "TileOverlay.h"
 
-//#include "Game.h" // needed only for TILE_GREY below
+#include "Game.h" // for GetGlobalTint
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Video.h"
@@ -58,6 +58,13 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 	int dx = ( std::max(viewport.x, 0) + viewport.w + 63 ) / 64;
 	int dy = ( std::max(viewport.y, 0) + viewport.h + 63 ) / 64;
 
+	Game* game = core->GetGame();
+	assert(game);
+	const Color* tintcol = core->GetGame()->GetGlobalTint();
+	if (tintcol) {
+		flags |= BLIT_TINTED;
+	}
+
 	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
@@ -70,7 +77,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 			}
 			assert(anim);
 			vid->BlitTile( anim->NextFrame(), 0, ( x * 64 ) - viewport.x,
-						  ( y * 64 ) - viewport.y, NULL, flags );
+						  ( y * 64 ) - viewport.y, NULL, flags, tintcol);
 			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
@@ -87,7 +94,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 						                   tile->anim[0]->NextFrame(),
 							               ( x * 64 ) - viewport.x,
 							               ( y * 64 ) - viewport.y,
-							               NULL, flags );
+							               NULL, flags, tintcol);
 						} else {
 							Sprite2D* mask = 0;
 							if (tile->anim[1]) {
@@ -96,7 +103,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 											   mask,
 											   ( x * 64 ) - viewport.x,
 											   ( y * 64 ) - viewport.y,
-											   NULL, BLIT_HALFTRANS | flags );
+											   NULL, BLIT_HALFTRANS | flags, tintcol);
 							}
 						}
 					}
