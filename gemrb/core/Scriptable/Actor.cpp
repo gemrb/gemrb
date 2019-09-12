@@ -4297,40 +4297,38 @@ void Actor::PlayExistenceSounds()
 		nextComment += time;
 	}
 
-	if (nextComment < time) {
-		ieDword delay = Modified[IE_EXISTANCEDELAY];
-		if (delay != (ieDword) -1) {
-			Audio *audio = core->GetAudioDrv();
-			int xpos, ypos;
-			audio->GetListenerPos(xpos, ypos);
-			Point listener(xpos, ypos);
-			if (nextComment && !Immobile() && Distance(Pos, listener) <= VOODOO_SHOUT_RANGE) {
-				//setup as an ambient
-				ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
-				if (strref != (ieStrRef) -1) {
-					StringBlock sb = core->strings->GetStringBlock(strref);
-					if (sb.Sound[0]) {
-						unsigned int vol = 100;
-						core->GetDictionary()->Lookup("Volume Ambients", vol);
-						int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
-						if (stream != -1) {
-							int audioLength = audio->QueueAmbient(stream, sb.Sound);
+	if (nextComment >= time) return;
 
-							if (audioLength > 0) {
-								SetAnimatedTalking(audioLength);
-							}
+	ieDword delay = Modified[IE_EXISTANCEDELAY];
+	if (delay == (ieDword) -1) return;
 
-							audio->ReleaseStream(stream, false);
-						}
+	Audio *audio = core->GetAudioDrv();
+	int xpos, ypos;
+	audio->GetListenerPos(xpos, ypos);
+	Point listener(xpos, ypos);
+	if (nextComment && !Immobile() && Distance(Pos, listener) <= VOODOO_SHOUT_RANGE) {
+		//setup as an ambient
+		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
+		if (strref != (ieStrRef) -1) {
+			StringBlock sb = core->strings->GetStringBlock(strref);
+			if (sb.Sound[0]) {
+				unsigned int vol = 100;
+				core->GetDictionary()->Lookup("Volume Ambients", vol);
+				int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
+				if (stream != -1) {
+					int audioLength = audio->QueueAmbient(stream, sb.Sound);
+					if (audioLength > 0) {
+						SetAnimatedTalking(audioLength);
 					}
+					audio->ReleaseStream(stream, false);
 				}
 			}
-			if (delay == 0) {
-				delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
-			}
-			nextComment = time + RAND(delay*1/4, delay*7/4);
 		}
 	}
+	if (delay == 0) {
+		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
+	}
+	nextComment = time + RAND(delay*1/4, delay*7/4);
 }
 
 bool Actor::OverrideActions()
