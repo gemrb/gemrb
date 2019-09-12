@@ -126,6 +126,8 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 		return ret;
 	}
 
+	SDL_RenderSetClipRect(renderer, reinterpret_cast<SDL_Rect*>(&screenClip));
+
 	if (color) {
 		if (drawingBuffer->blend) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
