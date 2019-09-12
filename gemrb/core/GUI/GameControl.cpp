@@ -1694,7 +1694,6 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	char Tmp[40];
 
 	if ((target_types&GA_POINT) == false) {
-		ResetTargetMode();
 		return; // not allowed to target point
 	}
 
