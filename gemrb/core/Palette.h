@@ -56,11 +56,14 @@ public:
 		alpha = alpha_;
 		refcount = 1;
 		named = false;
+		version = 0;
 	}
+
 	Palette() {
 		alpha = false;
 		refcount = 1;
 		named = false;
+		version = 0;
 	}
 
 	Color col[256]; //< RGB or RGBA 8 bit palette

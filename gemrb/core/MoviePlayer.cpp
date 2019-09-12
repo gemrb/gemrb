@@ -33,6 +33,7 @@ MoviePlayer::MoviePlayer(void)
 	subtitles = NULL;
 	isPlaying = false;
 	showSubtitles = false;
+	movieFormat = Video::DISPLAY;
 }
 
 MoviePlayer::~MoviePlayer(void)

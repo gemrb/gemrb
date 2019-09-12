@@ -425,7 +425,7 @@ static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieR
 void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 {
 	//no one hears you when you are in the Limbo!
-	if (!Sender->GetCurrentArea()) {
+	if (!Sender || !Sender->GetCurrentArea()) {
 		return;
 	}
 

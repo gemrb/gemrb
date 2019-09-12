@@ -46,6 +46,7 @@ Video::Video(void)
 	// boring inits just to be extra clean
 	bpp = 0;
 	fullscreen = false;
+	lastTime = 0;
 }
 
 Video::~Video(void)

@@ -214,7 +214,7 @@ bool SDLSurfaceSprite2D::HasTransparency() const
 #if SDL_VERSION_ATLEAST(1,3,0)
 	return SDL_ISPIXELFORMAT_ALPHA(fmt->format) || SDL_GetColorKey(*surface, NULL) != -1;
 #else
-	return fmt->Amask > 0 || ((*surface)->flags | SDL_SRCCOLORKEY);
+	return fmt->Amask > 0 || ((*surface)->flags & SDL_SRCCOLORKEY);
 #endif
 }
 
