@@ -450,18 +450,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					core->SetPause(PAUSE_ON);
 					break;
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
-					/*
-					 reset all input variables as if no events have happened yet
-					 restoring from "minimized state" should be a clean slate.
-					 */
-
-#if TARGET_OS_IPHONE
-					// FIXME:
-					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
-					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
-					// it could be this bug affects only the simulator.
-					SDL_Delay(1000);
-#endif
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
 					/*
