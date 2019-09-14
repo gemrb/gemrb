@@ -25,6 +25,7 @@
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
@@ -159,6 +160,7 @@ def WorldMapWindowCommon (Travel):
 		if WorldMapWindow:
 			WorldMapWindow.Unload ()
 		WorldMapWindow = None
+		WorldMapControl = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.UnhideGUI ()
@@ -180,6 +182,7 @@ def WorldMapWindowCommon (Travel):
 	#center on current area
 	WorldMapControl.AdjustScrolling (0,0)
 	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done
 	Button = Window.GetControl (0)
