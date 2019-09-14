@@ -1616,14 +1616,19 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 		// TODO: make the overflow more dynamic
 		if (p.x + frame.w >= mapsize.w + 64) {
 			p.x = mapsize.w - frame.w + 64;
-		}
-		if (p.x < -64) {
+		} else if (p.x < -64) {
 			p.x = -64;
 		}
-		if (p.y + frame.h >= mapsize.h + 288) {
-			p.y = mapsize.h - frame.h + 288;
+
+		Region mwinframe;
+		TextArea* mta = core->GetMessageTextArea();
+		if (mta) {
+			mwinframe = mta->GetWindow()->Frame();
 		}
-		if (p.y < 0) {
+
+		if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
+			p.y = mapsize.h - frame.h + mwinframe.h + 32;
+		} else if (p.y < 0) {
 			p.y = 0;
 		}
 
