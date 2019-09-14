@@ -98,7 +98,7 @@ public:
 
 	Size Dimensions() { return movieSize; }
 	void Play(Window* win);
-	virtual void Stop();
+	void Stop();
 
 	void SetSubtitles(SubtitleSet* subs);
 	void EnableSubtitles(bool set);

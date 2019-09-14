@@ -130,6 +130,9 @@
 		A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A244547F1F09BFF8008D5B5E /* GUIAnimation.cpp */; };
 		A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = A24454801F09BFF8008D5B5E /* GUIAnimation.h */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
+		A24C80AC232C9B56004CB41A /* VLCPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A24C80AD232C9DC1004CB41A /* libvlc.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */; };
+		A24C80AF232C9DC2004CB41A /* libvlccore.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */; };
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
 		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
@@ -400,7 +403,6 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
-		A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A26ADB15AA729800A8E25D /* VideoContext.cpp */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3516A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
@@ -447,7 +449,6 @@
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
 		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
-		A2DE8807181064DF007B8CC5 /* libvlc.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */; };
 		A2DE880918106615007B8CC5 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2DE880818106615007B8CC5 /* libbz2.dylib */; };
 		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */; };
 		A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */; };
@@ -1191,6 +1192,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A24C80AC232C9B56004CB41A /* VLCPlayer.so in CopyFiles */,
 				A2042A7919DB4A6800011F05 /* TTFImporter.so in CopyFiles */,
 				A272F8FA1762AF0E0048C004 /* PNGImporter.so in CopyFiles */,
 				A2FE2C8616F2320300DDC6C7 /* NullSource.so in CopyFiles */,
@@ -1288,6 +1290,7 @@
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlccore.9.dylib; path = ../../../../../Applications/VLC.app/Contents/MacOS/lib/libvlccore.9.dylib; sourceTree = "<group>"; };
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
 		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
@@ -1492,8 +1495,6 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2A26ADB15AA729800A8E25D /* VideoContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VideoContext.cpp; path = ../VLCPlayer/VideoContext.cpp; sourceTree = "<group>"; };
-		A2A26ADC15AA729800A8E25D /* VideoContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoContext.h; path = ../VLCPlayer/VideoContext.h; sourceTree = "<group>"; };
 		A2A2EA3216A5EB630092B903 /* TTFFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TTFFont.cpp; sourceTree = "<group>"; };
 		A2A2EA3316A5EB630092B903 /* TTFFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFont.h; sourceTree = "<group>"; };
 		A2A2EA3616A5FC860092B903 /* Freetype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Freetype.cpp; sourceTree = "<group>"; };
@@ -2227,7 +2228,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2DE8807181064DF007B8CC5 /* libvlc.5.dylib in Frameworks */,
+				A24C80AF232C9DC2004CB41A /* libvlccore.9.dylib in Frameworks */,
+				A24C80AD232C9DC1004CB41A /* libvlc.5.dylib in Frameworks */,
 				A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3026,8 +3028,6 @@
 		A2BD125715A7EE35000FAB95 /* VLCPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				A2A26ADB15AA729800A8E25D /* VideoContext.cpp */,
-				A2A26ADC15AA729800A8E25D /* VideoContext.h */,
 				A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */,
 				A2BD125915A7EE61000FAB95 /* VLCPlayer.h */,
 			);
@@ -3444,6 +3444,7 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */,
 				A289588220D6CFCF002F4A97 /* AVFoundation.framework */,
 				A289588020D6CFC1002F4A97 /* AVKit.framework */,
 				A289587E20D6CFAE002F4A97 /* GameController.framework */,
@@ -5300,7 +5301,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */,
-				A2A26ADD15AA729800A8E25D /* VideoContext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
