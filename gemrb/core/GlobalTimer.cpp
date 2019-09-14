@@ -102,8 +102,9 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 
 void GlobalTimer::DoStep(int count)
 {
-	if (!ViewportIsMoving())
+	if (!ViewportIsMoving()) {
 		return;
+	}
 
 	GameControl* gc = core->GetGameControl();
 
@@ -144,7 +145,10 @@ void GlobalTimer::DoStep(int count)
 			}
 		}
 	}
-	gc->MoveViewportTo(p, false);
+
+	if (gc->MoveViewportTo(p, false) == false) {
+		goal = Point(-1,-1);
+	}
 }
 
 bool GlobalTimer::UpdateViewport(unsigned long thisTime)

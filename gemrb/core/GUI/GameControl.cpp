@@ -1593,18 +1593,16 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	return true;
 }
 
-void GameControl::MoveViewportTo(Point p, bool center, int speed)
+bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
+	Map* area = CurrentArea();
+	bool canMove = area != NULL;
+
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
 		core->timer->SetMoveViewPort(p, speed, center);
-	} else if (p != vpOrigin) {
+	} else if (canMove && p != vpOrigin) {
 		updateVPTimer = true;
-
-		Map* area = CurrentArea();
-		if (area == NULL) {
-			return;
-		}
 
 		Size mapsize = area->GetSize();
 
@@ -1614,10 +1612,13 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		// TODO: make the overflow more dynamic
+		bool clamped = false;
 		if (p.x + frame.w >= mapsize.w + 64) {
 			p.x = mapsize.w - frame.w + 64;
+			clamped = true;
 		} else if (p.x < -64) {
 			p.x = -64;
+			clamped = true;
 		}
 
 		Region mwinframe;
@@ -1628,15 +1629,22 @@ void GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 		if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
 			p.y = mapsize.h - frame.h + mwinframe.h + 32;
+			clamped = true;
 		} else if (p.y < 0) {
 			p.y = 0;
+			clamped = true;
 		}
 
 		core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
 		vpOrigin = p;
+
+		return !clamped;
 	} else {
 		updateVPTimer = true;
+		canMove = false;
 	}
+
+	return canMove;
 }
 
 Region GameControl::Viewport()

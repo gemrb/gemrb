@@ -190,7 +190,7 @@ public:
 	void ClearMouseState();
 	Point GameMousePos() const;
 
-	void MoveViewportTo(Point, bool center, int speed = 0);
+	bool MoveViewportTo(Point, bool center, int speed = 0);
 	Region Viewport();
 
 	/** Selects one or all PC */
