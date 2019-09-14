@@ -59,7 +59,7 @@ def OpenMapWindow ():
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
 
 	# Add Note
 	Button = Window.GetControl (1)
