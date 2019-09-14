@@ -568,7 +568,6 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 		disp = SDL_SetVideoMode(disp->w, disp->h, disp->format->BitsPerPixel, flags);
 
 		fullscreen=set;
-		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
 		return true;
 	}
 	return false;
@@ -686,7 +685,7 @@ bool SDL12VideoDriver::InTextInput()
 
 bool SDL12VideoDriver::TouchInputEnabled()
 {
-    return core->MouseFeedback > 0;
+    return false;
 }
 
 #include "plugindef.h"

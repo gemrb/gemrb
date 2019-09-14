@@ -469,7 +469,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_MOUSEBUTTONUP:
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
 				// ignoring mouse events from touch devices
-				// because we handle touch input at th
+				// because we handle touch input at the view level
 				break;
 			} else {
 				/**

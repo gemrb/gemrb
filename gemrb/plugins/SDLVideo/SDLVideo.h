@@ -31,12 +31,6 @@
 #include <vector>
 #include <SDL.h>
 
-typedef unsigned char
-#ifdef __GNUC__
-	__attribute__((aligned(4)))
-#endif
-	Pixel;
-
 namespace GemRB {
 
 #if SDL_VERSION_ATLEAST(1,3,0)
