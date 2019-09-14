@@ -1612,13 +1612,12 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		// TODO: make the overflow more dynamic
-		bool clamped = false;
 		if (p.x + frame.w >= mapsize.w + 64) {
 			p.x = mapsize.w - frame.w + 64;
-			clamped = true;
+			canMove = false;
 		} else if (p.x < -64) {
 			p.x = -64;
-			clamped = true;
+			canMove = false;
 		}
 
 		Region mwinframe;
@@ -1629,16 +1628,14 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 		if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
 			p.y = mapsize.h - frame.h + mwinframe.h + 32;
-			clamped = true;
+			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;
-			clamped = true;
+			canMove = false;
 		}
 
 		core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
 		vpOrigin = p;
-
-		return !clamped;
 	} else {
 		updateVPTimer = true;
 		canMove = false;

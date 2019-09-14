@@ -60,7 +60,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 
 	Game* game = core->GetGame();
 	assert(game);
-	const Color* tintcol = core->GetGame()->GetGlobalTint();
+	const Color* tintcol = game->GetGlobalTint();
 	if (tintcol) {
 		flags |= BLIT_TINTED;
 	}
