@@ -943,6 +943,7 @@ public:
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
 	void SetAnimatedTalking(unsigned int);
+	bool HasPlayerClass() const;
 };
 }
 

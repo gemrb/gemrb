@@ -1285,7 +1285,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	// ERWAN.CRE from Victor's Improvement Pack has a max of 0 and still survives, grrr
-	if ((signed) hp>maxhp && (actor->GetBase(IE_CLASS) > 0 && actor->GetBase(IE_CLASS) < (ieDword)classcount)) {
+	if ((signed) hp>maxhp && actor->HasPlayerClass()) {
 		hp=maxhp;
 	}
 
@@ -3276,9 +3276,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	// flatfooted by invisible attacker: this is handled by GetDefense and ok
 	AC.SetDexterityBonus(GetDexterityAC());
 
-	// IE_CLASS is >classcount for non-PCs/NPCs
-	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] < (ieDword)classcount)
+	if (HasPlayerClass()) {
 		RefreshPCStats();
+	}
 
 	//if the animation ID was not modified by any effect, it may still be modified by something else
 	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
@@ -5234,7 +5234,7 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 {
 	int strict = 1;
 	// only player classes will have levels in the correct slots
-	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
+	if (!HasPlayerClass()) {
 		strict = 0;
 	}
 	return GetBaseCasterLevel(IE_SPL_PRIEST, strict) + GetBaseCasterLevel(IE_SPL_WIZARD, strict);
@@ -5996,7 +5996,7 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 	int val;
 
 	// only player classes get this bonus
-	if (BaseStats[IE_CLASS] == 0 || BaseStats[IE_CLASS] >= (ieDword) classcount) {
+	if (!HasPlayerClass()) {
 		return 0;
 	}
 
@@ -10185,7 +10185,7 @@ bool Actor::IsMultiClassed() const
 bool Actor::IsDualClassed() const
 {
 	// exclude the non-player classes
-	if (BaseStats[IE_CLASS] > (ieDword) classcount) return false;
+	if (!HasPlayerClass()) return false;
 
 	// make sure only one bit is set, as critters like kuo toa have garbage in the mc bits
 	return core->CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
@@ -10277,7 +10277,7 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 
 	//only works with PC's
 	ieDword	classid = BaseStats[IE_CLASS]-1;
-	if (classid>=(ieDword)classcount || !levelslots[classid])
+	if (!HasPlayerClass() || !levelslots[classid])
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
@@ -10317,7 +10317,7 @@ bool Actor::IsDualSwap() const
 	//the dualswap[class-1] holds the info
 	if (!IsDualClassed()) return false;
 	ieDword tmpclass = BaseStats[IE_CLASS]-1;
-	if (tmpclass>=(ieDword)classcount) return false;
+	if (!HasPlayerClass()) return false;
 	return (ieDword)dualswap[tmpclass]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
 }
 
@@ -11229,6 +11229,14 @@ ieDword Actor::GetClassID (const ieDword isclass) {
 void Actor::SetAnimatedTalking (unsigned int length) {
 	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
 	lastTalkTimeCheckAt = GetTickCount();
+}
+
+bool Actor::HasPlayerClass() const
+{
+	// no need to check for dual/multiclassing, since for that all used classes have to be player classes
+	int cid = BaseStats[IE_CLASS];
+	// IE_CLASS is >classcount for non-PCs/NPCs
+	return cid > 0 && cid < classcount;
 }
 
 }
