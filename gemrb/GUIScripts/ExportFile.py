@@ -74,16 +74,21 @@ def DonePress ():
 	FileName = FileNameEditBox.QueryText ()
 	Slot = GemRB.GetVar ("Slot")
 	GemRB.SaveCharacter (Slot, FileName)
-	if ExportWindow:
-		ExportWindow.Unload ()
-	GemRB.SetNextScript (GemRB.GetToken("NextScript"))
+
+	ExportWindow.Close()
+
+	if GameCheck.IsBG1():
+		CharGenCommon.close()
+		GemRB.SetNextScript ("Start")
+	else:
+		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
 
 def CancelPress ():
+	ExportWindow.Close ()
+
 	if GameCheck.IsBG1():
 		CharGenCommon.jumpTo ("accept")
 	else:
-		if ExportWindow:
-			ExportWindow.Unload ()
 		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
