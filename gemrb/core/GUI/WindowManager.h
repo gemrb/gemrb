@@ -42,14 +42,19 @@ public:
 		ShadowBlack
 	};
 
+	enum CursorFeedback {
+		MOUSE_ALL			= 0,
+		MOUSE_NO_CURSOR		= 1,
+		MOUSE_NO_TOOLTIPS	= 2,
+		MOUSE_NONE			= MOUSE_NO_CURSOR|MOUSE_NO_TOOLTIPS
+	} cursorFeedback;
+
 	static Holder<Sprite2D> CursorMouseUp;
 	static Holder<Sprite2D> CursorMouseDown;
 
 	Color FadeColor;
 
 private:
-	bool drawCursor;
-
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
@@ -100,7 +105,7 @@ public:
 	bool IsPresentingModalWindow() const;
 	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
 
-	void SetCursorEnabled(bool enabled) { drawCursor = enabled; }
+	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
 
 	/*
 	 Drawing is done in layers:

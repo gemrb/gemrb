@@ -1444,6 +1444,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	winmgr = new WindowManager(video.get());
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
 
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
@@ -2920,12 +2921,12 @@ int Interface::PlayMovie(const char* resref)
 	Window* win = winmgr->MakeWindow(screen);
 	win->SetFlags(Window::Borderless, OP_OR);
 	winmgr->PresentModalWindow(win);
-	winmgr->SetCursorEnabled(false);
+	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
 
 	mp->Play(win);
 	win->Close();
-	winmgr->SetCursorEnabled(true);
+	winmgr->SetCursorFeedback(cur);
 	SetCutSceneMode(false);
 	if (sound_override) {
 		sound_override->Stop();
@@ -3836,9 +3837,9 @@ void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
 
-	winmgr->SetCursorEnabled(false);
+	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
-	winmgr->SetCursorEnabled(true);
+	winmgr->SetCursorFeedback(cur);
 
 	Window* loadwin = GetWindow(0, "LOADWIN");
 	if (loadwin) {

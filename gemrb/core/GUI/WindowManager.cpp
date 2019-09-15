@@ -46,7 +46,7 @@ WindowManager::WindowManager(Video* vid)
 {
 	assert(vid);
 
-	drawCursor = true;
+	cursorFeedback = MOUSE_ALL;
 
 	hoverWin = NULL;
 	modalWin = NULL;
@@ -146,6 +146,12 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	}
 
 	return true;
+}
+
+WindowManager::CursorFeedback WindowManager::SetCursorFeedback(CursorFeedback feedback)
+{
+	std::swap(feedback, cursorFeedback);
+	return feedback;
 }
 
 /** Sets a Window on the Top */
@@ -390,7 +396,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 void WindowManager::DrawMouse() const
 {
-	if (drawCursor == false)
+	if (cursorFeedback == MOUSE_NONE)
 		return;
 
 	Point pos = eventMgr.MousePos();
@@ -409,17 +415,23 @@ void WindowManager::DrawMouse() const
 	// cursor is buffer midpoint, but offset by distance to edge
 	Point mid = eventMgr.MousePos() - pos;
 	cursorBuf->SetOrigin(pos);
+
 	DrawCursor(mid);
+
 	// tooltip is *always* midpoint to the buffer
 	// this will ensure the entire tooltip is visible
 	mid.x = bufSize.w / 2;
 	mid.y = bufSize.h / 2;
 	// FIXME: github issue #8: need to calculate the size prior to drawing and offset mid.x by bufSize.w - ttsize.w
+
 	DrawTooltip(mid);
 }
 
 void WindowManager::DrawCursor(const Point& pos) const
 {
+	if (cursorFeedback&MOUSE_NO_CURSOR) {
+		return;
+	}
 	// Cursor draw priority:
 	// 1. gamewin cursor trumps all (we use this for drag items and some others)
 	// 2. hoverwin cursor
@@ -449,6 +461,10 @@ void WindowManager::DrawCursor(const Point& pos) const
 
 void WindowManager::DrawTooltip(const Point& mid) const
 {
+	if (cursorFeedback&MOUSE_NO_TOOLTIPS) {
+		return;
+	}
+
 	static Tooltip tt = core->CreateTooltip(L"");
 	static unsigned long time = 0;
 	static Holder<SoundHandle> tooltip_sound = NULL;
