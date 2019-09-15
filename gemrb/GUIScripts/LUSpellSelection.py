@@ -122,7 +122,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
 		if not recommend:
-			GUICommon.CloseOtherWindow (SpellsWindow.Unload)
+			SpellsWindow.Close()
 		DoneButton = SpellsWindow.GetControl (0)
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
