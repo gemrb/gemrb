@@ -1129,67 +1129,75 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISFIGHTER]);
-	//actor->ChangeSorcererType(classesiwd2[ISFIGHTER]); // not a caster
 }
 
+// on load, all pcfs are ran, so we need to take care not to scramble the sorcerer type
+// both values are still 0 and checking equality guards against other meddling calls
+// (if it turns out to be wrong, just check against Ticks == 0)
 static void pcf_level_mage (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMAGE]);
-	actor->ChangeSorcererType(classesiwd2[ISMAGE]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISMAGE]);
 }
 
 static void pcf_level_thief (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISTHIEF]);
-	//actor->ChangeSorcererType(classesiwd2[ISTHIEF]); // not a caster
 }
 
+// all but iwd2 only have 3 level stats, so shortcircuit them
 static void pcf_level_barbarian (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARBARIAN]);
-	//actor->ChangeSorcererType(classesiwd2[ISBARBARIAN]); // not a caster
 }
 
 static void pcf_level_bard (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISBARD]);
-	actor->ChangeSorcererType(classesiwd2[ISBARD]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISBARD]);
 }
 
 static void pcf_level_cleric (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISCLERIC]);
-	actor->ChangeSorcererType(classesiwd2[ISCLERIC]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISCLERIC]);
 }
 
 static void pcf_level_druid (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISDRUID]);
-	actor->ChangeSorcererType(classesiwd2[ISDRUID]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISDRUID]);
 }
 
 static void pcf_level_monk (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISMONK]);
-	//actor->ChangeSorcererType(classesiwd2[ISMONK]); // not a caster
 }
 
 static void pcf_level_paladin (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISPALADIN]);
-	actor->ChangeSorcererType(classesiwd2[ISPALADIN]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISPALADIN]);
 }
 
 static void pcf_level_ranger (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISRANGER]);
-	actor->ChangeSorcererType(classesiwd2[ISRANGER]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISRANGER]);
 }
 
 static void pcf_level_sorcerer (Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	if (!third) return;
 	pcf_level(actor, oldValue, newValue, classesiwd2[ISSORCERER]);
-	actor->ChangeSorcererType(classesiwd2[ISSORCERER]);
+	if (newValue != oldValue) actor->ChangeSorcererType(classesiwd2[ISSORCERER]);
 }
 
 static void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
