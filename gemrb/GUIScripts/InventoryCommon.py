@@ -740,6 +740,7 @@ def ReadItemWindow ():
 			strref = 10831
 
 		CloseItemInfoWindow ()
+		GemRB.PlaySound ("EFF_M10") # failure!
 		OpenErrorWindow (strref)
 
 	else:
@@ -763,6 +764,7 @@ def DelayedReadItemWindow ():
 		strref = 4249
 	else:
 		strref = 10830
+	GemRB.PlaySound ("GAM_44") # success!
 	OpenErrorWindow (strref)
 	return
 
