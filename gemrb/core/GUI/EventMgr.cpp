@@ -330,24 +330,22 @@ Event EventMgr::CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, b
 	e.mod = 0;
 	e.type = (down) ? Event::TouchDown : Event::TouchUp;
 
-	for (int i = 0; i < numFingers; ++i) {
-		e.touch.x += fingers[i].x;
-		e.touch.y += fingers[i].y;
-
-		uint64_t id = fingers[i].id;
-		const TouchEvent::Finger* current = FingerState(id);
-		if (current) {
-			e.touch.deltaX += fingers[i].x - current->x;
-			e.touch.deltaY += fingers[i].y - current->y;
+	if (numFingers) {
+		for (int i = 0; i < numFingers; ++i) {
+			e.touch.x += fingers[i].x;
+			e.touch.y += fingers[i].y;
+			if (abs(fingers[i].deltaX) > abs(e.touch.deltaX)) {
+				e.touch.deltaX = fingers[i].deltaX;
+			}
+			if (abs(fingers[i].deltaY) > abs(e.touch.deltaY)) {
+				e.touch.deltaY = fingers[i].deltaY;
+			}
+			e.touch.fingers[i] = fingers[i];
 		}
 
-		e.touch.fingers[i] = fingers[i];
+		e.touch.x /= numFingers;
+		e.touch.y /= numFingers;
 	}
-
-	e.touch.x /= numFingers;
-	e.touch.y /= numFingers;
-	e.touch.deltaX /= numFingers;
-	e.touch.deltaY /= numFingers;
 
 	e.touch.numFingers = numFingers;
 	e.touch.pressure = pressure;

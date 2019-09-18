@@ -355,8 +355,8 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 
 		const TouchEvent::Finger* current = EvntManager->FingerState(finger->id);
 		if (current) {
-			fingers[i].deltaX = finger->x - current->x;
-			fingers[i].deltaY = finger->y - current->y;
+			fingers[i].deltaX = fingers[i].x - current->x;
+			fingers[i].deltaY = fingers[i].y - current->y;
 		}
 	}
 
@@ -413,8 +413,11 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// TODO: it may make more sense to calculate the pressure as an avg?
 				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, 0.0);
 				e = EvntManager->CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
-				e.mod = modstate;
-				EvntManager->DispatchEvent(e);
+				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0)
+				{
+					e.mod = modstate;
+					EvntManager->DispatchEvent(e);
+				}
 			}
 			break;
 		case SDL_MOUSEWHEEL:
