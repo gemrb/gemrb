@@ -387,14 +387,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			{
-				TouchEvent::Finger fingers[1] = { };
-				fingers[0].x = event.tfinger.x * screenSize.w;
-				fingers[0].y = event.tfinger.y * screenSize.h;
-				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
-				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
-				fingers[0].id = event.tfinger.fingerId;
+				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
-				Event touch = EvntManager->CreateTouchEvent(fingers, 1, true, event.tfinger.pressure);
+				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, event.tfinger.pressure);
 				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
 				e = EvntManager->CreateTouchGesture(touch.touch, 0.0, 0.0);
 				e.mod = modstate;
