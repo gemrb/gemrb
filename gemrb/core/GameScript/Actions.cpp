@@ -693,7 +693,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 
 	if (map) {
 		Actor *actor = (Actor *) tar;
-		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
+		if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), to->Pos, 0)) {
 			MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(), to->Pos, -1, true);
 		}
 	}
