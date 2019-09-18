@@ -1495,10 +1495,6 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 			return true;
 		}
 
-		if (overDoor || overContainer || overInfoPoint) {
-			return true;
-		}
-
 		screenMousePos = gesture.Pos();
 		isSelectionRect = true;
 	} else if (gesture.numFingers == 2) {
@@ -1515,36 +1511,41 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 				isFormationRotation = true;
 				screenMousePos = gesture.fingers[1].Pos();
 			}
+		} else { // scroll viewport
+			MoveViewportTo( vpOrigin - gesture.Delta(), false );
 		}
-	} else if (gesture.numFingers == 3) {
-		// keyboard/console
-
+	} else if (gesture.numFingers == 3) { // keyboard/console
 		Video* video = core->GetVideoDriver();
 
 		enum SWIPE {DOWN = -1, NONE = 0, UP = 1};
-		SWIPE swipe = NONE; // TODO: calculate this
+		SWIPE swipe = NONE;
+		if (gesture.deltaY < -10) {
+			swipe = UP;
+		} else if (gesture.deltaY > 10) {
+			swipe = DOWN;
+		}
 
 		Window* consoleWin = GemRB::GetWindow(0, "WIN_CON");
 		assert(consoleWin);
 
+		// swipe up to show the keyboard
+		// if the kwyboard is showing swipe up to access console
+		// swipe down to hide both keyboard and console
 		switch (swipe) {
 			case DOWN:
 				consoleWin->Close();
 				video->StopTextInput();
+				consoleWin->Close();
 				break;
 			case UP:
+				video->StartTextInput();
 				if (video->InTextInput()) {
 					consoleWin->Focus();
-				} else {
-					video->StartTextInput();
 				}
 				break;
 			case NONE:
 				break;
 		}
-
-
-		video->InTextInput();
 	}
 	return true;
 }
