@@ -341,16 +341,19 @@ bool WindowManager::DispatchEvent(const Event& event)
 				if (trackingWin->IsDisabled() == false) {
 					trackingWin->DispatchEvent(event);
 				}
-			}
 
-			if (event.type == Event::TouchUp) {
-				trackingWin = NULL;
+				if (event.type == Event::TouchUp) {
+					trackingWin = NULL;
+				}
 			}
 
 			// we don't deliver mouse up events if there isn't a corresponding mouse down (trackingWin == NULL).
 			return bool(trackingWin);
 		}
-		trackingWin = NULL;
+
+		if (event.type != Event::TouchGesture) {
+			trackingWin = NULL;
+		}
 	} else if (event.isScreen && trackingWin) {
 		if (trackingWin->IsDisabled() == false) {
 			trackingWin->DispatchEvent(event);
