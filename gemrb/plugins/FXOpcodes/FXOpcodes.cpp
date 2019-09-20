@@ -6044,6 +6044,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case 1:
 		// LastHitter
 		actor = map->GetActorByGlobalID(target->LastHitter);
+		// but don't attack yourself
+		if (actor && actor->GetGlobalID() == Owner->GetGlobalID()) return FX_APPLIED;
 		break;
 	case 2:
 		// NearestEnemyOf
