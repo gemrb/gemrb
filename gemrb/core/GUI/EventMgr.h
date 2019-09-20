@@ -260,6 +260,7 @@ public:
 
 	static const TouchEvent::Finger* FingerState(uint64_t id) { return (fingerStates.count(id)) ? &fingerStates[id] : NULL; };
 	static bool FingerDown();
+	static ieByte NumFingersDown() { return fingerStates.size(); };
 };
 
 }

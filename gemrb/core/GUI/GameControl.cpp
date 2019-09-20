@@ -1457,7 +1457,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 
 bool GameControl::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
-	if (te.numFingers == 2) {
+	if (EventMgr::NumFingersDown() == 2) {
 		// container highlights
 		DebugFlags |= DEBUG_SHOW_CONTAINERS;
 	}
