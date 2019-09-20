@@ -1538,10 +1538,10 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 				consoleWin->Close();
 				break;
 			case UP:
-				video->StartTextInput();
 				if (video->InTextInput()) {
 					consoleWin->Focus();
 				}
+				video->StartTextInput();
 				break;
 			case NONE:
 				break;
