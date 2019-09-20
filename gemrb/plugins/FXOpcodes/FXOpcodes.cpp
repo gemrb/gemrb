@@ -6152,9 +6152,19 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				condition = false;
 			}
 		}
+		fx->Parameter4 = 0;
+		fx->Parameter5 = 0;
 	} else {
 		// This is a normal trigger which gets a single opportunity every frame.
 		condition = (entry != NULL);
+
+		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
+		// there could be more than one tick in between successful triggers; trying with a half a round limit
+		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < AI_UPDATE_TIME/2) {
+			condition = false;
+			fx->Parameter4 = 0;
+			fx->Parameter5 = 0;
+		}
 	}
 
 	if (condition) {
@@ -6189,6 +6199,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
 			// no casting animation, no deplete, instant, no interrupt
 			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false);
+
+			// save a marker, so we can avoid two fireshielded mages almost instantly kill each other
+			fx->Parameter4 = actor->GetGlobalID();
+			fx->Parameter5 = core->GetGame()->GameTime;
 		}
 		Owner->SetSpellResRef(OldSpellResRef);
 
