@@ -5488,7 +5488,8 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		game->PartyMemberDied(this);
 		core->Autopause(AP_DEAD, this);
 	} else {
-		if (act) {
+		// sometimes we want to skip xp giving and favourite registration
+		if (grantXP && act) {
 			if (act->InParty) {
 				//adjust kill statistics here
 				PCStatsStruct *stat = act->PCStats;
@@ -5528,7 +5529,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	// XP seems to be handed at out at the moment of death
-	if (grantXP && InternalFlags&IF_GIVEXP) {
+	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 
