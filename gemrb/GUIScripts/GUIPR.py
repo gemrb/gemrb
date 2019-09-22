@@ -141,6 +141,7 @@ def UpdatePriestWindow ():
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
+		Button.SetAnimation ("")
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'], 0)
@@ -169,6 +170,7 @@ def UpdatePriestWindow ():
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = Window.GetControl (27 + i)
+		Button.SetAnimation ("")
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
