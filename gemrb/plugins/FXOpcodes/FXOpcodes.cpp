@@ -1448,10 +1448,16 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	BASE_SET(IE_MORALE, 10);
 
+	// don't give xp in cutscenes
+	bool giveXP = true;
+	if (core->InCutSceneMode()) {
+		giveXP = false;
+	}
+
 	Scriptable *killer = GetCasterObject();
 	target->Damage(0, damagetype, killer);
 	//death has damage type too
-	target->Die(killer);
+	target->Die(killer, giveXP);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }

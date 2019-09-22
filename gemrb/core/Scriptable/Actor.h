@@ -632,7 +632,7 @@ public:
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */
-	void Die(Scriptable *killer);
+	void Die(Scriptable *killer, bool grantXP = true);
 	/* debug function */
 	void GetNextAnimation();
 	/* debug function */

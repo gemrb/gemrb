@@ -5418,7 +5418,7 @@ void Actor::SendDiedTrigger()
 	free(neighbours);
 }
 
-void Actor::Die(Scriptable *killer)
+void Actor::Die(Scriptable *killer, bool grantXP)
 {
 	int i,j;
 
@@ -5528,7 +5528,7 @@ void Actor::Die(Scriptable *killer)
 	}
 
 	// XP seems to be handed at out at the moment of death
-	if (InternalFlags&IF_GIVEXP) {
+	if (grantXP && InternalFlags&IF_GIVEXP) {
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 
