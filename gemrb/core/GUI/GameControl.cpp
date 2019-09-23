@@ -2073,7 +2073,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 		CommandSelectedMovement(p);
 		HandleContainer(overContainer, selectedActor);
 	} else if (overInfoPoint) {
-		if (overInfoPoint->Type==ST_TRAVEL) {
+		if (overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
 			CommandSelectedMovement(p);
 
 			ieDword exitID = overInfoPoint->GetGlobalID();
