@@ -2789,7 +2789,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
-				//recalculate dest (mirror it)
+				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
 				break;

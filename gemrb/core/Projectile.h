@@ -224,6 +224,7 @@ public:
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
+	unsigned int Range;
 	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
@@ -387,6 +388,7 @@ private:
 	int AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
 	void LineTarget();      //line projectiles (walls, scorchers)
+	void LineTarget(PathNode* beg, unsigned int depth);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
