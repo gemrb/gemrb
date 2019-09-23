@@ -56,6 +56,14 @@ def OpenRecordsWindow ():
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
 
+		GUIRECCommon.CloseSubSubCustomizeWindow ()
+		GUIRECCommon.CloseSubCustomizeWindow ()
+		GUIRECCommon.CloseCustomizeWindow ()
+		GUIRECCommon.ExportCancelPress()
+		GUIRECCommon.CloseBiographyWindow ()
+		KitDonePress ()
+		CloseInformationWindow ()
+
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:

@@ -34,6 +34,7 @@ ItemAmountWindow = None
 ItemIdentifyWindow = None
 ItemAbilitiesWindow = None
 ErrorWindow = None
+ColorPicker = None
 StackAmount = 0
 pause = None
 
@@ -569,6 +570,7 @@ def UpdateSlot (pc, slot):
 	return
 
 def CancelColor():
+	global ColorPicker
 	if ColorPicker:
 		ColorPicker.Unload ()
 	GUIINV.InventoryWindow.SetVisible (WINDOW_VISIBLE)

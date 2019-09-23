@@ -69,6 +69,14 @@ def OpenRecordsWindow ():
 	global BonusSpellTable, HateRaceTable
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
+
+		GUIRECCommon.CloseSubSubCustomizeWindow ()
+		GUIRECCommon.CloseSubCustomizeWindow ()
+		GUIRECCommon.CloseCustomizeWindow ()
+		GUIRECCommon.ExportCancelPress()
+		GUIRECCommon.CloseBiographyWindow ()
+		CloseHelpWindow ()
+
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:

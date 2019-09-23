@@ -50,10 +50,17 @@ SpellType = None
 Level = 1
 
 def OpenMageWindow ():
-	global MageWindow, OptionsWindow, PortraitWindow
+	global MageWindow, OptionsWindow, PortraitWindow, OtherWindow, MageSpellInfoWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenMageWindow):
+		CloseMageSpellUnmemorizeWindow ()
+		if MageSpellInfoWindow:
+			MageSpellInfoWindow.Unload ()
+			MageSpellInfoWindow = None
+		if OtherWindow:
+			OtherWindow.Unload ()
+			OtherWindow = None
 		if MageWindow:
 			MageWindow.Unload ()
 		if OptionsWindow:

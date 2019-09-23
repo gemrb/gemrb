@@ -646,7 +646,8 @@ def CloseSubCustomizeWindow ():
 	if SubCustomizeWindow:
 		SubCustomizeWindow.Unload ()
 		SubCustomizeWindow = None
-	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if CustomizeWindow:
+		CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubCustomizeWindow ():
@@ -655,5 +656,6 @@ def CloseSubSubCustomizeWindow ():
 	if SubSubCustomizeWindow:
 		SubSubCustomizeWindow.Unload ()
 		SubSubCustomizeWindow = None
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if SubCustomizeWindow:
+		SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

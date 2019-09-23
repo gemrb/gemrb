@@ -41,10 +41,14 @@ OldOptionsWindow = None
 
 def OpenPriestWindow ():
 	import GUICommonWindows
-	global PriestWindow, OptionsWindow, PortraitWindow
+	global PriestWindow, OptionsWindow, PortraitWindow, PriestSpellInfoWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenPriestWindow):
+		ClosePriestSpellUnmemorizeWindow ()
+		if PriestSpellInfoWindow:
+			PriestSpellInfoWindow.Unload ()
+			PriestSpellInfoWindow = None
 		if PriestWindow:
 			PriestWindow.Unload ()
 		if OptionsWindow:
