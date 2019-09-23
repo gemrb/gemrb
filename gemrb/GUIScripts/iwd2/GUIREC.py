@@ -47,6 +47,7 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
+PauseState = None
 
 if not BonusSpellTable:
 	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
@@ -66,7 +67,7 @@ def Exportable(pc):
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
-	global BonusSpellTable, HateRaceTable
+	global BonusSpellTable, HateRaceTable, PauseState
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 
@@ -93,7 +94,11 @@ def OpenRecordsWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
+		GemRB.GamePause (PauseState, 3)
 		return
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
