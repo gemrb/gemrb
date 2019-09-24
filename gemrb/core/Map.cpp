@@ -2785,7 +2785,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = !( GetBlocked( p ) & PATH_MAP_PASSABLE );
+		bool wall = GetBlocked( p ) & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_SIDEWALL);
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
