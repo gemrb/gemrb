@@ -566,20 +566,25 @@ bool Projectile::FailedIDS(Actor *target) const
 
 void Projectile::Payload()
 {
+	if(Shake) {
+		core->timer->SetScreenShake( Shake, Shake, Shake);
+		Shake = 0;
+	}
+
+	//allow area affecting projectile with a spell
+	if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
+		return;
+	}
+
+	// PEF_CONTINUE never has a Target (LightningBolt)
+	// if we were to try to get one we would end up damaging
+	// either the caster, or the original target of the spell
+	// which are probably both nowhere near the projectile at this point
+	// all effects are applied as the projectile travels
 	if((ExtFlags&PEF_CONTINUE) == 0)
 	{
 		Actor *target;
 		Scriptable *Owner;
-
-		if(Shake) {
-			core->timer->SetScreenShake( Shake, Shake, Shake);
-			Shake = 0;
-		}
-
-		//allow area affecting projectile with a spell
-		if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
-			return;
-		}
 
 		if (Target) {
 			target = GetTarget();
