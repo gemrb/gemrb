@@ -749,13 +749,7 @@ int Projectile::CalculateExplosionCount()
 		}
 	}
 
-	if (!count) {
-		 count = Extension->ExplosionCount;
-	}
-	if (!count) {
-		count = 1;
-	}
-	return count;
+	return std::max<int>(Extension->ExplosionCount, 1);
 }
 
 void Projectile::EndTravel()
