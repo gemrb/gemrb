@@ -32,6 +32,8 @@
 #include "GameData.h"
 #include "Palette.h"
 
+#define OVERLAY_STEPS 20
+
 namespace GemRB {
 
 Button::Button(Region& frame)
@@ -58,7 +60,7 @@ Button::Button(Region& frame)
 	Clipping = 1.0;
 
 	memset( borders, 0, sizeof( borders ));
-	starttime = 0;
+	steps = 0;
 	PushOffset = Point(2, 2);
 }
 
@@ -129,36 +131,20 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 	MarkDirty();
 }
 
-/** make SourceRGB go closer to DestRGB */
-void Button::CloseUpColor()
+void Button::WillDraw()
 {
-	if (!starttime) return;
-	//using the realtime timer, because i don't want to
-	//handle Game at this point
-	unsigned long newtime;
-
-	newtime = GetTickCount();
-	if (newtime<starttime) {
+	// stuff for portrait overlays
+	if (steps == 0) {
 		return;
-	}
-	MarkDirty();
-	Color nc;
-
-	nc.r = (SourceRGB.r + DestRGB.r) / 2;
-	nc.g = (SourceRGB.g + DestRGB.g) / 2;
-	nc.b = (SourceRGB.b + DestRGB.b) / 2;
-	nc.a = (SourceRGB.a + DestRGB.a) / 2;
-	if (SourceRGB.r == nc.r &&
-		SourceRGB.g == nc.g &&
-		SourceRGB.b == nc.b &&
-		SourceRGB.a == nc.a) {
-		SourceRGB = DestRGB;
-		starttime = 0;
-		return;
+	} else if (steps == 1) {
+		StepColor = DestRGB; // deal with any rounding errors we acumulated
+	} else if (steps < OVERLAY_STEPS) {
+		StepColor.r = SourceRGB.r + ((DestRGB.r - SourceRGB.r) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
+		StepColor.g = SourceRGB.g + ((DestRGB.g - SourceRGB.g) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
+		StepColor.b = SourceRGB.b + ((DestRGB.b - SourceRGB.b) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
 	}
 
-	SourceRGB = nc;
-	starttime = newtime + 40;
+	--steps;
 }
 
 /** Draws the Control on the Output Display */
@@ -219,18 +205,14 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 				overlayHeight = Picture->Height;
 			int buttonHeight = Picture->Height - overlayHeight;
 
+			if (overlayHeight) {
+				// TODO: Add an option to add BLIT_GREY to the flags
+				assert(StepColor.a == 0xff);
+				video->BlitGameSprite(Picture, picXPos, picYPos, BLIT_TINTED, StepColor, NULL);
+			}
+
 			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
-			Region ro = Region(picXPos, picYPos + buttonHeight, Picture->Width, overlayHeight);
-
 			video->BlitSprite( Picture, picXPos, picYPos, &rb );
-
-			// TODO: Add an option to add BLIT_GREY to the flags
-			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, &ro);
-
-			// do NOT uncomment this, you can't change Changed or invalidate things from
-			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
-			// ^ We can now... should this be uncommented then?
-			//CloseUpColor();
 		}
 		else {
 			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
@@ -364,7 +346,22 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
-	return (pulseBorder) ? true : Control::IsAnimated();
+	if (steps > 0) {
+		return true;
+	}
+
+	if (pulseBorder) {
+		return true;
+	}
+
+	return Control::IsAnimated();
+}
+
+bool Button::IsOpaque() const
+{
+	return Picture != NULL
+		&& !(flags&IE_GUI_BUTTON_NO_IMAGE)
+		&& Picture->HasTransparency() == false;
 }
 
 void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
@@ -722,21 +719,15 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 	MarkDirty();
 }
 
-void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color &dest)
+void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &dest)
 {
 	if ((Clipping>clip) || !(flags&IE_GUI_BUTTON_HORIZONTAL) ) {
 		flags |= IE_GUI_BUTTON_HORIZONTAL;
-#if 0
-		// FIXME: This doesn't work while CloseUpColor isn't being called
-		// (see Draw)
-		SourceRGB=src;
-		DestRGB=dest;
-		starttime = GetTickCount();
-		starttime += 40;
-#else
-		SourceRGB = DestRGB = dest;
-		starttime = 0;
-#endif
+
+		steps = OVERLAY_STEPS;
+		SourceRGB = src;
+		DestRGB = dest;
+		StepColor = src;
 	}
 	Clipping = clip;
 	MarkDirty();

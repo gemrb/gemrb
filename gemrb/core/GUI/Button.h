@@ -126,7 +126,7 @@ public:
 	~Button();
 
 	bool IsAnimated() const;
-	bool IsOpaque() const { return Picture != NULL && !(flags&IE_GUI_BUTTON_NO_IMAGE) && Picture->HasTransparency() == false; };
+	bool IsOpaque() const;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);
@@ -190,8 +190,8 @@ private: // Private attributes
 	double Clipping;
 	Point drag_start;
 	/** HP Bar over portraits */
-	unsigned long starttime;
-	Color SourceRGB, DestRGB;
+	int steps;
+	Color SourceRGB, DestRGB, StepColor;
 	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */
 	Point Anchor;
 	/** Offset pictures and label move when the button is pressed. */
@@ -221,9 +221,9 @@ private: // Private attributes
 
 	bool HandleHotKey(const Event&);
 	bool HitTest (const Point&) const;
-	void CloseUpColor();
 	void DoToggle();
 
+	void WillDraw();
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	
