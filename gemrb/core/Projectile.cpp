@@ -738,14 +738,13 @@ void Projectile::ChangePhase()
 //Call this only if Extension exists!
 int Projectile::CalculateExplosionCount()
 {
-	int count = 0;
 	Actor *act = area->GetActorByGlobalID(Caster);
 	if(act) {
 		if (Extension->AFlags&PAF_LEV_MAGE) {
-			count = act->GetMageLevel();
+			return std::max<int>(act->GetMageLevel(), 1);
 		}
 		else if (Extension->AFlags&PAF_LEV_CLERIC) {
-			count = act->GetClericLevel();
+			return std::max<int>(act->GetClericLevel(), 1);
 		}
 	}
 
