@@ -1684,6 +1684,7 @@ def UpdatePortraitWindow ():
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
+		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle
 		talk = store = flag = blank = ' '
@@ -1703,7 +1704,6 @@ def UpdatePortraitWindow ():
 		if LUCommon.CanLevelUp (pcID):
 			flag = flag + blank + chr(255)
 		elif GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetText (ratio_str)
 			HPLabel.SetTextColor (color)
