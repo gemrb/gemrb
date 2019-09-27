@@ -235,7 +235,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Composite pictures (paperdolls/description icons)
 	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
-		std::list<Sprite2D*>::iterator iter = PictureList.begin();
+		std::vector<Sprite2D*>::iterator iter = PictureList.begin();
 		int xOffs = 0, yOffs = 0;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
@@ -680,7 +680,7 @@ void Button::SetPicture(Sprite2D* newpic)
 /** Clears the list of Pictures */
 void Button::ClearPictureList()
 {
-	for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
+	for (std::vector<Sprite2D*>::iterator iter = PictureList.begin();
 		 iter != PictureList.end(); ++iter)
 		Sprite2D::FreeSprite( *iter );
 	PictureList.clear();

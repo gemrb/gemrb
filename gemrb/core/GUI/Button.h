@@ -34,7 +34,7 @@
 
 #include "exports.h"
 
-#include <list>
+#include <vector>
 
 namespace GemRB {
 
@@ -184,7 +184,7 @@ private: // Private attributes
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
-	std::list<Sprite2D*> PictureList;
+	std::vector<Sprite2D*> PictureList;
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;
