@@ -295,6 +295,11 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 					IE_GUI_BUTTON_MULTILINE) & flags) {
 			// FIXME: I'm unsure when exactly this adjustment applies...
 			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
+		} else if (flags&IE_GUI_BUTTON_ANCHOR) {
+			r.x += Anchor.x;
+			r.y += Anchor.y;
+			r.w -= Anchor.x;
+			r.h -= Anchor.y;
 		}
 
 		font->Print( r, Text, ppoi, (ieByte) align );
