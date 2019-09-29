@@ -60,9 +60,8 @@ public:
 		interval = i;
 	}
 
-	void Update() {
-		TimeInterval now = GetTickCount();
-		if (fireDate <= now) {
+	void Update(TimeInterval time) {
+		if (fireDate <= time) {
 			action();
 			NextFireDate();
 		}

@@ -942,7 +942,8 @@ void Interface::Main()
 	fpsRgn.y = 0;
 
 	unsigned long frame = 0, time, timebase;
-	timebase = GetTickCount();
+	time = GetTickCount();
+	timebase = time;
 	double frames = 0.0;
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 
@@ -950,7 +951,7 @@ void Interface::Main()
 		std::deque<Timer>::iterator it;
 		for (it = timers.begin(); it != timers.end();) {
 			if (it->IsRunning()) {
-				it->Update();
+				it->Update(time);
 				++it;
 			} else {
 				it = timers.erase(it);
@@ -969,9 +970,9 @@ void Interface::Main()
 
 		GameLoop();
 		winmgr->DrawWindows();
+		time = GetTickCount();
 		if (DrawFPS) {
 			frame++;
-			time = GetTickCount();
 			if (time - timebase > 1000) {
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
