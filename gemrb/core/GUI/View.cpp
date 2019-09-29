@@ -191,10 +191,12 @@ void View::Draw()
 
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
+
+	bool needsDraw = NeedsDraw(); // check this before WillDraw else an animation update might get missed
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
 
-	if (NeedsDraw()) {
+	if (needsDraw) {
 		DrawBackground(NULL);
 		DrawSelf(drawFrame, intersect);
 	} else {
