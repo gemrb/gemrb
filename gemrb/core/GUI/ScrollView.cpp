@@ -194,7 +194,7 @@ void ScrollView::WillDraw()
 {
 	if (animation) {
 		// temporarily change the origin for drawing purposes
-		contentView.SetFrameOrigin(animation.Current());
+		contentView.SetFrameOrigin(animation.Next(GetTickCount()));
 	}
 }
 	
@@ -203,7 +203,6 @@ void ScrollView::DidDraw()
 	if (animation) {
 		// restore the origin to the true location passed to ScrollTo
 		contentView.SetFrameOrigin(animation.end);
-		animation.Next(GetTickCount());
 	}
 }
 	
