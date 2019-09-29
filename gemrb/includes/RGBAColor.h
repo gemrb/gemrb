@@ -37,6 +37,10 @@ struct Color {
 		tint.g = (tint.g * tintMod->g) >> 8;
 		tint.b = (tint.b * tintMod->b) >> 8;
 	}
+
+	bool operator==(const Color& rhs) const {
+		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
+	}
 }
 #ifdef __GNUC__
 	__attribute__((aligned(4)))
