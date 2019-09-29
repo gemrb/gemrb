@@ -194,7 +194,7 @@ void ScrollView::WillDraw()
 {
 	if (animation) {
 		// temporarily change the origin for drawing purposes
-		contentView.SetFrameOrigin(animation.CurrentPoint());
+		contentView.SetFrameOrigin(animation.Current());
 	}
 }
 	
@@ -203,7 +203,7 @@ void ScrollView::DidDraw()
 	if (animation) {
 		// restore the origin to the true location passed to ScrollTo
 		contentView.SetFrameOrigin(animation.end);
-		animation.NextPoint();
+		animation.Next(GetTickCount());
 	}
 }
 	
@@ -301,7 +301,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	newP.x = Clamp<short>(newP.x, maxx, 0);
 	newP.y = Clamp<short>(newP.y, maxy, 0);
 
-	Point current = (animation) ? animation.CurrentPoint() : contentView.Origin();
+	Point current = (animation) ? animation.Current() : contentView.Origin();
 	contentView.SetFrameOrigin(newP);
 	UpdateScrollbars();
 

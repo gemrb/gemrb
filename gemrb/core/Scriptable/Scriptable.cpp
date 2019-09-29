@@ -1729,22 +1729,14 @@ void Selectable::DrawCircle(const Region &vp)
 	if (size<=0) {
 		return;
 	}
-	Color mix;
+
 	Color* col = &selectedColor;
 	Sprite2D* sprite = circleBitmap[0];
 
 	if (Selected && !Over) {
 		sprite = circleBitmap[1];
 	} else if (Over) {
-		//doing a time dependent flashing of colors
-		//if it is too fast, increase the 6 to 7
-		unsigned long step;
-		step = GetTickCount();
-		step = tp_steps [(step >> 7) & 7]*2;
-		mix.a = overColor.a;
-		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;
-		mix.g = (overColor.g*step+selectedColor.g*(8-step))/8;
-		mix.b = (overColor.b*step+selectedColor.b*(8-step))/8;
+		Color mix = GlobalColorCycle.Blend(overColor, selectedColor);
 		col = &mix;
 	} else if (IsPC()) {
 		col = &overColor;

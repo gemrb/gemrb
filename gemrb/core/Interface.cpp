@@ -969,6 +969,9 @@ void Interface::Main()
 		HandleGUIBehaviour();
 
 		GameLoop();
+		// TODO: find other animations that need to be synchronized
+		// we can create a manager for them and everything can by updated at once
+		GlobalColorCycle.AdvanceTime(time);
 		winmgr->DrawWindows();
 		time = GetTickCount();
 		if (DrawFPS) {

@@ -22,33 +22,98 @@
 
 #include "Region.h"
 
+#include "globals.h"
+
 namespace GemRB {
 
+template <class T>
 class GUIAnimation {
 protected:
-	unsigned long begintime, endtime;
+	unsigned long begintime;
+	T current;
 	
 public:
-	GUIAnimation() : begintime(0), endtime(0) {}
-	GUIAnimation(unsigned long duration);
+	GUIAnimation() {
+		begintime = GetTickCount();
+	}
 	
-	virtual operator bool() const=0;
+	operator bool() const {
+		return !HasEnded();
+	}
+
+	T Next(unsigned long time) {
+		if (HasEnded() == false) {
+			current = GenerateNext(time);
+		}
+		return current;
+	}
+
+	T Current() {
+		return current;
+	}
+
+private:
+	virtual T GenerateNext(unsigned long time)=0;
+	virtual bool HasEnded() const=0;
 };
 
-class PointAnimation : public GUIAnimation {
+class PointAnimation : public GUIAnimation<Point> {
 public:
-	Point begin, end, current;
+	Point begin, end;
+	unsigned long endtime;
 	
 public:
 	PointAnimation() : GUIAnimation() {}
 	
 	PointAnimation(const Point& begin, const Point& end, unsigned long duration)
-	: GUIAnimation(duration), begin(begin), end(end), current(begin) {}
-	
-	Point NextPoint();
-	Point CurrentPoint() const;
+	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {}
 
-	operator bool() const;
+private:
+	Point GenerateNext(unsigned long time);
+	bool HasEnded() const;
+};
+
+class ColorCycle {
+	uint8_t step;
+	uint8_t speed;
+
+public:
+	ColorCycle(uint8_t speed) : step(0), speed(speed) {}
+
+	void AdvanceTime(unsigned long time);
+	Color Blend(const Color& c1, const Color& c2) const;
+
+	uint8_t Step() const {
+		return step;
+	}
+};
+
+// this is used to syncronize the various "selected" Actor color animations
+extern ColorCycle GlobalColorCycle;
+
+// This is supposed to be a fast optionally infinitely repeating transition
+// between 2 colors. We will create a global instance to syncronize many elements with the same animation.
+class ColorAnimation : public GUIAnimation<Color> {
+public:
+	Color begin, end;
+	bool repeat;
+
+public:
+	ColorAnimation()
+	: GUIAnimation() {
+		repeat = false;
+	}
+
+	ColorAnimation(const Color& begin, const Color& end, bool repeat)
+	: GUIAnimation(), begin(begin), end(end), repeat(repeat) {
+		// we don't handle alpha, if we need it revisit this.
+		this->begin.a = 0xff;
+		this->end.a = 0xff;
+	}
+
+private:
+	Color GenerateNext(unsigned long time);
+	bool HasEnded() const;
 };
 
 }

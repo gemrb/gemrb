@@ -18,22 +18,36 @@
  */
 
 #include "GUIAnimation.h"
-#include "globals.h"
 
 namespace GemRB {
 
-GUIAnimation::GUIAnimation(unsigned long duration)
+// so far everything we need uses this cycle
+static const unsigned long ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
+ColorCycle GlobalColorCycle(7);
+
+void ColorCycle::AdvanceTime(unsigned long time)
 {
-	begintime = GetTickCount();
-	endtime = begintime + duration;
+	step = ColorCycleSteps[(time >> speed) & 7];
 }
 
-PointAnimation::operator bool() const {
-	return current != end;
+Color ColorCycle::Blend(const Color& c1, const Color& c2) const
+{
+	Color mix;
+	// we dont waste our time with the alpha component
+	mix.a = c1.a;
+	mix.r = (c1.r * step + c2.r * (8-step)) >> 3;
+	mix.g = (c1.g * step + c2.g * (8-step)) >> 3;
+	mix.b = (c1.b * step + c2.b * (8-step)) >> 3;
+	return mix;
+}
+
+bool PointAnimation::HasEnded() const
+{
+	return current == end;
 }
 	
-Point PointAnimation::NextPoint() {
-	unsigned long curTime = GetTickCount();
+Point PointAnimation::GenerateNext(unsigned long curTime)
+{
 	if (curTime < endtime) {
 		int deltax = end.x - begin.x;
 		int deltay = end.y - begin.y;
@@ -42,16 +56,20 @@ Point PointAnimation::NextPoint() {
 		p.x = deltax * double(curTime - begintime) / deltaT;
 		p.y = deltay * double(curTime - begintime) / deltaT;
 
-		current = begin + p;
+		return begin + p;
 	} else {
-		current = end;
+		return end;
 	}
-	return current;
 }
 
-Point PointAnimation::CurrentPoint() const
+Color ColorAnimation::GenerateNext(unsigned long /*time*/)
 {
-	return current;
+	return GlobalColorCycle.Blend(begin, end);
+}
+
+bool ColorAnimation::HasEnded() const
+{
+	return (repeat) ? false : current == end;
 }
 
 }

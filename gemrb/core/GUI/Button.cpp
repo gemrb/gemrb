@@ -19,6 +19,8 @@
  */
 
 #include "GUI/Button.h"
+
+#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
@@ -313,15 +315,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			const Region& frRect = fr->rect;
 			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
 			if (pulseBorder && !fr->filled) {
-				Color mix;
-				unsigned long step = GetTickCount();
-				step = tp_steps[(step >> 7) & 7] * 2;
-
-				mix.a = ColorWhite.a;
-				mix.r = (ColorWhite.r * step + fr->color.r * (8-step))/8;
-				mix.g = (ColorWhite.g * step + fr->color.g * (8-step))/8;
-				mix.b = (ColorWhite.b * step + fr->color.b * (8-step))/8;
-
+				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
 				video->DrawRect( r, mix, fr->filled );
 			} else {
 				video->DrawRect( r, fr->color, fr->filled );

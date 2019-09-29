@@ -67,8 +67,6 @@ class DialogHandler;
 #define TARGET_MODE_DEFEND  4
 #define TARGET_MODE_PICK    5
 
-static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
-
 /**
  * @class GameControl
  * Widget displaying areas, where most of the game 'happens'.
