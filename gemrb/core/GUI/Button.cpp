@@ -20,7 +20,6 @@
 
 #include "GUI/Button.h"
 
-#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
@@ -33,8 +32,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Palette.h"
-
-#define OVERLAY_STEPS 20
 
 namespace GemRB {
 
@@ -62,7 +59,6 @@ Button::Button(Region& frame)
 	Clipping = 1.0;
 
 	memset( borders, 0, sizeof( borders ));
-	steps = 0;
 	PushOffset = Point(2, 2);
 }
 
@@ -135,18 +131,9 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 
 void Button::WillDraw()
 {
-	// stuff for portrait overlays
-	if (steps == 0) {
-		return;
-	} else if (steps == 1) {
-		StepColor = DestRGB; // deal with any rounding errors we acumulated
-	} else if (steps < OVERLAY_STEPS) {
-		StepColor.r = SourceRGB.r + ((DestRGB.r - SourceRGB.r) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
-		StepColor.g = SourceRGB.g + ((DestRGB.g - SourceRGB.g) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
-		StepColor.b = SourceRGB.b + ((DestRGB.b - SourceRGB.b) / OVERLAY_STEPS) * (OVERLAY_STEPS - steps);
+	if (overlayAnim) {
+		overlayAnim.Next(GetTickCount());
 	}
-
-	--steps;
 }
 
 /** Draws the Control on the Output Display */
@@ -209,8 +196,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			if (overlayHeight) {
 				// TODO: Add an option to add BLIT_GREY to the flags
-				assert(StepColor.a == 0xff);
-				video->BlitGameSprite(Picture, picXPos, picYPos, BLIT_TINTED, StepColor, NULL);
+				const Color& col = overlayAnim.Current();
+				video->BlitGameSprite(Picture, picXPos, picYPos, BLIT_TINTED, col, NULL);
 			}
 
 			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
@@ -345,7 +332,7 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
-	if (steps > 0) {
+	if (overlayAnim) {
 		return true;
 	}
 
@@ -723,10 +710,7 @@ void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &de
 	if ((Clipping>clip) || !(flags&IE_GUI_BUTTON_HORIZONTAL) ) {
 		flags |= IE_GUI_BUTTON_HORIZONTAL;
 
-		steps = OVERLAY_STEPS;
-		SourceRGB = src;
-		DestRGB = dest;
-		StepColor = src;
+		overlayAnim = ColorAnimation(src, dest, false);
 	}
 	Clipping = clip;
 	MarkDirty();

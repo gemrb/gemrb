@@ -62,9 +62,10 @@ Point PointAnimation::GenerateNext(unsigned long curTime)
 	}
 }
 
-Color ColorAnimation::GenerateNext(unsigned long /*time*/)
+Color ColorAnimation::GenerateNext(unsigned long time)
 {
-	return GlobalColorCycle.Blend(begin, end);
+	cycle.AdvanceTime(time - timeOffset);
+	return cycle.Blend(end, begin);
 }
 
 bool ColorAnimation::HasEnded() const

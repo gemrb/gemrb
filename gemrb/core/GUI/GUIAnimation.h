@@ -97,18 +97,24 @@ class ColorAnimation : public GUIAnimation<Color> {
 public:
 	Color begin, end;
 	bool repeat;
+	ColorCycle cycle;
+	int timeOffset;
 
 public:
 	ColorAnimation()
-	: GUIAnimation() {
+	: GUIAnimation(), cycle(0) {
 		repeat = false;
+		timeOffset = 0;
 	}
 
 	ColorAnimation(const Color& begin, const Color& end, bool repeat)
-	: GUIAnimation(), begin(begin), end(end), repeat(repeat) {
+	: GUIAnimation(), begin(begin), end(end), repeat(repeat), cycle(7) {
 		// we don't handle alpha, if we need it revisit this.
 		this->begin.a = 0xff;
 		this->end.a = 0xff;
+
+		unsigned long time = GetTickCount();
+		timeOffset = (time >> 7) & 7; // we want to start at the frame that is 0
 	}
 
 private:

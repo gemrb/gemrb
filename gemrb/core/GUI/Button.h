@@ -28,6 +28,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include "GUI/GUIAnimation.h"
 #include "GUI/Control.h"
 #include "GUI/TextSystem/Font.h"
 #include "Sprite2D.h"
@@ -190,8 +191,7 @@ private: // Private attributes
 	double Clipping;
 	Point drag_start;
 	/** HP Bar over portraits */
-	int steps;
-	Color SourceRGB, DestRGB, StepColor;
+	ColorAnimation overlayAnim;
 	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */
 	Point Anchor;
 	/** Offset pictures and label move when the button is pressed. */
