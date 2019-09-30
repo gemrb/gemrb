@@ -1730,13 +1730,14 @@ void Selectable::DrawCircle(const Region &vp)
 		return;
 	}
 
+	Color mix;
 	Color* col = &selectedColor;
 	Sprite2D* sprite = circleBitmap[0];
 
 	if (Selected && !Over) {
 		sprite = circleBitmap[1];
 	} else if (Over) {
-		Color mix = GlobalColorCycle.Blend(overColor, selectedColor);
+		mix = GlobalColorCycle.Blend(overColor, selectedColor);
 		col = &mix;
 	} else if (IsPC()) {
 		col = &overColor;
