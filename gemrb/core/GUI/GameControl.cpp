@@ -340,7 +340,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	unsigned short xradius = (size * 4) - 5;
 	unsigned short yradius = (size * 3) - 5;
 
-	const Color& green = (actorSelected) ? ColorGreenDark : ColorGreen;
+	const Color& green = (actorSelected) ? ColorGreen : ColorGreenDark;
 	const Color& color = (flash) ? GlobalColorCycle.Blend(ColorWhite, green) : green;
 
 	p = p - vpOrigin;
