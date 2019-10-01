@@ -257,12 +257,12 @@
 0xB600     NNOM       NNOM       NNOM       NNOM       18         2          0          *
 0xB610     NNOW       NNOW       NNOW       NNOW       18         2          0          *
 0xB700     NSLV       NSLV       NSLV       NSLV       18         2          0          *
-0xC000     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC000     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC100     ACAT       ACAT       ACAT       ACAT       3          1          1          *
 0xC200     ACHK       ACHK       ACHK       ACHK       3          1          1          *
 0xC300     ARAT       ARAT       ARAT       ARAT       3          1          1          *
 0xC400     ASQU       ASQU       ASQU       ASQU       3          1          1          *
-0xC500     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC500     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC600     NBEG       NBEG       NBEG       NBEG       18         2          0          *
 0xC610     NPRO       NPRO       NPRO       NPRO       18         2          0          *
 0xC700     NBOY       NBOY       NBOY       NBOY       18         2          0          *
