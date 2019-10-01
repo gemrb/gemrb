@@ -1336,6 +1336,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 
+		// don't change the cursor for birds
+		if (lastActor && (lastActor->GetStat(IE_DONOTJUMP) == DNJ_BIRD)) return;	
+		
 		if (lastActor) {
 			lastActorID = lastActor->GetGlobalID();
 			lastActor->SetOver( true );
