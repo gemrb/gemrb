@@ -684,9 +684,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);
 	}
 	//bird animations are not hindered by searchmap
-	//only animtype==7 (bird) uses this feature
+	//only animations with a space of 0 in avatars.2da files use this feature
 	//this is a hardcoded hack, but works for all engine type
-	if (anims->GetAnimType()!=IE_ANI_BIRD) {
+	if (anims->GetCircleSize() != 0) {
 		BaseStats[IE_DONOTJUMP]=0;
 	} else {
 		BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
@@ -6146,6 +6146,8 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN^STATE_SLEEP)) return false;
 		//can't talk to hostile
 		if (Modified[IE_EA]>=EA_EVILCUTOFF) return false;
+		// neither to bats and birds
+		if (anims->GetCircleSize() == 0) return false;
 		break;
 	}
 	if (ga_flags&GA_NO_DEAD) {
