@@ -685,7 +685,6 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	//bird animations are not hindered by searchmap
 	//only animations with a space of 0 in avatars.2da files use this feature
-	//this is a hardcoded hack, but works for all engine type
 	if (anims->GetCircleSize() != 0) {
 		BaseStats[IE_DONOTJUMP]=0;
 	} else {
