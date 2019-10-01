@@ -4551,7 +4551,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		return 0;
 	}
 	// hidden creatures are immune too, iwd2 Targos palisade attack relies on it (12cspn1a.bcs)
-	if (Modified[IE_AVATARREMOVAL]) {
+	// same for seagulls and other non-jumpers
+	if (Modified[IE_AVATARREMOVAL] || Modified[IE_DONOTJUMP] == DNJ_BIRD) {
 		return 0;
 	}
 
