@@ -14205,11 +14205,11 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
 				}
 				GameScript* restscript = new GameScript(resref, tar, 0, 0);
-				restscript->Update();
-				delete restscript;
-				if (tar->GetLastRested() == core->GetGame()->GameTime) {
+				if (restscript->Update()) {
+					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
 					dreamed = 1;
 				}
+				delete restscript;
 			}
 		}
 	}
