@@ -876,6 +876,9 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
 				if(!Sender->InMove()) print("At least it said so...");
+				// ensure the action doesn't get interrupted
+				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
+				Sender->CurrentActionInterruptable = false;
 				return;
 			}
 		}
