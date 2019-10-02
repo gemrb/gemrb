@@ -66,7 +66,9 @@ public:
 	PointAnimation() : GUIAnimation() {}
 	
 	PointAnimation(const Point& begin, const Point& end, unsigned long duration)
-	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {}
+	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {
+		Next(begintime);
+	}
 
 private:
 	Point GenerateNext(unsigned long time);
