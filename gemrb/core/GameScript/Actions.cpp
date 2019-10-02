@@ -4714,7 +4714,11 @@ void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->Stop();
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->ClearPath();
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
