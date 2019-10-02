@@ -41,7 +41,7 @@ def MoveToNewArea ():
 		return
 
 	# distance is stored in hours, but the action needs seconds
-	GemRB.ExecuteString ("AdvanceTime(%d)"%(hours*300))
+	GemRB.ExecuteString ("AdvanceTime(%d)"%(hours*300), 1)
 
 	# ~The journey took <DURATION>.~ but pst has it without the token
 	if GameCheck.IsPST():
