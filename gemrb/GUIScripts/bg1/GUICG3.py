@@ -49,18 +49,14 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AlignmentWindow = GemRB.LoadWindow(3)
 
-	for i in range(9):
-		Button = AlignmentWindow.GetControl(i+2)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetText (CommonTables.Aligns.GetValue (i,0))
-
 	# This section enables or disables different alignment selections
 	# based on Class, and depends on the ALIGNMNT.2DA table
 	#
 	# For now, we just enable all buttons
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetText (CommonTables.Aligns.GetValue (i,0))
 		if AlignmentOk.GetValue (KitName, CommonTables.Aligns.GetValue (i, 4)) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 		else:

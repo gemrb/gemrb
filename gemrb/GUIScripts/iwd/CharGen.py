@@ -1204,12 +1204,9 @@ def AlignmentPress():
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	GemRB.SetVar ("Alignment", 0)
 
-	for i in range (2, 11):
-		AlignmentSelectButton = AlignmentWindow.GetControl (i)
-		AlignmentSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-
 	for i in range (9):
 		AlignmentSelectButton = AlignmentWindow.GetControl (i + 2)
+		AlignmentSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if ClassAlignmentTable.GetValue (ClassName, CommonTables.Aligns.GetValue(i, 4)) == 0:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
