@@ -368,8 +368,10 @@ void GameControl::WillDraw()
 	// handle keeping the actor in the spotlight, but only when unpaused
 	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
 		Actor *star = core->GetFirstSelectedActor();
-		moveX = star->Pos.x - vpOrigin.x - frame.w/2;
-		moveY = star->Pos.y - vpOrigin.y - frame.h/2;
+		if (star) {
+			moveX = star->Pos.x - vpOrigin.x - frame.w/2;
+			moveY = star->Pos.y - vpOrigin.y - frame.h/2;
+		}
 	}
 
 	if (moveX || moveY) {
