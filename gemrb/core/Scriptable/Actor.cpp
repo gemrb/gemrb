@@ -4514,7 +4514,7 @@ bool Actor::AttackIsStunning(int damagetype) const {
 	return false;
 }
 
-bool Actor::CheckSilenced()
+bool Actor::CheckSilenced() const
 {
 	if (!(Modified[IE_STATE_ID] & STATE_SILENCED)) return false;
 	if (HasFeat(FEAT_SUBVOCAL_CASTING)) return false;
