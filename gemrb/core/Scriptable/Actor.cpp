@@ -4558,17 +4558,14 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
-	LastDamageType|=damagetype;
-	Actor *act=NULL;
+	LastDamageType |= damagetype;
 
-	if (hitter) {
-		if (hitter->Type==ST_ACTOR) {
-			act = (Actor *) hitter;
-		}
+	Actor *act = NULL;
+	if (hitter && hitter->Type == ST_ACTOR) {
+		act = (Actor *) hitter;
 	}
 
-	switch(modtype)
-	{
+	switch (modtype) {
 	case MOD_ADDITIVE:
 		//bonus against creature should only affect additive damages or spells like harm would be deadly
 		if (damage && act) {
@@ -4583,7 +4580,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		break;
 	default:
 		//this shouldn't happen
-		Log(ERROR, "Actor", "Invalid damagetype!");
+		Log(ERROR, "Actor", "Invalid damage modifier type!");
 		return 0;
 	}
 
@@ -4592,7 +4589,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
 		int mirrorimages = Modified[IE_MIRRORIMAGES];
 		if (mirrorimages) {
-			if (LuckyRoll(1,mirrorimages+1,0) != 1) {
+			if (LuckyRoll(1, mirrorimages + 1, 0) != 1) {
 				fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
 				Modified[IE_MIRRORIMAGES]--;
 				damage = 0;
@@ -4616,7 +4613,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
-	if (damage>0) {
+	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
 		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
@@ -4630,7 +4627,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
 		// common fists do normal damage, but cause sleeping for a round instead of death
-		if (Modified[IE_MINHITPOINTS]<=0 && AttackIsStunning(damagetype) ) {
+		if (Modified[IE_MINHITPOINTS] <= 0 && AttackIsStunning(damagetype)) {
 			// stack unconsciousness carefully to avoid replaying the stance changing
 			Effect *sleep = fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0);
 			if (sleep) {
@@ -4642,7 +4639,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 				delete fx;
 			}
 			//reduce damage to keep 1 hp
-			damage = Modified[IE_HITPOINTS]-1;
+			damage = Modified[IE_HITPOINTS] - 1;
 		}
 	}
 
@@ -4656,7 +4653,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	int chp = (signed) BaseStats[IE_HITPOINTS];
 	if (damage > 0) {
 		//if this kills us, check if attacker could cleave
-		if (act && (damage>chp)) {
+		if (act && (damage > chp)) {
 			act->CheckCleave();
 		}
 		GetHit(damage, 3); // FIXME: carry over the correct spellLevel
@@ -4672,9 +4669,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 	}
 
-	InternalFlags|=IF_ACTIVE;
+	InternalFlags |= IF_ACTIVE;
 	int damagelevel;
-	if (damage<10) {
+	if (damage < 10) {
 		damagelevel = 0;
 	} else if (damage < 20) { // a guess; impacts what blood bam we play, while elemental damage types are unaffected
 		damagelevel = 1;
@@ -4683,29 +4680,29 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		damagelevel = 2;
 	}
 
-	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
-		PlayDamageAnimation(DL_FIRE+damagelevel);
-	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD) ) {
-		PlayDamageAnimation(DL_COLD+damagelevel);
-	} else if (damagetype & (DAMAGE_ELECTRICITY) ) {
-		PlayDamageAnimation(DL_ELECTRICITY+damagelevel);
-	} else if (damagetype & (DAMAGE_ACID) ) {
-		PlayDamageAnimation(DL_ACID+damagelevel);
-	} else if (damagetype & (DAMAGE_MAGIC) ) {
-		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
+	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE)) {
+		PlayDamageAnimation(DL_FIRE + damagelevel);
+	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD)) {
+		PlayDamageAnimation(DL_COLD + damagelevel);
+	} else if (damagetype & (DAMAGE_ELECTRICITY)) {
+		PlayDamageAnimation(DL_ELECTRICITY + damagelevel);
+	} else if (damagetype & (DAMAGE_ACID)) {
+		PlayDamageAnimation(DL_ACID + damagelevel);
+	} else if (damagetype & (DAMAGE_MAGIC)) {
+		PlayDamageAnimation(DL_DISINTEGRATE + damagelevel);
 	} else {
-		if (chp<-10) {
+		if (chp < -10) {
 			PlayDamageAnimation(critical<<8);
 		} else {
-			PlayDamageAnimation(DL_BLOOD+damagelevel);
+			PlayDamageAnimation(DL_BLOOD + damagelevel);
 		}
 	}
 
 	if (InParty) {
-		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
+		if (chp < (signed) Modified[IE_MAXHITPOINTS]/10) {
 			core->Autopause(AP_WOUNDED, this);
 		}
-		if (damage>0) {
+		if (damage > 0) {
 			core->Autopause(AP_HIT, this);
 			core->SetEventFlag(EF_PORTRAIT);
 		}
