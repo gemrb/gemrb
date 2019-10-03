@@ -96,7 +96,7 @@ protected:
 	/** Mouse Button Up */
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	/** Mouse Over Event */
-	bool OnMouseOver(const MouseEvent&);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
 };
 
 }

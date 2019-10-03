@@ -170,16 +170,16 @@ bool Slider::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 }
 
 /** Mouse Over Event */
-bool Slider::OnMouseOver(const MouseEvent& me)
+bool Slider::OnMouseDrag(const MouseEvent& me)
 {
 	MarkDirty();
-	unsigned int oldPos = Pos;
-	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
-        SetPosition(ConvertPointFromScreen(me.Pos()));
 
-        if (oldPos != Pos) {
-            Control::OnMouseOver(me);
-        }
+	State = IE_GUI_SLIDER_GRABBEDKNOB;
+	unsigned int oldPos = Pos;
+	SetPosition(ConvertPointFromScreen(me.Pos()));
+
+	if (oldPos != Pos) {
+		Control::OnMouseDrag(me);
 	}
 	return true;
 }
