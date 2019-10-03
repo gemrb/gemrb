@@ -1856,6 +1856,7 @@ GEM_EXPORT void UpdateActorConfig()
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
+		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
 	if (GameDifficulty>DIFF_NIGHTMARE) GameDifficulty = DIFF_NIGHTMARE;
 
@@ -3549,7 +3550,7 @@ void Actor::RefreshPCStats() {
 	UpdateFatigue();
 
 	// add luck bonus from difficulty
-	Modified[IE_LUCK] += luckadjustments[GameDifficulty];
+	Modified[IE_LUCK] += luckadjustments[GameDifficulty - 1];
 
 	// regenerate actors with high enough constitution
 	int rate = GetConHealAmount();
@@ -4601,7 +4602,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		// adjust enemy damage according to difficulty settings:
 		// -50%, -25%, 0, 50%, 100%, 150%
 		if (act->GetStat(IE_EA) > EA_GOODCUTOFF) {
-			int adjustmentPercent = dmgadjustments[GameDifficulty];
+			int adjustmentPercent = dmgadjustments[GameDifficulty - 1];
 			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
 				damage += (damage * adjustmentPercent)/100;
 			}
@@ -7969,7 +7970,7 @@ void Actor::Heal(int hp)
 void Actor::AddExperience(int exp, int combat)
 {
 	int bonus = core->GetWisdomBonus(0, Modified[IE_WIS]);
-	int adjustmentPercent = xpadjustments[GameDifficulty];
+	int adjustmentPercent = xpadjustments[GameDifficulty - 1];
 	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
 		bonus += adjustmentPercent;
