@@ -52,6 +52,7 @@ def InitMapWindow (Window):
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
+	Window.DeleteControl(3) # replace the placeholder button with the map
 	Map = Window.CreateMapControl (3, 24, 23, 480, 360, Text, "USERNOTE", "RONOTE")
 	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
