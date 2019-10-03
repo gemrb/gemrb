@@ -1431,15 +1431,11 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_ELECTRICITY;
 		break;
 	case 512: //disintegration
-		damagetype = DAMAGE_MAGIC;
+		damagetype = DAMAGE_DISINTEGRATE;
 		break;
+	case 1024: // destruction, iwd2: maybe internally used for smiting and/or disruption (separate opcodes — see IWDOpcodes)
 	default:
 		damagetype = DAMAGE_ACID;
-	}
-	if (fx->Parameter3) {
-		// disintegration marked this, so it can be discerned from other magic damage
-		// hack: reuse a state bit to convey this info to Actor::CheckOnDeath
-		target->SetBaseNoPCF(IE_SPELLDURATIONMODPRIEST, 1);
 	}
 
 	if (damagetype!=DAMAGE_COLD) {
@@ -6417,7 +6413,6 @@ int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
 		fx->Parameter1 = 0;
 		fx->Parameter2 = 0x200;
-		fx->Parameter3 = 1; // mark it as disintegration, so we can destroy items later properly
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;

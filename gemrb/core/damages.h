@@ -44,6 +44,7 @@ namespace GemRB {
 #define DAMAGE_DISEASE 0x4000    //iwd2
 
 #define DAMAGE_CHUNKING 0x8000
+#define DAMAGE_DISINTEGRATE 0x10000 // internal gemrb marker
 //damage levels
 #define DL_CRITICAL 0
 #define DL_BLOOD  1

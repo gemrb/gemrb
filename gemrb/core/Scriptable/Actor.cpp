@@ -4688,7 +4688,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		PlayDamageAnimation(DL_ELECTRICITY + damagelevel);
 	} else if (damagetype & (DAMAGE_ACID)) {
 		PlayDamageAnimation(DL_ACID + damagelevel);
-	} else if (damagetype & (DAMAGE_MAGIC)) {
+	} else if (damagetype & (DAMAGE_MAGIC|DAMAGE_DISINTEGRATE)) {
 		PlayDamageAnimation(DL_DISINTEGRATE + damagelevel);
 	} else {
 		if (chp < -10) {
@@ -4712,6 +4712,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter)
 {
+	// shortcircuit for disintegration, which wouldn't hit any of the below
+	if (damage == 0 && resisted == 0) return;
+
 	bool detailed = false;
 	const char *type_name = "unknown";
 	if (displaymsg->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
@@ -5511,7 +5514,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	// it's too late to do it in CheckOnDeath(), but we also can't dump everything right away (see comment there)
 	// NOTE: IE_INV_ITEM_EQUIPPED only marks equipped weapons, but we need to ignore anything
 	// that has equipping effects, so all but the quick and main inventory slots
-	if (!((BaseStats[IE_SPELLDURATIONMODPRIEST] == 1) && (LastDamageType & DAMAGE_MAGIC))) {
+	if (!(LastDamageType & DAMAGE_DISINTEGRATE)) {
 		bool dump = true;
 		// ignore TNO, as he needs to keep his gear
 		if (game->protagonist == PM_NO && (GetScriptName() == game->GetPC(0, false)->GetScriptName())) {
@@ -5769,27 +5772,27 @@ bool Actor::CheckOnDeath()
 	// .. but this can't go in Die() because that is called
 	// from effects and dropping items might change effects!
 
-	// disintegration destroys normal items if difficulty level is high enough (the stat hack is just for differentiation)
-	if ((BaseStats[IE_SPELLDURATIONMODPRIEST]==1) && (LastDamageType & DAMAGE_MAGIC)) {
-		if  (GameDifficulty > DIFF_CORE) {
-			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
-		}
-		SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
-		return true;
-	}
-	// drop everything remaining, but ignore TNO, as he needs to keep his gear
-	Game *game = core->GetGame();
-	if (game->protagonist == PM_NO) {
-		if (GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+	// disintegration destroys normal items if difficulty level is high enough
+	bool disintegrated = LastDamageType & DAMAGE_DISINTEGRATE;
+	if (disintegrated && GameDifficulty > DIFF_CORE) {
+		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+	} else {
+		// drop everything remaining, but ignore TNO, as he needs to keep his gear
+		Game *game = core->GetGame();
+		if (game->protagonist == PM_NO) {
+			if (GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+				DropItem("", 0);
+			}
+		} else {
 			DropItem("", 0);
 		}
-	} else {
-		DropItem("", 0);
 	}
 
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
+
+	if (disintegrated) return true;
 
 	// party actors are never removed
 	if (Persistent()) return false;
