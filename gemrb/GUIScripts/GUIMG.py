@@ -127,6 +127,8 @@ def UpdateMageWindow (MageWindow):
 	if not Sorcerer:
 		for i in range (12):
 			Button = MageWindow.GetControl (3 + i)
+			Button.SetAnimation ("")
+
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
@@ -164,6 +166,8 @@ def UpdateMageWindow (MageWindow):
 
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
+		Button.SetAnimation ("")
+
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)

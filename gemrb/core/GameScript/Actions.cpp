@@ -693,7 +693,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 
 	if (map) {
 		Actor *actor = (Actor *) tar;
-		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
+		if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), to->Pos, 0)) {
 			MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(), to->Pos, -1, true);
 		}
 	}
@@ -4710,7 +4710,11 @@ void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->Stop();
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->ClearPath();
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
@@ -6152,7 +6156,7 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		}
 */
 		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
-		core->ApplySpell(spellres, (Actor *) tar, NULL, parameters->int1Parameter);
+		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
 	} else {
 		//apply spell on point
 		Point d;

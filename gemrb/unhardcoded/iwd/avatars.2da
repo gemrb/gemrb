@@ -224,12 +224,12 @@
 0xB600    NNOML     NNOML      NNOML      NNOML      2          2          0          *
 0xB610    NNOWL     NNOWL      NNOWL      NNOWL      2          2          0          *
 0xB700    NSLVL     NSLVL      NSIWL      NSIWL      18         2          0          *
-0xC000    ABAT      ABAT       ABAT       ABAT       2          1          1          *
+0xC000    ABAT      ABAT       ABAT       ABAT       2          0          1          *
 0xC100    ACAT      ACAT       ACAT       ACAT       2          1          1          *
 0xC200    ACHK      ACHK       ACHK       ACHK       2          1          1          *
 0xC300    ARAT      ARAT       ARAT       ARAT       2          1          1          *
 0xC400    ASQU      ASQU       ASQU       ASQU       2          1          1          *
-0xC500    ABAT      ABAT       ABAT       ABAT       2          1          1          *
+0xC500    ABAT      ABAT       ABAT       ABAT       2          0          1          *
 0xC600    NBEGH     NBEGH      NBEGH      NBEGH      2          2          0          *
 0xC610    NPROH     NPROH      NPROH      NPROH      2          2          0          *
 0xC700    NBOYH     NBOYH      NBOYH      NBOYH      3          2          0          *

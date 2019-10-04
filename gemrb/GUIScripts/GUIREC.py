@@ -47,6 +47,15 @@ SelectedTextArea = None
 def InitRecordsWindow (Window):
 	"""Open Records Window"""
 
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
+
+	def OnClose(Window):
+		GemRB.GamePause (PauseState, 3)
+		TopWindowClosed(Window)
+
+	Window.SetOnClose(OnClose)
+
 	# dual class
 	Button = Window.GetControl (0)
 	Button.SetText (7174)

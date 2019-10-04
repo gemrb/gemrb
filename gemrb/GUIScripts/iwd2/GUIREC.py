@@ -64,6 +64,15 @@ def InitRecordsWindow (Window):
 	global RecordsWindow, SelectWindow
 	global BonusSpellTable, HateRaceTable
 
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
+
+	def OnClose(Window):
+		GemRB.GamePause (PauseState, 3)
+		TopWindowClosed(Window)
+
+	Window.SetOnClose(OnClose)
+
 	RecordsWindow = Window
 
 	#portrait icon

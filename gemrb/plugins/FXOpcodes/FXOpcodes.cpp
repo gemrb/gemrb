@@ -1430,15 +1430,11 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_ELECTRICITY;
 		break;
 	case 512: //disintegration
-		damagetype = DAMAGE_MAGIC;
+		damagetype = DAMAGE_DISINTEGRATE;
 		break;
+	case 1024: // destruction, iwd2: maybe internally used for smiting and/or disruption (separate opcodes — see IWDOpcodes)
 	default:
 		damagetype = DAMAGE_ACID;
-	}
-	if (fx->Parameter3) {
-		// disintegration marked this, so it can be discerned from other magic damage
-		// hack: reuse a state bit to convey this info to Actor::CheckOnDeath
-		target->SetBaseNoPCF(IE_SPELLDURATIONMODPRIEST, 1);
 	}
 
 	if (damagetype!=DAMAGE_COLD) {
@@ -1447,10 +1443,16 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	BASE_SET(IE_MORALE, 10);
 
+	// don't give xp in cutscenes
+	bool giveXP = true;
+	if (core->InCutSceneMode()) {
+		giveXP = false;
+	}
+
 	Scriptable *killer = GetCasterObject();
 	target->Damage(0, damagetype, killer);
 	//death has damage type too
-	target->Die(killer);
+	target->Die(killer, giveXP);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
@@ -6044,6 +6046,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case 1:
 		// LastHitter
 		actor = map->GetActorByGlobalID(target->LastHitter);
+		// but don't attack yourself
+		if (actor && actor->GetGlobalID() == Owner->GetGlobalID()) return FX_APPLIED;
 		break;
 	case 2:
 		// NearestEnemyOf
@@ -6150,9 +6154,19 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				condition = false;
 			}
 		}
+		fx->Parameter4 = 0;
+		fx->Parameter5 = 0;
 	} else {
 		// This is a normal trigger which gets a single opportunity every frame.
 		condition = (entry != NULL);
+
+		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
+		// there could be more than one tick in between successful triggers; trying with a half a round limit
+		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < AI_UPDATE_TIME/2) {
+			condition = false;
+			fx->Parameter4 = 0;
+			fx->Parameter5 = 0;
+		}
 	}
 
 	if (condition) {
@@ -6187,6 +6201,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
 			// no casting animation, no deplete, instant, no interrupt
 			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false);
+
+			// save a marker, so we can avoid two fireshielded mages almost instantly kill each other
+			fx->Parameter4 = actor->GetGlobalID();
+			fx->Parameter5 = core->GetGame()->GameTime;
 		}
 		Owner->SetSpellResRef(OldSpellResRef);
 
@@ -6395,7 +6413,6 @@ int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
 		fx->Parameter1 = 0;
 		fx->Parameter2 = 0x200;
-		fx->Parameter3 = 1; // mark it as disintegration, so we can destroy items later properly
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;

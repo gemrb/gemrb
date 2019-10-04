@@ -34,6 +34,7 @@ ItemAmountWindow = None
 ItemIdentifyWindow = None
 ItemAbilitiesWindow = None
 ErrorWindow = None
+ColorPicker = None
 StackAmount = 0
 pause = None
 
@@ -579,6 +580,7 @@ def UpdateSlot (pc, slot):
 	return
 
 def CancelColor():
+	global ColorPicker
 	if ColorPicker:
 		ColorPicker.Unload ()
 	InventoryWindow = GemRB.GetView ("WIN_INV")
@@ -752,6 +754,7 @@ def ReadItemWindow ():
 			strref = 10831
 
 		CloseItemInfoWindow ()
+		GemRB.PlaySound ("EFF_M10") # failure!
 		OpenErrorWindow (strref)
 
 	else:
@@ -775,6 +778,7 @@ def DelayedReadItemWindow ():
 		strref = 4249
 	else:
 		strref = 10830
+	GemRB.PlaySound ("GAM_44") # success!
 	OpenErrorWindow (strref)
 	return
 

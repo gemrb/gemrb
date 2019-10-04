@@ -1335,6 +1335,9 @@ void GameControl::UpdateCursor()
 
 	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 	if (lastActor) {
+		// don't change the cursor for birds
+		if (lastActor->GetStat(IE_DONOTJUMP) == DNJ_BIRD) return;
+
 		ieDword type = lastActor->GetStat(IE_EA);
 		if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 			nextCursor = IE_CURSOR_ATTACK;
@@ -1734,9 +1737,10 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1793,9 +1797,10 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {

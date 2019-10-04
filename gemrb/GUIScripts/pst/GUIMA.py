@@ -25,6 +25,7 @@
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GUIMACommon
 from GUIDefines import *
 
 PosX = 0
@@ -37,7 +38,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -77,7 +78,7 @@ def InitMapWindow (Window):
 
 	return
 
-def OpenWMapWindow ():
+def OpenWorldMapWindow ():
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	Travel = GemRB.GetVar ("Travel")
@@ -93,6 +94,7 @@ def OpenWMapWindow ():
 	#center on current area
 	WMap.Scroll (0,0)
 	WMap.Focus()
+	WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done
 	Button = Window.GetControl (0)

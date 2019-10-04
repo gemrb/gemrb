@@ -1821,7 +1821,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	while (i--) {
 		Actor *tar = GetPC(i, true);
-		tar->Stop();
+		tar->ClearPath();
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
@@ -1841,7 +1841,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	while (i--) {
 		Actor *tar = GetNPC(i);
 		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
-			tar->Stop();
+			tar->ClearPath();
 			tar->SetModal(MS_NONE, 0);
 			tar->Heal(hp);
 			tar->Rest(hours);

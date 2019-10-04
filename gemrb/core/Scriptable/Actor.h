@@ -590,7 +590,7 @@ public:
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
-	bool CheckSilenced();
+	bool CheckSilenced() const;
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
@@ -630,7 +630,7 @@ public:
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */
-	void Die(Scriptable *killer);
+	void Die(Scriptable *killer, bool grantXP = true);
 	/* debug function */
 	void GetNextAnimation();
 	/* debug function */
@@ -941,6 +941,7 @@ public:
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
 	void SetAnimatedTalking(unsigned int);
+	bool HasPlayerClass() const;
 };
 }
 

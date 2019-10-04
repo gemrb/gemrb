@@ -78,6 +78,7 @@ Projectile::Projectile()
 	drawSpark = 0;
 	ZPos = 0;
 	extension_delay = 0;
+	Range = 0;
 	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = Speed = SFlags = ExtFlags = 0;
 	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
@@ -564,69 +565,72 @@ bool Projectile::FailedIDS(Actor *target) const
 
 void Projectile::Payload()
 {
-	Actor *target;
-	Scriptable *Owner;
-
 	if(Shake) {
 		core->timer->SetScreenShake( Shake, Shake, Shake);
 		Shake = 0;
 	}
 
-	//allow area affecting projectile with a spell	
+	//allow area affecting projectile with a spell
 	if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
 		return;
 	}
 
-	if (Target) {
-		target = GetTarget();
-		if (!target) {
-			//projectile resisted or failed to bounce properly
-			return;
-		}
-	} else {
-		//the target will be the original caster
-		//in case of single point area target (dimension door)
-		if (FakeTarget) {
-			target = area->GetActorByGlobalID(FakeTarget);
-			if (!target) {
-				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
-			}
-		} else {
-			target = area->GetActorByGlobalID(Caster);			
-		}
-	}
-	
-	Owner = area->GetScriptableByGlobalID(Caster);
-	if (!Owner) {
-		Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
-		Owner = target;
-	}
+	// PEF_CONTINUE never has a Target (LightningBolt)
+	// if we were to try to get one we would end up damaging
+	// either the caster, or the original target of the spell
+	// which are probably both nowhere near the projectile at this point
+	// all effects are applied as the projectile travels
+	if((ExtFlags&PEF_CONTINUE) == 0)
+	{
+		Actor *target;
+		Scriptable *Owner;
 
-	if (target) {
-		//apply this spell on target when the projectile fails
-		if (FailedIDS(target)) {
-			if (FailSpell[0]) {
-				if (Target) {
-					core->ApplySpell(FailSpell, target, Owner, Level);
-				} else {
-					//no Target, using the fake target as owner
-					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+		if (Target) {
+			target = GetTarget();
+		} else {
+			//the target will be the original caster
+			//in case of single point area target (dimension door)
+			if (FakeTarget) {
+				target = area->GetActorByGlobalID(FakeTarget);
+				if (!target) {
+					target = core->GetGame()->GetActorByGlobalID(FakeTarget);
 				}
+			} else {
+				target = area->GetActorByGlobalID(Caster);
 			}
-		} else {
-			//apply this spell on the target when the projectile succeeds
-			if (SuccSpell[0]) {
-				core->ApplySpell(SuccSpell, target, Owner, Level);
-			}
+		}
 
-			if(ExtFlags&PEF_RGB) {
-				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-					RGB >> 8, RGB >> 16, RGB >> 24);
+		if (target) {
+			Owner = area->GetScriptableByGlobalID(Caster);
+			if (!Owner) {
+				Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
+				Owner = target;
 			}
+			//apply this spell on target when the projectile fails
+			if (FailedIDS(target)) {
+				if (FailSpell[0]) {
+					if (Target) {
+						core->ApplySpell(FailSpell, target, Owner, Level);
+					} else {
+						//no Target, using the fake target as owner
+						core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+					}
+				}
+			} else {
+				//apply this spell on the target when the projectile succeeds
+				if (SuccSpell[0]) {
+					core->ApplySpell(SuccSpell, target, Owner, Level);
+				}
 
-			if (effects) {
-				effects->SetOwner(Owner);
-				effects->AddAllEffects(target, Destination);
+				if(ExtFlags&PEF_RGB) {
+					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+						RGB >> 8, RGB >> 16, RGB >> 24);
+				}
+
+				if (effects) {
+					effects->SetOwner(Owner);
+					effects->AddAllEffects(target, Destination);
+				}
 			}
 		}
 	}
@@ -691,7 +695,7 @@ void Projectile::ChangePhase()
 	if (!Extension) {
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		if (phase ==P_TRAVEL) {
+		if (phase == P_TRAVEL) {
 			if(ExtFlags&PEF_DEFSPELL) {
 				ApplyDefault();
 			}
@@ -745,10 +749,7 @@ int Projectile::CalculateExplosionCount()
 	}
 
 	if (!count) {
-		 count = Extension->ExplosionCount;
-	}
-	if (!count) {
-		count = 1;
+		 count = std::max<int>(1, Extension->ExplosionCount);
 	}
 	return count;
 }
@@ -878,6 +879,14 @@ void Projectile::DoStep(unsigned int walk_speed)
 		timeStartStep = timeStartStep + walk_speed;
 	}
 
+	if (ExtFlags&PEF_CONTINUE) {
+		// FIXME: should this depth be > 1?
+		// Also, should we look behind as well?
+		// the test case is lightning bolt, its a long projectile,
+		// so its possible we should search starting from step->Parent with depth 2
+		LineTarget(step, 1);
+	}
+
 	SetOrientation (step->orient, false);
 
 	Pos.x=step->x;
@@ -947,7 +956,9 @@ void Projectile::NextTarget(const Point &p)
 		Destination = Pos;
 		return;
 	}
-	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
+
+	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
+	path = area->GetLine( Pos, Destination, Speed, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)
@@ -973,18 +984,27 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		phase = P_EXPIRED;
 		return;
 	}
-	//replan the path in case the target moved
-	if(target->Pos!=Destination) {
-		NextTarget(target->Pos);
-		return;
-	}
 
-	//replan the path in case the source moved (only for line projectiles)
-	if(ExtFlags&PEF_LINE) {
-		Actor *c = area->GetActorByGlobalID(Caster);
-		if(c && c->Pos!=Pos) {
-			Pos=c->Pos;
+	if (ExtFlags&PEF_CONTINUE) {
+		const Point& A = Origin;
+		const Point& B = target->Pos;
+		double angle = atan2(B.y - A.y, B.x - A.x);
+		Point C(A.x + Range * cos(angle), A.y + Range * sin(angle));
+		SetTarget(C);
+	} else {
+		//replan the path in case the target moved
+		if(target->Pos!=Destination) {
 			NextTarget(target->Pos);
+			return;
+		}
+
+		//replan the path in case the source moved (only for line projectiles)
+		if(ExtFlags&PEF_LINE) {
+			Actor *c = area->GetActorByGlobalID(Caster);
+			if(c && c->Pos!=Pos) {
+				Pos=c->Pos;
+				NextTarget(target->Pos);
+			}
 		}
 	}
 }
@@ -1014,33 +1034,35 @@ int Projectile::CalculateTargetFlag()
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD;
 
-	if (Extension->AFlags&PAF_NO_WALL) {
-		flags|=GA_NO_LOS;
-	}
+	if (Extension) {
+		if (Extension->AFlags&PAF_NO_WALL) {
+			flags|=GA_NO_LOS;
+		}
 
-	//projectiles don't affect dead/inanimate normally
-	if (Extension->AFlags&PAF_INANIMATE) {
-		flags&=~GA_NO_DEAD;
-	}
+		//projectiles don't affect dead/inanimate normally
+		if (Extension->AFlags&PAF_INANIMATE) {
+			flags&=~GA_NO_DEAD;
+		}
 
-	//affect only enemies or allies
-	switch (Extension->AFlags&PAF_TARGET) {
-	case PAF_ENEMY:
-		flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
-		break;
-	case PAF_PARTY: //this doesn't exist in IE
-		flags|=GA_NO_ENEMY;
-		break;
-	case PAF_TARGET:
-		flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
-		break;
-	default:
-		return flags;
-	}
+		//affect only enemies or allies
+		switch (Extension->AFlags&PAF_TARGET) {
+		case PAF_ENEMY:
+			flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
+			break;
+		case PAF_PARTY: //this doesn't exist in IE
+			flags|=GA_NO_ENEMY;
+			break;
+		case PAF_TARGET:
+			flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
+			break;
+		default:
+			return flags;
+		}
 
-	//this is the only way to affect neutrals and enemies
-	if (Extension->APFlags&APF_INVERT_TARGET) {
-		flags^=(GA_NO_ALLY|GA_NO_ENEMY);
+		//this is the only way to affect neutrals and enemies
+		if (Extension->APFlags&APF_INVERT_TARGET) {
+			flags^=(GA_NO_ALLY|GA_NO_ENEMY);
+		}
 	}
 
 	Actor *caster = area->GetActorByGlobalID(Caster);
@@ -1091,14 +1113,19 @@ void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
 
 void Projectile::LineTarget()
 {
+	LineTarget(path, -1);
+}
+
+void Projectile::LineTarget(PathNode* beg, unsigned int depth)
+{
 	if(!effects) {
 		return;
 	}
 
 	Actor *original = area->GetActorByGlobalID(Caster);
 	Actor *prev = NULL;
-	PathNode *iter = path;
-	while(iter) {
+	PathNode *iter = beg;
+	while(iter && depth > 0) {
 		Point pos(iter->x,iter->y);
 		Actor *target = area->GetActorInRadius(pos, CalculateTargetFlag(), 1);
 		if (target && target->GetGlobalID()!=Caster && prev!=target) {
@@ -1117,6 +1144,7 @@ void Projectile::LineTarget()
 			}
 		}
 		iter = iter->Next;
+		--depth;
 	}
 }
 

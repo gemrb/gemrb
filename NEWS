@@ -1,4 +1,4 @@
-GemRB git (72aae8ff7):
+GemRB git (c7e0932ffe):
   New features:
     - 
     - using bags in stores, NPC breaking points
@@ -8,8 +8,8 @@ GemRB git (72aae8ff7):
   Improved features:
     - better megamod and detectable spells compatibility
     - iwd2 and pst levelup, infopoints, gui feedback, dualclassing
-    - verbal constants, (tobex) opcodes, falling, paperdolls
-    - pst area animations
+    - verbal constants, (tobex) opcodes, falling, paperdolls, projectiles
+    - pst area animations, multipalette animations
     - bugfixes
 
 GemRB v0.8.5 (2017-11-26):

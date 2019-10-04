@@ -25,6 +25,7 @@
 import GemRB
 import GameCheck
 import GUICommonWindows
+import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
@@ -190,48 +191,17 @@ def OpenWorldMapWindow ():
 	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
 
-def MoveToNewArea ():
+def ChangeTooltip ():
 	global WorldMapWindow, WorldMapControl
 
-	tmp = WorldMapControl.GetDestinationArea (1)
-	if tmp is None:
-		return
+	tt = ""
+	area = WorldMapControl.GetDestinationArea ()
+	if area and area["Distance"] >= 0:
+		str = GemRB.GetString(23084)
+		if (str):
+			tt = "%s: %d"%(str,area["Distance"])
 
-	WorldMapWindow.Close()
-
-	hours = tmp["Distance"]
-
-	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
-		return
-	elif hours == -1:
-		print "Invalid target", tmp
-		return
-
-	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
-
-	if hours == 0:
-		return
-
-	# distance is stored in hours, but the action needs seconds
-	GemRB.ExecuteString ("AdvanceTime(%d)"%(hours*300))
-
-	# ~The journey took <DURATION>.~ but pst has it without the token
-	# HOWEVER: pst has its own GUIMA + uses only neighbour travel (no MoveToNewArea)??
-	if GameCheck.IsPST():
-		# GemRB.DisplayString can only deal with resrefs, so cheat until noticed
-		if hours > 1:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19313))
-		else:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19312))
-	else:
-		time = ""
-		GemRB.SetToken ("HOUR", str(hours))
-		if hours > 1:
-			time =  GemRB.GetString (10700)
-		else:
-			time =  GemRB.GetString (10701)
-		GemRB.SetToken ("DURATION", time)
-		GemRB.DisplayString (10689, 0xffffff)
+	WorldMapControl.SetTooltip (tt)
 	return
 
 def WorldMapWindowCommon (Travel):
@@ -256,7 +226,8 @@ def WorldMapWindowCommon (Travel):
 		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "infofont")
 
 	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
 	# center on current area
 	MapC()
 
