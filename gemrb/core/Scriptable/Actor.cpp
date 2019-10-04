@@ -1887,11 +1887,11 @@ static void InitActorTables()
 	int i, j;
 
 	UpdateActorConfig();
-	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
-	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
-	third = !!core->HasFeature(GF_3ED_RULES);
-	raresnd = !!core->HasFeature(GF_RARE_ACTION_VB);
-	iwd2class = !!core->HasFeature(GF_LEVELSLOT_PER_CLASS);
+	pstflags = core->HasFeature(GF_PST_STATE_FLAGS) != 0;
+	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES) != 0;
+	third = core->HasFeature(GF_3ED_RULES) != 0;
+	raresnd = core->HasFeature(GF_RARE_ACTION_VB) != 0;
+	iwd2class = core->HasFeature(GF_LEVELSLOT_PER_CLASS) != 0;
 	// iwd2 has some different base class names
 	if (iwd2class) {
 		isclassnames[ISTHIEF] = "ROGUE";
