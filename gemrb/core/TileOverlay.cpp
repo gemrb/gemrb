@@ -34,7 +34,7 @@ TileOverlay::TileOverlay(int Width, int Height)
 	w = Width;
 	h = Height;
 	count = 0;
-	tiles = ( Tile * * ) malloc( w * h * sizeof( Tile * ) );
+	tiles = ( Tile * * ) calloc( w * h, sizeof( Tile * ) );
 }
 
 TileOverlay::~TileOverlay(void)
