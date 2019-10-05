@@ -897,6 +897,7 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
 		kitindex = kit&0xfff;
+		if (!kitindex && !baseclass) return 0;
 	}
 
 	if (kitindex == 0) {
