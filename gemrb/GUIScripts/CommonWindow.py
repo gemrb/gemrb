@@ -65,7 +65,7 @@ def UpdateContainerWindow ():
 	if GameCheck.IsPST():
 		GUICommon.SetEncumbranceLabels (Window, 54, None, pc, True)
 	else:
-		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
+		GUICommon.SetEncumbranceLabels (Window, 0x10000045, 0x10000046, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = Window.GetControl (0x10000036)
@@ -222,11 +222,11 @@ def OpenContainerWindow ():
 		if GameCheck.IsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.CreateLabel (0x10000043, "NUMBER", "", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Button.CreateLabel (0x10000044, "NUMBER", "", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000045, "NUMBER", "", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000046, "NUMBER", "", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 	else:
-		Label = Window.CreateLabel (0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = Window.CreateLabel (0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000045, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000046, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 
 	# container icon
 	Button = Window.GetControl (50)
