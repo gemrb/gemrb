@@ -3158,7 +3158,6 @@ void Interface::QuitGame(int BackToMain)
 	//clear cutscenes
 	//clear fade/screenshake effects
 	timer->Init();
-	timer->SetFadeFromColor(0);
 
 	//shutting down ingame music
 	//(do it before deleting the game)
