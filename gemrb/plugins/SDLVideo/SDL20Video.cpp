@@ -212,11 +212,17 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 
 	int ret = 0;
 	if (mask) {
-		SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
 		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
+
+		if (flags&BLIT_BLENDED) {
+			SDL_SetTextureBlendMode(maskTex, SDL_BLENDMODE_BLEND);
+		} else {
+			SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
 		SDL_SetRenderTarget(renderer, maskLayer);
 		SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureBlendMode(maskTex, maskBlender);
+		}
+
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 		ret = SDL_RenderCopyEx(renderer, maskTex, &srect, &drect, 0.0, NULL, flipflags);

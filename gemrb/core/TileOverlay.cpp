@@ -94,7 +94,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 						                   tile->anim[0]->NextFrame(),
 							               ( x * 64 ) - viewport.x,
 							               ( y * 64 ) - viewport.y,
-							               NULL, flags, tintcol);
+							               NULL, flags|BLIT_BLENDED, tintcol);
 						} else {
 							Sprite2D* mask = 0;
 							if (tile->anim[1]) {
