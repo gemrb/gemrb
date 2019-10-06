@@ -290,19 +290,15 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 	if Slot == None:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		if Type == "inventory":
-			Button.SetTooltip (12013) # Personal Item
-		elif Type == "ground":
-			Button.SetTooltip (12011) # Ground Item
-		else:
-			Button.SetTooltip ("")
+		tooltips = { "inventory": 12013, "ground": 12011, "container": "" }
+		Button.SetTooltip (tooltips[Type])
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)
 	else:
 		item = GemRB.GetItem (Slot['ItemResRef'])
 		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
+		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
 
 		# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
 		if item["MaxStackAmount"] > 1:
@@ -321,15 +317,10 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		else:
 			Button.SetTooltip (item["ItemNameIdentified"])
 			Button.EnableBorder (0, 0)
-			if magical:
-				Button.EnableBorder (1, 1)
-			else:
-				Button.EnableBorder (1, 0)
+			Button.EnableBorder (1, magical)
 
-		if GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped):
-			Button.EnableBorder (2, 0)
-		else:
-			Button.EnableBorder (2, 1)
+		unusable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped) == 0
+		Button.EnableBorder (2, unusable)
 
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 
