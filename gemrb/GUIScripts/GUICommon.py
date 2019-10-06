@@ -295,34 +295,35 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)
+		return
+
+	item = GemRB.GetItem (Slot['ItemResRef'])
+	identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+	magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
+
+	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
+	if item["MaxStackAmount"] > 1:
+		Button.SetText (str (Slot["Usages0"]))
 	else:
-		item = GemRB.GetItem (Slot['ItemResRef'])
-		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
+		Button.SetText ("")
 
-		# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
-		if item["MaxStackAmount"] > 1:
-			Button.SetText (str (Slot["Usages0"]))
-		else:
-			Button.SetText ("")
+	# auto-identify mundane items; the actual indentification will happen on transfer
+	if not identified and item["LoreToID"] == 0:
+		identified = True
 
-		# auto-identify mundane items; the actual indentification will happen on transfer
-		if not identified and item["LoreToID"] == 0:
-			identified = True
+	if not identified or item["ItemNameIdentified"] == -1:
+		Button.SetTooltip (item["ItemName"])
+		Button.EnableBorder (0, 1)
+		Button.EnableBorder (1, 0)
+	else:
+		Button.SetTooltip (item["ItemNameIdentified"])
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, magical)
 
-		if not identified or item["ItemNameIdentified"] == -1:
-			Button.SetTooltip (item["ItemName"])
-			Button.EnableBorder (0, 1)
-			Button.EnableBorder (1, 0)
-		else:
-			Button.SetTooltip (item["ItemNameIdentified"])
-			Button.EnableBorder (0, 0)
-			Button.EnableBorder (1, magical)
+	unusable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped) == 0
+	Button.EnableBorder (2, unusable)
 
-		unusable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped) == 0
-		Button.EnableBorder (2, unusable)
-
-		Button.SetItemIcon (Slot['ItemResRef'], 0)
+	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
 	return
 
