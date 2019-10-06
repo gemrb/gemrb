@@ -789,7 +789,8 @@ void Actor::SetCircleSize()
 		}
 	}
 
-	int csize = Clamp(anims->GetCircleSize(), 0, MAX_CIRCLE_SIZE);
+	// circle size 0 won't display, so we can ignore it when clamping
+	int csize = Clamp(anims->GetCircleSize(), 1, MAX_CIRCLE_SIZE) - 1;
 
 	SetCircle( anims->GetCircleSize(), oscillationFactor, *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
