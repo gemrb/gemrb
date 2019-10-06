@@ -141,7 +141,10 @@ def ChangeWeaponPressed ():
 	return
 
 #complete update
-def UpdateInventoryWindow (Window):
+def UpdateInventoryWindow (Window = None):
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
