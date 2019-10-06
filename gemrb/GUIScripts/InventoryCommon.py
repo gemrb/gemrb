@@ -732,7 +732,7 @@ def ReadItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	ret = Spellbook.CannotLearnSlotSpell(slot)
+	ret = Spellbook.CannotLearnSlotSpell()
 
 	if ret:
 		if ret == LSR_KNOWN and GameCheck.HasTOB():
