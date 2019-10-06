@@ -176,7 +176,7 @@ def OpenContainerWindow ():
 	# Gears (time) when options pane is down
 	if GameCheck.IsBG2():
 		Button = Window.GetControl (62)
-		Label = Button.CreateLabel (0x1000003e, "NORMAL", "", IE_FONT_SINGLE_LINE)
+		Label = Button.CreateLabel (0x10000047, "NORMAL", "", IE_FONT_SINGLE_LINE)
 
 		Label.SetAnimation ("CPEN")
 		Button.SetAnimation ("CGEAR")
