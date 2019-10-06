@@ -818,11 +818,6 @@ def GetReputation (repvalue):
 def OpenInformationWindow ():
 	global InformationWindow
 
-	if InformationWindow != None:
-		GUIRECCommon.CloseBiographyWindow ()
-		InformationWindow.Close()
-		return
-
 	InformationWindow = Window = GemRB.LoadWindow (4)
 
 	# Biography

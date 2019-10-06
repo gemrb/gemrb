@@ -533,10 +533,6 @@ def DoneBiographyWindow (ta):
 def OpenBiographyWindow ():
 	global BiographyWindow
 
-	if BiographyWindow != None:
-		CloseBiographyWindow ()
-		return
-
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	TextArea = Window.GetControl (0)
