@@ -528,7 +528,7 @@ def UpdateSlot (pc, slot):
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		TryAutoIdentification(pc, item, slot+1, slot_item, GemRB.GetVar("GUIEnhancements")&GE_TRY_IDENTIFY_ON_TRANSFER)
 
-	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
+	UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 
 	if slot_item:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
@@ -952,6 +952,53 @@ def AbilitiesItemWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAbilitiesItemWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
+	Button.SetFont ("NUMBER")
+	Button.SetBorder (0, 0,0,0,0, 128,128,255,64, 0,1)
+	Button.SetBorder (1, 2,2,2,2, 32,32,255,0, 0,0)
+	Button.SetBorder (2, 0,0,0,0, 255,128,128,64, 0,1)
+	Button.SetText ("")
+	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+
+	if Slot == None:
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		tooltips = { "inventory": 12013, "ground": 12011, "container": "" }
+		Button.SetTooltip (tooltips[Type])
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, 0)
+		Button.EnableBorder (2, 0)
+		return
+
+	item = GemRB.GetItem (Slot['ItemResRef'])
+	identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+	magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
+
+	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
+	if item["MaxStackAmount"] > 1:
+		Button.SetText (str (Slot["Usages0"]))
+	else:
+		Button.SetText ("")
+
+	# auto-identify mundane items; the actual indentification will happen on transfer
+	if not identified and item["LoreToID"] == 0:
+		identified = True
+
+	if not identified or item["ItemNameIdentified"] == -1:
+		Button.SetTooltip (item["ItemName"])
+		Button.EnableBorder (0, 1)
+		Button.EnableBorder (1, 0)
+	else:
+		Button.SetTooltip (item["ItemNameIdentified"])
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, magical)
+
+	unusable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped) == 0
+	Button.EnableBorder (2, unusable)
+
+	Button.SetItemIcon (Slot['ItemResRef'], 0)
+
 	return
 
 import GUIINV

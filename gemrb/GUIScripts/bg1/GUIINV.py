@@ -333,7 +333,7 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None) #TODO: implement OpenGroundItemAmountWindow
 
-		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	# making window visible/shaded depending on the pc's state
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
