@@ -6073,7 +6073,6 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case COND_GOTHIT:
 		// HitBy([ANYONE])
-		// TODO: should we ignore this for self-hits in non-contingency mode?
 		entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 		per_round = false;
 		break;
@@ -6136,6 +6135,42 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		// just use GameScript::TimeOfDay parameters->int0Parameter == TIMEOFDAY_NIGHT
 		timeOfDay = core->Time.GetHour(core->GetGame()->GameTime)/4;
 		condition = timeOfDay == fx->IsVariable;
+		break;
+	case COND_NEARX:
+		// Range([ANYONE], 'Extra')
+		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
+		condition = nearest && PersonalDistance(nearest, target) < fx->IsVariable;
+		break;
+	case COND_STATECHECK:
+		// StateCheck(Myself, 'Extra')
+		condition = (target->GetStat(IE_STATE_ID) & fx->IsVariable) > 0;
+		break;
+	case COND_DIED_ME:
+		// Died(Myself)
+		condition = target->GetMatchingTrigger(trigger_die, TEF_PROCESSED_EFFECTS);
+		per_round = false;
+		break;
+	case COND_DIED_ANY:
+		// Died([ANYONE])
+		condition = GameScript::EvaluateString(target, (char*) "Died([ANYONE])");
+		per_round = false;
+		break;
+	case COND_TURNEDBY:
+		// TurnedBy([ANYONE])
+		condition = target->GetMatchingTrigger(trigger_turnedby, TEF_PROCESSED_EFFECTS);
+		per_round = false;
+		break;
+	case COND_HP_LT:
+		// HPLT(Myself, 'Extra')
+		condition = target->GetBase(IE_HITPOINTS) < fx->IsVariable;
+		break;
+	case COND_HP_PERCENT_LT:
+		// HPPercentLT(Myself, 'Extra')
+		condition = target->GetBase(IE_HITPOINTS) < (fx->IsVariable * target->GetStat(IE_MAXHITPOINTS)) / 100;
+		break;
+	case COND_SPELLSTATE:
+		// CheckSpellState(Myself,'Extra')
+		condition = target->HasSpellState(fx->IsVariable);
 		break;
 	default:
 		condition = false;
