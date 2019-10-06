@@ -353,20 +353,11 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	ratio = (0.0 + encumbrance) / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
-			if invert_colors:
-				Control.SetTextColor (255, 0, 0, True)
-			else:
-				Control.SetTextColor (255, 0, 0)
+			Control.SetTextColor (255, 0, 0, invert_colors)
 		elif ratio > 0.8:
-			if invert_colors:
-				Control.SetTextColor (255, 255, 0, True)
-			else:
-				Control.SetTextColor (255, 255, 0)
+			Control.SetTextColor (255, 255, 0, invert_colors)
 		else:
-			if invert_colors:
-				Control.SetTextColor (255, 255, 255, True)
-			else:
-				Control.SetTextColor (255, 255, 255)
+			Control.SetTextColor (255, 255, 255, invert_colors)
 
 		if Control2ID:
 			Control2.SetTextColor (255, 0, 0)
