@@ -2374,6 +2374,8 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
 
+	// check for ActionOverride
+	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
 
