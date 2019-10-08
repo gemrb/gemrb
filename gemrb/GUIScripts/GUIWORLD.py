@@ -282,7 +282,7 @@ def DeathWindowEnd ():
 		GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,3)
 
-	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack())
+	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

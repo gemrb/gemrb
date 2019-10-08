@@ -1636,6 +1636,8 @@ void Game::UpdateScripts()
 		//don't check it any more
 		protagonist = PM_NO;
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindow");
+		// That's for BG as the action bars to the left and right remain visible.
+		core->ToggleViewsEnabled(false, "NOT_DLG");
 		return;
 	}
 
