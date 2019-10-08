@@ -81,7 +81,10 @@ BiographyWindow = None
 
 ###################################################
 def InitRecordsWindow (Window):
+	global RecordsWindow
 	global StatTable
+
+	RecordsWindow = Window
 	StatTable = GemRB.LoadTable("abcomm")
 
 	# Information
