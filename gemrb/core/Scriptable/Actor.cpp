@@ -8443,7 +8443,7 @@ void Actor::Draw(const Region &screen)
 		drawcircle = false;
 	}
 	// the speaker should get a circle even in cutscenes
-	if ((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
+	if (shoulddrawcircle && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
 		drawcircle = true;
 	}
 	bool drawtarget = false;
