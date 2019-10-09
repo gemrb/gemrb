@@ -2204,7 +2204,6 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	////how strength: value is based on class
 	////pst power of one also depends on this!
 	if (fx->Parameter2==3) {
-		//TODO: strextra for stats>=18
 		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,1),0);
 		fx->Parameter2 = 0;
 	}
@@ -6514,7 +6513,7 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_cure_confused_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	BASE_STATE_CURE( STATE_CONFUSED );
 	target->fxqueue.RemoveAllEffects(fx_confused_state_ref);
-	//FIXME:oddly enough, HoW removes the confused icon
+	//oddly enough, HoW removes the confused icon
 	//no one removes the rigid thinking icon
 	//there are also several mods floating around, which change these things inconsistently
 	//probably the best is to remove them all by default
@@ -6956,10 +6955,11 @@ int fx_summon_disable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-/* note/TODO from Taimon:
+/* note from Taimon:
 What happens at a lower level is that the engine recreates the entire stats on some changes to the creature. The application of an effect to the creature is one such change.
 Since the repeating effects are stored in a list inside those stats, they are being recreated every ai update, if there has been an effect application.
-The repeating effect itself internally uses a counter to store how often it has been called. And when this counter equals the period it fires of the effect. When the list is being recreated all those counters are lost.
+The repeating effect itself internally uses a counter to store how often it has been called. And when this counter equals the period it fires of the effect.
+When the list is being recreated all those counters are lost.
 */
 // 0x110 ApplyEffectRepeat
 int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
