@@ -392,8 +392,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 	if (!CurrentActionInterruptable) {
 		// sanity check
-		if (!CurrentAction && !GetNextAction())
+		if (!CurrentAction && !GetNextAction()) {
 			error("Scriptable", "No current action and no next action.\n");
+		}
 		return;
 	}
 
@@ -414,8 +415,8 @@ void Scriptable::ExecuteScript(int scriptCount)
 		// if party AI is disabled, don't run non-override scripts
 		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
 			scriptCount = 1;
-		// TODO: hardcoded action hacks
-		//TODO: add stuff here that overrides actions (like Panic, etc)
+		// hardcoded action overrides like charm, confusion, panic and berserking
+		// TODO: check why everything else but charm is handled separately and unify if possible
 		changed |= act->OverrideActions();
 	}
 
@@ -430,11 +431,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 		if (done) break;
 	}
 
-	if (changed)
+	if (changed) {
 		InitTriggers();
+	}
 
 	if (act) {
-		//TODO: add stuff here about idle actions
+		// if nothing is happening, look around, check if we're bored and so on
 		act->IdleActions(CurrentAction!=NULL);
 	}
 }
