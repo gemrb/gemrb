@@ -785,6 +785,7 @@ static EffectDesc effectnames[] = {
 };
 
 static EffectRef fx_set_berserk_state_ref = { "State:Berserk", -1 };//0x3
+static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 }; // 0x5
 static EffectRef fx_constitution_modifier_ref = { "ConstitutionModifier", -1 }; //0xa
 static EffectRef fx_damage_opcode_ref = { "Damage", -1 };  //0xc
 static EffectRef fx_death_ref = { "Death", -1 }; //0xd
@@ -1149,6 +1150,12 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// if there are several effects on the queue, suppress all but the newest
+	unsigned int count = target->fxqueue.CountEffects(fx_set_charmed_state_ref, -1, -1, NULL);
+	if (count > 1 && target->fxqueue.GetEffectOrder(fx_set_charmed_state_ref, fx) < count) {
+		return FX_PERMANENT;
+	}
+
 	bool playercharmed;
 	bool casterenemy;
 	if (fx->FirstApply) {
@@ -1160,7 +1167,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (caster->Type==ST_ACTOR) {
 			casterenemy = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 		} else {
-			casterenemy = true; //target->GetStat(IE_EA)>EA_GOODCUTOFF;
+			casterenemy = true;
 		}
 		if (!fx->DiceThrown) fx->DiceThrown = casterenemy;
 
