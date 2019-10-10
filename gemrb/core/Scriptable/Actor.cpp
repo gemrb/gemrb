@@ -10925,10 +10925,11 @@ void Actor::ResetCommentTime()
 	Game *game = core->GetGame();
 	if (bored_time) {
 		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 	} else {
 		nextBored = 0;
+		nextComment = game->GameTime + core->Roll(10, 500, 150);
 	}
-	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }
 
 // this one is just a hack, so we can keep a bunch of other functions const
