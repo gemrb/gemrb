@@ -4246,11 +4246,19 @@ void Actor::IdleActions(bool nonidle)
 
 	Game *game = core->GetGame();
 	//there is no combat
-	if (game->CombatCounter) return;
+	if (game->CombatCounter) {
+		ResetCommentTime();
+		return;
+	}
+
 	//and they are on the current area
 	if (map!=game->GetCurrentArea()) return;
+
 	//don't mess with cutscenes
-	if (core->InCutSceneMode()) return;
+	if (core->InCutSceneMode()) {
+		ResetCommentTime();
+		return;
+	}
 
 	//only party [N]PCs talk but others might play existence sounds
 	if (!InParty) {
@@ -4271,7 +4279,7 @@ void Actor::IdleActions(bool nonidle)
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
-		if (nextComment && !core->InCutSceneMode() && !Immobile() && !GetPartyComment()) {
+		if (nextComment && !Immobile() && !GetPartyComment()) {
 			GetAreaComment(map->AreaType);
 		}
 		nextComment = time+core->Roll(5,1000,bored_time/2);
@@ -4280,7 +4288,7 @@ void Actor::IdleActions(bool nonidle)
 
 	//drop the bored one liner if there was no action for some time
 	//if bored timeout is disabled, don't bother to set the new time
-	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile() || core->InCutSceneMode()) {
+	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
 		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
 		if (bored_time && nextBored && nextBored < time) {
