@@ -58,32 +58,32 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	: Sprite2D(obj)
 {
-	// SDL_ConvertSurface should copy colorkey/palette/pixels/surface RLE
-	// FIXME: our software renderer assumes the pitch is the width*BPP
-	// since our sprite class has no Pitch member we have to manually copy the pixels from
-	// obj to our own pixel buffer so the pitch will be as expected
-	//surface = SDL_ConvertSurface(obj.surface, obj.surface->format, obj.surface->flags);
-	/*
-	SDL_PixelFormat* fmt = obj.surface->format;
-	size_t numPx = obj.Width * obj.Height * fmt->BytesPerPixel;
-	pixels = malloc(numPx);
-	memcpy(pixels, obj.pixels, numPx);
-	surface = SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
-									   fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask );
-	memcpy(surface->format->palette->colors, obj.surface->format->palette->colors, surface->format->palette->ncolors);
-	freePixels = true;
-	pixels = surface->pixels;
-	palette = NULL;
-	surface = obj.surface;
-	SetColorKey(obj.GetColorKey());
-	 */
+	SDL_PixelFormat* fmt = (*obj.surface)->format;
+	pixels = (*obj.surface)->pixels;
 
-	// all copies now share underlying. AFIK we don't have actual need for modifying pixels,
-	// but just in case something comes up the code above can be used in a pinch
+	surface = new SurfaceHolder(
+			SDL_CreateRGBSurfaceFrom(
+				pixels,
+				Width,
+				Height,
+				Bpp < 8 ? 8 : Bpp,
+				Width * ( Bpp / 8 ),
+				fmt->Rmask,
+				fmt->Gmask,
+				fmt->Bmask,
+				fmt->Amask
+			)
+		);
 
-	// a copy does not retain the original
-	// it is as if it is a new sprite of version 0
-	surface = obj.surface;
+	if (Bpp == 8) {
+		memcpy(
+			(*surface)->format->palette->colors,
+			(*obj.surface)->format->palette->colors,
+			(*surface)->format->palette->ncolors
+		);
+		SetColorKey(obj.GetColorKey());
+	}
+
 	original = surface;
 	version = 0;
 }
@@ -207,7 +207,7 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
 	assert(RLE == false);
 }
-	
+
 bool SDLSurfaceSprite2D::HasTransparency() const
 {
 	SDL_PixelFormat* fmt = (*surface)->format;
