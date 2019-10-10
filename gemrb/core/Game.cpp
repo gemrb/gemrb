@@ -1486,10 +1486,12 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
+	// and delay most idle actions
 	// but only if we skip for at least an hour
 	if (add >= core->Time.hour_size) {
 		for (unsigned int i=0; i<PCs.size(); i++) {
 			Actor *pc = PCs[i];
+			pc->ResetCommentTime();
 			int conHealRate = pc->GetConHealAmount();;
 			// 1. regeneration as an effect
 			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
