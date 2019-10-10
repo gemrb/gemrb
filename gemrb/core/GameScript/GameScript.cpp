@@ -279,7 +279,7 @@ static const TriggerLink triggernames[] = {
 	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
-	{"nexttriggerobject", GameScript::NextTriggerObject, 0},
+	{"nexttriggerobject", NULL, 0}, // handled inline
 	{"nightmaremodeon", GameScript::NightmareModeOn, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
@@ -1976,6 +1976,9 @@ static Trigger* ReadTrigger(DataStream* stream)
 	return tR;
 }
 
+// NOTE: keep these in sync with gemtrig.ids!
+#define NEXT_TRIGGER_OBJECT_EX 0x4100
+#define NEXT_TRIGGER_OBJECT_EE 0x40e0
 static Condition* ReadCondition(DataStream* stream)
 {
 	char line[10];
@@ -1985,10 +1988,31 @@ static Condition* ReadCondition(DataStream* stream)
 		return NULL;
 	}
 	Condition* cO = new Condition();
+	Object *triggerer = NULL;
 	while (true) {
 		Trigger* tR = ReadTrigger( stream );
-		if (!tR)
+		if (!tR) {
+			if (triggerer) delete triggerer;
 			break;
+		}
+
+		// handle NextTriggerObject
+		/* Defines the object that the next trigger will be evaluated in reference to. This trigger
+		 * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
+		 * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
+		 * cannot be found, the next trigger will evaluate to false.
+		 */
+		if (triggerer) {
+			delete tR->objectParameter; // not using Release, so we don't have to check if it's null
+			tR->objectParameter = triggerer;
+			triggerer = NULL;
+		} else if (tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EX) || tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EE)) {
+			triggerer = tR->objectParameter;
+			tR->objectParameter = NULL;
+			delete tR;
+			continue;
+		}
+
 		cO->triggers.push_back( tR );
 	}
 	return cO;

@@ -792,7 +792,6 @@ public: //Script Functions
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NearSavedLocation(Scriptable* Sender, Trigger* parameters);
-	static int NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int NightmareModeOn(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);

@@ -1,4 +1,5 @@
 IDS
+0x40e0 NextTriggerObject(O:Object*)
 0x40ff UsedExit(S:ResRef*,O:Actor*)
 0x4100 NextTriggerObject(O:Object*)
 0x4101 MovementRate(O:Object*,I:Value*)

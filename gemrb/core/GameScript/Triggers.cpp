@@ -4204,17 +4204,6 @@ int GameScript::BeenInParty(Scriptable* Sender, Trigger* /*parameters*/)
  * TobEx triggers
  */
 
-/* Defines the object that the next trigger will be evaluated in reference to. This trigger
- * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
- * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
- * cannot be found, the next trigger will evaluate to false.
- */
-int GameScript::NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/)
-{
-	// TODO: implement
-	return 0;
-}
-
 /* Compares the animation movement rate of the target creature specified by Object to Value.
  * This is not affected by slow or haste, but is affected if the Object is entangled, webbed, etc.
  */
