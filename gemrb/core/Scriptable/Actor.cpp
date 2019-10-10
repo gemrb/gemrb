@@ -6172,7 +6172,7 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 			return false;
 		}
 		// charmed actors are only selectable if they were charmed by the party
-		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && BaseStats[IE_EA] <= EA_GOODCUTOFF) return false;
+		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && Modified[IE_EA] == EA_CHARMEDPC) return false;
 		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
