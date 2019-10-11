@@ -410,7 +410,8 @@ def AcceptPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	#10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	if not ImportedChar:
+		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:

@@ -155,7 +155,8 @@ def NextPress():
 	IDLUCommon.SetupSavingThrows (MyChar, Class, True)
 
 	# 10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
+	if not GemRB.GetVar ("ImportedChar"):
+		GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# reset hitpoints
@@ -220,6 +221,7 @@ def NextPress():
 	else:
 		NewRef = GemRB.CreateString (62015+MyChar, BioData)
 	GemRB.SetPlayerString (MyChar, 63, NewRef)
+	GemRB.SetVar ("ImportedChar", 0)
 
 	# set memorized spells as non-depleted - ready to use
 	GemRB.ChargeSpells (MyChar)
