@@ -4945,6 +4945,10 @@ int fx_poison_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_playsound (%s)", fx->Resource );
+	if (target && STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//this is probably inaccurate
 	if (target) {
 		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
