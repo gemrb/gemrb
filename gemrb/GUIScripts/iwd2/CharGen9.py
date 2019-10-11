@@ -160,8 +160,9 @@ def NextPress():
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# reset hitpoints
-	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
-	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
+	if not GemRB.GetVar ("ImportedChar"):
+		GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
+		GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
 	LUCommon.SetupHP (MyChar)
 
 	t=GemRB.GetVar ("Alignment")
