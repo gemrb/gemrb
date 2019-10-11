@@ -1033,7 +1033,7 @@ void Projectile::ClearPath()
 int Projectile::CalculateTargetFlag()
 {
 	//if there are any, then change phase to exploding
-	int flags = GA_NO_DEAD;
+	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
 
 	if (Extension) {
 		if (Extension->AFlags&PAF_NO_WALL) {
