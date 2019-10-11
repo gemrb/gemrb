@@ -203,7 +203,7 @@ GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
-#define SCHEDULE_MASK(time)	(1 << core->Time.GetHour(time + core->Time.hour_size/2))
+#define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
 #ifndef WIN32
 inline unsigned long GetTickCount()
