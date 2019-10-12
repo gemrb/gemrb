@@ -3219,19 +3219,26 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 //this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(1 << parameters->int0Parameter, core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 0 || parameters->int0Parameter > 23) return 0;
+
+	if (!parameters->int0Parameter) parameters->int0Parameter = 24;
+	return Schedule(1 << (parameters->int0Parameter - 1), core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(0xFFFFFFu << (parameters->int0Parameter + 1), core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 0 || parameters->int0Parameter > 22) return 0;
+
+	return Schedule((0xFFFFFFu << parameters->int0Parameter) & 0x7FFFFFu, core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(0xFFFFFFu >> (24 - parameters->int0Parameter - 1), core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 1 || parameters->int0Parameter > 23) return 0;
+
+	return Schedule((0xFFFFFFu >> (25 - parameters->int0Parameter)) | 1 << 23, core->GetGame()->GameTime);
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
