@@ -390,7 +390,7 @@
 0xEB39     MBE1       MBE1       MBE1       MBE1       9          2          1          *
 0xEB49     MBE2       MBE2       MBE2       MBE2       9          2          1          *
 0xEB79     MLER       MLER       MLER       MLER       9          2          1          *
-0xEC0B     MWDR       MWDR       MWDR       MWDR       9          2          1          *
+0xEC0B     MWDR       MWDR       MWDR       MWDR       9          5          1          *
 0xEC2B     MSHE       MSHE       MSHE       MSHE       9          2          1          *
 0xEC33     MCHI       MCHI       MCHI       MCHI       9          2          1          *
 0xEC4B     MDH1       MDH1       MDH1       MDH1       9          2          1          *

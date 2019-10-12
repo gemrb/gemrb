@@ -370,7 +370,7 @@
 0xEBD8    MSAL      MSAL       MSAL       MSAL       16         2          1          *
 0xEBE8    MSA2      MSA2       MSA2       MSA2       16         2          1          *
 0xEBF1    MARU      MARU       MARU       MARU       9          2          1          *
-0xEC0B    MWDR      MWDR       MWDR       MWDR       9          2          1          *
+0xEC0B    MWDR      MWDR       MWDR       MWDR       9          5          1          *
 0xEC1D    MCHY      MCHY       MCHY       MCHY       9          2          1          *
 0xEC2B    MSHE      MSHE       MSHE       MSHE       9          2          1          *
 0xEC33    MCHI      MCHI       MCHI       MCHI       9          2          1          *
