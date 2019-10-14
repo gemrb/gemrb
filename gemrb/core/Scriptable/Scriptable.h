@@ -489,15 +489,8 @@ public:
 		return StanceID;
 	}
 
-	inline void SetOrientation(int value, bool slow) {
-		//MAX_ORIENT == 16, so we can do this
-		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
-		if (!slow) {
-			Orientation = NewOrientation;
-		}
-	}
-
 	void SetStance(unsigned int arg);
+	void SetOrientation(int value, bool slow);
 	void SetAttackMoveChances(ieWord *amc);
 	virtual bool DoStep(unsigned int walk_speed, ieDword time = 0);
 	void AddWayPoint(const Point &Des);

@@ -2101,6 +2101,14 @@ void Movable::SetStance(unsigned int arg)
 	}
 }
 
+void Movable::SetOrientation(int value, bool slow) {
+	//MAX_ORIENT == 16, so we can do this
+	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+	if (!slow) {
+		Orientation = NewOrientation;
+	}
+}
+
 void Movable::SetAttackMoveChances(ieWord *amc)
 {
 	AttackMovements[0]=amc[0];
