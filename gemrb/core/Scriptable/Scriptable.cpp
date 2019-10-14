@@ -2080,25 +2080,24 @@ void Movable::SetStance(unsigned int arg)
 		}
 	}
 
-	if (arg<MAX_ANIMS) {
-		StanceID=(unsigned char) arg;
-
-		if (StanceID == IE_ANI_ATTACK) {
-			// Set stance to a random attack animation
-
-			int random = RAND(0, 99);
-			if (random < AttackMovements[0]) {
-				StanceID = IE_ANI_ATTACK_BACKSLASH;
-			} else if (random < AttackMovements[0] + AttackMovements[1]) {
-				StanceID = IE_ANI_ATTACK_SLASH;
-			} else {
-				StanceID = IE_ANI_ATTACK_JAB;
-			}
-		}
-
-	} else {
-		StanceID=IE_ANI_AWAKE;
+	if (arg >= MAX_ANIMS) {
+		StanceID = IE_ANI_AWAKE;
 		Log(ERROR, "Movable", "Tried to set invalid stance id(%u)", arg);
+		return;
+	}
+
+	StanceID = (unsigned char) arg;
+
+	if (StanceID == IE_ANI_ATTACK) {
+		// Set stance to a random attack animation
+		int random = RAND(0, 99);
+		if (random < AttackMovements[0]) {
+			StanceID = IE_ANI_ATTACK_BACKSLASH;
+		} else if (random < AttackMovements[0] + AttackMovements[1]) {
+			StanceID = IE_ANI_ATTACK_SLASH;
+		} else {
+			StanceID = IE_ANI_ATTACK_JAB;
+		}
 	}
 }
 
