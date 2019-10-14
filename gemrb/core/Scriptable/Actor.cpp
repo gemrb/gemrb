@@ -11281,5 +11281,62 @@ bool Actor::HasPlayerClass() const
 	return cid > 0 && cid < classcount;
 }
 
+// this is part of a REd function from the original (see #124)
+char Actor::GetArmorCode() const
+{
+	bool mageAnimation = (BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200;
+	// IE_ARMOR_TYPE + 1 is the armor code, but we also need to look up robes specifically as they have 3 types :(
+	CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
+	if (!itm) return '1';
+	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	if (!item) return '1';
+	bool wearingRobes = item->AnimationType[1] == 'W';
+
+	if (mageAnimation ^ wearingRobes) return '1';
+	return item->AnimationType[0];
 }
 
+const char* Actor::GetArmorSound() const
+{
+	// Character has mage animation or is a non-mage wearing mage robes
+	if ((BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200) return "";
+	char armorCode = GetArmorCode();
+	if (armorCode == '1') {
+		return "";
+	}
+
+	// generate a 1 letter suffix or emulate an empty string
+	// ARM_04G and ARM_04H exist, but couldn't be picked by the original function
+	const char* suffixes = "abcdefgh";
+	int maxChar = 6;
+	if (armorCode == '4') maxChar = 8;
+	int idx = RAND(0, maxChar);
+	char randomASCII = '\0';
+	if (idx < maxChar) randomASCII = suffixes[idx];
+
+	char *sound = new char[9];
+	strcpy(sound, "ARM_0");
+	sound[5] = armorCode;
+	sound[6] = randomASCII;
+	sound[7] = '\0';
+	return sound;
+}
+
+void Actor::PlayArmorSound() const
+{
+	if (Modified[IE_STATE_ID] & STATE_SILENCED) return;
+	// peculiar original behaviour: always for pcs, while the rest only clank if footstep sounds are on
+	if (!footsteps && !InParty) return;
+
+	Game *game = core->GetGame();
+	if (!game) return;
+	if (game->CombatCounter) return;
+
+	const char *armorSound = GetArmorSound();
+	if (armorSound[0]) {
+		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_WALK_CHAR, Pos.x, Pos.y);
+		delete armorSound;
+	}
+}
+
+}

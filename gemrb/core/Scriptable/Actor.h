@@ -438,6 +438,8 @@ private:
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
+	char GetArmorCode() const;
+	const char* GetArmorSound() const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -944,6 +946,7 @@ public:
 	unsigned int GetAdjustedTime(unsigned int time) const;
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
+	void PlayArmorSound() const;
 };
 }
 

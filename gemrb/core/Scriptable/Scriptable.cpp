@@ -2099,11 +2099,23 @@ void Movable::SetStance(unsigned int arg)
 			StanceID = IE_ANI_ATTACK_JAB;
 		}
 	}
+
+	// this doesn't get hit on movement, since movement overrides the stance manually
+	// but it is needed for the twang/clank when an actor stops moving
+	// a lot of other stances would get skipped later, since we check we're out of combat
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		actor->PlayArmorSound();
+	}
 }
 
 void Movable::SetOrientation(int value, bool slow) {
 	//MAX_ORIENT == 16, so we can do this
 	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+	if (NewOrientation != Orientation && Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		actor->PlayArmorSound();
+	}
 	if (!slow) {
 		Orientation = NewOrientation;
 	}
