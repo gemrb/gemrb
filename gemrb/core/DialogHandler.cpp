@@ -330,10 +330,17 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			if (!core->HasFeature(GF_AREA_OVERRIDE)) {
 				target->AddAction(GenerateAction("BreakInstants()"));
 			}
+			// ifdef with GF_CUTSCENE_AREASCRIPTS if needed
+			if (tr->Flags & IE_DLG_TR_FINAL) {
+				target->AddAction(GenerateAction("StartCutSceneMode()"));
+			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
 			}
 			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
+			if (tr->Flags & IE_DLG_TR_FINAL) {
+				target->AddAction(GenerateAction("EndCutSceneMode()"));
+			}
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
