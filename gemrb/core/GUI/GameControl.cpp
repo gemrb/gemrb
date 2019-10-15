@@ -99,16 +99,17 @@ GameControl::GameControl(const Region& frame)
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 
-	ieDword tmp=0;
+	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
-	AlwaysRun = !!tmp;
+	AlwaysRun = tmp != 0;
 
 	ClearMouseState();
 	ResetTargetMode();
 
+	tmp = 0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
-		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
+		ScreenFlags = SF_ALWAYSCENTER | SF_CENTERONACTOR;
 	} else {
 		ScreenFlags = SF_CENTERONACTOR;
 	}
@@ -391,12 +392,14 @@ void GameControl::WillDraw()
 				cursorFrame = 4; // left
 			}
 
-			// set these cursors on game window so they are universal
-			Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-			window->SetCursor(cursor);
-			Sprite2D::FreeSprite(cursor);
-			
-			numScrollCursor = (numScrollCursor+1) % 15;
+			if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
+				// set these cursors on game window so they are universal
+				Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
+				window->SetCursor(cursor);
+				Sprite2D::FreeSprite(cursor);
+
+				numScrollCursor = (numScrollCursor+1) % 15;
+			}
 		}
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);
