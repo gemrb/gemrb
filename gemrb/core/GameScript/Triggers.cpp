@@ -1578,17 +1578,24 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+// EEs extend this to NearSavedLocation(O:Object*,S:Global*,I:Range*)
 int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	if (core->HasFeature(GF_HAS_KAPUTZ)) {
-		// we don't understand how this works in pst yet
+		// TODO: we don't understand how this works in pst yet
 		return 1;
 	}
 	Actor *actor = (Actor *) Sender;
-	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
+	Point p;
+	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
+		p = actor->HomeLocation;
+	} else {
+		p.x = (short) actor->GetStat(IE_SAVEDXPOS);
+		p.y = (short) actor->GetStat(IE_SAVEDYPOS);
+	}
 	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);
 	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
