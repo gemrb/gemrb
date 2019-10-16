@@ -945,7 +945,9 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_SAVEDYPOS, parameters->int1Parameter);
 	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
+
 //IWD2, sets the homepoint P
+// handle [-1.-1] specially, if needed; ar6200.bcs has interesting use
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -4342,6 +4344,13 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	// iwd2 has two uses with [-1.-1]
+	if (parameters->pointParameter.x == -1) {
+		parameters->pointParameter.x = Sender->Pos.x;
+		parameters->pointParameter.y = Sender->Pos.y;
+	}
+
 	if (Distance(parameters->pointParameter, Sender) > 10) {
 		MoveNearerTo(Sender, parameters->pointParameter, 10,0);
 		return;
@@ -7114,8 +7123,14 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	fx->PosX=parameters->pointParameter.x;
-	fx->PosY=parameters->pointParameter.y;
+	// iwd2 with [-1.-1] again
+	if (parameters->pointParameter.x == -1) {
+		fx->PosX = src->Pos.x;
+		fx->PosY = src->Pos.y;
+	} else {
+		fx->PosX = parameters->pointParameter.x;
+		fx->PosY = parameters->pointParameter.y;
+	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
 	delete fx;
