@@ -1198,6 +1198,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 
+	// iwd2 is the only one with special handling:
+	// -2 is used as HomeLocation; no other unusual values are used
+	if (parameters->pointParameter.x < 0) {
+		parameters->pointParameter = actor->HomeLocation;
+	}
+
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, 0 );
