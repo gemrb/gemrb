@@ -8119,13 +8119,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	// is this true???
-	if (Des.x==-2 && Des.y==-2) {
-		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
-		Movable::WalkTo(p, MinDistance);
-	} else {
-		Movable::WalkTo(Des, MinDistance);
-	}
+	Movable::WalkTo(Des, MinDistance);
 }
 
 int Actor::WantDither() const
