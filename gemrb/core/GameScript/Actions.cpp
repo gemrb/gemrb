@@ -1333,7 +1333,7 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo(p, 0, 0);
+		actor->WalkTo(p, 0, parameters->int0Parameter);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
