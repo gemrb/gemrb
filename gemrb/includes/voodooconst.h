@@ -84,7 +84,8 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 
 // NearLocation range multiplier (currently the same for pst and iwd2/how)
 // arbitrary, started as 20 and has no effect for callers that want exact position
-static const int VOODOO_NEARLOC_F = 10;
+// supposedly the same feet->map conversion as usual
+static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
 
 // visual range stuff
 static const int VOODOO_CANSEE_F = 15;
