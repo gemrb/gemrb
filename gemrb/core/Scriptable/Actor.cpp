@@ -1854,13 +1854,13 @@ GEM_EXPORT void UpdateActorConfig()
 	GameDifficulty = 0;
 	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
 	if (GameDifficulty) {
-		GameDifficulty = DIFF_NIGHTMARE;
+		GameDifficulty = DIFF_INSANE;
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
-	if (GameDifficulty>DIFF_NIGHTMARE) GameDifficulty = DIFF_NIGHTMARE;
+	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);

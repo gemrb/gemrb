@@ -113,7 +113,8 @@ namespace GemRB {
 #define DIFF_NORMAL        2
 #define DIFF_CORE          3
 #define DIFF_HARD          4
-#define DIFF_NIGHTMARE     5
+#define DIFF_INSANE        5
+#define DIFF_NIGHTMARE     6 // rather check against the ini var where needed
 
 /** flags for GetActor */
 //default action
