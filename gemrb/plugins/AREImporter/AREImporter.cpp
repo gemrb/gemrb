@@ -1168,8 +1168,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					// 2 - area difficulty 2
 					// 4 - area difficulty 3
 					if (DifficultyMargin && !(DifficultyMargin & map->AreaDifficulty)) {
-						// iwd2 has GF_START_ACTIVE off, but that only touches IF_IDLE
-						ab->appearance = 0;
+						ab->DestroySelf();
 					}
 				}
 			}
