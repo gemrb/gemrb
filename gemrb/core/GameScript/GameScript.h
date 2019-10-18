@@ -613,6 +613,7 @@ public: //Script Functions
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
 	static int ChargeCount(Scriptable* Sender, Trigger* parameters);
 	static int CharName(Scriptable* Sender, Trigger* parameters);
+	static int CheckAreaDiffLevel(Scriptable* /*Sender*/, Trigger* parameters);
 	static int CheckDoorFlags(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyAverageLevel(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyLevel(Scriptable* Sender, Trigger* parameters);

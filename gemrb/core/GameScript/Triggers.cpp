@@ -3489,6 +3489,13 @@ int GameScript::StoryModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+int GameScript::CheckAreaDiffLevel(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	Map *map = core->GetGame()->GetCurrentArea();
+	if (!map) return 0;
+	return map->AreaDifficulty == parameters->int0Parameter;
+}
+
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	ieDword diff;

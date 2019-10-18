@@ -77,7 +77,7 @@ static const TriggerLink triggernames[] = {
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
-	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
+	{"checkareadifflevel", GameScript::CheckAreaDiffLevel, 0}, //iwd2
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
 	{"checkitemslot", GameScript::HasItemSlot, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
