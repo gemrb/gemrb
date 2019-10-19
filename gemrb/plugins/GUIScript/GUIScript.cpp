@@ -8240,7 +8240,7 @@ default to the class script slot (customisable by players).\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
-  * Index - script index (see scrlevel.2da)\n\
+  * Index - script index (see scrlev.ids)\n\
 \n\
 **Return value:** the player's script (.bcs or .baf resref)\n\
 \n\
@@ -8277,7 +8277,7 @@ script is customisable via the GUI (used if Index is omitted).\n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
   * ScriptName - the script resource\n\
-  * Index      - the script index (see scrlevel.2da)\n\
+  * Index      - the script index (see scrlev.ids)\n\
 \n\
 **Return value:** N/A\n\
 \n\
