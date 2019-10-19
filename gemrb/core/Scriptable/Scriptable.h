@@ -47,20 +47,21 @@ class Spell;
 class Sprite2D;
 class SpriteCover;
 
-#define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
 
 /** The distance between PC's who are about to enter a new area */
 #define MAX_TRAVELING_DISTANCE      400
 
-#define SCR_OVERRIDE 0
-#define SCR_AREA	 1
-#define SCR_SPECIFICS 2
-#define SCR_RESERVED  3
-#define SCR_CLASS    4
-#define SCR_RACE	 5
-#define SCR_GENERAL  6
-#define SCR_DEFAULT  7
+// script levels / slots (scrlev.ids)
+#define SCR_OVERRIDE  0
+#define SCR_AREA      1 // iwd2: special 1
+#define SCR_SPECIFICS 2 // iwd2: team
+#define SCR_RESERVED  3 // iwd2: pc-customizable scripts were saved here
+#define SCR_CLASS     4 // iwd2: special 2
+#define SCR_RACE      5 // iwd2: combat
+#define SCR_GENERAL   6 // iwd2: special 3
+#define SCR_DEFAULT   7 // iwd2: movement
+#define MAX_SCRIPTS   8
 
 //pst trap flags (portal)
 #define PORTAL_CURSOR 1

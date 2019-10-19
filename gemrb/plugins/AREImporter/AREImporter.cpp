@@ -1081,7 +1081,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword Orientation, Schedule, RemovalTime;
 			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
 			ieResRef Dialog;
-			ieResRef Scripts[8]; //the original order
+			ieResRef Scripts[8]; //the original order is shown in scrlev.ids
 			ieDword Flags;
 			ieByte DifficultyMargin;
 
