@@ -200,22 +200,25 @@ bool AREImporter::Open(DataStream* stream)
 	// If you set it to any other number, it will be that transparent.
 	// It's 1 byte, so setting it to 128 you'll have the same as the default of 0
 	str->ReadWord( &WUnknown );
+
 	AreaDifficulty = 0;
 	if (bigheader) {
 		// are9.1 difficulty bits for level2/level3
-		// TODO: there must be more advanced logic here for sure (guessing vs party level)
 		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
 		AreaDifficulty = 1;
 		ieByte tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		int avgPartyLevel = core->GetGame()->GetTotalPartyLevel(false) / core->GetGame()->GetPartySize(false);
+		str->Read(&tmp, 1); // 0x54
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 2;
 		}
 		tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		str->Read(&tmp, 1); // 0x55
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 4;
 		}
+		// 0x56 held the average party level at load time (usually 1, since it had no access yet),
+		// but we resolve everything here and store AreaDifficulty instead
 	}
 	//bigheader gap is here
 	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
