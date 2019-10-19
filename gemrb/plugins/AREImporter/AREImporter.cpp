@@ -1093,7 +1093,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &YDes );
 			str->ReadDword( &Flags );
 			str->ReadWord( &Spawned );
-			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, TODO: purpose unknown (portraits?)
+			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
 			str->Read( &DifficultyMargin, 1 ); // iwd2 only
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
@@ -1117,7 +1117,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
-			//TODO: iwd2 script?
+			// another iwd2 script slot
 			str->ReadResRef( Scripts[SCR_AREA] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			//not iwd2, this field is garbage
