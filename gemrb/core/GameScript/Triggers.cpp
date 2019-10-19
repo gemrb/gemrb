@@ -3483,11 +3483,12 @@ int GameScript::StoryModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+// the original was more complicated, but we simplify by doing more work in AREImporter
 int GameScript::CheckAreaDiffLevel(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (!map) return 0;
-	return map->AreaDifficulty == parameters->int0Parameter;
+	return map->AreaDifficulty == 1 << (parameters->int0Parameter - 1);
 }
 
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
