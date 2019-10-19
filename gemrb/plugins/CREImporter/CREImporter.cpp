@@ -1818,8 +1818,8 @@ void CREImporter::GetActorIWD2(Actor *act)
 	for (i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
+	ReadScript( act, SCR_SPECIFICS);
 	ReadScript( act, SCR_AREA);
-	ReadScript( act, SCR_RESERVED);
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->ReadDword( &act->BaseStats[IE_FEATS1]);
 	str->ReadDword( &act->BaseStats[IE_FEATS2]);
