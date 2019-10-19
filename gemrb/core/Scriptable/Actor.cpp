@@ -11329,7 +11329,7 @@ void Actor::PlayArmorSound() const
 	const char *armorSound = GetArmorSound();
 	if (armorSound[0]) {
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
-		delete armorSound;
+		delete[] armorSound;
 	}
 }
 
