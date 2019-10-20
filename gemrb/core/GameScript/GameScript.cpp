@@ -2059,6 +2059,11 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
 						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+						if (core->HasFeature(GF_3ED_RULES)) {
+							if (done) *done = true;
+						}
 						return false;
 					}
 
