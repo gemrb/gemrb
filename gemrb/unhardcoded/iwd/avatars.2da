@@ -356,7 +356,7 @@
 0xEB10    MSKA      MSKA       MSKA       MSKA       9          2          1          *
 0xEB18    MANI      MANI       MANI       MANI       9          2          1          *
 0xEB28    MAN2      MAN2       MAN2       MAN2       9          2          1          *
-0xEB39    MBE1      MBE1       MBE1       MBE1       9          2          1          *
+0xEB39    MBE1      MBE1       MBE1       MBE1       9          3          1          *
 0xEB49    MBE2      MBE2       MBE2       MBE2       9          2          1          *
 0xEB51    MSEE      MSEE       MSEE       MSEE       9          2          1          *
 0xEB52    MFIR      MFIR       MFIR       MFIR       9          2          1          *
