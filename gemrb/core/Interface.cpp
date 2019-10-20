@@ -2469,14 +2469,15 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	} else {
 		map = game->GetCurrentArea();
 	}
+	if (!map) return ab;
 
-	if (map) while(cnt--) {
+	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
 			return NULL;
 		}
 		ieDword sex = tmp->GetStat(IE_SEX);
-		//TODO: make this external
+		//TODO: make this external as summlimt.2da
 		int limit = 0;
 		switch (sex) {
 		case SEX_SUMMON: case SEX_SUMMON_DEMON:
