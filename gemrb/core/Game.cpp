@@ -1571,7 +1571,8 @@ bool Game::EveryoneDead() const
 	}
 	if (protagonist==PM_NO) {
 		Actor *nameless = PCs[0];
-		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+		// don't trigger this outside pst, our game loop depends on it
+		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GF_PST_STATE_FLAGS)) {
 			if (area->INISpawn) {
 				area->INISpawn->RespawnNameless();
 			}
