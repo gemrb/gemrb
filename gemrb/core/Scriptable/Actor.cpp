@@ -11318,6 +11318,8 @@ const char* Actor::GetArmorSound() const
 
 void Actor::PlayArmorSound() const
 {
+	// don't try immediately upon loading
+	if (!Ticks) return;
 	if (Modified[IE_STATE_ID] & STATE_SILENCED) return;
 	// peculiar original behaviour: always for pcs, while the rest only clank if footstep sounds are on
 	if (!footsteps && !InParty) return;
