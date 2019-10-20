@@ -11321,6 +11321,8 @@ void Actor::PlayArmorSound() const
 	if (Modified[IE_STATE_ID] & STATE_SILENCED) return;
 	// peculiar original behaviour: always for pcs, while the rest only clank if footstep sounds are on
 	if (!footsteps && !InParty) return;
+	// pst is missing the resources
+	if (pstflags) return;
 
 	Game *game = core->GetGame();
 	if (!game) return;
