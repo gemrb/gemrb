@@ -1317,7 +1317,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// now that we have all items, check if we need to jump through hoops to get a proper equipped slot
 	// move to fx_summon_creature2 if it turns out something else relies on having nothing equipped
 	if (eqslot == -1) {
-		act->inventory.SetEquipped(act->inventory.GetWeaponSlot(), eqheader); // just reset Equipped, so EquipBestWeapon does its job
+		act->inventory.SetEquipped(0, eqheader); // just reset Equipped, so EquipBestWeapon does its job
 		act->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
 
