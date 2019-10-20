@@ -1270,8 +1270,6 @@ void CREImporter::GetActorPST(Actor *act)
 void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	ieWord *indices = (ieWord *) calloc(Inventory_Size, sizeof(ieWord));
-	//CREItem** items;
-	unsigned int i,j,k;
 	ieWordSigned eqslot;
 	ieWord eqheader;
 
@@ -1279,7 +1277,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
 
 	//first read the indices
-	for (i = 0;i<Inventory_Size; i++) {
+	for (unsigned int i = 0; i < Inventory_Size; i++) {
 		str->ReadWord(indices+i);
 	}
 	//this word contains the equipping info (which slot is selected)
@@ -1294,7 +1292,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
-	for (i = 0;i<Inventory_Size;) {
+	for (unsigned int i = 0; i < Inventory_Size;) {
 		//the index was intentionally increased here, the fist slot isn't saved
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
@@ -1322,20 +1320,20 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREMemorizedSpell *) );
 
 	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < KnownSpellsCount; i++) {
+	for (unsigned int i = 0; i < KnownSpellsCount; i++) {
 		known_spells[i]=GetKnownSpell();
 	}
 
 	str->Seek( MemorizedSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < MemorizedSpellsCount; i++) {
+	for (unsigned int i = 0; i < MemorizedSpellsCount; i++) {
 		memorized_spells[i]=GetMemorizedSpell();
 	}
 
 	str->Seek( SpellMemorizationOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < SpellMemorizationCount; i++) {
+	for (unsigned int i = 0; i < SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(act);
 
-		j=KnownSpellsCount;
+		unsigned int j = KnownSpellsCount;
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
@@ -1348,7 +1346,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			}
 		}
 		for (j = 0; j < MemorizedCount; j++) {
-			k = MemorizedIndex+j;
+			unsigned int k = MemorizedIndex + j;
 			assert(k < MemorizedSpellsCount);
 			if (memorized_spells[k]) {
 				sm->memorized_spells.push_back( memorized_spells[k]);
@@ -1359,7 +1357,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 
-	i=KnownSpellsCount;
+	unsigned int i = KnownSpellsCount;
 	while(i--) {
 		if (known_spells[i]) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
