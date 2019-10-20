@@ -11299,20 +11299,39 @@ const char* Actor::GetArmorSound() const
 		return "";
 	}
 
-	// generate a 1 letter suffix or emulate an empty string
-	// ARM_04G and ARM_04H exist, but couldn't be picked by the original function
-	const char* suffixes = "abcdefgh";
+	char *sound = new char[9];
 	int maxChar = 6;
 	if (armorCode == '4') maxChar = 8;
-	int idx = RAND(0, maxChar);
-	char randomASCII = '\0';
-	if (idx < maxChar) randomASCII = suffixes[idx];
+	if (IWDSound) {
+		// all three iwds have this pattern: a_chain1-6, a_lthr1-6, a_plate1-8
+		const char* suffixes = "12345678";
+		int idx = RAND(0, maxChar-1);
+		if (armorCode == '2') {
+			strcpy(sound, "A_LTHR");
+			sound[6] = suffixes[idx];
+			sound[7] = '\0';
+		} else if (armorCode == '3') {
+			strcpy(sound, "A_CHAIN");
+			sound[7] = suffixes[idx];
+			sound[8] = '\0';
+		} else { // 4
+			strcpy(sound, "A_PLATE");
+			sound[7] = suffixes[idx];
+			sound[8] = '\0';
+		}
+	} else {
+		// generate a 1 letter suffix or emulate an empty string
+		// ARM_04G and ARM_04H exist, but couldn't be picked by the original function
+		const char* suffixes = "abcdefgh";
+		int idx = RAND(0, maxChar);
+		char randomASCII = '\0';
+		if (idx < maxChar) randomASCII = suffixes[idx];
 
-	char *sound = new char[9];
-	strcpy(sound, "ARM_0");
-	sound[5] = armorCode;
-	sound[6] = randomASCII;
-	sound[7] = '\0';
+		strcpy(sound, "ARM_0");
+		sound[5] = armorCode;
+		sound[6] = randomASCII;
+		sound[7] = '\0';
+	}
 	return sound;
 }
 
