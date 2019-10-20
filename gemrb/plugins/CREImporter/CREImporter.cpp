@@ -1284,6 +1284,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
+	// -1 is one of the plain inventory slots, but creatures like belhif.cre have it set as the equipped slot; see below
 	//the equipping effects are delayed until the actor gets an area
 	str->ReadWordSigned(&eqslot);
 	//the equipped slot's selected ability is stored here
@@ -1311,6 +1312,13 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				Log(ERROR, "CREImporter", "Invalid item index (%d) in creature!", index);
 			}
 		}
+	}
+
+	// now that we have all items, check if we need to jump through hoops to get a proper equipped slot
+	// move to fx_summon_creature2 if it turns out something else relies on having nothing equipped
+	if (eqslot == -1) {
+		act->inventory.SetEquipped(act->inventory.GetWeaponSlot(), eqheader); // just reset Equipped, so EquipBestWeapon does its job
+		act->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
 
 	free (indices);
