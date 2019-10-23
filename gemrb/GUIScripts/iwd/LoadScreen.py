@@ -63,10 +63,3 @@ def EndLoadScreen ():
 	LoadScreen = None
 	return
 
-def CloseLoadScreen ():
-	global LoadScreen
-
-	if LoadScreen:
-		LoadScreen.Unload()
-	LoadScreen = None
-	return

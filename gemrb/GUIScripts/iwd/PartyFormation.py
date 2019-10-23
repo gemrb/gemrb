@@ -98,7 +98,7 @@ def OnLoad ():
 			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",0) #using first row
 
-	LoadScreen.CloseLoadScreen()
+	LoadScreen.LoadScreen.Close()
 	return
 
 def CreateCharPress ():
