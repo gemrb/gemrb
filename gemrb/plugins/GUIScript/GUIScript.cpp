@@ -205,7 +205,7 @@ if (boolean) { \
 	Py_RETURN_FALSE; \
 }
 
-static ScriptingRefBase* GetScriptingRef(PyObject* obj) {
+static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
     if (!obj || obj == Py_None) {
         return NULL;
     }
@@ -1232,7 +1232,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	PyObject* lookup = NULL;
 	PARSE_ARGS2( args, "O|l", &lookup, &id );
 
-	ScriptingRefBase* ref = NULL;
+	const ScriptingRefBase* ref = NULL;
 	if (PyString_Check(lookup)) {
 		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), id);
 	} else {

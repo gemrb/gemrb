@@ -24,7 +24,7 @@ namespace GemRB {
 
 ScriptEngine::ScriptingDict ScriptEngine::GUIDict;
 
-bool ScriptEngine::RegisterScriptingRef(ScriptingRefBase* ref)
+bool ScriptEngine::RegisterScriptingRef(const ScriptingRefBase* ref)
 {
 	if (ref == NULL) return false;
 
@@ -34,7 +34,7 @@ bool ScriptEngine::RegisterScriptingRef(ScriptingRefBase* ref)
 	return true;
 }
 
-bool ScriptEngine::UnregisterScriptingRef(ScriptingRefBase* ref)
+bool ScriptEngine::UnregisterScriptingRef(const ScriptingRefBase* ref)
 {
 	if (ref == NULL) return false;
 

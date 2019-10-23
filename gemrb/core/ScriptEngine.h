@@ -68,24 +68,24 @@ public:
 
 class GEM_EXPORT ScriptEngine : public Plugin {
 public:
-	typedef std::map<ScriptingId, ScriptingRefBase*> ScriptingDefinitions;
+	typedef std::map<ScriptingId, const ScriptingRefBase*> ScriptingDefinitions;
 	
 private:
 	typedef std::map<ResRef, ScriptingDefinitions> ScriptingDict;
 	static ScriptingDict GUIDict;
 
 public:
-	static bool RegisterScriptingRef(ScriptingRefBase* ref);
-	static bool UnregisterScriptingRef(ScriptingRefBase* ref);
+	static bool RegisterScriptingRef(const ScriptingRefBase* ref);
+	static bool UnregisterScriptingRef(const ScriptingRefBase* ref);
 
 	static ScriptingDefinitions GetScriptingGroup(ResRef groupId)
 	{
 		return GUIDict[groupId];
 	}
 
-	static ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
+	static const ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
 	{
-		ScriptingRefBase* ref = NULL;
+		const ScriptingRefBase* ref = NULL;
 		ScriptingDefinitions::iterator it = GUIDict[group].find(id);
 		if (it != GUIDict[group].end()) {
 			ref = it->second;

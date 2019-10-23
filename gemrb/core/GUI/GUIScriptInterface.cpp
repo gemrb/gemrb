@@ -32,16 +32,16 @@ static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, const WindowScrip
 	return id;
 }
 
-View* GetView(ScriptingRefBase* base)
+View* GetView(const ScriptingRefBase* base)
 {
-	ViewScriptingRef* ref = dynamic_cast<ViewScriptingRef*>(base);
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(base);
 	if (ref) {
 		return ref->GetObject();
 	}
 	return NULL;
 }
 
-ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
+const ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 {
 	ResRef group = "Control";
 	if (win) {
@@ -51,8 +51,8 @@ ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 			id = ModifiedCtrlIdForWin(id, winref);
 		}
 	}
-	ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
-	return static_cast<ControlScriptingRef*>(base);
+	const ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
+	return static_cast<const ControlScriptingRef*>(base);
 }
 
 Control* GetControl(ScriptingId id, Window* win)
@@ -74,7 +74,7 @@ std::vector<View*> GetViews(ResRef group)
 
 	ScriptEngine::ScriptingDefinitions::iterator it;
 	for (it = defs.begin(); it != defs.end(); ++it) {
-		ViewScriptingRef* ref = static_cast<ViewScriptingRef*>(it->second);
+		const ViewScriptingRef* ref = static_cast<const ViewScriptingRef*>(it->second);
 		views.push_back(ref->GetObject());
 	}
 
