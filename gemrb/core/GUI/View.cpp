@@ -700,10 +700,21 @@ bool View::OnTouchGesture(const GestureEvent& gesture)
 	}
 	return false;
 }
+
+void View::RemoveScriptingRef(const ViewScriptingRef* ref)
+{
+	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), ref);
+	if (it != scriptingRefs.end()) {
+		bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);
+		assert(unregistered);
+		delete ref;
+		scriptingRefs.erase(it);
+	}
+}
 	
 void View::ClearScriptingRefs()
 {
-	std::list<ViewScriptingRef*>::iterator rit;
+	std::vector<ViewScriptingRef*>::iterator rit;
 	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
 		ViewScriptingRef* ref = *rit;
 		if (GetView(ref) == this) {

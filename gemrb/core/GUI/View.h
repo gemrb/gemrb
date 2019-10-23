@@ -26,8 +26,9 @@
 #include "ScriptEngine.h"
 
 #include <list>
+#include <vector>
 
-#define DEBUG_VIEWS 0
+#define DEBUG_VIEWS 1
 
 namespace GemRB {
 
@@ -69,7 +70,7 @@ public:
 private:
 	Holder<Sprite2D> background;
 	Holder<Sprite2D> cursor;
-	std::list<ViewScriptingRef*> scriptingRefs;
+	std::vector<ViewScriptingRef*> scriptingRefs;
 
 	mutable bool dirty;
 
@@ -238,6 +239,7 @@ public:
 
 	// GUIScripting
 	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
+	void RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
 };
 

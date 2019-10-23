@@ -1889,12 +1889,12 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			Window* win = dynamic_cast<Window*>(view);
 			if (win) {
 				win->Close();
-				view = NULL; // so that delete has no effect, window manager will dispose of it
 
 				if (win->Flags()&Window::DestroyOnClose) {
 					// invalidate the reference
 					PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
 				}
+				Py_RETURN_NONE;
 			}
 		} else {
 			// invalidate the reference
@@ -1903,8 +1903,18 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 
 		if (del) {
 			delete view;
+			Py_RETURN_NONE;
+		} else {
+			// return a new ref for a deleted group
+			const ViewScriptingRef* oldref = view->GetScriptingRef();
+			ScriptingId id = oldref->Id;
+			view->RemoveScriptingRef(oldref);
+
+			ResRef group = "Deleted";
+			const ViewScriptingRef* ref = view->AssignScriptingRef(id, group);
+
+			return gs->ConstructObjectForScriptable(ref);
 		}
-		Py_RETURN_NONE;
 	}
 	return AttributeError("Invalid view");
 }
