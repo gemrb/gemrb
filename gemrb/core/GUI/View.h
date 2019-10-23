@@ -28,7 +28,7 @@
 #include <list>
 #include <vector>
 
-#define DEBUG_VIEWS 1
+#define DEBUG_VIEWS 0
 
 namespace GemRB {
 
