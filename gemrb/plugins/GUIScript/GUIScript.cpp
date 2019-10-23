@@ -12499,7 +12499,7 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetTimer__doc,
 "===== SetTimer =====\n\
 \n\
-**Prototype:** GemRB.SetTimer (callback[, interval])\n\
+**Prototype:** GemRB.SetTimer (callback[, interval, repeats])\n\
 \n\
 **Description:** Set callback to be called repeatedly at given interval. \n\
 This is useful for things like running a twisted reactor.\n\
@@ -12507,6 +12507,7 @@ This is useful for things like running a twisted reactor.\n\
 **Parameters:**\n\
   * callback - python function to run\n\
   * interval - time interval in ticks\n\
+  * repeats - the number of times to repeat the action before expiring the timer\n\
 \n\
 **Return value:** N/A"
 );
@@ -12514,12 +12515,14 @@ This is useful for things like running a twisted reactor.\n\
 static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 {
 	Timer::TimeInterval interval = 0;
+	int repeats = -1;
 	PyObject* function = NULL;
-	PyArg_Parse(args, "O|i", &function, &interval);
+
+	PARSE_ARGS3(args, "Oi|i", &function, &interval, &repeats);
 
 	if (PyCallable_Check(function)) {
 		EventHandler handler = new PythonCallback(function);
-		core->SetTimer(handler, interval);
+		core->SetTimer(handler, interval, repeats);
 		Py_RETURN_NONE;
 	} else {
 		char buf[256];

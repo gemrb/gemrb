@@ -36,6 +36,7 @@ private:
 	TimeInterval fireDate;
 	bool valid;
 	EventHandler action;
+	int repeats;
 
 private:
 	void NextFireDate() {
@@ -43,8 +44,8 @@ private:
 	}
 
 public:
-	Timer(TimeInterval i, const EventHandler& handler)
-	: action(handler)
+	Timer(TimeInterval i, const EventHandler& handler, int repeats = -1)
+	: action(handler), repeats(repeats)
 	{
 		valid = true;
 		interval = i;
@@ -63,7 +64,14 @@ public:
 	void Update(TimeInterval time) {
 		if (fireDate <= time) {
 			action();
-			NextFireDate();
+			if (repeats != 0) {
+				if (repeats > 0) {
+					--repeats;
+				}
+				NextFireDate();
+			} else {
+				Invalidate();
+			}
 		}
 	}
 

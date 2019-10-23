@@ -780,7 +780,7 @@ public:
 
 	Audio* GetAudioDrv(void) const;
 
-	Timer& SetTimer(const EventHandler&, unsigned long interval);
+	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
 };
 
 extern GEM_EXPORT Interface * core;

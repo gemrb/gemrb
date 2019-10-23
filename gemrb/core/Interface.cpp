@@ -4894,9 +4894,9 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-Timer& Interface::SetTimer(const EventHandler& handler, unsigned long interval)
+Timer& Interface::SetTimer(const EventHandler& handler, unsigned long interval, int repeats)
 {
-	timers.push_back(Timer(interval, handler));
+	timers.push_back(Timer(interval, handler, repeats));
 	return timers.back();
 }
 
