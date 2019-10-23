@@ -11669,13 +11669,13 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
 		displaymsg->DisplayConstantString(STR_TOOFARAWAY, DMC_WHITE);
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
 
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {
-		return PyInt_FromLong( -1 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
 
 	// can't equip item because of similar already equipped
@@ -11684,7 +11684,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			displaymsg->DisplayConstantString(STR_ITEMEXCL, DMC_WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11692,7 +11692,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		CREItem *item = actor->inventory.GetUsedWeapon(false, Effect); //recycled variable
 		if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11702,14 +11702,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (eh && eh->IDReq) {
 			displaymsg->DisplayConstantString(STR_ITEMID, DMC_WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
 	//it is always possible to put these items into the inventory
 	if (!(Slottype&SLOT_INVENTORY)) {
 		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11726,7 +11726,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//freeing the item before returning
 	gamedata->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
 	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
 	if (res) {
@@ -11745,12 +11745,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
 		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
 			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
-			return PyInt_FromLong(0);
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
