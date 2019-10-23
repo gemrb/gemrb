@@ -33,6 +33,7 @@
 #include "PluginMgr.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
+#include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -657,6 +658,7 @@ void IniSpawn::RespawnNameless()
 	for (i=0;i<namelessvarcount;i++) {
 		SetVariable(game, NamelessVar[i].Name,"GLOBAL", NamelessVar[i].Value);
 	}
+	core->GetGameControl()->ChangeMap(nameless, true);
 }
 
 void IniSpawn::SpawnCreature(CritterEntry &critter) const
