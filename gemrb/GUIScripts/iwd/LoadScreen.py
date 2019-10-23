@@ -53,13 +53,8 @@ def StartLoadScreen ():
 	return
 
 def EndLoadScreen ():
-	global LoadScreen
-
-	if LoadScreen:
-		Skull = LoadScreen.GetControl (3)
-		Skull.SetMOS ("GTRBPSK2")
-		LoadScreen.Focus()
-		LoadScreen.Unload()
-	LoadScreen = None
+	Skull = LoadScreen.GetControl (3)
+	Skull.SetMOS ("GTRBPSK2")
 	return
 
+	GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)

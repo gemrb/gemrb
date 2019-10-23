@@ -59,13 +59,12 @@ def StartLoadScreen ():
 	def EndLoadScreen ():
 		GemRB.SetVar ("Progress", 0)
 		TMessageTA = GemRB.GetView("MsgSys", 0)
-		# FIXME somehow we get here before the MTA is created... that shouldn't happen (and BG2 works)
-		# TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+
+		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
 		Skull = LoadScreen.GetControl (3)
 		Skull.SetMOS ("GTRBPSK2")
-		LoadScreen.Focus()
-		LoadScreen.Unload()
+		GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
 		return
 
 	Bar = LoadScreen.GetControl (0)

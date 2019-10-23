@@ -46,12 +46,22 @@ def StartLoadScreen ():
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK")
+	Skull = LoadScreen.RemoveSubview(Skull)
+
+	barframe = Bar.GetFrame()
+	frame = Skull.GetFrame()
+	frame['x'] -= barframe['x']
+	frame['y'] -= barframe['y']
+	Skull.SetFrame(frame)
+	Bar.AddSubview(Skull)
+
 	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.Focus()
-	LoadScreen.Unload()
+
+	GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
+
 	return

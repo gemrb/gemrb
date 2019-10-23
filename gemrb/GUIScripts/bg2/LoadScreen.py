@@ -26,7 +26,6 @@ import GameCheck
 from GUIDefines import *
 
 LoadScreen = None
-hide = None
 
 def SetLoadScreen ():
 	return
@@ -75,7 +74,7 @@ def StartLoadScreen ():
 			Middle = LoadScreen.GetControl (3)
 			Middle.SetBAM ("COADCNTR", 1, 0)
 	
-		LoadScreen.Close()
+		GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
 		return
 
 	Bar = LoadScreen.GetControl (0)

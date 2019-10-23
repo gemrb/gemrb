@@ -52,7 +52,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		GemRB.SetVar ("Progress", 0)
 		Skull = Window.GetControl (1)
 		Skull.SetMOS ("GSKULON")
-		LoadScreen.Close()
+		GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
 		return
 	
 	Bar = Window.GetControl (0)
