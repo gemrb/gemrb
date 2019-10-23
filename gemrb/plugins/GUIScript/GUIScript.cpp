@@ -1191,7 +1191,8 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
         if (registerRef) {
             ScriptingId id = subView->GetScriptingRef()->Id;
             // FIXME: no promise that subView is a control (could be a plain view)
-            RegisterScriptableControl(static_cast<Control*>(subView), id);
+            const ControlScriptingRef* ref = RegisterScriptableControl(static_cast<Control*>(subView), id);
+			return gs->ConstructObjectForScriptable(ref);
         }
 
         // since we may reassign the ref, we must return the object representing the new one
