@@ -313,9 +313,6 @@ bool MapControl::OnMouseDrag(const MouseEvent& me)
 /** Mouse Button Up */
 bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	if (me.button == GEM_MB_ACTION && me.repeats == 2) {
-		window->Close();
-	}
 	Point p = ConvertPointFromScreen(me.Pos());
 
 	switch(GetValue()) {

@@ -102,6 +102,7 @@ def InitMapWindow (Window):
 
 	Map.SetFrame(placeholder.GetFrame())
 	Window.DeleteControl (placeholder)
+	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
