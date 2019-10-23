@@ -1081,6 +1081,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			}
 			break;
 		case BD_SOURCE:
+			// can't handle swap as BD_TARGET, since it just breaks dialog with PCs (eg. Maadeen in the gov. district)
+			// freeing Minsc requires skipping the non-interruptible check for the second dialog to properly start
+			Dialog = speaker->GetDialog(swap ? GD_NORMAL : GD_FEEDBACK);
+			break;
 		case BD_TARGET:
 			// Don't check for the target being non-interruptible if we swapped speakers
 			// or if the speaker is the target, otherwise do (and request feedback on failure).
