@@ -11674,6 +11674,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
+	bool ranged = item->GetWeaponHeader(true) != NULL;
 	if (!item) {
 		return PyInt_FromLong(ASI_FAILED);
 	}
@@ -11728,7 +11729,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( !Slottype) {
 		return PyInt_FromLong(ASI_FAILED);
 	}
-	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+	res = actor->inventory.AddSlotItem(slotitem, Slot, Slottype, ranged);
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
@@ -11742,7 +11743,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
 		//swapping won't cure this
-		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
+		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED, ranged);
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
 			return PyInt_FromLong(ASI_FAILED);
