@@ -36,7 +36,6 @@ ItemAbilitiesWindow = None
 ErrorWindow = None
 ColorPicker = None
 StackAmount = 0
-pause = None
 
 def OnDragItemGround ():
 	"""Drops and item to the ground."""
@@ -715,7 +714,6 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
-	global pause
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -723,6 +721,7 @@ def ReadItemWindow ():
 	ret = Spellbook.CannotLearnSlotSpell()
 
 	if ret:
+		# these failures are soft - the scroll is not destroyed
 		if ret == LSR_KNOWN and GameCheck.HasTOB():
 			strref = 72873
 		elif ret == LSR_KNOWN and GameCheck.IsPST():
@@ -744,31 +743,28 @@ def ReadItemWindow ():
 		CloseItemInfoWindow ()
 		GemRB.PlaySound ("EFF_M10") # failure!
 		OpenErrorWindow (strref)
+		return
 
-	else:
+	if GameCheck.IsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+
+	# we already checked for most failures, but we can still fail with bad % rolls vs intelligence
+	ret = Spellbook.LearnFromScroll (pc, slot)
+	if ret == LSR_OK:
+		GemRB.PlaySound ("GAM_44") # success!
 		if GameCheck.IsPST():
-			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-
-		pause = GemRB.GamePause(3,1) #query the pause state
-		GemRB.GamePause(0,1)
-		GemRB.UseItem (pc, slot, 1, 5)
-		GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
-
-	return ret
-
-def DelayedReadItemWindow ():
-	#restore the pause state
-	if pause:
-		GemRB.GamePause(1,1)
+			strref = 4249
+		else:
+			strref = 10830
+	else:
+		GemRB.PlaySound ("EFF_M10") # failure!
+		if GameCheck.IsPST():
+			strref = 4250
+		else:
+			strref = 10831
 
 	CloseItemInfoWindow ()
-	if GameCheck.IsPST():
-		strref = 4249
-	else:
-		strref = 10830
-	GemRB.PlaySound ("GAM_44") # success!
 	OpenErrorWindow (strref)
-	return
 
 def OpenItemWindow ():
 	"""Displays information about the item."""

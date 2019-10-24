@@ -695,3 +695,13 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 	for j in range(count):
 		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex, flags&LS_MEMO)
 
+def LearnFromScroll (pc, slot):
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+
+	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP)
+
+	# destroy the scroll, just one in case of a stack
+	GemRB.RemoveItem (pc, slot, 1)
+
+	return ret
