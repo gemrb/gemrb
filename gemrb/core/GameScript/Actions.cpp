@@ -5167,7 +5167,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	// if same target as before, don't play the war cry again, as they'd pop up too often
 	int flags = 0;
-	if (Sender->LastTargetPersistent == Sender->CurrentActionTarget) {
+	if (Sender->LastTargetPersistent == tar->GetGlobalID()) {
 		flags = AC_NO_SOUND;
 	}
 
