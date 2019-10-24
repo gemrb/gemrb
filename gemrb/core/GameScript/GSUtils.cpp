@@ -514,7 +514,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {
-		ieDword speech;
+		ieDword speech = 0;
 		Point pos(Sender->Pos.x, Sender->Pos.y);
 		if (flags&DS_SPEECH) {
 			speech = GEM_SND_SPEECH;
