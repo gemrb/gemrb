@@ -514,11 +514,19 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {
-		ieDword speech = GEM_SND_RELATIVE; //disable position
-		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
+		ieDword speech;
+		Point pos(Sender->Pos.x, Sender->Pos.y);
+		if (flags&DS_SPEECH) {
+			speech = GEM_SND_SPEECH;
+		}
+		// disable position, but only for party
+		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty) {
+			speech |= GEM_SND_RELATIVE;
+			pos.x = pos.y = 0;
+		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
+		core->GetAudioDrv()->Play(Sound, channel, pos.x, pos.y, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
