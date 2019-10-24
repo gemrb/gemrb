@@ -1020,7 +1020,9 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	if (!no_stance) {
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
@@ -1088,7 +1090,9 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	if (!no_stance) {
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
