@@ -11186,7 +11186,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 \n\
 **Parameters:**\n\
   * ResRef - the resource reference of the item\n\
-  * PartyID - the resource reference of the item\n\
+  * PartyID - the pc you want to check usability against (defaults to the selected one)\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemName'           - strref of unidentified name.\n\
