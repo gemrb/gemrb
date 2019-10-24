@@ -2233,7 +2233,11 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		return value;
 	}
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		Sender->locals->Lookup( VarName, value );
+		if (!Sender->locals->Lookup(VarName, value)) {
+			if (valid) {
+				*valid = false;
+			}
+		}
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
