@@ -984,7 +984,6 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
-			caster->CureInvisibility();
 		}
 	}
 	if (level == 0) {
@@ -1057,7 +1056,6 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
-			caster->CureInvisibility();
 		}
 	}
 	if (level == 0) {
@@ -1329,6 +1327,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	}
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
+		if (actor) actor->CureInvisibility();
 	}
 	return SpellCast(instant);
 }
@@ -1370,6 +1369,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
+		if (actor) actor->CureInvisibility();
 	}
 	return SpellCast(instant, target);
 }
