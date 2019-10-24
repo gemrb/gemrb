@@ -3716,15 +3716,15 @@ int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
 	}
 	int charge = item->Usages[parameters->int0Parameter];
 	switch (parameters->int2Parameter) {
-		case DM_EQUAL:
+		case EQUALS:
 			if (charge == parameters->int1Parameter)
 				return 1;
 			break;
-		case DM_LESS:
+		case LESS_THAN:
 			if (charge < parameters->int1Parameter)
 				return 1;
 			break;
-		case DM_GREATER:
+		case GREATER_THAN:
 			if (charge > parameters->int1Parameter)
 				return 1;
 			break;
@@ -3754,17 +3754,17 @@ int GameScript::CheckPartyAverageLevel( Scriptable* /*Sender*/, Trigger* paramet
 	if (count) level/=count;
 
 	switch (parameters->int1Parameter) {
-		case DM_EQUAL:
+		case EQUALS:
 			if (level ==parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case DM_LESS:
+		case LESS_THAN:
 			if (level < parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case DM_GREATER:
+		case GREATER_THAN:
 			if (level > parameters->int0Parameter) {
 				return 1;
 			}

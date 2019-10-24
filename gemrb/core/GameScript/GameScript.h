@@ -104,11 +104,6 @@ class StringBuffer;
 //#define VB_EXISTANCE_4 73
 #define VB_BIO       74
 
-//diffmode (iwd2)
-#define DM_EQUAL   1
-#define DM_LESS    2
-#define DM_GREATER 3
-
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1
 #define MSO_IGNORE_INVALID 2
