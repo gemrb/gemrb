@@ -11674,10 +11674,10 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
-	bool ranged = item->GetWeaponHeader(true) != NULL;
 	if (!item) {
 		return PyInt_FromLong(ASI_FAILED);
 	}
+	bool ranged = item->GetWeaponHeader(true) != NULL;
 
 	// can't equip item because of similar already equipped
 	if (Effect) {
