@@ -65,8 +65,6 @@ public:
 
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(unsigned int Sum);
-	
-	bool IsAnimated() const { return true; }
 
 private:
 	/** Call event handler on click */

@@ -233,6 +233,8 @@ void MapControl::UpdateViewport(Point vp)
 	
 	// clear any previously scheduled moves and then do it asap, so it works while paused
 	core->timer->SetMoveViewPort( vp, 0, false );
+
+	MarkDirty();
 }
 
 void MapControl::UpdateCursor()
