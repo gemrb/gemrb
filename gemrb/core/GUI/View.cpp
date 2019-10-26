@@ -159,6 +159,11 @@ void View::DrawSubviews() const
 	}
 }
 
+Region View::DrawingFrame() const
+{
+	return Region(ConvertPointToWindow(Point(0,0)), Dimensions());
+}
+
 void View::DrawBackground(const Region* rgn) const
 {
 	// FIXME: technically its possible for the BG to be smaller than the view
@@ -185,8 +190,8 @@ void View::Draw()
 
 	Video* video = core->GetVideoDriver();
 	const Region clip = video->GetScreenClip();
-	const Region drawFrame = Region(ConvertPointToWindow(Point(0,0)), Dimensions());
-	const Region intersect = clip.Intersect(drawFrame);
+	const Region& drawFrame = DrawingFrame();
+	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing

@@ -105,6 +105,7 @@ private:
 	// that have all been clipped to the video ScreenClip
 	// subclasses can then use the list to efficiently redraw only those sections that are dirty
 	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
+	Region DrawingFrame() const;
 
 	void AddedToWindow(Window*);
 	void AddedToView(View*);
