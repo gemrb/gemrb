@@ -206,6 +206,16 @@ class GWindow(GView, Scrollable):
   def GetControl(self, id): # backwards compatibility
 	return GetView(self, id)
 
+  def ReparentSubview(self, view, newparent):
+	  view = self.RemoveSubview(view)
+
+	  parentFrame = newparent.GetFrame()
+	  frame = view.GetFrame()
+	  frame['x'] -= parentFrame['x']
+	  frame['y'] -= parentFrame['y']
+	  view.SetFrame(frame)
+	  return newparent.AddSubview(view)
+
   def Unload(self): # backwards compatibility
 	self.Close()
 
