@@ -28,13 +28,10 @@ def OnLoad ():
 	BioWindow = GemRB.LoadWindow (23, "GUICG")
 	CharGenCommon.PositionCharGenWin(BioWindow)
 
-	placeholder = BioWindow.GetControl (3)
+	EditTextArea = BioWindow.ReplaceSubview(3, IE_GUI_TEXTAREA, "NORMAL")
 	BIO = GemRB.GetToken("BIO")
-	EditTextArea = BioWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL")
-	EditTextArea.SetFrame(placeholder.GetFrame())
 	EditTextArea.AddAlias("BIO")
 	EditTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
-	BioWindow.DeleteControl(placeholder)
 
 	if BIO:
 		EditTextArea.SetText (BIO)

@@ -55,7 +55,7 @@ def ShowMap ():
 	Button = Window.GetControl (1)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	Map = Window.GetControl (1000)
+	Map = Window.GetControl (2)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -94,14 +94,11 @@ def InitMapWindow (Window):
 		Label.SetText ("")
 
 	# Map Control
-	placeholder = Window.GetControl (2)
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Map = Window.CreateMapControl (1000, 0, 0, 0, 0, Label, "FLAG1")
+		Map = Window.ReplaceSubview(2, IE_GUI_MAP, Label, "FLAG1")
 	else:
-		Map = Window.CreateMapControl (1000, 0, 0, 0, 0)
+		Map = Window.ReplaceSubview(2, IE_GUI_MAP)
 
-	Map.SetFrame(placeholder.GetFrame())
-	Window.DeleteControl (placeholder)
 	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	if HasMapNotes ():
@@ -140,11 +137,7 @@ def AddNoteWindow ():
 
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
-		#0 is the default Scrollbar ID
-		placeholder = NoteWindow.GetControl (1)
-		frame = placeholder.GetFrame()
-		NoteWindow.DeleteControl(placeholder)
-		NoteLabel = NoteWindow.CreateTextArea(100, frame['x'], frame['y'], frame['w'], frame['h'], "NORMAL")
+		NoteLabel = NoteWindow.ReplaceSubview(1, IE_GUI_TEXTAREA, "NORMAL")
 		NoteLabel.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 
 		# center relative to map
@@ -214,17 +207,14 @@ def WorldMapWindowCommon (Travel):
 		WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
 
 	WorldMapWindow.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
-	placeholder = Window.GetControl (4)
-	frame = placeholder.GetFrame()
-	Window.DeleteControl (placeholder)
 	
 	if GameCheck.IsBG2():
-		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "floattxt")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "floattxt")
 	elif GameCheck.IsBG1():
-		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "toolfont", 1)
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "toolfont", 1)
 		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0xa4, 'g' : 0x6a, 'b' : 0x4c})
 	else:
-		WorldMapControl = Window.CreateWorldMapControl (4, frame['x'], frame['y'], frame['w'], frame['h'], Travel, "infofont")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "infofont")
 
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)

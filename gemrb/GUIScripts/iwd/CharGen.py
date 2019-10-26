@@ -2490,10 +2490,7 @@ def BiographyPress():
 	global CharGenWindow, BiographyWindow, BiographyTextArea
 
 	BiographyWindow = GemRB.LoadWindow (51)
-	placeholder = BiographyWindow.GetControl (4)
-	frame = placeholder.GetFrame()
-	BiographyTextArea = BiographyWindow.CreateTextArea(100, frame['x'], frame['y'], frame['w'], frame['h'], "NORMAL")
-	BiographyWindow.DeleteControl(placeholder)
+	BiographyTextArea = BiographyWindow.ReplaceSubview(4, IE_GUI_TEXTAREA, "NORMAL")
 	BiographyTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	BiographyTextArea.Focus()
 

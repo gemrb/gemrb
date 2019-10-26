@@ -146,6 +146,16 @@ class GView:
 		frame = {"x" : x, "y" : y, "w" : w, "h" : h}
 		return self.CreateSubview(id, type, frame, *args)
 
+	def ReplaceSubview(self, subview, ctype, *args):
+		if type(subview) == int:
+			subview = self.GetControl (subview)
+		id = subview.ID & 0x00000000ffffffff
+		print "my id is " + str(id)
+		frame = subview.GetFrame()
+		RemoveView(subview, True)
+
+		return self.CreateSubview(id, ctype, frame, args)
+
 	def CreateSubview(self, id, type, frame, *args):
 		view = CreateView(id, type, frame, *args)
 		return self.AddSubview(view)
