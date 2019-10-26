@@ -150,7 +150,6 @@ class GView:
 		if type(subview) == int:
 			subview = self.GetControl (subview)
 		id = subview.ID & 0x00000000ffffffff
-		print "my id is " + str(id)
 		frame = subview.GetFrame()
 		RemoveView(subview, True)
 
