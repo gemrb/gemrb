@@ -113,12 +113,21 @@ void View::MarkDirty()
 
 bool View::NeedsDraw() const
 {
+	// cull anything that can't be seen
 	if (frame.Dimensions().IsEmpty() || (flags&Invisible)) return false;
 
-	// subviews are drawn over when the superview is drawn, so always redraw when super needs it.
-	if (superView && superView->IsAnimated()) return true;
+	// check ourselves
+	if (dirty || IsAnimated()) {
+		return true;
+	}
 
-	return (dirty || IsAnimated());
+	// check our ancestors
+	if (superView) {
+		return superView->NeedsDraw();
+	}
+
+	// else we don't need an update
+	return false;
 }
 
 bool View::IsVisible() const

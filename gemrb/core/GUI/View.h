@@ -162,7 +162,7 @@ public:
 	void Draw();
 
 	void MarkDirty();
-	virtual bool NeedsDraw() const;
+	bool NeedsDraw() const;
 
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const;
