@@ -36,10 +36,6 @@
 
 namespace GemRB {
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_SLIDER_ON_CHANGE    IE_GUI_CUSTOMEVENT
-
-
 #define IE_GUI_SLIDER_KNOB        0
 #define IE_GUI_SLIDER_GRABBEDKNOB 1
 #define IE_GUI_SLIDER_BACKGROUND  2
