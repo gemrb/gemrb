@@ -30,7 +30,7 @@
 namespace GemRB {
 
 TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
-: Control(frame), textContainer(Region(p.x, p.y, 0, frame.h - (p.y*2)), core->GetTextFont(), NULL)
+: Control(frame), textContainer(Region(Point(), Dimensions()), core->GetTextFont(), NULL)
 {
 	ControlType = IE_GUI_EDIT;
 
@@ -47,8 +47,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	textContainer.SetPalette(palette);
 	palette->release();
 	max = maxLength;
-	textContainer.SetMargin(3);
-	textContainer.SetFrameSize(Dimensions());
+	textContainer.SetMargin(p.y, p.x);
 
 	SetFlags(Alpha|Numeric, OP_OR);
 }
