@@ -1920,7 +1920,9 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 			}
 		}
 	}
-	if (!TrapResets()) {
+	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
+	// should we always send Entered instead, also when !Trapped? Does not appear so, see history of InfoPoint::TriggerTrap
+	if (!TrapResets() && (TrapDetectionDiff && TrapRemovalDiff)) {
 		Trapped = false;
 	}
 	return true;
