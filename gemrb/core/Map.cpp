@@ -3759,9 +3759,7 @@ int Map::GetWeather()
 	if (Snow>=core->Roll(1,100,0) ) {
 		return WB_SNOW;
 	}
-	if (Fog>=core->Roll(1,100,0) ) {
-		return WB_FOG;
-	}
+	// TODO: handle WB_FOG the same way when we start drawing it
 	return WB_NORMAL;
 }
 
