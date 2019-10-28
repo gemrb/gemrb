@@ -2105,7 +2105,7 @@ void Game::Infravision()
 static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
 static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
 static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
-static const Color FogTint={0xff,0xff,0xff,0x40};      //whitish
+//TODO: add FogTint when a solution that does not hinder lightness calculation is implemented
 static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
