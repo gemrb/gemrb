@@ -91,7 +91,7 @@ static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
 static const int VOODOO_CANSEE_F = 15;
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
-static const int VOODOO_VISUAL_RANGE = 30;
+static const int VOODOO_VISUAL_RANGE = 28;
 static const int VOODOO_DIALOG_RANGE = 15;
 
 // character speed was also hardcoded depending on the used animation type
