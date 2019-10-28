@@ -54,8 +54,6 @@ class WorldMapControl;
  * allowing travelling between areas.
  */
 
-#define IE_GUI_WORLDMAP_ON_PRESS   IE_GUI_CUSTOMEVENT
-
 class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */

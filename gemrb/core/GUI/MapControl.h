@@ -32,9 +32,6 @@
 
 namespace GemRB {
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_MAP_ON_PRESS     	0x09000000
-#define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000005
 class Map;
 
 /**
