@@ -2130,9 +2130,7 @@ const Color *Game::GetGlobalTint() const
 		if (WeatherBits&WB_RAIN) {
 			return &DarkTint;
 		}
-		if (WeatherBits&WB_FOG) {
-			return &FogTint;
-		}
+		//TODO: add FogTint when it is fixed to not hinder lightness calculation
 	}
 
 	return NULL;
