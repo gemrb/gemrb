@@ -3759,7 +3759,7 @@ int Map::GetWeather()
 	if (Snow>=core->Roll(1,100,0) ) {
 		return WB_SNOW;
 	}
-	//TODO: add FOG when FogTint is fixed to not hinder lightness calculation
+	// TODO: handle WB_FOG the same way when we start drawing it
 	return WB_NORMAL;
 }
 
