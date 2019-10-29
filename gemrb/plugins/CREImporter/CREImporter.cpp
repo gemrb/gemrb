@@ -2952,7 +2952,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
-			for (unsigned int k=0;k<count;k++) {
+			for (int k=count-1;k>=0;k--) {
 				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
