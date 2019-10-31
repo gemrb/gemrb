@@ -902,11 +902,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		// spellcasting feedback
 		if (third) {
 			// only display it for party friendly creatures - enemies require a successful spellcraft check
-			if (Type == ST_ACTOR) {
-				Actor *caster = ((Actor *) this);
-				if (caster->GetStat(IE_EA) <= EA_CONTROLLABLE) {
-					DisplaySpellCastMessage(tgt, spl);
-				}
+			if (caster->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+				DisplaySpellCastMessage(tgt, spl);
 			}
 		} else {
 			DisplaySpellCastMessage(tgt, spl);
