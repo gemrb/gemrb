@@ -317,12 +317,12 @@ void Button::SetState(unsigned char state)
 		return;
 	}
 
+	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
+	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
+
 	if (State == state) {
 		return; // avoid redraw
 	}
-
-	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
-	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
 
 	if (State != state) {
 		MarkDirty();
