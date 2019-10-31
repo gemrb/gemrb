@@ -2255,9 +2255,17 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
 	}
 
-	if (direction==-1) {
+	// pst enables worldmap travel only after visiting the lower ward
+	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
+	if (direction == -1 && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+	if (direction == -1 && keyAreaVisited) {
+		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
+		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
+		// DestEntryPoint is all zeroes, pst just didn't use it
+		direction = 0;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );

@@ -2073,9 +2073,18 @@ formation_handling:
 		if (DoubleClick) Center(x,y);
 
 		//p is a searchmap travel region
-		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+		// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500)
+		bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
+		if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || (overInfoPoint && overInfoPoint->Type == ST_TRAVEL && teamMoved)) {
 			sprintf( Tmp, "NIDSpecial2()" );
-			party[0]->AddAction( GenerateAction( Tmp) );
+			if (teamMoved) {
+				// not clearing the queue means one can exit the worldmap and travel like it wasn't there
+				// remove if necessary
+				// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
+				party[0]->AddActionInFront(GenerateAction(Tmp));
+			} else {
+				party[0]->AddAction(GenerateAction(Tmp));
+			}
 		}
 	} else if (actor) {
 		if (actor->GetStat(IE_EA)<EA_CHARMED
