@@ -1141,64 +1141,59 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	}
 
 	// various individual checks
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+	if (Type != ST_ACTOR) {
+		return 1;
+	}
+	Actor *actor = (Actor *) this;
 
-		// check for silence
-		// only a handful of spells don't have a verbal component -
-		// the original hardcoded vocalize and a few more
-		// we (also) ignore tobex modded spells
-		if (actor->CheckSilenced()) {
-			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
-				Log(WARNING, "Scriptable", "Tried to cast while silenced!");
-				return 0;
-			}
-		}
-
-		// check for personal dead magic
-		if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
-			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
+	// check for silence
+	// only a handful of spells don't have a verbal component -
+	// the original hardcoded vocalize and a few more
+	// we (also) ignore tobex modded spells
+	if (actor->CheckSilenced()) {
+		if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
+			Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 			return 0;
 		}
+	}
 
-		// check for miscast magic and similar
-		ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
-		bool failed = false;
-		ieDword chance = 0;
-		switch(spl->SpellType)
-		{
-		case IE_SPL_PRIEST:
-			chance = actor->GetSpellFailure(false);
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		case IE_SPL_WIZARD:
-			chance = actor->GetSpellFailure(true);
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		case IE_SPL_INNATE:
-			chance = actor->Modified[IE_SPELLFAILUREINNATE];
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		}
-		if (verbose && chance && third) {
-			// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
-			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
-		}
-		if (failed) {
-			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
-			return 0;
-		}
+	// check for personal dead magic
+	if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
+		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
+		return 0;
+	}
 
-		// iwd2: make a concentration check if needed
-		if (!actor->ConcentrationCheck()) {
-			return 0;
-		}
+	// check for miscast magic and similar
+	ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
+	bool failed = false;
+	ieDword chance = 0;
+	switch(spl->SpellType)
+	{
+	case IE_SPL_PRIEST:
+		chance = actor->GetSpellFailure(false);
+		break;
+	case IE_SPL_WIZARD:
+		chance = actor->GetSpellFailure(true);
+		break;
+	case IE_SPL_INNATE:
+		chance = actor->Modified[IE_SPELLFAILUREINNATE];
+		break;
+	}
+	if (chance >= roll) {
+		failed = true;
+	}
+	if (verbose && chance && third) {
+		// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
+		displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
+	}
+	if (failed) {
+		displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
+		return 0;
+	}
+
+	// iwd2: make a concentration check if needed
+	if (!actor->ConcentrationCheck()) {
+		return 0;
 	}
 
 	return 1;
