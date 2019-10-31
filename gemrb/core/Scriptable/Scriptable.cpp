@@ -846,6 +846,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
+					delete pro;
 					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
