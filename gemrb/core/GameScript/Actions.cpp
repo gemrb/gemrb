@@ -2922,31 +2922,12 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable xptable;
+	AddXPCore(parameters);
+}
 
-	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
-		xptable.load("exptable");
-	} else {
-		xptable.load("xplist");
-	}
-
-	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
-	}
-	if (!xptable) {
-		Log(ERROR, "GameScript", "Can't perform ADDXP2DA");
-		return;
-	}
-	const char * xpvalue = xptable->QueryField( parameters->string0Parameter, "0" ); //level is unused
-
-	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
-		//divide party xp
-		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE );
-	} else {
-		//give xp everyone
-		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
-	}
-	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+void GameScript::AddXPVar(Scriptable* /*Sender*/, Action* parameters)
+{
+	AddXPCore(parameters, true);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)

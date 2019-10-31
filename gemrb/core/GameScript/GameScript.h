@@ -957,6 +957,7 @@ public:
 	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
+	static void AddXPVar(Scriptable *Sender, Action* parameters);
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);

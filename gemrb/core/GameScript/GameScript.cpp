@@ -468,7 +468,7 @@ static const ActionLink actionnames[] = {
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
-	{"addxpvar", GameScript::AddXP2DA, 0},
+	{"addxpvar", GameScript::AddXPVar, 0},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},

@@ -2922,4 +2922,36 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	Sender->ReleaseCurrentAction();
 }
 
+void AddXPCore(Action *parameters, bool divide)
+{
+	AutoTable xptable;
+
+	if (core->HasFeature(GF_HAS_EXPTABLE)) {
+		xptable.load("exptable");
+	} else {
+		xptable.load("xplist");
+	}
+
+	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
+		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
+	}
+	if (!xptable) {
+		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");
+		return;
+	}
+	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0"); // level is unused
+
+	if (divide) {
+		// force divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue), SX_DIVIDE);
+	} else if (xpvalue[0] == 'P' && xpvalue[1] == '_') {
+		// divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE);
+	} else {
+		// give xp to everyone
+		core->GetGame()->ShareXP(atoi(xpvalue), 0);
+	}
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+}
+
 }
