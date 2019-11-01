@@ -10632,7 +10632,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 	Map *area = GetCurrentArea();
 	if (!area) return false;
 
-	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED;
+	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF;
 	if (enemy) {
 		ieDword ea = GetSafeStat(IE_EA);
 		if (ea>=EA_EVILCUTOFF) {
@@ -10649,7 +10649,6 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 	std::vector<Actor *>::iterator neighbour;
 	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
 		Actor *toCheck = *neighbour;
-		if (toCheck==this) continue;
 		if (seenby) {
 			if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
 		}
