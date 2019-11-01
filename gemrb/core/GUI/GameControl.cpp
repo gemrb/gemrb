@@ -510,11 +510,10 @@ void GameControl::DrawInternal(Region& screen)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			// FIXME: no EA check? Summons and familiars and neutrals would now be marked too
 			std::vector<Actor *> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
 			std::vector<Actor *>::iterator monster;
 			for (monster = monsters.begin(); monster != monsters.end(); monster++) {
-				if ((*monster)->InParty) continue;
+				if ((*monster)->IsPartyMember()) continue;
 				if ((*monster)->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(screen, (*monster)->Pos, viewport, ColorBlack);
 			}
