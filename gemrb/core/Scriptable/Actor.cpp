@@ -6121,6 +6121,10 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 {
 	//scripts can still see this type of actor
 
+	if (ga_flags&GA_NO_SELF) {
+		if (checker && checker == this) return false;
+	}
+
 	if (ga_flags&GA_NO_UNSCHEDULED) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
