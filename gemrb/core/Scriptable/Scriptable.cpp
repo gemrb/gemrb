@@ -943,16 +943,15 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 	delete spell;
 }
 
+// NOTE: currently includes the sender
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
-	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
-	int i=0;
-	while(nearActors[i]!=NULL) {
-		nearActors[i]->AddTrigger(entry);
-		++i;
+	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+		(*neighbour)->AddTrigger(entry);
 	}
 	area->AddTrigger(entry);
-	free(nearActors);
 }
 
 inline void Scriptable::ResetCastingState(Actor *caster) {
@@ -1206,17 +1205,15 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 	Spell* spl = gamedata->GetSpell(SpellResRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	Actor **neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE));
-	Actor **poi = neighbours;
-	while (*poi) {
-		Actor *detective = *poi;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE));
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
-			poi++;
 			continue;
 		}
 		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
-			poi++;
 			continue;
 		}
 
@@ -1237,10 +1234,8 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
-		poi++;
 	}
 	gamedata->FreeSpell(spl, SpellResRef, false);
-	free(neighbours);
 }
 
 // shortcut for internal use when there is no wait

@@ -5410,10 +5410,12 @@ static const char *GetVarName(const char *table, int value)
 void Actor::SendDiedTrigger()
 {
 	if (!area) return;
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
-	Actor **poi = neighbours;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
 	ieDword ea = Modified[IE_EA];
-	while (*poi) {
+
+	std::vector<Actor *>::iterator poi;
+	for (poi = neighbours.begin(); poi != neighbours.end(); poi++) {
+		// NOTE: currently also sending the trigger to ourselves — prevent if it causes problems
 		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
 
 		// allies take a hit on morale and nobody cares about neutrals
@@ -5423,10 +5425,7 @@ void Actor::SendDiedTrigger()
 		} else if (ea > EA_EVILCUTOFF && pea > EA_EVILCUTOFF) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 		}
-
-		poi++;
 	}
-	free(neighbours);
 }
 
 void Actor::Die(Scriptable *killer, bool grantXP)
@@ -7866,13 +7865,11 @@ void Actor::ApplyModal(ieResRef modalSpell)
 		// target actors around us manually
 		// used for iwd2 songs, as the spells don't use an aoe projectile
 		if (!area) return;
-		Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
-		Actor **poi = neighbours;
-		while (*poi) {
-			core->ApplySpell(modalSpell, *poi, this, 0);
-			poi++;
+		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
+		std::vector<Actor *>::iterator neighbour;
+		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+			core->ApplySpell(modalSpell, *neighbour, this, 0);
 		}
-		free(neighbours);
 	} else {
 		core->ApplySpell(modalSpell, this, this, 0);
 	}
@@ -10640,21 +10637,20 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 			flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
 		} else return false; //neutrals got no enemy
 	}
-	Actor** visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
 
-	Actor** poi = visActors;
+	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
 	bool seeEnemy = false;
 
 	//we need to look harder if we look for seenby anyone
-	while (*poi && !seeEnemy) {
-		Actor *toCheck = *poi++;
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (toCheck==this) continue;
 		if (seenby) {
 			if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
 		}
 		else seeEnemy = true;
 	}
-	free(visActors);
 	return seeEnemy;
 }
 
@@ -10726,8 +10722,7 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60);
-	Actor **poi = neighbours;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60);
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
 	bool checked = false;
@@ -10737,8 +10732,9 @@ bool Actor::TryToHideIWD2()
 	// TODO: use crehidemd.2da as a skill bonus/malus (after refreshing effects, not here)
 	ieDword skill = GetStat(IE_HIDEINSHADOWS);
 	bool seen = false;
-	while (*poi) {
-		Actor *toCheck = *poi++;
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
 		}
@@ -10752,7 +10748,6 @@ bool Actor::TryToHideIWD2()
 		seen = skill < (roll + targetDC);
 		if (seen) {
 			HideFailed(this, 1, skill, roll, targetDC);
-			free(neighbours);
 			return false;
 		} else {
 			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
@@ -10762,16 +10757,14 @@ bool Actor::TryToHideIWD2()
 
 	// we're stationary, so no need to check if we're making movement sounds
 	if (!InMove() && !checked) {
-		free(neighbours);
 		return true;
 	}
 
 	// separate move silently check
 	skill = GetStat(IE_STEALTH);
-	poi = neighbours;
 	bool heard = false;
-	while (*poi) {
-		Actor *toCheck = *poi++;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;
 		}
@@ -10782,7 +10775,6 @@ bool Actor::TryToHideIWD2()
 		heard = skill < (roll + targetDC);
 		if (heard) {
 			HideFailed(this, 2, skill, roll, targetDC);
-			free(neighbours);
 			return false;
 		} else {
 			// ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
@@ -10790,7 +10782,6 @@ bool Actor::TryToHideIWD2()
 		}
 	}
 
-	free(neighbours);
 	return true;
 }
 
@@ -11133,18 +11124,15 @@ bool Actor::ConcentrationCheck() const
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F);
-	Actor **poi = neighbours;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F);
 	bool enemyFound = false;
-	while (*poi) {
-		Actor *neighbour = *poi;
-		if (neighbour->GetStat(IE_EA) > EA_EVILCUTOFF) {
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		if ((*neighbour)->GetStat(IE_EA) > EA_EVILCUTOFF) {
 			enemyFound = true;
 			break;
 		}
-		poi++;
 	}
-	free(neighbours);
 	if (!enemyFound) return true;
 
 	// so there is someone out to get us and we should do the real concentration check

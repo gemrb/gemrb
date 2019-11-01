@@ -537,18 +537,15 @@ static int CanSave()
 	}
 
 	Point pc1 =  game->GetPC(0, true)->Pos;
-	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
-	i = 0;
-	while (nearActors[i]) {
-		Actor *actor = nearActors[i];
-		if (actor->GetInternalFlag() & IF_NOINT) {
+	std::vector<Actor *> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+		if ((*neighbour)->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
 			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, DMC_BG2XPGREEN);
 			return 8;
 		}
-		i++;
 	}
-	free(nearActors);
 
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
 	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE

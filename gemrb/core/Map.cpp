@@ -936,19 +936,18 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*2*16);
+	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*2*16);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., 0).
 	// (Necessary since blocked areas of actors may overlap.)
-	int i=0;
-	while(nearActors[i]!=NULL) {
-		if(nearActors[i]!=actor && nearActors[i]->BlocksSearchMap())
-			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-		++i;
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+		if (*neighbour != actor && (*neighbour)->BlocksSearchMap()) {
+			BlockSearchMap((*neighbour)->Pos, (*neighbour)->size, (*neighbour)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+		}
 	}
-	free(nearActors);
 }
 
 void Map::DrawHighlightables()
@@ -1687,11 +1686,10 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
-//maybe consider using a simple list
-Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see)
+std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see) const
 {
-	ieDword count = 1;
 	size_t i = actors.size();
+	std::vector<Actor *> neighbours;
 	while (i--) {
 		Actor* actor = actors[i];
 
@@ -1706,31 +1704,9 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 				continue;
 			}
 		}
-		count++;
+		neighbours.push_back(actor);
 	}
-
-	Actor **ret = (Actor **) malloc( sizeof(Actor*) * count);
-	i = actors.size();
-	int j = 0;
-	while (i--) {
-		Actor* actor = actors[i];
-
-		if (PersonalDistance( p, actor ) > radius)
-			continue;
-		if (!actor->ValidTarget(flags) ) {
-			continue;
-		}
-		if (!(flags&GA_NO_LOS)) {
-			if (!IsVisibleLOS(actor->Pos, p)) {
-				continue;
-			}
-		}
-
-		ret[j++]=actor;
-	}
-
-	ret[j]=NULL;
-	return ret;
+	return neighbours;
 }
 
 
