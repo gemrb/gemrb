@@ -1686,7 +1686,7 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
-std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see) const
+std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see) const
 {
 	size_t i = actors.size();
 	std::vector<Actor *> neighbours;

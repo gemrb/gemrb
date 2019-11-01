@@ -6117,7 +6117,7 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 	core->SetEventFlag(EF_ACTION);
 }
 
-bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
+bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 {
 	//scripts can still see this type of actor
 
@@ -11045,7 +11045,7 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 }
 
 // checks whether the actor is visible to another scriptable
-bool Actor::IsInvisibleTo(Scriptable *checker) const
+bool Actor::IsInvisibleTo(const Scriptable *checker) const
 {
 	bool canSeeInvisibles = false;
 	if (checker && checker->Type == ST_ACTOR) {

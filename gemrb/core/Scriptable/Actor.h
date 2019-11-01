@@ -475,7 +475,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
+	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
 	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
 	/** Returns a Stat value */
@@ -921,7 +921,7 @@ public:
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
-	bool IsInvisibleTo(Scriptable *checker) const;
+	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
