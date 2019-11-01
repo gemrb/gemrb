@@ -851,49 +851,44 @@ int Game::AddMap(Map* map)
 	return i;
 }
 
+// this function should archive the area, and remove it only if the area
+// contains no active actors (combat, partymembers, etc)
 int Game::DelMap(unsigned int index, int forced)
 {
-//this function should archive the area, and remove it only if the area
-//contains no active actors (combat, partymembers, etc)
 	if (index >= Maps.size()) {
 		return -1;
 	}
 	Map *map = Maps[index];
 
-	if (MapIndex==(int) index) { //can't remove current map in any case
+	if (MapIndex == (int) index) { //can't remove current map in any case
 		const char *name = map->GetScriptName();
-		memcpy(AnotherArea, name, sizeof(AnotherArea) );
+		memcpy(AnotherArea, name, sizeof(AnotherArea));
 		return -1;
 	}
 
-
 	if (!map) { //this shouldn't happen, i guess
 		Log(WARNING, "Game", "Erased NULL Map");
-		Maps.erase( Maps.begin()+index);
-		if (MapIndex>(int) index) {
+		Maps.erase(Maps.begin() + index);
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
 	}
 
-	if (forced || (Maps.size()>MAX_MAPS_LOADED) )
-	{
+	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
 		const char *name = map->GetScriptName();
-		if (MasterArea(name)) {
-			if(!AnotherArea[0]) {
-				memcpy(AnotherArea, name, sizeof(AnotherArea));
-				if (!forced) {
-					return -1;
-				}
+		if (MasterArea(name) && !AnotherArea[0]) {
+			memcpy(AnotherArea, name, sizeof(AnotherArea));
+			if (!forced) {
+				return -1;
 			}
 		}
 		//this check must be the last, because
 		//after PurgeActors you cannot keep the
 		//area in memory
 		//Or the queues should be regenerated!
-		if (!map->CanFree())
-		{
+		if (!map->CanFree()) {
 			return 1;
 		}
 		//if there are still selected actors on the map (e.g. summons)
@@ -909,10 +904,10 @@ int Game::DelMap(unsigned int index, int forced)
 
 		//remove map from memory
 		core->SwapoutArea(Maps[index]);
-		delete( Maps[index] );
-		Maps.erase( Maps.begin()+index);
+		delete(Maps[index]);
+		Maps.erase(Maps.begin() + index);
 		//current map will be decreased
-		if (MapIndex>(int) index) {
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
