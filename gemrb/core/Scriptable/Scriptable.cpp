@@ -1205,7 +1205,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 	Spell* spl = gamedata->GetSpell(SpellResRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE));
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE), this);
 	std::vector<Actor *>::iterator neighbour;
 	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
 		Actor *detective = *neighbour;
