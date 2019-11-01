@@ -10629,7 +10629,6 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 //checks if we are seen, or seeing anyone
 bool Actor::SeeAnyOne(bool enemy, bool seenby)
 {
-	Map *area = GetCurrentArea();
 	if (!area) return false;
 
 	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF;
@@ -10639,7 +10638,9 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 			flag|=GA_NO_ENEMY|GA_NO_NEUTRAL;
 		} else if (ea<=EA_GOODCUTOFF) {
 			flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
-		} else return false; //neutrals got no enemy
+		} else {
+			return false; //neutrals got no enemy
+		}
 	}
 
 	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
@@ -10650,9 +10651,12 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
 		Actor *toCheck = *neighbour;
 		if (seenby) {
-			if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
+			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
+				seeEnemy = true;
+			}
+		} else {
+			seeEnemy = true;
 		}
-		else seeEnemy = true;
 	}
 	return seeEnemy;
 }
