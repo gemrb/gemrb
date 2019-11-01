@@ -11131,16 +11131,8 @@ bool Actor::ConcentrationCheck() const
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F, this);
-	bool enemyFound = false;
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
-		if ((*neighbour)->GetStat(IE_EA) > EA_EVILCUTOFF) {
-			enemyFound = true;
-			break;
-		}
-	}
-	if (!enemyFound) return true;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F, this);
+	if (neighbours.size() == 0) return true;
 
 	// so there is someone out to get us and we should do the real concentration check
 	int roll = LuckyRoll(1, 20, 0);
