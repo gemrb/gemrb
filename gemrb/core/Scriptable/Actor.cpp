@@ -11208,7 +11208,11 @@ bool Actor::WasClass(ieDword oldClassID) const
 // returns effective class, accounting for possible inactive dual
 ieDword Actor::GetActiveClass() const
 {
-	if (!IsDualInactive()) return GetStat(IE_CLASS);
+	if (!IsDualInactive()) {
+		// on load, Modified is not populated yet
+		if (Modified[IE_CLASS] == 0) return BaseStats[IE_CLASS];
+		return Modified[IE_CLASS];
+	}
 
 	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
 	int oldclass;
