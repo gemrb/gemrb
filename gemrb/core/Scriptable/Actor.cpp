@@ -3296,7 +3296,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (pstflags) {
 		core->GetGame()->locals->Lookup("APPEARANCE", pst_appearance);
 	}
-	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && pst_appearance == 0) {
+	if (Modified[IE_SEX] != BaseStats[IE_SEX] && pst_appearance == 0) {
 		UpdateAnimationID(true);
 	}
 
