@@ -241,7 +241,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
 		pro->SetEffects(fx);
 	}
-	pro->Range = eh->Range * VOODOO_ITM_RANGE_F;
+	pro->Range = eh->Range;
 	return pro;
 }
 

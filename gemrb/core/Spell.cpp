@@ -306,7 +306,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	if (seh->FeatureCount) {
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
-	pro->Range = GetCastingDistance(self) * VOODOO_SPL_RANGE_F;
+	pro->Range = GetCastingDistance(self);
 	return pro;
 }
 

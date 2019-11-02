@@ -990,7 +990,8 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		const Point& A = Origin;
 		const Point& B = target->Pos;
 		double angle = atan2(B.y - A.y, B.x - A.x);
-		Point C(A.x + Range * cos(angle), A.y + Range * sin(angle));
+		double adjustedRange = Feet2Pixels(Range, angle);
+		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
 		SetTarget(C);
 	} else {
 		//replan the path in case the target moved
