@@ -179,7 +179,7 @@ def DragItemAmount ():
 		Amount = Text.QueryText ()
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
-	OpenItemAmountWindow ()
+	OpenItemAmountWindow (None, UsedSlot)
 	return
 
 def MouseEnterSlot (btn, slot):
