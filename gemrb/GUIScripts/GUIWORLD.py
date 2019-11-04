@@ -266,6 +266,7 @@ def OpenReformPartyWindow ():
 	CommonWindow.SetGameGUIHidden(hideflag)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def DeathWindow ():

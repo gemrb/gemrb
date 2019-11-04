@@ -228,6 +228,7 @@ def OpenPriestSpellInfoWindow ():
 	Text.SetText (spell['SpellDesc'])
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnPriestMemorizeSpell ():
@@ -274,6 +275,7 @@ def OpenPriestSpellRemoveWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def ClosePriestSpellUnmemorizeWindow ():
@@ -306,6 +308,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnPriestUnmemorizeSpell ():

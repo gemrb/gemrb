@@ -918,6 +918,7 @@ def OpenInformationWindow ():
 	Label.SetText (str (stat['KillsTotalCount']))
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OpenKitInfoWindow ():
@@ -965,6 +966,7 @@ def OpenKitInfoWindow ():
 	TextArea.SetText (text)
 
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
+	KitInfoWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def KitDonePress():

@@ -380,6 +380,7 @@ def DisplayItem (itemresref, type):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(1))
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
+	ItemInfoWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OpenItemInfoWindow (btn, slot):
@@ -506,6 +507,7 @@ def OpenItemAmountWindow (btn, slot):
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def UpdateSlot (pc, slot):

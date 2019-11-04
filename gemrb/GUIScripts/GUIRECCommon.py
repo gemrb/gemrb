@@ -198,7 +198,7 @@ def OpenCustomPortraitWindow ():
 	global RowCount1, RowCount2
 
 	SubSubCustomizeWindow = GemRB.LoadWindow (19)
-	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
+	SubSubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	CustomPortraitDoneButton = SubSubCustomizeWindow.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -545,6 +545,7 @@ def OpenBiographyWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBiographyWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def CloseBiographyWindow ():
@@ -598,6 +599,7 @@ def OpenExportWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
+	ExportWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	NameField.Focus()
 	return
 
