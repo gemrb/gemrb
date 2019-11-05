@@ -2773,7 +2773,8 @@ static void InitActorTables()
 		int numstates = splstate->GetHighestValue();
 		if (numstates > 0) {
 			//rounding up
-			SpellStatesSize = (numstates >> 5) + 1;
+			// iwd1 has a practically empty ids though, so force a minimum
+			SpellStatesSize = std::max(6, (numstates >> 5) + 1);
 		}
 	}
 
