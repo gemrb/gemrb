@@ -839,7 +839,7 @@ def PortraitCustomPress():
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (Portrait)+"L"
-	Button.SetPicture (PortraitName, "NOPORTMD")
+	Button.SetPicture (PortraitName, "NOPORTLG")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	Button = Window.GetControl (1)
@@ -2720,7 +2720,7 @@ def ImportDonePress():
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1) )
 	PortraitName = GemRB.GetPlayerPortrait (MyChar, 0)
 	GemRB.SetToken ("LargePortrait", PortraitName )
-	PortraitButton.SetPicture (PortraitName)
+	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	Portrait = -1
 
 	ImportedChar = 1
