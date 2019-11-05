@@ -130,6 +130,8 @@ class StringBuffer;
 #define SC_AURA_CHECK   32
 #define SC_NOINTERRUPT  64
 
+#define ACF_REALLOW_SCRIPTS 1
+
 //trigger flags stored in triggers in .bcs files
 #define TF_NEGATE  1   //negate trigger result
 #define TF_APPLIED 2   //set in living when trigger applied
@@ -304,6 +306,7 @@ public:
 		} else {
 			RefCount = 1; //one reference hold by the script
 		}
+		flags = 0;
 	}
 	~Action()
 	{
@@ -323,6 +326,7 @@ public:
 	int int2Parameter;
 	char string0Parameter[65];
 	char string1Parameter[65];
+	unsigned short flags;
 private:
 	int RefCount;
 public:

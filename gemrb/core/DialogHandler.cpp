@@ -332,6 +332,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				target->AddAction(GenerateAction("BreakInstants()"));
 			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
+				if (i == tr->actions.size() - 1) tr->actions[i]->flags |= ACF_REALLOW_SCRIPTS;
 				target->AddAction(tr->actions[i]);
 			}
 			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
@@ -339,6 +340,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
 			EndDialog();
+			gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
 			ta->AppendText(L"\n");
 			return false;
 		}

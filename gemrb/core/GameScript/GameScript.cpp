@@ -26,6 +26,7 @@
 #include "win32def.h"
 
 #include "Game.h"
+#include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
@@ -2402,6 +2403,11 @@ static void PrintAction(StringBuffer& buffer, int actionID)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
+
+	// reallow area scripts after us, if they were disabled
+	if (aC->flags & ACF_REALLOW_SCRIPTS) {
+		core->GetGameControl()->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_NAND);
+	}
 
 	// check for ActionOverride
 	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)

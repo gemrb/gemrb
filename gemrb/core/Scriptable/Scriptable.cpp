@@ -405,6 +405,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 		act = (Actor *) this;
 	}
 
+	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
+	// currently limited with GF_CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
+	if (Type == ST_AREA && !core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && gc->GetDialogueFlags() & DF_POSTPONE_SCRIPTS) {
+		return;
+	}
+
 	// don't run scripts if we're in dialog
 	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
 		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
