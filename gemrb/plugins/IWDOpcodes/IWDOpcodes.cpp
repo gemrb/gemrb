@@ -108,7 +108,7 @@ static int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); //ee
 static int fx_slow_poison (Scriptable* Owner, Actor* target, Effect* fx); //ef
 static int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx); //f0
 static int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx); //f1
-// int fx_overlay f2 (same as PST)
+static int fx_overlay_iwd (Scriptable* Owner, Actor* target, Effect* fx); //f2 (iwd1)
 static int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx);//f3
 static int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx); //f4
 static int fx_curse (Scriptable* Owner, Actor* target, Effect* fx); //f5
@@ -258,6 +258,7 @@ static EffectDesc effectnames[] = {
 	{ "SlowPoison", fx_slow_poison, 0, -1 }, //ef
 	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1 }, //f0
 	{ "VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1 }, //f1
+	{ "Overlay2", fx_overlay_iwd, 0, -1 }, //f2
 	{ "AnimateDead", fx_animate_dead, 0, -1 }, //f3
 	{ "Prayer2", fx_prayer, 0, -1 }, //f4
 	{ "Curse2", fx_curse, 0, -1 }, //f5
@@ -2774,6 +2775,63 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
+}
+
+// Overlay
+// modelled on fx_visual_effect_iwd2
+int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if(0) print("fx_overlay_iwd(%2d) Type: %d", fx->Opcode, fx->Parameter2);
+	unsigned int type = fx->Parameter2;
+	switch(type) {
+		case 0:
+			STAT_BIT_OR(IE_MINORGLOBE, 1);
+			target->SetOverlay(OV_GLOBE);
+			break;
+		case 1:
+			target->SetOverlay(OV_SHROUD);
+			break;
+		case 2:
+			target->SetOverlay(OV_ANTIMAGIC);
+			break;
+		case 3:
+			target->SetOverlay(OV_RESILIENT);
+			break;
+		case 4:
+			target->SetOverlay(OV_NORMALMISS);
+			break;
+		case 5:
+			target->SetOverlay(OV_CLOAKFEAR);
+			break;
+		case 6:
+			target->SetOverlay(OV_ENTROPY);
+			break;
+		case 7:
+			target->SetOverlay(OV_FIREAURA);
+			break;
+		case 8:
+			target->SetOverlay(OV_FROSTAURA);
+			break;
+		case 9:
+			target->SetOverlay(OV_INSECT);
+			break;
+		case 10:
+			target->SetOverlay(OV_STORMSHELL);
+			break;
+		case 11:
+			target->SetOverlay(OV_LATH1);
+			target->SetOverlay(OV_LATH2);
+			break;
+		case 12:
+			target->SetOverlay(OV_GLATH1);
+			target->SetOverlay(OV_GLATH2);
+			break;
+		case 13:
+			target->SetOverlay(OV_SEVENEYES);
+			target->SetOverlay(OV_SEVENEYES2);
+			break;
+	}
+	return FX_APPLIED;
 }
 
 //414 ResilientSphere
