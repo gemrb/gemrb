@@ -2371,7 +2371,7 @@ def DrawAvatar():
 	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
 	table = GemRB.LoadTable ("avprefc")
 	lookup = GUICommon.GetClassRowName (MyChar)
-	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
+	AvatarID = AvatarID + table.GetValue (lookup, "CLASS")
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID + table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX), GTV_STR)
 
