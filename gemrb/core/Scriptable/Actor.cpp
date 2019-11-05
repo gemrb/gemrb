@@ -1463,8 +1463,8 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 		if (changed&mask) {
 			if (newValue&mask) {
 				handle_overlay(actor, i);
-//			} else if (oldValue&mask) {
-//				actor->RemoveVVCell(hc_overlays[i], true);
+			} else if (oldValue&mask) {
+				actor->RemoveVVCell(hc_overlays[i], true);
 			}
 		}
 		mask<<=1;
@@ -3319,6 +3319,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			}
 		}
 	}
+
+	// manually update the overlays
+	// we make sure to set them without pcfs, since they would trample each other otherwise
+	if (Modified[IE_SANCTUARY] != BaseStats[IE_SANCTUARY]) {
+		pcf_sanctuary(this, BaseStats[IE_SANCTUARY], Modified[IE_SANCTUARY]);
+	}
+
 	//add wisdom/casting_ability bonus spells
 	if (mxsplwis) {
 		if (spellbook.IsIWDSpellBook()) {
@@ -9962,7 +9969,7 @@ void Actor::SetOverlay(unsigned int overlay)
 {
 	if (overlay >= OVERLAY_COUNT) return;
 	// need to run the pcf, so the vvcs get loaded
-	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 1);
+	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 0);
 }
 
 //returns true if spell state is already set or illegal

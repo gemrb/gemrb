@@ -4646,8 +4646,8 @@ int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;
 	}
-	//this effect needs the pcf run immediately
-	STAT_SET_PCF( IE_SANCTUARY, fx->Parameter2);
+	// this effect needs the pcf to be ran immediately, but we do it manually
+	STAT_SET(IE_SANCTUARY, fx->Parameter2);
 	//a rare event, but this effect gives more in bg2 than in iwd2
 	//so we use this flag
 	if (!core->HasFeature(GF_ENHANCED_EFFECTS)) {
