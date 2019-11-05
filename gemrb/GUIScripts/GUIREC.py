@@ -213,7 +213,7 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	if (GameCheck.IsBG2() or GameCheck.IsIWD1()) and not GameCheck.IsBG2Demo():
+	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
 	else:
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
