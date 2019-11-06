@@ -2386,7 +2386,7 @@ int Response::Execute(Scriptable* Sender)
 				Sender->AddAction( aC );
 				ret = 0;
 				break;
-			case AF_CONTINUE:
+			case AF_CONTINUE: // this is never reached, since Continue also has AF_IMMEDIATE
 			case AF_MASK:
 				ret = 1;
 				break;
@@ -2419,7 +2419,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 		if (scr) {
 			if (InDebug&ID_ACTIONS) {
-				Log(WARNING, "GameScript", "Sender: %s-->override: %s",
+				Log(WARNING, "GameScript", "Sender %s ran ActionOverride on %s",
 					Sender->GetScriptName(), scr->GetScriptName() );
 			}
 			scr->ReleaseCurrentAction();
