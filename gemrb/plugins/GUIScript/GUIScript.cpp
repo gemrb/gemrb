@@ -14805,7 +14805,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		return 0;
+		Log(WARNING, "Actor", "Invalid weapon wielded by %s!", actor->GetName(1));
+		return dict;
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
