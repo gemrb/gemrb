@@ -8765,6 +8765,7 @@ bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 
 	switch (index) {
 		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
+		// wasn't played if the weapon wasn't of type misc (so just the swing sound if any)
 		case VB_ATTACK:
 			index = 0;
 			break;
@@ -8785,6 +8786,7 @@ bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 		case 100+IE_ANI_SHOOT:
 			index = 16; // SHOOT
 			break;
+		// these three supposedly never worked, at least not in bg2 (https://www.gibberlings3.net/forums/topic/19034-animation-2da-files)
 		case 100+IE_ANI_ATTACK_SLASH:
 			index = 22; // ATTACK_SLASH
 			break;
