@@ -37,8 +37,6 @@
 
 using namespace GemRB;
 
-static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
-
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
 

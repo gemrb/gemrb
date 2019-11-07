@@ -839,6 +839,7 @@ static EffectRef fx_pst_jumble_curse_ref = { "JumbleCurse", -1 };  //PST specifi
 static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
+static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -4059,6 +4060,12 @@ int fx_luck_cumulative (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_petrified_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_STONE) {
+		target->fxqueue.RemoveAllEffects(fx_eye_stone_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		return FX_NOT_APPLIED;
+	}
 
 	BASE_STATE_SET( STATE_PETRIFIED );
 	if (target->InParty) core->GetGame()->LeaveParty(target);
