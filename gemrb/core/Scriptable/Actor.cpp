@@ -359,6 +359,8 @@ static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
+//iwd1 and iwd2
+static EffectRef fx_eye_sword_ref = { "EyeOfTheSword", -1 };
 //iwd2
 static EffectRef control_undead_ref = { "ControlUndead2", -1 };
 static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
@@ -4605,7 +4607,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	int resisted = 0;
 
-	if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
+	if (Modified[IE_EXTSTATE_ID] & EXTSTATE_EYE_SWORD) {
+		fxqueue.RemoveAllEffects(fx_eye_sword_ref);
+		spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
+		damage = 0;
+	} else if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
 		int mirrorimages = Modified[IE_MIRRORIMAGES];
 		if (mirrorimages) {
 			if (LuckyRoll(1, mirrorimages + 1, 0) != 1) {
