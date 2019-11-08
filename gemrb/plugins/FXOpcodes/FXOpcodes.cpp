@@ -842,6 +842,7 @@ static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
+static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -1150,6 +1151,12 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1827,6 +1834,12 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_set_panic_state(%2d)", fx->Opcode);
 
 	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		return FX_NOT_APPLIED;
 	}
 

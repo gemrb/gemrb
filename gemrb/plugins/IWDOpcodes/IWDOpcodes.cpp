@@ -400,6 +400,7 @@ static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
+static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -1361,6 +1362,13 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
@@ -1508,6 +1516,13 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	bool enemyally = true;
 	Scriptable *caster = target->GetCurrentArea()->GetActorByGlobalID(fx->CasterID);
 	if (caster && caster->Type==ST_ACTOR) {
@@ -1600,6 +1615,12 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		return FX_NOT_APPLIED;
 	}
 
