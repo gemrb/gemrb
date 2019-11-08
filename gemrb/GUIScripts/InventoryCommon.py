@@ -417,6 +417,10 @@ def OpenGroundItemInfoWindow ():
 	DisplayItem(slot_item["ItemResRef"], value)
 	return
 
+# TODO: implement, reuse OpenItemAmountWindow, but be careful about any other uses of ItemButton
+def OpenGroundItemAmountWindow ():
+	pass
+
 def OpenItemAmountWindow ():
 	"""Open the split window."""
 
