@@ -2188,7 +2188,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasDescIcon",        //13GF_HAS_DESC_ICON
 		"HasPickSound",       //14GF_HAS_PICK_SOUND
 		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
-		"AutomapIni",         //16GF_AUTOMAP_INI
+		"AutomapINI",         //16GF_AUTOMAP_INI
 		"SmallFog",           //17GF_SMALL_FOG
 		"ReverseDoor",        //18GF_REVERSE_DOOR
 		"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
