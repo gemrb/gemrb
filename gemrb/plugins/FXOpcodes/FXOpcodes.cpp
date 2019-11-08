@@ -843,6 +843,7 @@ static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
+static EffectRef fx_eye_fortitude_ref = { "EyeOfFortitude", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -2109,6 +2110,13 @@ int fx_save_vs_spell_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_silenced_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_silenced_state(%2d)", fx->Opcode);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_SET( STATE_SILENCED );
 	} else {
@@ -2281,6 +2289,12 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is an IWD extension
 	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
 		return FX_NOT_APPLIED;
 	}
 
@@ -2874,6 +2888,12 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_blind_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		return FX_NOT_APPLIED;
+	}
+
 	//pst power word blind projectile support
 	if (fx->Parameter2==1) {
 		fx->Parameter2 = 0;
@@ -3061,6 +3081,12 @@ int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_deaf_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		return FX_NOT_APPLIED;
+	}
 
 	//adopted IWD2 method, spellfailure will be handled internally based on the spell state
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
