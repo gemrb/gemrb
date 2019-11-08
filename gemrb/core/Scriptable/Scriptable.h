@@ -345,10 +345,10 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellResRef, bool verbose=true);
+	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef);
+	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
 	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
@@ -430,7 +430,7 @@ public:
 	//play this wav file when stepping on the trap (on PST)
 	ieResRef EnterWav;
 public:
-	bool IsOver(const Point &Pos) const;
+	bool IsOver(const Point &Place) const;
 	void DrawOutline() const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const

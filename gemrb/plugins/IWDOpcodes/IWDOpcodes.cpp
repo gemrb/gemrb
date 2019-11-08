@@ -2775,7 +2775,7 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// Overlay
+// 0xf2 Overlay
 // modelled on fx_visual_effect_iwd2
 int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2827,6 +2827,9 @@ int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 13:
 			target->SetOverlay(OV_SEVENEYES);
 			target->SetOverlay(OV_SEVENEYES2);
+			break;
+		default:
+			Log(ERROR, "IWDOpcodes", "fx_overlay_iwd called with unknown mode: %d", type);
 			break;
 	}
 	return FX_APPLIED;

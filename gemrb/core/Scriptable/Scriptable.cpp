@@ -1121,8 +1121,8 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 }
 
 // check for input sanity and good casting conditions
-int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
-	Spell* spl = gamedata->GetSpell(SpellResRef);
+int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
+	Spell* spl = gamedata->GetSpell(SpellRef);
 	if (!spl) {
 		SpellHeader = -1;
 		Log(ERROR, "Scriptable", "Spell not found, aborting cast!");
@@ -1202,13 +1202,13 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 
 // checks if a party-friendly actor is nearby and if so, if it recognizes the spell
 // this enemy just started casting
-void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef)
+void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 {
 	if (!third || !caster || caster->GetStat(IE_EA) <= EA_CONTROLLABLE || !area) {
 		return;
 	}
 
-	Spell* spl = gamedata->GetSpell(SpellResRef);
+	Spell* spl = gamedata->GetSpell(SpellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE), this);
@@ -1241,7 +1241,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			break;
 		}
 	}
-	gamedata->FreeSpell(spl, SpellResRef, false);
+	gamedata->FreeSpell(spl, SpellRef, false);
 }
 
 // shortcut for internal use when there is no wait
@@ -1472,44 +1472,47 @@ int Scriptable::CheckWildSurge()
 		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
 		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
 		// ignore non-magic "spells"
-		if (!(spl->Flags&(SF_HLA|SF_TRIGGER) )) {
-			int check = roll + caster->Modified[IE_SURGEMOD];
-			if (caster->Modified[IE_FORCESURGE] != 7) {
-				// skip the caster level bonus if we're already in a complicated surge
-				check += caster->GetCasterLevel(spl->SpellType);
-			}
-			if (caster->Modified[IE_CHAOSSHIELD]) {
-				//avert the surge and decrease the chaos shield counter
-				check = 0;
-				caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
-				displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
-			}
+		if (spl->Flags&(SF_HLA|SF_TRIGGER)) {
+			gamedata->FreeSpell(spl, OldSpellResRef, false);
+			return 1;
+		}
 
-			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
-			if ((check > 0) && (check < 100) ) {
-				// display feedback: Wild Surge: bla bla
-				String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-				String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
-				displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
-				delete s1;
-				delete s2;
+		int check = roll + caster->Modified[IE_SURGEMOD];
+		if (caster->Modified[IE_FORCESURGE] != 7) {
+			// skip the caster level bonus if we're already in a complicated surge
+			check += caster->GetCasterLevel(spl->SpellType);
+		}
+		if (caster->Modified[IE_CHAOSSHIELD]) {
+			//avert the surge and decrease the chaos shield counter
+			check = 0;
+			caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
+			displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
+		}
 
-				// lookup the spell in the "check" row of wildmag.2da
-				ieResRef surgeSpellRef;
-				CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
+		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
+		if ((check > 0) && (check < 100) ) {
+			// display feedback: Wild Surge: bla bla
+			String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+			String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+			displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
+			delete s1;
+			delete s2;
 
-				if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
-					// handle the hardcoded cases - they'll also fail here
-					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
-						//free the spell handle because we need to return
-						gamedata->FreeSpell(spl, OldSpellResRef, false);
-						return 0;
-					}
-				} else {
-					// finally change the spell
-					// the hardcoded bunch does it on its own when needed
-					CopyResRef(SpellResRef, surgeSpellRef);
+			// lookup the spell in the "check" row of wildmag.2da
+			ieResRef surgeSpellRef;
+			CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
+
+			if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
+				// handle the hardcoded cases - they'll also fail here
+				if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
+					//free the spell handle because we need to return
+					gamedata->FreeSpell(spl, OldSpellResRef, false);
+					return 0;
 				}
+			} else {
+				// finally change the spell
+				// the hardcoded bunch does it on its own when needed
+				CopyResRef(SpellResRef, surgeSpellRef);
 			}
 		}
 
@@ -1867,12 +1870,12 @@ Highlightable::~Highlightable(void)
 	delete( outline );
 }
 
-bool Highlightable::IsOver(const Point &Pos) const
+bool Highlightable::IsOver(const Point &Place) const
 {
 	if (!outline) {
 		return false;
 	}
-	return outline->PointIn( Pos );
+	return outline->PointIn(Place);
 }
 
 void Highlightable::DrawOutline() const
