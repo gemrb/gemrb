@@ -841,6 +841,7 @@ static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
+static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -1845,6 +1846,12 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_poisoned_state(%2d): Damage: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_VENOM) {
+		target->fxqueue.RemoveAllEffects(fx_eye_venom_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_VENOM]);
 		return FX_NOT_APPLIED;
 	}
 
