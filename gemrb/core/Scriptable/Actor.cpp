@@ -361,6 +361,7 @@ static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd1 and iwd2
 static EffectRef fx_eye_sword_ref = { "EyeOfTheSword", -1 };
+static EffectRef fx_eye_mage_ref = { "EyeOfTheMage", -1 };
 //iwd2
 static EffectRef control_undead_ref = { "ControlUndead2", -1 };
 static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
@@ -4605,9 +4606,13 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		return 0;
 	}
 
-	int resisted = 0;
-
-	if (Modified[IE_EXTSTATE_ID] & EXTSTATE_EYE_SWORD) {
+	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MAGE) {
+		if (damagetype == DAMAGE_FIRE || damagetype == DAMAGE_COLD || damagetype == DAMAGE_ACID || damagetype == DAMAGE_ELECTRICITY) {
+			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
+			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
+			damage = 0;
+		}
+	} else if (Modified[IE_EXTSTATE_ID] & EXTSTATE_EYE_SWORD) {
 		fxqueue.RemoveAllEffects(fx_eye_sword_ref);
 		spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
 		damage = 0;
@@ -4633,6 +4638,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
+	int resisted = 0;
 	if (damage) {
 		ModifyDamage (hitter, damage, resisted, damagetype);
 	}
