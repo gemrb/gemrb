@@ -399,6 +399,7 @@ static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //4
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
+static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -1760,6 +1761,13 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_soul_eater(%2d): Damage %d", fx->Opcode, fx->Parameter1);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		return FX_NOT_APPLIED;
+	}
+
 	// Soul Eater has no effect on undead, constructs, and elemental creatures,
 	// but this is handled in the spells via fx_resist_spell_and_message
 	int damage = fx->Parameter1;

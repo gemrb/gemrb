@@ -840,6 +840,7 @@ static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
 static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
+static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -1393,6 +1394,12 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_death(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		return FX_NOT_APPLIED;
+	}
 
 	//if the opcode of this effect is associated with Death2 (iwd2's death magic opcode) and
 	//there is an active death ward effect, ignore this opcode
@@ -5574,6 +5581,12 @@ int fx_power_word_kill (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_power_word_kill(%2d): HP: %d Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword limit = 60;
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		return FX_NOT_APPLIED;
+	}
 
 	if (fx->Parameter1) {
 		limit = fx->Parameter1;
