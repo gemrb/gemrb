@@ -4612,11 +4612,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
 			damage = 0;
 		}
-	} else if (Modified[IE_EXTSTATE_ID] & EXTSTATE_EYE_SWORD) {
-		fxqueue.RemoveAllEffects(fx_eye_sword_ref);
-		spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
-		damage = 0;
-	} else if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
+	}
+
+	if (damage && !(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
 		int mirrorimages = Modified[IE_MIRRORIMAGES];
 		if (mirrorimages) {
 			if (LuckyRoll(1, mirrorimages + 1, 0) != 1) {
@@ -7490,6 +7488,13 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
 		}
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SWORD) {
+		target->fxqueue.RemoveAllEffects(fx_eye_sword_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
+		success = false;
+		roll = 2; // avoid chance critical misses
 	}
 
 	if (core->HasFeedback(FT_TOHIT)) {
