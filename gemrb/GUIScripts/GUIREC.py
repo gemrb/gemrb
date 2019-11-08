@@ -219,10 +219,7 @@ def UpdateRecordsWindow ():
 		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
 
 	# armorclass
-	Label = Window.GetControl (0x10000028)
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	Label.SetText (str (ac))
-	Label.SetTooltip (17183)
+	GUICommon.DisplayAC (pc, Window, 0x10000028)
 
 	# hp now
 	Label = Window.GetControl (0x10000029)

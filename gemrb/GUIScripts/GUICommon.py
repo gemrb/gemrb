@@ -813,6 +813,26 @@ def SafeStatEval (expression):
 
 	return eval(expression)
 
+def DisplayAC (pc, window, labelID):
+	AC = GemRB.GetPlayerStat (pc, IE_ARMORCLASS) + GetACStyleBonus (pc)
+	Label = window.GetControl (labelID)
+	Label.SetText (str (AC))
+	Label.SetTooltip (17183)
+
+def GetACStyleBonus (pc):
+	stars = GemRB.GetPlayerStat(pc, IE_PROFICIENCYSINGLEWEAPON) & 0x7
+	if not stars:
+		return 0
+
+	WStyleTable = GemRB.LoadTable ("wssingle", 1)
+	if not WStyleTable:
+		return 0
+	# are we actually single-wielding?
+	cdet = GemRB.GetCombatDetails (pc, 0)
+	if cdet["Style"] % 1000 != IE_PROFICIENCYSINGLEWEAPON:
+		return 0
+	return WStyleTable.GetValue (str(stars), "AC")
+
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)
 

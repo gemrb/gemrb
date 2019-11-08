@@ -150,9 +150,7 @@ def OpenInventoryWindow ():
 	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
 		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
-	# armor class
-	Label = Window.GetControl (0x10000038)
-	Label.SetTooltip (17183)
+	# armor class handled on refresh
 
 	# hp current
 	Label = Window.GetControl (0x10000039)
@@ -280,10 +278,7 @@ def RefreshInventoryWindow ():
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	Label = Window.GetControl (0x10000038)
-	Label.SetText (str (ac))
-	Label.SetTooltip (10339)
+	GUICommon.DisplayAC (pc, Window, 0x10000038)
 
 	# hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
