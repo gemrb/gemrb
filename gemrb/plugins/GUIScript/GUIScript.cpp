@@ -14771,8 +14771,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
 	}
 
-// 	actor->AC.dump();
-	actor->ToHit.dump();
 	PyObject *ac = PyDict_New();
 	PyDict_SetItemString(ac, "Total", PyInt_FromLong (actor->AC.GetTotal()));
 	PyDict_SetItemString(ac, "Natural", PyInt_FromLong (actor->AC.GetNatural()));
