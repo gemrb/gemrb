@@ -205,6 +205,17 @@ class GWindow(GView, Scrollable):
   def GetControl(self, id): # backwards compatibility
 	return GetView(self, id)
 
+  def AliasControls (self, map):
+	for alias, cid in map.iteritems():
+		control = self.GetControl(cid)
+		if control:
+		  control.AddAlias(alias, self.ID)
+		else:
+		  print "no control with id=" + str(cid)
+
+  def GetControlAlias(self, alias): # see AliasControls()
+	return GetView(alias, self.ID)
+
   def ReparentSubview(self, view, newparent):
 	  view = self.RemoveSubview(view)
 

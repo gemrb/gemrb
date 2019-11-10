@@ -67,14 +67,6 @@ def GetWindowPack():
 	# fallback to the smallest resolution
 	return default
 
-def AliasControls (win, map):
-	for alias, cid in map.iteritems():
-		control = win.GetControl(cid)
-		if control:
-			control.AddAlias(alias)
-		else:
-			print "no control with id=" + str(cid)
-
 def LocationPressed ():
 	AreaInfo = GemRB.GetAreaInfo()
 	TMessageTA = GemRB.GetView("MsgSys", 0)
