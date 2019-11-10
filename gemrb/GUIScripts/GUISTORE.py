@@ -638,13 +638,21 @@ def InitStoreDonateWindow (Window):
 	Field.SetStatus (IE_GUI_EDIT_NUMBER)
 	Field.Focus()
 
+	def SetItemAmount (Number):
+		MaxAmount = GemRB.GameGetPartyGold()
+		if Number < 0:
+			Number = 0
+		elif Number > MaxAmount:
+			Number = MaxAmount
+		Field.SetText (str(Number))
+
 	# +
 	Button = GemRB.GetView ('STOPLUS')
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncrementDonation)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Field.QueryInteger()+1))
 	Button.SetActionInterval (50)
 	# -
 	Button = GemRB.GetView ('STOMINUS')
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecrementDonation)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Field.QueryInteger()-1))
 	Button.SetActionInterval (50)
 	return
 
@@ -1754,30 +1762,6 @@ def GetRealPrice (pc, mode, Item, Slot):
 	if effprice == 0 and Item['Price'] > 0:
 		effprice = 1
 	return effprice
-
-def IncrementDonation ():
-	Window = GemRB.GetView('WINDONAT')
-
-	Field = Window.GetControl (5)
-	donation = int("0"+Field.QueryText ())
-	if donation<GemRB.GameGetPartyGold ():
-		Field.SetText (str(donation+1) )
-	else:
-		Field.SetText (str(GemRB.GameGetPartyGold ()) )
-	UpdateStoreDonateWindow (Window)
-	return
-
-def DecrementDonation ():
-	Window = GemRB.GetView('WINDONAT')
-
-	Field = Window.GetControl (5)
-	donation = int("0"+Field.QueryText ())
-	if donation>0:
-		Field.SetText (str(donation-1) )
-	else:
-		Field.SetText (str(0) )
-	UpdateStoreDonateWindow (Window)
-	return
 
 def DonateGold ():
 	Window = GemRB.GetView('WINDONAT')
