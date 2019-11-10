@@ -67,7 +67,10 @@ public:
 	~SDL20VideoDriver(void);
 
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
+
 	int CreateDriverDisplay(const Size& s, int bpp, const char* title);
+	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
+
 	void SwapBuffers(VideoBuffers& buffers);
 
 	Sprite2D* GetScreenshot( Region r );

@@ -45,9 +45,11 @@ GameType=auto
 #####################################################
 #  Game Name [String] Title for GemRB window, use   #
 #  anything you wish, e.g. Baldur's Gate 3: RotFL   #
+#                                                   #
+#  Defaults to GemRB: <actual game name>            #
 #####################################################
 
-GameName=Baldur's Gate 2
+# GameName=Baldur's Gate 2
 
 #####################################################
 #  Encoding [default|polish|czech] Language used by #

@@ -276,66 +276,6 @@ def RemoveClassAbilities (pc, table, Level):
 				elif ab[:3] != "FA_" and ab[:3] != "FS_":
 					print "ERROR, unknown class ability (type): ", ab
 
-def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
-	Button.SetFont ("NUMBER")
-
-	color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
-	Button.SetBorder (0, color, 0,1)
-	color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
-	Button.SetBorder (1, color, 0,0, Button.GetInsetFrame(2))
-	color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
-	Button.SetBorder (2, color, 0,1)
-
-	Button.SetText ("")
-	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
-
-	if Slot == None:
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		if Type == "inventory":
-			Button.SetTooltip (12013) # Personal Item
-		elif Type == "ground":
-			Button.SetTooltip (12011) # Ground Item
-		else:
-			Button.SetTooltip ("")
-		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
-		Button.EnableBorder (2, 0)
-	else:
-		item = GemRB.GetItem (Slot['ItemResRef'])
-		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
-
-		# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
-		if item["MaxStackAmount"] > 1:
-			Button.SetText (str (Slot["Usages0"]))
-		else:
-			Button.SetText ("")
-
-		# auto-identify mundane items; the actual indentification will happen on transfer
-		if not identified and item["LoreToID"] == 0:
-			identified = True
-
-		if not identified or item["ItemNameIdentified"] == -1:
-			Button.SetTooltip (item["ItemName"])
-			Button.EnableBorder (0, 1)
-			Button.EnableBorder (1, 0)
-		else:
-			Button.SetTooltip (item["ItemNameIdentified"])
-			Button.EnableBorder (0, 0)
-			if magical:
-				Button.EnableBorder (1, 1)
-			else:
-				Button.EnableBorder (1, 0)
-
-		if GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped):
-			Button.EnableBorder (2, 0)
-		else:
-			Button.EnableBorder (2, 1)
-
-		Button.SetItemIcon (Slot['ItemResRef'], 0)
-
-	return
-
 # PST uses a button, IWD2 two types, the rest are the same with two labels
 def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = False):
 	"""Displays the encumbrance as a ratio of current to maximum."""
@@ -865,6 +805,26 @@ def SafeStatEval (expression):
 
 GameWindow = GUIClasses.GWindow(ID=0, SCRIPT_GROUP="GAMEWIN")
 GameControl = GUIClasses.GView(ID=0, SCRIPT_GROUP="GC")
+
+def DisplayAC (pc, window, labelID):
+	AC = GemRB.GetPlayerStat (pc, IE_ARMORCLASS) + GetACStyleBonus (pc)
+	Label = window.GetControl (labelID)
+	Label.SetText (str (AC))
+	Label.SetTooltip (17183)
+
+def GetACStyleBonus (pc):
+	stars = GemRB.GetPlayerStat(pc, IE_PROFICIENCYSINGLEWEAPON) & 0x7
+	if not stars:
+		return 0
+
+	WStyleTable = GemRB.LoadTable ("wssingle", 1)
+	if not WStyleTable:
+		return 0
+	# are we actually single-wielding?
+	cdet = GemRB.GetCombatDetails (pc, 0)
+	if cdet["Style"] % 1000 != IE_PROFICIENCYSINGLEWEAPON:
+		return 0
+	return WStyleTable.GetValue (str(stars), "AC")
 
 class _stdioWrapper(object):
 	def __init__(self, log_level):

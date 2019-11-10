@@ -136,16 +136,13 @@ def UpdateRecordsWindow (Window):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	pic = GemRB.GetPlayerPortrait (pc, 0)["Sprite"]
-	if (GameCheck.IsBG2() or GameCheck.IsIWD1()) and not GameCheck.IsBG2Demo():
+	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
 		Button.SetPicture (pic, "NOPORTMD")
 	else:
 		Button.SetPicture (pic, "NOPORTLG")
 
 	# armorclass
-	Label = Window.GetControl (0x10000028)
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	Label.SetText (str (ac))
-	Label.SetTooltip (17183)
+	GUICommon.DisplayAC (pc, Window, 0x10000028)
 
 	# hp now
 	Label = Window.GetControl (0x10000029)

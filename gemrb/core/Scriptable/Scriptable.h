@@ -47,20 +47,21 @@ class Spell;
 class Sprite2D;
 class SpriteCover;
 
-#define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
 
 /** The distance between PC's who are about to enter a new area */
 #define MAX_TRAVELING_DISTANCE      400
 
-#define SCR_OVERRIDE 0
-#define SCR_AREA	 1
-#define SCR_SPECIFICS 2
-#define SCR_RESERVED  3
-#define SCR_CLASS    4
-#define SCR_RACE	 5
-#define SCR_GENERAL  6
-#define SCR_DEFAULT  7
+// script levels / slots (scrlev.ids)
+#define SCR_OVERRIDE  0
+#define SCR_AREA      1 // iwd2: special 1
+#define SCR_SPECIFICS 2 // iwd2: team
+#define SCR_RESERVED  3 // iwd2: pc-customizable scripts were saved here
+#define SCR_CLASS     4 // iwd2: special 2
+#define SCR_RACE      5 // iwd2: combat
+#define SCR_GENERAL   6 // iwd2: special 3
+#define SCR_DEFAULT   7 // iwd2: movement
+#define MAX_SCRIPTS   8
 
 //pst trap flags (portal)
 #define PORTAL_CURSOR 1
@@ -344,10 +345,10 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText();
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellResRef, bool verbose=true);
+	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef);
+	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
 	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
@@ -429,7 +430,7 @@ public:
 	//play this wav file when stepping on the trap (on PST)
 	ieResRef EnterWav;
 public:
-	bool IsOver(const Point &Pos) const;
+	bool IsOver(const Point &Place) const;
 	void DrawOutline(const Point& origin) const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
@@ -489,15 +490,8 @@ public:
 		return StanceID;
 	}
 
-	inline void SetOrientation(int value, bool slow) {
-		//MAX_ORIENT == 16, so we can do this
-		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
-		if (!slow) {
-			Orientation = NewOrientation;
-		}
-	}
-
 	void SetStance(unsigned int arg);
+	void SetOrientation(int value, bool slow);
 	void SetAttackMoveChances(ieWord *amc);
 	virtual bool DoStep(unsigned int walk_speed, ieDword time = 0);
 	void AddWayPoint(const Point &Des);

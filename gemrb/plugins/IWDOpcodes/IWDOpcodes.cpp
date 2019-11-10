@@ -37,8 +37,6 @@
 
 using namespace GemRB;
 
-static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
-
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
 
@@ -108,7 +106,7 @@ static int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); //ee
 static int fx_slow_poison (Scriptable* Owner, Actor* target, Effect* fx); //ef
 static int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx); //f0
 static int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx); //f1
-// int fx_overlay f2 (same as PST)
+static int fx_overlay_iwd (Scriptable* Owner, Actor* target, Effect* fx); //f2 (iwd1)
 static int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx);//f3
 static int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx); //f4
 static int fx_curse (Scriptable* Owner, Actor* target, Effect* fx); //f5
@@ -258,6 +256,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SlowPoison", fx_slow_poison, 0, -1), //ef
 	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1), //f0
 	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1), //f1
+	EffectDesc("Overlay2", fx_overlay_iwd, 0, -1), //f2
 	EffectDesc("AnimateDead", fx_animate_dead, 0, -1), //f3
 	EffectDesc("Prayer2", fx_prayer, 0, -1), //f4
 	EffectDesc("Curse2", fx_curse, 0, -1), //f5
@@ -400,6 +399,8 @@ static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //4
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
+static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
+static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -1361,6 +1362,13 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
@@ -1508,6 +1516,13 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	bool enemyally = true;
 	Scriptable *caster = target->GetCurrentArea()->GetActorByGlobalID(fx->CasterID);
 	if (caster && caster->Type==ST_ACTOR) {
@@ -1600,6 +1615,12 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1761,6 +1782,13 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_soul_eater(%2d): Damage %d", fx->Opcode, fx->Parameter1);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		return FX_NOT_APPLIED;
+	}
+
 	// Soul Eater has no effect on undead, constructs, and elemental creatures,
 	// but this is handled in the spells via fx_resist_spell_and_message
 	int damage = fx->Parameter1;
@@ -2758,6 +2786,66 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
+}
+
+// 0xf2 Overlay
+// modelled on fx_visual_effect_iwd2
+int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if(0) print("fx_overlay_iwd(%2d) Type: %d", fx->Opcode, fx->Parameter2);
+	unsigned int type = fx->Parameter2;
+	switch(type) {
+		case 0:
+			STAT_BIT_OR(IE_MINORGLOBE, 1);
+			target->SetOverlay(OV_GLOBE);
+			break;
+		case 1:
+			target->SetOverlay(OV_SHROUD);
+			break;
+		case 2:
+			target->SetOverlay(OV_ANTIMAGIC);
+			break;
+		case 3:
+			target->SetOverlay(OV_RESILIENT);
+			break;
+		case 4:
+			target->SetOverlay(OV_NORMALMISS);
+			break;
+		case 5:
+			target->SetOverlay(OV_CLOAKFEAR);
+			break;
+		case 6:
+			target->SetOverlay(OV_ENTROPY);
+			break;
+		case 7:
+			target->SetOverlay(OV_FIREAURA);
+			break;
+		case 8:
+			target->SetOverlay(OV_FROSTAURA);
+			break;
+		case 9:
+			target->SetOverlay(OV_INSECT);
+			break;
+		case 10:
+			target->SetOverlay(OV_STORMSHELL);
+			break;
+		case 11:
+			target->SetOverlay(OV_LATH1);
+			target->SetOverlay(OV_LATH2);
+			break;
+		case 12:
+			target->SetOverlay(OV_GLATH1);
+			target->SetOverlay(OV_GLATH2);
+			break;
+		case 13:
+			target->SetOverlay(OV_SEVENEYES);
+			target->SetOverlay(OV_SEVENEYES2);
+			break;
+		default:
+			Log(ERROR, "IWDOpcodes", "fx_overlay_iwd called with unknown mode: %d", type);
+			break;
+	}
+	return FX_APPLIED;
 }
 
 //414 ResilientSphere

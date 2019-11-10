@@ -97,22 +97,6 @@ def OpenLevelUpWindow():
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
 
-	if GameCheck.IsBG1() or GameCheck.IsIWD1():
-		# armorclass
-		Label = LevelUpWindow.GetControl (0x10000057)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
-		Label.SetTooltip (17183)
-
-		# hp now
-		Label = LevelUpWindow.GetControl (0x10000058)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
-		Label.SetTooltip (17184)
-
-		# hp max
-		Label = LevelUpWindow.GetControl (0x10000059)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
-		Label.SetTooltip (17378)
-
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	OldThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
@@ -306,6 +290,23 @@ def OpenLevelUpWindow():
 	LUCommon.SetupThaco (pc, Level)
 	LUCommon.SetupLore (pc, LevelDiff)
 	LUCommon.SetupHP (pc, Level, LevelDiff)
+
+	# we set up these labels so late, so they can show the new HP
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
+		# armorclass
+		Label = LevelUpWindow.GetControl (0x10000057)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
+		Label.SetTooltip (17183)
+
+		# hp now
+		Label = LevelUpWindow.GetControl (0x10000058)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+		Label.SetTooltip (17184)
+
+		# hp max
+		Label = LevelUpWindow.GetControl (0x10000059)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+		Label.SetTooltip (17378)
 
 	# use total levels for HLAs
 	HLACount = 0

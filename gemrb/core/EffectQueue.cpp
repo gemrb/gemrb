@@ -2234,6 +2234,21 @@ ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2
 	return cnt;
 }
 
+unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effect* fx) const
+{
+	ieDword cnt = 1;
+	ieDword opcode = ResolveEffect(effect_reference);
+
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); ++f) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		if (*f == fx) break;
+		cnt++;
+	}
+	return cnt;
+}
+
 void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
 {
 	std::list< Effect* >::const_iterator f;

@@ -40,6 +40,8 @@
 
 namespace GemRB {
 
+static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
+
 class Actor;
 struct Effect;
 class Factory;

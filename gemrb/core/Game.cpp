@@ -845,49 +845,44 @@ int Game::AddMap(Map* map)
 	return i;
 }
 
+// this function should archive the area, and remove it only if the area
+// contains no active actors (combat, partymembers, etc)
 int Game::DelMap(unsigned int index, int forced)
 {
-//this function should archive the area, and remove it only if the area
-//contains no active actors (combat, partymembers, etc)
 	if (index >= Maps.size()) {
 		return -1;
 	}
 	Map *map = Maps[index];
 
-	if (MapIndex==(int) index) { //can't remove current map in any case
+	if (MapIndex == (int) index) { //can't remove current map in any case
 		const char *name = map->GetScriptName();
-		memcpy(AnotherArea, name, sizeof(AnotherArea) );
+		memcpy(AnotherArea, name, sizeof(AnotherArea));
 		return -1;
 	}
 
-
 	if (!map) { //this shouldn't happen, i guess
 		Log(WARNING, "Game", "Erased NULL Map");
-		Maps.erase( Maps.begin()+index);
-		if (MapIndex>(int) index) {
+		Maps.erase(Maps.begin() + index);
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
 	}
 
-	if (forced || (Maps.size()>MAX_MAPS_LOADED) )
-	{
+	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
 		const char *name = map->GetScriptName();
-		if (MasterArea(name)) {
-			if(!AnotherArea[0]) {
-				memcpy(AnotherArea, name, sizeof(AnotherArea));
-				if (!forced) {
-					return -1;
-				}
+		if (MasterArea(name) && !AnotherArea[0]) {
+			memcpy(AnotherArea, name, sizeof(AnotherArea));
+			if (!forced) {
+				return -1;
 			}
 		}
 		//this check must be the last, because
 		//after PurgeActors you cannot keep the
 		//area in memory
 		//Or the queues should be regenerated!
-		if (!map->CanFree())
-		{
+		if (!map->CanFree()) {
 			return 1;
 		}
 		//if there are still selected actors on the map (e.g. summons)
@@ -903,10 +898,10 @@ int Game::DelMap(unsigned int index, int forced)
 
 		//remove map from memory
 		core->SwapoutArea(Maps[index]);
-		delete( Maps[index] );
-		Maps.erase( Maps.begin()+index);
+		delete(Maps[index]);
+		Maps.erase(Maps.begin() + index);
 		//current map will be decreased
-		if (MapIndex>(int) index) {
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
@@ -1469,10 +1464,12 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
+	// and delay most idle actions
 	// but only if we skip for at least an hour
 	if (add >= core->Time.hour_size) {
 		for (unsigned int i=0; i<PCs.size(); i++) {
 			Actor *pc = PCs[i];
+			pc->ResetCommentTime();
 			int conHealRate = pc->GetConHealAmount();;
 			// 1. regeneration as an effect
 			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
@@ -1552,7 +1549,8 @@ bool Game::EveryoneDead() const
 	}
 	if (protagonist==PM_NO) {
 		Actor *nameless = PCs[0];
-		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+		// don't trigger this outside pst, our game loop depends on it
+		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GF_PST_STATE_FLAGS)) {
 			if (area->INISpawn) {
 				area->INISpawn->RespawnNameless();
 			}
@@ -2087,7 +2085,6 @@ void Game::Infravision()
 static const Color DreamTint(0xf0,0xe0,0xd0,0x10);    //light brown scale
 static const Color NightTint(0x80,0x80,0xe0,0x40);    //dark, bluish
 static const Color DuskTint(0xe0,0x80,0x80,0x40);     //dark, reddish
-static const Color FogTint(0xff,0xff,0xff,0x40);      //whitish
 static const Color DarkTint(0x80,0x80,0xe0,0x10);     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
@@ -2111,9 +2108,6 @@ const Color *Game::GetGlobalTint() const
 		//get weather tint
 		if (WeatherBits&WB_RAIN) {
 			return &DarkTint;
-		}
-		if (WeatherBits&WB_FOG) {
-			return &FogTint;
 		}
 	}
 

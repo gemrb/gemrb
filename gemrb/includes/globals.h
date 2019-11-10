@@ -204,10 +204,11 @@ GEM_EXPORT unsigned int SquaredDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
+GEM_EXPORT double Feet2Pixels(int feet, double angle);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 
-#define SCHEDULE_MASK(time)	(1 << core->Time.GetHour(time + core->Time.hour_size/2))
+#define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
 #ifndef WIN32
 inline unsigned long GetTickCount()

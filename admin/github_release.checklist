@@ -1,6 +1,7 @@
 ### Release checklist
 
-This is a general release preparation checklist. See [Release.md](gemrb/docs/en/Release.md) for a longer writeup.
+This is a general release preparation checklist.
+See [Release.md](https://github.com/gemrb/gemrb/blob/master/gemrb/docs/en/Release.md) for a longer writeup.
 
 Final development:
 - [ ] Fix or postpone issues in the [milestone](https://github.com/gemrb/gemrb/milestones)

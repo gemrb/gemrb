@@ -402,7 +402,8 @@ def AcceptPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	#10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	if not ImportedChar:
+		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:
@@ -822,7 +823,7 @@ def PortraitCustomPress():
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (Portrait)+"L"
-	Button.SetPicture (PortraitName, "NOPORTMD")
+	Button.SetPicture (PortraitName, "NOPORTLG")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	Button = Window.GetControl (1)
@@ -2315,7 +2316,7 @@ def DrawAvatar():
 	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
 	table = GemRB.LoadTable ("avprefc")
 	lookup = GUICommon.GetClassRowName (MyChar)
-	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
+	AvatarID = AvatarID + table.GetValue (lookup, "CLASS")
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID + table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX), GTV_STR)
 
@@ -2637,7 +2638,7 @@ def ImportDonePress():
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1)["ResRef"])
 	Portrait = GemRB.GetPlayerPortrait (MyChar, 0)
 	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
-	PortraitButton.SetPicture (Portrait["Sprite"])
+	PortraitButton.SetPicture (Portrait["Sprite"], "NOPORTLG")
 	Portrait = -1
 
 	ImportedChar = 1

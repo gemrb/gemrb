@@ -1285,7 +1285,7 @@ int Interface::Init(InterfaceConfig* config)
 		} else var[0] = '\0'; \
 		value = NULL;
 
-	CONFIG_STRING("GameName", GameName, GEMRB_STRING);
+	CONFIG_STRING("GameName", GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
 	CONFIG_STRING("GameType", GameType, "auto");
 	// tob type is obsolete
 	if (stricmp( GameType, "tob" ) == 0) {
@@ -1558,6 +1558,27 @@ int Interface::Init(InterfaceConfig* config)
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	}
+
+	// if unset, manually populate GameName (window title)
+	std::map<std::string, std::string> gameTypeNameMap;
+	gameTypeNameMap["auto"] = "";
+	gameTypeNameMap["bg1"] = "Baldur's Gate 1";
+	gameTypeNameMap["bg2"] = "Baldur's Gate 2";
+	gameTypeNameMap["iwd"] = "Icewind Dale (vanilla)";
+	gameTypeNameMap["how"] = "Icewind Dale: Heart of Winter";
+	gameTypeNameMap["iwd2"] = "Icewind Dale 2";
+	gameTypeNameMap["pst"] = "Planescape: Torment";
+	gameTypeNameMap["demo"] = "Internal demo";
+	gameTypeNameMap["test"] = "Tests";
+	if (!stricmp(GameName, GEMRB_STRING)) {
+		if (gameTypeNameMap.find(GameType) != gameTypeNameMap.end()) {
+			std::string prefix = GEMRB_STRING" running ";
+			strlcpy(GameName, gameTypeNameMap[GameType].insert(0, prefix).c_str(), sizeof(GameName));
+		} else {
+			strlcpy(GameName, "GemRB running unknown game", sizeof(GameName));
+		}
+		video->SetWindowTitle(GameName);
 	}
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
@@ -2110,7 +2131,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasDescIcon",        //13GF_HAS_DESC_ICON
 		"HasPickSound",       //14GF_HAS_PICK_SOUND
 		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
-		"AutomapIni",         //16GF_AUTOMAP_INI
+		"AutomapINI",         //16GF_AUTOMAP_INI
 		"SmallFog",           //17GF_SMALL_FOG
 		"ReverseDoor",        //18GF_REVERSE_DOOR
 		"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
@@ -2413,14 +2434,15 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	} else {
 		map = game->GetCurrentArea();
 	}
+	if (!map) return ab;
 
-	if (map) while(cnt--) {
+	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
 			return NULL;
 		}
 		ieDword sex = tmp->GetStat(IE_SEX);
-		//TODO: make this external
+		//TODO: make this external as summlimt.2da
 		int limit = 0;
 		switch (sex) {
 		case SEX_SUMMON: case SEX_SUMMON_DEMON:
@@ -3303,14 +3325,14 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
-	Log(ERROR, "Interface", "Unable to load game.");
-
 	delete new_game;
 	delete new_worldmap;
 	delete gam_str;
 	delete wmp_str1;
 	delete wmp_str2;
 	delete sav_str;
+
+	error("Core", "Unable to load game.");
 }
 
 /* replace the current world map but sync areas available in old and new */

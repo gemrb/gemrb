@@ -74,9 +74,7 @@ def InitInventoryWindow (Window):
 	Label = Button.CreateLabel (0x10000043, "NUMBER", "0:", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 	Label = Button.CreateLabel (0x10000044, "NUMBER", "0:", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
-	# armor class
-	Label = Window.GetControl (0x10000038)
-	Label.SetTooltip (17183)
+	# armor class handled on refresh
 
 	# hp current
 	Label = Window.GetControl (0x10000039)
@@ -198,10 +196,7 @@ def RefreshInventoryWindow (Window):
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	Label = Window.GetControl (0x10000038)
-	Label.SetText (str (ac))
-	Label.SetTooltip (10339)
+	GUICommon.DisplayAC (pc, Window, 0x10000038)
 
 	# hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
@@ -248,7 +243,7 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
 
-		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	# making window visible/shaded depending on the pc's state
 	GUICommon.AdjustWindowVisibility (Window, pc, False)

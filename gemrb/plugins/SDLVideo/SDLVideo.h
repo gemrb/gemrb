@@ -71,6 +71,7 @@ public:
 	virtual ~SDLVideoDriver(void);
 	int Init(void);
 
+	virtual void SetWindowTitle(const char *title) = 0;
 	virtual bool SetFullscreenMode(bool set)=0;
 
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,

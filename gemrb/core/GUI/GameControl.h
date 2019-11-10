@@ -51,6 +51,7 @@ class DialogHandler;
 #define DF_IN_CONTAINER   32
 #define DF_OPENCONTINUEWINDOW 64
 #define DF_OPENENDWINDOW 128
+#define DF_POSTPONE_SCRIPTS 256
 
 //screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!

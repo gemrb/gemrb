@@ -342,6 +342,9 @@ static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
+//iwd1 and iwd2
+static EffectRef fx_eye_sword_ref = { "EyeOfTheSword", -1 };
+static EffectRef fx_eye_mage_ref = { "EyeOfTheMage", -1 };
 //iwd2
 static EffectRef control_undead_ref = { "ControlUndead2", -1 };
 static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
@@ -770,7 +773,8 @@ void Actor::SetCircleSize()
 		}
 	}
 
-	int csize = Clamp(anims->GetCircleSize(), 0, MAX_CIRCLE_SIZE);
+	// circle size 0 won't display, so we can ignore it when clamping
+	int csize = Clamp(anims->GetCircleSize(), 1, MAX_CIRCLE_SIZE) - 1;
 
 	SetCircle( anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
@@ -878,6 +882,7 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 
 	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
 		kitindex = kit&0xfff;
+		if (!kitindex && !baseclass) return 0;
 	}
 
 	if (kitindex == 0) {
@@ -1442,8 +1447,8 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 		if (changed&mask) {
 			if (newValue&mask) {
 				handle_overlay(actor, i);
-//			} else if (oldValue&mask) {
-//				actor->RemoveVVCell(hc_overlays[i], true);
+			} else if (oldValue&mask) {
+				actor->RemoveVVCell(hc_overlays[i], true);
 			}
 		}
 		mask<<=1;
@@ -1598,7 +1603,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
-NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,pcf_avatarremoval,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
@@ -1607,7 +1612,7 @@ NULL, pcf_alignment, pcf_dbutton, pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
+NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 };
 
 /** call this from ~Interface() */
@@ -1833,13 +1838,13 @@ GEM_EXPORT void UpdateActorConfig()
 	GameDifficulty = 0;
 	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
 	if (GameDifficulty) {
-		GameDifficulty = DIFF_NIGHTMARE;
+		GameDifficulty = DIFF_INSANE;
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
-	if (GameDifficulty>DIFF_NIGHTMARE) GameDifficulty = DIFF_NIGHTMARE;
+	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
@@ -2752,7 +2757,8 @@ static void InitActorTables()
 		int numstates = splstate->GetHighestValue();
 		if (numstates > 0) {
 			//rounding up
-			SpellStatesSize = (numstates >> 5) + 1;
+			// iwd1 has a practically empty ids though, so force a minimum
+			SpellStatesSize = std::max(6, (numstates >> 5) + 1);
 		}
 	}
 
@@ -3275,7 +3281,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (pstflags) {
 		core->GetGame()->locals->Lookup("APPEARANCE", pst_appearance);
 	}
-	if (Modified[IE_ANIMATION_ID] == BaseStats[IE_ANIMATION_ID] && pst_appearance == 0) {
+	if (Modified[IE_SEX] != BaseStats[IE_SEX] && pst_appearance == 0) {
 		UpdateAnimationID(true);
 	}
 
@@ -3297,6 +3303,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 			}
 		}
 	}
+
+	// manually update the overlays
+	// we make sure to set them without pcfs, since they would trample each other otherwise
+	if (Modified[IE_SANCTUARY] != BaseStats[IE_SANCTUARY]) {
+		pcf_sanctuary(this, BaseStats[IE_SANCTUARY], Modified[IE_SANCTUARY]);
+	}
+
 	//add wisdom/casting_ability bonus spells
 	if (mxsplwis) {
 		if (spellbook.IsIWDSpellBook()) {
@@ -4227,11 +4240,19 @@ void Actor::IdleActions(bool nonidle)
 
 	Game *game = core->GetGame();
 	//there is no combat
-	if (game->CombatCounter) return;
+	if (game->CombatCounter) {
+		ResetCommentTime();
+		return;
+	}
+
 	//and they are on the current area
 	if (map!=game->GetCurrentArea()) return;
+
 	//don't mess with cutscenes
-	if (core->InCutSceneMode()) return;
+	if (core->InCutSceneMode()) {
+		ResetCommentTime();
+		return;
+	}
 
 	//only party [N]PCs talk but others might play existence sounds
 	if (!InParty) {
@@ -4252,7 +4273,7 @@ void Actor::IdleActions(bool nonidle)
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
-		if (nextComment && !core->InCutSceneMode() && !Immobile() && !GetPartyComment()) {
+		if (nextComment && !Immobile() && !GetPartyComment()) {
 			GetAreaComment(map->AreaType);
 		}
 		nextComment = time+core->Roll(5,1000,bored_time/2);
@@ -4261,7 +4282,7 @@ void Actor::IdleActions(bool nonidle)
 
 	//drop the bored one liner if there was no action for some time
 	//if bored timeout is disabled, don't bother to set the new time
-	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile() || core->InCutSceneMode()) {
+	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
 		nextBored = time + core->Roll(1, 30, bored_time);
 	} else {
 		if (bored_time && nextBored && nextBored < time) {
@@ -4568,9 +4589,15 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		return 0;
 	}
 
-	int resisted = 0;
+	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MAGE) {
+		if (damagetype == DAMAGE_FIRE || damagetype == DAMAGE_COLD || damagetype == DAMAGE_ACID || damagetype == DAMAGE_ELECTRICITY) {
+			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
+			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
+			damage = 0;
+		}
+	}
 
-	if (!(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
+	if (damage && !(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
 		int mirrorimages = Modified[IE_MIRRORIMAGES];
 		if (mirrorimages) {
 			if (LuckyRoll(1, mirrorimages + 1, 0) != 1) {
@@ -4592,6 +4619,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
+	int resisted = 0;
 	if (damage) {
 		ModifyDamage (hitter, damage, resisted, damagetype);
 	}
@@ -5385,10 +5413,12 @@ static const char *GetVarName(const char *table, int value)
 void Actor::SendDiedTrigger()
 {
 	if (!area) return;
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
-	Actor **poi = neighbours;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
 	ieDword ea = Modified[IE_EA];
-	while (*poi) {
+
+	std::vector<Actor *>::iterator poi;
+	for (poi = neighbours.begin(); poi != neighbours.end(); poi++) {
+		// NOTE: currently also sending the trigger to ourselves — prevent if it causes problems
 		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
 
 		// allies take a hit on morale and nobody cares about neutrals
@@ -5398,10 +5428,7 @@ void Actor::SendDiedTrigger()
 		} else if (ea > EA_EVILCUTOFF && pea > EA_EVILCUTOFF) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 		}
-
-		poi++;
 	}
-	free(neighbours);
 }
 
 void Actor::Die(Scriptable *killer, bool grantXP)
@@ -6093,9 +6120,13 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 	core->SetEventFlag(EF_ACTION);
 }
 
-bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
+bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 {
 	//scripts can still see this type of actor
+
+	if (ga_flags&GA_NO_SELF) {
+		if (checker && checker == this) return false;
+	}
 
 	if (ga_flags&GA_NO_UNSCHEDULED) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
@@ -6147,7 +6178,7 @@ bool Actor::ValidTarget(int ga_flags, Scriptable *checker) const
 			return false;
 		}
 		// charmed actors are only selectable if they were charmed by the party
-		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && BaseStats[IE_EA] <= EA_GOODCUTOFF) return false;
+		if ((Modified[IE_STATE_ID] & STATE_CHARMED) && Modified[IE_EA] == EA_CHARMEDPC) return false;
 		if (Modified[IE_STATE_ID] & STATE_BERSERK) {
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
@@ -7451,6 +7482,13 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SWORD) {
+		target->fxqueue.RemoveAllEffects(fx_eye_sword_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
+		success = false;
+		roll = 2; // avoid chance critical misses
+	}
+
 	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
 		wchar_t rollLog[100];
@@ -7848,13 +7886,11 @@ void Actor::ApplyModal(ieResRef modalSpell)
 		// target actors around us manually
 		// used for iwd2 songs, as the spells don't use an aoe projectile
 		if (!area) return;
-		Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
-		Actor **poi = neighbours;
-		while (*poi) {
-			core->ApplySpell(modalSpell, *poi, this, 0);
-			poi++;
+		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
+		std::vector<Actor *>::iterator neighbour;
+		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+			core->ApplySpell(modalSpell, *neighbour, this, 0);
 		}
-		free(neighbours);
 	} else {
 		core->ApplySpell(modalSpell, this, this, 0);
 	}
@@ -8101,13 +8137,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	// is this true???
-	if (Des.x==-2 && Des.y==-2) {
-		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
-		Movable::WalkTo(p, MinDistance);
-	} else {
-		Movable::WalkTo(Des, MinDistance);
-	}
+	Movable::WalkTo(Des, MinDistance);
 }
 
 int Actor::WantDither() const
@@ -8432,7 +8462,7 @@ void Actor::Draw(const Region& vp)
 		drawcircle = false;
 	}
 	// the speaker should get a circle even in cutscenes
-	if ((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
+	if (shoulddrawcircle && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
 		drawcircle = true;
 	}
 	bool drawtarget = false;
@@ -8745,6 +8775,7 @@ bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 
 	switch (index) {
 		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
+		// wasn't played if the weapon wasn't of type misc (so just the swing sound if any)
 		case VB_ATTACK:
 			index = 0;
 			break;
@@ -8765,6 +8796,7 @@ bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 		case 100+IE_ANI_SHOOT:
 			index = 16; // SHOOT
 			break;
+		// these three supposedly never worked, at least not in bg2 (https://www.gibberlings3.net/forums/topic/19034-animation-2da-files)
 		case 100+IE_ANI_ATTACK_SLASH:
 			index = 22; // ATTACK_SLASH
 			break;
@@ -8802,13 +8834,13 @@ bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
 	snprintf(section,10,"%d", animid);
 
 	/* TODO: pst also has these, but we currently ignore them:
-	 * Another form of randomization or for different attack types, animations?
+	 * Another form of randomization for attack animations (random pick of Attack1-3 [if defined] and this is its sound)
 	 *    1x at2sound for each at1sound
 	 *    2x at3sound
-	 * What are these for?
-	 *   33x cf1sound (?)
+	 * Others:
+	 *   33x cf1sound (stance (combat) fidget)
 	 *    2x ms1sound (misc; both hammers hitting metal; ambient sounds for idle animations? Likely doesn't fit here)
-	 *   19x sf1sound (?)
+	 *   19x sf1sound (stand (normal) fidget)
 	 * 
 	 * TODO: iwd:
 	 *   att2-att4
@@ -9953,7 +9985,7 @@ void Actor::SetOverlay(unsigned int overlay)
 {
 	if (overlay >= OVERLAY_COUNT) return;
 	// need to run the pcf, so the vvcs get loaded
-	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 1);
+	SetStat(IE_SANCTUARY, Modified[IE_SANCTUARY] | (1<<overlay), 0);
 }
 
 //returns true if spell state is already set or illegal
@@ -10621,33 +10653,35 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 //checks if we are seen, or seeing anyone
 bool Actor::SeeAnyOne(bool enemy, bool seenby)
 {
-	Map *area = GetCurrentArea();
 	if (!area) return false;
 
-	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED;
+	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF;
 	if (enemy) {
 		ieDword ea = GetSafeStat(IE_EA);
 		if (ea>=EA_EVILCUTOFF) {
 			flag|=GA_NO_ENEMY|GA_NO_NEUTRAL;
 		} else if (ea<=EA_GOODCUTOFF) {
 			flag|=GA_NO_ALLY|GA_NO_NEUTRAL;
-		} else return false; //neutrals got no enemy
+		} else {
+			return false; //neutrals got no enemy
+		}
 	}
-	Actor** visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
 
-	Actor** poi = visActors;
+	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
 	bool seeEnemy = false;
 
 	//we need to look harder if we look for seenby anyone
-	while (*poi && !seeEnemy) {
-		Actor *toCheck = *poi++;
-		if (toCheck==this) continue;
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (seenby) {
-			if(ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10<PersonalDistance(toCheck, this) ) ) seeEnemy=true;
+			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
+				seeEnemy = true;
+			}
+		} else {
+			seeEnemy = true;
 		}
-		else seeEnemy = true;
 	}
-	free(visActors);
 	return seeEnemy;
 }
 
@@ -10719,8 +10753,7 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60);
-	Actor **poi = neighbours;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60, this);
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
 	bool checked = false;
@@ -10730,8 +10763,9 @@ bool Actor::TryToHideIWD2()
 	// TODO: use crehidemd.2da as a skill bonus/malus (after refreshing effects, not here)
 	ieDword skill = GetStat(IE_HIDEINSHADOWS);
 	bool seen = false;
-	while (*poi) {
-		Actor *toCheck = *poi++;
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
 		}
@@ -10745,7 +10779,6 @@ bool Actor::TryToHideIWD2()
 		seen = skill < (roll + targetDC);
 		if (seen) {
 			HideFailed(this, 1, skill, roll, targetDC);
-			free(neighbours);
 			return false;
 		} else {
 			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
@@ -10755,16 +10788,14 @@ bool Actor::TryToHideIWD2()
 
 	// we're stationary, so no need to check if we're making movement sounds
 	if (!InMove() && !checked) {
-		free(neighbours);
 		return true;
 	}
 
 	// separate move silently check
 	skill = GetStat(IE_STEALTH);
-	poi = neighbours;
 	bool heard = false;
-	while (*poi) {
-		Actor *toCheck = *poi++;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *toCheck = *neighbour;
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;
 		}
@@ -10775,7 +10806,6 @@ bool Actor::TryToHideIWD2()
 		heard = skill < (roll + targetDC);
 		if (heard) {
 			HideFailed(this, 2, skill, roll, targetDC);
-			free(neighbours);
 			return false;
 		} else {
 			// ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
@@ -10783,7 +10813,6 @@ bool Actor::TryToHideIWD2()
 		}
 	}
 
-	free(neighbours);
 	return true;
 }
 
@@ -10920,10 +10949,11 @@ void Actor::ResetCommentTime()
 	Game *game = core->GetGame();
 	if (bored_time) {
 		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
+		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 	} else {
 		nextBored = 0;
+		nextComment = game->GameTime + core->Roll(10, 500, 150);
 	}
-	nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 }
 
 // this one is just a hack, so we can keep a bunch of other functions const
@@ -11042,7 +11072,7 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 }
 
 // checks whether the actor is visible to another scriptable
-bool Actor::IsInvisibleTo(Scriptable *checker) const
+bool Actor::IsInvisibleTo(const Scriptable *checker) const
 {
 	bool canSeeInvisibles = false;
 	if (checker && checker->Type == ST_ACTOR) {
@@ -11125,19 +11155,8 @@ bool Actor::ConcentrationCheck() const
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
-	Actor **neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F);
-	Actor **poi = neighbours;
-	bool enemyFound = false;
-	while (*poi) {
-		Actor *neighbour = *poi;
-		if (neighbour->GetStat(IE_EA) > EA_EVILCUTOFF) {
-			enemyFound = true;
-			break;
-		}
-		poi++;
-	}
-	free(neighbours);
-	if (!enemyFound) return true;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F, this);
+	if (neighbours.size() == 0) return true;
 
 	// so there is someone out to get us and we should do the real concentration check
 	int roll = LuckyRoll(1, 20, 0);
@@ -11200,7 +11219,11 @@ bool Actor::WasClass(ieDword oldClassID) const
 // returns effective class, accounting for possible inactive dual
 ieDword Actor::GetActiveClass() const
 {
-	if (!IsDualInactive()) return GetStat(IE_CLASS);
+	if (!IsDualInactive()) {
+		// on load, Modified is not populated yet
+		if (Modified[IE_CLASS] == 0) return BaseStats[IE_CLASS];
+		return Modified[IE_CLASS];
+	}
 
 	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
 	int oldclass;
@@ -11267,5 +11290,85 @@ bool Actor::HasPlayerClass() const
 	return cid > 0 && cid < classcount;
 }
 
+// this is part of a REd function from the original (see #124)
+char Actor::GetArmorCode() const
+{
+	bool mageAnimation = (BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200;
+	// IE_ARMOR_TYPE + 1 is the armor code, but we also need to look up robes specifically as they have 3 types :(
+	CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
+	if (!itm) return '1';
+	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	if (!item) return '1';
+	bool wearingRobes = item->AnimationType[1] == 'W';
+
+	if (mageAnimation ^ wearingRobes) return '1';
+	return item->AnimationType[0];
 }
 
+const char* Actor::GetArmorSound() const
+{
+	// Character has mage animation or is a non-mage wearing mage robes
+	if ((BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200) return "";
+	char armorCode = GetArmorCode();
+	if (armorCode == '1') {
+		return "";
+	}
+
+	char *sound = new char[9];
+	int maxChar = 6;
+	if (armorCode == '4') maxChar = 8;
+	if (IWDSound) {
+		// all three iwds have this pattern: a_chain1-6, a_lthr1-6, a_plate1-8
+		const char* suffixes = "12345678";
+		int idx = RAND(0, maxChar-1);
+		if (armorCode == '2') {
+			strcpy(sound, "A_LTHR");
+			sound[6] = suffixes[idx];
+			sound[7] = '\0';
+		} else if (armorCode == '3') {
+			strcpy(sound, "A_CHAIN");
+			sound[7] = suffixes[idx];
+			sound[8] = '\0';
+		} else { // 4
+			strcpy(sound, "A_PLATE");
+			sound[7] = suffixes[idx];
+			sound[8] = '\0';
+		}
+	} else {
+		// generate a 1 letter suffix or emulate an empty string
+		// ARM_04G and ARM_04H exist, but couldn't be picked by the original function
+		const char* suffixes = "abcdefgh";
+		int idx = RAND(0, maxChar);
+		char randomASCII = '\0';
+		if (idx < maxChar) randomASCII = suffixes[idx];
+
+		strcpy(sound, "ARM_0");
+		sound[5] = armorCode;
+		sound[6] = randomASCII;
+		sound[7] = '\0';
+	}
+	return sound;
+}
+
+void Actor::PlayArmorSound() const
+{
+	// don't try immediately upon loading
+	if (!Ticks) return;
+	if (Modified[IE_STATE_ID] & STATE_SILENCED) return;
+	// peculiar original behaviour: always for pcs, while the rest only clank if footstep sounds are on
+	if (!footsteps && !InParty) return;
+	// pst is missing the resources
+	if (pstflags) return;
+
+	Game *game = core->GetGame();
+	if (!game) return;
+	if (game->CombatCounter) return;
+
+	const char *armorSound = GetArmorSound();
+	if (armorSound[0]) {
+		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
+		delete[] armorSound;
+	}
+}
+
+}

@@ -36,7 +36,7 @@ namespace GemRB {
 // completely empirical, 9 seems to work fine for iwd and bgs
 // but it is either too small for iwd2 or there are other bugs
 // (fireball to the door in the targos attack is a good test case)
-static const int VOODOO_SPL_RANGE_F = 9;
+static const int VOODOO_SPL_RANGE_F = 15;
 
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
@@ -62,6 +62,9 @@ static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square
 
 // used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
 // while it looks too big, it is needed this big in at least pst (help())
+// bgee testing shows a radius of 72 feet
+// In the EE Help() has the range of "visualrange" * 3 * (16 * (1 or 3/4 in the vertical)) == 3x visual range, converted via Feet2pixels
+// the '48' (3*16) default can be set by the 'Audible Range' game option in baldur.lua
 static const unsigned int VOODOO_SHOUT_RANGE = 400;
 
 // existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
@@ -84,13 +87,14 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 
 // NearLocation range multiplier (currently the same for pst and iwd2/how)
 // arbitrary, started as 20 and has no effect for callers that want exact position
-static const int VOODOO_NEARLOC_F = 10;
+// supposedly the same feet->map conversion as usual
+static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
 
 // visual range stuff
 static const int VOODOO_CANSEE_F = 15;
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
-static const int VOODOO_VISUAL_RANGE = 30;
+static const int VOODOO_VISUAL_RANGE = 28;
 static const int VOODOO_DIALOG_RANGE = 15;
 
 // character speed was also hardcoded depending on the used animation type

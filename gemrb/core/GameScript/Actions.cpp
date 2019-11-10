@@ -941,7 +941,9 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_SAVEDYPOS, parameters->int1Parameter);
 	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
+
 //IWD2, sets the homepoint P
+// handle [-1.-1] specially, if needed; ar6200.bcs has interesting use
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -1194,6 +1196,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 
+	// iwd2 is the only one with special handling:
+	// -2 is used as HomeLocation; no other unusual values are used
+	if (parameters->pointParameter.x < 0) {
+		parameters->pointParameter = actor->HomeLocation;
+	}
+
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, 0 );
@@ -1329,7 +1337,7 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo(p, 0, 0);
+		actor->WalkTo(p, 0, parameters->int0Parameter);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -2243,9 +2251,17 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
 	}
 
-	if (direction==-1) {
+	// pst enables worldmap travel only after visiting the lower ward
+	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
+	if (direction == -1 && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+	if (direction == -1 && keyAreaVisited) {
+		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
+		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
+		// DestEntryPoint is all zeroes, pst just didn't use it
+		direction = 0;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );
@@ -2902,31 +2918,12 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable xptable;
+	AddXPCore(parameters);
+}
 
-	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
-		xptable.load("exptable");
-	} else {
-		xptable.load("xplist");
-	}
-
-	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
-	}
-	if (!xptable) {
-		Log(ERROR, "GameScript", "Can't perform ADDXP2DA");
-		return;
-	}
-	const char * xpvalue = xptable->QueryField( parameters->string0Parameter, "0" ); //level is unused
-
-	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
-		//divide party xp
-		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE );
-	} else {
-		//give xp everyone
-		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
-	}
-	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+void GameScript::AddXPVar(Scriptable* /*Sender*/, Action* parameters)
+{
+	AddXPCore(parameters, true);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
@@ -4332,6 +4329,13 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	// iwd2 has two uses with [-1.-1]
+	if (parameters->pointParameter.x == -1) {
+		parameters->pointParameter.x = Sender->Pos.x;
+		parameters->pointParameter.y = Sender->Pos.y;
+	}
+
 	if (Distance(parameters->pointParameter, Sender) > 10) {
 		MoveNearerTo(Sender, parameters->pointParameter, 10,0);
 		return;
@@ -5148,7 +5152,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	// if same target as before, don't play the war cry again, as they'd pop up too often
 	int flags = 0;
-	if (Sender->LastTargetPersistent == Sender->CurrentActionTarget) {
+	if (Sender->LastTargetPersistent == tar->GetGlobalID()) {
 		flags = AC_NO_SOUND;
 	}
 
@@ -7107,8 +7111,14 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	fx->PosX=parameters->pointParameter.x;
-	fx->PosY=parameters->pointParameter.y;
+	// iwd2 with [-1.-1] again
+	if (parameters->pointParameter.x == -1) {
+		fx->PosX = src->Pos.x;
+		fx->PosY = src->Pos.y;
+	} else {
+		fx->PosX = parameters->pointParameter.x;
+		fx->PosY = parameters->pointParameter.y;
+	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
 	delete fx;

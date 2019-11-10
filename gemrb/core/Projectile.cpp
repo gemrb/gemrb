@@ -989,7 +989,8 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		const Point& A = Origin;
 		const Point& B = target->Pos;
 		double angle = atan2(B.y - A.y, B.x - A.x);
-		Point C(A.x + Range * cos(angle), A.y + Range * sin(angle));
+		double adjustedRange = Feet2Pixels(Range, angle);
+		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
 		SetTarget(C);
 	} else {
 		//replan the path in case the target moved
@@ -1032,7 +1033,7 @@ void Projectile::ClearPath()
 int Projectile::CalculateTargetFlag()
 {
 	//if there are any, then change phase to exploding
-	int flags = GA_NO_DEAD;
+	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
 
 	if (Extension) {
 		if (Extension->AFlags&PAF_NO_WALL) {
@@ -1180,10 +1181,6 @@ void Projectile::SecondaryTarget()
 		maxdeg = mindeg + Extension->ConeWidth;
 	}
 
-	int radius = Extension->ExplosionRadius;
-	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
-	Actor **poi=actors;
-
 	if (Extension->DiceCount) {
 		//precalculate the maximum affected target count in case of PAF_AFFECT_ONE 
 		extension_targetcount = core->Roll(Extension->DiceCount, Extension->DiceSize, 0);
@@ -1192,25 +1189,25 @@ void Projectile::SecondaryTarget()
 		extension_targetcount = 1;
 	}
 
-	while(*poi) {
+	int radius = Extension->ExplosionRadius;
+	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
+	std::vector<Actor *>::iterator poi;
+	for (poi = actors.begin(); poi != actors.end(); poi++) {
 		ieDword Target = (*poi)->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
-			poi++;
 			continue;
 		}
 
 		//IDS targeting for area projectiles
 		if (FailedIDS(*poi)) {
-			poi++;
 			continue;
 		}
 
 		if (Extension->AFlags&PAF_CONE) {
 			//cone never affects the caster
 			if(Caster==Target) {
-				poi++;
 				continue;
 			}
 			double xdiff = (*poi)->Pos.x-Pos.x;
@@ -1239,7 +1236,6 @@ void Projectile::SecondaryTarget()
 			//Log(DEBUG, "Projectile", "Target %s at angle %d (%d to %d), ignoring? %d %d, %d -> %d, %d", (*poi)->GetName(1), deg, mindeg, maxdeg, mindeg>deg || maxdeg<deg, degOffset, Orientation, saneOrientation, deg0);
 			//not in the right sector of circle
 			if (mindeg>deg || maxdeg<deg) {
-				poi++;
 				continue;
 			}
 		}
@@ -1258,6 +1254,7 @@ void Projectile::SecondaryTarget()
 		area->AddProjectile(pro, Pos, Target, false);
 
 		poi++;
+		if (poi == actors.end()) break;
 		fail=false;
 
 		//we already got one target affected in the AOE, this flag says
@@ -1269,14 +1266,12 @@ void Projectile::SecondaryTarget()
 			//if target counting is per HD and this target is an actor, use the xp level field
 			//otherwise count it as one
 			if ((Extension->APFlags&APF_COUNT_HD) && ((*poi)->Type==ST_ACTOR) ) {
-				Actor *actor = (Actor *) *poi;
-				extension_targetcount-= actor->GetXPLevel(true);
+				extension_targetcount-= (*poi)->GetXPLevel(true);
 			} else {
 				extension_targetcount--;
 			}
 		}
 	}
-	free(actors);
 
 	//In case of utter failure, apply a spell of the same name on the caster
 	//this feature is used by SCHARGE, PRTL_OP and PRTL_CL in the HoW pack

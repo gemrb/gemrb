@@ -339,7 +339,7 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 
 void DisplayMessage::DisplayStringName(const String& text, unsigned int color, const Scriptable *speaker) const
 {
-	if (!text.length()) return;
+	if (!text.length() || !text.compare(L" ")) return;
 
 	unsigned int speaker_color;
 	String name;

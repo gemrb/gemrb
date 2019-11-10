@@ -145,6 +145,7 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag);
 void SpellCore(Scriptable *Sender, Action *parameters, int flags);
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags);
 Gem_Polygon *GetPolygon2DA(ieDword index);
+void AddXPCore(Action *parameters, bool divide = false);
 
 inline int Bones(ieDword value)
 {

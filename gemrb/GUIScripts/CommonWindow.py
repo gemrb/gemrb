@@ -19,6 +19,7 @@
 
 import GemRB
 import GameCheck
+import InventoryCommon
 from GUIDefines import GS_DIALOGMASK, OP_SET
 
 def SetGameGUIHidden(hide):
@@ -111,7 +112,7 @@ def RedrawContainerWindow ():
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
 		else:
-			GUICommon.UpdateInventorySlot (pc, Button, Slot, "container")
+			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "container")
 
 	for i in range (4):
 		if i+RightTopIndex < RightCount:
@@ -132,7 +133,7 @@ def RedrawContainerWindow ():
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
 		else:
-			GUICommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
+			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 	# shade the inventory icon if it is full
 	Button = Window.GetControl (54)

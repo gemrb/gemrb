@@ -306,7 +306,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	if (seh->FeatureCount) {
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
-	pro->Range = GetCastingDistance(self) * VOODOO_SPL_RANGE_F;
+	pro->Range = GetCastingDistance(self);
 	return pro;
 }
 
@@ -317,9 +317,11 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
 	Actor *actor = NULL;
+	unsigned int limit = VOODOO_VISUAL_RANGE;
 	if (Sender && Sender->Type==ST_ACTOR) {
 		actor = (Actor *) Sender;
 		level = actor->GetCasterLevel(SpellType);
+		limit = actor->GetStat(IE_VISUALRANGE);
 	}
 
 	if (level<1) {
@@ -336,7 +338,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	if (seh->Target==TARGET_DEAD) {
 		return 0xffffffff;
 	}
-	return (unsigned int) seh->Range;
+	return std::min((unsigned int) seh->Range, limit);
 }
 
 static EffectRef fx_damage_ref = { "Damage", -1 };

@@ -384,8 +384,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 	if (!CurrentActionInterruptable) {
 		// sanity check
-		if (!CurrentAction && !GetNextAction())
+		if (!CurrentAction && !GetNextAction()) {
 			error("Scriptable", "No current action and no next action.\n");
+		}
 		return;
 	}
 
@@ -394,6 +395,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 	Actor *act = NULL;
 	if (Type == ST_ACTOR) {
 		act = (Actor *) this;
+	}
+
+	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
+	// currently limited with GF_CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
+	if (Type == ST_AREA && !core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && gc->GetDialogueFlags() & DF_POSTPONE_SCRIPTS) {
+		return;
 	}
 
 	// don't run scripts if we're in dialog
@@ -406,8 +413,8 @@ void Scriptable::ExecuteScript(int scriptCount)
 		// if party AI is disabled, don't run non-override scripts
 		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
 			scriptCount = 1;
-		// TODO: hardcoded action hacks
-		//TODO: add stuff here that overrides actions (like Panic, etc)
+		// hardcoded action overrides like charm, confusion, panic and berserking
+		// TODO: check why everything else but charm is handled separately and unify if possible
 		changed |= act->OverrideActions();
 	}
 
@@ -422,11 +429,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 		if (done) break;
 	}
 
-	if (changed)
+	if (changed) {
 		InitTriggers();
+	}
 
 	if (act) {
-		//TODO: add stuff here about idle actions
+		// if nothing is happening, look around, check if we're bored and so on
 		act->IdleActions(CurrentAction!=NULL);
 	}
 }
@@ -786,6 +794,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
+					delete pro;
 					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
@@ -833,6 +842,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
+					delete pro;
 					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
@@ -886,15 +896,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		area->SeeSpellCast(this, spellnum);
 
 		// spellcasting feedback
-		if (third) {
-			// only display it for party friendly creatures - enemies require a successful spellcraft check
-			if (Type == ST_ACTOR) {
-				Actor *caster = ((Actor *) this);
-				if (caster->GetStat(IE_EA) <= EA_CONTROLLABLE) {
-					DisplaySpellCastMessage(tgt, spl);
-				}
-			}
-		} else {
+		// iwd2: only display it for party friendly creatures - enemies require a successful spellcraft check
+		if (!third || (caster && caster->GetStat(IE_EA) <= EA_CONTROLLABLE)) {
 			DisplaySpellCastMessage(tgt, spl);
 		}
 	}
@@ -936,16 +939,15 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 	delete spell;
 }
 
+// NOTE: currently includes the sender
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
-	Actor** nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
-	int i=0;
-	while(nearActors[i]!=NULL) {
-		nearActors[i]->AddTrigger(entry);
-		++i;
+	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+		(*neighbour)->AddTrigger(entry);
 	}
 	area->AddTrigger(entry);
-	free(nearActors);
 }
 
 inline void Scriptable::ResetCastingState(Actor *caster) {
@@ -972,7 +974,6 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
-			caster->CureInvisibility();
 		}
 	}
 	if (level == 0) {
@@ -1008,7 +1009,9 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	if (!no_stance) {
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
 	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
@@ -1043,7 +1046,6 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		caster = ((Actor *) this);
 		if (!no_stance) {
 			caster->SetStance(IE_ANI_CONJURE);
-			caster->CureInvisibility();
 		}
 	}
 	if (level == 0) {
@@ -1076,7 +1078,9 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	if (!no_stance) {
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
@@ -1107,8 +1111,8 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 }
 
 // check for input sanity and good casting conditions
-int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
-	Spell* spl = gamedata->GetSpell(SpellResRef);
+int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
+	Spell* spl = gamedata->GetSpell(SpellRef);
 	if (!spl) {
 		SpellHeader = -1;
 		Log(ERROR, "Scriptable", "Spell not found, aborting cast!");
@@ -1128,64 +1132,59 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 	}
 
 	// various individual checks
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+	if (Type != ST_ACTOR) {
+		return 1;
+	}
+	Actor *actor = (Actor *) this;
 
-		// check for silence
-		// only a handful of spells don't have a verbal component -
-		// the original hardcoded vocalize and a few more
-		// we (also) ignore tobex modded spells
-		if (actor->CheckSilenced()) {
-			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
-				Log(WARNING, "Scriptable", "Tried to cast while silenced!");
-				return 0;
-			}
-		}
-
-		// check for personal dead magic
-		if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
-			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
+	// check for silence
+	// only a handful of spells don't have a verbal component -
+	// the original hardcoded vocalize and a few more
+	// we (also) ignore tobex modded spells
+	if (actor->CheckSilenced()) {
+		if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
+			Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 			return 0;
 		}
+	}
 
-		// check for miscast magic and similar
-		ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
-		bool failed = false;
-		ieDword chance = 0;
-		switch(spl->SpellType)
-		{
-		case IE_SPL_PRIEST:
-			chance = actor->GetSpellFailure(false);
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		case IE_SPL_WIZARD:
-			chance = actor->GetSpellFailure(true);
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		case IE_SPL_INNATE:
-			chance = actor->Modified[IE_SPELLFAILUREINNATE];
-			if (chance >= roll) {
-				failed = true;
-			}
-			break;
-		}
-		if (verbose && chance && third) {
-			// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
-			displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
-		}
-		if (failed) {
-			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
-			return 0;
-		}
+	// check for personal dead magic
+	if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
+		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
+		return 0;
+	}
 
-		// iwd2: make a concentration check if needed
-		if (!actor->ConcentrationCheck()) {
-			return 0;
-		}
+	// check for miscast magic and similar
+	ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
+	bool failed = false;
+	ieDword chance = 0;
+	switch(spl->SpellType)
+	{
+	case IE_SPL_PRIEST:
+		chance = actor->GetSpellFailure(false);
+		break;
+	case IE_SPL_WIZARD:
+		chance = actor->GetSpellFailure(true);
+		break;
+	case IE_SPL_INNATE:
+		chance = actor->Modified[IE_SPELLFAILUREINNATE];
+		break;
+	}
+	if (chance >= roll) {
+		failed = true;
+	}
+	if (verbose && chance && third) {
+		// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
+		displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
+	}
+	if (failed) {
+		displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
+		return 0;
+	}
+
+	// iwd2: make a concentration check if needed
+	if (!actor->ConcentrationCheck()) {
+		return 0;
 	}
 
 	return 1;
@@ -1193,26 +1192,24 @@ int Scriptable::CanCast(const ieResRef SpellResRef, bool verbose) {
 
 // checks if a party-friendly actor is nearby and if so, if it recognizes the spell
 // this enemy just started casting
-void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef)
+void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 {
 	if (!third || !caster || caster->GetStat(IE_EA) <= EA_CONTROLLABLE || !area) {
 		return;
 	}
 
-	Spell* spl = gamedata->GetSpell(SpellResRef);
+	Spell* spl = gamedata->GetSpell(SpellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	Actor **neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE));
-	Actor **poi = neighbours;
-	while (*poi) {
-		Actor *detective = *poi;
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE), this);
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
-			poi++;
 			continue;
 		}
 		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
-			poi++;
 			continue;
 		}
 
@@ -1233,10 +1230,8 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
-		poi++;
 	}
-	gamedata->FreeSpell(spl, SpellResRef, false);
-	free(neighbours);
+	gamedata->FreeSpell(spl, SpellRef, false);
 }
 
 // shortcut for internal use when there is no wait
@@ -1313,6 +1308,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	}
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
+		if (actor) actor->CureInvisibility();
 	}
 	return SpellCast(instant);
 }
@@ -1354,6 +1350,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
+		if (actor) actor->CureInvisibility();
 	}
 	return SpellCast(instant, target);
 }
@@ -1465,40 +1462,47 @@ int Scriptable::CheckWildSurge()
 		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
 		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
 		// ignore non-magic "spells"
-		if (!(spl->Flags&(SF_HLA|SF_TRIGGER) )) {
-			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
-			if (caster->Modified[IE_CHAOSSHIELD]) {
-				//avert the surge and decrease the chaos shield counter
-				check = 0;
-				caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
-				displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
-			}
+		if (spl->Flags&(SF_HLA|SF_TRIGGER)) {
+			gamedata->FreeSpell(spl, OldSpellResRef, false);
+			return 1;
+		}
 
-			// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
-			if ((check > 0) && (check < 100) ) {
-				// display feedback: Wild Surge: bla bla
-				String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-				String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
-				displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
-				delete s1;
-				delete s2;
+		int check = roll + caster->Modified[IE_SURGEMOD];
+		if (caster->Modified[IE_FORCESURGE] != 7) {
+			// skip the caster level bonus if we're already in a complicated surge
+			check += caster->GetCasterLevel(spl->SpellType);
+		}
+		if (caster->Modified[IE_CHAOSSHIELD]) {
+			//avert the surge and decrease the chaos shield counter
+			check = 0;
+			caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
+			displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,DMC_LIGHTGREY,caster);
+		}
 
-				// lookup the spell in the "check" row of wildmag.2da
-				ieResRef surgeSpellRef;
-				CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
+		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
+		if ((check > 0) && (check < 100) ) {
+			// display feedback: Wild Surge: bla bla
+			String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+			String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+			displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
+			delete s1;
+			delete s2;
 
-				if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
-					// handle the hardcoded cases - they'll also fail here
-					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
-						//free the spell handle because we need to return
-						gamedata->FreeSpell(spl, OldSpellResRef, false);
-						return 0;
-					}
-				} else {
-					// finally change the spell
-					// the hardcoded bunch does it on its own when needed
-					CopyResRef(SpellResRef, surgeSpellRef);
+			// lookup the spell in the "check" row of wildmag.2da
+			ieResRef surgeSpellRef;
+			CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
+
+			if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
+				// handle the hardcoded cases - they'll also fail here
+				if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
+					//free the spell handle because we need to return
+					gamedata->FreeSpell(spl, OldSpellResRef, false);
+					return 0;
 				}
+			} else {
+				// finally change the spell
+				// the hardcoded bunch does it on its own when needed
+				CopyResRef(SpellResRef, surgeSpellRef);
 			}
 		}
 
@@ -1514,7 +1518,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
 	int lvl = spl->SpellLevel-1;
-	int count, i, tmp, tmp2, tmp3;
+	int count, i, tmp, tmp3;
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
 	ieResRef newspl;
@@ -1546,10 +1550,8 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			// force surge and then cast
 			// force the surge roll to be < 100, so we cast a spell from the surge table
 			tmp = caster->Modified[IE_FORCESURGE];
-			tmp2 = caster->Modified[IE_SURGEMOD];
 			tmp3 = caster->WMLevelMod; // also save caster level; the original didn't reroll the bonus
 			caster->Modified[IE_FORCESURGE] = 7;
-			caster->Modified[IE_SURGEMOD] = - caster->GetCasterLevel(spl->SpellType); // nulify the bonus
 			if (LastSpellTarget) {
 				target = area->GetActorByGlobalID(LastSpellTarget);
 				if (!target) {
@@ -1579,7 +1581,6 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				CopyResRef(SpellResRef, newspl);
 			}
 			caster->Modified[IE_FORCESURGE] = tmp;
-			caster->Modified[IE_SURGEMOD] = tmp2;
 			break;
 		case '4': // change the target type to param1
 			strtok(surgeSpellRef,".");
@@ -1853,12 +1854,12 @@ Highlightable::~Highlightable(void)
 	delete( outline );
 }
 
-bool Highlightable::IsOver(const Point &Pos) const
+bool Highlightable::IsOver(const Point &Place) const
 {
 	if (!outline) {
 		return false;
 	}
-	return outline->PointIn( Pos );
+	return outline->PointIn(Place);
 }
 
 void Highlightable::DrawOutline(const Point& origin) const
@@ -1899,7 +1900,9 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 			}
 		}
 	}
-	if (!TrapResets()) {
+	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
+	// should we always send Entered instead, also when !Trapped? Does not appear so, see history of InfoPoint::TriggerTrap
+	if (!TrapResets() && (TrapDetectionDiff && TrapRemovalDiff)) {
 		Trapped = false;
 	}
 	return true;
@@ -2064,25 +2067,44 @@ void Movable::SetStance(unsigned int arg)
 		}
 	}
 
-	if (arg<MAX_ANIMS) {
-		StanceID=(unsigned char) arg;
-
-		if (StanceID == IE_ANI_ATTACK) {
-			// Set stance to a random attack animation
-
-			int random = RAND(0, 99);
-			if (random < AttackMovements[0]) {
-				StanceID = IE_ANI_ATTACK_BACKSLASH;
-			} else if (random < AttackMovements[0] + AttackMovements[1]) {
-				StanceID = IE_ANI_ATTACK_SLASH;
-			} else {
-				StanceID = IE_ANI_ATTACK_JAB;
-			}
-		}
-
-	} else {
-		StanceID=IE_ANI_AWAKE;
+	if (arg >= MAX_ANIMS) {
+		StanceID = IE_ANI_AWAKE;
 		Log(ERROR, "Movable", "Tried to set invalid stance id(%u)", arg);
+		return;
+	}
+
+	StanceID = (unsigned char) arg;
+
+	if (StanceID == IE_ANI_ATTACK) {
+		// Set stance to a random attack animation
+		int random = RAND(0, 99);
+		if (random < AttackMovements[0]) {
+			StanceID = IE_ANI_ATTACK_BACKSLASH;
+		} else if (random < AttackMovements[0] + AttackMovements[1]) {
+			StanceID = IE_ANI_ATTACK_SLASH;
+		} else {
+			StanceID = IE_ANI_ATTACK_JAB;
+		}
+	}
+
+	// this doesn't get hit on movement, since movement overrides the stance manually
+	// but it is needed for the twang/clank when an actor stops moving
+	// a lot of other stances would get skipped later, since we check we're out of combat
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		actor->PlayArmorSound();
+	}
+}
+
+void Movable::SetOrientation(int value, bool slow) {
+	//MAX_ORIENT == 16, so we can do this
+	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+	if (NewOrientation != Orientation && Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		actor->PlayArmorSound();
+	}
+	if (!slow) {
+		Orientation = NewOrientation;
 	}
 }
 

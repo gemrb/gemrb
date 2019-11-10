@@ -113,7 +113,8 @@ namespace GemRB {
 #define DIFF_NORMAL        2
 #define DIFF_CORE          3
 #define DIFF_HARD          4
-#define DIFF_NIGHTMARE     5
+#define DIFF_INSANE        5
+#define DIFF_NIGHTMARE     6 // rather check against the ini var where needed
 
 /** flags for GetActor */
 //default action
@@ -439,6 +440,8 @@ private:
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
+	char GetArmorCode() const;
+	const char* GetArmorSound() const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -473,7 +476,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
+	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
 	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
 	/** Returns a Stat value */
@@ -916,7 +919,7 @@ public:
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
-	bool IsInvisibleTo(Scriptable *checker) const;
+	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
@@ -942,6 +945,7 @@ public:
 	unsigned int GetAdjustedTime(unsigned int time) const;
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
+	void PlayArmorSound() const;
 };
 }
 

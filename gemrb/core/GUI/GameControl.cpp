@@ -536,16 +536,15 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
+			std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
+			std::vector<Actor*>::iterator monster;
 
-			int i = 0;
-			while(monsters[i]) {
-				Actor *target = monsters[i++];
+			for (monster = monsters.begin(); monster != monsters.end(); ++monster) {
+				Actor *target = *monster;
 				if (target->InParty) continue;
 				if (target->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(target->Pos, ColorBlack);
 			}
-			free(monsters);
 		} else {
 			trackerID = 0;
 		}
@@ -2146,15 +2145,23 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 			Map* map = actor->GetCurrentArea();
 			move = GetFormationPoint(map, i, src, p);
 		}
-			CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
+		CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
 	}
 
-	// handle travel
 	//p is a searchmap travel region
-	if (game->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+	// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500)
+	bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
+	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || (overInfoPoint && overInfoPoint->Type == ST_TRAVEL && teamMoved)) {
 		char Tmp[256];
 		sprintf( Tmp, "NIDSpecial2()" );
-		party[0]->AddAction( GenerateAction( Tmp) );
+		if (teamMoved) {
+			// not clearing the queue means one can exit the worldmap and travel like it wasn't there
+			// remove if necessary
+			// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
+			party[0]->AddActionInFront(GenerateAction(Tmp));
+		} else {
+			party[0]->AddAction(GenerateAction(Tmp));
+		}
 	}
 }
 

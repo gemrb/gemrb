@@ -201,22 +201,25 @@ bool AREImporter::Open(DataStream* stream)
 	// If you set it to any other number, it will be that transparent.
 	// It's 1 byte, so setting it to 128 you'll have the same as the default of 0
 	str->ReadWord( &WUnknown );
+
 	AreaDifficulty = 0;
 	if (bigheader) {
 		// are9.1 difficulty bits for level2/level3
-		// TODO: there must be more advanced logic here for sure (guessing vs party level)
 		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
 		AreaDifficulty = 1;
 		ieByte tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		int avgPartyLevel = core->GetGame()->GetTotalPartyLevel(false) / core->GetGame()->GetPartySize(false);
+		str->Read(&tmp, 1); // 0x54
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 2;
 		}
 		tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		str->Read(&tmp, 1); // 0x55
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 4;
 		}
+		// 0x56 held the average party level at load time (usually 1, since it had no access yet),
+		// but we resolve everything here and store AreaDifficulty instead
 	}
 	//bigheader gap is here
 	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
@@ -1079,7 +1082,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword Orientation, Schedule, RemovalTime;
 			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
 			ieResRef Dialog;
-			ieResRef Scripts[8]; //the original order
+			ieResRef Scripts[8]; //the original order is shown in scrlev.ids
 			ieDword Flags;
 			ieByte DifficultyMargin;
 
@@ -1091,7 +1094,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &YDes );
 			str->ReadDword( &Flags );
 			str->ReadWord( &Spawned );
-			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, TODO: purpose unknown (portraits?)
+			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
 			str->Read( &DifficultyMargin, 1 ); // iwd2 only
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
@@ -1115,7 +1118,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
-			//TODO: iwd2 script?
+			// another iwd2 script slot
 			str->ReadResRef( Scripts[SCR_AREA] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			//not iwd2, this field is garbage
@@ -1169,8 +1172,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					// 2 - area difficulty 2
 					// 4 - area difficulty 3
 					if (DifficultyMargin && !(DifficultyMargin & map->AreaDifficulty)) {
-						// iwd2 has GF_START_ACTIVE off, but that only touches IF_IDLE
-						ab->appearance = 0;
+						ab->DestroySelf();
 					}
 				}
 			}
