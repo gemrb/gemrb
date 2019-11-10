@@ -35,7 +35,6 @@ import CommonTables
 
 StoreWindow = None
 
-ItemAmountWindow = None
 RentConfirmWindow = None
 LeftButton = None
 RightButton = None
@@ -313,7 +312,7 @@ def InitStoreShoppingWindow (Window):
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenItemAmountWindow(Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -325,7 +324,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenBag)
+			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenBag(Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -366,7 +365,7 @@ def InitStoreShoppingWindow (Window):
 		Button = Window.GetControl (50)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBag)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseBag(Window))
 
 	#backpack
 	BackpackButton = Window.GetControl (44)
@@ -393,6 +392,7 @@ def UpdateStoreShoppingWindow (Window):
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
 	pc = GetPC()
+	Bag = GemRB.GetStore (STORE_BAG)
 
 	LeftCount = Store['StoreItemCount'] - ItemButtonCount
 	if LeftCount<0:
@@ -403,10 +403,14 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
 
-	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	RightCount = len(inventory_slots) - ItemButtonCount
+	if Bag:
+		RightCount = Bag['StoreItemCount'] - ItemButtonCount
+	else:
+		inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
+		RightCount = len(inventory_slots) - ItemButtonCount
 	if RightCount<0:
 		RightCount=0
+
 	ScrollBar = Window.GetControl (12)
 	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
@@ -959,40 +963,6 @@ def GetPC():
 
 	return pc
 
-def UpdateStoreShoppingWindow ():
-	global Store, Bag, inventory_slots
-
-	Window = StoreShoppingWindow
-	#reget store in case of a change
-	Store = GemRB.GetStore ()
-	pc = GetPC()
-	Bag = GemRB.GetStore (STORE_BAG)
-
-	LeftCount = Store['StoreItemCount'] - ItemButtonCount
-	if LeftCount<0:
-		LeftCount=0
-	ScrollBar = Window.GetControl (11)
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	if LeftTopIndex>LeftCount:
-		GemRB.SetVar ("LeftTopIndex", LeftCount)
-
-	if Bag:
-		RightCount = Bag['StoreItemCount'] - ItemButtonCount
-	else:
-		inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-		RightCount = len(inventory_slots) - ItemButtonCount
-	if RightCount<0:
-		RightCount=0
-	ScrollBar = Window.GetControl (12)
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	if RightTopIndex>RightCount:
-		GemRB.SetVar ("RightTopIndex", RightCount)
-
-	RedrawStoreShoppingWindow (Window)
-	return
-
 # Unselects all the selected buttons, so they are not preselected in other windows
 def UnselectNoRedraw ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1104,11 +1074,11 @@ def SellPressed ():
 	UpdateStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
 
-def OpenBag ():
+def OpenBag (Window):
 	if Bag:
 		#nested containers are not openable in bg2,
 		#but double-click has another function here
-		OpenItemAmountWindow (STORE_BAG)
+		OpenItemAmountWindow (Window, STORE_BAG)
 		return
 	if Inventory:
 		return
@@ -1123,10 +1093,10 @@ def OpenBag ():
 		GemRB.SetVar ("TopIndex", 0)
 		UnselectNoRedraw ()
 		GemRB.LoadRighthandStore (Slot['ItemResRef'])
-		UpdateStoreShoppingWindow ()
+		UpdateStoreShoppingWindow (Window)
 	return
 
-def CloseBag ():
+def CloseBag (Window):
 	if not Bag:
 		return
 	GemRB.SetVar ("RightIndex", 0)
@@ -1136,7 +1106,7 @@ def CloseBag ():
 	UnselectBag ()
 	GemRB.CloseRighthandStore ()
 	UnselectNoRedraw ()
-	UpdateStoreShoppingWindow ()
+	UpdateStoreShoppingWindow (Window)
 	return
 
 def UnselectBag ():
@@ -1273,12 +1243,8 @@ def RedrawStoreShoppingWindow (Window):
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
-def OpenItemAmountWindow (store = STORE_MAIN):
-	global ItemAmountWindow
+def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	global MaxAmount
-
-	if ItemAmountWindow != None:
-		return
 
 	wid = 16
 	if GameCheck.IsIWD2():
@@ -1288,7 +1254,7 @@ def OpenItemAmountWindow (store = STORE_MAIN):
 	else:
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindow (wid)
+	Window = GemRB.LoadWindow (wid)
 	Window.SetFlags(WF_BORDERLESS, OP_OR)
 	if store == STORE_MAIN:
 		Index = GemRB.GetVar ("LeftIndex")
@@ -1313,60 +1279,48 @@ def OpenItemAmountWindow (store = STORE_MAIN):
 	Text.SetStatus (IE_GUI_EDIT_NUMBER)
 	Text.Focus()
 
+	def SetItemAmount (Number):
+		if Number < 0:
+			Number = 0
+		elif Number > MaxAmount:
+			Number = MaxAmount
+		Text.SetText (str (Number))
+
 	# Decrease
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseItemAmount)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Text.QueryInteger()-1))
 	Button.SetActionInterval (200)
 
 	# Increase
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseItemAmount)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Text.QueryInteger()+1))
 	Button.SetActionInterval (200)
+
+	def CloseAmountWindow():
+		Window.Close()
+		UpdateStoreShoppingWindow(ShopWin)
+
+	def Confirm():
+		ConfirmItemAmount(Text.QueryInteger(), store)
+		CloseAmountWindow()
 
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmItemAmount(store))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Confirm)
 	Button.MakeDefault ()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelItemAmount)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAmountWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DecreaseItemAmount ():
-	global ItemAmountWindow
-
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	Number = int ("0"+Amount)-1
-	if Number < 0:
-		Number = 0
-	Text.SetText (str (Number))
-	return
-
-def IncreaseItemAmount ():
-	global ItemAmountWindow
+def ConfirmItemAmount (Number, store = STORE_MAIN):
 	global MaxAmount
 
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	Number = int ("0"+Amount)+1
-	if Number > MaxAmount:
-		Number = MaxAmount
-	Text.SetText (str (Number))
-	return
-
-def ConfirmItemAmount (store = STORE_MAIN):
-	global ItemAmountWindow
-	global MaxAmount
-
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	Number = int ("0"+Amount)
 	if Number > MaxAmount:
 		Number = MaxAmount
 	elif Number < 0:
@@ -1377,17 +1331,6 @@ def ConfirmItemAmount (store = STORE_MAIN):
 		Index = GemRB.GetVar ("RightIndex")
 	GemRB.SetPurchasedAmount (Index, Number, store)
 
-	ItemAmountWindow.Unload ()
-	ItemAmountWindow = None
-	UpdateStoreShoppingWindow ()
-	return
-
-def CancelItemAmount ():
-	global ItemAmountWindow
-
-	ItemAmountWindow.Unload ()
-	ItemAmountWindow = None
-	UpdateStoreShoppingWindow ()
 	return
 
 def RedrawStoreIdentifyWindow (Window):
