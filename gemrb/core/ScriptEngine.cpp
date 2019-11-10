@@ -28,8 +28,13 @@ bool ScriptEngine::RegisterScriptingRef(const ScriptingRefBase* ref)
 {
 	if (ref == NULL) return false;
 
-	// TODO: disallow overwriting existing entries
-	//assert(GUIDict[classId].find(id) == GUIDict[classId].end());
+	ScriptEngine::ScriptingDict::iterator it = GUIDict.find(ref->ScriptingGroup());
+	if (it != GUIDict.end()) {
+		if (it->second.count(ref->Id)) {
+			return false;
+		}
+	}
+
 	GUIDict[ref->ScriptingGroup()][ref->Id] = ref;
 	return true;
 }

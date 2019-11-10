@@ -1215,7 +1215,8 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
-	view->AssignScriptingRef(controlId, group);
+	const ViewScriptingRef* ref = view->AssignScriptingRef(controlId, group);
+	ABORT_IF_NULL(ref);
 	Py_RETURN_NONE;
 }
 
