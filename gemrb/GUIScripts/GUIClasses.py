@@ -265,6 +265,9 @@ class GControl(GView):
   def SetEvent(self, event, handler):
     GControl.EventMap[event](self, handler)
 
+  def QueryInteger(self):
+    return int("0"+self.QueryText())
+
 class GLabel(GControl):
   methods = {
     'SetFont': _GemRB.Label_SetFont,
