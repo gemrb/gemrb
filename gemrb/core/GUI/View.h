@@ -178,6 +178,7 @@ public:
 	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? OP_OR : OP_NAND); }
 	bool IsDisabled() const { return flags&Disabled; }
 	virtual bool IsDisabledCursor() const { return IsDisabled(); }
+	virtual bool IsReceivingEvents() const;
 
 	Region Frame() const { return frame; }
 	Point Origin() const { return frame.Origin(); }

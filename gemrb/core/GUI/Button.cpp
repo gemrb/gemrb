@@ -747,7 +747,7 @@ bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 
 bool Button::HandleHotKey(const Event& e)
 {
-	if (IsVisible() && e.type == Event::KeyDown) {
+	if (IsReceivingEvents() && e.type == Event::KeyDown) {
 		// only run once on keypress (or should it be KeyRelease?)
 		// we could support both; key down = left mouse down, key up = left mouse up
 		DoToggle();

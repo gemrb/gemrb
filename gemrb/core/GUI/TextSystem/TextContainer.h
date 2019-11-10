@@ -235,7 +235,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region& clip);
 	virtual void DrawContents(const Layout& layout, const Point& point);
 
-	virtual bool Editable() const { return true; }
+	virtual bool Editable() const { return IsReceivingEvents(); }
 
 	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
 	ContentIndex FindContentForChar(size_t idx);

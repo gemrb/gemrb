@@ -139,6 +139,15 @@ bool View::IsVisible() const
 	return isVisible;
 }
 
+bool View::IsReceivingEvents() const
+{
+	bool getEvents = !(flags&(IgnoreEvents|Invisible|Disabled));
+	if (superView && getEvents) {
+		return superView->IsReceivingEvents();
+	}
+	return getEvents;
+}
+
 void View::DirtyBGRect(const Region& r)
 {
 	// no need to draw the parent BG for opaque views
