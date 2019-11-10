@@ -933,7 +933,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					driver->MusicPlaying = false;
 					return -1;
 				case AL_INITIAL:
-					Log(MESSAGE, "OPENAL", "Music in INITIAL State. AutoStarting");
+					Log(MESSAGE, "OpenAL", "Music in INITIAL State. AutoStarting");
 					// ensure that MusicSource has no buffers attached by passing "NULL" buffer
 					alSourcei(driver->MusicSource, AL_BUFFER, 0);
 					checkALError("Unable to detach buffers from music source.", WARNING);
