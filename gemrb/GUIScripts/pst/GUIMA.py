@@ -28,9 +28,6 @@ import GUICommonWindows
 import GUIMACommon
 from GUIDefines import *
 
-PosX = 0
-PosY = 0
-
 ###################################################
 def InitMapWindow (Window):
 	Window.AddAlias("WIN_MAP")
@@ -46,19 +43,20 @@ def InitMapWindow (Window):
 	Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_SET_NOTE)
 
 	# Note text
-	Text = Window.GetControl (4)
-	Text.SetText ("")
-
-	Edit = Window.CreateTextEdit (6, 54, 353, 416, 25, "FONTDLG", "")
+	Edit = Window.GetControl (4)
+	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, NoteChanged)
+	Edit.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
-	Window.DeleteControl(3) # replace the placeholder button with the map
-	Map = Window.CreateMapControl (3, 24, 23, 480, 360, Text, "USERNOTE", "RONOTE")
-	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	Map = Window.ReplaceSubview(3, IE_GUI_MAP, Edit)
+	Map.AddAlias("MAP")
+
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
+	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -69,6 +67,10 @@ def InitMapWindow (Window):
 	# 2 - map name?
 	# 3 - map bitmap?
 	# 4 - ???
+
+	# these overlap the map. lets move them to be children of the map
+	Label = Window.ReparentSubview(Label, Map)
+	Edit = Window.ReparentSubview(Edit, Map)
 
 	# Done
 	Button = Window.GetControl (5)
@@ -104,45 +106,30 @@ def OpenWorldMapWindow ():
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.ToggleWindow, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.OpenWindowOnce, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)
 
-def NoteChanged ():
-	MapWindow = GemRB.GetView("WIN_MAP")
-
-	#shift focus to the static label
-	Label = MapWindow.GetControl (4)
-	Label.Focus()
-
-	Edit = MapWindow.GetControl (6)
-	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, None)
+def NoteChanged (Edit):
+	Edit.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	Text = Edit.QueryText ()
 	Edit.SetText ("")
-	GemRB.SetMapnote (PosX, PosY, 0, Text)
-	#the mapcontrol is a bit sluggish, update the label now
-	Label.SetText (Text)
+	PosX = GemRB.GetVar("MapControlX")
+	PosY = GemRB.GetVar("MapControlY")
+	GemRB.SetMapnote (PosX, PosY, 1, Text)
+
+	Map = GemRB.GetView("MAP")
+	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
+
 	return
 	
-def SetMapNote ():
-	global PosX, PosY
-
+def SetMapNote (Map):
 	if GemRB.GetVar ("ShowMapNotes") != IE_GUI_MAP_SET_NOTE:
 		return
 
 	MapWindow = GemRB.GetView("WIN_MAP")
 
-	Label = MapWindow.GetControl (4)
-
-	Edit = MapWindow.GetControl (6)
-	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, NoteChanged)
+	Edit = MapWindow.GetControl (4)
+	Edit.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_NAND)
 	Edit.Focus()
 
-	#copy the text from the static label into the editbox
-	Edit.SetText (Label.QueryText())
-	Label.SetText ("")
-
-	PosX = GemRB.GetVar("MapControlX")
-	PosY = GemRB.GetVar("MapControlY")
-	Map = MapWindow.GetControl (3)
-	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	return
 
 ###################################################

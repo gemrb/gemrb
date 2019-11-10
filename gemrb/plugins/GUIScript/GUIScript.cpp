@@ -34,7 +34,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "ImageFactory.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"
 #include "KeyMap.h"
@@ -2018,37 +2017,14 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		case IE_GUI_MAP:
 		{
 			PyObject* pylabel = NULL;
-			char *Flag = NULL;
-			char *Flag2 = NULL;
-
-			if (!PyArg_ParseTuple( constructArgs, "Os|s", &pylabel, &Flag, &Flag2))
+			if (!PyArg_ParseTuple( constructArgs, "O", &pylabel))
 			{
-				Flag = NULL;
 				PyErr_Clear(); //clearing the exception
 			}
 
-			MapControl* map = new MapControl(rgn);
-			if (Flag2) { //pst flavour
-				ResourceHolder<ImageMgr> anim(Flag);
-				if (anim) {
-					map->Flag[0] = anim->GetSprite2D();
-				}
-				ResourceHolder<ImageMgr> anim2(Flag2);
-				if (anim2) {
-					map->Flag[1] = anim2->GetSprite2D();
-				}
-			} else if (Flag) {
-				AnimationFactory* af = ( AnimationFactory* )
-				gamedata->GetFactoryResource( Flag, IE_BAM_CLASS_ID, IE_NORMAL );
-				if (af) {
-					for (int i=0;i<8;i++) {
-						map->Flag[i] = af->GetFrame(0,i);
-					}
-
-				}
-			}
-
-			map->LinkedLabel = GetView<Label>(pylabel);
+			AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
+			MapControl* map = new MapControl(rgn, flags);
+			map->LinkedLabel = GetView<Control>(pylabel);
 
 			view = map;
 		}
@@ -9724,19 +9700,17 @@ PyDoc_STRVAR( GemRB_SetMapnote__doc,
 
 static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 {
-	int x,y;
-	int color=0;
-	const char *txt=NULL;
-	PARSE_ARGS4( args,  "ii|is", &x, &y, &color, &txt);
-	GET_GAME();
+	Point point;
+	ieWord color = 0;
+	const char *txt = NULL;
+	PARSE_ARGS4( args,  "hh|hs", &point.x, &point.y, &color, &txt);
 
+	GET_GAME();
 	GET_MAP();
 
-	Point point;
-	point.x=x;
-	point.y=y;
 	if (txt && txt[0]) {
-		map->AddMapNote(point, color, StringFromCString(txt));
+		MapNote mn(StringFromCString(txt), color, false);
+		map->AddMapNote(point, mn);
 	} else {
 		map->RemoveMapNote(point);
 	}

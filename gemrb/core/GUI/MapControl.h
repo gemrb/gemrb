@@ -26,6 +26,7 @@
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
+#include "AnimationFactory.h"
 #include "GUI/Control.h"
 
 #include "exports.h"
@@ -33,6 +34,7 @@
 namespace GemRB {
 
 class Map;
+class MapNote;
 
 /**
  * @class MapControl
@@ -44,21 +46,18 @@ class GEM_EXPORT MapControl : public Control {
 private:
 	Region mosRgn;
 	Point notePos;
+
+	AnimationFactory* flags;
 	
 public:
 	// Small map bitmap
-	Sprite2D* MapMOS;
+	Holder<Sprite2D> MapMOS;
 	// current map
 	Map *MyMap;
-	// map flags
-	Sprite2D *Flag[8];
 	// The MapControl can set the text of this label directly
 	Control *LinkedLabel;
-	// Size of big map (area) in pixels
-	short MapWidth, MapHeight;
 
-	MapControl(const Region& frame);
-	~MapControl(void);
+	MapControl(const Region& frame, AnimationFactory* af);
 
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(unsigned int Sum);
@@ -69,6 +68,8 @@ private:
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	void UpdateCursor();
+
+	const MapNote* MapNoteAtPoint(const Point& p) const;
 
 	Region GetViewport() const;
 	void WillDraw();

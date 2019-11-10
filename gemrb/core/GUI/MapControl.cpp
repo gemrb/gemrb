@@ -35,30 +35,13 @@ namespace GemRB {
 #define MAP_VIEW_NOTES 1
 #define MAP_SET_NOTE   2
 #define MAP_REVEAL     3
+#define MAP_EDIT_NOTE  4
 
-typedef enum {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen} colorcode;
-
-static const Color colors[]={
- ColorBlack,
- ColorGray,
- ColorViolet,
- ColorGreen,
- ColorOrange,
- ColorRed,
- ColorBlue,
- ColorBlueDark,
- ColorGreenDark
-};
-
-MapControl::MapControl(const Region& frame)
-	: Control(frame)
+MapControl::MapControl(const Region& frame, AnimationFactory* af)
+: Control(frame), flags(af)
 {
 	ControlType = IE_GUI_MAP;
-
 	LinkedLabel = NULL;
-	MapWidth = MapHeight = 0;
-
-	memset(Flag,0,sizeof(Flag) );
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	if (MyMap && MyMap->SmallMap) {
@@ -66,18 +49,6 @@ MapControl::MapControl(const Region& frame)
 		MapMOS->acquire();
 	} else
 		MapMOS = NULL;
-}
-
-MapControl::~MapControl(void)
-{
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
-	for(int i=0;i<8;i++) {
-		if (Flag[i]) {
-			Sprite2D::FreeSprite(Flag[i]);
-		}
-	}
 }
 
 // Draw fog on the small bitmap
@@ -104,7 +75,7 @@ void MapControl::DrawFog(const Region& rgn)
 		}
 	}
 
-	video->DrawPoints(points, colors[black]);
+	video->DrawPoints(points, ColorBlack);
 }
 
 void MapControl::UpdateState(unsigned int Sum)
@@ -139,6 +110,16 @@ Point MapControl::ConvertPointFromGame(Point p) const
 	
 void MapControl::WillDraw()
 {
+	if (LinkedLabel) {
+		if (GetValue() == MAP_EDIT_NOTE)
+		{
+			LinkedLabel->SetFlags(IgnoreEvents, OP_NAND);
+			LinkedLabel->SetFocus();
+		} else {
+			LinkedLabel->SetFlags(IgnoreEvents, OP_OR);
+		}
+	}
+
 	if (MapMOS) {
 		const Size mosSize(MapMOS->Width, MapMOS->Height);
 		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
@@ -174,14 +155,14 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	video->DrawRect(rgn, ColorBlack, true);
 
 	if (MapMOS) {
-		video->BlitSprite( MapMOS, mosRgn.x, mosRgn.y, NULL );
+		video->BlitSprite( MapMOS.get(), mosRgn.x, mosRgn.y, NULL );
 	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(mosRgn);
 
 	Region vp = GetViewport();
-	video->DrawRect(vp, colors[green], false );
+	video->DrawRect(vp, ColorGreen, false );
 	
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
@@ -190,7 +171,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
 			Point pos = ConvertPointFromGame(actor->Pos);
-			video->DrawEllipse( pos, 3, 2, actor->Selected ? colors[green] : colors[darkgreen] );
+			video->DrawEllipse( pos, 3, 2, actor->Selected ? ColorGreen : ColorGreenDark );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -201,18 +182,19 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
 			
-			//Skip unexplored map notes
+			// Skip unexplored map notes unless they are player added
+			// FIXME: PST should include user notes regardless (!mn.readonly)
 			bool visible = MyMap->IsVisible( mn.Pos, true );
 			if (!visible)
 				continue;
 
-			Sprite2D *anim = Flag[mn.color&7];
 			Point pos = ConvertPointFromGame(mn.Pos);
 
+			Sprite2D* anim = (flags) ? flags->GetFrame(0, mn.color) : NULL;
 			if (anim) {
 				video->BlitSprite( anim, pos.x - anim->Width/2, pos.y - anim->Height/2, &rgn );
 			} else {
-				video->DrawEllipse( pos, 6, 5, colors[mn.color&7] );
+				video->DrawEllipse( pos, 6, 5, mn.GetColor() );
 			}
 		}
 	}
@@ -254,15 +236,34 @@ void MapControl::UpdateCursor()
 	}
 }
 
+const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
+{
+	Point gamePoint = ConvertPointToGame(p);
+	Size mapsize = MyMap->GetSize();
+
+	float scalar = float(mapsize.w) / mosRgn.w;
+	unsigned int radius = (flags) ? (flags->GetFrame(0)->Width / 2) * scalar : 5 * scalar;
+
+	return MyMap->MapNoteAtPoint(gamePoint, radius);
+}
+
 /** Mouse Button Down */
 bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (MyMap == NULL)
 		return false;
 
-	if (me.ButtonState(GEM_MB_ACTION)) {
-		UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	if (GetValue() == MAP_VIEW_NOTES) {
+		if (me.ButtonState(GEM_MB_ACTION)) {
+			Point p = ConvertPointFromScreen(me.Pos());
+
+			const MapNote* mn = MapNoteAtPoint(p);
+			if (!mn || mn->readonly) {
+				UpdateViewport(p);
+			}
+		}
 	}
+
 	UpdateCursor();
 	return true;
 }
@@ -273,41 +274,32 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (MyMap == NULL)
 		return false;
 
-	Point p = ConvertPointFromScreen(me.Pos());
-	
 	ieDword val = GetValue();
-	if (val) {
-		p = ConvertPointToGame(p);
+	if (val == MAP_VIEW_NOTES) {
+		Point p = ConvertPointFromScreen(me.Pos());
 
-		Size mapsize = MyMap->GetSize();
-		int i = MyMap->GetMapNoteCount();
-		while (i--) {
-			const MapNote& mn = MyMap->GetMapNote(i);
-			Sprite2D *anim = Flag[mn.color&7];
-			
-			if (Distance(p, mn.Pos) < anim->Width / 2 * double(mapsize.w) / mosRgn.w) {
-				if (LinkedLabel) {
-					LinkedLabel->SetText( mn.text );
-				}
-				notePos = mn.Pos;
-				return true;
-			}
+		String* text = NULL;
+		const MapNote* mn = MapNoteAtPoint(p);
+		if (mn) {
+			text = mn->text;
+			notePos = mn->Pos;
 		}
 
-		notePos = p;
+		if (LinkedLabel) {
+			LinkedLabel->SetText(text);
+		}
 	}
-	if (LinkedLabel) {
-		LinkedLabel->SetText( L"" );
-	}
-	
+
 	UpdateCursor();
 	return true;
 }
 	
 bool MapControl::OnMouseDrag(const MouseEvent& me)
 {
-	if (me.ButtonState(GEM_MB_ACTION)) {
-		UpdateViewport(ConvertPointFromScreen(me.Pos()));
+	if (GetValue() == MAP_VIEW_NOTES) {
+		if (me.ButtonState(GEM_MB_ACTION)) {
+			UpdateViewport(ConvertPointFromScreen(me.Pos()));
+		}
 	}
 	return true;
 }
@@ -318,10 +310,16 @@ bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	Point p = ConvertPointFromScreen(me.Pos());
 
 	switch(GetValue()) {
+		case MAP_EDIT_NOTE:
+			SetValue(MAP_VIEW_NOTES);
+			break;
 		case MAP_REVEAL:
 			UpdateViewport(p);
 			notePos = ConvertPointToGame(p);
-			ClickHandle(me);
+			break;
+		case MAP_SET_NOTE:
+			notePos = ConvertPointToGame(p);
+			SetValue(MAP_EDIT_NOTE);
 			break;
 		case MAP_NO_NOTES:
 			UpdateViewport(p);
@@ -330,13 +328,21 @@ bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 			//left click allows setting only when in MAP_SET_NOTE mode
 			if (me.ButtonState(GEM_MB_ACTION)) {
 				UpdateViewport(p);
+			} else {
+				const MapNote* mn = MapNoteAtPoint(p);
+				if (mn && !mn->readonly) {
+					notePos = mn->Pos;
+					SetValue(MAP_EDIT_NOTE);
+				} else {
+					notePos = ConvertPointToGame(p);
+				}
 			}
-			ClickHandle(me);
 			break;
 		default:
 			break;
 	}
 
+	ClickHandle(me);
 	Control::OnMouseUp(me, mod);
 	UpdateCursor();
 	return true;

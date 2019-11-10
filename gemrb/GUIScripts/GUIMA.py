@@ -95,7 +95,7 @@ def InitMapWindow (Window):
 
 	# Map Control
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Map = Window.ReplaceSubview(2, IE_GUI_MAP, Label, "FLAG1")
+		Map = Window.ReplaceSubview(2, IE_GUI_MAP, Label)
 	else:
 		Map = Window.ReplaceSubview(2, IE_GUI_MAP)
 

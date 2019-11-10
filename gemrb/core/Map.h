@@ -176,43 +176,63 @@ public:
 	ieWord color;
 	String* text;
 	Point Pos;
+	bool readonly;
 
 	MapNote& operator=( MapNote mn ) {
 		// note the pass by value
 		mn.swap(*this);
 		return *this;
 	}
+
 	MapNote( const MapNote& mn )
-	: strref(mn.strref), color(mn.color), Pos(mn.Pos) {
+	: strref(mn.strref), color(mn.color), Pos(mn.Pos), readonly(mn.readonly) {
 		if (mn.text) {
 			text = new String(*mn.text);
 		} else {
 			text = NULL;
 		}
 	}
-	MapNote(String* text, ieWord color)
-	: strref(0xffffffff), color(color), text(text)
+
+	MapNote(String* text, ieWord c, bool readonly)
+	: strref(-1), text(text), readonly(readonly)
 	{
-		if (text) {
-			//update custom strref
-			char* mbstring = MBCStringFromString(*text);
-			if (mbstring) {
-				strref = core->UpdateString( strref, mbstring);
-				free(mbstring);
-			} else {
-				strref = core->UpdateString(strref, "?");
-				Log(WARNING, "Map", "Failed to update string from map note, possibly an enconding issue.");
-			}
+		color = Clamp<ieWord>(c, 0, 8);
+		//update custom strref
+		char* mbstring = MBCStringFromString(*text);
+		if (mbstring) {
+			strref = core->UpdateString(-1, mbstring);
+			free(mbstring);
+		} else {
+			strref = core->UpdateString(-1, "?");
+			Log(WARNING, "Map", "Failed to update string from map note, possibly an enconding issue.");
 		}
 	}
-	MapNote(const ieStrRef ref, ieWord color)
-	: strref(ref), color(color)
+
+	MapNote(ieStrRef ref, ieWord c, bool readonly)
+	: strref(ref), readonly(readonly)
 	{
+		color = Clamp<ieWord>(c, 0, 8);
 		text = core->GetString(ref);
 	}
 
 	~MapNote() {
 		delete text;
+	}
+
+	const Color& GetColor() const {
+		static const Color colors[]={
+		 ColorBlack,
+		 ColorGray,
+		 ColorViolet,
+		 ColorGreen,
+		 ColorOrange,
+		 ColorRed,
+		 ColorBlue,
+		 ColorBlueDark,
+		 ColorGreenDark
+		};
+
+		return colors[color];
 	}
 };
 
@@ -546,12 +566,12 @@ public:
 	unsigned int GetAmbientCount(bool toSave=false);
 
 	//mapnotes
-	void AddMapNote(const Point &point, int color, String* text);
-	void AddMapNote(const Point &point, int color, ieStrRef strref);
+	void AddMapNote(const Point &point, ieWord color, String* text, bool readonly = false);
+	void AddMapNote(const Point &point, ieWord color, ieStrRef strref, bool readonly = false);
 	void AddMapNote(const Point &point, const MapNote& note);
 	void RemoveMapNote(const Point &point);
 	const MapNote& GetMapNote(int i) { return mapnotes[i]; }
-	const MapNote* MapNoteAtPoint(const Point &point);
+	const MapNote* MapNoteAtPoint(const Point &point, unsigned int radius);
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */

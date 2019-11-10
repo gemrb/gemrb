@@ -26,6 +26,7 @@
 
 #include "ActorMgr.h"
 #include "Ambient.h"
+#include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
 #include "EffectMgr.h"
@@ -1314,50 +1315,79 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
-	ieDword color = 0;
-
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	if (pst && !NoteCount) {
-		if( !INInote ) {
-			ReadAutonoteINI();
+	if (pst) {
+		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
+		if (flags == NULL) {
+			ResourceHolder<ImageMgr> roimg("RONOTE");
+			ResourceHolder<ImageMgr> userimg("USERNOTE");
+
+			CycleEntry rocycle = {1, 0};
+			flags = new AnimationFactory("FLAG1");
+			flags->AddCycle(rocycle);
+			flags->AddFrame(roimg->GetSprite2D());
+			CycleEntry usercycle = {1, 1};
+			flags->AddCycle(usercycle);
+			flags->AddFrame(userimg->GetSprite2D());
+
+			ieWord flt[2] = {0, 1};
+			flags->LoadFLT(flt, 2);
+			gamedata->AddFactoryResource(flags);
 		}
-		//add autonote.ini entries
-		if( INInote ) {
-			color = 1; //read only note
-			const char *scriptName = map->GetScriptName();
-			int count = INInote->GetKeyAsInt(scriptName, "count", 0);
-			while (count) {
-				char key[32];
-				int value;
-				sprintf(key, "xPos%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				point.x = value;
-				sprintf(key, "yPos%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				point.y = value;
-				sprintf(key, "text%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				map->AddMapNote( point, color, value);
-				count--;
+
+		if (!NoteCount) {
+			if( !INInote ) {
+				ReadAutonoteINI();
+			}
+
+			//add autonote.ini entries
+			if( INInote ) {
+				const char *scriptName = map->GetScriptName();
+				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
+				while (count) {
+					char key[32];
+					int value;
+					sprintf(key, "xPos%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					point.x = value;
+					sprintf(key, "yPos%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					point.y = value;
+					sprintf(key, "text%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					map->AddMapNote(point, 0, value, true);
+					count--;
+				}
+			}
+		} else {
+			for (i = 0; i < NoteCount; i++) {
+				ieDword px,py;
+				str->ReadDword(&px);
+				str->ReadDword(&py);
+
+				// in PST the coordinates are stored in small map space
+				// our MapControl wants them in large map space so we must convert
+				// its what other games use and its what our custom map note code uses
+				const Size mapsize = map->GetSize();
+				point.x = px * double(mapsize.w) / map->SmallMap->Width;
+				point.y = py * double(mapsize.h) / map->SmallMap->Height;
+
+				char bytes[501]; // 500 + null
+				str->Read(bytes, 500 );
+				bytes[500] = '\0';
+				String* text = StringFromCString(bytes);
+				ieDword readonly;
+				str->ReadDword(&readonly); //readonly == 1
+				if (readonly) {
+					map->AddMapNote(point, 0, text, true);
+				} else {
+					map->AddMapNote(point, 1, text, false);
+				}
+				str->Seek(20, GEM_CURRENT_POS);
 			}
 		}
-	}
-	for (i = 0; i < NoteCount; i++) {
-		if (pst) {
-			ieDword px,py;
-			str->ReadDword(&px);
-			str->ReadDword(&py);
-			point.x=px;
-			point.y=py;
-
-			char bytes[501]; // 500 + null
-			str->Read(bytes, 500 );
-			bytes[500] = '\0';
-			String* text = StringFromCString(bytes);
-			str->ReadDword(&color); //readonly == 1
-			map->AddMapNote(point, color, text);
-			str->Seek(20, GEM_CURRENT_POS);
-		} else {
+	} else {
+		for (i = 0; i < NoteCount; i++) {
 			ieWord px,py;
 
 			str->ReadWord( &px );
@@ -1366,11 +1396,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			point.y=py;
 			ieStrRef strref = 0;
 			str->ReadDword( &strref );
-			str->ReadWord( &px );
-			str->ReadWord( &py );
-			color=py;
+			ieWord location; // (0=Extenal (TOH/TOT), 1=Internal (TLK)
+			str->ReadWord( &location );
+			ieWord color;
+			str->ReadWord( &color );
 			str->Seek( 40, GEM_CURRENT_POS );
-			map->AddMapNote( point, color, strref );
+			// FIXME: do any other games have read only notes?
+			// BG2 allows editing the builtin notes, PST does not, what about others?
+			map->AddMapNote(point, color, strref, false);
 		}
 	}
 
@@ -2274,13 +2307,15 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
 		const MapNote& mn = map->GetMapNote(i);
-		int x;
 
 		if (pst) {
-			tmpDword = (ieDword) mn.Pos.x;
+			// in PST the coordinates are stored in small map space
+			const Size mapsize = map->GetSize();
+			tmpDword = mn.Pos.x * double(map->SmallMap->Width) / mapsize.w;
 			stream->WriteDword( &tmpDword );
-			tmpDword = (ieDword) mn.Pos.y;
+			tmpDword = mn.Pos.y * double(map->SmallMap->Height) / mapsize.h;
 			stream->WriteDword( &tmpDword );
+
 			int len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
@@ -2289,7 +2324,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
 				if (mbstring) {
 					// only care about number of bytes before null so strlen is what we want despite being MB string
-					len = (std::min)(static_cast<int>(strlen(mbstring)), 500);
+					len = std::min(static_cast<int>(strlen(mbstring)), 500);
 					stream->Write( mbstring, len);
 					free(mbstring);
 				} else {
@@ -2298,7 +2333,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			}
 
 			// pad the remaining space
-			x = 500 - len;
+			int x = 500 - len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}
@@ -2306,7 +2341,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			if (x) {
 				stream->Write( filling, x);
 			}
-			tmpDword = (ieDword) mn.color;
+			tmpDword = (ieDword) mn.readonly;
 			stream->WriteDword(&tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->Write( filling, 4);
@@ -2321,7 +2356,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteWord( &mn.color );
 			tmpDword = 1;
 			stream->WriteDword( &tmpDword );
-			for (x=0;x<9;x++) { //9 empty dwords
+			for (int x = 0; x < 9; ++x) { //9 empty dwords
 				stream->Write( filling, 4);
 			}
 		}

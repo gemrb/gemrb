@@ -3147,14 +3147,14 @@ unsigned int Map::GetAmbientCount(bool toSave)
 
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, String* text)
+void Map::AddMapNote(const Point& point, ieWord color, String* text, bool readonly)
 {
-	AddMapNote(point, MapNote(text, color));
+	AddMapNote(point, MapNote(text, color, readonly));
 }
 
-void Map::AddMapNote(const Point &point, int color, ieStrRef strref)
+void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly)
 {
-	AddMapNote(point, MapNote(strref, color));
+	AddMapNote(point, MapNote(strref, color, readonly));
 }
 
 void Map::AddMapNote(const Point &point, const MapNote& note)
@@ -3168,18 +3168,18 @@ void Map::RemoveMapNote(const Point &point)
 {
 	std::vector<MapNote>::iterator it = mapnotes.begin();
 	for (; it != mapnotes.end(); ++it) {
-		if (it->Pos == point) {
+		if (!it->readonly && it->Pos == point) {
 			mapnotes.erase(it);
 			break;
 		}
 	}
 }
 
-const MapNote* Map::MapNoteAtPoint(const Point &point)
+const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
-		if (Distance(point, mapnotes[i].Pos) < 10 ) {
+		if (Distance(point, mapnotes[i].Pos) < radius) {
 			return &mapnotes[i];
 		}
 	}
