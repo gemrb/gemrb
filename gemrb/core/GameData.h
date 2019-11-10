@@ -43,6 +43,7 @@ namespace GemRB {
 class Actor;
 struct Effect;
 class Factory;
+class FactoryObject;
 class Item;
 class Palette;
 class ScriptedAnimation;
@@ -104,8 +105,10 @@ public:
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
 
 	/** returns factory resource, currently works only with animations */
-	void* GetFactoryResource(const char* resname, SClass_ID type,
+	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false);
+
+	void AddFactoryResource(FactoryObject* res);
 
 	Store* GetStore(const ieResRef ResRef);
 	/// Saves a store to the cache and frees it.

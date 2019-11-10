@@ -465,7 +465,7 @@ Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bo
 	return tspr;
 }
 
-void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
+FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode, bool silent)
 {
 	int fobjindex = factory->IsLoaded(resname,type);
@@ -509,6 +509,11 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 			core->TypeExt(type));
 		return NULL;
 	}
+}
+
+void GameData::AddFactoryResource(FactoryObject* res)
+{
+	factory->AddFactoryObject(res);
 }
 
 Store* GameData::GetStore(const ieResRef ResRef)
