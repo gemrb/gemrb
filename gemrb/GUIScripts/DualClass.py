@@ -459,6 +459,7 @@ def DCClassBackPress ():
 	# close the class window
 	if DCClassWindow:
 		DCClassWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DCMainSkillsPress ():
@@ -574,6 +575,7 @@ def DCProfsCancelPress ():
 	# close out the profs window and go back a step
 	if DCProfsWindow:
 		DCProfsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	DCMainBackPress ()
 	return
@@ -637,6 +639,7 @@ def DCSkillsBackPress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	LUSkillsSelection.SkillsNullify ()
 	DCMainBackPress ()
 	return
@@ -646,5 +649,6 @@ def DCSkillsDonePress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
