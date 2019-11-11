@@ -1953,20 +1953,20 @@ int EffectQueue::MaxParam1(EffectRef &effect_reference, bool positive) const
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
 {
 	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); f++) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
-		//
+
 		int magic = (int) (*f)->Parameter1;
 		ieDword mask = (*f)->Parameter3;
 		ieDword value = (*f)->Parameter4;
-		if( magic==0) {
-			if( enchantment) continue;
-		} else if( magic>0) {
-			if( enchantment>magic) continue;
+		if (magic == 0) {
+			if (enchantment) continue;
+		} else if (magic > 0) {
+			if (enchantment > magic) continue;
 		}
 
-		if( (weapontype&mask) != value) {
+		if ((weapontype&mask) != value) {
 			continue;
 		}
 		return true;
@@ -1977,7 +1977,7 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
 	ResolveEffectRef(fx_weapon_immunity_ref);
-	if( fx_weapon_immunity_ref.opcode<0) {
+	if (fx_weapon_immunity_ref.opcode < 0) {
 		return 0;
 	}
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
