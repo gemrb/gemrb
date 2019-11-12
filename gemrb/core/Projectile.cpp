@@ -1220,11 +1220,9 @@ void Projectile::SecondaryTarget()
 
 			//unsigned int dist = (unsigned int) sqrt(xdiff*xdiff+ydiff*ydiff);
 			//int width = (*poi)->GetAnims()->GetCircleSize();
-			//int deg0=0;
 			if (ydiff) {
 				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
 				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
-				//deg0 = deg;
 				deg = ((deg % 360) + 360 + degOffset) % 360;
 			} else {
 				if (xdiff < 0) {
@@ -1234,7 +1232,6 @@ void Projectile::SecondaryTarget()
 				}
 			}
 
-			//Log(DEBUG, "Projectile", "Target %s at angle %d (%d to %d), ignoring? %d %d, %d -> %d, %d", (*poi)->GetName(1), deg, mindeg, maxdeg, mindeg>deg || maxdeg<deg, degOffset, Orientation, saneOrientation, deg0);
 			//not in the right sector of circle
 			if (mindeg>deg || maxdeg<deg) {
 				continue;
@@ -1253,9 +1250,6 @@ void Projectile::SecondaryTarget()
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)
 		area->AddProjectile(pro, Pos, Target, false);
-
-		poi++;
-		if (poi == actors.end()) break;
 		fail=false;
 
 		//we already got one target affected in the AOE, this flag says
