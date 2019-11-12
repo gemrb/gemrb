@@ -4607,7 +4607,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MAGE) {
-		if (damagetype == DAMAGE_FIRE || damagetype == DAMAGE_COLD || damagetype == DAMAGE_ACID || damagetype == DAMAGE_ELECTRICITY) {
+		if (damagetype & (DAMAGE_FIRE|DAMAGE_COLD|DAMAGE_ACID|DAMAGE_ELECTRICITY)) {
 			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
 			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
 			damage = 0;
