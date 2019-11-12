@@ -2170,7 +2170,15 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
-		stream->WriteDword( &an->originalFlags);
+
+		if (core->HasFeature(GF_AUTOMAP_INI)) {
+			/* PST toggles the active bit only, and we need to keep the rest. */
+			ieDword flags = (an->originalFlags & ~A_ANI_ACTIVE) | (an->Flags & A_ANI_ACTIVE);
+			stream->WriteDword(&flags);
+		} else {
+			stream->WriteDword(&an->Flags);
+		}
+
 		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START

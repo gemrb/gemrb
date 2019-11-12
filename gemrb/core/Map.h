@@ -271,7 +271,7 @@ public:
 	Point Pos;
 	ieDword appearance;
 	ieDword Flags;
-	// flags that must not be overriden for writing back the original value
+	// flags that must be touched by PST a bit only
 	ieDword originalFlags;
 	//these are on one dword
 	ieWord sequence;
