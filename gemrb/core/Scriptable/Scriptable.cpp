@@ -1020,7 +1020,8 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	if (!no_stance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+		// yep, the original didn't use the casting channel for this!
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
@@ -1089,7 +1090,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	}
 
 	if (!no_stance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
