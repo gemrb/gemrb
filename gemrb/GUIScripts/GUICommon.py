@@ -27,7 +27,6 @@ from ie_restype import RES_CHU, RES_2DA, RES_BAM
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
-from ie_slots import SLOT_ALL
 
 OtherWindowFn = None
 NextWindowFn = None
