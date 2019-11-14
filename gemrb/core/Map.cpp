@@ -746,6 +746,7 @@ void Map::UpdateScripts()
 
 		//if the actor is immobile, don't run the scripts
 		//FIXME: this is not universaly true, only some states have this effect
+		// paused targets do something similar, but are handled in the effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely

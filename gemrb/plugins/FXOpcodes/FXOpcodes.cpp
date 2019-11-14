@@ -4873,6 +4873,14 @@ int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 	if (!fx->Parameter1) {
 		fx->Parameter1 = 1;
 	}
+
+	if (fx->FirstApply) {
+		// the duration from the spell is already resolved to absolute ticks (deadline) here
+		// wait two more ticks, so the effect can expire and be cleaned up before we try
+		// executing any following actions (see mepair.bcs)
+		target->SetWait(fx->Duration - core->GetGame()->GameTime + 2);
+	}
+
 	STAT_MOD( IE_CASTERHOLD );
 	core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
 	return FX_PERMANENT;
