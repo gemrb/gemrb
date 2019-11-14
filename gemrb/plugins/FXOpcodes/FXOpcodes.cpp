@@ -7025,6 +7025,8 @@ int fx_unpause_caster (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_unpause_caster(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_pause_caster_modifier_ref);
+	// unsure, but makes sense
+	target->SetWait(0);
 	return FX_NOT_APPLIED;
 }
 
