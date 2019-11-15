@@ -473,6 +473,9 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	InfoPoint *trigger = (InfoPoint *) ip;
 	if ( parameters->int0Parameter != 0 ) {
 		trigger->Flags &= ~TRAP_DEACTIVATED;
+		if (trigger->TrapResets()) {
+			trigger->Trapped = 1;
+		}
 	} else {
 		trigger->Flags |= TRAP_DEACTIVATED;
 	}
