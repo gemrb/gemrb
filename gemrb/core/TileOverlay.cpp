@@ -55,6 +55,8 @@ void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 	bool bump = false;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
+	int origW = vp.w;
+	int origH = vp.h;
 	if (( vp.x + vp.w ) > w * 64) {
 		vp.x = ( w * 64 - vp.w );
 		bump = true;
@@ -71,7 +73,8 @@ void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 		vp.y = 0;
 		bump = true;
 	}
-	if(bump && !(core->timer->ViewportIsMoving())) {
+	// no need to do anything if we're in bounds, already changing or the call would have been a noop
+	if (bump && !(core->timer->ViewportIsMoving()) && (origW != vp.w || origH != vp.h)) {
 		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
 	}
 }
