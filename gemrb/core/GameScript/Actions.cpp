@@ -1062,6 +1062,9 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
+	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
+	GameControl *gc = core->GetGameControl();
+	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
 	core->timer->SetMoveViewPort( parameters->pointParameter.x, parameters->pointParameter.y, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?

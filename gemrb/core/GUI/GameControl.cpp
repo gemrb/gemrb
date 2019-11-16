@@ -2516,7 +2516,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 			areaname = pc->Area;
 		}
 		game->GetMap( areaname, true );
-		ScreenFlags|=SF_CENTERONACTOR;
+		if (!core->InCutSceneMode()) {
+			// don't interfere with any scripted moves of the viewport
+			// checking core->timer->ViewportIsMoving() is not enough
+			ScreenFlags |= SF_CENTERONACTOR;
+		}
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
