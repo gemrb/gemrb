@@ -944,7 +944,7 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	// have been cleared by this BlockSearchMap(..., 0).
 	// (Necessary since blocked areas of actors may overlap.)
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
 		if (*neighbour != actor && (*neighbour)->BlocksSearchMap()) {
 			BlockSearchMap((*neighbour)->Pos, (*neighbour)->size, (*neighbour)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 		}

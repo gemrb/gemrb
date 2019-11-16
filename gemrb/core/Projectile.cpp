@@ -1193,7 +1193,7 @@ void Projectile::SecondaryTarget()
 	int radius = Extension->ExplosionRadius;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	std::vector<Actor *>::iterator poi;
-	for (poi = actors.begin(); poi != actors.end(); poi++) {
+	for (poi = actors.begin(); poi != actors.end(); ++poi) {
 		ieDword Target = (*poi)->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)

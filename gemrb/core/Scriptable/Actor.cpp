@@ -7896,7 +7896,7 @@ void Actor::ApplyModal(ieResRef modalSpell)
 		if (!area) return;
 		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
 		std::vector<Actor *>::iterator neighbour;
-		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 			core->ApplySpell(modalSpell, *neighbour, this, 0);
 		}
 	} else {
@@ -10675,7 +10675,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 
 	//we need to look harder if we look for seenby anyone
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
+	for (neighbour = visActors.begin(); neighbour != visActors.end() && !seeEnemy; ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (seenby) {
 			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
@@ -10767,7 +10767,7 @@ bool Actor::TryToHideIWD2()
 	ieDword skill = GetStat(IE_HIDEINSHADOWS);
 	bool seen = false;
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
@@ -10797,7 +10797,7 @@ bool Actor::TryToHideIWD2()
 	// separate move silently check
 	skill = GetStat(IE_STEALTH);
 	bool heard = false;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;

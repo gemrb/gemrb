@@ -512,7 +512,7 @@ void GameControl::DrawInternal(Region& screen)
 		if (actor) {
 			std::vector<Actor *> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
 			std::vector<Actor *>::iterator monster;
-			for (monster = monsters.begin(); monster != monsters.end(); monster++) {
+			for (monster = monsters.begin(); monster != monsters.end(); ++monster) {
 				if ((*monster)->IsPartyMember()) continue;
 				if ((*monster)->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(screen, (*monster)->Pos, viewport, ColorBlack);

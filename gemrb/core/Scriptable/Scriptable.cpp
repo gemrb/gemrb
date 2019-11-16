@@ -697,7 +697,7 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 }
 
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
 		TriggerEntry &trigger = *m;
 		if (trigger.triggerID != id)
 			continue;
@@ -954,7 +954,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
 	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
 		(*neighbour)->AddTrigger(entry);
 	}
 	area->AddTrigger(entry);
@@ -1214,7 +1214,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE), this);
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {

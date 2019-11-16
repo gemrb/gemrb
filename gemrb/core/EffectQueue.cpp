@@ -352,8 +352,7 @@ EffectQueue::EffectQueue()
 EffectQueue::~EffectQueue()
 {
 	std::list< Effect* >::iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		delete (*f);
 	}
 }
@@ -2274,8 +2273,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 	ieDword cnt = 0;
 
 	std::list< Effect* >::const_iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx = *f;
 		if( Persistent(fx))
 			cnt++;
