@@ -196,6 +196,10 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	if (!dlg) {
+		return;
+	}
+
 	// FIXME: is this useful for anything concrete? Currently never true, since nothing sets DF_UNBREAKABLE (unused since it was introduced)
 	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
 		return;
