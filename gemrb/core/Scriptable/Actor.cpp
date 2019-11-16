@@ -1297,7 +1297,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	// ERWAN.CRE from Victor's Improvement Pack has a max of 0 and still survives, grrr
-	if ((signed) hp>maxhp && actor->HasPlayerClass()) {
+	if (maxhp && (signed) hp > maxhp) {
 		hp=maxhp;
 	}
 
