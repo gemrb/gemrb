@@ -106,7 +106,7 @@ def InitInventoryWindow (Window):
 	# info label, game paused, etc
 	# this is useless to us, message window is still visible
 	Label = Window.GetControl (0x1000003f)
-	Window.RemoveSubview(Label)
+	Window.RemoveSubview(Label, True)
 	# resize the win to hide the baked in BG for this useless control
 	width, height = Window.GetSize()
 	height -= 150 # close enough
