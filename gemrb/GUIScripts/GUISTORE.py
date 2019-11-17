@@ -930,7 +930,6 @@ ToggleStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "
 OpenStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreRentWindow, UpdateStoreRentWindow, WINDOW_HCENTER|WINDOW_TOP)
 
 def UpdateStoreCommon (Window, title, name, gold):
-	print Window.ID
 	if Store['StoreName'] != -1:
 		Label = Window.GetControlAlias (title)
 		if GameCheck.IsIWD2():
