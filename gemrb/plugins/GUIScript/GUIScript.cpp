@@ -320,7 +320,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
 			return actor->GetSkill(StatID);
 		} else {
-			return actor->GetStat(StatID);
+			if (StatID != IE_HITPOINTS || actor->HasVisibleHP()) {
+				return actor->GetStat(StatID);
+			} else {
+				return 0xdadadada;
+			}
 		}
 	}
 	return actor->GetBase( StatID );
@@ -8187,7 +8191,13 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 
 	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = GetCreatureStat( actor, StatID, !BaseStat );
-	return PyInt_FromLong( StatValue );
+
+	// special handling for the hidden hp
+	if ((unsigned)StatValue == 0xdadadada) {
+		return PyString_FromString("?");
+	} else {
+		return PyInt_FromLong(StatValue);
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
