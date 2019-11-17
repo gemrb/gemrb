@@ -13625,10 +13625,10 @@ bool GUIScript::ExecString(const char* string, bool feedback)
 
 PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 {
-	if (!ref) return NULL;
+	if (!ref) return RuntimeError("Cannot construct object with null ref.");
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
-	if (!obj) return NULL;
+	if (!obj) return RuntimeError("Failed to construct object");
 	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	return obj;
