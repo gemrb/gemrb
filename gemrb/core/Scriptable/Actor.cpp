@@ -11134,13 +11134,19 @@ void Actor::MovementCommand(char *command)
 	ProcessActions();
 }
 
+bool Actor::HasVisibleHP() const
+{
+	// sucks but this is set in different places
+	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
+	if (HasSpellState(SS_NOHPINFO)) return false;
+	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return false;
+	return true;
+}
+
 // shows hp/maxhp as overhead text
 void Actor::DisplayHeadHPRatio()
 {
-	//sucks but this is set in different places
-	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return;
-	if (HasSpellState(SS_NOHPINFO)) return;
-	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return;
+	if (!HasVisibleHP()) return;
 
 	wchar_t tmpstr[10];
 	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);

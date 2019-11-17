@@ -1096,8 +1096,12 @@ void GameControl::DisplayTooltip() {
 					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
 					// normal tooltips
 					if (actor->InParty) {
-						// in party: display hp
-						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						// in party: display hp unless instructed otherwise
+						if (actor->HasVisibleHP()) {
+							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						} else {
+							snprintf(buffer, 100, "%s\n?", name);
+						}
 					} else if (neutral) {
 						// neutral: display name only
 						snprintf(buffer, 100, "%s", name);

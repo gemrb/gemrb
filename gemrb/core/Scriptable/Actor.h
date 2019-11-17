@@ -925,6 +925,7 @@ public:
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
+	bool HasVisibleHP() const;
 	void DisplayHeadHPRatio();
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
