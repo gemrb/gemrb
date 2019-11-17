@@ -1909,11 +1909,12 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 		} else {
 			// return a new ref for a deleted group
 			const ViewScriptingRef* oldref = view->GetScriptingRef();
-			ScriptingId id = oldref->Id;
 			view->RemoveScriptingRef(oldref);
 
+			static ScriptingId id = 0;
 			ResRef group = "Deleted";
 			const ViewScriptingRef* ref = view->AssignScriptingRef(id, group);
+			++id;
 
 			return gs->ConstructObjectForScriptable(ref);
 		}
