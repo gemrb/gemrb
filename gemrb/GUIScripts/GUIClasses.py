@@ -156,8 +156,10 @@ class GView:
 		return self.CreateSubview(id, ctype, frame, args)
 
 	def CreateSubview(self, id, type, frame, *args):
-		view = CreateView(id, type, frame, *args)
-		return self.AddSubview(view)
+		view = CreateView(id, type, frame, *args) # this will create an entry in the generic 'control' group
+		created = self.AddSubview(view) # this will move the reference into the our window's group
+		RemoveView(view, False) # destroy the old reference just in case something tries to recycle the id while 'created' is still valid
+		return created
 
 	def RemoveSubview(self, view, delete=False):
 		return RemoveView(view, delete)
