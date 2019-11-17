@@ -1869,7 +1869,13 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 
 	core->GetDictionary()->SetAt(VarName, curVal);
-	ctrl->GetWindow()->RedrawControls(VarName, curVal);
+
+	Window* win = ctrl->GetWindow();
+	if (win) {
+		win->RedrawControls(VarName, curVal);
+	} else {
+		ctrl->UpdateState(VarName, curVal);
+	}
 
 	Py_RETURN_NONE;
 }
