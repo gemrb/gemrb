@@ -219,6 +219,8 @@ class GWindow(GView, Scrollable):
 	return GetView(alias, self.ID)
 
   def ReparentSubview(self, view, newparent):
+	  # reparenting assumes within the same window
+	  id = view.ID & 0x00000000ffffffff
 	  view = self.RemoveSubview(view)
 
 	  parentFrame = newparent.GetFrame()
@@ -226,7 +228,7 @@ class GWindow(GView, Scrollable):
 	  frame['x'] -= parentFrame['x']
 	  frame['y'] -= parentFrame['y']
 	  view.SetFrame(frame)
-	  return newparent.AddSubview(view)
+	  return newparent.AddSubview(view, None, id)
 
   def Unload(self): # backwards compatibility
 	self.Close()

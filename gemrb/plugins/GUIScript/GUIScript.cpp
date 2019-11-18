@@ -1173,31 +1173,36 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_AddSubview__doc,
-			 "AddSubview(superview, subview [,siblingView=None])\n\n"
-			 "Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any)." );
+			 "AddSubview(superview, subview [,siblingView=None, id=-1])\n\n"
+			 "Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any).\n"
+			 "You can pass id to assign a new id to the view. Do this if current id would conflict with an existing id in the new window.");
 
 static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 {
 	PyObject* pySubview = NULL;
 	PyObject* pySiblingView = Py_None;
-	PyArg_ParseTuple(args, "OO|O", &self, &pySubview, &pySiblingView);
+	int id = -1; // if we were moving a view from one window to another we may need to pass this to avoid conflicts
+	PyArg_ParseTuple(args, "OO|Oi", &self, &pySubview, &pySiblingView, &id);
+
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
 
 	View* superView = GetView<View>(self);
-	View* subView = GetView<View>(pySubview);
+	View* subView = GetView(ref);
 	View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
-        bool registerRef = (subView->GetWindow() == NULL);
+        bool registerRef = (subView->GetWindow() == NULL) || id != -1;
 		superView->AddSubviewInFrontOfView(subView, siblingView);
 
         if (registerRef) {
-            ScriptingId id = subView->GetScriptingRef()->Id;
+            ScriptingId sid = (id == -1) ? ref->Id : id;
             // FIXME: no promise that subView is a control (could be a plain view)
-            const ControlScriptingRef* ref = RegisterScriptableControl(static_cast<Control*>(subView), id);
-			return gs->ConstructObjectForScriptable(ref);
+            const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
+			return gs->ConstructObjectForScriptable(newref);
         }
 
-        // since we may reassign the ref, we must return the object representing the new one
-		return gs->ConstructObjectForScriptable(subView->GetScriptingRef());
+        // return what we had before
+		// Py_INCREF(pySubview);
+		return pySubview;
 	}
 
 	return AttributeError("Invalid view parameters.");
@@ -1890,39 +1895,35 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 	PyObject* pyView = NULL;
 	PyArg_ParseTuple(args, "O|i", &pyView, &del);
 
-	View* view = GetView<View>(pyView);
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pyView));
+	View* view = GetView(ref);
 	if (view) {
-		if (view->RemoveFromSuperview() == NULL) {
-			// might be a window
-			Window* win = dynamic_cast<Window*>(view);
-			if (win) {
-				win->Close();
-
-				if (win->Flags()&Window::DestroyOnClose) {
-					// invalidate the reference
-					PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
-				}
-				Py_RETURN_NONE;
+		Window* win = dynamic_cast<Window*>(view);
+		if (win) {
+			win->Close();
+			if (win->Flags()&Window::DestroyOnClose) {
+				// invalidate the reference
+				PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
 			}
-		} else {
-			// invalidate the reference
-			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
+			Py_RETURN_NONE;
 		}
 
 		if (del) {
+			// invalidate the reference
+			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
+			view->RemoveFromSuperview();
 			delete view;
 			Py_RETURN_NONE;
 		} else {
 			// return a new ref for a deleted group
-			const ViewScriptingRef* oldref = view->GetScriptingRef();
-			view->RemoveScriptingRef(oldref);
+			view->RemoveScriptingRef(ref);
 
 			static ScriptingId id = 0;
 			ResRef group = "Deleted";
-			const ViewScriptingRef* ref = view->AssignScriptingRef(id, group);
+			const ViewScriptingRef* newref = view->AssignScriptingRef(id, group);
 			++id;
 
-			return gs->ConstructObjectForScriptable(ref);
+			return gs->ConstructObjectForScriptable(newref);
 		}
 	}
 	return AttributeError("Invalid view");
