@@ -158,6 +158,7 @@ def ModifyCharsPress ():
 	return
 
 def EnterGamePress ():
+	GemRB.HardEndPL ()
 	GemRB.EnterGame ()
 	return
 
