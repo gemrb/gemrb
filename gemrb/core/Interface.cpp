@@ -963,7 +963,7 @@ void Interface::Main()
 			HandleFlags();
 		}
 		//eventflags are processed only when there is a game
-		if (EventFlag && game) {
+		if (EventFlag && gamectrl) {
 			HandleEvents();
 		}
 		HandleGUIBehaviour();
