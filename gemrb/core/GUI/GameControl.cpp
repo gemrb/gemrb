@@ -806,7 +806,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		if (!area)
 			return false;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		switch (Key.keycode) {
+		switch (Key.character) {
 			case 'a': //switches through the avatar animations
 				if (lastActor) {
 					lastActor->GetNextAnimation();
