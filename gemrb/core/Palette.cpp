@@ -92,7 +92,7 @@ Palette* Palette::Copy()
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 {
-	unsigned int s = 8*type;
+	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
 	//metal
 	core->GetPalette( (Colors[0]>>s)&0xFF, 12, &col[0x04]);
 	//minor
