@@ -54,6 +54,7 @@ void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* /*parent*/)
 	
 void ScrollView::ContentView::ResizeToSubviews()
 {
+	assert(superView);
 	// content view behaves as if RESIZE_WIDTH and RESIZE_HEIGHT are set always
 	Size newSize = superView->Dimensions();
 
@@ -75,6 +76,9 @@ void ScrollView::ContentView::ResizeToSubviews()
 	// subviews were already resized, so no need to run the autoresize
 	frame.w = newSize.w;
 	frame.h = newSize.h;
+
+	ScrollView* sv = static_cast<ScrollView*>(superView);
+	sv->UpdateScrollbars();
 }
 	
 void ScrollView::ContentView::WillDraw()
