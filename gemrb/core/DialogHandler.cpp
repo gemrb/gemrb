@@ -343,8 +343,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			EndDialog();
 			if (tr->actions.size()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
+			EndDialog();
 			ta->AppendText(L"\n");
 			return false;
 		}
