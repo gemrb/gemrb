@@ -151,7 +151,7 @@ def UpdateInventoryWindow (Window = None):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
 	RefreshInventoryWindow (Window)
 	# And now for the items ....
 
