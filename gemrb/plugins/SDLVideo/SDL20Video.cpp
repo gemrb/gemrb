@@ -126,7 +126,14 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 		return ret;
 	}
 
-	SDL_RenderSetClipRect(renderer, reinterpret_cast<SDL_Rect*>(&screenClip));
+	if (screenClip.Dimensions() == screenSize)
+	{
+		// SDL does _not_ seem to like having a clip rect of the entire renderer size
+		// I'm not sure if it is an SDL bug; possibly its just 0 based so it is out of bounds?
+		SDL_RenderSetClipRect(renderer, NULL);
+	} else {
+		SDL_RenderSetClipRect(renderer, reinterpret_cast<SDL_Rect*>(&screenClip));
+	}
 
 	if (color) {
 		if (drawingBuffer->blend) {
