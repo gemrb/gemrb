@@ -419,6 +419,8 @@ void WindowManager::DrawMouse() const
 	Point mid = eventMgr.MousePos() - pos;
 	cursorBuf->SetOrigin(pos);
 
+	video->SetScreenClip(NULL);
+
 	DrawCursor(mid);
 
 	// tooltip is *always* midpoint to the buffer
