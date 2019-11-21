@@ -38,7 +38,7 @@
 
 using namespace GemRB;
 
-void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
+static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
 {
 	// we assume the 2 dont overlap
 	Region sbr = sb->Frame();
