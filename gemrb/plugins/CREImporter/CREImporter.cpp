@@ -398,15 +398,6 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 	}
 
 	error("CREImporter", "Doing extra mage spell lookups!");
-	// FIXME: is this really needed? reachable only if wizard index was too high
-	kit = GemRB::log2(kit/0x40); // 0x40 is the first mage kit
-	int i;
-	for(i=0;i<magcount;i++) {
-		if (maglist[i].Equals(*ret)) {
-			return maglist[i].FindSpell(level, kit);
-		}
-	}
-	return NULL;
 }
 
 static void ReleaseMemoryCRE()
