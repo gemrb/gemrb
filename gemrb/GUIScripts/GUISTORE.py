@@ -1511,7 +1511,7 @@ def InfoWindow (Slot, Item):
 			Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
-	Button = Window.GetControlAlias ("STOLBTN")
+	Button = Window.GetControl (2)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
