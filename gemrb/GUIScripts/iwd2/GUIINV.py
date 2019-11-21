@@ -151,7 +151,7 @@ def UpdateInventoryWindow (Window = None):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (4):

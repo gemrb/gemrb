@@ -719,7 +719,7 @@ def InitStoreHealWindow (Window):
 		Count = Count-4
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	return
 
 def UpdateStoreHealWindow (Window):
@@ -820,7 +820,7 @@ def InitStoreRumourWindow (Window):
 		Count = Count-5
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
+	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	return
 
 def UpdateStoreRumourWindow (Window):
