@@ -283,6 +283,9 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 Interface::~Interface(void)
 {
+	WindowManager::CursorMouseUp = NULL;
+	WindowManager::CursorMouseDown = NULL;
+
 	delete winmgr;
 
 	DragItem(NULL,NULL);
