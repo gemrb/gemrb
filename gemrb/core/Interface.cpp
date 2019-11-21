@@ -1948,6 +1948,19 @@ int Interface::Init(InterfaceConfig* config)
 		console->SetCursor (cursor);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
+
+	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
+	char unhardcoded[_MAX_PATH + 30];
+	char pathString[_MAX_PATH + 50];
+	PathJoin(unhardcoded, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcoded);
+	PathJoin(strpath, GamePath, "gemrb_path.txt", NULL);
+	FileStream *pathFile = new FileStream();
+	// don't abort if something goes wrong, since it should never happen and it's not critical
+	if (pathFile->Create(strpath)) {
+		pathFile->Write(pathString, strlen(pathString));
+		pathFile->Close();
+	}
 	return GEM_OK;
 }
 
