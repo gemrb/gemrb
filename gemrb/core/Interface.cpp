@@ -1586,14 +1586,13 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	strcpy( NextScript, "Start" );
 
-	{
-		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-		char path[_MAX_PATH];
-		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-	}
+	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
+	char path[_MAX_PATH];
+	PathJoin(path, GemRBOverridePath, "override", GameType, NULL);
+	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	char unhardcodedTypePath[_MAX_PATH];
+	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// if unset, manually populate GameName (window title)
 	std::map<std::string, std::string> gameTypeNameMap;
@@ -1950,10 +1949,8 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
-	char unhardcoded[_MAX_PATH + 30];
 	char pathString[_MAX_PATH + 50];
-	PathJoin(unhardcoded, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
-	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcoded);
+	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
 	PathJoin(strpath, GamePath, "gemrb_path.txt", NULL);
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
