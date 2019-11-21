@@ -241,6 +241,8 @@ void View::Draw()
 	if (win == NULL ) {
 		video->DrawRect(drawFrame, ColorBlue, false);
 		debuginfo = EventMgr::ModState(GEM_MOD_SHIFT);
+	} else if (NeedsDraw()) {
+		video->DrawRect(drawFrame, ColorRed, false);
 	} else {
 		video->DrawRect(drawFrame, ColorGreen, false);
 	}
