@@ -312,7 +312,9 @@ class GTextEdit(GControl):
   }
 
 class GScrollBar(GControl, Scrollable):
-  pass
+  def SetVarAssoc(self, varname, val, min=0, max=None):
+    max = val if max is None else max
+    super(GScrollBar, self).SetVarAssoc(varname, val, min, max)
 
 class GButton(GControl):
   methods = {
