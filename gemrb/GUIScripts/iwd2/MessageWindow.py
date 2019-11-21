@@ -41,12 +41,6 @@ def OnLoad():
 	smallMTA = OptionsWindow.GetControl(1)
 	smallMTA.AddAlias("MsgSys", 0)
 	smallMTA.AddAlias("MTA_SM", 0)
-
-	frame = smallMTA.GetFrame()
-	frame['w'] += 12
-	frame['h'] += 4
-	frame['y'] -= 4
-	smallMTA.SetFrame(frame)
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 
 	# FIXME: I dont know what this TextEdit is for
@@ -73,12 +67,6 @@ def OnLoad():
 
 	largeMTA = DialogWindow.GetControl(1)
 	largeMTA.AddAlias("MTA_LG", 0)
-
-	frame = largeMTA.GetFrame()
-	frame['w'] += 34
-	frame['h'] += 3
-	frame['y'] -= 2
-	largeMTA.SetFrame(frame)
 
 	return
 

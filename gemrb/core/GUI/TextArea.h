@@ -125,6 +125,9 @@ public:
 	void SetSelectable(bool val);
 	void SetAnimPicture(Sprite2D* Picture);
 
+	ContentContainer::Margin GetMargins() const;
+	void SetMargins(ContentContainer::Margin m);
+
 	/** Returns the selected text */
 	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
@@ -144,6 +147,7 @@ private: // Private attributes
 	/** Fonts */
 	Font* finit, * ftext;
 	GemMarkupParser parser;
+	ContentContainer::Margin textMargins;
 
 	enum PALETTE_TYPE {
 		PALETTE_NORMAL = 0,	// standard text color

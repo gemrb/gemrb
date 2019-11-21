@@ -216,7 +216,7 @@ void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op
 }
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), palettes()
+	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), textMargins(0,3), palettes()
 {
 	palettes[PALETTE_NORMAL] = text->GetPalette();
 	finit = ftext;
@@ -293,6 +293,18 @@ void TextArea::SetAnimPicture(Sprite2D* pic)
 
 	assert(textContainer);
 	UpdateTextFrame();
+}
+
+ContentContainer::Margin TextArea::GetMargins() const
+{
+	return textMargins;
+}
+
+void TextArea::SetMargins(ContentContainer::Margin m)
+{
+	textMargins = m;
+	if (textContainer)
+		textContainer->SetMargin(textMargins);
 }
 
 ieDword TextArea::LineCount() const
@@ -650,7 +662,7 @@ void TextArea::ClearText()
 
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext, palettes[PALETTE_NORMAL]);
-	textContainer->SetMargin(0, 3);
+	textContainer->SetMargin(textMargins);
 	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextArea, TextContainer&>(this, &TextArea::TextChanged);
 	textContainer->callback = cb;
 	if (Flags()&Editable) {

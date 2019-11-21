@@ -38,6 +38,37 @@
 
 using namespace GemRB;
 
+void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
+{
+	// we assume the 2 dont overlap
+	Region sbr = sb->Frame();
+	Region tar = ta->Frame();
+
+	ContentContainer::Margin margins = ta->GetMargins();
+
+	if (sbr.x > tar.x + tar.w) {
+		margins.right += sbr.x - (tar.x + tar.w) + sbr.w;
+		tar.w += margins.right;
+	} else {
+		// TODO: there aren't actually scrollbars on the left
+		// but if there were we would handle that here
+	}
+
+	if (sbr.y < tar.y) {
+		margins.top += tar.y - sbr.y;
+		tar.y -= margins.top;
+		tar.h += margins.top;
+	}
+
+	if (sbr.y + sbr.h > tar.y + tar.h) {
+		margins.bottom += (sbr.y + sbr.h) - (tar.y + tar.h);
+		tar.h += margins.bottom;
+	}
+
+	ta->SetFrame(tar);
+	ta->SetMargins(margins);
+}
+
 CHUImporter::CHUImporter()
 {
 	str = NULL;
@@ -383,11 +414,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					// TextAreas automatically produce their own in GemRB
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
-						int w = sb->Frame().w;
+						MergeTextAreaAndScrollbar(ta, sb);
 						delete win->RemoveSubview(sb);
-						Size taSize = ta->Dimensions();
-						taSize.w += w;
-						ta->SetFrameSize(taSize);
 					}
 				} else {
 					// no scrollbar means we will ignore events
@@ -487,10 +515,7 @@ endalign:
 				} else {
 					TextArea* ta = GetControl<TextArea>(TAID, win);
 					if (ta) {
-						int w = sb->Frame().w;
-						Size taSize = ta->Dimensions();
-						taSize.w += w;
-						ta->SetFrameSize(taSize);
+						MergeTextAreaAndScrollbar(ta, sb);
 						delete sb;
 					} else {
 						ctrl = sb;
