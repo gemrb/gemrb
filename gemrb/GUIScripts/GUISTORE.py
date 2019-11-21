@@ -398,7 +398,7 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = Window.GetControl (11)
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount, 0, LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
@@ -412,7 +412,7 @@ def UpdateStoreShoppingWindow (Window):
 		RightCount=0
 
 	ScrollBar = Window.GetControl (12)
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
+	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount, 0, RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	if RightTopIndex>RightCount:
 		GemRB.SetVar ("RightTopIndex", RightCount)
@@ -488,9 +488,9 @@ def UpdateStoreIdentifyWindow (Window):
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	Count = len(inventory_slots)
+	Count = len(inventory_slots) - ItemButtonCount
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetVarAssoc ("TopIndex", Count-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
 	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow (Window)
 	return
@@ -587,15 +587,15 @@ def UpdateStoreStealWindow (Window):
 
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
-	LeftCount = Store['StoreItemCount']
+	LeftCount = Store['StoreItemCount'] - ItemButtonCount
 	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount, 0, LeftCount)
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	RightCount = len(inventory_slots)
+	RightCount = len(inventory_slots) - ItemButtonCount
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount, 0, RightCount)
 	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
