@@ -1950,6 +1950,13 @@ int Interface::Init(InterfaceConfig* config)
 
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
 	char pathString[_MAX_PATH + 50];
+#ifdef HAVE_REALPATH
+	if (unhardcodedTypePath[0] == '.') {
+		// canonicalize the relative path; usually from running from the build dir
+		realpath(unhardcodedTypePath, pathString);
+		strlcpy(unhardcodedTypePath, pathString, sizeof(unhardcodedTypePath));
+	}
+#endif
 	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
 	PathJoin(strpath, GamePath, "gemrb_path.txt", NULL);
 	FileStream *pathFile = new FileStream();
