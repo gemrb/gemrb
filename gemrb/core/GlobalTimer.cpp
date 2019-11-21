@@ -297,7 +297,7 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 	anim->ctlanim = ctlanim;
 
 	// and insert it into list of other anim refs, sorted by time
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
+	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
 		if ((*it)->time > time) {
 			animations.insert( it, anim );
 			anim = NULL;

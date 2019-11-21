@@ -1500,6 +1500,8 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//play the daylight transition movie appropriate for the area
 		//it is needed to play only when the area truly changed its tileset
 		//this is signalled by ChangeMap
+		// ... but don't do it for a scripted DayNight change
+		if (!fatigue) return;
 		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
 		ieResRef *res;
 

@@ -4872,6 +4872,14 @@ int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 	if (!fx->Parameter1) {
 		fx->Parameter1 = 1;
 	}
+
+	if (fx->FirstApply) {
+		// the duration from the spell is already resolved to absolute ticks (deadline) here
+		// wait two more ticks, so the effect can expire and be cleaned up before we try
+		// executing any following actions (see mepair.bcs)
+		target->SetWait(fx->Duration - core->GetGame()->GameTime + 2);
+	}
+
 	STAT_MOD( IE_CASTERHOLD );
 	core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
 	return FX_PERMANENT;
@@ -7018,6 +7026,8 @@ int fx_unpause_caster (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_unpause_caster(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_pause_caster_modifier_ref);
+	// unsure, but makes sense
+	target->SetWait(0);
 	return FX_NOT_APPLIED;
 }
 

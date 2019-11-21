@@ -473,6 +473,9 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	InfoPoint *trigger = (InfoPoint *) ip;
 	if ( parameters->int0Parameter != 0 ) {
 		trigger->Flags &= ~TRAP_DEACTIVATED;
+		if (trigger->TrapResets()) {
+			trigger->Trapped = 1;
+		}
 	} else {
 		trigger->Flags |= TRAP_DEACTIVATED;
 	}
@@ -1055,6 +1058,9 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
+	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
+	GameControl *gc = core->GetGameControl();
+	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
 	core->timer->SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -5282,10 +5288,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
-	if (Sender->Type != ST_ACTOR || ((Actor *)Sender)->InParty == 0) {
-		flags |= REST_NOAREA;
-	}
+	unsigned int flags = REST_NOAREA|REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
 	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
@@ -7007,7 +7010,7 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	if (!ini) {
 		return;
 	}
-	char key[5];
+	char key[40];
 	sprintf(key,"%d", parameters->int0Parameter);
 	const char *variable = ini->GetKeyAsString( key, "killvar", NULL );
 	if (!variable) {

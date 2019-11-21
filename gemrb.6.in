@@ -172,31 +172,6 @@ Use the specified plugin as the audio driver. The default is openal, while
 .I none
 will disable all audio.
 
-.TP
-.BR VolumeAmbients =INT
-Volume of ambient sounds in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeMovie =INT
-Volume during movie playback in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeMusic =INT
-Volume of background music in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeSFX =INT
-Volume of sound effects in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeVoices =INT
-Volume of PC or NPC voices in percents. The default is
-.IR 100 .
-
 .\"###################################################
 .SH Path parameters:
 

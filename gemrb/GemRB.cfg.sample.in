@@ -87,29 +87,9 @@ TooltipDelay=500
 #####################################################
 #  Audio Parameters                                 #
 #####################################################
-#                                                   #
-# All volume options are in percents, with 100      #
-# being the normal and default volume               #
-#                                                   #
-#####################################################
 
 # Choices: openal (default), sdlaudio (faster, but limited featureset), none
 #AudioDriver = openal
-
-# Volume of ambient sounds
-#VolumeAmbients = 100
-
-# Volume during movie playback
-#VolumeMovie = 100
-
-# Volume of background music
-#VolumeMusic = 100
-
-# Volume of sound effects
-#VolumeSFX = 100
-
-# Volume of PC or NPC voices
-#VolumeVoices = 100
 
 #####################################################
 #  Case Sensitive Filesystem [Boolean]              #

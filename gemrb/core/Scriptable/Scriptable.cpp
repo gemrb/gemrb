@@ -687,7 +687,7 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 }
 
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
 		TriggerEntry &trigger = *m;
 		if (trigger.triggerID != id)
 			continue;
@@ -944,7 +944,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
 	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); neighbour++) {
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
 		(*neighbour)->AddTrigger(entry);
 	}
 	area->AddTrigger(entry);
@@ -1010,7 +1010,8 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	if (!no_stance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+		// yep, the original didn't use the casting channel for this!
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
@@ -1079,7 +1080,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	}
 
 	if (!no_stance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_CASTING, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
@@ -1203,7 +1204,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, 10*caster->GetBase(IE_VISUALRANGE), this);
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
@@ -1390,13 +1391,9 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 		} else {
 			casting_time -= (int)actor->Modified[IE_MENTALSPEED];
 		}
-
-		if (casting_time < 0) {
-			casting_time = 0;
-		} else if (casting_time > 10) {
-			casting_time = 10;
-		}
+		casting_time = Clamp(casting_time, 0, 10);
 	}
+
 	// this is a guess which seems approximately right so far (same as in the bg2 manual, except that it may be a combat round instead)
 	int duration = (casting_time*core->Time.round_size) / 10;
 	if (instant) {

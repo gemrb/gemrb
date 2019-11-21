@@ -769,7 +769,6 @@ def ActionQWeaponPressed (which):
 # TODO: implement full weapon set switching instead
 def ActionQWeaponRightPressed (action):
 	"""Selects the used ability of the quick weapon."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
 	UpdateActionsWindow ()
@@ -1022,7 +1021,6 @@ def ActionQItem5Pressed ():
 
 def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
 	UpdateActionsWindow ()

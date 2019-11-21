@@ -305,14 +305,13 @@ def CancelPress():
 def AcceptPress():
 	#mage spells
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
-	KitIndex = KitTable.FindValue (3, Kit)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if TableName != "*":
-		#todo: set up ALL spell levels not just level 1
+		# setting up just the first spell level is enough, since the rest will be granted on level-up
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = Spellbook.GetLearnableMageSpells (KitIndex, t, 1)
+		Learnable = Spellbook.GetLearnableMageSpells (Kit, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1

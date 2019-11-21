@@ -421,9 +421,9 @@ bool Spellbook::RemoveSpell(CREKnownSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[i].begin(); sm != spells[i].end(); sm++) {
+		for (sm = spells[i].begin(); sm != spells[i].end(); ++sm) {
 			std::vector< CREKnownSpell* >::iterator ks;
-			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
 				if (*ks == spell) {
 					ieResRef ResRef;
 
@@ -465,10 +465,10 @@ void Spellbook::RemoveSpell(int spellid)
 void Spellbook::RemoveSpell(int spellid, int type)
 {
 	std::vector< CRESpellMemorization* >::iterator sm;
-	for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+	for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
 		std::vector< CREKnownSpell* >::iterator ks;
 
-		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
 			if (atoi((*ks)->SpellResRef+4)==spellid) {
 				ieResRef ResRef;
 
@@ -476,7 +476,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 				delete *ks;
 				ks = (*sm)->known_spells.erase(ks);
 				RemoveMemorization(*sm, ResRef);
-				ks--;
+				--ks;
 				ClearSpellInfo();
 			}
 		}
@@ -488,7 +488,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
 			std::vector< CREKnownSpell* >::iterator ks;
 
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
@@ -802,7 +802,7 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 		std::vector< CRESpellMemorization* >::iterator sm;
 		for (sm = spells[i].begin(); sm != spells[i].end(); ++sm) {
 			std::vector< CREMemorizedSpell* >::iterator s;
-			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
+			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
 				if (*s == spell) {
 					delete *s;
 					(*sm)->memorized_spells.erase( s );

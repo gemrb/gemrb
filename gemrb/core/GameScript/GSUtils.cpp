@@ -1236,6 +1236,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 		}
 	}
 	actor->SetPosition(position, adjust);
+	actor->SetStance(IE_ANI_READY);
 	if (face !=-1) {
 		actor->SetOrientation( face, false );
 	}

@@ -1113,14 +1113,19 @@ String GameControl::TooltipText() const {
 	int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
 	if (actor->InParty) {
-		wchar_t hpstring[10];
-		swprintf(hpstring, 10, L"%d/%d", hp, maxhp);
 		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
 			tip += L": ";
 		} else {
 			tip += L"\n";
 		}
-		tip += hpstring;
+
+		if (actor->HasVisibleHP()) {
+			wchar_t hpstring[10];
+			swprintf(hpstring, 10, L"%d/%d", hp, maxhp);
+			tip += hpstring;
+		} else {
+			tip += L"?";
+		}
 	} else {
 		// a guess at a neutral check
 		bool enemy = actor->GetStat(IE_EA) != EA_NEUTRAL;
@@ -2377,7 +2382,12 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 			areaname = pc->Area;
 		}
 		game->GetMap( areaname, true );
-		ScreenFlags|=SF_CENTERONACTOR;
+
+		if (!core->InCutSceneMode()) {
+			// don't interfere with any scripted moves of the viewport
+			// checking core->timer->ViewportIsMoving() is not enough
+			ScreenFlags |= SF_CENTERONACTOR;
+		}
 		
 		SetDisabled(false);
 

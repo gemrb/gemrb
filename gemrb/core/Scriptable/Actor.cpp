@@ -1278,7 +1278,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	// ERWAN.CRE from Victor's Improvement Pack has a max of 0 and still survives, grrr
-	if ((signed) hp>maxhp && actor->HasPlayerClass()) {
+	if (maxhp && (signed) hp > maxhp) {
 		hp=maxhp;
 	}
 
@@ -4590,7 +4590,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MAGE) {
-		if (damagetype == DAMAGE_FIRE || damagetype == DAMAGE_COLD || damagetype == DAMAGE_ACID || damagetype == DAMAGE_ELECTRICITY) {
+		if (damagetype & (DAMAGE_FIRE|DAMAGE_COLD|DAMAGE_ACID|DAMAGE_ELECTRICITY)) {
 			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
 			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
 			damage = 0;
@@ -7744,9 +7744,12 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		}
 	}
 
-	if (damage<=0) {
+	// don't complain when sarevok is 100% resistant in the cutscene that grants you the slayer form
+	if (damage <= 0 && !core->InCutSceneMode()) {
 		if (attacker && attacker->InParty) {
-			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+			if (core->HasFeedback(FT_COMBAT)) {
+				attacker->DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+			}
 			core->Autopause(AP_UNUSABLE, this);
 		}
 	}
@@ -7888,7 +7891,7 @@ void Actor::ApplyModal(ieResRef modalSpell)
 		if (!area) return;
 		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
 		std::vector<Actor *>::iterator neighbour;
-		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 			core->ApplySpell(modalSpell, *neighbour, this, 0);
 		}
 	} else {
@@ -10672,7 +10675,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 
 	//we need to look harder if we look for seenby anyone
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = visActors.begin(); neighbour != visActors.end()  && !seeEnemy; neighbour++) {
+	for (neighbour = visActors.begin(); neighbour != visActors.end() && !seeEnemy; ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (seenby) {
 			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
@@ -10764,7 +10767,7 @@ bool Actor::TryToHideIWD2()
 	ieDword skill = GetStat(IE_HIDEINSHADOWS);
 	bool seen = false;
 	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
@@ -10794,7 +10797,7 @@ bool Actor::TryToHideIWD2()
 	// separate move silently check
 	skill = GetStat(IE_STEALTH);
 	bool heard = false;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); neighbour++) {
+	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 		Actor *toCheck = *neighbour;
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;
@@ -11128,12 +11131,19 @@ void Actor::MovementCommand(char *command)
 	ProcessActions();
 }
 
+bool Actor::HasVisibleHP() const
+{
+	// sucks but this is set in different places
+	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
+	if (HasSpellState(SS_NOHPINFO)) return false;
+	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return false;
+	return true;
+}
+
 // shows hp/maxhp as overhead text
 void Actor::DisplayHeadHPRatio()
 {
-	//sucks but this is set in different places
-	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return;
-	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return;
+	if (!HasVisibleHP()) return;
 
 	wchar_t tmpstr[10];
 	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);

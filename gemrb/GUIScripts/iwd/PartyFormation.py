@@ -151,6 +151,7 @@ def ModifyCharsPress ():
 
 def EnterGamePress ():
 	PartyFormationWindow.Close()
+	GemRB.HardEndPL ()
 	GemRB.EnterGame ()
 	return
 
