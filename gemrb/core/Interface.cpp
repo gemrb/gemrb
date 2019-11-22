@@ -1590,7 +1590,7 @@ int Interface::Init(InterfaceConfig* config)
 	char path[_MAX_PATH];
 	PathJoin(path, GemRBOverridePath, "override", GameType, NULL);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-	char unhardcodedTypePath[_MAX_PATH];
+	char unhardcodedTypePath[_MAX_PATH * 2];
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
@@ -1949,12 +1949,15 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
-	char pathString[_MAX_PATH + 50];
+	char pathString[_MAX_PATH * 3];
 #ifdef HAVE_REALPATH
 	if (unhardcodedTypePath[0] == '.') {
 		// canonicalize the relative path; usually from running from the build dir
-		realpath(unhardcodedTypePath, pathString);
-		strlcpy(unhardcodedTypePath, pathString, sizeof(unhardcodedTypePath));
+		char *absolutePath = realpath(unhardcodedTypePath, NULL);
+		if (absolutePath) {
+			strlcpy(unhardcodedTypePath, absolutePath, sizeof(unhardcodedTypePath));
+			free(absolutePath);
+		}
 	}
 #endif
 	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
