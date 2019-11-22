@@ -6093,7 +6093,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
 "===== PlayMovie =====\n\
 \n\
-**Prototype:** GemRB.PlayMovie (MOVResRef[, flag])\n\
+**Prototype:** GemRB.PlayMovie (MOVResRef[, flag=0])\n\
 \n\
 **Description:** Plays the named movie. Sets the configuration variable \n\
 MOVResRef to 1. If flag was set to 1 it won't play the movie if the \n\
@@ -6101,7 +6101,9 @@ configuration variable was already set (saved in game ini).\n\
 \n\
 **Parameters:**\n\
   * MOVResRef - a .mve/.bik (or vlc compatible) resource reference.\n\
-  *      flag - don't play movie twice\n\
+  * flag:\n\
+      * 0 - only play the movie if it has never been played before\n\
+      * 1 - always play\n\
 \n\
 **Return value:**\n\
   * 0 - movie played\n\
