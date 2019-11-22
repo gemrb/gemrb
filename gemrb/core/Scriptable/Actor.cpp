@@ -7551,7 +7551,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	ModifyWeaponDamage(wi, target, damage, critical);
 
-	if (target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+	if (third && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
 		Log(DEBUG, "Actor", "Attacking invulnerable target, nulifying damage!");
 		damage = 0;
 	}
