@@ -2434,7 +2434,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				scr->CurrentActionInterruptable = false;
 			}
 		} else {
-			Log(ERROR, "GameScript", "Actionoverride failed for object: ");
+			Log(ERROR, "GameScript", "ActionOverride failed for object: ");
 			aC->objects[0]->dump();
 		}
 
@@ -2455,7 +2455,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			Sender->Activate();
 			if (actionflags[actionID]&AF_ALIVE) {
 				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death");
+					Log(WARNING, "GameScript", "Aborted action due to death!");
 					Sender->ReleaseCurrentAction();
 					return;
 				}
