@@ -551,7 +551,7 @@ ADD_CUSTOM_TARGET( uninstall
 # make dist for a gzipped tarball of current HEAD
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
 add_custom_target( dist
-	COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+	COMMAND git archive --worktree-attributes --prefix=${ARCHIVE_NAME}/ HEAD
 		| gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
