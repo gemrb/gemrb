@@ -2445,7 +2445,7 @@ static void InitActorTables()
 			int rowcount = tm->GetRowCount();
 			for (i = 0; i < rowcount; i++) {
 				const char* cls = tm->GetRowName(i);
-				std::map<std::string, int >::iterator it = className2ID.find(cls);
+				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
 				numWeaponSlots[id] = std::min(4, atoi(tm->QueryField(i, 0)));
