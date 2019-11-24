@@ -7,6 +7,7 @@ Final development:
 - [ ] Fix or postpone issues in the [milestone](https://github.com/gemrb/gemrb/milestones)
 - [ ] Triage open pull requests
 - [ ] Check local stashes
+- [ ] No Coverity Scan issues
 
 Beta testing:
 - [ ] Playthrough: Chateau Irenicus to Waukeen's promenade
@@ -21,6 +22,7 @@ Release:
 - [ ] Write docs:
   - [ ] Forum announcements
   - [ ] Release notes
+- [ ] Amend Roadmap in contributing.md
 - [ ] `make dist`
 - [ ] Add a git tag and push it
 - [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
