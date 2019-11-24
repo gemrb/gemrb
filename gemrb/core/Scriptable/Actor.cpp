@@ -4993,11 +4993,9 @@ void Actor::dump() const
 
 void Actor::dump(StringBuffer& buffer) const
 {
-	unsigned int i;
-
 	buffer.appendFormatted( "Debugdump of Actor %s (%s, %s):\n", LongName, ShortName, GetName(-1) );
 	buffer.append("Scripts:");
-	for (i = 0; i < MAX_SCRIPTS; i++) {
+	for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i]) {
 			poi = Scripts[i]->GetName();
@@ -5025,7 +5023,7 @@ void Actor::dump(StringBuffer& buffer) const
 
 	//this works for both level slot style
 	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
-	for (i = 0;i<ISCLASSES;i++) {
+	for (unsigned int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
 		if (level) {
 			buffer.appendFormatted("%s: %d    ", isclassnames[i], level);
@@ -5038,11 +5036,11 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	buffer.appendFormatted("Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
+		for(unsigned int i = 0; i < Modified[IE_COLORCOUNT]; i++) {
 			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
 		}
 	} else {
-		for(i=0;i<7;i++) {
+		for(unsigned int i = 0; i < 7; i++) {
 			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
 		}
 	}
