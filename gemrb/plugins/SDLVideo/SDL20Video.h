@@ -163,6 +163,14 @@ public:
 	void Clear() {
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+#if SDL_COMPILEDVERSION == SDL_VERSIONNUM(2, 0, 10)
+		/**
+		 * See GH issue #410. In some SDL2 backends of this version, a clear
+		 * runs over an outdated state of the clipping settings. This can
+		 * be overcome by a harmless draw command right before.
+		 */
+		SDL_RenderDrawPoint(renderer, 0, 0);
+#endif
 		SDL_RenderClear(renderer);
 
 		ClearMaskLayer();
@@ -172,6 +180,9 @@ public:
 		if (maskLayer) {
 			SDL_SetRenderTarget(renderer, maskLayer);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+#if SDL_COMPILEDVERSION == SDL_VERSIONNUM(2, 0, 10)
+			SDL_RenderDrawPoint(renderer, 0, 0);
+#endif
 			SDL_RenderClear(renderer);
 		}
 	}
