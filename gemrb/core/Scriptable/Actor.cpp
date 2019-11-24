@@ -11137,7 +11137,7 @@ void Actor::MovementCommand(char *command)
 bool Actor::HasVisibleHP() const
 {
 	// sucks but this is set in different places
-	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
+	if (!pstflags && GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
 	if (HasSpellState(SS_NOHPINFO)) return false;
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return false;
 	return true;
