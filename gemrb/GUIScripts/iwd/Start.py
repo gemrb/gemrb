@@ -63,7 +63,7 @@ def OnLoad ():
 	JoinGameButton = StartWindow.GetControl (0x03)
 	MoviesButton = StartWindow.GetControl (0x08)
 	QuitGameButton = StartWindow.GetControl (0x01)
-	VersionLabel = StartWindow.CreateLabel (0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+	VersionLabel = StartWindow.CreateLabel (0x0fff0000, 0, 0, 640, 30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	VersionLabel.SetText (GemRB.Version)
 	ProtocolButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
