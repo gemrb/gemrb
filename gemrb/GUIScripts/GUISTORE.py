@@ -1045,6 +1045,7 @@ def SelectSell ():
 	Flags = GemRB.IsValidStoreItem (pc, RightIndex, ITEM_BAG if Bag else ITEM_PC)
 	if Flags & SHOP_SELL:
 		GemRB.ChangeStoreItem (pc, RightIndex, SHOP_SELL|SHOP_SELECT)
+		RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
 
 def ToBagPressed ():
