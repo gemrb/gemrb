@@ -211,7 +211,7 @@ def WorldMapWindowCommon (Travel):
 	if GameCheck.IsBG2():
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "floattxt")
 	elif GameCheck.IsBG1():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "toolfont", 1)
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "toolfont", 1, True)
 		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0xa4, 'g' : 0x6a, 'b' : 0x4c})
 	else:
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "infofont")

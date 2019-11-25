@@ -2048,9 +2048,12 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		{
 			int direction, recolor = 0;
 			char *font = NULL;
-			PARSE_ARGS3( constructArgs, "i|si", &direction, &font, &recolor );
+			int paletteOverride = false;
+			PARSE_ARGS4( constructArgs, "i|sii", &direction, &font, &recolor, &paletteOverride);
 
-			view = new WorldMapControl(rgn, font?font:"", direction );
+			WorldMapControl* wmap = new WorldMapControl(rgn, font?font:"", direction );
+			wmap->SetOverrideIconPalette(paletteOverride);
+			view = wmap;
 		}
 			break;
 		case IE_GUI_BUTTON:
