@@ -52,7 +52,7 @@ def OnLoad():
 	ExitButton = StartWindow.GetControl(3)
 	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewLifePress)
 	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ResumeLifePress)
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitWindow.Focus)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.ShowModal (MODAL_SHADOW_GRAY))
 	ExitButton.MakeEscape()
 
 	ConfirmButton = QuitWindow.GetControl(1)

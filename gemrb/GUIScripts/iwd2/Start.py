@@ -206,7 +206,7 @@ def QuitPress():
 	CancelButton.SetText(13727)
 	QuitButton.SetText(15417)
 	TextArea.SetText(19532)
-	QuitWindow.Focus()
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def NewGamePress():

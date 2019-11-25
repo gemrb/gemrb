@@ -142,8 +142,7 @@ def NewSingle():
 	return
 
 def ExitPress():
-	StartWindow.SetVisible(False)
-	QuitWindow.Focus()
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
 def ExitConfirmed():
