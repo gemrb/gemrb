@@ -157,7 +157,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
 	// some "scrollbars" are sized to just show the up and down buttons
 	// we must skip the trough (and slider) in those cases
-	if (maxy >= stepy) {
+	if (maxy > upMy + doMy) {
 		// draw the trough
 		if (stepy) {
 			Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
