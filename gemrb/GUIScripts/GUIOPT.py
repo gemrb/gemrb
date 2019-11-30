@@ -646,6 +646,12 @@ def OpenQuitMsgWindow ():
 	Button.SetText (15589)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGamePress)
 
+	EnteredGame = GemRB.GetSystemVariable(SV_ENTERED_GAME)
+	if EnteredGame:
+		Button.SetState(IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState(IE_GUI_BUTTON_DISABLED)
+
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
