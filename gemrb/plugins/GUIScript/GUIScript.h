@@ -40,6 +40,7 @@ namespace GemRB {
 #define SV_HEIGHT 2
 #define SV_GAMEPATH 3
 #define SV_TOUCH 4
+#define SV_ENTERED_GAME 5
 
 class GUIScript : public ScriptEngine {
 public:

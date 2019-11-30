@@ -573,6 +573,7 @@ script ends, but a LoadGame() may precede EnterGame() in the same function\n\
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitFlag|=QF_ENTERGAME;
+	core->EnteredGame = true;
 	Py_RETURN_NONE;
 }
 
@@ -596,6 +597,7 @@ used by HideGUI().\n\
 static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitFlag=QF_QUITGAME;
+	core->EnteredGame = false;
 	Py_RETURN_NONE;
 }
 
@@ -11831,6 +11833,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
     * SV_HEIGHT = 2 - screen height\n\
     * SV_GAMEPATH = 3 - game path\n\
     * SV_TOUCH = 4 - are we using touch input mode?\n\
+    * SV_ENTERED_GAME = 5 - have we entered the game, without being in CG?\n\
 \n\
 **Return value:** This function returns -1 if the index is invalid.\n\
 \n\
@@ -11852,6 +11855,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_HEIGHT: value = core->Height; break;
 		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
 		case SV_TOUCH: value = core->GetVideoDriver()->TouchInputEnabled(); break;
+		case SV_ENTERED_GAME: value = core->EnteredGame; break;
 		default: value = -1; break;
 	}
 	if (path[0]) {
