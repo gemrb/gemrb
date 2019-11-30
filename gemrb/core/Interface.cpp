@@ -219,6 +219,7 @@ Interface::Interface()
 	GamePortraitsPath[0] = 0;
 	GameCharactersPath[0] = 0;
 	GameDataPath[0] = 0;
+	EnteredGame = false;
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 

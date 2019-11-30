@@ -814,6 +814,7 @@ public:
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
 	int Width, Height, Bpp;
+	bool EnteredGame;
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
