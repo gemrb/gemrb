@@ -388,21 +388,12 @@ def LoadGame ():
 def OpenQuitMsgWindow ():
 	global QuitMsgWindow
 
-	#GemRB.HideGUI()
-
-	if QuitMsgWindow:		
-		if QuitMsgWindow:
-			QuitMsgWindow.Unload ()
-		QuitMsgWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		GemRB.SetVar ("AskAndExit", 0)
-		
-		#GemRB.UnhideGUI ()
+	if QuitMsgWindow:
 		return
-		
+
 	QuitMsgWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", QuitMsgWindow.ID)
-	
+
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (28645)
@@ -422,22 +413,35 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# The game has not been saved ....
 	Text = Window.GetControl (3)
 	Text.SetText (39430)  # or 39431 - cannot be saved atm
 
-	#GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def QuitGame ():
-	OpenQuitMsgWindow ()
-	OpenOptionsWindow ()
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ('Start')
+	if GemRB.GetVar("AskAndExit") == 1:
+		GemRB.Quit()
+		return
+
+	CloseQuitMsgWindow()
+	OpenOptionsWindow()
+	GemRB.QuitGame()
+	GemRB.SetNextScript("Start")
+
+def CloseQuitMsgWindow ():
+	global QuitMsgWindow
+
+	if QuitMsgWindow:
+		QuitMsgWindow.Unload ()
+	QuitMsgWindow = None
+
+	GemRB.SetVar ("FloatWindow", -1)
+	GemRB.SetVar ("AskAndExit", 0)
 
 def SaveGame ():
 	GemRB.SetVar ("QuitAfterSave", 1)
