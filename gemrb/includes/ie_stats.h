@@ -372,7 +372,7 @@ namespace GemRB {
 #define IE_PROFICIENCYSWORDANDSHIELD		112
 #define IE_PROFICIENCYSINGLEWEAPON		113
 #define IE_PROFICIENCY2WEAPON		 114  
-#define IE_EXTRAPROFICIENCY1 		 115
+#define IE_PROFICIENCYCLUB		 115
 #define IE_ALCHEMY                       115
 #define IE_EXTRAPROFICIENCY2 		 116
 #define IE_ANIMALS                       116

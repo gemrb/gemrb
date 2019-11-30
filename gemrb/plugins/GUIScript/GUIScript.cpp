@@ -295,7 +295,7 @@ static bool StatIsASkill(unsigned int StatID) {
 	if (StatID >= IE_LORE && StatID <= IE_PICKPOCKET) return true;
 
 	// alchemy, animals, bluff, concentration, diplomacy, intimidate, search, spellcraft, magicdevice
-	// NOTE: change if you want to use IE_EXTRAPROFICIENCY1..., as they use the same values
+	// NOTE: change if you want to use IE_PROFICIENCYCLUB or IE_EXTRAPROFICIENCY2 etc., as they use the same values
 	if (StatID >= IE_ALCHEMY && StatID <= IE_MAGICDEVICE) return true;
 
 	// Hide, Wilderness_Lore
