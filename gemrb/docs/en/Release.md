@@ -72,7 +72,7 @@ options should also be mentioned here if they're not part of the changelog.
 
 * Test the downloads from sourceforge.net
 
-* Announce on SF, #GemRB in channel and title, Discord channel, LGDB and Gibberlings3:
+* Announce on SF, #GemRB in channel and title, Discord channel and Gibberlings3:
     - our forum
     - modding news (Lynx, Avenger, Mike1072, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
   (a template is available in `admin/announcement.template`)
