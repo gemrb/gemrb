@@ -32,6 +32,7 @@
 #include "GameScript/GameScript.h"
 
 #include <cassert>
+#include <cmath>
 
 using namespace GemRB;
 
@@ -220,23 +221,6 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }*/
 
-// just returns the integer part of the log
-// perfect for deducing kit values, since they are bitfields and we don't care about any noise
-
-namespace GemRB {
-// FIXME: delete this when we switch to c++11
-static int log2(int value)
-{
-	int pow = -1;
-	while (value) {
-		value = value>>1;
-		pow++;
-	}
-	return pow;
-}
-
-}
-
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
 {
 	level = 0;
@@ -252,7 +236,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	// still needs to happen first or the laxer check below can misclassify
 	// first translate the actual kit to a column index to make them comparable
 	// luckily they are in order
-	int kit2 = GemRB::log2(kit/0x8000); // 0x8000 is the first cleric kit
+	int kit2 = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
@@ -351,7 +335,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		}
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
-		kit = GemRB::log2(kit/0x8000); // 0x8000 is the first cleric kit
+		kit = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
 		ret = domlist[index].FindSpell(level, kit);
 		if (ret) {
 			return ret;
@@ -365,7 +349,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 			break;
 		}
 		// translate the actual kit to a column index to make them comparable
-		kit = GemRB::log2(kit/0x40); // 0x40 is the first mage kit
+		kit = std::log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
 		ret = maglist[index].FindSpell(level, kit);
 		if ( ret) {
