@@ -122,7 +122,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
 			// pixels = malloc(size);
 			// memcpy(pixels, GlyphPageData, size);
 		}
-		Sheet = core->GetVideoDriver()->CreateSprite8(Sheet->Frame.w, Sheet->Frame.h, pixels, font->GetPalette().get(), true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pixels, font->GetPalette().get(), true, 0);
 	}
 
 	SpriteSheet<ieWord>::Draw(chr, dest);
@@ -514,17 +514,18 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	}
 
 	// must ue rgn! the canvas height might be changed in RenderText()
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h, canvasPx, palette, true, 0);
 	if (alignment&IE_FONT_ALIGN_CENTER) {
-		canvas->Frame.x = (size.w - rgn.w) / 2;
+		rgn.x = (size.w - rgn.w) / 2;
 	} else if (alignment&IE_FONT_ALIGN_RIGHT) {
-		canvas->Frame.x = size.w - rgn.w;
+		rgn.x = size.w - rgn.w;
 	}
 	if (alignment&IE_FONT_ALIGN_MIDDLE) {
-		canvas->Frame.y = -(size.h - rgn.h) / 2;
+		rgn.y = -(size.h - rgn.h) / 2;
 	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
-		canvas->Frame.y = -(size.h - rgn.h);
+		rgn.y = -(size.h - rgn.h);
 	}
+	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn, canvasPx, palette, true, 0);
+
 	return canvas;
 }
 

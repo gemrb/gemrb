@@ -176,8 +176,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	// TODO: do an underline if requested
 
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, palette, true, 0);
-	spr->Frame.y = FT_FLOOR(metrics->horiBearingY);
+	Region r(0, FT_FLOOR(metrics->horiBearingY), sprSize.w, sprSize.h);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, 0);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
 	spr->release();
@@ -207,7 +207,7 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 #endif
 	// ttf fonts dont produce glyphs for whitespace
-	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
+	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(Region(), NULL, palette);
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);

@@ -222,18 +222,18 @@ bool GLVideoDriver::createPrograms()
 	return true;
 }
 
-Sprite2D* GLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
+Sprite2D* GLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	GLTextureSprite2D* spr = new GLTextureSprite2D(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
+	GLTextureSprite2D* spr = new GLTextureSprite2D(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
 	if (cK) spr->SetColorKey(index);
 	return spr;
 }
 
-Sprite2D* GLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels, Color* palette, bool cK, int index)
+Sprite2D* GLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels, Color* palette, bool cK, int index)
 {
 	if (palette == NULL) return NULL;
 
-	GLTextureSprite2D* spr = new GLTextureSprite2D(w, h, bpp, pixels);
+	GLTextureSprite2D* spr = new GLTextureSprite2D(rgn, bpp, pixels);
 	spr->SetPaletteManager(paletteManager);
 	Palette* pal = new Palette(palette);
 	spr->SetPalette(pal);
@@ -242,9 +242,9 @@ Sprite2D* GLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixel
 	return spr;
 }
 
-Sprite2D* GLVideoDriver::CreateSprite8(int w, int h, void* pixels, Palette* palette, bool cK, int index)
+Sprite2D* GLVideoDriver::CreateSprite8(const Region& rgn, void* pixels, Palette* palette, bool cK, int index)
 {
-	return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
+	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 
 void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, Palette* attachedPal,

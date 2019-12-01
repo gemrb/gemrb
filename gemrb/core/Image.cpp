@@ -44,7 +44,7 @@ Sprite2D* Image::GetSprite2D()
 	  a = {{ 0x00, 0x00, 0x00, 0xFF }};
 	void *pixels = malloc(sizeof(Color) * height*width);
 	memcpy(pixels, data, sizeof(Color)*height*width);
-	return core->GetVideoDriver()->CreateSprite(width, height, 32,
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, width, height), 32,
 			r.Mask, g.Mask, b.Mask, a.Mask, pixels);
 }
 

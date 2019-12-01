@@ -282,27 +282,28 @@ Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 			pixels[i++]=tmp;
 		}
 	}
-	return CreateSprite( sprite->Frame.w, sprite->Frame.h, 32, 0xFF000000,
+	return CreateSprite( sprite->Frame, 32, 0xFF000000,
 		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
 Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 {
-	unsigned int Width = sprite->Frame.w / ratio;
-	unsigned int Height = sprite->Frame.h / ratio;
+	Region scaledFrame = sprite->Frame;
+	scaledFrame.w /= ratio;
+	scaledFrame.h /= ratio;
 
-	unsigned int* pixels = (unsigned int *) malloc( Width * Height * 4 );
+	unsigned int* pixels = (unsigned int *) malloc( scaledFrame.w * scaledFrame.h * 4 );
 	int i = 0;
 
-	for (unsigned int y = 0; y < Height; y++) {
-		for (unsigned int x = 0; x < Width; x++) {
+	for (int y = 0; y < scaledFrame.h; y++) {
+		for (int x = 0; x < scaledFrame.w; x++) {
 			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
 
 			*(pixels + i++) = c.r + (c.g << 8) + (c.b << 16) + (c.a << 24);
 		}
 	}
 
-	Sprite2D* small = CreateSprite( Width, Height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
+	Sprite2D* small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
 0xff000000, pixels, false, 0 );
 
 	small->Frame.x = sprite->Frame.x / ratio;
@@ -332,7 +333,7 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 		}
 	}
 
-	Sprite2D* light = CreateSprite( radius*2, radius*2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+	Sprite2D* light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
 
 	light->Frame.x = radius;
 	light->Frame.y = radius;

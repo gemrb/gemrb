@@ -101,7 +101,7 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 				*dest++ = 0xff;
 		}
 	}
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
 		red_mask, green_mask, blue_mask, 0, p,
 		true, green_mask );
 	spr->Frame.x = 0;

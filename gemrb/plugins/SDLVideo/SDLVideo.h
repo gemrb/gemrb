@@ -74,12 +74,12 @@ public:
 	virtual void SetWindowTitle(const char *title) = 0;
 	virtual bool SetFullscreenMode(bool set)=0;
 
-	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+	virtual Sprite2D* CreateSprite(const Region& rgn, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);
-	virtual Sprite2D* CreateSprite8(int w, int h, void* pixels,
+	virtual Sprite2D* CreateSprite8(const Region& rgn, void* pixels,
 							Palette* palette, bool cK, int index);
-	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+	virtual Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
 
 	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,

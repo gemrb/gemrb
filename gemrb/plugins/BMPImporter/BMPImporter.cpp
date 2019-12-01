@@ -232,13 +232,13 @@ Sprite2D* BMPImporter::GetSprite2D()
 		const ieDword blue_mask = 0x00ff0000;
 		void* p = malloc( Width * Height * 4 );
 		memcpy( p, pixels, Width * Height * 4 );
-		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
 			red_mask, green_mask, blue_mask, 0x00000000, p,
 			true, green_mask|(0xff<<24) );
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Width, Height, NumColors == 16 ? 4 : 8,
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, Width, Height), NumColors == 16 ? 4 : 8,
 														   p, Palette, true, 0);
 	}
 	return spr;

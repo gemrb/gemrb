@@ -233,10 +233,10 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
+Sprite2D* SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	sprite_t* spr = new sprite_t(Region(0,0, w, h), bpp, pixels, rMask, gMask, bMask, aMask);
+	sprite_t* spr = new sprite_t(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
 
 	if (cK) {
 		spr->SetColorKey(index);
@@ -252,14 +252,14 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	return spr;
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
+Sprite2D* SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
 										Palette* palette, bool cK, int index)
 {
 	if (palette) {
-		return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
+		return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 	} else {
 		// an alpha only sprite. used by SpriteCover or as a mask passed to BlitTile
-		sprite_t* spr = new sprite_t(Region(0,0, w, h), 8, pixels, 0, 0, 0, 0);
+		sprite_t* spr = new sprite_t(rgn, 8, pixels, 0, 0, 0, 0);
 #if SDL_VERSION_ATLEAST(1,3,0)
 		SDL_Surface* mask = spr->GetSurface();
 		for (int i = 0; i < mask->format->palette->ncolors; ++i) {
@@ -274,10 +274,10 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 	}
 }
 
-Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
-	sprite_t* spr = new sprite_t(Region(0,0, w, h), bpp, pixels, 0, 0, 0, 0);
+	sprite_t* spr = new sprite_t(rgn, bpp, pixels, 0, 0, 0, 0);
 
 	spr->SetPalette(palette);
 	if (cK) {

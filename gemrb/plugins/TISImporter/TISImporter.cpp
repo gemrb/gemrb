@@ -108,9 +108,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		memset(pixels, 0, 4096);
 		memset(Palette, 0, 256 * sizeof(Color));
 		Palette[0].g = 200;
-		Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette );
-		spr->Frame.x = spr->Frame.y = 0;
-		return spr;
+		return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette );
 	}
 	str->Seek( pos, GEM_STREAM_START );
 	str->Read( &Col, 1024 );
@@ -132,9 +130,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		}
 	}
 	str->Read( pixels, 4096 );
-	Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette, transparent, transindex );
-	spr->Frame.x = spr->Frame.y = 0;
-	return spr;
+	return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette, transparent, transindex );
 }
 
 #include "plugindef.h"

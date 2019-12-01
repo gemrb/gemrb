@@ -165,12 +165,12 @@ public:
 
 	virtual bool TouchInputEnabled() = 0;
 
-	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+	virtual Sprite2D* CreateSprite(const Region&, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSprite8(int w, int h, void* pixels,
+	virtual Sprite2D* CreateSprite8(const Region&, void* pixels,
 									Palette* palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+	virtual Sprite2D* CreatePalettedSprite(const Region&, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 

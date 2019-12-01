@@ -29,9 +29,7 @@ SpriteCover::SpriteCover(const Point& wp, const Region& rgn, int dither)
 	: wp(wp)
 {
 	this->dither = dither;
-	mask = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h, NULL, NULL);
-	mask->Frame.x = rgn.x;
-	mask->Frame.y = rgn.y;
+	mask = core->GetVideoDriver()->CreateSprite8(rgn, NULL, NULL);
 }
 
 SpriteCover::~SpriteCover()
