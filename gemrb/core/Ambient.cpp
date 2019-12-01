@@ -64,7 +64,7 @@ ieDword Ambient::getTotalPitch() const
 {
 	ieDword p = 100;
 	if (pitchVariance != 0) {
-		p += -pitchVariance + rand() % (2 * pitchVariance);
+		p += rand() % (2 * pitchVariance) - pitchVariance;
 	}
 	return p;
 }
