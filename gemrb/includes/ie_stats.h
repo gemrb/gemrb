@@ -206,12 +206,13 @@ namespace GemRB {
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
 #define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
-#define MC_SEENPARTY            0x10000 //iwd2
+#define MC_SEENPARTY            0x10000 //iwd2, TODO: non-iwd2: restore item in hand
 #define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
-#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests
-#define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess)
+#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
+#define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess), elsewhere unused
+#define MC_NO_NIGHTMARE_MODS    0x400000 // TODO: ee
 //#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
 //#define                       0x20000000 // iwd2, unkown, probably irrelevant
 //#define                       0x40000000 // iwd2, unkown, probably irrelevant
