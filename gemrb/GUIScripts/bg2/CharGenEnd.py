@@ -180,6 +180,10 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 			else:
 				count = 0
 
+			# skip items already there (imported chars)
+			if GemRB.FindItem (MyChar, item_resref) != -1:
+				continue
+
 			targetslot = realslot[0]
 			SlotType = GemRB.GetSlotType (targetslot, MyChar)
 			i = 1
