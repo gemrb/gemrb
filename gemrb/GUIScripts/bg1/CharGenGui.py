@@ -193,8 +193,7 @@ def guardSkills():
 def unsetSkill():
 	import LUSkillsSelection
 	MyChar = GemRB.GetVar ("Slot")
-	LUSkillsSelection.SkillsNullify ()
-	LUSkillsSelection.SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify (MyChar)
 	
 def getSkills(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
