@@ -624,7 +624,7 @@ int GameData::GetSwingCount(ieDword ItemType)
 		ReadItemSounds();
 	}
 
-	// everything but IS_GET and IS_DROP — keep updated!
+	// everything but the unrelated preceding columns (IS_SWINGOFFSET)
 	return ItemSounds[ItemType].size() - 2;
 }
 
