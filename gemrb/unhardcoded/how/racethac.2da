@@ -1,0 +1,18 @@
+2DA V1.0
+0
+    PROFICIENCY     HUMAN     DWARF     ELF       GNOME     HALF_ELF  HALFLING  HALFORC
+89  LARGE_SWORD     0         0         1         0         0         0         0
+90  SMALL_SWORD     0         0         1         0         0         0         0
+91  BOW             0         0         1         0         0         0         0
+92  SPEAR           0         0         0         0         0         0         0
+93  AXE             0         0         0         0         0         0         0
+94  MISSILE         0         0         0         0         0         1         0
+95  GREAT_SWORD     0         0         0         0         0         0         0
+96  DAGGER          0         0         0         0         0         0         0
+97  HALBERD         0         0         0         0         0         0         0
+98  MACE            0         0         0         0         0         0         0
+99  FLAIL           0         0         0         0         0         0         0
+100  HAMMER         0         0         0         0         0         0         0
+101  CLUB           0         0         0         0         0         0         0
+102  QUARTER_STAFF  0         0         0         0         0         0         0
+103  CROSSBOW       0         0         0         0         0         0         0
