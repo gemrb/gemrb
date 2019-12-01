@@ -1546,6 +1546,7 @@ def SkillsPress():
 	MageSpell = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
+	LUSkillsSelection.SkillsNullify (MyChar)
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
