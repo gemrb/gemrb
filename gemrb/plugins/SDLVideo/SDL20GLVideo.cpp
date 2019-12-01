@@ -271,9 +271,9 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 	// I think this way makes more sense, but I need to examine the behavior of the the functions passing flag parameters
 	flags |= spr->renderFlags;
 
-	GLfloat x = (GLfloat)src.x/(GLfloat)spr->Width;
+	GLfloat x = (GLfloat)src.x/(GLfloat)spr->Frame.w;
 	GLfloat y = (GLfloat)src.y/(GLfloat)spr->Height;
-	GLfloat w = (GLfloat)src.w/(GLfloat)spr->Width;
+	GLfloat w = (GLfloat)src.w/(GLfloat)spr->Frame.w;
 	GLfloat h = (GLfloat)src.h/(GLfloat)spr->Height;
 	GLfloat textureCoords[] = { /* lower left */ x, y, /* lower right */x + w, y,
 								/* top left */ x, y + h, /* top right */ x + w, y + h };
@@ -533,8 +533,8 @@ static Region ClipSprite(const Sprite2D &sprite, const Region &clip, const int t
 
 void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
 {
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
+	int tx = x - spr->Frame.x;
+	int ty = y - spr->Frame.y;
 	tx -= Viewport.x;
 	ty -= Viewport.y;
 	unsigned int blitFlags = 0;
@@ -542,7 +542,7 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 	if (flags & TILE_GREY) blitFlags |= BLIT_GREY;
 	if (flags & TILE_SEPIA) blitFlags |= BLIT_SEPIA;
 
-	int w = spr->Width, h = spr->Height, dx = 0, dy = 0;
+	int w = spr->Frame.w, h = spr->Height, dx = 0, dy = 0;
 	if (clip) {
 		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
 		w = clippedTile.w;
@@ -572,8 +572,8 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, i
 void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								   SpriteCover* cover, Palette *palette, const Region* clip, bool anchor)
 {
-	int tx = x - spr->XPos;
-	int ty = y - spr->YPos;
+	int tx = x - spr->Frame.x;
+	int ty = y - spr->Frame.y;
 	if (!anchor) 
 	{
 		tx -= Viewport.x;
@@ -586,20 +586,20 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 	{
 		if (cover)
 		{
-			int trueX = cover->XPos - glSprite->XPos;
-			int trueY = cover->YPos - glSprite->YPos;
-			Uint8* data = new Uint8[glSprite->Width*glSprite->Height];
-			Uint8* coverPointer = &cover->pixels[trueY*glSprite->Width + trueX];
+			int trueX = cover->Frame.x - glSprite->Frame.x;
+			int trueY = cover->Frame.y - glSprite->Frame.y;
+			Uint8* data = new Uint8[glSprite->Frame.w*glSprite->Height];
+			Uint8* coverPointer = &cover->pixels[trueY*glSprite->Frame.w + trueX];
 			Uint8* dataPointer = data;
 			for(int h=0; h<glSprite->Height; h++)
 			{
-				for(int w=0; w<glSprite->Width; w++)
+				for(int w=0; w<glSprite->Frame.w; w++)
 				{
 					*dataPointer = !(*coverPointer) * 255;
 					dataPointer++;
 					coverPointer++;
 				}
-				coverPointer += cover->Width - glSprite->Width;
+				coverPointer += cover->Frame.w - glSprite->Frame.w;
 			}
 			glActiveTexture(GL_TEXTURE2);
 			glGenTextures(1, &coverTexture);
@@ -612,13 +612,13 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 #ifdef USE_GL
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #endif
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, glSprite->Width, glSprite->Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, glSprite->Frame.w, glSprite->Height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*) data);
 			delete[] data;
 			flags |= BLIT_EXTERNAL_MASK;
 		}
 	}
 
-	int w = glSprite->Width, h = glSprite->Height, dx = 0, dy = 0;
+	int w = glSprite->Frame.w, h = glSprite->Height, dx = 0, dy = 0;
 	if (clip) {
 		Region clippedTile = ClipSprite(*spr, *clip, tx, ty);
 		w = clippedTile.w;

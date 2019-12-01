@@ -499,8 +499,8 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		sca->SetBlend();
 		sca->SetDelay(AI_UPDATE_TIME*delay);
 		sca->SetDefaultDuration(AI_UPDATE_TIME*duration);
-		sca->XPos+=fx->PosX+offset.x;
-		sca->YPos+=fx->PosY+offset.y;
+		sca->Frame.x+=fx->PosX+offset.x;
+		sca->Frame.y+=fx->PosY+offset.y;
 		area->AddVVCell(sca);
 	}
 */

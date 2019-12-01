@@ -302,7 +302,7 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
 	int tmp = 64;
-	if (p.x > vpOrigin.x + frame.w - (tmp + spr->Width)) {
+	if (p.x > vpOrigin.x + frame.w - (tmp + spr->Frame.w)) {
 		p.x = vpOrigin.x + frame.w - tmp;
 		draw |= D_RIGHT;
 	}
@@ -314,7 +314,7 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 	}
 
 	tmp = mwinframe.h + 48;
-	if (p.y > vpOrigin.y + frame.h - (tmp + spr->Height)) {
+	if (p.y > vpOrigin.y + frame.h - (tmp + spr->Frame.h)) {
 		p.y = vpOrigin.y + frame.h - tmp;
 		draw |= D_BOTTOM;
 	}

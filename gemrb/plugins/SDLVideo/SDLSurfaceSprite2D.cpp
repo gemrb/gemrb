@@ -25,15 +25,15 @@
 
 namespace GemRB {
 
-SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pixels,
+SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, int Bpp, void* pixels,
 										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
-	: Sprite2D(Width, Height, Bpp, pixels)
+	: Sprite2D(rgn, Bpp, pixels)
 {
 	if (pixels) {
-		surface = new SurfaceHolder(SDL_CreateRGBSurfaceFrom( pixels, Width, Height, Bpp < 8 ? 8 : Bpp, Width * ( Bpp / 8 ),
+		surface = new SurfaceHolder(SDL_CreateRGBSurfaceFrom( pixels, Frame.w, Frame.h, Bpp < 8 ? 8 : Bpp, Frame.w * ( Bpp / 8 ),
 										   rmask, gmask, bmask, amask ));
 	} else {
-		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Width, Height, Bpp < 8 ? 8 : Bpp, rmask, gmask, bmask, amask));
+		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Frame.w, Frame.h, Bpp < 8 ? 8 : Bpp, rmask, gmask, bmask, amask));
 		SDL_FillRect(*surface, NULL, 0);
 	}
 
@@ -42,11 +42,11 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pi
 	version = 0;
 }
 
-SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp,
+SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, int Bpp,
 										Uint32 rmask, Uint32 gmask, Uint32 bmask, Uint32 amask)
-: Sprite2D(Width, Height, Bpp, NULL)
+: Sprite2D(rgn, Bpp, NULL)
 {
-	surface = new SurfaceHolder(SDL_CreateRGBSurface( 0, Width, Height, Bpp < 8 ? 8 : Bpp,
+	surface = new SurfaceHolder(SDL_CreateRGBSurface( 0, Frame.w, Frame.h, Bpp < 8 ? 8 : Bpp,
 													 rmask, gmask, bmask, amask ));
 	SDL_FillRect(*surface, NULL, 0);
 
@@ -64,10 +64,10 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	surface = new SurfaceHolder(
 			SDL_CreateRGBSurfaceFrom(
 				pixels,
-				Width,
-				Height,
+				Frame.w,
+				Frame.h,
 				Bpp < 8 ? 8 : Bpp,
-				Width * ( Bpp / 8 ),
+				Frame.w * ( Bpp / 8 ),
 				fmt->Rmask,
 				fmt->Gmask,
 				fmt->Bmask,
@@ -220,7 +220,7 @@ bool SDLSurfaceSprite2D::HasTransparency() const
 
 Color SDLSurfaceSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
-	if (x >= Width || y >= Height) return Color();
+	if (x >= Frame.w || y >= Frame.h) return Color();
 
 	return SDLVideoDriver::GetSurfacePixel(*surface, x, y);
 }
@@ -234,7 +234,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 		if (fmt != SDL_PIXELFORMAT_UNKNOWN) {
 			SDL_Surface* ns = SDL_ConvertSurfaceFormat( *surface, fmt, 0);
 #else
-		SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Width, Height, bpp, rmask, gmask, bmask, amask);
+		SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Frame.w, Frame.h, bpp, rmask, gmask, bmask, amask);
 		if (tmp) {
 			SDL_Surface* ns = SDL_ConvertSurface( *surface, tmp->format, 0);
 			SDL_FreeSurface(tmp);
@@ -307,16 +307,16 @@ void* SDLSurfaceSprite2D::NewVersion(unsigned int newversion) const
 }
 
 #if SDL_VERSION_ATLEAST(1,3,0)
-SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
+SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, int Bpp, void* pixels,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
-: SDLSurfaceSprite2D(Width, Height, Bpp, pixels, rmask, gmask, bmask, amask)
+: SDLSurfaceSprite2D(rgn, Bpp, pixels, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
 }
 
-SDLTextureSprite2D::SDLTextureSprite2D(int Width, int Height, int Bpp,
+SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, int Bpp,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
-: SDLSurfaceSprite2D(Width, Height, Bpp, rmask, gmask, bmask, amask)
+: SDLSurfaceSprite2D(rgn, Bpp, rmask, gmask, bmask, amask)
 {
 	texture = NULL;
 }

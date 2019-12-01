@@ -55,9 +55,9 @@ protected:
 	mutable version_t version;
 
 public:
-	SDLSurfaceSprite2D(int Width, int Height, int Bpp, void* pixels,
+	SDLSurfaceSprite2D(const Region&, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLSurfaceSprite2D(int Width, int Height, int Bpp,
+	SDLSurfaceSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
 	SDLSurfaceSprite2D* copy() const;
@@ -107,9 +107,9 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable Holder<TextureHolder> texture;
 
 public:
-	SDLTextureSprite2D(int Width, int Height, int Bpp, void* pixels,
+	SDLTextureSprite2D(const Region&, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLTextureSprite2D(int Width, int Height, int Bpp,
+	SDLTextureSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLTextureSprite2D(const SDLTextureSprite2D& obj);
 	SDLTextureSprite2D* copy() const;

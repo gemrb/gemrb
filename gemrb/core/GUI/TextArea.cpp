@@ -325,7 +325,7 @@ Region TextArea::UpdateTextFrame()
 
 		if (AnimPicture) {
 			// shrink and shift the container to accommodate the image
-			r.x = AnimPicture->Width;
+			r.x = AnimPicture->Frame.w;
 			r.w -= r.x;
 		} else {
 			r.x = 0;

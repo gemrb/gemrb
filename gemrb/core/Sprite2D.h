@@ -56,13 +56,14 @@ protected:
 	void* pixels;
 
 public:
-	int XPos, YPos, Width, Height, Bpp;
+	Region Frame;
+	int Bpp;
 
 	bool BAM;
 	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
 	ieDword renderFlags;
 
-	Sprite2D(int Width, int Height, int Bpp, void* pixels);
+	Sprite2D(const Region&, int Bpp, void* pixels);
 	Sprite2D(const Sprite2D &obj);
 	virtual Sprite2D* copy() const = 0;
 	virtual ~Sprite2D();

@@ -161,7 +161,7 @@ void View::DirtyBGRect(const Region& r)
 		return;
 
 	// do we want to intersect this too?
-	//Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
+	//Region bgRgn = Region(background->Frame.x, background->Frame.y, background->Frame.w, background->Height);
 	Region clip(Point(), Dimensions());
 	Region dirty = r.Intersect(clip);
 	dirtyBGRects.push_back(dirty);
@@ -190,13 +190,12 @@ void View::DrawBackground(const Region* rgn) const
 	if (background) {
 		Video* video = core->GetVideoDriver();
 		if (rgn) {
-			Region bgRgn = Region(background->XPos, background->YPos, background->Width, background->Height);
-			Region intersect = rgn->Intersect(bgRgn);
+			Region intersect = rgn->Intersect(background->Frame);
 			Point screenPt = ConvertPointToWindow(intersect.Origin());
 			Region toClip(screenPt, intersect.Dimensions());
 			video->BlitSprite( background.get(), intersect, toClip);
 		} else {
-			Point dp = ConvertPointToWindow(Point(background->XPos, background->YPos));
+			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
 			video->BlitSprite( background.get(), dp.x, dp.y );
 		}
 	}

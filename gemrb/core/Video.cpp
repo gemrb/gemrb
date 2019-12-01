@@ -182,13 +182,13 @@ Sprite2D* Video::MirrorSprite(const Sprite2D* sprite, unsigned int flags, bool M
 	if (flags&BLIT_MIRRORX) {
 		dest->renderFlags ^= BLIT_MIRRORX;
 		if (MirrorAnchor)
-			dest->XPos = sprite->Width - sprite->XPos;
+			dest->Frame.x = sprite->Frame.w - sprite->Frame.x;
 	}
 
 	if (flags&BLIT_MIRRORY) {
 		dest->renderFlags ^= BLIT_MIRRORY;
 		if (MirrorAnchor)
-			dest->YPos = sprite->Height - sprite->YPos;
+			dest->Frame.y = sprite->Frame.h - sprite->Frame.y;
 	}
 
 	return dest;
@@ -203,14 +203,14 @@ bool Video::GetFullscreenMode() const
 void Video::BlitSprite(const Sprite2D* spr, int x, int y,
 								const Region* clip)
 {
-	Region dst(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
+	Region dst(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
 	Region fClip = ClippedDrawingRect(dst, clip);
 
 	if (fClip.Dimensions().IsEmpty()) {
 		return; // already know blit fails
 	}
 
-	Region src(0, 0, spr->Width, spr->Height);
+	Region src(0, 0, spr->Frame.w, spr->Frame.h);
 	// adjust the src region to account for the clipping
 	src.x += fClip.x - dst.x; // the left edge
 	src.w -= dst.w - fClip.w; // the right edge
@@ -221,19 +221,19 @@ void Video::BlitSprite(const Sprite2D* spr, int x, int y,
 
 	// just pass fclip as dst
 	// since the next stage is also public, we must readd the Pos becuase it will again be removed
-	fClip.x += spr->XPos;
-	fClip.y += spr->YPos;
+	fClip.x += spr->Frame.x;
+	fClip.y += spr->Frame.y;
 	BlitSprite(spr, src, fClip);
 }
 
 void Video::BlitTiled(Region rgn, const Sprite2D* img)
 {
-	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
-	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
+	int xrep = ( rgn.w + img->Frame.w - 1 ) / img->Frame.w;
+	int yrep = ( rgn.h + img->Frame.h - 1 ) / img->Frame.h;
 	for (int y = 0; y < yrep; y++) {
 		for (int x = 0; x < xrep; x++) {
-			BlitSprite(img, rgn.x + (x*img->Width),
-				 rgn.y + (y*img->Height), &rgn);
+			BlitSprite(img, rgn.x + (x*img->Frame.w),
+				 rgn.y + (y*img->Frame.h), &rgn);
 		}
 	}
 }
@@ -260,18 +260,18 @@ Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 	if (!sprite)
 		return 0;
 
-	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
+	unsigned int *pixels = (unsigned int *) malloc (sprite->Frame.w * sprite->Frame.h * 4);
 	int i=0;
-	for (int y = 0; y < sprite->Height; y++) {
-		for (int x = 0; x < sprite->Width; x++) {
+	for (int y = 0; y < sprite->Frame.h; y++) {
+		for (int x = 0; x < sprite->Frame.w; x++) {
 			int sum = 0;
 			int cnt = 0;
 			for (int xx=x-3;xx<=x+3;xx++) {
 				for(int yy=y-3;yy<=y+3;yy++) {
 					if (((xx==x-3) || (xx==x+3)) &&
 					    ((yy==y-3) || (yy==y+3))) continue;
-					if (xx < 0 || xx >= sprite->Width) continue;
-					if (yy < 0 || yy >= sprite->Height) continue;
+					if (xx < 0 || xx >= sprite->Frame.w) continue;
+					if (yy < 0 || yy >= sprite->Frame.h) continue;
 					cnt++;
 					if (sprite->IsPixelTransparent(xx, yy))
 						sum++;
@@ -282,14 +282,14 @@ Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 			pixels[i++]=tmp;
 		}
 	}
-	return CreateSprite( sprite->Width, sprite->Height, 32, 0xFF000000,
+	return CreateSprite( sprite->Frame.w, sprite->Frame.h, 32, 0xFF000000,
 		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
 Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 {
-	unsigned int Width = sprite->Width / ratio;
-	unsigned int Height = sprite->Height / ratio;
+	unsigned int Width = sprite->Frame.w / ratio;
+	unsigned int Height = sprite->Frame.h / ratio;
 
 	unsigned int* pixels = (unsigned int *) malloc( Width * Height * 4 );
 	int i = 0;
@@ -305,8 +305,8 @@ Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 	Sprite2D* small = CreateSprite( Width, Height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
 0xff000000, pixels, false, 0 );
 
-	small->XPos = sprite->XPos / ratio;
-	small->YPos = sprite->YPos / ratio;
+	small->Frame.x = sprite->Frame.x / ratio;
+	small->Frame.y = sprite->Frame.y / ratio;
 
 	return small;
 }
@@ -334,8 +334,8 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 
 	Sprite2D* light = CreateSprite( radius*2, radius*2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
 
-	light->XPos = radius;
-	light->YPos = radius;
+	light->Frame.x = radius;
+	light->Frame.y = radius;
 
 	return light;
 }

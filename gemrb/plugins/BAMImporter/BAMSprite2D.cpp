@@ -25,9 +25,9 @@
 
 namespace GemRB {
 
-BAMSprite2D::BAMSprite2D(int Width, int Height, void* pixels,
+BAMSprite2D::BAMSprite2D(const Region& rgn, void* pixels,
 						 bool rle, Palette* palette, ieDword ck)
-	: Sprite2D(Width, Height, 8, pixels)
+	: Sprite2D(rgn, 8, pixels)
 {
 	palette->acquire();
 	pal = palette;
@@ -87,14 +87,14 @@ void BAMSprite2D::SetPalette(Palette* palette)
 Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
 	Color c;
-	if (x >= Width || y >= Height) return c;
+	if (x >= Frame.w || y >= Frame.h) return c;
 
 	if (renderFlags&BLIT_MIRRORY)
-		y = Height - y - 1;
+		y = Frame.h - y - 1;
 	if (renderFlags&BLIT_MIRRORX)
-		x = Width - x - 1;
+		x = Frame.w - x - 1;
 
-	int skipcount = y * Width + x;
+	int skipcount = y * Frame.w + x;
 
 	const ieByte *rle = (const ieByte*)pixels;
 	if (RLE) {

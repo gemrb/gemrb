@@ -256,7 +256,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 }
 
 ImageSpan::ImageSpan(Sprite2D* im)
-	: Content(Size(im->Width, im->Height))
+	: Content(im->Frame.Dimensions())
 {
 	assert(im);
 	im->acquire();
@@ -692,7 +692,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 		video->SetScreenClip(NULL);
 
 		Sprite2D* cursor = core->GetCursorSprite();
-		video->BlitSprite(cursor, drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->YPos);
+		video->BlitSprite(cursor, drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
 		cursor->release();
 
 		video->SetScreenClip(&sc);
@@ -753,7 +753,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		video->SetScreenClip(NULL);
 
 		Sprite2D* cursor = core->GetCursorSprite();
-		video->BlitSprite(cursor, p.x + dp.x, p.y + dp.y + cursor->YPos);
+		video->BlitSprite(cursor, p.x + dp.x, p.y + dp.y + cursor->Frame.y);
 		cursor->release();
 
 		video->SetScreenClip(&sc);

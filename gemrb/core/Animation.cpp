@@ -78,10 +78,10 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 	Sprite2D::FreeSprite(frames[index]);
 	frames[index]=frame;
 
-	int x = -frame->XPos;
-	int y = -frame->YPos;
-	int w = frame->Width;
-	int h = frame->Height;
+	int x = -frame->Frame.x;
+	int y = -frame->Frame.y;
+	int w = frame->Frame.w;
+	int h = frame->Frame.h;
 	if (x < animArea.x) {
 		animArea.w += (animArea.x - x);
 		animArea.x = x;

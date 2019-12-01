@@ -517,12 +517,12 @@ void WindowManager::DrawWindowFrame() const
 		// we assume if one fails, they all do
 		video->BlitSprite(edge, 0, 0);
 		edge = WinFrameEdge(1); // right
-		int sideW = edge->Width;
+		int sideW = edge->Frame.w;
 		video->BlitSprite(edge, screen.w - sideW, 0);
 		edge = WinFrameEdge(2); // top
 		video->BlitSprite(edge, sideW, 0);
 		edge = WinFrameEdge(3); // bottom
-		video->BlitSprite(edge, sideW, screen.h - edge->Height);
+		video->BlitSprite(edge, sideW, screen.h - edge->Frame.h);
 	}
 }
 

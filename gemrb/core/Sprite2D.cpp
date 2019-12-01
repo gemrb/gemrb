@@ -26,14 +26,12 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, void* pixels)
-	: pixels(pixels), Width(Width), Height(Height), Bpp(Bpp)
+Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
+	: pixels(pixels), Frame(rgn), Bpp(Bpp)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
 	RLE = false;
-	XPos = 0;
-	YPos = 0;
 	RefCount = 1;
 	renderFlags = 0;
 }
@@ -44,10 +42,7 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 	RLE = false;
 	RefCount = 1;
 
-	XPos = obj.XPos;
-	YPos = obj.YPos;
-	Width = obj.Width;
-	Height = obj.Height;
+	Frame = obj.Frame;
 	Bpp = obj.Bpp;
 	renderFlags = obj.renderFlags;
 

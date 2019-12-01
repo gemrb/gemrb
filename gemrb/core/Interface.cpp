@@ -4288,8 +4288,8 @@ Sprite2D *Interface::GetCursorSprite()
 	{
 		if(HasFeature(GF_OVERRIDE_CURSORPOS))
 		{
-			spr->XPos=1;
-			spr->YPos=spr->Height-1;
+			spr->Frame.x=1;
+			spr->Frame.y=spr->Frame.h-1;
 		}
 	}
 	return spr;

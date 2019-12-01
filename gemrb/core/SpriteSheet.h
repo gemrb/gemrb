@@ -32,7 +32,7 @@ namespace GemRB {
 template <typename KeyType>
 class SpriteSheet {
 protected:
-	Region SheetRegion;
+	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
 	SpriteSheet() {
@@ -45,7 +45,7 @@ public:
 public:
 	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
 		Sheet->acquire();
-		SheetRegion = Region(0,0, Sheet->Width, Sheet->Height);
+		SheetRegion = Sheet->Frame;
 	};
 	virtual ~SpriteSheet() {
 		if (Sheet) Sheet->release();

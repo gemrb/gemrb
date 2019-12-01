@@ -8198,7 +8198,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 		if (anim)
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame && bbox.IntersectsRegion( vp ) ) {
-			if (!newsc || !newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
+			if (!newsc || !newsc->Covers(cx, cy, nextFrame->Frame.x, nextFrame->Frame.y, nextFrame->Frame.w, nextFrame->Frame.h)) {
 				// the first anim contains the animarea for
 				// the entire multi-part animation
 				newsc = area->BuildSpriteCover(cx,
@@ -8207,7 +8207,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 					anims[0]->animArea.w,
 					anims[0]->animArea.h, WantDither() );
 			}
-			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
+			assert(newsc->Covers(cx, cy, nextFrame->Frame.x, nextFrame->Frame.y, nextFrame->Frame.w, nextFrame->Frame.h));
 
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
 			video->BlitGameSpriteWithPalette(nextFrame, palette,
@@ -8531,10 +8531,10 @@ void Actor::Draw(const Region& vp)
 		if (nextFrame && lastFrame != nextFrame) {
 			Region newBBox;
 			if (PartCount == 1) {
-				newBBox.x = cx - nextFrame->XPos;
-				newBBox.w = nextFrame->Width;
-				newBBox.y = cy - nextFrame->YPos;
-				newBBox.h = nextFrame->Height;
+				newBBox.x = cx - nextFrame->Frame.x;
+				newBBox.w = nextFrame->Frame.w;
+				newBBox.y = cy - nextFrame->Frame.y;
+				newBBox.h = nextFrame->Frame.h;
 			} else {
 				// FIXME: currently using the animarea instead
 				// of the real bounding box of this (multi-part) frame.

@@ -96,7 +96,7 @@ private:
 		for(int i=0; i < IMAGE_COUNT; i++) {
 			Frames[i] = images[i];
 			assert(Frames[i]);
-			s.w = std::max(s.w, Frames[i]->Width);
+			s.w = std::max(s.w, Frames[i]->Frame.w);
 		}
 
 		SetValueRange(0, SliderPxRange());

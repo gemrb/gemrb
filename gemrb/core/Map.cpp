@@ -4065,7 +4065,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();
 		if(covers) {
-			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y + height, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
+			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y + height, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h)) {
 				delete covers[ac];
 
 				// always provide a cover, even if it is 100% transparent

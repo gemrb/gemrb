@@ -121,7 +121,7 @@ void MapControl::WillDraw()
 	}
 
 	if (MapMOS) {
-		const Size mosSize(MapMOS->Width, MapMOS->Height);
+		const Size& mosSize = MapMOS->Frame.Dimensions();
 		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
 		mosRgn = Region(Origin() + center, mosSize);
 	} else {
@@ -192,7 +192,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			Sprite2D* anim = (flags) ? flags->GetFrame(0, mn.color) : NULL;
 			if (anim) {
-				video->BlitSprite( anim, pos.x - anim->Width/2, pos.y - anim->Height/2, &rgn );
+				video->BlitSprite( anim, pos.x - anim->Frame.w/2, pos.y - anim->Frame.h/2, &rgn );
 			} else {
 				video->DrawEllipse( pos, 6, 5, mn.GetColor() );
 			}
@@ -242,7 +242,7 @@ const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
 	Size mapsize = MyMap->GetSize();
 
 	float scalar = float(mapsize.w) / mosRgn.w;
-	unsigned int radius = (flags) ? (flags->GetFrame(0)->Width / 2) * scalar : 5 * scalar;
+	unsigned int radius = (flags) ? (flags->GetFrame(0)->Frame.w / 2) * scalar : 5 * scalar;
 
 	return MyMap->MapNoteAtPoint(gamePoint, radius);
 }

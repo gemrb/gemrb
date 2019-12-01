@@ -30,8 +30,8 @@ SpriteCover::SpriteCover(const Point& wp, const Region& rgn, int dither)
 {
 	this->dither = dither;
 	mask = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h, NULL, NULL);
-	mask->XPos = rgn.x;
-	mask->YPos = rgn.y;
+	mask->Frame.x = rgn.x;
+	mask->Frame.y = rgn.y;
 }
 
 SpriteCover::~SpriteCover()
@@ -46,10 +46,10 @@ bool SpriteCover::Covers(int x, int y, int xpos, int ypos,
 	if (x != wp.x || y != wp.y) return false;
 
 	// top-left not covered
-	if (xpos > mask->XPos || ypos > mask->YPos) return false;
+	if (xpos > mask->Frame.x || ypos > mask->Frame.y) return false;
 
 	// bottom-right not covered
-	if (width-xpos > mask->Width - mask->XPos || height - ypos > mask->Height - mask->YPos) return false;
+	if (width-xpos > mask->Frame.w - mask->Frame.x || height - ypos > mask->Frame.h - mask->Frame.y) return false;
 
 	return true;
 }
@@ -63,8 +63,8 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 	// advantages: faster
 	// disadvantages: makes the blitter much more complex
 
-	int xoff = wp.x - mask->XPos;
-	int yoff = wp.y - mask->YPos;
+	int xoff = wp.x - mask->Frame.x;
+	int yoff = wp.y - mask->Frame.y;
 
 	unsigned char* srcdata = static_cast<unsigned char*>(mask->LockSprite());
 
@@ -76,7 +76,7 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 		int y_bot = iter->y2 - yoff; // exclusive
 
 		if (y_top < 0) y_top = 0;
-		if ( y_bot > mask->Height) y_bot = mask->Height;
+		if ( y_bot > mask->Frame.h) y_bot = mask->Frame.h;
 		if (y_top >= y_bot) continue; // clipped
 
 		int ledge = iter->left_edge;
@@ -86,7 +86,7 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 		Point& c = poly->points[redge];
 		Point& d = poly->points[(redge+1)%(poly->count)];
 
-		unsigned char* line = srcdata + (y_top)*mask->Width;
+		unsigned char* line = srcdata + (y_top)*mask->Frame.w;
 		for (int sy = y_top; sy < y_bot; ++sy) {
 			int py = sy + yoff;
 
@@ -100,8 +100,8 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 			rt -= xoff;
 
 			if (lt < 0) lt = 0;
-			if (rt > mask->Width) rt = mask->Width;
-			if (lt >= rt) { line += mask->Width; continue; } // clipped
+			if (rt > mask->Frame.w) rt = mask->Frame.w;
+			if (lt >= rt) { line += mask->Frame.w; continue; } // clipped
 			bool doDither;
 
 			if (dither == 1) {
@@ -111,7 +111,7 @@ void SpriteCover::AddPolygon(Wall_Polygon* poly)
 			}
 
 			memset (line+lt, (doDither) ? 0x80 : 0xff, rt-lt);
-			line += mask->Width;
+			line += mask->Frame.w;
 		}
 	}
 

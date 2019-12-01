@@ -301,8 +301,8 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx, covery;
 	if (COVER) {
-		coverx = cover->XPos - spr->XPos;
-		covery = cover->YPos - spr->YPos;
+		coverx = cover->Frame.x - spr->Frame.x;
+		covery = cover->Frame.y - spr->Frame.y;
 	}
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
@@ -311,14 +311,14 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	assert(clip.w > 0 && clip.h > 0);
 	assert(clip.x >= tx);
 	assert(clip.y >= ty);
-	assert(clip.x + clip.w <= tx + spr->Width);
-	assert(clip.y + clip.h <= ty + spr->Height);
+	assert(clip.x + clip.w <= tx + spr->Frame.w);
+	assert(clip.y + clip.h <= ty + spr->Frame.h);
 
 	if (COVER) {
 		assert(tx >= tx - coverx);
 		assert(ty >= ty - coverx);
-		assert(tx + spr->Width <= tx - coverx + cover->Width);
-		assert(ty + spr->Height <= ty - covery + cover->Height);
+		assert(tx + spr->Frame.w <= tx - coverx + cover->Frame.w);
+		assert(ty + spr->Frame.h <= ty - covery + cover->Frame.h);
 	}
 
 
@@ -350,12 +350,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->LockSprite() + covery*cover->Width;
+			coverline = (Uint8*)cover->LockSprite() + covery*cover->Frame.w;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->LockSprite() + (covery+height-1)*cover->Width;
+			coverline = (Uint8*)cover->LockSprite() + (covery+height-1)*cover->Frame.w;
 	}
 	if (!XFLIP) {
 		pix = line + tx;
@@ -464,7 +464,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += yfactor * cover->Width - xfactor * width;
+			coverpix += yfactor * cover->Frame.w - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
@@ -492,8 +492,8 @@ static void BlitSprite_internal(SDL_Surface* target,
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx, covery;
 	if (COVER) {
-		coverx = cover->XPos - spr->XPos;
-		covery = cover->YPos - spr->YPos;
+		coverx = cover->Frame.x - spr->Frame.x;
+		covery = cover->Frame.y - spr->Frame.y;
 	}
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
@@ -502,14 +502,14 @@ static void BlitSprite_internal(SDL_Surface* target,
 	assert(clip.w > 0 && clip.h > 0);
 	assert(clip.x >= tx);
 	assert(clip.y >= ty);
-	assert(clip.x + clip.w <= tx + spr->Width);
-	assert(clip.y + clip.h <= ty + spr->Height);
+	assert(clip.x + clip.w <= tx + spr->Frame.w);
+	assert(clip.y + clip.h <= ty + spr->Frame.h);
 
 	if (COVER) {
 		assert(tx >= tx - coverx);
 		assert(ty >= ty - coverx);
-		assert(tx + spr->Width <= tx - coverx + cover->Width);
-		assert(ty + spr->Height <= ty - covery + cover->Height);
+		assert(tx + spr->Frame.w <= tx - coverx + cover->Frame.w);
+		assert(ty + spr->Frame.h <= ty - covery + cover->Frame.h);
 	}
 
 
@@ -519,15 +519,15 @@ static void BlitSprite_internal(SDL_Surface* target,
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + clip.y*pitch;
 		end = line + clip.h*pitch;
-		srcdata += (clip.y - ty)*spr->Width;
+		srcdata += (clip.y - ty)*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + covery)*cover->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + covery)*cover->Frame.w;
 	} else {
 		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 		end = line - clip.h*pitch;
-		srcdata += (ty + spr->Height - (clip.y + clip.h))*spr->Width;
+		srcdata += (ty + spr->Frame.h - (clip.y + clip.h))*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->Width;
+			coverpix = (Uint8*)cover->LockSprite() + (clip.y - ty + clip.h + covery - 1)*cover->Frame.w;
 	}
 
 	PTYPE *pix, *endpix;
@@ -540,7 +540,7 @@ static void BlitSprite_internal(SDL_Surface* target,
 	} else {
 		pix = line + clip.x + clip.w - 1;
 		endpix = pix - clip.w;
-		srcdata += tx + spr->Width - (clip.x + clip.w);
+		srcdata += tx + spr->Frame.w - (clip.x + clip.w);
 		if (COVER)
 			coverpix += clip.x - tx + clip.w + coverx - 1;
 	}
@@ -584,7 +584,7 @@ static void BlitSprite_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * cover->Width - xfactor * clip.w;
+			coverpix += yfactor * cover->Frame.w - xfactor * clip.w;
 	}
 
 	if (COVER)

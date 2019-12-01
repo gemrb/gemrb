@@ -345,7 +345,7 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Width, Height, 24,
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 
 	SDL_Surface* surface = screenshot->GetSurface();

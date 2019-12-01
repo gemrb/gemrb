@@ -99,20 +99,20 @@ void Container::CreateGroundIconCover()
 
 	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
 		if (groundicons[i]) {
-			Sprite2D& spr = *groundicons[i];
-			if (xpos < spr.XPos) {
-				width += spr.XPos - xpos;
-				xpos = spr.XPos;
+			const Region& sprrgn = groundicons[i]->Frame;
+			if (xpos < sprrgn.x) {
+				width += sprrgn.x - xpos;
+				xpos = sprrgn.x;
 			}
-			if (ypos < spr.YPos) {
-				height += spr.YPos - ypos;
-				ypos = spr.YPos;
+			if (ypos < sprrgn.y) {
+				height += sprrgn.y - ypos;
+				ypos = sprrgn.y;
 			}
-			if (width-xpos < spr.Width-spr.XPos) {
-				width = spr.Width-spr.XPos+xpos;
+			if (width-xpos < sprrgn.w - sprrgn.x) {
+				width = sprrgn.w - sprrgn.x + xpos;
 			}
-			if (height-ypos < spr.Height-spr.YPos) {
-				height = spr.Height-spr.YPos+ypos;
+			if (height-ypos < sprrgn.h - sprrgn.y) {
+				height = sprrgn.h - sprrgn.y + ypos;
 			}
 		}
 	}

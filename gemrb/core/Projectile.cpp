@@ -1802,7 +1802,7 @@ void Projectile::DrawTravel(const Region& viewport)
 			if (travel[i]) {
 				Sprite2D *frame = travel[i]->NextFrame();
 				Draw(frame, pos, flags, tint2);
-				pos.y-=frame->YPos;
+				pos.y-=frame->Frame.y;
 			}
 		}
 	} else {

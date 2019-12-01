@@ -124,7 +124,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture.get(), xOffs + AnimPicture->XPos, yOffs + AnimPicture->YPos, &rgn );
+			video->BlitSprite( AnimPicture.get(), xOffs + AnimPicture->Frame.x, yOffs + AnimPicture->Frame.y, &rgn );
 		}
 	}
 
@@ -138,10 +138,10 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Sprite2D *icon=m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		int h=0,w=0,xpos=0,ypos=0;
 		if (icon) {
-			h=icon->Height;
-			w=icon->Width;
-			xpos=icon->XPos;
-			ypos=icon->YPos;
+			h=icon->Frame.h;
+			w=icon->Frame.w;
+			xpos=icon->Frame.x;
+			ypos=icon->Frame.y;
 			Sprite2D::FreeSprite( icon );
 		}
 
@@ -179,8 +179,8 @@ void WorldMapControl::ScrollTo(const Point& pos)
 	WorldMap* worldmap = core->GetWorldMap();
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
 
-	int maxx = MapMOS->Width - frame.w;
-	int maxy = MapMOS->Height - frame.h;
+	int maxx = MapMOS->Frame.w - frame.w;
+	int maxy = MapMOS->Frame.h - frame.h;
 	Pos.x = Clamp<int>(Pos.x, 0, maxx);
 	Pos.y = Clamp<int>(Pos.y, 0, maxy);
 
@@ -211,10 +211,10 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			Sprite2D *icon=ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
 			Region rgn(ae->X, ae->Y, 0, 0);
 			if (icon) {
-				rgn.x -= icon->XPos;
-				rgn.y -= icon->YPos;
-				rgn.w = icon->Width;
-				rgn.h = icon->Height;
+				rgn.x -= icon->Frame.x;
+				rgn.y -= icon->Frame.y;
+				rgn.w = icon->Frame.w;
+				rgn.h = icon->Frame.h;
 				Sprite2D::FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {

@@ -69,8 +69,8 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/};
 		for (size_t i = 0; i < 3; i++) {
 			spr = af->GetFrame(0, topIconCycles[i]);
-			if (spr->XPos > 0) // not all datasets are messed up here
-				spr->YPos = spr->XPos;
+			if (spr->Frame.x > 0) // not all datasets are messed up here
+				spr->Frame.y = spr->Frame.x;
 			spr->release();
 		}
 	}
@@ -86,14 +86,14 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	if (isNumeric) {
 		spr = af->GetFrame(0);
 		baseLine = 0;
-		lineHeight = spr->Height;
+		lineHeight = spr->Frame.h;
 		spr->release();
 	} else {
 		spr = af->GetFrame(0, 0);
-		baseLine = spr->Height;
+		baseLine = spr->Frame.h;
 		spr->release();
 		spr = af->GetFrame(0, 1);
-		lineHeight = spr->Height;
+		lineHeight = spr->Frame.h;
 		spr->release();
 	}
 

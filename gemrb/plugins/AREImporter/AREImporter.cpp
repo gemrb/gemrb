@@ -1371,8 +1371,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				// our MapControl wants them in large map space so we must convert
 				// its what other games use and its what our custom map note code uses
 				const Size mapsize = map->GetSize();
-				point.x = px * double(mapsize.w) / map->SmallMap->Width;
-				point.y = py * double(mapsize.h) / map->SmallMap->Height;
+				point.x = px * double(mapsize.w) / map->SmallMap->Frame.w;
+				point.y = py * double(mapsize.h) / map->SmallMap->Frame.h;
 
 				char bytes[501]; // 500 + null
 				str->Read(bytes, 500 );
@@ -2320,10 +2320,10 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 
 		if (pst) {
 			// in PST the coordinates are stored in small map space
-			const Size mapsize = map->GetSize();
-			tmpDword = mn.Pos.x * double(map->SmallMap->Width) / mapsize.w;
+			const Size& mapsize = map->GetSize();
+			tmpDword = mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w;
 			stream->WriteDword( &tmpDword );
-			tmpDword = mn.Pos.y * double(map->SmallMap->Height) / mapsize.h;
+			tmpDword = mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h;
 			stream->WriteDword( &tmpDword );
 
 			int len = 0;

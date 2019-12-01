@@ -152,8 +152,7 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 		assert(data);
 		unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		spr = new BAMSprite2D (frames[findex].Width,
-							   frames[findex].Height,
+		spr = new BAMSprite2D (Region(0,0, frames[findex].Width, frames[findex].Height),
 							   framedata,
 							   RLECompressed,
 							   palette,
@@ -165,8 +164,8 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 			pixels, palette, true, 0 );
 	}
 
-	spr->XPos = (ieWordSigned)frames[findex].XPos;
-	spr->YPos = (ieWordSigned)frames[findex].YPos;
+	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
+	spr->Frame.y = (ieWordSigned)frames[findex].YPos;
 	if (mode == IE_SHADED) {
 		// CHECKME: is this ever used? Should we modify the sprite's palette
 		// without creating a local copy for this sprite?

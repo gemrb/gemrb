@@ -122,7 +122,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
 			// pixels = malloc(size);
 			// memcpy(pixels, GlyphPageData, size);
 		}
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pixels, font->GetPalette().get(), true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite8(Sheet->Frame.w, Sheet->Frame.h, pixels, font->GetPalette().get(), true, 0);
 	}
 
 	SpriteSheet<ieWord>::Draw(chr, dest);
@@ -135,9 +135,8 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 	video->SetScreenClip(NULL);
 	Region drawRgn = Region(0, 0, 1024, Sheet->Height);
 	video->DrawRect(drawRgn, ColorBlack, true);
-	Region sheetSize = Region(0,0, Sheet->Width, Sheet->Height);
-	video->DrawRect(sheetSize.Intersect(r), ColorWhite, false);
-	video->BlitSprite(Sheet, sheetSize.Intersect(r), drawRgn);
+	video->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
+	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn);
 }
 #endif
 
@@ -175,11 +174,11 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);
 	
-	Size size(spr->Width, spr->Height);
-	// FIXME: should we adjust for spr->XPos too?
-	Point pos(0, Baseline - spr->YPos);
+	Size size(spr->Frame.w, spr->Frame.h);
+	// FIXME: should we adjust for spr->Frame.x too?
+	Point pos(0, Baseline - spr->Frame.y);
 
-	Glyph tmp = Glyph(size, pos, (ieByte*)spr->LockSprite(), spr->Width);
+	Glyph tmp = Glyph(size, pos, (ieByte*)spr->LockSprite(), spr->Frame.w);
 	spr->UnlockSprite(); // FIXME: this is assuming it is ok to hang onto to pixel buffer returned from LockSprite()
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
@@ -517,14 +516,14 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	// must ue rgn! the canvas height might be changed in RenderText()
 	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn.w, rgn.h, canvasPx, palette, true, 0);
 	if (alignment&IE_FONT_ALIGN_CENTER) {
-		canvas->XPos = (size.w - rgn.w) / 2;
+		canvas->Frame.x = (size.w - rgn.w) / 2;
 	} else if (alignment&IE_FONT_ALIGN_RIGHT) {
-		canvas->XPos = size.w - rgn.w;
+		canvas->Frame.x = size.w - rgn.w;
 	}
 	if (alignment&IE_FONT_ALIGN_MIDDLE) {
-		canvas->YPos = -(size.h - rgn.h) / 2;
+		canvas->Frame.y = -(size.h - rgn.h) / 2;
 	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
-		canvas->YPos = -(size.h - rgn.h);
+		canvas->Frame.y = -(size.h - rgn.h);
 	}
 	return canvas;
 }

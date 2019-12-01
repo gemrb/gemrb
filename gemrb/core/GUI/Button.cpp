@@ -163,8 +163,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
-			int xOffs = ( frame.w / 2 ) - ( Image->Width / 2 );
-			int yOffs = ( frame.h / 2 ) - ( Image->Height / 2 );
+			int xOffs = ( frame.w / 2 ) - ( Image->Frame.w / 2 );
+			int yOffs = ( frame.h / 2 ) - ( Image->Frame.h / 2 );
 
 			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs );
 		}
@@ -180,19 +180,19 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	int picXPos = 0, picYPos = 0;
 	if (Picture && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		picXPos = ( rgn.w / 2 ) - ( Picture->Width / 2 ) + rgn.x;
-		picYPos = ( rgn.h / 2 ) - ( Picture->Height / 2 ) + rgn.y;
+		picXPos = ( rgn.w / 2 ) - ( Picture->Frame.w / 2 ) + rgn.x;
+		picYPos = ( rgn.h / 2 ) - ( Picture->Frame.h / 2 ) + rgn.y;
 		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
-			picXPos += Picture->XPos;
-			picYPos += Picture->YPos;
+			picXPos += Picture->Frame.x;
+			picYPos += Picture->Frame.y;
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
-			int overlayHeight = Picture->Height * (1.0 - Clipping);
+			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
 			if (overlayHeight < 0)
 				overlayHeight = 0;
-			if (overlayHeight >= Picture->Height)
-				overlayHeight = Picture->Height;
-			int buttonHeight = Picture->Height - overlayHeight;
+			if (overlayHeight >= Picture->Frame.h)
+				overlayHeight = Picture->Frame.h;
+			int buttonHeight = Picture->Frame.h - overlayHeight;
 
 			if (overlayHeight) {
 				// TODO: Add an option to add BLIT_GREY to the flags
@@ -200,23 +200,23 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 				video->BlitGameSprite(Picture, picXPos, picYPos, BLIT_TINTED, col, NULL);
 			}
 
-			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
+			Region rb = Region(picXPos, picYPos, Picture->Frame.w, buttonHeight);
 			video->BlitSprite( Picture, picXPos, picYPos, &rb );
 		}
 		else {
-			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
-			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, &r );
+			Region r( picXPos, picYPos, (int)(Picture->Frame.w * Clipping), Picture->Frame.h );
+			video->BlitSprite( Picture, picXPos + Picture->Frame.x, picYPos + Picture->Frame.y, &r );
 		}
 	}
 
 	// Button animation
 	if (AnimPicture) {
-		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Width * Clipping), AnimPicture->Height );
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, &r );
+			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs + AnimPicture->Frame.x, rgn.y + yOffs + AnimPicture->Frame.y, &r );
 		} else {
 			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs, rgn.y + yOffs, &r );
 		}
@@ -236,8 +236,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			yOffs = 0;
 		} else {
 			// Center the first picture, and align the rest to that
-			xOffs = frame.w / 2 - (*iter)->Width/2 + (*iter)->XPos;
-			yOffs = frame.h / 2 - (*iter)->Height/2 + (*iter)->YPos;
+			xOffs = frame.w / 2 - (*iter)->Frame.w/2 + (*iter)->Frame.x;
+			yOffs = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
@@ -278,7 +278,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT)) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
+			r = Region(picXPos, picYPos, Picture->Frame.w + 1, Picture->Frame.h);
 		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
 				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM |
 					IE_GUI_BUTTON_MULTILINE) & flags) {
@@ -649,7 +649,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	Picture = newpic;
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
-		unsigned int ratio = Picture->Width / frame.w;
+		unsigned int ratio = Picture->Frame.w / frame.w;
 		if (ratio > 1) {
 			Sprite2D *img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
 			Sprite2D::FreeSprite(Picture);
@@ -690,8 +690,8 @@ bool Button::HitTest(const Point& p) const
 		Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
 		if (Picture || PictureList.size() || !Unpressed) return true;
 		
-		int xOffs = ( frame.w / 2 ) - ( Unpressed->Width / 2 );
-		int yOffs = ( frame.h / 2 ) - ( Unpressed->Height / 2 );
+		int xOffs = ( frame.w / 2 ) - ( Unpressed->Frame.w / 2 );
+		int yOffs = ( frame.h / 2 ) - ( Unpressed->Frame.h / 2 );
 		hit = !Unpressed->IsPixelTransparent(p.x - xOffs, p.y - yOffs);
 	}
 	return hit;

@@ -177,7 +177,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	// TODO: do an underline if requested
 
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, palette, true, 0);
-	spr->YPos = FT_FLOOR(metrics->horiBearingY);
+	spr->Frame.y = FT_FLOOR(metrics->horiBearingY);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
 	spr->release();
@@ -211,9 +211,9 @@ TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);
-	blank->Width = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);;
+	blank->Frame.w = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);;
 	CreateGlyphForCharSprite(' ', blank);
-	blank->Width *= 4;
+	blank->Frame.w *= 4;
 	CreateGlyphForCharSprite('\t', blank);
 	blank->release();
 }

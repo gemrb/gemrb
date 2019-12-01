@@ -708,13 +708,13 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	if( SequenceFlags&IE_VVC_NOCOVER) {
 		if (cover) SetSpriteCover(NULL);
 	} else {
-		if (!cover || (Dither!=dither) || (!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height)) ) {
+		if (!cover || (Dither!=dither) || (!cover->Covers(cx, cy, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h)) ) {
 			Dither = dither;
 			Animation *anim = anims[Phase*MAX_ORIENT+Orientation];
 			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anim->animArea.x,
 			-anim->animArea.y, anim->animArea.w, anim->animArea.h, dither) );
 		}
-		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
+		assert(cover->Covers(cx, cy, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h));
 	}
 
 	video->BlitGameSpriteWithPalette(frame, palette, cx - viewport.x, cy - viewport.y, flags, tint, cover);
@@ -798,7 +798,7 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 		return NULL;
 	}
 	ScriptedAnimation * ret = twin;
-	//ret->YPos+=ret->ZPos+1;
+	//ret->Frame.y+=ret->ZPos+1;
 	if (ret->ZPos>=0) {
 		ret->ZPos=-1;
 	}

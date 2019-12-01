@@ -65,15 +65,14 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if(!KnobStepsCount) {
 		//linear progressbar (pst, iwd)
-		int w = BackGround2->Width;
-		int h = BackGround2->Height;
+		const Size& size = BackGround2->Frame.Dimensions();
 		//this is the PST/IWD specific part
-		Count = val*w/100;
-		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
+		Count = val * size.w / 100;
+		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, size.h );
 		core->GetVideoDriver()->BlitSprite( BackGround2.get(), r.x, r.y, &r );
 
 		core->GetVideoDriver()->BlitSprite( PBarCap.get(),
-			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos );
+			rgn.x+CapXPos+Count-PBarCap->Frame.w, rgn.y+CapYPos );
 		return;
 	}
 

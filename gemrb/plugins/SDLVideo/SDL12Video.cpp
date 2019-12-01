@@ -149,11 +149,11 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D*
 
 	int x = dst.x - src.x;
 	int y = dst.y - src.y;
-	int w = spr->Width;
-	int h = spr->Height;
+	int w = spr->Frame.w;
+	int h = spr->Frame.h;
 
-	//int tx = dst.x - spr->XPos;
-	//int ty = dst.y - spr->YPos;
+	//int tx = dst.x - spr->Frame.x;
+	//int ty = dst.y - spr->Frame.y;
 
 	const Uint8* srcdata = (const Uint8*)spr->LockSprite();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
@@ -596,7 +596,7 @@ Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Width, Height, 24,
+	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 	SDL_Surface* screenshotSurface = SDL_DisplayFormat(disp);
 	SDL_Surface* tmp = disp;

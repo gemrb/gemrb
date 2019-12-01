@@ -67,7 +67,7 @@ int ScrollBar::SliderPxRange() const
 
 int ScrollBar::GetFrameHeight(int frame) const
 {
-	return Frames[frame]->Height;
+	return Frames[frame]->Frame.h;
 }
 
 void ScrollBar::ScrollDelta(const Point& delta)
@@ -164,17 +164,17 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
 				video->BlitSprite( Frames[IMAGE_TROUGH].get(),
-					drawFrame.x + Frames[IMAGE_TROUGH]->XPos + ( ( frame.w - Frames[IMAGE_TROUGH]->Width - 1 ) / 2 ),
-					dy + Frames[IMAGE_TROUGH]->YPos, &rgn );
+					drawFrame.x + Frames[IMAGE_TROUGH]->Frame.x + ( ( frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1 ) / 2 ),
+					dy + Frames[IMAGE_TROUGH]->Frame.y, &rgn );
 			}
 		}
 		// draw the slider
-		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Width - 1) / 2 );
+		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
 		// FIXME: doesnt respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
 		video->BlitSprite( Frames[IMAGE_SLIDER].get(),
-						  drawFrame.x + slx + Frames[IMAGE_SLIDER]->XPos,
-						  drawFrame.y + Frames[IMAGE_SLIDER]->YPos + upMy + sly, &drawFrame );
+						  drawFrame.x + slx + Frames[IMAGE_SLIDER]->Frame.x,
+						  drawFrame.y + Frames[IMAGE_SLIDER]->Frame.y + upMy + sly, &drawFrame );
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
@@ -206,7 +206,7 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (p.y >= sliderPos && p.y <= sliderPos + GetFrameHeight(IMAGE_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
 		// scrollbars may share images, so no, we shouldn't do this. need to fix or odd behavior will occur when 2 scrollbars are visible.
-		Frames[IMAGE_SLIDER]->YPos = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
+		Frames[IMAGE_SLIDER]->Frame.y = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
 		return true;
 	}
 	// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
@@ -226,7 +226,7 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	State = 0;
-	Frames[IMAGE_SLIDER]->YPos = 0; //this is to clear any offset incurred by grabbing the slider
+	Frames[IMAGE_SLIDER]->Frame.y = 0; //this is to clear any offset incurred by grabbing the slider
 	return true;
 }
 
@@ -245,7 +245,7 @@ bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
 	if (State&SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		Point slideroffset(Frames[IMAGE_SLIDER]->XPos, Frames[IMAGE_SLIDER]->YPos);
+		Point slideroffset(Frames[IMAGE_SLIDER]->Frame.x, Frames[IMAGE_SLIDER]->Frame.y);
 		// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
 		int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
 		if (State&SLIDER_HORIZONTAL) {

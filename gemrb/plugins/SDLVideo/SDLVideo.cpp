@@ -236,7 +236,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	sprite_t* spr = new sprite_t(w, h, bpp, pixels, rMask, gMask, bMask, aMask);
+	sprite_t* spr = new sprite_t(Region(0,0, w, h), bpp, pixels, rMask, gMask, bMask, aMask);
 
 	if (cK) {
 		spr->SetColorKey(index);
@@ -259,7 +259,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 		return CreatePalettedSprite(w, h, 8, pixels, palette->col, cK, index);
 	} else {
 		// an alpha only sprite. used by SpriteCover or as a mask passed to BlitTile
-		sprite_t* spr = new sprite_t(w, h, 8, pixels, 0, 0, 0, 0);
+		sprite_t* spr = new sprite_t(Region(0,0, w, h), 8, pixels, 0, 0, 0, 0);
 #if SDL_VERSION_ATLEAST(1,3,0)
 		SDL_Surface* mask = spr->GetSurface();
 		for (int i = 0; i < mask->format->palette->ncolors; ++i) {
@@ -277,7 +277,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, void* pixels,
 Sprite2D* SDLVideoDriver::CreatePalettedSprite(int w, int h, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
-	sprite_t* spr = new sprite_t(w, h, bpp, pixels, 0, 0, 0, 0);
+	sprite_t* spr = new sprite_t(Region(0,0, w, h), bpp, pixels, 0, 0, 0, 0);
 
 	spr->SetPalette(palette);
 	if (cK) {
@@ -300,8 +300,8 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region dst)
 {
-	dst.x -= spr->XPos;
-	dst.y -= spr->YPos;
+	dst.x -= spr->Frame.x;
+	dst.y -= spr->Frame.y;
 	BlitSpriteClipped(spr, NULL, src, dst);
 }
 
@@ -309,8 +309,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, const Region* clip)
 {
-	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Width, spr->Height));
-	Region drect = (clip) ? *clip : Region(x - spr->XPos, y - spr->YPos, spr->Width, spr->Height);
+	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Frame.w, spr->Frame.h));
+	Region drect = (clip) ? *clip : Region(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
 	const Sprite2D* mask = (cover) ? cover->GetMask() : NULL;
 	BlitSpriteClipped(spr, mask, srect, drect, flags, &tint);
 }

@@ -53,7 +53,7 @@ void TooltipBackground::Reset()
 {
 	if (animationSpeed) {
 		// the animation starts with the curls side by side
-		animationPos = leftbg->Width + rightbg->Width;
+		animationPos = leftbg->Frame.w + rightbg->Frame.w;
 	} else {
 		animationPos = 9999; // will get clamped at draw times
 	}
@@ -71,7 +71,7 @@ void TooltipBackground::SetAnimationSpeed(int s)
 
 Size TooltipBackground::MaxTextSize() const
 {
-	return Size(background->Width - (margin * 2), background->Height);
+	return Size(background->Frame.w - (margin * 2), background->Frame.h);
 }
 
 void TooltipBackground::Draw(Region rgn) const
@@ -86,12 +86,12 @@ void TooltipBackground::Draw(Region rgn) const
 	Video* video = core->GetVideoDriver();
 
 	// calculate the unrolled region
-	Region bgclip(dp + Point(leftbg->Width, -background->YPos), Size(animationPos+1, background->Height));
-	bgclip.w -= leftbg->Width + rightbg->Width;
+	Region bgclip(dp + Point(leftbg->Frame.w, -background->Frame.y), Size(animationPos+1, background->Frame.h));
+	bgclip.w -= leftbg->Frame.w + rightbg->Frame.w;
 
 	// draw unrolled paper
 	// note that there is transparency at the edges... this will get covered up by the right curl's Xpos offset
-	video->BlitSprite( background.get(), dp.x + background->XPos+3, dp.y, &bgclip );
+	video->BlitSprite( background.get(), dp.x + background->Frame.x+3, dp.y, &bgclip );
 	
 	// draw left paper curl
 	video->BlitSprite( leftbg.get(), dp.x, dp.y );
@@ -103,7 +103,7 @@ void TooltipBackground::Draw(Region rgn) const
 	video->SetScreenClip(&bgclip);
 
 	// advance the animation
-	int maxw = std::min(MaxTextSize().w, rgn.w) + leftbg->Width + rightbg->Width;
+	int maxw = std::min(MaxTextSize().w, rgn.w) + leftbg->Frame.w + rightbg->Frame.w;
 	if (animationPos < maxw ) {
 		animationPos += animationSpeed;
 	} else {
