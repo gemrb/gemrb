@@ -52,13 +52,13 @@ public:
 
 	bool SupportsBAMSprites() { return true; }
 
-	void DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask = false);
-	void DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask = false);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0);
+	void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
 
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool needsMask = false);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0);
 
-	void DrawPoint(const Point& p, const Color& color, bool needsMask = false);
-	void DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask = false);
+	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
 
 	void Flush() {};
 
@@ -69,8 +69,8 @@ private:
 
 	int ProcessEvent(const SDL_Event & event);
 
-	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
-	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false);
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
 	void DrawHLine(short x1, short y, short x2, const Color& color);
 	void DrawVLine(short x, short y1, short y2, const Color& color);
 

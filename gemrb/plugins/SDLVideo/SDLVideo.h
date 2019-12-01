@@ -89,14 +89,14 @@ public:
 								SpriteCover* cover, const Region* clip = NULL);
 
 	/** This functions Draws a Circle */
-	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, bool needsMask = false);
+	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, unsigned int flags = 0);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-		double anglefrom, double angleto, bool drawlines = true, bool needsMask = false);
+		double anglefrom, double angleto, bool drawlines = true, unsigned int flags = 0);
 	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, bool needsMask = false);
+	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0);
 	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, bool needsMask = false);
+	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
 
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
@@ -115,9 +115,9 @@ protected:
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* = NULL);
 
 	using Video::DrawPoints;
-	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false)=0;
+	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
 	using Video::DrawLines;
-	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask = false)=0;
+	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
 
 	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;

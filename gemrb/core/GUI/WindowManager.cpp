@@ -590,10 +590,8 @@ void WindowManager::DrawWindows() const
 			modalWin->Draw();
 		}
 	} else if (FadeColor.a > 0) {
-		winFrameBuf->blend = false;
 		video->PushDrawingBuffer(winFrameBuf);
-		video->DrawRect(screen, FadeColor);
-		winFrameBuf->blend = true;
+		video->DrawRect(screen, FadeColor, BLIT_BLENDED);
 	}
 
 	DrawMouse();

@@ -115,8 +115,10 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
 	return static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
 }
 
-int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
+int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 {
+	// TODO: add support for BLIT_HALFTRANS, BLIT_TINTED, and others (no use for them ATM)
+
 	SDL_Texture* target = CurrentRenderBuffer();
 
 	assert(target);
@@ -136,7 +138,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color)
 	}
 
 	if (color) {
-		if (drawingBuffer->blend) {
+		if (flags&BLIT_BLENDED) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		} else {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
@@ -181,7 +183,7 @@ void SDL20VideoDriver::Flush()
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
-	UpdateRenderTarget();
+	UpdateRenderTarget(NULL, flags);
 
 	// we need to isolate flags that require software rendering to use as the "version"
 	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
@@ -242,7 +244,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask)
+void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -254,35 +256,37 @@ void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color&
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), needsMask);
+	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask)
+void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
 {
 	if (points.empty()) {
 		return;
 	}
-	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
 
-	if (needsMask) {
+	if (flags) {
+		// FIXME: this needs to be moved to stencil buffer
 		SetRendererForMask(color);
 		SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
 	}
 }
 
-void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color, bool needsMask)
+void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int flags)
 {
-	UpdateRenderTarget(&color);
+	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
 
-	if (needsMask) {
+	if (flags) {
+		// FIXME: this needs to be moved to stencil buffer
 		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
 		SDL_RenderDrawPoint(renderer, p.x, p.y);
 	}
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask)
+void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -294,41 +298,44 @@ void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& 
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), needsMask);
+	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool needsMask)
+void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
 {
-	UpdateRenderTarget(reinterpret_cast<const Color*>(&color));
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 
-	if (needsMask) {
+	if (flags) {
+		// FIXME: this needs to be moved to stencil buffer
 		SetRendererForMask(color);
 		SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 	}
 }
 
-void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask)
+void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags)
 {
-	UpdateRenderTarget(&color);
+	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 
-	if (needsMask) {
+	if (flags) {
+		// FIXME: this needs to be moved to stencil buffer
 		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
 		SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 	}
 }
 
-void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool needsMask)
+void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
 {
-	UpdateRenderTarget(&color);
+	UpdateRenderTarget(&color, flags);
 	if (fill) {
 		SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
 	} else {
 		SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
 	}
 
-	if (needsMask) {
+	if (flags) {
+		// FIXME: this needs to be moved to stencil buffer
 		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
 		if (fill) {
 			SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));

@@ -69,10 +69,9 @@ protected:
 	Region rect;
 
 public:
-	bool blend;
-	
+
 public:
-	VideoBuffer(const Region& r) : rect(r), blend(true) {}
+	VideoBuffer(const Region& r) : rect(r) {}
 	virtual ~VideoBuffer() {}
 	
 	::GemRB::Size Size() const { return rect.Dimensions(); }
@@ -198,23 +197,23 @@ public:
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool needsMask = false) = 0;
+	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0) = 0;
 
-	virtual void DrawPoint(const Point&, const Color& color, bool needsMask = false) = 0;
-	virtual void DrawPoints(const std::vector<Point>& points, const Color& color, bool needsMask = false)=0;
+	virtual void DrawPoint(const Point&, const Color& color, unsigned int flags = 0) = 0;
+	virtual void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0)=0;
 
 	/** Draws a circle */
-	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, bool needsMask = false) = 0;
+	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, unsigned int flags = 0) = 0;
 	/** Draws an Ellipse Segment */
 	virtual void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									double anglefrom, double angleto, bool drawlines = true, bool needsMask = false) = 0;
+									double anglefrom, double angleto, bool drawlines = true, unsigned int flags = 0) = 0;
 	/** Draws an ellipse */
-	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, bool needsMask = false) = 0;
+	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0) = 0;
 	/** Draws a polygon on the screen */
-	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, bool needsMask = false) = 0;
+	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0) = 0;
 	/** Draws a line segment */
-	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color, bool needsMask = false) = 0;
-	virtual void DrawLines(const std::vector<Point>& points, const Color& color, bool needsMask = false)=0;
+	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0) = 0;
+	virtual void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0)=0;
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */

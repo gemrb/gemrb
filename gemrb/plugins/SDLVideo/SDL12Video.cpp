@@ -370,7 +370,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 }
 
-void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int /*flags*/)
 {
 	if (!screenClip.PointInside(p)) {
 		return;
@@ -381,22 +381,22 @@ void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, bool /*need
 	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, color);
 }
 
-void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int /*flags*/)
 {
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
-void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int /*flags*/)
 {
 	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, reinterpret_cast<const Color&>(color));
 }
 
-void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int /*flags*/)
 {
 	DrawLines(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
-void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int /*flags*/)
 {
 	std::vector<SDL_Point>::const_iterator it = points.begin();
 	while (it != points.end()) {
@@ -452,7 +452,7 @@ void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
 }
 
-void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color, bool /*needsMask*/)
+void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color, unsigned int /*flags*/)
 {
 	if (start.y == end.y) return DrawHLine(start.x, start.y, end.x, color);
 	if (start.x == end.x) return DrawVLine(start.x, start.y, end.y, color);
@@ -517,13 +517,13 @@ void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Colo
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool /*needsMask*/)
+void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
 {
 	if (fill) {
 		SDL_Surface* currentBuf = CurrentRenderBuffer();
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
-		} else if ( SDL_ALPHA_OPAQUE == color.a || drawingBuffer->blend == false) {
+		} else if ( SDL_ALPHA_OPAQUE == color.a || (flags&BLIT_BLENDED) == 0) {
 			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
