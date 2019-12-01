@@ -2434,8 +2434,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				scr->CurrentActionInterruptable = false;
 			}
 		} else {
-			Log(ERROR, "GameScript", "ActionOverride failed for object: ");
+			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
 			aC->objects[0]->dump();
+			aC->dump();
 		}
 
 		aC->Release();
