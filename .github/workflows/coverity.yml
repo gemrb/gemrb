@@ -11,7 +11,7 @@ jobs:
       - name: Install dependencies
         run: |
           set -x
-          sudo apt-get install libpython2.7 zlib1g zlib1g-dev libsdl1.2debian libsdl1.2-dev libopenal1 libopenal-dev libsdl-mixer1.2 libsdl-mixer1.2-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng12-0 libpng12-dev libvorbis0a libvorbis-dev python-dev
+          sudo apt-get install libpython2.7 zlib1g zlib1g-dev libsdl1.2debian libsdl1.2-dev libopenal1 libopenal-dev libsdl-mixer1.2 libsdl-mixer1.2-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libvorbis0a libvorbis-dev python-dev libpng-dev
 
       - uses: actions/checkout@v1
         with:
