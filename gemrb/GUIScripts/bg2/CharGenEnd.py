@@ -112,8 +112,7 @@ def OnLoad():
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( MyChar, "gembak" )
+		GemRB.SaveCharacter (MyChar, "gembak")
 		#LETS PLAY!!
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)

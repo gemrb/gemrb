@@ -382,8 +382,7 @@ def setAccept():
 	
 	if playmode >=0:
 		CharGenCommon.close()
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
+		GemRB.SaveCharacter (MyChar, "gembak")
 		GemRB.EnterGame()
 	else:
 		#show the export window
