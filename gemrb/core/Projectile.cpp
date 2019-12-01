@@ -1215,11 +1215,8 @@ void Projectile::SecondaryTarget()
 			double ydiff = Pos.y-(*poi)->Pos.y;
 			int deg;
 
-			//fixme: a dragon will definitely be easier to hit than a mouse
-			//nothing checks on the personal space of the possible target
-
-			//unsigned int dist = (unsigned int) sqrt(xdiff*xdiff+ydiff*ydiff);
-			//int width = (*poi)->GetAnims()->GetCircleSize();
+			// a dragon will definitely be easier to hit than a mouse
+			// but nothing checks the personal space of possible targets in the original either #384
 			if (ydiff) {
 				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
 				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
