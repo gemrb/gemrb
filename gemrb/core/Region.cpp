@@ -148,7 +148,13 @@ bool Region::PointInside(const Point &p) const
 
 bool Region::RectInside(const Region& r) const
 {
-	return Intersect(r) == r;
+	// top-left not covered
+	if (r.x < x || r.y < y) return false;
+
+	// bottom-right not covered
+	if (r.x + r.w > x + w || r.y + r.h > y + h) return false;
+
+	return true;
 }
 
 bool Region::IntersectsRegion(const Region& rgn) const
