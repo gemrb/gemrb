@@ -63,7 +63,7 @@ public:
 	unsigned long endtime;
 	
 public:
-	PointAnimation() : GUIAnimation() {}
+	PointAnimation() : GUIAnimation(), endtime(0) {}
 	
 	PointAnimation(const Point& begin, const Point& end, unsigned long duration)
 	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {

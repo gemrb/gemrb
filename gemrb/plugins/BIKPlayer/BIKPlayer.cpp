@@ -78,6 +78,7 @@ BIKPlayer::BIKPlayer(void)
 	video_rendered_frame = validVideo = s_audio = false;
 	s_channels = s_first = s_stream = s_root = 0;
 	s_bands = NULL;
+	c_pic = c_last = NULL;
 }
 
 BIKPlayer::~BIKPlayer(void)
@@ -768,7 +769,6 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 				break;
 			}
 		}
-		mask >>= 1;
 		bits--;
 	}
 

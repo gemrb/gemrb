@@ -428,7 +428,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 							coverpix -= count;
 					}
 				} else {
-					if (!COVER || *coverpix < 0xff) {
+					if (!COVER || (coverpix && *coverpix < 0xff)) {
 						int extra_alpha = 0;
 						if (!shadow(*pix, p, extra_alpha, flags)) {
 							Uint8 r = col[p].r;

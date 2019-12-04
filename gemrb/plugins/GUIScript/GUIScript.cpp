@@ -359,7 +359,7 @@ PyDoc_STRVAR( GemRB_GetGameString__doc,
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
 	int Index = -1;
-	PyArg_ParseTuple( args, "i", &Index );
+	PARSE_ARGS1(args, "i", &Index);
 
 	switch(Index&0xf0) {
 	case 0: //game strings
@@ -494,7 +494,7 @@ to beyond the top.\n\
 static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 {
 	char* text = NULL;
-	PyArg_ParseTuple( args, "Os", &self, &text);
+	PARSE_ARGS2(args, "Os", &self, &text);
 
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
@@ -611,7 +611,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef strref = -1;
 	int flags = 0;
-	PyArg_ParseTuple( args, "i|i", &strref, &flags );
+	PARSE_ARGS2(args, "i|i", &strref, &flags);
 
 	char *text = core->GetCString( strref, flags );
 	PyObject* ret = (text) ? PyString_FromString( text ) : NULL;
@@ -663,7 +663,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	int WindowID = -1;
 	Window::WindowPosition pos = Window::PosCentered;
 	char* ref = NULL;
-	PyArg_ParseTuple( args, "i|si", &WindowID, &ref, &pos );
+	PARSE_ARGS3(args, "i|si", &WindowID, &ref, &pos);
 
 	Window* win = core->LoadWindow( WindowID, ref, pos );
 	ABORT_IF_NULL(win);
@@ -689,7 +689,7 @@ They are currently turned on by default.\n\
 static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 {
 	int Flag = core->CheatEnabled();
-	PyArg_ParseTuple( args, "i", &Flag );
+	PARSE_ARGS1(args, "i", &Flag);
 	core->EnableCheatKeys( Flag );
 	Py_RETURN_NONE;
 }
@@ -1186,7 +1186,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	PyObject* pySubview = NULL;
 	PyObject* pySiblingView = Py_None;
 	int id = -1; // if we were moving a view from one window to another we may need to pass this to avoid conflicts
-	PyArg_ParseTuple(args, "OO|Oi", &self, &pySubview, &pySiblingView, &id);
+	PARSE_ARGS4(args, "OO|Oi", &self, &pySubview, &pySiblingView, &id);
 
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
 
@@ -1198,6 +1198,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 		superView->AddSubviewInFrontOfView(subView, siblingView);
 
         if (registerRef) {
+			assert(ref);
             ScriptingId sid = (id == -1) ? ref->Id : id;
             // FIXME: no promise that subView is a control (could be a plain view)
             const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
@@ -1682,7 +1683,7 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
     Event::EventMods mod = 0;
     short count = 0;
 	PyObject* func = NULL;
-	PyArg_ParseTuple(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
+	PARSE_ARGS6(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
 
 	Control* ctrl = GetView<Control>(self);
 	if (ctrl) {
@@ -1897,7 +1898,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 {
 	int del = true;
 	PyObject* pyView = NULL;
-	PyArg_ParseTuple(args, "O|i", &pyView, &del);
+	PARSE_ARGS2(args, "O|i", &pyView, &del);
 
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pyView));
 	View* view = GetView(ref);
@@ -2089,7 +2090,7 @@ PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
 static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
 {
 	PyObject* pyView = NULL;
-	PyArg_ParseTuple( args,  "OO", &self, &pyView);
+	PARSE_ARGS2(args, "OO", &self, &pyView);
 
 	View* target = GetView<View>(self);
 	ABORT_IF_NULL(target);
@@ -2124,7 +2125,7 @@ PyDoc_STRVAR( GemRB_View_SetFrame__doc,
 static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 {
 	PyObject* pyRect = NULL;
-	PyArg_ParseTuple( args,  "OO", &self, &pyRect);
+	PARSE_ARGS2(args,  "OO", &self, &pyRect);
 
 	View* view = GetView<View>(self);
 	if (view) {
@@ -11720,7 +11721,7 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
 	int tooltipDelay;
-	PyArg_ParseTuple(args, "i", &tooltipDelay);
+	PARSE_ARGS1(args, "i", &tooltipDelay);
 	// FIXME: reimplement this
 	Py_RETURN_NONE;
 }

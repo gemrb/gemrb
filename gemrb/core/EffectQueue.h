@@ -171,6 +171,7 @@ public:
 	EffectDesc() {
 		Function = NULL;
 		Name = NULL;
+		Flags = 0;
 		opcode = -1;
 	}
 	
