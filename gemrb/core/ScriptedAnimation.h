@@ -24,7 +24,6 @@
 
 #include "Audio.h"
 #include "Palette.h"
-#include "SpriteCover.h"
 
 namespace GemRB {
 
@@ -108,7 +107,6 @@ public:
 	bool justCreated;
 	ieResRef ResName;
 	int Phase;
-	SpriteCover* cover;
 	ScriptedAnimation *twin;
 	bool active;
 	bool effect_owned;
@@ -129,10 +127,6 @@ public:
 	void SetFullPalette(const ieResRef PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
-	//sets spritecover
-	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
-	/* get stored SpriteCover */
-	SpriteCover* GetSpriteCover() const { return cover; }
 	int GetCurrentFrame();
 	ieDword GetSequenceDuration(ieDword multiplier);
 	/* sets up a delay in the beginning of the vvc */

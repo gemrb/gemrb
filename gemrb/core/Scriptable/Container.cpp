@@ -27,7 +27,6 @@
 #include "GameData.h"
 #include "Item.h"
 #include "Sprite2D.h"
-#include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
@@ -51,7 +50,6 @@ Container::Container(void)
 	inventory.SetInventoryType(INVENTORY_HEAP);
 	// NULL should be 0 for this
 	memset (groundicons, 0, sizeof(groundicons) );
-	groundiconcover = 0;
 	OpenFail = 0;
 }
 
@@ -63,8 +61,6 @@ void Container::FreeGroundIcons()
 			groundicons[i]=NULL;
 		}
 	}
-	delete groundiconcover;
-	groundiconcover = 0;
 }
 
 Container::~Container()
@@ -79,52 +75,22 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 
 	//draw it with highlight
 	ieDword flags = BLIT_TINTED | (highlight ? 0 : BLIT_NOSHADOW);
-	if (game) game->ApplyGlobalTint(tint, flags);
+	game->ApplyGlobalTint(tint, flags);
 
-	CreateGroundIconCover();
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		if (groundicons[i]) {
-			video->BlitGameSprite(groundicons[i], Pos.x - vp.x, Pos.y - vp.y, flags, tint, groundiconcover);
-		}
-	}
-}
-
-// create the SpriteCover for the groundicons
-void Container::CreateGroundIconCover()
-{
-	int xpos = 0;
-	int ypos = 0;
-	int width = 0;
-	int height = 0;
-
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
-		if (groundicons[i]) {
-			const Region& sprrgn = groundicons[i]->Frame;
-			if (xpos < sprrgn.x) {
-				width += sprrgn.x - xpos;
-				xpos = sprrgn.x;
+		const Sprite2D* icon = groundicons[i];
+		if (icon) {
+			// TODO: we could optimize by caching this and update it only when the Selectable moves
+			// unfortunately Pos is public so its a bit hairy to undo that
+			Region r = icon->Frame;
+			r.x = Pos.x - r.x;
+			r.y = Pos.y - r.y;
+			if (area->IntersectsWall(r)) {
+				ieDword dither = WantDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
+				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags | dither, tint);
+			} else {
+				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 			}
-			if (ypos < sprrgn.y) {
-				height += sprrgn.y - ypos;
-				ypos = sprrgn.y;
-			}
-			if (width-xpos < sprrgn.w - sprrgn.x) {
-				width = sprrgn.w - sprrgn.x + xpos;
-			}
-			if (height-ypos < sprrgn.h - sprrgn.y) {
-				height = sprrgn.h - sprrgn.y + ypos;
-			}
-		}
-	}
-
-	if (!groundiconcover ||
-		!groundiconcover->Covers(Pos.x, Pos.y, xpos, ypos, width, height))
-	{
-		delete groundiconcover;
-		groundiconcover = NULL;
-		if (width*height > 0) {
-			groundiconcover = GetCurrentArea()->BuildSpriteCover
-				(Pos.x, Pos.y, xpos, ypos, width, height, WantDither());
 		}
 	}
 }

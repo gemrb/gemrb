@@ -76,7 +76,9 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 				anim = tile->anim[0];
 			}
 			assert(anim);
-			vid->BlitTile( anim->NextFrame(), 0, ( x * 64 ) - viewport.x,
+
+			// this is the base terrain tile
+			vid->BlitTile( anim->NextFrame(), ( x * 64 ) - viewport.x,
 						  ( y * 64 ) - viewport.y, NULL, flags, tintcol);
 			if (!tile->om || tile->tileIndex) {
 				continue;
@@ -90,20 +92,29 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
 						if (RedrawTile) {
-							vid->BlitTile( ovtile->anim[0]->NextFrame(),
-						                   tile->anim[0]->NextFrame(),
-							               ( x * 64 ) - viewport.x,
-							               ( y * 64 ) - viewport.y,
-							               NULL, flags|BLIT_BLENDED, tintcol);
+							// FIXME: I don't think this is required anymore
+							// can't we combine with below? if tile->anim[1] is NULL then use tile->anim[0]
+							// which also determines BLIT_HALFTRANS... why again isn't water in BG1 done with BLIT_HALFTRANS?
+							vid->BlitTile(ovtile->anim[0]->NextFrame(),
+										  ( x * 64 ) - viewport.x,
+										  ( y * 64 ) - viewport.y,
+										  NULL, flags, tintcol);
+							vid->BlitTile(tile->anim[0]->NextFrame(),
+										  ( x * 64 ) - viewport.x,
+										  ( y * 64 ) - viewport.y,
+										  NULL, flags|BLIT_BLENDED, tintcol);
 						} else {
-							Sprite2D* mask = 0;
 							if (tile->anim[1]) {
-								mask = tile->anim[1]->NextFrame();
+								// this is the water (or whatever)
 								vid->BlitTile( ovtile->anim[0]->NextFrame(),
-											   mask,
 											   ( x * 64 ) - viewport.x,
 											   ( y * 64 ) - viewport.y,
 											   NULL, BLIT_HALFTRANS | flags, tintcol);
+								// this is the mask to blend the terrain tile with the water
+								vid->BlitTile( tile->anim[1]->NextFrame(),
+												( x * 64 ) - viewport.x,
+												( y * 64 ) - viewport.y,
+												NULL, BLIT_BLENDED | flags, tintcol);
 							}
 						}
 					}

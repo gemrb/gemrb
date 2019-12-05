@@ -171,9 +171,6 @@ namespace GemRB {
 #define I_COMPL_RESP 5
 #define I_DIALOG     6
 
-// 3 for blur, 8 for mirror images
-#define EXTRA_ACTORCOVERS 11
-
 //flags for UseItem
 #define UI_SILENT    1       //no sound when used up
 #define UI_MISS      2       //ranged miss (projectile has no effects)
@@ -382,7 +379,6 @@ private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;
-	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
 	ieByte weapSlotCount;
 	// true when command has been played after select
@@ -405,9 +401,8 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
-				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint, bool useShadowPalette = false);
+	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox, Animation** anims,
+						 unsigned char Face, const Color& tint, bool useShadowPalette = false);
 
 	/** fixes the palette */
 	void SetupColors();

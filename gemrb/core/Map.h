@@ -310,7 +310,6 @@ public:
 	ieResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	Palette* palette;
-	SpriteCover** covers;
 	AreaAnimation();
 	AreaAnimation(AreaAnimation *src);
 	~AreaAnimation();
@@ -386,6 +385,12 @@ private:
 	Actor** queue[QUEUE_COUNT];
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
+
+	// TODO: if SDL ever allows using individual color channels in customm blend modes
+	// we can combine these by using the color channels for the different stencils
+	// for now wallStencil uses 'rgb' for BLIT_STENCIL_HALF and 'a' for BLIT_STENCIL
+	VideoBuffer* animWallStencil;
+	VideoBuffer* wallStencil;
 public:
 	Map(void);
 	~Map(void);
@@ -428,15 +433,14 @@ public:
 	AreaAnimation* GetAnimation(const char* Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
-	unsigned int GetWallCount() { return WallCount; }
-	Wall_Polygon *GetWallGroup(int i) { return Walls[i]; }
+	unsigned int GetWallCount() const { return WallCount; }
+	Wall_Polygon *GetWallGroup(int i) const { return Walls[i]; }
 	void SetWallGroups(unsigned int count, Wall_Polygon **walls)
 	{
 		WallCount = count;
 		Walls = walls;
 	}
-	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
-		unsigned int width, unsigned int height, int flag, bool areaanim = false);
+	bool IntersectsWall(const Region&) const;
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void ActorSpottedByPlayer(Actor *actor);
@@ -629,6 +633,7 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
+	void RedrawStencils(const Region& vp);
 };
 
 }

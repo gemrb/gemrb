@@ -29,13 +29,20 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	renderer = NULL;
 	window = NULL;
 
-	maskBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
-											 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
-											 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+	stencilAlphaBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
+	stencilRGBBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+												   SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+												   SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD);
+
+	scratchBuffer = NULL;
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
+	SDL_DestroyTexture(scratchBuffer);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
@@ -71,6 +78,8 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
 	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
+	scratchBuffer =  SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, s.w, s.h);
+
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
 	return GEM_OK;
@@ -83,7 +92,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		return NULL;
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
-	if (format == RGBA8888)
+	if (format == RGBA8888) // FIXME: shouldnt this be determined by BLIT_BLENDED?
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 
 	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
@@ -102,17 +111,18 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 
 	SDL_RenderPresent( renderer );
-
-	it = buffers.begin();
-	for (; it != buffers.end(); ++it) {
-		static_cast<SDLTextureVideoBuffer*>(*it)->ClearMaskLayer();
-	}
 }
 
-SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer()
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer() const
 {
 	assert(drawingBuffer);
 	return static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+}
+
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
+{
+	assert(stencilBuffer);
+	return static_cast<SDLTextureVideoBuffer*>(stencilBuffer)->GetTexture();
 }
 
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
@@ -150,38 +160,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 	return 0;
 }
 
-int SDL20VideoDriver::SetRendererForMask(const SDL_Color& mask)
-{
-	SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
-	assert(maskLayer);
-
-	int ret = SDL_SetRenderTarget(renderer, maskLayer);
-	if (ret != 0) {
-		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
-		return ret;
-	}
-
-	ret = SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
-	if (ret != 0) {
-		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
-		return ret;
-	}
-
-	SDL_SetRenderDrawBlendMode(renderer, maskBlender);
-	// yes, mask.a is the correct value to pass!
-	return SDL_SetRenderDrawColor(renderer, mask.a, mask.a, mask.a, SDL_ALPHA_OPAQUE);
-}
-
-void SDL20VideoDriver::Flush()
-{
-	SDLTextureVideoBuffer* buffer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer);
-
-	UpdateRenderTarget();
-	buffer->RenderOnDisplay(renderer);
-	buffer->ClearMaskLayer();
-}
-
-void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
 	UpdateRenderTarget(NULL, flags);
 
@@ -202,7 +181,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	tex = texSprite->GetTexture(renderer);
 
 	if (flags & BLIT_HALFTRANS) {
-		SDL_SetTextureAlphaMod(tex, 255/2);
+		SDL_SetTextureAlphaMod(tex, 0x80);
 	} else {
 		SDL_SetTextureAlphaMod(tex, SDL_ALPHA_OPAQUE);
 	}
@@ -216,25 +195,45 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 		SDL_SetTextureColorMod(tex, 0xff, 0xff, 0xff);
 	}
 
+	if (flags & BLIT_BLENDED) {
+		// TODO: there is no reason we can't support other blendmodes too
+		// in fact, SDL_BLENDMODE_MOD looks useful
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+	} else {
+		// FIXME: I think we need to correct the blit flags in a few places before uncommenting this
+		// usually anything with an alpha should pass BLIT_BLENDED
+		//SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
+	}
+
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
 	int ret = 0;
-	if (mask) {
-		SDL_Texture* maskTex = static_cast<const SDLTextureSprite2D*>(mask)->GetTexture(renderer);
+	if (flags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RGB)) {
+		// 1. clear scratchpad segment
+		// 2. blend stencil segment to scratchpad
+		// 3. blend texture to scratchpad
+		// 4. copy scratchpad segment to screen
 
-		if (flags&BLIT_BLENDED) {
-			SDL_SetTextureBlendMode(maskTex, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderTarget(renderer, scratchBuffer);
+		SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, SDL_ALPHA_TRANSPARENT);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+		SDL_RenderFillRect(renderer, &drect);
+
+		SDL_Texture* stencilTex = CurrentStencilBuffer();
+		if (flags&BLIT_STENCIL_RGB) {
+			SDL_SetTextureBlendMode(stencilTex, stencilRGBBlender);
 		} else {
-			SDL_Texture* maskLayer = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetMaskLayer();
-		SDL_SetRenderTarget(renderer, maskLayer);
-		SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureBlendMode(maskTex, maskBlender);
+			SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 		}
 
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
-		ret = SDL_RenderCopyEx(renderer, maskTex, &srect, &drect, 0.0, NULL, flipflags);
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE); // FIXME: address fixme above for BLIT_BLENDED and remove this
+		SDL_RenderCopy(renderer, tex, &srect, &drect);
+		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
+
+		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
+		SDL_SetTextureBlendMode(scratchBuffer, SDL_BLENDMODE_BLEND);
+		ret = SDL_RenderCopyEx(renderer, scratchBuffer, &drect, &drect, 0.0, NULL, flipflags);
 	} else {
 		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 	}
@@ -266,24 +265,12 @@ void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SD
 	}
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
-
-	if (flags) {
-		// FIXME: this needs to be moved to stencil buffer
-		SetRendererForMask(color);
-		SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
-	}
 }
 
 void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
-
-	if (flags) {
-		// FIXME: this needs to be moved to stencil buffer
-		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
-		SDL_RenderDrawPoint(renderer, p.x, p.y);
-	}
 }
 
 void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags)
@@ -305,24 +292,12 @@ void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL
 {
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
-
-	if (flags) {
-		// FIXME: this needs to be moved to stencil buffer
-		SetRendererForMask(color);
-		SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
-	}
 }
 
 void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
-
-	if (flags) {
-		// FIXME: this needs to be moved to stencil buffer
-		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
-		SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
-	}
 }
 
 void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
@@ -332,16 +307,6 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 		SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
 	} else {
 		SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
-	}
-
-	if (flags) {
-		// FIXME: this needs to be moved to stencil buffer
-		SetRendererForMask(reinterpret_cast<const SDL_Color&>(color));
-		if (fill) {
-			SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
-		} else {
-			SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
-		}
 	}
 }
 

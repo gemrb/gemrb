@@ -99,8 +99,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
-void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask,
-											const Region& src, const Region& dst,
+void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
 											unsigned int flags, const Color* t)
 {
 	Color tint(255,255,255,255);

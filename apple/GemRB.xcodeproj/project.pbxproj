@@ -357,7 +357,6 @@
 		A29BF8E113A04A6F00C812DD /* Spellbook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0471395FF62006ADC12 /* Spellbook.cpp */; };
 		A29BF8E213A04A6F00C812DD /* SpellMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0491395FF62006ADC12 /* SpellMgr.cpp */; };
 		A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */; };
-		A29BF8E413A04A6F00C812DD /* SpriteCover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04D1395FF62006ADC12 /* SpriteCover.cpp */; };
 		A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04F1395FF62006ADC12 /* Store.cpp */; };
 		A29BF8E613A04A6F00C812DD /* StoreMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0511395FF62006ADC12 /* StoreMgr.cpp */; };
 		A29BF8E713A04A6F00C812DD /* StringMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0531395FF62006ADC12 /* StringMgr.cpp */; };
@@ -603,8 +602,6 @@
 		A2E663D5139E884500310FC8 /* SpellMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA04A1395FF62006ADC12 /* SpellMgr.h */; };
 		A2E663D6139E884500310FC8 /* Sprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */; };
 		A2E663D7139E884500310FC8 /* Sprite2D.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA04C1395FF62006ADC12 /* Sprite2D.h */; };
-		A2E663D8139E884500310FC8 /* SpriteCover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04D1395FF62006ADC12 /* SpriteCover.cpp */; };
-		A2E663D9139E884500310FC8 /* SpriteCover.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA04E1395FF62006ADC12 /* SpriteCover.h */; };
 		A2E663DA139E884500310FC8 /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04F1395FF62006ADC12 /* Store.cpp */; };
 		A2E663DB139E884500310FC8 /* Store.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0501395FF62006ADC12 /* Store.h */; };
 		A2E663DC139E884500310FC8 /* StoreMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0511395FF62006ADC12 /* StoreMgr.cpp */; };
@@ -1707,8 +1704,6 @@
 		A2BFA04A1395FF62006ADC12 /* SpellMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpellMgr.h; sourceTree = "<group>"; };
 		A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite2D.cpp; sourceTree = "<group>"; };
 		A2BFA04C1395FF62006ADC12 /* Sprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite2D.h; sourceTree = "<group>"; };
-		A2BFA04D1395FF62006ADC12 /* SpriteCover.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteCover.cpp; sourceTree = "<group>"; };
-		A2BFA04E1395FF62006ADC12 /* SpriteCover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteCover.h; sourceTree = "<group>"; };
 		A2BFA04F1395FF62006ADC12 /* Store.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Store.cpp; sourceTree = "<group>"; };
 		A2BFA0501395FF62006ADC12 /* Store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Store.h; sourceTree = "<group>"; };
 		A2BFA0511395FF62006ADC12 /* StoreMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StoreMgr.cpp; sourceTree = "<group>"; };
@@ -3187,8 +3182,6 @@
 				A2BFA04A1395FF62006ADC12 /* SpellMgr.h */,
 				A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */,
 				A2BFA04C1395FF62006ADC12 /* Sprite2D.h */,
-				A2BFA04D1395FF62006ADC12 /* SpriteCover.cpp */,
-				A2BFA04E1395FF62006ADC12 /* SpriteCover.h */,
 				A2D72B181B671329009F4D33 /* SpriteSheet.h */,
 				A2BFA04F1395FF62006ADC12 /* Store.cpp */,
 				A2BFA0501395FF62006ADC12 /* Store.h */,
@@ -3563,7 +3556,6 @@
 				A2E663D3139E884500310FC8 /* Spellbook.h in Headers */,
 				A2E663D5139E884500310FC8 /* SpellMgr.h in Headers */,
 				A2E663D7139E884500310FC8 /* Sprite2D.h in Headers */,
-				A2E663D9139E884500310FC8 /* SpriteCover.h in Headers */,
 				A2E663DB139E884500310FC8 /* Store.h in Headers */,
 				A2E663DD139E884500310FC8 /* StoreMgr.h in Headers */,
 				A2D672DE1B30F24400264D16 /* GUIFactory.h in Headers */,
@@ -5158,7 +5150,6 @@
 				A29BF8E113A04A6F00C812DD /* Spellbook.cpp in Sources */,
 				A29BF8E213A04A6F00C812DD /* SpellMgr.cpp in Sources */,
 				A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */,
-				A29BF8E413A04A6F00C812DD /* SpriteCover.cpp in Sources */,
 				A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */,
 				A29BF8E613A04A6F00C812DD /* StoreMgr.cpp in Sources */,
 				A29BF8E713A04A6F00C812DD /* StringMgr.cpp in Sources */,
@@ -5404,7 +5395,6 @@
 				A2E663D2139E884500310FC8 /* Spellbook.cpp in Sources */,
 				A2E663D4139E884500310FC8 /* SpellMgr.cpp in Sources */,
 				A2E663D6139E884500310FC8 /* Sprite2D.cpp in Sources */,
-				A2E663D8139E884500310FC8 /* SpriteCover.cpp in Sources */,
 				A2E663DA139E884500310FC8 /* Store.cpp in Sources */,
 				A2E663DC139E884500310FC8 /* StoreMgr.cpp in Sources */,
 				A2E663DE139E884500310FC8 /* StringMgr.cpp in Sources */,

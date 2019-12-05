@@ -286,7 +286,7 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void*
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
+void SDLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
 {
 	assert(spr->BAM == false);
 
@@ -295,24 +295,22 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	srect.x -= x - fClip.x;
 	srect.y -= y - fClip.y;
 
-	BlitSpriteClipped(spr, mask, srect, fClip, flags, tint);
+	BlitSpriteClipped(spr, srect, fClip, flags, tint);
 }
 
 void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region dst)
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
-	BlitSpriteClipped(spr, NULL, src, dst);
+	BlitSpriteClipped(spr, src, dst);
 }
 
 void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
-		unsigned int flags, Color tint,
-		SpriteCover* cover, const Region* clip)
+									unsigned int flags, Color tint, const Region* clip)
 {
 	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Frame.w, spr->Frame.h));
 	Region drect = (clip) ? *clip : Region(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
-	const Sprite2D* mask = (cover) ? cover->GetMask() : NULL;
-	BlitSpriteClipped(spr, mask, srect, drect, flags, &tint);
+	BlitSpriteClipped(spr, srect, drect, flags, &tint);
 }
 
 // SetPixel is in screen coordinates
@@ -540,6 +538,8 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 
 void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
 {
+	// FIXME: this takes origin in "viewport" coordinates, but drawing should be done in screen coordinates
+
 	Region bbox = poly->BBox;
 	bbox.x -= origin.x;
 	bbox.y -= origin.y;
@@ -612,7 +612,7 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags, const Color* tint)
 {
 	// FIXME?: srect isn't verified
 	Region dclipped = ClippedDrawingRect(dst);
@@ -644,11 +644,11 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask
 	}
 
 	if (spr->BAM) {
-		BlitSpriteBAMClipped(spr, mask, src, dclipped, flags, tint);
+		BlitSpriteBAMClipped(spr, src, dclipped, flags, tint);
 	} else {
 		SDL_Rect srect = RectFromRegion(src);
 		SDL_Rect drect = RectFromRegion(dclipped);
-		BlitSpriteNativeClipped(spr, mask, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+		BlitSpriteNativeClipped(spr, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
 }
 

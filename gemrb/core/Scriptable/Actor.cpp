@@ -446,8 +446,6 @@ Actor::Actor()
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
-	for (i = 0; i < EXTRA_ACTORCOVERS; ++i)
-		extraCovers[i] = NULL;
 
 	memset(ShortName, 0, sizeof(ShortName));
 	memset(LongName, 0, sizeof(LongName));
@@ -561,8 +559,6 @@ Actor::~Actor(void)
 			vvcShields[i] = NULL;
 		}
 	}
-	for (i = 0; i < EXTRA_ACTORCOVERS; i++)
-		delete extraCovers[i];
 
 	delete attackProjectile;
 	delete polymorphCache;
@@ -1829,8 +1825,6 @@ GEM_EXPORT void UpdateActorConfig()
 	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
-	//FIXME: Drop all actors' SpriteCover.
-	//the actor will change dithering only after selected/moved (its spritecover was updated)
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
@@ -8170,15 +8164,25 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 	}
 }
 
-void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox,
-							SpriteCover*& newsc, Animation** anims,
+void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox, Animation** anims,
 							unsigned char Face, const Color& tint, bool useShadowPalette)
 {
+	if (!bbox.IntersectsRegion(vp)) {
+		return;
+	}
+
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 
 	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+
+	// TODO: we could optimize by caching this and update it only when the Selectable moves
+	// unfortunately Pos is public so its a bit hairy to undo that
+	if (area->IntersectsWall(bbox)) {
+		flags |= WantDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
+	}
+
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
 	Game* game = core->GetGame();
 	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
@@ -8197,21 +8201,9 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 		Sprite2D* nextFrame = 0;
 		if (anim)
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-		if (nextFrame && bbox.IntersectsRegion( vp ) ) {
-			if (!newsc || !newsc->Covers(cx, cy, nextFrame->Frame.x, nextFrame->Frame.y, nextFrame->Frame.w, nextFrame->Frame.h)) {
-				// the first anim contains the animarea for
-				// the entire multi-part animation
-				newsc = area->BuildSpriteCover(cx,
-					cy, -anims[0]->animArea.x,
-					-anims[0]->animArea.y,
-					anims[0]->animArea.w,
-					anims[0]->animArea.h, WantDither() );
-			}
-			assert(newsc->Covers(cx, cy, nextFrame->Frame.x, nextFrame->Frame.y, nextFrame->Frame.w, nextFrame->Frame.h));
-
+		if (nextFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			video->BlitGameSpriteWithPalette(nextFrame, palette,
-											 cx - vp.x, cy - vp.y, flags, tint2, newsc);
+			video->BlitGameSpriteWithPalette(nextFrame, palette, cx - vp.x, cy - vp.y, flags, tint2);
 		}
 	}
 }
@@ -8568,7 +8560,6 @@ void Actor::Draw(const Region& vp)
 		// it could be divided so it will become a 0-15 number.
 		//
 
-		SpriteCover *sc = 0, *newsc = 0;
 		int blurx = cx;
 		int blury = cy;
 		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
@@ -8591,17 +8582,8 @@ void Actor::Draw(const Region& vp)
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
-					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(vp, icx, icy, sbbox, newsc,
-						anims, Face, mirrortint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[3+m] = newsc;
-					}
+					DrawActorSprite(vp, icx, icy, sbbox, anims, Face, mirrortint);
 				}
-			} else {
-				delete extraCovers[3+m];
-				extraCovers[3+m] = NULL;
 			}
 		}
 
@@ -8614,13 +8596,7 @@ void Actor::Draw(const Region& vp)
 				for (i = 0; i < 3; ++i) {
 					sbbox.x += blurdx; sbbox.y += blurdy;
 					blurx += blurdx; blury += blurdy;
-					newsc = sc = extraCovers[i];
-					DrawActorSprite(vp, blurx, blury, sbbox, newsc,
-						anims, Face, tint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[i] = newsc;
-					}
+					DrawActorSprite(vp, blurx, blury, sbbox, anims, Face, tint);
 				}
 			}
 		}
@@ -8644,17 +8620,13 @@ void Actor::Draw(const Region& vp)
 			}
 		}
 
-		newsc = sc = GetSpriteCover();
-
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(vp, cx, cy, BBox, newsc, shadowAnimations, Face, tint, true);
+			DrawActorSprite(vp, cx, cy, BBox, shadowAnimations, Face, tint, true);
 		}
 
 		// actor itself
-		DrawActorSprite(vp, cx, cy, BBox, newsc, anims, Face, tint);
-
-		if (newsc != sc) SetSpriteCover(newsc);
+		DrawActorSprite(vp, cx, cy, BBox, anims, Face, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
@@ -8663,13 +8635,7 @@ void Actor::Draw(const Region& vp)
 				for (i = 0; i < 3; ++i) {
 					sbbox.x -= blurdx; sbbox.y -= blurdy;
 					blurx -= blurdx; blury -= blurdy;
-					newsc = sc = extraCovers[i];
-					DrawActorSprite(vp, blurx, blury, sbbox, newsc,
-						anims, Face, tint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[i] = newsc;
-					}
+					DrawActorSprite(vp, blurx, blury, sbbox, anims, Face, tint);
 				}
 			}
 		}
@@ -8686,17 +8652,8 @@ void Actor::Draw(const Region& vp)
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
-					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(vp, icx, icy, sbbox, newsc,
-						anims, Face, mirrortint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[3+m] = newsc;
-					}
+					DrawActorSprite(vp, icx, icy, sbbox, anims, Face, mirrortint);
 				}
-			} else {
-				delete extraCovers[3+m];
-				extraCovers[3+m] = NULL;
 			}
 		}
 	}

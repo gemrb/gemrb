@@ -372,10 +372,16 @@ Map::Map(void)
 	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
 	MaterialMap = NULL;
+	wallStencil = NULL;
+	animWallStencil = NULL;
 }
 
 Map::~Map(void)
 {
+	Video* video = core->GetVideoDriver();
+	video->DestroyBuffer(wallStencil);
+	video->DestroyBuffer(animWallStencil);
+
 	unsigned int i;
 
 	free( MapSet );
@@ -1101,9 +1107,8 @@ static ieDword oldgametime = 0;
 //Draw the game area (including overlays, actors, animations, weather)
 void Map::DrawMap(const Region& viewport)
 {
-	if (!TMap) {
-		return;
-	}
+	assert(TMap);
+
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
 
@@ -1111,6 +1116,18 @@ void Map::DrawMap(const Region& viewport)
 	if (INISpawn) {
 		INISpawn->CheckSpawn();
 	}
+
+	// Map Drawing Strategy
+	// 1. Draw background
+	// 2. Draw overlays (weather)
+	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
+	// 4. Push the WF_COVERANIMS stencil
+	// 5. Draw background animations (BLIT_STENCIL)
+	// 6. push the opaque stencil
+	// 7. draw scriptables (BLIT_STENCIL), keep a list of any that have a stencil+dither flag
+	// 8. draw our list of stencil+dither objects (_no_ BLIT_STENCIL, but BLIT_HALFTRANS)
+	// 9. draw fog (BLIT_BLENDED)
+	// 10. draw text (BLIT_BLENDED)
 
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
@@ -1145,39 +1162,46 @@ void Map::DrawMap(const Region& viewport)
 		TMap->DrawOverlays( viewport, rain, flags );
 	}
 
-	//drawing queues 1 and 0
-	//starting with lower priority
-	//so displayed, but inactive actors (dead) will be drawn over
-	int q = PR_DISPLAY;
-	int index = Qcount[q];
-	Actor* actor = GetNextActor(q, index);
-	aniIterator aniidx = animations.begin();
-	scaIterator scaidx = vvcCells.begin();
-	proIterator proidx = projectiles.begin();
-	spaIterator spaidx = particles.begin();
-	int pileidx = 0;
-	Container *pile = GetNextPile(pileidx);
-
-	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
-	VEFObject *sca = GetNextScriptedAnimation(scaidx);
-	Projectile *pro = GetNextProjectile(proidx);
-	Particles *spark = GetNextSpark(spaidx);
+	RedrawStencils(viewport);
+	video->SetStencilBuffer(animWallStencil);
 
 	//draw all background animations first
+	aniIterator aniidx = animations.begin();
+	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
 		a->Draw(viewport, this);
 		a = GetNextAreaAnimation(aniidx, gametime);
 	}
+
+	video->SetStencilBuffer(wallStencil);
 
 	if (!bgoverride) {
 		//Draw Outlines
 		DrawHighlightables(viewport);
 	}
 
+	//drawing queues 1 and 0
+	//starting with lower priority
+	//so displayed, but inactive actors (dead) will be drawn over
+	int q = PR_DISPLAY;
+	int index = Qcount[q];
+	Actor* actor = GetNextActor(q, index);
+
+	scaIterator scaidx = vvcCells.begin();
+	proIterator proidx = projectiles.begin();
+	spaIterator spaidx = particles.begin();
+	int pileidx = 0;
+	Container *pile = GetNextPile(pileidx);
+
+	VEFObject *sca = GetNextScriptedAnimation(scaidx);
+	Projectile *pro = GetNextProjectile(proidx);
+	Particles *spark = GetNextSpark(spaidx);
+
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
 	// an area animation with height > 0 even if the actors themselves are not
 	// hidden by it.
 
+	std::vector<Scriptable*> dithered;
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
@@ -1255,8 +1279,7 @@ void Map::DrawMap(const Region& viewport)
 		}
 	}
 
-	// flush composited drawing operations
-	video->Flush();
+	video->SetStencilBuffer(NULL);
 
 	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
 		DrawSearchMap(viewport);
@@ -2035,29 +2058,75 @@ unsigned int Map::GetBlocked(const Point &c) const
 	return GetBlocked(c.x/16, c.y/12);
 }
 
-//flags:0 - never dither (full cover)
-//	1 - dither if polygon wants it
-//	2 - always dither
-
-SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-	unsigned int width, unsigned int height, int flags, bool areaanim)
+void Map::RedrawStencils(const Region& vp)
 {
-	SpriteCover* sc = new SpriteCover(Point(x, y), Region(xpos, ypos, width, height), flags);
+	Video* video = core->GetVideoDriver();
 
-	unsigned int wpcount = GetWallCount();
-	unsigned int i;
+	if (wallStencil == NULL) {
+		wallStencil = video->CreateBuffer(vp);
+	}
 
-	for (i = 0; i < wpcount; ++i)
+	if (animWallStencil == NULL) {
+		animWallStencil = video->CreateBuffer(vp);
+	}
+
+	// TODO: we could optimize this by only redrawing when the viewport moves
+	wallStencil->Clear();
+	animWallStencil->Clear();
+
+	// TODO: I believe wall groups are organized in relation to the tile map
+	// if so we should be able to jump to the correct groups occupying 'vp'
+	// instead of iterating everything
+
+	// color is used as follows:
+	// the 'rgb' channels are for representing all walls as "dithered" (50% transparent)
+	// the 'a' channel is used to draw the walls in their "native" form taking WF_DITHER into account
+	// we then pass BLIT_STENCIL_RGB for anything that is always dithered and BLIT_STENCIL_ALPHA for everything else
+	static const Color opaque(0x80,0x80,0x80,0xff);
+	static const Color dithered(0x80,0x80,0x80,0x80);
+	video->PushDrawingBuffer(wallStencil);
+	for (unsigned int i = 0; i < WallCount; ++i)
+	{
+		Wall_Polygon* wp = Walls[i];
+		if (!wp) continue;
+
+		if (vp.IntersectsRegion(wp->BBox)) {
+			if (wp->wall_flag & WF_COVERANIMS) {
+				video->PushDrawingBuffer(animWallStencil);
+				if (wp->wall_flag & WF_DITHER) {
+					video->DrawPolygon(wp, vp.Origin(), dithered, true);
+				} else {
+					video->DrawPolygon(wp, vp.Origin(), opaque, true);
+				}
+				video->PopDrawingBuffer();
+			}
+
+			if (wp->wall_flag & WF_DITHER) {
+				video->DrawPolygon(wp, vp.Origin(), dithered, true);
+			} else {
+				video->DrawPolygon(wp, vp.Origin(), opaque, true);
+			}
+		}
+	}
+	video->PopDrawingBuffer();
+}
+
+bool Map::IntersectsWall(const Region& r) const
+{
+	// TODO: I believe wall groups are organized in relation to the tile map
+	// if so we should be able to jump to the correct groups occupying 'r'
+	// instead of iterating everything
+	for (unsigned int i = 0; i < WallCount; ++i)
 	{
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp) continue;
-		if (!wp->PointCovered(x, y)) continue;
-		if (areaanim && !(wp->GetPolygonFlag() & WF_COVERANIMS)) continue;
 
-		sc->AddPolygon(wp);
+		if (r.IntersectsRegion(wp->BBox)) {
+			return true;
+		}
 	}
 
-	return sc;
+	return false;
 }
 
 void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg)
@@ -2077,11 +2146,6 @@ void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg
 		else
 			value|=WF_DISABLED;
 		wp->SetPolygonFlag(value);
-	}
-	//all actors will have to generate a new spritecover
-	i=(int) actors.size();
-	while(i--) {
-		actors[i]->SetSpriteCover(NULL);
 	}
 }
 
@@ -3871,7 +3935,6 @@ AreaAnimation::AreaAnimation()
 	animation=NULL;
 	animcount=0;
 	palette=NULL;
-	covers=NULL;
 	appearance = sequence = frame = transparency = height = 0;
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
@@ -3903,8 +3966,6 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	memcpy(BAM, src->BAM, sizeof(ieResRef));
 
 	palette = src->palette ? new Palette(src->palette->col, src->palette->alpha) : NULL;
-	// covers will get built once we try to draw it
-	covers = NULL;
 
 	// handles the rest: animation, resets animcount
 	InitAnimation();
@@ -3919,12 +3980,6 @@ AreaAnimation::~AreaAnimation()
 	}
 	free(animation);
 	gamedata->FreePalette(palette, PaletteRef);
-	if (covers) {
-		for(int i=0;i<animcount;i++) {
-			delete covers[i];
-		}
-		free (covers);
-	}
 }
 
 Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
@@ -4056,33 +4111,14 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 	if (Flags&A_ANI_NO_WALL)
 		covered = false;
 
-	if (!covers) {
-		covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
-	}
-
 	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();
-		if(covers) {
-			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y + height, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h)) {
-				delete covers[ac];
-
-				// always provide a cover, even if it is 100% transparent
-				// SDL2 depends on AreaAnimations being drawn to the mask layer
-				if (covered) {
-					covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y + height, -anim->animArea.x,
-														-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
-				} else {
-					covers[ac] = new SpriteCover(Point(Pos.x, Pos.y+height),
-												 Region(-anim->animArea.x, -anim->animArea.y, anim->animArea.w, anim->animArea.h),
-												 flags);
-				}
-			}
+		if (covered == true) {
+			flags |= BLIT_STENCIL_ALPHA;
 		}
-
-		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y,
-										 flags, tint, covers?covers[ac]:0);
+		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y, flags, tint);
 	}
 }
 

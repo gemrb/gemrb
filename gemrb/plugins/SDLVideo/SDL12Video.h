@@ -60,11 +60,10 @@ public:
 	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
 	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
 
-	void Flush() {};
-
 private:
 	void SwapBuffers(VideoBuffers&);
-	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
+	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const;
+	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const;
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt);
 
 	int ProcessEvent(const SDL_Event & event);
@@ -74,11 +73,9 @@ private:
 	void DrawHLine(short x1, short y, short x2, const Color& color);
 	void DrawVLine(short x, short y1, short y2, const Color& color);
 
-	void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask,
-					   const Region& src, const Region& dst,
-					   unsigned int flags = 0, const Color* tint = NULL);
-	void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask,
-								 const SDL_Rect& src, const SDL_Rect& dst,
+	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
+							  unsigned int flags = 0, const Color* tint = NULL);
+	void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst,
 								 unsigned int flags = 0, const SDL_Color* tint = NULL);
 
 	void BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SDL_Rect& drect);

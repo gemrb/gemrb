@@ -127,6 +127,11 @@ void Video::PopDrawingBuffer()
 	drawingBuffer = drawingBuffers.back();
 }
 
+void Video::SetStencilBuffer(VideoBuffer* stencil)
+{
+	stencilBuffer = stencil;
+}
+
 int Video::SwapBuffers(unsigned int fpscap)
 {
 	SwapBuffers(drawingBuffers);
@@ -239,18 +244,16 @@ void Video::BlitTiled(Region rgn, const Sprite2D* img)
 }
 
 void Video::BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
-							   unsigned int flags, Color tint,
-							   SpriteCover* cover,
-							   const Region* clip)
+							   unsigned int flags, Color tint, const Region* clip)
 {
 	if (pal) {
 		Palette* oldpal = spr->GetPalette();
 		spr->SetPalette(pal);
-		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
+		BlitGameSprite(spr, x, y, flags, tint, clip);
 		spr->SetPalette(oldpal);
 		if (oldpal) oldpal->release();
 	} else {
-		BlitGameSprite(spr, x, y, flags, tint, cover, clip);
+		BlitGameSprite(spr, x, y, flags, tint, clip);
 	}
 }
 

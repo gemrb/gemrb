@@ -56,7 +56,6 @@ public:
 //between first edge is base line/separate baseline
 //DITHER means the polygon only dithers what it covers
 
-#define WF_ALWAYSCOVER  0
 #define WF_BASELINE 1
 #define WF_DITHER 2
 //this is used only externally, but converted to baseline on load time
@@ -75,6 +74,8 @@ public:
 	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);
+
+	
 public:
 	ieDword wall_flag;
 	Point base0, base1;

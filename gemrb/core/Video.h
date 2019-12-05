@@ -56,7 +56,9 @@ enum SpriteBlitFlags {
 	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000; timestop palette
 	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
 	BLIT_DARK = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
-	BLIT_GLOW = IE_VVC_GLOWING // 0x00200000; not implemented in SDLVideo yet
+	BLIT_GLOW = IE_VVC_GLOWING, // 0x00200000; not implemented in SDLVideo yet
+	BLIT_STENCIL_ALPHA = 0x00400000, // use the buffer ahead of drawigBuffer as a stencil using the stencil buffer alpha channel
+	BLIT_STENCIL_RGB = 0x00800000 // use the buffer ahead of drawigBuffer as a stencil using the stencil buffer rgb channels as alphas
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
@@ -67,8 +69,6 @@ enum SpriteBlitFlags {
 class GEM_EXPORT VideoBuffer {
 protected:
 	Region rect;
-
-public:
 
 public:
 	VideoBuffer(const Region& r) : rect(r) {}
@@ -125,6 +125,7 @@ protected:
 	VideoBuffers drawingBuffers;
 	// the current top of drawingBuffers that draw operations occur on
 	VideoBuffer* drawingBuffer;
+	VideoBuffer* stencilBuffer;
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 	virtual void Wait(unsigned long) = 0;
@@ -154,6 +155,7 @@ public:
 	void DestroyBuffer(VideoBuffer*);
 	void PushDrawingBuffer(VideoBuffer*);
 	void PopDrawingBuffer();
+	void SetStencilBuffer(VideoBuffer*);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	const Size& GetScreenSize() { return screenSize; }
@@ -173,8 +175,8 @@ public:
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 
-	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
-						  const Region* clip, unsigned int flags, const Color* tint = NULL) = 0;
+	virtual void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
+						  unsigned int flags, const Color* tint = NULL) = 0;
 	void BlitSprite(const Sprite2D* spr, int x, int y,
 					const Region* clip = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) = 0;
@@ -183,15 +185,10 @@ public:
 	// not a pretty interface :)
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
 								unsigned int flags, Color tint,
-								SpriteCover* cover,
 								const Region* clip = NULL) = 0;
 
 	void BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
-				   unsigned int flags, Color tint,
-				   SpriteCover* cover,
-				   const Region* clip = NULL);
-
-	virtual void Flush()=0;
+				   unsigned int flags, Color tint, const Region* clip = NULL);
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */

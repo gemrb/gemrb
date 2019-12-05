@@ -70,7 +70,6 @@ ScriptedAnimation::ScriptedAnimation()
 
 void ScriptedAnimation::Init()
 {
-	cover = NULL;
 	memset(anims,0,sizeof(anims));
 	palette = NULL;
 	sounds[0][0] = 0;
@@ -414,9 +413,6 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		palette->release();
 	}
 
-	if (cover) {
-		SetSpriteCover(NULL);
-	}
 	if (twin) {
 		delete twin;
 	}
@@ -434,7 +430,6 @@ void ScriptedAnimation::SetPhase(int arg)
 	if (arg>=P_ONSET && arg<=P_RELEASE) {
 		Phase = arg;
 	}
-	SetSpriteCover(NULL);
 	if (twin) {
 		twin->SetPhase(Phase);
 	}
@@ -705,19 +700,11 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	int cy = Pos.y - ZPos + YPos;
 	if (SequenceFlags&IE_VVC_HEIGHT) cy-=height;
 
-	if( SequenceFlags&IE_VVC_NOCOVER) {
-		if (cover) SetSpriteCover(NULL);
-	} else {
-		if (!cover || (Dither!=dither) || (!cover->Covers(cx, cy, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h)) ) {
-			Dither = dither;
-			Animation *anim = anims[Phase*MAX_ORIENT+Orientation];
-			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anim->animArea.x,
-			-anim->animArea.y, anim->animArea.w, anim->animArea.h, dither) );
-		}
-		assert(cover->Covers(cx, cy, frame->Frame.x, frame->Frame.y, frame->Frame.w, frame->Frame.h));
+	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
+		flags |= (dither) ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
 	}
 
-	video->BlitGameSpriteWithPalette(frame, palette, cx - viewport.x, cy - viewport.y, flags, tint, cover);
+	video->BlitGameSpriteWithPalette(frame, palette, cx - viewport.x, cy - viewport.y, flags, tint);
 
 	if (light) {
 		video->BlitGameSprite( light, cx - viewport.x, cy - viewport.y, flags^flag, tint, NULL);

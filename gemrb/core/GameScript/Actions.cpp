@@ -6960,26 +6960,14 @@ void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/
 	core->FogOfWar&=~FOG_DRAWFOG;
 }
 
-static void DeleteAllSpriteCovers()
-{
-	Game *game = core->GetGame();
-	int i = game->GetPartySize(false);
-	while (i--) {
-		Selectable *tar = (Selectable *) game->GetPC(i, false);
-		tar->SetSpriteCover(NULL);
-	}
-}
-
 void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->FogOfWar&=~FOG_DITHERSPRITES;
-	DeleteAllSpriteCovers();
 }
 
 void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->FogOfWar |= FOG_DITHERSPRITES;
-	DeleteAllSpriteCovers();
 }
 
 //the PST crew apparently loved hardcoding stuff

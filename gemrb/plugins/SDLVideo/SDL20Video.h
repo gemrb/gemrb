@@ -55,67 +55,8 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 	}
 }
 
-class SDL20VideoDriver : public SDLVideoDriver {
-private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-
-	SDL_BlendMode maskBlender;
-
-public:
-	SDL20VideoDriver(void);
-	~SDL20VideoDriver(void);
-
-	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
-
-	int CreateDriverDisplay(const Size& s, int bpp, const char* title);
-	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
-
-	void SwapBuffers(VideoBuffers& buffers);
-
-	Sprite2D* GetScreenshot( Region r );
-	bool SetFullscreenMode(bool set);
-	void SetGamma(int brightness, int contrast);
-	bool ToggleGrabInput();
-
-	void StartTextInput();
-	void StopTextInput();
-	bool InTextInput();
-	
-	bool TouchInputEnabled();
-
-	void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0);
-	void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
-
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0);
-	
-	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
-	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
-
-	void Flush();
-
-private:
-	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
-
-	int ProcessEvent(const SDL_Event & event);
-
-	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer();
-	int UpdateRenderTarget(const Color* color = NULL, unsigned int flags = 0);
-	int SetRendererForMask(const SDL_Color& mask);
-
-	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
-	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
-
-	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Sprite2D* /*mask*/, const Region& /*src*/, const Region& /*dst*/,
-					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
-	void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
-
-	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
-};
-
 class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Texture* texture;
-	SDL_Texture* maskLayer;
 	SDL_Renderer* renderer;
 
 	 // the format of the pixel data the client thinks we use, we may have to convert in CopyPixels()
@@ -139,7 +80,6 @@ public:
 	{
 		assert(texture);
 		assert(renderer);
-		maskLayer = NULL;
 
 		SDL_QueryTexture(texture, &nativeFormat, NULL, NULL, NULL);
 
@@ -154,9 +94,6 @@ public:
 
 	~SDLTextureVideoBuffer() {
 		SDL_DestroyTexture(texture);
-		if (maskLayer) {
-			SDL_DestroyTexture(maskLayer);
-		}
 		operator delete(conversionBuffer);
 	}
 
@@ -172,19 +109,6 @@ public:
 		SDL_RenderDrawPoint(renderer, 0, 0);
 #endif
 		SDL_RenderClear(renderer);
-
-		ClearMaskLayer();
-	}
-
-	void ClearMaskLayer() {
-		if (maskLayer) {
-			SDL_SetRenderTarget(renderer, maskLayer);
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
-#if SDL_COMPILEDVERSION == SDL_VERSIONNUM(2, 0, 10)
-			SDL_RenderDrawPoint(renderer, 0, 0);
-#endif
-			SDL_RenderClear(renderer);
-		}
 	}
 
 	bool RenderOnDisplay(void* display) const {
@@ -192,12 +116,6 @@ public:
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		int ret = SDL_RenderCopy(renderer, texture, NULL, &dst);
-
-		if (maskLayer && ret == 0) {
-			SDL_SetTextureBlendMode(maskLayer, SDL_BLENDMODE_BLEND);
-			ret = SDL_RenderCopy(renderer, maskLayer, NULL, &dst);
-		}
-
 		if (ret != 0) {
 			Log(ERROR, "SDLVideo", "%s", SDL_GetError());
 		}
@@ -265,16 +183,69 @@ public:
 		}
 	}
 
-	SDL_Texture* GetMaskLayer() {
-		if (maskLayer == NULL)
-			maskLayer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
-		return maskLayer;
-	}
-
 	SDL_Texture* GetTexture() const
 	{
 		return texture;
 	}
+};
+
+class SDL20VideoDriver : public SDLVideoDriver {
+private:
+	SDL_Window* window;
+	SDL_Renderer* renderer;
+
+	SDL_BlendMode stencilAlphaBlender;
+	SDL_BlendMode stencilRGBBlender;
+
+	SDL_Texture* scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
+
+public:
+	SDL20VideoDriver(void);
+	~SDL20VideoDriver(void);
+
+	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
+
+	int CreateDriverDisplay(const Size& s, int bpp, const char* title);
+	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
+
+	void SwapBuffers(VideoBuffers& buffers);
+
+	Sprite2D* GetScreenshot( Region r );
+	bool SetFullscreenMode(bool set);
+	void SetGamma(int brightness, int contrast);
+	bool ToggleGrabInput();
+
+	void StartTextInput();
+	void StopTextInput();
+	bool InTextInput();
+	
+	bool TouchInputEnabled();
+
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0);
+	void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
+
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0);
+	
+	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
+
+private:
+	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
+
+	int ProcessEvent(const SDL_Event & event);
+
+	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const;
+	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const;
+	int UpdateRenderTarget(const Color* color = NULL, unsigned int flags = 0);
+
+	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
+	void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
+
+	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Region& /*src*/, const Region& /*dst*/,
+					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
+	void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+
+	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
 };
 
 }

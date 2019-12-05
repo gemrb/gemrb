@@ -30,7 +30,6 @@
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"
-#include "SpriteCover.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
@@ -1693,22 +1692,10 @@ Selectable::Selectable(ScriptableType type)
 	Over = false;
 	size = 0;
 	sizeFactor = 1.0f;
-	cover = NULL;
 	circleBitmap[0] = NULL;
 	circleBitmap[1] = NULL;
 	selectedColor = ColorBlack;
 	overColor = ColorBlack;
-}
-
-void Selectable::SetSpriteCover(SpriteCover* c)
-{
-	delete cover;
-	cover = c;
-}
-
-Selectable::~Selectable(void)
-{
-	delete cover;
 }
 
 void Selectable::SetBBox(const Region &newBBox)
@@ -1746,7 +1733,6 @@ void Selectable::DrawCircle(const Region &vp)
 	}
 
 	if (sprite) {
-		// FIXME: we probably need to generate and pass a SpriteCover. issue #224
 		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y );
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
@@ -1755,7 +1741,7 @@ void Selectable::DrawCircle(const Region &vp)
 		if (csize < 4) csize = 3;
 
 		core->GetVideoDriver()->DrawEllipse( Pos - vp.Origin(),
-		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col, true );
+		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col);
 	}
 }
 
@@ -1795,8 +1781,6 @@ void Selectable::Select(int Value)
 	if (Selected!=0x80 || Value!=1) {
 		Selected = (ieWord) Value;
 	}
-	//forcing regeneration of the cover
-	SetSpriteCover(NULL);
 }
 
 void Selectable::SetCircle(int circlesize, float factor, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)

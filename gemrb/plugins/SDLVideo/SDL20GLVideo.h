@@ -58,7 +58,7 @@ namespace GemRB
 		int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 		void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette);
 		void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint, SpriteCover* cover, Palette *palette = NULL,	const Region* clip = NULL, bool anchor = false);
-		void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags, const Color* tint = NULL);
+		void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, unsigned int flags, const Color* tint = NULL);
 		Sprite2D* CreateSprite(const Region&, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,	bool cK = false, int index = 0);
 		Sprite2D* CreateSprite8(const Region&, void* pixels,	Palette* palette, bool cK, int index);
 		Sprite2D* CreatePalettedSprite(const Region&, int bpp, void* pixels, Color* palette, bool cK = false, int index = 0);

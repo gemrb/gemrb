@@ -82,11 +82,11 @@ public:
 	virtual Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0);
 
-	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
-						  const Region* clip, unsigned int flags, const Color* tint = NULL);
+	virtual void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
+						  unsigned int flags, const Color* tint = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst);
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
-								SpriteCover* cover, const Region* clip = NULL);
+								const Region* clip = NULL);
 
 	/** This functions Draws a Circle */
 	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, unsigned int flags = 0);
@@ -111,7 +111,8 @@ protected:
 	typedef Point SDL_Point;
 #endif
 
-	virtual inline vid_buf_t* CurrentRenderBuffer()=0;
+	virtual inline vid_buf_t* CurrentRenderBuffer() const=0;
+	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* = NULL);
 
 	using Video::DrawPoints;
@@ -119,9 +120,9 @@ protected:
 	using Video::DrawLines;
 	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
 
-	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Sprite2D* mask, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Sprite2D* spr, const Sprite2D* mask, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
+	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
+	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
 
 	int PollEvents();
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/

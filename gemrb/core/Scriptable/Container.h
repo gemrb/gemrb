@@ -59,7 +59,6 @@ private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
 	void FreeGroundIcons();
-	void CreateGroundIconCover();
 public:
 	Point toOpen;
 	ieWord Type;
@@ -69,7 +68,6 @@ public:
 	ieStrRef OpenFail;
 	//these are not saved
 	Sprite2D *groundicons[3];
-	SpriteCover *groundiconcover;
 	//keyresref is stored in Highlightable
 };
 

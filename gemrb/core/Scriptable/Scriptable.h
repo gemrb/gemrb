@@ -45,7 +45,6 @@ class Scriptable;
 class Selectable;
 class Spell;
 class Sprite2D;
-class SpriteCover;
 
 #define MAX_GROUND_ICON_DRAWN   3
 
@@ -379,7 +378,6 @@ private:
 class GEM_EXPORT Selectable : public Scriptable {
 public:
 	Selectable(ScriptableType type);
-	virtual ~Selectable(void);
 public:
 	Region BBox;
 	ieWord Selected; //could be 0x80 for unselectable
@@ -389,9 +387,6 @@ public:
 	Sprite2D *circleBitmap[2];
 	int size;
 	float sizeFactor;
-private:
-	// current SpriteCover for wallgroups
-	SpriteCover* cover;
 public:
 	void SetBBox(const Region &newBBox);
 	void DrawCircle(const Region &vp);
@@ -401,10 +396,6 @@ public:
 	void Select(int Value);
 	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
-	/* store SpriteCover */
-	void SetSpriteCover(SpriteCover* c);
-	/* get stored SpriteCover */
-	SpriteCover* GetSpriteCover() const { return cover; }
 	/* want dithered SpriteCover */
 	int WantDither() const;
 };
