@@ -2088,7 +2088,7 @@ void Map::RedrawStencils(const Region& vp)
 	for (unsigned int i = 0; i < WallCount; ++i)
 	{
 		Wall_Polygon* wp = Walls[i];
-		if (!wp) continue;
+		if (!wp || (wp->wall_flag & WF_DISABLED)) continue;
 
 		if (vp.IntersectsRegion(wp->BBox)) {
 			if (wp->wall_flag & WF_COVERANIMS) {
@@ -2119,7 +2119,7 @@ bool Map::IntersectsWall(const Region& r) const
 	for (unsigned int i = 0; i < WallCount; ++i)
 	{
 		Wall_Polygon* wp = GetWallGroup(i);
-		if (!wp) continue;
+		if (!wp || (wp->wall_flag&WF_DISABLED)) continue;
 
 		if (r.IntersectsRegion(wp->BBox)) {
 			return true;
