@@ -1121,13 +1121,12 @@ void Map::DrawMap(const Region& viewport)
 	// 1. Draw background
 	// 2. Draw overlays (weather)
 	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
-	// 4. Push the WF_COVERANIMS stencil
-	// 5. Draw background animations (BLIT_STENCIL)
-	// 6. push the opaque stencil
-	// 7. draw scriptables (BLIT_STENCIL), keep a list of any that have a stencil+dither flag
-	// 8. draw our list of stencil+dither objects (_no_ BLIT_STENCIL, but BLIT_HALFTRANS)
-	// 9. draw fog (BLIT_BLENDED)
-	// 10. draw text (BLIT_BLENDED)
+	// 4. set the video stencil buffer to animWallStencil
+	// 5. Draw background animations (BLIT_STENCIL_ALPHA)
+	// 6. set the video stencil buffer to wallStencil
+	// 7. draw scriptables (BLIT_STENCIL_RGB, or BLITSTENCIL_ALPHA depending on scriptable->WantDither() return value)
+	// 8. draw fog (BLIT_BLENDED)
+	// 9. draw text (BLIT_BLENDED)
 
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();

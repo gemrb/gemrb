@@ -302,6 +302,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region d
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
+	// FIXME: needs BLIT_BLENDED for anything with an alpha
 	BlitSpriteClipped(spr, src, dst);
 }
 

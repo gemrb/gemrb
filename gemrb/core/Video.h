@@ -57,8 +57,8 @@ enum SpriteBlitFlags {
 	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
 	BLIT_DARK = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
 	BLIT_GLOW = IE_VVC_GLOWING, // 0x00200000; not implemented in SDLVideo yet
-	BLIT_STENCIL_ALPHA = 0x00400000, // use the buffer ahead of drawigBuffer as a stencil using the stencil buffer alpha channel
-	BLIT_STENCIL_RGB = 0x00800000 // use the buffer ahead of drawigBuffer as a stencil using the stencil buffer rgb channels as alphas
+	BLIT_STENCIL_ALPHA = 0x00400000, // blend with the stencil buffer using the stencils alpha channel as the stencil
+	BLIT_STENCIL_RGB = 0x00800000 // blend with the stencil buffer using the stencils rgb channels as the stencil
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
