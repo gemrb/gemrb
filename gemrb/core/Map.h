@@ -391,6 +391,7 @@ private:
 	// for now wallStencil uses 'rgb' for BLIT_STENCIL_HALF and 'a' for BLIT_STENCIL
 	VideoBuffer* animWallStencil;
 	VideoBuffer* wallStencil;
+	Region stencilViewport;
 public:
 	Map(void);
 	~Map(void);
