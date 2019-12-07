@@ -419,8 +419,6 @@ void WindowManager::DrawMouse() const
 	Point mid = eventMgr.MousePos() - pos;
 	cursorBuf->SetOrigin(pos);
 
-	video->SetScreenClip(NULL);
-
 	DrawCursor(mid);
 
 	// tooltip is *always* midpoint to the buffer
@@ -595,6 +593,9 @@ void WindowManager::DrawWindows() const
 	}
 
 	DrawMouse();
+
+	// Be sure to reset this to nothing, else some renderer backends (metal at least) complain when we clear (swapbuffers)
+	video->SetScreenClip(NULL);
 }
 
 //copies a screenshot into a sprite
