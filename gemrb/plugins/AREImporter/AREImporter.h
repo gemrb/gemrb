@@ -74,7 +74,8 @@ private:
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, Map *map);
-	int PutPoints(DataStream *stream, Point *p, unsigned int count);
+	int PutPoints(DataStream *stream, const std::vector<Point>&);
+	int PutPoints(DataStream *stream, const Point *p, size_t count);
 	int PutDoors(DataStream *stream, Map *map, ieDword &VertIndex);
 	int PutItems(DataStream *stream, Map *map);
 	int PutContainers(DataStream *stream, Map *map, ieDword &VertIndex);

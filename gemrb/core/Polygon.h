@@ -25,7 +25,7 @@
 
 #include "Region.h"
 
-#include <list>
+#include <vector>
 
 namespace GemRB {
 
@@ -36,17 +36,20 @@ public:
 };
 
 class GEM_EXPORT Gem_Polygon {
+	std::vector<Trapezoid> ComputeTrapezoids() const;
+private:
+	void RecalcBBox();
 public:
-	Gem_Polygon(Point* points, unsigned int count, Region *bbox = NULL);
-	~Gem_Polygon(void);
+	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
+
 	Region BBox;
-	Point* points;
-	unsigned int count;
-	std::list<Trapezoid> trapezoids;
+	std::vector<Point> verticies;
+	std::vector<Point> rasterData; // same as verticies, but relative to BBox
+
+	size_t Count() const {return verticies.size();}
+
 	bool PointIn(const Point &p) const;
 	bool PointIn(int x, int y) const;
-	void RecalcBBox();
-	void ComputeTrapezoids();
 };
 
 // wall polygons are used to render area wallgroups

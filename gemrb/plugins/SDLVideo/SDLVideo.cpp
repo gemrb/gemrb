@@ -535,83 +535,44 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-
+#undef SetPixel
 
 void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
 {
-	// FIXME: this takes origin in "viewport" coordinates, but drawing should be done in screen coordinates
-
-	Region bbox = poly->BBox;
-	bbox.x -= origin.x;
-	bbox.y -= origin.y;
-
-	if (!poly->count || !bbox.IntersectsRegion(screenClip)) {
-		return;
-	}
-
 	std::vector<SDL_Point> points;
-	points.reserve(poly->trapezoids.size());
+	Size size = drawingBuffer->Size();
 
 	if (fill) {
-		std::list<Trapezoid>::iterator iter;
-		for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-			 ++iter)
+		const std::vector<Point>& lines = poly->rasterData;
+		size_t count = lines.size();
+		points.resize(count);
+		for (size_t i = 0; i < count; ++i)
 		{
-			int y_top = iter->y1 - origin.y; // inclusive
-			int y_bot = iter->y2 - origin.y; // exclusive
-
-			if (y_top < 0) y_top = 0;
-			if (y_bot >= screenSize.h) y_bot = screenSize.h - 1;
-			if (y_top >= y_bot) continue; // clipped
-
-			int ledge = iter->left_edge;
-			int redge = iter->right_edge;
-			const Point& a = poly->points[ledge];
-			const Point& b = poly->points[(ledge+1)%(poly->count)];
-			const Point& c = poly->points[redge];
-			const Point& d = poly->points[(redge+1)%(poly->count)];
-
-			points.reserve(points.size() + (y_bot*2));
-
-			for (int y = y_top; y < y_bot; ++y) {
-				int py = y + origin.y;
-
-				int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
-				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
-
-				lt -= origin.x;
-				rt -= origin.x;
-
-				if (lt < 0) lt = 0;
-				if (rt >= screenSize.w) rt = screenSize.w - 1;
-				if (lt >= rt) { continue; } // clipped
-
-				// Draw a line from (y,lt) to (y,rt)
-				SetPixel(drawingBuffer, lt, y);
-				SetPixel(drawingBuffer, rt, y);
-			}
+			points[i].x = Clamp(lines[i].x + origin.x, 0, size.w-1);
+			points[i].y = Clamp(lines[i].y + origin.y, 0, size.h-1);
 		}
 	} else {
-		Size size = drawingBuffer->Size();
-		Point p = Clamp(poly->points[0] - origin, Point(0,0), Point(size.w, size.h));
-		SetPixel(drawingBuffer, p.x, p.y);
+		points.resize(poly->Count()*2);
 
-		points.reserve(points.size() + (poly->count*2));
+		Point p = Clamp(poly->verticies[0] - origin, Point(0,0), Point(size.w, size.h));
+		points[0].x = p.x;
+		points[0].y = p.y;
 
-		for (unsigned int i = 1; i < poly->count; i++) {
+		size_t j = 1;
+		for (size_t i = 1; i < poly->Count(); ++i, ++j) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			Point p = Clamp(poly->points[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
-			SetPixel(drawingBuffer, p.x, p.y);
-			SetPixel(drawingBuffer, p.x, p.y);
+			Point p = Clamp(poly->verticies[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
+			points[j].x = p.x;
+			points[j].y = p.y;
+			points[++j] = points[i];
 		}
 		// reconnect with start point
-		SetPixel(drawingBuffer, p.x, p.y);
+		points[j].x = p.x;
+		points[j].y = p.y;
 	}
 
 	DrawLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
 }
-
-#undef SetPixel
 
 void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags, const Color* tint)
 {

@@ -1603,15 +1603,15 @@ int AREImporter::GetStoredFileSize(Map *map)
 	VerticesCount = 0;
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip=map->TMap->GetInfoPoint(i);
-		VerticesCount+=ip->outline->count;
+		VerticesCount+=ip->outline->Count();
 	}
 	for(i=0;i<ContainersCount;i++) {
 		Container *c=map->TMap->GetContainer(i);
-		VerticesCount+=c->outline->count;
+		VerticesCount+=c->outline->Count();
 	}
 	for(i=0;i<DoorsCount;i++) {
 		Door *d=map->TMap->GetDoor(i);
-		VerticesCount+=d->open->count+d->closed->count+d->oibcount+d->cibcount;
+		VerticesCount+=d->open->Count()+d->closed->Count()+d->oibcount+d->cibcount;
 	}
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
@@ -1785,10 +1785,10 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		}
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
-		tmpWord = (ieWord) d->open->count;
+		tmpWord = (ieWord) d->open->Count();
 		stream->WriteWord( &tmpWord);
 		VertIndex += tmpWord;
-		tmpWord = (ieWord) d->closed->count;
+		tmpWord = (ieWord) d->closed->Count();
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
@@ -1866,12 +1866,16 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImporter::PutPoints( DataStream *stream, Point *p, unsigned int count)
+int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p)
+{
+	return PutPoints(stream, &p[0], p.size());
+}
+
+int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 {
 	ieWord tmpWord;
-	unsigned int j;
 
-	for(j=0;j<count;j++) {
+	for(size_t j=0;j<count;j++) {
 		tmpWord = p[j].x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = p[j].y;
@@ -1887,18 +1891,18 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	//regions
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
-		PutPoints(stream, ip->outline->points, ip->outline->count);
+		PutPoints(stream, ip->outline->verticies);
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
 		Container *c = map->TMap->GetContainer(i);
-		PutPoints(stream, c->outline->points, c->outline->count);
+		PutPoints(stream, c->outline->verticies);
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
-		PutPoints(stream, d->open->points, d->open->count);
-		PutPoints(stream, d->closed->points, d->closed->count);
+		PutPoints(stream, d->open->verticies);
+		PutPoints(stream, d->closed->verticies);
 		PutPoints(stream, d->open_ib, d->oibcount);
 		PutPoints(stream, d->closed_ib, d->cibcount);
 	}
@@ -1973,7 +1977,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 			stream->Write( filling, 8);
 		}
 		//outline polygon index and count
-		tmpWord = c->outline->count;
+		tmpWord = c->outline->Count();
 		stream->WriteDword( &VertIndex);
 		stream->WriteWord( &tmpWord);
 		VertIndex +=tmpWord;
@@ -2014,7 +2018,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) (ip->outline->BBox.y + ip->outline->BBox.h);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->outline->count;
+		tmpWord = (ieWord) ip->outline->Count();
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;

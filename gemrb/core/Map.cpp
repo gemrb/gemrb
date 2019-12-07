@@ -2095,20 +2095,21 @@ void Map::RedrawStencils(const Region& vp)
 		if (!wp || (wp->wall_flag & WF_DISABLED)) continue;
 
 		if (vp.IntersectsRegion(wp->BBox)) {
+			const Point& origin = wp->BBox.Origin() - vp.Origin();
 			if (wp->wall_flag & WF_COVERANIMS) {
 				video->PushDrawingBuffer(animWallStencil);
 				if (wp->wall_flag & WF_DITHER) {
-					video->DrawPolygon(wp, vp.Origin(), dithered, true);
+					video->DrawPolygon(wp, origin, dithered, true);
 				} else {
-					video->DrawPolygon(wp, vp.Origin(), opaque, true);
+					video->DrawPolygon(wp, origin, opaque, true);
 				}
 				video->PopDrawingBuffer();
 			}
 
 			if (wp->wall_flag & WF_DITHER) {
-				video->DrawPolygon(wp, vp.Origin(), dithered, true);
+				video->DrawPolygon(wp, origin, dithered, true);
 			} else {
-				video->DrawPolygon(wp, vp.Origin(), opaque, true);
+				video->DrawPolygon(wp, origin, opaque, true);
 			}
 		}
 	}
