@@ -5757,6 +5757,15 @@ void Actor::SetPersistent(int partyslot)
 	InternalFlags|=IF_FROMGAME;
 	//if an actor is coming from a game, it should have these too
 	CreateStats();
+	// ensure QSlots are set up to be what the class needs
+	InitButtons(GetActiveClass(), false);
+
+	if (PCStats->QuickWeaponSlots[0] != 0xffff) return;
+	// ReinitQuickSlots does not take care of weapon slots, so do it manually
+	for (int i = 0; i < 4; i++) {
+		SetupQuickSlot(i + ACT_WEAPON1, inventory.GetWeaponSlot(i), 0);
+	}
+	// call ReinitQuickSlots here if something needs it
 }
 
 void Actor::DestroySelf()
