@@ -540,7 +540,6 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
 {
 	std::vector<SDL_Point> points;
-	Size size = drawingBuffer->Size();
 
 	if (fill) {
 		const std::vector<Point>& lines = poly->rasterData;
@@ -548,20 +547,20 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 		points.resize(count);
 		for (size_t i = 0; i < count; ++i)
 		{
-			points[i].x = Clamp(lines[i].x + origin.x, 0, size.w-1);
-			points[i].y = Clamp(lines[i].y + origin.y, 0, size.h-1);
+			points[i].x = lines[i].x + origin.x;
+			points[i].y = lines[i].y + origin.y;
 		}
 	} else {
 		points.resize(poly->Count()*2);
 
-		Point p = Clamp(poly->vertices[0] - origin, Point(0,0), Point(size.w, size.h));
+		const Point& p = poly->vertices[0] - origin;
 		points[0].x = p.x;
 		points[0].y = p.y;
 
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, ++j) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			Point p = Clamp(poly->vertices[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
+			const Point& p = poly->vertices[i] - origin;
 			points[j].x = p.x;
 			points[j].y = p.y;
 			points[++j] = points[i];
