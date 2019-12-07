@@ -554,14 +554,14 @@ void SDLVideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const C
 	} else {
 		points.resize(poly->Count()*2);
 
-		Point p = Clamp(poly->verticies[0] - origin, Point(0,0), Point(size.w, size.h));
+		Point p = Clamp(poly->vertices[0] - origin, Point(0,0), Point(size.w, size.h));
 		points[0].x = p.x;
 		points[0].y = p.y;
 
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, ++j) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			Point p = Clamp(poly->verticies[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
+			Point p = Clamp(poly->vertices[i] - origin, Point(0,0), Point(size.w-1, size.h-1));
 			points[j].x = p.x;
 			points[j].y = p.y;
 			points[++j] = points[i];

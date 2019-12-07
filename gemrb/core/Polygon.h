@@ -43,10 +43,10 @@ public:
 	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
 
 	Region BBox;
-	std::vector<Point> verticies;
-	std::vector<Point> rasterData; // same as verticies, but relative to BBox
+	std::vector<Point> vertices;
+	std::vector<Point> rasterData; // same as vertices, but relative to BBox
 
-	size_t Count() const {return verticies.size();}
+	size_t Count() const {return vertices.size();}
 
 	bool PointIn(const Point &p) const;
 	bool PointIn(int x, int y) const;

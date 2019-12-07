@@ -30,7 +30,7 @@
 namespace GemRB {
 
 Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
-: verticies(points, points + cnt)
+: vertices(points, points + cnt)
 {
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
@@ -48,10 +48,10 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 
 		int ledge = iter->left_edge;
 		int redge = iter->right_edge;
-		const Point& a = verticies[ledge];
-		const Point& b = verticies[(ledge+1)%(Count())];
-		const Point& c = verticies[redge];
-		const Point& d = verticies[(redge+1)%(Count())];
+		const Point& a = vertices[ledge];
+		const Point& b = vertices[(ledge+1)%(Count())];
+		const Point& c = vertices[redge];
+		const Point& d = vertices[(redge+1)%(Count())];
 
 		rasterData.reserve(rasterData.size() + (y_bot*2));
 
@@ -77,26 +77,26 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 
 void Gem_Polygon::RecalcBBox()
 {
-	if (verticies.empty()) {
+	if (vertices.empty()) {
 		BBox.x=BBox.y=BBox.w=BBox.h=0;
 		return;
 	}
-	BBox.x = verticies[0].x;
-	BBox.y = verticies[0].y;
-	BBox.w = verticies[0].x;
-	BBox.h = verticies[0].y;
-	for(size_t i=1; i<verticies.size(); i++) {
-		if(verticies[i].x<BBox.x) {
-			BBox.x = verticies[i].x;
+	BBox.x = vertices[0].x;
+	BBox.y = vertices[0].y;
+	BBox.w = vertices[0].x;
+	BBox.h = vertices[0].y;
+	for(size_t i=1; i<vertices.size(); i++) {
+		if(vertices[i].x<BBox.x) {
+			BBox.x = vertices[i].x;
 		}
-		if(verticies[i].x>BBox.w) {
-			BBox.w = verticies[i].x;
+		if(vertices[i].x>BBox.w) {
+			BBox.w = vertices[i].x;
 		}
-		if(verticies[i].y<BBox.y) {
-			BBox.y = verticies[i].y;
+		if(vertices[i].y<BBox.y) {
+			BBox.y = vertices[i].y;
 		}
-		if(verticies[i].y>BBox.h) {
-			BBox.h = verticies[i].y;
+		if(vertices[i].y>BBox.h) {
+			BBox.h = vertices[i].y;
 		}
 	}
 	BBox.w-=BBox.x;
@@ -113,16 +113,16 @@ bool Gem_Polygon::PointIn(int tx, int ty) const
 {
 	int  yflag0, yflag1, xflag0 , index;
 	bool inside_flag = false;
-	size_t count = verticies.size();
+	size_t count = vertices.size();
 
 	if (count < 3) {
 		return false;
 	}
 	index = 0;
 
-	const Point* vtx0 = &verticies[count - 1];
+	const Point* vtx0 = &vertices[count - 1];
 	yflag0 = ( vtx0->y >= ty );
-	const Point* vtx1 = &verticies[index];
+	const Point* vtx1 = &vertices[index];
 
 	for (size_t j = count + 1; --j ;) {
 		yflag1 = ( vtx1->y >= ty );
@@ -141,7 +141,7 @@ bool Gem_Polygon::PointIn(int tx, int ty) const
 		}
 		yflag0 = yflag1;
 		vtx0 = vtx1;
-		vtx1 = &verticies[++index];
+		vtx1 = &vertices[++index];
 	}
 	return inside_flag;
 }
@@ -217,10 +217,10 @@ struct ScanlineInt {
 		if (x > i2.x)
 			return false;
 
-		const Point& a = p->verticies[pi];
-		const Point& b = p->verticies[(pi+1)%(p->Count())];
-		const Point& c = p->verticies[i2.pi];
-		const Point& d = p->verticies[(i2.pi+1)%(p->Count())];
+		const Point& a = p->vertices[pi];
+		const Point& b = p->vertices[(pi+1)%(p->Count())];
+		const Point& c = p->vertices[i2.pi];
+		const Point& d = p->vertices[(i2.pi+1)%(p->Count())];
 
 		int dx1 = a.x - b.x;
 		int dx2 = c.x - d.x;
@@ -247,7 +247,7 @@ struct ScanlineInt {
 std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 {
 	std::vector<Trapezoid> trapezoids;
-	size_t count = verticies.size();
+	size_t count = vertices.size();
 
 	if (count < 3) return trapezoids;
 
@@ -258,20 +258,20 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	unsigned int i;
 
 	for (i = 0; i < count; ++i)
-		ys.push_back(verticies[i].y);
+		ys.push_back(vertices[i].y);
 
 	Point p;
 	// y coords of self-intersections
 	for (unsigned int i1 = 0; i1 < count; ++i1) {
-		const Point& a = verticies[i1];
-		const Point& b = verticies[(i1+1)%count];
+		const Point& a = vertices[i1];
+		const Point& b = vertices[(i1+1)%count];
 
 		// intersections with horizontal lines don't matter
 		if (a.y == b.y) continue;
 
 		for (unsigned int i2 = i1+2; i2 < count; ++i2) {
-			const Point& c = verticies[i2];
-			const Point& d = verticies[(i2+1)%count];
+			const Point& c = vertices[i2];
+			const Point& d = vertices[(i2+1)%count];
 			
 			// intersections with horizontal lines don't matter
 			if (c.y == d.y) continue;
@@ -312,8 +312,8 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		// the nexty scanline.)
 		ints.clear();
 		for (i = 0; i < count; ++i) {
-			const Point& a = verticies[i];
-			const Point& b = verticies[(i+1)%count];
+			const Point& a = vertices[i];
+			const Point& b = vertices[(i+1)%count];
 
 			if (a.y == b.y) continue;
 

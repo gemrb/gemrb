@@ -1891,18 +1891,18 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	//regions
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
-		PutPoints(stream, ip->outline->verticies);
+		PutPoints(stream, ip->outline->vertices);
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
 		Container *c = map->TMap->GetContainer(i);
-		PutPoints(stream, c->outline->verticies);
+		PutPoints(stream, c->outline->vertices);
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
-		PutPoints(stream, d->open->verticies);
-		PutPoints(stream, d->closed->verticies);
+		PutPoints(stream, d->open->vertices);
+		PutPoints(stream, d->closed->vertices);
 		PutPoints(stream, d->open_ib, d->oibcount);
 		PutPoints(stream, d->closed_ib, d->cibcount);
 	}
