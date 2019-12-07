@@ -229,6 +229,8 @@ public:
 	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
 	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
 
+	void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
+
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
 

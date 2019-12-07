@@ -603,8 +603,9 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			}
 
 			Color fillc(c.r, c.g, c.b, c.a/2);
-			video->DrawPolygon( poly, vpOrigin, fillc, true );
-			video->DrawPolygon( poly, vpOrigin, c, false );
+			const Point& origin = poly->BBox.Origin() - vpOrigin;
+			video->DrawPolygon( poly, origin, fillc, true );
+			video->DrawPolygon( poly, origin, c, false );
 		}
 	}
 

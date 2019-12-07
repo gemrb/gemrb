@@ -312,6 +312,31 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 	}
 }
 
+void SDL20VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+{
+	if (fill) {
+		const std::vector<Point>& lines = poly->rasterData;
+		size_t count = lines.size();
+		assert(count%2==0);
+		for (size_t i = 0; i < count; i+=2)
+		{
+			// SDL_RenderDrawLines actually is for drawing polygons so it is, ironically, not what we want
+			// when drawing the "rasterized" data. doing so would work ok most of the time, but other times
+			// the reconnection of the last to first point (done by SDL) will be visible
+			DrawLine(lines[i] + origin, lines[i+1] + origin, color);
+		}
+	} else {
+		std::vector<SDL_Point> points(poly->Count());
+		for (size_t i = 0; i < poly->Count(); ++i) {
+			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			points[i].x = p.x;
+			points[i].y = p.y;
+		}
+
+		DrawLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	}
+}
+
 Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 {
 	SDL_Rect rect = RectFromRegion(r);

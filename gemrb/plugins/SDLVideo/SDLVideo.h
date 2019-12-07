@@ -95,8 +95,6 @@ public:
 		double anglefrom, double angleto, bool drawlines = true, unsigned int flags = 0);
 	/** This functions Draws an Ellipse */
 	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0);
-	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
 
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
