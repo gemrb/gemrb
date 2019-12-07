@@ -2282,10 +2282,9 @@ void Game::SetExpansion(ieDword value)
 void Game::dump() const
 {
 	StringBuffer buffer;
-	size_t idx;
 
 	buffer.append("Currently loaded areas:\n");
-	for(idx=0;idx<Maps.size();idx++) {
+	for (size_t idx = 0; idx < Maps.size(); idx++) {
 		Map *map = Maps[idx];
 
 		print("%s", map->GetScriptName());
@@ -2299,10 +2298,16 @@ void Game::dump() const
 	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
 
 	buffer.appendFormatted("Party size: %d\n", (int) PCs.size());
-	for(idx=0;idx<PCs.size();idx++) {
+	for (size_t idx = 0; idx < PCs.size(); idx++) {
 		Actor *actor = PCs[idx];
 
 		buffer.appendFormatted("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
+	}
+
+	buffer.appendFormatted("\nNPC count: %zu\n", NPCs.size());
+	for (size_t idx = 0; idx < NPCs.size(); idx++) {
+		Actor *actor = NPCs[idx];
+		buffer.appendFormatted("Name: %s\tSelected: %s\n", actor->ShortName, actor->Selected ? "x ": "-");
 	}
 	Log(DEBUG, "Game", buffer);
 }
