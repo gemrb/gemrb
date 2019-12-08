@@ -2083,11 +2083,11 @@ void Map::RedrawStencils(const Region& vp)
 	// instead of iterating everything
 
 	// color is used as follows:
-	// the 'rgb' channels are for representing all walls as "dithered" (50% transparent)
-	// the 'a' channel is used to draw the walls in their "native" form taking WF_DITHER into account
-	// we then pass BLIT_STENCIL_RGB for anything that is always dithered and BLIT_STENCIL_ALPHA for everything else
-	static const Color opaque(0xff,0xff,0xff,0xff);
-	static const Color dithered(0xff,0xff,0xff,0x80);
+	// the 'a' channel is for representing all walls as "dithered" (50% transparent)
+	// the 'rgb' channels are used to draw the walls in their "native" form taking WF_DITHER into account
+	// we then pass BLIT_STENCIL_ALPHA for anything that is always dithered and BLIT_STENCIL_RGB for everything else
+	static const Color opaque(0xff,0xff,0xff,0x80);
+	static const Color dithered(0x80,0x80,0x80,0x80);
 	video->PushDrawingBuffer(wallStencil);
 	for (unsigned int i = 0; i < WallCount; ++i)
 	{
