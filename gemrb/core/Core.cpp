@@ -181,6 +181,30 @@ unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
+// What's the deal with the spell and item ranges in their descriptions being in feet?
+//
+// Kjeron provided these notes:
+// It had no standards - spell descriptions were copied straight from their source material.
+// In game it ranged from 3.57 units per foot, to 28.57 units per foot, but most often around
+// 8.5 units per foot, which was still wrong. The descriptions have mostly been fixed in the
+// EE's, albeit with some rounding.
+//
+// 16 horizontal pixels = 1 foot
+// 12 vertical pixels = 1 foot
+//
+// Projectile trap/explosion size is based on horizontal distance, 16 = 16h pixels = 1 foot radius
+// 80 = 5' radius
+// 256 = 16' radius
+// 448 = 28' radius (max engine can handle for repeating AoE's)
+// 480 = 30' radius
+//
+// Visual/Script Range = 448h/336v pixels (28 feet) (I don't know why it's often listed as 30')
+// Spellcasting Range = 16h/12v pixels (1 foot) per unit
+// Opcode 262 (Visual Range) = 32h/24v pixels (2 feet) per unit
+//
+// The one thing that is 30' (480h/360v pixels) is PC movement rate per round, at least in original BG1,
+// BG2 bumped it up by 50% to 45' per round.
+
 // 1 foot = 16px horizontally, 12px vertically and all in between
 // we use them to construct an ellipse and through its central angle get the adjusted "radius"
 // Potential optimisation through precomputing:
