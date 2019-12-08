@@ -55,6 +55,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
 	if (window == NULL) {
@@ -92,9 +93,6 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		return NULL;
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
-	if (format == RGBA8888) // FIXME: shouldnt this be determined by BLIT_BLENDED?
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-
 	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
 }
 
@@ -162,7 +160,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
-	UpdateRenderTarget(NULL, flags);
+	UpdateRenderTarget();
 
 	// we need to isolate flags that require software rendering to use as the "version"
 	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
@@ -200,9 +198,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		// in fact, SDL_BLENDMODE_MOD looks useful
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 	} else {
-		// FIXME: I think we need to correct the blit flags in a few places before uncommenting this
-		// usually anything with an alpha should pass BLIT_BLENDED
-		//SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
+		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
 	}
 
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
@@ -227,7 +223,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 			SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 		}
 
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE); // FIXME: address fixme above for BLIT_BLENDED and remove this
 		SDL_RenderCopy(renderer, tex, &srect, &drect);
 		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
 

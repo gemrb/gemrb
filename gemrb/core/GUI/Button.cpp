@@ -303,9 +303,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
 			if (pulseBorder && !fr->filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
-				video->DrawRect( r, mix, fr->filled );
+				video->DrawRect( r, mix, fr->filled, BLIT_BLENDED );
 			} else {
-				video->DrawRect( r, fr->color, fr->filled );
+				video->DrawRect( r, fr->color, fr->filled, BLIT_BLENDED );
 			}
 		}
 	}

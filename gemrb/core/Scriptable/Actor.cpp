@@ -8176,6 +8176,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	Video* video = core->GetVideoDriver();
 
 	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+	flags |= BLIT_BLENDED;
 
 	// TODO: we could optimize by caching this and update it only when the Selectable moves
 	// unfortunately Pos is public so its a bit hairy to undo that
