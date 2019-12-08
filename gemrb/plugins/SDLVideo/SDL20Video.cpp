@@ -587,12 +587,8 @@ bool SDL20VideoDriver::ToggleGrabInput()
 	return (isGrabbed != SDL_GetWindowGrab(window));
 }
 
-#ifndef USE_OPENGL
 #include "plugindef.h"
-
 
 GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
-
-#endif
