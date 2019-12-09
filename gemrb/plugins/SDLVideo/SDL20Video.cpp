@@ -160,8 +160,6 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
-	UpdateRenderTarget();
-
 	// we need to isolate flags that require software rendering to use as the "version"
 	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
 
@@ -223,13 +221,14 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 			SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 		}
 
-		SDL_RenderCopy(renderer, tex, &srect, &drect);
+		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
 
 		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
 		SDL_SetTextureBlendMode(scratchBuffer, SDL_BLENDMODE_BLEND);
-		ret = SDL_RenderCopyEx(renderer, scratchBuffer, &drect, &drect, 0.0, NULL, flipflags);
+		ret = SDL_RenderCopy(renderer, scratchBuffer, &drect, &drect);
 	} else {
+		UpdateRenderTarget();
 		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 	}
 
