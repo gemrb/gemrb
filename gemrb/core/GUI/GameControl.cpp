@@ -322,7 +322,7 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 	if (arrow_orientations[draw]>=0) {
 		Video* video = core->GetVideoDriver();
 		Sprite2D *arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
-		video->BlitGameSprite(arrow, p.x - vpOrigin.x, p.y - vpOrigin.y, BLIT_TINTED, color, NULL);
+		video->BlitGameSprite(arrow, p.x - vpOrigin.x, p.y - vpOrigin.y, BLIT_TINTED | BLIT_BLENDED, color, NULL);
 		arrow->release();
 	}
 	spr->release();
