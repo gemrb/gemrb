@@ -1172,8 +1172,6 @@ void Map::DrawMap(const Region& viewport)
 		a = GetNextAreaAnimation(aniidx, gametime);
 	}
 
-	video->SetStencilBuffer(wallStencil);
-
 	if (!bgoverride) {
 		//Draw Outlines
 		DrawHighlightables(viewport);
@@ -1202,6 +1200,7 @@ void Map::DrawMap(const Region& viewport)
 
 	std::vector<Scriptable*> dithered;
 	while (actor || a || sca || spark || pro || pile) {
+		video->SetStencilBuffer(wallStencil);
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
 			assert(actor != NULL);
@@ -1218,6 +1217,7 @@ void Map::DrawMap(const Region& viewport)
 			break;
 		case AOT_AREA:
 			//draw animation
+			video->SetStencilBuffer(animWallStencil);
 			a->Draw( viewport, this );
 			a = GetNextAreaAnimation(aniidx,gametime);
 			break;
