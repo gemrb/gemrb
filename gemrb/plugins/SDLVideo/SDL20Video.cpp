@@ -210,7 +210,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		// 4. copy scratchpad segment to screen
 
 		SDL_SetRenderTarget(renderer, scratchBuffer);
-		SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, SDL_ALPHA_TRANSPARENT);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
 
