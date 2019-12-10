@@ -2304,7 +2304,7 @@ void Game::dump() const
 		buffer.appendFormatted("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
 
-	buffer.appendFormatted("\nNPC count: %zu\n", NPCs.size());
+	buffer.appendFormatted("\nNPC count: %d\n", (int) NPCs.size());
 	for (size_t idx = 0; idx < NPCs.size(); idx++) {
 		Actor *actor = NPCs[idx];
 		buffer.appendFormatted("Name: %s\tSelected: %s\n", actor->ShortName, actor->Selected ? "x ": "-");
