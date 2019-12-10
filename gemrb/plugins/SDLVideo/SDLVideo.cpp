@@ -539,6 +539,13 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 
 void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags, const Color* tint)
 {
+#if SDL_VERSION_ATLEAST(1,3,0)
+	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BLIT_MIRRORX or BLIT_MIRRORY is set
+	// instead of doing this and then reversing it in that case only for SDL to reverse it yet again
+	// lets just not worry about clipping on SDL2. the backends handle all of that for us unline with SDL 1 where we
+	// might walk off a memory buffer we have no danger of that. This fixes bizzare clipping issues when a "flipped" sprit is partially offscreen
+	Region dclipped = dst;
+#else
 	// FIXME?: srect isn't verified
 	Region dclipped = ClippedDrawingRect(dst);
 	int trim = dst.h - dclipped.h;
@@ -559,6 +566,9 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	if (dclipped.Dimensions().IsEmpty() || src.Dimensions().IsEmpty()) {
 		return;
 	}
+
+	assert(dclipped.w == src.w && dclipped.h == src.h);
+#endif
 
 	if (spr->renderFlags&BLIT_MIRRORX) {
 		flags ^= BLIT_MIRRORX;
