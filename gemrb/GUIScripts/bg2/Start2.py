@@ -42,10 +42,11 @@ def OnLoad():
 	if GameCheck.IsBG2Demo():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
 
+	StartWindow = GemRB.LoadWindow (0, "START")
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
 		if GameCheck.HasTOB():
-			StartWindow.SetPicture("STARTOLD")
+			StartWindow.SetBackground("STARTOLD")
 		if not skip_videos and not skip_videos&4:
 			GemRB.PlayMovie ("INTRO15F", 1)
 			skip_videos |= 4
@@ -53,10 +54,6 @@ def OnLoad():
 		if not skip_videos and not skip_videos&2:
 			GemRB.PlayMovie ("INTRO", 1)
 			skip_videos |= 2
-
-	StartWindow = GemRB.LoadWindow (0, "START")
-	if GemRB.GetVar("oldgame")==1 and GameCheck.HasTOB():
-		StartWindow.SetBackground("STARTOLD")
 
 	#end ToB specific part
 	SinglePlayerButton = StartWindow.GetControl (0)
@@ -320,4 +317,5 @@ def Restart():
 		QuitWindow.Unload()
 	GemRB.SetNextScript ("Start")
 	return
+
 
