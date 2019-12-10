@@ -74,7 +74,7 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 	Game *game = core->GetGame();
 
 	//draw it with highlight
-	ieDword flags = BLIT_TINTED | (highlight ? 0 : BLIT_NOSHADOW);
+	ieDword flags = BLIT_TINTED | BLIT_BLENDED | (highlight ? 0 : BLIT_NOSHADOW);
 	game->ApplyGlobalTint(tint, flags);
 
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
