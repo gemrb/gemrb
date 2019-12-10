@@ -1922,12 +1922,12 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 		if (del) {
 			// invalidate the reference
 			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
-			view->RemoveFromSuperview();
-			delete view;
+			delete view->RemoveFromSuperview();
 			Py_RETURN_NONE;
 		} else {
 			// return a new ref for a deleted group
 			view->RemoveScriptingRef(ref);
+			view->RemoveFromSuperview();
 
 			static ScriptingId id = 0;
 			ResRef group = "Deleted";

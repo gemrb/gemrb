@@ -101,13 +101,16 @@ def UpdateControlStatus():
 	largeFrame = largeMTA.GetFrame()
 
 	# swap the 2 TextAreas
-	largeMW.AddSubview(smallMTA)
+	smallMTA = smallMW.RemoveSubview(smallMTA)
+	smallMTA = largeMW.AddSubview(smallMTA)
 	smallMTA.SetFrame(largeFrame)
-	smallMTA.AddAlias("MTA_LG", 0)
-	
-	smallMW.AddSubview(largeMTA)
+
+	largeMTA = largeMW.RemoveSubview(largeMTA)
+	largeMTA = smallMW.AddSubview(largeMTA)
 	largeMTA.SetFrame(smallFrame)
-	largeMTA.AddAlias("MTA_SM", 0)
+
+	smallMTA.AddAlias("MTA_LG", 0, True)
+	largeMTA.AddAlias("MTA_SM", 0, True)
 	
 	if Override:
 		#gets PC currently talking
