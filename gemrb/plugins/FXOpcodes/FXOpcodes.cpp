@@ -1387,7 +1387,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	if (target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+	if (core->HasFeature(GF_3ED_RULES) && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
 		Log(DEBUG, "fx_damage", "Attacking invulnerable target, skipping!");
 		return FX_NOT_APPLIED;
 	}

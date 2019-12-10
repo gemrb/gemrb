@@ -30,13 +30,10 @@
 #include "Holder.h"
 #include "Resource.h"
 #include "ResourceManager.h"
+#include "TableMgr.h"
 
 #include <map>
 #include <vector>
-
-#ifdef _MSC_VER // No SFINAE
-#include "TableMgr.h"
-#endif
 
 namespace GemRB {
 
@@ -121,6 +118,8 @@ public:
 	// itemsnd.2da functions
 	bool GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
+
+	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
 private:
 	void ReadItemSounds();
 private:
@@ -133,6 +132,7 @@ private:
 	typedef std::map<const char*, Store*, iless> StoreMap;
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
+	AutoTable raceTHAC0Bonus;
 };
 
 extern GEM_EXPORT GameData * gamedata;

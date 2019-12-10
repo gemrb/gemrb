@@ -828,12 +828,14 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 		return;
 	}
 	unsigned int interval = event.interval;
-	if (interval) {
-		if (last_spawndate + interval >= core->GetGame()->GameTime) {
+	ieDword gameTime = core->GetGame()->GameTime;
+	// gameTime can be 0 for the first area, so make sure to not exit prematurely
+	if (interval && gameTime) {
+		if (last_spawndate + interval >= gameTime) {
 			return;
 		}
 	}
-	last_spawndate=core->GetGame()->GameTime;
+	last_spawndate = gameTime;
 	
 	for(int i=0;i<event.crittercount;i++) {
 		CritterEntry* critter = event.critters+i;

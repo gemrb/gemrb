@@ -392,7 +392,7 @@ def SkillsSave (pc):
 		if SkillValue > 0:
 			GemRB.SetPlayerStat (pc, SkillID, SkillValue)
 
-def SkillsNullify ():
+def SkillsNullify (pc = None):
 	global SkillsTable
 	if not SkillsTable:
 		SkillsTable = GemRB.LoadTable ("skills")
@@ -400,6 +400,10 @@ def SkillsNullify ():
 	for i in range(SkillsTable.GetRowCount()-2):
 		GemRB.SetVar ("Skill "+str(i), 0)
 		GemRB.SetVar ("SkillBase "+str(i), 0)
+		if pc:
+			SkillName = SkillsTable.GetRowName (i+2)
+			SkillID = SkillsTable.GetValue (SkillName, "ID")
+			GemRB.SetPlayerStat (pc, SkillID, 0)
 
 def SkillsHide (i):
 	Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+i)

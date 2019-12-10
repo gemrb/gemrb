@@ -61,14 +61,11 @@ a lot of (compatibly licensed) art is missing. See also the docs on
 [creating a new game](http://www.gemrb.org/wiki/doku.php?id=newgame:newgame)
 
 2. Some GemRB mods are in the [gemrb-mods repo](https://github.com/lynxlynxlynx/gemrb-mods).
-If you know WeiDU, a good task would be to merge them into
-a tweakpack (10pp should stay alone though). And/or enhance them, they come with their own TODOs.
+The [mod idea page](http://www.gemrb.org/wiki/doku.php?id=developers:mods) also lists 
+several ideas from simple tweaks to more complex mods.  If you know WeiDU, a good task would be to add
+more of the documented tweaks (idea page) to the tweakpack.
 
-3. The [mod idea page](http://www.gemrb.org/wiki/doku.php?id=developers:mods) also lists 
-several ideas from simple tweaks to more complex mods. 
-Many could be added to the tweakpack under point 2, while others deserve independent projects.
-
-4. Modders can also contribute with research (see above), especially when it requires WeiDU test beds.
+3. Modders can also contribute with research (see above), especially when it requires WeiDU test beds.
 
 
 ### Everyone else
@@ -161,7 +158,7 @@ All of this makes reviewing and bisecting for regressions easier.
 
 1. Squash merge only if the history is a mess or it makes more
 sense (eg. consecutive commits through the github website). 
-2. For release planning check the milestones and gemrb/docs/Release.txt.
+2. For release planning check the milestones and any pending pull requests.
 2.1. When starting the final approach, use `admin/github_release.checklist`
 as a template to track progress in a dedicated issue.
 3. Releases are usually made when larger pieces of work land or many smaller
@@ -198,13 +195,12 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.8.6 was to **finish the [subviews](https://github.com/gemrb/gemrb/issues/95)
-work**, but the process got interrupted and stalled. Due to user encouragement,
-the focus for 0.8.6 shifted to audio, pathfinder and lots of polishing work.
-
-0.8.7 will therefore start with a renewed focus on the subviews branch.
+The plan for 0.8.7 is to make the subviews branch ready for release.
 It will also mark the switch to the C++11 standard. Once the branch is
-merged, we can also start working on the port to python3.
+merged, we can also start working on the port to python3. Naturally the
+release will contain also other unrelated fixes, so just look at the tracker.
+The first priority is to fix the issues tagged with "subviews" and thoroughly
+test it out.
 
 Since it is in a branch, the subviews windowing rewrite (and more) is not
 bound to any release, so work can continue independently. Due to the volume

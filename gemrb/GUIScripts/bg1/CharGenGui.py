@@ -193,8 +193,7 @@ def guardSkills():
 def unsetSkill():
 	import LUSkillsSelection
 	MyChar = GemRB.GetVar ("Slot")
-	LUSkillsSelection.SkillsNullify ()
-	LUSkillsSelection.SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify (MyChar)
 	
 def getSkills(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
@@ -381,8 +380,7 @@ def setAccept():
 		
 	if playmode >=0:
 		CharGenCommon.close()
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
+		GemRB.SaveCharacter (MyChar, "gembak")
 		GemRB.EnterGame()
 	else:
 		#show the export window

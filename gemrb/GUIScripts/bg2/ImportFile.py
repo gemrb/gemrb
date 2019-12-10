@@ -69,6 +69,7 @@ def DonePress():
 	GemRB.SetToken ("SmallPortrait", SmallPortrait)
 	GemRB.SetToken ("LargePortrait", MediumPortrait)
 	GemRB.SetNextScript("CharGen7")
+	GemRB.SetVar ("ImportedChar", 1)
 	return
 	
 def CancelPress():

@@ -29,24 +29,30 @@ OptionsButton = 0
 MultiPlayerButton = 0
 MoviesButton = 0
 BackButton = 0
+skip_videos = None
 
 def OnLoad():
 	global StartWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
-	global SinglePlayerButton
+	global SinglePlayerButton, skip_videos
 
-	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if skip_videos is None:
+		skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	if GameCheck.IsBG2Demo():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
 
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
-		if not skip_videos:
+		if GameCheck.HasTOB():
+			StartWindow.SetPicture("STARTOLD")
+		if not skip_videos and not skip_videos&4:
 			GemRB.PlayMovie ("INTRO15F", 1)
+			skip_videos |= 4
 	else:
-		if not skip_videos:
+		if not skip_videos and not skip_videos&2:
 			GemRB.PlayMovie ("INTRO", 1)
+			skip_videos |= 2
 
 	StartWindow = GemRB.LoadWindow (0, "START")
 	if GemRB.GetVar("oldgame")==1 and GameCheck.HasTOB():

@@ -1768,7 +1768,7 @@ def UpdateAnimatedPortrait (Window,i):
 	Button.SetAnimation (pic, cycle)
 	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 
-	if hp_max<1:
+	if hp_max < 1 or hp is "?":
 		ratio = 0.0
 	else:
 		ratio = (hp + 0.0) / hp_max
@@ -1777,7 +1777,7 @@ def UpdateAnimatedPortrait (Window,i):
 	r = int (255 * (1.0 - ratio))
 	g = int (255 * ratio)
 
-	ButtonHP.SetText ("%d / %d" %(hp, hp_max))
+	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
 	ButtonHP.SetTextColor ({'r' : r, 'g' : g, 'b' : 0}, False)
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)

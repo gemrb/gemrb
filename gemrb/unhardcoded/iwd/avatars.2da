@@ -78,7 +78,7 @@
 0x6003    CIMC1     CIMC2      CIMC3      CIMC4      6          2          0          S
 0x6010    CHFC1     CHFC2      CHFC3      CHFC4      6          2          0          M
 0x6011    CEFC1     CEFC2      CEFC3      CEFC4      6          2          0          M
-0x6012    CDMC1     CDMC2      CDMC3      CDMC4      6          2          0          S
+0x6012    CIFC1     CIFC2      CIFC3      CIFC4      6          2          0          S
 0x6013    CIFC1     CIFC2      CIFC3      CIFC4      6          2          0          S
 0x6100    CHMF1     CHMF2      CHMF3      CHMF4      6          2          0          L
 0x6101    CEMF1     CEMF2      CEMF3      CEMF4      6          2          0          M
@@ -86,7 +86,7 @@
 0x6103    CIMF1     CIMF2      CIMF3      CIMF4      6          2          0          S
 0x6110    CHFF1     CHFF2      CHFF3      CHFF4      6          2          0          M
 0x6111    CEFF1     CEFF2      CEFF3      CEFF4      6          2          0          M
-0x6112    CDMF1     CDMF2      CDMF3      CDMF4      6          2          0          S
+0x6112    CIFF1     CIFF2      CIFF3      CIFF4      6          2          0          S
 0x6113    CIFF1     CIFF2      CIFF3      CIFF4      6          2          0          S
 0x6200    CHMW1     CHMW2      CHMW3      CHMW4      6          2          0          L
 0x6201    CEMW1     CEMW2      CEMW3      CEMW4      6          2          0          M
@@ -102,7 +102,7 @@
 0x6303    CIMT1     CIMT2      CIMT2      CIMT2      6          2          0          S
 0x6310    CHFT1     CHFT2      CHFT2      CHFT2      6          2          0          M
 0x6311    CEFT1     CEFT2      CEFT2      CEFT2      6          2          0          M
-0x6312    CDMT1     CDMT2      CDMT2      CDMT2      6          2          0          S
+0x6312    CIFT1     CIFT2      CIFT2      CIFT2      6          2          0          S
 0x6313    CIFT1     CIFT2      CIFT2      CIFT2      6          2          0          S
 0x6400    UDRZ1     UDRZ1      UDRZ1      UDRZ1      6          2          0          *
 0x6401    UELM1     UELM1      UELM1      UELM1      6          2          1          *

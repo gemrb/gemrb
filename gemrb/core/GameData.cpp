@@ -629,8 +629,24 @@ int GameData::GetSwingCount(ieDword ItemType)
 		ReadItemSounds();
 	}
 
-	// everything but IS_GET and IS_DROP — keep updated!
+	// everything but the unrelated preceding columns (IS_SWINGOFFSET)
 	return ItemSounds[ItemType].size() - 2;
+}
+
+static bool loadedRacialTHAC0 = false;
+int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
+{
+	if (!loadedRacialTHAC0) {
+		raceTHAC0Bonus.load("racethac", true);
+		loadedRacialTHAC0 = true;
+	}
+
+	// not all games have the table
+	if (!raceTHAC0Bonus) return 0;
+
+	char profString[5];
+	snprintf(profString, sizeof(profString), "%u", proficiency);
+	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
 }
 
 }

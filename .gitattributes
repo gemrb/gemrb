@@ -9,3 +9,4 @@
 *.sav diff=ie
 
 testing export-ignore
+.github export-ignore

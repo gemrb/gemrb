@@ -200,18 +200,19 @@ namespace GemRB {
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800  // iwd2: either different meaning or leftover cruft (set in a few creatures)
-#define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
+#define MC_HIDE_HP              0x1000  // also 'large creature' according to IE dev info (definitely something else in pst)
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
 #define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
 #define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
-#define MC_SEENPARTY            0x10000 //iwd2
+#define MC_SEENPARTY            0x10000 //iwd2, TODO: non-iwd2: restore item in hand
 #define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
-#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests
-#define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess)
+#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
+#define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess), elsewhere unused
+#define MC_NO_NIGHTMARE_MODS    0x400000 // TODO: ee
 //#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
 //#define                       0x20000000 // iwd2, unkown, probably irrelevant
 //#define                       0x40000000 // iwd2, unkown, probably irrelevant
@@ -372,7 +373,7 @@ namespace GemRB {
 #define IE_PROFICIENCYSWORDANDSHIELD		112
 #define IE_PROFICIENCYSINGLEWEAPON		113
 #define IE_PROFICIENCY2WEAPON		 114  
-#define IE_EXTRAPROFICIENCY1 		 115
+#define IE_PROFICIENCYCLUB		 115
 #define IE_ALCHEMY                       115
 #define IE_EXTRAPROFICIENCY2 		 116
 #define IE_ANIMALS                       116

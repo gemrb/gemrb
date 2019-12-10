@@ -720,7 +720,7 @@ public:
 	Variables *RtRows;
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
-	char GameType[_MAX_PATH];
+	char GameType[10];
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];

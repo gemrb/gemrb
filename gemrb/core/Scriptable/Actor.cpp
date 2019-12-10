@@ -312,6 +312,7 @@ std::vector<std::vector<int> > skillrac;
 
 // subset of races.2da
 std::map<unsigned int, int> favoredMap;
+std::map<unsigned int, const char *> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
@@ -2420,7 +2421,7 @@ static void InitActorTables()
 			int rowcount = tm->GetRowCount();
 			for (i = 0; i < rowcount; i++) {
 				const char* cls = tm->GetRowName(i);
-				std::map<std::string, int >::iterator it = className2ID.find(cls);
+				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
 				numWeaponSlots[id] = std::min(4, atoi(tm->QueryField(i, 0)));
@@ -2732,15 +2733,17 @@ static void InitActorTables()
 		}
 	}
 
-	// races table, initially only used for iwd2 multiclassing xp penalties
+	// races table
 	tm.load("races");
-	if (tm && third) {
+	if (tm && !pstflags) {
 		int racesNRows = tm->GetRowCount();
 
 		for (i = 0; i < racesNRows; i++) {
 			int raceID = strtol(tm->QueryField(i, 3), NULL, 0);
 			int favClass = strtol(tm->QueryField(i, 8), NULL, 0);
+			const char *raceName = tm->GetRowName(i);
 			favoredMap.insert(std::make_pair(raceID, favClass));
+			raceID2Name.insert(std::make_pair(raceID, raceName));
 		}
 	}
 
@@ -4972,11 +4975,9 @@ void Actor::dump() const
 
 void Actor::dump(StringBuffer& buffer) const
 {
-	unsigned int i;
-
 	buffer.appendFormatted( "Debugdump of Actor %s (%s, %s):\n", LongName, ShortName, GetName(-1) );
 	buffer.append("Scripts:");
-	for (i = 0; i < MAX_SCRIPTS; i++) {
+	for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i]) {
 			poi = Scripts[i]->GetName();
@@ -5004,7 +5005,7 @@ void Actor::dump(StringBuffer& buffer) const
 
 	//this works for both level slot style
 	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
-	for (i = 0;i<ISCLASSES;i++) {
+	for (unsigned int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
 		if (level) {
 			buffer.appendFormatted("%s: %d    ", isclassnames[i], level);
@@ -5017,11 +5018,11 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	buffer.appendFormatted("Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
+		for(unsigned int i = 0; i < Modified[IE_COLORCOUNT]; i++) {
 			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
 		}
 	} else {
-		for(i=0;i<7;i++) {
+		for(unsigned int i = 0; i < 7; i++) {
 			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
 		}
 	}
@@ -5735,6 +5736,15 @@ void Actor::SetPersistent(int partyslot)
 	InternalFlags|=IF_FROMGAME;
 	//if an actor is coming from a game, it should have these too
 	CreateStats();
+	// ensure QSlots are set up to be what the class needs
+	InitButtons(GetActiveClass(), false);
+
+	if (PCStats->QuickWeaponSlots[0] != 0xffff) return;
+	// ReinitQuickSlots does not take care of weapon slots, so do it manually
+	for (int i = 0; i < 4; i++) {
+		SetupQuickSlot(i + ACT_WEAPON1, inventory.GetWeaponSlot(i), 0);
+	}
+	// call ReinitQuickSlots here if something needs it
 }
 
 void Actor::DestroySelf()
@@ -6978,7 +6988,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		DamageBonus += favoredEnemy;
 	}
 
-	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
+	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
+	if (raceID2Name.size()) {
+		if (raceID2Name.count(BaseStats[IE_RACE])) {
+			const char *raceName = raceID2Name[BaseStats[IE_RACE]];
+			prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
+		}
+	}
 
 	if (third) {
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
@@ -7537,7 +7553,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	ModifyWeaponDamage(wi, target, damage, critical);
 
-	if (target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+	if (third && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
 		Log(DEBUG, "Actor", "Attacking invulnerable target, nulifying damage!");
 		damage = 0;
 	}
@@ -11092,7 +11108,7 @@ void Actor::MovementCommand(char *command)
 bool Actor::HasVisibleHP() const
 {
 	// sucks but this is set in different places
-	if (GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
+	if (!pstflags && GetStat(IE_MC_FLAGS) & MC_HIDE_HP) return false;
 	if (HasSpellState(SS_NOHPINFO)) return false;
 	if (GetStat(IE_EXTSTATE_ID) & EXTSTATE_NO_HP) return false;
 	return true;

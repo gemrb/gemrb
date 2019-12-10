@@ -354,9 +354,6 @@ def AcceptPress():
 	# apply class/kit abilities
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
-	# save all the skills
-	LUSkillsSelection.SkillsSave (MyChar)
-
 	TmpTable = GemRB.LoadTable ("repstart")
 	t = CommonTables.Aligns.FindValue (3, t)
 	t = TmpTable.GetValue (t, 0) * 10
@@ -1511,6 +1508,7 @@ def SkillsPress():
 	MageSpell = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
+	LUSkillsSelection.SkillsNullify (MyChar)
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
@@ -1616,6 +1614,9 @@ def RedrawSkills():
 
 def SkillsDonePress():
 	global CharGenWindow, SkillsWindow, SkillsState
+
+	# save all the skills
+	LUSkillsSelection.SkillsSave (MyChar)
 
 	if SkillsWindow:
 		SkillsWindow.Unload ()
