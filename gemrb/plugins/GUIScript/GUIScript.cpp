@@ -1215,8 +1215,8 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_AddAlias__doc,
-			 "AddAlias(GView, AliasGroup, AliasID])\n\n"
-			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the view." );
+			 "AddAlias(GView, AliasGroup, AliasID, Overwrite])\n\n"
+			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the view, optionally overwriteing an existing entry." );
 
 static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 {
@@ -1224,10 +1224,15 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 	// default to the lowest valid value (since its optional and we often only want 1 control per alias)
 	// the exception being for creating groups such as the GAMEGUI windows for quickly hiding/showing the entire group
 	ScriptingId controlId = 0;
-	PARSE_ARGS3( args, "Os|l", &self, &group, &controlId );
+	int overwrite = false;
+	PARSE_ARGS4( args, "Os|li", &self, &group, &controlId, &overwrite );
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
+	if (overwrite) {
+		ViewScriptingRef delref(NULL, controlId, group);
+		ScriptEngine::UnregisterScriptingRef(&delref);
+	}
 	const ViewScriptingRef* ref = view->AssignScriptingRef(controlId, group);
 	ABORT_IF_NULL(ref);
 	Py_RETURN_NONE;
