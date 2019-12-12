@@ -1452,13 +1452,11 @@ void Game::SetControlStatus(unsigned int value, int mode)
 
 void Game::AddGold(ieDword add)
 {
-	ieDword old;
-
 	if (!add) {
 		return;
 	}
-	old = PartyGold;
-	PartyGold += add;
+	ieDword old = PartyGold;
+	PartyGold = Clamp(PartyGold + add, (ieDword) 0, PartyGold + add);
 	if (old<PartyGold) {
 		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, DMC_GOLD, PartyGold-old);
 	} else {
