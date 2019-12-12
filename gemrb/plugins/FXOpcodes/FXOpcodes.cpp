@@ -4292,7 +4292,6 @@ int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x8B DisplayString
-// gemrb extension: rgb colour for displaystring
 // gemrb extension: resource may be an strref list (src or 2da)
 
 int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -4322,7 +4321,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
+		displaymsg->DisplayStringName(fx->Parameter1, DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
