@@ -7685,7 +7685,7 @@ int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_magical_rest(%2d)", fx->Opcode);
 	//instant, full rest
-	target->Rest(0);
+	target->Rest(8);
 	target->fxqueue.RemoveAllEffects(fx_fatigue_ref);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FATIGUE);
 	return FX_NOT_APPLIED;
