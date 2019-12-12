@@ -28,6 +28,7 @@ import GUICommonWindows
 import CommonWindow
 import GUIClasses
 import CommonTables
+import LUCommon
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
@@ -186,33 +187,52 @@ def FixAnomen( idx):
 def FixProtagonist( idx):
 	ClassName = GUICommon.GetClassRowName (idx)
 	KitIndex = GUICommon.GetKitIndex (idx)
-	# only give a few items for transitions from soa
-	if GemRB.GetVar("oldgame"):
-		# give the Amulet of Seldarine to the pc's first empty inventory slot
-		invslot = GemRB.GetSlots (idx, -1, -1)[0]
-		GemRB.CreateItem(idx, "AMUL27", invslot, 1, 0, 0)
-		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-		# TODO: give bag19/bag19a (.../19e?) based on the experience
-		invslot = GemRB.GetSlots (idx, -1, -1)[0]
-		if GemRB.GetVar ("StartMP"):
-			GemRB.CreateItem(idx, "BAG19", invslot, 1, 0, 0)
+
+	# prepare to adjust the XP to the minimum if it is lower than what new characters start with
+	# but don't let dualclassed characters get more xp than the rest
+	XP = GemRB.GetPlayerStat (idx, IE_XP)
+	XP2 = CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2")
+	Dual = GUICommon.IsDualClassed (pc, True)
+	if Dual:
+		OldLevel = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		if GUICommon.IsDualSwap (pc):
+			OldLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2)
+
+		OldClassIndex = Dual[1]
+		if Dual[0] == 1:
+			# was not a class before
+			KittedClass = CommonTables.KitList.GetValue (Dual[1], 7)
+			OldClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
+		ClassName = GUICommon.GetClassRowName (OldClassIndex, "index")
+		OldXP = LUCommon.GetNextLevelExp (OldLevel, ClassName)
+		XP += OldXP
+
+	# fresh game? Give them all the equipment
+	if not (GemRB.GetVar("oldgame") or GemRB.GetVar ("ImportedChar")):
+		GiveEquipment (idx, ClassName, KitIndex)
+		FixInnates (idx)
+		return
+
+	# only give a few items for transitions from soa or if we're upgrading an imported character
+	# give the Amulet of Seldarine to the pc's first empty inventory slot
+	invslot = GemRB.GetSlots (idx, -1, -1)
+	GemRB.CreateItem (idx, "AMUL27", invslot[0], 1, 0, 0)
+	GemRB.ChangeItemFlag (idx, invslot[0], IE_INV_ITEM_IDENTIFIED, OP_OR)
+
+	# adjust the XP and set a hardcoded difficulty variable to the difference
+	if XP <= XP2:
+		GemRB.SetPlayerStat (idx, IE_XP, XP2)
+		GemRB.SetGlobal ("XPGIVEN", "GLOBAL", XP2 - XP)
+		# extra bag of goodies to go along with all that learning
+		# bag19b-bag19e are unused and identical
+		if GemRB.GetVar ("ImportedChar"):
+			GemRB.CreateItem (idx, "BAG19A", invslot[1], 1, 0, 0)
 		else:
-			GemRB.CreateItem(idx, "BAG19A", invslot, 1, 0, 0)
-		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			GemRB.CreateItem (idx, "BAG19", invslot[1], 1, 0, 0)
+		GemRB.ChangeItemFlag (idx, invslot[1], IE_INV_ITEM_IDENTIFIED, OP_OR)
 
-		# adjust the XP to the minimum if it is lower and set a difficulty variable to the difference
-		xp = GemRB.GetPlayerStat(idx, IE_XP)
-		# FIXME: not fair for disabled dual-classes (should take the inactive level xp into account)
-		xp2 = CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2")
-		if xp2 > xp:
-			GemRB.SetPlayerStat(idx, IE_XP, xp2)
-			GemRB.SetGlobal("XPGIVEN","GLOBAL", xp2-xp)
-
-		FixFamiliar (idx)
-		FixInnates (idx)
-	else:
-		GiveEquipment(idx, ClassName, KitIndex)
-		FixInnates (idx)
+	FixFamiliar (idx)
+	FixInnates (idx)
 	return
 
 # replace the familiar with the improved version

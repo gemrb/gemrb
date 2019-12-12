@@ -1456,7 +1456,11 @@ void Game::AddGold(ieDword add)
 		return;
 	}
 	ieDword old = PartyGold;
-	PartyGold = Clamp(PartyGold + add, (ieDword) 0, PartyGold + add);
+	if (signed(PartyGold + add) < 0) {
+		PartyGold = 0;
+	} else {
+		PartyGold += add;
+	}
 	if (old<PartyGold) {
 		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, DMC_GOLD, PartyGold-old);
 	} else {
