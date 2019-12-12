@@ -3438,7 +3438,11 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
-			gold = fx->Parameter1;
+			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+				gold = (ieDword) -fx->Parameter1;
+			} else {
+				gold = fx->Parameter1;
+			}
 			break;
 		case MOD_ABSOLUTE:
 			gold = fx->Parameter1-game->PartyGold;
