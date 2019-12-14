@@ -589,7 +589,7 @@ void WindowManager::DrawWindows() const
 		}
 	} else if (FadeColor.a > 0) {
 		video->PushDrawingBuffer(winFrameBuf);
-		video->DrawRect(screen, FadeColor, BLIT_BLENDED);
+		video->DrawRect(screen, FadeColor, true, BLIT_BLENDED);
 	}
 
 	DrawMouse();
