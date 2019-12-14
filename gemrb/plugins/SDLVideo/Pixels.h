@@ -320,15 +320,8 @@ public:
 	SDL_Rect clip;
 
 	SDLPixelIterator(const SDL_Rect& clip, SDL_Surface* surf)
-	: IPixelIterator(NULL, surf->pitch, Forward, Forward), imp(NULL), format(surf->format), clip(clip)
-	{
-		Uint8* pixels = static_cast<Uint8*>(surf->pixels);
-		pixels = FindStart(pixels, surf->pitch, format->BytesPerPixel, clip, xdir, ydir);
-
-		InitImp(pixels, surf->pitch, surf->format->BytesPerPixel);
-
-		pixel = surf->pixels;
-	}
+	: SDLPixelIterator(Forward, Forward, clip, surf)
+	{}
 
 	SDLPixelIterator(Direction x, Direction y, const SDL_Rect& clip, SDL_Surface* surf)
 	: IPixelIterator(NULL, surf->pitch, x, y), imp(NULL), format(surf->format), clip(clip)
