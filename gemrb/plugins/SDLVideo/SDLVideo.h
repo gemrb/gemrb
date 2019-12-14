@@ -58,12 +58,20 @@ inline int GetModState(int modstate)
 	if (modstate&KMOD_ALT) value |= GEM_MOD_ALT;
 	return value;
 }
-	
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+template<typename T>
+inline const SDL_Rect& RectFromRegion(T&& rgn)
+{
+	return reinterpret_cast<const SDL_Rect&>(rgn);
+}
+#else
 inline SDL_Rect RectFromRegion(const Region& rgn)
 {
 	SDL_Rect rect = {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
 	return rect;
 }
+#endif
 
 class SDLVideoDriver : public Video {
 public:
