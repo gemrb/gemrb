@@ -65,7 +65,8 @@ class SDLTextureVideoBuffer : public VideoBuffer {
 
 	// if the inputFormat is different than the actual texture format we will allocate a buffer to handle conversion
 	// this has significant memory overhead, but is much faster than dynamic allocation every frame
-	void* conversionBuffer;
+	// this is also used for rendering stencils
+	SDL_Surface* conversionBuffer = nullptr;
 
 private:
 	static Region TextureRegion(SDL_Texture* tex, const Point& p) {
@@ -81,12 +82,11 @@ public:
 		assert(texture);
 		assert(renderer);
 
-		SDL_QueryTexture(texture, &nativeFormat, NULL, NULL, NULL);
+		int access;
+		SDL_QueryTexture(texture, &nativeFormat, &access, NULL, NULL);
 
-		if (inputFormat != nativeFormat) {
-			conversionBuffer = operator new(SDL_BYTESPERPIXEL(nativeFormat) * rect.w * rect.h);
-		} else {
-			conversionBuffer = NULL;
+		if (inputFormat != nativeFormat || access == SDL_TEXTUREACCESS_STREAMING) {
+			conversionBuffer = SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, SDL_BITSPERPIXEL(nativeFormat), nativeFormat);
 		}
 
 		Clear();
@@ -94,7 +94,7 @@ public:
 
 	~SDLTextureVideoBuffer() {
 		SDL_DestroyTexture(texture);
-		operator delete(conversionBuffer);
+		SDL_FreeSurface(conversionBuffer);
 	}
 
 	void Clear() {
@@ -152,7 +152,7 @@ public:
 			Palette* pal = va_arg(args, Palette*);
 			va_end(args);
 
-			Uint32* dst = static_cast<Uint32*>(conversionBuffer);
+			Uint32* dst = static_cast<Uint32*>(conversionBuffer->pixels);
 			SDL_PixelFormat* pxfmt = SDL_AllocFormat(nativeFormat);
 			bool hasalpha = SDL_ISPIXELFORMAT_ALPHA(nativeFormat);
 
@@ -167,14 +167,14 @@ public:
 
 			SDL_FreeFormat(pxfmt);
 
-			int ret = SDL_UpdateTexture(texture, &dest, conversionBuffer, sdlpitch);
+			int ret = SDL_UpdateTexture(texture, &dest, conversionBuffer->pixels, sdlpitch);
 			if (ret != 0) {
 				Log(ERROR, "SDL20Video", "%s", SDL_GetError());
 			}
 		} else {
-			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, (pitch) ? *pitch : sdlpitch, nativeFormat, conversionBuffer, sdlpitch);
+			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, (pitch) ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
 			if (ret == 0) {
-				ret = SDL_UpdateTexture(texture, &dest, conversionBuffer, sdlpitch);
+				ret = SDL_UpdateTexture(texture, &dest, conversionBuffer->pixels, sdlpitch);
 			}
 
 			if (ret != 0) {
