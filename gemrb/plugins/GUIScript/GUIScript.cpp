@@ -1922,7 +1922,8 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 		if (del) {
 			// invalidate the reference
 			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
-			delete view->RemoveFromSuperview();
+			view->RemoveFromSuperview();
+			delete view;
 			Py_RETURN_NONE;
 		} else {
 			// return a new ref for a deleted group
