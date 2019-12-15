@@ -391,7 +391,7 @@ void SDL20VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const
 			// SDL_RenderDrawLines actually is for drawing polygons so it is, ironically, not what we want
 			// when drawing the "rasterized" data. doing so would work ok most of the time, but other times
 			// the reconnection of the last to first point (done by SDL) will be visible
-			DrawLine(lines[i] + origin, lines[i+1] + origin, color);
+			DrawLine(lines[i] + origin, lines[i+1] + origin, color, flags);
 		}
 	} else {
 		std::vector<SDL_Point> points(poly->Count());
