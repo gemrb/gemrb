@@ -92,6 +92,10 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	}
 
 #if USE_OPENGL
+	if (strcmp(info.name, "opengl") != 0) {
+		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
+	}
+
 	// must follow SDL_CreateRenderer
 	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
 	if (!stencilShader)
