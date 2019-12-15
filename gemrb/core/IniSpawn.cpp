@@ -857,11 +857,11 @@ void IniSpawn::InitialSpawn()
 		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
 	}
 
-	// move the rest of the party if needed (note the i=1, 0 has the protagonist aka TNO)
+	// move the rest of the party if needed
 	if (!PartySpawnPoint.isnull()) {
 		Game *game = core->GetGame();
-		for (int i=1; i < game->GetPartySize(false); i++) {
-			Actor *pc = game->GetPC(i, false);
+		while (game->GetPartySize(false) > 1) {
+			Actor *pc = game->GetPC(1, false); // skip TNO
 			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
 			game->LeaveParty(pc);
 		}
