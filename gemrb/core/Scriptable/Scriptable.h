@@ -397,7 +397,7 @@ public:
 	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
 	/* want dithered SpriteCover */
-	int WantDither() const;
+	bool ForceDither() const;
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {

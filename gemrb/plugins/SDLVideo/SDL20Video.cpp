@@ -33,10 +33,6 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
 													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
-	stencilRGBBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
-												   SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
-												   SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD);
-
 	scratchBuffer = NULL;
 }
 
@@ -206,7 +202,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
 	int ret = 0;
-	if (flags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RGB)) {
+	if (flags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)) {
 		// 1. clear scratchpad segment
 		// 2. blend stencil segment to scratchpad
 		// 3. blend texture to scratchpad
@@ -218,11 +214,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		SDL_RenderFillRect(renderer, &drect);
 
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
-		if (flags&BLIT_STENCIL_RGB) {
-			SDL_SetTextureBlendMode(stencilTex, stencilRGBBlender);
-		} else {
-			SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
-		}
+		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 
 		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);

@@ -639,7 +639,7 @@ retry:
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation, int height)
+bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Color &p_tint, Map *area, bool dither, int orientation, int height)
 {
 	if (FaceTarget) {
 		SetOrientation(orientation);
@@ -701,7 +701,7 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	if (SequenceFlags&IE_VVC_HEIGHT) cy-=height;
 
 	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
-		flags |= (dither) ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
+		flags |= (dither) ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
 	}
 
 	video->BlitGameSpriteWithPalette(frame, palette, cx - viewport.x, cy - viewport.y, flags, tint);

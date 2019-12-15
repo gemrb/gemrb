@@ -386,10 +386,6 @@ private:
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
 
-	// TODO: if SDL ever allows using individual color channels in customm blend modes
-	// we can combine these by using the color channels for the different stencils
-	// for now wallStencil uses 'rgb' for BLIT_STENCIL_HALF and 'a' for BLIT_STENCIL
-	VideoBuffer* animWallStencil;
 	VideoBuffer* wallStencil;
 	Region stencilViewport;
 public:

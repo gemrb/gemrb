@@ -1797,21 +1797,10 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Spr
 }
 
 //used for creatures
-int Selectable::WantDither() const
+bool Selectable::ForceDither() const
 {
-	//if dithering is disabled globally, don't do it
-	if (core->FogOfWar&FOG_DITHERSPRITES) {
-		return 0;
-	}
-	//if actor is dead, dither it if polygon wants
-	if (Selected&0x80) {
-		return 1;
-	}
 	//if actor is selected dither it
-	if (Selected) {
-		return 2;
-	}
-	return 1;
+	return Selected;
 }
 
 /***********************

@@ -48,7 +48,7 @@ public:
 	//draws the ground icons
 	void DrawPile(bool highlight, const Region& viewport, Color tint);
 	//returns dithering option
-	int WantDither();
+	bool ForceDither();
 	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;

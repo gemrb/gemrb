@@ -8153,10 +8153,10 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-int Actor::WantDither() const
+bool Actor::ForceDither() const
 {
-	if (always_dither) return 2;
-	return Selectable::WantDither();
+	if (always_dither) return true;
+	return Selectable::ForceDither();
 }
 
 //there is a similar function in Map for stationary vvcs
@@ -8168,7 +8168,7 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 		ScriptedAnimation* vvc = vvcCells[i];
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(viewport, Pos, tint, area, WantDither(), GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(viewport, Pos, tint, area, false, GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
@@ -8197,7 +8197,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	// TODO: we could optimize by caching this and update it only when the Selectable moves
 	// unfortunately Pos is public so its a bit hairy to undo that
 	if (area->IntersectsWall(bbox)) {
-		flags |= WantDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
+		flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
 	}
 
 	if (!ca->lockPalette) flags |= BLIT_TINTED;

@@ -373,14 +373,12 @@ Map::Map(void)
 	reverb = NULL;
 	MaterialMap = NULL;
 	wallStencil = NULL;
-	animWallStencil = NULL;
 }
 
 Map::~Map(void)
 {
 	Video* video = core->GetVideoDriver();
 	video->DestroyBuffer(wallStencil);
-	video->DestroyBuffer(animWallStencil);
 
 	unsigned int i;
 
@@ -1122,9 +1120,9 @@ void Map::DrawMap(const Region& viewport)
 	// 2. Draw overlays (weather)
 	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
 	// 4. set the video stencil buffer to animWallStencil
-	// 5. Draw background animations (BLIT_STENCIL_ALPHA)
+	// 5. Draw background animations (BLIT_STENCIL_GREEN)
 	// 6. set the video stencil buffer to wallStencil
-	// 7. draw scriptables (BLIT_STENCIL_RGB, or BLITSTENCIL_ALPHA depending on scriptable->WantDither() return value)
+	// 7. draw scriptables (depending on scriptable->ForceDither() return value)
 	// 8. draw fog (BLIT_BLENDED)
 	// 9. draw text (BLIT_BLENDED)
 
@@ -1162,7 +1160,7 @@ void Map::DrawMap(const Region& viewport)
 	}
 
 	RedrawStencils(viewport);
-	video->SetStencilBuffer(animWallStencil);
+	video->SetStencilBuffer(wallStencil);
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
@@ -1200,7 +1198,6 @@ void Map::DrawMap(const Region& viewport)
 
 	std::vector<Scriptable*> dithered;
 	while (actor || a || sca || spark || pro || pile) {
-		video->SetStencilBuffer(wallStencil);
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
 			assert(actor != NULL);
@@ -1217,7 +1214,6 @@ void Map::DrawMap(const Region& viewport)
 			break;
 		case AOT_AREA:
 			//draw animation
-			video->SetStencilBuffer(animWallStencil);
 			a->Draw( viewport, this );
 			a = GetNextAreaAnimation(aniidx,gametime);
 			break;
@@ -2068,26 +2064,29 @@ void Map::RedrawStencils(const Region& vp)
 	Video* video = core->GetVideoDriver();
 
 	if (wallStencil == NULL) {
-		wallStencil = video->CreateBuffer(vp);
-	}
-
-	if (animWallStencil == NULL) {
-		animWallStencil = video->CreateBuffer(vp);
+		wallStencil = video->CreateBuffer(vp, Video::DISPLAY);
 	}
 
 	wallStencil->Clear();
-	animWallStencil->Clear();
 
 	// TODO: I believe wall groups are organized in relation to the tile map
 	// if so we should be able to jump to the correct groups occupying 'vp'
 	// instead of iterating everything
 
 	// color is used as follows:
-	// the 'a' channel is for representing all walls as "dithered" (50% transparent)
-	// the 'rgb' channels are used to draw the walls in their "native" form taking WF_DITHER into account
-	// we then pass BLIT_STENCIL_ALPHA for anything that is always dithered and BLIT_STENCIL_RGB for everything else
-	static const Color opaque(0xff,0xff,0xff,0x80);
-	static const Color dithered(0x80,0x80,0x80,0x80);
+	// the 'r' channel is for the native value for all walls
+	// the 'g' channel is for the native value for only WF_COVERANIMS walls
+	// the 'b' channel is for always opaque (always 0xff, 100% opaque)
+	// the 'a' channel is for always dithered (always 0x80, 50% transparent)
+	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
+	Color stencilcol(0, 0, 0xff, 0x80);
+	/*
+	// FIXME: do we need this? or some variant?
+	if (core->FogOfWar&FOG_DITHERSPRITES) {
+		return stencilcol.a = 0xff;
+	}
+	*/
+
 	video->PushDrawingBuffer(wallStencil);
 	for (unsigned int i = 0; i < WallCount; ++i)
 	{
@@ -2096,21 +2095,20 @@ void Map::RedrawStencils(const Region& vp)
 
 		if (vp.IntersectsRegion(wp->BBox)) {
 			const Point& origin = wp->BBox.Origin() - vp.Origin();
-			if (wp->wall_flag & WF_COVERANIMS) {
-				video->PushDrawingBuffer(animWallStencil);
-				if (wp->wall_flag & WF_DITHER) {
-					video->DrawPolygon(wp, origin, dithered, true);
-				} else {
-					video->DrawPolygon(wp, origin, opaque, true);
-				}
-				video->PopDrawingBuffer();
-			}
 
 			if (wp->wall_flag & WF_DITHER) {
-				video->DrawPolygon(wp, origin, dithered, true);
+				stencilcol.r = 0x80;
 			} else {
-				video->DrawPolygon(wp, origin, opaque, true);
+				stencilcol.r = 0xff;
 			}
+
+			if (wp->wall_flag & WF_COVERANIMS) {
+				stencilcol.g = stencilcol.r;
+			} else {
+				stencilcol.g = 0;
+			}
+
+			video->DrawPolygon(wp, origin, stencilcol, true);
 		}
 	}
 	video->PopDrawingBuffer();
@@ -4121,7 +4119,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();
 		if (covered == true) {
-			flags |= BLIT_STENCIL_ALPHA;
+			flags |= BLIT_STENCIL_GREEN;
 		}
 		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y, flags, tint);
 	}

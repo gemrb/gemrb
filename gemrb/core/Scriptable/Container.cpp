@@ -86,7 +86,7 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 			r.x = Pos.x - r.x;
 			r.y = Pos.y - r.y;
 			if (area->IntersectsWall(r)) {
-				ieDword dither = WantDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RGB;
+				ieDword dither = ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags | dither, tint);
 			} else {
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
@@ -157,14 +157,10 @@ void Container::RefreshGroundIcons()
 }
 
 //used for ground piles
-int Container::WantDither()
+bool Container::ForceDither()
 {
 	//if pile is highlighted, always dither it
-	if (Highlight) {
-		return 2; //dither me if you want
-	}
-	//if pile isn't highlighted, dither it if the polygon wants
-	return 1;
+	return Highlight;
 }
 
 int Container::IsOpen() const

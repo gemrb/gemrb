@@ -195,7 +195,6 @@ private:
 	SDL_Renderer* renderer;
 
 	SDL_BlendMode stencilAlphaBlender;
-	SDL_BlendMode stencilRGBBlender;
 
 	SDL_Texture* scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 

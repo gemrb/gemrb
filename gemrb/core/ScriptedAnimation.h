@@ -114,7 +114,7 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation, int height);
+	bool Draw(const Region &viewport, const Point &Pos, const Color &p_tint, Map *area, bool dither, int orientation, int height);
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
