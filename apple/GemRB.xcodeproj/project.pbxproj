@@ -148,6 +148,8 @@
 		A265ECEF13A8669700C6DF12 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECF113A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
+		A26ECB4623A61CDC00D3DD59 /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
+		A26ECB4A23A6212400D3DD59 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */; };
 		A27217031CAE2678005F3976 /* Tooltip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27217011CAE2678005F3976 /* Tooltip.cpp */; };
 		A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27217011CAE2678005F3976 /* Tooltip.cpp */; };
 		A27217051CAE2678005F3976 /* Tooltip.h in Headers */ = {isa = PBXBuildFile; fileRef = A27217021CAE2678005F3976 /* Tooltip.h */; };
@@ -1299,6 +1301,8 @@
 		A265ECEA13A8669700C6DF12 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../gemrb/core/System/Logging.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEC13A8669700C6DF12 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../gemrb/core/System/String.cpp; sourceTree = SOURCE_ROOT; };
+		A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
+		A26ECB4C23A6903800D3DD59 /* StencilF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
 		A27217011CAE2678005F3976 /* Tooltip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tooltip.cpp; sourceTree = "<group>"; };
 		A27217021CAE2678005F3976 /* Tooltip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tooltip.h; sourceTree = "<group>"; };
 		A27368CF1A338E7200A8EEB8 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
@@ -2178,6 +2182,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A20574FB19994979007FF22C /* SDL2.framework in Frameworks */,
+				A26ECB4A23A6212400D3DD59 /* OpenGL.framework in Frameworks */,
 				A298DD0C14EB4E8C00F59F56 /* Cocoa.framework in Frameworks */,
 				A298DD0D14EB4E8C00F59F56 /* libgemrb_core.dylib in Frameworks */,
 			);
@@ -3396,6 +3401,8 @@
 		A2E5A4B619992CC000CCE6D8 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */,
+				A26ECB4C23A6903800D3DD59 /* StencilF.glsl */,
 				A2E5A4B719992CC000CCE6D8 /* Ellipse.glslf */,
 				A2E5A4B819992CC000CCE6D8 /* Ellipse.glslv */,
 				A2E5A4B919992CC000CCE6D8 /* Rect.glslf */,
@@ -5058,6 +5065,7 @@
 			files = (
 				A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */,
 				A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */,
+				A26ECB4623A61CDC00D3DD59 /* GLSLProgram.cpp in Sources */,
 				A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */,
 				A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 			);
@@ -7004,6 +7012,10 @@
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DUSE_OPENGL=1",
+				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};
@@ -7029,6 +7041,10 @@
 				);
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DUSE_OPENGL=1",
+				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};

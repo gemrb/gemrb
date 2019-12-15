@@ -24,6 +24,8 @@
 #include "SDLVideo.h"
 #include "SDLSurfaceSprite2D.h"
 
+#include "GLSLProgram.h"
+
 namespace GemRB {
 
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat, SDL_Renderer*);
@@ -195,6 +197,8 @@ private:
 	SDL_Renderer* renderer;
 
 	SDL_BlendMode stencilAlphaBlender;
+
+	GLSLProgram* stencilShader = nullptr;
 
 	SDL_Texture* scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 

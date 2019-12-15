@@ -34,6 +34,10 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
 	scratchBuffer = NULL;
+
+	// WARNING: do _not_ call opengl here
+	// all function pointers will be NULL
+	// until after SDL_CreateRenderer is called
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -41,6 +45,8 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	SDL_DestroyTexture(scratchBuffer);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+
+	if (stencilShader) stencilShader->Release();
 }
 
 int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)
@@ -51,7 +57,20 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-	//SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+	//SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
+
+#if USE_OPENGL
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+
+	/*
+	 these have no effect on the context created by SDL_CreateRenderer
+	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	*/
+#endif
+
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 #endif
@@ -72,13 +91,23 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
+#if USE_OPENGL
+	// must follow SDL_CreateRenderer
+	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
+	if (!stencilShader)
+	{
+		std::string msg = GLSLProgram::GetLastError();
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+	}
+#endif
+
 	// we set logical size so that platforms where the window can be a diffrent size then requested
 	// function properly. eg iPhone and Android the requested size may be 640x480,
 	// but the window will always be the size of the screen
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
 	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
-	scratchBuffer =  SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, s.w, s.h);
+	scratchBuffer = SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, s.w, s.h);
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
@@ -213,11 +242,44 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
 
+		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
+
+#if USE_OPENGL
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
+
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
 		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 
-		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
+		GLint previous_program;
+		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
+
+		GLint channel = 0;
+		if (flags&BLIT_STENCIL_RED) {
+			channel = 1;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			channel = 2;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			channel = 3;
+		}
+
+		stencilShader->Use();
+		stencilShader->SetUniformValue("u_channel", 1, channel);
+
+		glActiveTexture(GL_TEXTURE0);
+		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
+
 		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
+
+		SDL_GL_UnbindTexture(stencilTex);
+		glUseProgram(previous_program);
+#else
+		// alpha masking only
+		SDL_Texture* stencilTex = CurrentStencilBuffer();
+		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
+		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
+#endif
 
 		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
 		SDL_SetTextureBlendMode(scratchBuffer, SDL_BLENDMODE_BLEND);

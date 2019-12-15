@@ -21,20 +21,13 @@
 #ifndef GemRB_OpenGLEnv_h
 #define GemRB_OpenGLEnv_h
 
-#if USE_GL
-	#if __APPLE__
-		#include <GLEW/glew.h>
-	#else
-		#include <GL/glew.h>
-	#endif
+#if __APPLE__
+	#include <OpenGL/gl3.h>
 #else
-	#if __APPLE__
-		#include <OpenGLES/ES2/gl.h>
-		#include <OpenGLES/ES2/glext.h>
-	#else
-		#include <GLES2/gl2.h>
-		#include <GLES2/gl2ext.h>
-	#endif
+	// FIXME: what do we really need here?
+	// SDL 2 already handled "wrangleing" the extensions
+	// we should just need gl3.h (or whatever is minimum for a version 2.1 context)
+	//#include <GL/glew.h>
 #endif
 
 #endif
