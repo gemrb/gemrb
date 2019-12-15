@@ -543,7 +543,8 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BLIT_MIRRORX or BLIT_MIRRORY is set
 	// instead of doing this and then reversing it in that case only for SDL to reverse it yet again
 	// lets just not worry about clipping on SDL2. the backends handle all of that for us unlike with SDL 1 where we
-	// might walk off a memory buffer we have no danger of that. This fixes bizzare clipping issues when a "flipped" sprit is partially offscreen
+	// might walk off a memory buffer; we have no danger of that in SDL 2.
+	// This fixes bizzare clipping issues when a "flipped" sprite is partially offscreen
 	// we still will clip with screenClip later so no worries there
 	Region dclipped = dst;
 #else
