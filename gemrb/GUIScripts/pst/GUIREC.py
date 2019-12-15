@@ -168,7 +168,7 @@ def UpdateRecordsWindow ():
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.LearnSpell(pc, "SPWI602", 8)
+	
 	# Setting up the character information
 	GetCharacterHeader (pc)
 
