@@ -189,7 +189,13 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
 	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	unsigned int version = 0;
+#if USE_OPENGL
+	// TODO: write shaders for BLIT_GREY and BLIT_SEPIA (BLIT_GREY has precedence)
+	version |= (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+#else
+	version |= (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+#endif
 
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 	SDL_Texture* tex = NULL;
@@ -286,7 +292,14 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		ret = SDL_RenderCopy(renderer, scratchBuffer, &drect, &drect);
 	} else {
 		UpdateRenderTarget();
+#if USE_OPENGL
+		// apply shaders to tex
+
 		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
+#else
+		// "shaders" were applied via software (RenderSpriteVersion)
+		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
+#endif
 	}
 
 	if (ret != 0) {
