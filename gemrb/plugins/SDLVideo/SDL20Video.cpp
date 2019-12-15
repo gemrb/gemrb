@@ -94,6 +94,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 #if USE_OPENGL
 	if (strcmp(info.name, "opengl") != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
+		return GEM_ERROR;
 	}
 
 	// must follow SDL_CreateRenderer
@@ -102,6 +103,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	{
 		std::string msg = GLSLProgram::GetLastError();
 		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		return GEM_ERROR;
 	}
 #endif
 
