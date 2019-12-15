@@ -1682,7 +1682,10 @@ def UpdateAnimatedPortrait (Window,i):
 	pic = GemRB.GetPlayerPortrait (i+1, 0)
 	if not pic:
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetAnimation ("")
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		ButtonHP.SetText ("")
+		ButtonHP.SetBAM ("", 0, 0)
 		return
 
 	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
