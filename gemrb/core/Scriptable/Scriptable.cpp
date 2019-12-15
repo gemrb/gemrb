@@ -1850,7 +1850,7 @@ void Highlightable::DrawOutline(Point origin) const
 	}
 	Color fillcol(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a/2);
 	origin = outline->BBox.Origin() - origin;
-	core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true );
+	core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_BLENDED );
 	core->GetVideoDriver()->DrawPolygon( outline, origin, outlineColor, false );
 }
 
