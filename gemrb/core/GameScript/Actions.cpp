@@ -4936,7 +4936,6 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	//max. shouting distance, please adjust it if you know better
 	map->Shout(actor, parameters->int0Parameter, false);
 }
 
@@ -4951,7 +4950,7 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	// 0 means unlimited shout distance
+	// true means global, unlimited, shout distance
 	map->Shout(actor, parameters->int0Parameter, true);
 }
 
