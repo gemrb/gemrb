@@ -418,7 +418,7 @@ public:
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
 		unsigned int width, unsigned int height, int flag, bool areaanim = false);
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
-	void Shout(Actor* actor, int shoutID, unsigned int radius);
+	void Shout(Actor* actor, int shoutID, bool global);
 	void ActorSpottedByPlayer(Actor *actor);
 	void InitActors();
 	void InitActor(Actor *actor);

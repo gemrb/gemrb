@@ -60,13 +60,6 @@ static const int VOODOO_FINDTRAP_RANGE = 10;
 // The distance of operating a trigger, container, dialog buffer etc.
 static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square is 16x12 (diagonal of 20), so that's about two
 
-// used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
-// while it looks too big, it is needed this big in at least pst (help())
-// bgee testing shows a radius of 72 feet
-// In the EE Help() has the range of "visualrange" * 3 * (16 * (1 or 3/4 in the vertical)) == 3x visual range, converted via Feet2pixels
-// the '48' (3*16) default can be set by the 'Audible Range' game option in baldur.lua
-static const unsigned int VOODOO_SHOUT_RANGE = 400;
-
 // existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
 // while it should clearly always be delayed at least a bit. The engine uses randomization.
 // Estimates from bg1 research:

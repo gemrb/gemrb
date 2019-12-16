@@ -4339,7 +4339,9 @@ void Actor::PlayExistenceSounds()
 	int xpos, ypos;
 	audio->GetListenerPos(xpos, ypos);
 	Point listener(xpos, ypos);
-	if (nextComment && !Immobile() && Distance(Pos, listener) <= VOODOO_SHOUT_RANGE) {
+	double angle = atan2(listener.y - Pos.y, listener.x - Pos.x);
+	int distance = (3 * GetStat(IE_VISUALRANGE)) / 2; // refer to Map::Shout regarding audible range
+	if (nextComment && !Immobile() && Distance(Pos, listener) <= Feet2Pixels(distance, angle)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
 		if (strref != (ieStrRef) -1) {

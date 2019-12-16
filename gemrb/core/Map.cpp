@@ -1384,7 +1384,7 @@ void Map::UpdateEffects()
 	}
 }
 
-void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
+void Map::Shout(Actor* actor, int shoutID, bool global)
 {
 	size_t i=actors.size();
 	while (i--) {
@@ -1395,8 +1395,18 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 			continue;
 		}
 
-		if (radius) {
-			if (Distance(actor->Pos, listener->Pos)>radius) {
+		if (!global) {
+			/* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling 
+			and more than 1x visual range in others;
+			in EE, the '48' (3*16) default can be set by the 'Audible Range' option in baldur.lua
+
+			This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual 
+			range in several places, so we will use '3 * visual_range / 2' */
+			const Point& A = actor->Pos;
+			const Point& B = listener->Pos;
+			double angle = atan2(B.y - A.y, B.x - A.x);
+			int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
+			if (Distance(A, B) > Feet2Pixels(distance, angle)) {
 				continue;
 			}
 		}
@@ -4172,4 +4182,3 @@ void Map::SetupReverbInfo() {
 }
 
 }
-
