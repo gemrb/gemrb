@@ -1384,7 +1384,7 @@ void Map::UpdateEffects()
 	}
 }
 
-void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
+void Map::Shout(Actor* actor, int shoutID, bool global)
 {
 	size_t i=actors.size();
 	while (i--) {
@@ -1395,8 +1395,11 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 			continue;
 		}
 
-		if (radius) {
-			if (Distance(actor->Pos, listener->Pos)>radius) {
+		if (!global) {
+		        const Point& A = actor->Pos;
+			const Point& B = listener->Pos;
+			double angle = atan2(B.y - A.y, B.x - A.x);
+			if (Distance(A, B)>Feet2Pixels(30, angle)) {
 				continue;
 			}
 		}

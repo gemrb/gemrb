@@ -4937,7 +4937,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	//max. shouting distance, please adjust it if you know better
-	map->Shout(actor, parameters->int0Parameter, VOODOO_SHOUT_RANGE);
+	map->Shout(actor, parameters->int0Parameter, false);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
@@ -4952,7 +4952,7 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	// 0 means unlimited shout distance
-	map->Shout(actor, parameters->int0Parameter, 0);
+	map->Shout(actor, parameters->int0Parameter, true);
 }
 
 void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
@@ -4962,7 +4962,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	}
 	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
-	map->Shout((Actor *) Sender, 0, VOODOO_SHOUT_RANGE);
+	map->Shout((Actor *) Sender, 0, false);
 }
 
 void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
