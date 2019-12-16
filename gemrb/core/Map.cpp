@@ -1406,7 +1406,7 @@ void Map::Shout(Actor* actor, int shoutID, bool global)
 			const Point& B = listener->Pos;
 			double angle = atan2(B.y - A.y, B.x - A.x);
 			int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
-			if (Distance(A, B)>Feet2Pixels(distance, angle)) {
+			if (Distance(A, B) > Feet2Pixels(distance, angle)) {
 				continue;
 			}
 		}
