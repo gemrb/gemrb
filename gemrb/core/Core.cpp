@@ -212,8 +212,8 @@ unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
 // 16 16 16 16 15 15 15 14 14 14 13 13 13 12 12 12 12 12 12
 double Feet2Pixels(int feet, double angle)
 {
-	double sin2 = pow(sin(angle) / 16, 2);
-	double cos2 = pow(cos(angle) / 12, 2);
+	double sin2 = pow(sin(angle) / 12, 2);
+	double cos2 = pow(cos(angle) / 16, 2);
 	double r = sqrt(1 / (cos2 + sin2));
 	return r * feet;
 }
