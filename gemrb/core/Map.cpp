@@ -1398,7 +1398,6 @@ void Map::Shout(Actor* actor, int shoutID, bool global)
 		if (!global) {
 			/* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling 
 			and more than 1x visual range in others in EE, the '48' (3*16) default can be set by the 'Audible Range'
-			game option in baldur.lua
 
 			This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual 
 			range in several places, so we will use '3 * visual_range / 2' */
@@ -4182,4 +4181,3 @@ void Map::SetupReverbInfo() {
 }
 
 }
-
