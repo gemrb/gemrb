@@ -6238,6 +6238,13 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 	}
 
 	ip->InitTriggers();
+	// we also need to reset the IF_INTRAP bit for any actors that are inside or subsequent triggers will be skipped
+	// there are only two users of this action, so we can be a bit sloppy and skip the geometry checks
+	std::vector<Actor *> nearActors = Sender->GetCurrentArea()->GetAllActorsInRadius(ip->Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, MAX_OPERATING_DISTANCE*16);
+	std::vector<Actor *>::iterator candidate;
+	for (candidate = nearActors.begin(); candidate != nearActors.end(); ++candidate) {
+		(*candidate)->SetInTrap(false);
+	}
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
