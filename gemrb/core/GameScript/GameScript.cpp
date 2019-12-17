@@ -2127,9 +2127,9 @@ void GameScript::EvaluateAllBlocks()
 				if (target) {
 					// save the target in case it selfdestructs and we need to manually exit the cutscene
 					core->SetCutSceneRunner(target);
-					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after?
+					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
 					rS->responses[0]->Execute(target);
-					// TODO: this will break blocking instants, if there are any
+					// NOTE: this will break blocking instants, if there are any
 					target->ReleaseCurrentAction();
 				} else {
 					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
