@@ -1958,7 +1958,9 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
-	//actor->InternalFlags |= IF_CLEANUP;
+	if (actor == core->GetCutSceneRunner()) {
+		core->SetCutSceneMode(false);
+	}
 }
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)

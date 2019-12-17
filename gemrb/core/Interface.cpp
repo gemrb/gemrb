@@ -259,6 +259,7 @@ Interface::Interface()
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
 	FeedbackLevel = 0;
+	CutSceneRunner = NULL;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -3740,6 +3741,12 @@ bool Interface::SaveConfig()
 	return true;
 }
 
+// this is more of a workaround than anything else
+// needed for cases where the script runner is gone before finishing his queue
+void Interface::SetCutSceneRunner(Scriptable *runner) {
+	CutSceneRunner = runner;
+}
+
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
@@ -3761,6 +3768,8 @@ void Interface::SetCutSceneMode(bool active)
 		SetEventFlag(EF_CONTROL);
 	}
 	video->SetMouseEnabled(!active);
+
+	if (!active) SetCutSceneRunner(NULL);
 }
 
 /** returns true if in dialogue or cutscene */
