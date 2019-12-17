@@ -2306,13 +2306,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		//projectile immunity
 		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
 
-		//don't resist item projectile payloads based on spell school, bounce, etc.
-		//FIXME: -Uh, why not ?
 		//Allegedly, the book of infinite spells needed this, but irresistable by level
-		//spells got fx->Power = 0, so i added those exceptions and removed this
-		//if( fx->InventorySlot) {
-		//	return 1;
-		//}
+		//spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
 
 		//check level resistances
 		//check specific spell immunity
