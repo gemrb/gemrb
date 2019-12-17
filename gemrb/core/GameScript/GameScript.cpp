@@ -18,6 +18,27 @@
  *
  */
 
+// This class implements IEScript, the scripting language used in various scripts (compiled) and dialogs (plain text).
+//
+// Scriptable objects in GemRB execute script actions one-by-one from a queue,
+// this is done in Scriptable::ProcessActions. If a blocking action is encountered
+// (AF_BLOCKING in the actionnames table in GameScript.cpp) and CurrentAction is
+// left set at the end of execution (ie, the action doesn't call
+// ReleaseCurrentAction() on the Sender) then execution ends for that frame, and
+// the same action is repeated the next time around. This behaviour is important
+// because some state (eg, marked objects) is reset at the beginning of each action
+// but must remain unchanged while the action is being executed.
+//
+// Scriptable::ExecuteScript is one way for the action queue to be changed; the
+// triggers of all blocks are checked (note that some triggers have side-effects,
+// for example See() changes LastSeen) until all triggers for a block evaluate as
+// true, and then that block is executed. If actions from that block are already
+// queued (from a previous round of checks) then nothing happens, so a block is not
+// restarted until it is finished. This becomes a bit more complicated when
+// Continue() is involved, be warned and make sure to check any behaviour changes
+// against the original engine. Note that AF_INSTANT actions are executed
+// instantly, rather than added to the queue.
+
 #include "GameScript/GameScript.h"
 
 #include "GameScript/GSUtils.h"
