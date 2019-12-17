@@ -216,7 +216,7 @@ namespace GemRB {
 #define APP_LADY         0x1000      //lady count
 #define APP_MURDER       0x2000      //murder count
 #define APP_NOTURN       0x4000      //doesn't face gabber in dialogue
-#define APP_BUDDY        0x8000      //npcs will turn hostile if this one dies
+#define APP_BUDDY        0x8000      // unused; supposedly: npcs will turn hostile if this one dies
 #define APP_DEAD         0x40000000  //used by the engine to prevent dying twice
 
 #define DC_GOOD   0
