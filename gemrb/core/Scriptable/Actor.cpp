@@ -7005,11 +7005,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
-	if (raceID2Name.size()) {
-		if (raceID2Name.count(BaseStats[IE_RACE])) {
-			const char *raceName = raceID2Name[BaseStats[IE_RACE]];
-			prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
-		}
+	if (raceID2Name.count(BaseStats[IE_RACE])) {
+		const char *raceName = raceID2Name[BaseStats[IE_RACE]];
+		prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
 	}
 
 	if (third) {
