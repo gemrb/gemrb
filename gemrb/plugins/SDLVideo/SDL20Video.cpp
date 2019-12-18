@@ -59,7 +59,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	//SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
 
-#if USE_OPENGL
+#if OPENGL_BACKEND
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
 	/*
@@ -91,7 +91,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
-#if USE_OPENGL
+#if OPENGL_BACKEND
 	if (strcmp(info.name, "opengl") != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
 		return GEM_ERROR;
@@ -196,7 +196,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 {
 	// we need to isolate flags that require software rendering to use as the "version"
 	unsigned int version = 0;
-#if USE_OPENGL
+#if OPENGL_BACKEND
 	// TODO: write shaders for BLIT_GREY and BLIT_SEPIA (BLIT_GREY has precedence)
 	version |= (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
 #else
@@ -256,7 +256,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 
 		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 
-#if USE_OPENGL
+#if OPENGL_BACKEND
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 		SDL_RenderFlush(renderer);
 #endif
@@ -298,8 +298,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		ret = SDL_RenderCopy(renderer, scratchBuffer, &drect, &drect);
 	} else {
 		UpdateRenderTarget();
-#if USE_OPENGL
-		// apply shaders to tex
+#if OPENGL_BACKEND
+		// TODO: apply shaders to tex
 
 		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
 #else
