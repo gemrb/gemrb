@@ -8197,7 +8197,11 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	// TODO: we could optimize by caching this and update it only when the Selectable moves
 	// unfortunately Pos is public so its a bit hairy to undo that
 	if (area->IntersectsWall(bbox)) {
-		flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
+		if (core->FogOfWar&FOG_DITHERSPRITES) { // dithering disabled setting
+			flags |= BLIT_STENCIL_BLUE;
+		} else {
+			flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
+		}
 	}
 
 	if (!ca->lockPalette) flags |= BLIT_TINTED;

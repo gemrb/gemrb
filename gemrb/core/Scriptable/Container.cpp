@@ -86,11 +86,13 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 			r.x = Pos.x - r.x;
 			r.y = Pos.y - r.y;
 			if (area->IntersectsWall(r)) {
-				ieDword dither = ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
-				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags | dither, tint);
-			} else {
-				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
+				if (core->FogOfWar&FOG_DITHERSPRITES) { // dithering disabled setting
+					flags |= BLIT_STENCIL_BLUE;
+				} else {
+					flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
+				}
 			}
+			video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 		}
 	}
 }

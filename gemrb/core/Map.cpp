@@ -2080,13 +2080,6 @@ void Map::RedrawStencils(const Region& vp)
 	// the 'a' channel is for always dithered (always 0x80, 50% transparent)
 	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
 	Color stencilcol(0, 0, 0xff, 0x80);
-	/*
-	// FIXME: do we need this? or some variant?
-	if (core->FogOfWar&FOG_DITHERSPRITES) {
-		return stencilcol.a = 0xff;
-	}
-	*/
-
 	video->PushDrawingBuffer(wallStencil);
 	for (unsigned int i = 0; i < WallCount; ++i)
 	{
