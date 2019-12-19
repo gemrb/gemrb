@@ -6617,6 +6617,8 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_drain_items (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_drain_items(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) return FX_NOT_APPLIED;
+
 	ieDword i=fx->Parameter1;
 	while (i--) {
 		//deplete magic item = 0
