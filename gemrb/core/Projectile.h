@@ -277,14 +277,6 @@ public:
 	bool PointInRadius(const Point &p) const;
 	void Cleanup();
 
-	//inliners to protect data consistency
-	inline PathNode * GetNextStep() {
-		if (!step) {
-			DoStep((unsigned int) ~0);
-		}
-		return step;
-	}
-
 	inline Point GetDestination() const { return Destination; }
 	inline const char * GetName() const { return name; }
 	inline ieWord GetType() const { return type; }
