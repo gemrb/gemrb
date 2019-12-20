@@ -535,7 +535,7 @@ bool Projectile::FailedIDS(Actor *target) const
 			if (caster) {
 				//TODO move this to Actor
 				//TODO some projectiles use melee attack (fist), others use projectile attack
-				//this apparently depends on the spell's spell form (normal vs. projectile)
+				//this apparently depends on the spell's SpellForm (normal vs. projectile)
 				int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
 				if (roll==1) {
 					return true; //critical failure
