@@ -175,7 +175,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0x9, g);
 			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0x63);
+			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0x5f);
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
