@@ -1287,6 +1287,12 @@ int Projectile::Update()
 	if (pause) {
 		return 1;
 	}
+
+	Game *game = core->GetGame();
+	if (game && game->IsTimestopActive()) {
+		return 1;
+	}
+
 	//recreate path if target has moved
 	if(Target) {
 		SetTarget(Target, false);
@@ -1812,7 +1818,13 @@ void Projectile::DrawTravel(const Region &screen)
 		}
 	} else {
 		if (travel[face]) {
-			Sprite2D *frame = travel[face]->NextFrame();
+			Sprite2D *frame;
+			if (game && game->IsTimestopActive()) {
+				frame = travel[face]->LastFrame();
+				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
+			} else {
+				frame = travel[face]->NextFrame();
+			}
 			video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
 		}
 	}
