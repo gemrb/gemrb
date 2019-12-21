@@ -476,14 +476,18 @@ def SetupClockWindowControls (Window):
 	# Select all characters
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41659)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
 
 	# Formations
+	import GUIWORLD
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
 
 	return
 
