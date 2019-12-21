@@ -2289,8 +2289,8 @@ bool Condition::Evaluate(Scriptable* Sender)
 	for (size_t i = 0; i < triggers.size(); i++) {
 		Trigger* tR = triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
-		//was already True()
-		if (!ORcount || !subresult) {
+		//was already True() ... but this sane approach was only used in iwd2!
+		if (!core->HasFeature(GF_EFFICIENT_OR) || !ORcount || !subresult) {
 			result = tR->Evaluate(Sender);
 		}
 		if (result > 1) {

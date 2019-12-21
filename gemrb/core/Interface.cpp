@@ -2273,6 +2273,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		"FixedMoraleOpcode",  //78GF_FIXED_MORALE_OPCODE
 		"Happiness",          //79GF_HAPPINESS
+		"EfficientORTrigger", //80GF_EFFICIENT_OR
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
