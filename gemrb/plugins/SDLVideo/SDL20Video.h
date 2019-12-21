@@ -24,7 +24,11 @@
 #include "SDLVideo.h"
 #include "SDLSurfaceSprite2D.h"
 
+#if OPENGL_BACKEND
 #include "GLSLProgram.h"
+#else
+class GLSLProgram {};
+#endif
 
 namespace GemRB {
 

@@ -46,7 +46,7 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
-	if (stencilShader) stencilShader->Release();
+	delete stencilShader;
 }
 
 int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)

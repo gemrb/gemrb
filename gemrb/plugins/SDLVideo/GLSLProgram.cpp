@@ -16,6 +16,11 @@ using namespace GemRB;
 
 std::string GLSLProgram::errMessage;
 
+GLSLProgram::~GLSLProgram()
+{
+	if (program != 0) glDeleteProgram(program);
+}
+
 GLSLProgram* GLSLProgram::Create(std::string vertexSource, std::string fragmentSource)
 {
 	GLSLProgram* program = new GLSLProgram();
@@ -187,12 +192,6 @@ GLint GLSLProgram::getUniformLocation(std::string uniformName)
 		return -1;
 	}
 	return uniforms.at(uniformName);
-}
-
-void GLSLProgram::Release()
-{
-	if (program != 0) glDeleteProgram(program);
-	delete this;
 }
 
 const std::string GLSLProgram::GetLastError()
