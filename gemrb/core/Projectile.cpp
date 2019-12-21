@@ -1685,7 +1685,14 @@ void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
 	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 	PathNode *iter = path;
-	Sprite2D *frame = travel[face]->NextFrame();
+	Sprite2D *frame;
+	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+		frame = travel[face]->LastFrame();
+		flag |= BLIT_GREY;
+	} else {
+		frame = travel[face]->NextFrame();
+	}
+
 	Color tint2 = tint;
 	if (game) game->ApplyGlobalTint(tint2, flag);
 	while(iter) {
@@ -1775,22 +1782,25 @@ void Projectile::DrawTravel(const Region &screen)
 	if (ExtFlags&PEF_POP) {
 			//draw pop in/hold/pop out animation sequences
 			Sprite2D *frame;
-			
-			if(ExtFlags&PEF_UNPOP) {
-				frame = shadow[0]->NextFrame();
-				if(shadow[0]->endReached) {
-					ExtFlags&=~PEF_UNPOP;
-				}
+			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+				frame = travel[face]->LastFrame();
+				flags |= BLIT_GREY;
 			} else {
-				frame = travel[0]->NextFrame();
-				if(travel[0]->endReached) {
-					travel[0]->playReversed=true;
-					travel[0]->SetPos(0);
-					ExtFlags|=PEF_UNPOP;
+				if (ExtFlags&PEF_UNPOP) {
 					frame = shadow[0]->NextFrame();
+					if (shadow[0]->endReached) {
+						ExtFlags &= ~PEF_UNPOP;
+					}
+				} else {
+					frame = travel[0]->NextFrame();
+					if (travel[0]->endReached) {
+						travel[0]->playReversed = true;
+						travel[0]->SetPos(0);
+						ExtFlags |= PEF_UNPOP;
+						frame = shadow[0]->NextFrame();
+					}
 				}
 			}
-
 			video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
 			return;
 	}
