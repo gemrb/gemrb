@@ -2064,7 +2064,7 @@ void Map::RedrawStencils(const Region& vp)
 	Video* video = core->GetVideoDriver();
 
 	if (wallStencil == NULL) {
-		wallStencil = video->CreateBuffer(vp, Video::DISPLAY);
+		wallStencil = video->CreateBuffer(vp, Video::RGBA8888);
 	}
 
 	wallStencil->Clear();
