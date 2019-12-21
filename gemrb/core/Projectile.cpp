@@ -1289,7 +1289,7 @@ int Projectile::Update()
 	}
 
 	Game *game = core->GetGame();
-	if (game && game->IsTimestopActive()) {
+	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		return 1;
 	}
 
@@ -1819,7 +1819,7 @@ void Projectile::DrawTravel(const Region &screen)
 	} else {
 		if (travel[face]) {
 			Sprite2D *frame;
-			if (game && game->IsTimestopActive()) {
+			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
 				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
 			} else {

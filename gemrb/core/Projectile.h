@@ -73,6 +73,7 @@ namespace GemRB {
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours (use alpha)
 #define PTF_BRIGHTEN 256    //brighten alpha
+#define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)

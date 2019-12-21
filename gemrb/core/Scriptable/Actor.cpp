@@ -9591,6 +9591,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			} else {
 				// TODO: EEs add a bit to fx_melee for only applying with monk fists: parameter2 of 4 (no other value supported)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref);
+				// ignore timestop
+				pro->TFlags |= PTF_TIMELESS;
 			}
 			//AddEffect created a copy, the original needs to be scrapped
 			delete AttackEffect;
