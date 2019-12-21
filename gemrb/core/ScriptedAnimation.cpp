@@ -606,7 +606,14 @@ retry:
 		Phase++;
 		goto retry;
 	}
-	frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+
+	Game *game = core->GetGame();
+	if (game && game->IsTimestopActive()) {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->LastFrame();
+		return false;
+	} else {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+	}
 
 	//explicit duration
 	if (Phase==P_HOLD) {
@@ -678,7 +685,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
 
-	if (Transparency & IE_VVC_GREYSCALE) {
+	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
 		flag |= BLIT_GREY;
 	}
 
