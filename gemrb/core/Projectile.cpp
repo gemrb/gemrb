@@ -1876,7 +1876,7 @@ void Projectile::Draw(Sprite2D* spr, const Point& p,
 {
 	Video *video = core->GetVideoDriver();
 	Palette* pal = (spr->Bpp == 8) ? palette : NULL;
-	video->BlitGameSpriteWithPalette(spr, pal, p.x, p.y, flags, tint, NULL);
+	video->BlitGameSpriteWithPalette(spr, pal, p.x, p.y, flags|BLIT_BLENDED, tint, NULL);
 }
 
 }
