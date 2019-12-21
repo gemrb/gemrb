@@ -377,7 +377,7 @@
 0xEC4B    MDH1      MDH1       MDH1       MDH1       9          2          1          *
 0xEC5B    MDH2      MDH2       MDH2       MDH2       9          2          1          *
 0xED00    MYU1      MYU1       MYU1       MYU1       9          2          1          *
-0xED09    MCOR      MCOR       MCOR       MCOR       9          3          1          *
+0xED09    MCOR      MCOR       MCOR       MCOR       9          2          1          *
 0xED10    MYU2      MYU2       MYU2       MYU2       9          2          1          *
 0xED19    MGLA      MGLA       MGLA       MGLA       9          2          1          *
 0xED20    MYU3      MYU3       MYU3       MYU3       9          2          1          *
