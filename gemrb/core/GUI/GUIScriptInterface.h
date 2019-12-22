@@ -38,7 +38,7 @@ public:
 
 	// class to instantiate on the script side (Python)
 	virtual const ScriptingClassId ScriptingClass() const {
-		return ScriptingGroup().CString();
+		return {"View"};
 	};
 
 	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
