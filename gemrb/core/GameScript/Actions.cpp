@@ -1845,9 +1845,6 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	if (ret) {
 		*poi = '*';
 	}
-	if (parameters->int0Parameter == SONG_BATTLE) {
-		core->GetGame()->CombatCounter = 150;
-	}
 }
 
 //starts the current area music (songtype is in int0Parameter)
