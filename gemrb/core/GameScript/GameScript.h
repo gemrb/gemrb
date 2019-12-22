@@ -1290,7 +1290,6 @@ public:
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SelectWeaponAbility(Scriptable* Sender, Action* parameters);
 	static void SendTrigger(Scriptable* Sender, Action* parameters);
-	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
