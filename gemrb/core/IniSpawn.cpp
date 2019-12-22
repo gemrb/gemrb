@@ -53,7 +53,6 @@ IniSpawn::IniSpawn(Map *owner)
 	localscount = 0;
 	eventspawns = NULL;
 	eventcount = 0;
-	last_spawndate = 0;
 	//high detail level by default
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
@@ -831,20 +830,20 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 	ieDword gameTime = core->GetGame()->GameTime;
 	// gameTime can be 0 for the first area, so make sure to not exit prematurely
 	if (interval && gameTime) {
-		if (last_spawndate + interval >= gameTime) {
+		if (event.lastSpawndate + interval >= gameTime) {
 			return;
 		}
 	}
-	last_spawndate = gameTime;
 	
 	for(int i=0;i<event.crittercount;i++) {
 		CritterEntry* critter = event.critters+i;
-		if (!Schedule(critter->TimeOfDay, last_spawndate) ) {
+		if (!Schedule(critter->TimeOfDay, event.lastSpawndate) ) {
 			continue;
 		}
 		for(int j=0;j<critter->SpawnCount;j++) {
 			SpawnCreature(*critter);
 		}
+		event.lastSpawndate = gameTime;
 	}
 }
 
