@@ -741,11 +741,10 @@ void View::ClearScriptingRefs()
 	std::vector<ViewScriptingRef*>::iterator rit;
 	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
 		ViewScriptingRef* ref = *rit;
-		if (GetView(ref) == this) {
-			bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);
-			assert(unregistered);
-			delete ref;
-		}
+		assert(GetView(ref) == this);
+		bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);
+		assert(unregistered);
+		delete ref;
 		rit = scriptingRefs.erase(rit);
 	}
 }

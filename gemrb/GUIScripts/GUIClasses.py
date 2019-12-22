@@ -22,7 +22,7 @@ import GameCheck
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper
-from GemRB import GetView, CreateView, RemoveView
+from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
 
 def CreateScrollbarARGs(bam = None):
 	bamframes = list(range(6))
@@ -158,7 +158,7 @@ class GView:
 	def CreateSubview(self, id, type, frame, *args):
 		view = CreateView(id, type, frame, *args) # this will create an entry in the generic 'control' group
 		created = self.AddSubview(view) # this will move the reference into the our window's group
-		RemoveView(view, False) # destroy the old reference just in case something tries to recycle the id while 'created' is still valid
+		RemoveScriptingRef(view) # destroy the old reference just in case something tries to recycle the id while 'created' is still valid
 		return created
 
 	def RemoveSubview(self, view, delete=False):

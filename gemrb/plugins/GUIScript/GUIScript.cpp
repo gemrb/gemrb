@@ -1863,6 +1863,21 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_RemoveScriptingRef__doc,
+			 "RemoveScriptingRef(GView)\n\n"
+			 "Remove the decoded view reference from the scripting engine. You can use this to remove an alias or any other reference." );
+
+static PyObject* GemRB_RemoveScriptingRef(PyObject* self, PyObject* args)
+{
+	PARSE_ARGS( args, "O", &self );
+
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(self));
+	ABORT_IF_NULL(ref);
+	ref->GetObject()->RemoveScriptingRef(ref);
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_RemoveView__doc,
 "RemoveView(GView [,delete])\n\n"
 "Remove a view from its superview and optionally delete it." );
@@ -12969,6 +12984,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreatePlayer, METH_VARARGS),
 	METHOD(CreateString, METH_VARARGS),
 	METHOD(CreateView, METH_VARARGS),
+	METHOD(RemoveScriptingRef, METH_VARARGS),
 	METHOD(RemoveView, METH_VARARGS),
 	METHOD(DeleteSaveGame, METH_VARARGS),
 	METHOD(DispelEffect, METH_VARARGS),
