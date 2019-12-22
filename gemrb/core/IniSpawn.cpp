@@ -522,7 +522,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
 {
 	const char *s;
-	
+	entry.name = strdup(entryname);
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
 	if (entry.interval < 15) entry.interval = 15; // lower bound from the original
 	//don't default to NULL here, some entries may be missing in original game

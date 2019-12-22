@@ -115,10 +115,12 @@ public:
 	ieDword interval;
 	int crittercount;
 	CritterEntry *critters;
+	char *name;
 	SpawnEntry() {
 		interval = 0;
 		crittercount = 0;
 		critters = NULL;
+		name = NULL;
 	}
 	~SpawnEntry() {
 		if (critters) {
@@ -127,6 +129,7 @@ public:
 			}
 			delete[] critters;
 		}
+		free(name);
 	}
 };
 
