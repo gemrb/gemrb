@@ -1913,7 +1913,7 @@ void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0, GEM_SND_RELATIVE);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
