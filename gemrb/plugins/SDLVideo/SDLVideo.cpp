@@ -1359,8 +1359,16 @@ void SDLVideoDriver::SetFadeColor(int r, int g, int b)
 	if (b>255) b=255;
 	else if(b<0) b=0;
 	fadeColor.b=b;
-	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
-	SDL_FillRect( extra, NULL, val );
+
+	/**
+	 * `extra` is tightly coupled to SDL1.2 code. Thus, some fade effects in PST
+	 * currently don't work for SDL2 - but assuming its presence otherwise causes
+	 * a crash.
+	 */
+	if (extra) {
+		long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
+		SDL_FillRect( extra, NULL, val );
+	}
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)
