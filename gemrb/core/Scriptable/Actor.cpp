@@ -4470,7 +4470,7 @@ void Actor::GetHit(int damage, int spellLevel)
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
-		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
+		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP || HasSpellState(SS_NOAWAKE)) {
 			return;
 		}
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
