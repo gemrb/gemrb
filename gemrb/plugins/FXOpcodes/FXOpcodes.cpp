@@ -7212,7 +7212,7 @@ int fx_set_traps_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_to_hit_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	HandleBonus( target, IE_HITBONUS, fx->Parameter1, fx->TimingMode );
+	STAT_MOD(IE_HITBONUS);
 	return FX_PERMANENT;
 }
 
