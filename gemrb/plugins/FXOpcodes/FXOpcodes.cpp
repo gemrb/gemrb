@@ -5915,6 +5915,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is the bg2 style stoneskin, not normally using spell states
 	//but this way we can support hybrid games
+	// TODO: EE uses this as a switch to roll for the amount of skins (add GF_; is Parameter1 ever 0 in this cases?)
 	if (fx->Parameter2) {
 		target->SetSpellState(SS_IRONSKIN);
 		//gradient for iron skins?
