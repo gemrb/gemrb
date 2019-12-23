@@ -358,6 +358,7 @@ static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
+static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd1 and iwd2
@@ -3671,7 +3672,10 @@ void Actor::UpdateFatigue()
 			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else {
-		DisablePortraitIcon(PI_FATIGUE);
+		// the icon can be added manually; eg. by spcl321 in bg2 (berserker enrage)
+		if (!fxqueue.HasEffectWithParam(fx_display_portrait_icon_ref, PI_FATIGUE)) {
+			DisablePortraitIcon(PI_FATIGUE);
+		}
 		FatigueComplaintDelay = 0;
 	}
 
