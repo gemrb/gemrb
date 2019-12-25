@@ -1912,6 +1912,18 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	}
 }
 
+// list of allowed area and exit combinations in pst that trigger worldmap travel
+static std::map<std::string, std::vector<std::string>> pstWMapExits {
+	{"ar0100", {"to0300", "to0200", "to0101"}},
+	{"ar0101", {"to0100"}},
+	{"ar0200", {"to0100", "to0301", "to0400"}},
+	{"ar0300", {"to0100", "to0301", "to0400"}},
+	{"ar0301", {"to0200", "to0300"}},
+	{"ar0400", {"to0200", "to0300"}},
+	{"ar0500", {"to0405", "to0600"}},
+	{"ar0600", {"to0500"}}
+};
+
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
@@ -2073,10 +2085,25 @@ formation_handling:
 		}
 		if (DoubleClick) Center(x,y);
 
-		//p is a searchmap travel region
-		// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500)
+		// pst: determine if we need to trigger worldmap travel instead
 		bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
-		if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || (overInfoPoint && overInfoPoint->Type == ST_TRAVEL && teamMoved)) {
+		teamMoved = teamMoved && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+		if (teamMoved) {
+			teamMoved = false;
+			auto wmapExits = pstWMapExits.find(party[0]->GetCurrentArea()->GetScriptName());
+			if (wmapExits != pstWMapExits.end()) {
+				for (std::string exit : wmapExits->second) {
+					if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+						teamMoved = true;
+						break;
+					}
+				}
+			}
+		}
+
+		//p is a searchmap travel region
+		// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500 when travelling globally)
+		if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || teamMoved) {
 			sprintf( Tmp, "NIDSpecial2()" );
 			if (teamMoved) {
 				// not clearing the queue means one can exit the worldmap and travel like it wasn't there
