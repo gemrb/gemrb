@@ -2093,10 +2093,9 @@ void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short
 		}
 	}
 	// then summons etc.
-	for (size_t i = 0; i < game->selected.size(); i++) {
-		Actor *act = game->selected[i];
-		if (!act->InParty) {
-			party.push_back(act);
+	for (Actor *selected : game->selected) {
+		if (!selected->InParty) {
+			party.push_back(selected);
 		}
 	}
 
@@ -2117,7 +2116,7 @@ void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short
 			actor->Stop();
 		}
 
-		if (i || party.size() > 1) {
+		if (party.size() > 1) {
 			Map* map = actor->GetCurrentArea();
 			move = GetFormationPoint(map, i, src, p);
 		}
