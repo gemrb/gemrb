@@ -1924,6 +1924,30 @@ static std::map<std::string, std::vector<std::string>> pstWMapExits {
 	{"ar0600", {"to0500"}}
 };
 
+// pst: determine if we need to trigger worldmap travel, since it had it's own system
+// eg. it doesn't use the searchmap for this in ar0500 when travelling globally
+// has to be a plain travel region and on the whitelist
+bool GameControl::ShouldTriggerWorldMap(Actor *pc) const
+{
+	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
+
+	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+	if (!teamMoved) return false;
+
+	teamMoved = false;
+	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
+	if (wmapExits != pstWMapExits.end()) {
+		for (std::string exit : wmapExits->second) {
+			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+				teamMoved = true;
+				break;
+			}
+		}
+	}
+
+	return teamMoved;
+}
+
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
@@ -2101,28 +2125,12 @@ void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short
 	}
 	if (DoubleClick) Center(x, y);
 
-	// pst: determine if we need to trigger worldmap travel instead
-	bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
-	teamMoved = teamMoved && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
-	if (teamMoved) {
-		teamMoved = false;
-		auto wmapExits = pstWMapExits.find(party[0]->GetCurrentArea()->GetScriptName());
-		if (wmapExits != pstWMapExits.end()) {
-			for (std::string exit : wmapExits->second) {
-				if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
-					teamMoved = true;
-					break;
-				}
-			}
-		}
-	}
-
-	// p is a searchmap travel region
-	// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500 when travelling globally)
-	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || teamMoved) {
+	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
+	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
+	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
 		char Tmp[256];
 		sprintf(Tmp, "NIDSpecial2()");
-		if (teamMoved) {
+		if (doWorldMap) {
 			// not clearing the queue means one can exit the worldmap and travel like it wasn't there
 			// remove if necessary
 			// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
