@@ -121,6 +121,7 @@
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
+		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */ = {isa = PBXBuildFile; fileRef = A232B0FC1A15B6E600E5342E /* GemMarkup.h */; };
@@ -1279,6 +1280,7 @@
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
 		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
 		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
+		A231677E23AA071E00D04811 /* GameSpriteF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GemMarkup.cpp; sourceTree = "<group>"; };
 		A232B0FC1A15B6E600E5342E /* GemMarkup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GemMarkup.h; sourceTree = "<group>"; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
@@ -3401,6 +3403,7 @@
 		A2E5A4B619992CC000CCE6D8 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				A231677E23AA071E00D04811 /* GameSpriteF.glsl */,
 				A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */,
 				A26ECB4C23A6903800D3DD59 /* StencilF.glsl */,
 				A2E5A4B719992CC000CCE6D8 /* Ellipse.glslf */,
@@ -4597,6 +4600,7 @@
 				A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */,
 				A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */,
 				A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */,
+				A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */,
 				A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */,
 				A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */,
 				A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */,

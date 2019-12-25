@@ -47,6 +47,7 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	SDL_DestroyWindow(window);
 
 	delete stencilShader;
+	delete spriteShader;
 }
 
 int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)
@@ -100,6 +101,14 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	// must follow SDL_CreateRenderer
 	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
 	if (!stencilShader)
+	{
+		std::string msg = GLSLProgram::GetLastError();
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		return GEM_ERROR;
+	}
+
+	spriteShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/GameSpriteF.glsl");
+	if (!spriteShader)
 	{
 		std::string msg = GLSLProgram::GetLastError();
 		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
@@ -194,53 +203,19 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
-	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = 0;
-#if OPENGL_BACKEND
-	// TODO: write shaders for BLIT_GREY and BLIT_SEPIA (BLIT_GREY has precedence)
-	version |= (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-#else
-	version |= (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-#endif
-
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
-	SDL_Texture* tex = NULL;
 
-	// TODO: handle "shadow" (BLIT_NOSHADOW|BLIT_TRANSSHADOW). I'm not even sure when "shadow" is used.
-	// regular lightmap shadows are actually handled via tinting
-	// its part of blending, not tinting, so maybe we could handle them with the SpriteCover
-	// and simplify things at the same time (now that SpriteCover supports full alpha)
-
+#if OPENGL_BACKEND
+	// FIXME: ingegtate these into the shader if possible
+	unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	// update palette
+	RenderSpriteVersion(texSprite, version);
+#else
+	// we need to isolate flags that require software rendering to use as the "version"
+	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
 	// WARNING: software fallback == slow
 	RenderSpriteVersion(texSprite, version);
-
-	tex = texSprite->GetTexture(renderer);
-
-	if (flags & BLIT_HALFTRANS) {
-		SDL_SetTextureAlphaMod(tex, 0x80);
-	} else {
-		SDL_SetTextureAlphaMod(tex, SDL_ALPHA_OPAQUE);
-	}
-
-	if (tint && flags&BLIT_TINTED) {
-		if (tint->a != SDL_ALPHA_OPAQUE) {
-			SDL_SetTextureAlphaMod(tex, 255-tint->a);
-		}
-		SDL_SetTextureColorMod(tex, tint->r, tint->g, tint->b);
-	} else {
-		SDL_SetTextureColorMod(tex, 0xff, 0xff, 0xff);
-	}
-
-	if (flags & BLIT_BLENDED) {
-		// TODO: there is no reason we can't support other blendmodes too
-		// in fact, SDL_BLENDMODE_MOD looks useful
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-	} else {
-		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
-	}
-
-	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
-	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+#endif
 
 	int ret = 0;
 	if (flags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)) {
@@ -254,16 +229,12 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
 
-		SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
-
-#if OPENGL_BACKEND
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-		SDL_RenderFlush(renderer);
-#endif
+		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
 		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 
+#if OPENGL_BACKEND
 		GLint previous_program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
@@ -288,8 +259,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		glUseProgram(previous_program);
 #else
 		// alpha masking only
-		SDL_Texture* stencilTex = CurrentStencilBuffer();
-		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
 #endif
 
@@ -298,19 +267,87 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		ret = SDL_RenderCopy(renderer, scratchBuffer, &drect, &drect);
 	} else {
 		UpdateRenderTarget();
-#if OPENGL_BACKEND
-		// TODO: apply shaders to tex
-
-		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
-#else
-		// "shaders" were applied via software (RenderSpriteVersion)
-		ret = SDL_RenderCopyEx(renderer, tex, &srect, &drect, 0.0, NULL, flipflags);
-#endif
+		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 	}
 
 	if (ret != 0) {
 		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
 	}
+}
+
+int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const SDL_Rect* srcrect,
+									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
+{
+	SDL_Texture* texture = sprite->GetTexture(renderer);
+#if OPENGL_BACKEND
+	GLint activeTex;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
+
+	spriteShader->Use();
+	if (flags&BLIT_GREY) {
+		spriteShader->SetUniformValue("u_greyMode", 1, 1);
+	} else if (flags&BLIT_SEPIA) {
+		spriteShader->SetUniformValue("u_greyMode", 1, 2);
+	}
+/*
+	if (flags&(BLIT_TRANSSHADOW|BLIT_NOSHADOW)) {
+		Palette* pal = sprite->GetPalette();
+		Color c = pal->col[1];
+
+		if (flags&BLIT_TRANSSHADOW) {
+			spriteShader->SetUniformValue("u_shadowMode", 1, 1);
+			spriteShader->SetUniformValue("u_ck", 4, c.r/256.0f, c.g/256.0f, c.b/256.0f, c.a/256.0f);
+		} else if (flags&BLIT_NOSHADOW) {
+			spriteShader->SetUniformValue("u_shadowMode", 1, 2);
+			spriteShader->SetUniformValue("u_ck", 4, c.r/256.0f, c.g/256.0f, c.b/256.0f, c.a/256.0f);
+		}
+
+		pal->release();
+	}
+*/
+	spriteShader->SetUniformValue("s_texture", 1, 0);
+	glActiveTexture(GL_TEXTURE0);
+	SDL_GL_BindTexture(texture, nullptr, nullptr);
+#else
+	// "shaders" were already applied via software (RenderSpriteVersion)
+	// they had to be applied very first so we could create a texture from the software rendering
+#endif
+	if (flags & BLIT_HALFTRANS) {
+		SDL_SetTextureAlphaMod(texture, 0x80);
+	} else {
+		SDL_SetTextureAlphaMod(texture, SDL_ALPHA_OPAQUE);
+	}
+
+	if (tint && flags&BLIT_TINTED) {
+		if (tint->a != SDL_ALPHA_OPAQUE) {
+			SDL_SetTextureAlphaMod(texture, 255-tint->a);
+		}
+		SDL_SetTextureColorMod(texture, tint->r, tint->g, tint->b);
+	} else {
+		SDL_SetTextureColorMod(texture, 0xff, 0xff, 0xff);
+	}
+
+	if (flags & BLIT_BLENDED) {
+		// TODO: there is no reason we can't support other blendmodes too
+		// in fact, SDL_BLENDMODE_MOD looks useful
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	} else {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+	}
+
+	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+
+#if OPENGL_BACKEND
+	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
+
+	SDL_GL_UnbindTexture(texture);
+	glActiveTexture(activeTex);
+
+	return ret;
+#else
+	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
+#endif
 }
 
 void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags)
