@@ -1928,8 +1928,6 @@ static std::map<std::string, std::vector<std::string>> pstWMapExits {
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
-	unsigned int i;
-
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
@@ -1948,11 +1946,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
 		if (count != 0) {
-			for (i = 0; i < highlighted.size(); i++)
+			for (size_t i = 0; i < highlighted.size(); i++)
 				highlighted[i]->SetOver( false );
 			highlighted.clear();
 			game->SelectActor( NULL, false, SELECT_NORMAL );
-			for (i = 0; i < count; i++) {
+			for (size_t i = 0; i < count; i++) {
 				// FIXME: should call handler only once
 				game->SelectActor( ab[i], true, SELECT_NORMAL );
 			}
