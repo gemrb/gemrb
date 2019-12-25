@@ -185,6 +185,7 @@ private:
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
+	void ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint);
 
 private:
 	Actor *user;     //the user of item or spell

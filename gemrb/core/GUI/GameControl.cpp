@@ -1929,7 +1929,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	unsigned short Mod)
 {
 	unsigned int i;
-	char Tmp[256];
 
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
@@ -2041,79 +2040,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 formation_handling:
 	if (doMove && game->selected.size() > 0) {
-		// construct a sorted party
-		// TODO: this is still ugly, help?
-		std::vector<Actor *> party;
-		// first, from the actual party
-		int max = game->GetPartySize(false);
-		for(int idx = 1; idx<=max; idx++) {
-			Actor *act = game->FindPC(idx);
-			if(act->IsSelected()) {
-				party.push_back(act);
-			}
-		}
-		//summons etc
-		for (i = 0; i < game->selected.size(); i++) {
-			Actor *act = game->selected[i];
-			if (!act->InParty) {
-				party.push_back(act);
-			}
-		}
-
-		//party formation movement
-		Point src;
-		if (FormationRotation) {
-			p = ClickPoint;
-			src = FormationApplicationPoint;
-		} else {
-			src = party[0]->Pos;
-		}
-		Point move = p;
-
-		for(i = 0; i < party.size(); i++) {
-			actor = party[i];
-			// don't stop the party if we're trying to add a waypoint
-			if (!(Mod & GEM_MOD_SHIFT)) {
-				actor->Stop();
-			}
-
-			if (i || party.size() > 1) {
-				Map* map = actor->GetCurrentArea();
-				move = GetFormationPoint(map, i, src, p);
-			}
-			CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
-		}
-		if (DoubleClick) Center(x,y);
-
-		// pst: determine if we need to trigger worldmap travel instead
-		bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
-		teamMoved = teamMoved && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
-		if (teamMoved) {
-			teamMoved = false;
-			auto wmapExits = pstWMapExits.find(party[0]->GetCurrentArea()->GetScriptName());
-			if (wmapExits != pstWMapExits.end()) {
-				for (std::string exit : wmapExits->second) {
-					if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
-						teamMoved = true;
-						break;
-					}
-				}
-			}
-		}
-
-		//p is a searchmap travel region
-		// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500 when travelling globally)
-		if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || teamMoved) {
-			sprintf( Tmp, "NIDSpecial2()" );
-			if (teamMoved) {
-				// not clearing the queue means one can exit the worldmap and travel like it wasn't there
-				// remove if necessary
-				// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
-				party[0]->AddActionInFront(GenerateAction(Tmp));
-			} else {
-				party[0]->AddAction(GenerateAction(Tmp));
-			}
-		}
+		ExecuteMovement(actor, x, y, Mod & GEM_MOD_SHIFT);
 	} else if (actor) {
 		if (actor->GetStat(IE_EA)<EA_CHARMED
 			&& target_mode == TARGET_MODE_NONE) {
@@ -2125,6 +2052,87 @@ formation_handling:
 	}
 	FormationRotation = false;
 	core->GetEventMgr()->FakeMouseMove();
+}
+
+void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint)
+{
+	Game *game = core->GetGame();
+	Point p(x,y);
+	core->GetVideoDriver()->ConvertToGame(p.x, p.y);
+
+	// construct a sorted party
+	std::vector<Actor *> party;
+	// first, from the actual party
+	int max = game->GetPartySize(false);
+	for (int idx = 1; idx <= max; idx++) {
+		Actor *act = game->FindPC(idx);
+		if (act->IsSelected()) {
+			party.push_back(act);
+		}
+	}
+	// then summons etc.
+	for (size_t i = 0; i < game->selected.size(); i++) {
+		Actor *act = game->selected[i];
+		if (!act->InParty) {
+			party.push_back(act);
+		}
+	}
+
+	// party formation movement
+	Point src;
+	if (FormationRotation) {
+		p = ClickPoint;
+		src = FormationApplicationPoint;
+	} else {
+		src = party[0]->Pos;
+	}
+	Point move = p;
+
+	for (size_t i = 0; i < party.size(); i++) {
+		actor = party[i];
+		// don't stop the party if we're just trying to add a waypoint
+		if (!createWaypoint) {
+			actor->Stop();
+		}
+
+		if (i || party.size() > 1) {
+			Map* map = actor->GetCurrentArea();
+			move = GetFormationPoint(map, i, src, p);
+		}
+		CreateMovement(actor, move, createWaypoint);
+	}
+	if (DoubleClick) Center(x, y);
+
+	// pst: determine if we need to trigger worldmap travel instead
+	bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
+	teamMoved = teamMoved && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+	if (teamMoved) {
+		teamMoved = false;
+		auto wmapExits = pstWMapExits.find(party[0]->GetCurrentArea()->GetScriptName());
+		if (wmapExits != pstWMapExits.end()) {
+			for (std::string exit : wmapExits->second) {
+				if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+					teamMoved = true;
+					break;
+				}
+			}
+		}
+	}
+
+	// p is a searchmap travel region
+	// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500 when travelling globally)
+	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || teamMoved) {
+		char Tmp[256];
+		sprintf(Tmp, "NIDSpecial2()");
+		if (teamMoved) {
+			// not clearing the queue means one can exit the worldmap and travel like it wasn't there
+			// remove if necessary
+			// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
+			party[0]->AddActionInFront(GenerateAction(Tmp));
+		} else {
+			party[0]->AddAction(GenerateAction(Tmp));
+		}
+	}
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
