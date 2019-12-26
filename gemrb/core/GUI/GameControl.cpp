@@ -366,7 +366,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	}
 
 	Region viewport = core->GetVideoDriver()->GetViewport();
-	// TODO: 0.5 and 0.7 are pretty much random values
+	// NOTE: 0.5 and 0.7 are pretty much random values
 	// right segment
 	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - viewport.x, p.y - viewport.y, xradius,
 								yradius, color, -0.5, 0.5 );
@@ -1975,9 +1975,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			highlighted.clear();
 			game->SelectActor( NULL, false, SELECT_NORMAL );
 			for (size_t i = 0; i < count; i++) {
-				// FIXME: should call handler only once
-				game->SelectActor( ab[i], true, SELECT_NORMAL );
+				game->SelectActor(ab[i], true, SELECT_QUIET);
 			}
+			core->SetEventFlag(EF_SELECTION);
 		}
 		free( ab );
 		DrawSelectionRect = false;
