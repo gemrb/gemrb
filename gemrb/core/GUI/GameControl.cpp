@@ -2109,6 +2109,7 @@ void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short
 	}
 	Point move = p;
 
+	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
 	for (size_t i = 0; i < party.size(); i++) {
 		actor = party[i];
 		// don't stop the party if we're just trying to add a waypoint
@@ -2121,22 +2122,16 @@ void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short
 			move = GetFormationPoint(map, i, src, p);
 		}
 		CreateMovement(actor, move, createWaypoint);
+		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
+		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
 	}
 	if (DoubleClick) Center(x, y);
 
 	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
-	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
 	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
 		char Tmp[256];
 		sprintf(Tmp, "NIDSpecial2()");
-		if (doWorldMap) {
-			// not clearing the queue means one can exit the worldmap and travel like it wasn't there
-			// remove if necessary
-			// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
-			party[0]->AddActionInFront(GenerateAction(Tmp));
-		} else {
-			party[0]->AddAction(GenerateAction(Tmp));
-		}
+		party[0]->AddAction(GenerateAction(Tmp));
 	}
 }
 

@@ -99,6 +99,7 @@ class SpriteCover;
 #define IF_USEEXIT       0x1000 //
 #define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
 //#define IF_WASINDIALOG   0x4000 //actor just left dialog
+#define IF_PST_WMAPPING  0x8000 // trying to use the worldmap for travel
 
 //scriptable flags
 #define IF_ACTIVE        0x10000

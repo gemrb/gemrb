@@ -5084,6 +5084,7 @@ void Actor::SetMap(Map *map)
 		InternalFlags &=~IF_CLEANUP;
 		return;
 	}
+	InternalFlags &= ~IF_PST_WMAPPING;
 
 	//These functions are called once when the actor is first put in
 	//the area. It already has all the items (including fist) at this
@@ -10439,6 +10440,10 @@ bool Actor::BlocksSearchMap() const
 bool Actor::CannotPassEntrance(ieDword exitID) const
 {
 	if (LastExit!=exitID) {
+		return true;
+	}
+
+	if (InternalFlags & IF_PST_WMAPPING) {
 		return true;
 	}
 
