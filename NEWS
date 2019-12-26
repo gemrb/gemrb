@@ -1,10 +1,15 @@
-GemRB git (3fe07e7e3):
+GemRB git (d670f0867):
   New features:
     - 
 
   Improved features:
     - 
+    - audio, pst ini handling
+    - effects, projectiles, actions
     - bugfixes
+
+  Notes:
+    - switched to c++11 and cmake 3.1 as a minimum
 
 GemRB v0.8.6 (2019-11-24):
   New features:
