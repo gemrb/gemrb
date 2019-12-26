@@ -218,6 +218,19 @@ double Feet2Pixels(int feet, double angle)
 	return r * feet;
 }
 
+/* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling
+ a nd more than 1x visual range in others;
+ in EE, the '48' (3*16) default can be set by the 'Audible Range' option in baldur.lua
+
+ This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual
+ range in several places, so we will use '3 * visual_range / 2' */
+bool WithinAudibleRange(const Actor *actor, const Point &dest)
+{
+	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
+	int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
+	return Distance(actor->Pos, dest) <= Feet2Pixels(distance, angle);
+}
+
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
 int EARelation(Scriptable* Owner, Actor* target)
