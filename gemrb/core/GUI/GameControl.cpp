@@ -129,7 +129,6 @@ GameControl::GameControl(const Region& frame)
 //so it doesn't cause problems with the original engine
 void GameControl::ReadFormations()
 {
-	unsigned int i,j;
 	AutoTable tab("formatio");
 	if (!tab) {
 		// fallback
@@ -139,12 +138,12 @@ void GameControl::ReadFormations()
 	}
 	formationcount = tab->GetRowCount();
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for(i=0; i<formationcount; i++) {
-		for(j=0;j<FORMATIONSIZE;j++) {
-			short k=(short) atoi(tab->QueryField(i,j*2));
-			formations[i][j].x=k;
-			k=(short) atoi(tab->QueryField(i,j*2+1));
-			formations[i][j].y=k;
+	for (unsigned int i = 0; i < formationcount; i++) {
+		for (unsigned int j = 0; j < FORMATIONSIZE; j++) {
+			short k = (short) atoi(tab->QueryField(i, j*2));
+			formations[i][j].x = k;
+			k = (short) atoi(tab->QueryField(i, j*2+1));
+			formations[i][j].y = k;
 		}
 	}
 }
@@ -298,8 +297,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 {
 	Video* video = core->GetVideoDriver();
 
-	//p.x-=viewport.x;
-	//p.y-=viewport.y;
 	ieDword draw = 0;
 	if (p.x<viewport.x) {
 		p.x=viewport.x;
@@ -314,7 +311,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
 
 	tmp = spr->Width;
-	//tmp = core->ArrowSprites[0]->Width;
 
 	if (p.x>viewport.x+viewport.w-tmp) {
 		p.x=viewport.x+viewport.w;//-tmp;
@@ -322,7 +318,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	}
 
 	tmp = spr->Height;
-	//tmp = core->ArrowSprites[0]->Height;
 
 	if (p.y>viewport.y+viewport.h-tmp) {
 		p.y=viewport.y+viewport.h;//-tmp;
@@ -414,8 +409,7 @@ void GameControl::DrawInternal(Region& screen)
 
 	// setup outlines
 	InfoPoint *i;
-	unsigned int idx;
-	for (idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
 		if (overInfoPoint == i && target_mode) {
 			if (i->VisibleTrap(0)) {
@@ -435,7 +429,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	Door *d;
-	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
+	for (size_t idx = 0; (d = area->TMap->GetDoor(idx)); idx++) {
 		d->Highlight = false;
 		if (d->Flags & DOOR_HIDDEN) {
 			continue;
@@ -473,7 +467,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	Container *c;
-	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); idx++) {
 		if (c->Flags & CONT_DISABLED) {
 			continue;
 		}
@@ -511,11 +505,10 @@ void GameControl::DrawInternal(Region& screen)
 
 		if (actor) {
 			std::vector<Actor *> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-			std::vector<Actor *>::iterator monster;
-			for (monster = monsters.begin(); monster != monsters.end(); ++monster) {
-				if ((*monster)->IsPartyMember()) continue;
-				if ((*monster)->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, (*monster)->Pos, viewport, ColorBlack);
+			for (auto monster : monsters) {
+				if (monster->IsPartyMember()) continue;
+				if (monster->GetStat(IE_NOTRACKING)) continue;
+				DrawArrowMarker(screen, monster->Pos, viewport, ColorBlack);
 			}
 		} else {
 			trackerID = 0;
@@ -730,9 +723,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
-
-	if (!game)
-		return false;
+	if (!game) return false;
 
 	if (DialogueFlags&DF_IN_DIALOG) {
 		if (Mod) return false;
@@ -849,10 +840,9 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 			case 'j': //teleports the selected actors
-				for (i = 0; i < game->selected.size(); i++) {
-					Actor* actor = game->selected[i];
-					actor->ClearActions();
-					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
+				for (Actor *selectee : game->selected) {
+					selectee->ClearActions();
+					MoveBetweenAreasCore(selectee, core->GetGame()->CurrentArea, p, -1, true);
 				}
 				break;
 			case 'k': //kicks out actor
@@ -2154,15 +2144,12 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 void GameControl::PerformActionOn(Actor *actor)
 {
 	Game* game = core->GetGame();
-	unsigned int i;
 
 	//determining the type of the clicked actor
-	ieDword type;
-
-	type = actor->GetStat(IE_EA);
-	if ( type >= EA_EVILCUTOFF || type == EA_GOODBUTRED ) {
+	ieDword type = actor->GetStat(IE_EA);
+	if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 		type = ACT_ATTACK; //hostile
-	} else if ( type > EA_CHARMED ) {
+	} else if (type > EA_CHARMED) {
 		type = ACT_TALK; //neutral
 	} else {
 		type = ACT_NONE; //party
@@ -2180,10 +2167,8 @@ void GameControl::PerformActionOn(Actor *actor)
 		type = ACT_THIEVING;
 	}
 
-	if (type != ACT_NONE) {
-		if(!actor->ValidTarget(target_types)) {
-			return;
-		}
+	if (type != ACT_NONE && !actor->ValidTarget(target_types)) {
+		return;
 	}
 
 	//we shouldn't zero this for two reasons in case of spell or item
@@ -2229,29 +2214,27 @@ void GameControl::PerformActionOn(Actor *actor)
 			break;
 		case ACT_ATTACK:
 			//all of them attacks the red circled actor
-			for(i=0;i<game->selected.size();i++) {
-				TryToAttack(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToAttack(selectee, actor);
 			}
 			break;
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToCast(source, actor);
 				}
 			}
 			break;
 		case ACT_DEFEND:
-			for(i=0;i<game->selected.size();i++) {
-				TryToDefend(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToDefend(selectee, actor);
 			}
 			break;
 		case ACT_THIEVING:
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToPick(source, actor);
 				}
 			}
@@ -2291,7 +2274,6 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 	if (!game) return false;
 	int partysize = game->GetPartySize(false);
 	
-	int pm;
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 	switch (Key) {
@@ -2312,7 +2294,7 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_TAB:
 			// show partymember hp/maxhp as overhead text
-			for (pm=0; pm < partysize; pm++) {
+			for (int pm = 0; pm < partysize; pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
 				pc->DisplayHeadHPRatio();
@@ -2340,8 +2322,6 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 
 void GameControl::CalculateSelection(const Point &p)
 {
-	unsigned int i;
-
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
@@ -2361,11 +2341,12 @@ void GameControl::CalculateSelection(const Point &p)
 		}
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
-		for (i = 0; i < highlighted.size(); i++)
-			highlighted[i]->SetOver( false );
+		for (Actor *highlightee : highlighted) {
+			highlightee->SetOver(false);
+		}
 		highlighted.clear();
 		if (count != 0) {
-			for (i = 0; i < count; i++) {
+			for (size_t i = 0; i < count; i++) {
 				ab[i]->SetOver( true );
 				highlighted.push_back( ab[i] );
 			}
