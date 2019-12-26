@@ -7408,8 +7408,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	unsigned int weaponrange = GetWeaponRange(wi);
-	if ((PersonalDistance(this, target) > weaponrange) || (GetCurrentArea() != target->GetCurrentArea())) {
+	if (!WithinPersonalRange(this, target, GetWeaponRange(wi)) || (GetCurrentArea() != target->GetCurrentArea())) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -7592,35 +7591,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 int Actor::GetWeaponRange(const WeaponInfo &wi) const
 {
-	if (!wi.range) {
-		// hitting header lookup failed
-		return 0;
-	}
-
-	int rangemultiplier = VOODOO_WPN_RANGE1;
-	if (wi.wflags&WEAPON_RANGED) {
-		rangemultiplier = VOODOO_WPN_RANGE2;
-		// testing shows that the stored range is ignored and only two constants used, see #98
-		// TODO: store in a table instead, so it is moddable. itemdata.2da would fit, but currently only iwd2 has it
-		switch (wi.itemtype) {
-			case 0xf: // bow
-			case 0x1b: // xbow
-			case 0x12: // sling
-				rangemultiplier *= 100;
-				break;
-			case 0x10: // throwing dagger
-			case 0x15: // throwing hammer
-			case 0x18: // dart
-			case 0x19: // throwing axe (one even has a range of 1 set)
-				rangemultiplier *= 60;
-				break;
-			default:
-				rangemultiplier *= wi.range;
-				break;
-		}
-		return rangemultiplier;
-	}
-	return rangemultiplier * wi.range;
+	return std::min(wi.range, Modified[IE_VISUALRANGE]);
 }
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const

@@ -41,12 +41,6 @@ static const int VOODOO_SPL_RANGE_F = 15;
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
 
-// factors for our guess for proper weapon ranges
-// long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
-// 400 units is about the normal sight range
-static const int VOODOO_WPN_RANGE1 = 10; // melee
-static const int VOODOO_WPN_RANGE2 = 4;  // ranged weapons
-
 // a multiplier for visual range that we use in the trap finding modal action/effect
 static const int VOODOO_FINDTRAP_RANGE = 10;
 

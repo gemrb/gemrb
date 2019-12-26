@@ -51,6 +51,7 @@
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 
+#include <cmath>
 #include <cstdio>
 
 namespace GemRB {
@@ -1430,11 +1431,12 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
+	double angle = atan2(actor->Pos.y - target->Pos.y, actor->Pos.x - target->Pos.x);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		(PersonalDistance(Sender, target) > weaponrange) ||
+		!WithinPersonalRange(actor, target, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
-		MoveNearerTo(Sender, target, weaponrange);
+		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));
 		return;
 	} else if (target->Type == ST_DOOR) {
 		//Forcing a lock does not launch the trap...
