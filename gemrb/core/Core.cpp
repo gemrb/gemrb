@@ -87,7 +87,7 @@ unsigned int Distance(Point p, Point q)
 }
 
 /** Calculates distance squared from a point to a scriptable */
-unsigned int SquaredMapDistance(Point p, Scriptable *b)
+unsigned int SquaredMapDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x/16 - b->Pos.x/16 );
 	long y = ( p.y/12 - b->Pos.y/12 );
@@ -95,14 +95,14 @@ unsigned int SquaredMapDistance(Point p, Scriptable *b)
 }
 
 /** Calculates distance between 2 points */
-unsigned int Distance(Point p, Scriptable *b)
+unsigned int Distance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
 	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
-unsigned int PersonalDistance(Point p, Scriptable *b)
+unsigned int PersonalDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
@@ -114,7 +114,7 @@ unsigned int PersonalDistance(Point p, Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(Point p, Scriptable *b)
+unsigned int SquaredPersonalDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
@@ -127,7 +127,7 @@ unsigned int SquaredPersonalDistance(Point p, Scriptable *b)
 }
 
 /** Calculates map distance between 2 scriptables */
-unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = (a->Pos.x/16 - b->Pos.x/16 );
 	long y = (a->Pos.y/12 - b->Pos.y/12 );
@@ -135,7 +135,7 @@ unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance between 2 scriptables */
-unsigned int Distance(Scriptable *a, Scriptable *b)
+unsigned int Distance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -143,7 +143,7 @@ unsigned int Distance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance squared between 2 scriptables */
-unsigned int SquaredDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -151,7 +151,7 @@ unsigned int SquaredDistance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance between 2 scriptables, including feet circle if applicable */
-unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
+unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -166,7 +166,7 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -233,7 +233,7 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
-int EARelation(Scriptable* Owner, Actor* target)
+int EARelation(const Scriptable* Owner, const Actor* target)
 {
 	ieDword eao = EA_ENEMY;
 
