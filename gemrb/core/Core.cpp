@@ -231,6 +231,12 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 	return Distance(actor->Pos, dest) <= Feet2Pixels(distance, angle);
 }
 
+bool WithinPersonalRange(const Actor *actor, const Scriptable *dest, int distance)
+{
+	double angle = atan2(actor->Pos.y - dest->Pos.y, actor->Pos.x - dest->Pos.x);
+	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
+}
+
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
 int EARelation(const Scriptable* Owner, const Actor* target)
