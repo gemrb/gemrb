@@ -390,7 +390,7 @@ Map::~Map(void)
 		delete anim;
 	}
 
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		//don't delete NPC/PC
 		if (actor && !actor->Persistent()) {
 			delete actor;
@@ -659,7 +659,7 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 void Map::UpdateScripts()
 {
 	bool has_pcs = false;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->InParty) {
 			has_pcs = true;
 			break;
@@ -1364,7 +1364,7 @@ void Map::AddAnimation(AreaAnimation* panim)
 //this might be unnecessary later
 void Map::UpdateEffects()
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		actor->RefreshEffects(NULL);
 	}
 }
@@ -1406,7 +1406,7 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 {
 	int count = 0;
 
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
@@ -1420,7 +1420,7 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 bool Map::AnyEnemyNearPoint(const Point &p)
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
@@ -1468,7 +1468,7 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 //call this once, after area was loaded
 void Map::InitActors()
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		actor->SetMap(this);
 		InitActor(actor);
 	}
@@ -1509,7 +1509,7 @@ void Map::AddActor(Actor* actor, bool init)
 bool Map::AnyPCSeesEnemy()
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
 			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
 				return true;
@@ -1619,7 +1619,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 	if (!objectID) {
 		return NULL;
 	}
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->GetGlobalID()==objectID) {
 			return actor;
 		}
@@ -1635,7 +1635,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 */
 Actor* Map::GetActor(const Point &p, int flags)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
 			continue;
 		if (!actor->ValidTarget(flags) ) {
@@ -1648,7 +1648,7 @@ Actor* Map::GetActor(const Point &p, int flags)
 
 Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
@@ -1662,7 +1662,7 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see) const
 {
 	std::vector<Actor *> neighbours;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags, see) ) {
@@ -1682,7 +1682,7 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 
 Actor* Map::GetActor(const char* Name, int flags)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
 			if (!actor->ValidTarget(flags) ) {
 				return NULL;
@@ -1699,7 +1699,7 @@ int Map::GetActorCount(bool any) const
 		return (int) actors.size();
 	}
 	int ret = 0;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (MustSave(actor)) {
 			ret++;
 		}
@@ -1709,7 +1709,7 @@ int Map::GetActorCount(bool any) const
 
 void Map::JumpActors(bool jump)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
 			if (jump) {
 				actor->FixPosition();
@@ -1721,7 +1721,7 @@ void Map::JumpActors(bool jump)
 
 void Map::SelectActors()
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->Modified[IE_EA]<EA_CONTROLLABLE) {
 			core->GetGame()->SelectActor(actor, true, SELECT_QUIET);
 		}
@@ -1793,7 +1793,7 @@ Actor* Map::GetActor(int index, bool any) const
 
 Scriptable* Map::GetActorByDialog(const char *resref)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		//if a busy or hostile actor shouldn't be found
 		//set this to GD_CHECK
 		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
@@ -1870,7 +1870,7 @@ Scriptable* Map::GetItemByDialog(ieResRef resref)
 //this function finds an actor by its original resref (not correct yet)
 Actor* Map::GetActorByResource(const char *resref)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), resref, 8 ) == 0) { //temporarily!
 			return actor;
 		}
@@ -1880,7 +1880,7 @@ Actor* Map::GetActorByResource(const char *resref)
 
 Actor* Map::GetActorByScriptName(const char *name)
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), name, 8 ) == 0) {
 			return actor;
 		}
@@ -1892,7 +1892,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 //use this function only for party?
 		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
 			continue;
@@ -1914,7 +1914,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 
 bool Map::SpawnsAlive() const
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
 			continue;
 		if (actor->Spawned) {
@@ -2048,7 +2048,7 @@ void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg
 		wp->SetPolygonFlag(value);
 	}
 	//all actors will have to generate a new spritecover
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		actor->SetSpriteCover(NULL);
 	}
 }
@@ -2298,7 +2298,7 @@ void Map::RemoveActor(Actor* actor)
 //and noone is trying to follow the party out
 bool Map::CanFree()
 {
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (actor->IsPartyMember()) {
 			return false;
 		}
@@ -2336,7 +2336,7 @@ void Map::dump(bool show_actors) const
 
 	if (show_actors) {
 		buffer.append("\n");
-		for (Actor *actor : actors) {
+		for (auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actor->GetName(1), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
@@ -3377,7 +3377,7 @@ void Map::UpdateFog()
 		SetMapVisibility( 0 );
 	}
 
-	for (Actor *actor : actors) {
+	for (auto actor : actors) {
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		if (core->FogOfWar&FOG_DRAWFOG) {
 			int state = actor->Modified[IE_STATE_ID];

@@ -1917,7 +1917,7 @@ static std::map<std::string, std::vector<std::string>> pstWMapExits {
 // pst: determine if we need to trigger worldmap travel, since it had it's own system
 // eg. it doesn't use the searchmap for this in ar0500 when travelling globally
 // has to be a plain travel region and on the whitelist
-bool GameControl::ShouldTriggerWorldMap(Actor *pc) const
+bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 {
 	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
 
