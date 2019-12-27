@@ -30,7 +30,7 @@ def MoveToNewArea ():
 		return
 
 	hours = travel["Distance"]
-	GUIMA.OpenWorldMapWindow ()
+	GUIMA.WorldMapWindow.Close()
 
 	if travel["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
