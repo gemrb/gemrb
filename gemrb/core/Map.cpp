@@ -4098,7 +4098,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}
-	ieDword flags = BLIT_TINTED;
+	ieDword flags = BLIT_TINTED|BLIT_BLENDED;
 	if (game) game->ApplyGlobalTint(tint, flags);
 	bool covered = true;
 
