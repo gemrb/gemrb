@@ -26,6 +26,9 @@ from GUIDefines import STR_AREANAME, LOG_MESSAGE
 def MoveToNewArea ():
 	import GUIMA
 	travel = GUIMA.WorldMapControl.GetDestinationArea (not GameCheck.IsPST()) # no random encounters in pst, AFAIR
+	if not travel:
+		return
+
 	hours = travel["Distance"]
 	GUIMA.OpenWorldMapWindow ()
 
