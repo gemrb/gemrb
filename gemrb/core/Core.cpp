@@ -226,9 +226,14 @@ double Feet2Pixels(int feet, double angle)
  range in several places, so we will use '3 * visual_range / 2' */
 bool WithinAudibleRange(const Actor *actor, const Point &dest)
 {
-	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
 	int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
-	return Distance(actor->Pos, dest) <= Feet2Pixels(distance, angle);
+	return WithinRange(actor, dest, distance);
+}
+
+bool WithinRange(const Actor *actor, const Point &dest, int distance)
+{
+	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
+	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
 bool WithinPersonalRange(const Actor *actor, const Scriptable *dest, int distance)
