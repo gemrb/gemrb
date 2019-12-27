@@ -61,7 +61,8 @@ public:
 		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
 		DestroyOnClose = 4,		// window will be deleted on close rather then hidden and sent to the back
 		AlphaChannel = 8,		// Create window with RGBA buffer suitable for creating non rectangular windows
-		Modal = 16
+		Modal = 16,
+		NoSounds = 32			// doesn't play the open/close sounds
 	};
 
 private:

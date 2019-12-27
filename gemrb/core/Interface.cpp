@@ -2968,7 +2968,7 @@ int Interface::PlayMovie(const char* resref)
 	SetCutSceneMode(true);
 	Region screen(0,0, Width, Height);
 	Window* win = winmgr->MakeWindow(screen);
-	win->SetFlags(Window::Borderless, OP_OR);
+	win->SetFlags(Window::Borderless|Window::NoSounds, OP_OR);
 	winmgr->PresentModalWindow(win);
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();

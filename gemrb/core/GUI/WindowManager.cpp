@@ -141,7 +141,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 		video->PopDrawingBuffer();
 	}
 
-	if (win->Flags()&Window::Borderless) {
+	if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 		core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
 	}
 
@@ -233,7 +233,7 @@ void WindowManager::CloseWindow(Window* win)
 	if (it == windows.end()) return;
 
 	if (win == modalWin) {
-		if (win->Flags()&Window::Borderless) {
+		if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 			core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 		}
 
