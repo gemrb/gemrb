@@ -2330,11 +2330,11 @@ int fx_cure_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x2F Cure:Invisible
 // 0x74 Cure:Invisible2
-
 int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	if (!STATE_GET(STATE_NONDET)) {
+	Game *game = core->GetGame();
+	if (!STATE_GET(STATE_NONDET) && !game->StateOverrideFlag && !game->StateOverrideTime) {
 		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
 		} else {
