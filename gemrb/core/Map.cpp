@@ -924,7 +924,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*2*16);
+	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
@@ -1653,8 +1653,9 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 {
 	std::vector<Actor *> neighbours;
 	for (auto actor : actors) {
-		if (PersonalDistance( p, actor ) > radius)
+		if (!WithinRange(actor, p, radius)) {
 			continue;
+		}
 		if (!actor->ValidTarget(flags, see) ) {
 			continue;
 		}
