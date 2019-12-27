@@ -4581,7 +4581,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_find_traps(%2d)", fx->Opcode);
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword id = target->GetGlobalID();
-	ieDword range = target->GetStat(IE_VISUALRANGE) * VOODOO_FINDTRAP_RANGE;
+	ieDword range = target->GetStat(IE_VISUALRANGE) / 2;
 	ieDword skill;
 	bool detecttraps = true;
 
@@ -4613,7 +4613,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Door* door = TMap->GetDoor( Count++ );
 		if (!door)
 			break;
-		if (Distance(door->Pos, target->Pos)<range) {
+		if (WithinRange(target, door->Pos, range)) {
 			door->TryDetectSecret(skill, id);
 			if (detecttraps && door->Visible()) {
 			//when was door trap noticed
@@ -4631,7 +4631,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Container* container = TMap->GetContainer( Count++ );
 		if (!container)
 			break;
-		if (Distance(container->Pos, target->Pos)<range) {
+		if (WithinRange(target, container->Pos, range)) {
 			//when was door trap noticed
 			container->DetectTrap(skill, id);
 		}
@@ -4643,7 +4643,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		InfoPoint* trap = TMap->GetInfoPoint( Count++ );
 		if (!trap)
 			break;
-		if (Distance(trap->Pos, target->Pos)<range) {
+		if (WithinRange(target, trap->Pos, range)) {
 			//when was door trap noticed
 			trap->DetectTrap(skill, id);
 		}

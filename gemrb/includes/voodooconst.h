@@ -41,9 +41,6 @@ static const int VOODOO_SPL_RANGE_F = 15;
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
 
-// a multiplier for visual range that we use in the trap finding modal action/effect
-static const int VOODOO_FINDTRAP_RANGE = 10;
-
 // fx_casting_glow has hardcoded height offsets, while they should be avatar based
 // ypos_by_direction and xpos_by_direction
 
