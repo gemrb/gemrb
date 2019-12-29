@@ -121,6 +121,8 @@
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
+		A231677A23A7267A00D04811 /* SDLSurfaceDrawing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A231677823A7267A00D04811 /* SDLSurfaceDrawing.cpp */; };
+		A231677C23A7288C00D04811 /* SDLSurfaceDrawing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A231677823A7267A00D04811 /* SDLSurfaceDrawing.cpp */; };
 		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
@@ -1280,6 +1282,8 @@
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
 		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
 		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
+		A231677823A7267A00D04811 /* SDLSurfaceDrawing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SDLSurfaceDrawing.cpp; sourceTree = "<group>"; };
+		A231677923A7267A00D04811 /* SDLSurfaceDrawing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceDrawing.h; sourceTree = "<group>"; };
 		A231677E23AA071E00D04811 /* GameSpriteF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GemMarkup.cpp; sourceTree = "<group>"; };
 		A232B0FC1A15B6E600E5342E /* GemMarkup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GemMarkup.h; sourceTree = "<group>"; };
@@ -2867,8 +2871,7 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
-				A20B1199204F70F600B10A0C /* Pixels.h */,
-				A2E5A4B619992CC000CCE6D8 /* Shaders */,
+				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */,
 				A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */,
 				A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */,
@@ -2877,19 +2880,22 @@
 				A2E5A4A619992CAB00CCE6D8 /* GLTextureSprite2D.h */,
 				A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */,
 				A2E5A4A819992CAB00CCE6D8 /* Matrix.h */,
-				A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */,
-				A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */,
-				A249187B141075A60038B170 /* CocoaWrapper.m */,
+				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
+				A20B1199204F70F600B10A0C /* Pixels.h */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
 				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
+				A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */,
+				A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */,
 				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
 				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
+				A231677823A7267A00D04811 /* SDLSurfaceDrawing.cpp */,
+				A231677923A7267A00D04811 /* SDLSurfaceDrawing.h */,
 				A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */,
 				A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */,
 				A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */,
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
+				A2E5A4B619992CC000CCE6D8 /* Shaders */,
 				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
-				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
 			);
 			path = SDLVideo;
 			sourceTree = "<group>";
@@ -4977,6 +4983,7 @@
 				A276B4EF13A28BE100D41A8A /* SDLVideo.cpp in Sources */,
 				A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */,
 				A2EC2F95176BD44D00FD960E /* SDLSurfaceSprite2D.cpp in Sources */,
+				A231677A23A7267A00D04811 /* SDLSurfaceDrawing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5247,6 +5254,7 @@
 				A226F43613A11A66009CE75E /* MVEPlayer.cpp in Sources */,
 				A226F43713A11A66009CE75E /* mvevideodec16.cpp in Sources */,
 				A226F43813A11A66009CE75E /* mvevideodec8.cpp in Sources */,
+				A231677C23A7288C00D04811 /* SDLSurfaceDrawing.cpp in Sources */,
 				A27368D11A338E7800A8EEB8 /* mem.cpp in Sources */,
 				A226F43E13A11A7E009CE75E /* PLTImporter.cpp in Sources */,
 				A226F44013A11A8D009CE75E /* PROImporter.cpp in Sources */,
