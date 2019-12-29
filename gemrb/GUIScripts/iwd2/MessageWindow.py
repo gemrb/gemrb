@@ -102,10 +102,11 @@ def UpdateControlStatus():
 
 	# swap the 2 TextAreas
 	smallMTA = smallMW.RemoveSubview(smallMTA)
+	largeMTA = largeMW.RemoveSubview(largeMTA)
+
 	smallMTA = largeMW.AddSubview(smallMTA)
 	smallMTA.SetFrame(largeFrame)
 
-	largeMTA = largeMW.RemoveSubview(largeMTA)
 	largeMTA = smallMW.AddSubview(largeMTA)
 	largeMTA.SetFrame(smallFrame)
 
