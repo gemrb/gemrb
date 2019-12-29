@@ -229,6 +229,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
 
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
 		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
