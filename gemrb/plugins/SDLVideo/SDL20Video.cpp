@@ -288,24 +288,27 @@ int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const S
 		spriteShader->SetUniformValue("u_greyMode", 1, 1);
 	} else if (flags&BLIT_SEPIA) {
 		spriteShader->SetUniformValue("u_greyMode", 1, 2);
+	} else {
+		spriteShader->SetUniformValue("u_greyMode", 1, 0);
 	}
-/*
+
 	if (flags&(BLIT_TRANSSHADOW|BLIT_NOSHADOW)) {
 		Palette* pal = sprite->GetPalette();
 		Color c = pal->col[1];
 
+		spriteShader->SetUniformValue("u_ck", 3, c.r/255.0f, c.g/255.0f, c.b/255.0f);
 		if (flags&BLIT_TRANSSHADOW) {
-			spriteShader->SetUniformValue("u_shadowMode", 1, 1);
-			spriteShader->SetUniformValue("u_ck", 4, c.r/256.0f, c.g/256.0f, c.b/256.0f, c.a/256.0f);
-		} else if (flags&BLIT_NOSHADOW) {
 			spriteShader->SetUniformValue("u_shadowMode", 1, 2);
-			spriteShader->SetUniformValue("u_ck", 4, c.r/256.0f, c.g/256.0f, c.b/256.0f, c.a/256.0f);
+		} else if (flags&BLIT_NOSHADOW) {
+			spriteShader->SetUniformValue("u_shadowMode", 1, 1);
 		}
 
 		pal->release();
+	} else {
+		spriteShader->SetUniformValue("u_shadowMode", 1, 0);
 	}
-*/
-	spriteShader->SetUniformValue("s_texture", 1, 0);
+
+	//spriteShader->SetUniformValue("s_texture", 1, 0);
 	glActiveTexture(GL_TEXTURE0);
 	SDL_GL_BindTexture(texture, nullptr, nullptr);
 #else
