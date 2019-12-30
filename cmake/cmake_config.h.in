@@ -17,7 +17,7 @@
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}
-#cmakedefine USE_OPENGL ${USE_OPENGL}
+#cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_UNISTD_H 1
