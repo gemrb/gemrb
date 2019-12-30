@@ -98,6 +98,10 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
+#ifndef __APPLE__
+	glewInit();
+#endif
+
 	// must follow SDL_CreateRenderer
 	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
 	if (!stencilShader)

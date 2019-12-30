@@ -24,10 +24,7 @@
 #if __APPLE__
 	#include <OpenGL/gl3.h>
 #else
-	// FIXME: what do we really need here?
-	// SDL 2 already handled "wrangleing" the extensions
-	// we should just need gl3.h (or whatever is minimum for a version 2.1 context)
-	//#include <GL/glew.h>
+	#include <GL/glew.h>
 #endif
 
 #endif
