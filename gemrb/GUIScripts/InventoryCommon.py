@@ -236,10 +236,10 @@ def CloseItemInfoWindow ():
 	GUIINV.UpdateInventoryWindow ()
 	return
 
-def DisplayItem (itemresref, type):
+def DisplayItem (slotItem, type):
 	global ItemInfoWindow
 
-	item = GemRB.GetItem (itemresref)
+	item = GemRB.GetItem (slotItem["ItemResRef"])
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
 	if GameCheck.IsPST():
@@ -259,10 +259,10 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (2)
 	if GameCheck.IsPST():
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetItemIcon (itemresref)
+		Button.SetItemIcon (slotItem["ItemResRef"])
 	else:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-		Button.SetItemIcon (itemresref,0)
+		Button.SetItemIcon (slotItem["ItemResRef"], 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#middle button
@@ -300,9 +300,9 @@ def DisplayItem (itemresref, type):
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		if GameCheck.IsPST():
-			Button.SetItemIcon (itemresref, 1) # no DescIcon
+			Button.SetItemIcon (slotItem["ItemResRef"], 1) # no DescIcon
 		else:
-			Button.SetItemIcon (itemresref, 2)
+			Button.SetItemIcon (slotItem["ItemResRef"], 2)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#right button
@@ -316,6 +316,12 @@ def DisplayItem (itemresref, type):
 	container = (type&1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (type&1) and (item["Type"] == 38)
+	# perhaps it's true everywhere, but it's definitely needed in pst
+	# and yes, the check is reversed, so the bit name is a misnomer in this case
+	if dialog and GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
+		dialog = False
+		drink = True # "Use"
+
 	if drink:
 		Button.SetText (strrefs[3])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
@@ -391,7 +397,7 @@ def OpenItemInfoWindow (slot = None):
 		value = 1
 	else:
 		value = 3
-	DisplayItem (slot_item["ItemResRef"], value)
+	DisplayItem (slot_item, value)
 	return
 
 #auto identify when lore is high enough
@@ -414,7 +420,7 @@ def OpenGroundItemInfoWindow ():
 		value = 0
 	else:
 		value = 2
-	DisplayItem(slot_item["ItemResRef"], value)
+	DisplayItem(slot_item, value)
 	return
 
 # TODO: implement, reuse OpenItemAmountWindow, but be careful about any other uses of ItemButton
