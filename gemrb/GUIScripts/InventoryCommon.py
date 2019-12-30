@@ -318,7 +318,7 @@ def DisplayItem (slotItem, type):
 	familiar = (type&1) and (item["Type"] == 38)
 	# perhaps it's true everywhere, but it's definitely needed in pst
 	# and yes, the check is reversed, so the bit name is a misnomer in this case
-	if dialog and GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
+	if GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
 		dialog = False
 		drink = True # "Use"
 
