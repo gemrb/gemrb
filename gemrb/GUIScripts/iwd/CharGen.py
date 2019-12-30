@@ -1951,7 +1951,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	GemRB.SetVar ("MageSpellBook", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
-	if len(Learnable)<1:
+	if len(Learnable) < 1 or GemRB.GetPlayerStat (MyChar, IE_CLASS) == 5: # no bards
 		MageSpellsDonePress()
 		return
 
