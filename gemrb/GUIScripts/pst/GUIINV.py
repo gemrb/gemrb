@@ -156,7 +156,9 @@ def OpenInventoryWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
 
-	GemRB.UnhideGUI ()
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommonWindows.PortraitWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommonWindows.OptionsWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def UpdateInventoryWindow ():
