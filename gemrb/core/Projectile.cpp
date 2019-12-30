@@ -1193,7 +1193,7 @@ void Projectile::SecondaryTarget()
 		extension_targetcount = 1;
 	}
 
-	int radius = Extension->ExplosionRadius;
+	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	std::vector<Actor *>::iterator poi;
 	for (poi = actors.begin(); poi != actors.end(); ++poi) {
