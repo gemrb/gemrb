@@ -581,57 +581,60 @@ void Projectile::Payload()
 	// either the caster, or the original target of the spell
 	// which are probably both nowhere near the projectile at this point
 	// all effects are applied as the projectile travels
-	if((ExtFlags&PEF_CONTINUE) == 0)
-	{
-		Actor *target;
-		Scriptable *Owner;
+	if (ExtFlags & PEF_CONTINUE) {
+		delete effects;
+		effects = NULL;
+		return;
+	}
 
-		if (Target) {
-			target = GetTarget();
+	Actor *target;
+	Scriptable *Owner;
+
+	if (Target) {
+		target = GetTarget();
+	} else {
+		//the target will be the original caster
+		//in case of single point area target (dimension door)
+		if (FakeTarget) {
+			target = area->GetActorByGlobalID(FakeTarget);
+			if (!target) {
+				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
+			}
 		} else {
-			//the target will be the original caster
-			//in case of single point area target (dimension door)
-			if (FakeTarget) {
-				target = area->GetActorByGlobalID(FakeTarget);
-				if (!target) {
-					target = core->GetGame()->GetActorByGlobalID(FakeTarget);
-				}
-			} else {
-				target = area->GetActorByGlobalID(Caster);
-			}
+			target = area->GetActorByGlobalID(Caster);
 		}
+	}
 
-		if (target) {
-			Owner = area->GetScriptableByGlobalID(Caster);
-			if (!Owner) {
-				Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
-				Owner = target;
+	if (target) {
+		Owner = area->GetScriptableByGlobalID(Caster);
+		if (!Owner) {
+			Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
+			Owner = target;
+		}
+		//apply this spell on target when the projectile fails
+		if (FailedIDS(target)) {
+			if (FailSpell[0]) {
+				if (Target) {
+					core->ApplySpell(FailSpell, target, Owner, Level);
+				} else {
+					//no Target, using the fake target as owner
+					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+				}
 			}
-			//apply this spell on target when the projectile fails
-			if (FailedIDS(target)) {
-				if (FailSpell[0]) {
-					if (Target) {
-						core->ApplySpell(FailSpell, target, Owner, Level);
-					} else {
-						//no Target, using the fake target as owner
-						core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
-					}
-				}
-			} else {
-				//apply this spell on the target when the projectile succeeds
-				if (SuccSpell[0]) {
-					core->ApplySpell(SuccSpell, target, Owner, Level);
-				}
+		} else {
+			//apply this spell on the target when the projectile succeeds
+			if (SuccSpell[0]) {
+				core->ApplySpell(SuccSpell, target, Owner, Level);
+			}
 
-				if(ExtFlags&PEF_RGB) {
-					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-						RGB >> 8, RGB >> 16, RGB >> 24);
-				}
+			if(ExtFlags&PEF_RGB) {
+				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+					RGB >> 8, RGB >> 16, RGB >> 24);
+			}
 
-				if (effects) {
-					effects->SetOwner(Owner);
-					effects->AddAllEffects(target, Destination);
-				}
+			if (effects) {
+				effects->SetOwner(Owner);
+				effects->AddAllEffects(target, Destination);
 			}
 		}
 	}
