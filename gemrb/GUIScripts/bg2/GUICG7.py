@@ -20,19 +20,16 @@
 
 import GemRB
 import GUICommon
-import Spellbook
 import CommonTables
-from ie_stats import *
-from GUIDefines import *
 import LUSpellSelection
+from GUIDefines import *
+from ie_stats import *
 
 def OnLoad():
-	KitTable = GemRB.LoadTable("magesch")
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
-	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
 	# make sure we have a correct table
 	if TableName == "*":
@@ -40,6 +37,7 @@ def OnLoad():
 		return
 
 	# get our kit index
+	KitTable = GemRB.LoadTable ("magesch")
 	KitIndex = GUICommon.GetKitIndex (Slot)
 	if KitIndex:
 		KitValue = KitTable.GetValue(KitIndex - 21, 3)
