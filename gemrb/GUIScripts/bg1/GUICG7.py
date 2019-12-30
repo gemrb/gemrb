@@ -33,11 +33,6 @@ def OnLoad():
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
 	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 
-	# make sure we have a correct table
-	if Spellbook.IsSorcererBook (BookType):
-		# sorcerers need their known not max table or they would progress too slowly
-		TableName = "SPLSRCKN"
-
 	# get our kit
 	KitValue = GemRB.GetPlayerStat (Slot, IE_KIT)
 

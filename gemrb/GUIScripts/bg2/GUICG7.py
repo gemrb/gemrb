@@ -38,9 +38,6 @@ def OnLoad():
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG6")
 		return
-	if Spellbook.IsSorcererBook (BookType):
-		# sorcerers need their known not max table or they would progress too slowly
-		TableName = "SPLSRCKN"
 
 	# get our kit index
 	KitIndex = GUICommon.GetKitIndex (Slot)
