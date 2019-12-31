@@ -20,6 +20,7 @@
 
 #include "SDLSurfaceSprite2D.h"
 
+#include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
 #include "System/Logging.h"

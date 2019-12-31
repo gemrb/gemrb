@@ -166,6 +166,8 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
+	SDL_Surface* mask = CurrentStencilBuffer();
+
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
 	if (remflags == BLIT_TINTED) {
@@ -268,9 +270,7 @@ void SDL12VideoDriver::BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SD
 	SDL_LowerBlit(surf, &srect, CurrentRenderBuffer(), &drect);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite2D* mask,
-											   const SDL_Rect& srect, const SDL_Rect& drect,
-											   unsigned int flags, const SDL_Color* tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
 	// non-BAM Blitting
 
@@ -308,9 +308,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	SDL_Surface* surf = sdlspr->GetSurface();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
-	SDL_Surface* masksurf = NULL;
-	if (mask) {
-		masksurf = ((SDLSurfaceSprite2D*)mask)->GetSurface();
+	SDL_Surface* stencilsurf = nullptr;
+	if (remflags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)) {
+		stencilsurf = CurrentStencilBuffer();
 	}
 
 	if (surf->format->BytesPerPixel == 1) {
@@ -345,23 +345,23 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	if (remflags&BLIT_TINTED) {
 		if (remflags&BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender(c);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		} else if (remflags&BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender(c);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		} else {
 			RGBBlendingPipeline<TINT, true> blender(c);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		}
 	} else if (remflags&BLIT_GREY) {
 		RGBBlendingPipeline<GREYSCALE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 	} else if (remflags&BLIT_SEPIA) {
 		RGBBlendingPipeline<SEPIA, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
-	} else if (mask) {
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+	} else if (stencilsurf) {
 		RGBBlendingPipeline<NONE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, masksurf);
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 	} else {
 		SDL_Rect s = srect;
 		SDL_Rect d = drect;
@@ -369,164 +369,67 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const Sprite
 	}
 }
 
-void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int /*flags*/)
+void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int flags)
 {
-	if (!screenClip.PointInside(p)) {
-		return;
-	}
-
-	std::vector<SDL_Point> points;
-	points.push_back(p);
-	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, color);
-}
-
-void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int /*flags*/)
-{
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
-}
-
-void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int /*flags*/)
-{
-	SDLVideoDriver::SetSurfacePixels(CurrentRenderBuffer(), points, reinterpret_cast<const Color&>(color));
-}
-
-void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int /*flags*/)
-{
-	DrawLines(points, reinterpret_cast<const SDL_Color&>(color));
-}
-
-void SDL12VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int /*flags*/)
-{
-	std::vector<SDL_Point>::const_iterator it = points.begin();
-	while (it != points.end()) {
-		Point p1 = *it++;
-		if (it == points.end()) {
-			Log(WARNING, "SDL12Video", "DrawLines was passed an odd number of points. Last point discarded.");
-			break;
-		}
-		Point p2 = *it++;
-		DrawLine(p1, p2, reinterpret_cast<const Color&>(color));
-	}
-}
-
-void SDL12VideoDriver::DrawHLine(short x1, short y, short x2, const Color& color)
-{
-	if (x1 > x2) {
-		short tmpx = x1;
-		x1 = x2;
-		x2 = tmpx;
-	}
-
-	short min = screenClip.x;
-	short max = min + screenClip.w - 1;
-	x1 = Clamp(x1, min, max);
-	x2 = Clamp(x2, min, max);
-	y = Clamp<short>(y, screenClip.y, screenClip.y + screenClip.h - 1);
-
-	std::vector<SDL_Point> points;
-	for (; x1 <= x2 ; x1++ )
-		points.push_back(Point(x1, y));
-
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
-}
-
-void SDL12VideoDriver::DrawVLine(short x, short y1, short y2, const Color& color)
-{
-	if (y1 > y2) {
-		short tmpy = y1;
-		y1 = y2;
-		y2 = tmpy;
-	}
-
-	short min = screenClip.y;
-	short max = min + screenClip.h - 1;
-	y1 = Clamp(y1, min, max);
-	y2 = Clamp(y2, min, max);
-	x = Clamp<short>(x, screenClip.x, screenClip.x + screenClip.w - 1);
-
-	std::vector<SDL_Point> points;
-	for (; y1 <= y2 ; y1++ )
-		points.push_back(Point(x, y1));
-
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
-}
-
-void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color, unsigned int /*flags*/)
-{
-	if (start.y == end.y) return DrawHLine(start.x, start.y, end.x, color);
-	if (start.x == end.x) return DrawVLine(start.x, start.y, end.y, color);
-
-	// clamp the points to screenClip
-	Point min = screenClip.Origin();
-	Point max = min + Point(screenClip.w - 1, screenClip.h - 1);
-	Point p1 = Clamp(start, min, max);
-	Point p2 = Clamp(end, min, max);
-	
-	bool yLonger = false;
-	int shortLen = p2.y - p1.y;
-	int longLen = p2.x - p1.x;
-	if (abs( shortLen ) > abs( longLen )) {
-		std::swap(shortLen, longLen);
-		yLonger = true;
-	}
-
-	int decInc;
-	if (longLen == 0) {
-		decInc = 0;
+	if (flags&BLIT_BLENDED) {
+		DrawPointSurface<true>(CurrentRenderBuffer(), p, screenClip, color);
 	} else {
-		decInc = ( shortLen * 65536 ) / longLen;
+		DrawPointSurface<false>(CurrentRenderBuffer(), p, screenClip, color);
 	}
+}
 
-	std::vector<SDL_Point> points;
+void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags)
+{
+	if (flags&BLIT_BLENDED) {
+		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
+	} else {
+		DrawPointsSurface<false>(CurrentRenderBuffer(), points, screenClip, color);
+	}
+}
 
-	do { // TODO: rewrite without loop
-		if (yLonger) {
-			if (longLen > 0) {
-				longLen += p1.y;
-				for (int j = 0x8000 + ( p1.x << 16 ); p1.y <= longLen; ++p1.y) {
-					points.push_back(Point( j >> 16, p1.y ));
-					j += decInc;
-				}
-				break;
-			}
-			longLen += p1.y;
-			for (int j = 0x8000 + ( p1.x << 16 ); p1.y >= longLen; --p1.y) {
-				points.push_back(Point( j >> 16, p1.y ));
-				j -= decInc;
-			}
-			break;
-		}
+void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
+{
+	if (flags&BLIT_BLENDED) {
+		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, reinterpret_cast<const Color&>(color));
+	} else {
+		DrawPointsSurface<false>(CurrentRenderBuffer(), points, screenClip, reinterpret_cast<const Color&>(color));
+	}
+}
 
-		if (longLen > 0) {
-			longLen += p1.x;
-			for (int j = 0x8000 + ( p1.y << 16 ); p1.x <= longLen; ++p1.x) {
-				points.push_back(Point( p1.x, j >> 16 ));
-				j += decInc;
-			}
-			break;
-		}
-		longLen += p1.x;
-		for (int j = 0x8000 + ( p1.y << 16 ); p1.x >= longLen; --p1.x) {
-			points.push_back(Point( p1.x, j >> 16 ));
-			j -= decInc;
-		}
-	} while (false);
+void SDL12VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+{
+	if (flags&BLIT_BLENDED) {
+		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);
+	} else {
+		DrawPolygonSurface<false>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);
+	}
+}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color));
+void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color, unsigned int flags)
+{
+	if (flags&BLIT_BLENDED) {
+		DrawLineSurface<true>(CurrentRenderBuffer(), start, end, screenClip, color);
+	} else {
+		DrawLineSurface<false>(CurrentRenderBuffer(), start, end, screenClip, color);
+	}
+}
+
+void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags)
+{
+	if (flags&BLIT_BLENDED) {
+		DrawLinesSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
+	} else {
+		DrawLinesSurface<false>(CurrentRenderBuffer(), points, screenClip, color);
+	}
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
 {
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+
 	if (fill) {
-		SDL_Surface* currentBuf = CurrentRenderBuffer();
-		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
-			return;
-		} else if ( SDL_ALPHA_OPAQUE == color.a || (flags&BLIT_BLENDED) == 0) {
-			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
-			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
-			SDL_FillRect( currentBuf, &drect, val );
-		} else {
+		if (flags&BLIT_BLENDED) {
 			SDL_Surface* rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
 			SDL_Color c = {color.r, color.g, color.b, color.a};
 			SetSurfacePalette(rectsurf, &c, 1);
@@ -539,15 +442,24 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 
 			// use our RGBBlendingPipeline because SDL 1.2 apprently doesnt support blending 8bit surface + SDL_SRCALPHA to 32bit RGBA (seems like a bug)
 			RGBBlendingPipeline<NONE, false> blender;
-			BlitBlendedRect(rectsurf, CurrentRenderBuffer(), srect, drect, blender, 0, NULL);
+			BlitBlendedRect(rectsurf, currentBuf, srect, drect, blender, 0, NULL);
 
 			SDL_FreeSurface( rectsurf );
+		} else {
+			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
+			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
+			SDL_FillRect( currentBuf, &drect, val );
 		}
+	} else if (flags&BLIT_BLENDED) {
+		DrawHLineSurface<true>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<true>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<true>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<true>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	} else {
-		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color );
-		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color );
-		DrawHLine( rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color );
-		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color );
+		DrawHLineSurface<false>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<false>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<false>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<false>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	}
 }
 
@@ -584,10 +496,16 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	if (flip) SDL_Flip( disp );
 }
 
-SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer()
+SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer() const
 {
 	assert(drawingBuffer);
 	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
+}
+
+SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
+{
+	assert(stencilBuffer);
+	return static_cast<SDLSurfaceVideoBuffer*>(stencilBuffer)->Surface();
 }
 
 Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )

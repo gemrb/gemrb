@@ -26,10 +26,10 @@
 #include "GUI/EventMgr.h"
 #include "win32def.h"
 
+#include "SDLSurfaceDrawing.h"
 #include "SDLSurfaceSprite2D.h"
 
 #include <vector>
-#include <SDL.h>
 
 namespace GemRB {
 
@@ -58,20 +58,6 @@ inline int GetModState(int modstate)
 	if (modstate&KMOD_ALT) value |= GEM_MOD_ALT;
 	return value;
 }
-
-#if SDL_VERSION_ATLEAST(1,3,0)
-template<typename T>
-inline const SDL_Rect& RectFromRegion(T&& rgn)
-{
-	return reinterpret_cast<const SDL_Rect&>(rgn);
-}
-#else
-inline SDL_Rect RectFromRegion(const Region& rgn)
-{
-	SDL_Rect rect = {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
-	return rect;
-}
-#endif
 
 class SDLVideoDriver : public Video {
 public:
@@ -123,8 +109,6 @@ protected:
 
 	using Video::DrawPoints;
 	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
-	using Video::DrawLines;
-	virtual void DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
 
 	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
@@ -138,7 +122,6 @@ protected:
 public:
 	// static functions for manipulating surfaces
 	static int SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
-	static void SetSurfacePixels(SDL_Surface* surf, const std::vector<SDL_Point>& pixels, const Color& color);
 };
 
 }

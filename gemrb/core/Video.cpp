@@ -346,6 +346,7 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 
 Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
 {
+	// TODO: turn this into one of our software "shaders"
 	Color sum;
 	unsigned int count = ratio*ratio;
 	unsigned int r=0, g=0, b=0, a=0;
