@@ -324,7 +324,7 @@ def DisplayItem (slotItem, type):
 
 	if drink:
 		Button.SetText (strrefs[3])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConsumeItem)
 	elif read:
 		Button.SetText (strrefs[4])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
@@ -687,7 +687,7 @@ def ReleaseFamiliar ():
 	CloseItemInfoWindow ()
 	return
 
-def DrinkItemWindow ():
+def ConsumeItem ():
 	"""Drink the potion"""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
