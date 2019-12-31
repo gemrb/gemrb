@@ -73,7 +73,7 @@ public:
 	ieDword GetColorKey() const;
 	void SetColorKey(ieDword pxvalue);
 	bool HasTransparency() const;
-	Color GetPixel(unsigned short x, unsigned short y) const;
+	Color GetPixel(const Point&) const;
 	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 						 ieDword bmask, ieDword amask);
 

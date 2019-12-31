@@ -689,10 +689,11 @@ bool Button::HitTest(const Point& p) const
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 		Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
 		if (Picture || PictureList.size() || !Unpressed) return true;
-		
-		int xOffs = ( frame.w / 2 ) - ( Unpressed->Frame.w / 2 );
-		int yOffs = ( frame.h / 2 ) - ( Unpressed->Frame.h / 2 );
-		hit = !Unpressed->IsPixelTransparent(p.x - xOffs, p.y - yOffs);
+
+		Point off;
+		off.x = ( frame.w / 2 ) - ( Unpressed->Frame.w / 2 );
+		off.y = ( frame.h / 2 ) - ( Unpressed->Frame.h / 2 );
+		hit = !Unpressed->IsPixelTransparent(p - off);
 	}
 	return hit;
 }

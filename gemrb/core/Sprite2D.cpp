@@ -57,9 +57,14 @@ Sprite2D::~Sprite2D()
 	}
 }
 
-bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
+Color Sprite2D::GetPixel(int x, int y) const
 {
-	return GetPixel(x, y).a == 0;
+	return GetPixel(Point(x, y));
+}
+
+bool Sprite2D::IsPixelTransparent(const Point& p) const
+{
+	return GetPixel(p).a == 0;
 }
 
 const void* Sprite2D::LockSprite() const

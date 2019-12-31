@@ -720,39 +720,3 @@ void SDLVideoDriver::SetSurfacePixels(SDL_Surface* surface, const std::vector<SD
 
 	SDL_UnlockSurface( surface );
 }
-
-Color SDLVideoDriver::GetSurfacePixel(SDL_Surface* surface, short x, short y)
-{
-	Color c;
-	SDL_LockSurface( surface );
-	Uint8 Bpp = surface->format->BytesPerPixel;
-	unsigned char * pixels = ( ( unsigned char * ) surface->pixels ) +
-	( ( y * surface->pitch + (x*Bpp)) );
-	Uint32 val = 0;
-
-	if (Bpp == 1) {
-		val = *pixels;
-	} else if (Bpp == 2) {
-		val = *(Uint16 *)pixels;
-	} else if (Bpp == 3) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
-#else
-		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
-#endif
-	} else if (Bpp == 4) {
-		val = *(Uint32 *)pixels;
-	}
-	
-	SDL_UnlockSurface( surface );
-	SDL_GetRGBA( val, surface->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
-	
-	// check color key... SDL_GetRGBA wont get this
-#if SDL_VERSION_ATLEAST(1,3,0)
-	Uint32 ck;
-	if (SDL_GetColorKey(surface, &ck) != -1 && ck == val) c.a = SDL_ALPHA_TRANSPARENT;
-#else
-	if (surface->format->colorkey == val) c.a = SDL_ALPHA_TRANSPARENT;
-#endif
-	return c;
-}

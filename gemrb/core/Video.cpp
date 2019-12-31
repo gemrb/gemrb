@@ -276,7 +276,7 @@ Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 					if (xx < 0 || xx >= sprite->Frame.w) continue;
 					if (yy < 0 || yy >= sprite->Frame.h) continue;
 					cnt++;
-					if (sprite->IsPixelTransparent(xx, yy))
+					if (sprite->IsPixelTransparent(Point(xx, yy)))
 						sum++;
 				}
 			}

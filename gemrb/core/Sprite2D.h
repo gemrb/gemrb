@@ -68,7 +68,7 @@ public:
 	virtual Sprite2D* copy() const = 0;
 	virtual ~Sprite2D();
 
-	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
+	bool IsPixelTransparent(const Point& p) const;
 
 	virtual const void* LockSprite() const;
 	virtual void* LockSprite();
@@ -77,7 +77,8 @@ public:
 	virtual Palette *GetPalette() const = 0;
 	virtual const Color* GetPaletteColors() const = 0;
 	virtual void SetPalette(Palette *pal) = 0;
-	virtual Color GetPixel(unsigned short x, unsigned short y) const = 0;
+	virtual Color GetPixel(const Point&) const = 0;
+	Color GetPixel(int x, int y) const;
 	virtual bool HasTransparency() const = 0;
 	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
 	virtual ieDword GetColorKey() const = 0;

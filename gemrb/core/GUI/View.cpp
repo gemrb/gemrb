@@ -430,7 +430,7 @@ bool View::HitTest(const Point& p) const
 	}
 
 	if (!IsOpaque() && background) {
-		return !background->IsPixelTransparent(p.x, p.y);
+		return !background->IsPixelTransparent(p);
 	}
 	return true;
 }
