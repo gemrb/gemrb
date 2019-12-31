@@ -42,10 +42,7 @@ inline bool PointClipped(SDL_Surface* surf, const Point& p)
 }
 
 template<bool BLENDED=false>
-void DrawPointSurface(SDL_Surface* surface, Point p, const Region& clip, const Color& color);
-
-template<>
-void DrawPointSurface<false>(SDL_Surface* dst, Point p, const Region& clip, const Color& color)
+void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
 
@@ -53,7 +50,15 @@ void DrawPointSurface<false>(SDL_Surface* dst, Point p, const Region& clip, cons
 	if (PointClipped(dst, p)) return;
 
 	Uint32* px = ((Uint32*)dst->pixels) + p.y * dst->pitch + p.x;
-	*px = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
+
+	if (BLENDED) {
+		Color dstc;
+		SDL_GetRGB( *px, dst->format, &dstc.r, &dstc.g, &dstc.b );
+		ShaderBlend<false>(color, dstc);
+		*px = SDL_MapRGBA(dst->format, dstc.r, dstc.g, dstc.b, dstc.a);
+	} else {
+		*px = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
+	}
 }
 
 template<bool BLENDED=false>
@@ -128,10 +133,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 }
 
 template<bool BLENDED=false>
-void DrawHLineSurface(SDL_Surface* surface, Point p, int x2, const Region& clip, const Color& color);
-
-template<>
-void DrawHLineSurface<false>(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
+void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to, but this is optimized for our needs
 
@@ -143,28 +145,39 @@ void DrawHLineSurface<false>(SDL_Surface* dst, Point p, int x2, const Region& cl
 	if (p.x < 0 || x2 > dst->w) return;
 
 	if (p.x == x2)
-		return DrawPointSurface(dst, p, clip, color);
+		return DrawPointSurface<false>(dst, p, clip, color);
 
-	Uint32* row = (Uint32*)dst->pixels + (dst->pitch/4 * p.y);
-	Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
+	if (BLENDED) {
+		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
+		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
+		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+		static StaticIterator alpha(Color(0,0,0,0));
+		const static OneMinusSrcA<false, false> blender;
 
-	int numPx = std::min(x2 - p.x, dst->w - p.x);
-	SDL_memset4(row + p.x, c, numPx);
+		WriteColor(color, dstit, dstend, alpha, blender);
+	} else {
+		Uint32* row = (Uint32*)dst->pixels + (dst->pitch/4 * p.y);
+		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
+
+		int numPx = std::min(x2 - p.x, dst->w - p.x);
+		SDL_memset4(row + p.x, c, numPx);
+	}
 }
 
 template<bool BLENDED=false>
-void DrawVLineSurface(SDL_Surface* dst, const Point& p, int y2, const Region& clip, const Color& color);
-
-template<>
-void DrawVLineSurface<false>(SDL_Surface* dst, const Point& p, int y2, const Region& clip, const Color& color)
+inline void DrawVLineSurface(SDL_Surface* dst, const Point& p, int y2, const Region& clip, const Color& color)
 {
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+	static StaticIterator alpha(Color(0,0,0,0));
 
-	for (; dstit != dstend; ++dstit) {
-		assert(dstit.imp->pixel < dstend.imp->pixel);
-		dstit.WriteRGBA(color.r, color.g, color.b, color.a);
+	if (BLENDED) {
+		const static OneMinusSrcA<false, false> blender;
+		WriteColor(color, dstit, dstend, alpha, blender);
+	} else {
+		const static SrcRGBA<false> blender;
+		WriteColor(color, dstit, dstend, alpha, blender);
 	}
 }
 
