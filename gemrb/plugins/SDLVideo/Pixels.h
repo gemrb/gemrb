@@ -18,6 +18,11 @@
  *
  */
 
+#ifndef PIXELS_H
+#define PIXELS_H
+
+#include "Video.h"
+
 namespace GemRB {
 
 struct RGBBlender {
@@ -519,3 +524,5 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 }
 
 }
+
+#endif // PIXELS_H
