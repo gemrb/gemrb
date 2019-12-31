@@ -1647,6 +1647,13 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
+	// pst has no aura pollution
+	bool aural = true;
+	if (spellCount >= 1000) {
+		spellCount -= 1000;
+		aural = false;
+	}
+
 	if (!spellCount) {
 		ResetTargetMode();
 		return; //not casting or using an own item
@@ -1691,6 +1698,9 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
+		if (!aural) {
+			action->int2Parameter |= UI_NOAURA;
+		}
 		//for multi-shot items like BG wand of lightning
 		if (spellCount) {
 			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;

@@ -14037,10 +14037,11 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	print("Range: %d", itemdata.Range);
 	print("Target: %d", forcetarget);
 	print("Projectile: %d", itemdata.ProjectileAnimation);
-	//
+	int count = 1;
 	switch (forcetarget) {
 		case TARGET_SELF:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, 1);
+			if (core->HasFeature(GF_TEAM_MOVEMENT)) count += 1000; // pst inventory workaround to avoid another parameter
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, count);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
