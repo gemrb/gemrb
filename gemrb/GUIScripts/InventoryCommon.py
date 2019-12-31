@@ -693,7 +693,8 @@ def DrinkItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
-	GemRB.UseItem (pc, slot, 0)
+	# pst also requires forcing the target (eg. clot charms), which doesn't hurt elsewhere
+	GemRB.UseItem (pc, slot, 0, 5)
 	CloseItemInfoWindow ()
 	return
 
