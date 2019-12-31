@@ -66,6 +66,26 @@ inline void ShaderBlend(const Color& src, Color& dst) {
 		dst.a = src.a + dst.a * (255 - src.a);
 }
 
+template <bool MASKED, bool SRCALPHA>
+struct OneMinusSrcA : RGBBlender {
+	void operator()(const Color& c, Color& dst, Uint8 mask) const {
+		ShaderBlend<SRCALPHA>(c, dst);
+		if (MASKED) {
+			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+		}
+	}
+};
+
+template <bool MASKED>
+struct SrcRGBA : RGBBlender {
+	void operator()(const Color& c, Color& dst, Uint8 mask) const {
+		dst = c;
+		if (MASKED) {
+			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+		}
+	}
+};
+
 enum SHADER {
 	NONE,
 	TINT,
@@ -521,6 +541,22 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 
 	SDL_UnlockSurface(dst);
 	SDL_UnlockSurface(src);
+}
+
+template<class BLENDER>
+static void WriteColor(Color srcc,
+				 SDLPixelIterator dst, SDLPixelIterator dstend,
+				 IColorIterator& mask, const BLENDER& blender)
+{
+	for (; dst != dstend; ++dst, ++mask) {
+		assert(dst.imp->pixel < dstend.imp->pixel);
+		Color dstc;
+		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
+
+		blender(srcc, dstc, mask->a);
+
+		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
+	}
 }
 
 }
