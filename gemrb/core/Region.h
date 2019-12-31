@@ -109,6 +109,7 @@ public:
 	Region Intersect(const Region& rgn) const;
 
 	Point Origin() const { return Point(x, y); }
+	Point Maximum() const { return Point(x + w, y + h); }
 	Size Dimensions() const { return Size(w, h); }
 	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
