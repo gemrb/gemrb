@@ -1,5 +1,6 @@
 
 varying vec2 v_texCoord;
+varying vec4 v_color;
 uniform sampler2D s_texture;
 
 uniform int u_greyMode;
@@ -28,5 +29,5 @@ void main()
 		color = vec4(grey + (21.0/256.0), grey, max(0.0, grey - (32.0/256.0)), color.a);
 	}
 
-	gl_FragColor = color;
+	gl_FragColor = vec4(color.rgb * v_color.rgb, color.a);
 }
