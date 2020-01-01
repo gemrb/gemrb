@@ -8210,8 +8210,6 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	if (game->TimeStoppedFor(this)) {
 		flags |= BLIT_GREY;
 	}
-	Color tint2 = tint;
-	game->ApplyGlobalTint(tint2, flags);
 
 	// display current frames in the right order
 	const int* zOrder = ca->GetZOrder(Face);
@@ -8224,7 +8222,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			video->BlitGameSpriteWithPalette(nextFrame, palette, cx - vp.x, cy - vp.y, flags, tint2);
+			video->BlitGameSpriteWithPalette(nextFrame, palette, cx - vp.x, cy - vp.y, flags, tint);
 		}
 	}
 }
