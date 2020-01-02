@@ -320,17 +320,8 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		remflags &= ~shaderflags;
 	}
 
-	// must be checked afer palette versioning is done
-	if (remflags == BLIT_HALFTRANS) {
-		// we can only use SDL_SetAlpha if we dont need our general purpose blitter for another reason
-		SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
-		remflags &= ~BLIT_HALFTRANS;
-	} else {
-		SDL_SetAlpha(surf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-	}
-
-	// more than BLIT_HALFTRANS is still set
-	if (remflags & BLIT_HALFTRANS) {
+	bool halftrans = remflags & BLIT_HALFTRANS;
+	if (halftrans && (remflags ^ BLIT_HALFTRANS)) { // other flags are set too
 		// handle halftrans with 50% alpha tinting
 		if (!(remflags & BLIT_TINTED)) {
 			c.r = c.g = c.b = c.a = 255;
@@ -338,6 +329,10 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		}
 		c.a >>= 1;
 	}
+
+	// FIXME: this always assumes BLIT_BLENDED if any "shader" flags are set
+	// we don't currently have a need for non blended sprites (we do for primitives, which is handled elsewhere)
+	// however, it could make things faster if we handled it
 
 	if (remflags&BLIT_TINTED) {
 		if (remflags&BLIT_GREY) {
@@ -356,10 +351,18 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 	} else if (remflags&BLIT_SEPIA) {
 		RGBBlendingPipeline<SEPIA, true> blender;
 		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
-	} else if (stencilsurf) {
+	} else if (stencilsurf || (remflags&(BLIT_MIRRORX|BLIT_MIRRORY|BLIT_BLENDED))) {
 		RGBBlendingPipeline<NONE, true> blender;
 		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 	} else {
+		// must be checked afer palette versioning is done
+		if (halftrans) {
+			// we can only use SDL_SetAlpha if we dont need our general purpose blitter for another reason
+			SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
+		} else {
+			SDL_SetAlpha(surf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+		}
+
 		SDL_Rect s = srect;
 		SDL_Rect d = drect;
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
