@@ -294,9 +294,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
+	Uint16 coverpitch = 0;
+
 	if (COVER) {
 		assert(cover);
 		SDL_LockSurface(cover);
+		coverpitch = cover->pitch / cover->format->BytesPerPixel;
 	}
 	assert(spr);
 
@@ -341,12 +344,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->pixels + covery*cover->w;
+			coverline = (Uint8*)cover->pixels + covery * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->pixels + (covery+height-1)*cover->w;
+			coverline = (Uint8*)cover->pixels + (covery+height-1) * coverpitch;
 	}
 	if (!XFLIP) {
 		pix = line + tx;
@@ -455,7 +458,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += yfactor * cover->w - xfactor * width;
+			coverpix += yfactor * coverpitch - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
@@ -476,9 +479,12 @@ static void BlitSprite_internal(SDL_Surface* target,
             const Sprite2D* spr, unsigned int flags,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
 {
+	Uint16 coverpitch = 0;
+
 	if (COVER) {
 		assert(cover);
 		SDL_LockSurface(cover);
+		coverpitch = cover->pitch / cover->format->BytesPerPixel;
 	}
 	assert(spr);
 
@@ -497,19 +503,18 @@ static void BlitSprite_internal(SDL_Surface* target,
 
 	PTYPE *line, *end;
 	Uint8 *coverpix;
-
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + clip.y*pitch;
 		end = line + clip.h*pitch;
 		srcdata += (clip.y - ty)*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->pixels + (clip.y - ty + covery)*cover->w;
+			coverpix = (Uint8*)cover->pixels + (clip.y - ty + covery) * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 		end = line - clip.h*pitch;
 		srcdata += (ty + spr->Frame.h - (clip.y + clip.h))*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->pixels + (clip.y - ty + clip.h + covery - 1)*cover->w;
+			coverpix = (Uint8*)cover->pixels + (clip.y - ty + clip.h + covery - 1) * coverpitch;
 	}
 
 	PTYPE *pix, *endpix;
@@ -566,7 +571,7 @@ static void BlitSprite_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		srcdata += (width - clip.w);
 		if (COVER)
-			coverpix += yfactor * cover->w - xfactor * clip.w;
+			coverpix += yfactor * coverpitch - xfactor * clip.w;
 	}
 
 	if (COVER)
