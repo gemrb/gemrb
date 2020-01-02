@@ -267,12 +267,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	SDL_UnlockSurface(currentBuf);
 }
 
-void SDL12VideoDriver::BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SDL_Rect& drect)
-{
-	// since we should already be clipped we can call SDL_LowerBlit directly
-	SDL_LowerBlit(surf, &srect, CurrentRenderBuffer(), &drect);
-}
-
 void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
 {
 	// non-BAM Blitting

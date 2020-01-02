@@ -74,8 +74,6 @@ private:
 	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
 							  unsigned int flags = 0, const Color* tint = NULL);
 	void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
-
-	void BlitSurfaceClipped(SDL_Surface* surf, SDL_Rect& srect, SDL_Rect& drect);
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {
