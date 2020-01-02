@@ -30,11 +30,11 @@ namespace GemRB {
 
 inline bool PointClipped(SDL_Surface* surf, const Point& p)
 {
-	if (p.x < 0 || p.x > surf->w) {
+	if (p.x < 0 || p.x >= surf->w) {
 		return true;
 	}
 
-	if (p.y < 0 || p.y > surf->h) {
+	if (p.y < 0 || p.y >= surf->h) {
 		return true;
 	}
 
@@ -63,7 +63,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 	p = Clamp(p, clip.Origin(), clip.Maximum());
 	if (PointClipped(dst, p)) return;
 
-	Uint32* px = ((Uint32*)dst->pixels) + p.y * dst->pitch + p.x;
+	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 
 	if (BLENDED) {
 		Color dstc;
@@ -147,20 +147,28 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 }
 
 template<bool BLENDED=false>
-void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
+void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to, but this is optimized for our needs
 
-	assert(p.x < x2);
-	p.x = Clamp<int>(p.x, clip.x, clip.x + clip.w);
-	p.y = Clamp<int>(p.y, clip.y, clip.y + clip.h);
+	if (p.y < clip.y || p.y > clip.y + clip.h) {
+		return;
+	}
 
-	if (p.y < 0 || p.y > dst->h) return;
-	if (p.x < 0 || x2 > dst->w) return;
+	if (x2 < p.x) {
+		std::swap(x2, p.x);
+	}
+
+	p.x = Clamp<int>(p.x, clip.x, clip.x + clip.w);
+	x2 = Clamp<int>(x2, clip.x, clip.x + clip.w);
 
 	if (p.x == x2)
 		return DrawPointSurface<false>(dst, p, clip, color);
 
+	if (p.y < 0 || p.y >= dst->h) return;
+	if (p.x < 0 || x2 >= dst->w) return;
+
+	assert(p.x < x2);
 	if (BLENDED) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
@@ -170,17 +178,25 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 
 		WriteColor(color, dstit, dstend, alpha, blender);
 	} else {
-		Uint32* row = (Uint32*)dst->pixels + (dst->pitch/4 * p.y);
+		Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
 
 		int numPx = std::min(x2 - p.x, dst->w - p.x);
-		SDL_memset4(row + p.x, c, numPx);
+		SDL_memset4(px, c, numPx);
 	}
 }
 
 template<bool BLENDED=false>
-inline void DrawVLineSurface(SDL_Surface* dst, const Point& p, int y2, const Region& clip, const Color& color)
+inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
 {
+	if (p.x < clip.x || p.x > clip.x + clip.w) {
+		return;
+	}
+
+	if (y2 < p.y) {
+		std::swap(y2, p.y);
+	}
+
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);

@@ -166,7 +166,10 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
-	SDL_Surface* mask = CurrentStencilBuffer();
+	SDL_Surface* mask = nullptr;
+	if (remflags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)) {
+		mask = CurrentStencilBuffer();
+	}
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
