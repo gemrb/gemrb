@@ -64,6 +64,8 @@ enum SpriteBlitFlags {
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
+#define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)
+
 // !!! Keep this synchronized with GUIDefines.py !!!
 // used for calculating the tooltip delay limit and the real tooltip delay
 #define TOOLTIP_DELAY_FACTOR 250

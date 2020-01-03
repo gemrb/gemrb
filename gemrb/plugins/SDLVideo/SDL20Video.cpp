@@ -222,7 +222,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 #endif
 
 	int ret = 0;
-	if (flags&(BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)) {
+	if (flags&BLIT_STENCIL_MASK) {
 		// 1. clear scratchpad segment
 		// 2. blend stencil segment to scratchpad
 		// 3. blend texture to scratchpad
