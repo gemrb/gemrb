@@ -292,8 +292,9 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 	if (COVER) {
 		assert(cover);
+		assert(cover->format->BytesPerPixel == 4);
 		SDL_LockSurface(cover);
-		coverpitch = cover->pitch / cover->format->BytesPerPixel;
+		coverpitch = cover->pitch / 4;
 	}
 	assert(spr);
 
@@ -333,17 +334,17 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 
 	PTYPE *line, *end, *pix;
-	Uint8 *coverline, *coverpix = NULL;
+	Uint32 *coverline, *coverpix = NULL;
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->pixels + covery * coverpitch;
+			coverline = (Uint32*)cover->pixels + covery * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
 		if (COVER)
-			coverline = (Uint8*)cover->pixels + (covery+height-1) * coverpitch;
+			coverline = (Uint32*)cover->pixels + (covery+height-1) * coverpitch;
 	}
 	if (!XFLIP) {
 		pix = line + tx;
@@ -477,8 +478,9 @@ static void BlitSprite_internal(SDL_Surface* target,
 
 	if (COVER) {
 		assert(cover);
+		assert(cover->format->BytesPerPixel == 4);
 		SDL_LockSurface(cover);
-		coverpitch = cover->pitch / cover->format->BytesPerPixel;
+		coverpitch = cover->pitch / 4;
 	}
 	assert(spr);
 
@@ -496,19 +498,19 @@ static void BlitSprite_internal(SDL_Surface* target,
 	assert(clip.y + clip.h <= ty + spr->Frame.h);
 
 	PTYPE *line, *end;
-	Uint8 *coverpix;
+	Uint32 *coverpix;
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + clip.y*pitch;
 		end = line + clip.h*pitch;
 		srcdata += (clip.y - ty)*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->pixels + (clip.y - ty + covery) * coverpitch;
+			coverpix = (Uint32*)cover->pixels + (clip.y - ty + covery) * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 		end = line - clip.h*pitch;
 		srcdata += (ty + spr->Frame.h - (clip.y + clip.h))*spr->Frame.w;
 		if (COVER)
-			coverpix = (Uint8*)cover->pixels + (clip.y - ty + clip.h + covery - 1) * coverpitch;
+			coverpix = (Uint32*)cover->pixels + (clip.y - ty + clip.h + covery - 1) * coverpitch;
 	}
 
 	PTYPE *pix, *endpix;
