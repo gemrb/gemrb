@@ -275,12 +275,6 @@ struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 	}
 };
 
-
-// MSVC6 requires all template arguments to a function to be reflected in the
-// argument list. We wrap them in the type of a dummy argument.
-template <bool b>
-class MSVCHack {};
-
 // RLE, palette
 template<typename PTYPE, bool COVER, bool XFLIP, typename Shadow, typename Tinter, typename Blender>
 static void BlitSpriteRLE_internal(SDL_Surface* target,
@@ -292,7 +286,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             Uint8 transindex,
             SDL_Surface* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	Uint16 coverpitch = 0;
 
@@ -477,7 +471,7 @@ static void BlitSprite_internal(SDL_Surface* target,
             int transindex,
             SDL_Surface* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0, MSVCHack<COVER>* /*dummy*/ = 0, MSVCHack<XFLIP>* /*dummy*/ = 0)
+            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	Uint16 coverpitch = 0;
 
