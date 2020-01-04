@@ -173,7 +173,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-		static StaticIterator alpha(Color(0,0,0,0));
+		static StaticAlphaIterator alpha(0);
 		const static OneMinusSrcA<false, false> blender;
 
 		WriteColor(color, dstit, dstend, alpha, blender);
@@ -200,7 +200,7 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-	static StaticIterator alpha(Color(0,0,0,0));
+	static StaticAlphaIterator alpha(0);
 
 	if (BLENDED) {
 		const static OneMinusSrcA<false, false> blender;

@@ -184,6 +184,7 @@ struct IPixelIterator
 
 	virtual IPixelIterator* Clone() const=0;
 	virtual void Advance(int)=0;
+	virtual Uint8 Channel(Uint32 mask, Uint8 shift) const=0;
 
 	IPixelIterator& operator++() {
 		Advance(1);
@@ -218,6 +219,10 @@ struct PixelIterator : IPixelIterator
 
 	virtual PIXEL* operator->() {
 		return static_cast<PIXEL*>(pixel);
+	}
+
+	Uint8 Channel(Uint32 mask, Uint8 shift) const {
+		return ((*static_cast<PIXEL*>(pixel))&mask) >> shift;
 	}
 
 	IPixelIterator* Clone() const {
@@ -283,22 +288,24 @@ struct PaletteIterator : public IColorIterator
 	}
 };
 
-// an endless iterator that always returns 'color' when dereferenced
-struct StaticIterator : public IColorIterator
+struct IAlphaIterator
 {
-	Color color;
+	virtual Uint8 operator*() const=0;
+	virtual IAlphaIterator& operator++()=0;
+};
 
-	StaticIterator(const Color& c) : color(c) {}
+// an endless iterator that always returns 'alpha' when dereferenced
+struct StaticAlphaIterator : public IAlphaIterator
+{
+	Uint8 alpha;
 
-	const Color& operator*() const {
-		return color;
+	StaticAlphaIterator(Uint8 a) : alpha(a) {}
+
+	Uint8 operator*() const {
+		return alpha;
 	}
 
-	const Color* operator->() const {
-		return &color;
-	}
-
-	IColorIterator& operator++() {
+	IAlphaIterator& operator++() {
 		return *this;
 	}
 };
@@ -343,6 +350,13 @@ struct SDLPixelIterator : IPixelIterator
 public:
 	SDL_PixelFormat* format;
 	SDL_Rect clip;
+
+	SDLPixelIterator(SDL_Surface* surf)
+	: SDLPixelIterator({}, surf)
+	{
+		clip.w = surf->w;
+		clip.h = surf->h;
+	}
 
 	SDLPixelIterator(const SDL_Rect& clip, SDL_Surface* surf)
 	: SDLPixelIterator(Forward, Forward, clip, surf)
@@ -404,6 +418,21 @@ public:
 
 	Uint8* operator->() const {
 		return static_cast<Uint8*>(imp->pixel);
+	}
+
+	Uint8 Channel(Uint32 mask, Uint8 shift) const {
+		switch (format->BytesPerPixel) {
+			case 1:
+				return static_cast<PixelIterator<Uint8>*>(imp)->Channel(mask, shift);
+			case 2:
+				return static_cast<PixelIterator<Uint16>*>(imp)->Channel(mask, shift);
+			case 3:
+				assert(false);
+			case 4:
+				return static_cast<PixelIterator<Uint32>*>(imp)->Channel(mask, shift);
+			default:
+				assert(false);
+		}
 	}
 
 	IPixelIterator* Clone() const {
@@ -493,10 +522,30 @@ public:
 	}
 };
 
+struct RGBAChannelIterator : public IAlphaIterator
+{
+	Uint32 mask;
+	Uint8 shift;
+	IPixelIterator* pixelIt;
+
+	RGBAChannelIterator(IPixelIterator* it, Uint32 mask, Uint8 shift)
+	: mask(mask), shift(shift), pixelIt(it)
+	{}
+
+	Uint8 operator*() const {
+		return pixelIt->Channel(mask, shift);
+	}
+
+	IAlphaIterator& operator++() {
+		pixelIt->Advance(1);
+		return *this;
+	}
+};
+
 template<class BLENDER>
 static void Blit(SDLPixelIterator src,
 				 SDLPixelIterator dst, SDLPixelIterator dstend,
-				 IColorIterator& mask,
+				 IAlphaIterator& mask,
 				 const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst, ++src, ++mask) {
@@ -505,7 +554,7 @@ static void Blit(SDLPixelIterator src,
 		src.ReadRGBA(srcc.r, srcc.g, srcc.b, srcc.a);
 		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 
-		blender(srcc, dstc, mask->a);
+		blender(srcc, dstc, *mask);
 
 		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 	}
@@ -514,7 +563,7 @@ static void Blit(SDLPixelIterator src,
 template <typename BLENDER>
 static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 							const SDL_Rect& srcrgn, const SDL_Rect& dstrgn,
-							BLENDER blender, Uint32 flags, SDL_Surface* mask)
+							BLENDER blender, Uint32 flags, SDL_Surface* maskSurf)
 {
 	assert(src && dst);
 	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
@@ -529,13 +578,32 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
 	SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
 
-	if (mask) {
-		SDL_LockSurface(mask);
-		PaletteIterator alpha(reinterpret_cast<Color*>(mask->format->palette->colors), static_cast<Uint8*>(mask->pixels));
+	if (maskSurf) {
+		SDL_LockSurface(maskSurf);
+		SDL_PixelFormat* fmt = maskSurf->format;
+
+		Uint32 mask = 0;
+		Uint8 shift = 0;
+		if (flags&BLIT_STENCIL_RED) {
+			mask = fmt->Rmask;
+			shift = fmt->Rshift;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			mask = fmt->Gmask;
+			shift = fmt->Gshift;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			mask = fmt->Bmask;
+			shift = fmt->Bshift;
+		} else {
+			mask = fmt->Amask;
+			shift = fmt->Ashift;
+		}
+
+		SDLPixelIterator maskIt(maskSurf);
+		RGBAChannelIterator alpha(&maskIt, mask, shift);
 		Blit(srcbeg, dstbeg, dstend, alpha, blender);
-		SDL_UnlockSurface(mask);
+		SDL_UnlockSurface(maskSurf);
 	} else {
-		StaticIterator alpha(Color(0,0,0,0));
+		StaticAlphaIterator alpha(0);
 		Blit(srcbeg, dstbeg, dstend, alpha, blender);
 	}
 
@@ -545,15 +613,15 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 
 template<class BLENDER>
 static void WriteColor(Color srcc,
-				 SDLPixelIterator dst, SDLPixelIterator dstend,
-				 IColorIterator& mask, const BLENDER& blender)
+					   SDLPixelIterator dst, SDLPixelIterator dstend,
+					   IAlphaIterator& mask, const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst, ++mask) {
 		assert(dst.imp->pixel < dstend.imp->pixel);
 		Color dstc;
 		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 
-		blender(srcc, dstc, mask->a);
+		blender(srcc, dstc, *mask);
 
 		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 	}

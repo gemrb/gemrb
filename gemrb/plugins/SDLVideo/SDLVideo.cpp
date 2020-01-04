@@ -630,7 +630,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 			SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
 			SDLPixelIterator beg(r, newV);
 			SDLPixelIterator end = SDLPixelIterator::end(beg);
-			StaticIterator alpha(Color(0,0,0,0xff));
+			StaticAlphaIterator alpha(0xff);
 
 			if (renderflags & BLIT_GREY) {
 				RGBBlendingPipeline<GREYSCALE, true> blender;
