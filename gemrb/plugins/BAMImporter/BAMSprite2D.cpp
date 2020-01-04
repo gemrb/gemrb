@@ -26,13 +26,12 @@
 namespace GemRB {
 
 BAMSprite2D::BAMSprite2D(const Region& rgn, void* pixels,
-						 bool rle, Palette* palette, ieDword ck)
+						 Palette* palette, ieDword ck)
 	: Sprite2D(rgn, 8, pixels)
 {
 	palette->acquire();
 	pal = palette;
 	colorkey = ck;
-	RLE = rle;
 	BAM = true;
 	freePixels = false; // managed by AnimationFactory
 
@@ -47,7 +46,6 @@ BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	pal = obj.pal;
 	pal->acquire();
 	colorkey = obj.GetColorKey();
-	RLE = obj.RLE;
 
 	BAM = true;
 	freePixels = false; // managed by AnimationFactory
@@ -102,17 +100,11 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 	int skipcount = y * Frame.w + x;
 
 	const ieByte *rle = (const ieByte*)pixels;
-	if (RLE) {
-		while (skipcount > 0) {
-			if (*rle++ == colorkey)
-				skipcount -= (*rle++)+1;
-			else
-				skipcount--;
-		}
-	} else {
-		// uncompressed
-		rle += skipcount;
-		skipcount = 0;
+	while (skipcount > 0) {
+		if (*rle++ == colorkey)
+			skipcount -= (*rle++)+1;
+		else
+			skipcount--;
 	}
 
 	if (skipcount >= 0 && *rle != colorkey) {

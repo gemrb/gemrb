@@ -31,7 +31,6 @@ Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
-	RLE = false;
 	RefCount = 1;
 	renderFlags = 0;
 }
@@ -39,7 +38,6 @@ Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
 Sprite2D::Sprite2D(const Sprite2D &obj)
 {
 	BAM = false;
-	RLE = false;
 	RefCount = 1;
 
 	Frame = obj.Frame;

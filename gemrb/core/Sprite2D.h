@@ -60,7 +60,6 @@ public:
 	int Bpp;
 
 	bool BAM;
-	bool RLE; // in theory this could apply to more than BAMs, but currently does not.
 	ieDword renderFlags;
 
 	Sprite2D(const Region&, int Bpp, void* pixels);

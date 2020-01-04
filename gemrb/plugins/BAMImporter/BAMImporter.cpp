@@ -142,21 +142,16 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-			bool BAMsprite, unsigned char* data)
+										bool RLESprite, unsigned char* data)
 {
 	Sprite2D* spr = 0;
 
-	if (BAMsprite) {
-		bool RLECompressed = (frames[findex].FrameData & 0x80000000) == 0;
-
+	if (RLESprite) {
 		assert(data);
 		unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
 		spr = new BAMSprite2D (Region(0,0, frames[findex].Width, frames[findex].Height),
-							   framedata,
-							   RLECompressed,
-							   palette,
-							   CompressedColorIndex);
+							   framedata, palette, CompressedColorIndex);
 	} else {
 		void* pixels = GetFramePixels(findex);
 		Region r(0,0, frames[findex].Width, frames[findex].Height);
@@ -271,8 +266,9 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		Sprite2D* frame = GetFrameInternal(i, mode, allowCompression, data);
-		assert(!allowCompression || frame->BAM);
+		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
+		Sprite2D* frame = GetFrameInternal(i, mode, RLECompressed, data);
+		assert(!RLECompressed || frame->BAM);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {

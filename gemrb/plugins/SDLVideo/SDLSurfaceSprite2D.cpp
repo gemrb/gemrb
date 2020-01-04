@@ -202,12 +202,6 @@ void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
 #else
 	SDL_SetColorKey(*surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
 #endif
-
-	// regardless of rle or the success of SDL_SetSurfaceRLE
-	// we must keep RLE false because SDL hides the actual RLE data from us (see SDL_BlitMap)
-	// and we are left to access the pixels in decoded form (updated by SDL_UnlockSurface).
-	// SDL Blits will make use of RLE acceleration, but our internal blitters cannot.
-	assert(RLE == false);
 }
 
 bool SDLSurfaceSprite2D::HasTransparency() const
