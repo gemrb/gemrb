@@ -89,6 +89,10 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 			buf = SDL_DisplayFormatAlpha(tmp);
 			SDL_FreeSurface(tmp);
+		} else if (fmt == DISPLAY_ALPHA) {
+			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
+			buf = SDL_DisplayFormatAlpha(tmp);
+			SDL_FreeSurface(tmp);
 		} else {
 			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
 			buf = SDL_DisplayFormat(tmp);

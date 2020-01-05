@@ -48,6 +48,8 @@ Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* ren
 			// the renderer will throw an error for such a format
 			// fall-through
 		case Video::DISPLAY:
+			// fall-though
+		case Video::DISPLAY_ALPHA:
 			if (renderer) {
 				// I looked at the SDL source code to determine that the format at index 0 is the default
 				SDL_RendererInfo info;

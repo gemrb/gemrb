@@ -131,7 +131,7 @@ void Window::RecreateBuffer()
 	Video* video = core->GetVideoDriver();
 	video->DestroyBuffer(backBuffer);
 
-	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::RGBA8888 : Video::DISPLAY;
+	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::DISPLAY_ALPHA : Video::DISPLAY;
 	backBuffer = video->CreateBuffer(frame, fmt);
 
 	// the entire window must be invalidated, because the new buffer is blank

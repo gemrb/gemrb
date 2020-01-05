@@ -102,6 +102,7 @@ public:
 
 	enum BufferFormat {
 		DISPLAY, // whatever format the video driver thinks is best for the display
+		DISPLAY_ALPHA, // the same RGB format as DISPLAY, but forces an alpha if DISPLAY doesn't provide one
 		RGBPAL8,	// 8 bit palettized
 		RGB555, // 16 bit RGB (truecolor)
 		RGBA8888, // Standard 8 bits per channel with alpha
