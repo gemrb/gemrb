@@ -171,6 +171,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	assert(p.x < x2);
 	if (BLENDED) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
+		r.h = 1;
 		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 		static StaticAlphaIterator alpha(0);
