@@ -198,6 +198,7 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	}
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
+	r.w = 1;
 	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 	static StaticAlphaIterator alpha(0);
