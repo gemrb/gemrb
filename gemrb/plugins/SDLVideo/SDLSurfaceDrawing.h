@@ -301,17 +301,17 @@ void DrawPolygonSurface(SDL_Surface* surface, Gem_Polygon* poly, const Point& or
 	} else {
 		std::vector<Point> points(poly->Count()*2);
 
-		const Point& p = poly->vertices[0] - origin;
+		const Point& p = poly->vertices[0] - poly->BBox.Origin() + origin;
 		points[0].x = p.x;
 		points[0].y = p.y;
 
 		size_t j = 1;
-		for (size_t i = 1; i < poly->Count(); ++i, ++j) {
+		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			const Point& p = poly->vertices[i] - origin;
+			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
 			points[j].x = p.x;
 			points[j].y = p.y;
-			points[++j] = points[i];
+			points[j+1] = points[j];
 		}
 		// reconnect with start point
 		points[j].x = p.x;
