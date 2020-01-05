@@ -349,28 +349,34 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		clipstartline = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 	}
 
-
+	// FIXME: we have a lot of unnecissary branching with COVER
+	// this is because for some reason we chose to mirror the destination rather than the source
+	// if we rewrote this to mirror jsut the source the code would be more simple and probably faster
 	PTYPE *line, *end, *pix;
-	Uint32* coverpix = NULL;
-	if (COVER)
-		coverpix = (Uint32*)cover->pixels + (covery * coverpitch) + coverx;
-
+	Uint32 *coverline, *coverpix = NULL;
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
+		if (COVER)
+			coverline = (Uint32*)cover->pixels + covery * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
+		if (COVER)
+			coverline = (Uint32*)cover->pixels + (covery+height-1) * coverpitch;
 	}
-
 	if (!XFLIP) {
 		pix = line + tx;
 		clipstartpix = line + clip.x;
 		clipendpix = clipstartpix + clip.w;
+		if (COVER)
+			coverpix = coverline + coverx;
 	} else {
 		pix = line + tx + width - 1;
 		clipstartpix = line + clip.x + clip.w - 1;
 		clipendpix = clipstartpix - clip.w;
+		if (COVER)
+			coverpix = coverline + coverx + width - 1;
 	}
 
 	// clipstartpix is the first pixel to draw
@@ -407,11 +413,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 					count = 1;
 				pix -= count;
 				if (COVER)
-					coverpix += count;
+					coverpix -= count;
 			}
 		}
 
 		// Blit a line, if it's not vertically clipped
+
 		if ((!yflip && pix >= clipstartline) || (yflip && pix < clipstartline+pitch))
 		{
 			while ( (!XFLIP && pix < clipendpix) || (XFLIP && pix > clipendpix) )
@@ -421,11 +428,13 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 					int count = (int)(*srcdata++) + 1;
 					if (!XFLIP) {
 						pix += count;
+						if (COVER)
+							coverpix += count;
 					} else {
 						pix -= count;
+						if (COVER)
+							coverpix -= count;
 					}
-					if (COVER)
-						coverpix += count;
 				} else {
 					Uint8 maskval = (coverpix) ? (((*coverpix)&covermask) >> covershift) : 0;
 					if (!COVER || (coverpix && maskval < 0xff)) {
@@ -449,10 +458,11 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 					if (!XFLIP) {
 						pix++;
+						if (COVER) coverpix++;
 					} else {
 						pix--;
+						if (COVER) coverpix--;
 					}
-					if (COVER) coverpix++;
 				}
 			}
 		}
@@ -463,7 +473,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += coverpitch - width;
+			coverpix += yfactor * coverpitch - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
