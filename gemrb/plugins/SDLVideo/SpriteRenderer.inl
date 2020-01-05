@@ -289,12 +289,29 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	Uint16 coverpitch = 0;
+	Uint32 covermask = 0;
+	Uint8 covershift = 0;
 
 	if (COVER) {
 		assert(cover);
-		assert(cover->format->BytesPerPixel == 4);
+		SDL_PixelFormat* fmt = cover->format;
+		assert(fmt->BytesPerPixel == 4);
 		SDL_LockSurface(cover);
 		coverpitch = cover->pitch / 4;
+
+		if (flags&BLIT_STENCIL_RED) {
+			covermask = fmt->Rmask;
+			covershift = fmt->Rshift;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			covermask = fmt->Gmask;
+			covershift = fmt->Gshift;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			covermask = fmt->Bmask;
+			covershift = fmt->Bshift;
+		} else {
+			covermask = fmt->Amask;
+			covershift = fmt->Ashift;
+		}
 	}
 	assert(spr);
 
@@ -334,30 +351,26 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 
 	PTYPE *line, *end, *pix;
-	Uint32 *coverline, *coverpix = NULL;
+	Uint32* coverpix = NULL;
+	if (COVER)
+		coverpix = (Uint32*)cover->pixels + (covery * coverpitch) + coverx;
+
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
-		if (COVER)
-			coverline = (Uint32*)cover->pixels + covery * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
-		if (COVER)
-			coverline = (Uint32*)cover->pixels + (covery+height-1) * coverpitch;
 	}
+
 	if (!XFLIP) {
 		pix = line + tx;
 		clipstartpix = line + clip.x;
 		clipendpix = clipstartpix + clip.w;
-		if (COVER)
-			coverpix = coverline + coverx;
 	} else {
 		pix = line + tx + width - 1;
 		clipstartpix = line + clip.x + clip.w - 1;
 		clipendpix = clipstartpix - clip.w;
-		if (COVER)
-			coverpix = coverline + coverx + width - 1;
 	}
 
 	// clipstartpix is the first pixel to draw
@@ -394,12 +407,11 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 					count = 1;
 				pix -= count;
 				if (COVER)
-					coverpix -= count;
+					coverpix += count;
 			}
 		}
 
 		// Blit a line, if it's not vertically clipped
-
 		if ((!yflip && pix >= clipstartline) || (yflip && pix < clipstartline+pitch))
 		{
 			while ( (!XFLIP && pix < clipendpix) || (XFLIP && pix > clipendpix) )
@@ -409,15 +421,14 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 					int count = (int)(*srcdata++) + 1;
 					if (!XFLIP) {
 						pix += count;
-						if (COVER)
-							coverpix += count;
 					} else {
 						pix -= count;
-						if (COVER)
-							coverpix -= count;
 					}
+					if (COVER)
+						coverpix += count;
 				} else {
-					if (!COVER || (coverpix && *coverpix < 0xff)) {
+					Uint8 maskval = (coverpix) ? (((*coverpix)&covermask) >> covershift) : 0;
+					if (!COVER || (coverpix && maskval < 0xff)) {
 						int extra_alpha = 0;
 						if (!shadow(*pix, p, extra_alpha, flags)) {
 							Uint8 r = col[p].r;
@@ -425,7 +436,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 							Uint8 b = col[p].b;
 							Uint8 a = col[p].a;
 							tint(r, g, b, a, flags);
-							a = (coverpix) ? a - *coverpix : a;
+							a = a - maskval;
 							blend(*pix, r, g, b, a >> extra_alpha);
 							*pix |= amask; // color keyed surface is 100% opaque
 						}
@@ -438,11 +449,10 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 					if (!XFLIP) {
 						pix++;
-						if (COVER) coverpix++;
 					} else {
 						pix--;
-						if (COVER) coverpix--;
 					}
+					if (COVER) coverpix++;
 				}
 			}
 		}
@@ -453,7 +463,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
 		if (COVER)
-			coverpix += yfactor * coverpitch - xfactor * width;
+			coverpix += coverpitch - width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
