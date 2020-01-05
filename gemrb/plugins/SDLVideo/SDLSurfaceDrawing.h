@@ -163,7 +163,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	x2 = Clamp<int>(x2, clip.x, clip.x + clip.w);
 
 	if (p.x == x2)
-		return DrawPointSurface<false>(dst, p, clip, color);
+		return DrawPointSurface<BLENDED>(dst, p, clip, color);
 
 	if (p.y < 0 || p.y >= dst->h) return;
 	if (p.x < 0 || x2 >= dst->w) return;
@@ -197,6 +197,15 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	if (y2 < p.y) {
 		std::swap(y2, p.y);
 	}
+
+	p.y = Clamp<int>(p.y, clip.y, clip.y + clip.h);
+	y2 = Clamp<int>(y2, clip.y, clip.y + clip.h);
+
+	if (p.y == y2)
+		return DrawPointSurface<BLENDED>(dst, p, clip, color);
+
+	if (p.x < 0 || p.x >= dst->w) return;
+	if (p.y < 0 || y2 >= dst->h) return;
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
