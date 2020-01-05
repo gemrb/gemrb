@@ -2064,6 +2064,9 @@ void Map::RedrawStencils(const Region& vp)
 	Video* video = core->GetVideoDriver();
 
 	if (wallStencil == NULL) {
+		// FIXME: this should be forced 8bit*4 color format
+		// but currently that is forcing some performance killing converison issues on some platforms
+		// for now things will break if we use 16 bit color settings
 		wallStencil = video->CreateBuffer(vp, Video::DISPLAY_ALPHA);
 	}
 
