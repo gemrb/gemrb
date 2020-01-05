@@ -66,9 +66,8 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFrame(screen);
 
 	// FIXME: need to recreate these if resolution changes
-	// NOTE: TT width is 138 = 128px (bg) + 10px (right curl) for BG2
-	// FIXME?: update this to the widest width needed for all games (if different)
-	cursorBuf = vid->CreateBuffer(Region(0,0,138,64), Video::DISPLAY_ALPHA);
+	// NOTE: widest known TT is IWD2: 250px (bg) + 6px (borders)
+	cursorBuf = vid->CreateBuffer(Region(0, 0, 256, 64), Video::DISPLAY_ALPHA);
 	winFrameBuf = vid->CreateBuffer(screen, Video::DISPLAY_ALPHA);
 
 	// set the buffer that always gets cleared just in case anything
