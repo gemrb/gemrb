@@ -84,7 +84,8 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 	std::vector<Point>::const_iterator it;
 	it = points.begin();
 	for (; it != points.end(); ++it) {
-		Point p = Clamp(*it, clip.Origin(), clip.Maximum());
+		Point p = *it;
+		if (clip.PointInside(p) == false) continue;
 		if (PointClipped(surface, p)) continue;
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
@@ -149,9 +150,11 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 template<bool BLENDED=false>
 void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
 {
+	assert(clip.x >= 0 && clip.w <= dst->w);
+	assert(clip.y >= 0 && clip.h <= dst->h);
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to, but this is optimized for our needs
 
-	if (p.y < clip.y || p.y > clip.y + clip.h) {
+	if (p.y < clip.y || p.y >= clip.y + clip.h) {
 		return;
 	}
 
@@ -159,14 +162,14 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		std::swap(x2, p.x);
 	}
 
-	p.x = Clamp<int>(p.x, clip.x, clip.x + clip.w);
-	x2 = Clamp<int>(x2, clip.x, clip.x + clip.w);
+	if (p.x >= clip.x + clip.w) return;
+	if (x2 < clip.x) return;
+
+	if (p.x < clip.x) p.x = clip.x;
+	x2 = Clamp<int>(x2, p.x, clip.x + clip.w);
 
 	if (p.x == x2)
 		return DrawPointSurface<BLENDED>(dst, p, clip, color);
-
-	if (p.y < 0 || p.y >= dst->h) return;
-	if (p.x < 0 || x2 >= dst->w) return;
 
 	assert(p.x < x2);
 	if (BLENDED) {
@@ -190,7 +193,10 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 template<bool BLENDED=false>
 inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
 {
-	if (p.x < clip.x || p.x > clip.x + clip.w) {
+	assert(clip.x >= 0 && clip.w <= dst->w);
+	assert(clip.y >= 0 && clip.h <= dst->h);
+
+	if (p.x < clip.x || p.x >= clip.x + clip.w) {
 		return;
 	}
 
@@ -198,14 +204,14 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 		std::swap(y2, p.y);
 	}
 
-	p.y = Clamp<int>(p.y, clip.y, clip.y + clip.h);
-	y2 = Clamp<int>(y2, clip.y, clip.y + clip.h);
+	if (p.y >= clip.y + clip.h) return;
+	if (y2 < clip.y) return;
+
+	if (p.y < clip.y) p.y = clip.y;
+	y2 = Clamp<int>(y2, p.y, clip.y + clip.h);
 
 	if (p.y == y2)
 		return DrawPointSurface<BLENDED>(dst, p, clip, color);
-
-	if (p.x < 0 || p.x >= dst->w) return;
-	if (p.y < 0 || y2 >= dst->h) return;
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
@@ -228,11 +234,11 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	if (start.y == end.y) return DrawHLineSurface<BLENDED>(surface, start, end.x, clip, color);
 	if (start.x == end.x) return DrawVLineSurface<BLENDED>(surface, start, end.y, clip, color);
 
-	// clamp the points to clip
-	Point min = clip.Origin();
-	Point max = min + Point(clip.w - 1, clip.h - 1);
-	Point p1 = Clamp(start, min, max);
-	Point p2 = Clamp(end, min, max);
+	assert(clip.x >= 0 && clip.w <= surface->w);
+	assert(clip.y >= 0 && clip.h <= surface->h);
+
+	Point p1 = start;
+	Point p2 = end;
 
 	bool yLonger = false;
 	int shortLen = p2.y - p1.y;
