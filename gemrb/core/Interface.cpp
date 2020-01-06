@@ -5582,6 +5582,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
 	int mastertable = gamedata->LoadTable( tablename );
+	if (mastertable == -1) return -1;
 	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
@@ -5602,6 +5603,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			value = actor->GetSafeStat(stat);
 		}
 		int table = gamedata->LoadTable( tablename );
+		if (table == -1) continue;
 		Holder<TableMgr> tm = gamedata->GetTable( table );
 		if (!tm) continue;
 

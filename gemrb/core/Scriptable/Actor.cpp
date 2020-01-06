@@ -9813,6 +9813,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	long ret = 0;
 	//don't close this table, it can mess with the guiscripts
 	int table = gamedata->LoadTable(resref);
+	if (table == -1) return 0;
 	Holder<TableMgr> tm = gamedata->GetTable(table);
 	if (tm) {
 		unsigned int row;
@@ -11259,7 +11260,9 @@ bool Actor::IsKitInactive() const
 
 	const int CLASS = 7;
 
-	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+	int table = gamedata->LoadTable("kitlist");
+	if (table == -1) return false;
+	Holder<TableMgr> tm = gamedata->GetTable(table);
 	if (tm) {
 		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
 		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));
