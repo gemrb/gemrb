@@ -826,57 +826,54 @@ void Map::UpdateScripts()
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
-		// (eg, TriggerActivation changes this, see lightning room from SoA)
-		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
-
-		//If this InfoPoint is a Switch Trigger
-		if (wasActive && ip->Type == ST_TRIGGER) {
-			ip->Update();
-			continue;
-		}
 
 		if (ip->IsPortal()) {
 			DrawPortal(ip, ip->Trapped&PORTAL_TRAVEL);
 		}
 
-		if (wasActive) {
-			q=Qcount[PR_SCRIPT];
-			ieDword exitID = ip->GetGlobalID();
-			while (q--) {
-				Actor* actor = queue[PR_SCRIPT][q];
-				if (ip->Type == ST_PROXIMITY) {
-					if(ip->Entered(actor)) {
-						//if trap triggered, then mark actor
-						actor->SetInTrap(ipCount);
-						wasActive|=_TRAP_USEPOINT;
-					}
-				} else {
-					//ST_TRAVEL
-					//don't move if doing something else
-					// added CurrentAction as part of blocking action fixes
-					if (actor->CannotPassEntrance(exitID) ) {
-						continue;
-					}
-					//this is needed, otherwise the travel
-					//trigger would be activated anytime
-					//Well, i don't know why is it here, but lets try this
-					if (ip->Entered(actor)) {
-						UseExit(actor, ip);
-					}
+		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
+		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
+		// (eg, TriggerActivation changes this, see lightning room from SoA)
+		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
+		if (!wasActive) continue;
+
+		if (ip->Type == ST_TRIGGER) {
+			ip->Update();
+			continue;
+		}
+
+		q = Qcount[PR_SCRIPT];
+		ieDword exitID = ip->GetGlobalID();
+		while (q--) {
+			Actor *actor = queue[PR_SCRIPT][q];
+			if (ip->Type == ST_PROXIMITY) {
+				if (ip->Entered(actor)) {
+					// if trap triggered, then mark actor
+					actor->SetInTrap(ipCount);
+					wasActive |= _TRAP_USEPOINT;
+				}
+			} else {
+				// ST_TRAVEL
+				// don't move if doing something else
+				// added CurrentAction as part of blocking action fixes
+				if (actor->CannotPassEntrance(exitID)) {
+					continue;
+				}
+				// this is needed, otherwise the travel
+				// trigger would be activated anytime
+				// Well, i don't know why is it here, but lets try this
+				if (ip->Entered(actor)) {
+					UseExit(actor, ip);
 				}
 			}
 		}
 
-		if (wasActive) {
-			//Play the PST specific enter sound
-			if (wasActive&_TRAP_USEPOINT) {
-				core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
-					ip->TrapLaunch.x, ip->TrapLaunch.y);
-			}
-			ip->Update();
+		// Play the PST specific enter sound
+		if (wasActive & _TRAP_USEPOINT) {
+			core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
+				ip->TrapLaunch.x, ip->TrapLaunch.y);
 		}
+		ip->Update();
 	}
 
 	UpdateSpawns();
