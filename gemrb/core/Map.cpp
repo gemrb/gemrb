@@ -832,7 +832,7 @@ void Map::UpdateScripts()
 		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
 
 		//If this InfoPoint is a Switch Trigger
-		if (ip->Type == ST_TRIGGER) {
+		if (wasActive && ip->Type == ST_TRIGGER) {
 			ip->Update();
 			continue;
 		}
