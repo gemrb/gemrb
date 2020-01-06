@@ -382,6 +382,8 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 	long yfrom = (long)round(radiusfrom * sin(anglefrom));
 	long xto = (long)round(radiusto * cos(angleto));
 	long yto = (long)round(radiusto * sin(angleto));
+	long xrl = (long) xr;
+	long yrl = (long) yr;
 
 	if (drawlines) {
 		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color, flags);
@@ -405,14 +407,14 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
 
-	tas = 2 * xr * xr;
-	tbs = 2 * yr * yr;
-	x = xr;
+	tas = 2 * xrl * xrl;
+	tbs = 2 * yrl * yrl;
+	x = xrl;
 	y = 0;
-	xc = yr * yr * ( 1 - ( 2 * xr ) );
-	yc = xr * xr;
+	xc = yrl * yrl * (1 - (2 * xrl));
+	yc = xrl * xrl;
 	ee = 0;
-	sx = tbs * xr;
+	sx = tbs * xrl;
 	sy = 0;
 
 	std::vector<SDL_Point> points;
@@ -439,12 +441,12 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 	}
 
 	x = 0;
-	y = yr;
-	xc = yr * yr;
-	yc = xr * xr * ( 1 - ( 2 * yr ) );
+	y = yrl;
+	xc = yrl * yrl;
+	yc = xrl * xrl * (1 - (2 * yrl));
 	ee = 0;
 	sx = 0;
-	sy = tas * yr;
+	sy = tas * yrl;
 
 	while (sx <= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
@@ -477,15 +479,17 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
+	long xrl = (long) xr;
+	long yrl = (long) yr;
 
-	tas = 2 * xr * xr;
-	tbs = 2 * yr * yr;
-	x = xr;
+	tas = 2 * xrl * xrl;
+	tbs = 2 * yrl * yrl;
+	x = xrl;
 	y = 0;
-	xc = yr * yr * ( 1 - ( 2 * xr ) );
-	yc = xr * xr;
+	xc = yrl * yrl * (1 - (2 * xrl));
+	yc = xrl * xrl;
 	ee = 0;
-	sx = tbs * xr;
+	sx = tbs * xrl;
 	sy = 0;
 
 	std::vector<SDL_Point> points;
@@ -508,12 +512,12 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 	}
 
 	x = 0;
-	y = yr;
-	xc = yr * yr;
-	yc = xr * xr * ( 1 - ( 2 * yr ) );
+	y = yrl;
+	xc = yrl * yrl;
+	yc = xrl * xrl * (1 - (2 * yrl));
 	ee = 0;
 	sx = 0;
-	sy = tas * yr;
+	sy = tas * yrl;
 
 	while (sx <= sy) {
 		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
