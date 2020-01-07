@@ -23,7 +23,7 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
-#define uint8_t unsigned char
+#include <cstdint>
 
 #if HAVE_ICONV
 #include <iconv.h>

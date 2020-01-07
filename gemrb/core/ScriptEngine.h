@@ -24,8 +24,8 @@
 #include "Plugin.h"
 #include "Resource.h"
 
+#include <cstdint>
 #include <map>
-#include <stdint.h>
 #include <string>
 #include <typeinfo>
 #include <vector>

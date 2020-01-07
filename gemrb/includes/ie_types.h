@@ -40,16 +40,6 @@ namespace GemRB {
 #define SIZEOF_LONG_INT 4
 #endif
 
-//well msvc and Android likes __int64, and me too
-#ifndef WIN32
-#define __int64 long long
-#endif
-
-// TODO: remove once we require c++11 support
-#ifndef HAVE_UINT64_T
-typedef __int64 uint64_t;
-#endif
-
 typedef unsigned char ieByte;
 typedef signed char ieByteSigned;
 typedef unsigned short ieWord;

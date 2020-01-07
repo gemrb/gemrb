@@ -37,6 +37,7 @@
 
 #include <bitset>
 #include <climits>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <vector>

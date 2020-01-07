@@ -1,15 +1,10 @@
 #include "RNG_SFMT.h"
+
+#include <cstdint>
 #include <climits>
 #include <ctime>
 
 #include "System/Logging.h"
-
-// This is from gcc sources, namely from fixincludes/inclhack.def
-// On C++11 systems, <cstdint> could be included instead.
-#if __cplusplus <= 199711L
-#undef UINT64_MAX
-#define UINT64_MAX (~(uint64_t)0)
-#endif
 
 /**
  * The constructor initializes the random number generator with a 32bit integer seed
