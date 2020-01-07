@@ -209,7 +209,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 {
 	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
 
-#if OPENGL_BACKEND
+#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
 	// FIXME: ingegtate these into the shader if possible
 	unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
 	// update palette
@@ -220,7 +220,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 	// WARNING: software fallback == slow
 	RenderSpriteVersion(texSprite, version);
 #endif
-
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
 		// 1. clear scratchpad segment
@@ -228,20 +227,20 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		// 3. blend texture to scratchpad
 		// 4. copy scratchpad segment to screen
 
+		SDL_Texture* stencilTex = CurrentStencilBuffer();
+		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
+
 		SDL_SetRenderTarget(renderer, scratchBuffer);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
 
+		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
+
+#if OPENGL_BACKEND
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 		SDL_RenderFlush(renderer);
 #endif
-		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
-
-		SDL_Texture* stencilTex = CurrentStencilBuffer();
-		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
-
-#if OPENGL_BACKEND
 		GLint previous_program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
@@ -285,8 +284,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
 {
+	// FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
 	SDL_Texture* texture = sprite->GetTexture(renderer);
-#if OPENGL_BACKEND
+#if 0
 	GLint activeTex;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
 
@@ -348,7 +348,7 @@ int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const S
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
-#if OPENGL_BACKEND
+#if 0
 	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
 
 	SDL_GL_UnbindTexture(texture);
