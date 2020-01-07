@@ -454,7 +454,7 @@ void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
 		}
-	} else if (flags&BLIT_BLENDED) {
+	} else if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawHLineSurface<true>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<true>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<true>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
