@@ -87,8 +87,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 	it = points.begin();
 	for (; it != points.end(); ++it) {
 		Point p = *it;
-		if (clip.PointInside(p) == false) continue;
-		if (PointClipped(surface, p)) continue;
+		if (!clip.PointInside(p) || PointClipped(surface, p)) continue;
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
 		unsigned char* dst = start + ((p.y * surface->pitch) + (p.x * fmt->BytesPerPixel));
