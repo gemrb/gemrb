@@ -651,7 +651,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( (ieWord*) &points[x].x );
 			str->ReadWord( (ieWord*) &points[x].y );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
+		Gem_Polygon* poly = new Gem_Polygon(points, VertexCount, &bbox);
 		free( points );
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
 		ip->TrapDetectionDiff = TrapDetDiff;
@@ -754,15 +754,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( &OpenFail );
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
-		for (x = 0; x < vertCount; x++) {
-			ieWord tmp;
-			str->ReadWord( &tmp );
-			points[x].x = tmp;
-			str->ReadWord( &tmp );
-			points[x].y = tmp;
-		}
-		if (vertCount == 0 && bbox.w == 0 && bbox.h == 0) {
+
+		Container* c = nullptr;
+		if (vertCount == 0) {
 			/* piles have no polygons and no bounding box in some areas,
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
@@ -770,10 +764,22 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			bbox.y = YPos - 5;
 			bbox.w = 16;
 			bbox.h = 12;
+			c = map->AddContainer( Name, Type, nullptr );
+			c->BBox = bbox;
+		} else {
+			Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
+			for (x = 0; x < vertCount; x++) {
+				ieWord tmp;
+				str->ReadWord( &tmp );
+				points[x].x = tmp;
+				str->ReadWord( &tmp );
+				points[x].y = tmp;
+			}
+			Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
+			c = map->AddContainer( Name, Type, poly );
+			free( points );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
-		free( points );
-		Container* c = map->AddContainer( Name, Type, poly );
+
 		//c->SetMap(map);
 		c->Pos.x = XPos;
 		c->Pos.y = YPos;
@@ -1607,7 +1613,8 @@ int AREImporter::GetStoredFileSize(Map *map)
 	}
 	for(i=0;i<ContainersCount;i++) {
 		Container *c=map->TMap->GetContainer(i);
-		VerticesCount+=c->outline->Count();
+		if (c->outline)
+			VerticesCount+=c->outline->Count();
 	}
 	for(i=0;i<DoorsCount;i++) {
 		Door *d=map->TMap->GetDoor(i);
@@ -1896,7 +1903,9 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	//containers
 	for(i=0;i<ContainersCount;i++) {
 		Container *c = map->TMap->GetContainer(i);
-		PutPoints(stream, c->outline->vertices);
+		if (c->outline) {
+			PutPoints(stream, c->outline->vertices);
+		}
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
@@ -1957,13 +1966,13 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 		tmpWord = (ieWord) c->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpWord = (ieWord) c->outline->BBox.x;
+		tmpWord = (ieWord) c->BBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) c->outline->BBox.y;
+		tmpWord = (ieWord) c->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
+		tmpWord = (ieWord) (c->BBox.x + c->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (c->outline->BBox.y + c->outline->BBox.h);
+		tmpWord = (ieWord) (c->BBox.y + c->BBox.h);
 		stream->WriteWord( &tmpWord);
 		//item index and offset
 		tmpDword = c->inventory.GetSlotCount();
@@ -1977,7 +1986,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 			stream->Write( filling, 8);
 		}
 		//outline polygon index and count
-		tmpWord = c->outline->Count();
+		tmpWord = (c->outline) ? c->outline->Count() : 0;
 		stream->WriteDword( &VertIndex);
 		stream->WriteWord( &tmpWord);
 		VertIndex +=tmpWord;

@@ -440,14 +440,8 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 				continue;
 			}
 		}
-		if (c->outline->BBox.x > position.x)
-			continue;
-		if (c->outline->BBox.y > position.y)
-			continue;
-		if (c->outline->BBox.x + c->outline->BBox.w < position.x)
-			continue;
-		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
-			continue;
+
+		if (!c->BBox.PointInside(position)) continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
 		if (c->Type == IE_CONTAINER_PILE) {
@@ -457,9 +451,9 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 				continue;
 			}
 			return c;
-		}
-		if (c->outline->PointIn( position ))
+		} else if (c->outline->PointIn(position)) {
 			return c;
+		}
 	}
 	return NULL;
 }

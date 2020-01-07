@@ -3701,7 +3701,6 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 Container *Map::GetPile(Point position)
 {
-	Point tmp[4];
 	char heapname[32];
 
 	//converting to search square
@@ -3713,18 +3712,10 @@ Container *Map::GetPile(Point position)
 	position.y=position.y*12+6;
 	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
 	if (!container) {
-		//bounding box covers the search square
-		tmp[0].x=position.x-8;
-		tmp[0].y=position.y-6;
-		tmp[1].x=position.x+8;
-		tmp[1].y=position.y-6;
-		tmp[2].x=position.x+8;
-		tmp[2].y=position.y+6;
-		tmp[3].x=position.x-8;
-		tmp[3].y=position.y+6;
-		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
+		container = AddContainer(heapname, IE_CONTAINER_PILE, nullptr);
 		container->Pos=position;
+		//bounding box covers the search square
+		container->BBox = Region::RegionFromPoints(Point(position.x-8, position.y-6), Point(position.x+8,position.y+6));
 	}
 	return container;
 }
@@ -3743,6 +3734,9 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 	c->Type = Type;
 	c->outline = outline;
 	c->SetMap(this);
+	if (outline) {
+		c->BBox = outline->BBox;
+	}
 	TMap->AddContainer( c );
 	return c;
 }

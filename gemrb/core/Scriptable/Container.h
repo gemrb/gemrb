@@ -60,6 +60,7 @@ private:
 	void RefreshGroundIcons();
 	void FreeGroundIcons();
 public:
+	Region BBox;
 	Point toOpen;
 	ieWord Type;
 	ieDword Flags;
