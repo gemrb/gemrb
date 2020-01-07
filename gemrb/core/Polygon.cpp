@@ -32,6 +32,8 @@ namespace GemRB {
 Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 : vertices(points, points + cnt)
 {
+	assert(cnt >= 3);
+
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
 
@@ -77,10 +79,6 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 
 void Gem_Polygon::RecalcBBox()
 {
-	if (vertices.empty()) {
-		BBox.x=BBox.y=BBox.w=BBox.h=0;
-		return;
-	}
 	BBox.x = vertices[0].x;
 	BBox.y = vertices[0].y;
 	BBox.w = vertices[0].x;
