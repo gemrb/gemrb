@@ -116,27 +116,26 @@ Door* TileMap::GetDoor(unsigned int idx) const
 Door* TileMap::GetDoor(const Point &p) const
 {
 	for (size_t i = 0; i < doors.size(); i++) {
-		Gem_Polygon *doorpoly;
-
 		Door* door = doors[i];
 		if (door->Flags&DOOR_HIDDEN) {
 			continue;
 		}
+
+		Gem_Polygon* doorpoly = nullptr;
 		if (door->Flags&DOOR_OPEN)
 			doorpoly = door->open;
 		else
 			doorpoly = door->closed;
 
-		if (doorpoly->BBox.x > p.x)
-			continue;
-		if (doorpoly->BBox.y > p.y)
-			continue;
-		if (doorpoly->BBox.x + doorpoly->BBox.w < p.x)
-			continue;
-		if (doorpoly->BBox.y + doorpoly->BBox.h < p.y)
-			continue;
-		if (doorpoly->PointIn( p ))
-			return door;
+		if (doorpoly) {
+			if (!doorpoly->PointIn(p)) continue;
+		} else if (door->Flags&DOOR_OPEN) {
+			if (!door->OpenBBox.PointInside(p)) continue;
+		} else {
+			if (!door->ClosedBBox.PointInside(p)) continue;
+		}
+
+		return door;
 	}
 	return NULL;
 }

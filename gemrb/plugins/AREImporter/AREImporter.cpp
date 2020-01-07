@@ -909,30 +909,35 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 
 		//Reading Open Polygon
+		Gem_Polygon* open = nullptr;
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* )
-			malloc( OpenVerticesCount*sizeof( Point ) );
-		for (x = 0; x < OpenVerticesCount; x++) {
-			str->ReadWord( &minX );
-			points[x].x = minX;
-			str->ReadWord( &minY );
-			points[x].y = minY;
+		if (OpenVerticesCount) {
+			Point* points = (Point*)malloc( OpenVerticesCount*sizeof( Point ) );
+			for (x = 0; x < OpenVerticesCount; x++) {
+				str->ReadWord( &minX );
+				points[x].x = minX;
+				str->ReadWord( &minY );
+				points[x].y = minY;
+			}
+			open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
+			free( points );
 		}
-		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
-		free( points );
 
 		//Reading Closed Polygon
+		Gem_Polygon* closed = nullptr;
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
-		points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
-		for (x = 0; x < ClosedVerticesCount; x++) {
-			str->ReadWord( &minX );
-			points[x].x = minX;
-			str->ReadWord( &minY );
-			points[x].y = minY;
+		if (ClosedVerticesCount) {
+			Point* points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
+			for (x = 0; x < ClosedVerticesCount; x++) {
+				str->ReadWord( &minX );
+				points[x].x = minX;
+				str->ReadWord( &minY );
+				points[x].y = minY;
+			}
+			closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
+			free( points );
 		}
-		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
-		free( points );
 
 		//Getting Door Information from the WED File
 		bool BaseClosed;
@@ -941,9 +946,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			BaseClosed = !BaseClosed;
 		}
 
-		Door* door;
-		door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
+		Door* door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
 					indices, count, open, closed );
+		door->OpenBBox = BBOpen;
+		door->ClosedBBox = BBClosed;
 
 		tmm->SetupClosedDoor(door->closed_wg_index, door->closed_wg_count);
 		tmm->SetupOpenDoor(door->open_wg_index, door->open_wg_count);
@@ -951,7 +957,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//Reading Open Impeded blocks
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
+		Point* points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
 		for (x = 0; x < OpenImpededCount; x++) {
 			str->ReadWord( &minX );
 			points[x].x = minX;
@@ -1618,7 +1624,12 @@ int AREImporter::GetStoredFileSize(Map *map)
 	}
 	for(i=0;i<DoorsCount;i++) {
 		Door *d=map->TMap->GetDoor(i);
-		VerticesCount+=d->open->Count()+d->closed->Count()+d->oibcount+d->cibcount;
+		if (d->open)
+			VerticesCount += d->open->Count();
+		if (d->closed)
+			VerticesCount += d->closed->Count();
+
+		VerticesCount += d->oibcount+d->cibcount;
 	}
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
@@ -1792,30 +1803,30 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		}
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
-		tmpWord = (ieWord) d->open->Count();
+		tmpWord = (d->open) ? d->open->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		VertIndex += tmpWord;
-		tmpWord = (ieWord) d->closed->Count();
+		tmpWord = (d->closed) ? d->closed->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
 		//open bounding box
-		tmpWord = (ieWord) d->open->BBox.x;
+		tmpWord = (ieWord) d->OpenBBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->open->BBox.y;
+		tmpWord = (ieWord) d->OpenBBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->open->BBox.x+d->open->BBox.w);
+		tmpWord = (ieWord) (d->OpenBBox.x+d->OpenBBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->open->BBox.y+d->open->BBox.h);
+		tmpWord = (ieWord) (d->OpenBBox.y+d->OpenBBox.h);
 		stream->WriteWord( &tmpWord);
 		//closed bounding box
-		tmpWord = (ieWord) d->closed->BBox.x;
+		tmpWord = (ieWord) d->ClosedBBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->closed->BBox.y;
+		tmpWord = (ieWord) d->ClosedBBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->closed->BBox.x+d->closed->BBox.w);
+		tmpWord = (ieWord) (d->ClosedBBox.x+d->ClosedBBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->closed->BBox.y+d->closed->BBox.h);
+		tmpWord = (ieWord) (d->ClosedBBox.y+d->ClosedBBox.h);
 		stream->WriteWord( &tmpWord);
 		//open and closed impeded blocks
 		stream->WriteDword( &VertIndex);
@@ -1910,8 +1921,10 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	//doors
 	for(i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
-		PutPoints(stream, d->open->vertices);
-		PutPoints(stream, d->closed->vertices);
+		if (d->open)
+			PutPoints(stream, d->open->vertices);
+		if (d->closed)
+			PutPoints(stream, d->closed->vertices);
 		PutPoints(stream, d->open_ib, d->oibcount);
 		PutPoints(stream, d->closed_ib, d->cibcount);
 	}

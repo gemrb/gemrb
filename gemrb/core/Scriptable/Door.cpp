@@ -97,9 +97,12 @@ void Door::UpdateDoor()
 	} else {
 		outline = closed;
 	}
-	// update the Scriptable position
-	Pos.x = outline->BBox.x + outline->BBox.w/2;
-	Pos.y = outline->BBox.y + outline->BBox.h/2;
+
+	if (outline) {
+		// update the Scriptable position
+		Pos.x = outline->BBox.x + outline->BBox.w/2;
+		Pos.y = outline->BBox.y + outline->BBox.h/2;
+	}
 
 	unsigned char pmdflags;
 

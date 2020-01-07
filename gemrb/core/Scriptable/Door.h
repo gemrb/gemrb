@@ -61,6 +61,8 @@ public:
 	//trigger areas
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
+	Region OpenBBox;
+	Region ClosedBBox;
 	//impeded blocks
 	Point* open_ib; //impeded blocks stored in a Point array
 	int oibcount;
