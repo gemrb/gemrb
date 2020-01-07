@@ -2,7 +2,7 @@
 *
            REST      	DAY	NIGHT
 0          *		*	* 
-1          REST		* 	*
+1          *		* 	*
 2          REST		* 	* 
 3          REST		* 	* 
 4          REST		* 	* 
