@@ -94,11 +94,10 @@ public:
 	}
 
 	void Clear() {
-		Uint32 ck = buffer->format->colorkey;
-		if (ck) {
-			SDL_FillRect(buffer, NULL, ck);
+		if (buffer->flags & SDL_SRCCOLORKEY) {
+			SDL_FillRect(buffer, NULL, buffer->format->colorkey);
 		} else {
-			SDL_FillRect(buffer, NULL, SDL_MapRGBA(buffer->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT));
+			SDL_FillRect(buffer, NULL, 0);
 		}
 	}
 
