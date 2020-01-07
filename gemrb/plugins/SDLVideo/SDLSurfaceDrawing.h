@@ -23,6 +23,8 @@
 
 #include <SDL.h>
 
+#include <cmath>
+
 #include "Pixels.h"
 #include "Polygon.h"
 
@@ -255,21 +257,30 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		decInc = ( shortLen * 65536 ) / longLen;
 	}
 
+	// attempt to estimate the number of points
+	// we over estimate by shortLen to avoid a realloc
+	int hyp = sqrt(longLen * longLen + shortLen * shortLen) + shortLen;
 	std::vector<Point> points;
+	points.reserve(hyp);
+	Point newp;
 
 	do { // TODO: rewrite without loop
 		if (yLonger) {
 			if (longLen > 0) {
 				longLen += p1.y;
 				for (int j = 0x8000 + ( p1.x << 16 ); p1.y <= longLen; ++p1.y) {
-					points.push_back(Point( j >> 16, p1.y ));
+					newp = Point( j >> 16, p1.y );
+					if (clip.PointInside(newp))
+						points.push_back(newp);
 					j += decInc;
 				}
 				break;
 			}
 			longLen += p1.y;
 			for (int j = 0x8000 + ( p1.x << 16 ); p1.y >= longLen; --p1.y) {
-				points.push_back(Point( j >> 16, p1.y ));
+				newp = Point( j >> 16, p1.y );
+				if (clip.PointInside(newp))
+					points.push_back(newp);
 				j -= decInc;
 			}
 			break;
@@ -278,14 +289,18 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		if (longLen > 0) {
 			longLen += p1.x;
 			for (int j = 0x8000 + ( p1.y << 16 ); p1.x <= longLen; ++p1.x) {
-				points.push_back(Point( p1.x, j >> 16 ));
+				newp = Point( p1.x, j >> 16 );
+				if (clip.PointInside(newp))
+					points.push_back(newp);
 				j += decInc;
 			}
 			break;
 		}
 		longLen += p1.x;
 		for (int j = 0x8000 + ( p1.y << 16 ); p1.x >= longLen; --p1.x) {
-			points.push_back(Point( p1.x, j >> 16 ));
+			newp = Point( p1.x, j >> 16 );
+			if (clip.PointInside(newp))
+				points.push_back(newp);
 			j -= decInc;
 		}
 	} while (false);
