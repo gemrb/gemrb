@@ -571,7 +571,7 @@ void WindowManager::DrawWindows() const
 			win->Draw();
 			static const Color fill(0, 0, 0, 128);
 			Region winrgn(Point(), win->Dimensions());
-			video->DrawRect(winrgn, fill);
+			video->DrawRect(winrgn, fill, true, BLIT_BLENDED);
 		} else {
 			win->Draw();
 		}
