@@ -33,7 +33,7 @@
 #include "GameData.h"
 #include "Palette.h"
 
-#define IS_PORTRAIT ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT)
+#define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
 
@@ -277,7 +277,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		Region r = rgn;
-		if (Picture && IS_PORTRAIT) {
+		if (IS_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Frame.w + 1, Picture->Frame.h);
@@ -439,7 +439,7 @@ Sprite2D* Button::Cursor() const
 
 Holder<Button::DragOp> Button::DragOperation()
 {
-	if (Picture && IS_PORTRAIT) {
+	if (IS_PORTRAIT) {
 		EnableBorder(1, true);
 		return Holder<Button::DragOp>(new PortraitDragOp(this));
 	}
@@ -448,7 +448,7 @@ Holder<Button::DragOp> Button::DragOperation()
 
 bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
-	if (dop.dragView != this && (Picture && IS_PORTRAIT)) {
+	if (dop.dragView != this && IS_PORTRAIT) {
 		return dynamic_cast<const PortraitDragOp*>(&dop);
 	}
 	return View::AcceptsDragOperation(dop);
