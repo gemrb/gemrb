@@ -226,8 +226,13 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
 			Point p(event.button.x, event.button.y);
 			EventButton btn = SDL_BUTTON(event.button.button);
-			e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
-			EvntManager->DispatchEvent(e);
+			if (btn) {
+				// it has been observed that multibutton mice can
+				// result in 0 for some of their extra buttons
+				// on at least some platforms
+				e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
+				EvntManager->DispatchEvent(e);
+			}
 			break;
 	}
 	return GEM_OK;
