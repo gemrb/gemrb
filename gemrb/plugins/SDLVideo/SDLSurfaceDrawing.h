@@ -23,8 +23,6 @@
 
 #include <SDL.h>
 
-#include <cmath>
-
 #include "Pixels.h"
 #include "Polygon.h"
 
@@ -256,11 +254,12 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		decInc = ( shortLen * 65536 ) / longLen;
 	}
 
-	// attempt to estimate the number of points
-	// we over estimate by shortLen to avoid a realloc
-	int hyp = sqrt(longLen * longLen + shortLen * shortLen) + shortLen;
+	// the numper of "points" is the length of the hypotenuse
+	// however, since we are only aproximating a straight line (because pixels)
+	// and sqrts are expensive and mallocs larger mallocs arent more expensive than smaller ones
+	// we will just overestimate by reserving shortLen + longLen Points
 	std::vector<Point> points;
-	points.reserve(hyp);
+	points.reserve(longLen + shortLen);
 	Point newp;
 
 	do { // TODO: rewrite without loop
