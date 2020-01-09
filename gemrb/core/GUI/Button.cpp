@@ -33,6 +33,8 @@
 #include "GameData.h"
 #include "Palette.h"
 
+#define IS_PORTRAIT ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT)
+
 namespace GemRB {
 
 Button::Button(Region& frame)
@@ -275,7 +277,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		Region r = rgn;
-		if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT)) {
+		if (Picture && IS_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Frame.w + 1, Picture->Frame.h);
@@ -426,7 +428,7 @@ String Button::TooltipText() const
 
 Sprite2D* Button::Cursor() const
 {
-	if (flags & IE_GUI_BUTTON_PORTRAIT) {
+	if (IS_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
 			return gc->GetTargetActionCursor();
@@ -437,7 +439,7 @@ Sprite2D* Button::Cursor() const
 
 Holder<Button::DragOp> Button::DragOperation()
 {
-	if (Picture && (flags & IE_GUI_BUTTON_PORTRAIT)) {
+	if (Picture && IS_PORTRAIT) {
 		EnableBorder(1, true);
 		return Holder<Button::DragOp>(new PortraitDragOp(this));
 	}
@@ -446,7 +448,7 @@ Holder<Button::DragOp> Button::DragOperation()
 
 bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
-	if (dop.dragView != this && (Picture && (flags & IE_GUI_BUTTON_PORTRAIT))) {
+	if (dop.dragView != this && (Picture && IS_PORTRAIT)) {
 		return dynamic_cast<const PortraitDragOp*>(&dop);
 	}
 	return View::AcceptsDragOperation(dop);
@@ -538,7 +540,7 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
-	if (flags & IE_GUI_BUTTON_PORTRAIT) {
+	if (IS_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc)
 			gc->SetLastActor(core->GetGame()->FindPC(ControlID + 1));
@@ -562,7 +564,7 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 		SetState( IE_GUI_BUTTON_UNPRESSED );
 	}
 
-	if (flags & IE_GUI_BUTTON_PORTRAIT) {
+	if (IS_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc)
 			gc->SetLastActor(NULL);
