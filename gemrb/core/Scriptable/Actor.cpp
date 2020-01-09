@@ -5852,9 +5852,12 @@ bool Actor::CheckOnDeath()
 	//if chunked death, then return true
 	ieDword gore = 0;
 	core->GetDictionary()->Lookup("Gore", gore);
-	if (LastDamageType&DAMAGE_CHUNKING && gore) {
-		//play chunky animation
-		//chunks are projectiles
+	if (LastDamageType & DAMAGE_CHUNKING) {
+		if (gore) {
+			// TODO: play chunky animation #128
+			// chunks are projectiles
+		}
+		RemovalTime = time;
 		return true;
 	}
 	return false;
