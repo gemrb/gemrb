@@ -4671,8 +4671,17 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		target->DestroySelf();
 		break;
 	case 1: //chunky death
-		target->NewBase(IE_HITPOINTS,(ieDword) -100, MOD_ABSOLUTE);
+		target->LastDamageType |= DAMAGE_CHUNKING;
+		target->NewBase(IE_HITPOINTS, (ieDword) -100, MOD_ABSOLUTE);
 		target->Die(Owner);
+		// we also have to remove any party members or their corpses will stay around
+		if (target->InParty) {
+			int slot = core->GetGame()->LeaveParty(target);
+			core->GetGame()->DelNPC(slot);
+			target->SetPersistent(-1);
+		}
+		target->SetBase(IE_MC_FLAGS, target->GetBase(IE_MC_FLAGS) & ~MC_KEEP_CORPSE);
+		// CheckOnDeath will do the actual chunking
 		break;
 	case 2: //normal death
 		target->Die(Owner);
