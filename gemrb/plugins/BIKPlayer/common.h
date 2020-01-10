@@ -44,7 +44,6 @@
 #define av_always_inline inline 
 
 #define FFABS(a) ((a) >= 0 ? (a) : (-(a)))
-#define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
 #ifndef M_PI
