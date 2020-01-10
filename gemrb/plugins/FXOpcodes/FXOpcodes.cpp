@@ -4395,6 +4395,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			sca->XPos+=fx->PosX;
 			sca->YPos+=fx->PosY;
 		}
+		sca->ZPos += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2<32) {
 			int tmp = fx->Parameter2>>2;
 			if (tmp) {
