@@ -201,15 +201,6 @@ ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
-# MODULE is only available since 2.8.8, but that's too new for Travis and IRIX
-MACRO(FIND_PKG_OURS name)
-if (${CMAKE_MAJOR_VERSION} GREATER 2 OR CMAKE_MINOR_VERSION GREATER 8 OR CMAKE_PATCH_VERSION GREATER 8)
-	find_package(${name} MODULE)
-else()
-	find_package(${name})
-endif()
-ENDMACRO(FIND_PKG_OURS)
-
 IF(NOT STATIC_LINK)
 	# prevent static libraries from being selected by FIND_LIBRARY
 	LIST(REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -267,7 +258,7 @@ ENDIF()
 IF((SDL_BACKEND STREQUAL "SDL") AND NOT USE_SDL2)
 	INCLUDE(FindSDL)
 	IF(USE_SDLMIXER)
-		FIND_PKG_OURS(SDL_mixer)
+		find_package(SDL_mixer MODULE)
 	ENDIF()
 ENDIF()
 
@@ -279,7 +270,7 @@ IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 	SET(SDL_FOUND ${SDL2_FOUND})
 
 	IF(USE_SDLMIXER)
-		FIND_PKG_OURS(SDL2_mixer)
+		find_package(SDL2_mixer MODULE)
 		# unify variables, so we don't have to differentiate later
 		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
 		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
@@ -378,7 +369,7 @@ IF(USE_OPENAL)
 ENDIF()
 
 IF(USE_LIBVLC AND NOT MSVC)
-	FIND_PKG_OURS(LIBVLC)
+	find_package(LIBVLC MODULE)
 	IF(LIBVLC_FOUND)
 		MESSAGE(STATUS "Looking for VLC: found")
 	ELSE()
