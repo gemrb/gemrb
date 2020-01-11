@@ -23,10 +23,20 @@
 
 #include <SDL.h>
 
+#include <cmath>
+
 #include "Pixels.h"
 #include "Polygon.h"
 
 namespace GemRB {
+
+// we continually recycle this vector
+// this prevents constant allocation/deallocation
+// while drawing. Yes, its permanantly used memory, but we do
+// enough drawing that this is not a problem (its a tiny amount anyway)
+// Point is trivial and clear() should be constant
+static std::vector<Point> g_points;
+static_assert(std::is_trivially_destructible<Point>::value, "Expected Point to be trivially destructable.");
 
 inline bool PointClipped(SDL_Surface* surf, const Point& p)
 {
@@ -258,8 +268,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	// however, since we are only aproximating a straight line (because pixels)
 	// and sqrts are expensive and mallocs larger mallocs arent more expensive than smaller ones
 	// we will just overestimate by reserving shortLen + longLen Points
-	std::vector<Point> points;
-	points.reserve(longLen + shortLen);
+	g_points.clear();
+	g_points.reserve(std::abs(longLen) + std::abs(shortLen));
 	Point newp;
 
 	do { // TODO: rewrite without loop
@@ -269,7 +279,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 				for (int j = 0x8000 + ( p1.x << 16 ); p1.y <= longLen; ++p1.y) {
 					newp = Point( j >> 16, p1.y );
 					if (clip.PointInside(newp))
-						points.push_back(newp);
+						g_points.push_back(newp);
 					j += decInc;
 				}
 				break;
@@ -278,7 +288,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 			for (int j = 0x8000 + ( p1.x << 16 ); p1.y >= longLen; --p1.y) {
 				newp = Point( j >> 16, p1.y );
 				if (clip.PointInside(newp))
-					points.push_back(newp);
+					g_points.push_back(newp);
 				j -= decInc;
 			}
 			break;
@@ -289,7 +299,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 			for (int j = 0x8000 + ( p1.y << 16 ); p1.x <= longLen; ++p1.x) {
 				newp = Point( p1.x, j >> 16 );
 				if (clip.PointInside(newp))
-					points.push_back(newp);
+					g_points.push_back(newp);
 				j += decInc;
 			}
 			break;
@@ -298,12 +308,12 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		for (int j = 0x8000 + ( p1.y << 16 ); p1.x >= longLen; --p1.x) {
 			newp = Point( p1.x, j >> 16 );
 			if (clip.PointInside(newp))
-				points.push_back(newp);
+				g_points.push_back(newp);
 			j -= decInc;
 		}
 	} while (false);
 
-	DrawPointsSurface<BLENDED>(surface, points, clip, color);
+	DrawPointsSurface<BLENDED>(surface, g_points, clip, color);
 }
 
 template<bool BLENDED=false>
@@ -328,25 +338,26 @@ void DrawPolygonSurface(SDL_Surface* surface, Gem_Polygon* poly, const Point& or
 			DrawHLineSurface<BLENDED>(surface, lines[i] + origin, (lines[i+1] + origin).x, clip, color);
 		}
 	} else {
-		std::vector<Point> points(poly->Count()*2);
+		g_points.clear();
+		g_points.resize(poly->Count()*2); // resize, not reserve! (it wont shrink the capacity FYI)
 
 		const Point& p = poly->vertices[0] - poly->BBox.Origin() + origin;
-		points[0].x = p.x;
-		points[0].y = p.y;
+		g_points[0].x = p.x;
+		g_points[0].y = p.y;
 
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
 			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
-			points[j].x = p.x;
-			points[j].y = p.y;
-			points[j+1] = points[j];
+			g_points[j].x = p.x;
+			g_points[j].y = p.y;
+			g_points[j+1] = g_points[j];
 		}
 		// reconnect with start point
-		points[j].x = p.x;
-		points[j].y = p.y;
+		g_points[j].x = p.x;
+		g_points[j].y = p.y;
 
-		DrawLinesSurface<BLENDED>(surface, points, clip, color);
+		DrawLinesSurface<BLENDED>(surface, g_points, clip, color);
 	}
 }
 
