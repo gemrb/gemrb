@@ -271,7 +271,6 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 			SDL_FreeSurface(tmp);
 #endif
 			if (ns) {
-				SDL_FreeSurface(*surface);
 				if (freePixels) {
 					free((void*)pixels);
 				}
