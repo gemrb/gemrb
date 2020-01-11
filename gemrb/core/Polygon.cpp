@@ -113,9 +113,6 @@ bool Gem_Polygon::PointIn(int tx, int ty) const
 	bool inside_flag = false;
 	size_t count = vertices.size();
 
-	if (count < 3) {
-		return false;
-	}
 	index = 0;
 
 	const Point* vtx0 = &vertices[count - 1];
@@ -246,8 +243,6 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 {
 	std::vector<Trapezoid> trapezoids;
 	size_t count = vertices.size();
-
-	if (count < 3) return trapezoids;
 
 	std::vector<int> ys;
 	ys.reserve(2*count);
