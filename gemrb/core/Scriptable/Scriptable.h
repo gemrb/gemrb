@@ -408,7 +408,8 @@ public:
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 public:
-	Gem_Polygon* outline;
+	Region BBox;
+	Gem_Polygon* outline = nullptr;
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;

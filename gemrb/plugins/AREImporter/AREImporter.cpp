@@ -645,15 +645,37 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
+		InfoPoint* ip = nullptr;
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
-		for (x = 0; x < VertexCount; x++) {
-			str->ReadWord( (ieWord*) &points[x].x );
-			str->ReadWord( (ieWord*) &points[x].y );
+		if (VertexCount == 1) {
+			ip = tm->AddInfoPoint( Name, Type, nullptr );
+			ip->BBox = bbox;
+			// this is exactly the same as bbox.Origin()
+			str->ReadWord( (ieWord*) &tmp );
+			assert(tmp == bbox.x);
+			str->ReadWord( (ieWord*) &tmp );
+			assert(tmp == bbox.y);
+
+			if (bbox.Dimensions().IsEmpty()) {
+				// we approximate a bounding box equivalent to a small radius
+				// we copied this from the Container code that seems to indicate
+				// this is how the originals behave. It is probably "good enough"
+				bbox.x = PosX - 7;
+				bbox.y = PosY - 5;
+				bbox.w = 16;
+				bbox.h = 12;
+			}
+		} else {
+			Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
+			for (x = 0; x < VertexCount; x++) {
+				str->ReadWord( (ieWord*) &points[x].x );
+				str->ReadWord( (ieWord*) &points[x].y );
+			}
+			Gem_Polygon* poly = new Gem_Polygon(points, VertexCount, &bbox);
+			free( points );
+			ip = tm->AddInfoPoint( Name, Type, poly );
 		}
-		Gem_Polygon* poly = new Gem_Polygon(points, VertexCount, &bbox);
-		free( points );
-		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
+
 		ip->TrapDetectionDiff = TrapDetDiff;
 		ip->TrapRemovalDiff = TrapRemDiff;
 		ip->Trapped = Trapped;
@@ -760,10 +782,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			/* piles have no polygons and no bounding box in some areas,
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
-			bbox.x = XPos - 7;
-			bbox.y = YPos - 5;
-			bbox.w = 16;
-			bbox.h = 12;
+			if (bbox.Dimensions().IsEmpty()) {
+				bbox.x = XPos - 7;
+				bbox.y = YPos - 5;
+				bbox.w = 16;
+				bbox.h = 12;
+			}
 			c = map->AddContainer( Name, Type, nullptr );
 			c->BBox = bbox;
 		} else {
@@ -1615,7 +1639,11 @@ int AREImporter::GetStoredFileSize(Map *map)
 	VerticesCount = 0;
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip=map->TMap->GetInfoPoint(i);
-		VerticesCount+=ip->outline->Count();
+		if (ip->outline) {
+			VerticesCount+=ip->outline->Count();
+		} else {
+			VerticesCount++;
+		}
 	}
 	for(i=0;i<ContainersCount;i++) {
 		Container *c=map->TMap->GetContainer(i);
@@ -1909,7 +1937,12 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	//regions
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
-		PutPoints(stream, ip->outline->vertices);
+		if (ip->outline) {
+			PutPoints(stream, ip->outline->vertices);
+		} else {
+			Point origin = ip->BBox.Origin();
+			PutPoints(stream, &origin, 1);
+		}
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
@@ -2032,15 +2065,15 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = ((ieWord) ip->Type) - 1;
 		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpWord = (ieWord) ip->outline->BBox.x;
+		tmpWord = (ieWord) ip->BBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->outline->BBox.y;
+		tmpWord = (ieWord) ip->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
+		tmpWord = (ieWord) (ip->BBox.x + ip->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (ip->outline->BBox.y + ip->outline->BBox.h);
+		tmpWord = (ieWord) (ip->BBox.y + ip->BBox.h);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->outline->Count();
+		tmpWord = (ip->outline) ? ip->outline->Count() : 1;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;

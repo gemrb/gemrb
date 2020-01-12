@@ -528,6 +528,8 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 			break;
 	}
 	ip->outline = outline;
+	if (ip->outline)
+		ip->BBox = outline->BBox;
 	//ip->Active = true; //set active on creation
 	infoPoints.push_back( ip );
 	return ip;
