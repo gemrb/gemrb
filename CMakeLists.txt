@@ -150,11 +150,16 @@ endif()
 MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	INCLUDE(CheckCXXCompilerFlag)
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations -Wno-error=stringop-truncation")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-			# clang ignores -Wno-error
+			# clang doesn't know as many -Wno-error directives, so we don't set up these in the shared path above
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
+			CHECK_CXX_COMPILER_FLAG("-Wno-error=stringop-truncation" NO_STRINGOP_TRUNCATION)
+			if (NO_STRINGOP_TRUNCATION)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=stringop-truncation")
+			endif ()
 		else()
 			# hit in python2 includes
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-register")
@@ -172,7 +177,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	# mark chars explicitly signed (ARM defaults to unsigned)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 	# only export symbols explicitly marked to be exported.
-	INCLUDE(CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)
 	IF (VISIBILITY_HIDDEN AND NOT WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
