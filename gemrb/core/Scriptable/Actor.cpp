@@ -5508,6 +5508,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		killer = area->GetActorByGlobalID(LastHitter);
 	}
 
+	bool killerPC = false;
 	if (killer) {
 		if (killer->Type==ST_ACTOR) {
 			act = (Actor *) killer;
@@ -5515,6 +5516,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
 				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
 			}
+			killerPC = act->InParty > 0;
 		}
 	}
 
@@ -5591,6 +5593,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 
 	ieDword value = 0;
 	ieVariable varname;
+	if (InParty && killerPC) {
+		game->locals->SetAt("PM_KILLED", 1, nocreate);
+	}
 
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
