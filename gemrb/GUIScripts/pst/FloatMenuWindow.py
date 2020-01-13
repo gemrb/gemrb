@@ -552,9 +552,11 @@ def FloatMenuSelectItems ():
 
 def FloatMenuSelectSpells ():
 	global float_menu_mode, float_menu_index, float_menu_selected
+
 	pc = GemRB.GameGetFirstSelectedPC ()
-	# only allow it for mage-types
-	if GUICommon.GetClassRowName (pc)[-4:] != "MAGE":
+	ClassName = GUICommon.GetClassRowName (pc)
+	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE", GTV_INT)
+	if not BookType:
 		return
 
 	float_menu_mode = MENU_MODE_SPELLS
