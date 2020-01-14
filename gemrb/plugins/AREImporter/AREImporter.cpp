@@ -648,8 +648,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		InfoPoint* ip = nullptr;
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		if (VertexCount == 1) {
-			ip = tm->AddInfoPoint( Name, Type, nullptr );
-			ip->BBox = bbox;
 			// this is exactly the same as bbox.Origin()
 			str->ReadWord( (ieWord*) &tmp );
 			assert(tmp == bbox.x);
@@ -665,6 +663,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				bbox.w = 16;
 				bbox.h = 12;
 			}
+
+			ip = tm->AddInfoPoint( Name, Type, nullptr );
+			ip->BBox = bbox;
 		} else {
 			Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 			for (x = 0; x < VertexCount; x++) {
