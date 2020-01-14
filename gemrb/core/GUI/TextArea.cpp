@@ -64,12 +64,6 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], NULL, NULL, &flexFrame));
 		AddSubviewInFrontOfView(selOption);
-
-		if (EventMgr::TouchInputEnabled) {
-			// keeping the options spaced out (for touch screens)
-			r.y += ta.LineHeight();
-		}
-		r.y += selOption->Dimensions().h; // FIXME: this can overflow the height
 	}
 
 	if (numbered) {
@@ -325,7 +319,7 @@ Region TextArea::UpdateTextFrame()
 
 		if (AnimPicture) {
 			// shrink and shift the container to accommodate the image
-			r.x = AnimPicture->Frame.w;
+			r.x = AnimPicture->Frame.w + 5;
 			r.w -= r.x;
 		} else {
 			r.x = 0;
@@ -636,9 +630,9 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	size_t selectIdx = -1;
 	if (dialogBeginNode) {
 		if (AnimPicture)
-			m = ContentContainer::Margin(10, 3);
+			m = ContentContainer::Margin(10, 20);
 		else
-			m = ContentContainer::Margin(LineHeight(), 40, 0);
+			m = ContentContainer::Margin(LineHeight(), 40, 10);
 	} else {
 		m = ContentContainer::Margin(0, 3);
 		selectIdx = GetValue();
