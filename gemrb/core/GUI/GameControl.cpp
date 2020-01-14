@@ -2335,12 +2335,15 @@ void GameControl::MakeSelection(bool extend)
 
 void GameControl::SetCutSceneMode(bool active)
 {
+	WindowManager* wm = core->GetWindowManager();
 	if (active) {
 		ScreenFlags |= SF_CUTSCENE;
 		moveX = 0;
 		moveY = 0;
+		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
 		ScreenFlags &= ~SF_CUTSCENE;
+		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
 	}
 	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
 }
