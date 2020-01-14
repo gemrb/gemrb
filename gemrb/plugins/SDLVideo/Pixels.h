@@ -203,12 +203,14 @@ struct PixelIterator : IPixelIterator
 
 	PixelIterator(PIXEL* p, int w, int pitch)
 	: IPixelIterator(p, pitch, Forward, Forward), w(w) {
+		assert(w > 0);
 		assert(pitch >= w);
 		xpos = 0;
 	}
 
 	PixelIterator(PIXEL* p, Direction x, Direction y, int w, int pitch)
 	: IPixelIterator(p, pitch, x, y), w(w) {
+		assert(w > 0);
 		assert(pitch >= w);
 		xpos = (x == Reverse) ? w-1 : 0;
 	}
@@ -347,16 +349,20 @@ struct SDLPixelIterator : IPixelIterator
 		return pixels;
 	}
 
+	inline static SDL_Rect SurfaceRect(SDL_Surface* surf) {
+		SDL_Rect r {};
+		r.w = surf->w;
+		r.h = surf->h;
+		return r;
+	}
+
 public:
 	SDL_PixelFormat* format;
 	SDL_Rect clip;
 
 	SDLPixelIterator(SDL_Surface* surf)
-	: SDLPixelIterator({}, surf)
-	{
-		clip.w = surf->w;
-		clip.h = surf->h;
-	}
+	: SDLPixelIterator(SurfaceRect(surf), surf)
+	{}
 
 	SDLPixelIterator(const SDL_Rect& clip, SDL_Surface* surf)
 	: SDLPixelIterator(Forward, Forward, clip, surf)
