@@ -9192,7 +9192,7 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 	if (!vvc) {
 		return;
 	}
-	if (vvc->ZPos<0) {
+	if (vvc->YPos < 0) {
 		vvcCells=&vvcShields;
 	} else {
 		vvcCells=&vvcOverlays;
