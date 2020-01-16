@@ -195,6 +195,8 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 	if (color) {
 		if (flags&BLIT_BLENDED) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		} else if (flags&BLIT_MULTIPLY) {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
 		} else {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		}
