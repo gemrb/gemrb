@@ -193,9 +193,9 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 	}
 
 	if (color) {
-		if (flags&BLIT_BLENDED) {
+		if (flags & BLIT_BLENDED) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		} else if (flags&BLIT_MULTIPLY) {
+		} else if (flags & BLIT_MULTIPLY) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
 		} else {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
@@ -340,9 +340,9 @@ int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const S
 	}
 
 	if (flags & BLIT_BLENDED) {
-		// TODO: there is no reason we can't support other blendmodes too
-		// in fact, SDL_BLENDMODE_MOD looks useful
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	} else if (flags & BLIT_MULTIPLY) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
 	} else {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 	}
