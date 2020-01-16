@@ -1840,11 +1840,12 @@ void Highlightable::DrawOutline(Point origin) const
 	Color fillcol(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a/2);
 	origin = outline->BBox.Origin() - origin;
 
-	// FIXME: for PST these next 2 lines should not execute and the commented out line should
-	core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_BLENDED );
-	core->GetVideoDriver()->DrawPolygon( outline, origin, outlineColor, false );
-
-	//core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_MULTIPLY );
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_MULTIPLY );
+	} else {
+		core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_BLENDED );
+		core->GetVideoDriver()->DrawPolygon( outline, origin, outlineColor, false );
+	}
 }
 
 void Highlightable::SetCursor(unsigned char CursorIndex)
