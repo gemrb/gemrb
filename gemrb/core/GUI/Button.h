@@ -202,15 +202,9 @@ private: // Private attributes
 	Holder<EventMgr::EventCallback> HotKeyCallback;
 
 	struct HotKey {
-		KeyboardKey key;
-		short mod;
-		bool global;
-
-		HotKey() {
-			key = '\0';
-			mod = 0;
-			global = false;
-		}
+		KeyboardKey key = '\0';
+		short mod = 0;
+		bool global = false;
 
 		operator bool() const {
 			return key != '\0';
