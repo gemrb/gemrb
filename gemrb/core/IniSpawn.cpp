@@ -861,6 +861,7 @@ void IniSpawn::InitialSpawn()
 		Game *game = core->GetGame();
 		while (game->GetPartySize(false) > 1) {
 			Actor *pc = game->GetPC(1, false); // skip TNO
+			pc->Stop();
 			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
 			game->LeaveParty(pc);
 		}
