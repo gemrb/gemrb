@@ -2910,7 +2910,7 @@ void Actor::PlayCritDamageAnimation(int type)
 	int row = tm->FindTableValue (1, type);
 	if (row>=0) {
 		//the animations are listed in column 0
-		AddAnimation(tm->QueryField(row, 0), -1, 0, AA_PLAYONCE|AA_BLEND);
+		AddAnimation(tm->QueryField(row, 0), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
 }
 
@@ -2918,8 +2918,10 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
 	int flags = AA_PLAYONCE;
+	int height = 22;
 	if (pstflags) {
 		flags |= AA_BLEND;
+		height = 45; // empirical like in fx_visual_spell_hit
 	}
 
 	Log(COMBAT, "Actor", "Damage animation type: %d", type);
@@ -2936,38 +2938,38 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
 			if(hit) {
-				AddAnimation(d_main[type], i, 0, flags);
+				AddAnimation(d_main[type], i, height, flags);
 			}
 			break;
 		case 4: case 5: case 6: //fire
 			if(hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, flags);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			for(i=DL_FIRE;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], 0, flags);
+				AddAnimation(d_splash[i], d_gradient[i], height, flags);
 			}
 			break;
 		case 7: case 8: case 9: //electricity
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, flags);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], 0, flags);
+				AddAnimation(d_splash[i], d_gradient[i], height, flags);
 			}
 			break;
 		case 10: case 11: case 12://cold
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, flags);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 		case 13: case 14: case 15://acid
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, flags);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 		case 16: case 17: case 18://disintegrate
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, flags);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 	}
