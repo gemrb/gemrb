@@ -2934,8 +2934,8 @@ int Interface::PlayMovie(const char* resref)
 	};
 
 	AutoTable sttable(resref);
-	if (sttable) {
-		Font* font = GetFont(MovieFontResRef);
+	Font* font = GetFont(MovieFontResRef);
+	if (sttable && font) {
 		Holder<Palette> pal = font->GetPalette();
 		Color fore = pal->front;
 		Color bg = pal->back;
