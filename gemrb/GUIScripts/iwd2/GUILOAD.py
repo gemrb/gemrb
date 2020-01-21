@@ -76,6 +76,8 @@ def OnLoad ():
 
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	ScrollBarPress ()
+
+	LoadWindow.SetEventProxy(ScrollBar)
 	LoadWindow.Focus()
 	return
 

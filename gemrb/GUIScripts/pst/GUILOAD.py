@@ -76,8 +76,10 @@ def OnLoad ():
 	else:
 		TopIndex = 0
 	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	ScrollBarPress ()
+
+	LoadWindow.SetEventProxy(ScrollBar)
 	LoadWindow.Focus()
 	return
 
