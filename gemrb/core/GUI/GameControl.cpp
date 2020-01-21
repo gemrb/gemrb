@@ -1275,7 +1275,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	// let us target party members even if they are invisible
 	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (lastActor && lastActor->Modified[IE_EA] >= EA_CONTROLLED) {
-		if (!lastActor->ValidTarget(target_types&(~GA_SELECT)) || !area->IsVisible(gameMousePos, false)) {
+		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
 			lastActor = NULL;
 		}
 	}
