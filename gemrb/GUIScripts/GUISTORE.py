@@ -1891,11 +1891,12 @@ def RentConfirm (Window):
 	cutscene = GemRB.RestParty (13, 1, RentIndex+1)
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
+
 	Window = GemRB.GetView('WINRENT')
 	if cutscene:
 		CloseStoreWindow ()
 	else:
-		TextArea = Window.GetControl (12)
+		TextArea = Window.GetControlAlias('RENTTA')
 		#is there any way to change this???
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
 		TextArea.SetText (strrefs["restedfor"])
