@@ -111,6 +111,7 @@ void EventMgr::DispatchEvent(Event& e)
 
 		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
+			assert(hit->second.size() > 0);
 			KeyMap::value_type::second_type list = hit->second;
 			Holder<EventCallback> cb = hit->second.front();
 			if ((*cb)(e)) {
@@ -232,8 +233,10 @@ void EventMgr::UnRegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey ke
 		KeyMap::value_type::second_type::iterator cbit;
 		cbit = std::find(it->second.begin(), it->second.end(), cb);
 		if (cbit != it->second.end()) {
-			cb = *cbit;
 			it->second.erase(cbit);
+			if (it->second.empty()) {
+				HotKeys.erase(it);
+			}
 		}
 	}
 }
