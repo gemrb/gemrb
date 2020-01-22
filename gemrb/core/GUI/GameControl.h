@@ -108,6 +108,8 @@ private:
 	String* DisplayText;
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
+	bool ShouldTriggerWorldMap(const Actor *pc) const;
+	void ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint);
 	Actor *user; //the user of item or spell
 
 	Door* overDoor;

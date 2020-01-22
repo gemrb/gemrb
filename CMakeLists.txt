@@ -150,11 +150,16 @@ endif()
 MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	INCLUDE(CheckCXXCompilerFlag)
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations -Wno-error=stringop-truncation")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-			# clang ignores -Wno-error
+			# clang doesn't know as many -Wno-error directives, so we don't set up these in the shared path above
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
+			CHECK_CXX_COMPILER_FLAG("-Wno-error=stringop-truncation" NO_STRINGOP_TRUNCATION)
+			if (NO_STRINGOP_TRUNCATION)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=stringop-truncation")
+			endif ()
 		else()
 			# hit in python2 includes
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-register")
@@ -172,7 +177,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	# mark chars explicitly signed (ARM defaults to unsigned)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 	# only export symbols explicitly marked to be exported.
-	INCLUDE(CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)
 	IF (VISIBILITY_HIDDEN AND NOT WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
@@ -200,15 +204,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
-
-# MODULE is only available since 2.8.8, but that's too new for Travis and IRIX
-MACRO(FIND_PKG_OURS name)
-if (${CMAKE_MAJOR_VERSION} GREATER 2 OR CMAKE_MINOR_VERSION GREATER 8 OR CMAKE_PATCH_VERSION GREATER 8)
-	find_package(${name} MODULE)
-else()
-	find_package(${name})
-endif()
-ENDMACRO(FIND_PKG_OURS)
 
 IF(NOT STATIC_LINK)
 	# prevent static libraries from being selected by FIND_LIBRARY
@@ -267,7 +262,7 @@ ENDIF()
 IF((SDL_BACKEND STREQUAL "SDL") AND NOT USE_SDL2)
 	INCLUDE(FindSDL)
 	IF(USE_SDLMIXER)
-		FIND_PKG_OURS(SDL_mixer)
+		find_package(SDL_mixer MODULE)
 	ENDIF()
 ENDIF()
 
@@ -279,7 +274,7 @@ IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 	SET(SDL_FOUND ${SDL2_FOUND})
 
 	IF(USE_SDLMIXER)
-		FIND_PKG_OURS(SDL2_mixer)
+		find_package(SDL2_mixer MODULE)
 		# unify variables, so we don't have to differentiate later
 		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
 		SET(SDL_MIXER_INCLUDE_DIRS ${SDL2_MIXER_INCLUDE_DIRS})
@@ -362,7 +357,7 @@ IF(USE_OPENAL)
 ENDIF()
 
 IF(USE_LIBVLC AND NOT MSVC)
-	FIND_PKG_OURS(LIBVLC)
+	find_package(LIBVLC MODULE)
 	IF(LIBVLC_FOUND)
 		MESSAGE(STATUS "Looking for VLC: found")
 	ELSE()

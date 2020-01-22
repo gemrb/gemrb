@@ -73,6 +73,7 @@ namespace GemRB {
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours (use alpha)
 #define PTF_BRIGHTEN 256    //brighten alpha
+#define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
@@ -276,14 +277,6 @@ public:
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;
 	void Cleanup();
-
-	//inliners to protect data consistency
-	inline PathNode * GetNextStep() {
-		if (!step) {
-			DoStep((unsigned int) ~0);
-		}
-		return step;
-	}
 
 	inline Point GetDestination() const { return Destination; }
 	inline const char * GetName() const { return name; }

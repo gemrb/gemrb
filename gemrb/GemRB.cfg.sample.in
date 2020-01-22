@@ -153,6 +153,8 @@ GUIEnhancements = 15
 #  These are the paths where the Game you want to   #
 #  play is installed.                               #
 #  Enter the full path to the directory.            #
+#                                                   #
+#  Remember, EE versions are not supported!         #
 #####################################################
 
 GamePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/

@@ -264,7 +264,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->ReadDword( &tmp );
 	XPos = (signed) tmp;
 	stream->ReadDword( &tmp );  //this affects visibility
-	ZPos = (signed) tmp;
+	YPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 
@@ -273,7 +273,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	YPos = (signed) tmp;
+	ZPos = (signed) tmp;
 	stream->ReadDword( &LightX );
 	stream->ReadDword( &LightY );
 	stream->ReadDword( &LightZ );
@@ -606,7 +606,14 @@ retry:
 		Phase++;
 		goto retry;
 	}
-	frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+
+	Game *game = core->GetGame();
+	if (game && game->IsTimestopActive()) {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->LastFrame();
+		return false;
+	} else {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+	}
 
 	//explicit duration
 	if (Phase==P_HOLD) {
@@ -678,7 +685,7 @@ bool ScriptedAnimation::Draw(const Region &viewport, const Point &Pos, const Col
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
 
-	if (Transparency & IE_VVC_GREYSCALE) {
+	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
 		flag |= BLIT_GREY;
 	}
 

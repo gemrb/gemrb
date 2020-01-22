@@ -61,7 +61,7 @@ BEGGAR     SOUND      0xc600     0xc6ff     4
 CHILDREN   SOUND      0xc700     0xc7ff     4
 DEFAULT    SOUND      0xc800     0xcfff     4
 SLAVE      SOUND      0xcb00     0xcbff     4
-IWD        WAL_09     0xe000     0xefff     4
+IWD        SOUND      0xe000     0xefff     4
 GOBLIN     SOUND      0xe400     0xe4ff     2
 NONE       *          0xef00     0xefff     0
 

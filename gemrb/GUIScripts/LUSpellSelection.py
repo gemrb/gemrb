@@ -33,7 +33,6 @@ Class = 0
 
 # basic spell selection
 SpellsWindow = 0		# << spell selection window
-#SpellKnownTable = 0		# << known spells per level (table)
 DoneButton = 0			# << done/next button
 SpellsTextArea = 0		# << spell description area
 SpellsSelectPointsLeft = [0]*9	# << spell selections left per level
@@ -73,7 +72,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	recommend is used in bg2 for spell recommendation / autopick."""
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
-	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
+	global SpellsTextArea, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
@@ -97,8 +96,9 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			ButtonCount = 30
 
 	# make sure there is an entry at the given level (bard)
-	SpellsKnownTable = GemRB.LoadTable (table)
-	if not SpellsKnownTable.GetValue (str(level), str(1), GTV_INT):
+	SpellLearnTable = table
+	SpellsToMemoTable = GemRB.LoadTable (table)
+	if not SpellsToMemoTable.GetValue (str(level), str(1), GTV_INT):
 		if chargen:
 			if GameCheck.IsBG2():
 				GemRB.SetNextScript("GUICG6")
@@ -178,24 +178,33 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 
+	# adjust the table for the amount of spells available for learning for free
+	# bg2 had SPLSRCKN, iwd2 also SPLBRDKN, but all the others lacked the tables
+	if SpellLearnTable == "MXSPLSOR":
+		SpellLearnTable = "SPLSRCKN"
+	elif SpellLearnTable == "MXSPLBRD":
+		SpellLearnTable = "SPLBRDKN"
+	# ... which is also important for mages during chargen and then never again
+	elif SpellLearnTable == "MXSPLWIZ":
+		SpellLearnTable = "SPLWIZKN"
+	else:
+		print "OpenSpellsWindow: unhandled spell learning type encountered, falling back to memo table:", table
+	SpellLearnTable = GemRB.LoadTable (SpellLearnTable)
+
 	AlreadyShown = 0
 	for i in range (9):
 		# make sure we always have a value to minus (bards)
-		SecondPoints = SpellsKnownTable.GetValue (str(level-diff), str(i+1), GTV_INT)
-		if not SecondPoints:
-			SecondPoints = 0
+		SecondPoints = SpellsToMemoTable.GetValue (str(level-diff), str(i+1), GTV_INT)
 
 		# make sure we get more spells of each class before continuing
-		SpellsSelectPointsLeft[i] = SpellsKnownTable.GetValue (str(level), str(i+1), GTV_INT) - SecondPoints
+		SpellsSelectPointsLeft[i] = SpellsToMemoTable.GetValue (str(level), str(i+1), GTV_INT) - SecondPoints
+		if SpellsSelectPointsLeft[i] <= 0:
+			continue
+		SpellsSelectPointsLeft[i] = SpellLearnTable.GetValue (str(level), str(i+1), GTV_INT)
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
 		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
 			# specialists get an extra spell per level
-			SpellsSelectPointsLeft[i] += 1
-
-		# chargen character seem to get more spells per level (this is kinda dirty hack)
-		# except sorcerers
-		if chargen and not IWD2 and not Spellbook.HasSorcererBook (pc, Class):
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level

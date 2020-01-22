@@ -2329,11 +2329,11 @@ int fx_cure_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 
 // 0x2F Cure:Invisible
 // 0x74 Cure:Invisible2
-
 int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	if (!STATE_GET(STATE_NONDET)) {
+	Game *game = core->GetGame();
+	if (!STATE_GET(STATE_NONDET) && !game->StateOverrideFlag && !game->StateOverrideTime) {
 		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
 		} else {
@@ -3437,7 +3437,11 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
-			gold = fx->Parameter1;
+			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+				gold = (ieDword) -fx->Parameter1;
+			} else {
+				gold = fx->Parameter1;
+			}
 			break;
 		case MOD_ABSOLUTE:
 			gold = fx->Parameter1-game->PartyGold;
@@ -4287,7 +4291,6 @@ int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x8B DisplayString
-// gemrb extension: rgb colour for displaystring
 // gemrb extension: resource may be an strref list (src or 2da)
 
 int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -4317,7 +4320,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
+		displaymsg->DisplayStringName(fx->Parameter1, DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -4391,6 +4394,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			sca->XPos+=fx->PosX;
 			sca->YPos+=fx->PosY;
 		}
+		sca->ZPos += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2<32) {
 			int tmp = fx->Parameter2>>2;
 			if (tmp) {
@@ -4577,7 +4581,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_find_traps(%2d)", fx->Opcode);
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword id = target->GetGlobalID();
-	ieDword range = target->GetStat(IE_VISUALRANGE) * VOODOO_FINDTRAP_RANGE;
+	ieDword range = target->GetStat(IE_VISUALRANGE) / 2;
 	ieDword skill;
 	bool detecttraps = true;
 
@@ -4609,7 +4613,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Door* door = TMap->GetDoor( Count++ );
 		if (!door)
 			break;
-		if (Distance(door->Pos, target->Pos)<range) {
+		if (WithinRange(target, door->Pos, range)) {
 			door->TryDetectSecret(skill, id);
 			if (detecttraps && door->Visible()) {
 			//when was door trap noticed
@@ -4627,7 +4631,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Container* container = TMap->GetContainer( Count++ );
 		if (!container)
 			break;
-		if (Distance(container->Pos, target->Pos)<range) {
+		if (WithinRange(target, container->Pos, range)) {
 			//when was door trap noticed
 			container->DetectTrap(skill, id);
 		}
@@ -4639,7 +4643,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		InfoPoint* trap = TMap->GetInfoPoint( Count++ );
 		if (!trap)
 			break;
-		if (Distance(trap->Pos, target->Pos)<range) {
+		if (WithinRange(target, trap->Pos, range)) {
 			//when was door trap noticed
 			trap->DetectTrap(skill, id);
 		}
@@ -4667,8 +4671,17 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		target->DestroySelf();
 		break;
 	case 1: //chunky death
-		target->NewBase(IE_HITPOINTS,(ieDword) -100, MOD_ABSOLUTE);
+		target->LastDamageType |= DAMAGE_CHUNKING;
+		target->NewBase(IE_HITPOINTS, (ieDword) -100, MOD_ABSOLUTE);
 		target->Die(Owner);
+		// we also have to remove any party members or their corpses will stay around
+		if (target->InParty) {
+			int slot = core->GetGame()->LeaveParty(target);
+			core->GetGame()->DelNPC(slot);
+			target->SetPersistent(-1);
+		}
+		target->SetBase(IE_MC_FLAGS, target->GetBase(IE_MC_FLAGS) & ~MC_KEEP_CORPSE);
+		// CheckOnDeath will do the actual chunking
 		break;
 	case 2: //normal death
 		target->Die(Owner);
@@ -5913,6 +5926,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is the bg2 style stoneskin, not normally using spell states
 	//but this way we can support hybrid games
+	// TODO: EE uses this as a switch to roll for the amount of skins (add GF_; is Parameter1 ever 0 in this cases?)
 	if (fx->Parameter2) {
 		target->SetSpellState(SS_IRONSKIN);
 		//gradient for iron skins?
@@ -6615,6 +6629,8 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_drain_items (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_drain_items(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) return FX_NOT_APPLIED;
+
 	ieDword i=fx->Parameter1;
 	while (i--) {
 		//deplete magic item = 0
@@ -7207,7 +7223,7 @@ int fx_set_traps_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_to_hit_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_to_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	HandleBonus( target, IE_HITBONUS, fx->Parameter1, fx->TimingMode );
+	STAT_MOD(IE_HITBONUS);
 	return FX_PERMANENT;
 }
 
@@ -7683,7 +7699,7 @@ int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_magical_rest(%2d)", fx->Opcode);
 	//instant, full rest
-	target->Rest(0);
+	target->Rest(8);
 	target->fxqueue.RemoveAllEffects(fx_fatigue_ref);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FATIGUE);
 	return FX_NOT_APPLIED;

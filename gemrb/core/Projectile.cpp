@@ -534,7 +534,7 @@ bool Projectile::FailedIDS(Actor *target) const
 			if (caster) {
 				//TODO move this to Actor
 				//TODO some projectiles use melee attack (fist), others use projectile attack
-				//this apparently depends on the spell's spell form (normal vs. projectile)
+				//this apparently depends on the spell's SpellForm (normal vs. projectile)
 				int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
 				if (roll==1) {
 					return true; //critical failure
@@ -580,57 +580,60 @@ void Projectile::Payload()
 	// either the caster, or the original target of the spell
 	// which are probably both nowhere near the projectile at this point
 	// all effects are applied as the projectile travels
-	if((ExtFlags&PEF_CONTINUE) == 0)
-	{
-		Actor *target;
-		Scriptable *Owner;
+	if (ExtFlags & PEF_CONTINUE) {
+		delete effects;
+		effects = NULL;
+		return;
+	}
 
-		if (Target) {
-			target = GetTarget();
+	Actor *target;
+	Scriptable *Owner;
+
+	if (Target) {
+		target = GetTarget();
+	} else {
+		//the target will be the original caster
+		//in case of single point area target (dimension door)
+		if (FakeTarget) {
+			target = area->GetActorByGlobalID(FakeTarget);
+			if (!target) {
+				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
+			}
 		} else {
-			//the target will be the original caster
-			//in case of single point area target (dimension door)
-			if (FakeTarget) {
-				target = area->GetActorByGlobalID(FakeTarget);
-				if (!target) {
-					target = core->GetGame()->GetActorByGlobalID(FakeTarget);
-				}
-			} else {
-				target = area->GetActorByGlobalID(Caster);
-			}
+			target = area->GetActorByGlobalID(Caster);
 		}
+	}
 
-		if (target) {
-			Owner = area->GetScriptableByGlobalID(Caster);
-			if (!Owner) {
-				Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
-				Owner = target;
+	if (target) {
+		Owner = area->GetScriptableByGlobalID(Caster);
+		if (!Owner) {
+			Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
+			Owner = target;
+		}
+		//apply this spell on target when the projectile fails
+		if (FailedIDS(target)) {
+			if (FailSpell[0]) {
+				if (Target) {
+					core->ApplySpell(FailSpell, target, Owner, Level);
+				} else {
+					//no Target, using the fake target as owner
+					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+				}
 			}
-			//apply this spell on target when the projectile fails
-			if (FailedIDS(target)) {
-				if (FailSpell[0]) {
-					if (Target) {
-						core->ApplySpell(FailSpell, target, Owner, Level);
-					} else {
-						//no Target, using the fake target as owner
-						core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
-					}
-				}
-			} else {
-				//apply this spell on the target when the projectile succeeds
-				if (SuccSpell[0]) {
-					core->ApplySpell(SuccSpell, target, Owner, Level);
-				}
+		} else {
+			//apply this spell on the target when the projectile succeeds
+			if (SuccSpell[0]) {
+				core->ApplySpell(SuccSpell, target, Owner, Level);
+			}
 
-				if(ExtFlags&PEF_RGB) {
-					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-						RGB >> 8, RGB >> 16, RGB >> 24);
-				}
+			if(ExtFlags&PEF_RGB) {
+				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+					RGB >> 8, RGB >> 16, RGB >> 24);
+			}
 
-				if (effects) {
-					effects->SetOwner(Owner);
-					effects->AddAllEffects(target, Destination);
-				}
+			if (effects) {
+				effects->SetOwner(Owner);
+				effects->AddAllEffects(target, Destination);
 			}
 		}
 	}
@@ -1189,7 +1192,7 @@ void Projectile::SecondaryTarget()
 		extension_targetcount = 1;
 	}
 
-	int radius = Extension->ExplosionRadius;
+	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	std::vector<Actor *>::iterator poi;
 	for (poi = actors.begin(); poi != actors.end(); ++poi) {
@@ -1286,6 +1289,12 @@ int Projectile::Update()
 	if (pause) {
 		return 1;
 	}
+
+	Game *game = core->GetGame();
+	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+		return 1;
+	}
+
 	//recreate path if target has moved
 	if(Target) {
 		SetTarget(Target, false);
@@ -1675,7 +1684,14 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
 	Game *game = core->GetGame();
 	PathNode *iter = path;
-	Sprite2D *frame = travel[face]->NextFrame();
+	Sprite2D *frame;
+	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+		frame = travel[face]->LastFrame();
+		flag |= BLIT_GREY;
+	} else {
+		frame = travel[face]->NextFrame();
+	}
+
 	Color tint2 = tint;
 	if (game) game->ApplyGlobalTint(tint2, flag);
 	while(iter) {
@@ -1761,22 +1777,25 @@ void Projectile::DrawTravel(const Region& viewport)
 	if (ExtFlags&PEF_POP) {
 			//draw pop in/hold/pop out animation sequences
 			Sprite2D *frame;
-			
-			if(ExtFlags&PEF_UNPOP) {
-				frame = shadow[0]->NextFrame();
-				if(shadow[0]->endReached) {
-					ExtFlags&=~PEF_UNPOP;
-				}
+			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+				frame = travel[face]->LastFrame();
+				flags |= BLIT_GREY;
 			} else {
-				frame = travel[0]->NextFrame();
-				if(travel[0]->endReached) {
-					travel[0]->playReversed=true;
-					travel[0]->SetPos(0);
-					ExtFlags|=PEF_UNPOP;
+				if (ExtFlags&PEF_UNPOP) {
 					frame = shadow[0]->NextFrame();
+					if (shadow[0]->endReached) {
+						ExtFlags &= ~PEF_UNPOP;
+					}
+				} else {
+					frame = travel[0]->NextFrame();
+					if (travel[0]->endReached) {
+						travel[0]->playReversed = true;
+						travel[0]->SetPos(0);
+						ExtFlags |= PEF_UNPOP;
+						frame = shadow[0]->NextFrame();
+					}
 				}
 			}
-
 			Draw(frame, pos, flags, tint2);
 			return;
 	}
@@ -1804,7 +1823,13 @@ void Projectile::DrawTravel(const Region& viewport)
 		}
 	} else {
 		if (travel[face]) {
-			Sprite2D *frame = travel[face]->NextFrame();
+			Sprite2D *frame;
+			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
+				frame = travel[face]->LastFrame();
+				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
+			} else {
+				frame = travel[face]->NextFrame();
+			}
 			Draw(frame, pos, flags, tint2);
 		}
 	}

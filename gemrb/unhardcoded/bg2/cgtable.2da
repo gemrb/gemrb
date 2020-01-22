@@ -12,8 +12,8 @@ UNUSED7     *          *
 UNUSED8     *          *
 NECROMANCY  CGNecrom   07
 ALTERATION  CGAltera   08
-ENCHANTMENT CGEnchan   02
-ABJURATION  CGAbjura   05
+ENCHANTMENT CGEnchan   05
+ABJURATION  CGAbjura   02
 ILLUSION    CGIllusi   01
 CONJURATION CGConjur   03
 INVOCATION  CGInvoca   06

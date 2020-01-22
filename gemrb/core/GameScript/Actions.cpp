@@ -1841,9 +1841,6 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	if (ret) {
 		*poi = '*';
 	}
-	if (parameters->int0Parameter == SONG_BATTLE) {
-		core->GetGame()->CombatCounter = 150;
-	}
 }
 
 //starts the current area music (songtype is in int0Parameter)
@@ -1909,7 +1906,7 @@ void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0, GEM_SND_RELATIVE);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1954,7 +1951,9 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
-	//actor->InternalFlags |= IF_CLEANUP;
+	if (actor == core->GetCutSceneRunner()) {
+		core->SetCutSceneMode(false);
+	}
 }
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
@@ -4932,8 +4931,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	//max. shouting distance, please adjust it if you know better
-	map->Shout(actor, parameters->int0Parameter, VOODOO_SHOUT_RANGE);
+	map->Shout(actor, parameters->int0Parameter, false);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
@@ -4947,8 +4945,8 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	// 0 means unlimited shout distance
-	map->Shout(actor, parameters->int0Parameter, 0);
+	// true means global, unlimited, shout distance
+	map->Shout(actor, parameters->int0Parameter, true);
 }
 
 void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
@@ -4958,7 +4956,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	}
 	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
-	map->Shout((Actor *) Sender, 0, VOODOO_SHOUT_RANGE);
+	map->Shout((Actor *) Sender, 0, false);
 }
 
 void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
@@ -6236,6 +6234,13 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 	}
 
 	ip->InitTriggers();
+	// we also need to reset the IF_INTRAP bit for any actors that are inside or subsequent triggers will be skipped
+	// there are only two users of this action, so we can be a bit sloppy and skip the geometry checks
+	std::vector<Actor *> nearActors = Sender->GetCurrentArea()->GetAllActorsInRadius(ip->Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, MAX_OPERATING_DISTANCE);
+	std::vector<Actor *>::iterator candidate;
+	for (candidate = nearActors.begin(); candidate != nearActors.end(); ++candidate) {
+		(*candidate)->SetInTrap(false);
+	}
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)

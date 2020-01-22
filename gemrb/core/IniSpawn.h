@@ -113,12 +113,15 @@ struct CritterEntry {
 class SpawnEntry {
 public:
 	ieDword interval;
+	ieDword lastSpawndate;
 	int crittercount;
 	CritterEntry *critters;
+	char *name;
 	SpawnEntry() {
-		interval = 0;
+		interval = lastSpawndate = 0;
 		crittercount = 0;
 		critters = NULL;
+		name = NULL;
 	}
 	~SpawnEntry() {
 		if (critters) {
@@ -127,6 +130,7 @@ public:
 			}
 			delete[] critters;
 		}
+		free(name);
 	}
 };
 
@@ -158,7 +162,6 @@ private:
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
-	ieDword last_spawndate;
 	int eventcount;
 	SpawnEntry *eventspawns;
 	ieDword detail_level;

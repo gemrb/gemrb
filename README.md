@@ -43,8 +43,6 @@ Architectures and platforms that successfully run or ran GemRB:
 
 If you have something to add to the list or if an entry doesn't work any more, do let us know!
 
-g++ 4.3 is known to miscompile gemrb.
-
 ## Requirements
 
 See the INSTALL [file](https://github.com/gemrb/gemrb/blob/master/INSTALL).

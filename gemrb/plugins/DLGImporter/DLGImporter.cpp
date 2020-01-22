@@ -373,6 +373,10 @@ static char** GetStrings(char* string, unsigned int& count)
 		if (*poi == '.' && *(poi+1) == ',') {
 			poi++;
 		}
+		// pst/d300mer8.dlg: TransformPartyItem("Tankard", "TankardF",1,0,0);\r\nSetGlobal("Mebbeth_Quest","GLOBAL",10)
+		if (!strncmp(poi, ";\r\nSetGlobal", 12)) {
+			poi++;
+		}
 		int len = GetActionLength( poi );
 		if((*poi=='/') && (*(poi+1)=='/') ) {
 			poi+=len;

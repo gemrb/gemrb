@@ -145,7 +145,6 @@ GameControl::~GameControl()
 //so it doesn't cause problems with the original engine
 void GameControl::ReadFormations()
 {
-	unsigned int i,j;
 	AutoTable tab("formatio");
 	if (!tab) {
 		// fallback
@@ -155,12 +154,12 @@ void GameControl::ReadFormations()
 	}
 	formationcount = tab->GetRowCount();
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for(i=0; i<formationcount; i++) {
-		for(j=0;j<FORMATIONSIZE;j++) {
-			short k=(short) atoi(tab->QueryField(i,j*2));
-			formations[i][j].x=k;
-			k=(short) atoi(tab->QueryField(i,j*2+1));
-			formations[i][j].y=k;
+	for (unsigned int i = 0; i < formationcount; i++) {
+		for (unsigned int j = 0; j < FORMATIONSIZE; j++) {
+			short k = (short) atoi(tab->QueryField(i, j*2));
+			formations[i][j].x = k;
+			k = (short) atoi(tab->QueryField(i, j*2+1));
+			formations[i][j].y = k;
 		}
 	}
 }
@@ -345,7 +344,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	const Color& color = (flash) ? GlobalColorCycle.Blend(ColorWhite, green) : green;
 
 	p = p - vpOrigin;
-	// TODO: 0.5 and 0.7 are pretty much random values
+	// NOTE: 0.5 and 0.7 are pretty much random values
 	// right segment
 	core->GetVideoDriver()->DrawEllipseSegment( p + Point(offset, 0),
 											   xradius, yradius, color, -0.5, 0.5, true);
@@ -436,8 +435,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	// FIXME: some of this should happen during mouse events
 	// setup outlines
 	InfoPoint *i;
-	unsigned int idx;
-	for (idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
 		if (overInfoPoint == i && target_mode) {
 			if (i->VisibleTrap(0)) {
@@ -459,7 +457,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// FIXME: some of this should happen during mouse events
 	Door *d;
-	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
+	for (size_t idx = 0; (d = area->TMap->GetDoor(idx)); idx++) {
 		d->Highlight = false;
 		if (d->Flags & DOOR_HIDDEN) {
 			continue;
@@ -498,7 +496,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// FIXME: some of this should happen during mouse events
 	Container *c;
-	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); idx++) {
 		if (c->Flags & CONT_DISABLED) {
 			continue;
 		}
@@ -537,13 +535,10 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 		if (actor) {
 			std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-			std::vector<Actor*>::iterator monster;
-
-			for (monster = monsters.begin(); monster != monsters.end(); ++monster) {
-				Actor *target = *monster;
-				if (target->InParty) continue;
-				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(target->Pos, ColorBlack);
+			for (auto monster : monsters) {
+				if (monster->IsPartyMember()) continue;
+				if (monster->GetStat(IE_NOTRACKING)) continue;
+				DrawArrowMarker(monster->Pos, ColorBlack);
 			}
 		} else {
 			trackerID = 0;
@@ -885,10 +880,9 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				}
 				break;
 			case 'j': //teleports the selected actors
-				for (size_t i = 0; i < game->selected.size(); i++) {
-					Actor* actor = game->selected[i];
-					actor->ClearActions();
-					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, gameMousePos, -1, true);
+				for (Actor *selectee : game->selected) {
+					selectee->ClearActions();
+					MoveBetweenAreasCore(selectee, core->GetGame()->CurrentArea, gameMousePos, -1, true);
 				}
 				break;
 			case 'k': //kicks out actor
@@ -1761,6 +1755,13 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
+	// pst has no aura pollution
+	bool aural = true;
+	if (spellCount >= 1000) {
+		spellCount -= 1000;
+		aural = false;
+	}
+
 	if (!spellCount) {
 		ResetTargetMode();
 		return; //not casting or using an own item
@@ -1805,6 +1806,9 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
+		if (!aural) {
+			action->int2Parameter |= UI_NOAURA;
+		}
 		//for multi-shot items like BG wand of lightning
 		if (spellCount) {
 			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
@@ -1983,6 +1987,42 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	return true;
 }
 
+// list of allowed area and exit combinations in pst that trigger worldmap travel
+static std::map<std::string, std::vector<std::string>> pstWMapExits {
+	{"ar0100", {"to0300", "to0200", "to0101"}},
+	{"ar0101", {"to0100"}},
+	{"ar0200", {"to0100", "to0301", "to0400"}},
+	{"ar0300", {"to0100", "to0301", "to0400"}},
+	{"ar0301", {"to0200", "to0300"}},
+	{"ar0400", {"to0200", "to0300"}},
+	{"ar0500", {"to0405", "to0600"}},
+	{"ar0600", {"to0500"}}
+};
+
+// pst: determine if we need to trigger worldmap travel, since it had it's own system
+// eg. it doesn't use the searchmap for this in ar0500 when travelling globally
+// has to be a plain travel region and on the whitelist
+bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
+{
+	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
+
+	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+	if (!teamMoved) return false;
+
+	teamMoved = false;
+	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
+	if (wmapExits != pstWMapExits.end()) {
+		for (std::string exit : wmapExits->second) {
+			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+				teamMoved = true;
+				break;
+			}
+		}
+	}
+
+	return teamMoved;
+}
+
 /** Mouse Button Up */
 bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
@@ -2108,30 +2148,27 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 	Game* game = core->GetGame();
 
 	// construct a sorted party
-	// TODO: this is still ugly, help?
 	std::vector<Actor *> party;
 	// first, from the actual party
 	int max = game->GetPartySize(false);
-	for(int idx = 1; idx<=max; idx++) {
+	for (int idx = 1; idx <= max; idx++) {
 		Actor *act = game->FindPC(idx);
 		assert(act);
-		if(act->IsSelected()) {
+		if (act->IsSelected()) {
 			party.push_back(act);
 		}
 	}
-
-	//summons etc
-	for (size_t i = 0; i < game->selected.size(); i++) {
-		Actor *act = game->selected[i];
-		if (!act->InParty) {
-			party.push_back(act);
+	// then summons etc.
+	for (Actor *selected : game->selected) {
+		if (!selected->InParty) {
+			party.push_back(selected);
 		}
 	}
 	
 	if (party.empty())
 		return;
 
-	//party formation movement
+	// party formation movement
 	Point src;
 	Point move = p;
 	if (isFormationRotation) {
@@ -2140,37 +2177,30 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 		src = party[0]->Pos;
 	}
 
-	for(unsigned int i = 0; i < party.size(); i++) {
-		Actor* actor = party[i];
-			// don't stop the party if we're trying to add a waypoint
-			if (!(Mod & GEM_MOD_SHIFT)) {
-				actor->Stop();
-			}
+	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
+	for (size_t i = 0; i < party.size(); i++) {
+		Actor *actor = party[i];
+		// don't stop the party if we're just trying to add a waypoint
+		if (!(Mod & GEM_MOD_SHIFT)) {
+			actor->Stop();
+		}
 
-		if (i || party.size() > 1) {
+		if (party.size() > 1) {
 			Map* map = actor->GetCurrentArea();
 			move = GetFormationPoint(map, i, src, p);
 		}
 		CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
+		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
+		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
 	}
 
-	//p is a searchmap travel region
-	// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500)
-	bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
-	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || (overInfoPoint && overInfoPoint->Type == ST_TRAVEL && teamMoved)) {
+	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
+	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
 		char Tmp[256];
-		sprintf( Tmp, "NIDSpecial2()" );
-		if (teamMoved) {
-			// not clearing the queue means one can exit the worldmap and travel like it wasn't there
-			// remove if necessary
-			// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
-			party[0]->AddActionInFront(GenerateAction(Tmp));
-		} else {
-			party[0]->AddAction(GenerateAction(Tmp));
-		}
+		sprintf(Tmp, "NIDSpecial2()");
+		party[0]->AddAction(GenerateAction(Tmp));
 	}
 }
-
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
 	// gc uses the opposite direction
@@ -2189,15 +2219,12 @@ void GameControl::Scroll(const Point& amt)
 void GameControl::PerformActionOn(Actor *actor)
 {
 	Game* game = core->GetGame();
-	unsigned int i;
 
 	//determining the type of the clicked actor
-	ieDword type;
-
-	type = actor->GetStat(IE_EA);
-	if ( type >= EA_EVILCUTOFF || type == EA_GOODBUTRED ) {
+	ieDword type = actor->GetStat(IE_EA);
+	if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 		type = ACT_ATTACK; //hostile
-	} else if ( type > EA_CHARMED ) {
+	} else if (type > EA_CHARMED) {
 		type = ACT_TALK; //neutral
 	} else {
 		type = ACT_NONE; //party
@@ -2215,10 +2242,8 @@ void GameControl::PerformActionOn(Actor *actor)
 		type = ACT_THIEVING;
 	}
 
-	if (type != ACT_NONE) {
-		if(!actor->ValidTarget(target_types)) {
-			return;
-		}
+	if (type != ACT_NONE && !actor->ValidTarget(target_types)) {
+		return;
 	}
 
 	//we shouldn't zero this for two reasons in case of spell or item
@@ -2264,29 +2289,27 @@ void GameControl::PerformActionOn(Actor *actor)
 			break;
 		case ACT_ATTACK:
 			//all of them attacks the red circled actor
-			for(i=0;i<game->selected.size();i++) {
-				TryToAttack(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToAttack(selectee, actor);
 			}
 			break;
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToCast(source, actor);
 				}
 			}
 			break;
 		case ACT_DEFEND:
-			for(i=0;i<game->selected.size();i++) {
-				TryToDefend(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToDefend(selectee, actor);
 			}
 			break;
 		case ACT_THIEVING:
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToPick(source, actor);
 				}
 			}

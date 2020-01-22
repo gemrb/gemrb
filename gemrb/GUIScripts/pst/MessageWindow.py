@@ -85,17 +85,6 @@ def OnLoad():
 	OpenButton = OptionsWindow.GetControl (10)
 	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
 
-	# Select all
-	Button = ActionsWindow.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
-
-	# Select all
-	Button = ActionsWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.ActionStopPressed)
-
-	FormationButton = ActionsWindow.GetControl (4)
-	FormationButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
-
 	GUICommonWindows.SetupClockWindowControls (ActionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
 

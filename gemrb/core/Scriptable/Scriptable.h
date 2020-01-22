@@ -98,6 +98,7 @@ class Sprite2D;
 #define IF_USEEXIT       0x1000 //
 #define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
 //#define IF_WASINDIALOG   0x4000 //actor just left dialog
+#define IF_PST_WMAPPING  0x8000 // trying to use the worldmap for travel
 
 //scriptable flags
 #define IF_ACTIVE        0x10000
@@ -369,7 +370,7 @@ private:
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
-	/* do some magic for the wierd/awesome wild surges */
+	/* do some magic for the weird/awesome wild surges */
 	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);

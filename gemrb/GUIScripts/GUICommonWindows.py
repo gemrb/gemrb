@@ -451,14 +451,18 @@ def SetupClockWindowControls (Window):
 	# Select all characters
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41659)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
 
 	# Formations
+	import GUIWORLD
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
 
 	return
 
@@ -1740,7 +1744,10 @@ def UpdateAnimatedPortrait (Window,i):
 	pic = GemRB.GetPlayerPortrait (i+1, 0)["ResRef"]
 	if not pic:
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetAnimation ("")
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		ButtonHP.SetText ("")
+		ButtonHP.SetBAM ("", 0, 0)
 		return
 
 	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
@@ -2019,5 +2026,7 @@ def RestPress ():
 		GemRB.SetTimedEvent (RealRestPress, 2)
 
 def RealRestPress ():
-	GemRB.RestParty(0, 0, 1)
+	# only bg2 has area-based rest movies
+	# outside movies start at 2, 1 is for inns
+	GemRB.RestParty(0, 0 if GameCheck.IsBG2() else 2, 1)
 	return

@@ -229,6 +229,7 @@ Interface::Interface()
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
 	FeedbackLevel = 0;
+	CutSceneRunner = NULL;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -2219,6 +2220,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"AnimatedDialog",	  //78GF_ANIMATED_DIALOG
 		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
 		"Happiness",          //80GF_HAPPINESS
+		"EfficientORTrigger", //81GF_EFFICIENT_OR
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -3164,6 +3166,12 @@ bool Interface::SaveConfig()
 	return true;
 }
 
+// this is more of a workaround than anything else
+// needed for cases where the script runner is gone before finishing his queue
+void Interface::SetCutSceneRunner(Scriptable *runner) {
+	CutSceneRunner = runner;
+}
+
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
@@ -3173,6 +3181,8 @@ void Interface::SetCutSceneMode(bool active)
 	}
 
 	ToggleViewsVisible(!active, "HIDE_CUT");
+
+	if (!active) SetCutSceneRunner(NULL);
 }
 
 /** returns true if in dialogue or cutscene */
@@ -4879,6 +4889,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
 	int mastertable = gamedata->LoadTable( tablename );
+	if (mastertable == -1) return -1;
 	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
@@ -4899,6 +4910,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			value = actor->GetSafeStat(stat);
 		}
 		int table = gamedata->LoadTable( tablename );
+		if (table == -1) continue;
 		Holder<TableMgr> tm = gamedata->GetTable( table );
 		if (!tm) continue;
 

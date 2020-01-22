@@ -341,6 +341,7 @@ static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
+static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd1 and iwd2
@@ -2884,13 +2885,19 @@ void Actor::PlayCritDamageAnimation(int type)
 	int row = tm->FindTableValue (1, type);
 	if (row>=0) {
 		//the animations are listed in column 0
-		AddAnimation(tm->QueryField(row, 0), -1, 0, AA_PLAYONCE);
+		AddAnimation(tm->QueryField(row, 0), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
 }
 
 void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
+	int flags = AA_PLAYONCE;
+	int height = 22;
+	if (pstflags) {
+		flags |= AA_BLEND;
+		height = 45; // empirical like in fx_visual_spell_hit
+	}
 
 	Log(COMBAT, "Actor", "Damage animation type: %d", type);
 
@@ -2906,38 +2913,38 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
 			if(hit) {
-				AddAnimation(d_main[type], i, 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], i, height, flags);
 			}
 			break;
 		case 4: case 5: case 6: //fire
 			if(hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			for(i=DL_FIRE;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
+				AddAnimation(d_splash[i], d_gradient[i], height, flags);
 			}
 			break;
 		case 7: case 8: case 9: //electricity
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
+				AddAnimation(d_splash[i], d_gradient[i], height, flags);
 			}
 			break;
 		case 10: case 11: case 12://cold
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 		case 13: case 14: case 15://acid
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 		case 16: case 17: case 18://disintegrate
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+				AddAnimation(d_main[type], d_gradient[type], height, flags);
 			}
 			break;
 	}
@@ -3648,7 +3655,10 @@ void Actor::UpdateFatigue()
 			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else {
-		DisablePortraitIcon(PI_FATIGUE);
+		// the icon can be added manually; eg. by spcl321 in bg2 (berserker enrage)
+		if (!fxqueue.HasEffectWithParam(fx_display_portrait_icon_ref, PI_FATIGUE)) {
+			DisablePortraitIcon(PI_FATIGUE);
+		}
 		FatigueComplaintDelay = 0;
 	}
 
@@ -4316,7 +4326,7 @@ void Actor::PlayExistenceSounds()
 	int xpos, ypos;
 	audio->GetListenerPos(xpos, ypos);
 	Point listener(xpos, ypos);
-	if (nextComment && !Immobile() && Distance(Pos, listener) <= VOODOO_SHOUT_RANGE) {
+	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
 		if (strref != (ieStrRef) -1) {
@@ -4445,7 +4455,7 @@ void Actor::GetHit(int damage, int spellLevel)
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
-		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
+		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP || HasSpellState(SS_NOAWAKE)) {
 			return;
 		}
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
@@ -5057,6 +5067,7 @@ void Actor::SetMap(Map *map)
 		InternalFlags &=~IF_CLEANUP;
 		return;
 	}
+	InternalFlags &= ~IF_PST_WMAPPING;
 
 	//These functions are called once when the actor is first put in
 	//the area. It already has all the items (including fist) at this
@@ -5482,6 +5493,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		killer = area->GetActorByGlobalID(LastHitter);
 	}
 
+	bool killerPC = false;
 	if (killer) {
 		if (killer->Type==ST_ACTOR) {
 			act = (Actor *) killer;
@@ -5489,6 +5501,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
 				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
 			}
+			killerPC = act->InParty > 0;
 		}
 	}
 
@@ -5565,6 +5578,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 
 	ieDword value = 0;
 	ieVariable varname;
+	if (InParty && killerPC) {
+		game->locals->SetAt("PM_KILLED", 1, nocreate);
+	}
 
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
@@ -5826,9 +5842,12 @@ bool Actor::CheckOnDeath()
 	//if chunked death, then return true
 	ieDword gore = 0;
 	core->GetDictionary()->Lookup("Gore", gore);
-	if (LastDamageType&DAMAGE_CHUNKING && gore) {
-		//play chunky animation
-		//chunks are projectiles
+	if (LastDamageType & DAMAGE_CHUNKING) {
+		if (gore) {
+			// TODO: play chunky animation #128
+			// chunks are projectiles
+		}
+		RemovalTime = time;
 		return true;
 	}
 	return false;
@@ -6988,11 +7007,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
-	if (raceID2Name.size()) {
-		if (raceID2Name.count(BaseStats[IE_RACE])) {
-			const char *raceName = raceID2Name[BaseStats[IE_RACE]];
-			prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
-		}
+	if (raceID2Name.count(BaseStats[IE_RACE])) {
+		const char *raceName = raceID2Name[BaseStats[IE_RACE]];
+		prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
 	}
 
 	if (third) {
@@ -7390,8 +7407,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	unsigned int weaponrange = GetWeaponRange(wi);
-	if ((PersonalDistance(this, target) > weaponrange) || (GetCurrentArea() != target->GetCurrentArea())) {
+	if (!WithinPersonalRange(this, target, GetWeaponRange(wi)) || (GetCurrentArea() != target->GetCurrentArea())) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -7574,35 +7590,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 int Actor::GetWeaponRange(const WeaponInfo &wi) const
 {
-	if (!wi.range) {
-		// hitting header lookup failed
-		return 0;
-	}
-
-	int rangemultiplier = VOODOO_WPN_RANGE1;
-	if (wi.wflags&WEAPON_RANGED) {
-		rangemultiplier = VOODOO_WPN_RANGE2;
-		// testing shows that the stored range is ignored and only two constants used, see #98
-		// TODO: store in a table instead, so it is moddable. itemdata.2da would fit, but currently only iwd2 has it
-		switch (wi.itemtype) {
-			case 0xf: // bow
-			case 0x1b: // xbow
-			case 0x12: // sling
-				rangemultiplier *= 100;
-				break;
-			case 0x10: // throwing dagger
-			case 0x15: // throwing hammer
-			case 0x18: // dart
-			case 0x19: // throwing axe (one even has a range of 1 set)
-				rangemultiplier *= 60;
-				break;
-			default:
-				rangemultiplier *= wi.range;
-				break;
-		}
-		return rangemultiplier;
-	}
-	return rangemultiplier * wi.range;
+	return std::min(wi.range, Modified[IE_VISUALRANGE]);
 }
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
@@ -7898,7 +7886,7 @@ void Actor::ApplyModal(ieResRef modalSpell)
 		// target actors around us manually
 		// used for iwd2 songs, as the spells don't use an aoe projectile
 		if (!area) return;
-		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)*VOODOO_SPL_RANGE_F);
+		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)/2);
 		std::vector<Actor *>::iterator neighbour;
 		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
 			core->ApplySpell(modalSpell, *neighbour, this, 0);
@@ -9165,7 +9153,7 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 	if (!vvc) {
 		return;
 	}
-	if (vvc->ZPos<0) {
+	if (vvc->YPos < 0) {
 		vvcCells=&vvcShields;
 	} else {
 		vvcCells=&vvcOverlays;
@@ -9546,6 +9534,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			} else {
 				// TODO: EEs add a bit to fx_melee for only applying with monk fists: parameter2 of 4 (no other value supported)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref);
+				// ignore timestop
+				pro->TFlags |= PTF_TIMELESS;
 			}
 			//AddEffect created a copy, the original needs to be scrapped
 			delete AttackEffect;
@@ -9793,6 +9783,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	long ret = 0;
 	//don't close this table, it can mess with the guiscripts
 	int table = gamedata->LoadTable(resref);
+	if (table == -1) return 0;
 	Holder<TableMgr> tm = gamedata->GetTable(table);
 	if (tm) {
 		unsigned int row;
@@ -10392,6 +10383,10 @@ bool Actor::CannotPassEntrance(ieDword exitID) const
 		return true;
 	}
 
+	if (InternalFlags & IF_PST_WMAPPING) {
+		return true;
+	}
+
 	if (InternalFlags&IF_USEEXIT) {
 		return false;
 	}
@@ -10645,7 +10640,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 		}
 	}
 
-	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby?15*10:GetSafeStat(IE_VISUALRANGE)*10, this);
+	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby ? VOODOO_VISUAL_RANGE/2 : GetSafeStat(IE_VISUALRANGE), this);
 	bool seeEnemy = false;
 
 	//we need to look harder if we look for seenby anyone
@@ -10731,7 +10726,7 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, 60, this);
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, VOODOO_VISUAL_RANGE/2, this);
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
 	bool checked = false;
@@ -11140,7 +11135,7 @@ bool Actor::ConcentrationCheck() const
 	if (Modified[IE_SPECFLAGS]&SPECF_DRIVEN) return true;
 
 	// anyone in a 5' radius?
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5*VOODOO_SPL_RANGE_F, this);
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5, this);
 	if (neighbours.size() == 0) return true;
 
 	// so there is someone out to get us and we should do the real concentration check
@@ -11235,7 +11230,9 @@ bool Actor::IsKitInactive() const
 
 	const int CLASS = 7;
 
-	Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+	int table = gamedata->LoadTable("kitlist");
+	if (table == -1) return false;
+	Holder<TableMgr> tm = gamedata->GetTable(table);
 	if (tm) {
 		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
 		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));

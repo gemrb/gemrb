@@ -32,6 +32,7 @@
 #include "TableMgr.h"
 #include "Video.h"
 #include "GameScript/GameScript.h"
+#include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "GUI/TextArea.h"
 
@@ -76,7 +77,8 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 
 	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 		String msg(L"\n[color=bcefbc]");
-		String* str = core->GetString(displaymsg->GetStringReference(STR_JOURNALCHANGE));
+		ieStrRef strJournalChange = displaymsg->GetStringReference(STR_JOURNALCHANGE);
+		String* str = core->GetString(strJournalChange);
 		msg += *str;
 		delete str;
 		str = core->GetString(tr->journalStrRef);
@@ -92,6 +94,9 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 		}
 		delete str;
 		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMarkupString(msg);
+		// pst also has a sound attached to the base string, so play it manually
+		// NOTE: this doesn't display the string anywhere
+		DisplayStringCore(core->GetGame(), strJournalChange, 0);
 	}
 }
 

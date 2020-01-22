@@ -41,15 +41,6 @@ static const int VOODOO_SPL_RANGE_F = 15;
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
 
-// factors for our guess for proper weapon ranges
-// long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
-// 400 units is about the normal sight range
-static const int VOODOO_WPN_RANGE1 = 10; // melee
-static const int VOODOO_WPN_RANGE2 = 4;  // ranged weapons
-
-// a multiplier for visual range that we use in the trap finding modal action/effect
-static const int VOODOO_FINDTRAP_RANGE = 10;
-
 // fx_casting_glow has hardcoded height offsets, while they should be avatar based
 // ypos_by_direction and xpos_by_direction
 
@@ -59,13 +50,6 @@ static const int VOODOO_FINDTRAP_RANGE = 10;
 // it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
 // The distance of operating a trigger, container, dialog buffer etc.
 static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square is 16x12 (diagonal of 20), so that's about two
-
-// used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
-// while it looks too big, it is needed this big in at least pst (help())
-// bgee testing shows a radius of 72 feet
-// In the EE Help() has the range of "visualrange" * 3 * (16 * (1 or 3/4 in the vertical)) == 3x visual range, converted via Feet2pixels
-// the '48' (3*16) default can be set by the 'Audible Range' game option in baldur.lua
-static const unsigned int VOODOO_SHOUT_RANGE = 400;
 
 // existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
 // while it should clearly always be delayed at least a bit. The engine uses randomization.

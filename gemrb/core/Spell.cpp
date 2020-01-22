@@ -44,6 +44,8 @@ static int pstflags = false;
 static int inited = false;
 SpellFocus *spellfocus = NULL;
 int schoolcount = 0;
+static EffectRef fx_damage_ref = { "Damage", -1 };
+static unsigned int damageOpcode = 0;
 
 static void InitSpellTables()
 {
@@ -93,6 +95,7 @@ Spell::Spell(void)
 	if (!inited) {
 		inited = true;
 		InitSpellTables();
+		damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	}
 	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
 	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
@@ -169,10 +172,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		//check if bg1
 		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
 			ieResRef s;
-			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0x9, g);
+			snprintf(s, 9, "CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
 			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0x63);
+			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, std::min(cgsound&0xff, 99));
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
@@ -231,7 +234,8 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		//the hostile flag is used to determine if this was an attack
 		fx->SourceFlags = Flags;
 		//pst spells contain a friendly flag in the spell header
-		if (pst_hostile) {
+		// while iwd spells never set this bit
+		if (pst_hostile || fx->Opcode == damageOpcode) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
 		fx->CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
@@ -341,15 +345,13 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	return std::min((unsigned int) seh->Range, limit);
 }
 
-static EffectRef fx_damage_ref = { "Damage", -1 };
 // checks if any of the extended headers contains fx_damage
 bool Spell::ContainsDamageOpcode() const
 {
-	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	for (int h=0; h< ExtHeaderCount; h++) {
 		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
 			Effect *fx = ext_headers[h].features+i;
-			if (fx->Opcode == damage_opcode) {
+			if (fx->Opcode == damageOpcode) {
 				return true;
 			}
 		}

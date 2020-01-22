@@ -283,7 +283,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 
 		#see if we can assign to this prof
 		if ClassWeaponsTable:
-			# this table has profs as rows, so ignore the wierd use of the column var
+			# this table has profs as rows, so ignore the weird use of the column var
 			# it also has different ordering than ProfsTable
 			col = ClassWeaponsTable.GetColumnIndex (ProfsTable.GetRowName(i))
 			maxprof = ClassWeaponsTable.GetValue (ProfsColumn, col)

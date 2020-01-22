@@ -57,3 +57,4 @@ Post-release:
 - [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
 - [ ] Update versions back to the `-git` suffix
 - [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
+- [ ] If the manpage changed, adapt the web copy (pandoc can convert it to markdown)

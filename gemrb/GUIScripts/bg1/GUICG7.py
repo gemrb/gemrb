@@ -19,24 +19,17 @@
 # character generation, mage spells (GUICG7)
 
 import GemRB
-from GUIDefines import *
-from ie_stats import *
 import GUICommon
-import Spellbook
 import CommonTables
 import LUSpellSelection
+from GUIDefines import *
+from ie_stats import *
 
 def OnLoad():
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "MAGESPELL")
-	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
-
-	# make sure we have a correct table
-	if Spellbook.IsSorcererBook (BookType):
-		# sorcerers need their known not max table or they would progress too slowly
-		TableName = "SPLSRCKN"
 
 	# get our kit
 	KitValue = GemRB.GetPlayerStat (Slot, IE_KIT)
@@ -51,7 +44,7 @@ def OnLoad():
 			if CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
-	Spellbook.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)
+
 	LUSpellSelection.OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1,False)
 
 	return

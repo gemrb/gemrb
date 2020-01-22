@@ -387,6 +387,7 @@ private:
 	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;
 	std::string Encoding;
+	Scriptable *CutSceneRunner;
 public:
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
@@ -485,6 +486,9 @@ public:
 	int Roll(int dice, int size, int add) const;
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
+	/** store the scriptable running the cutscene */
+	void SetCutSceneRunner(Scriptable *runner);
+	Scriptable *GetCutSceneRunner() const { return CutSceneRunner; };
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */

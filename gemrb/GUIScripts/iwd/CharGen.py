@@ -1905,11 +1905,11 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	GemRB.SetVar ("MageSpellBook", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
-	if len(Learnable)<1:
+	if len(Learnable) < 1 or GemRB.GetPlayerStat (MyChar, IE_CLASS) == 5: # no bards
 		MageSpellsDonePress()
 		return
 
-	if k>0:
+	if k & ~0x4000 > 0:
 		MageSpellsSelectPointsLeft = 3
 	else:
 		MageSpellsSelectPointsLeft = 2
@@ -2022,6 +2022,11 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	if MageMemorizePointsLeft<1 or len(Learnable)<1:
 		MageMemorizeDonePress()
 		return
+
+	# one more spell for specialists
+	k = GemRB.GetPlayerStat (MyChar, IE_KIT)
+	if k & ~0x4000 > 0:
+		MageMemorizePointsLeft = MageMemorizePointsLeft + 1
 
 	PointsLeftLabel = MageMemorizeWindow.GetControl (0x1000001b)
 	PointsLeftLabel.SetUseRGB (1)
