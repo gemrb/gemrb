@@ -45,10 +45,17 @@ SelectedBook = 0
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
 
 def OpenSpellBookWindow ():
-	global SpellBookWindow, OptionsWindow, PortraitWindow
+	global SpellBookWindow, OptionsWindow, PortraitWindow, SpellBookSpellInfoWindow, SpellBookSpellUnmemorizeWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenSpellBookWindow):
+		if SpellBookSpellInfoWindow:
+			SpellBookSpellInfoWindow.Unload ()
+			SpellBookSpellInfoWindow = None
+		if SpellBookSpellUnmemorizeWindow:
+			SpellBookSpellUnmemorizeWindow.Unload ()
+			SpellBookSpellUnmemorizeWindow = None
+
 		if SpellBookWindow:
 			SpellBookWindow.Unload ()
 		if OptionsWindow:
@@ -273,7 +280,7 @@ def GetMemorizedSpellsCount (total=False):
 	if total:
 		count = 'KnownCount' # all
 
-	counts = map (lambda x: (x[count] & x[count]) or 1, MemorizedSpellList)
+	counts = map (lambda x: max(x[count], 1), MemorizedSpellList)
 	return sum(counts)
 
 def SpellBookPrevPress ():

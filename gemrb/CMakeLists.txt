@@ -79,7 +79,11 @@ ELSE(APPLE)
 	ADD_SUBDIRECTORY( docs )
 	ADD_SUBDIRECTORY( tests )
 
-	ADD_EXECUTABLE(gemrb GemRB.cpp )
+	IF(WIN32)
+		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../windows/window.rc)
+	ELSE(WIN32)
+		ADD_EXECUTABLE(gemrb GemRB.cpp )
+	ENDIF()
 
 	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" GemRB.cfg.noinstall.sample DESTINATION ${EXAMPLE_CONF_DIR} )
 ENDIF(APPLE)

@@ -691,8 +691,6 @@ def GetStatOverview (pc):
 				lines = 0
 
 	return "\n".join (res)
-	pass
-
 
 def OpenInformationWindow ():
 	global InformationWindow

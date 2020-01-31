@@ -737,7 +737,7 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 
 bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 {
-	if (streams[stream].free || !streams[stream].locked)
+	if (stream < 0 || streams[stream].free || !streams[stream].locked)
 		return false;
 	streams[stream].locked = false;
 	if (!HardStop) {
@@ -754,7 +754,7 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 
 //This one is used for movies and ambients.
 int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
-		            ieWord gain, bool point, bool Ambient )
+		            ieWord gain, bool point, int ambientRange)
 {
 	// Find a free (or finished) stream for this sound
 	int stream = -1;
@@ -780,7 +780,8 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	alSourcef( source, AL_PITCH, 1.0f );
 	alSourcefv( source, AL_POSITION, position );
 	alSourcef( source, AL_GAIN, 0.01f * gain );
-	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+	// AL_REFERENCE_DISTANCE is the distance under which the volume would normally drop by half
+	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? ambientRange : REFERENCE_DISTANCE);
 	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
 	alSourcei( source, AL_LOOPING, 0 );
 	checkALError("Unable to set stream parameters", WARNING);
@@ -788,7 +789,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	streams[stream].Buffer = 0;
 	streams[stream].Source = source;
 	streams[stream].free = false;
-	streams[stream].ambient = Ambient;
+	streams[stream].ambient = ambientRange > 0;
 	streams[stream].locked = true;
 
 	return stream;
@@ -899,14 +900,12 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const
 				return AL_FORMAT_MONO8;
 			else
 				return AL_FORMAT_MONO16;
-			break;
 
 		case 2:
 			if (bits == 8)
 				return AL_FORMAT_STEREO8;
 			else
 				return AL_FORMAT_STEREO16;
-			break;
 	}
 	return AL_FORMAT_MONO8;
 }
@@ -934,35 +933,32 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					driver->MusicPlaying = false;
 					return -1;
 				case AL_INITIAL:
-					 {
-						Log(MESSAGE, "OPENAL", "Music in INITIAL State. AutoStarting");
-						// ensure that MusicSource has no buffers attached by passing "NULL" buffer
-						alSourcei(driver->MusicSource, AL_BUFFER, 0);
-						checkALError("Unable to detach buffers from music source.", WARNING);
-						for (int i = 0; i < MUSICBUFFERS; i++) {
-							driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
-							alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
-								driver->music_memory, ACM_BUFFERSIZE,
-								driver->MusicReader->get_samplerate() );
-						}
-						checkALError("Unable to buffer data.", ERROR);
-						// FIXME: determine if we should error out if any data fails to buffer
-						alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
-						if (!checkALError("Unable to queue buffer.", ERROR)) {
-							if (driver->MusicSource && alIsSource( driver->MusicSource )) {
-								alSourcePlay( driver->MusicSource );
-								if (!checkALError("Error playing music source", ERROR)) {
-									// no errors happened
-									bFinished = AL_FALSE;
-									break;
-								}
+					Log(MESSAGE, "OpenAL", "Music in INITIAL State. AutoStarting");
+					// ensure that MusicSource has no buffers attached by passing "NULL" buffer
+					alSourcei(driver->MusicSource, AL_BUFFER, 0);
+					checkALError("Unable to detach buffers from music source.", WARNING);
+					for (int i = 0; i < MUSICBUFFERS; i++) {
+						driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
+						alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
+							driver->music_memory, ACM_BUFFERSIZE,
+							driver->MusicReader->get_samplerate() );
+					}
+					checkALError("Unable to buffer data.", ERROR);
+					// FIXME: determine if we should error out if any data fails to buffer
+					alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
+					if (!checkALError("Unable to queue buffer.", ERROR)) {
+						if (driver->MusicSource && alIsSource( driver->MusicSource )) {
+							alSourcePlay( driver->MusicSource );
+							if (!checkALError("Error playing music source", ERROR)) {
+								// no errors happened
+								bFinished = AL_FALSE;
+								break;
 							}
 						}
-						// if all had gone well we would have broken out
-						driver->MusicPlaying = false;
-						return -1;
 					}
-					break;
+					// if all had gone well we would have broken out
+					driver->MusicPlaying = false;
+					return -1;
 				case AL_STOPPED:
 					Log(MESSAGE, "OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback");
 					if (driver->MusicSource && alIsSource( driver->MusicSource )) {

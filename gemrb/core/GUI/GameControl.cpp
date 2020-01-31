@@ -129,7 +129,6 @@ GameControl::GameControl(const Region& frame)
 //so it doesn't cause problems with the original engine
 void GameControl::ReadFormations()
 {
-	unsigned int i,j;
 	AutoTable tab("formatio");
 	if (!tab) {
 		// fallback
@@ -139,12 +138,12 @@ void GameControl::ReadFormations()
 	}
 	formationcount = tab->GetRowCount();
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for(i=0; i<formationcount; i++) {
-		for(j=0;j<FORMATIONSIZE;j++) {
-			short k=(short) atoi(tab->QueryField(i,j*2));
-			formations[i][j].x=k;
-			k=(short) atoi(tab->QueryField(i,j*2+1));
-			formations[i][j].y=k;
+	for (unsigned int i = 0; i < formationcount; i++) {
+		for (unsigned int j = 0; j < FORMATIONSIZE; j++) {
+			short k = (short) atoi(tab->QueryField(i, j*2));
+			formations[i][j].x = k;
+			k = (short) atoi(tab->QueryField(i, j*2+1));
+			formations[i][j].y = k;
 		}
 	}
 }
@@ -298,8 +297,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 {
 	Video* video = core->GetVideoDriver();
 
-	//p.x-=viewport.x;
-	//p.y-=viewport.y;
 	ieDword draw = 0;
 	if (p.x<viewport.x) {
 		p.x=viewport.x;
@@ -314,7 +311,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
 
 	tmp = spr->Width;
-	//tmp = core->ArrowSprites[0]->Width;
 
 	if (p.x>viewport.x+viewport.w-tmp) {
 		p.x=viewport.x+viewport.w;//-tmp;
@@ -322,7 +318,6 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	}
 
 	tmp = spr->Height;
-	//tmp = core->ArrowSprites[0]->Height;
 
 	if (p.y>viewport.y+viewport.h-tmp) {
 		p.y=viewport.y+viewport.h;//-tmp;
@@ -366,7 +361,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	}
 
 	Region viewport = core->GetVideoDriver()->GetViewport();
-	// TODO: 0.5 and 0.7 are pretty much random values
+	// NOTE: 0.5 and 0.7 are pretty much random values
 	// right segment
 	core->GetVideoDriver()->DrawEllipseSegment( p.x + step - viewport.x, p.y - viewport.y, xradius,
 								yradius, color, -0.5, 0.5 );
@@ -414,8 +409,7 @@ void GameControl::DrawInternal(Region& screen)
 
 	// setup outlines
 	InfoPoint *i;
-	unsigned int idx;
-	for (idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
 		if (overInfoPoint == i && target_mode) {
 			if (i->VisibleTrap(0)) {
@@ -435,7 +429,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	Door *d;
-	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
+	for (size_t idx = 0; (d = area->TMap->GetDoor(idx)); idx++) {
 		d->Highlight = false;
 		if (d->Flags & DOOR_HIDDEN) {
 			continue;
@@ -473,7 +467,7 @@ void GameControl::DrawInternal(Region& screen)
 	}
 
 	Container *c;
-	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); idx++) {
 		if (c->Flags & CONT_DISABLED) {
 			continue;
 		}
@@ -510,16 +504,12 @@ void GameControl::DrawInternal(Region& screen)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-
-			int i = 0;
-			while(monsters[i]) {
-				Actor *target = monsters[i++];
-				if (target->InParty) continue;
-				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, target->Pos, viewport, ColorBlack);
+			std::vector<Actor *> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
+			for (auto monster : monsters) {
+				if (monster->IsPartyMember()) continue;
+				if (monster->GetStat(IE_NOTRACKING)) continue;
+				DrawArrowMarker(screen, monster->Pos, viewport, ColorBlack);
 			}
-			free(monsters);
 		} else {
 			trackerID = 0;
 		}
@@ -733,9 +723,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
-
-	if (!game)
-		return false;
+	if (!game) return false;
 
 	if (DialogueFlags&DF_IN_DIALOG) {
 		if (Mod) return false;
@@ -852,10 +840,9 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 			case 'j': //teleports the selected actors
-				for (i = 0; i < game->selected.size(); i++) {
-					Actor* actor = game->selected[i];
-					actor->ClearActions();
-					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
+				for (Actor *selectee : game->selected) {
+					selectee->ClearActions();
+					MoveBetweenAreasCore(selectee, core->GetGame()->CurrentArea, p, -1, true);
 				}
 				break;
 			case 'k': //kicks out actor
@@ -1099,8 +1086,12 @@ void GameControl::DisplayTooltip() {
 					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
 					// normal tooltips
 					if (actor->InParty) {
-						// in party: display hp
-						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						// in party: display hp unless instructed otherwise
+						if (actor->HasVisibleHP()) {
+							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						} else {
+							snprintf(buffer, 100, "%s\n?", name);
+						}
 					} else if (neutral) {
 						// neutral: display name only
 						snprintf(buffer, 100, "%s", name);
@@ -1336,6 +1327,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 
+		// don't change the cursor for birds
+		if (lastActor && (lastActor->GetStat(IE_DONOTJUMP) == DNJ_BIRD)) return;	
+		
 		if (lastActor) {
 			lastActorID = lastActor->GetGlobalID();
 			lastActor->SetOver( true );
@@ -1637,9 +1631,10 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1651,6 +1646,13 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 void GameControl::TryToCast(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
+
+	// pst has no aura pollution
+	bool aural = true;
+	if (spellCount >= 1000) {
+		spellCount -= 1000;
+		aural = false;
+	}
 
 	if (!spellCount) {
 		ResetTargetMode();
@@ -1696,9 +1698,13 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		if (!aural) {
+			action->int2Parameter |= UI_NOAURA;
+		}
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1906,13 +1912,46 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	}
 }
 
+// list of allowed area and exit combinations in pst that trigger worldmap travel
+static std::map<std::string, std::vector<std::string>> pstWMapExits {
+	{"ar0100", {"to0300", "to0200", "to0101"}},
+	{"ar0101", {"to0100"}},
+	{"ar0200", {"to0100", "to0301", "to0400"}},
+	{"ar0300", {"to0100", "to0301", "to0400"}},
+	{"ar0301", {"to0200", "to0300"}},
+	{"ar0400", {"to0200", "to0300"}},
+	{"ar0500", {"to0405", "to0600"}},
+	{"ar0600", {"to0500"}}
+};
+
+// pst: determine if we need to trigger worldmap travel, since it had it's own system
+// eg. it doesn't use the searchmap for this in ar0500 when travelling globally
+// has to be a plain travel region and on the whitelist
+bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
+{
+	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
+
+	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+	if (!teamMoved) return false;
+
+	teamMoved = false;
+	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
+	if (wmapExits != pstWMapExits.end()) {
+		for (std::string exit : wmapExits->second) {
+			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+				teamMoved = true;
+				break;
+			}
+		}
+	}
+
+	return teamMoved;
+}
+
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
-	unsigned int i;
-	char Tmp[256];
-
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
@@ -1931,14 +1970,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
 		if (count != 0) {
-			for (i = 0; i < highlighted.size(); i++)
+			for (size_t i = 0; i < highlighted.size(); i++)
 				highlighted[i]->SetOver( false );
 			highlighted.clear();
 			game->SelectActor( NULL, false, SELECT_NORMAL );
-			for (i = 0; i < count; i++) {
-				// FIXME: should call handler only once
-				game->SelectActor( ab[i], true, SELECT_NORMAL );
+			for (size_t i = 0; i < count; i++) {
+				game->SelectActor(ab[i], true, SELECT_QUIET);
 			}
+			core->SetEventFlag(EF_SELECTION);
 		}
 		free( ab );
 		DrawSelectionRect = false;
@@ -2023,55 +2062,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 formation_handling:
 	if (doMove && game->selected.size() > 0) {
-		// construct a sorted party
-		// TODO: this is still ugly, help?
-		std::vector<Actor *> party;
-		// first, from the actual party
-		int max = game->GetPartySize(false);
-		for(int idx = 1; idx<=max; idx++) {
-			Actor *act = game->FindPC(idx);
-			if(act->IsSelected()) {
-				party.push_back(act);
-			}
-		}
-		//summons etc
-		for (i = 0; i < game->selected.size(); i++) {
-			Actor *act = game->selected[i];
-			if (!act->InParty) {
-				party.push_back(act);
-			}
-		}
-
-		//party formation movement
-		Point src;
-		if (FormationRotation) {
-			p = ClickPoint;
-			src = FormationApplicationPoint;
-		} else {
-			src = party[0]->Pos;
-		}
-		Point move = p;
-
-		for(i = 0; i < party.size(); i++) {
-			actor = party[i];
-			// don't stop the party if we're trying to add a waypoint
-			if (!(Mod & GEM_MOD_SHIFT)) {
-				actor->Stop();
-			}
-
-			if (i || party.size() > 1) {
-				Map* map = actor->GetCurrentArea();
-				move = GetFormationPoint(map, i, src, p);
-			}
-			CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
-		}
-		if (DoubleClick) Center(x,y);
-
-		//p is a searchmap travel region
-		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
-			sprintf( Tmp, "NIDSpecial2()" );
-			party[0]->AddAction( GenerateAction( Tmp) );
-		}
+		ExecuteMovement(actor, x, y, Mod & GEM_MOD_SHIFT);
 	} else if (actor) {
 		if (actor->GetStat(IE_EA)<EA_CHARMED
 			&& target_mode == TARGET_MODE_NONE) {
@@ -2083,6 +2074,65 @@ formation_handling:
 	}
 	FormationRotation = false;
 	core->GetEventMgr()->FakeMouseMove();
+}
+
+void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint)
+{
+	Game *game = core->GetGame();
+	Point p(x,y);
+	core->GetVideoDriver()->ConvertToGame(p.x, p.y);
+
+	// construct a sorted party
+	std::vector<Actor *> party;
+	// first, from the actual party
+	int max = game->GetPartySize(false);
+	for (int idx = 1; idx <= max; idx++) {
+		Actor *act = game->FindPC(idx);
+		if (act->IsSelected()) {
+			party.push_back(act);
+		}
+	}
+	// then summons etc.
+	for (Actor *selected : game->selected) {
+		if (!selected->InParty) {
+			party.push_back(selected);
+		}
+	}
+
+	// party formation movement
+	Point src;
+	if (FormationRotation) {
+		p = ClickPoint;
+		src = FormationApplicationPoint;
+	} else {
+		src = party[0]->Pos;
+	}
+	Point move = p;
+
+	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
+	for (size_t i = 0; i < party.size(); i++) {
+		actor = party[i];
+		// don't stop the party if we're just trying to add a waypoint
+		if (!createWaypoint) {
+			actor->Stop();
+		}
+
+		if (party.size() > 1) {
+			Map* map = actor->GetCurrentArea();
+			move = GetFormationPoint(map, i, src, p);
+		}
+		CreateMovement(actor, move, createWaypoint);
+		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
+		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
+	}
+	if (DoubleClick) Center(x, y);
+
+	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
+	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
+		char Tmp[256];
+		sprintf(Tmp, "NIDSpecial2()");
+		party[0]->AddAction(GenerateAction(Tmp));
+	}
 }
 
 void GameControl::OnMouseWheelScroll(short x, short y)
@@ -2104,15 +2154,12 @@ void GameControl::OnMouseWheelScroll(short x, short y)
 void GameControl::PerformActionOn(Actor *actor)
 {
 	Game* game = core->GetGame();
-	unsigned int i;
 
 	//determining the type of the clicked actor
-	ieDword type;
-
-	type = actor->GetStat(IE_EA);
-	if ( type >= EA_EVILCUTOFF || type == EA_GOODBUTRED ) {
+	ieDword type = actor->GetStat(IE_EA);
+	if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 		type = ACT_ATTACK; //hostile
-	} else if ( type > EA_CHARMED ) {
+	} else if (type > EA_CHARMED) {
 		type = ACT_TALK; //neutral
 	} else {
 		type = ACT_NONE; //party
@@ -2130,10 +2177,8 @@ void GameControl::PerformActionOn(Actor *actor)
 		type = ACT_THIEVING;
 	}
 
-	if (type != ACT_NONE) {
-		if(!actor->ValidTarget(target_types)) {
-			return;
-		}
+	if (type != ACT_NONE && !actor->ValidTarget(target_types)) {
+		return;
 	}
 
 	//we shouldn't zero this for two reasons in case of spell or item
@@ -2179,29 +2224,27 @@ void GameControl::PerformActionOn(Actor *actor)
 			break;
 		case ACT_ATTACK:
 			//all of them attacks the red circled actor
-			for(i=0;i<game->selected.size();i++) {
-				TryToAttack(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToAttack(selectee, actor);
 			}
 			break;
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToCast(source, actor);
 				}
 			}
 			break;
 		case ACT_DEFEND:
-			for(i=0;i<game->selected.size();i++) {
-				TryToDefend(game->selected[i], actor);
+			for (Actor *selectee : game->selected) {
+				TryToDefend(selectee, actor);
 			}
 			break;
 		case ACT_THIEVING:
 			if (game->selected.size()==1) {
-				Actor *source;
-				source = core->GetFirstSelectedActor();
-				if(source) {
+				Actor *source = core->GetFirstSelectedActor();
+				if (source) {
 					TryToPick(source, actor);
 				}
 			}
@@ -2241,7 +2284,6 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 	if (!game) return false;
 	int partysize = game->GetPartySize(false);
 	
-	int pm;
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
 	switch (Key) {
@@ -2262,7 +2304,7 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_TAB:
 			// show partymember hp/maxhp as overhead text
-			for (pm=0; pm < partysize; pm++) {
+			for (int pm = 0; pm < partysize; pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
 				pc->DisplayHeadHPRatio();
@@ -2290,8 +2332,6 @@ bool GameControl::OnSpecialKeyPress(unsigned char Key)
 
 void GameControl::CalculateSelection(const Point &p)
 {
-	unsigned int i;
-
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
@@ -2311,11 +2351,12 @@ void GameControl::CalculateSelection(const Point &p)
 		}
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
-		for (i = 0; i < highlighted.size(); i++)
-			highlighted[i]->SetOver( false );
+		for (Actor *highlightee : highlighted) {
+			highlightee->SetOver(false);
+		}
 		highlighted.clear();
 		if (count != 0) {
-			for (i = 0; i < count; i++) {
+			for (size_t i = 0; i < count; i++) {
 				ab[i]->SetOver( true );
 				highlighted.push_back( ab[i] );
 			}
@@ -2505,7 +2546,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 			areaname = pc->Area;
 		}
 		game->GetMap( areaname, true );
-		ScreenFlags|=SF_CENTERONACTOR;
+		if (!core->InCutSceneMode()) {
+			// don't interfere with any scripted moves of the viewport
+			// checking core->timer->ViewportIsMoving() is not enough
+			ScreenFlags |= SF_CENTERONACTOR;
+		}
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {

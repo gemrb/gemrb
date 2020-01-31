@@ -25,10 +25,12 @@
 import GemRB
 import GUICommon
 import GUICommonWindows
+import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
 WorldMapWindow = None
+WorldMapControl = None
 PosX = 0
 PosY = 0
 
@@ -57,7 +59,7 @@ def OpenMapWindow ():
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -150,7 +152,7 @@ def OpenWorldMapWindow ():
 	return
 
 def WorldMapWindowCommon (Travel):
-	global WorldMapWindow
+	global WorldMapWindow, WorldMapControl
 
 	GemRB.HideGUI()
 
@@ -158,6 +160,7 @@ def WorldMapWindowCommon (Travel):
 		if WorldMapWindow:
 			WorldMapWindow.Unload ()
 		WorldMapWindow = None
+		WorldMapControl = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.UnhideGUI ()
@@ -170,15 +173,16 @@ def WorldMapWindowCommon (Travel):
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
 
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "FONTDLG")
-	WMap = Window.GetControl (4)
-	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0x84, 0x4a, 0x2c, 0x00)
-	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, 0x20, 0x20, 0x00, 0xff)
-	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)
-	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, 0x20, 0x20, 0x00, 0xa0)
-	WMap.SetAnimation ("WMPTY")
+	WorldMapControl = Window.GetControl (4)
+	WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0x84, 0x4a, 0x2c, 0x00)
+	WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, 0x20, 0x20, 0x00, 0xff)
+	WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)
+	WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, 0x20, 0x20, 0x00, 0xa0)
+	WorldMapControl.SetAnimation ("WMPTY")
 	#center on current area
-	WMap.AdjustScrolling (0,0)
-	WMap.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WorldMapControl.AdjustScrolling (0,0)
+	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done
 	Button = Window.GetControl (0)

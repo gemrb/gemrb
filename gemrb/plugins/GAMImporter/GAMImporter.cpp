@@ -357,7 +357,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->ReadWord( &pcInfo.ViewXPos );
 	str->ReadWord( &pcInfo.ViewYPos );
 	str->ReadWord( &pcInfo.ModalState ); //see Modal.ids
-	str->ReadWord( &pcInfo.Happiness );
+	str->ReadWordSigned( &pcInfo.Happiness );
 	for (i=0; i<MAX_INTERACT; i++) {
 		str->ReadDword( &pcInfo.Interact[i] ); //interact counters
 	}
@@ -1140,7 +1140,7 @@ void GAMImporter::GetMazeEntry(void *memory)
 {
 	maze_entry *h = (maze_entry *) memory;
 
-	str->ReadDword( &h->override );
+	str->ReadDword( &h->me_override );
 	str->ReadDword( &h->valid );
 	str->ReadDword( &h->accessible );
 	str->ReadDword( &h->trapped );
@@ -1171,7 +1171,7 @@ void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
 void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
 {
 	maze_entry *h = (maze_entry *) memory;
-	stream->WriteDword( &h->override );
+	stream->WriteDword( &h->me_override );
 	stream->WriteDword( &h->valid );
 	stream->WriteDword( &h->accessible );
 	stream->WriteDword( &h->trapped );

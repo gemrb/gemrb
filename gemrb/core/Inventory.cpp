@@ -361,7 +361,6 @@ void Inventory::KillSlot(unsigned int index)
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		error("Inventory", "Invalid item: %s!", item->ItemResRef);
-		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
@@ -565,7 +564,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	}
 }
 
-int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
+int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 {
 	int twohanded = item->Flags&IE_INV_ITEM_TWOHANDED;
 	if (slot >= 0) {
@@ -575,7 +574,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		//check for equipping weapons
-		if (WhyCantEquip(slot,twohanded)) {
+		if (WhyCantEquip(slot, twohanded, ranged)) {
 			return ASI_FAILED;
 		}
 
@@ -1773,7 +1772,7 @@ inline bool Inventory::TwoHandedInSlot(int slot) const
 	return false;
 }
 
-int Inventory::WhyCantEquip(int slot, int twohanded) const
+int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 {
 	// check only for hand slots
 	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
@@ -1786,7 +1785,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 		return STR_MAGICWEAPON;
 	}
 
-	//can't equip in shield slot if a weapon slot is twohanded
+	//can't equip in shield slot if a weapon slot is twohanded or ranged
 	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
 		//see GetShieldSlot
 		int otherslot;
@@ -1799,6 +1798,9 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 			if (TwoHandedInSlot(i)) {
 				return STR_TWOHANDED_USED;
 			}
+			if (ranged) {
+				return STR_NO_RANGED_OFFHAND;
+			}
 		}
 	}
 
@@ -1807,10 +1809,8 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
 				return STR_NOT_IN_OFFHAND;
 			}
-		} else {
-			if (slot==SLOT_LEFT) {
-				return STR_NOT_IN_OFFHAND;
-			}
+		} else if (slot == SLOT_LEFT) {
+			return STR_NOT_IN_OFFHAND;
 		}
 		if (IsSlotBlocked(slot)) {
 		//cannot equip two handed while shield slot is in use?

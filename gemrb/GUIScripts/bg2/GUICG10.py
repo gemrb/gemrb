@@ -130,4 +130,4 @@ def RedrawMCs():
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClassPress)
-		Button.SetVarAssoc("Class", MCRowIndices[i-2][0]+1) #multiclass, actually; just a wierd system
+		Button.SetVarAssoc("Class", MCRowIndices[i-2][0]+1) # multiclass, actually; just a weird system

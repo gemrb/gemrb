@@ -47,20 +47,21 @@ class Spell;
 class Sprite2D;
 class SpriteCover;
 
-#define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
 
 /** The distance between PC's who are about to enter a new area */
 #define MAX_TRAVELING_DISTANCE      400
 
-#define SCR_OVERRIDE 0
-#define SCR_AREA	 1
-#define SCR_SPECIFICS 2
-#define SCR_RESERVED  3
-#define SCR_CLASS    4
-#define SCR_RACE	 5
-#define SCR_GENERAL  6
-#define SCR_DEFAULT  7
+// script levels / slots (scrlev.ids)
+#define SCR_OVERRIDE  0
+#define SCR_AREA      1 // iwd2: special 1
+#define SCR_SPECIFICS 2 // iwd2: team
+#define SCR_RESERVED  3 // iwd2: pc-customizable scripts were saved here
+#define SCR_CLASS     4 // iwd2: special 2
+#define SCR_RACE      5 // iwd2: combat
+#define SCR_GENERAL   6 // iwd2: special 3
+#define SCR_DEFAULT   7 // iwd2: movement
+#define MAX_SCRIPTS   8
 
 //pst trap flags (portal)
 #define PORTAL_CURSOR 1
@@ -98,6 +99,7 @@ class SpriteCover;
 #define IF_USEEXIT       0x1000 //
 #define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
 //#define IF_WASINDIALOG   0x4000 //actor just left dialog
+#define IF_PST_WMAPPING  0x8000 // trying to use the worldmap for travel
 
 //scriptable flags
 #define IF_ACTIVE        0x10000
@@ -280,6 +282,7 @@ public:
 	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
 
 	ieDword LastTarget, LastSpellTarget;
+	ieDword LastTargetPersistent; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
 	Point LastTargetPos;
 	int SpellHeader;
 	ieResRef SpellResRef;
@@ -343,10 +346,10 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellResRef, bool verbose=true);
+	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellResRef);
+	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
 	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
@@ -368,7 +371,7 @@ private:
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
-	/* do some magic for the wierd/awesome wild surges */
+	/* do some magic for the weird/awesome wild surges */
 	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);
@@ -386,6 +389,7 @@ public:
 	Color overColor;
 	Sprite2D *circleBitmap[2];
 	int size;
+	float sizeFactor;
 private:
 	// current SpriteCover for wallgroups
 	SpriteCover* cover;
@@ -396,7 +400,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
+	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
 	/* store SpriteCover */
 	void SetSpriteCover(SpriteCover* c);
@@ -427,7 +431,7 @@ public:
 	//play this wav file when stepping on the trap (on PST)
 	ieResRef EnterWav;
 public:
-	bool IsOver(const Point &Pos) const;
+	bool IsOver(const Point &Place) const;
 	void DrawOutline() const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
@@ -488,15 +492,8 @@ public:
 		return StanceID;
 	}
 
-	inline void SetOrientation(int value, bool slow) {
-		//MAX_ORIENT == 16, so we can do this
-		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
-		if (!slow) {
-			Orientation = NewOrientation;
-		}
-	}
-
 	void SetStance(unsigned int arg);
+	void SetOrientation(int value, bool slow);
 	void SetAttackMoveChances(ieWord *amc);
 	virtual bool DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);

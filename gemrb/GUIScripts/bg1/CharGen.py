@@ -17,15 +17,14 @@
 #
 #
 #character generation (GUICG 0)
-from GUIDefines import *
 
 import CharGenCommon
 import CharGenGui
 
 def init():
 	print("init")
-		#(name,control,text)
-		#(name,script | setFn,commentFn,unsetFn,gaurd)
+	# (name, control, text)
+	# (name, script | setFn, commentFn, unsetFn, guard)
 	stages = [
 	("gender"	 , 0		, 11956		),
 	("Show name, create player" , None    ,CharGenGui.getName, CharGenGui.unsetPlayer,  CharGenGui.setPlayer ),

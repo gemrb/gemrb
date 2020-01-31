@@ -12,6 +12,10 @@ Full changelog digest:
 NEWS entry
 [/code]
 
+Thanks to everyone that contributed their time, including:
+git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
+https://github.com/mntnr/name-your-contributors is preferred
+
 (Optionally link or copy also the release notes)
 
 ******************* MODDING RING ********************
@@ -28,7 +32,3 @@ For SF, just remove all of the BBCode.
 
 https://sourceforge.net/p/gemrb/news/new
 
-******************** LGDB ******************
-http://www.lgdb.org/game/gemrb
-Visit the project page and submit an update (version, changelog). Choose
-"edit current" on the top and scroll through the form to get to the relevant part.

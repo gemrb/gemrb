@@ -51,6 +51,8 @@ public:
 	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */
 	void SetBackGround(Sprite2D* back);
+	/** Inserts text at the current cursor position */
+	void InsertText(const String&);
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Draws the Console on the Output Display */

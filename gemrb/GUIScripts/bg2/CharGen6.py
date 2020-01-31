@@ -31,8 +31,7 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 
 	# nullify our thieving skills
-	LUSkillsSelection.SkillsNullify ()
-	LUSkillsSelection.SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify (MyChar)
 
 	# nullify our proficiencies
 	LUProfsSelection.ProfsNullify ()

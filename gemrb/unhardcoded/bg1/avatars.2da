@@ -105,7 +105,7 @@
 0x6211     CEFW1      CEFW2      CEFW3      CEFW4      6          2          0          M
 0x6212     CDMW1      CDMW2      CDMW3      CDMW4      6          2          0          S
 0x6213     CDMW1      CDMW2      CDMW3      CDMW4      6          2          0          S
-0x6214     CDMW1      CIFW2      CIFW3      CIFW4      6          2          0          S
+0x6214     CDMW1      CDFW2      CDFW3      CDFW4      6          2          0          S
 0x6215     CHFW1      CHFW2      CHFW3      CHFW4      6          2          0          L
 0x6300     CHMT1      CHMT2      CHMT2      CHMT2      6          2          0          L
 0x6301     CEMT1      CEMT2      CEMT2      CEMT2      6          2          0          M
@@ -149,6 +149,7 @@
 0x7500     MDOP       MDOP       MDOP       MDOP       14         2          1          *
 0x7501     MDOP       MDOP       MDOP       MDOP       14         2          GR         *
 0x7600     METT       METT       METT       METT       14         2          1          *
+0x7700     MGHL       MGHL       MGHL       MGHL       14         2          1          *
 0x7701     MGHL       MGHL       MGHL       MGHL       14         2          1          *
 0x7702     MGHL       MGHL       MGHL       MGHL       14         2          RE         *
 0x7703     MGHL       MGHL       MGHL       MGHL       14         2          GA         *
@@ -240,12 +241,12 @@
 0xB600     NNOM       NNOM       NNOM       NNOM       18         2          0          *
 0xB610     NNOW       NNOW       NNOW       NNOW       18         2          0          *
 0xB700     NSLV       NSLV       NSLV       NSLV       18         2          0          *
-0xC000     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC000     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC100     ACAT       ACAT       ACAT       ACAT       3          1          1          *
 0xC200     ACHK       ACHK       ACHK       ACHK       3          1          1          *
 0xC300     ARAT       ARAT       ARAT       ARAT       3          1          1          *
 0xC400     ASQU       ASQU       ASQU       ASQU       3          1          1          *
-0xC500     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC500     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC600     NBEG       NBEG       NBEG       NBEG       18         2          0          *
 0xC610     NPRO       NPRO       NPRO       NPRO       18         2          0          *
 0xC700     NBOY       NBOY       NBOY       NBOY       18         2          0          *

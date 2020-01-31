@@ -27,7 +27,7 @@
 dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
-AC_INIT(gemrb, 0.8.5-git)
+AC_INIT(gemrb, 0.8.6-git)
 
 AC_MSG_WARN([
 

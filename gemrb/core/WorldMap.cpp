@@ -146,6 +146,7 @@ WorldMap::WorldMap(void)
 	encounterArea = -1;
 	Width = Height = 0;
 	MapNumber = AreaName = 0;
+	Flags = 0;
 	unknown1 = unknown2 = 0;
 }
 
@@ -447,9 +448,9 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;
-	print("Gathering path information for: %s", AreaName);
+	Log(DEBUG, "WorldMap", "Gathering path information for: %s", AreaName);
 	while (GotHereFrom[i]!=-1) {
-		print("Adding path to %d", i);
+		Log(DEBUG, "WorldMap", "Adding path to %d", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
 		if (i==(ieDword) -1) {
@@ -457,7 +458,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		}
 	}
 
-	print("Walkpath size is: %d",(int) walkpath.size());
+	Log(DEBUG, "WorldMap", "Walkpath size is: %d", (int) walkpath.size());
 	if (walkpath.empty()) {
 		return NULL;
 	}
@@ -470,7 +471,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 			encounter=true;
 			break;
 		}
-		p++;
+		++p;
 	}
 	while(p!=walkpath.rend() );
 	return lastpath;
@@ -590,7 +591,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
-	print("Updated Area visibility: %s(visited, accessible and visible)", AreaName);
+	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", AreaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 	if (direction<0 || direction>3)
@@ -600,7 +601,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
-			print("Updated Area visibility: %s(accessible, and visible)", ae2->AreaName);
+			Log(DEBUG, "WorldMap", "Updated Area visibility: %s (accessible and visible)", ae2->AreaName);
 			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 		}
 	}

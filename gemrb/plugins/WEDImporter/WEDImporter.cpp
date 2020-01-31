@@ -297,8 +297,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 
 	str->Seek (PolygonsOffset, GEM_STREAM_START);
 	
-	ieDword i; //msvc6.0 isn't ISO compatible, so this variable cannot be declared in 'for'
-	for (i=0;i<polygonCount;i++) {
+	for (ieDword i=0; i < polygonCount; i++) {
 		str->ReadDword ( &PolygonHeaders[i].FirstVertex);
 		str->ReadDword ( &PolygonHeaders[i].CountVertex);
 		str->ReadWord ( &PolygonHeaders[i].Flags);
@@ -308,7 +307,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 		str->ReadWord ( &PolygonHeaders[i].MaxY);
 	}
 
-	for (i=0;i<polygonCount;i++) {
+	for (ieDword i=0; i < polygonCount; i++) {
 		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
 		//compose polygon
 		ieDword count = PolygonHeaders[i].CountVertex;

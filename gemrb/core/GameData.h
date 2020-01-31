@@ -29,15 +29,14 @@
 #include "Cache.h"
 #include "Holder.h"
 #include "ResourceManager.h"
+#include "TableMgr.h"
 
 #include <map>
 #include <vector>
 
-#ifdef _MSC_VER // No SFINAE
-#include "TableMgr.h"
-#endif
-
 namespace GemRB {
+
+static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 class Actor;
 struct Effect;
@@ -115,6 +114,8 @@ public:
 	// itemsnd.2da functions
 	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
+
+	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
 private:
 	void ReadItemSounds();
 private:
@@ -127,6 +128,7 @@ private:
 	typedef std::map<const char*, Store*, iless> StoreMap;
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
+	AutoTable raceTHAC0Bonus;
 };
 
 extern GEM_EXPORT GameData * gamedata;

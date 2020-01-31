@@ -59,6 +59,7 @@ class StringBuffer;
 #define DS_SPEECH  64
 #define DS_AREA    128
 #define DS_QUEUE   256
+#define DS_CIRCLE  512
 
 //verbal constant (bg2), we have a lookup table (vcremap) for other games
 #define VB_INITIALMEET 0
@@ -103,11 +104,6 @@ class StringBuffer;
 //#define VB_EXISTANCE_4 73
 #define VB_BIO       74
 
-//diffmode (iwd2)
-#define DM_EQUAL   1
-#define DM_LESS    2
-#define DM_GREATER 3
-
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1
 #define MSO_IGNORE_INVALID 2
@@ -133,6 +129,8 @@ class StringBuffer;
 #define SC_INSTANT      16
 #define SC_AURA_CHECK   32
 #define SC_NOINTERRUPT  64
+
+#define ACF_REALLOW_SCRIPTS 1
 
 //trigger flags stored in triggers in .bcs files
 #define TF_NEGATE  1   //negate trigger result
@@ -308,6 +306,7 @@ public:
 		} else {
 			RefCount = 1; //one reference hold by the script
 		}
+		flags = 0;
 	}
 	~Action()
 	{
@@ -327,6 +326,7 @@ public:
 	int int2Parameter;
 	char string0Parameter[65];
 	char string1Parameter[65];
+	unsigned short flags;
 private:
 	int RefCount;
 public:
@@ -612,6 +612,7 @@ public: //Script Functions
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
 	static int ChargeCount(Scriptable* Sender, Trigger* parameters);
 	static int CharName(Scriptable* Sender, Trigger* parameters);
+	static int CheckAreaDiffLevel(Scriptable* /*Sender*/, Trigger* parameters);
 	static int CheckDoorFlags(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyAverageLevel(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyLevel(Scriptable* Sender, Trigger* parameters);
@@ -791,7 +792,6 @@ public: //Script Functions
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NearSavedLocation(Scriptable* Sender, Trigger* parameters);
-	static int NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/);
 	static int NightmareModeOn(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
@@ -961,6 +961,7 @@ public:
 	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
+	static void AddXPVar(Scriptable *Sender, Action* parameters);
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
@@ -1289,7 +1290,6 @@ public:
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SelectWeaponAbility(Scriptable* Sender, Action* parameters);
 	static void SendTrigger(Scriptable* Sender, Action* parameters);
-	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);

@@ -183,6 +183,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			c<<=1;
 			if (gettwin) c++;
 			//this is needed for PST twin animations that contain 2 or 3 phases
+			assert(p < 3);
 			p*=MAX_ORIENT;
 		} else if (type&FIVE) {
 			c=SixteenToFive[c];
@@ -191,6 +192,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			c=SixteenToNine[c];
 			if ((i&15)>=9) mirror = true;
 		} else if (!(type&SEVENEYES)) {
+			assert(p < 3);
 			p*=MAX_ORIENT;
 		}
 
@@ -264,7 +266,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->ReadDword( &tmp );
 	XPos = (signed) tmp;
 	stream->ReadDword( &tmp );  //this affects visibility
-	ZPos = (signed) tmp;
+	YPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 
@@ -273,7 +275,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	YPos = (signed) tmp;
+	ZPos = (signed) tmp;
 	stream->ReadDword( &LightX );
 	stream->ReadDword( &LightY );
 	stream->ReadDword( &LightZ );
@@ -604,7 +606,14 @@ retry:
 		Phase++;
 		goto retry;
 	}
-	frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+
+	Game *game = core->GetGame();
+	if (game && game->IsTimestopActive()) {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->LastFrame();
+		return false;
+	} else {
+		frame = anims[Phase*MAX_ORIENT+Orientation]->NextFrame();
+	}
 
 	//explicit duration
 	if (Phase==P_HOLD) {
@@ -676,7 +685,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
 
-	if (Transparency & IE_VVC_GREYSCALE) {
+	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
 		flag |= BLIT_GREY;
 	}
 

@@ -286,9 +286,9 @@ void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 }
 
 int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
-			ieWord gain, bool point, bool Ambient)
+			ieWord gain, bool point, int ambientRange)
 {
-	if (Ambient) {
+	if (ambientRange) {
 		// TODO: ambient sounds
 		return -1;
 	}

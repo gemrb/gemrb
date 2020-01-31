@@ -7,6 +7,7 @@
 #cmakedefine HAVE_SIZEOF_SSIZE_T 1
 #cmakedefine HAVE_STRNDUP 1
 #cmakedefine HAVE_STRLCPY 1
+#cmakedefine HAVE_REALPATH 1
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
 #cmakedefine HAVE_MEMALIGN 1
 #cmakedefine HAVE_ALIGNED_MALLOC 1
@@ -16,6 +17,7 @@
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}
 #cmakedefine USE_OPENGL ${USE_OPENGL}
+#cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_UNISTD_H 1

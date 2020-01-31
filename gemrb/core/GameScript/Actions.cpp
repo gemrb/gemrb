@@ -72,9 +72,9 @@ void GameScript::SetAreaRestFlag(Scriptable* Sender, Action* parameters)
 	Map *map=Sender->GetCurrentArea();
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
-		map->AreaType|=AT_CAN_REST;
+		map->AreaType |= AT_CAN_REST_INDOORS;
 	} else {
-		map->AreaType&=~AT_CAN_REST;
+		map->AreaType &= ~AT_CAN_REST_INDOORS;
 	}
 }
 
@@ -473,6 +473,9 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	InfoPoint *trigger = (InfoPoint *) ip;
 	if ( parameters->int0Parameter != 0 ) {
 		trigger->Flags &= ~TRAP_DEACTIVATED;
+		if (trigger->TrapResets()) {
+			trigger->Trapped = 1;
+		}
 	} else {
 		trigger->Flags |= TRAP_DEACTIVATED;
 	}
@@ -693,7 +696,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 
 	if (map) {
 		Actor *actor = (Actor *) tar;
-		if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
+		if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), to->Pos, 0)) {
 			MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(), to->Pos, -1, true);
 		}
 	}
@@ -945,7 +948,9 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_SAVEDYPOS, parameters->int1Parameter);
 	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
+
 //IWD2, sets the homepoint P
+// handle [-1.-1] specially, if needed; ar6200.bcs has interesting use
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -1057,6 +1062,9 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
+	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
+	GameControl *gc = core->GetGameControl();
+	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
 	core->timer->SetMoveViewPort( parameters->pointParameter.x, parameters->pointParameter.y, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -1198,6 +1206,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 
+	// iwd2 is the only one with special handling:
+	// -2 is used as HomeLocation; no other unusual values are used
+	if (parameters->pointParameter.x < 0) {
+		parameters->pointParameter = actor->HomeLocation;
+	}
+
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, 0 );
@@ -1333,7 +1347,7 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo(p, 0, 0);
+		actor->WalkTo(p, 0, parameters->int0Parameter);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1738,7 +1752,9 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->CurrentActionState = 1;
 	// parameters->int2Parameter is unused here so hijack it to store the wait time
-	parameters->int2Parameter = gt + target->GetWait();
+	// and make sure we wait at least one round, so strings without audio have some time to display
+	unsigned long waitCounter = target->GetWait();
+	parameters->int2Parameter = gt + (waitCounter > 0 ? waitCounter : core->Time.round_size);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -1829,9 +1845,6 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	if (ret) {
 		*poi = '*';
 	}
-	if (parameters->int0Parameter == SONG_BATTLE) {
-		core->GetGame()->CombatCounter = 150;
-	}
 }
 
 //starts the current area music (songtype is in int0Parameter)
@@ -1897,7 +1910,7 @@ void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0, GEM_SND_RELATIVE);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1942,7 +1955,9 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
-	//actor->InternalFlags |= IF_CLEANUP;
+	if (actor == core->GetCutSceneRunner()) {
+		core->SetCutSceneMode(false);
+	}
 }
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
@@ -2110,10 +2125,12 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		actor->LastTarget = 0;
+		actor->LastTargetPersistent = 0;
 		return;
 	}
 	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
+	actor->LastTargetPersistent = tar->GetGlobalID();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -2243,9 +2260,17 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
 	}
 
-	if (direction==-1) {
+	// pst enables worldmap travel only after visiting the lower ward
+	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
+	if (direction == -1 && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+	if (direction == -1 && keyAreaVisited) {
+		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
+		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
+		// DestEntryPoint is all zeroes, pst just didn't use it
+		direction = 0;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );
@@ -2902,31 +2927,12 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable xptable;
+	AddXPCore(parameters);
+}
 
-	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
-		xptable.load("exptable");
-	} else {
-		xptable.load("xplist");
-	}
-
-	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
-	}
-	if (!xptable) {
-		Log(ERROR, "GameScript", "Can't perform ADDXP2DA");
-		return;
-	}
-	const char * xpvalue = xptable->QueryField( parameters->string0Parameter, "0" ); //level is unused
-
-	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
-		//divide party xp
-		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE );
-	} else {
-		//give xp everyone
-		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
-	}
-	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+void GameScript::AddXPVar(Scriptable* /*Sender*/, Action* parameters)
+{
+	AddXPCore(parameters, true);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
@@ -4332,6 +4338,13 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	// iwd2 has two uses with [-1.-1]
+	if (parameters->pointParameter.x == -1) {
+		parameters->pointParameter.x = Sender->Pos.x;
+		parameters->pointParameter.y = Sender->Pos.y;
+	}
+
 	if (Distance(parameters->pointParameter, Sender) > 10) {
 		MoveNearerTo(Sender, parameters->pointParameter, 10,0);
 		return;
@@ -4710,7 +4723,11 @@ void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->Stop();
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->ClearPath();
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
@@ -4918,8 +4935,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	//max. shouting distance, please adjust it if you know better
-	map->Shout(actor, parameters->int0Parameter, VOODOO_SHOUT_RANGE);
+	map->Shout(actor, parameters->int0Parameter, false);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
@@ -4933,8 +4949,8 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	// 0 means unlimited shout distance
-	map->Shout(actor, parameters->int0Parameter, 0);
+	// true means global, unlimited, shout distance
+	map->Shout(actor, parameters->int0Parameter, true);
 }
 
 void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
@@ -4944,7 +4960,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	}
 	//TODO: add state limiting like in Shout?
 	Map *map=Sender->GetCurrentArea();
-	map->Shout((Actor *) Sender, 0, VOODOO_SHOUT_RANGE);
+	map->Shout((Actor *) Sender, 0, false);
 }
 
 void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
@@ -5142,7 +5158,14 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, 0);
+	// if same target as before, don't play the war cry again, as they'd pop up too often
+	int flags = 0;
+	if (Sender->LastTargetPersistent == tar->GetGlobalID()) {
+		flags = AC_NO_SOUND;
+	}
+
+	AttackCore(Sender, tar, flags);
+	parameters->int2Parameter = 1;
 
 	Sender->CurrentActionState--;
 	if (Sender->CurrentActionState <= 0) {
@@ -5267,10 +5290,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	unsigned int flags = REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
-	if (Sender->Type != ST_ACTOR || ((Actor *)Sender)->InParty == 0) {
-		flags |= REST_NOAREA;
-	}
+	unsigned int flags = REST_NOAREA|REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
 	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
@@ -6217,6 +6237,13 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 	}
 
 	ip->InitTriggers();
+	// we also need to reset the IF_INTRAP bit for any actors that are inside or subsequent triggers will be skipped
+	// there are only two users of this action, so we can be a bit sloppy and skip the geometry checks
+	std::vector<Actor *> nearActors = Sender->GetCurrentArea()->GetAllActorsInRadius(ip->Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, MAX_OPERATING_DISTANCE);
+	std::vector<Actor *>::iterator candidate;
+	for (candidate = nearActors.begin(); candidate != nearActors.end(); ++candidate) {
+		(*candidate)->SetInTrap(false);
+	}
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
@@ -6989,7 +7016,7 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	if (!ini) {
 		return;
 	}
-	char key[5];
+	char key[40];
 	sprintf(key,"%d", parameters->int0Parameter);
 	const char *variable = ini->GetKeyAsString( key, "killvar", NULL );
 	if (!variable) {
@@ -7093,8 +7120,14 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	fx->PosX=parameters->pointParameter.x;
-	fx->PosY=parameters->pointParameter.y;
+	// iwd2 with [-1.-1] again
+	if (parameters->pointParameter.x == -1) {
+		fx->PosX = src->Pos.x;
+		fx->PosY = src->Pos.y;
+	} else {
+		fx->PosX = parameters->pointParameter.x;
+		fx->PosY = parameters->pointParameter.y;
+	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
 	delete fx;

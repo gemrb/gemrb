@@ -194,23 +194,31 @@ bool AREImporter::Open(DataStream* stream)
 	str->ReadWord( &WSnow );
 	str->ReadWord( &WFog );
 	str->ReadWord( &WLightning );
+	// unused wind speed, TODO: EEs use it for transparency
+	// a single byte was re-purposed to control the alpha on the stencil water for more or less transparency.
+	// If you set it to 0, then the water should be appropriately 50% transparent.
+	// If you set it to any other number, it will be that transparent.
+	// It's 1 byte, so setting it to 128 you'll have the same as the default of 0
 	str->ReadWord( &WUnknown );
+
 	AreaDifficulty = 0;
 	if (bigheader) {
 		// are9.1 difficulty bits for level2/level3
-		// TODO: there must be more advanced logic here for sure (guessing vs party level)
 		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
 		AreaDifficulty = 1;
 		ieByte tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		int avgPartyLevel = core->GetGame()->GetTotalPartyLevel(false) / core->GetGame()->GetPartySize(false);
+		str->Read(&tmp, 1); // 0x54
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 2;
 		}
 		tmp = 0;
-		str->Read( &tmp, 1);
-		if (tmp) {
+		str->Read(&tmp, 1); // 0x55
+		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 4;
 		}
+		// 0x56 held the average party level at load time (usually 1, since it had no access yet),
+		// but we resolve everything here and store AreaDifficulty instead
 	}
 	//bigheader gap is here
 	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
@@ -380,6 +388,7 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	ambi->sounds.push_back(sound);
 	memcpy(ambi->name, sound, 9);
 	ambi->appearance = (1<<25) - 1; // default to all 24 bits enabled, one per hour
+	ambi->radius = 50; // REFERENCE_DISTANCE
 	return ambi;
 }
 
@@ -1072,7 +1081,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword Orientation, Schedule, RemovalTime;
 			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
 			ieResRef Dialog;
-			ieResRef Scripts[8]; //the original order
+			ieResRef Scripts[8]; //the original order is shown in scrlev.ids
 			ieDword Flags;
 			ieByte DifficultyMargin;
 
@@ -1084,13 +1093,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &YDes );
 			str->ReadDword( &Flags );
 			str->ReadWord( &Spawned );
-			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, TODO: purpose unknown (portraits?)
+			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
 			str->Read( &DifficultyMargin, 1 ); // iwd2 only
 			str->Seek( 4, GEM_CURRENT_POS ); //actor animation, unused
 			str->ReadDword( &Orientation );
 			str->ReadDword( &RemovalTime );
 			str->ReadWord( &MaxDistance );
-			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused http://gibberlings3.net/forums/index.php?showtopic=21724
+			str->Seek( 2, GEM_CURRENT_POS ); // apparently unused https://gibberlings3.net/forums/topic/21724-a
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -1108,7 +1117,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
-			//TODO: iwd2 script?
+			// another iwd2 script slot
 			str->ReadResRef( Scripts[SCR_AREA] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			//not iwd2, this field is garbage
@@ -1162,8 +1171,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					// 2 - area difficulty 2
 					// 4 - area difficulty 3
 					if (DifficultyMargin && !(DifficultyMargin & map->AreaDifficulty)) {
-						// iwd2 has GF_START_ACTIVE off, but that only touches IF_IDLE
-						ab->appearance = 0;
+						ab->DestroySelf();
 					}
 				}
 			}
@@ -1185,6 +1193,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+
 	core->LoadProgress(90);
 	Log(DEBUG, "AREImporter", "Loading animations");
 	str->Seek( AnimOffset, GEM_STREAM_START );
@@ -1204,6 +1214,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
+			anim->originalFlags = anim->Flags;
 			str->ReadWordSigned( &anim->height );
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &startFrameRange );
@@ -1218,6 +1229,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
+
+			if (pst) {
+				AdjustPSTFlags(anim);
+			}
 
 			//set up the animation, it cannot be done here
 			//because a StaticSequence action can change
@@ -1304,7 +1319,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ieDword color = 0;
 
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst && !NoteCount) {
 		if( !INInote ) {
 			ReadAutonoteINI();
@@ -1474,6 +1488,22 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	return map;
+}
+
+void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
+	/**
+	 * For PST, map animation flags work differently to a degree that they
+	 * should not be mixed together with the rest as they even tend to
+	 * break things (like stopping early, hiding under FoW).
+	 *
+	 * So far, a better approximation towards handling animations is:
+	 * - always set A_ANI_BLEND, A_ANI_SYNC,
+	 * - unset A_ANI_PLAYONCE, A_ANI_NOT_IN_FOG, A_ANI_BACKGROUND.
+	 *
+	 * The actual use of bits in PST map anims isn't fully solved here.
+	 */
+	areaAnim->Flags |= (A_ANI_BLEND | A_ANI_SYNC);
+	areaAnim->Flags &= ~(A_ANI_PLAYONCE | A_ANI_NOT_IN_FOG | A_ANI_BACKGROUND);
 }
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
@@ -2140,7 +2170,15 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
-		stream->WriteDword( &an->Flags);
+
+		if (core->HasFeature(GF_AUTOMAP_INI)) {
+			/* PST toggles the active bit only, and we need to keep the rest. */
+			ieDword flags = (an->originalFlags & ~A_ANI_ACTIVE) | (an->Flags & A_ANI_ACTIVE);
+			stream->WriteDword(&flags);
+		} else {
+			stream->WriteDword(&an->Flags);
+		}
+
 		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START

@@ -35,6 +35,7 @@ public:
 	
 	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
+	void SetWindowTitle(const char *title) { SDL_WM_SetCaption(title, 0); };
 	int SwapBuffers(void);
 
 	bool TouchInputEnabled() const;

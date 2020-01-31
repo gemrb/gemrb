@@ -115,12 +115,11 @@ class StringBuffer;
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
-#define STAT_ADD_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 1 )
 #define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
 #define STAT_SET_PCF(stat, mod) target->SetStat( stat, ( mod ), 1 )
-#define STAT_BIT_OR_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 1 )
+#define STAT_BIT_OR_PCF(stat, mod) target->NewStat(stat, (mod), MOD_BITOR)
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
@@ -263,9 +262,11 @@ public:
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
+	void ModifyAllEffectSources(Point &source);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
+	unsigned int GetEffectOrder(EffectRef &effect_reference, const Effect *fx) const;
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(const Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);

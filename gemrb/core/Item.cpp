@@ -24,6 +24,7 @@
 #include "Item.h"
 
 #include "win32def.h"
+#include "voodooconst.h"
 
 #include "Interface.h"
 #include "Projectile.h"
@@ -240,6 +241,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
 		pro->SetEffects(fx);
 	}
+	pro->Range = eh->Range;
 	return pro;
 }
 

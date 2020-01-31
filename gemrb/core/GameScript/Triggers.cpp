@@ -355,7 +355,6 @@ int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 			}
 			return 1;
 	}
-	return 0;
 }
 
 int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)
@@ -1579,17 +1578,24 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+// EEs extend this to NearSavedLocation(O:Object*,S:Global*,I:Range*)
 int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	if (core->HasFeature(GF_HAS_KAPUTZ)) {
-		// we don't understand how this works in pst yet
+		// TODO: we don't understand how this works in pst yet
 		return 1;
 	}
 	Actor *actor = (Actor *) Sender;
-	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
+	Point p;
+	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
+		p = actor->HomeLocation;
+	} else {
+		p.x = (short) actor->GetStat(IE_SAVEDXPOS);
+		p.y = (short) actor->GetStat(IE_SAVEDYPOS);
+	}
 	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);
 	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
@@ -1745,13 +1751,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	Actor* actor = ( Actor* ) target;
-	// make sure to discout unscheduled actors - count them as dead
-	// alternatively we could set their death vars when disabling them wrt AreaDifficulty
-	//if (!actor->ValidTarget(GA_NO_UNSCHEDULED)) also avoids hidden (avatar removal)!
-	Game *game = core->GetGame();
-	if (game && !Schedule(game->GameTime, true)) {
-		return 1;
-	}
+	// actors not meeting AreaDifficulty get deleted before we have to worry about them
 	if (actor->GetStat( IE_STATE_ID ) & STATE_DEAD) {
 		return 1;
 	}
@@ -2184,6 +2184,7 @@ int GameScript::SetSpellTarget(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	scr->LastTarget = 0;
+	scr->LastTargetPersistent = 0;
 	scr->LastTargetPos.empty();
 	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
@@ -3219,19 +3220,26 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 //this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(1 << parameters->int0Parameter, core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 0 || parameters->int0Parameter > 23) return 0;
+
+	if (!parameters->int0Parameter) parameters->int0Parameter = 24;
+	return Schedule(1 << (parameters->int0Parameter - 1), core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(0xFFFFFFu << (parameters->int0Parameter + 1), core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 0 || parameters->int0Parameter > 22) return 0;
+
+	return Schedule((0xFFFFFFu << parameters->int0Parameter) & 0x7FFFFFu, core->GetGame()->GameTime);
 }
 
 //this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return Schedule(0xFFFFFFu >> (24 - parameters->int0Parameter - 1), core->GetGame()->GameTime);
+	if (parameters->int0Parameter < 1 || parameters->int0Parameter > 23) return 0;
+
+	return Schedule((0xFFFFFFu >> (25 - parameters->int0Parameter)) | 1 << 23, core->GetGame()->GameTime);
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
@@ -3475,6 +3483,14 @@ int GameScript::StoryModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+// the original was more complicated, but we simplify by doing more work in AREImporter
+int GameScript::CheckAreaDiffLevel(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	Map *map = core->GetGame()->GetCurrentArea();
+	if (!map) return 0;
+	return map->AreaDifficulty == 1 << (parameters->int0Parameter - 1);
+}
+
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	ieDword diff;
@@ -3700,15 +3716,15 @@ int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
 	}
 	int charge = item->Usages[parameters->int0Parameter];
 	switch (parameters->int2Parameter) {
-		case DM_EQUAL:
+		case EQUALS:
 			if (charge == parameters->int1Parameter)
 				return 1;
 			break;
-		case DM_LESS:
+		case LESS_THAN:
 			if (charge < parameters->int1Parameter)
 				return 1;
 			break;
-		case DM_GREATER:
+		case GREATER_THAN:
 			if (charge > parameters->int1Parameter)
 				return 1;
 			break;
@@ -3738,17 +3754,17 @@ int GameScript::CheckPartyAverageLevel( Scriptable* /*Sender*/, Trigger* paramet
 	if (count) level/=count;
 
 	switch (parameters->int1Parameter) {
-		case DM_EQUAL:
+		case EQUALS:
 			if (level ==parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case DM_LESS:
+		case LESS_THAN:
 			if (level < parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case DM_GREATER:
+		case GREATER_THAN:
 			if (level > parameters->int0Parameter) {
 				return 1;
 			}
@@ -4203,17 +4219,6 @@ int GameScript::BeenInParty(Scriptable* Sender, Trigger* /*parameters*/)
 /*
  * TobEx triggers
  */
-
-/* Defines the object that the next trigger will be evaluated in reference to. This trigger
- * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
- * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
- * cannot be found, the next trigger will evaluate to false.
- */
-int GameScript::NextTriggerObject(Scriptable* /*Sender*/, Trigger* /*parameters*/)
-{
-	// TODO: implement
-	return 0;
-}
 
 /* Compares the animation movement rate of the target creature specified by Object to Value.
  * This is not affected by slow or haste, but is affected if the Object is entangled, webbed, etc.

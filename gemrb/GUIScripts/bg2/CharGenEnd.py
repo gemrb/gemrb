@@ -112,8 +112,7 @@ def OnLoad():
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( MyChar, "gembak" )
+		GemRB.SaveCharacter (MyChar, "gembak")
 		#LETS PLAY!!
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
@@ -180,6 +179,10 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 				item_resref = item_resref[0]
 			else:
 				count = 0
+
+			# skip items already there (imported chars)
+			if GemRB.FindItem (MyChar, item_resref) != -1:
+				continue
 
 			targetslot = realslot[0]
 			SlotType = GemRB.GetSlotType (targetslot, MyChar)

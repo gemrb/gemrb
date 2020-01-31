@@ -18,6 +18,27 @@
  *
  */
 
+// This class implements IEScript, the scripting language used in various scripts (compiled) and dialogs (plain text).
+//
+// Scriptable objects in GemRB execute script actions one-by-one from a queue,
+// this is done in Scriptable::ProcessActions. If a blocking action is encountered
+// (AF_BLOCKING in the actionnames table in GameScript.cpp) and CurrentAction is
+// left set at the end of execution (ie, the action doesn't call
+// ReleaseCurrentAction() on the Sender) then execution ends for that frame, and
+// the same action is repeated the next time around. This behaviour is important
+// because some state (eg, marked objects) is reset at the beginning of each action
+// but must remain unchanged while the action is being executed.
+//
+// Scriptable::ExecuteScript is one way for the action queue to be changed; the
+// triggers of all blocks are checked (note that some triggers have side-effects,
+// for example See() changes LastSeen) until all triggers for a block evaluate as
+// true, and then that block is executed. If actions from that block are already
+// queued (from a previous round of checks) then nothing happens, so a block is not
+// restarted until it is finished. This becomes a bit more complicated when
+// Continue() is involved, be warned and make sure to check any behaviour changes
+// against the original engine. Note that AF_INSTANT actions are executed
+// instantly, rather than added to the queue.
+
 #include "GameScript/GameScript.h"
 
 #include "GameScript/GSUtils.h"
@@ -26,6 +47,7 @@
 #include "win32def.h"
 
 #include "Game.h"
+#include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
@@ -77,7 +99,7 @@ static const TriggerLink triggernames[] = {
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
-	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
+	{"checkareadifflevel", GameScript::CheckAreaDiffLevel, 0}, //iwd2
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
 	{"checkitemslot", GameScript::HasItemSlot, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
@@ -279,7 +301,7 @@ static const TriggerLink triggernames[] = {
 	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
-	{"nexttriggerobject", GameScript::NextTriggerObject, 0},
+	{"nexttriggerobject", NULL, 0}, // handled inline
 	{"nightmaremodeon", GameScript::NightmareModeOn, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
@@ -468,7 +490,7 @@ static const ActionLink actionnames[] = {
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
-	{"addxpvar", GameScript::AddXP2DA, 0},
+	{"addxpvar", GameScript::AddXPVar, 0},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
@@ -1283,7 +1305,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 			}
 			index--;
 		}
-		m++;
+		++m;
 	}
 	return NULL;
 }
@@ -1514,7 +1536,7 @@ void InitializeIEScript()
 			triggerflags[i] |= TF_CONDITION;
 	}
 
-	for (l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
+	for (l = missing_triggers.begin(); l != missing_triggers.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
@@ -1665,7 +1687,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_actions.begin(); l!=missing_actions.end();l++) {
+	for (l = missing_actions.begin(); l != missing_actions.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = actionsTable->GetValueIndex( j );
@@ -1725,7 +1747,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_objects.begin(); l!=missing_objects.end();l++) {
+	for (l = missing_objects.begin(); l != missing_objects.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );
@@ -1976,6 +1998,9 @@ static Trigger* ReadTrigger(DataStream* stream)
 	return tR;
 }
 
+// NOTE: keep these in sync with gemtrig.ids!
+#define NEXT_TRIGGER_OBJECT_EX 0x4100
+#define NEXT_TRIGGER_OBJECT_EE 0x40e0
 static Condition* ReadCondition(DataStream* stream)
 {
 	char line[10];
@@ -1985,10 +2010,31 @@ static Condition* ReadCondition(DataStream* stream)
 		return NULL;
 	}
 	Condition* cO = new Condition();
+	Object *triggerer = NULL;
 	while (true) {
 		Trigger* tR = ReadTrigger( stream );
-		if (!tR)
+		if (!tR) {
+			if (triggerer) delete triggerer;
 			break;
+		}
+
+		// handle NextTriggerObject
+		/* Defines the object that the next trigger will be evaluated in reference to. This trigger
+		 * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
+		 * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
+		 * cannot be found, the next trigger will evaluate to false.
+		 */
+		if (triggerer) {
+			delete tR->objectParameter; // not using Release, so we don't have to check if it's null
+			tR->objectParameter = triggerer;
+			triggerer = NULL;
+		} else if (tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EX) || tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EE)) {
+			triggerer = tR->objectParameter;
+			tR->objectParameter = NULL;
+			delete tR;
+			continue;
+		}
+
 		cO->triggers.push_back( tR );
 	}
 	return cO;
@@ -2035,6 +2081,11 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
 						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+						if (core->HasFeature(GF_3ED_RULES)) {
+							if (done) *done = true;
+						}
 						return false;
 					}
 
@@ -2095,9 +2146,11 @@ void GameScript::EvaluateAllBlocks()
 				Action *action = response->actions[0];
 				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
 				if (target) {
-					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after?
+					// save the target in case it selfdestructs and we need to manually exit the cutscene
+					core->SetCutSceneRunner(target);
+					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
 					rS->responses[0]->Execute(target);
-					// TODO: this will break blocking instants, if there are any
+					// NOTE: this will break blocking instants, if there are any
 					target->ReleaseCurrentAction();
 				} else {
 					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
@@ -2236,8 +2289,8 @@ bool Condition::Evaluate(Scriptable* Sender)
 	for (size_t i = 0; i < triggers.size(); i++) {
 		Trigger* tR = triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
-		//was already True()
-		if (!ORcount || !subresult) {
+		//was already True() ... but this sane approach was only used in iwd2!
+		if (!core->HasFeature(GF_EFFICIENT_OR) || !ORcount || !subresult) {
 			result = tR->Evaluate(Sender);
 		}
 		if (result > 1) {
@@ -2327,8 +2380,6 @@ int ResponseSet::Execute(Scriptable* Sender)
 		Response* rE = responses[i];
 		if (rE->weight > randWeight) {
 			return rE->Execute(Sender);
-			/* this break is only symbolic */
-			break;
 		}
 		randWeight-=rE->weight;
 	}
@@ -2358,7 +2409,7 @@ int Response::Execute(Scriptable* Sender)
 				Sender->AddAction( aC );
 				ret = 0;
 				break;
-			case AF_CONTINUE:
+			case AF_CONTINUE: // this is never reached, since Continue also has AF_IMMEDIATE
 			case AF_MASK:
 				ret = 1;
 				break;
@@ -2376,6 +2427,13 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
 
+	// reallow area scripts after us, if they were disabled
+	if (aC->flags & ACF_REALLOW_SCRIPTS) {
+		core->GetGameControl()->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_NAND);
+	}
+
+	// check for ActionOverride
+	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
 
@@ -2384,7 +2442,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 		if (scr) {
 			if (InDebug&ID_ACTIONS) {
-				Log(WARNING, "GameScript", "Sender: %s-->override: %s",
+				Log(WARNING, "GameScript", "Sender %s ran ActionOverride on %s",
 					Sender->GetScriptName(), scr->GetScriptName() );
 			}
 			scr->ReleaseCurrentAction();
@@ -2399,8 +2457,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				scr->CurrentActionInterruptable = false;
 			}
 		} else {
-			Log(ERROR, "GameScript", "Actionoverride failed for object: ");
+			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
 			aC->objects[0]->dump();
+			aC->dump();
 		}
 
 		aC->Release();
@@ -2420,7 +2479,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			Sender->Activate();
 			if (actionflags[actionID]&AF_ALIVE) {
 				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death");
+					Log(WARNING, "GameScript", "Aborted action due to death!");
 					Sender->ReleaseCurrentAction();
 					return;
 				}

@@ -413,6 +413,7 @@ private:
 	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;
 	std::string Encoding;
+	Scriptable *CutSceneRunner;
 public:
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
@@ -528,6 +529,8 @@ public:
 	void RedrawAll();
 	/** Refreshes any control associated with the variable name with value*/
 	void RedrawControls(const char *varname, unsigned int value);
+	/** Attempts to paste text into the interface. */
+	void RequestPasting(const String&);
 	/** Popup the Console */
 	void PopupConsole();
 	/** Get the SaveGameIterator */
@@ -552,6 +555,9 @@ public:
 	int Roll(int dice, int size, int add) const;
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
+	/** store the scriptable running the cutscene */
+	void SetCutSceneRunner(Scriptable *runner);
+	Scriptable *GetCutSceneRunner() const { return CutSceneRunner; };
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */
@@ -686,6 +692,7 @@ public:
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;
+	int GetRareSelectSoundCount() const;
 	int GetMaximumAbility() const;
 	int GetStrengthBonus(int column, int value, int ex) const;
 	int GetIntelligenceBonus(int column, int value) const;
@@ -800,7 +807,7 @@ public:
 	Variables *RtRows;
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
-	char GameType[_MAX_PATH];
+	char GameType[10];
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];

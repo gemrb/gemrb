@@ -110,6 +110,7 @@ static ieWordSigned *wisbon = NULL;
 static int **reputationmod = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+static int NumRareSelectSounds = 2;
 
 static ieWord IDT_FAILURE = 0;
 static ieWord IDT_CRITRANGE = 1;
@@ -258,6 +259,7 @@ Interface::Interface()
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
 	FeedbackLevel = 0;
+	CutSceneRunner = NULL;
 
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
@@ -1045,8 +1047,6 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 
 int Interface::LoadSprites()
 {
-	ieDword i;
-	int size;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		Log(ERROR, "Core", "No 2DA Importer Available.");
 		return GEM_ERROR;
@@ -1134,7 +1134,7 @@ int Interface::LoadSprites()
 		Sprite2D::FreeSprite( tmpsprite );
 	}
 
-	i = 0;
+	ieDword i = 0;
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
@@ -1147,9 +1147,8 @@ int Interface::LoadSprites()
 	}
 
 	// Load ground circle bitmaps (PST only)
-	//block required due to msvc6.0 incompatibility
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
-	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
@@ -1331,7 +1330,7 @@ int Interface::Init(InterfaceConfig* config)
 		} else var[0] = '\0'; \
 		value = NULL;
 
-	CONFIG_STRING("GameName", GameName, GEMRB_STRING);
+	CONFIG_STRING("GameName", GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
 	CONFIG_STRING("GameType", GameType, "auto");
 	// tob type is obsolete
 	if (stricmp( GameType, "tob" ) == 0) {
@@ -1588,13 +1587,33 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	strcpy( NextScript, "Start" );
 
-	{
-		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-		char path[_MAX_PATH];
-		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
+	char path[_MAX_PATH];
+	PathJoin(path, GemRBOverridePath, "override", GameType, NULL);
+	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	char unhardcodedTypePath[_MAX_PATH * 2];
+	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+
+	// if unset, manually populate GameName (window title)
+	std::map<std::string, std::string> gameTypeNameMap;
+	gameTypeNameMap["auto"] = "";
+	gameTypeNameMap["bg1"] = "Baldur's Gate 1";
+	gameTypeNameMap["bg2"] = "Baldur's Gate 2";
+	gameTypeNameMap["iwd"] = "Icewind Dale (vanilla)";
+	gameTypeNameMap["how"] = "Icewind Dale: Heart of Winter";
+	gameTypeNameMap["iwd2"] = "Icewind Dale 2";
+	gameTypeNameMap["pst"] = "Planescape: Torment";
+	gameTypeNameMap["demo"] = "Internal demo";
+	gameTypeNameMap["test"] = "Tests";
+	if (!stricmp(GameName, GEMRB_STRING)) {
+		if (gameTypeNameMap.find(GameType) != gameTypeNameMap.end()) {
+			std::string prefix = GEMRB_STRING" running ";
+			strlcpy(GameName, gameTypeNameMap[GameType].insert(0, prefix).c_str(), sizeof(GameName));
+		} else {
+			strlcpy(GameName, "GemRB running unknown game", sizeof(GameName));
+		}
+		video->SetWindowTitle(GameName);
 	}
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
@@ -1929,6 +1948,27 @@ int Interface::Init(InterfaceConfig* config)
 		console->SetCursor (cursor);
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
+
+	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
+	char pathString[_MAX_PATH * 3];
+#ifdef HAVE_REALPATH
+	if (unhardcodedTypePath[0] == '.') {
+		// canonicalize the relative path; usually from running from the build dir
+		char *absolutePath = realpath(unhardcodedTypePath, NULL);
+		if (absolutePath) {
+			strlcpy(unhardcodedTypePath, absolutePath, sizeof(unhardcodedTypePath));
+			free(absolutePath);
+		}
+	}
+#endif
+	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
+	PathJoin(strpath, GamePath, "gemrb_path.txt", NULL);
+	FileStream *pathFile = new FileStream();
+	// don't abort if something goes wrong, since it should never happen and it's not critical
+	if (pathFile->Create(strpath)) {
+		pathFile->Write(pathString, strlen(pathString));
+		pathFile->Close();
+	}
 	return GEM_OK;
 }
 
@@ -2169,7 +2209,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasDescIcon",        //13GF_HAS_DESC_ICON
 		"HasPickSound",       //14GF_HAS_PICK_SOUND
 		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
-		"AutomapIni",         //16GF_AUTOMAP_INI
+		"AutomapINI",         //16GF_AUTOMAP_INI
 		"SmallFog",           //17GF_SMALL_FOG
 		"ReverseDoor",        //18GF_REVERSE_DOOR
 		"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
@@ -2232,6 +2272,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
 		"FixedMoraleOpcode",  //78GF_FIXED_MORALE_OPCODE
+		"Happiness",          //79GF_HAPPINESS
+		"EfficientORTrigger", //80GF_EFFICIENT_OR
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2300,7 +2342,7 @@ bool Interface::LoadGemRBINI()
 		strlcpy(INIConfig, s, sizeof(INIConfig));
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-
+	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
 
 	for (int i=0;i<GF_COUNT;i++) {
@@ -2470,14 +2512,15 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	} else {
 		map = game->GetCurrentArea();
 	}
+	if (!map) return ab;
 
-	if (map) while(cnt--) {
+	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
 			return NULL;
 		}
 		ieDword sex = tmp->GetStat(IE_SEX);
-		//TODO: make this external
+		//TODO: make this external as summlimt.2da
 		int limit = 0;
 		switch (sex) {
 		case SEX_SUMMON: case SEX_SUMMON_DEMON:
@@ -3268,6 +3311,17 @@ void Interface::DelAllWindows()
 	ModalWindow = NULL;
 }
 
+/**
+ * Delegates a pasting request of text to a fitting consumer, e.g. console,
+ * potentially text inputs, ...
+ */
+void Interface::RequestPasting(const String & string)
+{
+	if (ConsolePopped) {
+		console->InsertText(string);
+	}
+}
+
 /** Popup the Console */
 void Interface::PopupConsole()
 {
@@ -3688,6 +3742,12 @@ bool Interface::SaveConfig()
 	return true;
 }
 
+// this is more of a workaround than anything else
+// needed for cases where the script runner is gone before finishing his queue
+void Interface::SetCutSceneRunner(Scriptable *runner) {
+	CutSceneRunner = runner;
+}
+
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
@@ -3709,6 +3769,8 @@ void Interface::SetCutSceneMode(bool active)
 		SetEventFlag(EF_CONTROL);
 	}
 	video->SetMouseEnabled(!active);
+
+	if (!active) SetCutSceneRunner(NULL);
 }
 
 /** returns true if in dialogue or cutscene */
@@ -3889,8 +3951,6 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 cleanup:
 	// Something went wrong, so try to clean after itself
 
-	error("Core", "Unable to load game.");
-
 	delete new_game;
 	delete new_worldmap;
 
@@ -3898,6 +3958,8 @@ cleanup:
 	delete wmp_str1;
 	delete wmp_str2;
 	delete sav_str;
+
+	error("Core", "Unable to load game.");
 }
 
 /* replace the current world map but sync areas available in old and new */
@@ -5247,6 +5309,8 @@ int Interface::CompressSave(const char *folder)
 	return 0;
 }
 
+int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }
+
 int Interface::GetMaximumAbility() const { return MaximumAbility; }
 
 int Interface::GetStrengthBonus(int column, int value, int ex) const
@@ -5518,6 +5582,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
 	int mastertable = gamedata->LoadTable( tablename );
+	if (mastertable == -1) return -1;
 	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
@@ -5538,6 +5603,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			value = actor->GetSafeStat(stat);
 		}
 		int table = gamedata->LoadTable( tablename );
+		if (table == -1) continue;
 		Holder<TableMgr> tm = gamedata->GetTable( table );
 		if (!tm) continue;
 

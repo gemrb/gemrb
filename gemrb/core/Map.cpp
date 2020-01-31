@@ -191,7 +191,6 @@ static inline bool MustSave(Actor *actor)
 static void InitSpawnGroups()
 {
 	ieResRef GroupName;
-	int i;
 
 	AutoTable tab("spawngrp", true);
 
@@ -201,7 +200,7 @@ static void InitSpawnGroups()
 	if (!tab)
 		return;
 
-	i=tab->GetColNamesCount();
+	int i = tab->GetColNamesCount();
 	while (i--) {
 		int j=tab->GetRowCount();
 		while (j--) {
@@ -295,9 +294,8 @@ static void InitExplore()
 		}
 	}
 
-	int i;
 	VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
-	for (i=0;i<MaxVisibility;i++) {
+	for (int i = 0; i < MaxVisibility; i++) {
 		VisibilityMasks[i] = (Point *) malloc(VisibilityPerimeter*sizeof(Point) );
 	}
 
@@ -376,8 +374,6 @@ Map::Map(void)
 
 Map::~Map(void)
 {
-	unsigned int i;
-
 	free( SrchMap );
 	free( MaterialMap );
 
@@ -389,53 +385,45 @@ Map::~Map(void)
 
 	delete TMap;
 	delete INISpawn;
-	aniIterator aniidx;
-	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
-		delete (*aniidx);
+	 for (auto anim : animations) {
+		delete anim;
 	}
 
-	for (i = 0; i < actors.size(); i++) {
-		Actor* a = actors[i];
+	for (auto actor : actors) {
 		//don't delete NPC/PC
-		if (a && !a->Persistent() ) {
-			delete a;
+		if (actor && !actor->Persistent()) {
+			delete actor;
 		}
 	}
 
-	for (i = 0; i < entrances.size(); i++) {
-		delete entrances[i];
+	for (auto entrance : entrances) {
+		delete entrance;
 	}
-	for (i = 0; i < spawns.size(); i++) {
-		delete spawns[i];
+	for (auto spawn : spawns) {
+		delete spawn;
 	}
 	delete LightMap;
 	delete HeightMap;
 	Sprite2D::FreeSprite( SmallMap );
-	for (i = 0; i < QUEUE_COUNT; i++) {
+	for (int i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
 	}
 
-	proIterator pri;
-
-	for (pri = projectiles.begin(); pri != projectiles.end(); pri++) {
-		delete (*pri);
+	for (auto projectile : projectiles) {
+		delete projectile;
 	}
 
-	scaIterator sci;
-
-	for (sci = vvcCells.begin(); sci != vvcCells.end(); sci++) {
-		delete (*sci);
+	for (auto vvc : vvcCells) {
+		delete vvc;
 	}
 
-	spaIterator spi;
-
-	for (spi = particles.begin(); spi != particles.end(); spi++) {
-		delete (*spi);
+	for (auto particle : particles) {
+		delete particle;
 	}
 
-	for (i = 0; i < ambients.size(); i++) {
-		delete ambients[i];
+	for (auto ambient : ambients) {
+		delete ambient;
 	}
 
 	if (reverb) {
@@ -446,7 +434,7 @@ Map::~Map(void)
 	free( ExploredBitmap );
 	free( VisibleBitmap );
 	if (Walls) {
-		for(i=0;i<WallCount;i++) {
+		for (unsigned int i = 0; i < WallCount; i++) {
 			delete Walls[i];
 		}
 		free( Walls );
@@ -669,9 +657,8 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 void Map::UpdateScripts()
 {
 	bool has_pcs = false;
-	size_t i=actors.size();
-	while (i--) {
-		if (actors[i]->InParty) {
+	for (auto actor : actors) {
+		if (actor->InParty) {
 			has_pcs = true;
 			break;
 		}
@@ -744,6 +731,7 @@ void Map::UpdateScripts()
 
 		//if the actor is immobile, don't run the scripts
 		//FIXME: this is not universaly true, only some states have this effect
+		// paused targets do something similar, but are handled in the effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely
@@ -836,57 +824,54 @@ void Map::UpdateScripts()
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
-		// (eg, TriggerActivation changes this, see lightning room from SoA)
-		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
-
-		//If this InfoPoint is a Switch Trigger
-		if (ip->Type == ST_TRIGGER) {
-			ip->Update();
-			continue;
-		}
 
 		if (ip->IsPortal()) {
 			DrawPortal(ip, ip->Trapped&PORTAL_TRAVEL);
 		}
 
-		if (wasActive) {
-			q=Qcount[PR_SCRIPT];
-			ieDword exitID = ip->GetGlobalID();
-			while (q--) {
-				Actor* actor = queue[PR_SCRIPT][q];
-				if (ip->Type == ST_PROXIMITY) {
-					if(ip->Entered(actor)) {
-						//if trap triggered, then mark actor
-						actor->SetInTrap(ipCount);
-						wasActive|=_TRAP_USEPOINT;
-					}
-				} else {
-					//ST_TRAVEL
-					//don't move if doing something else
-					// added CurrentAction as part of blocking action fixes
-					if (actor->CannotPassEntrance(exitID) ) {
-						continue;
-					}
-					//this is needed, otherwise the travel
-					//trigger would be activated anytime
-					//Well, i don't know why is it here, but lets try this
-					if (ip->Entered(actor)) {
-						UseExit(actor, ip);
-					}
+		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
+		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
+		// (eg, TriggerActivation changes this, see lightning room from SoA)
+		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
+		if (!wasActive) continue;
+
+		if (ip->Type == ST_TRIGGER) {
+			ip->Update();
+			continue;
+		}
+
+		q = Qcount[PR_SCRIPT];
+		ieDword exitID = ip->GetGlobalID();
+		while (q--) {
+			Actor *actor = queue[PR_SCRIPT][q];
+			if (ip->Type == ST_PROXIMITY) {
+				if (ip->Entered(actor)) {
+					// if trap triggered, then mark actor
+					actor->SetInTrap(ipCount);
+					wasActive |= _TRAP_USEPOINT;
+				}
+			} else {
+				// ST_TRAVEL
+				// don't move if doing something else
+				// added CurrentAction as part of blocking action fixes
+				if (actor->CannotPassEntrance(exitID)) {
+					continue;
+				}
+				// this is needed, otherwise the travel
+				// trigger would be activated anytime
+				// Well, i don't know why is it here, but lets try this
+				if (ip->Entered(actor)) {
+					UseExit(actor, ip);
 				}
 			}
 		}
 
-		if (wasActive) {
-			//Play the PST specific enter sound
-			if (wasActive&_TRAP_USEPOINT) {
-				core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
-					ip->TrapLaunch.x, ip->TrapLaunch.y);
-			}
-			ip->Update();
+		// Play the PST specific enter sound
+		if (wasActive & _TRAP_USEPOINT) {
+			core->GetAudioDrv()->Play(ip->EnterWav, SFX_CHAN_ACTIONS,
+				ip->TrapLaunch.x, ip->TrapLaunch.y);
 		}
+		ip->Update();
 	}
 
 	UpdateSpawns();
@@ -934,19 +919,17 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*2*16);
+	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., 0).
 	// (Necessary since blocked areas of actors may overlap.)
-	int i=0;
-	while(nearActors[i]!=NULL) {
-		if(nearActors[i]!=actor && nearActors[i]->BlocksSearchMap())
-			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-		++i;
+	for (auto neighbour : nearActors) {
+		if (neighbour != actor && neighbour->BlocksSearchMap()) {
+			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+		}
 	}
-	free(nearActors);
 }
 
 void Map::DrawHighlightables()
@@ -1368,7 +1351,7 @@ void Map::AddAnimation(AreaAnimation* panim)
 	aniIterator iter;
 
 	int Height = anim->GetHeight();
-	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
+	for (iter = animations.begin(); (iter != animations.end()) && ((*iter)->GetHeight() < Height); ++iter) ;
 	animations.insert(iter, anim);
 }
 
@@ -1376,25 +1359,21 @@ void Map::AddAnimation(AreaAnimation* panim)
 //this might be unnecessary later
 void Map::UpdateEffects()
 {
-	size_t i = actors.size();
-	while (i--) {
-		actors[i]->RefreshEffects(NULL);
+	for (auto actor : actors) {
+		actor->RefreshEffects(NULL);
 	}
 }
 
-void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
+void Map::Shout(Actor* actor, int shoutID, bool global)
 {
-	size_t i=actors.size();
-	while (i--) {
-		Actor *listener = actors[i];
-
+	for (auto listener : actors) {
 		// skip the shouter, so gpshout's InMyGroup(LastHeardBy(Myself)) can get two distinct actors
 		if (listener == actor) {
 			continue;
 		}
 
-		if (radius) {
-			if (Distance(actor->Pos, listener->Pos)>radius) {
+		if (!global) {
+			if (WithinAudibleRange(actor, listener->Pos)) {
 				continue;
 			}
 		}
@@ -1412,10 +1391,7 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 {
 	int count = 0;
 
-	size_t i = actors.size();
-	while (i--) {
-		Actor *actor = actors[i];
-
+	for (auto actor : actors) {
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
@@ -1429,10 +1405,7 @@ int Map::CountSummons(ieDword flags, ieDword sex)
 bool Map::AnyEnemyNearPoint(const Point &p)
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	size_t i = actors.size();
-	while (i--) {
-		Actor *actor = actors[i];
-
+	for (auto actor : actors) {
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
@@ -1480,10 +1453,7 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 //call this once, after area was loaded
 void Map::InitActors()
 {
-	size_t i = actors.size();
-	while(i--) {
-		Actor* actor = actors[i];
-
+	for (auto actor : actors) {
 		actor->SetMap(this);
 		InitActor(actor);
 	}
@@ -1524,9 +1494,7 @@ void Map::AddActor(Actor* actor, bool init)
 bool Map::AnyPCSeesEnemy()
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
 			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
 				return true;
@@ -1636,10 +1604,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 	if (!objectID) {
 		return NULL;
 	}
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
-
+	for (auto actor : actors) {
 		if (actor->GetGlobalID()==objectID) {
 			return actor;
 		}
@@ -1655,10 +1620,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 */
 Actor* Map::GetActor(const Point &p, int flags)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
-
+	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
 			continue;
 		if (!actor->ValidTarget(flags) ) {
@@ -1671,10 +1633,7 @@ Actor* Map::GetActor(const Point &p, int flags)
 
 Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
-
+	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
@@ -1685,16 +1644,13 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
-//maybe consider using a simple list
-Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see)
+std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see) const
 {
-	ieDword count = 1;
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
-
-		if (PersonalDistance( p, actor ) > radius)
+	std::vector<Actor *> neighbours;
+	for (auto actor : actors) {
+		if (!WithinRange(actor, p, radius)) {
 			continue;
+		}
 		if (!actor->ValidTarget(flags, see) ) {
 			continue;
 		}
@@ -1704,39 +1660,15 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 				continue;
 			}
 		}
-		count++;
+		neighbours.push_back(actor);
 	}
-
-	Actor **ret = (Actor **) malloc( sizeof(Actor*) * count);
-	i = actors.size();
-	int j = 0;
-	while (i--) {
-		Actor* actor = actors[i];
-
-		if (PersonalDistance( p, actor ) > radius)
-			continue;
-		if (!actor->ValidTarget(flags) ) {
-			continue;
-		}
-		if (!(flags&GA_NO_LOS)) {
-			if (!IsVisibleLOS(actor->Pos, p)) {
-				continue;
-			}
-		}
-
-		ret[j++]=actor;
-	}
-
-	ret[j]=NULL;
-	return ret;
+	return neighbours;
 }
 
 
 Actor* Map::GetActor(const char* Name, int flags)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
 			if (!actor->ValidTarget(flags) ) {
 				return NULL;
@@ -1753,9 +1685,8 @@ int Map::GetActorCount(bool any) const
 		return (int) actors.size();
 	}
 	int ret = 0;
-	size_t i=actors.size();
-	while (i--) {
-		if (MustSave(actors[i])) {
+	for (auto actor : actors) {
+		if (MustSave(actor)) {
 			ret++;
 		}
 	}
@@ -1764,9 +1695,7 @@ int Map::GetActorCount(bool any) const
 
 void Map::JumpActors(bool jump)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
 			if (jump) {
 				actor->FixPosition();
@@ -1778,9 +1707,7 @@ void Map::JumpActors(bool jump)
 
 void Map::SelectActors()
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (actor->Modified[IE_EA]<EA_CONTROLLABLE) {
 			core->GetGame()->SelectActor(actor, true, SELECT_QUIET);
 		}
@@ -1852,9 +1779,7 @@ Actor* Map::GetActor(int index, bool any) const
 
 Scriptable* Map::GetActorByDialog(const char *resref)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		//if a busy or hostile actor shouldn't be found
 		//set this to GD_CHECK
 		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
@@ -1867,7 +1792,7 @@ Scriptable* Map::GetActorByDialog(const char *resref)
 	}
 
 	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
-	i = TMap->GetInfoPointCount();
+	unsigned int i = TMap->GetInfoPointCount();
 	while (i--) {
 		InfoPoint* ip = TMap->GetInfoPoint(i);
 		if (strnicmp(ip->GetDialog(), resref, 8) == 0) {
@@ -1931,9 +1856,7 @@ Scriptable* Map::GetItemByDialog(ieResRef resref)
 //this function finds an actor by its original resref (not correct yet)
 Actor* Map::GetActorByResource(const char *resref)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), resref, 8 ) == 0) { //temporarily!
 			return actor;
 		}
@@ -1943,9 +1866,7 @@ Actor* Map::GetActorByResource(const char *resref)
 
 Actor* Map::GetActorByScriptName(const char *name)
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), name, 8 ) == 0) {
 			return actor;
 		}
@@ -1957,9 +1878,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 //use this function only for party?
 		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
 			continue;
@@ -1981,9 +1900,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 
 bool Map::SpawnsAlive() const
 {
-	size_t i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
+	for (auto actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
 			continue;
 		if (actor->Spawned) {
@@ -1999,6 +1916,13 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	//a faulty music list on the fly. I don't want to add a method just for that
 	//crap when we already have that pointer at hand!
 	char* poi = core->GetMusicPlaylist( SongHeader.SongList[SongType] );
+	// for subareas fall back to the main list
+	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
+	// it's not the correct music, perhaps it needs the one from the master area
+	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
+	if (!poi && !MasterArea && SongType == SONG_BATTLE) {
+		poi = core->GetMusicPlaylist(SongType);
+	}
 	if (!poi) return;
 
 	//check if restart needed (either forced or the current song is different)
@@ -2090,9 +2014,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	video->InitSpriteCover(sc, flags);
 
 	unsigned int wpcount = GetWallCount();
-	unsigned int i;
-
-	for (i = 0; i < wpcount; ++i)
+	for (unsigned int i = 0; i < wpcount; ++i)
 	{
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp) continue;
@@ -2107,12 +2029,10 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 
 void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg)
 {
-	unsigned int i;
-
 	if (!Walls) {
 		return;
 	}
-	for(i=baseindex; i < baseindex+count; ++i) {
+	for (unsigned int i = baseindex; i < baseindex + count; ++i) {
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp)
 			continue;
@@ -2124,9 +2044,8 @@ void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg
 		wp->SetPolygonFlag(value);
 	}
 	//all actors will have to generate a new spritecover
-	i=(int) actors.size();
-	while(i--) {
-		actors[i]->SetSpriteCover(NULL);
+	for (auto actor : actors) {
+		actor->SetSpriteCover(NULL);
 	}
 }
 
@@ -2266,16 +2185,15 @@ void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
 //if P is empty, the position won't be checked
 ieDword Map::HasVVCCell(const ieResRef resource, const Point &p)
 {
-	scaIterator iter;
 	ieDword ret = 0;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end(); iter++) {
+	for (auto vvc : vvcCells) {
 		if (!p.isempty()) {
-			if ((*iter)->XPos!=p.x) continue;
-			if ((*iter)->YPos!=p.y) continue;
+			if (vvc->XPos!=p.x) continue;
+			if (vvc->YPos!=p.y) continue;
 		}
-		if (strnicmp(resource, (*iter)->ResName, sizeof(ieResRef) )) continue;
-		ScriptedAnimation *sca = (*iter)->GetSingleObject();
+		if (strnicmp(resource, vvc->ResName, sizeof(ieResRef))) continue;
+		ScriptedAnimation *sca = vvc->GetSingleObject();
 		if (sca) {
 			ieDword tmp = sca->GetSequenceDuration(AI_UPDATE_TIME)-sca->GetCurrentFrame();
 			if (tmp>ret) {
@@ -2299,11 +2217,7 @@ void Map::AddVVCell(VEFObject* vvc)
 
 AreaAnimation* Map::GetAnimation(const char* Name)
 {
-	aniIterator iter;
-
-	for(iter=animations.begin();iter!=animations.end();iter++) {
-		AreaAnimation *anim = *iter;
-
+	for (auto anim : animations) {
 		if (anim->Name[0] && (strnicmp(anim->Name, Name, 32) == 0)) {
 			return anim;
 		}
@@ -2341,12 +2255,9 @@ void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
 
 Entrance* Map::GetEntrance(const char* Name)
 {
-	size_t i=entrances.size();
-	while (i--) {
-		Entrance *e = entrances[i];
-
-		if (strnicmp( e->Name, Name, 32 ) == 0) {
-			return e;
+	for (auto entrance : entrances) {
+		if (strnicmp(entrance->Name, Name, 32) == 0) {
+			return entrance;
 		}
 	}
 	return NULL;
@@ -2354,9 +2265,8 @@ Entrance* Map::GetEntrance(const char* Name)
 
 bool Map::HasActor(Actor *actor)
 {
-	size_t i=actors.size();
-	while (i--) {
-		if (actors[i] == actor) {
+	for (Actor *act : actors) {
+		if (act == actor) {
 			return true;
 		}
 	}
@@ -2384,13 +2294,12 @@ void Map::RemoveActor(Actor* actor)
 //and noone is trying to follow the party out
 bool Map::CanFree()
 {
-	size_t i=actors.size();
-	while (i--) {
-		if (actors[i]->IsPartyMember()) {
+	for (auto actor : actors) {
+		if (actor->IsPartyMember()) {
 			return false;
 		}
 
-		if (actors[i]->GetInternalFlag()&IF_USEEXIT) {
+		if (actor->GetInternalFlag()&IF_USEEXIT) {
 			return false;
 		}
 	}
@@ -2402,12 +2311,10 @@ bool Map::CanFree()
 void Map::dump(bool show_actors) const
 {
 	StringBuffer buffer;
-	size_t i;
-
 	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName );
 	buffer.append("Scripts:");
 
-	for (i = 0; i < MAX_SCRIPTS; i++) {
+	for (size_t i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i]) {
 			poi = Scripts[i]->GetName();
@@ -2421,14 +2328,13 @@ void Map::dump(bool show_actors) const
 	buffer.appendFormatted( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
 	buffer.appendFormatted( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
 	buffer.appendFormatted( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
-	buffer.appendFormatted( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
+	buffer.appendFormatted( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST_INDOORS) );
 
 	if (show_actors) {
 		buffer.append("\n");
-		i = actors.size();
-		while (i--) {
-			if (actors[i]->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
-				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actors[i]->GetName(1), actors[i]->GetGlobalID(), actors[i]->GetScriptName(), actors[i]->Pos.x, actors[i]->Pos.y);
+		for (auto actor : actors) {
+			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actor->GetName(1), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
 		}
 	}
@@ -2668,11 +2574,11 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = !( GetBlocked( p ) & PATH_MAP_PASSABLE );
+		bool wall = GetBlocked( p ) & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_SIDEWALL);
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
-				//recalculate dest (mirror it)
+				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
 				break;
@@ -2988,8 +2894,8 @@ unsigned int Map::GetAmbientCount(bool toSave)
 	if (!toSave) return (unsigned int) ambients.size();
 
 	unsigned int ambiCount = 0;
-	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if (!((*it)->flags & IE_AMBI_NOSAVE)) ambiCount++;
+	for (auto ambient : ambients) {
+		if (!(ambient->flags & IE_AMBI_NOSAVE)) ambiCount++;
 	}
 	return ambiCount;
 }
@@ -3147,8 +3053,7 @@ void Map::UpdateSpawns()
 		return;
 	}
 	ieDword time = core->GetGame()->GameTime;
-	for (std::vector<Spawn *>::iterator it = spawns.begin() ; it != spawns.end(); ++it) {
-		Spawn *spawn = *it;
+	for (auto spawn : spawns) {
 		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
 			//only reactivate the spawn point if the party cannot currently see it;
 			//also make sure the party has moved away some
@@ -3295,8 +3200,7 @@ void Map::UpdateFog()
 		SetMapVisibility( 0 );
 	}
 
-	for (unsigned int e = 0; e<actors.size(); e++) {
-		Actor *actor = actors[e];
+	for (auto actor : actors) {
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		if (core->FogOfWar&FOG_DRAWFOG) {
 			int state = actor->Modified[IE_STATE_ID];
@@ -3361,22 +3265,19 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 
 Spawn* Map::GetSpawn(const char* Name)
 {
-	for (size_t i = 0; i < spawns.size(); i++) {
-		Spawn* sp = spawns[i];
-
-		if (stricmp( sp->Name, Name ) == 0)
-			return sp;
+	for (auto spawn : spawns) {
+		if (stricmp(spawn->Name, Name) == 0) {
+			return spawn;
+		}
 	}
 	return NULL;
 }
 
 Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius)
 {
-	for (size_t i = 0; i < spawns.size(); i++) {
-		Spawn* sp = spawns[i];
-
-		if (Distance(point, sp->Pos)<radius) {
-			return sp;
+	for (auto spawn : spawns) {
+		if (Distance(point, spawn->Pos) < radius) {
+			return spawn;
 		}
 	}
 	return NULL;
@@ -3422,6 +3323,49 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
 	}
 }
 
+// merges pile 1 into pile 2
+static void MergePiles(Container *donorPile, Container *pile)
+{
+	unsigned int i = donorPile->inventory.GetSlotCount();
+	while (i--) {
+		CREItem *item = donorPile->RemoveItem(i, 0);
+		int count = pile->inventory.CountItems(item->ItemResRef, 0);
+		if (count == 0) {
+			pile->AddItem(item);
+			continue;
+		}
+
+		// ensure slots are stacked fully before adding new ones
+		int skipped = count;
+		while (count) {
+			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
+			if (slot == -1) {
+				// probably an inventory bug, shouldn't happen
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+				skipped--;
+				continue;
+			}
+			CREItem *otheritem = pile->inventory.GetSlotItem(slot);
+			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
+				// already full (or nonstackable), nothing to do here
+				skipped--;
+				continue;
+			}
+			if (pile->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
+				// the merge either failed (add whole) or went over the limit (add remainder)
+				pile->AddItem(item);
+			}
+			skipped = 1; // just in case we would be eligible for the safety net below
+			break;
+		}
+
+		// all found slots were already unsuitable, so just dump the item to a new one
+		if (!skipped) {
+			pile->AddItem(item);
+		}
+	}
+}
+
 void Map::MoveVisibleGroundPiles(const Point &Pos)
 {
 	//creating the container at the given position
@@ -3433,42 +3377,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 		Container * c = TMap->GetContainer( containercount);
 		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
 			//transfer the pile to the other container
-			unsigned int i=c->inventory.GetSlotCount();
-			while (i--) {
-				CREItem *item = c->RemoveItem(i, 0);
-				int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
-				if (count == 0) {
-					othercontainer->AddItem(item);
-					continue;
-				}
-				// ensure slots are stacked fully before adding new ones
-				int skipped = count;
-				while (count) {
-					int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
-					if (slot == -1) {
-						// probably an inventory bug, shouldn't happen
-						Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
-						skipped--;
-						continue;
-					}
-					CREItem *otheritem = othercontainer->inventory.GetSlotItem(slot);
-					if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
-						// already full (or nonstackable), nothing to do here
-						skipped--;
-						continue;
-					}
-					if (othercontainer->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
-						// the merge either failed (add whole) or went over the limit (add remainder)
-						othercontainer->AddItem(item);
-					}
-					skipped = 1; // just in case we would be eligible for the safety net below
-					break;
-				}
-				// all found slots were already unsuitable, so just dump the item to a new one
-				if (!skipped) {
-					othercontainer->AddItem(item);
-				}
-			}
+			MergePiles(c, othercontainer);
 		}
 	}
 
@@ -3579,23 +3488,19 @@ int Map::GetWeather()
 	if (Snow>=core->Roll(1,100,0) ) {
 		return WB_SNOW;
 	}
-	if (Fog>=core->Roll(1,100,0) ) {
-		return WB_FOG;
-	}
+	// TODO: handle WB_FOG the same way when we start drawing it
 	return WB_NORMAL;
 }
 
 void Map::FadeSparkle(const Point &pos, bool forced)
 {
-	spaIterator iter;
-
-	for(iter=particles.begin(); iter!=particles.end();iter++) {
-		if ((*iter)->MatchPos(pos) ) {
+	for (auto particle : particles) {
+		if (particle->MatchPos(pos)) {
 			if (forced) {
 				//particles.erase(iter);
-				(*iter)->SetPhase(P_EMPTY);
+				particle->SetPhase(P_EMPTY);
 			} else {
-				(*iter)->SetPhase(P_FADE);
+				particle->SetPhase(P_FADE);
 			}
 			return;
 		}
@@ -3734,7 +3639,7 @@ AreaAnimation::AreaAnimation()
 	palette=NULL;
 	covers=NULL;
 	appearance = sequence = frame = transparency = height = 0;
-	Flags = startFrameRange = skipcycle = startchance = 0;
+	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
 	Name[0] = 0;
 	BAM[0] = 0;
@@ -3747,6 +3652,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	sequence = src->sequence;
 	animation = NULL;
 	Flags = src->Flags;
+	originalFlags = src->originalFlags;
 	Pos.x = src->Pos.x;
 	Pos.y = src->Pos.y;
 	appearance = src->appearance;
@@ -4016,4 +3922,3 @@ void Map::SetupReverbInfo() {
 }
 
 }
-

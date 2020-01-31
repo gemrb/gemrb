@@ -49,14 +49,6 @@ def SetupSpellsWindow(chargen=0):
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 	# mxsplbon.2da is handled in core and does not affect learning
 
-	# sorcerer types need this change to not get too many spells
-	# for them the castable and known count progress differently
-	# TODO: create an extra clsskills column to hold this data
-	if SpellTableName == "MXSPLSOR":
-		SpellTableName = "SPLSRCKN"
-	elif SpellTableName == "MXSPLBRD":
-		SpellTableName = "SPLBRDKN"
-
 	# charbase has domain slots reserved, so nuke them
 	if chargen:
 		Spellbook.UnsetupSpellLevels (MyChar, "MXSPLCLR", IE_IWD2_SPELL_DOMAIN, 1)

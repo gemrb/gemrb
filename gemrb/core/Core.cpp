@@ -87,7 +87,7 @@ unsigned int Distance(Point p, Point q)
 }
 
 /** Calculates distance squared from a point to a scriptable */
-unsigned int SquaredMapDistance(Point p, Scriptable *b)
+unsigned int SquaredMapDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x/16 - b->Pos.x/16 );
 	long y = ( p.y/12 - b->Pos.y/12 );
@@ -95,14 +95,14 @@ unsigned int SquaredMapDistance(Point p, Scriptable *b)
 }
 
 /** Calculates distance between 2 points */
-unsigned int Distance(Point p, Scriptable *b)
+unsigned int Distance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
 	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
-unsigned int PersonalDistance(Point p, Scriptable *b)
+unsigned int PersonalDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
@@ -114,7 +114,7 @@ unsigned int PersonalDistance(Point p, Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(Point p, Scriptable *b)
+unsigned int SquaredPersonalDistance(Point p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
@@ -127,7 +127,7 @@ unsigned int SquaredPersonalDistance(Point p, Scriptable *b)
 }
 
 /** Calculates map distance between 2 scriptables */
-unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = (a->Pos.x/16 - b->Pos.x/16 );
 	long y = (a->Pos.y/12 - b->Pos.y/12 );
@@ -135,7 +135,7 @@ unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance between 2 scriptables */
-unsigned int Distance(Scriptable *a, Scriptable *b)
+unsigned int Distance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -143,7 +143,7 @@ unsigned int Distance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance squared between 2 scriptables */
-unsigned int SquaredDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -151,7 +151,7 @@ unsigned int SquaredDistance(Scriptable *a, Scriptable *b)
 }
 
 /** Calculates distance between 2 scriptables, including feet circle if applicable */
-unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
+unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -166,7 +166,7 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
+unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
@@ -181,9 +181,70 @@ unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
+// What's the deal with the spell and item ranges in their descriptions being in feet?
+//
+// Kjeron provided these notes:
+// It had no standards - spell descriptions were copied straight from their source material.
+// In game it ranged from 3.57 units per foot, to 28.57 units per foot, but most often around
+// 8.5 units per foot, which was still wrong. The descriptions have mostly been fixed in the
+// EE's, albeit with some rounding.
+//
+// 16 horizontal pixels = 1 foot
+// 12 vertical pixels = 1 foot
+//
+// Projectile trap/explosion size is based on horizontal distance, 16 = 16h pixels = 1 foot radius
+// 80 = 5' radius
+// 256 = 16' radius
+// 448 = 28' radius (max engine can handle for repeating AoE's)
+// 480 = 30' radius
+//
+// Visual/Script Range = 448h/336v pixels (28 feet) (I don't know why it's often listed as 30')
+// Spellcasting Range = 16h/12v pixels (1 foot) per unit
+// Opcode 262 (Visual Range) = 32h/24v pixels (2 feet) per unit
+//
+// The one thing that is 30' (480h/360v pixels) is PC movement rate per round, at least in original BG1,
+// BG2 bumped it up by 50% to 45' per round.
+
+// 1 foot = 16px horizontally, 12px vertically and all in between
+// we use them to construct an ellipse and through its central angle get the adjusted "radius"
+// Potential optimisation through precomputing:
+// rounding the angle into 5° intervals [0-90] gives these values per foot:
+// 16 16 16 16 15 15 15 14 14 14 13 13 13 12 12 12 12 12 12
+double Feet2Pixels(int feet, double angle)
+{
+	double sin2 = pow(sin(angle) / 12, 2);
+	double cos2 = pow(cos(angle) / 16, 2);
+	double r = sqrt(1 / (cos2 + sin2));
+	return r * feet;
+}
+
+/* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling
+ a nd more than 1x visual range in others;
+ in EE, the '48' (3*16) default can be set by the 'Audible Range' option in baldur.lua
+
+ This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual
+ range in several places, so we will use '3 * visual_range / 2' */
+bool WithinAudibleRange(const Actor *actor, const Point &dest)
+{
+	int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
+	return WithinRange(actor, dest, distance);
+}
+
+bool WithinRange(const Actor *actor, const Point &dest, int distance)
+{
+	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
+	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
+}
+
+bool WithinPersonalRange(const Actor *actor, const Scriptable *dest, int distance)
+{
+	double angle = atan2(actor->Pos.y - dest->Pos.y, actor->Pos.x - dest->Pos.x);
+	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
+}
+
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
-int EARelation(Scriptable* Owner, Actor* target)
+int EARelation(const Scriptable* Owner, const Actor* target)
 {
 	ieDword eao = EA_ENEMY;
 

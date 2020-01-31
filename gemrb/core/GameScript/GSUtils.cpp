@@ -51,6 +51,7 @@
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 
+#include <cmath>
 #include <cstdio>
 
 namespace GemRB {
@@ -158,9 +159,7 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	}
 	Actor* ab = ( Actor* ) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
-	if (reputation > 200) {
-		reputation = 200;
-	}
+	reputation = Clamp(reputation, 10, 200);
 	return happiness[alignment-1][reputation/10-1];
 }
 
@@ -516,12 +515,25 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {
-		ieDword speech = GEM_SND_RELATIVE; //disable position
-		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
+		ieDword speech = 0;
+		Point pos(Sender->Pos.x, Sender->Pos.y);
+		if (flags&DS_SPEECH) {
+			speech = GEM_SND_SPEECH;
+		}
+		// disable position, but only for party
+		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty) {
+			speech |= GEM_SND_RELATIVE;
+			pos.x = pos.y = 0;
+		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play(Sound, channel, 0, 0, speech, &len);
+		core->GetAudioDrv()->Play(Sound, channel, pos.x, pos.y, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+
+		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
+			reinterpret_cast<Actor*>(Sender)->SetAnimatedTalking(len);
+		}
+
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
 	}
@@ -873,6 +885,9 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
 				if(!Sender->InMove()) print("At least it said so...");
+				// ensure the action doesn't get interrupted
+				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
+				Sender->CurrentActionInterruptable = false;
 				return;
 			}
 		}
@@ -1075,6 +1090,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			}
 			break;
 		case BD_SOURCE:
+			// can't handle swap as BD_TARGET, since it just breaks dialog with PCs (eg. Maadeen in the gov. district)
+			// freeing Minsc requires skipping the non-interruptible check for the second dialog to properly start
+			if (speaker) {
+				Dialog = speaker->GetDialog(swap ? GD_NORMAL : GD_FEEDBACK);
+			} else {
+				Dialog = scr->GetDialog();
+			}
+			break;
 		case BD_TARGET:
 			// Don't check for the target being non-interruptible if we swapped speakers
 			// or if the speaker is the target, otherwise do (and request feedback on failure).
@@ -1234,6 +1257,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 		}
 	}
 	actor->SetPosition(position, adjust);
+	actor->SetStance(IE_ANI_READY);
 	if (face !=-1) {
 		actor->SetOrientation( face, false );
 	}
@@ -1407,11 +1431,12 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
+	double angle = atan2(actor->Pos.y - target->Pos.y, actor->Pos.x - target->Pos.x);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		(PersonalDistance(Sender, target) > weaponrange) ||
+		!WithinPersonalRange(actor, target, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
-		MoveNearerTo(Sender, target, weaponrange);
+		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));
 		return;
 	} else if (target->Type == ST_DOOR) {
 		//Forcing a lock does not launch the trap...
@@ -1433,6 +1458,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	actor->FaceTarget(target);
 
 	Sender->LastTarget = target->GetGlobalID();
+	Sender->LastTargetPersistent = Sender->LastTarget;
 	actor->PerformAttack(core->GetGame()->GameTime);
 }
 
@@ -1567,7 +1593,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				//str++;
 				delete newAction;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -1927,7 +1952,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				//str++;
 				delete newTrigger;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -2216,7 +2240,11 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		return value;
 	}
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		Sender->locals->Lookup( VarName, value );
+		if (!Sender->locals->Lookup(VarName, value)) {
+			if (valid) {
+				*valid = false;
+			}
+		}
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
@@ -2895,6 +2923,38 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
+}
+
+void AddXPCore(Action *parameters, bool divide)
+{
+	AutoTable xptable;
+
+	if (core->HasFeature(GF_HAS_EXPTABLE)) {
+		xptable.load("exptable");
+	} else {
+		xptable.load("xplist");
+	}
+
+	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
+		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
+	}
+	if (!xptable) {
+		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");
+		return;
+	}
+	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0"); // level is unused
+
+	if (divide) {
+		// force divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue), SX_DIVIDE);
+	} else if (xpvalue[0] == 'P' && xpvalue[1] == '_') {
+		// divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE);
+	} else {
+		// give xp to everyone
+		core->GetGame()->ShareXP(atoi(xpvalue), 0);
+	}
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 }

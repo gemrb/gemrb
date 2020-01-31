@@ -119,6 +119,7 @@ struct UsedItemType {
 typedef char EventNameType[17];
 #define IS_DROP	0
 #define IS_GET	1
+#define IS_SWINGOFFSET 2 // offset to the swing sound columns
 
 #define UNINIT_IEDWORD 0xcccccccc
 
@@ -295,7 +296,7 @@ static bool StatIsASkill(unsigned int StatID) {
 	if (StatID >= IE_LORE && StatID <= IE_PICKPOCKET) return true;
 
 	// alchemy, animals, bluff, concentration, diplomacy, intimidate, search, spellcraft, magicdevice
-	// NOTE: change if you want to use IE_EXTRAPROFICIENCY1..., as they use the same values
+	// NOTE: change if you want to use IE_PROFICIENCYCLUB or IE_EXTRAPROFICIENCY2 etc., as they use the same values
 	if (StatID >= IE_ALCHEMY && StatID <= IE_MAGICDEVICE) return true;
 
 	// Hide, Wilderness_Lore
@@ -320,7 +321,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
 			return actor->GetSkill(StatID);
 		} else {
-			return actor->GetStat(StatID);
+			if (StatID != IE_HITPOINTS || actor->HasVisibleHP()) {
+				return actor->GetStat(StatID);
+			} else {
+				return 0xdadadada;
+			}
 		}
 	}
 	return actor->GetBase( StatID );
@@ -496,11 +501,11 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 			return PyString_FromString("");
 		}
 		switch(Index&15) {
-		case 0:
+		case 0: // STR_LOADMOS
 			return PyString_FromString( game->LoadMos );
-		case 1:
+		case 1: // STR_AREANAME
 			return PyString_FromString( game->CurrentArea );
-		case 2:
+		case 2: // STR_TEXTSCREEN
 			return PyString_FromString( game->TextScreen );
 		}
 	}
@@ -4062,7 +4067,7 @@ ignored).\n\
   * ControlID   - the new control will be available via this controlID\n\
   * x,y,w,h     - X position, Y position, Width and Height of the control\n\
   * direction   - travel direction (-1 to ignore)\n\
-  * font        - font uused to display names of map locations\n\
+  * font        - font used to display names of map locations\n\
   * recolor     - recolor map icons (bg1)\n\
 \n\
 **Return value:** N/A\n\
@@ -5491,6 +5496,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
+	if (!anim->HasControl()) Py_RETURN_NONE;
 
 	if (Blend) {
 		anim->SetBlend(true);
@@ -6088,7 +6094,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
 "===== PlayMovie =====\n\
 \n\
-**Prototype:** GemRB.PlayMovie (MOVResRef[, flag])\n\
+**Prototype:** GemRB.PlayMovie (MOVResRef[, flag=0])\n\
 \n\
 **Description:** Plays the named movie. Sets the configuration variable \n\
 MOVResRef to 1. If flag was set to 1 it won't play the movie if the \n\
@@ -6096,7 +6102,9 @@ configuration variable was already set (saved in game ini).\n\
 \n\
 **Parameters:**\n\
   * MOVResRef - a .mve/.bik (or vlc compatible) resource reference.\n\
-  *      flag - don't play movie twice\n\
+  * flag:\n\
+      * 0 - only play the movie if it has never been played before\n\
+      * 1 - always play\n\
 \n\
 **Return value:**\n\
   * 0 - movie played\n\
@@ -6210,6 +6218,7 @@ PyDoc_STRVAR( GemRB_SaveConfig__doc,
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
+	UpdateActorConfig(); // Button doesn't trigger this in its OnMouseUp handler where it calls SetVar
 	return PyBool_FromLong(core->SaveConfig());
 }
 
@@ -8185,7 +8194,13 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 
 	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = GetCreatureStat( actor, StatID, !BaseStat );
-	return PyInt_FromLong( StatValue );
+
+	// special handling for the hidden hp
+	if ((unsigned)StatValue == 0xdadadada) {
+		return PyString_FromString("?");
+	} else {
+		return PyInt_FromLong(StatValue);
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
@@ -8238,7 +8253,7 @@ default to the class script slot (customisable by players).\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
-  * Index - script index (see scrlevel.2da)\n\
+  * Index - script index (see scrlev.ids)\n\
 \n\
 **Return value:** the player's script (.bcs or .baf resref)\n\
 \n\
@@ -8275,7 +8290,7 @@ script is customisable via the GUI (used if Index is omitted).\n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
   * ScriptName - the script resource\n\
-  * Index      - the script index (see scrlevel.2da)\n\
+  * Index      - the script index (see scrlev.ids)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -11184,7 +11199,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 \n\
 **Parameters:**\n\
   * ResRef - the resource reference of the item\n\
-  * PartyID - the resource reference of the item\n\
+  * PartyID - the pc you want to check usability against (defaults to the selected one)\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemName'           - strref of unidentified name.\n\
@@ -11667,14 +11682,15 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
 		displaymsg->DisplayConstantString(STR_TOOFARAWAY, DMC_WHITE);
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
 
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {
-		return PyInt_FromLong( -1 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
+	bool ranged = item->GetWeaponHeader(true) != NULL;
 
 	// can't equip item because of similar already equipped
 	if (Effect) {
@@ -11682,7 +11698,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			displaymsg->DisplayConstantString(STR_ITEMEXCL, DMC_WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11690,7 +11706,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		CREItem *item = actor->inventory.GetUsedWeapon(false, Effect); //recycled variable
 		if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11700,14 +11716,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (eh && eh->IDReq) {
 			displaymsg->DisplayConstantString(STR_ITEMID, DMC_WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
 	//it is always possible to put these items into the inventory
 	if (!(Slottype&SLOT_INVENTORY)) {
 		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11724,9 +11740,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//freeing the item before returning
 	gamedata->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
-	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+	res = actor->inventory.AddSlotItem(slotitem, Slot, Slottype, ranged);
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
@@ -11740,15 +11756,15 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
 		//swapping won't cure this
-		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
+		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED, ranged);
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
 		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
 			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
-			return PyInt_FromLong(0);
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
@@ -14021,10 +14037,11 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	print("Range: %d", itemdata.Range);
 	print("Target: %d", forcetarget);
 	print("Projectile: %d", itemdata.ProjectileAnimation);
-	//
+	int count = 1;
 	switch (forcetarget) {
 		case TARGET_SELF:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, 1);
+			if (core->HasFeature(GF_TEAM_MOVEMENT)) count += 1000; // pst inventory workaround to avoid another parameter
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, count);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
@@ -14203,11 +14220,11 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
 				}
 				GameScript* restscript = new GameScript(resref, tar, 0, 0);
-				restscript->Update();
-				delete restscript;
-				if (tar->GetLastRested() == core->GetGame()->GameTime) {
+				if (restscript->Update()) {
+					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
 					dreamed = 1;
 				}
+				delete restscript;
 			}
 		}
 	}
@@ -14768,8 +14785,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
 	}
 
-// 	actor->AC.dump();
-	actor->ToHit.dump();
 	PyObject *ac = PyDict_New();
 	PyDict_SetItemString(ac, "Total", PyInt_FromLong (actor->AC.GetTotal()));
 	PyDict_SetItemString(ac, "Natural", PyInt_FromLong (actor->AC.GetNatural()));
@@ -14802,7 +14817,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		return 0;
+		Log(WARNING, "Actor", "Invalid weapon wielded by %s!", actor->GetName(1));
+		return dict;
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
@@ -15132,13 +15148,12 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m2;
 	switch(index) {
 		case ME_OVERRIDE:
-			m->override = value;
+			m->me_override = value;
 			break;
 		default:
 		case ME_VALID:
 		case ME_ACCESSIBLE:
 			return AttributeError( GemRB_SetMazeEntry__doc );
-			break;
 		case ME_TRAP: //trapped/traptype
 			if (value==-1) {
 				m->trapped = 0;
@@ -15330,7 +15345,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
-	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
+	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->me_override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
 	if (m->trapped) {

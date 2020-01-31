@@ -87,7 +87,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 	String token;
 
 	String::const_iterator it = text.begin() + tagPos;
-	for (; it != text.end(); it++) {
+	for (; it != text.end(); ++it) {
 		assert(context.size());
 		TextAttributes& attributes = context.top();
 
@@ -114,7 +114,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 					case '[': // wasn't actually a tag after all
 						state = TEXT;
 						token.insert((String::size_type) 0, 1, L'[');
-						it--; // rewind so the TEXT node is created
+						--it; // rewind so the TEXT node is created
 						continue;
 				}
 				break;
@@ -146,7 +146,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (*++it == '/')
 							state = CLOSE_TAG;
 						else {
-							it--;
+							--it;
 							state = OPEN_TAG;
 						}
 						continue;

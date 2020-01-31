@@ -1,14 +1,27 @@
-GemRB git (435b73d5a):
+GemRB git (d670f0867):
   New features:
     - 
-    - using bags in stores, NPC breaking points
+
+  Improved features:
+    - 
+    - audio, pst ini handling
+    - effects, projectiles, actions
+    - bugfixes
+
+  Notes:
+    - switched to c++11 and cmake 3.1 as a minimum
+
+GemRB v0.8.6 (2019-11-24):
+  New features:
+    - more audio, especially in bg1 and pst
     - sndchann.2da support
-    - more audio, especially in bg1
+    - using bags in stores, NPC breaking points, worldmap travel in pst
 
   Improved features:
     - better megamod and detectable spells compatibility
-    - iwd2 and pst levelup, infopoints, gui feedback
-    - verbal constants, (tobex) opcodes, falling, paperdolls
+    - iwd2 and pst levelup, infopoints, gui feedback, dualclassing, ranges
+    - verbal constants, (tobex) opcodes, falling, paperdolls, projectiles
+    - pst area animations, multipalette animations
     - bugfixes
 
 GemRB v0.8.5 (2017-11-26):

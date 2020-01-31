@@ -96,7 +96,7 @@ void NullSound::GetListenerPos(int& x, int& y)
 	y = YPos;
 }
 
-int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
+int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, int)
 {
 	return -1;
 }

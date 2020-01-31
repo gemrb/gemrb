@@ -70,10 +70,8 @@ more than once, only the last occurrence is used.
 Empty lines and lines starting with `#' (hash sign) are ignored.
 
 At least the
-.I GameType
-and
 .I GamePath
-parameters need to be changed. That is often enough, so do not fiddle with the other paths too much.
+parameter needs to be changed. That is often enough, so do not fiddle with the other paths too much.
 
 .SH General Parameters:
 
@@ -83,7 +81,7 @@ Type of the game. The value is a name of subdirectory in override/
 and GUIScripts/ directories
 with game type-specific files and scripts. It is at present also used
 for various tweaks hardcoded in the GemRB engine. To autodetect the game
-type, use "auto".
+type, use the default "auto".
 
 .TP
 .BR GameName =STRING
@@ -171,31 +169,6 @@ the unexplored parts of an area are blacked out. It is enabled by default.
 Use the specified plugin as the audio driver. The default is openal, while
 .I none
 will disable all audio.
-
-.TP
-.BR VolumeAmbients =INT
-Volume of ambient sounds in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeMovie =INT
-Volume during movie playback in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeMusic =INT
-Volume of background music in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeSFX =INT
-Volume of sound effects in percents. The default is
-.IR 100 .
-
-.TP
-.BR VolumeVoices =INT
-Volume of PC or NPC voices in percents. The default is
-.IR 100 .
 
 .\"###################################################
 .SH Path parameters:
@@ -460,11 +433,17 @@ if you want to ignore the settings from the original configuration files - baldu
 system-wide configuration file
 
 .TP
-.B @DATA_DIR@/override/
+.B @DATA_DIR@/unhardcoded/
 directory with
 .BR GemRB -distributed
 data files. These used to be hardcoded in the original engine. The files
 are sorted into directories for specific games.
+
+.TP
+.B @DATA_DIR@/override/
+directory with
+.BR GemRB -distributed
+data files. These files override their namesakes in the original data.
 
 .TP
 .B @DATA_DIR@/GUIScripts/
@@ -487,20 +466,21 @@ cache directory
 .SH BUGS
 Many.
 .B GemRB
-is still in an early development stage and not nearly complete.
+is still in development stage and not complete.
 
-If you stumble over something which is supposed to work, either make a bug report
-at http://sourceforge.net/projects/gemrb or come to the official IRC channel
+If you stumble over something which is supposed to work but doesn't,
+file an issue at https://github.com/gemrb/gemrb or first visit the 
+official IRC channel
 .I #GemRB
-at FreeNode.
+on the FreeNode IRC network.
 
 .\"###################################################
 .SH AUTHOR
-The GemRB Project development team at http://gemrb.org
+The GemRB Project development team at https://gemrb.org
 
 .\"###################################################
 .SH COPYING
-Copyright (C) 2003-2011 The GemRB Project
+Copyright (C) 2003-2020 The GemRB Project
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

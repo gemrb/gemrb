@@ -47,6 +47,7 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
+PauseState = None
 
 if not BonusSpellTable:
 	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
@@ -66,9 +67,17 @@ def Exportable(pc):
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
-	global BonusSpellTable, HateRaceTable
+	global BonusSpellTable, HateRaceTable, PauseState
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
+
+		GUIRECCommon.CloseSubSubCustomizeWindow ()
+		GUIRECCommon.CloseSubCustomizeWindow ()
+		GUIRECCommon.CloseCustomizeWindow ()
+		GUIRECCommon.ExportCancelPress()
+		GUIRECCommon.CloseBiographyWindow ()
+		CloseHelpWindow ()
+
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:
@@ -85,7 +94,11 @@ def OpenRecordsWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
+		GemRB.GamePause (PauseState, 3)
 		return
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
@@ -798,7 +811,7 @@ def DisplayWeapons (pc):
 			RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(5*failure["Shield"])+"%", 0))
 		if arcana:
 			AddIndent()
-			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(arcana)+"%", 0))
+			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(-arcana)+"%", 0))
 		# Other, just a guess to show the remainder
 		if other:
 			AddIndent()

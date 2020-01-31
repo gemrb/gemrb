@@ -193,8 +193,7 @@ def guardSkills():
 def unsetSkill():
 	import LUSkillsSelection
 	MyChar = GemRB.GetVar ("Slot")
-	LUSkillsSelection.SkillsNullify ()
-	LUSkillsSelection.SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify (MyChar)
 	
 def getSkills(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
@@ -337,8 +336,9 @@ def setAccept():
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
 	#lore, thac0, hp, and saves
-	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
-	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
+	if not GemRB.GetVar ("ImportedChar"):
+		GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+		GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
 	LUCommon.SetupSavingThrows (MyChar)
 	LUCommon.SetupThaco (MyChar)
 	LUCommon.SetupLore (MyChar)
@@ -367,7 +367,8 @@ def setAccept():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 	GemRB.SetPlayerString (MyChar, 74, 11863)
 	#10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	if not GemRB.GetVar ("ImportedChar"):
+		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# apply class/kit abilities
@@ -375,13 +376,13 @@ def setAccept():
 
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
+	GemRB.SetVar ("ImportedChar", 0)
 	
 	GUICommon.CloseOtherWindow(None)
 	
 	if playmode >=0:
 		CharGenCommon.close()
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
+		GemRB.SaveCharacter (MyChar, "gembak")
 		GemRB.EnterGame()
 	else:
 		#show the export window

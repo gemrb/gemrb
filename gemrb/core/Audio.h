@@ -120,7 +120,7 @@ public:
 	virtual void GetListenerPos(int &XPos, int &YPos ) = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
 	virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
-				ieWord gain, bool point, bool Ambient) = 0;
+				ieWord gain, bool point, int ambientRange) = 0;
 	virtual int QueueAmbient(int stream, const char* sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;

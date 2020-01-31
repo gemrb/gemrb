@@ -1,0 +1,49 @@
+name: Coverity Scan checkup
+
+on: 
+  schedule:
+    - cron: '0 15 1/7 * *' # Weekly at 22:00 UTC
+
+jobs:
+  latest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          set -x
+          sudo apt-get update
+          sudo apt-get install libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 libvlc-dev libvlccore-dev libvorbis-dev
+
+      - uses: actions/checkout@v1
+        with:
+          ref: subviews
+
+      - name: Download Coverity Build Tool
+        run: |
+          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=GemRB" -O cov-analysis-linux64.tar.gz
+          mkdir cov-analysis-linux64
+          tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
+        env:
+          TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+
+      - name: Run CMake
+        run: cmake -DINSOURCEBUILD=1 -DDISABLE_WERROR=1
+
+      - name: Build with cov-build
+        run: |
+          export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
+          cov-build --dir cov-int make -j2
+
+      - name: Submit the result to Coverity Scan
+        run: |
+          tar caf gemrb.xz cov-int
+          curl \
+            --form token=$TOKEN \
+            --form email=gemrb-commits@lists.sourceforge.net \
+            --form file=@gemrb.xz \
+            --form version="$(git describe)" \
+            --form description="GemRB weekly checkup" \
+            https://scan.coverity.com/builds?project=GemRB
+        env:
+          TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+

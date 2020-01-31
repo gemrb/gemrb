@@ -250,7 +250,6 @@ def EvaluateQuest (index):
 			#print "COMPLETED", suff
 			desc = GemRB.GetINIQuestsKey (tag, 'descCompleted' + suff, '0')
 			return (1, desc)
-			break
 
 
 	assigned = 1

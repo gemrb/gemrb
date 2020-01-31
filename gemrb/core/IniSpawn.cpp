@@ -33,6 +33,7 @@
 #include "PluginMgr.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
+#include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -52,7 +53,6 @@ IniSpawn::IniSpawn(Map *owner)
 	localscount = 0;
 	eventspawns = NULL;
 	eventcount = 0;
-	last_spawndate = 0;
 	//high detail level by default
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
@@ -521,7 +521,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
 {
 	const char *s;
-	
+	entry.name = strdup(entryname);
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
 	if (entry.interval < 15) entry.interval = 15; // lower bound from the original
 	//don't default to NULL here, some entries may be missing in original game
@@ -657,6 +657,7 @@ void IniSpawn::RespawnNameless()
 	for (i=0;i<namelessvarcount;i++) {
 		SetVariable(game, NamelessVar[i].Name,"GLOBAL", NamelessVar[i].Value);
 	}
+	core->GetGameControl()->ChangeMap(nameless, true);
 }
 
 void IniSpawn::SpawnCreature(CritterEntry &critter) const
@@ -826,21 +827,23 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 		return;
 	}
 	unsigned int interval = event.interval;
-	if (interval) {
-		if (last_spawndate + interval >= core->GetGame()->GameTime) {
+	ieDword gameTime = core->GetGame()->GameTime;
+	// gameTime can be 0 for the first area, so make sure to not exit prematurely
+	if (interval && gameTime) {
+		if (event.lastSpawndate + interval >= gameTime) {
 			return;
 		}
 	}
-	last_spawndate=core->GetGame()->GameTime;
 	
 	for(int i=0;i<event.crittercount;i++) {
 		CritterEntry* critter = event.critters+i;
-		if (!Schedule(critter->TimeOfDay, last_spawndate) ) {
+		if (!Schedule(critter->TimeOfDay, event.lastSpawndate) ) {
 			continue;
 		}
 		for(int j=0;j<critter->SpawnCount;j++) {
 			SpawnCreature(*critter);
 		}
+		event.lastSpawndate = gameTime;
 	}
 }
 
@@ -853,11 +856,12 @@ void IniSpawn::InitialSpawn()
 		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
 	}
 
-	// move the rest of the party if needed (note the i=1, 0 has the protagonist aka TNO)
+	// move the rest of the party if needed
 	if (!PartySpawnPoint.isnull()) {
 		Game *game = core->GetGame();
-		for (int i=1; i < game->GetPartySize(false); i++) {
-			Actor *pc = game->GetPC(i, false);
+		while (game->GetPartySize(false) > 1) {
+			Actor *pc = game->GetPC(1, false); // skip TNO
+			pc->Stop();
 			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
 			game->LeaveParty(pc);
 		}

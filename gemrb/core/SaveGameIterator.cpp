@@ -311,7 +311,7 @@ bool SaveGameIterator::RescanSaveGames()
 		}
 	} while (++dir);
 
-	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); i++) {
+	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); ++i) {
 		save_slots.push_back(BuildSaveGame(*i));
 		free(*i);
 	}
@@ -330,7 +330,7 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
 {
 	RescanSaveGames();
 
-	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); i++) {
+	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); ++i) {
 		if (strcmp(name, (*i)->GetName()) == 0)
 			return *i;
 	}
@@ -354,7 +354,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 	//maximum pathlength == 240, without 8+3 filenames
 	if ( (cnt != 2) || (strlen(Path)>240) ) {
-		Log(WARNING, "SaveGame" "Invalid savegame directory '%s' in %s.", slotname, Path );
+		Log(WARNING, "SaveGame", "Invalid savegame directory '%s' in %s.", slotname, Path );
 		return NULL;
 	}
 
@@ -378,7 +378,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
-	for (charlist::iterator m = save_slots.begin();m!=save_slots.end();m++) {
+	for (charlist::iterator m = save_slots.begin(); m != save_slots.end(); ++m) {
 		int tmp = IsQuickSaveSlot(folder, (*m)->GetSlotName() );
 		if (tmp) {
 			size_t pos = myslots.size();
@@ -537,18 +537,15 @@ static int CanSave()
 	}
 
 	Point pc1 =  game->GetPC(0, true)->Pos;
-	Actor **nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15*10);
-	i = 0;
-	while (nearActors[i]) {
-		Actor *actor = nearActors[i];
-		if (actor->GetInternalFlag() & IF_NOINT) {
+	std::vector<Actor *> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15);
+	std::vector<Actor *>::iterator neighbour;
+	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
+		if ((*neighbour)->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
 			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, DMC_BG2XPGREEN);
 			return 8;
 		}
-		i++;
 	}
-	free(nearActors);
 
 	//TODO: can't save while AOE spells are in effect -> CANTSAVE
 	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE

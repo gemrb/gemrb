@@ -50,6 +50,7 @@ class DialogHandler;
 #define DF_IN_CONTAINER   32
 #define DF_OPENCONTINUEWINDOW 64
 #define DF_OPENENDWINDOW 128
+#define DF_POSTPONE_SCRIPTS 256
 
 //screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -184,6 +185,8 @@ private:
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport, const Color& color);
+	bool ShouldTriggerWorldMap(const Actor *pc) const;
+	void ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint);
 
 private:
 	Actor *user;     //the user of item or spell

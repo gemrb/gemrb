@@ -476,14 +476,18 @@ def SetupClockWindowControls (Window):
 	# Select all characters
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41659)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
 
 	# Formations
+	import GUIWORLD
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
 
 	return
 
@@ -804,7 +808,6 @@ def ActionQWeaponPressed (which):
 # TODO: implement full weapon set switching instead
 def ActionQWeaponRightPressed (action):
 	"""Selects the used ability of the quick weapon."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
 	UpdateActionsWindow ()
@@ -1057,7 +1060,6 @@ def ActionQItem5Pressed ():
 
 def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
 	UpdateActionsWindow ()
@@ -1684,7 +1686,10 @@ def UpdateAnimatedPortrait (Window,i):
 	pic = GemRB.GetPlayerPortrait (i+1, 0)
 	if not pic:
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetAnimation ("")
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		ButtonHP.SetText ("")
+		ButtonHP.SetBAM ("", 0, 0)
 		return
 
 	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
@@ -1712,7 +1717,7 @@ def UpdateAnimatedPortrait (Window,i):
 	Button.SetAnimation (pic, cycle)
 	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 
-	if hp_max<1:
+	if hp_max < 1 or hp is "?":
 		ratio = 0.0
 	else:
 		ratio = (hp + 0.0) / hp_max
@@ -1721,7 +1726,7 @@ def UpdateAnimatedPortrait (Window,i):
 	r = int (255 * (1.0 - ratio))
 	g = int (255 * ratio)
 
-	ButtonHP.SetText ("%d / %d" %(hp, hp_max))
+	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
 	ButtonHP.SetTextColor (r, g, 0, False)
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)
@@ -2077,7 +2082,9 @@ def RestPress ():
 		GemRB.SetTimedEvent (RealRestPress, 2)
 
 def RealRestPress ():
-	GemRB.RestParty(0, 0, 1)
+	# only bg2 has area-based rest movies
+	# outside movies start at 2, 1 is for inns
+	GemRB.RestParty(0, 0 if GameCheck.IsBG2() else 2, 1)
 	return
 
 def SwitchPCByKey (wIdx, key, mod):

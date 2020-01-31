@@ -136,7 +136,7 @@ struct PCStruct {
 	ieWord   ViewXPos;
 	ieWord   ViewYPos;
 	ieWord   ModalState;
-	ieWord   Happiness;
+	ieWordSigned   Happiness;
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
@@ -176,7 +176,7 @@ struct GAMLocationEntry {
 
 //pst maze data structures (TODO: create a separate class?)
 struct maze_entry {
-	ieDword override;
+	ieDword me_override;
 	ieDword accessible;
 	ieDword valid;
 	ieDword trapped;
@@ -367,6 +367,8 @@ public:
 	bool MasterArea(const char *area);
 	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const char *area);
+	/** Guess the master area of the given area*/
+	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/
 	void PlacePersistents(Map *map, const char *ResRef);
 	/** Returns slot of the map, if it was already loaded,

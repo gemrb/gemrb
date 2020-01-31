@@ -73,6 +73,7 @@ namespace GemRB {
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours (use alpha)
 #define PTF_BRIGHTEN 256    //brighten alpha
+#define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
@@ -224,6 +225,7 @@ public:
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
+	unsigned int Range;
 	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
@@ -276,14 +278,6 @@ public:
 	bool PointInRadius(const Point &p) const;
 	void Cleanup();
 
-	//inliners to protect data consistency
-	inline PathNode * GetNextStep() {
-		if (!step) {
-			DoStep((unsigned int) ~0);
-		}
-		return step;
-	}
-
 	inline Point GetDestination() const { return Destination; }
 	inline const char * GetName() const { return name; }
 	inline ieWord GetType() const { return type; }
@@ -316,7 +310,7 @@ public:
 
 	void SetIdentifiers(const char *name, ieWord type);
 
-	void SetEffectsCopy(EffectQueue *eq);
+	void SetEffectsCopy(EffectQueue *eq, Point &source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
@@ -387,6 +381,7 @@ private:
 	int AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
 	void LineTarget();      //line projectiles (walls, scorchers)
+	void LineTarget(PathNode* beg, unsigned int depth);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall

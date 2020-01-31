@@ -38,7 +38,8 @@ class ProjectileEntry
 public:
 	ProjectileEntry()
 	{
-		memset(this,0,sizeof(ProjectileEntry));
+		resname[0] = 0;
+		projectile = NULL;
 	}
 	~ProjectileEntry()
 	{

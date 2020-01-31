@@ -34,7 +34,7 @@ private:
 	//Data
 	ieWord Language;
 	ieDword StrRefCount, Offset;
-	CTlkOverride *override;
+	CTlkOverride *OverrideTLK;
 
 public:
 	TLKImporter(void);

@@ -52,6 +52,7 @@ public:
 	bool SameResource(const ieResRef ResRef, int Cycle);
 	void SetPaletteGradients(ieDword *col);
 	void SetBlend(bool b);
+	bool HasControl() const { return control != NULL; };
 };
 
 }

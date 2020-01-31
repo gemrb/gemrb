@@ -23,6 +23,7 @@
 #include "Spell.h"
 
 #include "win32def.h"
+#include "voodooconst.h"
 
 #include "Audio.h"
 #include "Game.h"
@@ -43,6 +44,8 @@ static int pstflags = false;
 static int inited = false;
 SpellFocus *spellfocus = NULL;
 int schoolcount = 0;
+static EffectRef fx_damage_ref = { "Damage", -1 };
+static unsigned int damageOpcode = 0;
 
 static void InitSpellTables()
 {
@@ -92,6 +95,7 @@ Spell::Spell(void)
 	if (!inited) {
 		inited = true;
 		InitSpellTables();
+		damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	}
 	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
 	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
@@ -168,10 +172,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		//check if bg1
 		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
 			ieResRef s;
-			snprintf(s, 9, "CAS_P%c%01d%c", t, cgsound&0x9, g);
+			snprintf(s, 9, "CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
 			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0x63);
+			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, std::min(cgsound&0xff, 99));
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
@@ -230,15 +234,16 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		//the hostile flag is used to determine if this was an attack
 		fx->SourceFlags = Flags;
 		//pst spells contain a friendly flag in the spell header
-		if (pst_hostile) {
+		// while iwd spells never set this bit
+		if (pst_hostile || fx->Opcode == damageOpcode) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
-		fx->CasterID = self->GetGlobalID(); // needed early for check_type, reset later
+		fx->CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
 		fx->CasterLevel = level;
 		fx->SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
-		if (self->Type == ST_ACTOR) {
+		if (self && self->Type == ST_ACTOR) {
 			Actor *caster = (Actor *) self;
 			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
@@ -285,7 +290,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			selfqueue->AddEffect( fx );
 		}
 	}
-	if (selfqueue) {
+	if (self && selfqueue) {
 		Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 		core->ApplyEffectQueue(selfqueue, target, self);
 		delete selfqueue;
@@ -305,6 +310,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	if (seh->FeatureCount) {
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
+	pro->Range = GetCastingDistance(self);
 	return pro;
 }
 
@@ -315,9 +321,11 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
 	Actor *actor = NULL;
+	unsigned int limit = VOODOO_VISUAL_RANGE;
 	if (Sender && Sender->Type==ST_ACTOR) {
 		actor = (Actor *) Sender;
 		level = actor->GetCasterLevel(SpellType);
+		limit = actor->GetStat(IE_VISUALRANGE);
 	}
 
 	if (level<1) {
@@ -334,18 +342,16 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	if (seh->Target==TARGET_DEAD) {
 		return 0xffffffff;
 	}
-	return (unsigned int) seh->Range;
+	return std::min((unsigned int) seh->Range, limit);
 }
 
-static EffectRef fx_damage_ref = { "Damage", -1 };
 // checks if any of the extended headers contains fx_damage
 bool Spell::ContainsDamageOpcode() const
 {
-	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	for (int h=0; h< ExtHeaderCount; h++) {
 		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
 			Effect *fx = ext_headers[h].features+i;
-			if (fx->Opcode == damage_opcode) {
+			if (fx->Opcode == damageOpcode) {
 				return true;
 			}
 		}

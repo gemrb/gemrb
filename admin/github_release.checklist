@@ -1,0 +1,60 @@
+### Release checklist
+
+This is a general release preparation checklist to be used in the final stages of preparing
+a new release. Copy it to a new issue on the GitHub tracker and the syntax will suddenly make sense.
+
+Final development:
+- [ ] Fix or postpone issues in the [milestone](https://github.com/gemrb/gemrb/milestones)
+- [ ] Triage open pull requests
+- [ ] Check local stashes
+- [ ] No Coverity Scan issues
+
+Beta testing:
+- [ ] Playthrough: Chateau Irenicus to Waukeen's promenade
+- [ ] Playthrough: TOB up to Saradush
+- [ ] Ideally a full game runthrough of one of the compleatable games
+- [ ] Retest character generation of remaining games
+
+Release:
+- [ ] Finalise choice of version number, eg. v1.2.3
+- [ ] Update version number in `gemrb/includes/globals.h` and `configure.in`
+- [ ] Final `NEWS` update
+- [ ] Amend Roadmap in contributing.md
+- [ ] Create the source tarball with `make dist`
+  - [ ] Add any missing files to the cmake install targets and recreate the tarball
+  - [ ] Add any new extraneus files to `.gitattributes` and recreate
+  - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
+- [ ] Add a git tag and push it
+    ```
+        ver=0.8.2
+        git tag -a -m "GemRB $ver" v$ver
+        git push origin v$ver
+    ```
+
+Deployment:
+- [ ] Promote the new tag to a release on GitHub
+- [ ] Write docs:
+  - [ ] Forum announcements
+  - [ ] Release notes if needed (configuration changes, notes for packagers)
+- [ ] SourceForge
+  - [ ] Upload source package to SourceForge
+    - [ ] Upload any release notes alongside
+  - [ ] Mark release's AppVeyor build as a Windows default on SourceForge and source for everyone else
+  - [ ] (optional) regenerate android build
+  - [ ] Test downloads
+- [ ] Runtime tests of release packages
+- [ ] Announce on
+  - [ ] homepage: sidebar (versions and news), news, start (version), changelog (status
+      and log swap), old_changelogs
+  - [ ] Gibberlings3 forums
+    - [ ] GemRB forum
+    - [ ] modding news (a template is available in `admin/announcement.template`)
+  - [ ] SourceForge project page news section
+  - [ ] #GemRB in channel and title
+  - [ ] Discord channel
+
+Post-release:
+- [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
+- [ ] Update versions back to the `-git` suffix
+- [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
+- [ ] If the manpage changed, adapt the web copy (pandoc can convert it to markdown)

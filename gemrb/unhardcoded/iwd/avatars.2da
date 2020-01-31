@@ -78,7 +78,7 @@
 0x6003    CIMC1     CIMC2      CIMC3      CIMC4      6          2          0          S
 0x6010    CHFC1     CHFC2      CHFC3      CHFC4      6          2          0          M
 0x6011    CEFC1     CEFC2      CEFC3      CEFC4      6          2          0          M
-0x6012    CDMC1     CDMC2      CDMC3      CDMC4      6          2          0          S
+0x6012    CIFC1     CIFC2      CIFC3      CIFC4      6          2          0          S
 0x6013    CIFC1     CIFC2      CIFC3      CIFC4      6          2          0          S
 0x6100    CHMF1     CHMF2      CHMF3      CHMF4      6          2          0          L
 0x6101    CEMF1     CEMF2      CEMF3      CEMF4      6          2          0          M
@@ -86,7 +86,7 @@
 0x6103    CIMF1     CIMF2      CIMF3      CIMF4      6          2          0          S
 0x6110    CHFF1     CHFF2      CHFF3      CHFF4      6          2          0          M
 0x6111    CEFF1     CEFF2      CEFF3      CEFF4      6          2          0          M
-0x6112    CDMF1     CDMF2      CDMF3      CDMF4      6          2          0          S
+0x6112    CIFF1     CIFF2      CIFF3      CIFF4      6          2          0          S
 0x6113    CIFF1     CIFF2      CIFF3      CIFF4      6          2          0          S
 0x6200    CHMW1     CHMW2      CHMW3      CHMW4      6          2          0          L
 0x6201    CEMW1     CEMW2      CEMW3      CEMW4      6          2          0          M
@@ -102,7 +102,7 @@
 0x6303    CIMT1     CIMT2      CIMT2      CIMT2      6          2          0          S
 0x6310    CHFT1     CHFT2      CHFT2      CHFT2      6          2          0          M
 0x6311    CEFT1     CEFT2      CEFT2      CEFT2      6          2          0          M
-0x6312    CDMT1     CDMT2      CDMT2      CDMT2      6          2          0          S
+0x6312    CIFT1     CIFT2      CIFT2      CIFT2      6          2          0          S
 0x6313    CIFT1     CIFT2      CIFT2      CIFT2      6          2          0          S
 0x6400    UDRZ1     UDRZ1      UDRZ1      UDRZ1      6          2          0          *
 0x6401    UELM1     UELM1      UELM1      UELM1      6          2          1          *
@@ -224,12 +224,12 @@
 0xB600    NNOML     NNOML      NNOML      NNOML      2          2          0          *
 0xB610    NNOWL     NNOWL      NNOWL      NNOWL      2          2          0          *
 0xB700    NSLVL     NSLVL      NSIWL      NSIWL      18         2          0          *
-0xC000    ABAT      ABAT       ABAT       ABAT       2          1          1          *
+0xC000    ABAT      ABAT       ABAT       ABAT       2          0          1          *
 0xC100    ACAT      ACAT       ACAT       ACAT       2          1          1          *
 0xC200    ACHK      ACHK       ACHK       ACHK       2          1          1          *
 0xC300    ARAT      ARAT       ARAT       ARAT       2          1          1          *
 0xC400    ASQU      ASQU       ASQU       ASQU       2          1          1          *
-0xC500    ABAT      ABAT       ABAT       ABAT       2          1          1          *
+0xC500    ABAT      ABAT       ABAT       ABAT       2          0          1          *
 0xC600    NBEGH     NBEGH      NBEGH      NBEGH      2          2          0          *
 0xC610    NPROH     NPROH      NPROH      NPROH      2          2          0          *
 0xC700    NBOYH     NBOYH      NBOYH      NBOYH      3          2          0          *
@@ -356,7 +356,7 @@
 0xEB10    MSKA      MSKA       MSKA       MSKA       9          2          1          *
 0xEB18    MANI      MANI       MANI       MANI       9          2          1          *
 0xEB28    MAN2      MAN2       MAN2       MAN2       9          2          1          *
-0xEB39    MBE1      MBE1       MBE1       MBE1       9          2          1          *
+0xEB39    MBE1      MBE1       MBE1       MBE1       9          3          1          *
 0xEB49    MBE2      MBE2       MBE2       MBE2       9          2          1          *
 0xEB51    MSEE      MSEE       MSEE       MSEE       9          2          1          *
 0xEB52    MFIR      MFIR       MFIR       MFIR       9          2          1          *
@@ -370,14 +370,14 @@
 0xEBD8    MSAL      MSAL       MSAL       MSAL       16         2          1          *
 0xEBE8    MSA2      MSA2       MSA2       MSA2       16         2          1          *
 0xEBF1    MARU      MARU       MARU       MARU       9          2          1          *
-0xEC0B    MWDR      MWDR       MWDR       MWDR       9          2          1          *
+0xEC0B    MWDR      MWDR       MWDR       MWDR       9          5          1          *
 0xEC1D    MCHY      MCHY       MCHY       MCHY       9          2          1          *
 0xEC2B    MSHE      MSHE       MSHE       MSHE       9          2          1          *
 0xEC33    MCHI      MCHI       MCHI       MCHI       9          2          1          *
 0xEC4B    MDH1      MDH1       MDH1       MDH1       9          2          1          *
 0xEC5B    MDH2      MDH2       MDH2       MDH2       9          2          1          *
 0xED00    MYU1      MYU1       MYU1       MYU1       9          2          1          *
-0xED09    MCOR      MCOR       MCOR       MCOR       9          3          1          *
+0xED09    MCOR      MCOR       MCOR       MCOR       9          2          1          *
 0xED10    MYU2      MYU2       MYU2       MYU2       9          2          1          *
 0xED19    MGLA      MGLA       MGLA       MGLA       9          2          1          *
 0xED20    MYU3      MYU3       MYU3       MYU3       9          2          1          *

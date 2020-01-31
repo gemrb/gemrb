@@ -34,8 +34,8 @@ ItemAmountWindow = None
 ItemIdentifyWindow = None
 ItemAbilitiesWindow = None
 ErrorWindow = None
+ColorPicker = None
 StackAmount = 0
-pause = None
 
 def OnDragItemGround ():
 	"""Drops and item to the ground."""
@@ -236,10 +236,10 @@ def CloseItemInfoWindow ():
 	GUIINV.UpdateInventoryWindow ()
 	return
 
-def DisplayItem (itemresref, type):
+def DisplayItem (slotItem, type):
 	global ItemInfoWindow
 
-	item = GemRB.GetItem (itemresref)
+	item = GemRB.GetItem (slotItem["ItemResRef"])
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
 	if GameCheck.IsPST():
@@ -259,10 +259,10 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (2)
 	if GameCheck.IsPST():
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetItemIcon (itemresref)
+		Button.SetItemIcon (slotItem["ItemResRef"])
 	else:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-		Button.SetItemIcon (itemresref,0)
+		Button.SetItemIcon (slotItem["ItemResRef"], 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#middle button
@@ -300,9 +300,9 @@ def DisplayItem (itemresref, type):
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		if GameCheck.IsPST():
-			Button.SetItemIcon (itemresref, 1) # no DescIcon
+			Button.SetItemIcon (slotItem["ItemResRef"], 1) # no DescIcon
 		else:
-			Button.SetItemIcon (itemresref, 2)
+			Button.SetItemIcon (slotItem["ItemResRef"], 2)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#right button
@@ -316,9 +316,15 @@ def DisplayItem (itemresref, type):
 	container = (type&1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (type&1) and (item["Type"] == 38)
+	# perhaps it's true everywhere, but it's definitely needed in pst
+	# and yes, the check is reversed, so the bit name is a misnomer in this case
+	if GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
+		dialog = False
+		drink = True # "Use"
+
 	if drink:
 		Button.SetText (strrefs[3])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConsumeItem)
 	elif read:
 		Button.SetText (strrefs[4])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
@@ -391,7 +397,7 @@ def OpenItemInfoWindow (slot = None):
 		value = 1
 	else:
 		value = 3
-	DisplayItem (slot_item["ItemResRef"], value)
+	DisplayItem (slot_item, value)
 	return
 
 #auto identify when lore is high enough
@@ -414,8 +420,12 @@ def OpenGroundItemInfoWindow ():
 		value = 0
 	else:
 		value = 2
-	DisplayItem(slot_item["ItemResRef"], value)
+	DisplayItem(slot_item, value)
 	return
+
+# TODO: implement, reuse OpenItemAmountWindow, but be careful about any other uses of ItemButton
+def OpenGroundItemAmountWindow ():
+	pass
 
 def OpenItemAmountWindow ():
 	"""Open the split window."""
@@ -527,7 +537,7 @@ def UpdateSlot (pc, slot):
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		TryAutoIdentification(pc, item, slot+1, slot_item, GemRB.GetVar("GUIEnhancements")&GE_TRY_IDENTIFY_ON_TRANSFER)
 
-	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
+	UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 
 	if slot_item:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
@@ -569,6 +579,7 @@ def UpdateSlot (pc, slot):
 	return
 
 def CancelColor():
+	global ColorPicker
 	if ColorPicker:
 		ColorPicker.Unload ()
 	GUIINV.InventoryWindow.SetVisible (WINDOW_VISIBLE)
@@ -676,13 +687,14 @@ def ReleaseFamiliar ():
 	CloseItemInfoWindow ()
 	return
 
-def DrinkItemWindow ():
+def ConsumeItem ():
 	"""Drink the potion"""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
-	GemRB.UseItem (pc, slot, 0)
+	# pst also requires forcing the target (eg. clot charms), which doesn't hurt elsewhere
+	GemRB.UseItem (pc, slot, 0, 5)
 	CloseItemInfoWindow ()
 	return
 
@@ -713,7 +725,6 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
-	global pause
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -721,6 +732,7 @@ def ReadItemWindow ():
 	ret = Spellbook.CannotLearnSlotSpell()
 
 	if ret:
+		# these failures are soft - the scroll is not destroyed
 		if ret == LSR_KNOWN and GameCheck.HasTOB():
 			strref = 72873
 		elif ret == LSR_KNOWN and GameCheck.IsPST():
@@ -740,31 +752,30 @@ def ReadItemWindow ():
 			strref = 10831
 
 		CloseItemInfoWindow ()
+		GemRB.PlaySound ("EFF_M10") # failure!
 		OpenErrorWindow (strref)
+		return
 
-	else:
+	if GameCheck.IsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+
+	# we already checked for most failures, but we can still fail with bad % rolls vs intelligence
+	ret = Spellbook.LearnFromScroll (pc, slot)
+	if ret == LSR_OK:
+		GemRB.PlaySound ("GAM_44") # success!
 		if GameCheck.IsPST():
-			slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-
-		pause = GemRB.GamePause(3,1) #query the pause state
-		GemRB.GamePause(0,1)
-		GemRB.UseItem (pc, slot, 1, 5)
-		GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
-
-	return ret
-
-def DelayedReadItemWindow ():
-	#restore the pause state
-	if pause:
-		GemRB.GamePause(1,1)
+			strref = 4249
+		else:
+			strref = 10830
+	else:
+		GemRB.PlaySound ("EFF_M10") # failure!
+		if GameCheck.IsPST():
+			strref = 4250
+		else:
+			strref = 10831
 
 	CloseItemInfoWindow ()
-	if GameCheck.IsPST():
-		strref = 4249
-	else:
-		strref = 10830
 	OpenErrorWindow (strref)
-	return
 
 def OpenItemWindow ():
 	"""Displays information about the item."""
@@ -948,6 +959,53 @@ def AbilitiesItemWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAbilitiesItemWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
+	Button.SetFont ("NUMBER")
+	Button.SetBorder (0, 0,0,0,0, 128,128,255,64, 0,1)
+	Button.SetBorder (1, 2,2,2,2, 32,32,255,0, 0,0)
+	Button.SetBorder (2, 0,0,0,0, 255,128,128,64, 0,1)
+	Button.SetText ("")
+	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+
+	if Slot == None:
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		tooltips = { "inventory": 12013, "ground": 12011, "container": "" }
+		Button.SetTooltip (tooltips[Type])
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, 0)
+		Button.EnableBorder (2, 0)
+		return
+
+	item = GemRB.GetItem (Slot['ItemResRef'])
+	identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+	magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
+
+	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
+	if item["MaxStackAmount"] > 1:
+		Button.SetText (str (Slot["Usages0"]))
+	else:
+		Button.SetText ("")
+
+	# auto-identify mundane items; the actual indentification will happen on transfer
+	if not identified and item["LoreToID"] == 0:
+		identified = True
+
+	if not identified or item["ItemNameIdentified"] == -1:
+		Button.SetTooltip (item["ItemName"])
+		Button.EnableBorder (0, 1)
+		Button.EnableBorder (1, 0)
+	else:
+		Button.SetTooltip (item["ItemNameIdentified"])
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, magical)
+
+	unusable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped) == 0
+	Button.EnableBorder (2, unusable)
+
+	Button.SetItemIcon (Slot['ItemResRef'], 0)
+
 	return
 
 import GUIINV

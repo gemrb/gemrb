@@ -1,0 +1,20 @@
+2DA V1.0
+*
+            RESREF    SOUND
+UNUSED0     *         *
+UNUSED1     *         *
+UNUSED2     *         *
+UNUSED3     *         *
+UNUSED4     *         *
+UNUSED5     *         *
+UNUSED6     *         *
+UNUSED7     *         *
+UNUSED8     *         *
+NECROMANCY  NecroCG   13
+ALTERATION  AlterCG   15
+ENCHANTMENT EnchaCG   09
+ABJURATION  AbjurCG   03
+ILLUSION    IllusCG   01
+CONJURATION ConjuCG   05
+INVOCATION  InvocCG   11
+DIVINATION  DivinCG   07

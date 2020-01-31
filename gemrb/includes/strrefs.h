@@ -226,8 +226,9 @@ namespace GemRB {
 #define STR_ATTACK_ROLL_L 191
 #define STR_HIT 192
 #define STR_MISS 193
+#define STR_NO_RANGED_OFFHAND 194
 
-#define STRREF_COUNT 194
+#define STRREF_COUNT 195
 }
 
 #endif //! IE_STRINGS_H

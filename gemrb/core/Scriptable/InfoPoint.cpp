@@ -158,6 +158,8 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	if (!Trapped) {
 		// we have to set Entered somewhere, here seems best..
 		// FIXME: likely not best :)
+		// NOTE: while only pst has this trigger, sending the normal trigger_entered in other
+		// games breaks them. See git log -p -Strigger_entered for some previous attempts (already 3)
 		AddTrigger(TriggerEntry(trigger_harmlessentered, ID));
 		return true;
 	} else if (Highlightable::TriggerTrap(skill, ID)) {

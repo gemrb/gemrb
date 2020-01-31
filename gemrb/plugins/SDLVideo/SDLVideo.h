@@ -72,6 +72,7 @@ public:
 	virtual int PollEvents();
 
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title)=0;
+	virtual void SetWindowTitle(const char *title) = 0;
 	virtual bool SetFullscreenMode(bool set)=0;
 	virtual int SwapBuffers(void);
 

@@ -36,19 +36,10 @@ namespace GemRB {
 // completely empirical, 9 seems to work fine for iwd and bgs
 // but it is either too small for iwd2 or there are other bugs
 // (fireball to the door in the targos attack is a good test case)
-static const int VOODOO_SPL_RANGE_F = 9;
+static const int VOODOO_SPL_RANGE_F = 15;
 
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
-
-// factors for our guess for proper weapon ranges
-// long bows and xbows have a range of 100, shortbows 75, while melee weapons around 0
-// 400 units is about the normal sight range
-static const int VOODOO_WPN_RANGE1 = 10; // melee
-static const int VOODOO_WPN_RANGE2 = 4;  // ranged weapons
-
-// a multiplier for visual range that we use in the trap finding modal action/effect
-static const int VOODOO_FINDTRAP_RANGE = 10;
 
 // fx_casting_glow has hardcoded height offsets, while they should be avatar based
 // ypos_by_direction and xpos_by_direction
@@ -59,10 +50,6 @@ static const int VOODOO_FINDTRAP_RANGE = 10;
 // it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
 // The distance of operating a trigger, container, dialog buffer etc.
 static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square is 16x12 (diagonal of 20), so that's about two
-
-// used for the shout action, supposedly "slightly larger than the default visual radius of NPCs"
-// while it looks too big, it is needed this big in at least pst (help())
-static const unsigned int VOODOO_SHOUT_RANGE = 400;
 
 // existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
 // while it should clearly always be delayed at least a bit. The engine uses randomization.
@@ -84,13 +71,14 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 
 // NearLocation range multiplier (currently the same for pst and iwd2/how)
 // arbitrary, started as 20 and has no effect for callers that want exact position
-static const int VOODOO_NEARLOC_F = 10;
+// supposedly the same feet->map conversion as usual
+static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
 
 // visual range stuff
-static const int VOODOO_CANSEE_F = 15;
+static const int VOODOO_CANSEE_F = 16;
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
-static const int VOODOO_VISUAL_RANGE = 30;
+static const int VOODOO_VISUAL_RANGE = 28;
 static const int VOODOO_DIALOG_RANGE = 15;
 
 // character speed was also hardcoded depending on the used animation type

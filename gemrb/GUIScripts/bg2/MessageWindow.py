@@ -194,7 +194,10 @@ def FixProtagonist( idx):
 		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 		# TODO: give bag19/bag19a (.../19e?) based on the experience
 		invslot = GemRB.GetSlots (idx, -1, -1)[0]
-		GemRB.CreateItem(idx, "BAG19A", invslot, 1, 0, 0)
+		if GemRB.GetVar ("StartMP"):
+			GemRB.CreateItem(idx, "BAG19", invslot, 1, 0, 0)
+		else:
+			GemRB.CreateItem(idx, "BAG19A", invslot, 1, 0, 0)
 		GemRB.ChangeItemFlag (idx, invslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 
 		# adjust the XP to the minimum if it is lower and set a difficulty variable to the difference

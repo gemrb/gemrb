@@ -113,7 +113,8 @@ namespace GemRB {
 #define DIFF_NORMAL        2
 #define DIFF_CORE          3
 #define DIFF_HARD          4
-#define DIFF_NIGHTMARE     5
+#define DIFF_INSANE        5
+#define DIFF_NIGHTMARE     6 // rather check against the ini var where needed
 
 /** flags for GetActor */
 //default action
@@ -215,7 +216,7 @@ namespace GemRB {
 #define APP_LADY         0x1000      //lady count
 #define APP_MURDER       0x2000      //murder count
 #define APP_NOTURN       0x4000      //doesn't face gabber in dialogue
-#define APP_BUDDY        0x8000      //npcs will turn hostile if this one dies
+#define APP_BUDDY        0x8000      // unused; supposedly: npcs will turn hostile if this one dies
 #define APP_DEAD         0x40000000  //used by the engine to prevent dying twice
 
 #define DC_GOOD   0
@@ -372,6 +373,10 @@ public:
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
 	ieDword *spellStates;
+	// set after modifying maxhp, adjusts hp next tick
+	int checkHP;
+	// to determine that a tick has passed
+	ieDword checkHPTime;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -396,10 +401,12 @@ private:
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
 	ieDword LastFatigueCheck;
+	unsigned int remainingTalkSoundTime;
+	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint);
+				unsigned char Face, const Color& tint, bool useShadowPalette = false);
 
 	/** fixes the palette */
 	void SetupColors();
@@ -431,6 +438,9 @@ private:
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
+	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
+	char GetArmorCode() const;
+	const char* GetArmorSound() const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -465,7 +475,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
+	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
 	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
 	/** Returns a Stat value */
@@ -564,7 +574,7 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	bool VerbalConstant(int start, int count=1, bool queue=false) const;
+	bool VerbalConstant(int start, int count=1, int flags=0) const;
 	/* display string or verbal constant depending on what is available */
 	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
@@ -585,7 +595,7 @@ public:
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
-	bool CheckSilenced();
+	bool CheckSilenced() const;
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
@@ -625,7 +635,7 @@ public:
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */
-	void Die(Scriptable *killer);
+	void Die(Scriptable *killer, bool grantXP = true);
 	/* debug function */
 	void GetNextAnimation();
 	/* debug function */
@@ -911,10 +921,11 @@ public:
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
-	bool IsInvisibleTo(Scriptable *checker) const;
+	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
+	bool HasVisibleHP() const;
 	void DisplayHeadHPRatio();
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
@@ -930,10 +941,14 @@ public:
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
+	bool IsKitInactive() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
+	void SetAnimatedTalking(unsigned int);
+	bool HasPlayerClass() const;
+	void PlayArmorSound() const;
 };
 }
 

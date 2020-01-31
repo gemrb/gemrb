@@ -352,8 +352,7 @@ EffectQueue::EffectQueue()
 EffectQueue::~EffectQueue()
 {
 	std::list< Effect* >::iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		delete (*f);
 	}
 }
@@ -400,6 +399,16 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 		return;
 	}
 	ModifyEffectPoint(effect_reference.opcode, x, y);
+}
+
+void EffectQueue::ModifyAllEffectSources(Point &source)
+{
+	std::list< Effect* >::const_iterator f;
+
+	for (f = effects.begin(); f != effects.end(); ++f) {
+		(*f)->SourceX = source.x;
+		(*f)->SourceY = source.y;
+	}
 }
 
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing)
@@ -495,7 +504,7 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
-	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx2 = *f;
 
 		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
@@ -532,7 +541,7 @@ void EffectQueue::Cleanup()
 			delete *f;
 			effects.erase(f++);
 		} else {
-			f++;
+			++f;
 		}
 	}
 }
@@ -1157,7 +1166,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		// specialist mages get a +2 bonus to saves to spells of the same school used against them
 		specialist = actor->GetStat(IE_KIT);
 		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
-			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
 			if (specialist & (1 << (fx->PrimaryType+5))) {
 				bonus += 2;
 			}
@@ -1435,6 +1443,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	// FX_PERMANENT returners aren't part of the queue, so permanent stat mods can't be detected
 	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
 	Spell *spell = gamedata->GetSpell(Removed, true);
+	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
 	if (spell->ExtHeaderCount > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
@@ -1943,20 +1952,20 @@ int EffectQueue::MaxParam1(EffectRef &effect_reference, bool positive) const
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
 {
 	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); f++) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
-		//
+
 		int magic = (int) (*f)->Parameter1;
 		ieDword mask = (*f)->Parameter3;
 		ieDword value = (*f)->Parameter4;
-		if( magic==0) {
-			if( enchantment) continue;
-		} else if( magic>0) {
-			if( enchantment>magic) continue;
+		if (magic == 0) {
+			if (enchantment) continue;
+		} else if (magic > 0) {
+			if (enchantment > magic) continue;
 		}
 
-		if( (weapontype&mask) != value) {
+		if ((weapontype&mask) != value) {
 			continue;
 		}
 		return true;
@@ -1967,7 +1976,7 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
 	ResolveEffectRef(fx_weapon_immunity_ref);
-	if( fx_weapon_immunity_ref.opcode<0) {
+	if (fx_weapon_immunity_ref.opcode < 0) {
 		return 0;
 	}
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
@@ -2230,6 +2239,21 @@ ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2
 	return cnt;
 }
 
+unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effect* fx) const
+{
+	ieDword cnt = 1;
+	ieDword opcode = ResolveEffect(effect_reference);
+
+	std::list< Effect* >::const_iterator f;
+	for (f = effects.begin(); f != effects.end(); ++f) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		if (*f == fx) break;
+		cnt++;
+	}
+	return cnt;
+}
+
 void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -2249,8 +2273,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 	ieDword cnt = 0;
 
 	std::list< Effect* >::const_iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx = *f;
 		if( Persistent(fx))
 			cnt++;
@@ -2283,13 +2306,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		//projectile immunity
 		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
 
-		//don't resist item projectile payloads based on spell school, bounce, etc.
-		//FIXME: -Uh, why not ?
 		//Allegedly, the book of infinite spells needed this, but irresistable by level
-		//spells got fx->Power = 0, so i added those exceptions and removed this
-		//if( fx->InventorySlot) {
-		//	return 1;
-		//}
+		//spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
 
 		//check level resistances
 		//check specific spell immunity
@@ -2341,7 +2359,7 @@ bool EffectQueue::HasHostileEffects() const
 	bool hostile = false;
 
 	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx = *f;
 		if (fx->SourceFlags&SF_HOSTILE) {
 			hostile = true;
