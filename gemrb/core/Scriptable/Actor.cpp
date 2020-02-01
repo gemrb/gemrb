@@ -8119,12 +8119,12 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 
 void Actor::NewPath()
 {
-	PathTries++;
+	//PathTries++;
 	Point tmp = Destination;
-	ClearPath();
-	if (PathTries>10) {
-		return;
-	}
+	//ClearPath();
+	//if (PathTries>10) {
+	//	return;
+	//}
 	Movable::WalkTo(tmp, size );
 }
 

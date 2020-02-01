@@ -2286,7 +2286,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
 
 	this->prevTicks = Ticks;
-
+    Destination = Des;
 	const int XEPS = 2;
 	const int YEPS = 1;
 
@@ -2300,10 +2300,9 @@ void Movable::WalkTo(const Point &Des, int distance)
 	path = area->FindPath(Pos, Des, size, distance);
 
 	if (path) {
-		Destination = Des;
 		step = path;
 	} else {
-		ClearPath();
+		//ClearPath();
 		FixPosition();
 	}
 }

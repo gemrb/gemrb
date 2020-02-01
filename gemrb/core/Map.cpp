@@ -899,20 +899,14 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	bool no_more_steps = true;
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
-
-		PathNode * step = actor->GetStep();
-		if (step && step->Next) {
-			//we should actually wait for a short time and check then
-			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
-				actor->NewPath();
-			}
-		}
 	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 		no_more_steps = actor->DoStep( speed, time );
 		if (actor->BlocksSearchMap()) {
 			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
+		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE);
+		if (nearActors.size() > 1) actor->NewPath();
 	}
 
 	return no_more_steps;
