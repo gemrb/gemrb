@@ -2783,6 +2783,8 @@ static void InitActorTables()
 			// iwd1 has a practically empty ids though, so force a minimum
 			SpellStatesSize = std::max(6, (numstates >> 5) + 1);
 		}
+	} else {
+		SpellStatesSize = 6;
 	}
 
 	// modal actions/state data
