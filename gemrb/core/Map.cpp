@@ -889,7 +889,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	}
 }
 
-bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
+bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
@@ -901,12 +901,16 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 		ClearSearchMapFor(actor);
 	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-		no_more_steps = actor->DoStep( speed, time );
+		no_more_steps = actor->DoStep(walkScale, time);
 		if (actor->BlocksSearchMap()) {
 			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
-		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE);
-		if (nearActors.size() > 1) actor->NewPath();
+
+		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,
+                                                   actor->size + 1, actor);
+		if (!nearActors.empty() && actor->GetPath()) {
+            actor->NewPath();
+		}
 	}
 
 	return no_more_steps;
@@ -1654,7 +1658,7 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 				continue;
 			}
 		}
-		neighbours.push_back(actor);
+		neighbours.emplace_back(actor);
 	}
 	return neighbours;
 }
@@ -2273,7 +2277,7 @@ void Map::RemoveActor(Actor* actor)
 	while (i--) {
 		if (actors[i] == actor) {
 			//path is invalid outside this area, but actions may be valid
-			actor->ClearPath();
+            actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
 			CopyResRef(actor->Area, "");
@@ -2610,14 +2614,13 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
 	bool *isClosed = new bool[Width * Height]();
-	SearchmapPoint *parents = new SearchmapPoint[Width * Height];
-	unsigned short *distFromStart = new unsigned short[Width * Height]();
+	auto *parents = new SearchmapPoint[Width * Height];
+	auto *distFromStart = new unsigned short[Width * Height]();
 
 	int dxCross = smptDest.x - smptSource.x;
 	int dyCross = smptDest.y - smptSource.y;
 
-	Log(DEBUG, "PathFinderWIP", "FindPath((%d %d), (%d %d), minDist = %d, size = %d)",
-		smptSource.x, smptSource.y, smptDest.x, smptDest.y, minDistance, size);
+	//Log(DEBUG, "PathFinderWIP", "FindPath((%d %d), (%d %d), minDist = %d, size = %d)", smptSource.x, smptSource.y, smptDest.x, smptDest.y, minDistance, size);
 
 	bool foundPath = false;
 	parents[smptSource.y * Width + smptSource.x] = smptSource;
@@ -2658,9 +2661,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			if (parents[smptCurrent.y * Width + smptCurrent.x] != smptCurrent &&
 				squaredDist < squaredMinDist) {
 				if (!sight || IsVisibleLOS(nmptCurrent, d)) {
-					Log(DEBUG, "PathFinderWIP", "(%d %d) is close enough to (%d %d)", nmptCurrent.x, nmptCurrent.y,
-						d.x, d.y);
-					Log(DEBUG, "PathFinderWIP", "MinDistance = %d", minDistance);
+					//Log(DEBUG, "PathFinderWIP", "(%d %d) is close enough to (%d %d)", nmptCurrent.x, nmptCurrent.y, d.x, d.y);
+					//Log(DEBUG, "PathFinderWIP", "MinDistance = %d", minDistance);
 					smptDest = smptCurrent;
 					foundPath = true;
 					break;
@@ -2731,7 +2733,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	if (foundPath) {
 		smptCurrent = smptDest;
 		while (!resultPath || smptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
-			Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptCurrent.x, smptCurrent.y);
+			//Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptCurrent.x, smptCurrent.y);
 			PathNode *newStep = new PathNode;
 			newStep->x = smptCurrent.x;
 			newStep->y = smptCurrent.y;
@@ -2749,7 +2751,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			smptCurrent = parents[smptCurrent.y * Width + smptCurrent.x];
 		}
 	} else {
-		Log(DEBUG, "PathFinderWIP", "Pathfinder destination is unreachable");
+		//Log(DEBUG, "PathFinderWIP", "Pathfinder destination is unreachable");
 	}
 	// Right proper memory management
 	delete[] isClosed;

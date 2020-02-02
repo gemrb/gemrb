@@ -381,7 +381,7 @@ public:
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);
-	bool DoStepForActor(Actor *actor, int speed, ieDword time);
+	bool DoStepForActor(Actor *actor, int walkScale, ieDword time);
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();

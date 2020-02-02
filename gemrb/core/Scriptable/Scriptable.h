@@ -504,7 +504,7 @@ public:
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
-	void ClearPath();
+	void ClearPath(bool resetDestination);
 
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();

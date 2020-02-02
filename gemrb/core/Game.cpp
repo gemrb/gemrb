@@ -1810,7 +1810,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	while (i--) {
 		Actor *tar = GetPC(i, true);
-		tar->ClearPath();
+        tar->ClearPath(true);
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
@@ -1828,7 +1828,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	// also let familiars rest
 	for (auto tar : NPCs) {
 		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
-			tar->ClearPath();
+            tar->ClearPath(true);
 			tar->SetModal(MS_NONE, 0);
 			tar->Heal(hp);
 			tar->Rest(hours);

@@ -2017,7 +2017,7 @@ Movable::Movable(ScriptableType type)
 Movable::~Movable(void)
 {
 	if (path) {
-		ClearPath();
+        ClearPath(true);
 	}
 }
 
@@ -2168,6 +2168,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
 	}
+
 	if (!path) return true;
 	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
@@ -2208,7 +2209,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			step = step->Next;
 			return false;
 		} else {
-			ClearPath();
+            ClearPath(true);
 			NewOrientation = Orientation;
 			return true;
 		}
@@ -2230,6 +2231,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		Pos.x += std::ceil(dx) * xSign;
 		Pos.y += std::ceil(dy) * ySign;
+
 		SetOrientation(step->orient, false);
 		this->timeStartStep = time;
 	}
@@ -2287,29 +2289,28 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	this->prevTicks = Ticks;
     Destination = Des;
-	const int XEPS = 2;
-	const int YEPS = 1;
+	const int XEPS = 32;
+	const int YEPS = 12;
 
-	if (std::abs(Des.x / 16 - Pos.x / 16) <= XEPS &&
-		std::abs(Des.y / 12 - Pos.y / 12) <= YEPS) {
-		ClearPath();
+	if (std::abs(Des.x - Pos.x) <= XEPS &&
+		std::abs(Des.y - Pos.y) <= YEPS) {
+        ClearPath(true);
 		return;
 	}
 
 	area->ClearSearchMapFor(this);
-	path = area->FindPath(Pos, Des, size, distance);
+	auto newPath = area->FindPath(Pos, Des, size, distance);
 
-	if (path) {
+	if (newPath) {
+        ClearPath(false);
+	    path = newPath;
 		step = path;
-	} else {
-		//ClearPath();
-		FixPosition();
 	}
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int flags)
 {
-	ClearPath();
+    ClearPath(true);
 	area->ClearSearchMapFor(this);
 	path = area->RunAway( Pos, Des, size, PathLength, flags );
 }
@@ -2375,19 +2376,23 @@ void Movable::MoveTo(const Point &Des)
 void Movable::Stop()
 {
 	Scriptable::Stop();
-	ClearPath();
+    ClearPath(true);
 }
 
-void Movable::ClearPath()
+void Movable::ClearPath(bool resetDestination)
 {
-	//this is to make sure attackers come to us
-	//make sure ClearPath doesn't screw Destination (in the rare cases Destination
-	//is set before ClearPath
-	Destination = Pos;
-	if (StanceID==IE_ANI_WALK || StanceID==IE_ANI_RUN) {
-		StanceID = IE_ANI_AWAKE;
-	}
-	InternalFlags&=~IF_NORETICLE;
+
+	if (resetDestination) {
+        //this is to make sure attackers come to us
+        //make sure ClearPath doesn't screw Destination (in the rare cases Destination
+        //is set before ClearPath
+        Destination = Pos;
+
+        if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
+            StanceID = IE_ANI_AWAKE;
+        }
+        InternalFlags &= ~IF_NORETICLE;
+    }
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;

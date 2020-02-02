@@ -487,7 +487,7 @@ Actor::Actor()
 	nextWalk = 0;
 	lastattack = 0;
 	InTrap = 0;
-	PathTries = 0;
+	this->resetPathTries();
 	TargetDoor = 0;
 	attackProjectile = NULL;
 	lastInit = 0;
@@ -4228,7 +4228,7 @@ bool Actor::PlayWarCry(int range) const
 void Actor::CommandActor(Action* action, bool clearPath)
 {
 	Scriptable::Stop(); // stop what you were doing
-	if (clearPath) ClearPath();
+	if (clearPath) ClearPath(true);
 	AddAction(action); // now do this new thing
 
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
@@ -5132,8 +5132,8 @@ void Actor::SetMap(Map *map)
 
 void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy)
 {
-	PathTries = 0;
-	ClearPath();
+	this->resetPathTries();
+    ClearPath(true);
 	Point p, q;
 	p.x = position.x/16;
 	p.y = position.y/12;
@@ -5594,7 +5594,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	ReleaseCurrentAction();
-	ClearPath();
+    ClearPath(true);
 	SetModal( MS_NONE );
 
 	ieDword value = 0;
@@ -6659,13 +6659,15 @@ int Actor::Immobile() const
 	return 0;
 }
 
-bool Actor::DoStep(unsigned int walk_speed, ieDword time)
+bool Actor::DoStep(unsigned int walkScale, ieDword time)
 {
 	if (Immobile()) {
 		return true;
 	}
-
-	return Movable::DoStep(walk_speed, time);
+    if (Destination != Pos && !this->GetPath()) {
+        this->NewPath();
+    }
+	return Movable::DoStep(walkScale, time);
 }
 
 ieDword Actor::GetNumberOfAttacks()
@@ -8117,15 +8119,18 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	return GemRB::Schedule(appearance, gametime);
 }
 
+const int maxPathTries = 20;
+
 void Actor::NewPath()
 {
-	//PathTries++;
 	Point tmp = Destination;
-	//ClearPath();
-	//if (PathTries>10) {
-	//	return;
-	//}
-	Movable::WalkTo(tmp, size );
+	if (this->getPathTries() > maxPathTries) {
+        ClearPath(true);
+        this->resetPathTries();
+		return;
+	}
+	WalkTo(tmp, InternalFlags, size);
+	if (!this->GetPath()) this->incrementPathTries();
 }
 
 void Actor::SetInTrap(ieDword setreset)
@@ -8146,13 +8151,13 @@ void Actor::SetRunFlags(ieDword flags)
 
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
-	PathTries = 0;
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
 	Movable::WalkTo(Des, MinDistance);
+
 }
 
 int Actor::WantDither() const
@@ -11396,5 +11401,19 @@ void Actor::PlayArmorSound() const
 		delete[] armorSound;
 	}
 }
+
+    int Actor::getPathTries() const {
+        return PathTries;
+    }
+
+    void Actor::incrementPathTries() {
+        PathTries++;
+        // "%s: PathTries = %d", this->LongName, PathTries);
+    }
+
+    void Actor::resetPathTries() {
+        PathTries = 0;
+        //Log(DEBUG, "PathFinderWIP", "%s: PathTries = %d", this->LongName, PathTries);
+    }
 
 }

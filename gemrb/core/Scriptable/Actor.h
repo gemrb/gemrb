@@ -331,7 +331,7 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-	int PathTries; //the # of previous tries to pick up a new walkpath
+
 	ArmorClass AC;
 	ToHitStats ToHit;
 	ModalState Modal;
@@ -378,6 +378,14 @@ public:
 	// to determine that a tick has passed
 	ieDword checkHPTime;
 private:
+    int PathTries;
+public:
+    int getPathTries() const;
+    void incrementPathTries();
+    void resetPathTries();
+
+private:
+    //the # of previous tries to pick up a new walkpath
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;
@@ -743,7 +751,7 @@ public:
 	void UpdateAnimations();
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
-	bool DoStep(unsigned int walk_speed, ieDword time = 0);
+	bool DoStep(unsigned int walkScale, ieDword time = 0);
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
