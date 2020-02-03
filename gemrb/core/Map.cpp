@@ -2849,7 +2849,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL, true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|PATH_MAP_ACTOR, true);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
