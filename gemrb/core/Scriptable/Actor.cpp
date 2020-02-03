@@ -8119,7 +8119,7 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	return GemRB::Schedule(appearance, gametime);
 }
 
-const int maxPathTries = 20;
+const int maxPathTries = 15;
 
 void Actor::NewPath()
 {

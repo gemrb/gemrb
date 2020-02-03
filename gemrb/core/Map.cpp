@@ -905,12 +905,14 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 		if (actor->BlocksSearchMap()) {
 			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
+        // Actor bumping
 
 		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,
                                                    actor->size + 1, actor);
 		if (!nearActors.empty() && actor->GetPath()) {
             actor->NewPath();
 		}
+
 	}
 
 	return no_more_steps;
@@ -1294,6 +1296,7 @@ void Map::DrawSearchMap(const Region &screen)
 	Color inaccessible = { 128, 128, 128, 128 };
 	Color impassible = { 128, 64, 64, 128 }; // red-ish
 	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
+	Color actor = { 128, 64, 128, 128 }; // purple-ish
 	Video *vid=core->GetVideoDriver();
 	Region rgn=vid->GetViewport();
 	Region block;
@@ -1306,16 +1309,19 @@ void Map::DrawSearchMap(const Region &screen)
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
 			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
+            block.x=screen.x+x*16-(rgn.x % 16);
+            block.y=screen.y+y*12-(rgn.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
-				block.x=screen.x+x*16-(rgn.x % 16);
-				block.y=screen.y+y*12-(rgn.y % 12);
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
 					vid->DrawRect(block,impassible);
 				} else if (blockvalue & PATH_MAP_SIDEWALL) {
 					vid->DrawRect(block,sidewall);
-				} else {
+				} else if (!(blockvalue & PATH_MAP_ACTOR)){
 					vid->DrawRect(block,inaccessible);
 				}
+			}
+			if (blockvalue & PATH_MAP_ACTOR) {
+			    vid->DrawRect(block, actor);
 			}
 		}
 	}
@@ -1976,11 +1982,6 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 		}
 	}
 	return false;
-}
-
-bool Map::IsActor(unsigned int px, unsigned int py, unsigned int size) const
-{
-	return this->CheckSearchmapPointFlags(px, py, size, ~PATH_MAP_ACTOR);
 }
 
 bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
@@ -2701,7 +2702,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
 									(unsigned) smptChild.y >= Height;
-			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size) || IsActor(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
@@ -2848,7 +2849,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|PATH_MAP_ACTOR, true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL, true);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary

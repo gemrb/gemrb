@@ -425,7 +425,6 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool IsActor(unsigned int px, unsigned int py, unsigned int size) const;
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
 	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
