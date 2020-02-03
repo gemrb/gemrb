@@ -2017,7 +2017,7 @@ Movable::Movable(ScriptableType type)
 Movable::~Movable(void)
 {
 	if (path) {
-        ClearPath(true);
+		ClearPath(true);
 	}
 }
 
@@ -2209,7 +2209,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			step = step->Next;
 			return false;
 		} else {
-            ClearPath(true);
+			ClearPath(true);
 			NewOrientation = Orientation;
 			return true;
 		}
@@ -2288,13 +2288,13 @@ void Movable::WalkTo(const Point &Des, int distance)
 	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
 
 	this->prevTicks = Ticks;
-    Destination = Des;
+	Destination = Des;
 	const int XEPS = 32;
 	const int YEPS = 12;
 
 	if (std::abs(Des.x - Pos.x) <= XEPS &&
 		std::abs(Des.y - Pos.y) <= YEPS) {
-        ClearPath(true);
+		ClearPath(true);
 		return;
 	}
 
@@ -2302,15 +2302,15 @@ void Movable::WalkTo(const Point &Des, int distance)
 	auto newPath = area->FindPath(Pos, Des, size, distance);
 
 	if (newPath) {
-        ClearPath(false);
-	    path = newPath;
+		ClearPath(false);
+		path = newPath;
 		step = path;
 	}
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int flags)
 {
-    ClearPath(true);
+	ClearPath(true);
 	area->ClearSearchMapFor(this);
 	path = area->RunAway( Pos, Des, size, PathLength, flags );
 }
@@ -2376,23 +2376,23 @@ void Movable::MoveTo(const Point &Des)
 void Movable::Stop()
 {
 	Scriptable::Stop();
-    ClearPath(true);
+	ClearPath(true);
 }
 
 void Movable::ClearPath(bool resetDestination)
 {
 
 	if (resetDestination) {
-        //this is to make sure attackers come to us
-        //make sure ClearPath doesn't screw Destination (in the rare cases Destination
-        //is set before ClearPath
-        Destination = Pos;
+		//this is to make sure attackers come to us
+		//make sure ClearPath doesn't screw Destination (in the rare cases Destination
+		//is set before ClearPath
+		Destination = Pos;
 
-        if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
-            StanceID = IE_ANI_AWAKE;
-        }
-        InternalFlags &= ~IF_NORETICLE;
-    }
+		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
+			StanceID = IE_ANI_AWAKE;
+		}
+		InternalFlags &= ~IF_NORETICLE;
+	}
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;

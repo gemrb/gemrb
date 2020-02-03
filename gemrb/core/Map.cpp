@@ -905,12 +905,11 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 		if (actor->BlocksSearchMap()) {
 			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
-        // Actor bumping
+		// Actor bumping
 
-		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,
-                                                   actor->size + 1, actor);
+		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size + 1, actor);
 		if (!nearActors.empty() && actor->GetPath()) {
-            actor->NewPath();
+			actor->NewPath();
 		}
 
 	}
@@ -1309,8 +1308,8 @@ void Map::DrawSearchMap(const Region &screen)
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
 			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
-            block.x=screen.x+x*16-(rgn.x % 16);
-            block.y=screen.y+y*12-(rgn.y % 12);
+			block.x=screen.x+x*16-(rgn.x % 16);
+			block.y=screen.y+y*12-(rgn.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
 					vid->DrawRect(block,impassible);
@@ -1321,7 +1320,7 @@ void Map::DrawSearchMap(const Region &screen)
 				}
 			}
 			if (blockvalue & PATH_MAP_ACTOR) {
-			    vid->DrawRect(block, actor);
+				vid->DrawRect(block, actor);
 			}
 		}
 	}
@@ -1986,7 +1985,7 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 
 bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
 {
-	return this->CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE);
+	return CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE);
 }
 
 unsigned int Map::GetBlocked(const Point &c) const
@@ -2278,7 +2277,7 @@ void Map::RemoveActor(Actor* actor)
 	while (i--) {
 		if (actors[i] == actor) {
 			//path is invalid outside this area, but actions may be valid
-            actor->ClearPath(true);
+			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
 			CopyResRef(actor->Area, "");
@@ -2438,7 +2437,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 	SearchmapPoint smptFarthest = FindFarthest(d, size, PathLen);
 	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
 
-	return this->FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
+	return FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
 Point Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
@@ -2494,7 +2493,7 @@ Point Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen)
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
 {
-	return this->FindPath(s, d, size) == NULL;
+	return FindPath(s, d, size) == NULL;
 }
 
 /* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)

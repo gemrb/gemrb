@@ -377,15 +377,13 @@ public:
 	int checkHP;
 	// to determine that a tick has passed
 	ieDword checkHPTime;
-private:
-    int PathTries;
-public:
-    int getPathTries() const;
-    void incrementPathTries();
-    void resetPathTries();
+    int GetPathTries() const;
+    void IncrementPathTries();
+    void ResetPathTries();
 
 private:
-    //the # of previous tries to pick up a new walkpath
+	//the # of previous tries to pick up a new walkpath
+	int PathTries;
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;

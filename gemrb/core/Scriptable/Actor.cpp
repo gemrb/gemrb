@@ -398,7 +398,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
 //internal flags for calculating to hit
-#define WEAPON_FIST        0
+#define WEAPON_FIST	    0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -487,7 +487,7 @@ Actor::Actor()
 	nextWalk = 0;
 	lastattack = 0;
 	InTrap = 0;
-	this->resetPathTries();
+	ResetPathTries();
 	TargetDoor = 0;
 	attackProjectile = NULL;
 	lastInit = 0;
@@ -3648,7 +3648,7 @@ void Actor::UpdateFatigue()
 		updated = true;
 	} else if (LastFatigueCheck) {
 		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
-		                    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+		                	- (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
 		if (FatigueDiff) {
 			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
 			updated = true;
@@ -3706,19 +3706,19 @@ void Actor::RollSaves()
 }
 
 //saving throws:
-//type      bits in file    order in stats
-//0  spells            1    4
-//1  breath            2    3
-//2  death             4    0
-//3  wands             8    1
-//4  polymorph        16    2
+//type	  bits in file	order in stats
+//0  spells			1	4
+//1  breath			2	3
+//2  death			 4	0
+//3  wands			 8	1
+//4  polymorph		16	2
 
 //iwd2 (luckily they use the same bits as it would be with bg2):
 //0 not used
 //1 not used
-//2 fortitude          4   0
-//3 reflex             8   1
-//4 will              16   2
+//2 fortitude		  4   0
+//3 reflex			 8   1
+//4 will			  16   2
 
 // in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
 // since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
@@ -4222,7 +4222,7 @@ bool Actor::PlayWarCry(int range) const
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
-#define SEL_ACTION_COUNT_ALL     7
+#define SEL_ACTION_COUNT_ALL	 7
 
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action, bool clearPath)
@@ -4899,10 +4899,10 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		case DAMAGE_CRUSHING: type = 3; break; //crushing
 		case DAMAGE_MISSILE: type = 4; break;  //missile
 		case DAMAGE_ELECTRICITY: type = 5; levels = false; break; //electricity
-		case DAMAGE_COLD: type = 6; levels = false; break;     //cold
+		case DAMAGE_COLD: type = 6; levels = false; break;	 //cold
 		case DAMAGE_MAGIC: type = 7; levels = false; break;
 		case DAMAGE_STUNNING: type = -3; break;
-		default: return;                       //other
+		default: return;					   //other
 	}
 
 	ieResRef Sound;
@@ -5132,8 +5132,8 @@ void Actor::SetMap(Map *map)
 
 void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy)
 {
-	this->resetPathTries();
-    ClearPath(true);
+	ResetPathTries();
+	ClearPath(true);
 	Point p, q;
 	p.x = position.x/16;
 	p.y = position.y/12;
@@ -5199,9 +5199,9 @@ ieDword Actor::GetXPLevel(int modified) const
 // returns the guessed caster level by passed spell type
 // FIXME: add more logic for cross-type kits (like avengers)?
 // FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
-//        that is, it takes the correct level, not first or average or min or max.
-//        We need to propagate the spellbook info all through here. :/
-//        NOTE: this is only problematic for multiclassed actors
+//		that is, it takes the correct level, not first or average or min or max.
+//		We need to propagate the spellbook info all through here. :/
+//		NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;
@@ -5594,7 +5594,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	ReleaseCurrentAction();
-    ClearPath(true);
+	ClearPath(true);
 	SetModal( MS_NONE );
 
 	ieDword value = 0;
@@ -6664,9 +6664,9 @@ bool Actor::DoStep(unsigned int walkScale, ieDword time)
 	if (Immobile()) {
 		return true;
 	}
-    if (Destination != Pos && !this->GetPath()) {
-        this->NewPath();
-    }
+	if (Destination != Pos && !GetPath()) {
+		NewPath();
+	}
 	return Movable::DoStep(walkScale, time);
 }
 
@@ -8124,13 +8124,13 @@ const int maxPathTries = 15;
 void Actor::NewPath()
 {
 	Point tmp = Destination;
-	if (this->getPathTries() > maxPathTries) {
-        ClearPath(true);
-        this->resetPathTries();
+	if (GetPathTries() > maxPathTries) {
+		ClearPath(true);
+		ResetPathTries();
 		return;
 	}
 	WalkTo(tmp, InternalFlags, size);
-	if (!this->GetPath()) this->incrementPathTries();
+	if (!GetPath()) IncrementPathTries();
 }
 
 void Actor::SetInTrap(ieDword setreset)
@@ -11402,18 +11402,16 @@ void Actor::PlayArmorSound() const
 	}
 }
 
-    int Actor::getPathTries() const {
-        return PathTries;
-    }
+	int Actor::GetPathTries() const {
+		return PathTries;
+	}
 
-    void Actor::incrementPathTries() {
-        PathTries++;
-        // "%s: PathTries = %d", this->LongName, PathTries);
-    }
+	void Actor::IncrementPathTries() {
+		PathTries++;
+	}
 
-    void Actor::resetPathTries() {
-        PathTries = 0;
-        //Log(DEBUG, "PathFinderWIP", "%s: PathTries = %d", this->LongName, PathTries);
-    }
+	void Actor::ResetPathTries() {
+		PathTries = 0;
+	}
 
 }
