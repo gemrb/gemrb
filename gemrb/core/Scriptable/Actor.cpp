@@ -3706,19 +3706,19 @@ void Actor::RollSaves()
 }
 
 //saving throws:
-//type	  bits in file	order in stats
-//0  spells			1	4
-//1  breath			2	3
-//2  death			 4	0
-//3  wands			 8	1
-//4  polymorph		16	2
+//type      bits in file    order in stats
+//0  spells            1    4
+//1  breath            2    3
+//2  death             4    0
+//3  wands             8    1
+//4  polymorph        16    2
 
 //iwd2 (luckily they use the same bits as it would be with bg2):
 //0 not used
 //1 not used
-//2 fortitude		  4   0
-//3 reflex			 8   1
-//4 will			  16   2
+//2 fortitude          4   0
+//3 reflex             8   1
+//4 will              16   2
 
 // in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
 // since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
