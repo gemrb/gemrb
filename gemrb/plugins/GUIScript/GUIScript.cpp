@@ -9961,11 +9961,11 @@ PyDoc_STRVAR( GemRB_ExecuteString__doc,
 **Description:** Executes an in-game script action in the current area \n\
 script context. This means that LOCALS will be treated as the current \n\
 area's variable. If a number was given, it will execute the action in the \n\
-numbered PC's context.\n\
+numbered actor's context.\n\
 \n\
 **Parameters:**\n\
   * String - a gamescript action\n\
-  * Slot   - a player slot\n\
+  * Slot   - a player slot or global ID\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -9992,12 +9992,8 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (actornum) {
-		Actor *pc = game->FindPC(actornum);
-		if (pc) {
-			GameScript::ExecuteString( pc, String );
-		} else {
-			Log(WARNING, "GUIScript", "Player not found!");
-		}
+		GET_ACTOR_GLOBAL();
+		GameScript::ExecuteString(actor, String);
 	} else {
 		GameScript::ExecuteString( game->GetCurrentArea( ), String );
 	}
