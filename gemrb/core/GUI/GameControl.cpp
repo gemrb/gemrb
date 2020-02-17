@@ -375,30 +375,34 @@ void GameControl::WillDraw()
 	}
 
 	if (moveX || moveY) {
-		MoveViewportTo( vpOrigin + Point(moveX, moveY), false );
+		if (MoveViewportTo( vpOrigin + Point(moveX, moveY), false )) {
+			if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
+				int cursorFrame = 0; // right
+				if (moveY < 0) {
+					cursorFrame = 2; // up
+					if (moveX > 0) cursorFrame--; // +right
+					else if (moveX < 0) cursorFrame++; // +left
+				} else if (moveY > 0) {
+					cursorFrame = 6; // down
+					if (moveX > 0) cursorFrame++; // +right
+					else if (moveX < 0) cursorFrame--; // +left
+				} else if (moveX < 0) {
+					cursorFrame = 4; // left
+				}
 
-		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
-			int cursorFrame = 0; // right
-			if (moveY < 0) {
-				cursorFrame = 2; // up
-				if (moveX > 0) cursorFrame--; // +right
-				else if (moveX < 0) cursorFrame++; // +left
-			} else if (moveY > 0) {
-				cursorFrame = 6; // down
-				if (moveX > 0) cursorFrame++; // +right
-				else if (moveX < 0) cursorFrame--; // +left
-			} else if (moveX < 0) {
-				cursorFrame = 4; // left
+				if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
+					// set these cursors on game window so they are universal
+					Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
+					window->SetCursor(cursor);
+					Sprite2D::FreeSprite(cursor);
+
+					numScrollCursor = (numScrollCursor+1) % 15;
+				}
 			}
-
-			if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
-				// set these cursors on game window so they are universal
-				Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-				window->SetCursor(cursor);
-				Sprite2D::FreeSprite(cursor);
-
-				numScrollCursor = (numScrollCursor+1) % 15;
-			}
+		} else {
+			window->SetCursor(NULL);
+			moveY = 0;
+			moveX = 0;
 		}
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);
@@ -1607,7 +1611,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		// TODO: make the overflow more dynamic
-		if (p.x + frame.w >= mapsize.w + 64) {
+		if (frame.w >= mapsize.w) {
+			p.x = (mapsize.w - frame.w)/2;
+			canMove = false;
+		} else if (p.x + frame.w >= mapsize.w + 64) {
 			p.x = mapsize.w - frame.w + 64;
 			canMove = false;
 		} else if (p.x < -64) {
@@ -1621,7 +1628,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			mwinframe = mta->GetWindow()->Frame();
 		}
 
-		if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
+		if (frame.h >= mapsize.h) {
+			p.y = (mapsize.h - frame.h)/2;
+			canMove = false;
+		} else if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
 			p.y = mapsize.h - frame.h + mwinframe.h + 32;
 			canMove = false;
 		} else if (p.y < 0) {
