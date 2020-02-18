@@ -7305,7 +7305,8 @@ void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* paramete
 	}
 
 	// TODO: ensure it's using the inventory/CREItem flags, not Item — IE_ITEM_ADAMANTINE won't work as an input otherwise
-	tar->inventory.DestroyItem("", parameters->int0Parameter, ~0);
+	Actor *actor = (Actor *) tar;
+	actor->inventory.DestroyItem("", parameters->int0Parameter, ~0);
 }
 
 }

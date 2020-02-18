@@ -9984,14 +9984,14 @@ The above example will force Player2 to attack an enemy, as the example will run
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
-	int actornum=0;
+	int globalID = 0;
 
-	if (!PyArg_ParseTuple( args, "s|i", &String, &actornum )) {
+	if (!PyArg_ParseTuple( args, "s|i", &String, &globalID)) {
 		return AttributeError( GemRB_ExecuteString__doc );
 	}
 	GET_GAME();
 
-	if (actornum) {
+	if (globalID) {
 		GET_ACTOR_GLOBAL();
 		GameScript::ExecuteString(actor, String);
 	} else {
