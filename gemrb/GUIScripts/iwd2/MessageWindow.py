@@ -26,8 +26,11 @@ from GUIDefines import *
 import CommonWindow
 
 MTASize = GS_SMALLDIALOG
+smallID = -1
+largeID = -1
 
 def OnLoad():
+	global smallID, largeID
 	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	OptionsWindow.AddAlias("OPTWIN")
@@ -40,8 +43,9 @@ def OnLoad():
 	# compensate for the bogus scrollbar on the CHU BG
 	smallMTA = OptionsWindow.GetControl(1)
 	smallMTA.AddAlias("MsgSys", 0)
-	smallMTA.AddAlias("MTA_SM", 0)
+	smallMTA.AddAlias("MTA_SM", 0, True)
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	smallID = smallMTA.ID
 
 	# FIXME: I dont know what this TextEdit is for
 	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
@@ -66,7 +70,8 @@ def OnLoad():
 	DialogWindow.AddAlias("NOT_DLG", 2)
 
 	largeMTA = DialogWindow.GetControl(1)
-	largeMTA.AddAlias("MTA_LG", 0)
+	largeMTA.AddAlias("MTA_LG", 0, True)
+	largeID = largeMTA.ID
 
 	return
 
@@ -104,14 +109,13 @@ def UpdateControlStatus():
 	smallMTA = smallMW.RemoveSubview(smallMTA)
 	largeMTA = largeMW.RemoveSubview(largeMTA)
 
-	smallMTA = largeMW.AddSubview(smallMTA)
-	smallMTA.SetFrame(largeFrame)
+	newLargeMTA = largeMW.AddSubview(smallMTA, None, largeID)
+	newLargeMTA.SetFrame(largeFrame)
+	newLargeMTA.AddAlias("MTA_LG", 0, True)
 
-	largeMTA = smallMW.AddSubview(largeMTA)
-	largeMTA.SetFrame(smallFrame)
-
-	smallMTA.AddAlias("MTA_LG", 0, True)
-	largeMTA.AddAlias("MTA_SM", 0, True)
+	newSmallMTA = smallMW.AddSubview(largeMTA, None, smallID)
+	newSmallMTA.SetFrame(smallFrame)
+	newSmallMTA.AddAlias("MTA_SM", 0, True)
 	
 	if Override:
 		#gets PC currently talking
