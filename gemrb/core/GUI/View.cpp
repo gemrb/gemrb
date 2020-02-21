@@ -725,15 +725,28 @@ bool View::OnTouchGesture(const GestureEvent& gesture)
 	return false;
 }
 
-void View::RemoveScriptingRef(const ViewScriptingRef* ref)
+const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group)
 {
-	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), ref);
+	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
 	if (it != scriptingRefs.end()) {
-		bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);
+		bool unregistered = ScriptEngine::UnregisterScriptingRef(old);
 		assert(unregistered);
-		delete ref;
-		scriptingRefs.erase(it);
+		delete old;
+
+		ViewScriptingRef* newref = CreateScriptingRef(id, group);
+
+		if (ScriptEngine::RegisterScriptingRef(newref)) {
+			*it = newref;
+			return newref;
+		}
 	}
+	return nullptr;
+}
+
+const ViewScriptingRef* View::RemoveScriptingRef(const ViewScriptingRef* ref)
+{
+	static ScriptingId id = 0;
+	return ReplaceScriptingRef(ref, id++, "__DEL__");
 }
 	
 void View::ClearScriptingRefs()

@@ -241,7 +241,8 @@ public:
 
 	// GUIScripting
 	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
-	void RemoveScriptingRef(const ViewScriptingRef*);
+	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group);
+	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
 };
 

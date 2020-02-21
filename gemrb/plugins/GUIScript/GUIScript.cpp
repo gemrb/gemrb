@@ -1153,29 +1153,45 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 {
 	PyObject* pySubview = NULL;
 	PyObject* pySiblingView = Py_None;
-	int id = -1; // if we were moving a view from one window to another we may need to pass this to avoid conflicts
-	PARSE_ARGS(args, "OO|Oi", &self, &pySubview, &pySiblingView, &id);
+	PyObject* pyid = NULL; // if we were moving a view from one window to another we may need to pass this to avoid conflicts
+	PARSE_ARGS(args, "OO|OO", &self, &pySubview, &pySiblingView, &pyid);
 
-	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
+	ScriptingId id = (pyid) ? (ScriptingId)PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
+
+	// FIXME: no promise that subView is a control (could be a plain view)
+	const ControlScriptingRef* ref = dynamic_cast<const ControlScriptingRef*>(GetScriptingRef(pySubview));
 
 	View* superView = GetView<View>(self);
 	View* subView = GetView(ref);
 	View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
-        bool registerRef = (subView->GetWindow() == NULL) || id != -1;
-		superView->AddSubviewInFrontOfView(subView, siblingView);
+		PyObject* attr = PyObject_GetAttrString(pySubview, "SCRIPT_GROUP");
 
-        if (registerRef) {
-			assert(ref);
-            ScriptingId sid = (id == -1) ? ref->Id : id;
-            // FIXME: no promise that subView is a control (could be a plain view)
+		Window* oldwin = subView->GetWindow();
+		superView->AddSubviewInFrontOfView(subView, siblingView);
+		
+		char* grp = PyString_AsString(attr);
+		if (strcasecmp(grp, "__DEL__") == 0) {
+			if (id == ScriptingId(-1)) {
+				return RuntimeError("Cannot add deleted view without a valid id parameter.");
+			}
+			// replace the ref with a new one and return it
+			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, ref);
+			return gs->ConstructObjectForScriptable(newref);
+		} else if (oldwin == NULL || id != ScriptingId(-1)) {
+			// create a new reference and return it
+			ScriptingId sid = (id == ScriptingId(-1)) ? ref->Id : id;
             const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
 			return gs->ConstructObjectForScriptable(newref);
-        }
+		} else {
+			// return the ref we already have
+			return pySubview;
+		}
 
         // return what we had before
-		// Py_INCREF(pySubview);
-		return pySubview;
+		// for some reason we cant just return pySubview
+		// the ID attribute gets lost even though we can see it if we check here
+		return gs->ConstructObjectForScriptable(ref);
 	}
 
 	return AttributeError("Invalid view parameters.");
@@ -1873,8 +1889,8 @@ static PyObject* GemRB_RemoveScriptingRef(PyObject* self, PyObject* args)
 
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(self));
 	ABORT_IF_NULL(ref);
-	ref->GetObject()->RemoveScriptingRef(ref);
-
+	auto delref = ref->GetObject()->RemoveScriptingRef(ref);
+	ABORT_IF_NULL(delref);
 	Py_RETURN_NONE;
 }
 
@@ -1909,15 +1925,11 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			Py_RETURN_NONE;
 		} else {
 			// return a new ref for a deleted group
-			view->RemoveScriptingRef(ref);
+			auto delref = view->RemoveScriptingRef(ref);
+			assert(delref);
 			view->RemoveFromSuperview();
 
-			static ScriptingId id = 0;
-			ResRef group = "Deleted";
-			const ViewScriptingRef* newref = view->AssignScriptingRef(id, group);
-			++id;
-
-			return gs->ConstructObjectForScriptable(newref);
+			return gs->ConstructObjectForScriptable(delref);
 		}
 	}
 	return AttributeError("Invalid view");

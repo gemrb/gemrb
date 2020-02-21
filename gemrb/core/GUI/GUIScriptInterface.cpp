@@ -81,11 +81,9 @@ std::vector<View*> GetViews(ResRef group)
 	return views;
 }
 
-const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id)
+const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing)
 {
 	if (!ctrl) return NULL;
-	//const ControlScriptingRef* test = static_cast<const ControlScriptingRef*>(ctrl->GetScriptingRef());
-	//assert(test == NULL);
 
 	ResRef group = "Control";
     Window* win = ctrl->GetWindow();
@@ -98,7 +96,12 @@ const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId 
 	}
 
 	ctrl->ControlID = (ieDword)id;
-	return static_cast<const ControlScriptingRef*>(ctrl->AssignScriptingRef(id, group));
+
+	if (existing) {
+		return static_cast<const ControlScriptingRef*>(ctrl->ReplaceScriptingRef(existing, id, group));
+	} else {
+		return static_cast<const ControlScriptingRef*>(ctrl->AssignScriptingRef(id, group));
+	}
 }
 
 const WindowScriptingRef* RegisterScriptableWindow(Window* win, ResRef pack, ScriptingId id)
