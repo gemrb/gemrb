@@ -29,8 +29,6 @@
 
 namespace GemRB {
 
-extern bool RedrawTile;
-
 class GEM_EXPORT TileOverlay {
 public:
 	int w, h;

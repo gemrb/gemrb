@@ -2302,7 +2302,6 @@ bool Interface::LoadGemRBINI()
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
-	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
 
 	for (int i=0;i<GF_COUNT;i++) {
 		if (!game_flags[i]) {
