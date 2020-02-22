@@ -59,7 +59,7 @@ public:
 
 		HUDLock(WindowManager& wm)
 		: wm(wm) {
-			wm.video->PushDrawingBuffer(wm.winFrameBuf);
+			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
 
 		~HUDLock() {
@@ -80,8 +80,7 @@ private:
 	EventMgr eventMgr;
 
 	Holder<Video> video;
-	VideoBuffer* cursorBuf;
-	VideoBuffer* winFrameBuf;
+	VideoBuffer* HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;
@@ -94,7 +93,7 @@ private:
 	inline void DrawMouse() const;
 	// DrawMouse simply calls the following with some position calculations and buffer context changes
 	inline void DrawCursor(const Point& pos) const;
-	inline void DrawTooltip(const Point& pos) const;
+	inline void DrawTooltip(Point pos) const;
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);

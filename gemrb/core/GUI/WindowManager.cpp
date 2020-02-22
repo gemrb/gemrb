@@ -65,14 +65,11 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	gameWin->SetFrame(screen);
 
-	// FIXME: need to recreate these if resolution changes
-	// NOTE: widest known TT is IWD2: 250px (bg) + 6px (borders)
-	cursorBuf = vid->CreateBuffer(Region(0, 0, 256, 64), Video::DISPLAY_ALPHA);
-	winFrameBuf = vid->CreateBuffer(screen, Video::DISPLAY_ALPHA);
+	HUDBuf = vid->CreateBuffer(screen, Video::DISPLAY_ALPHA);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
-	vid->PushDrawingBuffer(cursorBuf);
+	vid->PushDrawingBuffer(HUDBuf);
 	video = vid;
 	// TODO: changing screen size should adjust window positions too
 	// TODO: how do we get notified if the Video driver changes size?
@@ -85,8 +82,7 @@ WindowManager::~WindowManager()
 	DestroyWindows(windows);
 	assert(windows.empty());
 
-	video->DestroyBuffer(cursorBuf);
-	video->DestroyBuffer(winFrameBuf);
+	video->DestroyBuffer(HUDBuf);
 	video.release();
 	delete gameWin;
 }
@@ -134,7 +130,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 		} else {
 			shieldColor.a = 0xff;
 		}
-		video->PushDrawingBuffer(winFrameBuf);
+		video->PushDrawingBuffer(HUDBuf);
 		video->DrawRect(screen, shieldColor);
 		video->PopDrawingBuffer();
 	}
@@ -399,31 +395,8 @@ void WindowManager::DrawMouse() const
 		return;
 
 	Point pos = eventMgr.MousePos();
-	Size bufSize = cursorBuf->Size();
-	pos.y += 10; // the cursor needs to be slightly above the buffer midpoint to completely fit.
-
-	// clamp to screen
-	pos.x = std::max<int>(0, pos.x - bufSize.w / 2);
-	pos.x = std::min<int>((screen.w - bufSize.w), pos.x);
-	pos.y = std::max<int>(0, pos.y - bufSize.h / 2);
-	pos.y = std::min<int>((screen.h - bufSize.h), pos.y);
-
-	cursorBuf->Clear();
-	video->PushDrawingBuffer(cursorBuf);
-
-	// cursor is buffer midpoint, but offset by distance to edge
-	Point mid = eventMgr.MousePos() - pos;
-	cursorBuf->SetOrigin(pos);
-
-	DrawCursor(mid);
-
-	// tooltip is *always* midpoint to the buffer
-	// this will ensure the entire tooltip is visible
-	mid.x = bufSize.w / 2;
-	mid.y = bufSize.h / 2;
-	// FIXME: github issue #8: need to calculate the size prior to drawing and offset mid.x by bufSize.w - ttsize.w
-
-	DrawTooltip(mid);
+	DrawCursor(pos);
+	DrawTooltip(pos);
 }
 
 void WindowManager::DrawCursor(const Point& pos) const
@@ -458,7 +431,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 	}
 }
 
-void WindowManager::DrawTooltip(const Point& mid) const
+void WindowManager::DrawTooltip(Point pos) const
 {
 	if (cursorFeedback&MOUSE_NO_TOOLTIPS) {
 		return;
@@ -492,7 +465,13 @@ void WindowManager::DrawTooltip(const Point& mid) const
 			reset = false;
 		}
 
-		tt.Draw(mid);
+		// clamp pos so that the TT is all visible (TT draws centered at pos)
+		int halfW = tt.TextSize().w/2 + 10;
+		int halfH = tt.TextSize().h/2 + 5;
+		pos.x = Clamp<int>(pos.x, halfW, screen.w - halfW);
+		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
+
+		tt.Draw(pos);
 	}
 }
 
@@ -527,7 +506,7 @@ WindowManager::HUDLock WindowManager::DrawHUD()
 
 void WindowManager::DrawWindows() const
 {
-	winFrameBuf->Clear();
+	HUDBuf->Clear();
 
 	if (!windows.size()) {
 		return;
@@ -582,7 +561,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	// winFrameBuf is has been filled with the modal shield color
-	video->PushDrawingBuffer(winFrameBuf);
+	video->PushDrawingBuffer(HUDBuf);
 	if (drawFrame) {
 		DrawWindowFrame();
 	}
@@ -611,8 +590,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 		screenshot = video->GetScreenshot( win->Frame() );
 	} else {
 		// we dont want cursors and tooltips in the shot
-		cursorBuf->Clear();
-		winFrameBuf->Clear();
+		HUDBuf->Clear();
 		screenshot = video->GetScreenshot( screen );
 	}
 
