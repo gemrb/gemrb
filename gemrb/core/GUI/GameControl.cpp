@@ -289,9 +289,12 @@ static const int arrow_orientations[16]={
 //WARNING:don't use reference for point, because it is altered
 void GameControl::DrawArrowMarker(Point p, const Color& color)
 {
+	WindowManager* wm = core->GetWindowManager();
+	auto lock = wm->DrawHUD();
+
 	ieDword draw = 0;
-	if (p.x < vpOrigin.x + 64) {
-		p.x = vpOrigin.x + 64;
+	if (p.x < vpOrigin.x) {
+		p.x = vpOrigin.x;
 		draw|= D_LEFT;
 	}
 	if (p.y < vpOrigin.y) {
@@ -300,21 +303,15 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 	}
 
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
-	int tmp = 64;
-	if (p.x > vpOrigin.x + frame.w - (tmp + spr->Frame.w)) {
-		p.x = vpOrigin.x + frame.w - tmp;
+	int tmp = spr->Frame.w;
+	if (p.x > vpOrigin.x + frame.w - tmp) {
+		p.x = vpOrigin.x + frame.w;
 		draw |= D_RIGHT;
 	}
 
-	Region mwinframe;
-	TextArea* mta = core->GetMessageTextArea();
-	if (mta) {
-		mwinframe = mta->GetWindow()->Frame();
-	}
-
-	tmp = mwinframe.h + 48;
-	if (p.y > vpOrigin.y + frame.h - (tmp + spr->Frame.h)) {
-		p.y = vpOrigin.y + frame.h - tmp;
+	tmp = spr->Frame.h;
+	if (p.y > vpOrigin.y + frame.h - tmp) {
+		p.y = vpOrigin.y + frame.h;
 		draw |= D_BOTTOM;
 	}
 
