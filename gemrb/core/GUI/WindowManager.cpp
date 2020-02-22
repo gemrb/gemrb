@@ -126,7 +126,6 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	win->SetDisabled(false);
 	win->SetFlags(Window::Modal, OP_OR);
 	modalWin = win;
-	winFrameBuf->Clear();
 
 	if (Shadow != ShadowNone) {
 		Color shieldColor;
@@ -246,8 +245,6 @@ void WindowManager::CloseWindow(Window* win)
 				break;
 			}
 		}
-		if (modalWin == NULL)
-			winFrameBuf->Clear();
 	}
 
 	if (win == hoverWin) {
@@ -523,8 +520,15 @@ void WindowManager::DrawWindowFrame() const
 	}
 }
 
+WindowManager::HUDLock WindowManager::DrawHUD()
+{
+	return HUDLock(*this);
+}
+
 void WindowManager::DrawWindows() const
 {
+	winFrameBuf->Clear();
+
 	if (!windows.size()) {
 		return;
 	}
@@ -577,17 +581,16 @@ void WindowManager::DrawWindows() const
 		}
 	}
 
-	if (modalWin || drawFrame) {
-		// winFrameBuf is has been filled with the modal shield color
-		video->PushDrawingBuffer(winFrameBuf);
-		if (drawFrame) {
-			DrawWindowFrame();
-		}
-		if (modalWin) {
-			modalWin->Draw();
-		}
-	} else if (FadeColor.a > 0) {
-		video->PushDrawingBuffer(winFrameBuf);
+	// winFrameBuf is has been filled with the modal shield color
+	video->PushDrawingBuffer(winFrameBuf);
+	if (drawFrame) {
+		DrawWindowFrame();
+	}
+	if (modalWin) {
+		modalWin->Draw();
+	}
+
+	if (FadeColor.a > 0) {
 		video->DrawRect(screen, FadeColor, true);
 	}
 
@@ -609,6 +612,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win) const
 	} else {
 		// we dont want cursors and tooltips in the shot
 		cursorBuf->Clear();
+		winFrameBuf->Clear();
 		screenshot = video->GetScreenshot( screen );
 	}
 

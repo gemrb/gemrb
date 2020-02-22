@@ -54,6 +54,19 @@ public:
 
 	Color FadeColor;
 
+	struct HUDLock {
+		WindowManager& wm;
+
+		HUDLock(WindowManager& wm)
+		: wm(wm) {
+			wm.video->PushDrawingBuffer(wm.winFrameBuf);
+		}
+
+		~HUDLock() {
+			wm.video->PopDrawingBuffer();
+		}
+	};
+
 private:
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
@@ -106,6 +119,9 @@ public:
 	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
 
 	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
+
+	// all drawing will be done directly on the screen until DrawingLock is destoryed
+	HUDLock DrawHUD();
 
 	/*
 	 Drawing is done in layers:
