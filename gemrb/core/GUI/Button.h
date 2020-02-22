@@ -81,7 +81,7 @@ class Palette;
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
-#define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
+#define IE_GUI_BUTTON_PORTRAIT     (IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE)   // portrait
 
 /** Border/frame settings for a button */
 struct ButtonBorder {

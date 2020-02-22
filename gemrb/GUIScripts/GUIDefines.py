@@ -67,6 +67,8 @@ IE_GUI_BUTTON_CENTER_PICTURES = 0x00100000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
 
+IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
+
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)
 

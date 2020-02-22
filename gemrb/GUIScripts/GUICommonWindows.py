@@ -1675,7 +1675,7 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
+		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
 						IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		# TODO: recheck if this resetting is needed for all or for none
 		if GameCheck.IsIWD2():
