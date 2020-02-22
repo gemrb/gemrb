@@ -940,7 +940,6 @@ void Interface::Main()
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn( 0, Height - 30, 80, 30 );
 	wchar_t fpsstring[20] = {L"???.??? fps"};
-	VideoBuffer* fpsBuf = video->CreateBuffer(fpsRgn);
 	// set for printing
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
@@ -986,7 +985,7 @@ void Interface::Main()
 				frame = 0;
 				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
 			}
-			video->PushDrawingBuffer(fpsBuf);
+			auto lock = winmgr->DrawHUD();
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print( fpsRgn, String(fpsstring), palette,
 					   IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
@@ -994,7 +993,6 @@ void Interface::Main()
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 
 	gamedata->FreePalette( palette );
-	video->DestroyBuffer(fpsBuf);
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
