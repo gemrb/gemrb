@@ -12177,8 +12177,8 @@ PyDoc_STRVAR( GemRB_CreateCreature__doc,
 \n\
 **Prototype:** GemRB.CreateCreature (globalID, CreResRef[, posX, posY])\n\
 \n\
-**Description:** Creates creature in the vicinity of the player character or \n\
-at specified point.\n\
+**Description:** Creates creature in the vicinity of the specified actor or \n\
+at the specified point (takes precedence if both are specified).\n\
 \n\
 **Parameters:** \n\
   * globalID - party ID or global ID of the actor to use\n\
