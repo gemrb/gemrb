@@ -478,7 +478,7 @@ void SDL20VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const
 	}
 }
 
-Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
+Sprite2D* SDL20VideoDriver::GetScreenshot(Region r, VideoBuffer* buf)
 {
 	SDL_Rect rect = RectFromRegion(r);
 
@@ -488,8 +488,18 @@ Sprite2D* SDL20VideoDriver::GetScreenshot( Region r )
 	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 
+	SDL_Texture* target = SDL_GetRenderTarget(renderer);
+	if (buf) {
+		auto texture = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+		SDL_SetRenderTarget(renderer, texture);
+	} else {
+		SDL_SetRenderTarget(renderer, nullptr);
+	}
+
 	SDL_Surface* surface = screenshot->GetSurface();
 	SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_BGR24, surface->pixels, surface->pitch);
+
+	SDL_SetRenderTarget(renderer, target);
 
 	return screenshot;
 }

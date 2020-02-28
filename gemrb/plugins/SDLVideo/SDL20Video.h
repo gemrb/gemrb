@@ -220,7 +220,7 @@ public:
 
 	void SwapBuffers(VideoBuffers& buffers);
 
-	Sprite2D* GetScreenshot( Region r );
+	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr );
 	bool SetFullscreenMode(bool set);
 	void SetGamma(int brightness, int contrast);
 	bool ToggleGrabInput();

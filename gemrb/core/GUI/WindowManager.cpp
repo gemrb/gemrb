@@ -580,18 +580,20 @@ void WindowManager::DrawWindows() const
 }
 
 //copies a screenshot into a sprite
-Sprite2D* WindowManager::GetScreenshot(Window* win) const
+Sprite2D* WindowManager::GetScreenshot(Window* win)
 {
 	Sprite2D* screenshot = NULL;
 	if (win) { // we dont really care if we are managing the window
 		// only a screen shot of passed win
-		win->MarkDirty();
-		win->Draw();
-		screenshot = video->GetScreenshot( win->Frame() );
+		VideoBuffer* winBuf = win->Draw(false);
+		screenshot = video->GetScreenshot( Region(Point(), win->Dimensions()), winBuf );
 	} else {
-		// we dont want cursors and tooltips in the shot
-		HUDBuf->Clear();
+		// redraw the windows without the mouse elements
+		auto mouseState = SetCursorFeedback(MOUSE_NONE);
+		DrawWindows();
+		video->SwapBuffers(0);
 		screenshot = video->GetScreenshot( screen );
+		SetCursorFeedback(mouseState);
 	}
 
 	return screenshot;

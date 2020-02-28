@@ -539,23 +539,20 @@ SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
 	return static_cast<SDLSurfaceVideoBuffer*>(stencilBuffer)->Surface();
 }
 
-Sprite2D* SDL12VideoDriver::GetScreenshot( Region r )
+Sprite2D* SDL12VideoDriver::GetScreenshot( Region r, VideoBuffer* buf )
 {
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
 	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
-	SDL_Surface* screenshotSurface = SDL_DisplayFormat(disp);
-	SDL_Surface* tmp = disp;
-	disp = screenshotSurface;
-	Video::SwapBuffers(0);
-
 	SDL_Rect src = RectFromRegion(r);
-	SDL_BlitSurface( screenshotSurface, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
-
-	disp = tmp;
-	SDL_FreeSurface(screenshotSurface);
+	if (buf) {
+		auto surface = static_cast<SDLSurfaceVideoBuffer*>(buf)->Surface();
+		SDL_BlitSurface( surface, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
+	} else {
+		SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
+	}
 
 	return screenshot;
 }

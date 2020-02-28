@@ -37,7 +37,7 @@ public:
 	int CreateDriverDisplay(const Size&, int bpp, const char* title);
 	void SetWindowTitle(const char *title) { SDL_WM_SetCaption(title, 0); };
 
-	Sprite2D* GetScreenshot( Region r );
+	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr );
 
 	bool SetFullscreenMode(bool set);
 

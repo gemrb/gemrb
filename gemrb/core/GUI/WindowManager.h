@@ -134,7 +134,7 @@ public:
 
 	Size ScreenSize() const { return screen.Dimensions(); }
 
-	Sprite2D* GetScreenshot(Window* win) const;
+	Sprite2D* GetScreenshot(Window* win);
 	Window* GetGameWindow() const { return gameWin; }
 
 	static void SetTooltipDelay(int);
