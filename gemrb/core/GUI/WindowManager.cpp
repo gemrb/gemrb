@@ -114,7 +114,7 @@ bool WindowManager::IsPresentingModalWindow() const
 }
 
 /** Show a Window in Modal Mode */
-bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
+bool WindowManager::PresentModalWindow(Window* win, ModalShadow shadow)
 {
 	if (!IsOpenWindow( win )) return false;
 
@@ -122,18 +122,7 @@ bool WindowManager::PresentModalWindow(Window* win, ModalShadow Shadow)
 	win->SetDisabled(false);
 	win->SetFlags(Window::Modal, OP_OR);
 	modalWin = win;
-
-	if (Shadow != ShadowNone) {
-		Color shieldColor;
-		if (Shadow == ShadowGray) {
-			shieldColor.a = 128;
-		} else {
-			shieldColor.a = 0xff;
-		}
-		video->PushDrawingBuffer(HUDBuf);
-		video->DrawRect(screen, shieldColor);
-		video->PopDrawingBuffer();
-	}
+	modalShadow = shadow;
 
 	if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 		core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
@@ -560,12 +549,22 @@ void WindowManager::DrawWindows() const
 		}
 	}
 
-	// winFrameBuf is has been filled with the modal shield color
 	video->PushDrawingBuffer(HUDBuf);
+
 	if (drawFrame) {
 		DrawWindowFrame();
 	}
+
 	if (modalWin) {
+		if (modalShadow != ShadowNone) {
+			Color shieldColor;
+			if (modalShadow == ShadowGray) {
+				shieldColor.a = 128;
+			} else {
+				shieldColor.a = 0xff;
+			}
+			video->DrawRect(screen, shieldColor);
+		}
 		VideoBuffer* modalBuffer = modalWin->Draw(false);
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
 	}

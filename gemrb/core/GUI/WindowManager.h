@@ -81,6 +81,7 @@ private:
 
 	Holder<Video> video;
 	VideoBuffer* HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
+	ModalShadow modalShadow = ShadowNone;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;
