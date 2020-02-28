@@ -139,6 +139,18 @@ void Window::RecreateBuffer()
 	MarkDirty();
 }
 
+VideoBuffer* Window::Draw(bool composite)
+{
+	View::Draw();
+
+	if (composite == false) {
+		core->GetVideoDriver()->PopDrawingBuffer();
+		return backBuffer;
+	} else {
+		return nullptr;
+	}
+}
+
 void Window::WillDraw()
 {
 	backBuffer->SetOrigin(frame.Origin());

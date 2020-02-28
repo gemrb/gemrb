@@ -513,7 +513,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	// draw the game window now (beneath everything else); its not part of the windows collection
-	gameWin->Draw();
+	gameWin->Draw(true);
 
 	bool drawFrame = false;
 	Window* frontWin = windows.front();
@@ -551,12 +551,12 @@ void WindowManager::DrawWindows() const
 		if (win->IsDisabled() && win->NeedsDraw()) {
 			// Important to only draw if the window itself is dirty
 			// controls on greyed out windows shouldnt be updating anyway
-			win->Draw();
+			win->Draw(true);
 			static const Color fill(0, 0, 0, 128);
 			Region winrgn(Point(), win->Dimensions());
 			video->DrawRect(winrgn, fill, true, BLIT_BLENDED);
 		} else {
-			win->Draw();
+			win->Draw(true);
 		}
 	}
 
@@ -566,7 +566,7 @@ void WindowManager::DrawWindows() const
 		DrawWindowFrame();
 	}
 	if (modalWin) {
-		modalWin->Draw();
+		modalWin->Draw(true);
 	}
 
 	if (FadeColor.a > 0) {
