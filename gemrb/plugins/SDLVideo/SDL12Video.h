@@ -62,6 +62,9 @@ public:
 
 	void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
 
+	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
+						 const Color* tint = nullptr, const Region* clip = nullptr);
+
 private:
 	void SwapBuffers(VideoBuffers&);
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const;
