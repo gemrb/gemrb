@@ -1165,6 +1165,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	View* subView = GetView(ref);
 	View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
+		assert(ref);
 		PyObject* attr = PyObject_GetAttrString(pySubview, "SCRIPT_GROUP");
 
 		Window* oldwin = subView->GetWindow();
@@ -1187,11 +1188,6 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			// return the ref we already have
 			return pySubview;
 		}
-
-        // return what we had before
-		// for some reason we cant just return pySubview
-		// the ID attribute gets lost even though we can see it if we check here
-		return gs->ConstructObjectForScriptable(ref);
 	}
 
 	return AttributeError("Invalid view parameters.");
