@@ -111,7 +111,7 @@ protected:
 	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
 
 	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
 
 	int PollEvents();

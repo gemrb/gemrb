@@ -255,9 +255,10 @@ private:
 
 	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Region& /*src*/, const Region& /*dst*/,
 					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
-	void BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
 
-	int RenderCopyShaded(const SDLTextureSprite2D*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* = NULL);
+	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* = NULL);
 
 	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
 };

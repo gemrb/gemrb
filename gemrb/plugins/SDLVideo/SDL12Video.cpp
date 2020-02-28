@@ -271,7 +271,30 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	SDL_UnlockSurface(currentBuf);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+{
+	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
+	SDL_Surface* surf = sdlspr->GetSurface();
+
+	Color c;
+	if (tint){
+		c = Color(tint->r, tint->g, tint->b, tint->unused);
+	}
+
+	if (surf->format->BytesPerPixel == 1) {
+		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
+
+		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
+		unsigned int version = flags&shaderflags;
+		RenderSpriteVersion(sdlspr, version, &c);
+		// since the "shading" has been done we clear the flags
+		flags &= ~shaderflags;
+	}
+
+	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
+}
+
+void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, Color tint)
 {
 	// non-BAM Blitting
 
@@ -295,18 +318,11 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 
 	//		print("Unoptimized blit: %04X", flags);
 
-	Color c;
-	if (tint){
-		c = Color(tint->r, tint->g, tint->b, tint->unused);
-	}
-
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags;
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
-	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
-	SDL_Surface* surf = sdlspr->GetSurface();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 	SDL_Surface* stencilsurf = nullptr;
@@ -314,24 +330,14 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 		stencilsurf = CurrentStencilBuffer();
 	}
 
-	if (surf->format->BytesPerPixel == 1) {
-		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
-
-		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
-		unsigned int version = remflags&shaderflags;
-		RenderSpriteVersion(sdlspr, version, &c);
-		// since the "shading" has been done we clear the flags
-		remflags &= ~shaderflags;
-	}
-
 	bool halftrans = remflags & BLIT_HALFTRANS;
 	if (halftrans && (remflags ^ BLIT_HALFTRANS)) { // other flags are set too
 		// handle halftrans with 50% alpha tinting
 		if (!(remflags & BLIT_TINTED)) {
-			c.r = c.g = c.b = c.a = 255;
+			tint.r = tint.g = tint.b = tint.a = 255;
 			remflags |= BLIT_TINTED;
 		}
-		c.a >>= 1;
+		tint.a >>= 1;
 	}
 
 	// FIXME: this always assumes BLIT_BLENDED if any "shader" flags are set
@@ -340,13 +346,13 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 
 	if (remflags&BLIT_TINTED) {
 		if (remflags&BLIT_GREY) {
-			RGBBlendingPipeline<GREYSCALE, true> blender(c);
+			RGBBlendingPipeline<GREYSCALE, true> blender(tint);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		} else if (remflags&BLIT_SEPIA) {
-			RGBBlendingPipeline<SEPIA, true> blender(c);
+			RGBBlendingPipeline<SEPIA, true> blender(tint);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		} else {
-			RGBBlendingPipeline<TINT, true> blender(c);
+			RGBBlendingPipeline<TINT, true> blender(tint);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 		}
 	} else if (remflags&BLIT_GREY) {

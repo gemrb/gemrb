@@ -207,21 +207,26 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 	return 0;
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, const SDL_Color* tint)
 {
-	const SDLTextureSprite2D* texSprite = static_cast<const SDLTextureSprite2D*>(spr);
+	#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
+		// FIXME: ingegtate these into the shader if possible
+		unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+		// update palette
+		RenderSpriteVersion(texSprite, version);
+	#else
+		// we need to isolate flags that require software rendering to use as the "version"
+		unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+		// WARNING: software fallback == slow
+		RenderSpriteVersion(spr, version);
+	#endif
 
-#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-	// FIXME: ingegtate these into the shader if possible
-	unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-	// update palette
-	RenderSpriteVersion(texSprite, version);
-#else
-	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-	// WARNING: software fallback == slow
-	RenderSpriteVersion(texSprite, version);
-#endif
+	SDL_Texture* tex = spr->GetTexture(renderer);
+	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
+}
+
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+{
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
 		// 1. clear scratchpad segment
@@ -283,11 +288,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const Sprite2D* spr, const SDL_Re
 	}
 }
 
-int SDL20VideoDriver::RenderCopyShaded(const SDLTextureSprite2D* sprite, const SDL_Rect* srcrect,
+int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
 {
 	// FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-	SDL_Texture* texture = sprite->GetTexture(renderer);
 #if 0
 	GLint activeTex;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);

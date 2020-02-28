@@ -594,7 +594,8 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	} else {
 		SDL_Rect srect = RectFromRegion(src);
 		SDL_Rect drect = RectFromRegion(dclipped);
-		BlitSpriteNativeClipped(spr, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+		const sprite_t* native = static_cast<const sprite_t*>(spr);
+		BlitSpriteNativeClipped(native, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
 }
 
