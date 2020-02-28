@@ -566,7 +566,8 @@ void WindowManager::DrawWindows() const
 		DrawWindowFrame();
 	}
 	if (modalWin) {
-		modalWin->Draw(true);
+		VideoBuffer* modalBuffer = modalWin->Draw(false);
+		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
 	}
 
 	if (FadeColor.a > 0) {
