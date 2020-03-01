@@ -10556,8 +10556,8 @@ void Actor::CureInvisibility()
 // removes the sanctuary effect
 void Actor::CureSanctuary()
 {
-	// 1 is the bit for the sanctuary overlay value
-	pcf_sanctuary(this, Modified[IE_SANCTUARY], Modified[IE_SANCTUARY] & ~1);
+	// clear the overlay immediately
+	pcf_sanctuary(this, Modified[IE_SANCTUARY], Modified[IE_SANCTUARY] & ~(1<<OV_SANCTUARY));
 
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
