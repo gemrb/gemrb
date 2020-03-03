@@ -502,7 +502,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	// draw the game window now (beneath everything else); its not part of the windows collection
-	gameWin->Draw(true);
+	gameWin->Draw();
 
 	bool drawFrame = false;
 	Window* frontWin = windows.front();
@@ -540,12 +540,12 @@ void WindowManager::DrawWindows() const
 		if (win->IsDisabled() && win->NeedsDraw()) {
 			// Important to only draw if the window itself is dirty
 			// controls on greyed out windows shouldnt be updating anyway
-			win->Draw(true);
+			win->Draw();
 			static const Color fill(0, 0, 0, 128);
 			Region winrgn(Point(), win->Dimensions());
 			video->DrawRect(winrgn, fill, true, BLIT_BLENDED);
 		} else {
-			win->Draw(true);
+			win->Draw();
 		}
 	}
 
@@ -565,7 +565,7 @@ void WindowManager::DrawWindows() const
 			}
 			video->DrawRect(screen, shieldColor);
 		}
-		VideoBuffer* modalBuffer = modalWin->Draw(false);
+		VideoBuffer* modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
 	}
 
@@ -585,7 +585,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win)
 	Sprite2D* screenshot = NULL;
 	if (win) { // we dont really care if we are managing the window
 		// only a screen shot of passed win
-		VideoBuffer* winBuf = win->Draw(false);
+		VideoBuffer* winBuf = win->DrawWithoutComposition();
 		screenshot = video->GetScreenshot( Region(Point(), win->Dimensions()), winBuf );
 	} else {
 		// redraw the windows without the mouse elements

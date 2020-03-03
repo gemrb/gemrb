@@ -139,16 +139,12 @@ void Window::RecreateBuffer()
 	MarkDirty();
 }
 
-VideoBuffer* Window::Draw(bool composite)
+VideoBuffer* Window::DrawWithoutComposition()
 {
 	View::Draw();
 
-	if (composite == false) {
-		core->GetVideoDriver()->PopDrawingBuffer();
-		return backBuffer;
-	} else {
-		return nullptr;
-	}
+	core->GetVideoDriver()->PopDrawingBuffer();
+	return backBuffer;
 }
 
 void Window::WillDraw()

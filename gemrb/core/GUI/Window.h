@@ -114,7 +114,7 @@ public:
 	bool IsDisabledCursor() const;
 	bool IsReceivingEvents() const { return true; }
 
-	VideoBuffer* Draw(bool composite);
+	VideoBuffer* DrawWithoutComposition();
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
 	bool DispatchEvent(const Event&);
