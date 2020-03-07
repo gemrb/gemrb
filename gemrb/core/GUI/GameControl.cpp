@@ -113,7 +113,7 @@ GameControl::GameControl(const Region& frame)
 	} else {
 		ScreenFlags = SF_CENTERONACTOR;
 	}
-	DialogueFlags = 0;
+	DialogueFlags = DF_FREEZE_SCRIPTS;
 	dialoghandler = new DialogHandler();
 	DisplayText = NULL;
 	DisplayTextTime = 0;

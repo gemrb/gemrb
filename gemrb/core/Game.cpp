@@ -961,6 +961,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 failedload:
 	core->LoadProgress(100);
+	core->GetGameControl()->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_NAND);
 	return ret;
 }
 
