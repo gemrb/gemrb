@@ -1835,7 +1835,6 @@ def PortraitButtonOnShiftPress (i):
 def PortraitButtonHPOnPress (i): ##pst hitpoint display
 	Window = PortraitWindow
 
-	i = GemRB.GetVar ('PressedPortraitHP')
 	hbs = GemRB.GetVar('Health Bar Settings')
 	ButtonHP = Window.GetControl (5 + i)
 
