@@ -75,6 +75,16 @@ void Gem_Polygon::Rasterize()
 			rasterData[y].push_back(std::make_pair(Point(lt, y), Point(rt, y)));
 		}
 	}
+
+	for (auto& segments : rasterData) {
+		std::sort(segments.begin(), segments.end(), [](const LineSegment& a, const LineSegment& b) {
+			// return true if a.x < b.x, assume segments can't overlap except possibly the endpoints
+			assert(a.first.y == b.first.y);
+			assert(a.second.y == b.second.y);
+			assert(a.first.x <= a.second.x);
+			return a.first.x < b.first.x;
+		});
+	}
 }
 
 void Gem_Polygon::RecalcBBox()
@@ -103,42 +113,63 @@ void Gem_Polygon::RecalcBBox()
 
 bool Gem_Polygon::PointIn(const Point& p) const
 {
-	if(!BBox.PointInside(p) ) return false;
-	return PointIn(p.x, p.y);
+	Point relative = p - BBox.Origin();
+
+	if (relative.y < 0 || relative.y >= int(rasterData.size())) {
+		return false;
+	}
+
+	for (const auto& seg : rasterData[relative.y]) {
+		if (relative.x >= seg.first.x) {
+			if (relative.x <= seg.second.x) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	return false;
 }
 
 bool Gem_Polygon::PointIn(int tx, int ty) const
 {
-	int  yflag0, yflag1, xflag0 , index;
-	bool inside_flag = false;
-	size_t count = vertices.size();
+	return PointIn(Point(tx, ty));
+}
 
-	index = 0;
+bool Gem_Polygon::IntersectsRect(const Region& rect) const
+{
+	// first do a quick check on the 4 corner points
+	// most ot the time an intersection would contain one
+	// and we can avoid a more expensive search
 
-	const Point* vtx0 = &vertices[count - 1];
-	yflag0 = ( vtx0->y >= ty );
-	const Point* vtx1 = &vertices[index];
+	if (PointIn(rect.Origin()) ||
+		PointIn(rect.x + rect.w, rect.y) ||
+		PointIn(rect.x, rect.y + rect.h) ||
+		PointIn(rect.Maximum()))
+	{
+		return true;
+	}
 
-	for (size_t j = count + 1; --j ;) {
-		yflag1 = ( vtx1->y >= ty );
-		if (yflag0 != yflag1) {
-			xflag0 = ( vtx0->x >= tx );
-			if (xflag0 == ( vtx1->x >= tx )) {
-				if (xflag0)
-					inside_flag = !inside_flag;
-			} else {
-				if (( vtx1->x -
-					( vtx1->y - ty ) * ( vtx0->x - vtx1->x ) /
-					( vtx0->y - vtx1->y ) ) >= tx) {
-					inside_flag = !inside_flag;
+	Point relative = rect.Origin() - BBox.Origin();
+	if (relative.y < 0 || relative.y + rect.h >= int(rasterData.size())) {
+		return false;
+	}
+
+	for (int y = relative.y; y < relative.y + rect.h; ++y) {
+		int xmin = relative.x;
+		int xmax = relative.x + rect.w;
+
+		for (const auto& seg : rasterData[y]) {
+			if (xmax >= seg.first.x) {
+				if (xmin <= seg.second.x) {
+					return true;
 				}
+				//break;
 			}
 		}
-		yflag0 = yflag1;
-		vtx0 = vtx1;
-		vtx1 = &vertices[++index];
 	}
-	return inside_flag;
+
+	return false;
 }
 
 // returns twice the area of triangle a, b, c.

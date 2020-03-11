@@ -53,6 +53,8 @@ public:
 
 	bool PointIn(const Point &p) const;
 	bool PointIn(int x, int y) const;
+
+	bool IntersectsRect(const Region&) const;
 };
 
 // wall polygons are used to render area wallgroups
