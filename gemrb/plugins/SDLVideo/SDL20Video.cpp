@@ -466,12 +466,16 @@ void SDL20VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const
 			}
 		}
 	} else {
-		std::vector<SDL_Point> points(poly->Count());
-		for (size_t i = 0; i < poly->Count(); ++i) {
+		std::vector<SDL_Point> points(poly->Count() + 1);
+		size_t i = 0;
+		for (; i < poly->Count(); ++i) {
 			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
 			points[i].x = p.x;
 			points[i].y = p.y;
 		}
+
+		// close the polygon with first point
+		points[i] = points[0];
 
 		DrawLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
 	}
