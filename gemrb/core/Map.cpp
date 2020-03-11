@@ -2050,7 +2050,7 @@ void Map::RedrawStencils(const Region& vp)
 	video->PopDrawingBuffer();
 }
 
-bool Map::IntersectsWall(const Region& r) const
+bool Map::BehindWall(const Point& pos, const Region& r) const
 {
 	// TODO: I believe wall groups are organized in relation to the tile map
 	// if so we should be able to jump to the correct groups occupying 'r'
@@ -2060,8 +2060,10 @@ bool Map::IntersectsWall(const Region& r) const
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp || (wp->wall_flag&WF_DISABLED)) continue;
 
-		if (r.IntersectsRegion(wp->BBox)) {
-			return true;
+		if (wp->PointBehind(pos)) {
+			if (wp->IntersectsRect(r)) {
+				return true;
+			}
 		}
 	}
 

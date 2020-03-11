@@ -437,7 +437,7 @@ public:
 		WallCount = count;
 		Walls = walls;
 	}
-	bool IntersectsWall(const Region&) const;
+	bool BehindWall(const Point&, const Region&) const;
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, bool global);
 	void ActorSpottedByPlayer(Actor *actor);

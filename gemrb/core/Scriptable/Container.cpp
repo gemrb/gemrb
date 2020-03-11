@@ -85,7 +85,7 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 			Region r = icon->Frame;
 			r.x = Pos.x - r.x;
 			r.y = Pos.y - r.y;
-			if (area->IntersectsWall(r)) {
+			if (area->BehindWall(Pos, r)) {
 				if (core->FogOfWar&FOG_DITHERSPRITES) { // dithering disabled setting
 					flags |= BLIT_STENCIL_BLUE;
 				} else {

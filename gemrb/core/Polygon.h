@@ -77,8 +77,8 @@ class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
 	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) { wall_flag = 0; }
 	//is the point above the baseline
-	bool PointCovered(const Point &p) const;
-	bool PointCovered(int x, int y) const;
+	bool PointBehind(const Point &p) const;
+	bool PointBehind(int x, int y) const;
 	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);

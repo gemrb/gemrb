@@ -410,7 +410,7 @@ void Wall_Polygon::SetBaseline(const Point &a, const Point &b)
 	base1=a;
 }
 
-bool Wall_Polygon::PointCovered(const Point &p) const
+bool Wall_Polygon::PointBehind(const Point &p) const
 {
 	if (wall_flag&WF_DISABLED)
 		return false;
@@ -423,10 +423,10 @@ bool Wall_Polygon::PointCovered(const Point &p) const
 	return true;
 }
 
-bool Wall_Polygon::PointCovered(int tx, int ty) const
+bool Wall_Polygon::PointBehind(int tx, int ty) const
 {
 	Point p((short) tx, (short) ty);
-	return PointCovered(p);
+	return PointBehind(p);
 }
 
 
