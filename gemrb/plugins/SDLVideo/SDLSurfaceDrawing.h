@@ -331,11 +331,11 @@ template<bool BLENDED=false>
 void DrawPolygonSurface(SDL_Surface* surface, Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
 {
 	if (fill) {
-		const std::vector<Point>& lines = poly->rasterData;
-		size_t count = lines.size();
-		for (size_t i = 0; i < count; i+=2)
+		for (const auto& lineSegments : poly->rasterData)
 		{
-			DrawHLineSurface<BLENDED>(surface, lines[i] + origin, (lines[i+1] + origin).x, clip, color);
+			for (const auto& segment : lineSegments) {
+				DrawHLineSurface<BLENDED>(surface, segment.first + origin, (segment.second + origin).x, clip, color);
+			}
 		}
 	} else {
 		// we continually recycle this vector

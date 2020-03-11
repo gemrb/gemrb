@@ -37,14 +37,17 @@ public:
 
 class GEM_EXPORT Gem_Polygon {
 	std::vector<Trapezoid> ComputeTrapezoids() const;
-private:
 	void RecalcBBox();
+	void Rasterize();
+
 public:
+	using LineSegment = std::pair<Point, Point>;
+
 	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
 
 	Region BBox;
 	std::vector<Point> vertices;
-	std::vector<Point> rasterData; // same as vertices, but relative to BBox
+	std::vector<std::vector<LineSegment>> rasterData; // same as vertices, but relative to BBox
 
 	size_t Count() const {return vertices.size();}
 

@@ -37,25 +37,27 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
 
-	std::vector<Trapezoid> trapezoids = ComputeTrapezoids();
-	std::vector<Trapezoid>::iterator iter;
-	for (iter = trapezoids.begin(); iter != trapezoids.end(); ++iter)
-	{
-		int y_top = iter->y1 - BBox.y; // inclusive
-		int y_bot = iter->y2 - BBox.y; // exclusive
+	Rasterize();
+}
+
+void Gem_Polygon::Rasterize()
+{
+	rasterData.resize(BBox.h);
+
+	for (const auto& trap : ComputeTrapezoids()) {
+		int y_top = trap.y1 - BBox.y; // inclusive
+		int y_bot = trap.y2 - BBox.y; // exclusive
 
 		if (y_top < 0) y_top = 0;
 		if (y_bot >= BBox.h) y_bot = BBox.h - 1;
 		if (y_top >= y_bot) continue; // clipped
 
-		int ledge = iter->left_edge;
-		int redge = iter->right_edge;
+		int ledge = trap.left_edge;
+		int redge = trap.right_edge;
 		const Point& a = vertices[ledge];
 		const Point& b = vertices[(ledge+1)%(Count())];
 		const Point& c = vertices[redge];
 		const Point& d = vertices[(redge+1)%(Count())];
-
-		rasterData.reserve(rasterData.size() + (y_bot*2));
 
 		for (int y = y_top; y < y_bot; ++y) {
 			int py = y + BBox.y;
@@ -70,9 +72,7 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 			if (rt >= BBox.w) rt = BBox.w - 1;
 			if (lt >= rt) { continue; } // clipped
 
-			// Draw a line from (y,lt) to (y,rt)
-			rasterData.push_back(Point(lt, y));
-			rasterData.push_back(Point(rt, y));
+			rasterData[y].push_back(std::make_pair(Point(lt, y), Point(rt, y)));
 		}
 	}
 }
@@ -101,7 +101,7 @@ void Gem_Polygon::RecalcBBox()
 	BBox.h-=BBox.y;
 }
 
-bool Gem_Polygon::PointIn(const Point &p) const
+bool Gem_Polygon::PointIn(const Point& p) const
 {
 	if(!BBox.PointInside(p) ) return false;
 	return PointIn(p.x, p.y);
