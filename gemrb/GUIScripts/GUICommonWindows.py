@@ -1654,6 +1654,10 @@ def UpdatePortraitWindow ():
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.iteritems():
 		pcID = i + 1
+		if (pcID <= GemRB.GetPartySize()):
+			Button.SetAction(lambda btn, val, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
+			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
+
 		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window, i)
 			continue

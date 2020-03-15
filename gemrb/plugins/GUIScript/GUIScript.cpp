@@ -3269,6 +3269,37 @@ static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /
 	return PyInt_FromLong(gc->GetTargetMode());
 }
 
+PyDoc_STRVAR( GemRB_GameControlLocateActor__doc,
+"===== GameControlLocateActor =====\n\
+\n\
+**Prototype:** GemRB.GameControlLocateActor ()\n\
+\n\
+**Description:** Activates location indicators such as arrow markers or pulsating draw circles for the actor.\n\
+Only one actor can be located at a time.\n\
+\n\
+**Return value:** N/A\n\
+"
+);
+
+static PyObject* GemRB_GameControlLocateActor(PyObject* /*self*/, PyObject* args)
+{
+	int globalID = -1;
+	PARSE_ARGS(args,  "i", &globalID);
+
+	GET_GAMECONTROL();
+
+	if (globalID == -1) {
+		gc->SetLastActor(nullptr);
+		Py_RETURN_NONE;
+	}
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	gc->SetLastActor(actor);
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_GameControlToggleAlwaysRun__doc,
 "===== GameControlToggleAlwaysRun =====\n\
 \n\
@@ -13012,6 +13043,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FindItem, METH_VARARGS),
 	METHOD(FindStoreItem, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
+	METHOD(GameControlLocateActor, METH_VARARGS),
 	METHOD(GameControlToggleAlwaysRun, METH_NOARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
