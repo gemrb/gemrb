@@ -51,14 +51,9 @@ Button::Button(Region& frame)
 	ResetEventHandler( MouseOverButton );
 
 	hasText = false;
-	font = core->GetButtonFont();
 	normal_palette = NULL;
-	disabled_palette = font->GetPalette()->Copy();
-	for (int i = 0; i < 256; i++) {
-		disabled_palette->col[i].r = ( disabled_palette->col[i].r * 2 ) / 3;
-		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
-		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
-	}
+	disabled_palette = NULL;
+	SetFont(core->GetButtonFont());
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	Picture = NULL;
@@ -372,6 +367,9 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
+	gamedata->FreePalette(disabled_palette);
+	disabled_palette = font->GetPalette()->Copy();
+	disabled_palette->Darken();
 }
 
 bool Button::WantsDragOperation()
@@ -734,7 +732,11 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 void Button::SetTextColor(const Color &fore, const Color &back)
 {
 	gamedata->FreePalette( normal_palette );
+	gamedata->FreePalette(disabled_palette);
+
 	normal_palette = new Palette( fore, back );
+	disabled_palette = normal_palette->Copy();
+	disabled_palette->Darken();
 	MarkDirty();
 }
 
