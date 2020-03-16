@@ -72,7 +72,20 @@ void Gem_Polygon::Rasterize()
 			if (rt >= BBox.w) rt = BBox.w - 1;
 			if (lt >= rt) { continue; } // clipped
 
-			rasterData[y].push_back(std::make_pair(Point(lt, y), Point(rt, y)));
+			bool merged = false;
+			for (auto& seg : rasterData[y]) {
+				if (rt >= seg.first.x && lt <= seg.second.x) {
+					// merge overlapping segment
+					seg.first.x = std::min<int>(seg.first.x, lt);
+					seg.second.x = std::max<int>(seg.second.x, rt);
+					merged = true;
+					break;
+				}
+			}
+
+			if (!merged) {
+				rasterData[y].push_back(std::make_pair(Point(lt, y), Point(rt, y)));
+			}
 		}
 	}
 
