@@ -87,6 +87,16 @@ void Palette::Brighten()
 	version++;
 }
 
+void Palette::Darken()
+{
+	for (int i = 0; i < 256; i++) {
+		col[i].r = (col[i].r * 2) / 3;
+		col[i].g = (col[i].g * 2) / 3;
+		col[i].b = (col[i].b * 2) / 3;
+		col[i].a = (col[i].a * 2) / 3;
+	}
+}
+
 Palette* Palette::Copy()
 {
 	return new Palette(col, alpha);

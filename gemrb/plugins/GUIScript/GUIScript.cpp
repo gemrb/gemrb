@@ -7820,11 +7820,11 @@ PyDoc_STRVAR( GemRB_ExecuteString__doc,
 **Description:** Executes an in-game script action in the current area \n\
 script context. This means that LOCALS will be treated as the current \n\
 area's variable. If a number was given, it will execute the action in the \n\
-numbered PC's context.\n\
+numbered actor's context.\n\
 \n\
 **Parameters:**\n\
   * String - a gamescript action\n\
-  * Slot   - a player slot\n\
+  * Slot   - a player slot or global ID\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -7843,17 +7843,14 @@ The above example will force Player2 to attack an enemy, as the example will run
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
-	int actornum=0;
-	PARSE_ARGS( args,  "s|i", &String, &actornum );
+	int globalID = 0;
+
+	PARSE_ARGS( args,  "s|i", &String, &globalID );
 	GET_GAME();
 
-	if (actornum) {
-		Actor *pc = game->FindPC(actornum);
-		if (pc) {
-			GameScript::ExecuteString( pc, String );
-		} else {
-			Log(WARNING, "GUIScript", "Player not found!");
-		}
+	if (globalID) {
+		GET_ACTOR_GLOBAL();
+		GameScript::ExecuteString(actor, String);
 	} else {
 		GameScript::ExecuteString( game->GetCurrentArea( ), String );
 	}
@@ -9902,8 +9899,8 @@ PyDoc_STRVAR( GemRB_CreateCreature__doc,
 \n\
 **Prototype:** GemRB.CreateCreature (globalID, CreResRef[, posX, posY])\n\
 \n\
-**Description:** Creates creature in the vicinity of the player character or \n\
-at specified point.\n\
+**Description:** Creates creature in the vicinity of the specified actor or \n\
+at the specified point (takes precedence if both are specified).\n\
 \n\
 **Parameters:** \n\
   * globalID - party ID or global ID of the actor to use\n\
