@@ -3878,7 +3878,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	memcpy(Name, src->Name, sizeof(ieVariable));
 	memcpy(BAM, src->BAM, sizeof(ieResRef));
 
-	palette = src->palette ? new Palette(src->palette->col, src->palette->alpha) : NULL;
+	palette = src->palette ? src->palette->Copy() : NULL;
 
 	// handles the rest: animation, resets animcount
 	InitAnimation();

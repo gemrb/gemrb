@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 
@@ -49,14 +50,9 @@ private:
 public:
 	Palette(const Color &color, const Color &back);
 
-	Palette(const Color* colours, bool alpha_=false) {
-		for (int i = 0; i < 256; ++i) {
-			col[i] = colours[i];
-		}
-		alpha = alpha_;
-		refcount = 1;
-		named = false;
-		version = 0;
+	Palette(const Color* begin, const Color* end)
+	: Palette() {
+		std::copy(begin, end, col);
 	}
 
 	Palette() {
@@ -98,7 +94,7 @@ public:
 	void SetupGlobalRGBModification(const Palette* src,
 		const RGBModifier& mod);
 
-	Palette* Copy();
+	Palette* Copy() const;
 
 	bool operator==(const Palette&) const;
 	bool operator!=(const Palette&) const;

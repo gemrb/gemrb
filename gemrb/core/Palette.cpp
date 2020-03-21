@@ -28,12 +28,8 @@ namespace GemRB {
 #define MUL    2
 
 Palette::Palette(const Color &color, const Color &back)
+: Palette()
 {
-	alpha = false;
-	refcount = 1;
-	version = 0;
-	named = false;
-
 	front = color;
 	this->back = back;
 	col[0].r = 0;
@@ -97,9 +93,11 @@ void Palette::Darken()
 	}
 }
 
-Palette* Palette::Copy()
+Palette* Palette::Copy() const
 {
-	return new Palette(col, alpha);
+	Palette* newPal = new Palette(std::begin(col), std::end(col));
+	newPal->alpha = alpha;
+	return newPal;
 }
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
