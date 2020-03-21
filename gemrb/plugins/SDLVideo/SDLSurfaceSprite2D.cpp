@@ -131,15 +131,6 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 	return palette;
 }
 
-const Color* SDLSurfaceSprite2D::GetPaletteColors() const
-{
-	SDL_PixelFormat* fmt = (*surface)->format;
-	if (fmt->BytesPerPixel != 1) {
-		return NULL;
-	}
-	return reinterpret_cast<const Color*>(fmt->palette->colors);
-}
-
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
 	Palette* palette = surface->palette.get();

@@ -67,7 +67,6 @@ public:
 	void UnlockSprite() const;
 
 	Palette *GetPalette() const;
-	const Color* GetPaletteColors() const;
 	int SetPalette(const Color* pal) const;
 	void SetPalette(Palette *pal);
 	ieDword GetColorKey() const;

@@ -42,7 +42,6 @@ public:
 	~BAMSprite2D();
 
 	Palette *GetPalette() const;
-	const Color* GetPaletteColors() const { return pal->col; };
 	void SetPalette(Palette *pal);
 	Color GetPixel(const Point&) const;
 	ieDword GetColorKey() const { return colorkey; };

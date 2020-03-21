@@ -27,7 +27,6 @@ namespace GemRB
 		GLuint GetMaskTexture();
 		void SetPaletteTexture(int texture);
 		Palette* GetPalette() const;
-		const Color* GetPaletteColors() const { return currentPalette->col; }
 		void SetPalette(Palette *pal);
 		Color GetPixel(unsigned short x, unsigned short y) const;
 		ieDword GetColorKey() const { return colorKeyIndex; }

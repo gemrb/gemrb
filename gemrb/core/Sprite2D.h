@@ -74,7 +74,6 @@ public:
 	virtual void UnlockSprite() const;
 
 	virtual Palette *GetPalette() const = 0;
-	virtual const Color* GetPaletteColors() const = 0;
 	virtual void SetPalette(Palette *pal) = 0;
 	virtual Color GetPixel(const Point&) const = 0;
 	Color GetPixel(int x, int y) const;
