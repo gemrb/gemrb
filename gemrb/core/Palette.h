@@ -96,6 +96,7 @@ public:
 
 	Palette* Copy() const;
 
+	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst);
 	bool operator==(const Palette&) const;
 	bool operator!=(const Palette&) const;
 private:

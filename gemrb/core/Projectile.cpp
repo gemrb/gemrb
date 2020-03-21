@@ -41,9 +41,7 @@
 
 namespace GemRB {
 
-//to get gradient color
-//apparently pst doesn't have the small palette correctly
-#define PALSIZE 32
+constexpr uint8_t PALSIZE = 32;
 
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
@@ -384,13 +382,13 @@ void Projectile::Setup()
 
 	//set any static tint
 	if(ExtFlags&PEF_TINT) {
-		Color tmpColor[PALSIZE];
-
-		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
+		uint8_t idx = PALSIZE/2;
+		const auto& pal32 = core->GetPalette32(Gradients[0]);
+		const Color& tmpColor = pal32[idx];
 		// PALSIZE is usually 12, but pst has it at 32, which is now the default, so make sure we're not trying to read an empty (black) entry
-		unsigned int idx = PALSIZE/2;
-		if (tmpColor[idx].r + tmpColor[idx].g + tmpColor[idx].b == 0) idx = 6;
-		StaticTint(tmpColor[idx]);
+
+		if (tmpColor.r + tmpColor.g + tmpColor.b == 0) idx = 6;
+		StaticTint(pal32[idx]);
 	}
 
 	CreateAnimations(travel, BAMRes1, Seq1);
@@ -790,10 +788,8 @@ int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 
 	if(pal) {
 		if (ExtFlags & PEF_TINT) {
-			Color tmpColor[PALSIZE];
-
-			core->GetPalette( pal[0], PALSIZE, tmpColor );
-			sca->Tint = tmpColor[PALSIZE/2];
+			const auto& pal32 = core->GetPalette32( pal[0] );
+			sca->Tint = pal32[PALSIZE/2];
 			sca->Transparency |= BLIT_TINTED;
 		} else {
 			for(int i=0;i<7;i++) {
@@ -1483,10 +1479,8 @@ void Projectile::DrawExplosion(const Region& vp)
 				if (apflags & APF_VVCPAL) {
 					//if the palette is used as tint (as opposed to clown colorset) tint the vvc
 					if (apflags & APF_TINT) {
-						Color tmpColor[PALSIZE];
-
-						core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
-						vvc->Tint = tmpColor[PALSIZE/2];
+						const auto& pal32 = core->GetPalette32(Extension->ExplColor);
+						vvc->Tint = pal32[PALSIZE/2];
 						vvc->Transparency |= BLIT_TINTED;
 					} else {
 						vvc->SetPalette(Extension->ExplColor);

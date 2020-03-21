@@ -375,7 +375,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		// Actually, the slots seem to be written in the cre file
 		// but we ignore them, i'm not sure this is correct
 		int colorcount = Colors[6];
-		int size = 32;
+		constexpr int size = 32;
 		//the color count shouldn't be more than 6!
 		if (colorcount>6) colorcount=6;
 		int dest = 256-colorcount*size;
@@ -394,8 +394,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 		*/
 		for (int i = 0; i < colorcount; i++) {
-			core->GetPalette( Colors[i]&255, size,
-				&palette[PAL_MAIN]->col[dest] );
+			const auto& pal32 = core->GetPalette32(Colors[i]);
+			palette[PAL_MAIN]->CopyColorRange(pal32.begin(), pal32.end(), dest);			
 			dest +=size;
 		}
 

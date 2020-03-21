@@ -32,13 +32,16 @@
 #include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
+#include "GameData.h"
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
 #include "Holder.h"
+#include "ImageMgr.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
 
+#include <array>
 #include <map>
 #include <string>
 #include <vector>
@@ -310,6 +313,9 @@ enum FeedbackType {
 	FT_CASTING = 64
 };
 
+template<int SIZE>
+using ColorPal = std::array<Color, SIZE>;
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -357,12 +363,12 @@ private:
 	ieResRef *DefSound; //default sounds
 	int DSCount;
 
-	Image * pal256;
-	Image * pal32;
-	Image * pal16;
 	ResRef Palette16;
 	ResRef Palette32;
 	ResRef Palette256;
+	std::vector<ColorPal<256>> palettes256;
+	std::vector<ColorPal<32>>  palettes32;
+	std::vector<ColorPal<16>>  palettes16;
 
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
@@ -435,7 +441,9 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
-	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
+	const ColorPal<16>& GetPalette16(uint8_t idx) const { return palettes16[idx]; }
+	const ColorPal<32>& GetPalette32(uint8_t idx) const { return palettes32[idx]; }
+	const ColorPal<256>& GetPalette256(uint8_t idx) const { return palettes256[idx]; }
 	/** Returns a preloaded Font */
 	Font* GetFont(const ResRef&) const;
 	Font* GetTextFont() const;
@@ -682,6 +690,27 @@ private:
 	bool LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
+
+	template<int SIZE>
+	bool LoadPalette(ResRef resref, std::vector<ColorPal<SIZE>>& palettes)
+	{
+		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
+
+		ResourceHolder<ImageMgr> palim(resref);
+		if (palim) {
+			auto image = palim->GetImage();
+			int height = image->GetHeight();
+			palettes.resize(height);
+			for (int row = 0; row < height; ++row) {
+				for (int col = 0; col < SIZE; ++col) {
+					palettes[row][col] = image->GetPixel(col, row);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();

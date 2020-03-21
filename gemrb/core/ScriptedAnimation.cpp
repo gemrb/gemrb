@@ -477,9 +477,6 @@ void ScriptedAnimation::SetFullPalette(int idx)
 	//no need to call twin
 }
 
-#define PALSIZE 12
-static Color NewPal[PALSIZE];
-
 void ScriptedAnimation::SetPalette(int gradient, int start)
 {
 	//get a palette
@@ -490,9 +487,11 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	if (start==-1) {
 		start=4;
 	}
-	core->GetPalette( gradient&255, PALSIZE, NewPal );
 
-	memcpy( &palette->col[start], NewPal, PALSIZE*sizeof( Color ) );
+	constexpr int PALSIZE = 12;
+	const auto& pal16 = core->GetPalette16(gradient);
+	palette->CopyColorRange(pal16.begin(), &pal16[PALSIZE], start);
+
 	if (twin) {
 		twin->SetPalette(gradient, start);
 	}

@@ -3587,7 +3587,8 @@ static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, i
 		Sprite2D::FreeSprite(old);
 
 		Palette* newpal = Picture->GetPalette()->Copy();
-		core->GetPalette( col1, 12, &newpal->col[4]);
+		const auto& pal16 = core->GetPalette16(col1);
+		newpal->CopyColorRange(pal16.begin(), &pal16[12], 4);
 		Picture->SetPalette( newpal );
 		newpal->release();
 	}

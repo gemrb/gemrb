@@ -28,8 +28,6 @@
 
 using namespace GemRB;
 
-static int pperm[8]={3,6,0,5,4,1,2,7};
-
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword blue_mask = 0x000000ff;
@@ -80,9 +78,10 @@ bool PLTImporter::Open(DataStream* str)
 
 Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
-	Color Palettes[8][256];
+	static int pperm[8]={3,6,0,5,4,1,2,7};
+	ColorPal<256> Palettes[8];
 	for (int i = 0; i < 8; i++) {
-		core->GetPalette( (paletteIndex[pperm[i]] >> (8*type)) & 0xFF, 256, Palettes[i] );
+		Palettes[i] = core->GetPalette256(paletteIndex[pperm[i]] >> (8*type));
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;

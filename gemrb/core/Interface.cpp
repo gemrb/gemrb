@@ -45,10 +45,8 @@
 #include "Factory.h"
 #include "FontManager.h"
 #include "Game.h"
-#include "GameData.h"
 #include "GameScript/GameScript.h"
 #include "GlobalTimer.h"
-#include "ImageMgr.h"
 #include "ItemMgr.h"
 #include "KeyMap.h"
 #include "MapMgr.h"
@@ -146,10 +144,6 @@ Interface::Interface()
 	displaymsg = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
-
-	pal16 = NULL;
-	pal32 = NULL;
-	pal256 = NULL;
 
 	UseCorruptedHack = false;
 
@@ -361,10 +355,6 @@ Interface::~Interface(void)
 	delete plugin_flags;
 
 	delete projserv;
-
-	delete pal256;
-	delete pal32;
-	delete pal16;
 
 	delete timer;
 	delete displaymsg;
@@ -1669,19 +1659,9 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		ResourceHolder<ImageMgr> pal16im(Palette16);
-		if (pal16im)
-			pal16 = pal16im->GetImage();
-		ResourceHolder<ImageMgr> pal32im(Palette32);
-		if (pal32im)
-			pal32 = pal32im->GetImage();
-		ResourceHolder<ImageMgr> pal256im(Palette256);
-		if (pal256im)
-			pal256 = pal256im->GetImage();
-		if (!pal16 || !pal32 || !pal256) {
-			Log(FATAL, "Core", "No palettes found.");
-			return GEM_ERROR;
-		}
+		LoadPalette<16>(Palette16, palettes16);
+		LoadPalette<32>(Palette32, palettes32);
+		LoadPalette<256>(Palette256, palettes256);
 		Log(MESSAGE, "Core", "Palettes Loaded");
 	}
 
@@ -2385,31 +2365,6 @@ bool Interface::LoadEncoding()
 	return true;
 }
 
-/** No descriptions */
-Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
-{
-	Image *img;
-	if (colors == 32) {
-		img = pal32;
-	} else if (colors <= 32) {
-		img = pal16;
-	} else if (colors == 256) {
-		img = pal256;
-	} else {
-		return pal;
-	}
-	if (index >= img->GetHeight()) {
-		index = 0;
-	}
-	int width = img->GetWidth();
-	for (int i = 0; i < colors; i++) {
-		if (i >= width) {
-			Log(WARNING, "Interface", "Trying to access invalid palette index (%d)! Using black instead", i);
-		}
-		pal[i] = img->GetPixel(i, index);
-	}
-	return pal;
-}
 /** Returns a preloaded Font */
 Font* Interface::GetFont(const ResRef& ResRef) const
 {

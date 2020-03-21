@@ -36,8 +36,6 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
-#define PALSIZE 8
-static Color ActorColor[PALSIZE];
 static const wchar_t* DisplayFormatName = L"[color=%06X]%ls - [/color][p][color=%06X]%ls[/color][/p]";
 static const wchar_t* DisplayFormatAction = L"[color=%06X]%ls - [/color][p][color=%06X]%ls %ls[/color][/p]";
 static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
@@ -131,14 +129,16 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			string = StringFromCString(speaker->GetName(-1));
-			core->GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
-			// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
-			if (ActorColor[4].r + ActorColor[4].g + ActorColor[4].b < 75) {
-				ActorColor[4].r = 75;
-				ActorColor[4].g = 75;
-				ActorColor[4].b = 75;
+			{
+				auto pal16 = core->GetPalette16( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
+				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
+				if (pal16[4].r + pal16[4].g + pal16[4].b < 75) {
+					pal16[4].r = 75;
+					pal16[4].g = 75;
+					pal16[4].b = 75;
+				}
+				speaker_color = (pal16[4].r<<16) | (pal16[4].g<<8) | pal16[4].b;
 			}
-			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER:
 		case ST_PROXIMITY:

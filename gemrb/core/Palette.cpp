@@ -49,6 +49,12 @@ Palette::Palette(const Color &color, const Color &back)
 	}
 }
 
+void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst)
+{
+	std::copy(srcBeg, srcEnd, &col[dst]);
+	version++;
+}
+
 void Palette::CreateShadedAlphaChannel()
 {
 	for (int i = 0; i < 256; ++i) {
@@ -103,20 +109,18 @@ Palette* Palette::Copy() const
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 {
 	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
-	//metal
-	core->GetPalette( (Colors[0]>>s)&0xFF, 12, &col[0x04]);
-	//minor
-	core->GetPalette( (Colors[1]>>s)&0xFF, 12, &col[0x10]);
-	//major
-	core->GetPalette( (Colors[2]>>s)&0xFF, 12, &col[0x1c]);
-	//skin
-	core->GetPalette( (Colors[3]>>s)&0xFF, 12, &col[0x28]);
-	//leather
-	core->GetPalette( (Colors[4]>>s)&0xFF, 12, &col[0x34]);
-	//armor
-	core->GetPalette( (Colors[5]>>s)&0xFF, 12, &col[0x40]);
-	//hair
-	core->GetPalette( (Colors[6]>>s)&0xFF, 12, &col[0x4c]);
+	constexpr uint8_t numCols = 12;
+
+	enum PALETTES : uint8_t
+	{
+		METAL = 0, MINOR, MAJOR, SKIN, LEATHER, ARMOR, HAIR,
+		END
+	};
+
+	for (uint8_t idx = METAL; idx < END; ++idx) {
+		const auto& pal16 = core->GetPalette16(Colors[idx]>>s);
+		CopyColorRange(pal16.begin(), &pal16[numCols], 0x04 + (idx*12));
+	}
 	
 	//minor
 	memcpy( &col[0x58], &col[0x11], 8 * sizeof( Color ) );
