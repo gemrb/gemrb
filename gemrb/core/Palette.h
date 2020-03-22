@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 
 namespace GemRB {
