@@ -155,7 +155,7 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 	} else {
 		void* pixels = GetFramePixels(findex);
 		Region r(0,0, frames[findex].Width, frames[findex].Height);
-		spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, 0 );
+		spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, CompressedColorIndex);
 	}
 
 	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
