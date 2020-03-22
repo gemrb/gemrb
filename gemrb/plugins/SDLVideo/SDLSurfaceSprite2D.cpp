@@ -78,11 +78,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 		);
 
 	if (Bpp == 8) {
-		memcpy(
-			(*surface)->format->palette->colors,
-			(*obj.surface)->format->palette->colors,
-			(*surface)->format->palette->ncolors
-		);
+		SDLVideoDriver::SetSurfacePalette(*surface, fmt->palette->colors);
 		SetColorKey(obj.GetColorKey());
 	}
 
