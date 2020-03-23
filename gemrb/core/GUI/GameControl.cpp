@@ -113,6 +113,7 @@ GameControl::GameControl(const Region& frame)
 	} else {
 		ScreenFlags = SF_CENTERONACTOR;
 	}
+	// the game always starts paused so nothing happens till we are ready
 	DialogueFlags = DF_FREEZE_SCRIPTS;
 	dialoghandler = new DialogHandler();
 	DisplayText = NULL;
