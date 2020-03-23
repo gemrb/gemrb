@@ -1219,7 +1219,7 @@ int GameControl::GetCursorOverContainer(Container *overContainer) const
 
 Sprite2D* GameControl::GetTargetActionCursor() const
 {
-	int curIdx = IE_CURSOR_NORMAL;
+	int curIdx = -1;
 	switch(target_mode) {
 		case TARGET_MODE_TALK:
 			curIdx = IE_CURSOR_TALK;
@@ -1237,7 +1237,10 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 			curIdx = IE_CURSOR_PICK;
 			break;
 	}
-	return core->Cursors[curIdx];
+	if (curIdx != -1) {
+		return core->Cursors[curIdx];
+	}
+	return nullptr;
 }
 
 Sprite2D* GameControl::Cursor() const

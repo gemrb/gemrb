@@ -230,6 +230,7 @@ protected:
 	bool OnMouseOver(const MouseEvent&);
 	/** Mouse Button Down */
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDrag(const MouseEvent& /*me*/);
 	/** Mouse Button Up */
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 };

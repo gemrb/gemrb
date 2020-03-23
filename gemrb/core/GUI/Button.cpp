@@ -429,7 +429,8 @@ Sprite2D* Button::Cursor() const
 	if (IS_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
-			return gc->GetTargetActionCursor();
+			Sprite2D* cur = gc->GetTargetActionCursor();
+			if (cur) return cur;
 		}
 	}
 	return Control::Cursor();
@@ -454,6 +455,7 @@ bool Button::AcceptsDragOperation(const DragOp& dop) const
 
 void Button::CompleteDragOperation(const DragOp& dop)
 {
+	SetCursor(nullptr);
 	if (dop.dragView == this) {
 		// this was the dragged view
 		EnableBorder(1, false);
@@ -487,6 +489,14 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		}
 	}
 	return Control::OnMouseDown(me, mod);
+}
+
+bool Button::OnMouseDrag(const MouseEvent& me)
+{
+	if (IS_PORTRAIT) {
+		SetCursor(core->Cursors[IE_CURSOR_SWAP]);
+	}
+	return Control::OnMouseDrag(me);
 }
 
 /** Mouse Button Up */
@@ -533,6 +543,10 @@ bool Button::OnMouseOver(const MouseEvent& me)
 void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseEnter(me, dop);
+
+	if (dop && AcceptsDragOperation(*dop)) {
+		SetCursor(core->Cursors[IE_CURSOR_SWAP]);
+	}
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );
