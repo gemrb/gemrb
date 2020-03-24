@@ -646,20 +646,19 @@ def UpdateActionsWindow ():
 	global CurrentWindow, OptionsWindow, PortraitWindow
 	global level, TopIndex
 
-	if GameCheck.IsPST():
-		return
-	if GameCheck.IsIWD2():
-		CurrentWindow = PortraitWindow
-		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
-	else:
+	if not GameCheck.IsIWD2():
 		CurrentWindow = ActionsWindow
 		ActionBarControlOffset = 0
+		UpdateClock ()
+	else:
+		CurrentWindow = PortraitWindow
+		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
+
+	if GameCheck.IsPST():
+		return
 
 	if CurrentWindow == None:
 		return
-
-	if not GameCheck.IsIWD2():
-		UpdateClock ()
 
 	Selected = GemRB.GetSelectedSize()
 
@@ -2006,7 +2005,7 @@ def UpdateClock ():
 		twin = GemRB.GetView("WIN_TOP")
 		Button = ActionsWindow.GetControl (2)
 
-		if twin and twin.ID != -1:
+		if twin:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
