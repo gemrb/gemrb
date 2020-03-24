@@ -161,8 +161,8 @@ def DeleteGameCancel ():
 def DeleteGamePress ():
 	global ConfirmWindow
 
-	LoadWindow.SetVisible(False)
 	ConfirmWindow=GemRB.LoadWindow (1)
+	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (28639)
@@ -176,7 +176,7 @@ def DeleteGamePress ():
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.MakeEscape()
-	ConfirmWindow.Focus()
+	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CancelPress ():
