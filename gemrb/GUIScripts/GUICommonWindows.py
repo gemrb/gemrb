@@ -1343,6 +1343,7 @@ def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
 	if window:
 		window.Close()
+		UpdateClock()
 
 # TODO: this really looks like (most of?) it only applies to the inventory window
 # it woudl be better to move that to GUIINV
@@ -1403,6 +1404,8 @@ def SetTopWindow (window, selectionHandler = None):
 		window.AddAlias("WIN_TOP")
 		window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
+
+		UpdateClock()
 
 		if selectionHandler:
 			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
@@ -1994,10 +1997,19 @@ def SetPSTGamedaysAndHourToken ():
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
 def UpdateClock ():
-	global ActionsWindow, OptionsWindow
+	global OptionsWindow
+
+	ActionsWindow = GemRB.GetView("ACTWIN")
 
 	if GameCheck.IsPST ():
 		SetPSTGamedaysAndHourToken ()
+		twin = GemRB.GetView("WIN_TOP")
+		Button = ActionsWindow.GetControl (2)
+
+		if twin and twin.ID != -1:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	else:
 		Clock = None
