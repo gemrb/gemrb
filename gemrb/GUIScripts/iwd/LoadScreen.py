@@ -42,7 +42,6 @@ def StartLoadScreen ():
 
 	LoadScreen = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
-	LoadScreen.SetOnClose(lambda win: GemRB.GamePause(0, 0))
 
 	SetLoadScreen()
 	Bar = LoadScreen.GetControl (0)

@@ -34,6 +34,7 @@ def EnterGame():
 
 	import MessageWindow
 	MessageWindow.OnLoad()
+	GemRB.GamePause (0, 0)
 
 #upgrade savegame to next version
 def GameExpansion():
