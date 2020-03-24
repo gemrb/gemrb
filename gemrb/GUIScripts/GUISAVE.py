@@ -87,6 +87,8 @@ def OpenSaveWindow ():
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
+			if GameCheck.IsIWD2 ():
+				Button.SetSize (21, 21)
 
 	ScrollBar = Window.GetControl (ctrl_offset[5])
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
