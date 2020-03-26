@@ -433,11 +433,11 @@ public:
 			case 2:
 				return static_cast<PixelIterator<Uint16>*>(imp)->Channel(mask, shift);
 			case 3:
-				assert(false);
+				error("SDLVideo", "Cannot request SDLPixelIterator channel on 24bpp.");
 			case 4:
 				return static_cast<PixelIterator<Uint32>*>(imp)->Channel(mask, shift);
 			default:
-				assert(false);
+				error("SDLVideo", "Invalid bpp setting while requesting SDLPixelIterator channel.");
 		}
 	}
 
