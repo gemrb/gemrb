@@ -21,6 +21,7 @@
 #ifndef DOOR_H
 #define DOOR_H
 
+#include "Polygon.h"
 #include "Scriptable/Scriptable.h"
 
 namespace GemRB {
@@ -46,9 +47,28 @@ class TileOverlay;
 #define DOOR_LOCKEDINFOTEXT 0x8000
 #define DOOR_WARNINGINFOTEXT 0x10000
 
+class DoorTrigger {
+	WallPolygonGroup openWalls;
+	WallPolygonGroup closedWalls;
+
+	std::shared_ptr<Gem_Polygon> openTrigger;
+	std::shared_ptr<Gem_Polygon> closedTrigger;
+
+	bool isOpen = false;
+
+public:
+	DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGroup&& openWall,
+				std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWall);
+
+	void SetState(bool open);
+
+	std::shared_ptr<Gem_Polygon> StatePolygon() const;
+	std::shared_ptr<Gem_Polygon> StatePolygon(bool open) const;
+};
+
 class GEM_EXPORT Door : public Highlightable {
 public:
-	Door(TileOverlay* Overlay);
+	Door(TileOverlay* Overlay, DoorTrigger&& trigger);
 	~Door(void);
 public:
 	ieVariable LinkedInfo;
@@ -59,8 +79,7 @@ public:
 	ieDword Flags;
 	int closedIndex;
 	//trigger areas
-	Gem_Polygon* open;
-	Gem_Polygon* closed;
+	DoorTrigger doorTrigger;
 	Region& OpenBBox = BBox; // an alias for the base class BBox
 	Region ClosedBBox;
 	//impeded blocks
@@ -68,11 +87,7 @@ public:
 	int oibcount;
 	Point* closed_ib;
 	int cibcount;
-	//wallgroup covers
-	unsigned int open_wg_index;
-	unsigned int open_wg_count;
-	unsigned int closed_wg_index;
-	unsigned int closed_wg_count;
+
 	Point toOpen[2];
 	ieResRef OpenSound;
 	ieResRef CloseSound;
@@ -95,8 +110,8 @@ public:
 	bool CanDetectTrap() const;
 	void SetDoorLocked(int Locked, int playsound);
 	void SetDoorOpen(int Open, int playsound, ieDword ID);
-	void SetPolygon(bool Open, Gem_Polygon* poly);
 	int IsOpen() const;
+	bool HitTest(const Point& p) const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
@@ -105,6 +120,9 @@ public:
 	void dump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);
+
+	std::shared_ptr<Gem_Polygon> OpenTriggerArea() const;
+	std::shared_ptr<Gem_Polygon> ClosedTriggerArea() const;
 };
 
 }

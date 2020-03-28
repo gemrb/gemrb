@@ -36,14 +36,39 @@ namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
-Door::Door(TileOverlay* Overlay)
-	: Highlightable( ST_DOOR )
+DoorTrigger::DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGroup&& openWalls,
+			std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWalls)
+: openWalls(std::move(openWalls)), closedWalls(std::move(closedWalls)),
+openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
+{}
+
+void DoorTrigger::SetState(bool open)
+{
+	isOpen = open;
+	for (auto& wp : openWalls) {
+		wp->SetDisabled(!isOpen);
+	}
+	for (auto& wp : closedWalls) {
+		wp->SetDisabled(isOpen);
+	}
+}
+
+std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon() const
+{
+	return StatePolygon(isOpen);
+}
+
+std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
+{
+	return (open) ? openTrigger : closedTrigger;
+}
+
+Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
+	: Highlightable( ST_DOOR ), doorTrigger(std::move(trigger))
 {
 	tiles = NULL;
 	tilecount = 0;
 	Flags = 0;
-	open = NULL;
-	closed = NULL;
 	open_ib = NULL;
 	oibcount = 0;
 	closed_ib = NULL;
@@ -55,22 +80,12 @@ Door::Door(TileOverlay* Overlay)
 	overlay = Overlay;
 	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
-	open_wg_index = open_wg_count = closed_wg_index = closed_wg_count = 0;
 	closedIndex = NameStrRef = hp = ac = 0;
 	DiscoveryDiff = LockDifficulty = 0;
 }
 
 Door::~Door(void)
 {
-	if (Flags&DOOR_OPEN) {
-		if (closed) {
-			delete( closed );
-		}
-	} else {
-		if (open) {
-			delete( open );
-		}
-	}
 	if (tiles) {
 		free( tiles );
 	}
@@ -92,11 +107,8 @@ void Door::ImpedeBlocks(int count, Point *points, unsigned char value)
 
 void Door::UpdateDoor()
 {
-	if (Flags&DOOR_OPEN) {
-		outline = open;
-	} else {
-		outline = closed;
-	}
+	doorTrigger.SetState(Flags&DOOR_OPEN);
+	outline = doorTrigger.StatePolygon();
 
 	if (outline) {
 		// update the Scriptable position
@@ -200,6 +212,34 @@ int Door::IsOpen() const
 	return ret;
 }
 
+bool Door::HitTest(const Point& p) const
+{
+	if (Flags&DOOR_HIDDEN) {
+		return false;
+	}
+
+	auto doorpoly = doorTrigger.StatePolygon();
+	if (doorpoly) {
+		if (!doorpoly->PointIn(p)) return false;
+	} else if (Flags&DOOR_OPEN) {
+		if (!OpenBBox.PointInside(p)) return false;
+	} else {
+		if (!ClosedBBox.PointInside(p)) return false;
+	}
+
+	return true;
+}
+
+std::shared_ptr<Gem_Polygon> Door::OpenTriggerArea() const
+{
+	return doorTrigger.StatePolygon(true);
+}
+
+std::shared_ptr<Gem_Polygon> Door::ClosedTriggerArea() const
+{
+	return doorTrigger.StatePolygon(false);
+}
+
 //also mark actors to fix position
 bool Door::BlockedOpen(int Open, int ForceOpen)
 {
@@ -279,8 +319,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	ToggleTiles(Open, playsound);
 	//synchronising other data with the door state
 	UpdateDoor();
-	area->ActivateWallgroups(open_wg_index, open_wg_count, Flags&DOOR_OPEN);
-	area->ActivateWallgroups(closed_wg_index, closed_wg_count, !(Flags&DOOR_OPEN));
+
 	core->SetEventFlag(EF_TARGETMODE);
 }
 
@@ -307,19 +346,6 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 bool Door::Visible()
 {
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
-}
-
-void Door::SetPolygon(bool Open, Gem_Polygon* poly)
-{
-	if (Open) {
-		if (open)
-			delete( open );
-		open = poly;
-	} else {
-		if (closed)
-			delete( closed );
-		closed = poly;
-	}
 }
 
 void Door::SetNewOverlay(TileOverlay *Overlay) {

@@ -90,15 +90,12 @@ TileObject* TileMap::GetTile(unsigned int idx)
 
 //doors
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indices, int count,
-	Gem_Polygon* open, Gem_Polygon* closed)
+	int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt)
 {
-	Door* door = new Door( overlays[0] );
+	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles( indices, count );
-	door->SetPolygon( false, closed );
-	door->SetPolygon( true, open );
 	door->SetName( ID );
 	door->SetScriptName( Name );
 	doors.push_back( door );
@@ -115,27 +112,8 @@ Door* TileMap::GetDoor(unsigned int idx) const
 
 Door* TileMap::GetDoor(const Point &p) const
 {
-	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors[i];
-		if (door->Flags&DOOR_HIDDEN) {
-			continue;
-		}
-
-		Gem_Polygon* doorpoly = nullptr;
-		if (door->Flags&DOOR_OPEN)
-			doorpoly = door->open;
-		else
-			doorpoly = door->closed;
-
-		if (doorpoly) {
-			if (!doorpoly->PointIn(p)) continue;
-		} else if (door->Flags&DOOR_OPEN) {
-			if (!door->OpenBBox.PointInside(p)) continue;
-		} else {
-			if (!door->ClosedBBox.PointInside(p)) continue;
-		}
-
-		return door;
+	for (Door* door : doors) {
+		if (door->HitTest(p)) return door;
 	}
 	return NULL;
 }
@@ -505,8 +483,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
-	Gem_Polygon* outline)
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );

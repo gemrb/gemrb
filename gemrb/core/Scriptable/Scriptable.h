@@ -404,13 +404,12 @@ public:
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	Highlightable(ScriptableType type);
-	virtual ~Highlightable(void);
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 public:
 	Region BBox;
-	Gem_Polygon* outline = nullptr;
+	std::shared_ptr<Gem_Polygon> outline;
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;

@@ -21,7 +21,10 @@
 #ifndef WEDIMPORTER_H
 #define WEDIMPORTER_H
 
+#include "Polygon.h"
 #include "TileMapMgr.h"
+
+#include <vector>
 
 namespace GemRB {
 
@@ -36,21 +39,26 @@ struct Overlay {
 
 class WEDImporter : public TileMapMgr {
 private:
-	std::vector< Overlay> overlays;
+	std::vector<Overlay> overlays;
 	DataStream* str;
 	ieDword OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
 		DoorsOffset, DoorTilesOffset;
 	ieDword WallPolygonsCount, PolygonsOffset, VerticesOffset,
-		WallGroupsOffset, PILTOffset;
+		WallGroupsOffset, PLTOffset;
 	ieDword DoorPolygonsCount;
 	//these will change as doors are being read, so get them in time!
 	ieWord OpenPolyCount, ClosedPolyCount;
 	ieDword OpenPolyOffset, ClosedPolyOffset;
 	bool ExtendedNight;
 
+	WallPolygonGroup polygonTable;
+
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
 	int AddOverlay(TileMap *tm, Overlay *overlays, bool rain);
+	void ReadWallPolygons();
+	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const;
+
 public:
 	WEDImporter(void);
 	~WEDImporter(void);
@@ -58,11 +66,11 @@ public:
 	//if tilemap already exists, don't create it
 	TileMap* GetTileMap(TileMap *tm);
 	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
-	Wall_Polygon **GetWallGroups();
-	ieDword GetWallPolygonsCount() { return WallPolygonsCount; }
-	ieDword GetPolygonsCount() { return WallPolygonsCount+DoorPolygonsCount; }
-	void SetupOpenDoor(unsigned int &index, unsigned int &count);
-	void SetupClosedDoor(unsigned int &index, unsigned int &count);
+
+	std::vector<WallPolygonGroup> GetWallGroups() const;
+
+	WallPolygonGroup OpenDoorPolygons() const;
+	WallPolygonGroup ClosedDoorPolygons() const;
 	void SetExtendedNight(bool night) { ExtendedNight = night; }
 };
 

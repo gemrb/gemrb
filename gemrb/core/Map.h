@@ -333,6 +333,11 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJ
 #define PR_DISPLAY 1
 #define PR_IGNORE  2
 
+#define DEBUG_SHOW_INFOPOINTS   0x01
+#define DEBUG_SHOW_CONTAINERS   0x02
+#define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
+#define DEBUG_SHOW_LIGHTMAP     0x08
+
 typedef std::list<AreaAnimation*>::iterator aniIterator;
 typedef std::list<VEFObject*>::iterator scaIterator;
 typedef std::list<Projectile*>::iterator proIterator;
@@ -373,8 +378,7 @@ private:
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
-	Wall_Polygon **Walls;
-	unsigned int WallCount;
+	std::vector<WallPolygonGroup> wallGroups;
 	std::list< VEFObject*> vvcCells;
 	std::list< Projectile*> projectiles;
 	std::list< Particles*> particles;
@@ -416,7 +420,7 @@ public:
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
 	void DrawHighlightables(const Region& viewport);
-	void DrawMap(const Region& viewport);
+	void DrawMap(const Region& viewport, uint8_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
@@ -430,15 +434,11 @@ public:
 	AreaAnimation* GetAnimation(const char* Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
-	unsigned int GetWallCount() const { return WallCount; }
-	Wall_Polygon *GetWallGroup(int i) const { return Walls[i]; }
-	void SetWallGroups(unsigned int count, Wall_Polygon **walls)
+	void SetWallGroups(std::vector<WallPolygonGroup>&& walls)
 	{
-		WallCount = count;
-		Walls = walls;
+		wallGroups = std::move(walls);
 	}
 	bool BehindWall(const Point&, const Region&) const;
-	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, bool global);
 	void ActorSpottedByPlayer(Actor *actor);
 	void InitActors();
@@ -515,7 +515,7 @@ public:
 	//containers
 	/* this function returns/creates a pile container at position */
 	Container* AddContainer(const char* Name, unsigned short Type,
-		Gem_Polygon* outline);
+							std::shared_ptr<Gem_Polygon> outline);
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);
 
@@ -631,6 +631,9 @@ private:
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 	void RedrawStencils(const Region& vp);
+
+	using WallPolygonSet = std::set<std::shared_ptr<Wall_Polygon>>;
+	WallPolygonSet WallsCoveringRegion(const Region&) const;
 };
 
 }

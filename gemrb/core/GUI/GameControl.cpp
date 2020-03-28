@@ -51,11 +51,6 @@
 
 namespace GemRB {
 
-#define DEBUG_SHOW_INFOPOINTS   0x01
-#define DEBUG_SHOW_CONTAINERS   0x02
-#define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
-#define DEBUG_SHOW_LIGHTMAP     0x08
-
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
@@ -434,6 +429,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();
 
+	// TODO: move the TMap debugging into Map
 	// FIXME: some of this should happen during mouse events
 	// setup outlines
 	InfoPoint *i;
@@ -529,7 +525,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	//drawmap should be here so it updates fog of war
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
-	area->DrawMap( Viewport() );
+	area->DrawMap(Viewport(), DebugFlags);
 	game->DrawWeather(screen, update_scripts);
 
 	if (trackerID) {
@@ -578,31 +574,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, gameMousePos, gameClickPoint);
 				DrawTargetReticle(p, 4, false);
 			}
-		}
-	}
-
-	// Show wallpolygons
-	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-
-		unsigned int count = area->GetWallCount();
-		for (unsigned int i = 0; i < count; ++i) {
-			Wall_Polygon* poly = area->GetWallGroup(i);
-			if (!poly) continue;
-			// yellow
-			Color c;
-			c.r = 0x7F;
-			c.g = 0x7F;
-			c.b = 0;
-			c.a = 0;
-			//if polygon is disabled, make it grey
-			if (poly->wall_flag&WF_DISABLED) {
-				c.b = 0x7F;
-			}
-
-			Color fillc(c.r, c.g, c.b, c.a/2);
-			const Point& origin = poly->BBox.Origin() - vpOrigin;
-			video->DrawPolygon( poly, origin, fillc, true );
-			video->DrawPolygon( poly, origin, c, false );
 		}
 	}
 

@@ -23,7 +23,7 @@
 
 #include "exports.h"
 
-#include "Polygon.h"
+#include "Scriptable/Door.h"
 #include "TileOverlay.h"
 
 namespace GemRB {
@@ -32,7 +32,6 @@ namespace GemRB {
 #define IE_CONTAINER_PILE   4
 
 class Container;
-class Door;
 class InfoPoint;
 class TileObject;
 
@@ -50,8 +49,7 @@ public:
 	~TileMap(void);
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
-		int ClosedIndex, unsigned short* indices, int count,
-		Gem_Polygon* open, Gem_Polygon* closed);
+		int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt);
 	//gets door by active region (click target)
 	Door* GetDoor(const Point &position) const;
 	//gets door by activation position (spell target)
@@ -74,8 +72,7 @@ public:
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type,
-		Gem_Polygon* outline);
+	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const char* Name) const;
 	InfoPoint* GetInfoPoint(unsigned int idx) const;

@@ -334,8 +334,6 @@ Map::Map(void)
 	SmallMap = NULL;
 	MapSet = NULL;
 	SrchMap = NULL;
-	Walls = NULL;
-	WallCount = 0;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
 	INISpawn = NULL;
@@ -438,13 +436,6 @@ Map::~Map(void)
 	//malloc-d in AREImp
 	free( ExploredBitmap );
 	free( VisibleBitmap );
-	if (Walls) {
-		for (unsigned int i = 0; i < WallCount; i++) {
-			delete Walls[i];
-		}
-		free( Walls );
-	}
-	WallCount=0;
 }
 
 void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
@@ -1086,7 +1077,7 @@ VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 static ieDword oldgametime = 0;
 
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(const Region& viewport)
+void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 {
 	assert(TMap);
 
@@ -1305,6 +1296,53 @@ void Map::DrawMap(const Region& viewport)
 	}
 
 	oldgametime=gametime;
+
+	// Show wallpolygons
+	if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
+		const auto& polys = WallsCoveringRegion(viewport);
+		for (const auto& poly : polys) {
+			// yellow
+			Color c;
+			c.r = 0x7F;
+			c.g = 0x7F;
+			c.b = 0;
+			c.a = 0xFF;
+			//if polygon is disabled, make it grey
+			if (poly->wall_flag&WF_DISABLED) {
+				c.b = 0x7F;
+			}
+
+			Color fillc(c.r, c.g, c.b, c.a/2);
+			const Point& origin = poly->BBox.Origin() - viewport.Origin();
+			video->DrawPolygon( poly.get(), origin, fillc, true, BLIT_BLENDED);
+			video->DrawPolygon( poly.get(), origin, c, false );
+		}
+	}
+}
+
+Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
+{
+	// WallGroups are collections that contain a reference to all wall polygons intersecting
+	// a 640x480 region moving from top left to bottom right of the map
+
+	constexpr uint32_t groupHeight = 480;
+	constexpr uint32_t groupWidth = 640;
+
+	uint32_t pitch = CeilDiv<uint32_t>(TMap->XCellCount * 64, groupWidth);
+	uint32_t ymin = r.y / groupHeight;
+	uint32_t ymax = CeilDiv<uint32_t>(r.y + r.h, groupHeight);
+	uint32_t xmin = r.x / groupWidth;
+	uint32_t xmax = CeilDiv<uint32_t>(r.x + r.w, groupWidth);
+
+	WallPolygonSet set;
+	for (uint32_t y = ymin; y < ymax; ++y) {
+		for (uint32_t x = xmin; x < xmax; ++x) {
+			const auto& group = wallGroups[y * pitch + x];
+			set.insert(group.begin(), group.end());
+		}
+	}
+
+	return set;
 }
 
 void Map::DrawSearchMap(const Region &vp)
@@ -2012,10 +2050,6 @@ void Map::RedrawStencils(const Region& vp)
 
 	wallStencil->Clear();
 
-	// TODO: I believe wall groups are organized in relation to the tile map
-	// if so we should be able to jump to the correct groups occupying 'vp'
-	// instead of iterating everything
-
 	// color is used as follows:
 	// the 'r' channel is for the native value for all walls
 	// the 'g' channel is for the native value for only WF_COVERANIMS walls
@@ -2024,10 +2058,10 @@ void Map::RedrawStencils(const Region& vp)
 	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
 	Color stencilcol(0, 0, 0xff, 0x80);
 	video->PushDrawingBuffer(wallStencil);
-	for (unsigned int i = 0; i < WallCount; ++i)
-	{
-		Wall_Polygon* wp = Walls[i];
-		if (!wp || (wp->wall_flag & WF_DISABLED)) continue;
+
+	const auto& polys = WallsCoveringRegion(vp);
+	for (const auto& wp : polys) {
+		if (wp->wall_flag & WF_DISABLED) continue;
 
 		if (vp.IntersectsRegion(wp->BBox)) {
 			const Point& origin = wp->BBox.Origin() - vp.Origin();
@@ -2044,21 +2078,18 @@ void Map::RedrawStencils(const Region& vp)
 				stencilcol.g = 0;
 			}
 
-			video->DrawPolygon(wp, origin, stencilcol, true);
+			video->DrawPolygon(wp.get(), origin, stencilcol, true);
 		}
 	}
+
 	video->PopDrawingBuffer();
 }
 
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
-	// TODO: I believe wall groups are organized in relation to the tile map
-	// if so we should be able to jump to the correct groups occupying 'r'
-	// instead of iterating everything
-	for (unsigned int i = 0; i < WallCount; ++i)
-	{
-		Wall_Polygon* wp = GetWallGroup(i);
-		if (!wp || (wp->wall_flag&WF_DISABLED)) continue;
+	const auto& polys = WallsCoveringRegion(r);
+	for (const auto& wp : polys) {
+		if (wp->wall_flag&WF_DISABLED) continue;
 
 		if (wp->PointBehind(pos)) {
 			if (wp->IntersectsRect(r)) {
@@ -2069,25 +2100,6 @@ bool Map::BehindWall(const Point& pos, const Region& r) const
 
 	return false;
 }
-
-void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg)
-{
-	if (!Walls) {
-		return;
-	}
-	for (unsigned int i = baseindex; i < baseindex + count; ++i) {
-		Wall_Polygon* wp = GetWallGroup(i);
-		if (!wp)
-			continue;
-		ieDword value=wp->GetPolygonFlag();
-		if (flg)
-			value&=~WF_DISABLED;
-		else
-			value|=WF_DISABLED;
-		wp->SetPolygonFlag(value);
-	}
-}
-
 
 //this function determines actor drawing order
 //it should be extended to wallgroups, animations, effects!
@@ -3649,7 +3661,7 @@ void Map::AddItemToLocation(const Point &position, CREItem *item)
 }
 
 Container* Map::AddContainer(const char* Name, unsigned short Type,
-	Gem_Polygon* outline)
+							 std::shared_ptr<Gem_Polygon> outline)
 {
 	Container* c = new Container();
 	c->SetScriptName( Name );

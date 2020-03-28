@@ -25,6 +25,7 @@
 
 #include "Region.h"
 
+#include <memory>
 #include <vector>
 
 namespace GemRB {
@@ -75,7 +76,7 @@ public:
 
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
-	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) { wall_flag = 0; }
+	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
 	bool PointBehind(const Point &p) const;
 	bool PointBehind(int x, int y) const;
@@ -83,11 +84,14 @@ public:
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);
 
+	void SetDisabled(bool disabled);
 	
 public:
-	ieDword wall_flag;
+	ieDword wall_flag = 0;
 	Point base0, base1;
 };
+
+using WallPolygonGroup = std::vector<std::shared_ptr<Wall_Polygon>>;
 
 }
 

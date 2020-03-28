@@ -35,15 +35,12 @@ public:
 	virtual TileMap* GetTileMap(TileMap *tm) = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
 		bool& BaseClosed) = 0;
-	virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) = 0;
-	virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) = 0;
+	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
+	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
 	virtual void SetExtendedNight(bool night) = 0;
 
-	virtual Wall_Polygon** GetWallGroups() = 0;
-	//returns only the wall polygon counts
-	virtual ieDword GetWallPolygonsCount() = 0;
-	//returns Wall + Door polygon counts
-	virtual ieDword GetPolygonsCount() = 0;
+	virtual WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const = 0;
+	virtual std::vector<WallPolygonGroup> GetWallGroups() const = 0;
 };
 
 }

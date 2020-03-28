@@ -1819,11 +1819,6 @@ Highlightable::Highlightable(ScriptableType type)
 	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
 
-Highlightable::~Highlightable(void)
-{
-	delete( outline );
-}
-
 bool Highlightable::IsOver(const Point &Place) const
 {
 	if (!outline) {
@@ -1841,10 +1836,10 @@ void Highlightable::DrawOutline(Point origin) const
 	origin = outline->BBox.Origin() - origin;
 
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_MULTIPLY );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, fillcol, true, BLIT_MULTIPLY );
 	} else {
-		core->GetVideoDriver()->DrawPolygon( outline, origin, fillcol, true, BLIT_BLENDED );
-		core->GetVideoDriver()->DrawPolygon( outline, origin, outlineColor, false );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, fillcol, true, BLIT_BLENDED );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, false );
 	}
 }
 

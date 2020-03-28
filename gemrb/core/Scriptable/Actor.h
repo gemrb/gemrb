@@ -734,6 +734,7 @@ public:
 
 	/* if necessary, advance animation */
 	void UpdateAnimations();
+	Region DrawingRegion() const;
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
 	bool DoStep(unsigned int walk_speed, ieDword time = 0);

@@ -443,4 +443,13 @@ bool Wall_Polygon::PointBehind(int tx, int ty) const
 }
 
 
+void Wall_Polygon::SetDisabled(bool disabled)
+{
+	if (disabled) {
+		wall_flag |= WF_DISABLED;
+	} else {
+		wall_flag &= ~WF_DISABLED;
+	}
+}
+
 }
