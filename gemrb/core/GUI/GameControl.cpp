@@ -1092,7 +1092,13 @@ String GameControl::TooltipText() const {
 	if (area == NULL) {
 		return View::TooltipText();
 	}
-	Actor* actor = area->GetActor(GameMousePos(), GA_NO_DEAD|GA_NO_UNSCHEDULED);
+
+	const Point& gameMousePos = GameMousePos();
+	if (!area->IsVisible(gameMousePos, false)) {
+		return View::TooltipText();
+	}
+
+	Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (actor == NULL) {
 		return View::TooltipText();
 	}
