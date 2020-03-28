@@ -273,6 +273,12 @@ inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
 	return ret;
 }
 
+template <typename T>
+inline T CeilDiv(const T& dividend, const T& divisor)
+{
+	return (dividend + divisor - 1) / divisor;
+}
+
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40
