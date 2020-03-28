@@ -215,7 +215,7 @@ public:
 	/** Draws an ellipse */
 	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0) = 0;
 	/** Draws a polygon on the screen */
-	virtual void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0) = 0;
+	virtual void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0) = 0;
 	/** Draws a line segment */
 	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0) = 0;
 	virtual void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0)=0;

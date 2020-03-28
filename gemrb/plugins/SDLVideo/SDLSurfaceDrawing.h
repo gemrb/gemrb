@@ -328,7 +328,7 @@ void DrawLinesSurface(SDL_Surface* surface, const std::vector<Point>& points, co
 }
 
 template<bool BLENDED=false>
-void DrawPolygonSurface(SDL_Surface* surface, Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
+void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
 {
 	if (fill) {
 		for (const auto& lineSegments : poly->rasterData)

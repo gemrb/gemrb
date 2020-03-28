@@ -449,7 +449,7 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 	}
 }
 
-void SDL20VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+void SDL20VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
 {
 	if (fill) {
 		UpdateRenderTarget(&color, flags);

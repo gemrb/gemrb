@@ -427,7 +427,7 @@ void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SD
 	}
 }
 
-void SDL12VideoDriver::DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+void SDL12VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);

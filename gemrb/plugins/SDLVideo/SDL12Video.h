@@ -60,7 +60,7 @@ public:
 	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
 	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
 
-	void DrawPolygon(Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
+	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
 
 	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr);
