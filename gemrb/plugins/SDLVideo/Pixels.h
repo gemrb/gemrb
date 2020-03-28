@@ -23,6 +23,10 @@
 
 #include "Video.h"
 
+// FIXME: could handle 24bpp with a packed struct
+#define ERROR_UNHANDLED_24BPP error("SDLVideo", "24bpp is not supported.")
+#define ERROR_UNKNOWN_BPP error("SDLVideo", "Invalid bpp.")
+
 namespace GemRB {
 
 struct RGBBlender {
@@ -323,8 +327,7 @@ struct SDLPixelIterator : IPixelIterator
 				imp = new PixelIterator<Uint32>(static_cast<Uint32*>(pixel), xdir, ydir, clip.w, pitch);
 				break;
 			case 3:
-				assert(false); // FIXME: could handle this with a packed struct
-				break;
+				ERROR_UNHANDLED_24BPP;
 			case 2:
 				imp = new PixelIterator<Uint16>(static_cast<Uint16*>(pixel), xdir, ydir, clip.w, pitch);
 				break;
@@ -332,8 +335,7 @@ struct SDLPixelIterator : IPixelIterator
 				imp = new PixelIterator<Uint8>(static_cast<Uint8*>(pixel), xdir, ydir, clip.w, pitch);
 				break;
 			default:
-				assert(false);
-				break;
+				ERROR_UNKNOWN_BPP;
 		}
 	}
 
@@ -433,11 +435,11 @@ public:
 			case 2:
 				return static_cast<PixelIterator<Uint16>*>(imp)->Channel(mask, shift);
 			case 3:
-				error("SDLVideo", "Cannot request SDLPixelIterator channel on 24bpp.");
+				ERROR_UNHANDLED_24BPP;
 			case 4:
 				return static_cast<PixelIterator<Uint32>*>(imp)->Channel(mask, shift);
 			default:
-				error("SDLVideo", "Invalid bpp setting while requesting SDLPixelIterator channel.");
+				ERROR_UNKNOWN_BPP;
 		}
 	}
 
@@ -456,8 +458,7 @@ public:
 				pixel = *reinterpret_cast<Uint32*>(imp->pixel);
 				break;
 			case 3:
-				assert(false); // FIXME: could handle this
-				break;
+				ERROR_UNHANDLED_24BPP;
 			case 2:
 				pixel = *reinterpret_cast<Uint16*>(imp->pixel);
 				break;
@@ -480,8 +481,7 @@ public:
 #endif
 				return;
 			default:
-				assert(false);
-				break;
+				ERROR_UNKNOWN_BPP;
 		}
 
 		unsigned v;
@@ -516,14 +516,12 @@ public:
 				*reinterpret_cast<Uint32*>(imp->pixel) = pixel;
 				break;
 			case 3:
-				assert(false); // FIXME: could handle this
-				break;
+				ERROR_UNHANDLED_24BPP;
 			case 2:
 				*reinterpret_cast<Uint16*>(imp->pixel) = pixel;
 				break;
 			default:
-				assert(false);
-				break;
+				ERROR_UNKNOWN_BPP;
 		}
 	}
 };
