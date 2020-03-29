@@ -46,6 +46,7 @@ namespace GemRB {
 #define EA_GOODCUTOFF  		30
 #define EA_NOTGOOD 		31
 #define EA_ANYTHING		126
+#define EA_AREAOBJECT	127 // included in EA groups 31|NOTGOOD, 126|ANYTHING, and 199|NOTEVIL.
 #define EA_NEUTRAL 		128
 #define EA_NOTNEUTRAL  	198
 #define EA_NOTEVIL 		199
