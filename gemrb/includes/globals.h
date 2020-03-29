@@ -33,6 +33,7 @@
 #endif
 
 #include "ie_types.h"
+#include <type_traits>
 
 #define VERSION_GEMRB "0.8.6-git"
 
@@ -273,10 +274,35 @@ inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
 	return ret;
 }
 
+// WARNING: these are meant to be fast, if you are concerned with overflow/underflow don't use them
 template <typename T>
-inline T CeilDiv(const T& dividend, const T& divisor)
+inline T CeilDivUnsigned(T dividend, T divisor)
 {
+	static_assert(std::is_unsigned<T>::value, "This quick round only works for positive values.");
 	return (dividend + divisor - 1) / divisor;
+}
+
+template <typename T>
+inline T CeilDivSlow(T dividend, T divisor)
+{
+	if (divisor < 0) {
+		return (dividend - divisor - 1) / divisor;
+	} else {
+		return (dividend + divisor - 1) / divisor;
+	}
+}
+
+template <typename T>
+inline T CeilDiv(T dividend, T divisor)
+{
+	static_assert(std::is_integral<T>::value, "Only integral types allowed");
+	// the compiler should be able to boil all this away (at least in release mode)
+	// and just inline the fastest version supported by T
+	if (std::is_unsigned<T>::value) {
+		return CeilDivUnsigned(dividend, divisor);
+	} else {
+		return CeilDivSlow(dividend, divisor);
+	}
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable
