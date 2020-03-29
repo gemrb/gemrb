@@ -47,7 +47,7 @@ class TileOverlay;
 #define DOOR_LOCKEDINFOTEXT 0x8000
 #define DOOR_WARNINGINFOTEXT 0x10000
 
-class DoorTrigger {
+class GEM_EXPORT DoorTrigger {
 	WallPolygonGroup openWalls;
 	WallPolygonGroup closedWalls;
 
