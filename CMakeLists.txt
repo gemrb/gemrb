@@ -152,7 +152,7 @@ MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	INCLUDE(CheckCXXCompilerFlag)
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations -Wno-error=stringop-truncation")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 			# clang doesn't know as many -Wno-error directives, so we don't set up these in the shared path above
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
