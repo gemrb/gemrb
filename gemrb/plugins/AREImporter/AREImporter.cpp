@@ -647,12 +647,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 		InfoPoint* ip = nullptr;
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
-		if (VertexCount == 1) {
+		if (VertexCount <= 1) {
 			// this is exactly the same as bbox.Origin()
-			str->ReadWord( (ieWord*) &tmp );
-			assert(tmp == bbox.x);
-			str->ReadWord( (ieWord*) &tmp );
-			assert(tmp == bbox.y);
+			if (VertexCount == 1) {
+				str->ReadWord( (ieWord*) &tmp );
+				assert(tmp == bbox.x);
+				str->ReadWord( (ieWord*) &tmp );
+				assert(tmp == bbox.y);
+			}
 
 			if (bbox.Dimensions().IsEmpty()) {
 				// we approximate a bounding box equivalent to a small radius
