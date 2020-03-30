@@ -1333,7 +1333,7 @@ Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
 	uint32_t maxHeight = CeilDiv<uint32_t>(TMap->YCellCount * 64, groupHeight);
 	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(r.y + r.h, groupHeight));
 	uint32_t xmin = r.x / groupWidth;
-	const uint32_t& xmax = pitch;
+	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x + r.w, groupWidth));
 
 	WallPolygonSet set;
 	for (uint32_t y = ymin; y < ymax; ++y) {
