@@ -394,8 +394,6 @@ void GameControl::WillDraw()
 			}
 		} else {
 			window->SetCursor(NULL);
-			moveY = 0;
-			moveX = 0;
 		}
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);
