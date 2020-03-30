@@ -536,15 +536,11 @@ InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 
 		if (!(ip->GetInternalFlag()&IF_ACTIVE))
 			continue;
-		if (ip->outline->BBox.x > p.x)
-			continue;
-		if (ip->outline->BBox.y > p.y)
-			continue;
-		if (ip->outline->BBox.x + ip->outline->BBox.w < p.x)
-			continue;
-		if (ip->outline->BBox.y + ip->outline->BBox.h < p.y)
-			continue;
-		if (ip->outline->PointIn( p ))
+
+		if (ip->outline != nullptr && ip->outline->PointIn(p))
+			return ip;
+
+		if (ip->BBox.PointInside(p))
 			return ip;
 	}
 	return NULL;
