@@ -393,7 +393,7 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 		str->ReadWord (&idx);
 	}
 
-	size_t groupSize = ceilf(overlays[0].Width/10.0f * overlays[0].Height/7.5f);
+	size_t groupSize = ceilf(overlays[0].Width/10.0f) * ceilf(overlays[0].Height/7.5f);
 	std::vector<WallPolygonGroup> polygonGroups;
 	polygonGroups.reserve(groupSize);
 
