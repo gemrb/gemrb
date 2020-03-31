@@ -1133,7 +1133,9 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 		TMap->DrawOverlays( viewport, rain, flags );
 	}
 
-	RedrawStencils(viewport);
+	const auto& viewportWalls = WallsCoveringRegion(viewport);
+
+	RedrawStencils(viewport, viewportWalls);
 	video->SetStencilBuffer(wallStencil);
 
 	//draw all background animations first
@@ -1299,8 +1301,7 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 
 	// Show wallpolygons
 	if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
-		const auto& polys = WallsCoveringRegion(viewport);
-		for (const auto& poly : polys) {
+		for (const auto& poly : viewportWalls) {
 			// yellow
 			Color c;
 			c.r = 0x7F;
@@ -2032,7 +2033,7 @@ unsigned int Map::GetBlocked(const Point &c) const
 	return GetBlocked(c.x/16, c.y/12);
 }
 
-void Map::RedrawStencils(const Region& vp)
+void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
 {
 	if (stencilViewport == vp) {
 		return;
@@ -2060,8 +2061,7 @@ void Map::RedrawStencils(const Region& vp)
 	Color stencilcol(0, 0, 0xff, 0x80);
 	video->PushDrawingBuffer(wallStencil);
 
-	const auto& polys = WallsCoveringRegion(vp);
-	for (const auto& wp : polys) {
+	for (const auto& wp : walls) {
 		if (wp->wall_flag & WF_DISABLED) continue;
 
 		if (vp.IntersectsRegion(wp->BBox)) {
@@ -2088,6 +2088,7 @@ void Map::RedrawStencils(const Region& vp)
 
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
+	// TODO: refactor so this only happens for actors on screen
 	const auto& polys = WallsCoveringRegion(r);
 	for (const auto& wp : polys) {
 		if (wp->wall_flag&WF_DISABLED) continue;

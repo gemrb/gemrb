@@ -630,9 +630,9 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-	void RedrawStencils(const Region& vp);
 
 	using WallPolygonSet = std::set<std::shared_ptr<Wall_Polygon>>;
+	void RedrawStencils(const Region& vp, const WallPolygonSet& walls);
 	WallPolygonSet WallsCoveringRegion(const Region&) const;
 };
 
