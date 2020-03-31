@@ -643,85 +643,94 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 
-	KeyboardKey keycode = Key.keycode;
-	switch (keycode) {
-		case GEM_UP:
-		case GEM_DOWN:
-		case GEM_LEFT:
-		case GEM_RIGHT:
-			{
-				ieDword keyScrollSpd = 64;
-				core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-				if (keycode >= GEM_UP) {
-					int v = (keycode == GEM_UP) ? -1 : 1;
-					Scroll( Point(0, keyScrollSpd * v) );
-				} else {
-					int v = (keycode == GEM_LEFT) ? -1 : 1;
-					Scroll( Point(keyScrollSpd * v, 0) );
-				}
+	if (mod) {
+		// the random bitshift is to skip checking hotkeys with mods
+		// eg. ctrl-j should be ignored for keymap.ini handling and
+		// passed straight on
+		if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
+			game->SetHotKey(toupper(Key.character));
+			return View::OnKeyPress(Key, mod);
+		}
+		return true;
+	} else {
+		KeyboardKey keycode = Key.keycode;
+			switch (keycode) {
+				case GEM_UP:
+				case GEM_DOWN:
+				case GEM_LEFT:
+				case GEM_RIGHT:
+					{
+						ieDword keyScrollSpd = 64;
+						core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
+						if (keycode >= GEM_UP) {
+							int v = (keycode == GEM_UP) ? -1 : 1;
+							Scroll( Point(0, keyScrollSpd * v) );
+						} else {
+							int v = (keycode == GEM_LEFT) ? -1 : 1;
+							Scroll( Point(keyScrollSpd * v, 0) );
+						}
+					}
+					break;
+				case GEM_ALT:
+		#ifdef ANDROID
+				case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
+		#endif
+					DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
+					break;
+				case GEM_TAB: // show partymember hp/maxhp as overhead text
+				// fallthrough
+				case GEM_ESCAPE: // redraw actionbar
+					// do nothing; these are handled in DispatchEvent due to tab having two functions
+					break;
+				case '0':
+					game->SelectActor( NULL, false, SELECT_NORMAL );
+					i = game->GetPartySize(false)/2+1;
+					while(i--) {
+						SelectActor(i, true);
+					}
+					break;
+				case '-':
+					game->SelectActor( NULL, true, SELECT_NORMAL );
+					i = game->GetPartySize(false)/2+1;
+					while(i--) {
+						SelectActor(i, false);
+					}
+					break;
+				case '=':
+					SelectActor(-1);
+					break;
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+					game->SelectPCSingle(keycode-'0');
+					SelectActor(keycode-'0');
+					break;
+				case '7': // 1 & 2
+				case '8': // 3 & 4
+				case '9': // 5 & 6
+					game->SelectActor( NULL, false, SELECT_NORMAL );
+					i = game->GetPartySize(false);
+					pc = 2*(keycode - '6')-1;
+					if (pc >= i) {
+						SelectActor(i, true);
+						break;
+					}
+					SelectActor(pc, true);
+					SelectActor(pc+1, true);
+					break;
+				default:
+					if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
+						game->SetHotKey(toupper(Key.character));
+						return View::OnKeyPress(Key, 0);
+					}
+					break;
 			}
-			break;
-		case GEM_ALT:
-#ifdef ANDROID
-		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
-#endif
-			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			break;
-		case GEM_TAB: // show partymember hp/maxhp as overhead text
-		// fallthrough
-		case GEM_ESCAPE: // redraw actionbar
-			// do nothing; these are handled in DispatchEvent due to tab having two functions
-			break;
-		case '0':
-			game->SelectActor( NULL, false, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2+1;
-			while(i--) {
-				SelectActor(i, true);
-			}
-			break;
-		case '-':
-			game->SelectActor( NULL, true, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2+1;
-			while(i--) {
-				SelectActor(i, false);
-			}
-			break;
-		case '=':
-			SelectActor(-1);
-			break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-			game->SelectPCSingle(keycode-'0');
-			SelectActor(keycode-'0');
-			break;
-		case '7': // 1 & 2
-		case '8': // 3 & 4
-		case '9': // 5 & 6
-			game->SelectActor( NULL, false, SELECT_NORMAL );
-			i = game->GetPartySize(false);
-			pc = 2*(keycode - '6')-1;
-			if (pc >= i) {
-				SelectActor(i, true);
-				break;
-			}
-			SelectActor(pc, true);
-			SelectActor(pc+1, true);
-			break;
-		default:
-			// the random bitshift is to skip checking hotkeys with mods
-			// eg. ctrl-j should be ignored for keymap.ini handling and
-			// passed straight on
-			if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
-				core->GetGame()->SetHotKey(toupper(Key.character));
-				return View::OnKeyPress(Key, mod);
-			}
-			break;
+			return true;
 	}
-	return true;
+	return false;
 }
 
 //Select (or deselect) a new actor (or actors)
