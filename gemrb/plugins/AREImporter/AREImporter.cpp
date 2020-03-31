@@ -669,8 +669,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ip = tm->AddInfoPoint( Name, Type, nullptr );
 			ip->BBox = bbox;
 		} else if (VertexCount == 2) {
-			Log(ERROR, "AREImporter", "Encounted a bogus polygon with 2 verticies");
+#define MSG "Encounted a bogus polygon with 2 verticies"
+#if NDEBUG
+			Log(ERROR, "AREImporter", MSG);
 			continue;
+#else // make this fatal on debug builds
+			error("AREImporter", MSG);
+#endif
+#undef MSG
 		} else {
 			Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 			for (x = 0; x < VertexCount; x++) {
