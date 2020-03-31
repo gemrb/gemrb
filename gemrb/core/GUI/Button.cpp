@@ -33,6 +33,8 @@
 #include "GameData.h"
 #include "Palette.h"
 
+#include <cmath>
+
 #define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
@@ -651,7 +653,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	Picture = newpic;
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
-		unsigned int ratio = Picture->Frame.w / frame.w;
+		unsigned int ratio = round((float) Picture->Frame.w / (float) frame.w);
 		if (ratio > 1) {
 			Sprite2D *img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
 			Sprite2D::FreeSprite(Picture);
