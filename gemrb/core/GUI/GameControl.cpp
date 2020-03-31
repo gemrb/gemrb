@@ -643,17 +643,24 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 	unsigned int i, pc;
 	Game* game = core->GetGame();
 
+	KeyboardKey keycode = Key.keycode;
 	if (mod) {
-		// the random bitshift is to skip checking hotkeys with mods
-		// eg. ctrl-j should be ignored for keymap.ini handling and
-		// passed straight on
-		if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
-			game->SetHotKey(toupper(Key.character));
-			return View::OnKeyPress(Key, mod);
+		switch (keycode) {
+			case GEM_ALT:
+				DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
+				break;
+			default:
+				// the random bitshift is to skip checking hotkeys with mods
+				// eg. ctrl-j should be ignored for keymap.ini handling and
+				// passed straight on
+				if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
+					game->SetHotKey(toupper(Key.character));
+					return View::OnKeyPress(Key, mod);
+				}
+				break;
 		}
 		return true;
 	} else {
-		KeyboardKey keycode = Key.keycode;
 			switch (keycode) {
 				case GEM_UP:
 				case GEM_DOWN:
@@ -671,12 +678,12 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 						}
 					}
 					break;
-				case GEM_ALT:
-		#ifdef ANDROID
+				#ifdef ANDROID
 				case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
-		#endif
+
 					DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
 					break;
+				#endif
 				case GEM_TAB: // show partymember hp/maxhp as overhead text
 				// fallthrough
 				case GEM_ESCAPE: // redraw actionbar
