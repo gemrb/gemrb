@@ -382,7 +382,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 #endif
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -394,10 +394,10 @@ void SDL20VideoDriver::DrawPoints(const std::vector<Point>& points, const Color&
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
 {
 	if (points.empty()) {
 		return;
@@ -406,13 +406,13 @@ void SDL20VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SD
 	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -424,22 +424,22 @@ void SDL20VideoDriver::DrawLines(const std::vector<Point>& points, const Color& 
 		sdlpoints.push_back(sdlpoint);
 	}
 
-	DrawLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawLines(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
 {
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags)
+void SDL20VideoDriver::DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 }
 
-void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
+void SDL20VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
 {
 	UpdateRenderTarget(&color, flags);
 	if (fill) {
@@ -449,7 +449,7 @@ void SDL20VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill
 	}
 }
 
-void SDL20VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
 {
 	if (fill) {
 		UpdateRenderTarget(&color, flags);
@@ -477,7 +477,7 @@ void SDL20VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin,
 		// close the polygon with first point
 		points[i] = points[0];
 
-		DrawLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
+		DrawSDLLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
 	}
 }
 

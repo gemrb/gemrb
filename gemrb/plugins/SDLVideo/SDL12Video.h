@@ -52,16 +52,6 @@ public:
 
 	bool SupportsBAMSprites() { return true; }
 
-	void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0);
-	void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
-
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0);
-
-	void DrawPoint(const Point& p, const Color& color, unsigned int flags = 0);
-	void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0);
-
-	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0);
-
 	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr);
 
@@ -73,11 +63,22 @@ private:
 
 	int ProcessEvent(const SDL_Event & event);
 
-	void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0);
 	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
 							  unsigned int flags = 0, const Color* tint = NULL);
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
 	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, Color tint);
+
+	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags) override;
+
+	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) override;
+	void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+
+	void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) override;
+
+	void DrawPointImp(const Point& p, const Color& color, uint32_t flags) override;
+	void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+
+	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) override;
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {

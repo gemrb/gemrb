@@ -82,14 +82,6 @@ public:
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
 								const Region* clip = NULL);
 
-	/** This functions Draws a Circle */
-	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, unsigned int flags = 0);
-	/** This functions Draws an Ellipse Segment */
-	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-		double anglefrom, double angleto, bool drawlines = true, unsigned int flags = 0);
-	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0);
-
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 
@@ -107,9 +99,6 @@ protected:
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* = NULL);
 
-	using Video::DrawPoints;
-	virtual void DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags = 0)=0;
-
 	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
@@ -118,6 +107,14 @@ protected:
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
 	void Wait(unsigned long w) { SDL_Delay(w); }
+
+private:
+	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0)=0;
+
+	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) override;
+	void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+							   double anglefrom, double angleto, bool drawlines, uint32_t flags) override;
+	void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags) override;
 
 public:
 	// static functions for manipulating surfaces

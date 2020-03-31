@@ -45,7 +45,7 @@ class SpriteCover;
 
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
-enum SpriteBlitFlags {
+enum SpriteBlitFlags : uint32_t {
 	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
 	BLIT_BLENDED = IE_VVC_BLENDED, // 8; not implemented in SDLVideo yet
 	BLIT_MIRRORX = IE_VVC_MIRRORX, // 0x10
@@ -141,6 +141,18 @@ private:
 	virtual int PollEvents() = 0;
 	virtual int CreateDriverDisplay(const Size& s, int bpp, const char* title) = 0;
 
+	// the actual drawing implementations
+	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) = 0;
+	virtual void DrawPointImp(const Point&, const Color& color, uint32_t flags) = 0;
+	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) = 0;
+	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) = 0;
+	virtual void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+									   double anglefrom, double angleto, bool drawlines, uint32_t flags) = 0;
+	virtual void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags) = 0;
+	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) = 0;
+	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) = 0;
+	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)=0;
+
 public:
 	Video(void);
 	virtual ~Video(void);
@@ -202,23 +214,23 @@ public:
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, unsigned int flags = 0) = 0;
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
 
-	virtual void DrawPoint(const Point&, const Color& color, unsigned int flags = 0) = 0;
-	virtual void DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags = 0)=0;
+	void DrawPoint(const Point&, const Color& color, unsigned int flags = 0);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
 
 	/** Draws a circle */
-	virtual void DrawCircle(const Point& origin, unsigned short r, const Color& color, unsigned int flags = 0) = 0;
+	void DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags = 0);
 	/** Draws an Ellipse Segment */
-	virtual void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									double anglefrom, double angleto, bool drawlines = true, unsigned int flags = 0) = 0;
+	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+									double anglefrom, double angleto, bool drawlines = true, uint32_t flags = 0);
 	/** Draws an ellipse */
-	virtual void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, unsigned int flags = 0) = 0;
+	void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags = 0);
 	/** Draws a polygon on the screen */
-	virtual void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, unsigned int flags = 0) = 0;
+	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, uint32_t flags = 0);
 	/** Draws a line segment */
-	virtual void DrawLine(const Point& p1, const Point& p2, const Color& color, unsigned int flags = 0) = 0;
-	virtual void DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags = 0)=0;
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags = 0);
+	void DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
 	/** Sets Event Manager */

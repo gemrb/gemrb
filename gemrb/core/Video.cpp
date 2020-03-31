@@ -369,6 +369,84 @@ Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, uns
 	return sum;
 }
 
+Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
+{
+	Color outC = inCol;
+	if (flags & BLIT_HALFTRANS) {
+		outC.a /= 2; // FIXME: should this divide by 2 or jsut set to 0x80?
+	}
 
+	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_TINTED?
+	// if so we should do that here instead of in the implementations
+
+	if (flags & BLIT_GREY) {
+		//static RGBBlendingPipeline<GREYSCALE, true> blender;
+	} else if (flags & BLIT_SEPIA) {
+		//static RGBBlendingPipeline<SEPIA, true> blender;
+	}
+
+	if (flags & BLIT_TINTED) {
+		// FIXME: we would need another parameter for tinting the color
+	}
+
+	// clear handled flags
+	flags &= ~(BLIT_HALFTRANS|BLIT_GREY|BLIT_SEPIA|BLIT_TINTED);
+	return outC;
+}
+
+void Video::DrawRect(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawRectImp(rgn, c, fill, flags);
+}
+
+void Video::DrawPoint(const Point& p, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPointImp(p, c, flags);
+}
+
+void Video::DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPointsImp(points, c, flags);
+}
+
+void Video::DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawCircleImp(origin, r, c, flags);
+}
+
+void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+								double anglefrom, double angleto, bool drawlines, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, anglefrom, angleto, drawlines, flags);
+}
+
+void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawEllipseImp(origin, xr, yr, c, flags);
+}
+
+void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPolygonImp(poly, origin, c, fill, flags);
+}
+
+void Video::DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawLineImp(p1, p2, c, flags);
+}
+
+void Video::DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawLinesImp(points, c, flags);
+}
 
 }

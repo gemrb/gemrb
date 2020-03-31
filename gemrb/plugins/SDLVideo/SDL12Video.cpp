@@ -400,7 +400,7 @@ void SDL12VideoDriver::BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigne
 	}
 }
 
-void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned int flags)
+void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawPointSurface<true>(CurrentRenderBuffer(), p, screenClip, color);
@@ -409,7 +409,7 @@ void SDL12VideoDriver::DrawPoint(const Point& p, const Color& color, unsigned in
 	}
 }
 
-void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color& color, unsigned int flags)
+void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
@@ -418,7 +418,7 @@ void SDL12VideoDriver::DrawPoints(const std::vector<Point>& points, const Color&
 	}
 }
 
-void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, unsigned int flags)
+void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.unused < 0xff) {
 		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, reinterpret_cast<const Color&>(color));
@@ -427,7 +427,7 @@ void SDL12VideoDriver::DrawPoints(const std::vector<SDL_Point>& points, const SD
 	}
 }
 
-void SDL12VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, unsigned int flags)
+void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);
@@ -436,7 +436,7 @@ void SDL12VideoDriver::DrawPolygon(const Gem_Polygon* poly, const Point& origin,
 	}
 }
 
-void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Color& color, unsigned int flags)
+void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawLineSurface<true>(CurrentRenderBuffer(), start, end, screenClip, color);
@@ -445,7 +445,7 @@ void SDL12VideoDriver::DrawLine(const Point& start, const Point& end, const Colo
 	}
 }
 
-void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& color, unsigned int flags)
+void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
 		DrawLinesSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
@@ -455,7 +455,7 @@ void SDL12VideoDriver::DrawLines(const std::vector<Point>& points, const Color& 
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDL12VideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, unsigned int flags)
+void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
 {
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 

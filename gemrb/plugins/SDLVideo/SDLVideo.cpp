@@ -333,7 +333,7 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 #endif
 
 /** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& color, unsigned int flags)
+void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, uint32_t flags)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -367,7 +367,7 @@ void SDLVideoDriver::DrawCircle(const Point& c, unsigned short r, const Color& c
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 static double ellipseradius(unsigned short xr, unsigned short yr, double angle) {
@@ -377,8 +377,8 @@ static double ellipseradius(unsigned short xr, unsigned short yr, double angle) 
 }
 
 /** This functions Draws an Ellipse Segment */
-void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
-	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, unsigned int flags)
+void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
+	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, uint32_t flags)
 {
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
@@ -474,13 +474,13 @@ void SDLVideoDriver::DrawEllipseSegment(const Point& c, unsigned short xr,
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 
 /** This functions Draws an Ellipse */
-void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
-								 unsigned short yr, const Color& color, unsigned int flags)
+void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
+									unsigned short yr, const Color& color, uint32_t flags)
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -541,7 +541,7 @@ void SDLVideoDriver::DrawEllipse(const Point& c, unsigned short xr,
 		}
 	}
 
-	DrawPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 #undef SetPixel

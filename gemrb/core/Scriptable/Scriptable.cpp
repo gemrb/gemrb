@@ -1832,13 +1832,12 @@ void Highlightable::DrawOutline(Point origin) const
 	if (!outline) {
 		return;
 	}
-	Color fillcol(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a/2);
 	origin = outline->BBox.Origin() - origin;
 
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, fillcol, true, BLIT_MULTIPLY );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BLIT_MULTIPLY|BLIT_HALFTRANS );
 	} else {
-		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, fillcol, true, BLIT_BLENDED );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BLIT_BLENDED|BLIT_HALFTRANS );
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, false );
 	}
 }

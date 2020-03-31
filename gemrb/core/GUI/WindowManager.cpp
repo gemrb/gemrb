@@ -557,13 +557,12 @@ void WindowManager::DrawWindows() const
 
 	if (modalWin) {
 		if (modalShadow != ShadowNone) {
-			Color shieldColor;
+			uint32_t flags = 0;
+
 			if (modalShadow == ShadowGray) {
-				shieldColor.a = 128;
-			} else {
-				shieldColor.a = 0xff;
+				flags |= BLIT_HALFTRANS;
 			}
-			video->DrawRect(screen, shieldColor);
+			video->DrawRect(screen, ColorBlack, true, flags);
 		}
 		VideoBuffer* modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
