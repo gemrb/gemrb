@@ -1300,23 +1300,28 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 	oldgametime=gametime;
 
 	// Show wallpolygons
-	if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
+	if (debugFlags & DEBUG_SHOW_WALLS_ALL) {
 		for (const auto& poly : viewportWalls) {
-			// yellow
-			Color c;
-			c.r = 0x7F;
-			c.g = 0x7F;
-			c.b = 0;
-			c.a = 0xFF;
-			//if polygon is disabled, make it grey
+			const Point& origin = poly->BBox.Origin() - viewport.Origin();
+
 			if (poly->wall_flag&WF_DISABLED) {
-				c.b = 0x7F;
+				if (debugFlags & DEBUG_SHOW_WALLS_DISABLED) {
+					video->DrawPolygon( poly.get(), origin, ColorGray, true, BLIT_BLENDED|BLIT_HALFTRANS);
+				}
+				continue;
 			}
 
-			Color fillc(c.r, c.g, c.b, c.a/2);
-			const Point& origin = poly->BBox.Origin() - viewport.Origin();
-			video->DrawPolygon( poly.get(), origin, fillc, true, BLIT_BLENDED);
-			video->DrawPolygon( poly.get(), origin, c, false );
+			Color c = ColorYellow;
+
+			if (debugFlags & DEBUG_SHOW_WALLS_ANIM_COVER) {
+				if (poly->wall_flag & WF_COVERANIMS) {
+					// darker yellow for walls with WF_COVERANIMS
+					c.r -= 0x80;
+					c.g -= 0x80;
+				}
+			}
+
+			video->DrawPolygon( poly.get(), origin, c, true, BLIT_BLENDED|BLIT_HALFTRANS);
 		}
 	}
 }

@@ -1033,6 +1033,18 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
 				Log(MESSAGE, "GameControl", "Show traps and infopoints %s", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
+			case '5':
+				static uint32_t wallFlags[4] {
+					DEBUG_SHOW_WALLS_ACTIVE,
+					DEBUG_SHOW_WALLS_DISABLED,
+					DEBUG_SHOW_WALLS_ANIM_COVER,
+					DEBUG_SHOW_WALLS_ALL
+				};
+				static uint32_t flagIdx = 0;
+				DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
+				DebugFlags |= wallFlags[flagIdx++];
+				flagIdx = flagIdx % 4;
+				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
 				Log(MESSAGE, "GameControl", "Show lightmap %s", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
@@ -1057,7 +1069,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 #ifdef ANDROID
 		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
 #endif
-			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+			DebugFlags &= ~(DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS);
 			break;
 		default:
 			return false;
@@ -1442,7 +1454,7 @@ bool GameControl::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
 	if (EventMgr::NumFingersDown() == 2) {
 		// container highlights
-		DebugFlags |= DEBUG_SHOW_CONTAINERS;
+		DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
 	}
 
 	// TODO: check pressure to distinguish between tooltip and HP modes
@@ -1464,7 +1476,7 @@ bool GameControl::OnTouchDown(const TouchEvent& te, unsigned short mod)
 bool GameControl::OnTouchUp(const TouchEvent& te, unsigned short mod)
 {
 	if (EventMgr::ModState(GEM_MOD_ALT) == false) {
-		DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+		DebugFlags &= ~(DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS);
 	}
 
 	return View::OnTouchUp(te, mod);
@@ -1483,7 +1495,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 	} else if (gesture.numFingers == 2) {
 		if (gesture.dTheta < -0.2 || gesture.dTheta > 0.2) { // TODO: actually figure out a good number
 			if (EventMgr::ModState(GEM_MOD_ALT) == false) {
-				DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+				DebugFlags &= ~(DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS);
 			}
 
 			isSelectionRect = false;
