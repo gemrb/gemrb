@@ -427,7 +427,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();
 
-	// TODO: move the TMap debugging into Map
 	// FIXME: some of this should happen during mouse events
 	// setup outlines
 	InfoPoint *i;
@@ -440,15 +439,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 				continue;
 			}
 		}
-		if (i->VisibleTrap(DebugFlags & DEBUG_SHOW_INFOPOINTS)) {
-			i->outlineColor = ColorRed; // traps
-		} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-			i->outlineColor = ColorBlue; // debug infopoints
-			i->outlineColor.a = 0x80;
-		} else {
-			continue;
-		}
-		i->Highlight = true;
 	}
 
 	// FIXME: some of this should happen during mouse events
@@ -458,67 +448,60 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 		if (d->Flags & DOOR_HIDDEN) {
 			continue;
 		}
+
+		if (d->Flags & DOOR_SECRET) {
+			if (d->Flags & DOOR_FOUND) {
+				d->Highlight = true;
+				d->outlineColor = ColorMagenta; // found hidden door
+			} else {
+				continue;
+			}
+		}
+
 		if (overDoor == d) {
+			d->Highlight = true;
 			if (target_mode) {
 				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
 					// only highlight targettable doors
 					d->outlineColor = ColorGreen;
-					d->Highlight = true;
-					continue;
 				}
 			} else if (!(d->Flags & DOOR_SECRET)) {
 				// mouse over, not in target mode, no secret door
 				d->outlineColor = ColorCyan;
-				d->Highlight = true;
-				continue;
 			}
 		}
+
+		// traps always take precedence
 		if (d->VisibleTrap(0)) {
-			d->outlineColor = ColorRed; // traps
-		} else if (d->Flags & DOOR_SECRET) {
-			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
-				d->outlineColor = ColorMagenta; // found hidden door
-			} else {
-				// secret door is invisible
-				continue;
-			}
-		} else if (DebugFlags & DEBUG_SHOW_DOORS) {
-			d->outlineColor = ColorCyan; // debug doors
-		} else {
-			continue;
+			d->Highlight = true;
+			d->outlineColor = ColorRed;
 		}
-		d->Highlight = true;
 	}
 
 	// FIXME: some of this should happen during mouse events
 	Container *c;
 	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); idx++) {
+		c->Highlight = false;
 		if (c->Flags & CONT_DISABLED) {
 			continue;
 		}
 
-		c->Highlight = false;
-		if (overContainer == c && target_mode) {
-			if (c->VisibleTrap(0) || (c->Flags & CONT_LOCKED)) {
-				// only highlight targettable containers
-				c->outlineColor = ColorGreen;
-				c->Highlight = true;
-				continue;
-			}
-		} else if (overContainer == c) {
-			// mouse over, not in target mode
-			c->outlineColor = ColorCyan;
+		if (overContainer == c) {
 			c->Highlight = true;
-			continue;
+			if (target_mode) {
+				if (c->Flags & CONT_LOCKED) {
+					c->outlineColor = ColorGreen;
+				}
+			} else {
+				c->outlineColor = ColorCyan;
+			}
 		}
+
+		// traps always take precedence
 		if (c->VisibleTrap(0)) {
+			c->Highlight = true;
 			c->outlineColor = ColorRed; // traps
-		} else if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
-			c->outlineColor = ColorCyan; // debug containers
-		} else {
-			continue;
 		}
-		c->Highlight = true;
 	}
 
 	//drawmap should be here so it updates fog of war
@@ -1042,8 +1025,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case '5':
 				static uint32_t wallFlags[4] {
-					DEBUG_SHOW_WALLS_ACTIVE,
-					DEBUG_SHOW_WALLS_DISABLED,
+					DEBUG_SHOW_WALLS,
+					DEBUG_SHOW_DOORS_DISABLED,
 					DEBUG_SHOW_WALLS_ANIM_COVER,
 					DEBUG_SHOW_WALLS_ALL
 				};

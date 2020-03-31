@@ -929,15 +929,17 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	}
 }
 
-void Map::DrawHighlightables(const Region& viewport)
+void Map::DrawHighlightables(const Region& viewport, uint32_t debugFlags)
 {
 	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
 	Container *c;
-
-	while ( (c = TMap->GetContainer(i++))!=NULL ) {
-		if (c->Highlight) {
-			if (c->Type != IE_CONTAINER_PILE) {
+	while ((c = TMap->GetContainer(i++)) != NULL) {
+		if (c->Type != IE_CONTAINER_PILE) {
+			if (c->Highlight) {
+				c->DrawOutline(viewport.Origin());
+			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
+				c->outlineColor = ColorCyan;
 				c->DrawOutline(viewport.Origin());
 			}
 		}
@@ -946,25 +948,39 @@ void Map::DrawHighlightables(const Region& viewport)
 	Door *d;
 	i = 0;
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
-		if (d->Highlight) d->DrawOutline(viewport.Origin());
+		if (d->Highlight) {
+			d->DrawOutline(viewport.Origin());
+		} else if (debugFlags & (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET)) {
+			if ((debugFlags & DEBUG_SHOW_DOORS_SECRET) && (d->Flags & DOOR_SECRET)) {
+				d->outlineColor = ColorMagenta;
+			} else {
+				d->outlineColor = ColorCyan;
+			}
+
+			d->DrawOutline(viewport.Origin());
+		}
 	}
 
 	InfoPoint *p;
 	i = 0;
 	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
-		if (p->Highlight) p->DrawOutline(viewport.Origin());
+		if (p->Highlight) {
+			p->DrawOutline(viewport.Origin());
+		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
+			p->outlineColor = ColorBlue;
+			p->DrawOutline(viewport.Origin());
+		}
 	}
 }
 
-void Map::DrawPile(Region screen, int pileidx)
+void Map::DrawPile(Region screen, Container* c)
 {
-	Container *c = TMap->GetContainer(pileidx);
 	assert(c != NULL);
 
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	c->DrawPile(c->Highlight, screen, tint);
+	c->DrawPile(true, screen, tint);
 }
 
 Container *Map::GetNextPile(int &index) const
@@ -1077,7 +1093,7 @@ VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 static ieDword oldgametime = 0;
 
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
+void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 {
 	assert(TMap);
 
@@ -1148,7 +1164,7 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 
 	if (!bgoverride) {
 		//Draw Outlines
-		DrawHighlightables(viewport);
+		DrawHighlightables(viewport, debugFlags);
 	}
 
 	//drawing queues 1 and 0
@@ -1184,7 +1200,10 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				DrawPile(viewport, pileidx-1);
+				Container* c = TMap->GetContainer(pileidx-1);
+				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
+					DrawPile(viewport, c);
+				}
 				pile = GetNextPile(pileidx);
 			}
 			break;
@@ -1300,14 +1319,18 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 	oldgametime=gametime;
 
 	// Show wallpolygons
-	if (debugFlags & DEBUG_SHOW_WALLS_ALL) {
+	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
 		for (const auto& poly : viewportWalls) {
 			const Point& origin = poly->BBox.Origin() - viewport.Origin();
 
 			if (poly->wall_flag&WF_DISABLED) {
-				if (debugFlags & DEBUG_SHOW_WALLS_DISABLED) {
+				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
 					video->DrawPolygon( poly.get(), origin, ColorGray, true, BLIT_BLENDED|BLIT_HALFTRANS);
 				}
+				continue;
+			}
+
+			if ((debugFlags & (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER)) == 0) {
 				continue;
 			}
 
@@ -1319,6 +1342,8 @@ void Map::DrawMap(const Region& viewport, uint8_t debugFlags)
 					c.r -= 0x80;
 					c.g -= 0x80;
 				}
+			} else if ((debugFlags & DEBUG_SHOW_WALLS) == 0) {
+				continue;
 			}
 
 			video->DrawPolygon( poly.get(), origin, c, true, BLIT_BLENDED|BLIT_HALFTRANS);

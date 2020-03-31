@@ -337,12 +337,13 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_INFOPOINTS   	= 0x01,
 	DEBUG_SHOW_CONTAINERS   	= 0x02,
 	DEBUG_SHOW_DOORS			= 0x04,
-	DEBUG_SHOW_LIGHTMAP     	= 0x08,
-	// FIXME: only doors have WF_DISABLED, we should handle that with DEBUG_SHOW_DOORS instead
-	DEBUG_SHOW_WALLS_ACTIVE		= 0x10,
-	DEBUG_SHOW_WALLS_DISABLED	= 0x20,
-	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x40,
-	DEBUG_SHOW_WALLS_ALL		= (DEBUG_SHOW_WALLS_ACTIVE|DEBUG_SHOW_WALLS_DISABLED|DEBUG_SHOW_WALLS_ANIM_COVER)
+	DEBUG_SHOW_DOORS_SECRET		= 0x08,
+	DEBUG_SHOW_DOORS_DISABLED	= 0x10,
+	DEBUG_SHOW_DOORS_ALL		= (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET|DEBUG_SHOW_DOORS_DISABLED),
+	DEBUG_SHOW_LIGHTMAP     	= 0x20,
+	DEBUG_SHOW_WALLS			= 0x40,
+	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x80,
+	DEBUG_SHOW_WALLS_ALL		= (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER)
 };
 
 typedef std::list<AreaAnimation*>::iterator aniIterator;
@@ -426,8 +427,8 @@ public:
 	void MoveVisibleGroundPiles(const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
-	void DrawHighlightables(const Region& viewport);
-	void DrawMap(const Region& viewport, uint8_t debugFlags);
+	void DrawHighlightables(const Region& viewport, uint32_t debugFlags);
+	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
@@ -621,7 +622,7 @@ private:
 	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
-	void DrawPile (Region screen, int pileidx);
+	void DrawPile (Region screen, Container* c);
 	void DrawSearchMap(const Region &vp);
 	void GenerateQueues();
 	void SortQueues();
