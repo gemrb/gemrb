@@ -307,7 +307,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region d
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
-	unsigned int flags = (spr->HasTransparency()) ? BLIT_BLENDED : 0;
+	uint32_t flags = (spr->HasTransparency()) ? BLIT_BLENDED : BLIT_NO_FLAGS;
 	BlitSpriteClipped(spr, src, dst, flags);
 }
 

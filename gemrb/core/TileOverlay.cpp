@@ -94,7 +94,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 						vid->BlitTile( ovtile->anim[0]->NextFrame(),
 									   ( x * 64 ) - viewport.x,
 									   ( y * 64 ) - viewport.y,
-									   NULL, flags | ((tile->anim[1]) ? BLIT_HALFTRANS : 0), tintcol);
+									   NULL, flags | ((tile->anim[1]) ? BLIT_HALFTRANS : BLIT_NO_FLAGS), tintcol);
 
 						if (tile->anim[1]) {
 							// this is the mask to blend the terrain tile with the water
