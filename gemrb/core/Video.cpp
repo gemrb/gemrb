@@ -32,6 +32,8 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
+static Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags);
+
 Video::Video(void)
 {
 	drawingBuffer = NULL;
