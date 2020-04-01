@@ -215,32 +215,32 @@ public:
 
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 
-	int CreateDriverDisplay(const Size& s, int bpp, const char* title);
-	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
+	int CreateDriverDisplay(const Size& s, int bpp, const char* title) override;
+	void SetWindowTitle(const char *title) override { SDL_SetWindowTitle(window, title); };
 
-	void SwapBuffers(VideoBuffers& buffers);
+	void SwapBuffers(VideoBuffers& buffers) override;
 
-	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr );
-	bool SetFullscreenMode(bool set);
-	void SetGamma(int brightness, int contrast);
-	bool ToggleGrabInput();
+	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr ) override;
+	bool SetFullscreenMode(bool set) override;
+	void SetGamma(int brightness, int contrast) override;
+	bool ToggleGrabInput() override;
 
-	void StartTextInput();
-	void StopTextInput();
-	bool InTextInput();
+	void StartTextInput() override;
+	void StopTextInput() override;
+	bool InTextInput() override;
 	
-	bool TouchInputEnabled();
+	bool TouchInputEnabled() override;
 
 	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
-						 const Color* tint = nullptr, const Region* clip = nullptr);
+						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:
-	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat);
+	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 
-	int ProcessEvent(const SDL_Event & event);
+	int ProcessEvent(const SDL_Event & event) override;
 
-	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const;
-	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const;
+	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
+	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	int UpdateRenderTarget(const Color* color = NULL, unsigned int flags = 0);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0) override;
@@ -257,8 +257,9 @@ private:
 	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) override;
 
 	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Region& /*src*/, const Region& /*dst*/,
-					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) { assert(false); } // SDL2 does not support this
-	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
+	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
+								 unsigned int flags = 0, const SDL_Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
 
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* = NULL);

@@ -33,39 +33,40 @@ private:
 public:
 	SDL12VideoDriver(void);
 	
-	int Init(void);
-	int CreateDriverDisplay(const Size&, int bpp, const char* title);
-	void SetWindowTitle(const char *title) { SDL_WM_SetCaption(title, 0); };
+	int Init(void) override;
+	int CreateDriverDisplay(const Size&, int bpp, const char* title) override;
+	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
-	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr );
+	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr ) override;
 
-	bool SetFullscreenMode(bool set);
+	bool SetFullscreenMode(bool set) override;
 
-	bool ToggleGrabInput();
+	bool ToggleGrabInput() override;
 
-	void StartTextInput();
-	void StopTextInput();
-	bool InTextInput();
+	void StartTextInput() override;
+	void StopTextInput() override;
+	bool InTextInput() override;
 
-	bool TouchInputEnabled();
-	void SetGamma(int brightness, int contrast);
+	bool TouchInputEnabled() override;
+	void SetGamma(int brightness, int contrast) override;
 
-	bool SupportsBAMSprites() { return true; }
+	bool SupportsBAMSprites() override { return true; }
 
 	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
-						 const Color* tint = nullptr, const Region* clip = nullptr);
+						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:
-	void SwapBuffers(VideoBuffers&);
-	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const;
-	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const;
-	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt);
+	void SwapBuffers(VideoBuffers&) override;
+	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
+	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
+	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
 
-	int ProcessEvent(const SDL_Event & event);
+	int ProcessEvent(const SDL_Event & event) override;
 
 	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
-							  unsigned int flags = 0, const Color* tint = NULL);
-	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+							  unsigned int flags = 0, const Color* tint = NULL) override;
+	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
+								 unsigned int flags = 0, const SDL_Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, Color tint);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags) override;

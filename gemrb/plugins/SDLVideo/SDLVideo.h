@@ -63,24 +63,21 @@ class SDLVideoDriver : public Video {
 public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
-	int Init(void);
+	int Init(void) override;
 
-	virtual void SetWindowTitle(const char *title) = 0;
-	virtual bool SetFullscreenMode(bool set)=0;
-
-	virtual Sprite2D* CreateSprite(const Region& rgn, int bpp, ieDword rMask,
+	Sprite2D* CreateSprite(const Region& rgn, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
-		bool cK = false, int index = 0);
-	virtual Sprite2D* CreateSprite8(const Region& rgn, void* pixels,
-							Palette* palette, bool cK, int index);
-	virtual Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
-								   Color* palette, bool cK = false, int index = 0);
+		bool cK = false, int index = 0) override;
+	Sprite2D* CreateSprite8(const Region& rgn, void* pixels,
+							Palette* palette, bool cK, int index) override;
+	Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
+								   Color* palette, bool cK = false, int index = 0) override;
 
-	virtual void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
-						  unsigned int flags, const Color* tint = NULL);
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst);
-	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
-								const Region* clip = NULL);
+	void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
+						  unsigned int flags, const Color* tint = NULL) override;
+	void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) override;
+	void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+								const Region* clip = NULL) override;
 
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Sprite2D* img);
@@ -103,10 +100,10 @@ protected:
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
 
-	int PollEvents();
+	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
-	void Wait(unsigned long w) { SDL_Delay(w); }
+	void Wait(unsigned long w) override { SDL_Delay(w); }
 
 private:
 	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0)=0;
