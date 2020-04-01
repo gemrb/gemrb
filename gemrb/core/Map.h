@@ -622,7 +622,7 @@ private:
 	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
-	void DrawPile (Region screen, Container* c);
+	void DrawPile (Region screen, Container* c, bool highlight);
 	void DrawSearchMap(const Region &vp);
 	void GenerateQueues();
 	void SortQueues();

@@ -973,14 +973,14 @@ void Map::DrawHighlightables(const Region& viewport, uint32_t debugFlags)
 	}
 }
 
-void Map::DrawPile(Region screen, Container* c)
+void Map::DrawPile(Region screen, Container* c, bool highlight)
 {
 	assert(c != NULL);
 
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	c->DrawPile(true, screen, tint);
+	c->DrawPile(highlight, screen, tint);
 }
 
 Container *Map::GetNextPile(int &index) const
@@ -1202,7 +1202,9 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			if (!bgoverride) {
 				Container* c = TMap->GetContainer(pileidx-1);
 				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
-					DrawPile(viewport, c);
+					DrawPile(viewport, c, true);
+				} else {
+					DrawPile(viewport, c, false);
 				}
 				pile = GetNextPile(pileidx);
 			}
