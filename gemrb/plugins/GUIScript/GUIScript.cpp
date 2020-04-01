@@ -471,18 +471,23 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	String* chapText = StringFromCString(text);
 	if (chapText) {
 		// insert enough newlines to push the text offscreen
+		auto margins = ta->GetMargins();
 		int rowHeight = ta->LineHeight();
-		int h = ta->Dimensions().h;
-		int newlines = (h / rowHeight);
-		ta->AppendText(String(newlines, L'\n'));
+		int h = ta->Frame().h - (margins.top + margins.bottom);
+		int w = ta->Frame().w - (margins.left + margins.right);
+		int newlines = CeilDiv(h, rowHeight);
+		ta->AppendText(String(newlines - 1, L'\n'));
 		ta->AppendText(*chapText);
-		// append again after the chtext so it will scroll out of view
-		ta->AppendText(String(newlines, L'\n'));
+		// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
+		ta->AppendText(String(newlines + 1, L'\n'));
 
 		delete chapText;
 		ta->SetFlags(View::IgnoreEvents, OP_OR);
 		int lines = ta->ContentHeight() / rowHeight;
-		int ticksPerLine = 1200.0f * (12.0f/float(rowHeight));// scale based on text size so smaller text scrolls more slowly
+		float heightScale = 12.0f / rowHeight; // scale based on text size so smaller text scrolls more slowly
+		float widthScale = 640.0f / w;  // scale based on width to become more slow as we get wider
+		// TODO: add a global configurable scale factor... but we cant store floats in the INI?
+		int ticksPerLine = 1100.0f * heightScale * widthScale;
 		ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
 	}
 	Py_RETURN_NONE;

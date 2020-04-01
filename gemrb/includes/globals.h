@@ -278,7 +278,7 @@ inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
 template <typename T>
 inline T CeilDivUnsigned(T dividend, T divisor)
 {
-	static_assert(std::is_unsigned<T>::value, "This quick round only works for positive values.");
+	//static_assert(std::is_unsigned<T>::value, "This quick round only works for positive values.");
 	return (dividend + divisor - 1) / divisor;
 }
 
