@@ -8180,7 +8180,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 
-	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+	uint32_t flags = TranslucentShadows ? BLIT_TRANSSHADOW : BLIT_NO_FLAGS;
 	flags |= BLIT_BLENDED;
 
 	// TODO: we could optimize by caching this and update it only when the Selectable moves
@@ -8610,7 +8610,7 @@ void Actor::Draw(const Region& vp)
 		}
 
 		Game* game = core->GetGame();
-		ieDword flags = !ca->lockPalette ? BLIT_TINTED : 0;
+		uint32_t flags = !ca->lockPalette ? BLIT_TINTED : BLIT_NO_FLAGS;
 		game->ApplyGlobalTint(tint, flags);
 
 		// infravision, independent of light map and global light

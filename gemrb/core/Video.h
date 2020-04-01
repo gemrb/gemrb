@@ -46,6 +46,7 @@ class SpriteCover;
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
 enum SpriteBlitFlags : uint32_t {
+	BLIT_NO_FLAGS = 0,
 	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
 	BLIT_BLENDED = IE_VVC_BLENDED, // 8; not implemented in SDLVideo yet
 	BLIT_MIRRORX = IE_VVC_MIRRORX, // 0x10
