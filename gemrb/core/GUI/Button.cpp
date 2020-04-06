@@ -735,7 +735,7 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 	gamedata->FreePalette(disabled_palette);
 
 	normal_palette = new Palette( fore, back );
-	disabled_palette = normal_palette->Copy();
+	disabled_palette = new Palette(fore, back);
 	disabled_palette->Darken();
 	MarkDirty();
 }
