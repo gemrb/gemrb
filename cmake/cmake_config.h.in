@@ -25,3 +25,4 @@
 #cmakedefine WIN32_USE_STDIO 1
 #cmakedefine HAVE_ICONV 1
 #cmakedefine RPI 1
+#cmakedefine01 ICONV_ACCEPTS_NONCONST_INPUT
