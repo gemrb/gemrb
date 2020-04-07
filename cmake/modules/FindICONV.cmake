@@ -50,7 +50,10 @@ set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARY})
 check_cxx_source_compiles(
     "#include <iconv.h>
      int main() {
-        iconv(iconv_t(-1), 0, 0, 0, 0);
+        iconv_t ic;
+        ic = iconv_open(\"to\", \"from\");
+        iconv(ic, 0, 0, 0, 0);
+        iconv_close(ic);
      }"
     ICONV_COMPILES)
 
