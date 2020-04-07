@@ -1420,6 +1420,8 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 			SetSlotItem( TmpItem, SlotID );
 		} else {
 			delete TmpItem;
+			//if the item isn't creatable, we still destroy the old item
+			KillSlot( SlotID );
 		}
 	} else {
 		//if the item isn't creatable, we still destroy the old item
