@@ -1420,8 +1420,6 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 			SetSlotItem( TmpItem, SlotID );
 		} else {
 			delete TmpItem;
-			//if the item isn't creatable, we still destroy the old item
-			KillSlot( SlotID );
 		}
 	} else {
 		//if the item isn't creatable, we still destroy the old item
@@ -1470,7 +1468,8 @@ void Inventory::BreakItemSlot(ieDword slot)
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
 	//if it is the magic weapon slot, don't break it, just remove it, because it couldn't be removed
-	if(slot ==(unsigned int) SLOT_MAGIC) {
+	//or for pst, just remove it as there is no breaking (the replacement item is a sound)
+	if(slot ==(unsigned int) SLOT_MAGIC || core->HasFeature(GF_HAS_PICK_SOUND)) {
 		newItem[0]=0;
 	} else {
 		memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
