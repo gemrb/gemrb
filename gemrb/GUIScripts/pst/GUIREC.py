@@ -829,7 +829,7 @@ def OpenBiographyWindow ():
 
 	BioTable = GemRB.LoadTable ("bios")
 	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	BioText = int (BioTable.GetValue (BioTable.GetRowName (Specific+1), 'BIO'))
+	BioText = int (BioTable.GetValue (BioTable.GetRowName (Specific), 'BIO'))
 
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (BioText)
