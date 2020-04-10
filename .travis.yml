@@ -2,6 +2,7 @@
 # TODO: run the minimal test also from the installed gemrb
 language: cpp
 
+dist: xenial
 compiler:
   - clang
   - gcc
@@ -55,8 +56,8 @@ script:
     make install
 
 deploy:
-  skip_cleanup: true
   provider: script
+  edge: true
   script: ../testing/travis-deploy.sh
   on:
     branch: master
@@ -76,7 +77,7 @@ os:
   - linux
   - osx
 
-matrix:
+jobs:
   exclude:
     - os: osx
       compiler: gcc # actually just linked to clang
