@@ -72,7 +72,8 @@ def OpenLUStatsWindow(Type = 1):
 		GUIREC.RecordsWindow.SetVisible (WINDOW_INVISIBLE)
 		# only TNO gets the main stat boosts
 		pc = GemRB.GameGetSelectedPCSingle ()
-		if pc != 1:
+		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+		if Specific != 2:
 			GUIREC.OpenLevelUpWindow ()
 			return
 	else:
