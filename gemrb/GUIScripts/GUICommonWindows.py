@@ -356,6 +356,9 @@ def AIPress (toggle=1):
 		Button.SetTooltip (AITip['Enable'])
 		Button.SetState(IE_GUI_BUTTON_NORMAL)
 
+	if GameCheck.IsPST ():
+		GemRB.SetGlobal ("partyScriptsActive", "GLOBALS", AI)
+
 	#force redrawing, in case a hotkey triggered this function
 	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
