@@ -109,7 +109,7 @@ def InitInventoryWindow (Window):
 	Window.RemoveSubview(Label, True)
 	# resize the win to hide the baked in BG for this useless control
 	width, height = Window.GetSize()
-	height -= 150 # close enough
+	height -= 167 # read from the chu
 	Window.SetSize(width, height)
 
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
