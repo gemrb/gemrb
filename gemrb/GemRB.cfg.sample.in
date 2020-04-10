@@ -67,7 +67,7 @@ GameType=auto
 # * 640x480 (except in iwd2)
 # * 800x600 (bg2, iwd:how, iwd2)
 # * 1024x768 (bg2, iwd:how, iwd2)
-# * 1280x1024 (bg2, iwd:how, iwd2)
+# * 1280x960 (bg2, iwd:how, iwd2)
 
 #Screen width
 Width=640
