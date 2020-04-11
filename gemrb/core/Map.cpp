@@ -1381,14 +1381,14 @@ Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
 
 void Map::DrawSearchMap(const Region &vp)
 {
-	Color inaccessible(128, 128, 128, 128);
-	Color impassible(128, 64, 64, 128); // red-ish
-	Color sidewall(64, 64, 128, 128); // blue-ish
-	Video *vid=core->GetVideoDriver();
-	Region block;
+	static const Color inaccessible = ColorGray;
+	static const Color impassible(128, 64, 64, 0xff); // red-ish
+	static const Color sidewall(64, 64, 128, 0xff); // blue-ish
+	constexpr uint32_t flags = BLIT_BLENDED | BLIT_HALFTRANS;
 
-	block.w=16;
-	block.h=12;
+	Video *vid=core->GetVideoDriver();
+	Region block(0,0,16,12);
+
 	int w = vp.w/16+2;
 	int h = vp.h/12+2;
 
@@ -1396,14 +1396,14 @@ void Map::DrawSearchMap(const Region &vp)
 		for(int y=0;y<h;y++) {
 			unsigned char blockvalue = GetBlocked(x+vp.x/16, y+vp.y/12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
-				block.x=vp.x+x*16-(vp.x % 16);
-				block.y=vp.y+y*12-(vp.y % 12);
+				block.x = x * 16 - (vp.x % 16);
+				block.y = y * 12 - (vp.y % 12);
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
-					vid->DrawRect(block,impassible);
+					vid->DrawRect(block, impassible, true, flags);
 				} else if (blockvalue & PATH_MAP_SIDEWALL) {
-					vid->DrawRect(block,sidewall);
+					vid->DrawRect(block, sidewall, true, flags);
 				} else {
-					vid->DrawRect(block,inaccessible);
+					vid->DrawRect(block, inaccessible, true, flags);
 				}
 			}
 		}
