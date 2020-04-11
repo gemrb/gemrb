@@ -377,6 +377,11 @@ public:
 	int checkHP;
 	// to determine that a tick has passed
 	ieDword checkHPTime;
+	/**
+	 * We don't know how to profit of them, but PST needs them saved.
+	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
+	 */
+	ieByte pstColorBytes[10];
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
