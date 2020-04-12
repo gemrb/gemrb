@@ -1460,7 +1460,7 @@ void Map::Shout(Actor* actor, int shoutID, bool global)
 		}
 
 		if (!global) {
-			if (WithinAudibleRange(actor, listener->Pos)) {
+			if (!WithinAudibleRange(actor, listener->Pos)) {
 				continue;
 			}
 		}

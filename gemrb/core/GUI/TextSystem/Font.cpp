@@ -275,7 +275,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 		size_t lineLen = line.length();
 		if (lineLen) {
 			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
-			StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
+			StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, 0, true};
 			const Size lineSize = StringSize(line, &metrics);
 			size_t linePos = metrics.numChars;
 			Point linePoint;
@@ -681,6 +681,11 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 			} else {
 				w = std::max(w, wordW);
 			}
+
+			if (metrics && metrics->numLines > 0 && metrics->numLines <= lines) {
+				break;
+			}
+
 			if (newline) {
 				newline = false;
 				lines++;
@@ -699,6 +704,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		metrics->forceBreak = forceBreak;
 		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
+		metrics->numLines = lines;
 #if DEBUG_FONT
 		assert(metrics->numChars <= string.length());
 		assert(w <= stop->w);

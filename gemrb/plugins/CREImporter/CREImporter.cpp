@@ -1200,8 +1200,8 @@ void CREImporter::GetActorPST(Actor *act)
 		act->BaseStats[IE_COLORS+i] = tmpWord;
 	}
 	act->BaseStats[IE_COLORCOUNT] = tmpByte; //hack
-
-	str->Seek(31, GEM_CURRENT_POS);
+	str->Read(act->pstColorBytes, 10);
+	str->Seek(21, GEM_CURRENT_POS);
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SPECIES]=tmpByte; // offset: 0x311
 	str->Read( &tmpByte, 1 );
@@ -2788,7 +2788,8 @@ int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
 		tmpWord = actor->BaseStats[IE_COLORS+i];
 		stream->WriteWord( &tmpWord);
 	}
-	stream->Write(filling,31);
+	stream->Write(actor->pstColorBytes, 10);
+	stream->Write(filling, 21);
 	tmpByte = actor->BaseStats[IE_SPECIES];
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_TEAM];

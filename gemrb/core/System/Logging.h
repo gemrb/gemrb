@@ -60,19 +60,11 @@ GEM_EXPORT void ShutdownLogging();
 # define PRINTF_FORMAT(x, y)
 #endif
 
-#if defined(__GNUC__)
-# define NORETURN __attribute__ ((noreturn))
-#elif defined(_MSC_VER)
-# define NORETURN __declspec(noreturn)
-#else
-# define NORETURN
-#endif
-
 GEM_EXPORT void print(const char* message, ...)
 	PRINTF_FORMAT(1, 2);
 
 /// Log an error, and exit.
-NORETURN
+[[noreturn]]
 GEM_EXPORT void error(const char* owner, const char* message, ...)
 	PRINTF_FORMAT(2, 3);
 
@@ -82,7 +74,6 @@ GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
 GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
 
 #undef PRINTF_FORMAT
-#undef NORETURN
 
 }
 

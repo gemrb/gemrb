@@ -247,7 +247,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	// Button label
 	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Palette* ppoi = normal_palette;
-		int align = 0;
+		ieByte align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled())
 			ppoi = disabled_palette;
@@ -269,28 +269,30 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
-		if (! (flags & IE_GUI_BUTTON_MULTILINE)) {
-			align |= IE_FONT_SINGLE_LINE;
-		}
-
 		Region r = rgn;
 		if (IS_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Frame.w + 1, Picture->Frame.h);
-		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
-				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM |
-					IE_GUI_BUTTON_MULTILINE) & flags) {
-			// FIXME: I'm unsure when exactly this adjustment applies...
-			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
 		} else if (flags&IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
 			r.y += Anchor.y;
 			r.w -= Anchor.x;
 			r.h -= Anchor.y;
+		} else {
+			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
+			font->StringSize(Text, &metrics);
+
+			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
+				// FIXME: I'm unsure when exactly this adjustment applies...
+				// we do know that if a button is multiline it should not have margins
+				// I'm actually wondering if we need this at all anymore
+				// I suspect its origins predate the fixing of font baseline alignment
+				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+			}
 		}
 
-		font->Print( r, Text, ppoi, (ieByte) align );
+		font->Print( r, Text, ppoi, align );
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
@@ -709,7 +711,7 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 	gamedata->FreePalette(disabled_palette);
 
 	normal_palette = new Palette( fore, back );
-	disabled_palette = normal_palette->Copy();
+	disabled_palette = new Palette(fore, back);
 	disabled_palette->Darken();
 	MarkDirty();
 }

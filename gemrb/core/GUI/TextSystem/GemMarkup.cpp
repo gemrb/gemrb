@@ -36,6 +36,7 @@ Holder<Palette> GemMarkupParser::GetSharedPalette(const String& colorString)
 	palCol.g = g;
 	palCol.b = b;
 	Palette* pal = new Palette(palCol, ColorBlack);
+	pal->CreateShadedAlphaChannel();
 	// stifle clang analyzer about pal (falsely) being deleted by release()
 	Holder<Palette> ret = PalCache.insert(std::make_pair(colorString, pal)).first->second;
 	pal->release();
