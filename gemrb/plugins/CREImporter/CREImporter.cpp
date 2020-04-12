@@ -1658,10 +1658,10 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	ieDword memocount;
 	ieDword tmpDword;
 
-	int check = 0;
+	int check = 0, i = count;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
 	assert(sm && sm->SlotCount == 0 && sm->SlotCountWithBonus == 0); // unused
-	while(count--) {
+	while(i--) {
 		str->ReadDword(&spellindex);
 		str->ReadDword(&totalcount);
 		str->ReadDword(&memocount);
@@ -1701,13 +1701,13 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	// hacks for domain spells, since their count is not stored and also always 1
 	// NOTE: luckily this does not cause save game incompatibility
 	str->ReadDword(&tmpDword);
-	if (type == IE_IWD2_SPELL_DOMAIN) {
+	if (type == IE_IWD2_SPELL_DOMAIN && count > 0) {
 		sm->SlotCount = 1;
 	} else {
 		sm->SlotCount = (ieWord) tmpDword;
 	}
 	str->ReadDword(&tmpDword);
-	if (type == IE_IWD2_SPELL_DOMAIN) {
+	if (type == IE_IWD2_SPELL_DOMAIN && count > 0) {
 		sm->SlotCountWithBonus = 1;
 	} else {
 		sm->SlotCountWithBonus = (ieWord) tmpDword;
