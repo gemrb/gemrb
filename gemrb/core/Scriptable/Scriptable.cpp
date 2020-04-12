@@ -2277,11 +2277,12 @@ void Movable::FixPosition()
 	Pos.y=Pos.y*12+6;
 }
 
-void Movable::WalkTo(const Point &Des, int distance)
+bool Movable::WalkTo(const Point &Des, int distance)
 {
+	bool willBump = false;
 	// Rate limiting
 	if (this->Ticks < this->prevTicks + 2) {
-		return;
+		return false;
 	}
 	// The rate limiting stuff is probably not optimal, since it requires lots of pathfinder calls
 	// An incremental pathfinding algorithm would be preferable, but LOS checks are slow
@@ -2295,17 +2296,27 @@ void Movable::WalkTo(const Point &Des, int distance)
 	if (std::abs(Des.x - Pos.x) <= XEPS &&
 		std::abs(Des.y - Pos.y) <= YEPS) {
 		ClearPath(true);
-		return;
+		return false;
 	}
 
 	area->ClearSearchMapFor(this);
-	auto newPath = area->FindPath(Pos, Des, size, distance);
+	auto newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
+	if (!newPath) {
+		newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
+		willBump = true;
+	}
 
 	if (newPath) {
 		ClearPath(false);
 		path = newPath;
 		step = path;
 	}
+	if (!willBump) {
+		Log(DEBUG, "PathFinderWIP", "%s: Path found without bumping", this->GetName(0));
+	} else {
+		Log(DEBUG, "PathFinderWIP", "%s: Path found with bumping", this->GetName(0));
+	}
+	return willBump;
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int flags)
@@ -2403,6 +2414,8 @@ void Movable::ClearPath(bool resetDestination)
 	step = NULL;
 	//don't call ReleaseCurrentAction
 }
+
+
 
 /**********************
  * Tiled Object Class *

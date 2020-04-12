@@ -37,7 +37,6 @@
 #include "ImageMgr.h"
 #include "Palette.h"
 #include "Particles.h"
-#include "PathFinder.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
 #include "SaveGameIterator.h"
@@ -900,21 +899,44 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 	}
+	actor->DecreaseBumpBackTimer();
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 		no_more_steps = actor->DoStep(walkScale, time);
 		if (actor->BlocksSearchMap()) {
 			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
 		}
 		// Actor bumping
-
-		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size + 1, actor);
+		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size, actor);
 		if (!nearActors.empty() && actor->GetPath()) {
-			actor->NewPath();
+			if (actor->WillBump()) {
+				if (!BumpNPC(actor, nearActors)) {
+					actor->NewPath();
+				}
+			}
 		}
-
 	}
 
 	return no_more_steps;
+}
+
+bool Map::BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors) {
+	static SearchmapPoint smptFarthest;
+	static NavmapPoint nmptFarthest;
+	for (auto bumped : nearActors) {
+		if (!bumped->GetPath() && IsBumpable(actor, bumped)) {
+			smptFarthest = FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
+			nmptFarthest.x = smptFarthest.x * 16;
+			nmptFarthest.y = smptFarthest.y * 12;
+			bumped->BumpAway(nmptFarthest);
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Map::IsBumpable(const Actor *actor, const Actor *bumped) {
+	return (actor->IsPartyMember() && bumped->GetStat(IE_EA) < EA_EVILCUTOFF) || actor->GetStat(IE_NPCBUMP) > 0 ;
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
@@ -1942,13 +1964,13 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
-unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
+unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking) const
 {
 	if (y>=Height || x>=Width) {
 		return 0;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
-	if (ret&(PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR)) {
+	if (ret&(PATH_MAP_DOOR_IMPASSABLE|(actorsAreBlocking ? PATH_MAP_ACTOR : 0))) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
 	if (ret&PATH_MAP_DOOR_OPAQUE) {
@@ -1957,7 +1979,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 	return ret;
 }
 
-bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags) const
+bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -1973,19 +1995,19 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 	for (unsigned int i=0; i<size-1; i++) {
 		for (unsigned int j=0; j<size-1; j++) {
 			if (i*i+j*j <= r) {
-				if (!(GetBlocked(ppx+i,ppy+j)&flags)) return true;
-				if (!(GetBlocked(ppx+i,ppy-j)&flags)) return true;
-				if (!(GetBlocked(ppx-i,ppy+j)&flags)) return true;
-				if (!(GetBlocked(ppx-i,ppy-j)&flags)) return true;
+				if (!(GetBlocked(ppx+i,ppy+j, actorsAreBlocking)&flags)) return true;
+				if (!(GetBlocked(ppx+i,ppy-j, actorsAreBlocking)&flags)) return true;
+				if (!(GetBlocked(ppx-i,ppy+j, actorsAreBlocking)&flags)) return true;
+				if (!(GetBlocked(ppx-i,ppy-j, actorsAreBlocking)&flags)) return true;
 			}
 		}
 	}
 	return false;
 }
 
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
+bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size, bool actorsAreBlocking) const
 {
-	return CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE);
+	return CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE, actorsAreBlocking);
 }
 
 unsigned int Map::GetBlocked(const Point &c) const
@@ -2440,7 +2462,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 	return FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
-Point Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const
+SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const
 {
 	SearchmapPoint smptFarthest;
 	float *dist = new float[Width * Height]();
@@ -2491,9 +2513,9 @@ Point Map::FindFarthest(const Point &d, unsigned int size, unsigned int PathLen)
 	return smptFarthest;
 }
 
-bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
+bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
 {
-	return FindPath(s, d, size) == NULL;
+	return FindPath(s, d, size, 0, true, false, actorsAreBlocking) == NULL;
 }
 
 /* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
@@ -2592,7 +2614,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
  * find a path from start to goal, ending at the specified distance from the
  * target (the goal must be in sight of the end, if 'sight' is specified)
  */
-PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, bool sight, bool backAway)
+PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, bool sight, bool backAway, bool actorsAreBlocking)
 {
 	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
 	static const size_t DEGREES_OF_FREEDOM = 8;
@@ -2607,7 +2629,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	smptDest.x = d.x / 16;
 	smptDest.y = d.y / 12;
 
-	if (size && GetBlocked(d.x, d.y, size)) {
+	if (size && GetBlocked(d.x, d.y, size, true)) { // We don't want to bump a still npc out of position
 		AdjustPosition(smptDest);
 	}
 
@@ -2674,7 +2696,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		smptParent = parents[smptCurrent.y * Width + smptCurrent.x];
 		nmptParent.x = smptParent.x * 16;
 		nmptParent.y = smptParent.y * 12;
-		bool reachable = IsWalkableTo(nmptCurrent, nmptParent);
+		bool reachable = IsWalkableTo(nmptCurrent, nmptParent, actorsAreBlocking);
 		if (!reachable && smptCurrent != smptSource) {
 			smptBestParent.x = 0;
 			smptBestParent.y = 0;
@@ -2701,7 +2723,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
 									(unsigned) smptChild.y >= Height;
-			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size, actorsAreBlocking);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
@@ -2729,27 +2751,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		}
 	}
 
-	PathNode *resultPath = NULL;
 	if (foundPath) {
-		smptCurrent = smptDest;
-		while (!resultPath || smptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
-			//Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptCurrent.x, smptCurrent.y);
-			PathNode *newStep = new PathNode;
-			newStep->x = smptCurrent.x;
-			newStep->y = smptCurrent.y;
-			newStep->Next = resultPath;
-			newStep->Parent = NULL;
-			if (backAway) {
-				newStep->orient = GetOrient(parents[smptCurrent.y * Width + smptCurrent.x], smptCurrent);
-			} else {
-				newStep->orient = GetOrient(smptCurrent, parents[smptCurrent.y * Width + smptCurrent.x]);
-			}
-			if (resultPath) {
-				resultPath->Parent = newStep;
-			}
-			resultPath = newStep;
-			smptCurrent = parents[smptCurrent.y * Width + smptCurrent.x];
-		}
+		return BuildActorPath(smptCurrent, smptDest, parents, backAway);
 	} else {
 		//Log(DEBUG, "PathFinderWIP", "Pathfinder destination is unreachable");
 	}
@@ -2757,6 +2760,33 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	delete[] isClosed;
 	delete[] parents;
 	delete[] distFromStart;
+
+	return NULL;
+}
+
+PathNode *
+Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents,
+					bool backAway) const {
+	PathNode *resultPath = NULL;
+	smptCurrent = smptDest;
+	while (!resultPath || smptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
+		//Log(DEBUG, "PathFinderWIP", "Adding (%d %d) to path", smptCurrent.x, smptCurrent.y);
+		PathNode *newStep = new PathNode;
+		newStep->x = smptCurrent.x;
+		newStep->y = smptCurrent.y;
+		newStep->Next = resultPath;
+		newStep->Parent = NULL;
+		if (backAway) {
+			newStep->orient = GetOrient(parents[smptCurrent.y * Width + smptCurrent.x], smptCurrent);
+		} else {
+			newStep->orient = GetOrient(smptCurrent, parents[smptCurrent.y * Width + smptCurrent.x]);
+		}
+		if (resultPath) {
+			resultPath->Parent = newStep;
+		}
+		resultPath = newStep;
+		smptCurrent = parents[smptCurrent.y * Width + smptCurrent.x];
+	}
 	return resultPath;
 }
 
@@ -2846,9 +2876,9 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL);
 }
 
-bool Map::IsWalkableTo(const Point &s, const Point &d) const
+bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|PATH_MAP_ACTOR, true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|(actorsAreBlocking ? PATH_MAP_ACTOR : 0), true);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary

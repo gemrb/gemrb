@@ -460,6 +460,7 @@ private: //these seem to be sensitive, so get protection
 	PathNode* path; //whole path
 	PathNode* step; //actual step
 	unsigned int prevTicks;
+
 protected:
 	ieDword timeStartStep;
 public:
@@ -501,7 +502,8 @@ public:
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
-	void WalkTo(const Point &Des, int MinDistance = 0);
+	// Returns true if the movable will have to bump
+	bool WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
 	void ClearPath(bool resetDestination);

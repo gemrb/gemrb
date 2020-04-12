@@ -456,7 +456,7 @@ Actor::Actor()
 		Modified[i] = 0;
 	}
 	PrevStats = NULL;
-
+	BumpBackTimer = 0;
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
@@ -5130,14 +5130,20 @@ void Actor::SetMap(Map *map)
 	}
 }
 
-void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy)
+void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy, bool argsAreNavmapPoints)
 {
 	ResetPathTries();
 	ClearPath(true);
 	Point p, q;
-	p.x = position.x/16;
-	p.y = position.y/12;
+	if (argsAreNavmapPoints) {
+		p.x = position.x / 16;
+		p.y = position.y / 12;
+	} else {
+		p.x = position.x;
+		q.x = position.y;
+	}
 	q = p;
+
 	lastFrame = NULL;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();
@@ -8156,7 +8162,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	Movable::WalkTo(Des, MinDistance);
+	SetWillBump(Movable::WalkTo(Des, MinDistance));
 
 }
 
@@ -11414,4 +11420,38 @@ void Actor::PlayArmorSound() const
 		PathTries = 0;
 	}
 
+	void Actor::BumpAway(Point farthest) {
+		if (!BumpBackTimer) {
+			OldPos = Pos;
+		}
+		BumpBackTimer = 10;
+		SetPosition(farthest, 0);
+	}
+
+	void Actor::BumpBack() {
+		assert(!BumpBackTimer);
+		SetPosition(OldPos, 0, 0, 0, false);
+	}
+
+	void Actor::DecreaseBumpBackTimer() {
+		if (!BumpBackTimer) {
+			return;
+		}
+		BumpBackTimer--;
+		if (!BumpBackTimer) {
+			BumpBack();
+		}
+	}
+
+bool Actor::WillBump() const {
+	return _WillBump;
 }
+
+void Actor::SetWillBump(bool willBump) {
+	_WillBump = willBump;
+}
+}
+
+
+
+

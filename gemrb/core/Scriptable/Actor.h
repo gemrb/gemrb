@@ -380,7 +380,9 @@ public:
     int GetPathTries() const;
     void IncrementPathTries();
     void ResetPathTries();
-
+	void BumpAway(Point farthest);
+	void BumpBack();
+	void DecreaseBumpBackTimer();
 private:
 	//the # of previous tries to pick up a new walkpath
 	int PathTries;
@@ -409,6 +411,16 @@ private:
 	ieDword LastFatigueCheck;
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
+	Point OldPos;
+	bool _WillBump;
+public:
+	bool WillBump() const;
+
+	void SetWillBump(bool willBump);
+
+private:
+	unsigned BumpBackTimer;
+
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
@@ -465,7 +477,7 @@ public:
 	/** places the actor on the map */
 	void SetMap(Map *map);
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(const Point &position, int jump, int radiusx=0, int radiusy=0);
+	void SetPosition(const Point &position, int jump, int radiusx=0, int radiusy=0, bool argsAreNavmapPoints = true);
 	/** you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */

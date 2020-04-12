@@ -26,6 +26,7 @@
 
 #include "Interface.h"
 #include "Scriptable/Scriptable.h"
+#include "PathFinder.h"
 
 #include <algorithm>
 #include <queue>
@@ -425,9 +426,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
-	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size, bool actorsAreBlocking = false) const;
+	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = false) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = false) const;
 	unsigned int GetBlocked(const Point &p) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
@@ -519,7 +520,7 @@ public:
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway);
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size);
+	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false);
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
@@ -527,13 +528,12 @@ public:
 	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true, bool backAway = false);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true, bool backAway = false, bool actorsAreBlocking = false);
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
-	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false) const;
 	bool IsVisibleLOS(const Point &s, const Point &d) const;
-	bool IsWalkableTo(const Point &s, const Point &d) const;
+
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
@@ -606,7 +606,16 @@ private:
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 
-	Point FindFarthest(const Point &d, unsigned int size, unsigned int PathLen) const;
+	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
+
+
+	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false) const;
+	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = false) const;
+	bool BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors);
+	bool IsBumpable(const Actor *actor, const Actor *bumped);
+
+	inline PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents,
+							 bool backAway) const;
 };
 
 }
