@@ -307,8 +307,7 @@ void Button::DrawInternal(Region& rgn)
 			// FIXME: I'm unsure when exactly this adjustment applies...
 			r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
 		} else {
-			Font::StringSizeMetrics metrics;
-			metrics.size = r.Dimensions();
+			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
 			font->StringSize(Text, &metrics);
 
 			if (metrics.numLines > 1) {
