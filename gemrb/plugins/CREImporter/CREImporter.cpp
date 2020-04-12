@@ -1957,12 +1957,8 @@ void CREImporter::GetActorIWD2(Actor *act)
 	SpellMemorizationCount = 0;
 	MemorizedSpellsOffset = 0;
 	MemorizedSpellsCount = 0;
-	//6 bytes unknown, 600 bytes spellbook offsets
-	//skipping spellbook offsets
-	ieWord tmp1, tmp2, tmp3;
-	str->ReadWord( &tmp1);
-	str->ReadWord( &tmp2);
-	str->ReadWord( &tmp3);
+	// skipping class (probably redundant), class mask (calculated)
+	str->Seek(6, GEM_CURRENT_POS);
 	ieDword ClassSpellOffsets[8*9];
 
 	//spellbook spells
@@ -2869,6 +2865,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
+	ieDword tmpDword;
 	int i;
 	char filling[124];
 
@@ -2919,10 +2916,11 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( &tmpByte, 1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
-	//3 unknown words
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write(&tmpByte, 1);
+	stream->Write(filling, 1);
+	tmpDword = actor->GetClassMask();
+	stream->WriteDword(&tmpDword);
 	return 0;
 }
 
