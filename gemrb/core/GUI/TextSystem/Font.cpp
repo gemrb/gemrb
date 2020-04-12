@@ -410,7 +410,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			word = line.substr(linePos, wordBreak - linePos);
 		}
 
-		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, true};
+		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, 0, true};
 		int wordW = StringSize(word, &metrics).w;
 		if (dp.x == 0 && metrics.forceBreak) {
 			done = true;
@@ -559,7 +559,7 @@ size_t Font::Print(Region rgn, const String& string,
 			stringSize.h = LineHeight;
 		} else {
 			stringSize = rgn.Dimensions();
-			StringSizeMetrics metrics = {stringSize, 0, true};
+			StringSizeMetrics metrics = {stringSize, 0, 0, true};
 			stringSize = StringSize(string, &metrics);
 			if (alignment&IE_FONT_NO_CALC && metrics.numChars < string.length()) {
 				// PST GUISTORE, not sure what else
