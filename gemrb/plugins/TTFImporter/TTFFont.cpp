@@ -50,10 +50,10 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		// TODO: make this work on BE systems
 		// TODO: maybe we want to work with non-unicode fonts?
 		iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.encoding.c_str());
-	#if __FreeBSD__
-		size_t ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
-	#else
+	#if ICONV_ACCEPTS_NONCONST_INPUT
 		size_t ret = iconv(cd, &oldchar, &in, &newchar, &out);
+	#else
+		size_t ret = iconv(cd, (const char **)&oldchar, &in, &newchar, &out);
 	#endif
 		if (ret != GEM_OK) {
 			Log(ERROR, "FONT", "iconv error: %d", errno);

@@ -51,14 +51,9 @@ Button::Button(Region& frame)
 	ResetEventHandler( MouseOverButton );
 
 	hasText = false;
-	font = core->GetButtonFont();
 	normal_palette = NULL;
-	disabled_palette = font->GetPalette()->Copy();
-	for (int i = 0; i < 256; i++) {
-		disabled_palette->col[i].r = ( disabled_palette->col[i].r * 2 ) / 3;
-		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
-		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
-	}
+	disabled_palette = NULL;
+	SetFont(core->GetButtonFont());
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	Picture = NULL;
@@ -280,7 +275,7 @@ void Button::DrawInternal(Region& rgn)
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Palette* ppoi = normal_palette;
-		int align = 0;
+		ieByte align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED)
 			ppoi = disabled_palette;
@@ -302,23 +297,26 @@ void Button::DrawInternal(Region& rgn)
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
-		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
-			align |= IE_FONT_SINGLE_LINE;
-		}
-
 		Region r = rgn;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
 		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
-				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM |
-					IE_GUI_BUTTON_MULTILINE) & Flags) {
+				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM) & Flags) {
 			// FIXME: I'm unsure when exactly this adjustment applies...
-			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
+			r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+		} else {
+			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
+			font->StringSize(Text, &metrics);
+
+			if (metrics.numLines > 1) {
+				// FIXME: I'm unsure when exactly this adjustment applies...
+				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+			}
 		}
 
-		font->Print( r, Text, ppoi, (ieByte) align );
+		font->Print( r, Text, ppoi, align );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
@@ -372,6 +370,9 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
+	gamedata->FreePalette(disabled_palette);
+	disabled_palette = font->GetPalette()->Copy();
+	disabled_palette->Darken();
 }
 
 bool Button::WantsDragOperation()
@@ -734,7 +735,11 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 void Button::SetTextColor(const Color &fore, const Color &back)
 {
 	gamedata->FreePalette( normal_palette );
+	gamedata->FreePalette(disabled_palette);
+
 	normal_palette = new Palette( fore, back );
+	disabled_palette = new Palette(fore, back);
+	disabled_palette->Darken();
 	MarkDirty();
 }
 

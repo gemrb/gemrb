@@ -7297,4 +7297,16 @@ void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
 	Sender->SetWait(1);
 }
 
+void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+
+	// TODO: ensure it's using the inventory/CREItem flags, not Item — IE_ITEM_ADAMANTINE won't work as an input otherwise
+	Actor *actor = (Actor *) tar;
+	actor->inventory.DestroyItem("", parameters->int0Parameter, ~0);
+}
+
 }

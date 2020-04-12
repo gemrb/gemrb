@@ -38,6 +38,7 @@ Palette* GemMarkupParser::GetSharedPalette(const String& colorString)
 	palCol.g = g;
 	palCol.b = b;
 	Palette* pal = new Palette(palCol, ColorBlack);
+	pal->CreateShadedAlphaChannel();
 	PalCache.insert(std::make_pair(colorString, pal));
 	pal->release();
 	return pal;

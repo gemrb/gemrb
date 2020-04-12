@@ -356,6 +356,9 @@ def AIPress (toggle=1):
 		Button.SetTooltip (AITip['Enable'])
 		Button.SetState(IE_GUI_BUTTON_NORMAL)
 
+	if GameCheck.IsPST ():
+		GemRB.SetGlobal ("partyScriptsActive", "GLOBALS", AI)
+
 	#force redrawing, in case a hotkey triggered this function
 	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
@@ -1619,7 +1622,7 @@ def UpdatePortraitWindow ():
 			continue
 
 		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | \
-						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_MULTILINE | IE_GUI_BUTTON_ALIGN_BOTTOM
+						IE_GUI_BUTTON_DRAGGABLE | IE_GUI_BUTTON_ALIGN_BOTTOM
 		if GameCheck.IsIWD2():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
@@ -1710,7 +1713,7 @@ def UpdateAnimatedPortrait (Window,i):
 	else:
 		cycle = 0
 
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE |IE_GUI_BUTTON_MULTILINE, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 	if cycle<6:
 		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 

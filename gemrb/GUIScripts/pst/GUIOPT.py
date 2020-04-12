@@ -76,8 +76,7 @@ def OpenOptionsWindow ():
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-		button.SetFlags (IE_GUI_BUTTON_MULTILINE, OP_OR)
-	
+
 	# Return to Game
 	ConfigOptButton(Window.GetControl (0), 28638, OpenOptionsWindow)
 

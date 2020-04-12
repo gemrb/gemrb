@@ -48,14 +48,14 @@ You can also help by:
 emails at [gemrb-commits](https://sourceforge.net/p/gemrb/mailman/))
 - researching the behaviour of the originals:
   - reports tagged with [research needed](https://github.com/gemrb/gemrb/labels/research%20needed)
-  - other open [questions](http://www.gemrb.org/wiki/doku.php?id=developers:ietesting)
-  - reverse engineering the original binaries (there is an IDA pro db available for a faster start)
-  - check questions about IESDP (forum)
+  - reverse engineering the original binaries
+  - check questions about IESDP ([forum](https://www.gibberlings3.net/forums/forum/54-iesdp-updates-and-info/))
 
-If you're a web developer, see this [report](https://github.com/gemrb/gemrb/issues/116).
+If you're a web developer, check the website [reports](https://github.com/gemrb/gemrb.github.io/issues).
 
 
 ### Modders, game designers and artists
+
 1. GemRB comes with a bundled demo, but it is trivial. The challenge is to enhance it, but
 a lot of (compatibly licensed) art is missing. See also the docs on
 [creating a new game](http://www.gemrb.org/wiki/doku.php?id=newgame:newgame)
@@ -65,7 +65,7 @@ The [mod idea page](http://www.gemrb.org/wiki/doku.php?id=developers:mods) also 
 several ideas from simple tweaks to more complex mods.  If you know WeiDU, a good task would be to add
 more of the documented tweaks (idea page) to the tweakpack.
 
-3. Modders can also contribute with research (see above), especially when it requires WeiDU test beds.
+3. Modders can also contribute with research (see above), especially when it requires WeiDU test mods.
 
 
 ### Everyone else
@@ -92,7 +92,8 @@ Let us know of any articles, buzz or other materials you find about GemRB.
 You can suggest cool screenshots or fanart for the gallery and videos
 for the [video playlist](https://www.youtube.com/playlist?list=PL0AE43FB55973C06A).
 
-If you're a web designer, see this [report](https://github.com/gemrb/gemrb/issues/116).
+If you're a web designer, check the website [repo](https://github.com/gemrb/gemrb.github.io)
+and suggest improvements.
 
 And finally, do what you want, as long as it is beneficial to the project. :)
 
@@ -130,19 +131,24 @@ so we can improve our process and documentation!
 
 
 ## Useful tools
-- gdb
-  You can use the following to automatically run gemrb and already start with a
-  breakpoint in `abort()`:
-    `gdb -q -iex "set breakpoint pending on" -iex "b abort" -ex run --args path/to/gemrb -c agame.cfg`
-  (available as a script in `admin/run.gdb`)
-- valgrind
-  We bundle a suppression file for upstream problems at testing/python.supp
-  You can use it for example this way (if running from the build dir):
-    `valgrind --track-origins=yes --suppressions=../testing/python.supp gemrb/gemrb -c agame.cfg &> valgrind.log`
-  (available as a script in `admin/run.valgrind`)
+- gdb / `admin/run.gdb`
+
+You can use the following to automatically run gemrb and already start with a
+breakpoint in `abort()`:
+
+    gdb -q -iex "set breakpoint pending on" -iex "b abort" -ex run --args path/to/gemrb -c agame.cfg
+
+- valgrind / `admin/run.valgrind`
+
+We bundle a suppression file for upstream problems at `testing/python.supp`.
+You can use it for example this way (if running from the build dir):
+
+    valgrind --track-origins=yes --suppressions=../testing/python.supp gemrb/gemrb -c agame.cfg &> valgrind.log
+
 - `git diff` display for IE binary formats
-  Check out `admin/enable-ie-git-diff` if you want `git log` and others to be able
-  to display diffs of included binary files (spells and other overrides).
+
+Check out `admin/enable-ie-git-diff` if you want `git log` and others to be able
+to display diffs of included binary files (spells and other overrides).
 
 
 ## Version tracking
@@ -159,7 +165,7 @@ All of this makes reviewing and bisecting for regressions easier.
 1. Squash merge only if the history is a mess or it makes more
 sense (eg. consecutive commits through the github website). 
 2. For release planning check the milestones and any pending pull requests.
-2.1. When starting the final approach, use `admin/github_release.checklist`
+  2.1. When starting the final approach, use `admin/github_release.checklist`
 as a template to track progress in a dedicated issue.
 3. Releases are usually made when larger pieces of work land or many smaller
 fixes have accrued.

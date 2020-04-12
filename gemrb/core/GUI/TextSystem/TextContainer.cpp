@@ -106,7 +106,7 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 			drawRegion.w = rgn.w - p.x;
 			maxSize.w = drawRegion.w;
 		} else {
-			Font::StringSizeMetrics metrics = {maxSize, 0, true};
+			Font::StringSizeMetrics metrics = {maxSize, 0, 0, true};
 			drawRegion.w = layoutFont->StringSize(text, &metrics).w;
 		}
 	}
@@ -115,7 +115,7 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 			// take remainder of parent height
 			drawRegion.h = rgn.w - p.y;
 		} else {
-			Font::StringSizeMetrics metrics = {maxSize, 0, true};
+			Font::StringSizeMetrics metrics = {maxSize, 0, 0, true};
 			drawRegion.h = layoutFont->StringSize(text, &metrics).h;
 		}
 	}
@@ -206,7 +206,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
 					const String& substr = text.substr(numPrinted, subLen);
-					Font::StringSizeMetrics metrics = {lineSegment.Dimensions(), 0, lineSegment.w == lineRgn.w};
+					Font::StringSizeMetrics metrics = {lineSegment.Dimensions(), 0, 0, lineSegment.w == lineRgn.w};
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);

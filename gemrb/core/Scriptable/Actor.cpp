@@ -1433,7 +1433,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 
 	// always draw it for party members; the rest must not be invisible to have it;
 	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
-	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible)) {
+	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hc_flags[idx] & HC_INVISIBLE)) {
 		delete sca;
 		return;
 	}
@@ -2783,6 +2783,8 @@ static void InitActorTables()
 			// iwd1 has a practically empty ids though, so force a minimum
 			SpellStatesSize = std::max(6, (numstates >> 5) + 1);
 		}
+	} else {
+		SpellStatesSize = 6;
 	}
 
 	// modal actions/state data
@@ -10565,11 +10567,12 @@ void Actor::CureInvisibility()
 // removes the sanctuary effect
 void Actor::CureSanctuary()
 {
-	Effect *newfx;
+	// clear the overlay immediately
+	pcf_sanctuary(this, Modified[IE_SANCTUARY], Modified[IE_SANCTUARY] & ~(1<<OV_SANCTUARY));
 
+	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-
 	delete newfx;
 }
 
