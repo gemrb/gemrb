@@ -198,7 +198,8 @@ public:
 		// specifiy behavior of StringSize based on values of struct
 		// StringSize will modify the struct with the results
 		Size size;		// maximum size allowed; updated with actual size <= initial value
-		size_t numChars;// maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
+		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
+		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
 		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
 	};
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;

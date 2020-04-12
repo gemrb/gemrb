@@ -275,7 +275,7 @@ void Button::DrawInternal(Region& rgn)
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Palette* ppoi = normal_palette;
-		int align = 0;
+		ieByte align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED)
 			ppoi = disabled_palette;
@@ -297,23 +297,27 @@ void Button::DrawInternal(Region& rgn)
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
-		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
-			align |= IE_FONT_SINGLE_LINE;
-		}
-
 		Region r = rgn;
 		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
 		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
-				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM |
-					IE_GUI_BUTTON_MULTILINE) & Flags) {
+				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM) & Flags) {
 			// FIXME: I'm unsure when exactly this adjustment applies...
-			r = Region( rgn.x + 5, rgn.y + 5, rgn.w - 10, rgn.h - 10);
+			r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+		} else {
+			Font::StringSizeMetrics metrics;
+			metrics.size = r.Dimensions();
+			font->StringSize(Text, &metrics);
+
+			if (metrics.numLines > 1) {
+				// FIXME: I'm unsure when exactly this adjustment applies...
+				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+			}
 		}
 
-		font->Print( r, Text, ppoi, (ieByte) align );
+		font->Print( r, Text, ppoi, align );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
