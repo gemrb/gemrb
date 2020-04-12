@@ -15903,9 +15903,9 @@ PyDoc_STRVAR( GemRB_internal__doc,
 "This module is only for implementing GUIClass.py."
 "It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp" );
 
-/** Initialization Routine */
+/** Initialize enough to run Python code that is not specific to games. */
 
-bool GUIScript::Init(void)
+bool GUIScript::Init_non_specific (void)
 {
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
@@ -15926,6 +15926,15 @@ bool GUIScript::Init(void)
 	if (!p_GemRB) {
 		return false;
 	}
+
+	return true;
+}
+
+/** Initialization Routine */
+
+bool GUIScript::Init(void)
+{
+	GUIScript::Init_non_specific ();
 
 	char string[_MAX_PATH+200];
 
