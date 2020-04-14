@@ -33,6 +33,8 @@
 #ifdef WIN32
 #include <string.h>
 #include <windows.h>
+#include <tchar.h>
+#include <strsafe.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -44,8 +46,10 @@
 namespace GemRB {
 
 #ifdef WIN32
+#define TCHAR_FORMAT "%ls"
 typedef HMODULE LibHandle;
 #else
+#define TCHAR_FORMAT "%s"
 typedef void *LibHandle;
 #endif
 
