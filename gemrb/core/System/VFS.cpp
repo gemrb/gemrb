@@ -64,10 +64,12 @@
 
 #ifdef WIN32
 
+#include <tchar.h>
+
 using namespace GemRB;
 
 struct DIR {
-	char path[_MAX_PATH];
+	TCHAR path[_MAX_PATH];
 	bool is_first;
 	struct _finddata_t c_file;
 	intptr_t hFile;
@@ -77,36 +79,43 @@ struct dirent {
 	char d_name[_MAX_PATH];
 };
 
+
 // buffer which readdir returns
 static dirent de;
 
+#define STRSAFE_NO_DEPRECATE
+#include <strsafe.h>
+
 static DIR* opendir(const char* filename)
 {
+	TCHAR t_filename[_MAX_PATH] = {0};
 	DIR* dirp = ( DIR* ) malloc( sizeof( DIR ) );
 	dirp->is_first = 1;
 
-	sprintf( dirp->path, "%s%s*.*", filename, SPathDelimiter );
-	//if((hFile = (long)_findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
+	mbstowcs(t_filename, filename, _MAX_PATH - 1);
+	StringCbPrintf(dirp->path, _MAX_PATH * sizeof(TCHAR), TEXT("%s%s*.*"), t_filename, SPathDelimiter);
 
 	return dirp;
 }
 
 static dirent* readdir(DIR* dirp)
 {
-	struct _finddata_t c_file;
+	struct _tfinddata_t c_file;
 
 	if (dirp->is_first) {
 		dirp->is_first = 0;
-		dirp->hFile = _findfirst( dirp->path, &c_file );
+		dirp->hFile = _tfindfirst(dirp->path, &c_file);
 		if (dirp->hFile == -1L)
 			return NULL;
 	} else {
-		if (_findnext( dirp->hFile, &c_file ) != 0) {
+		if (_tfindnext(dirp->hFile, &c_file) != 0) {
 			return NULL;
 		}
 	}
 
-	strcpy( de.d_name, c_file.name );
+	TCHAR td_name[_MAX_PATH];
+	StringCbCopy(td_name, _MAX_PATH, c_file.name);
+	wcstombs(de.d_name, td_name, _MAX_PATH);
 
 	return &de;
 }
@@ -206,7 +215,6 @@ char* PathAppend (char* target, const char* name)
 
 	return target;
 }
-
 
 static bool FindInDir(const char* Dir, char *Filename)
 {
@@ -576,6 +584,5 @@ void DirectoryIterator::Rewind()
 	else
 		this->operator++();
 }
-
 
 }
