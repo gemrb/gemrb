@@ -23,6 +23,11 @@
 
 // NOTE: Python.h has to be included first.
 
+// This definition needs to be here to keep mingw happy with standard python.org packages
+#if _MINGW32_
+#define hypot _hypot
+#endif
+
 #if defined(WIN32) && defined(_DEBUG)
 #undef _DEBUG
 #include <Python.h>
