@@ -69,6 +69,8 @@
 
 /// Disable silly MSVC warnings
 #if _MSC_VER >= 1000
+//  4267 disables the warnings related to conversion between size_t and other types 
+#	pragma warning( disable: 4267 )
 //	4251 disables the annoying warning about missing dll interface in templates
 #	pragma warning( disable: 4251 521 )
 #	pragma warning( disable: 4275 )
