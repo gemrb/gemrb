@@ -57,8 +57,6 @@
 
 #include <algorithm>
 #include <climits>
-#include <cstdio>
-#include <cstdlib>
 #ifndef WIN32
 # include <sys/time.h>
 #endif
