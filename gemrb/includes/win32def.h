@@ -39,6 +39,9 @@
 # define NOMINMAX
 # endif
 
+#define UNICODE
+#define _UNICODE
+
 # include <windows.h>
 # define swprintf  _snwprintf
 # define vswprintf _vsnwprintf

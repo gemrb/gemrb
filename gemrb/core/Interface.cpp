@@ -1441,7 +1441,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	if ( StupidityDetector( CachePath )) {
 		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
-		return false;
+		return GEM_ERROR;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
 
