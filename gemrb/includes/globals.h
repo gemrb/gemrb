@@ -45,8 +45,6 @@
 # define S_IWRITE S_IWUSR
 #endif
 
-#ifndef GLOBALS_ONLY_DEFS
-
 #include "RGBAColor.h"
 #include "SClassID.h"
 #include "errors.h"
@@ -62,8 +60,6 @@
 #ifndef WIN32
 # include <sys/time.h>
 #endif
-
-#endif //GLOBALS_ONLY_DEFS
 
 namespace GemRB {
 
