@@ -54,9 +54,6 @@
 #include "System/DataStream.h"
 #include "System/String.h"
 
-#include <algorithm>
-#include <cstdio>
-#include <cstdlib>
 #ifndef WIN32
 # include <sys/time.h>
 #endif
