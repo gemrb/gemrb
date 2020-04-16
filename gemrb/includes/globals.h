@@ -55,15 +55,16 @@
 #include "System/DataStream.h"
 #include "System/String.h"
 
-#include <algorithm>
-#include <climits>
-#ifndef WIN32
+#ifdef WIN32
+# include <algorithm>
+#else
 # include <sys/time.h>
 #endif
 
 #include "System/Logging.h"
 
 #include <bitset>
+#include <climits>
 
 namespace GemRB {
 
