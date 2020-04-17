@@ -127,7 +127,7 @@ void Tooltip::SetText(const String& t)
 {
 	text = t;
 
-	Font::StringSizeMetrics metrics = {Size(), 0, true};
+	Font::StringSizeMetrics metrics = {Size(), 0, 0, true};
 	// FIXME: arbitrary fallback size
 	metrics.size = (background) ? background->MaxTextSize() : Size(128,128);
 	textSize = font->StringSize( text, &metrics );
