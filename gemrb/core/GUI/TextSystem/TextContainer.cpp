@@ -709,7 +709,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 
 	if (Editable() && printPos < cursorPos && printPos + textLen >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
-		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
+		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};
 
 		// diff is the length of the TextSpan we want however, it may fall inside of a word
 		size_t diff = cursorPos - printPos;
@@ -772,7 +772,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 		TextSpan* ts = (TextSpan*)layout->content;
 		const String& text = ts->Text();
 		const Font* printFont = ts->LayoutFont();
-		Font::StringSizeMetrics metrics = {Size(0,0), 0, true};
+		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};
 		size_t numChars = 0;
 
 		const Regions& regions = layout->regions;
