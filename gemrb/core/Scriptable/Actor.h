@@ -353,8 +353,8 @@ public:
 	ieDword TargetDoor;
 
 	EffectQueue fxqueue;
-	vvcVector vvcOverlays;
-	vvcVector vvcShields;
+	mutable vvcVector vvcOverlays; // FIXME: this should not be mutable
+	mutable vvcVector vvcShields; // FIXME: this should not be mutable
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
@@ -407,7 +407,7 @@ private:
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox, Animation** anims,
-						 unsigned char Face, const Color& tint, bool useShadowPalette = false);
+						 unsigned char Face, const Color& tint, bool useShadowPalette = false) const;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -759,7 +759,7 @@ public:
 	ScriptedAnimation *FindOverlay(int index) const;
 	bool ForceDither() const;
 	/* draw videocells */
-	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint);
+	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint) const;
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();

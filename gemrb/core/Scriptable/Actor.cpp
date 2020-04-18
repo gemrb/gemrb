@@ -8149,7 +8149,7 @@ bool Actor::ForceDither() const
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Color &tint)
+void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Color &tint) const
 {
 	Map* area = GetCurrentArea();
 
@@ -8170,7 +8170,7 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 }
 
 void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox, Animation** anims,
-							unsigned char Face, const Color& tint, bool useShadowPalette)
+							unsigned char Face, const Color& tint, bool useShadowPalette) const
 {
 	if (!bbox.IntersectsRegion(vp)) {
 		return;
