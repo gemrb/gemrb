@@ -1703,7 +1703,7 @@ void Selectable::SetBBox(const Region &newBBox)
 	BBox = newBBox;
 }
 
-void Selectable::DrawCircle(const Region &vp)
+void Selectable::DrawCircle(const Region &vp) const
 {
 	/* BG2 colours ground circles as follows:
 	dark green for unselected party members
@@ -1720,7 +1720,7 @@ void Selectable::DrawCircle(const Region &vp)
 	}
 
 	Color mix;
-	Color* col = &selectedColor;
+	const Color* col = &selectedColor;
 	Sprite2D* sprite = circleBitmap[0];
 
 	if (Selected && !Over) {
