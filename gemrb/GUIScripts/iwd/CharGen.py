@@ -555,9 +555,6 @@ def SetCharacterDescription():
 		if PriestSpell == "*":
 			PriestSpell = DruidSpell
 		if PriestSpell!="*":
-			TextArea.Append ("\n")
-			TextArea.Append (11028)
-			TextArea.Append (":\n")
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 			if PriestSpell == "MXSPLPRS" or PriestSpell == "MXSPLPAL":
 				ClassFlag = 0x4000
@@ -568,11 +565,15 @@ def SetCharacterDescription():
 
 			Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, 1)
 			PriestMemorized = GemRB.GetVar ("PriestMemorized")
-			for i in range (len(Learnable)):
-				if (1 << i) & PriestMemorized:
-					Spell = GemRB.GetSpell (Learnable[i])
-					TextArea.Append (Spell["SpellName"])
-					TextArea.Append (" +\n")
+			if (PriestMemorized != 0):
+				TextArea.Append ("\n")
+				TextArea.Append (11028)
+				TextArea.Append ("\n")
+				for i in range (len(Learnable)):
+					if (1 << i) & PriestMemorized:
+						Spell = GemRB.GetSpell (Learnable[i])
+						TextArea.Append (Spell["SpellName"])
+						TextArea.Append (" +\n")
 	return
 
 
@@ -2720,7 +2721,7 @@ def ImportPress():
 
 def ImportDonePress():
 	global CharGenWindow, ImportWindow, CharImportList
-	global CharGenState, SkillsState, Portrait, ImportedChar
+	global CharGenState, SkillsState, Portrait, ImportedChar, HasStrExtra
 
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
@@ -2731,6 +2732,9 @@ def ImportDonePress():
 	GemRB.SetToken ("LargePortrait", PortraitName )
 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	Portrait = -1
+
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
 
 	ImportedChar = 1
 	CharGenState = 7
