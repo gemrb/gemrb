@@ -86,7 +86,7 @@ public:
 	T& operator*() const { return *ptr; }
 	T* operator->() const { return ptr; }
 
-	operator bool() const { return ptr != nullptr; }
+	explicit operator bool() const noexcept { return ptr != nullptr; }
 	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
@@ -100,25 +100,25 @@ protected:
 template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return !lhs;
+    return !bool(lhs);
 }
 
 template<class T>
 inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return !rhs;
+    return !bool(rhs);
 }
 
 template<class T>
 inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return lhs;
+    return bool(lhs);
 }
 
 template<class T>
 inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return rhs;
+    return bool(rhs);
 }
 
 }
