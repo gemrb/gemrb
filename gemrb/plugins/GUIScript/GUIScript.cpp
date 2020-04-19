@@ -1075,7 +1075,7 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 			return AttributeError( GemRB_LoadWindowFrame__doc );
 		}
 
-		ResourceHolder<ImageMgr> im(ResRef[i]);
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef[i]);
 		if (im == nullptr) {
 			return NULL;
 		}
@@ -1159,7 +1159,7 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	ResourceHolder<ImageMgr> mos(MosResRef);
+	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosResRef);
 	if (mos != nullptr) {
 		win->SetBackGround( mos->GetSprite2D(), true );
 	}
@@ -3264,7 +3264,7 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 	}
 
 	if (ResRef[0]) {
-		ResourceHolder<ImageMgr> im(ResRef);
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef);
 		if (im == nullptr) {
 			return RuntimeError("Picture resource not found!\n");
 		}
@@ -4232,11 +4232,11 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
 
-		ResourceHolder<ImageMgr> anim(Flag);
+		ResourceHolder<ImageMgr> anim = GetResourceHolder<ImageMgr>(Flag);
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
 		}
-		ResourceHolder<ImageMgr> anim2(Flag2);
+		ResourceHolder<ImageMgr> anim2 = GetResourceHolder<ImageMgr>(Flag2);
 		if (anim2) {
 			map->Flag[1] = anim2->GetSprite2D();
 		}
@@ -5169,7 +5169,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	ResourceHolder<ImageMgr> im(ResRef);
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef);
 	if (im == nullptr) {
 		return RuntimeError("Picture resource not found!\n");
 	}

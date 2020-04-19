@@ -452,7 +452,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		// dialog speaker pic
 		ieResRef PortraitResRef;
 		strnlwrcpy(PortraitResRef, portrait, 8);
-		ResourceHolder<ImageMgr> im(PortraitResRef, true);
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PortraitResRef, true);
 		Sprite2D* image = NULL;
 		if (im) {
 			// we set the anim picture for the speaker to always be on the side during dialogue,

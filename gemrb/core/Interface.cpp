@@ -1236,7 +1236,7 @@ int Interface::LoadFonts()
 		}
 
 		Font* fnt = NULL;
-		ResourceHolder<FontManager> fntMgr(font_name);
+		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
 		gamedata->FreePalette(pal);
 
@@ -1705,13 +1705,13 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		ResourceHolder<ImageMgr> pal16im(Palette16);
+		ResourceHolder<ImageMgr> pal16im = GetResourceHolder<ImageMgr>(Palette16);
 		if (pal16im)
 			pal16 = pal16im->GetImage();
-		ResourceHolder<ImageMgr> pal32im(Palette32);
+		ResourceHolder<ImageMgr> pal32im = GetResourceHolder<ImageMgr>(Palette32);
 		if (pal32im)
 			pal32 = pal32im->GetImage();
-		ResourceHolder<ImageMgr> pal256im(Palette256);
+		ResourceHolder<ImageMgr> pal256im = GetResourceHolder<ImageMgr>(Palette256);
 		if (pal256im)
 			pal256 = pal256im->GetImage();
 		if (!pal16 || !pal32 || !pal256) {
@@ -2749,7 +2749,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
-		ResourceHolder<ImageMgr> mos(Background);
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(Background);
 		if (mos != nullptr) {
 			win->SetBackGround( mos->GetSprite2D(), true );
 		}
@@ -3513,7 +3513,7 @@ int Interface::PlayMovie(const char* ResRef)
 		}
 	}
 
-	ResourceHolder<MoviePlayer> mp(realResRef);
+	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(realResRef);
 	if (!mp) {
 		gamedata->FreePalette(palette);
 		free(frames);

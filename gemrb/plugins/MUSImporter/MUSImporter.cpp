@@ -309,7 +309,7 @@ void MUSImporter::PlayMusic(char* name)
 		strlcpy(FName, name, _MAX_PATH);
 	}
 
-	ResourceHolder<SoundMgr> sound(FName, manager);
+	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager);
 	if (sound) {
 		int soundID = core->GetAudioDrv()->CreateStream( sound );
 		if (soundID == -1) {
