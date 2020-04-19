@@ -134,7 +134,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 	str->ReadDword(&m->Flags); // TODO: use; only present in EE, so make sure to ignore in other games, since it's not guaranteed to be 0
 
 	// Load map bitmap
-	ResourceHolder<ImageMgr> mos(m->MapResRef);
+	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(m->MapResRef);
 	if (!mos) {
 		Log(ERROR, "WMPImporter", "Worldmap image not found.");
 	} else {

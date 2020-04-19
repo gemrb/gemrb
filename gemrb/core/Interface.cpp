@@ -1186,7 +1186,7 @@ int Interface::LoadFonts()
 		}
 
 		Font* fnt = NULL;
-		ResourceHolder<FontManager> fntMgr(font_name);
+		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
 		gamedata->FreePalette(pal);
 
@@ -1661,9 +1661,19 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		LoadPalette<16>(Palette16, palettes16);
-		LoadPalette<32>(Palette32, palettes32);
-		LoadPalette<256>(Palette256, palettes256);
+		ResourceHolder<ImageMgr> pal16im = GetResourceHolder<ImageMgr>(Palette16);
+		if (pal16im)
+			pal16 = pal16im->GetImage();
+		ResourceHolder<ImageMgr> pal32im = GetResourceHolder<ImageMgr>(Palette32);
+		if (pal32im)
+			pal32 = pal32im->GetImage();
+		ResourceHolder<ImageMgr> pal256im = GetResourceHolder<ImageMgr>(Palette256);
+		if (pal256im)
+			pal256 = pal256im->GetImage();
+		if (!pal16 || !pal32 || !pal256) {
+			Log(FATAL, "Core", "No palettes found.");
+			return GEM_ERROR;
+		}
 		Log(MESSAGE, "Core", "Palettes Loaded");
 	}
 
@@ -2826,7 +2836,7 @@ int Interface::PlayMovie(const char* resref)
 		}
 	}
 
-	ResourceHolder<MoviePlayer> mp(realResRef);
+	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(realResRef);
 	if (!mp) {
 		return -1;
 	}

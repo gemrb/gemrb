@@ -142,7 +142,7 @@ Sprite2D* SaveGame::GetPortrait(int index) const
 	}
 	char nPath[_MAX_PATH];
 	sprintf( nPath, "PORTRT%d", index );
-	ResourceHolder<ImageMgr> im(nPath, manager, true);
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(nPath, manager, true);
 	if (!im)
 		return NULL;
 	return im->GetSprite2D();
@@ -150,7 +150,7 @@ Sprite2D* SaveGame::GetPortrait(int index) const
 
 Sprite2D* SaveGame::GetPreview() const
 {
-	ResourceHolder<ImageMgr> im(Prefix, manager, true);
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(Prefix, manager, true);
 	if (!im)
 		return NULL;
 	return im->GetSprite2D();

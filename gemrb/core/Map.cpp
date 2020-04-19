@@ -4141,7 +4141,7 @@ void Map::SetInternalSearchMap(int x, int y, int value)
 
 void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
-	ResourceHolder<ImageMgr> bmp(bgResRef);
+	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
 
 	if (Background) {
 		Sprite2D::FreeSprite(Background);

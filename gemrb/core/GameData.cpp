@@ -249,7 +249,7 @@ Palette *GameData::GetPalette(const ieResRef resname)
 	if (PaletteCache.RefCount(resname)!=-1) {
 		return NULL;
 	}
-	ResourceHolder<ImageMgr> im(resname);
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resname);
 	if (im == nullptr) {
 		PaletteCache.SetAt(resname, NULL);
 		return NULL;
@@ -495,7 +495,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		ResourceHolder<ImageMgr> img(resname, silent);
+		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resname, silent);
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory( resname );
 			factory->AddFactoryObject( fact );
