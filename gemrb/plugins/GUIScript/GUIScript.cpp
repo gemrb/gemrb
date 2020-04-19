@@ -4740,7 +4740,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	int itflags = DirectoryIterator::Files;
 	itflags |= (dirs) ? DirectoryIterator::Directories : 0;
-	dirit.SetFlags(itflags);
+	dirit.SetFlags(itflags, true);
 
 	std::vector<std::string> strings;
 	if (dirit) {

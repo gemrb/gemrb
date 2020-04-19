@@ -121,7 +121,7 @@ void CachedDirectoryImporter::Refresh()
 	cache.clear();
 
 	DirectoryIterator it(path);
-	it.SetFlags(DirectoryIterator::Files);
+	it.SetFlags(DirectoryIterator::Files, true);
 	if (!it)
 		return;
 

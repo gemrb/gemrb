@@ -177,11 +177,15 @@ void LoadPlugins(const char* pluginpath)
 	const char* pluginExt = "so";
 #endif
 
-	dirIt.SetFilterPredicate(new ExtFilter(pluginExt));
+	dirIt.SetFlags(DirectoryIterator::Files);
+	dirIt.SetFilterPredicate(new ExtFilter(pluginExt)); // rewinds
 
 	typedef std::set<std::string> PathSet;
 	PathSet delayedPlugins;
-	dirIt.SetFlags(DirectoryIterator::Files);
+
+	if (!dirIt) {
+		return;
+	}
 
 	char path[_MAX_PATH];
 	do {
