@@ -250,7 +250,7 @@ Palette *GameData::GetPalette(const ieResRef resname)
 		return NULL;
 	}
 	ResourceHolder<ImageMgr> im(resname);
-	if (im == NULL) {
+	if (im == nullptr) {
 		PaletteCache.SetAt(resname, NULL);
 		return NULL;
 	}
@@ -520,7 +520,7 @@ Store* GameData::GetStore(const ieResRef ResRef)
 
 	DataStream* str = gamedata->GetResource(ResRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
+	if (sm == nullptr) {
 		delete ( str );
 		return NULL;
 	}
@@ -549,7 +549,7 @@ void GameData::SaveStore(Store* store)
 	}
 
 	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
+	if (sm == nullptr) {
 		error("GameData", "Can't save store to cache.");
 	}
 

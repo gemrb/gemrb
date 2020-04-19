@@ -2991,7 +2991,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
-	assert(eM != NULL);
+	assert(eM != nullptr);
 
 	std::list< Effect* >::const_iterator f=actor->fxqueue.GetFirstEffect();
 	for(unsigned int i=0;i<EffectsCount;i++) {

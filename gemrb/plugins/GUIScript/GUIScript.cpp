@@ -1076,7 +1076,7 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 		}
 
 		ResourceHolder<ImageMgr> im(ResRef[i]);
-		if (im == NULL) {
+		if (im == nullptr) {
 			return NULL;
 		}
 
@@ -1160,7 +1160,7 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	ResourceHolder<ImageMgr> mos(MosResRef);
-	if (mos != NULL) {
+	if (mos != nullptr) {
 		win->SetBackGround( mos->GetSprite2D(), true );
 	}
 	win->Invalidate();
@@ -1507,7 +1507,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	if (col == -1) {
@@ -1547,7 +1547,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	int row = tm->GetRowIndex( rowname );
@@ -1582,7 +1582,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	const char* str = tm->GetRowName( row );
@@ -1621,7 +1621,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	int col = tm->GetColumnIndex( colname );
@@ -1656,7 +1656,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	const char* str = tm->GetColumnName( col );
@@ -1692,7 +1692,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 
@@ -1727,7 +1727,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 
@@ -3265,7 +3265,7 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 
 	if (ResRef[0]) {
 		ResourceHolder<ImageMgr> im(ResRef);
-		if (im == NULL) {
+		if (im == nullptr) {
 			return RuntimeError("Picture resource not found!\n");
 		}
 
@@ -5170,7 +5170,7 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 	}
 
 	ResourceHolder<ImageMgr> im(ResRef);
-	if (im == NULL) {
+	if (im == nullptr) {
 		return RuntimeError("Picture resource not found!\n");
 	}
 

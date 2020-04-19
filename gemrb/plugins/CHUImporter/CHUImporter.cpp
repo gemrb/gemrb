@@ -107,7 +107,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos(MosFile);
-		if (mos != NULL) {
+		if (mos != nullptr) {
 			win->SetBackGround( mos->GetSprite2D(), true );
 		}
 	}
