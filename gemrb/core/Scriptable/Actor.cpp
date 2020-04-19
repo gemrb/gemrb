@@ -7798,19 +7798,34 @@ void Actor::UpdateActorState()
 		}
 	}
 
-	if (attackProjectile) {
-		unsigned char StanceID = GetStance();
-		unsigned char Face = GetOrientation();
-		CharAnimations* ca = GetAnims();
+	unsigned char StanceID = GetStance();
+	unsigned char Face = GetOrientation();
+	CharAnimations* ca = GetAnims();
+	if (ca) {
 		Animation** anims = ca->GetAnimation( StanceID, Face );
+		if (attackProjectile) {
+			unsigned int frameCount = anims[0]->GetFrameCount();
+			unsigned int currentFrame = anims[0]->GetCurrentFrame();
+			//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+			// however some critters don't have that long animations (eg. squirrel 0xC400)
+			if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+				GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+				attackProjectile = NULL;
+			}
+		}
 
-		unsigned int frameCount = anims[0]->GetFrameCount();
-		unsigned int currentFrame = anims[0]->GetCurrentFrame();
-		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
-		// however some critters don't have that long animations (eg. squirrel 0xC400)
-		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-			attackProjectile = NULL;
+		if (anims[0]->endReached == false) {
+			//check if walk sounds need to be played
+			//dialog, pause game
+			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+				//footsteps option set, stance
+				if (footsteps && (GetStance() == IE_ANI_WALK)) {
+					//frame reached 0
+					if (!anims[0]->GetCurrentFrame()) {
+						PlayWalkSound();
+					}
+				}
+			}
 		}
 	}
 
@@ -8413,20 +8428,6 @@ bool Actor::UpdateDrawingState()
 		int PartCount = ca->GetTotalPartCount();
 		Animation** shadows = ca->GetShadowAnimation(StanceID, Face);
 		AdvanceAnimations(anims, shadows, PartCount);
-
-		if (anims[0]->endReached == false) {
-			//check if walk sounds need to be played
-			//dialog, pause game
-			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-				//footsteps option set, stance
-				if (footsteps && (GetStance() == IE_ANI_WALK)) {
-					//frame reached 0
-					if (!anims[0]->GetCurrentFrame()) {
-						PlayWalkSound();
-					}
-				}
-			}
-		}
 
 		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
 
