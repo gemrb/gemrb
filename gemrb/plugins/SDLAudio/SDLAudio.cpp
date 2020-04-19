@@ -145,7 +145,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	}
 
 	// TODO: move this loading code somewhere central
-	ResourceHolder<SoundMgr> acm(ResRef);
+	ResourceHolder<SoundMgr> acm = GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
 		print("failed acm load");
 		return Holder<SoundHandle>();
