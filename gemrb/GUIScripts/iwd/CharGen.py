@@ -292,6 +292,9 @@ def BackPress():
 		SkillsButton.SetState (IE_GUI_BUTTON_ENABLED)
 		SkillsButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 		SkillsState = 0
+		#remove all known spells and nullify the memorizable counts
+		Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
+		Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 	elif CharGenState == 6:
 		NameButton.SetState (IE_GUI_BUTTON_DISABLED)
 		BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -310,8 +313,7 @@ def CancelPress():
 	GemRB.SetNextScript ("PartyFormation")
 	return
 
-def AcceptPress():
-	#mage spells
+def LearnSpells(MyChar):
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
@@ -353,8 +355,11 @@ def AcceptPress():
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
+def AcceptPress():
 	# apply class/kit abilities
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
+	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 
 	TmpTable = GemRB.LoadTable ("repstart")
 	t = CommonTables.Aligns.FindValue (3, t)
@@ -364,7 +369,6 @@ def AcceptPress():
 	if MyChar == 1:
 		GemRB.GameSetReputation (t)
 
-	print "Reputation", t
 	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (ClassName, "ROLLS") #number of dice
 	b = TmpTable.GetValue (ClassName, "SIDES") #size
@@ -523,22 +527,13 @@ def SetCharacterDescription():
 					TextArea.Append ("%\n")
 
 		if MageSpell !="*":
-			info = GetKnownSpellsInfo (IE_SPELL_TYPE_WIZARD)
-			if info == "":
-				Learnable = Spellbook.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), Alignment, 1)
-				MageSpellBook = GemRB.GetVar ("MageSpellBook")
-				MageMemorized = GemRB.GetVar ("MageMemorized")
-				info = GetLearnableSpellInfo (Learnable, MageSpellBook, MageMemorized)
+			info = Spellbook.GetKnownSpellsDescription(MyChar, IE_SPELL_TYPE_WIZARD)
 			TextArea.Append ("\n" + GemRB.GetString(11027) + "\n" + info)
 
 		if PriestSpell == "*":
 			PriestSpell = DruidSpell
 		if PriestSpell!="*":
-			info = GetKnownSpellsInfo (IE_SPELL_TYPE_PRIEST)
-			if info == "":
-				Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, Alignment, 1)
-				PriestMemorized = GemRB.GetVar ("PriestMemorized")
-				info = GetLearnableSpellInfo (Learnable, PriestMemorized)
+			info = Spellbook.GetKnownSpellsDescription(MyChar, IE_SPELL_TYPE_PRIEST)
 			TextArea.Append ("\n" + GemRB.GetString(11028) + "\n" + info)
 
 		TextArea.Append ("\n")
@@ -558,36 +553,12 @@ def SetCharacterDescription():
 	return
 
 def GetClassFlag(TableName):
-	if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
+	if TableName in ("MXSPLPRS", "MXSPLPAL"):
+		return 0x4000
+	elif TableName in ("MXSPLDRU", "MXSPLRAN"):
 		return 0x8000
-	elif TableName == "MXSPLDRU":
-		return 0x4000
-	elif TableName == "MXSPLRAN":
-		return 0x4000
 	else:
 		return 0
-
-def GetLearnableSpellInfo(Learnable, SpellBook, SpellToMark = 0):
-	info = ""
-	for i, SpellRef in enumerate (Learnable):
-		if (1 << i) & SpellBook:
-			Spell = GemRB.GetSpell (SpellRef)
-			info += GemRB.GetString (Spell["SpellName"])
-			if (1 << i) & SpellToMark:
-				info += " +"
-			info += "\n"
-	return info
-
-
-def GetKnownSpellsInfo(SpellType):
-	global MyChar
-	info = ""
-	for level in range(0, 9):
-		for j in reversed (range(0, GemRB.GetKnownSpellsCount (MyChar, SpellType, level) )):
-			Spell = GemRB.GetKnownSpell (MyChar, SpellType, level, j)
-			Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
-			info += GemRB.GetString (Spell) + "\n"
-	return info
 
 # Gender Selection
 def GenderPress():
@@ -787,9 +758,8 @@ def CGLargeCustomPortrait():
 	if Portrait=="":
 		Portrait = "NOPORTMD"
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList2.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif PortraitList2.QueryText ()!="":
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	Button = Window.GetControl (0)
 	Button.SetPicture (Portrait, "NOPORTMD")
@@ -810,9 +780,8 @@ def CGSmallCustomPortrait():
 	if Portrait=="":
 		Portrait = "NOPORTSM"
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList1.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif PortraitList1.QueryText ()!="":
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (Portrait, "NOPORTSM")
@@ -1047,7 +1016,6 @@ def ClassMultiPress():
 	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = CommonTables.Races.GetRowName (RaceRow)
 
-	print "Multi racename:", RaceName
 	for i in range (2, 10):
 		ClassMultiSelectButton = ClassMultiWindow.GetControl (i)
 		ClassMultiSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
@@ -1055,10 +1023,10 @@ def ClassMultiPress():
 	j = 2
 	for i in range (ClassCount):
 		ClassName = CommonTables.Classes.GetRowName (i)
-		if (CommonTables.Classes.GetValue (ClassName, "MULTI") > 0):
+		if CommonTables.Classes.GetValue (ClassName, "MULTI") > 0:
 			ClassMultiSelectButton = ClassMultiWindow.GetControl (j)
 			j = j + 1
-			if (CommonTables.Classes.GetValue (ClassName, RaceName) > 0):
+			if CommonTables.Classes.GetValue (ClassName, RaceName) > 0:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1559,6 +1527,7 @@ def SkillsPress():
 	IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 	LUSkillsSelection.SkillsNullify (MyChar)
+	LearnSpells(MyChar)
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
@@ -1628,11 +1597,11 @@ def SkillsSelect():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindow (6)
 
-	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
-		GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL),
+		GemRB.GetPlayerStat (MyChar, IE_LEVEL2),
 		GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
-	LUSkillsSelection.SetupSkillsWindow (MyChar, \
+	LUSkillsSelection.SetupSkillsWindow (MyChar,
 		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillsWindow, RedrawSkills, [0,0,0], Levels, 0, False)
 
 	SkillsPointsLeft = GemRB.GetVar ("SkillPointsLeft")
