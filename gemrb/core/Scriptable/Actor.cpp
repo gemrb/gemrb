@@ -7754,7 +7754,71 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 }
 
-void Actor::UpdateActorState(ieDword gameTime) {
+void Actor::UpdateActorState()
+{
+	if (InTrap) {
+		area->ClearTrap(this, InTrap-1);
+	}
+
+	Game* game = core->GetGame();
+
+	//make actor unselectable and unselected when it is not moving
+	//dead, petrified, frozen, paralysed or unavailable to player
+	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
+		game->SelectActor(this, false, SELECT_NORMAL);
+	}
+
+	if (remainingTalkSoundTime > 0) {
+		unsigned int currentTick = GetTickCount();
+		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
+		lastTalkTimeCheckAt = currentTick;
+
+		if (diffTime >= remainingTalkSoundTime) {
+			remainingTalkSoundTime = 0;
+		} else {
+			remainingTalkSoundTime -= diffTime;
+		}
+		SetCircleSize();
+	}
+
+	// display pc hitpoints if requested
+	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("HP Over Head", tmp);
+	if (tmp && Persistent() && (game->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
+		DisplayHeadHPRatio();
+	}
+
+	// trigger on-enemy-sighted autopause
+	if (!(InternalFlags & IF_TRIGGER_AP)) {
+		// always recheck in case of EA changes (npc going hostile)
+		if (Modified[IE_EA] > EA_EVILCUTOFF && !(InternalFlags & IF_STOPATTACK)) {
+			InternalFlags |= IF_TRIGGER_AP;
+			core->Autopause(AP_ENEMY, this);
+		}
+	}
+
+	if (attackProjectile) {
+		unsigned char StanceID = GetStance();
+		unsigned char Face = GetOrientation();
+		CharAnimations* ca = GetAnims();
+		Animation** anims = ca->GetAnimation( StanceID, Face );
+
+		unsigned int frameCount = anims[0]->GetFrameCount();
+		unsigned int currentFrame = anims[0]->GetCurrentFrame();
+		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+		// however some critters don't have that long animations (eg. squirrel 0xC400)
+		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			attackProjectile = NULL;
+		}
+	}
+
+	UpdateModalState(game->GameTime);
+}
+
+void Actor::UpdateModalState(ieDword gameTime)
+{
 	if (Modal.LastApplyTime == gameTime) {
 		return;
 	}
@@ -7876,7 +7940,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		// shut everyone up, so they don't whine if the actor is on a long hiding-in-shadows recon mission
 		core->GetGame()->ResetPartyCommentTimes();
 	}
-
 }
 
 void Actor::ApplyModal(ieResRef modalSpell)
@@ -8172,10 +8235,6 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox, Animation** anims,
 							unsigned char Face, const Color& tint, bool useShadowPalette) const
 {
-	if (!bbox.IntersectsRegion(vp)) {
-		return;
-	}
-
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
@@ -8247,46 +8306,8 @@ bool Actor::ShouldHibernate() {
 	return true;
 }
 
-void Actor::UpdateAnimations()
+void Actor::AdvanceAnimations(Animation** anims, Animation** shadowAnimations, size_t count)
 {
-	// TODO: move this
-	if (InTrap) {
-		area->ClearTrap(this, InTrap-1);
-	}
-
-	//make actor unselectable and unselected when it is not moving
-	//dead, petrified, frozen, paralysed or unavailable to player
-	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
-		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	}
-
-	CharAnimations* ca = GetAnims();
-	if (!ca) {
-		return;
-	}
-
-	ca->PulseRGBModifiers();
-
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetNextFace();
-	Animation** anims = ca->GetAnimation( StanceID, Face );
-	if (!anims) {
-		return;
-	}
-	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
-
-	//If you find a better place for it, I'll really be glad to put it there
-	//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
-	// however some critters don't have that long animations (eg. squirrel 0xC400)
-	if (attackProjectile) {
-		unsigned int frameCount = anims[0]->GetFrameCount();
-		unsigned int currentFrame = anims[0]->GetCurrentFrame();
-		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-			attackProjectile = NULL;
-		}
-	}
-
 	// advance first (main) animation by one frame (in sync)
 	if (Immobile()) {
 		// update animation, continue last-displayed frame
@@ -8303,8 +8324,8 @@ void Actor::UpdateAnimations()
 	}
 
 	// update all other animation parts, in sync with the first part
-	int PartCount = ca->GetTotalPartCount();
-	for (int part = 1; part < PartCount; ++part) {
+
+	for (size_t part = 1; part < count; ++part) {
 		if (anims[part])
 			anims[part]->GetSyncedNextFrame(anims[0]);
 	}
@@ -8318,18 +8339,6 @@ void Actor::UpdateAnimations()
 			if (shadowAnimations) {
 				shadowAnimations[0]->endReached = false;
 				shadowAnimations[0]->SetPos(0);
-			}
-		}
-	} else {
-		//check if walk sounds need to be played
-		//dialog, pause game
-		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-			//footsteps option set, stance
-			if (footsteps && (GetStance() == IE_ANI_WALK)) {
-				//frame reached 0
-				if (!anims[0]->GetCurrentFrame()) {
-					PlayWalkSound();
-				}
 			}
 		}
 	}
@@ -8373,16 +8382,76 @@ bool Actor::HasBodyHeat() const
 	return true;
 }
 
-void Actor::Draw(const Region& vp)
+bool Actor::UpdateDrawingState()
 {
 	Map* area = GetCurrentArea();
 	if (!area) {
 		InternalFlags &= ~IF_TRIGGER_AP;
-		return;
+		return false;
 	}
 
-	int cx = Pos.x;
-	int cy = Pos.y;
+	//visual feedback
+	CharAnimations* ca = GetAnims();
+	if (!ca) {
+		InternalFlags &= ~IF_TRIGGER_AP;
+		return false;
+	}
+
+	ca->PulseRGBModifiers();
+
+	unsigned char StanceID = GetStance();
+	unsigned char Face = GetNextFace();
+	Animation** anims = ca->GetAnimation( StanceID, Face );
+	if (anims) {
+		if (Immobile() || !ShouldDrawCircle()) {
+			//set the last frame if actor is died and deactivated
+			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
+				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
+			}
+		}
+
+		int PartCount = ca->GetTotalPartCount();
+		Animation** shadows = ca->GetShadowAnimation(StanceID, Face);
+		AdvanceAnimations(anims, shadows, PartCount);
+
+		if (anims[0]->endReached == false) {
+			//check if walk sounds need to be played
+			//dialog, pause game
+			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+				//footsteps option set, stance
+				if (footsteps && (GetStance() == IE_ANI_WALK)) {
+					//frame reached 0
+					if (!anims[0]->GetCurrentFrame()) {
+						PlayWalkSound();
+					}
+				}
+			}
+		}
+
+		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
+
+		// update bounding box and such
+		if (nextFrame && lastFrame != nextFrame) {
+			Region newBBox;
+			if (PartCount == 1) {
+				newBBox.x = Pos.x - nextFrame->Frame.x;
+				newBBox.w = nextFrame->Frame.w;
+				newBBox.y = Pos.y - nextFrame->Frame.y;
+				newBBox.h = nextFrame->Frame.h;
+			} else {
+				// FIXME: currently using the animarea instead
+				// of the real bounding box of this (multi-part) frame.
+				// Shouldn't matter much, though. (wjp)
+				newBBox.x = Pos.x + anims[0]->animArea.x;
+				newBBox.y = Pos.y + anims[0]->animArea.y;
+				newBBox.w = anims[0]->animArea.w;
+				newBBox.h = anims[0]->animArea.h;
+			}
+			lastFrame = nextFrame;
+			SetBBox( newBBox );
+		}
+	}
+
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
@@ -8395,7 +8464,7 @@ void Actor::Draw(const Region& vp)
 			// for a while this didn't return (disable drawing) if about to hibernate;
 			// Avenger said (aa10aaed) "we draw the actor now for the last time".
 			InternalFlags &= ~IF_TRIGGER_AP;
-			return;
+			return false;
 		}
 	}
 
@@ -8403,18 +8472,20 @@ void Actor::Draw(const Region& vp)
 	// let us assume not, for now..
 	if (!(InternalFlags & IF_VISIBLE)) {
 		InternalFlags &= ~IF_TRIGGER_AP;
-		return;
+		return false;
 	}
 
 	//iwd has this flag saved in the creature
 	if (Modified[IE_AVATARREMOVAL]) {
-		return;
+		return false;
 	}
 
-	//visual feedback
-	CharAnimations* ca = GetAnims();
-	if (!ca) {
-		InternalFlags &= ~IF_TRIGGER_AP;
+	return true;
+}
+
+void Actor::Draw(const Region& vp) const
+{
+	if (!BBox.IntersectsRegion(vp)) {
 		return;
 	}
 
@@ -8434,6 +8505,9 @@ void Actor::Draw(const Region& vp)
 			Trans = 255;
 		}
 	}
+
+	int cx = Pos.x;
+	int cy = Pos.y;
 
 	//can't move this, because there is permanent blur state where
 	//there is no effect (just state bit)
@@ -8492,19 +8566,6 @@ void Actor::Draw(const Region& vp)
 		}
 	}
 
-	if (remainingTalkSoundTime > 0) {
-		unsigned int currentTick = GetTickCount();
-		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
-		lastTalkTimeCheckAt = currentTick;
-
-		if (diffTime >= remainingTalkSoundTime) {
-			remainingTalkSoundTime = 0;
-		} else {
-			remainingTalkSoundTime -= diffTime;
-		}
-		SetCircleSize();
-	}
-
 	if (drawcircle) {
 		DrawCircle(vp);
 		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
@@ -8514,40 +8575,10 @@ void Actor::Draw(const Region& vp)
 	}
 
 	unsigned char StanceID = GetStance();
-	unsigned char Face = GetNextFace();
+	unsigned char Face = GetOrientation();
+	CharAnimations* ca = GetAnims();
 	Animation** anims = ca->GetAnimation( StanceID, Face );
 	if (anims) {
-		if (Immobile() || !shoulddrawcircle) {
-			//set the last frame if actor is died and deactivated
-			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
-				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
-			}
-		}
-
-		int PartCount = ca->GetTotalPartCount();
-		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
-
-		// update bounding box and such
-		if (nextFrame && lastFrame != nextFrame) {
-			Region newBBox;
-			if (PartCount == 1) {
-				newBBox.x = cx - nextFrame->Frame.x;
-				newBBox.w = nextFrame->Frame.w;
-				newBBox.y = cy - nextFrame->Frame.y;
-				newBBox.h = nextFrame->Frame.h;
-			} else {
-				// FIXME: currently using the animarea instead
-				// of the real bounding box of this (multi-part) frame.
-				// Shouldn't matter much, though. (wjp)
-				newBBox.x = cx + anims[0]->animArea.x;
-				newBBox.y = cy + anims[0]->animArea.y;
-				newBBox.w = anims[0]->animArea.w;
-				newBBox.h = anims[0]->animArea.h;
-			}
-			lastFrame = nextFrame;
-			SetBBox( newBBox );
-		}
-
 		// Drawing the actor:
 		// * mirror images:
 		//     Drawn without transparency, unless fully invisible.
@@ -8668,23 +8699,6 @@ void Actor::Draw(const Region& vp)
 
 	//draw videocells over the actor
 	DrawVideocells(vp, vvcOverlays, tint);
-
-	// display pc hitpoints if requested
-	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("HP Over Head", tmp);
-	if (tmp && Persistent() && (core->GetGame()->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
-		DisplayHeadHPRatio();
-	}
-
-	// trigger on-enemy-sighted autopause
-	if (!(InternalFlags & IF_TRIGGER_AP)) {
-		// always recheck in case of EA changes (npc going hostile)
-		if (Modified[IE_EA] > EA_EVILCUTOFF && !(InternalFlags & IF_STOPATTACK)) {
-			InternalFlags |= IF_TRIGGER_AP;
-			core->Autopause(AP_ENEMY, this);
-		}
-	}
 }
 
 /* Handling automatic stance changes */

@@ -442,6 +442,10 @@ private:
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
 	const char* GetArmorSound() const;
+
+	void AdvanceAnimations(Animation** anims, Animation** shadows, size_t count);
+	/* applies modal spell etc, if needed */
+	void UpdateModalState(ieDword gameTime);
 public:
 	Actor(void);
 	~Actor(void);
@@ -695,8 +699,6 @@ public:
 	void ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical);
 	/* adjusts damage dealt to this actor, handles mirror images  */
 	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype);
-	/* applies modal spell etc, if needed */
-	void UpdateActorState(ieDword gameTime);
 	/* returns the hp adjustment based on constitution */
 	int GetHpAdjustment(int multiplier, bool modified=true) const;
 	/* does all the housekeeping after loading the actor from file */
@@ -736,12 +738,11 @@ public:
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
-
-	/* if necessary, advance animation */
-	void UpdateAnimations();
 	Region DrawingRegion() const;
-	/* if necessary, draw actor */
-	void Draw(const Region &screen);
+	void UpdateActorState();
+	/* update internal per frame state and return true if state is suitable for drawing the actor */
+	bool UpdateDrawingState();
+	void Draw(const Region &screen) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0);
 
 	/* add mobile vvc (spell effects) to actor's list */

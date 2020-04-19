@@ -749,8 +749,7 @@ void Map::UpdateScripts()
 		 * and we should probably be staggering the script executions anyway
 		 */
 		actor->Update();
-
-		actor->UpdateActorState(game->GameTime);
+		actor->UpdateActorState();
 
 		int speed = actor->CalculateSpeed(false);
 		if (speed) {
@@ -1193,8 +1192,10 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
 			assert(actor != NULL);
-			actor->Draw( viewport );
-			actor->UpdateAnimations();
+			if (actor->UpdateDrawingState()) {
+				actor->Draw( viewport );
+			}
+
 			actor = GetNextActor(q, index);
 			break;
 		case AOT_PILE:
