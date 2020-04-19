@@ -97,6 +97,30 @@ protected:
 	T *ptr;
 };
 
+template<class T>
+inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
+{
+    return !lhs;
+}
+
+template<class T>
+inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
+{
+    return !rhs;
+}
+
+template<class T>
+inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
+{
+    return lhs;
+}
+
+template<class T>
+inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
+{
+    return rhs;
+}
+
 }
 
 #endif

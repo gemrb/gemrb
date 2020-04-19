@@ -3440,7 +3440,6 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 			// use default pic
 			pic = SpriteFromPy(pydefaultPic);
 		}
-
 		if (!pic) {
 			return RuntimeError("Picture resource not found!\n");
 		}

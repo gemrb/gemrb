@@ -2455,7 +2455,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
-	assert(eM != NULL);
+	assert(eM != nullptr);
 
 	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();
 	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();

@@ -1536,7 +1536,7 @@ int Interface::Init(InterfaceConfig* config)
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
-	if (guiscript == NULL) {
+	if (guiscript == nullptr) {
 		Log(FATAL, "Core", "Missing GUI Script Engine.");
 		return GEM_ERROR;
 	}
@@ -1680,9 +1680,9 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
-	if (guifact == NULL) {
-		Log(FATAL, "Core", "Failed to load GUIFactory.");
+	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
+	if (windowmgr == nullptr) {
+		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
 	guifact->SetWindowManager(*winmgr);
@@ -1697,7 +1697,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
-	if (AudioDriver == NULL) {
+	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
 	}
@@ -4404,7 +4404,7 @@ int Interface::SwapoutArea(Map *map)
 	}
 
 	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
-	if (mm == NULL) {
+	if (mm == nullptr) {
 		return -1;
 	}
 	int size = mm->GetStoredFileSize (map);
@@ -4438,7 +4438,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		return -1;
 	}
 	PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
-	if (gm == NULL) {
+	if (gm == nullptr) {
 		return -1;
 	}
 
@@ -4469,7 +4469,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 int Interface::WriteGame(const char *folder)
 {
 	PluginHolder<SaveGameMgr> gm(IE_GAM_CLASS_ID);
-	if (gm == NULL) {
+	if (gm == nullptr) {
 		return -1;
 	}
 
@@ -4495,7 +4495,7 @@ int Interface::WriteGame(const char *folder)
 int Interface::WriteWorldMap(const char *folder)
 {
 	PluginHolder<WorldMapMgr> wmm(IE_WMP_CLASS_ID);
-	if (wmm == NULL) {
+	if (wmm == nullptr) {
 		return -1;
 	}
 
