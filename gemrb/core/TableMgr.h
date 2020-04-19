@@ -87,8 +87,8 @@ public:
 
 	bool load(const char* ResRef, bool silent=false);
 	void release();
-	bool ok() const { return table; }
-	operator bool() const { return table; }
+	bool ok() const noexcept { return table != nullptr; }
+	operator bool() const noexcept { return table != nullptr; }
 
 	const TableMgr& operator*() const { return *table; }
 	const TableMgr* operator->() const { return &*table; }
