@@ -4,7 +4,7 @@ BUILDING GEMRB WITH CMAKE
 Tools you will need to build GemRB:
   - cmake
   - make
-  - g++ or clang (others not tested)
+  - a C++ compiler (g++, clang, MSVC and mingw are known to work)
 
 NOTE: g++ 4.3 is known to miscompile gemrb.
 
@@ -15,7 +15,7 @@ Required dependencies:
 
 Optional dependencies:
   - OpenAL (for sound; preferred)
-  - SDL_mixer / SDL2_mixer (for faster, but lower-quality sound)
+  - SDL_mixer / SDL2_mixer (for faster, but lower-quality and rarer sound)
   - (lib)PNG (for the png importer plugin)
   - libvorbis (for ogg/vorbis support)
   - FreeType (for the TTF fonts plugin)
@@ -29,7 +29,7 @@ with -DSDL_BACKEND=Auto (default) or even without defining specific backend
 for autodetection.
 
 You can explicitly disable searching (and using) a particular optional
-dependency by specifying -DUSE_foo=OFF flags (cummulative), where "foo" can be
+dependency by specifying -DUSE_foo=OFF flags (cumulative), where "foo" can be
 any name from the above list.
 
 Building GemRB on unix-like systems
