@@ -24,7 +24,7 @@
 #include "Game.h"
 #include "Interface.h"
 #include "GUI/GameControl.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 namespace GemRB {
 

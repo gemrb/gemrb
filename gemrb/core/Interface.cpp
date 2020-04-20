@@ -80,7 +80,7 @@
 #include "GUI/TextArea.h"
 #include "GUI/WindowManager.h"
 #include "GUI/WorldMapControl.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/FileFilters.h"

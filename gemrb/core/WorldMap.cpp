@@ -26,7 +26,7 @@
 #include "Interface.h"
 #include "TableMgr.h"
 #include "Video.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 #include <list>
 

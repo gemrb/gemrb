@@ -27,7 +27,7 @@
 #include "Map.h"
 #include "Sprite2D.h"
 #include "Video.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 namespace GemRB {
 

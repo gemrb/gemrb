@@ -19,7 +19,7 @@
  */
  
 #include "Ambient.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 #include <algorithm>
 
