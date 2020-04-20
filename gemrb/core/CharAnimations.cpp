@@ -30,7 +30,7 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Palette.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 namespace GemRB {
 

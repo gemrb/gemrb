@@ -52,7 +52,7 @@
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 #include "StringMgr.h"

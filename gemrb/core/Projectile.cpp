@@ -33,7 +33,7 @@
 #include "Sprite2D.h"
 #include "VEFObject.h"
 #include "Video.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Actor.h"
 
 #include <cmath>

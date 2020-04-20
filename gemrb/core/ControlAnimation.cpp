@@ -27,7 +27,7 @@
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "GUI/Button.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 namespace GemRB {
 
