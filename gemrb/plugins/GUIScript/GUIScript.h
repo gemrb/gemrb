@@ -50,7 +50,6 @@ public:
 	GUIScript(void);
 	~GUIScript(void);
 	/** Initialization Routine */
-	bool Init_non_specific(void);
 	bool Init(void);
 	/** Autodetect GameType */
 	bool Autodetect(void);
