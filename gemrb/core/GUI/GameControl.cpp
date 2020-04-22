@@ -41,7 +41,7 @@
 #include "GUI/EventMgr.h"
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
