@@ -20,11 +20,25 @@ import GemRB
 import inspect
 import tempfile
 import os
+from subprocess import Popen, PIPE
+
+
+def adjust_document(document, **kwargs):
+	# Pass through Pandoc.
+	# Add an appropriately filled module field.
+	# Add the link to the function index.
+	metadata = ["--metadata={}:{}".format(kwname, kwvalue)
+		for kwname, kwvalue in kwargs.items()]
+	pandoc_invocation = ["pandoc", "--from=dokuwiki",
+			"--to=markdown+yaml_metadata_block", "--standalone"] + metadata
+	pipe = Popen(pandoc_invocation, stdin=PIPE, stdout=PIPE)
+	return pipe.communicate(document)[0]
+
 
 temporary_directory = tempfile.mkdtemp(prefix="GemRB_GUIScript_docstrings_")
 
 for (name, value) in inspect.getmembers(GemRB, inspect.isbuiltin):
-	with open(os.path.join(temporary_directory, name), "w") as target_file:
-		target_file.write(inspect.getdoc(value))
+	with open(os.path.join(temporary_directory, '{}.md'.format(name)), "w") as target_file:
+		target_file.write(adjust_document(inspect.getdoc(value), module='GemRB', title=name))
 
 print temporary_directory
