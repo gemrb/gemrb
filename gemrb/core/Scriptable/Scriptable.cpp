@@ -1703,7 +1703,7 @@ void Selectable::SetBBox(const Region &newBBox)
 	BBox = newBBox;
 }
 
-void Selectable::DrawCircle(const Region &vp) const
+void Selectable::DrawCircle(const Point& p) const
 {
 	/* BG2 colours ground circles as follows:
 	dark green for unselected party members
@@ -1733,14 +1733,14 @@ void Selectable::DrawCircle(const Region &vp) const
 	}
 
 	if (sprite) {
-		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y );
+		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - p.x, Pos.y - p.y );
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9
 		int csize = (size - 1) * 4;
 		if (csize < 4) csize = 3;
 
-		core->GetVideoDriver()->DrawEllipse( Pos - vp.Origin(),
+		core->GetVideoDriver()->DrawEllipse( Pos - p,
 		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col);
 	}
 }

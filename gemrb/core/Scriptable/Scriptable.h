@@ -391,7 +391,7 @@ public:
 	float sizeFactor;
 public:
 	void SetBBox(const Region &newBBox);
-	void DrawCircle(const Region &vp) const;
+	void DrawCircle(const Point& p) const;
 	bool IsOver(const Point &Pos) const;
 	void SetOver(bool over);
 	bool IsSelected() const;

@@ -8562,7 +8562,7 @@ void Actor::Draw(const Region& vp) const
 	}
 
 	if (drawcircle) {
-		DrawCircle(vp);
+		DrawCircle(vp.Origin());
 		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
 	}
 	if (drawtarget) {
