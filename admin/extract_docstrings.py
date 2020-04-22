@@ -39,6 +39,7 @@ temporary_directory = tempfile.mkdtemp(prefix="GemRB_GUIScript_docstrings_")
 
 for (name, value) in inspect.getmembers(GemRB, inspect.isbuiltin):
 	with open(os.path.join(temporary_directory, '{}.md'.format(name)), "w") as target_file:
-		target_file.write(adjust_document(inspect.getdoc(value), module='GemRB', title=name))
+		target_file.write(adjust_document(inspect.getdoc(value)
+			+ '\n\n[[guiscript:index|Function index]]', module='GemRB', title=name))
 
 print temporary_directory
