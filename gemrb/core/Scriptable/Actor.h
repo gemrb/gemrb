@@ -406,7 +406,7 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox, Animation** anims,
+	void DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anims,
 						 unsigned char Face, const Color& tint, bool useShadowPalette = false) const;
 
 	/** fixes the palette */

@@ -8247,7 +8247,7 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 	}
 }
 
-void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox, Animation** anims,
+void Actor::DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anims,
 							unsigned char Face, const Color& tint, bool useShadowPalette) const
 {
 	CharAnimations* ca = GetAnims();
@@ -8285,7 +8285,7 @@ void Actor::DrawActorSprite(const Region& vp, int cx, int cy, const Region& bbox
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			video->BlitGameSpriteWithPalette(nextFrame, palette, cx - vp.x, cy - vp.y, flags, tint);
+			video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
 		}
 	}
 }
@@ -8507,27 +8507,21 @@ void Actor::Draw(const Region& vp) const
 		}
 	}
 
-	int cx = Pos.x;
-	int cy = Pos.y;
-
 	//can't move this, because there is permanent blur state where
 	//there is no effect (just state bit)
 	if ((State&STATE_BLUR) && Trans < 128) {
 		Trans = 128;
 	}
-	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
+	Color tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 	tint.a = (ieByte) (255-Trans);
 
-	unsigned char heightmapindex = area->HeightMap->GetAt( cx / 16, cy / 12);
+	unsigned char heightmapindex = area->HeightMap->GetAt( Pos.x / 16, Pos.y / 12);
 	if (heightmapindex > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
 		// cannot work out how they work, so here is an incorrect
 		// hack (probably). please fix!
 		heightmapindex = 15;
 	}
-
-	//don't use cy for area map access beyond this point
-	cy -= heightmapindex;
 
 	//draw videocells under the actor
 	DrawVideocells(vp, vvcShields, tint);
@@ -8600,18 +8594,17 @@ void Actor::Draw(const Region& vp) const
 		// it could be divided so it will become a 0-15 number.
 		//
 
-		int blurx = cx;
-		int blury = cy;
 		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		Color mirrortint = tint;
 		//mirror images are also half transparent when invis
 		//if (mirrortint.a > 0) mirrortint.a = 255;
 
-		int i;
+		int cx = Pos.x - vp.x;
+		int cy = Pos.y - vp.y - heightmapindex;
 
 		// mirror images behind the actor
-		for (i = 0; i < 4; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
 				Region sbbox = BBox;
@@ -8622,21 +8615,23 @@ void Actor::Draw(const Region& vp) const
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
-					DrawActorSprite(vp, icx, icy, sbbox, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, sbbox, anims, Face, mirrortint);
 				}
 			}
 		}
 
 		// blur sprites behind the actor
+		int blurx = cx;
+		int blury = cy;
 		if (State & STATE_BLUR) {
 			if (Face < 4 || Face >= 12) {
 				Region sbbox = BBox;
 				sbbox.x -= 4*blurdx; sbbox.y -= 4*blurdy;
 				blurx -= 4*blurdx; blury -= 4*blurdy;
-				for (i = 0; i < 3; ++i) {
+				for (int i = 0; i < 3; ++i) {
 					sbbox.x += blurdx; sbbox.y += blurdy;
 					blurx += blurdx; blury += blurdy;
-					DrawActorSprite(vp, blurx, blury, sbbox, anims, Face, tint);
+					DrawActorSprite(blurx, blury, sbbox, anims, Face, tint);
 				}
 			}
 		}
@@ -8662,26 +8657,26 @@ void Actor::Draw(const Region& vp) const
 
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(vp, cx, cy, BBox, shadowAnimations, Face, tint, true);
+			DrawActorSprite(cx, cy, BBox, shadowAnimations, Face, tint, true);
 		}
 
 		// actor itself
-		DrawActorSprite(vp, cx, cy, BBox, anims, Face, tint);
+		DrawActorSprite(cx, cy, BBox, anims, Face, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
 			if (Face >= 4 && Face < 12) {
 				Region sbbox = BBox;
-				for (i = 0; i < 3; ++i) {
+				for (int i = 0; i < 3; ++i) {
 					sbbox.x -= blurdx; sbbox.y -= blurdy;
 					blurx -= blurdx; blury -= blurdy;
-					DrawActorSprite(vp, blurx, blury, sbbox, anims, Face, tint);
+					DrawActorSprite(blurx, blury, sbbox, anims, Face, tint);
 				}
 			}
 		}
 
 		// mirror images in front of the actor
-		for (i = 4; i < 8; ++i) {
+		for (int i = 4; i < 8; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
 				Region sbbox = BBox;
@@ -8692,7 +8687,7 @@ void Actor::Draw(const Region& vp) const
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
-					DrawActorSprite(vp, icx, icy, sbbox, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, sbbox, anims, Face, mirrortint);
 				}
 			}
 		}
