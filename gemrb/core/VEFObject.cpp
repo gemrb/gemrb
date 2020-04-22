@@ -178,7 +178,7 @@ bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, Map
 		switch((*iter).type) {
 		case VEF_BAM:
 		case VEF_VVC:
-			tmp = ((ScriptedAnimation *) (*iter).ptr)->Draw(vp, pos, p_tint, area, dither, orientation, height);
+			tmp = ((ScriptedAnimation *) (*iter).ptr)->Draw(pos - vp.Origin(), p_tint, area, dither, orientation, height);
 			break;
 		case VEF_2DA:
 		case VEF_VEF:
