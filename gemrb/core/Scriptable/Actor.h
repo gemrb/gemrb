@@ -760,7 +760,7 @@ public:
 	ScriptedAnimation *FindOverlay(int index) const;
 	bool ForceDither() const;
 	/* draw videocells */
-	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint) const;
+	void DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const;
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();

@@ -8227,7 +8227,7 @@ bool Actor::ForceDither() const
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Color &tint) const
+void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const
 {
 	Map* area = GetCurrentArea();
 
@@ -8235,7 +8235,7 @@ void Actor::DrawVideocells(const Region& viewport, vvcVector &vvcCells, const Co
 		ScriptedAnimation* vvc = vvcCells[i];
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(Pos - viewport.Origin(), tint, area, false, GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(pos, tint, area, false, GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
@@ -8524,7 +8524,7 @@ void Actor::Draw(const Region& vp) const
 	}
 
 	//draw videocells under the actor
-	DrawVideocells(vp, vvcShields, tint);
+	DrawVideocells(Pos - vp.Origin(), vvcShields, tint);
 
 	bool shoulddrawcircle = ShouldDrawCircle();
 	bool drawcircle = shoulddrawcircle;
@@ -8694,7 +8694,7 @@ void Actor::Draw(const Region& vp) const
 	}
 
 	//draw videocells over the actor
-	DrawVideocells(vp, vvcOverlays, tint);
+	DrawVideocells(Pos - vp.Origin(), vvcOverlays, tint);
 }
 
 /* Handling automatic stance changes */
