@@ -199,7 +199,11 @@ CachePath=@DEFAULT_CACHE_DIR@
 #  enter the full path to the GemRB executable      #
 #####################################################
 
+# preconfigured path
 #GemRBPath=@DATA_DIR@
+
+# path for official binaries
+GemRBPath=.
 
 #####################################################
 #  GemRB GUI Scripts Path [String]                  #
