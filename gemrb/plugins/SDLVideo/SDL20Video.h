@@ -220,7 +220,7 @@ public:
 
 	void SwapBuffers(VideoBuffers& buffers) override;
 
-	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr ) override;
+	Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
 	bool SetFullscreenMode(bool set) override;
 	void SetGamma(int brightness, int contrast) override;
 	bool ToggleGrabInput() override;
@@ -231,7 +231,7 @@ public:
 	
 	bool TouchInputEnabled() override;
 
-	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:

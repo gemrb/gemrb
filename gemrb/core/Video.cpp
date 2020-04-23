@@ -89,12 +89,14 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 	return r;
 }
 
-VideoBuffer* Video::CreateBuffer(const Region& r, BufferFormat fmt)
+VideoBufferPtr Video::CreateBuffer(const Region& r, BufferFormat fmt)
 {
 	VideoBuffer* buf = NewVideoBuffer(r, fmt);
 	assert(buf); // FIXME: we should probably deal with this happening
 	buffers.push_back(buf);
-	return buffers.back();
+	return VideoBufferPtr(buffers.back(), [this](VideoBuffer* buffer) {
+		DestroyBuffer(buffer);
+	});
 }
 
 void Video::DestroyBuffer(VideoBuffer* buffer)
@@ -112,10 +114,10 @@ void Video::DestroyBuffer(VideoBuffer* buffer)
 	delete buffer;
 }
 
-void Video::PushDrawingBuffer(VideoBuffer* buf)
+void Video::PushDrawingBuffer(const VideoBufferPtr& buf)
 {
 	assert(buf);
-	drawingBuffers.push_back(buf);
+	drawingBuffers.push_back(buf.get());
 	drawingBuffer = drawingBuffers.back();
 }
 
@@ -129,9 +131,9 @@ void Video::PopDrawingBuffer()
 	drawingBuffer = drawingBuffers.back();
 }
 
-void Video::SetStencilBuffer(VideoBuffer* stencil)
+void Video::SetStencilBuffer(const VideoBufferPtr& stencil)
 {
-	stencilBuffer = stencil;
+	stencilBuffer = stencil.get();
 }
 
 int Video::SwapBuffers(unsigned int fpscap)

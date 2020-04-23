@@ -379,9 +379,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	}
 }
 
-void SDL12VideoDriver::BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
+void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
 {
-	auto surface = static_cast<SDLSurfaceVideoBuffer*>(buf)->Surface();
+	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 	const Region& r = buf->Rect();
 	Point origin = r.Origin() + p;
 
@@ -539,7 +539,7 @@ SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
 	return static_cast<SDLSurfaceVideoBuffer*>(stencilBuffer)->Surface();
 }
 
-Sprite2D* SDL12VideoDriver::GetScreenshot( Region r, VideoBuffer* buf )
+Sprite2D* SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr& buf)
 {
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
@@ -548,7 +548,7 @@ Sprite2D* SDL12VideoDriver::GetScreenshot( Region r, VideoBuffer* buf )
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 	SDL_Rect src = RectFromRegion(r);
 	if (buf) {
-		auto surface = static_cast<SDLSurfaceVideoBuffer*>(buf)->Surface();
+		auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 		SDL_BlitSurface( surface, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 	} else {
 		SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);

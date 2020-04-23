@@ -37,7 +37,7 @@ public:
 	int CreateDriverDisplay(const Size&, int bpp, const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
-	Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr ) override;
+	Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
 
 	bool SetFullscreenMode(bool set) override;
 
@@ -52,7 +52,7 @@ public:
 
 	bool SupportsBAMSprites() override { return true; }
 
-	void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:

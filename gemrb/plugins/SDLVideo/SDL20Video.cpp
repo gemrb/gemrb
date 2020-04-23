@@ -288,9 +288,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 	}
 }
 
-void SDL20VideoDriver::BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
 {
-	auto tex = static_cast<SDLTextureVideoBuffer*>(buf)->GetTexture();
+	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();
 	Point origin = r.Origin() + p;
 
@@ -481,7 +481,7 @@ void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 	}
 }
 
-Sprite2D* SDL20VideoDriver::GetScreenshot(Region r, VideoBuffer* buf)
+Sprite2D* SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr& buf)
 {
 	SDL_Rect rect = RectFromRegion(r);
 

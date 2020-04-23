@@ -398,7 +398,7 @@ private:
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
 
-	VideoBuffer* wallStencil;
+	VideoBufferPtr wallStencil;
 	Region stencilViewport;
 public:
 	Map(void);

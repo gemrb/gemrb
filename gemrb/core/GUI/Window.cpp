@@ -40,12 +40,6 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	RecreateBuffer();
 }
 
-Window::~Window()
-{
-	// Dont Close() the window. WindowManager owns the window, so it will be deleting it
-	core->GetVideoDriver()->DestroyBuffer(backBuffer);
-}
-
 void Window::Close()
 {
 	if (flags&DestroyOnClose) {
@@ -129,7 +123,6 @@ void Window::FlagsChanged(unsigned int oldflags)
 void Window::RecreateBuffer()
 {
 	Video* video = core->GetVideoDriver();
-	video->DestroyBuffer(backBuffer);
 
 	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::DISPLAY_ALPHA : Video::DISPLAY;
 	backBuffer = video->CreateBuffer(frame, fmt);
@@ -139,7 +132,7 @@ void Window::RecreateBuffer()
 	MarkDirty();
 }
 
-VideoBuffer* Window::DrawWithoutComposition()
+const VideoBufferPtr& Window::DrawWithoutComposition()
 {
 	View::Draw();
 

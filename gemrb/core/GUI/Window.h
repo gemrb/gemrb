@@ -98,7 +98,6 @@ private:
 
 public:
 	Window(const Region& frame, WindowManager& mgr);
-	~Window();
 
 	void Close();
 	void Focus();
@@ -114,7 +113,7 @@ public:
 	bool IsDisabledCursor() const;
 	bool IsReceivingEvents() const { return true; }
 
-	VideoBuffer* DrawWithoutComposition();
+	const VideoBufferPtr& DrawWithoutComposition();
 	void RedrawControls(const char* VarName, unsigned int Sum);
 
 	bool DispatchEvent(const Event&);
@@ -137,7 +136,7 @@ private: // Private attributes
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
 
-	VideoBuffer* backBuffer;
+	VideoBufferPtr backBuffer;
 	WindowManager& manager;
 };
 

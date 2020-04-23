@@ -373,9 +373,6 @@ Map::Map(void)
 
 Map::~Map(void)
 {
-	Video* video = core->GetVideoDriver();
-	video->DestroyBuffer(wallStencil);
-
 	free( MapSet );
 	free( SrchMap );
 	free( MaterialMap );

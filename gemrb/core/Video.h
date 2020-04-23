@@ -92,6 +92,8 @@ public:
 	virtual bool RenderOnDisplay(void* display) const = 0;
 };
 
+using VideoBufferPtr = std::unique_ptr<VideoBuffer, std::function<void(VideoBuffer*)>>;
+
 /**
  * @class Video
  * Base class for video output plugins.
@@ -135,6 +137,7 @@ protected:
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 	virtual void Wait(unsigned long) = 0;
+	void DestroyBuffer(VideoBuffer*);
 
 private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
@@ -169,11 +172,10 @@ public:
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
 	int SwapBuffers(unsigned int fpscap = 30);
-	VideoBuffer* CreateBuffer(const Region&, BufferFormat = DISPLAY);
-	void DestroyBuffer(VideoBuffer*);
-	void PushDrawingBuffer(VideoBuffer*);
+	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = DISPLAY);
+	void PushDrawingBuffer(const VideoBufferPtr&);
 	void PopDrawingBuffer();
-	void SetStencilBuffer(VideoBuffer*);
+	void SetStencilBuffer(const VideoBufferPtr&);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	const Size& GetScreenSize() { return screenSize; }
@@ -208,12 +210,12 @@ public:
 	void BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
 				   unsigned int flags, Color tint, const Region* clip = NULL);
 
-	virtual void BlitVideoBuffer(VideoBuffer* buf, const Point& p, unsigned int flags,
+	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
 								 const Color* tint = nullptr, const Region* clip = nullptr) = 0;
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
-	virtual Sprite2D* GetScreenshot( Region r, VideoBuffer* buf = nullptr) = 0;
+	virtual Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
 

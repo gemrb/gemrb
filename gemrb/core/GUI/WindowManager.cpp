@@ -82,7 +82,6 @@ WindowManager::~WindowManager()
 	DestroyWindows(windows);
 	assert(windows.empty());
 
-	video->DestroyBuffer(HUDBuf);
 	video.release();
 	delete gameWin;
 }
@@ -564,7 +563,7 @@ void WindowManager::DrawWindows() const
 			}
 			video->DrawRect(screen, ColorBlack, true, flags);
 		}
-		VideoBuffer* modalBuffer = modalWin->DrawWithoutComposition();
+		auto& modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
 	}
 
@@ -584,7 +583,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win)
 	Sprite2D* screenshot = NULL;
 	if (win) { // we dont really care if we are managing the window
 		// only a screen shot of passed win
-		VideoBuffer* winBuf = win->DrawWithoutComposition();
+		auto& winBuf = win->DrawWithoutComposition();
 		screenshot = video->GetScreenshot( Region(Point(), win->Dimensions()), winBuf );
 	} else {
 		// redraw the windows without the mouse elements
