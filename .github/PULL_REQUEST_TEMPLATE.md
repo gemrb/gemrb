@@ -8,3 +8,4 @@
 - [ ] I used the same coding style as the surrounding code <!-- yet to be formally defined, see issue #161 -->
 - [ ] I have tested the proposed changes
 - [ ] I extended the documentation, if necessary
+- [ ] The proposed change builds also on our build bots (check after submission)
