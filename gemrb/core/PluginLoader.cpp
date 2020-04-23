@@ -160,7 +160,9 @@ void LoadPlugins(char* pluginpath)
 #endif
 
 	if (! FindFiles( path, files )) {
+#ifndef STATIC_LINK
 		Log(ERROR, "PluginLoader", "Cannot find any plugins!");
+#endif
 		return;
 	}
 
