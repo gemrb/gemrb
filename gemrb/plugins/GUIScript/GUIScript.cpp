@@ -5598,7 +5598,7 @@ sound as if it was said by that PC (EAX).\n\
 \n\
 **Parameters:**\n\
   * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
-  * channel - the name of the channel the sound should be played on (optional, defaults to \"GUI\"\n\
+  * channel - the name of the channel the sound should be played on (optional, defaults to 'GUI'\n\
   * xpos - x coordinate of the position where the sound should be played (optional)\n\
   * ypos - y coordinate of the position where the sound should be played (optional)\n\
   * type - defaults to 1, use 4 for speeches or other sounds that should stop the previous sounds (optional)\n\
