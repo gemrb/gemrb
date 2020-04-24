@@ -1370,7 +1370,9 @@ Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
 	for (uint32_t y = ymin; y < ymax; ++y) {
 		for (uint32_t x = xmin; x < xmax; ++x) {
 			const auto& group = wallGroups[y * pitch + x];
-			set.insert(group.begin(), group.end());
+			std::copy_if(group.begin(), group.end(), std::inserter(set, set.end()), [&](const std::shared_ptr<Wall_Polygon>& wp) {
+				return r.IntersectsRegion(wp->BBox);
+			});
 		}
 	}
 
@@ -2094,23 +2096,21 @@ void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
 	for (const auto& wp : walls) {
 		if (wp->wall_flag & WF_DISABLED) continue;
 
-		if (vp.IntersectsRegion(wp->BBox)) {
-			const Point& origin = wp->BBox.Origin() - vp.Origin();
+		const Point& origin = wp->BBox.Origin() - vp.Origin();
 
-			if (wp->wall_flag & WF_DITHER) {
-				stencilcol.r = 0x80;
-			} else {
-				stencilcol.r = 0xff;
-			}
-
-			if (wp->wall_flag & WF_COVERANIMS) {
-				stencilcol.g = stencilcol.r;
-			} else {
-				stencilcol.g = 0;
-			}
-
-			video->DrawPolygon(wp.get(), origin, stencilcol, true);
+		if (wp->wall_flag & WF_DITHER) {
+			stencilcol.r = 0x80;
+		} else {
+			stencilcol.r = 0xff;
 		}
+
+		if (wp->wall_flag & WF_COVERANIMS) {
+			stencilcol.g = stencilcol.r;
+		} else {
+			stencilcol.g = 0;
+		}
+
+		video->DrawPolygon(wp.get(), origin, stencilcol, true);
 	}
 
 	video->PopDrawingBuffer();
@@ -2124,9 +2124,7 @@ bool Map::BehindWall(const Point& pos, const Region& r) const
 		if (wp->wall_flag&WF_DISABLED) continue;
 
 		if (wp->PointBehind(pos)) {
-			if (wp->IntersectsRect(r)) {
-				return true;
-			}
+			return true;
 		}
 	}
 
