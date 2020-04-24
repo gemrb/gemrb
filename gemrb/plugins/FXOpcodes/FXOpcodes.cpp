@@ -6887,7 +6887,7 @@ int fx_spelltrap(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->RestoreSpellLevel(fx->Parameter3, 0);
 		fx->Parameter3 = 0;
 	}
-	if (fx->Parameter1<=0) {
+	if (fx->Parameter1 <=0 || STATE_GET(STATE_DEAD)) {
 		//gone down to zero
 		return FX_NOT_APPLIED;
 	}
