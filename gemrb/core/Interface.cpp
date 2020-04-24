@@ -1425,26 +1425,8 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	ieDword brightness = 10;
 	ieDword contrast = 5;
-
-	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = 0;
-	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay( Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-
-	winmgr = new WindowManager(video.get());
-	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
-
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
-	video->SetGamma(brightness, contrast);
 
 	Color defcolor(255, 255, 255, 200);
 	SetInfoTextColor(defcolor);
@@ -1552,6 +1534,29 @@ int Interface::Init(InterfaceConfig* config)
 	char unhardcodedTypePath[_MAX_PATH * 2];
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+
+	// fix the sample config default resolution for iwd2
+	if (stricmp(GameType, "iwd2") == 0 && Width == 640 && Height == 480) {
+		Width = 800;
+		Height = 600;
+	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay(Size(Width, Height), Bpp, fullScreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
+
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
+
+	winmgr = new WindowManager(video.get());
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
 
 	// if unset, manually populate GameName (window title)
 	std::map<std::string, std::string> gameTypeNameMap;
