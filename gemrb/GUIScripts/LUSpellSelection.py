@@ -46,6 +46,7 @@ SpellLevel = 0			# << current level of spells
 SpellStart = 0			# << starting id of the spell list
 SpellPointsLeftLabel = 0	# << label indicating the number of points left
 EnhanceGUI = 0			# << scrollbars and extra spell slot for sorcs on LU
+BonusPoints = [0]*9		# bonus learning/memo points
 
 # chargen only
 SpellsPickButton = 0		# << button to select random spells
@@ -72,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	recommend is used in bg2 for spell recommendation / autopick."""
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
-	global SpellsTextArea, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
+	global SpellsTextArea, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart, BonusPoints
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
@@ -191,6 +192,14 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		print "OpenSpellsWindow: unhandled spell learning type encountered, falling back to memo table:", table
 	SpellLearnTable = GemRB.LoadTable (SpellLearnTable)
 
+	CastingStatValue = 0
+	if IWD2:
+		# mxsplbon.2da is handled in core, but does also affect learning, at least in chargen
+		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
+		ClassRowName = GUICommon.GetClassRowName (pc)
+		CastingStat = CommonTables.ClassSkills.GetValue (ClassRowName, "CASTING", GTV_INT)
+		CastingStatValue = GemRB.GetPlayerStat (pc, CastingStat)
+
 	AlreadyShown = 0
 	for i in range (9):
 		# make sure we always have a value to minus (bards)
@@ -200,12 +209,19 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellsSelectPointsLeft[i] = SpellsToMemoTable.GetValue (str(level), str(i+1), GTV_INT) - SecondPoints
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
+
 		SpellsSelectPointsLeft[i] = SpellLearnTable.GetValue (str(level), str(i+1), GTV_INT)
+		# luckily the bonus applies both to learning and memorization
+		if IWD2 and chargen:
+			BonusPoints[i] = BonusSpellTable.GetValue (str(CastingStatValue), str(i+1), GTV_INT)
+			SpellsSelectPointsLeft[i] += BonusPoints[i]
+
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
 		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
 			# specialists get an extra spell per level
 			SpellsSelectPointsLeft[i] += 1
+			BonusPoints[i] = 1
 
 		# get all the spells of the given level
 		Spells[i] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1, Class)
@@ -315,11 +331,9 @@ def SpellsDonePress ():
 		if chargen and sum(MemoBook) == 0 and \
 		(GameCheck.IsBG1() or (IWD2 and SpellBookType != IE_IWD2_SPELL_SORCERER)):
 			SpellLevel = 0
-			SpellsSelectPointsLeft[SpellLevel] = 1
-			if KitMask != 0x4000:
-				# specialists get an extra spell per level
-				SpellsSelectPointsLeft[SpellLevel] += 1
-			DoneButton.SetDisabled (True)
+			# bump it for specialists and iwd2 casters with high stats
+			SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
+			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			Memorization = 1
 			ShowKnownSpells()
 			return
