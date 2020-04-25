@@ -213,7 +213,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
 			# specialists get an extra spell per level
 			SpellsSelectPointsLeft[i] += 1
-			BonusPoints[i] = 1
+			BonusPoints[i] += 1
 
 		# get all the spells of the given level
 		Spells[i] = Spellbook.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1, Class)
