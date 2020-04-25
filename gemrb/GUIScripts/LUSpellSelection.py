@@ -218,7 +218,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
-		elif chargen and KitMask != 0x4000 and (not IWD2 or Class == 11):
+		elif chargen and KitMask != 0x4000 and (not IWD2 or SpellBookType == IE_IWD2_SPELL_WIZARD):
 			# specialists get an extra spell per level
 			SpellsSelectPointsLeft[i] += 1
 			BonusPoints[i] += 1
@@ -329,7 +329,7 @@ def SpellsDonePress ():
 
 		# bg1 lets you memorize spells too (iwd too, but it does it by itself)
 		if chargen and sum(MemoBook) == 0 and \
-		(GameCheck.IsBG1() or (IWD2 and SpellBookType != IE_IWD2_SPELL_SORCERER)):
+		(GameCheck.IsBG1() or (IWD2 and SpellBookType == IE_IWD2_SPELL_WIZARD)):
 			SpellLevel = 0
 			# bump it for specialists and iwd2 casters with high stats
 			SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
@@ -663,7 +663,7 @@ def HasSpecialistSpell ():
 	"""Determines if specialist requirements have been met.
 
 	Always returns true if the mage is not a specialist.
-	Returns true only if the specialists knows at least one spell from thier
+	Returns true only if the specialists knows at least one spell from their
 	school."""
 
 	# always return true for non-kitted classed
