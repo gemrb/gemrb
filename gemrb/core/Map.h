@@ -426,10 +426,8 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size, bool actorsAreBlocking = false) const;
-	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = false) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = false) const;
-	unsigned int GetBlocked(const Point &p) const;
+	bool CheckPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = true) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -609,8 +607,8 @@ private:
 	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
 
 
-	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false) const;
-	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = false) const;
+	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false, bool actorsAreBlocking = true) const;
+	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
 	bool BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors);
 	bool IsBumpable(const Actor *actor, const Actor *bumped);
 

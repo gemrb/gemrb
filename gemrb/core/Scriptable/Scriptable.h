@@ -498,7 +498,7 @@ public:
 	void SetAttackMoveChances(ieWord *amc);
 	virtual bool DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
-	void RunAwayFrom(const Point &Des, int PathLength, int flags);
+	void RunAwayFrom(const Point &Des, int PathLength, int noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();

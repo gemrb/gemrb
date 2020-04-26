@@ -417,13 +417,7 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	Point OldPos;
-	bool _WillBump;
-public:
-	bool WillBump() const;
-
-	void SetWillBump(bool willBump);
-
-private:
+	bool WillBump;
 	unsigned BumpBackTimer;
 
 	/** paint the actor itself. Called internally by Draw() */
@@ -972,6 +966,8 @@ public:
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
+	bool GetWillBump() const;
+	void SetWillBump(bool willBump);
 };
 }
 

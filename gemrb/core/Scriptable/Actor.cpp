@@ -8614,7 +8614,7 @@ void Actor::Draw(const Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
+				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
@@ -8707,7 +8707,7 @@ void Actor::Draw(const Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
+				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
@@ -11411,48 +11411,57 @@ void Actor::PlayArmorSound() const
 	}
 }
 
-	int Actor::GetPathTries() const {
-		return PathTries;
-	}
-
-	void Actor::IncrementPathTries() {
-		PathTries++;
-	}
-
-	void Actor::ResetPathTries() {
-		PathTries = 0;
-	}
-
-	void Actor::BumpAway(Point farthest) {
-		if (!BumpBackTimer) {
-			OldPos = Pos;
-		}
-		BumpBackTimer = 10;
-		SetPosition(farthest, 0);
-	}
-
-	void Actor::BumpBack() {
-		assert(!BumpBackTimer);
-		SetPosition(OldPos, 0, 0, 0, false);
-	}
-
-	void Actor::DecreaseBumpBackTimer() {
-		if (!BumpBackTimer) {
-			return;
-		}
-		BumpBackTimer--;
-		if (!BumpBackTimer) {
-			BumpBack();
-		}
-	}
-
-bool Actor::WillBump() const {
-	return _WillBump;
+int Actor::GetPathTries() const
+{
+	return PathTries;
 }
 
-void Actor::SetWillBump(bool willBump) {
-	_WillBump = willBump;
+void Actor::IncrementPathTries()
+{
+	PathTries++;
 }
+
+void Actor::ResetPathTries()
+{
+	PathTries = 0;
+}
+
+void Actor::BumpAway(Point farthest)
+{
+	if (!BumpBackTimer) {
+		OldPos = Pos;
+	}
+	BumpBackTimer = 10;
+	SetPosition(farthest, 0);
+}
+
+void Actor::BumpBack()
+{
+	assert(!BumpBackTimer);
+	SetPosition(OldPos, 0, 0, 0, false);
+}
+
+void Actor::DecreaseBumpBackTimer()
+{
+	if (!BumpBackTimer) {
+		return;
+	}
+	BumpBackTimer--;
+	if (!BumpBackTimer) {
+		BumpBack();
+	}
+}
+
+bool Actor::GetWillBump() const
+{
+	return WillBump;
+}
+
+void Actor::SetWillBump(bool willBump)
+{
+	WillBump = willBump;
+}
+
 }
 
 

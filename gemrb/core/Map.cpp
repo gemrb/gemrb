@@ -729,7 +729,7 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 
 		//if the actor is immobile, don't run the scripts
-		//FIXME: this is not universaly true, only some states have this effect
+		//FIXME: this is not universally true, only some states have this effect
 		// paused targets do something similar, but are handled in the effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
@@ -795,6 +795,7 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
 			more_steps = !DoStepForActor(actor, actor->speed, time);
+
 		}
 	}
 
@@ -907,10 +908,12 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 		}
 		// Actor bumping
 		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size, actor);
-		if (!nearActors.empty() && actor->GetPath()) {
-			if (actor->WillBump()) {
-				if (!BumpNPC(actor, nearActors)) {
-					actor->NewPath();
+		if (!nearActors.empty()) {
+			if (actor->GetPath()) {
+				if (actor->GetWillBump()) {
+					if (!BumpNPC(actor, nearActors)) {
+						actor->NewPath();
+					}
 				}
 			}
 		}
@@ -1329,7 +1332,7 @@ void Map::DrawSearchMap(const Region &screen)
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
+			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12, false);
 			block.x=screen.x+x*16-(rgn.x % 16);
 			block.y=screen.y+y*12-(rgn.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
@@ -1979,7 +1982,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlock
 	return ret;
 }
 
-bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
+bool Map::CheckPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2003,16 +2006,6 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 		}
 	}
 	return false;
-}
-
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size, bool actorsAreBlocking) const
-{
-	return CheckSearchmapPointFlags(px, py, size, PATH_MAP_PASSABLE, actorsAreBlocking);
-}
-
-unsigned int Map::GetBlocked(const Point &c) const
-{
-	return GetBlocked(c.x/16, c.y/12);
 }
 
 //flags:0 - never dither (full cover)
@@ -2489,7 +2482,8 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 									smptChild.y < 0 ||
 									  (unsigned) smptChild.x >= Width ||
 									  (unsigned) smptChild.y >= Height;
-			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size);
+			bool childBlocked = CheckPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
+												PATH_MAP_PASSABLE, true);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
@@ -2594,7 +2588,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = GetBlocked( p ) & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_SIDEWALL);
+		bool wall = GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_DOOR_IMPASSABLE | PATH_MAP_SIDEWALL);
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
@@ -2629,7 +2623,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	smptDest.x = d.x / 16;
 	smptDest.y = d.y / 12;
 
-	if (size && GetBlocked(d.x, d.y, size, true)) { // We don't want to bump a still npc out of position
+	if (size && CheckPointFlags(d.x, d.y, size, PATH_MAP_PASSABLE, true)) {
+		// We don't want to bump a still npc on our target position, we want to stop before
 		AdjustPosition(smptDest);
 	}
 
@@ -2723,7 +2718,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
 									(unsigned) smptChild.y >= Height;
-			bool childBlocked = GetBlocked(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size, actorsAreBlocking);
+			bool childBlocked = CheckPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
+												PATH_MAP_PASSABLE, actorsAreBlocking);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
@@ -2812,7 +2808,7 @@ bool Map::IsVisible(const Point &pos, int explored)
 	return (VisibleBitmap[by] & bi)!=0;
 }
 
-bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable) const
+bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable, bool actorsAreBlocking) const
 {
 	int sX = s.x / 16;
 	int sY = s.y / 12;
@@ -2830,7 +2826,7 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// right to left
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
-				int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy));
+				int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy), actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
@@ -2839,7 +2835,7 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// left to right
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
-				int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy));
+				int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy), actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
@@ -2852,7 +2848,7 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// bottom to top
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
-				int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty);
+				int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty, actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
@@ -2861,7 +2857,7 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 			// top to bottom
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
-				int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty);
+				int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty, actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
@@ -2878,7 +2874,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|(actorsAreBlocking ? PATH_MAP_ACTOR : 0), true);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|(actorsAreBlocking ? PATH_MAP_ACTOR : 0), true, actorsAreBlocking);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
@@ -3197,7 +3193,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 			if (los) {
 				if (!block) {
-					int type = GetBlocked(Tile);
+					int type = GetBlocked(Tile.x / 16, Tile.y / 12);
 					if (type & PATH_MAP_NO_SEE) {
 						block=true;
 					} else if (type & PATH_MAP_SIDEWALL) {
@@ -3483,7 +3479,7 @@ int Map::GetCursor( const Point &p)
 	if (!IsVisible( p, true ) ) {
 		return IE_CURSOR_INVALID;
 	}
-	switch (GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
+	switch (GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL)) {
 		case 0:
 			return IE_CURSOR_BLOCKED;
 		case PATH_MAP_PASSABLE:

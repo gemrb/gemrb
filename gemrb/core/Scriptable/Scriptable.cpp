@@ -2319,11 +2319,11 @@ bool Movable::WalkTo(const Point &Des, int distance)
 	return willBump;
 }
 
-void Movable::RunAwayFrom(const Point &Des, int PathLength, int flags)
+void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway( Pos, Des, size, PathLength, flags );
+	path = area->RunAway(Pos, Des, size, PathLength, noBackAway );
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
