@@ -112,15 +112,14 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 char* ConvertCharEncoding(const char* string, const char* from, const char* to) {
 	iconv_t cd = iconv_open(to, from);
 	if (cd == (iconv_t)-1) {
-	    Log(ERROR, "String", "iconv_open(%s, %s) failed with error: %s", to, from, strerror(errno));
-	    return strdup(string);
+		Log(ERROR, "String", "iconv_open(%s, %s) failed with error: %s", to, from, strerror(errno));
+		return strdup(string);
 	}
 
 
 	char * in = (char *) string;
 	size_t in_len = strlen(string);
-	// twice as much bytes should be safe for most encodings
-	size_t out_len = in_len * 2 + 1;
+	size_t out_len = (in_len + 1) * 4;
 	size_t out_len_left = out_len;
 	char* buf = (char*) malloc(out_len);
 	char* buf_out = buf;
@@ -131,9 +130,9 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	#endif
 
 	if (ret == (size_t)-1) {
-	    Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
-	    free(buf);
-	    return strdup(string);
+		Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
+		free(buf);
+		return strdup(string);
 	}
 
 	size_t used = out_len - out_len_left;
