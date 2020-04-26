@@ -23,7 +23,7 @@
 #include "win32def.h"
 
 #include "GameScript/GameScript.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 
 namespace GemRB {
 

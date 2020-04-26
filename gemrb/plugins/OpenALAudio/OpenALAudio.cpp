@@ -408,7 +408,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		return 0;
 	}
 
-	ResourceHolder<SoundMgr> acm(ResRef);
+	ResourceHolder<SoundMgr> acm = GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
 		alDeleteBuffers( 1, &Buffer );
 		checkALError("Unable to delete buffer!", ERROR);

@@ -47,7 +47,6 @@ def SetupSpellsWindow(chargen=0):
 		KitValue = GemRB.GetVar ("LUKit")
 
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
-	# mxsplbon.2da is handled in core and does not affect learning
 
 	# charbase has domain slots reserved, so nuke them
 	if chargen:

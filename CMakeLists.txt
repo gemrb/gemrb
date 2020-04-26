@@ -85,7 +85,7 @@ MACRO(SET_PATH variable default)
 ENDMACRO(SET_PATH)
 
 if (${LAYOUT} MATCHES "home")
-	SET_PATH( PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/plugins )
+	SET_PATH( PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/plugins/ )
 	SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX} )
 	SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6 )
 	SET_PATH( BIN_DIR ${CMAKE_INSTALL_PREFIX} )
@@ -137,7 +137,7 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 endif (${LAYOUT} MATCHES "home")
 # convert the slashes for windows' users' convenience
-file(TO_NATIVE_PATH ${PLUGIN_DIR} PLUGIN_DIR)
+file(TO_NATIVE_PATH ${PLUGIN_DIR} DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
 
 # check if this is a release version
@@ -200,8 +200,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if (NOT APPLE AND NOT UNSAFE_PLUGIN)
 		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
-	# GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
-	ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
@@ -581,7 +579,7 @@ message(STATUS "  SVG_DIR: ${SVG_DIR}")
 message(STATUS "  MENU_DIR: ${MENU_DIR}")
 message(STATUS "")
 message(STATUS "Options:")
-message(STATUS "  LAYOUT: ${LAYOUT}")
+PRINT_OPTION(LAYOUT)
 PRINT_OPTION(NOCOLOR)
 PRINT_OPTION(STATIC_LINK)
 PRINT_OPTION(INSOURCEBUILD)

@@ -2488,6 +2488,11 @@ def CharSoundSelect():
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
 	RowCount=CharSoundVoiceList.ListResources(CHR_SOUNDS)
+	if GemRB.GetVar ("Gender") == 2:
+		GemRB.SetVar ("Selected", 0) #first female sound
+	else:
+		GemRB.SetVar ("Selected", 15)
+	CharSoundVoiceList.SetVarAssoc ("Selected", 0)
 
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
 	CharSoundPlayButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -2517,7 +2522,6 @@ def CharSoundPlayPress():
 	global CharSoundVoiceList, SoundIndex, VerbalConstants
 
 	row = CharSoundVoiceList.QueryText ()
-
 	GemRB.SetPlayerSound (MyChar, row)
 
 	#play sound as sound slot

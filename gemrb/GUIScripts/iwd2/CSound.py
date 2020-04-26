@@ -32,7 +32,6 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindow(19)
-	GemRB.SetVar("Sound",0)  #scrapping the sound value
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 
@@ -48,9 +47,13 @@ def OnLoad():
 	TextAreaControl.SetText(17236)
 
 	TextAreaControl = SoundWindow.GetControl(45)
-	TextAreaControl.SetVarAssoc("Sound", 0)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
 	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
+	if GemRB.GetVar ("Gender") == 2:
+		GemRB.SetVar ("Sound", 0) #first female sound
+	else:
+		GemRB.SetVar ("Sound", 21)
+	TextAreaControl.SetVarAssoc("Sound", 0)
 
 	PlayButton = SoundWindow.GetControl(47)
 	PlayButton.SetText(17318)

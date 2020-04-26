@@ -50,7 +50,7 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "GUI/Window.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -3928,7 +3928,7 @@ void Map::SetInternalSearchMap(int x, int y, int value)
 
 void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
-	ResourceHolder<ImageMgr> bmp(bgResRef);
+	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
 
 	if (Background) {
 		Sprite2D::FreeSprite(Background);

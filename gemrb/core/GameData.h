@@ -134,21 +134,19 @@ private:
 extern GEM_EXPORT GameData * gamedata;
 
 template <class T>
-class ResourceHolder : public Holder<T>
+using ResourceHolder = Holder<T>;
+
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
 {
-public:
-	ResourceHolder()
-	{
-	}
-	ResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
-		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)))
-	{
-	}
-	ResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
-		: Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)))
-	{
-	}
-};
+	return Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
+}
+
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
+{
+	return Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
+}
 
 }
 

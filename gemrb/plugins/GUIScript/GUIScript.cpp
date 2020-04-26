@@ -1075,8 +1075,8 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 			return AttributeError( GemRB_LoadWindowFrame__doc );
 		}
 
-		ResourceHolder<ImageMgr> im(ResRef[i]);
-		if (im == NULL) {
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef[i]);
+		if (im == nullptr) {
 			return NULL;
 		}
 
@@ -1159,8 +1159,8 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	ResourceHolder<ImageMgr> mos(MosResRef);
-	if (mos != NULL) {
+	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosResRef);
+	if (mos != nullptr) {
 		win->SetBackGround( mos->GetSprite2D(), true );
 	}
 	win->Invalidate();
@@ -1507,7 +1507,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	if (col == -1) {
@@ -1547,7 +1547,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	int row = tm->GetRowIndex( rowname );
@@ -1582,7 +1582,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	const char* str = tm->GetRowName( row );
@@ -1621,7 +1621,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	int col = tm->GetColumnIndex( colname );
@@ -1656,7 +1656,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 	const char* str = tm->GetColumnName( col );
@@ -1692,7 +1692,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 
@@ -1727,7 +1727,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 	}
 
 	Holder<TableMgr> tm = gamedata->GetTable( ti );
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		return RuntimeError("Can't find resource");
 	}
 
@@ -3264,8 +3264,8 @@ static PyObject* GemRB_TextEdit_SetBackground(PyObject * /*self*/, PyObject* arg
 	}
 
 	if (ResRef[0]) {
-		ResourceHolder<ImageMgr> im(ResRef);
-		if (im == NULL) {
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef);
+		if (im == nullptr) {
 			return RuntimeError("Picture resource not found!\n");
 		}
 
@@ -4232,11 +4232,11 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 	if (Flag2) { //pst flavour
 		map->convertToGame = false;
 
-		ResourceHolder<ImageMgr> anim(Flag);
+		ResourceHolder<ImageMgr> anim = GetResourceHolder<ImageMgr>(Flag);
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
 		}
-		ResourceHolder<ImageMgr> anim2(Flag2);
+		ResourceHolder<ImageMgr> anim2 = GetResourceHolder<ImageMgr>(Flag2);
 		if (anim2) {
 			map->Flag[1] = anim2->GetSprite2D();
 		}
@@ -5169,8 +5169,8 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	ResourceHolder<ImageMgr> im(ResRef);
-	if (im == NULL) {
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ResRef);
+	if (im == nullptr) {
 		return RuntimeError("Picture resource not found!\n");
 	}
 
@@ -5598,7 +5598,7 @@ sound as if it was said by that PC (EAX).\n\
 \n\
 **Parameters:**\n\
   * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
-  * channel - the name of the channel the sound should be played on (optional, defaults to \"GUI\"\n\
+  * channel - the name of the channel the sound should be played on (optional, defaults to 'GUI'\n\
   * xpos - x coordinate of the position where the sound should be played (optional)\n\
   * ypos - y coordinate of the position where the sound should be played (optional)\n\
   * type - defaults to 1, use 4 for speeches or other sounds that should stop the previous sounds (optional)\n\

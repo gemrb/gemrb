@@ -45,7 +45,7 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"

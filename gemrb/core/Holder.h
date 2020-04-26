@@ -85,10 +85,8 @@ public:
 	}
 	T& operator*() const { return *ptr; }
 	T* operator->() const { return ptr; }
-	bool operator!() const { return !ptr; }
-#include "operatorbool.h"
 
-	OPERATOR_BOOL(Holder<T>,T,ptr)
+	explicit operator bool() const noexcept { return ptr != nullptr; }
 	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
@@ -98,6 +96,30 @@ public:
 protected:
 	T *ptr;
 };
+
+template<class T>
+inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
+{
+    return !bool(lhs);
+}
+
+template<class T>
+inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
+{
+    return !bool(rhs);
+}
+
+template<class T>
+inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
+{
+    return bool(lhs);
+}
+
+template<class T>
+inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
+{
+    return bool(rhs);
+}
 
 }
 

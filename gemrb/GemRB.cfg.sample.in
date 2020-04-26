@@ -199,7 +199,11 @@ CachePath=@DEFAULT_CACHE_DIR@
 #  enter the full path to the GemRB executable      #
 #####################################################
 
+# preconfigured path
 #GemRBPath=@DATA_DIR@
+
+# path for official binaries
+GemRBPath=.
 
 #####################################################
 #  GemRB GUI Scripts Path [String]                  #
@@ -224,7 +228,7 @@ CachePath=@DEFAULT_CACHE_DIR@
 #  GemRB from source directory on Linux.            #
 #####################################################
 
-#PluginsPath=@PLUGIN_DIR@
+#PluginsPath=@DEFAULT_PLUGINS_DIR@
 
 #####################################################
 #  Custom Font Path [String]                        #

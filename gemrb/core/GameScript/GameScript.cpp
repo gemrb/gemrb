@@ -52,7 +52,7 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
@@ -2061,7 +2061,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	bool continueExecution = false;
 	if (continuing) continueExecution = *continuing;
 
-	RandomNumValue=RNG_SFMT::getInstance()->rand();
+	RandomNumValue = RAND_ALL();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->condition->Evaluate(MySelf)) {

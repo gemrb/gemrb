@@ -39,6 +39,9 @@
 # define NOMINMAX
 # endif
 
+#define UNICODE
+#define _UNICODE
+
 # include <windows.h>
 # define swprintf  _snwprintf
 # define vswprintf _vsnwprintf
@@ -58,12 +61,6 @@
 #endif
 
 #include "System/VFS.h"
-
-#ifdef _MSC_VER
-# ifndef round
-#  define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-# endif
-#endif
 
 #ifndef M_PI
 #define M_PI    3.14159265358979323846 // pi

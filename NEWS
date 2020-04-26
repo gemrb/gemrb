@@ -1,11 +1,11 @@
-GemRB git (d670f0867):
+GemRB git (491b32ee02):
   New features:
     - 
 
   Improved features:
     - 
-    - audio, pst ini handling
-    - effects, projectiles, actions
+    - audio, pst ini handling, savegame compatibility
+    - effects, projectiles, actions, range calculations
     - bugfixes
 
   Notes:

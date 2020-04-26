@@ -106,8 +106,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
-		ResourceHolder<ImageMgr> mos(MosFile);
-		if (mos != NULL) {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosFile);
+		if (mos != nullptr) {
 			win->SetBackGround( mos->GetSprite2D(), true );
 		}
 	}
@@ -237,11 +237,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				Sprite2D* img = NULL;
 				Sprite2D* img2 = NULL;
 				if ( MOSFile[0] ) {
-					ResourceHolder<ImageMgr> mos(MOSFile);
+					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
 				}
 				if ( MOSFile2[0] ) {
-					ResourceHolder<ImageMgr> mos(MOSFile2);
+					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile2);
 					img2 = mos->GetSprite2D();
 				}
 
@@ -258,7 +258,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					}
 				}
 				else {
-					ResourceHolder<ImageMgr> mos(BAMFile);
+					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BAMFile);
 					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
 				}
@@ -282,7 +282,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobStepsCount );
 				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
 				sldr->ControlID = ControlID;
-				ResourceHolder<ImageMgr> mos(MOSFile);
+				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
@@ -344,7 +344,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					cursor = bam->GetFrame( CurCycle, CurFrame );
 				}
 
-				ResourceHolder<ImageMgr> mos(BGMos);
+				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BGMos);
 				Sprite2D *img = NULL;
 				if(mos) {
 					img = mos->GetSprite2D();

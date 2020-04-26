@@ -302,16 +302,15 @@ void Button::DrawInternal(Region& rgn)
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
-		} else if ((IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT |
-				   IE_GUI_BUTTON_ALIGN_TOP   | IE_GUI_BUTTON_ALIGN_BOTTOM) & Flags) {
-			// FIXME: I'm unsure when exactly this adjustment applies...
-			r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
 		} else {
 			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
 			font->StringSize(Text, &metrics);
 
-			if (metrics.numLines > 1) {
+			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & Flags)) {
 				// FIXME: I'm unsure when exactly this adjustment applies...
+				// we do know that if a button is multiline it should not have margins
+				// I'm actually wondering if we need this at all anymore
+				// I suspect its origins predate the fixing of font baseline alignment
 				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
 			}
 		}

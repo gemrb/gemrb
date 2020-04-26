@@ -298,12 +298,12 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm(TmpResRef);
+	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
 
 	// night small map is *optional*!
 	if (!sm) {
 		//fall back to day minimap
-		sm = ResourceHolder<ImageMgr> (map->WEDResRef);
+		sm = GetResourceHolder<ImageMgr>(map->WEDResRef);
 	}
 
 	//the map state was altered, no need to hold this off for any later
@@ -316,7 +316,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		snprintf( TmpResRef, 9, "%.6sLN", map->WEDResRef);
 	}
 
-	ResourceHolder<ImageMgr> lm(TmpResRef);
+	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!lm) {
 		Log(ERROR, "AREImporter", "No lightmap available.");
 		return false;
@@ -457,10 +457,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm(TmpResRef);
+	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!sm) {
 		//fall back to day minimap
-		sm = ResourceHolder<ImageMgr> (map->WEDResRef);
+		sm = GetResourceHolder<ImageMgr>(map->WEDResRef);
 	}
 
 	//if the Script field is empty, the area name will be copied into it on first load
@@ -482,7 +482,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%.6sLN", WEDResRef);
 	}
 
-	ResourceHolder<ImageMgr> lm(TmpResRef);
+	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!lm) {
 		Log(ERROR, "AREImporter", "No lightmap available.");
 		return NULL;
@@ -490,7 +490,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%.6sSR", WEDResRef);
 
-	ResourceHolder<ImageMgr> sr(TmpResRef);
+	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!sr) {
 		Log(ERROR, "AREImporter", "No searchmap available.");
 		return NULL;
@@ -498,7 +498,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%.6sHT", WEDResRef);
 
-	ResourceHolder<ImageMgr> hm(TmpResRef);
+	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!hm) {
 		Log(ERROR, "AREImporter", "No heightmap available.");
 		return NULL;
@@ -2342,7 +2342,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
-	assert(eM != NULL);
+	assert(eM != nullptr);
 
 	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();
 	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();

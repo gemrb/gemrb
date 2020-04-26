@@ -147,8 +147,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Dialog.cpp \
 		    main/gemrb/core/Calendar.cpp \
 		    main/gemrb/core/DialogHandler.cpp \
-		    main/gemrb/core/RNG/RNG_SFMT.cpp \
-		    main/gemrb/core/RNG/sfmt/SFMT.c \
+		    main/gemrb/core/RNG.cpp \
 		    main/gemrb/core/System/Logger.cpp \
 		    main/gemrb/core/System/Logger/MessageWindowLogger.cpp \
 		    main/gemrb/core/System/Logger/File.cpp \
@@ -246,7 +245,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 LOCAL_SHARED_LIBRARIES := SDL2 openal ogg vorbis python
 LOCAL_STATIC_LIBRARIES := freetype2-static png gnustl_static
 
-LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF -DHAVE_UNISTD_H -DSFMT_MEXP=19937
+LOCAL_CPPFLAGS += -fexceptions -finline-functions -O0 -DSTATIC_LINK=Yes -DHAVE_SNPRINTF -DHAVE_UNISTD_H
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog -lz -ldl
 # LOCAL_LDLIBS += -L$(LOCAL_PATH)/../../../gemrb/obj/local/armeabi/ -logg -lvorbis -lSDL_mixer -lpython2.7 -l freetype2-static -lpng -lgnustl_static

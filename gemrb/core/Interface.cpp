@@ -82,7 +82,7 @@
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
 #include "GUI/WorldMapControl.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/VFS.h"
@@ -1236,7 +1236,7 @@ int Interface::LoadFonts()
 		}
 
 		Font* fnt = NULL;
-		ResourceHolder<FontManager> fntMgr(font_name);
+		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
 		gamedata->FreePalette(pal);
 
@@ -1441,7 +1441,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	if ( StupidityDetector( CachePath )) {
 		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
-		return false;
+		return GEM_ERROR;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
 
@@ -1478,17 +1478,9 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	ieDword brightness = 10;
 	ieDword contrast = 5;
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	vars->Lookup("Full Screen", FullScreen);
-	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
-	video->SetGamma(brightness, contrast);
+	vars->Lookup("Full Screen", FullScreen);
 
 	Color defcolor={255,255,255,200};
 	SetInfoTextColor(defcolor);
@@ -1571,13 +1563,15 @@ int Interface::Init(InterfaceConfig* config)
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
+			Log(ERROR, "Core", "This means you set the GamePath config variable incorrectly or that the game is running (Windows only).");
+			Log(ERROR, "Core", "It must point to the game directory that holds a readable chitin.key");
 			return GEM_ERROR;
 		}
 	}
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
-	if (guiscript == NULL) {
+	if (guiscript == nullptr) {
 		Log(FATAL, "Core", "Missing GUI Script Engine.");
 		return GEM_ERROR;
 	}
@@ -1594,6 +1588,20 @@ int Interface::Init(InterfaceConfig* config)
 	char unhardcodedTypePath[_MAX_PATH * 2];
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+
+	// fix the sample config default resolution for iwd2
+	if (stricmp(GameType, "iwd2") == 0 && Width == 640 && Height == 480) {
+		Width = 800;
+		Height = 600;
+	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
 
 	// if unset, manually populate GameName (window title)
 	std::map<std::string, std::string> gameTypeNameMap;
@@ -1703,13 +1711,13 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		ResourceHolder<ImageMgr> pal16im(Palette16);
+		ResourceHolder<ImageMgr> pal16im = GetResourceHolder<ImageMgr>(Palette16);
 		if (pal16im)
 			pal16 = pal16im->GetImage();
-		ResourceHolder<ImageMgr> pal32im(Palette32);
+		ResourceHolder<ImageMgr> pal32im = GetResourceHolder<ImageMgr>(Palette32);
 		if (pal32im)
 			pal32 = pal32im->GetImage();
-		ResourceHolder<ImageMgr> pal256im(Palette256);
+		ResourceHolder<ImageMgr> pal256im = GetResourceHolder<ImageMgr>(Palette256);
 		if (pal256im)
 			pal256 = pal256im->GetImage();
 		if (!pal16 || !pal32 || !pal256) {
@@ -1735,7 +1743,7 @@ int Interface::Init(InterfaceConfig* config)
 	video->SetEventMgr( evntmgr );
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
-	if (windowmgr == NULL) {
+	if (windowmgr == nullptr) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
@@ -1750,7 +1758,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
-	if (AudioDriver == NULL) {
+	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
 	}
@@ -2747,8 +2755,8 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
-		ResourceHolder<ImageMgr> mos(Background);
-		if (mos != NULL) {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(Background);
+		if (mos != nullptr) {
 			win->SetBackGround( mos->GetSprite2D(), true );
 		}
 	}
@@ -3511,7 +3519,7 @@ int Interface::PlayMovie(const char* ResRef)
 		}
 	}
 
-	ResourceHolder<MoviePlayer> mp(realResRef);
+	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(realResRef);
 	if (!mp) {
 		gamedata->FreePalette(palette);
 		free(frames);
@@ -5140,7 +5148,7 @@ int Interface::SwapoutArea(Map *map)
 	}
 
 	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
-	if (mm == NULL) {
+	if (mm == nullptr) {
 		return -1;
 	}
 	int size = mm->GetStoredFileSize (map);
@@ -5174,7 +5182,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		return -1;
 	}
 	PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
-	if (gm == NULL) {
+	if (gm == nullptr) {
 		return -1;
 	}
 
@@ -5205,7 +5213,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 int Interface::WriteGame(const char *folder)
 {
 	PluginHolder<SaveGameMgr> gm(IE_GAM_CLASS_ID);
-	if (gm == NULL) {
+	if (gm == nullptr) {
 		return -1;
 	}
 
@@ -5231,7 +5239,7 @@ int Interface::WriteGame(const char *folder)
 int Interface::WriteWorldMap(const char *folder)
 {
 	PluginHolder<WorldMapMgr> wmm(IE_WMP_CLASS_ID);
-	if (wmm == NULL) {
+	if (wmm == nullptr) {
 		return -1;
 	}
 

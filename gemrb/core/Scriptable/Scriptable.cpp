@@ -36,7 +36,7 @@
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
 #include "GUI/TextSystem/Font.h"
-#include "RNG/RNG_SFMT.h"
+#include "RNG.h"
 #include "Scriptable/InfoPoint.h"
 #include <cmath>
 

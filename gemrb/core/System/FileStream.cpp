@@ -31,6 +31,11 @@ int FileStream::FileStreamPtrCount = 0;
 #endif
 
 #ifdef WIN32
+
+#define TCHAR_NAME(name) \
+	TCHAR t_name[MAX_PATH] = {0}; \
+	mbstowcs(t_name, name, MAX_PATH - 1);
+
 struct FileStream::File {
 private:
 	HANDLE file;
@@ -49,7 +54,8 @@ public:
 		return 0;
 	}
 	bool OpenRO(const char *name) {
-		file = CreateFile(name,
+		TCHAR_NAME(name)
+		file = CreateFile(t_name,
 			GENERIC_READ,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
@@ -58,7 +64,8 @@ public:
 		return (file != INVALID_HANDLE_VALUE);
 	}
 	bool OpenRW(const char *name) {
-		file = CreateFile(name,
+		TCHAR_NAME(name)
+		file = CreateFile(t_name,
 			GENERIC_READ | GENERIC_WRITE,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
@@ -67,7 +74,8 @@ public:
 		return (file != INVALID_HANDLE_VALUE);
 	}
 	bool OpenNew(const char *name) {
-		file = CreateFile(name,
+		TCHAR_NAME(name)
+		file = CreateFile(t_name,
 			GENERIC_WRITE,
 			FILE_SHARE_READ,
 			NULL,

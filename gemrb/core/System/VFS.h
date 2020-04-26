@@ -148,9 +148,7 @@ public:
 	const char *GetName();
 	void GetFullPath(char *);
 	DirectoryIterator& operator++();
-#include "operatorbool.h"
-	OPERATOR_BOOL(DirectoryIterator,void,Entry)
-	bool operator !() { return !Entry; }
+	explicit operator bool () const noexcept { return Entry != nullptr; }
 	void Rewind();
 private:
 	FileFilterPredicate* predicate;

@@ -249,8 +249,8 @@ Palette *GameData::GetPalette(const ieResRef resname)
 	if (PaletteCache.RefCount(resname)!=-1) {
 		return NULL;
 	}
-	ResourceHolder<ImageMgr> im(resname);
-	if (im == NULL) {
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resname);
+	if (im == nullptr) {
 		PaletteCache.SetAt(resname, NULL);
 		return NULL;
 	}
@@ -495,7 +495,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		ResourceHolder<ImageMgr> img(resname, silent);
+		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resname, silent);
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory( resname );
 			factory->AddFactoryObject( fact );
@@ -520,7 +520,7 @@ Store* GameData::GetStore(const ieResRef ResRef)
 
 	DataStream* str = gamedata->GetResource(ResRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
+	if (sm == nullptr) {
 		delete ( str );
 		return NULL;
 	}
@@ -549,7 +549,7 @@ void GameData::SaveStore(Store* store)
 	}
 
 	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
+	if (sm == nullptr) {
 		error("GameData", "Can't save store to cache.");
 	}
 
