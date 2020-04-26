@@ -351,6 +351,8 @@ def EmptyControls ():
 		GemRB.SpellCast (pc, -1, 0)
 
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	if not CurrentWindow:
+		return # current case in our game demo (on right-click)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetVisible (False)
