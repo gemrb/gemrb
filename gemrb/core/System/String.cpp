@@ -123,11 +123,7 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	size_t out_len_left = out_len;
 	char* buf = (char*) malloc(out_len);
 	char* buf_out = buf;
-	#if ICONV_ACCEPTS_NONCONST_INPUT
-		size_t ret = iconv(cd, &in, &in_len, &buf_out, &out_len_left);
-	#else
-		size_t ret = iconv(cd, (const char **)&in, &in_len, &buf_out, &out_len_left);
-	#endif
+	size_t ret = iconv(cd, &in, &in_len, &buf_out, &out_len_left);
 
 	if (ret == (size_t)-1) {
 		Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
