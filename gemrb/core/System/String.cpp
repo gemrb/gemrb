@@ -107,9 +107,13 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 
 #if HAVE_ICONV
 // returns new string converted to given encoding
-// in case iconv is not available, or there is encoding error, copy of original
-// string is returned
+// in case iconv is not available, requested encoding is the same as string encoding,
+// or there is encoding error, copy of original string is returned.
 char* ConvertCharEncoding(const char* string, const char* from, const char* to) {
+	if (strcmp(from, to) == 0) {
+	    return strdup(string);
+	}
+
 	iconv_t cd = iconv_open(to, from);
 	if (cd == (iconv_t)-1) {
 		Log(ERROR, "String", "iconv_open(%s, %s) failed with error: %s", to, from, strerror(errno));
