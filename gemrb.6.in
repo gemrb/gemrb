@@ -89,8 +89,7 @@ Arbitrary name of the game. It will be displayed in the window's title bar.
 
 .TP
 .BR Encoding =(default|polish|czech|german)
-Specify language used in the game data. Except of polish version of BG1, it's
-safe to leave it commented out.
+Specify language used in the game data.
 
 .TP
 .BR GUIEnhancements =INT

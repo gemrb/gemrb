@@ -53,8 +53,7 @@ GameType=auto
 
 #####################################################
 #  Encoding [default|polish|czech|german] Language  #
-#  used by game data. Except of polish BG1, leave   #
-#  disabled.                                        #
+#  used by game data.                               #
 #####################################################
 
 # Encoding=default
