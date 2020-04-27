@@ -415,6 +415,7 @@ private:
 	std::string Encoding;
 	Scriptable *CutSceneRunner;
 public:
+	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	Holder<StringMgr> strings2;

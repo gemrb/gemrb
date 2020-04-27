@@ -10,8 +10,9 @@ Naming
 ------
 
 default.ini is standard encoding for all western language-games.
-polish.ini is encoding used for polish version of BG1.
-czec.ini is effectively the same as default.ini.
+polish.ini is encoding used for all polish version of games.
+czech.ini is effectively the same as default.ini.
+german.ini is encoding used for all german language-games.
 
 To use e.g. polish.ini encoding, specify "Encoding=polish" in GemRB.cfg.
 Default is default.ini.
