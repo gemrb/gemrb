@@ -92,6 +92,12 @@
 
 #include <vector>
 
+#ifdef WIN32
+#include "CodepageToIconv.h"
+#else
+#include <langinfo.h>
+#endif
+
 namespace GemRB {
 
 GEM_EXPORT Interface* core = NULL;
@@ -214,6 +220,23 @@ Interface::Interface()
 	SpecialSpellsCount = -1;
 	SpecialSpells = NULL;
 	Encoding = "default";
+
+#ifdef WIN32
+#ifdef HAVE_ICONV
+	const uint32_t codepage = GetACP();
+	const char* iconvCode = GetIconvNameForCodepage(codepage);
+
+	if (nullptr == iconvCode) {
+		error("Interface", "Mapping of codepage %u unknown to iconv.", codepage);
+	}
+	SystemEncoding = iconvCode;
+#else // HAVE_ICONV
+	SystemEncoding = nullptr;
+#endif// HAVE_ICONV
+#else // WIN32
+	SystemEncoding = nl_langinfo(CODESET);
+#endif // WIN32
+
 	TLKEncoding.encoding = "ISO-8859-1";
 	TLKEncoding.widechar = false;
 	TLKEncoding.multibyte = false;
@@ -2824,6 +2847,7 @@ bool Interface::DelSymbol(unsigned int index)
 int Interface::PlayMovie(const char* resref)
 {
 	const char *realResRef = resref;
+
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
 	AutoTable mvesnd;

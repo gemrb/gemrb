@@ -1308,8 +1308,11 @@ static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 	PARSE_ARGS(args, "O", &self);
 	Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
-	// FIXME: handle non-ascii chars or prevent their input
-	char* cStr = MBCStringFromString(ctrl->QueryText());
+
+	String wstring = ctrl->QueryText();
+	std::string nstring(wstring.begin(), wstring.end());
+	char * cStr = ConvertCharEncoding(nstring.c_str(),
+		core->TLKEncoding.encoding.c_str(), core->SystemEncoding);
 	if (cStr) {
 		PyObject* pyStr = PyString_FromString(cStr);
 		free(cStr);
@@ -4744,7 +4747,14 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	std::vector<std::string> strings;
 	if (dirit) {
 		do {
-			std::string string = dirit.GetName();
+			const char *name = dirit.GetName();
+			if (name[0] == '.' || dirit.IsDirectory() != dirs)
+				continue;
+
+			char * str = ConvertCharEncoding(name, core->SystemEncoding, core->TLKEncoding.encoding.c_str());
+			String* string = StringFromCString(str);
+			free(str);
+
 			if (dirs == false) {
 				size_t pos = string.find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
@@ -4752,8 +4762,9 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 				}
 				string.resize(pos);
 			}
+
 			StringToUpper(string);
-			strings.push_back(string);
+			strings.push_back(*string);
 		} while (++dirit);
 	}
 

@@ -46,6 +46,7 @@ extern GEM_EXPORT unsigned char pl_lowercase[256];
 typedef std::wstring String;
 
 // String creators
+GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT char* MBCStringFromString(const String& string);
 
@@ -93,7 +94,6 @@ GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 GEM_EXPORT int strlench(const char* string, char ch);
-
 }
 
 #ifndef HAVE_STRNLEN
