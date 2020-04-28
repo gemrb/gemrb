@@ -623,6 +623,8 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 			}
 
 #if SDL_VERSION_ATLEAST(1,3,0)
+            // if this is the color key then it will be 100% transparent which negates these flags
+            assert(spr->GetColorKey() != 1);
 			// FIXME: verify these are correct
 			if (renderflags&BLIT_NOSHADOW) {
 				pal->colors[1].a = 0;
