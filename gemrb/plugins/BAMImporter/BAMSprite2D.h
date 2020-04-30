@@ -44,7 +44,7 @@ public:
 	Palette *GetPalette() const;
 	void SetPalette(Palette *pal);
 	Color GetPixel(const Point&) const;
-	ieDword GetColorKey() const { return colorkey; };
+	int32_t GetColorKey() const { return colorkey; };
 	void SetColorKey(ieDword ck) { colorkey = (ieByte)ck; };
 	bool HasTransparency() const;
 };

@@ -167,16 +167,20 @@ int SDLSurfaceSprite2D::SetPalette(const Color* pal) const
 	return SDLVideoDriver::SetSurfacePalette(*surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << Bpp);
 }
 
-ieDword SDLSurfaceSprite2D::GetColorKey() const
+int32_t SDLSurfaceSprite2D::GetColorKey() const
 {
-	ieDword ck = 0;
 #if SDL_VERSION_ATLEAST(1,3,0)
+    Uint32 ck = -1;
 	int ret = SDL_GetColorKey(*surface, &ck);
-	assert(ret == 0);
+    if (ret == 0) {
+        return ck;
+    }
 #else
-	ck = (*surface)->format->colorkey;
+    if ((*surface)->flags & SDL_SRCCOLORKEY) {
+        return (*surface)->format->colorkey;
+    }
 #endif
-	return ck;
+	return -1;
 }
 
 void SDLSurfaceSprite2D::SetColorKey(ieDword ck)

@@ -79,7 +79,7 @@ public:
 	Color GetPixel(int x, int y) const;
 	virtual bool HasTransparency() const = 0;
 	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
-	virtual ieDword GetColorKey() const = 0;
+	virtual int32_t GetColorKey() const = 0;
 	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
 	virtual void SetColorKey(ieDword) = 0;
 	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
