@@ -57,57 +57,6 @@ const unsigned int BSHIFT32 = 0;
 const Uint16 halfmask16 = ((0xFFU >> (RLOSS16+1)) << RSHIFT16) | ((0xFFU >> (GLOSS16+1)) << GSHIFT16) | ((0xFFU >> (BLOSS16+1)) << BSHIFT16);
 const Uint32 halfmask32 = ((0xFFU >> 1) << RSHIFT32) | ((0xFFU >> 1) << GSHIFT32) | ((0xFFU >> 1) << BSHIFT32);
 
-struct SRShadow_NOP {
-	template<typename PTYPE>
-	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }
-};
-
-struct SRShadow_None {
-	template<typename PTYPE>
-	bool operator()(PTYPE&, Uint8 p, int&, unsigned int) const { return (p == 1); }
-};
-
-struct SRShadow_HalfTrans {
-	SRShadow_HalfTrans(const SDL_PixelFormat* format, const Color& col)
-	{
-		shadowcol = (Uint32)SDL_MapRGBA(format, col.r/2, col.g/2, col.b/2, 0);
-		mask =   (0x7F >> format->Rloss) << format->Rshift
-				| (0x7F >> format->Gloss) << format->Gshift
-				| (0x7F >> format->Bloss) << format->Bshift;
-	}
-
-	template<typename PTYPE>
-	bool operator()(PTYPE& pix, Uint8 p, int&, unsigned int) const
-	{
-		if (p == 1) {
-			pix = ((pix >> 1)&mask) + shadowcol;
-			return true;
-		}
-		return false;
-	}
-
-	Uint32 mask;
-	Uint32 shadowcol;
-};
-
-struct SRShadow_Regular {
-	template<typename PTYPE>
-	bool operator()(PTYPE&, Uint8, int&, unsigned int) const { return false; }
-};
-
-// Conditionally handle halftrans,noshadow,transshadow
-struct SRShadow_Flags {
-	template<typename PTYPE>
-	bool operator()(PTYPE&, Uint8 p, int& a, unsigned int flags) const {
-		if ((flags & BLIT_HALFTRANS) || ((p == 1) && (flags & BLIT_TRANSSHADOW)))
-			a = 1;
-		if (p == 1 && (flags & BLIT_NOSHADOW))
-			return true;
-		return false;
-	}
-};
-
-
 template<bool PALALPHA>
 struct SRTinter_NoTint {
 	void operator()(Uint8&, Uint8&, Uint8&, Uint8& a, unsigned int) const {
@@ -276,7 +225,7 @@ struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 };
 
 // RLE, palette
-template<typename PTYPE, bool COVER, bool XFLIP, typename Shadow, typename Tinter, typename Blender>
+template<typename PTYPE, bool COVER, bool XFLIP, typename Tinter, typename Blender>
 static void BlitSpriteRLE_internal(SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
@@ -286,7 +235,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             Uint8 transindex,
             SDL_Surface* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
+            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	Uint16 coverpitch = 0;
 	Uint32 covermask = 0;
@@ -438,17 +387,14 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 				} else {
 					Uint8 maskval = (coverpix) ? (((*coverpix)&covermask) >> covershift) : 0;
 					if (!COVER || (coverpix && maskval < 0xff)) {
-						int extra_alpha = 0;
-						if (!shadow(*pix, p, extra_alpha, flags)) {
-							Uint8 r = col[p].r;
-							Uint8 g = col[p].g;
-							Uint8 b = col[p].b;
-							Uint8 a = col[p].a;
-							tint(r, g, b, a, flags);
-							a = a - maskval;
-							blend(*pix, r, g, b, a >> extra_alpha);
-							*pix |= amask; // color keyed surface is 100% opaque
-						}
+						Uint8 r = col[p].r;
+						Uint8 g = col[p].g;
+						Uint8 b = col[p].b;
+						Uint8 a = col[p].a;
+						tint(r, g, b, a, flags);
+						a = a - maskval;
+						blend(*pix, r, g, b, a);
+						*pix |= amask; // color keyed surface is 100% opaque
 					}
 #ifdef HIGHLIGHTCOVER
 					else if (COVER) {
@@ -483,7 +429,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 // call the BlitSprite{RLE,}_internal instantiation with the specified
 // COVER, XFLIP
-template<typename PTYPE, typename Shadow, typename Tinter, typename Blender>
+template<typename PTYPE, typename Tinter, typename Blender>
 static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
@@ -494,29 +440,29 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             int transindex,
             SDL_Surface* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
+            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	if (!COVER && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, false, Shadow, Tinter, Blender>(target,
+		BlitSpriteRLE_internal<PTYPE, false, false, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			shadow, tint, blend);
+			tint, blend);
 	else if (!COVER && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, true, Shadow, Tinter, Blender>(target,
+		BlitSpriteRLE_internal<PTYPE, false, true, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			shadow, tint, blend);
+			tint, blend);
 	else if (COVER && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, false, Shadow, Tinter, Blender>(target,
+		BlitSpriteRLE_internal<PTYPE, true, false, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			shadow, tint, blend);
+			tint, blend);
 	else // if (COVER && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, true, Shadow, Tinter, Blender>(target,
+		BlitSpriteRLE_internal<PTYPE, true, true, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
-			shadow, tint, blend);
+			tint, blend);
 }
 
 // call the BlitSpritePAL_dispatch2 instantiation with the right pixelformat
 // TODO: Hardcoded/non-hardcoded pixelformat
-template<typename Shadow, typename Tinter, typename Blender>
+template<typename Tinter, typename Blender>
 static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
@@ -527,17 +473,17 @@ static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
             int transindex,
             SDL_Surface* cover,
             const Sprite2D* spr, unsigned int flags,
-            const Shadow& shadow, const Tinter& tint, const Blender& /*dummy*/)
+            const Tinter& tint, const Blender& /*dummy*/)
 {
 	if (target->format->BytesPerPixel == 4) {
 		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
 		BlitSpritePAL_dispatch2<Uint32>(COVER, XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
-		                                cover, spr, flags, shadow, tint, blend);
+		                                cover, spr, flags, tint, blend);
 	} else {
 		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
 		BlitSpritePAL_dispatch2<Uint16>(COVER, XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
-		                                cover, spr, flags, shadow, tint, blend);
+		                                cover, spr, flags, tint, blend);
 	}
 }

@@ -131,8 +131,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	// most game sprites:
 	// covered, BLIT_TINTED
-	// covered, BLIT_TINTED | BLIT_TRANSSHADOW
-	// covered, BLIT_TINTED | BLIT_NOSHADOW
 
 	// area-animations?
 	// BLIT_TINTED
@@ -167,7 +165,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY | BLIT_BLENDED);
-	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
 	SDL_Surface* mask = nullptr;
@@ -178,50 +175,26 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
 	if (remflags == BLIT_TINTED) {
-
-		SRShadow_Regular shadow;
 		SRTinter_Tint<true, true> tinter(tint);
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (remflags == (BLIT_TINTED | BLIT_TRANSSHADOW)) {
-
-		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_Alpha blender;
-
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
-
-	} else if (remflags == (BLIT_TINTED | BLIT_NOSHADOW)) {
-
-		SRShadow_None shadow;
-		SRTinter_Tint<false, false> tinter(tint);
-		SRBlender_Alpha blender;
-
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 
 	} else if (remflags == BLIT_HALFTRANS) {
-
-		SRShadow_HalfTrans shadow(currentBuf->format, palette->col[1]);
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 
 	} else if (remflags == 0) {
-
-		SRShadow_Regular shadow;
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 
 	} else {
 		// handling the following effects with conditionals:
 		// halftrans
-		// noshadow
-		// transshadow
 		// grey (TODO)
 		// sepia (TODO)
 		// glow (not yet)
@@ -236,31 +209,30 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 		if (!(remflags & BLIT_TINTED)) tint.a = 255;
 
-		SRShadow_Flags shadow; // for halftrans, noshadow, transshadow
 		SRBlender_Alpha blender;
 		if (remflags & blit_PALETTEALPHA) {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<true> tinter(tint);
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<true> tinter;
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 			}
 		} else {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<false> tinter(tint);
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<false> tinter;
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
 			}
 
 		}
@@ -312,15 +284,12 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	// xflip
 
 	// not handling the following effects at all:
-	// noshadow
-	// transshadow
 	// palettealpha
 
 	//		print("Unoptimized blit: %04X", flags);
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags;
-	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
 	SDL_Surface* currentBuf = CurrentRenderBuffer();

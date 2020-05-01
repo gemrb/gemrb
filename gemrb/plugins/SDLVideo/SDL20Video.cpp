@@ -222,13 +222,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	}
 	
 #if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-	// FIXME: ingegtate these into the shader if possible
-	unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-	// update palette
-	RenderSpriteVersion(texSprite, version);
+	// OPENGL
 #else
 	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	unsigned int version = (BLIT_GREY|BLIT_SEPIA) & flags;
 	// WARNING: software fallback == slow
 	RenderSpriteVersion(spr, version);
 #endif
@@ -331,22 +328,6 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		spriteShader->SetUniformValue("u_greyMode", 1, 2);
 	} else {
 		spriteShader->SetUniformValue("u_greyMode", 1, 0);
-	}
-
-	if (flags&(BLIT_TRANSSHADOW|BLIT_NOSHADOW)) {
-		Palette* pal = sprite->GetPalette();
-		Color c = pal->col[1];
-
-		spriteShader->SetUniformValue("u_ck", 3, c.r/255.0f, c.g/255.0f, c.b/255.0f);
-		if (flags&BLIT_TRANSSHADOW) {
-			spriteShader->SetUniformValue("u_shadowMode", 1, 2);
-		} else if (flags&BLIT_NOSHADOW) {
-			spriteShader->SetUniformValue("u_shadowMode", 1, 1);
-		}
-
-		pal->release();
-	} else {
-		spriteShader->SetUniformValue("u_shadowMode", 1, 0);
 	}
 
 	//spriteShader->SetUniformValue("s_texture", 1, 0);

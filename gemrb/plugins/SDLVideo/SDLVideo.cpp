@@ -621,21 +621,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 					ShaderSepia(dstc);
 				}
 			}
-
-#if SDL_VERSION_ATLEAST(1,3,0)
-			// if this is the color key then it will be 100% transparent which negates these flags
-			constexpr int shadowIdx = 1;
-			assert(spr->GetColorKey() != shadowIdx);
-			// FIXME: verify these are correct
-			if (renderflags&BLIT_NOSHADOW) {
-				pal->colors[shadowIdx].a = 0;
-			} else if (renderflags&BLIT_TRANSSHADOW) {
-				pal->colors[shadowIdx].a = 128;
-			}
-#endif
 		} else {
-			assert((renderflags&(BLIT_NOSHADOW|BLIT_TRANSSHADOW)) == 0);
-
 			SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(renderflags);
 			SDL_LockSurface(newV);
 
