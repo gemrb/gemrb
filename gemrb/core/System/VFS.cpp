@@ -93,7 +93,7 @@ static DIR* opendir(const char* filename)
 	dirp->is_first = 1;
 
 	mbstowcs(t_filename, filename, _MAX_PATH - 1);
-	StringCbPrintf(dirp->path, _MAX_PATH * sizeof(TCHAR), TEXT("%s%s*.*"), t_filename, SPathDelimiter);
+	StringCbPrintf(dirp->path, _MAX_PATH * sizeof(TCHAR), TEXT("%s%s*.*"), t_filename, TEXT("\\"));
 
 	return dirp;
 }
