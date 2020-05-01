@@ -209,17 +209,17 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, const SDL_Color* tint)
 {
-	#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-		// FIXME: ingegtate these into the shader if possible
-		unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-		// update palette
-		RenderSpriteVersion(texSprite, version);
-	#else
-		// we need to isolate flags that require software rendering to use as the "version"
-		unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
-		// WARNING: software fallback == slow
-		RenderSpriteVersion(spr, version);
-	#endif
+#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
+	// FIXME: ingegtate these into the shader if possible
+	unsigned int version = (BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	// update palette
+	RenderSpriteVersion(texSprite, version);
+#else
+	// we need to isolate flags that require software rendering to use as the "version"
+	unsigned int version = (BLIT_GREY|BLIT_SEPIA|BLIT_NOSHADOW|BLIT_TRANSSHADOW) & flags;
+	// WARNING: software fallback == slow
+	RenderSpriteVersion(spr, version);
+#endif
 
 	SDL_Texture* tex = spr->GetTexture(renderer);
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
