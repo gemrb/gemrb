@@ -75,8 +75,6 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 
 	//draw it with highlight
 	ieDword flags = BLIT_TINTED | BLIT_BLENDED;
-	if (highlight == false) flags |= BLIT_NOSHADOW;
-
 	game->ApplyGlobalTint(tint, flags);
 
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
@@ -94,7 +92,17 @@ void Container::DrawPile(bool highlight, const Region& vp, Color tint)
 					flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
 				}
 			}
-			video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
+			if (highlight) {
+				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
+			} else {
+				const Color trans;
+				Palette* p = icon->GetPalette();
+				Color tmpc = p->col[1];
+				p->CopyColorRange(&trans, &trans + 1, 1);
+				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
+				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
+				p->release();
+			}
 		}
 	}
 }

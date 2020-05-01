@@ -180,7 +180,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	if (remflags == BLIT_TINTED) {
 
 		SRShadow_Regular shadow;
-		SRTinter_Tint<false, false> tinter(tint);
+		SRTinter_Tint<true, true> tinter(tint);
 		SRBlender_Alpha blender;
 
 		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, shadow, tinter, blender);
