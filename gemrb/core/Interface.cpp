@@ -1568,7 +1568,7 @@ int Interface::Init(InterfaceConfig* config)
 	// we also need the display to exist to create sprites using the display format
 	ieDword fullscreen = 0;
 	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(Width, Height), Bpp, fullScreen, GameName) == GEM_ERROR) {
+	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
@@ -1689,19 +1689,9 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		ResourceHolder<ImageMgr> pal16im = GetResourceHolder<ImageMgr>(Palette16);
-		if (pal16im)
-			pal16 = pal16im->GetImage();
-		ResourceHolder<ImageMgr> pal32im = GetResourceHolder<ImageMgr>(Palette32);
-		if (pal32im)
-			pal32 = pal32im->GetImage();
-		ResourceHolder<ImageMgr> pal256im = GetResourceHolder<ImageMgr>(Palette256);
-		if (pal256im)
-			pal256 = pal256im->GetImage();
-		if (!pal16 || !pal32 || !pal256) {
-			Log(FATAL, "Core", "No palettes found.");
-			return GEM_ERROR;
-		}
+		LoadPalette<16>(Palette16, palettes16);
+		LoadPalette<32>(Palette32, palettes32);
+		LoadPalette<256>(Palette256, palettes256);
 		Log(MESSAGE, "Core", "Palettes Loaded");
 	}
 
@@ -1718,8 +1708,8 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
-	if (windowmgr == nullptr) {
+	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
+	if (!guifact) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
