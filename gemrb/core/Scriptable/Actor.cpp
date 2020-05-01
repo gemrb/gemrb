@@ -8254,8 +8254,7 @@ void Actor::DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anim
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 
-	uint32_t flags = TranslucentShadows ? BLIT_TRANSSHADOW : BLIT_NO_FLAGS;
-	flags |= BLIT_BLENDED;
+	uint32_t flags = BLIT_BLENDED;
 
 	// TODO: we could optimize by caching this and update it only when the Selectable moves
 	// unfortunately Pos is public so its a bit hairy to undo that
@@ -8285,7 +8284,22 @@ void Actor::DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anim
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
+			if (palette->alpha && TranslucentShadows) {
+				ieByte tmpa = palette->col[1].a;
+				palette->col[1].a /= 2;
+				video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
+				palette->col[1].a = tmpa;
+			} else if (TranslucentShadows) {
+				Palette* cpy = palette->Copy();
+				cpy->col[1].a = tint.a / 2;
+				for (int i = 2; i < 256; ++i) {
+					cpy->col[i].a = tint.a;
+				}
+				video->BlitGameSpriteWithPalette(nextFrame, cpy, cx, cy, flags, tint);
+				cpy->release();
+			} else {
+				video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
+			}
 		}
 	}
 }

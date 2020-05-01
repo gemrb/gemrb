@@ -352,7 +352,9 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 	if (tint && flags&BLIT_TINTED) {
 		if (tint->a != SDL_ALPHA_OPAQUE) {
-			SDL_SetTextureAlphaMod(texture, 255-tint->a);
+			// FIXME: do we actually have to handle this?
+			// setting the alpha mod for the texture is not what we want.
+			//SDL_SetTextureAlphaMod(texture, 255-tint->a);
 		}
 		SDL_SetTextureColorMod(texture, tint->r, tint->g, tint->b);
 	} else {
