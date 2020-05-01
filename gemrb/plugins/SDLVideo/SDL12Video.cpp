@@ -166,7 +166,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	bool vflip = bool(spr->renderFlags&BLIT_MIRRORY);
 
 	// remove already handled flags and incompatible combinations
-	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
+	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY | BLIT_BLENDED);
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
