@@ -671,7 +671,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 		return false;
 	}
 
-	ieDword flag = BLIT_TRANSSHADOW;
+	ieDword flag = 0;
 	//transferring flags to SDLdriver, this will have to be consolidated later
 
 	if (Transparency & IE_VVC_TRANSPARENT) {
@@ -773,6 +773,9 @@ void ScriptedAnimation::GetPaletteCopy()
 			Sprite2D* spr = anims[i]->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
+				Color shadowalpha = palette->col[1];
+				shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+				palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
 				//we need only one palette, so break here
 				break;
 			}
