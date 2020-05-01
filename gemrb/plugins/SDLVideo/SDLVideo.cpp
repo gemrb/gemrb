@@ -634,8 +634,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 			}
 #endif
 		} else {
-			// FIXME: this should technically support BLIT_TINTED; we just dont use it
-			// FIXME: this should technically support BLIT_NOSHADOW and BLIT_TRANSSHADOW
+			assert((renderflags&(BLIT_NOSHADOW|BLIT_TRANSSHADOW)) == 0);
 
 			SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(renderflags);
 			SDL_LockSurface(newV);
