@@ -117,7 +117,7 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
 	Holder<Sprite2D> pic = NULL;
 	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
-		ResourceHolder<ImageMgr> im(PyString_AsString(pypic));
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PyString_AsString(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
 			pic->release(); // prevent leak

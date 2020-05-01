@@ -235,7 +235,7 @@ void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) c
 		const Font* printFont = LayoutFont();
 		Holder<Palette> printPalette = palette;
 		TextContainer* container = static_cast<TextContainer*>(parent);
-		if (printPalette == NULL && container) {
+		if (!printPalette && container) {
 			printPalette = container->TextPalette();
 		}
 		assert(printFont && printPalette);

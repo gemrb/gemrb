@@ -113,15 +113,21 @@ static void PrintDLError()
 
 static bool LoadPlugin(const char* pluginpath)
 {
-	// Try to load the Module
 #ifdef WIN32
-	HMODULE hMod = LoadLibrary( pluginpath );
+	TCHAR path[_MAX_PATH];
+	TCHAR t_pluginpath[_MAX_PATH] = {0};
+
+	mbstowcs(t_pluginpath, pluginpath, _MAX_PATH - 1);
+	StringCbCopy(path, _MAX_PATH, t_pluginpath);
+
+	HMODULE hMod = LoadLibrary(path);
 #else
 	// Note: the RTLD_GLOBAL is necessary to export symbols to modules
 	//       which python may have to dlopen (-wjp, 20060716)
 	// (to reproduce, try 'import bz2' or another .so module)
-	void* hMod = dlopen( pluginpath, RTLD_NOW | RTLD_GLOBAL );
+	void* hMod = dlopen(pluginpath, RTLD_NOW | RTLD_GLOBAL);
 #endif
+
 	if (hMod == NULL) {
 		Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", pluginpath);
 		PrintDLError();

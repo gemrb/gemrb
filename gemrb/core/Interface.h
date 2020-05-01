@@ -697,7 +697,7 @@ private:
 	{
 		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
 
-		ResourceHolder<ImageMgr> palim(resref);
+		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
 			auto image = palim->GetImage();
 			int height = image->GetHeight();

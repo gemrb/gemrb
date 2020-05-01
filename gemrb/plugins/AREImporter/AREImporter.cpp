@@ -1370,8 +1370,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (pst) {
 		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
 		if (flags == NULL) {
-			ResourceHolder<ImageMgr> roimg("RONOTE");
-			ResourceHolder<ImageMgr> userimg("USERNOTE");
+			ResourceHolder<ImageMgr> roimg = GetResourceHolder<ImageMgr>("RONOTE");
+			ResourceHolder<ImageMgr> userimg = GetResourceHolder<ImageMgr>("USERNOTE");
 
 			CycleEntry rocycle = {1, 0};
 			flags = new AnimationFactory("FLAG1");

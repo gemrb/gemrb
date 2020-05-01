@@ -6452,7 +6452,7 @@ void Actor::SetDialog(const ieResRef resref)
 
 Sprite2D* Actor::CopyPortrait(int which) const
 {
-	ResourceHolder<ImageMgr> im( which ? SmallPortrait : LargePortrait );
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(which ? SmallPortrait : LargePortrait);
 	return (im) ? im->GetSprite2D() : NULL;
 }
 

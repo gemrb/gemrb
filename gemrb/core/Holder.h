@@ -98,6 +98,12 @@ protected:
 };
 
 template<class T>
+inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
+{
+	return &lhs == &rhs;
+}
+
+template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
     return !bool(lhs);

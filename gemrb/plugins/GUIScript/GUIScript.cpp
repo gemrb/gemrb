@@ -4744,26 +4744,25 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	itflags |= (dirs) ? DirectoryIterator::Directories : 0;
 	dirit.SetFlags(itflags, true);
 
-	std::vector<std::string> strings;
+	std::vector<String> strings;
 	if (dirit) {
 		do {
 			const char *name = dirit.GetName();
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			char * str = ConvertCharEncoding(name, core->SystemEncoding, core->TLKEncoding.encoding.c_str());
+			char *str = ConvertCharEncoding(name, core->SystemEncoding, core->TLKEncoding.encoding.c_str());
 			String* string = StringFromCString(str);
 			free(str);
 
 			if (dirs == false) {
-				size_t pos = string.find_last_of(L'.');
+				size_t pos = string->find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
 					continue;
 				}
-				string.resize(pos);
+				string->resize(pos);
 			}
-
-			StringToUpper(string);
+			StringToUpper(*string);
 			strings.push_back(*string);
 		} while (++dirit);
 	}
@@ -4771,13 +4770,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	std::vector<SelectOption> TAOptions;
 	std::sort(strings.begin(), strings.end());
 	for (size_t i =0; i < strings.size(); i++) {
-		String* string = StringFromCString(strings[i].c_str());
-		TAOptions.push_back(std::make_pair(i, *string));
-		delete string;
+		TAOptions.push_back(std::make_pair(i, strings[i]));
 	}
 	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
 
-	return MakePyList<const std::string&, PyString_FromStringObj>(strings);
+	return MakePyList<const String&, PyString_FromStringObj>(strings);
 }
 
 
