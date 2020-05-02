@@ -27,8 +27,6 @@
 #ifndef VFS_H
 #define VFS_H
 
-#include <cstdio>
-
 #ifndef _MAX_PATH
 #ifdef WIN32
 #define _MAX_PATH 260
@@ -44,6 +42,7 @@
 #include <sys/stat.h>
 
 #ifdef WIN32
+#include "win32def.h"
 #include <direct.h>
 #include <io.h>
 #include <windows.h>
