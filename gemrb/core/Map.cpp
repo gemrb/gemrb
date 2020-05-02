@@ -930,6 +930,7 @@ bool Map::BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors) {
 	for (auto bumped : nearActors) {
 		if (!bumped->GetPath() && IsBumpable(actor, bumped)) {
 			smptFarthest = FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
+			Log(DEBUG, "PathFinderWIP", "Bumping nmpt(%d %d) -> smpt(%d %d)\n", bumped->Pos.x, bumped->Pos.y, smptFarthest.x, smptFarthest.y);
 			nmptFarthest.x = smptFarthest.x * 16;
 			nmptFarthest.y = smptFarthest.y * 12;
 			bumped->BumpAway(nmptFarthest);
@@ -2465,6 +2466,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
 	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
 	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
+	Log(DEBUG, "PathFinderWIP", "Fleeing from (%d %d)\n", d.x, d.y);
 	std::priority_queue<PQNode> open;
 	float diagWeight = sqrt(2);
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
@@ -2485,7 +2487,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 									  (unsigned) smptChild.x >= Width ||
 									  (unsigned) smptChild.y >= Height;
 			bool childBlocked = CheckPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
-												PATH_MAP_PASSABLE, true);
+												PATH_MAP_PASSABLE, false);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
@@ -2506,6 +2508,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	}
 	// Right proper memory management
 	delete[] dist;
+	Log(DEBUG, "PathFinderWIP", "Fleeing to (%d %d)\n", smptFarthest.x, smptFarthest.y);
 	return smptFarthest;
 }
 

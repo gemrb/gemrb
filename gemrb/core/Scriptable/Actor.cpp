@@ -5134,6 +5134,7 @@ void Actor::SetMap(Map *map)
 
 void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy, bool argsAreNavmapPoints)
 {
+	Log(DEBUG, "PathFinderWIP", "Call SetPosition((%d %d) -> (%d %d)\n", Pos.x, Pos.y, position.x, position.y);
 	ResetPathTries();
 	ClearPath(true);
 	Point p, q;
@@ -5142,7 +5143,7 @@ void Actor::SetPosition(const Point &position, int jump, int radiusx, int radius
 		p.y = position.y / 12;
 	} else {
 		p.x = position.x;
-		q.x = position.y;
+		p.y = position.y;
 	}
 	q = p;
 
@@ -5154,10 +5155,12 @@ void Actor::SetPosition(const Point &position, int jump, int radiusx, int radius
 		map->AdjustPosition( p, radiusx, radiusy );
 	}
 	if (p==q) {
-		MoveTo( position );
+		Log(DEBUG, "PathFinderWIP", "SetPosition((%d %d) -> (%d %d)\n", Pos.x, Pos.y, (argsAreNavmapPoints ? position : q).x, (argsAreNavmapPoints ? position : q).y);
+		MoveTo( argsAreNavmapPoints ? position : q);
 	} else {
 		p.x = p.x * 16 + 8;
 		p.y = p.y * 12 + 6;
+		Log(DEBUG, "PathFinderWIP", "SetPosition((%d %d) -> (%d %d)\n", Pos.x, Pos.y, p.x, p.y);
 		MoveTo( p );
 	}
 }
@@ -11432,7 +11435,7 @@ void Actor::BumpAway(Point farthest)
 		OldPos = Pos;
 	}
 	BumpBackTimer = 10;
-	SetPosition(farthest, 0);
+	SetPosition(farthest, 0, 0, 0, false);
 }
 
 void Actor::BumpBack()
