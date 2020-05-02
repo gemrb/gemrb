@@ -914,6 +914,8 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 					if (!BumpNPC(actor, nearActors)) {
 						actor->NewPath();
 					}
+				} else {
+					actor->NewPath();
 				}
 			}
 		}
