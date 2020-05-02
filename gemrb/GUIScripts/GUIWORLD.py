@@ -302,6 +302,8 @@ def OpenReformPartyWindow ():
 	return
 
 def DeathWindow ():
+	# break out of any cutscenes; can happen in wk spirit warrior dream #715
+	GemRB.EndCutSceneMode ()
 	if GameCheck.IsIWD1():
 		#no death movie, but music is changed
 		GemRB.LoadMusicPL ("Theme.mus",1)
