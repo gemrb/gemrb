@@ -898,14 +898,7 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 
 	bool no_more_steps = true;
 	if (actor->BlocksSearchMap()) {
-		ClearSearchMapFor(actor);
-	}
-	actor->DecreaseBumpBackTimer();
-	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-		no_more_steps = actor->DoStep(walkScale, time);
-		if (actor->BlocksSearchMap()) {
-			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-		}
+
 		// Actor bumping
 		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size, actor);
 		if (!nearActors.empty()) {
@@ -919,6 +912,15 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 				}
 			}
 		}
+		ClearSearchMapFor(actor);
+
+	}
+	actor->DecreaseBumpBackTimer();
+	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
+		no_more_steps = actor->DoStep(walkScale, time);
+		if (actor->BlocksSearchMap()) {
+			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
+		}
 	}
 
 	return no_more_steps;
@@ -930,9 +932,9 @@ bool Map::BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors) {
 	for (auto bumped : nearActors) {
 		if (!bumped->GetPath() && IsBumpable(actor, bumped)) {
 			smptFarthest = FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
-			Log(DEBUG, "PathFinderWIP", "Bumping nmpt(%d %d) -> smpt(%d %d)\n", bumped->Pos.x, bumped->Pos.y, smptFarthest.x, smptFarthest.y);
 			nmptFarthest.x = smptFarthest.x * 16;
 			nmptFarthest.y = smptFarthest.y * 12;
+			Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", bumped->Pos.x, bumped->Pos.y, nmptFarthest.x, nmptFarthest.y);
 			bumped->BumpAway(nmptFarthest);
 		} else {
 			return false;
