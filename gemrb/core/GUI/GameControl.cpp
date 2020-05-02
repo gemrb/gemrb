@@ -1838,7 +1838,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			//there. Here we have to check on the
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
-				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
+				GameControl *gc = core->GetGameControl();
+				if (!(trap->Flags & TRAP_DEACTIVATED) && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 					actor->LastMarked = trap->GetGlobalID();
 					//directly feeding the event, even if there are actions in the queue
