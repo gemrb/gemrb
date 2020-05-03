@@ -1039,7 +1039,9 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			core->SetPause(PAUSE_ON);
 			break;
 		case ' ': //soft pause
-			core->TogglePause();
+			if (!(GetDialogueFlags() & DF_FREEZE_SCRIPTS) && !(DialogueFlags & DF_IN_DIALOG)) {
+				core->TogglePause();
+			}
 			break;
 		case GEM_ALT: //alt key (shows containers)
 #ifdef ANDROID
