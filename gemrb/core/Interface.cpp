@@ -555,8 +555,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_TEXTSCREEN) {
 		EventFlag&=~EF_TEXTSCREEN;
-		// FIXME: need to reimplement this
-		//video->SetMouseEnabled(true);
+		winmgr->SetCursorFeedback(WindowManager::MOUSE_ALL);
 		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
 		return;
 	}

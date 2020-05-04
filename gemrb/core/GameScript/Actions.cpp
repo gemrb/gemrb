@@ -796,8 +796,11 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 
 	Game *game = core->GetGame();
 	game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
-	// FIXME: reimplement this
-	// core->GetVideoDriver()->SetMouseEnabled(!active);
+	if (active) {
+		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
+	} else {
+		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_ALL);
+	}
 }
 
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
