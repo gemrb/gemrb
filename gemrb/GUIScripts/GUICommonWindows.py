@@ -1354,6 +1354,8 @@ def CloseTopWindow ():
 def TopWindowClosed(window):
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
+	GemRB.GetView ("ACTWIN").SetVisible (True)
+	GemRB.GetView ("MSGWIN").SetVisible(True)
 
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
@@ -1391,6 +1393,9 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			window.SetOnClose(TopWindowClosed)
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
+			# hide some windows to declutter higher resolutions and avoid unwanted interaction
+			GemRB.GetView ("ACTWIN").SetVisible(False)
+			GemRB.GetView ("MSGWIN").SetVisible(False)
 
 		return window
 	
