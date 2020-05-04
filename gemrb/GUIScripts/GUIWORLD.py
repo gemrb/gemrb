@@ -97,6 +97,7 @@ def OpenEndMessageWindow ():
 	Button.SetDisabled(False)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
 def OpenContinueMessageWindow ():
@@ -106,6 +107,7 @@ def OpenContinueMessageWindow ():
 	Button.SetDisabled(False)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
 def UpdateReformWindow ():

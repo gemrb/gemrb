@@ -383,7 +383,7 @@ void Button::SetFont(Font* newfont)
 
 String Button::TooltipText() const
 {
-	if (IsDisabled()) {
+	if (IsDisabled() || flags & IE_GUI_BUTTON_NO_TOOLTIP) {
 		return L"";
 	}
 
