@@ -164,12 +164,12 @@ def OpenContainerWindow ():
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	# fix wrong height in the CHU and reposition
-	if GemRB.GetSystemVariable (SV_WIDTH) == 1024:
-		Size = Window.GetSize ()
-		Pos = Window.GetPos ()
-		Window.SetSize (Size[0], 90)
-		Window.SetPos (Pos[0], 768 - 90)
+	# fix wrong height in the guiw10.chu and reposition
+	# we do it always, since that chu is used as a base for some arbitrary resolutions
+	Size = Window.GetSize ()
+	Pos = Window.GetPos ()
+	Window.SetSize (Size[0], 90)
+	Window.SetPos (Pos[0], GemRB.GetSystemVariable (SV_HEIGHT) - 90)
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
