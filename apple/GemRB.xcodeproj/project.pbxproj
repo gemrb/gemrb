@@ -48,13 +48,6 @@
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
 		A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACF197344BD00A6BC96 /* FileCache.h */; };
-		A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
-		A20E4ADE197344BD00A6BC96 /* RNG_SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */; };
-		A20E4ADF197344BD00A6BC96 /* SFMT-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD5197344BD00A6BC96 /* SFMT-common.h */; };
-		A20E4AE0197344BD00A6BC96 /* SFMT-params.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD6197344BD00A6BC96 /* SFMT-params.h */; };
-		A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */; };
-		A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
-		A20E4AE3197344BD00A6BC96 /* SFMT.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4AD9197344BD00A6BC96 /* SFMT.h */; };
 		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* ../artwork/gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
@@ -245,8 +238,6 @@
 		A276B54813A28D5900D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A276B54913A28D5D00D41A8A /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A276FB01199E8D7D00BD6CEF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB00199E8D7C00BD6CEF /* OpenGLES.framework */; };
-		A276FB02199E8EEE00BD6CEF /* RNG_SFMT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */; };
-		A276FB03199E8EF300BD6CEF /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = A20E4AD8197344BD00A6BC96 /* SFMT.c */; };
 		A276FB08199EBF7E00BD6CEF /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB07199EBF7E00BD6CEF /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A27ABCD016F2396C00FE11EF /* NullSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */; };
@@ -746,6 +737,14 @@
 		A2EDA0461F99B39600F0866A /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EDA0451F99B39600F0866A /* Python.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2F5F068246102D70073802C /* DialogResponder.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F061246102D60073802C /* DialogResponder.h */; };
+		A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F062246102D60073802C /* CodepageToIconv.cpp */; };
+		A2F5F06A246102D70073802C /* CodepageToIconv.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F063246102D60073802C /* CodepageToIconv.h */; };
+		A2F5F06B246102D70073802C /* RNG.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F064246102D70073802C /* RNG.h */; };
+		A2F5F06C246102D70073802C /* RNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F065246102D70073802C /* RNG.cpp */; };
+		A2F5F06D246102D70073802C /* DialogResponder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F066246102D70073802C /* DialogResponder.cpp */; };
+		A2F5F06E246102D70073802C /* CodepageToIconvMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */; };
+		A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
 		A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
 		A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */; };
@@ -1255,13 +1254,6 @@
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
 		A20B1199204F70F600B10A0C /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
-		A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG_SFMT.cpp; sourceTree = "<group>"; };
-		A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG_SFMT.h; sourceTree = "<group>"; };
-		A20E4AD5197344BD00A6BC96 /* SFMT-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-common.h"; sourceTree = "<group>"; };
-		A20E4AD6197344BD00A6BC96 /* SFMT-params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params.h"; sourceTree = "<group>"; };
-		A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params19937.h"; sourceTree = "<group>"; };
-		A20E4AD8197344BD00A6BC96 /* SFMT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SFMT.c; sourceTree = "<group>"; };
-		A20E4AD9197344BD00A6BC96 /* SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMT.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
@@ -1830,6 +1822,14 @@
 		A2EC8066146056B40033754A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		A2EDA0451F99B39600F0866A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2F5F061246102D60073802C /* DialogResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogResponder.h; sourceTree = "<group>"; };
+		A2F5F062246102D60073802C /* CodepageToIconv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconv.cpp; sourceTree = "<group>"; };
+		A2F5F063246102D60073802C /* CodepageToIconv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CodepageToIconv.h; sourceTree = "<group>"; };
+		A2F5F064246102D70073802C /* RNG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG.h; sourceTree = "<group>"; };
+		A2F5F065246102D70073802C /* RNG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG.cpp; sourceTree = "<group>"; };
+		A2F5F066246102D70073802C /* DialogResponder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogResponder.cpp; sourceTree = "<group>"; };
+		A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconvMap.cpp; sourceTree = "<group>"; };
+		A2F5F06F246103B90073802C /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapReverb.cpp; sourceTree = "<group>"; };
 		A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapReverb.h; sourceTree = "<group>"; };
@@ -2253,6 +2253,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */,
 				A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2442,28 +2443,6 @@
 				A2AAF39313A150F900AE8402 /* AudioToolbox.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		A20E4AD0197344BD00A6BC96 /* RNG */ = {
-			isa = PBXGroup;
-			children = (
-				A20E4AD1197344BD00A6BC96 /* RNG_SFMT.cpp */,
-				A20E4AD2197344BD00A6BC96 /* RNG_SFMT.h */,
-				A20E4AD3197344BD00A6BC96 /* sfmt */,
-			);
-			path = RNG;
-			sourceTree = "<group>";
-		};
-		A20E4AD3197344BD00A6BC96 /* sfmt */ = {
-			isa = PBXGroup;
-			children = (
-				A20E4AD5197344BD00A6BC96 /* SFMT-common.h */,
-				A20E4AD6197344BD00A6BC96 /* SFMT-params.h */,
-				A20E4AD7197344BD00A6BC96 /* SFMT-params19937.h */,
-				A20E4AD8197344BD00A6BC96 /* SFMT.c */,
-				A20E4AD9197344BD00A6BC96 /* SFMT.h */,
-			);
-			path = sfmt;
 			sourceTree = "<group>";
 		};
 		A232B0FA1A15B6E600E5342E /* TextSystem */ = {
@@ -3068,6 +3047,9 @@
 				A2BF9FA51395FF61006ADC12 /* Callback.h */,
 				A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */,
 				A2BF9FA71395FF61006ADC12 /* CharAnimations.h */,
+				A2F5F062246102D60073802C /* CodepageToIconv.cpp */,
+				A2F5F063246102D60073802C /* CodepageToIconv.h */,
+				A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */,
 				A2BF9FA91395FF61006ADC12 /* Compressor.cpp */,
 				A2BF9FAA1395FF61006ADC12 /* Compressor.h */,
 				A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */,
@@ -3082,6 +3064,8 @@
 				A2BF9FB41395FF61006ADC12 /* DialogHandler.h */,
 				A2BF9FB51395FF61006ADC12 /* DialogMgr.cpp */,
 				A2BF9FB61395FF61006ADC12 /* DialogMgr.h */,
+				A2F5F066246102D70073802C /* DialogResponder.cpp */,
+				A2F5F061246102D60073802C /* DialogResponder.h */,
 				A2BF9FB71395FF61006ADC12 /* DisplayMessage.cpp */,
 				A2BF9FB81395FF61006ADC12 /* DisplayMessage.h */,
 				A2BF9FB91395FF61006ADC12 /* Effect.h */,
@@ -3170,7 +3154,8 @@
 				A2BFA02A1395FF62006ADC12 /* ResourceManager.h */,
 				A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */,
 				A2BFA02C1395FF62006ADC12 /* ResourceSource.h */,
-				A20E4AD0197344BD00A6BC96 /* RNG */,
+				A2F5F065246102D70073802C /* RNG.cpp */,
+				A2F5F064246102D70073802C /* RNG.h */,
 				A2BFA02D1395FF62006ADC12 /* SaveGame.h */,
 				A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */,
 				A2BFA02F1395FF62006ADC12 /* SaveGameIterator.h */,
@@ -3449,6 +3434,7 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2F5F06F246103B90073802C /* libiconv.tbd */,
 				A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */,
 				A289588220D6CFCF002F4A97 /* AVFoundation.framework */,
 				A289588020D6CFC1002F4A97 /* AVKit.framework */,
@@ -3481,7 +3467,6 @@
 				A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */,
 				A2E66351139E882900310FC8 /* Ambient.h in Headers */,
 				A2E66353139E882900310FC8 /* AmbientMgr.h in Headers */,
-				A20E4ADF197344BD00A6BC96 /* SFMT-common.h in Headers */,
 				A2E66355139E882900310FC8 /* Animation.h in Headers */,
 				A2E66357139E883100310FC8 /* AnimationFactory.h in Headers */,
 				A2E66359139E883100310FC8 /* AnimationMgr.h in Headers */,
@@ -3495,12 +3480,10 @@
 				A2E66364139E883100310FC8 /* Calendar.h in Headers */,
 				A2E66366139E883100310FC8 /* Callback.h in Headers */,
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
-				A20E4AE0197344BD00A6BC96 /* SFMT-params.h in Headers */,
 				A2E6636A139E883100310FC8 /* Compressor.h in Headers */,
 				A2E6636C139E883100310FC8 /* ControlAnimation.h in Headers */,
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
-				A20E4AE3197344BD00A6BC96 /* SFMT.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
 				A2E66374139E883100310FC8 /* DialogHandler.h in Headers */,
 				A2E66376139E883100310FC8 /* DialogMgr.h in Headers */,
@@ -3517,7 +3500,6 @@
 				A2E66381139E883100310FC8 /* FactoryObject.h in Headers */,
 				A2E66383139E883100310FC8 /* Font.h in Headers */,
 				A2E66385139E883100310FC8 /* Game.h in Headers */,
-				A20E4AE1197344BD00A6BC96 /* SFMT-params19937.h in Headers */,
 				A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */,
 				A2E66387139E883100310FC8 /* GameData.h in Headers */,
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
@@ -3560,6 +3542,7 @@
 				A2E663C4139E883E00310FC8 /* ResourceSource.h in Headers */,
 				A2E663C5139E883E00310FC8 /* SaveGame.h in Headers */,
 				A2E663C7139E883E00310FC8 /* SaveGameIterator.h in Headers */,
+				A2F5F06B246102D70073802C /* RNG.h in Headers */,
 				A2E663C9139E883E00310FC8 /* SaveGameMgr.h in Headers */,
 				A2E663CB139E884500310FC8 /* ScriptedAnimation.h in Headers */,
 				A2E663CD139E884500310FC8 /* ScriptEngine.h in Headers */,
@@ -3579,6 +3562,7 @@
 				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
 				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
 				71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */,
+				A2F5F068246102D70073802C /* DialogResponder.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
 				A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */,
 				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
@@ -3599,6 +3583,7 @@
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
 				A27217051CAE2678005F3976 /* Tooltip.h in Headers */,
+				A2F5F06A246102D70073802C /* CodepageToIconv.h in Headers */,
 				A2E6640F139E885A00310FC8 /* InfoPoint.h in Headers */,
 				A27E5D6218106384009434E5 /* VEFObject.h in Headers */,
 				A2E66411139E885A00310FC8 /* PCStatStruct.h in Headers */,
@@ -3621,7 +3606,6 @@
 				A2E66430139E886100310FC8 /* WorldMapControl.h in Headers */,
 				A2E66433139E886700310FC8 /* GameScript.h in Headers */,
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
-				A20E4ADE197344BD00A6BC96 /* RNG_SFMT.h in Headers */,
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
 				A2DE329A14EB071200117503 /* Logger.h in Headers */,
 				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
@@ -4438,7 +4422,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A2E6633D139E87A400310FC8 /* Build configuration list for PBXNativeTarget "gemrb_core" */;
 			buildPhases = (
-				A23B1745188061AA00EB6AC8 /* ShellScript */,
+				A23B1745188061AA00EB6AC8 /* Run Script */,
 				A2E66334139E875400310FC8 /* Headers */,
 				A2E66335139E875400310FC8 /* Sources */,
 				A2E66336139E875400310FC8 /* Frameworks */,
@@ -4507,7 +4491,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1130;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
@@ -4624,7 +4607,7 @@
 			shellPath = /bin/sh;
 			shellScript = "/*\nThis script makes the bundle thumbnails\n*/\nf=${SRCROOT}\nin=${SRCROOT}/../artwork/gemrb.icns\npng512=${f}/ios/iTunesArtwork\n\nsips --resampleWidth 512 \"${in}\" --out \"${png512}\"\nin=${png512}\necho $in\nsips --setProperty format png --resampleWidth 57 \"${in}\" --out \"${f}/ios/Icon.png\"\nsips --setProperty format png --resampleWidth 114 \"${in}\" --out \"${f}/ios/Icon@2x.png\"\nsips --setProperty format png --resampleWidth 29 \"${in}\" --out \"${f}/ios/Icon-Small.png\"\nsips --setProperty format png --resampleWidth 58 \"${in}\" --out \"${f}/ios/Icon-Small@2x.png\"\nsips --setProperty format png --resampleWidth 50 \"${in}\" --out \"${f}/ios/Icon-Small-50.png\"\nsips --setProperty format png --resampleWidth 72 \"${in}\" --out \"${f}/ios/Icon-72.png\"";
 		};
-		A23B1745188061AA00EB6AC8 /* ShellScript */ = {
+		A23B1745188061AA00EB6AC8 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4632,12 +4615,13 @@
 			inputPaths = (
 				"$(SRCROOT)/CMakeLists.txt",
 			);
+			name = "Run Script";
 			outputPaths = (
 				"$(SRCROOT)/config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cmake \"$SRCROOT\"";
+			shellScript = "echo \"$SRCROOT\"\ncmake \"$SRCROOT\"\n";
 		};
 		A23B17461880787B00EB6AC8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5207,13 +5191,11 @@
 				A29BF90F13A04A6F00C812DD /* Actions.cpp in Sources */,
 				A29BF91013A04A6F00C812DD /* GameScript.cpp in Sources */,
 				A29BF91113A04A6F00C812DD /* GSUtils.cpp in Sources */,
-				A276FB03199E8EF300BD6CEF /* SFMT.c in Sources */,
 				A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */,
 				A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */,
 				A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */,
 				A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */,
 				A226F41113A119E2009CE75E /* ACMReader.cpp in Sources */,
-				A276FB02199E8EEE00BD6CEF /* RNG_SFMT.cpp in Sources */,
 				A226F41213A119E2009CE75E /* decoder.cpp in Sources */,
 				A226F41313A119E2009CE75E /* unpacker.cpp in Sources */,
 				A226F41713A119EA009CE75E /* AREImporter.cpp in Sources */,
@@ -5342,8 +5324,8 @@
 				A2E66358139E883100310FC8 /* AnimationMgr.cpp in Sources */,
 				A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */,
 				A2E6635B139E883100310FC8 /* ArchiveImporter.cpp in Sources */,
-				A20E4AE2197344BD00A6BC96 /* SFMT.c in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
+				A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */,
 				A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
@@ -5364,6 +5346,7 @@
 				A2E66382139E883100310FC8 /* Font.cpp in Sources */,
 				A2E66384139E883100310FC8 /* Game.cpp in Sources */,
 				A2E66386139E883100310FC8 /* GameData.cpp in Sources */,
+				A2F5F06D246102D70073802C /* DialogResponder.cpp in Sources */,
 				A2E66388139E883700310FC8 /* GlobalTimer.cpp in Sources */,
 				A2E6638B139E883E00310FC8 /* Image.cpp in Sources */,
 				A2E6638D139E883E00310FC8 /* ImageFactory.cpp in Sources */,
@@ -5374,7 +5357,6 @@
 				A2E66397139E883E00310FC8 /* Inventory.cpp in Sources */,
 				A2E66399139E883E00310FC8 /* Item.cpp in Sources */,
 				A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */,
-				A20E4ADD197344BD00A6BC96 /* RNG_SFMT.cpp in Sources */,
 				A2E6639B139E883E00310FC8 /* ItemMgr.cpp in Sources */,
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,
 				A2E6639F139E883E00310FC8 /* Map.cpp in Sources */,
@@ -5397,6 +5379,7 @@
 				A2E663BD139E883E00310FC8 /* Resource.cpp in Sources */,
 				A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */,
 				A2E663C1139E883E00310FC8 /* ResourceManager.cpp in Sources */,
+				A2F5F06C246102D70073802C /* RNG.cpp in Sources */,
 				A2E663C3139E883E00310FC8 /* ResourceSource.cpp in Sources */,
 				A2E663C6139E883E00310FC8 /* SaveGameIterator.cpp in Sources */,
 				A2E663C8139E883E00310FC8 /* SaveGameMgr.cpp in Sources */,
@@ -5433,6 +5416,7 @@
 				A2E6640E139E885A00310FC8 /* InfoPoint.cpp in Sources */,
 				A20A278B1A71E3200077077C /* View.cpp in Sources */,
 				A2E66410139E885A00310FC8 /* PCStatStruct.cpp in Sources */,
+				A2F5F06E246102D70073802C /* CodepageToIconvMap.cpp in Sources */,
 				A2E66412139E885A00310FC8 /* Scriptable.cpp in Sources */,
 				A2E66414139E886100310FC8 /* Button.cpp in Sources */,
 				A2E66416139E886100310FC8 /* Console.cpp in Sources */,
@@ -6534,7 +6518,6 @@
 					/opt/X11/include,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = /opt/X11/lib;
 				MACH_O_TYPE = mh_bundle;
 				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
@@ -6555,7 +6538,6 @@
 					/opt/X11/include,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = /opt/X11/lib;
 				MACH_O_TYPE = mh_bundle;
 				OTHER_LDFLAGS = "-lpng";
 				PRODUCT_NAME = PNGImporter;
@@ -6962,12 +6944,9 @@
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
 					/opt/X11/include/freetype2,
+					/usr/local/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/opt/X11/lib,
-				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
@@ -6985,12 +6964,9 @@
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
 					/opt/X11/include/freetype2,
+					/usr/local/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/opt/X11/lib,
-				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
@@ -7452,7 +7428,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
 				WRAPPER_EXTENSION = app;
@@ -7473,7 +7449,7 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -7538,9 +7514,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
+					/usr/local/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/X11/lib,
+					/usr/local/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -7621,9 +7603,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../gemrb/includes,
+					/usr/local/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/X11/lib,
+					/usr/local/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
