@@ -100,7 +100,7 @@ protected:
 template<class T>
 inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 {
-	return &lhs == &rhs;
+	return lhs.get() == rhs.get();
 }
 
 template<class T>
