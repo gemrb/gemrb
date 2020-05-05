@@ -292,9 +292,6 @@ def BackPress():
 		SkillsButton.SetState (IE_GUI_BUTTON_ENABLED)
 		SkillsButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 		SkillsState = 0
-		#remove all known spells and nullify the memorizable counts
-		Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
-		Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 	elif CharGenState == 6:
 		NameButton.SetState (IE_GUI_BUTTON_DISABLED)
 		BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -477,7 +474,6 @@ def SetCharacterDescription():
 		MageSpell = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 		IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 		IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
-		Alignment = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 
 		if IsThief!="*":
 			TextArea.Append ("\n")
@@ -528,13 +524,15 @@ def SetCharacterDescription():
 
 		if MageSpell !="*":
 			info = Spellbook.GetKnownSpellsDescription(MyChar, IE_SPELL_TYPE_WIZARD)
-			TextArea.Append ("\n" + GemRB.GetString(11027) + "\n" + info)
+			if info:
+				TextArea.Append ("\n" + GemRB.GetString(11027) + "\n" + info)
 
 		if PriestSpell == "*":
 			PriestSpell = DruidSpell
 		if PriestSpell!="*":
 			info = Spellbook.GetKnownSpellsDescription(MyChar, IE_SPELL_TYPE_PRIEST)
-			TextArea.Append ("\n" + GemRB.GetString(11028) + "\n" + info)
+			if info:
+				TextArea.Append ("\n" + GemRB.GetString(11028) + "\n" + info)
 
 		TextArea.Append ("\n")
 		TextArea.Append (9466)
@@ -1517,7 +1515,6 @@ def AbilitiesCancelPress():
 def SkillsPress():
 	global CharGenWindow, AppearanceButton
 	global SkillsState, SkillsButton, CharGenState, ClassFlag
-
 	Level = 1
 	SpellLevel = 1
 	ClassName = GUICommon.GetClassRowName (MyChar)
@@ -1527,7 +1524,6 @@ def SkillsPress():
 	IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 	LUSkillsSelection.SkillsNullify (MyChar)
-	LearnSpells(MyChar)
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
@@ -1560,10 +1556,10 @@ def SkillsPress():
 			SkillsState = 4
 
 	if SkillsState == 4:
-		if PriestSpell=="MXSPLPRS" or PriestSpell =="MXSPLPAL":
+		if PriestSpell=="MXSPLPRS":
 			ClassFlag = 0x4000
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
-		elif DruidSpell=="MXSPLDRU" or DruidSpell =="MXSPLRAN":
+		elif DruidSpell=="MXSPLDRU":
 			#no separate spell progression
 			if DruidSpell == "MXSPLDRU":
 				DruidSpell = "MXSPLPRS"
@@ -1750,6 +1746,12 @@ def ProficienciesSelect():
 	ProfsTable = GemRB.LoadTable ("profs")
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
 	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
+
+	#remove all known spells and nullify the memorizable counts
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
+	GemRB.SetVar ("MageMemorized", 0)
+	GemRB.SetVar ("MageSpellBook", 0)
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	ProficienciesPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
@@ -2145,10 +2147,11 @@ def MageMemorizeSelectPress():
 	return
 
 def MageMemorizeDonePress():
-	global CharGenWindow, MageMemorizeWindow, SkillsState
+	global CharGenWindow, MageMemorizeWindow, SkillsState, MyChar
 
 	if MageMemorizeWindow:
 		MageMemorizeWindow.Unload ()
+	LearnSpells(MyChar)
 	SkillsState = 4
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
@@ -2256,10 +2259,11 @@ def PriestMemorizeSelectPress():
 	return
 
 def PriestMemorizeDonePress():
-	global CharGenWindow, PriestMemorizeWindow, SkillsState
+	global CharGenWindow, PriestMemorizeWindow, SkillsState, MyChar
 
 	if PriestMemorizeWindow:
 		PriestMemorizeWindow.Unload ()
+	LearnSpells(MyChar)
 	SkillsState = 5
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
