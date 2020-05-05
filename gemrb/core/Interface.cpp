@@ -555,7 +555,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_TEXTSCREEN) {
 		EventFlag&=~EF_TEXTSCREEN;
-		winmgr->SetCursorFeedback(WindowManager::MOUSE_ALL);
+		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
 		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
 		return;
 	}

@@ -799,7 +799,7 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	if (active) {
 		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
-		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_ALL);
+		core->GetWindowManager()->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
 	}
 }
 
