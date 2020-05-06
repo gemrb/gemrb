@@ -489,23 +489,29 @@ def SetCharacterDescription():
 				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
 				TextArea.Append ("%\n")
 		elif DruidSpell!="*":
-			TextArea.Append ("\n")
-			TextArea.Append (8442)
-			TextArea.Append ("\n")
+			PositiveStats = []
 			for i in range (4):
 				StatID = SkillsTable.GetValue (i+2, 3)
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if Stat>0:
+					PositiveStats.append ((i, Stat))
+			if PositiveStats:
+				TextArea.Append ("\n")
+				TextArea.Append (8442)
+				TextArea.Append ("\n")
+				for i, Stat in PositiveStats:
 					TextArea.Append (SkillsTable.GetValue (i+2, 2))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
 					TextArea.Append ("%\n")
-			TextArea.Append ("\n")
-			TextArea.Append (15982)
-			TextArea.Append (": " )
+
 			RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
-			TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 3) )
-			TextArea.Append ("\n")
+			if RacialEnemy != -1:
+				TextArea.Append ("\n")
+				TextArea.Append (15982)
+				TextArea.Append (": " )
+				TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 3))
+				TextArea.Append ("\n")
 		elif IsBard!="*":
 			TextArea.Append ("\n")
 			TextArea.Append (8442)
