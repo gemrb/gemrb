@@ -521,6 +521,18 @@ def SetCharacterDescription():
 					TextArea.Append (str(Stat) )
 					TextArea.Append ("%\n")
 
+		if MageSpell != "*":
+			info = Spellbook.GetKnownSpellsDescription (MyChar, IE_SPELL_TYPE_WIZARD)
+			if info:
+				TextArea.Append ("\n" + GemRB.GetString (11027) + "\n" + info)
+
+		if PriestSpell == "*":
+			PriestSpell = DruidSpell
+		if PriestSpell != "*":
+			info = Spellbook.GetKnownSpellsDescription (MyChar, IE_SPELL_TYPE_PRIEST)
+			if info:
+				TextArea.Append ("\n" + GemRB.GetString (11028) + "\n" + info)
+
 		TextArea.Append ("\n")
 		TextArea.Append (9466)
 		TextArea.Append ("\n")
@@ -535,44 +547,6 @@ def SetCharacterDescription():
 					TextArea.Append ("+")
 					j = j + 1
 				TextArea.Append ("\n")
-
-		if MageSpell !="*":
-			TextArea.Append ("\n")
-			TextArea.Append (11027)
-			TextArea.Append (":\n")
-			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			Learnable = Spellbook.GetLearnableMageSpells (GemRB.GetPlayerStat (MyChar, IE_KIT), t,1)
-			MageSpellBook = GemRB.GetVar ("MageSpellBook")
-			MageMemorized = GemRB.GetVar ("MageMemorized")
-			for i in range (len(Learnable)):
-				if (1 << i) & MageSpellBook:
-					Spell = GemRB.GetSpell (Learnable[i])
-					TextArea.Append (Spell["SpellName"])
-					if (1 << i) & MageMemorized:
-						TextArea.Append (" +")
-					TextArea.Append ("\n")
-
-		if PriestSpell == "*":
-			PriestSpell = DruidSpell
-		if PriestSpell!="*":
-			TextArea.Append ("\n")
-			TextArea.Append (11028)
-			TextArea.Append (":\n")
-			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			if PriestSpell == "MXSPLPRS" or PriestSpell == "MXSPLPAL":
-				ClassFlag = 0x4000
-			elif PriestSpell == "MXSPLDRU" or PriestSpell == "MXSPLRAN":
-				ClassFlag = 0x8000
-			else:
-				ClassFlag = 0
-
-			Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, 1)
-			PriestMemorized = GemRB.GetVar ("PriestMemorized")
-			for i in range (len(Learnable)):
-				if (1 << i) & PriestMemorized:
-					Spell = GemRB.GetSpell (Learnable[i])
-					TextArea.Append (Spell["SpellName"])
-					TextArea.Append (" +\n")
 	return
 
 
