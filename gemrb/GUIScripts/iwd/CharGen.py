@@ -338,16 +338,10 @@ def AcceptPress():
 	if TableName == "*":
 		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 	if TableName != "*":
-		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
-			ClassFlag = 0x8000
-		elif TableName == "MXSPLDRU":
+		ClassFlag = GetClassFlag (TableName)
+		if TableName == "MXSPLDRU":
 			#there is no separate druid table, falling back to priest
 			TableName = "MXSPLPRS"
-			ClassFlag = 0x4000
-		elif TableName == "MXSPLRAN":
-			ClassFlag = 0x4000
-		else:
-			ClassFlag = 0
 
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
@@ -549,9 +543,15 @@ def SetCharacterDescription():
 				TextArea.Append ("\n")
 	return
 
+def GetClassFlag(TableName):
+	if TableName in ("MXSPLPRS", "MXSPLPAL"):
+		return 0x4000
+	elif TableName in ("MXSPLDRU", "MXSPLRAN"):
+		return 0x8000
+	else:
+		return 0
 
 # Gender Selection
-
 def GenderPress():
 	global CharGenWindow, GenderWindow, GenderDoneButton, GenderTextArea
 	global MyChar
@@ -1553,10 +1553,10 @@ def SkillsPress():
 			SkillsState = 4
 
 	if SkillsState == 4:
-		if PriestSpell=="MXSPLPRS" or PriestSpell =="MXSPLPAL":
+		if PriestSpell == "MXSPLPRS":
 			ClassFlag = 0x4000
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
-		elif DruidSpell=="MXSPLDRU" or DruidSpell =="MXSPLRAN":
+		elif DruidSpell == "MXSPLDRU":
 			#no separate spell progression
 			if DruidSpell == "MXSPLDRU":
 				DruidSpell = "MXSPLPRS"
