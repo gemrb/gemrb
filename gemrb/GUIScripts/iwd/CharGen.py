@@ -2694,7 +2694,7 @@ def ImportPress():
 
 def ImportDonePress():
 	global CharGenWindow, ImportWindow, CharImportList
-	global CharGenState, SkillsState, Portrait, ImportedChar
+	global CharGenState, SkillsState, Portrait, ImportedChar, HasStrExtra
 
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
@@ -2705,6 +2705,9 @@ def ImportDonePress():
 	GemRB.SetToken ("LargePortrait", PortraitName )
 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	Portrait = -1
+
+	ClassName = GUICommon.GetClassRowName (MyChar)
+	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
 
 	ImportedChar = 1
 	CharGenState = 7
