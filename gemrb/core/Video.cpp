@@ -377,7 +377,10 @@ Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
 {
 	Color outC = inCol;
 	if (flags & BLIT_HALFTRANS) {
-		outC.a /= 2; // FIXME: should this divide by 2 or jsut set to 0x80?
+		// set exactly to 128 because it is an optimized value
+		// if we end up needing to do half of something already transparent we can change this
+		// or do the calculations before calling the video driver and dont pass BLIT_HALFTRANS
+		outC.a = 128;
 	}
 
 	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_TINTED?
