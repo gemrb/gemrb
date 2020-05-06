@@ -540,9 +540,8 @@ void WindowManager::DrawWindows() const
 			// Important to only draw if the window itself is dirty
 			// controls on greyed out windows shouldnt be updating anyway
 			win->Draw();
-			static const Color fill(0, 0, 0, 128);
 			Region winrgn(Point(), win->Dimensions());
-			video->DrawRect(winrgn, fill, true, BLIT_BLENDED);
+			video->DrawRect(winrgn, ColorBlack, true, BLIT_HALFTRANS|BLIT_BLENDED);
 		} else {
 			win->Draw();
 		}
@@ -561,7 +560,7 @@ void WindowManager::DrawWindows() const
 			if (modalShadow == ShadowGray) {
 				flags |= BLIT_HALFTRANS;
 			}
-			video->DrawRect(screen, ColorBlack, true, flags);
+			video->DrawRect(screen, ColorBlack, true, flags|BLIT_BLENDED);
 		}
 		auto& modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
