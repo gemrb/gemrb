@@ -97,6 +97,17 @@ def GetKnownSpells(actor, BookType):
 
 	return knownSpells
 
+def GetKnownSpellsDescription(actor, BookType):
+	""" Gets text to display in the chargen spell listing. """
+
+	info = ""
+	spells = GetKnownSpells (actor, BookType)
+	# reverse spells order grouped by SpellLevel
+	spells.sort (lambda fst, snd: -1 if fst['SpellLevel'] == snd['SpellLevel'] else 0)
+	for spell in spells:
+		info += GemRB.GetString (spell['SpellName']) + "\n"
+	return info
+
 def GetKnownSpellsLevel(actor, BookType, level):
 	knownSpells = []
 	spellResRefs = []

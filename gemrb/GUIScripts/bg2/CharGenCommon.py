@@ -22,6 +22,7 @@ from ie_stats import *
 from GUIDefines import *
 import GUICommon
 import CommonTables
+import Spellbook
 from ie_restype import RES_BMP
 
 CharGenWindow = 0
@@ -198,22 +199,12 @@ def DisplayOverview(step):
 				TextAreaControl.Append ("\n" + GemRB.GetString(8442) + "\n" + info)
 
 			# arcane spells
-			info = ""
-			for level in range(0, 9):
-				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_WIZARD, level) ):
-					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_WIZARD, level, j)
-					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
-					info += GemRB.GetString (Spell) + "\n"
+			info = Spellbook.GetKnownSpellsDescription (MyChar, IE_SPELL_TYPE_WIZARD)
 			if info != "":
 				TextAreaControl.Append ("\n" + GemRB.GetString(11027) + "\n" + info)
 
 			# divine spells
-			info = ""
-			for level in range(0, 7):
-				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level) ):
-					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_PRIEST, level, j)
-					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
-					info += GemRB.GetString (Spell) + "\n"
+			info = Spellbook.GetKnownSpellsDescription (MyChar, IE_SPELL_TYPE_PRIEST)
 			if info != "":
 				TextAreaControl.Append ("\n" + GemRB.GetString(11028) + "\n" + info)
 
