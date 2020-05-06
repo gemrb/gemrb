@@ -347,8 +347,8 @@ def LearnSpells(MyChar):
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
 		PriestMemorized = GemRB.GetVar ("PriestMemorized")
-		j = 1
-		while (PriestMemorized and PriestMemorized != 1<<(j-1)):
+		j = 0
+		while PriestMemorized and PriestMemorized != 1<<j:
 			j = j + 1
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
