@@ -1524,17 +1524,21 @@ def SkillsPress():
 	LUSkillsSelection.SkillsNullify (MyChar)
 
 	if SkillsState == 0:
-		GemRB.SetVar ("HatedRace", 0)
-		if IsThief!="*":
-			SkillsSelect()
-		elif DruidSpell!="*":
+		if DruidSpell != "*":
 			Skill = GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH")
 			GemRB.SetPlayerStat (MyChar, IE_STEALTH, Skill)
-			RacialEnemySelect()
-		elif IsBard!="*":
+		elif IsBard != "*":
 			Skill = GemRB.LoadTable(IsBard).GetValue(str(Level), "PICK_POCKETS")
 			GemRB.SetPlayerStat (MyChar, IE_PICKPOCKET, Skill)
-			SkillsState = 1
+
+		GemRB.SetVar ("HatedRace", 0)
+		GemRB.SetVar ("RacialEnemy", 0)
+		GemRB.SetVar ("RacialEnemyIndex", 0)
+		HateRace = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
+		if HateRace != "*":
+			RacialEnemySelect()
+		elif IsThief != "*":
+			SkillsSelect()
 		else:
 			SkillsState = 1
 
