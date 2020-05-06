@@ -368,7 +368,6 @@ def AcceptPress():
 	if MyChar == 1:
 		GemRB.GameSetReputation (t)
 
-	print "Reputation", t
 	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (ClassName, "ROLLS") #number of dice
 	b = TmpTable.GetValue (ClassName, "SIDES") #size
@@ -759,9 +758,8 @@ def CGLargeCustomPortrait():
 	if Portrait=="":
 		Portrait = "NOPORTMD"
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList2.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif PortraitList2.QueryText () != "":
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	Button = Window.GetControl (0)
 	Button.SetPicture (Portrait, "NOPORTMD")
@@ -782,9 +780,8 @@ def CGSmallCustomPortrait():
 	if Portrait=="":
 		Portrait = "NOPORTSM"
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList1.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	elif PortraitList1.QueryText () != "":
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (Portrait, "NOPORTSM")
@@ -1019,7 +1016,6 @@ def ClassMultiPress():
 	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = CommonTables.Races.GetRowName (RaceRow)
 
-	print "Multi racename:", RaceName
 	for i in range (2, 10):
 		ClassMultiSelectButton = ClassMultiWindow.GetControl (i)
 		ClassMultiSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
@@ -1027,10 +1023,10 @@ def ClassMultiPress():
 	j = 2
 	for i in range (ClassCount):
 		ClassName = CommonTables.Classes.GetRowName (i)
-		if (CommonTables.Classes.GetValue (ClassName, "MULTI") > 0):
+		if CommonTables.Classes.GetValue (ClassName, "MULTI") > 0:
 			ClassMultiSelectButton = ClassMultiWindow.GetControl (j)
 			j = j + 1
-			if (CommonTables.Classes.GetValue (ClassName, RaceName) > 0):
+			if CommonTables.Classes.GetValue (ClassName, RaceName) > 0:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1600,11 +1596,11 @@ def SkillsSelect():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindow (6)
 
-	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
-		GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL),
+		GemRB.GetPlayerStat (MyChar, IE_LEVEL2),
 		GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
-	LUSkillsSelection.SetupSkillsWindow (MyChar, \
+	LUSkillsSelection.SetupSkillsWindow (MyChar,
 		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillsWindow, RedrawSkills, [0,0,0], Levels, 0, False)
 
 	SkillsPointsLeft = GemRB.GetVar ("SkillPointsLeft")
