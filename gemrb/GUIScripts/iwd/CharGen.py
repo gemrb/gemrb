@@ -310,11 +310,12 @@ def CancelPress():
 	GemRB.SetNextScript ("PartyFormation")
 	return
 
-def AcceptPress():
-	#mage spells
+def LearnSpells(MyChar):
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
+
+	# mage spells
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if TableName != "*":
 		# setting up just the first spell level is enough, since the rest will be granted on level-up
@@ -353,8 +354,11 @@ def AcceptPress():
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
+def AcceptPress():
 	# apply class/kit abilities
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
+	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 
 	TmpTable = GemRB.LoadTable ("repstart")
 	t = CommonTables.Aligns.FindValue (3, t)
@@ -1744,6 +1748,12 @@ def ProficienciesSelect():
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
 	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 
+	# remove all known spells and nullify the memorizable counts
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
+	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
+	GemRB.SetVar ("MageMemorized", 0)
+	GemRB.SetVar ("MageSpellBook", 0)
+
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	ProficienciesPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
 	PointsLeftLabel = ProficienciesWindow.GetControl (0x10000009)
@@ -2138,10 +2148,11 @@ def MageMemorizeSelectPress():
 	return
 
 def MageMemorizeDonePress():
-	global CharGenWindow, MageMemorizeWindow, SkillsState
+	global CharGenWindow, MageMemorizeWindow, SkillsState, MyChar
 
 	if MageMemorizeWindow:
 		MageMemorizeWindow.Unload ()
+	LearnSpells (MyChar)
 	SkillsState = 4
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
@@ -2249,10 +2260,11 @@ def PriestMemorizeSelectPress():
 	return
 
 def PriestMemorizeDonePress():
-	global CharGenWindow, PriestMemorizeWindow, SkillsState
+	global CharGenWindow, PriestMemorizeWindow, SkillsState, MyChar
 
 	if PriestMemorizeWindow:
 		PriestMemorizeWindow.Unload ()
+	LearnSpells (MyChar)
 	SkillsState = 5
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
