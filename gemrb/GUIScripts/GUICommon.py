@@ -34,17 +34,17 @@ NextWindowFn = None
 CommonTables.Load ()
 
 def CloseOtherWindow (NewWindowFn):
-	global OtherWindowFn,NextWindowFn
+  global OtherWindowFn,NextWindowFn
 
 	GemRB.LeaveContainer()
-	if OtherWindowFn and OtherWindowFn != NewWindowFn:
+    if OtherWindowFn and OtherWindowFn != NewWindowFn:
 		# allow detection of 'next window'
-		NextWindowFn = NewWindowFn
+	    NextWindowFn =NewWindowFn
 		# switching from a window to something else, call old function
 		OtherWindowFn ()
 		OtherWindowFn = NewWindowFn
 		return 0
-	elif OtherWindowFn:
+elif OtherWindowFn:
 		# something is calling us with its own function, so
 		# it is closing down, return true
 		OtherWindowFn = None
