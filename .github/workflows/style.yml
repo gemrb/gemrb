@@ -20,7 +20,10 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: Setup Python
+      uses: actions/setup-python@v1
+  
     - name: python-lint whitespace check
       run: |
         pip install pycodestyle
-        git diff -u origin/master gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
+        git diff -u origin/master -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
