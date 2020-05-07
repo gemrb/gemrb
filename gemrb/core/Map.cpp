@@ -1126,20 +1126,18 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 	}
 
 	if (!bgoverride) {
-		int rain, flags;
+		int rain = 0;
+		int flags = 0;
 
 		if (game->IsTimestopActive()) {
 			flags = BLIT_GREY;
-		}
-		else if (AreaFlags&AF_DREAM) {
+		} else if (AreaFlags&AF_DREAM) {
 			flags = BLIT_SEPIA;
-		} else flags = 0;
+		}
 
 		if (HasWeather()) {
 			//zero when the weather particles are all gone
 			rain = game->weather->GetPhase()-P_EMPTY;
-		} else {
-			rain = 0;
 		}
 
 		TMap->DrawOverlays( viewport, rain, flags );
