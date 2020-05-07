@@ -335,11 +335,19 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
 	} else {
 		// must be checked afer palette versioning is done
+		
+		// the gamewin is an RGB surface (no alpha)
+		// RGBA->RGB with SDL_SRCALPHA
+		//     The source is alpha-blended with the destination, using the alpha channel. SDL_SRCCOLORKEY and the per-surface alpha are ignored.
+		// RGBA->RGB without SDL_SRCALPHA
+		//     The RGB data is copied from the source. The source alpha channel and the per-surface alpha value are ignored.
 		if (halftrans) {
 			// we can only use SDL_SetAlpha if we dont need our general purpose blitter for another reason
 			SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
-		} else {
+		} else if (remflags&BLIT_BLENDED) {
 			SDL_SetAlpha(surf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+		} else {
+			SDL_SetAlpha(surf, 0, SDL_ALPHA_OPAQUE);
 		}
 
 		SDL_Rect s = srect;
