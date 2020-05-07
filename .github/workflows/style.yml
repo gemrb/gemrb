@@ -3,8 +3,6 @@
 name: Style checks
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -25,8 +23,5 @@ jobs:
   
     - name: python-lint whitespace check
       run: |
-        pwd &&
-        echo $GITHUB_WORKSPACE &&
-        cd /home/runner/work/gemrb/gemrb &&
         pip install pycodestyle &&
-        git diff -u origin/master -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
+        git diff -u ..$GITHUB_BASE_REF -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
