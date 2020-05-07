@@ -25,7 +25,8 @@ jobs:
   
     - name: python-lint whitespace check
       run: |
-        git remote add tmp-origin https://github.com/gemrb/gemrb.git
-        pip install pycodestyle
-        git diff -u tmp-origin/master -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
-        git remote remove tmp-origin
+        pwd &&
+        echo $GITHUB_WORKSPACE &&
+        cd /home/runner/work/gemrb/gemrb &&
+        pip install pycodestyle &&
+        git diff -u origin/master -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
