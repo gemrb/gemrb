@@ -21,7 +21,7 @@ DEF_DONATE2 = 29
 DEF_IDENTIFY = 30
 DEF_GOTXP = 31
 
-# sfx channel names
+# sfx channel names from sndchann.2da; keep synced with Audio::Audio in core
 CHAN_NARRATOR = "NARRATIO"
 CHAN_AMB_AREA = "AREA_AMB"
 CHAN_ACTIONS = "ACTIONS"
