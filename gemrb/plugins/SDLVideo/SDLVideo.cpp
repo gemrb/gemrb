@@ -600,13 +600,24 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	}
 }
 
-void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* tint)
+void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* tint)
 {
-	SDLSurfaceSprite2D::version_t version = spr->GetVersion(false);
-
-	if (renderflags != version) {
-		if (spr->Bpp == 8) {
-			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(renderflags));
+	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
+	SDLSurfaceSprite2D::version_t newVersion = renderflags;
+	
+	if (spr->Bpp == 8) {
+		if (tint) {
+			assert(renderflags&BLIT_TINTED);
+			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
+			newVersion |= tintv << 32;
+		}
+		
+		if (spr->IsPaletteStale()) {
+			spr->Restore();
+		}
+		
+		if (oldVersion != newVersion) {
+			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(newVersion));
 
 			for (size_t i = 0; i < 256; ++i) {
 				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
@@ -622,24 +633,24 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned
 					ShaderSepia(dstc);
 				}
 			}
-		} else {
-			SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(renderflags);
-			SDL_LockSurface(newV);
-
-			SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
-			SDLPixelIterator beg(r, newV);
-			SDLPixelIterator end = SDLPixelIterator::end(beg);
-			StaticAlphaIterator alpha(0xff);
-
-			if (renderflags & BLIT_GREY) {
-				RGBBlendingPipeline<GREYSCALE, true> blender;
-				Blit(beg, beg, end, alpha, blender);
-			} else if (renderflags & BLIT_SEPIA) {
-				RGBBlendingPipeline<SEPIA, true> blender;
-				Blit(beg, beg, end, alpha, blender);
-			}
-			SDL_UnlockSurface(newV);
 		}
+	} else if (oldVersion != newVersion) {
+		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
+		SDL_LockSurface(newV);
+
+		SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
+		SDLPixelIterator beg(r, newV);
+		SDLPixelIterator end = SDLPixelIterator::end(beg);
+		StaticAlphaIterator alpha(0xff);
+
+		if (renderflags & BLIT_GREY) {
+			RGBBlendingPipeline<GREYSCALE, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		} else if (renderflags & BLIT_SEPIA) {
+			RGBBlendingPipeline<SEPIA, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		}
+		SDL_UnlockSurface(newV);
 	}
 }
 

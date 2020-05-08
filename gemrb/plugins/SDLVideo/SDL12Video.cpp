@@ -249,7 +249,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	SDL_Surface* surf = sdlspr->GetSurface();
 
 	Color c;
-	if (tint){
+	if (tint && (flags&BLIT_TINTED)){
 		c = Color(tint->r, tint->g, tint->b, tint->unused);
 	}
 
@@ -257,8 +257,13 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
 
 		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
-		unsigned int version = flags&shaderflags;
-		RenderSpriteVersion(sdlspr, version, &c);
+		uint32_t version = flags&shaderflags;
+		if (flags&BLIT_TINTED) {
+			RenderSpriteVersion(sdlspr, version, &c);
+		} else {
+			RenderSpriteVersion(sdlspr, version);
+		}
+		
 		// since the "shading" has been done we clear the flags
 		flags &= ~shaderflags;
 	}

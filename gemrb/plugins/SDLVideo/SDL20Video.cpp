@@ -209,23 +209,11 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
 {
-	Palette* pal = spr->GetPalette();
-
-	if (pal) {
-		SDLSurfaceSprite2D::version_t curversion = spr->GetVersion(true);
-		SDLSurfaceSprite2D::version_t palv = ((curversion&SDLSurfaceSprite2D::PalMask) >> 16);
-
-		if (pal->GetVersion() != palv) {
-			spr->Restore();
-		}
-		pal->release();
-	}
-	
 #if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
 	// OPENGL
 #else
 	// we need to isolate flags that require software rendering to use as the "version"
-	unsigned int version = (BLIT_GREY|BLIT_SEPIA) & flags;
+	uint32_t version = (BLIT_GREY|BLIT_SEPIA) & flags;
 	// WARNING: software fallback == slow
 	RenderSpriteVersion(spr, version);
 #endif

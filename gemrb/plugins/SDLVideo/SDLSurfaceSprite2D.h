@@ -30,12 +30,7 @@ namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
 public:
-	typedef unsigned long long version_t;
-
-	enum VersionMask {
-		PalMask = 0xffffffff00000000,
-		FlagMask = 0x00000000ffffffff
-	};
+	using version_t = uint64_t;
 
 protected:
 	struct SurfaceHolder : public Held<SurfaceHolder>
@@ -52,7 +47,8 @@ protected:
 
 	Holder<SurfaceHolder> original;
 	mutable Holder<SurfaceHolder> surface;
-	mutable version_t version;
+	mutable version_t version = 0;
+	mutable version_t palVersion = 0;
 
 public:
 	SDLSurfaceSprite2D(const Region&, int Bpp, void* pixels,
@@ -80,11 +76,12 @@ public:
 
 	// return a copy of the surface or the palette if 8 bit
 	// this copy is what is returned from GetSurface for rendering
-	virtual void* NewVersion(unsigned int version) const;
+	virtual void* NewVersion(version_t version) const;
+	version_t GetVersion() const noexcept { return version; }
+	bool IsPaletteStale() const;
 	// restore the sprite to version 0 (aka original) and free the versioned resources
 	// an 8 bit sprite will be also implicitly restored by SetPalette()
 	virtual void Restore() const;
-	version_t GetVersion(bool includePal = true) const;
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -118,7 +115,7 @@ public:
 
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 
-	void* NewVersion(unsigned int version) const;
+	void* NewVersion(version_t version) const;
 	void Restore() const;
 };
 #endif

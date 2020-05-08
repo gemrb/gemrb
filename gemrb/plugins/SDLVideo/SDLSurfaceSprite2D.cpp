@@ -41,7 +41,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, int Bpp, void* pixels
 
 	assert(*surface);
 	original = surface;
-	version = 0;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, int Bpp,
@@ -54,7 +53,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, int Bpp,
 
 	assert(*surface);
 	original = surface;
-	version = 0;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
@@ -83,7 +81,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	}
 
 	original = surface;
-	version = 0;
 }
 
 SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
@@ -118,8 +115,9 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 			return NULL;
 		}
 		assert(fmt->palette->ncolors <= 256);
-		palette = new Palette();
-		memcpy(palette->col, fmt->palette->colors, fmt->palette->ncolors * 4);
+		const Color* begin = reinterpret_cast<const Color*>(fmt->palette->colors);
+		const Color* end = begin + fmt->palette->ncolors;
+		palette = new Palette(begin, end);
 	}
 	palette->acquire();
 	surface->palette = palette;
@@ -127,13 +125,18 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 	return palette;
 }
 
+bool SDLSurfaceSprite2D::IsPaletteStale() const
+{
+	Palette* pal = GetPalette();
+	return pal && pal->GetVersion() != palVersion;
+}
+
 void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
 	Palette* palette = surface->palette.get();
-	version_t palv = ((GetVersion()&PalMask) >> 16);
 
 	if (pal == palette) {
-		if (pal->GetVersion() != palv) {
+		if (pal->GetVersion() != palVersion) {
 			Restore();
 		} else {
 			return;
@@ -142,7 +145,7 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 
 	if (palette) {
 		palette->release();
-		palette = NULL;
+		palette = nullptr;
 	}
 
 	if (version == 0) {
@@ -292,32 +295,26 @@ void SDLSurfaceSprite2D::Restore() const
 	}
 }
 
-SDLSurfaceSprite2D::version_t SDLSurfaceSprite2D::GetVersion(bool includePal) const
+void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
 {
-	if (Bpp == 8 && includePal) {
-		Palette* pal = GetPalette();
-		version_t v = pal->GetVersion();
-		v = (v << 16) & version;
-		pal->release();
-		return v;
-	}
-	return version;
-}
-
-void* SDLSurfaceSprite2D::NewVersion(unsigned int newversion) const
-{
-	if (newversion == 0) {
+	if (newversion == 0 || version != newversion) {
 		Restore();
+		version = newversion;
 	}
-
-	version = newversion;
 
 	if (Bpp == 8) {
 		Palette* pal = GetPalette(); // generate the backup
 		pal->release();
+		
+		palVersion = pal->GetVersion();
+		
 		// we just allow overwritting the palette
 		return surface->surface->format->palette;
-	} else if (version != newversion) {
+	}
+	
+	palVersion = 0;
+
+	if (version != newversion) {
 		SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
 		surface = new SurfaceHolder(newVersion);
 
@@ -367,7 +364,7 @@ void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 	SDLSurfaceSprite2D::SetColorKey(pxvalue);
 }
 
-void* SDLTextureSprite2D::NewVersion(unsigned int version) const
+void* SDLTextureSprite2D::NewVersion(version_t version) const
 {
 	texture = NULL;
 	return SDLSurfaceSprite2D::NewVersion(version);
