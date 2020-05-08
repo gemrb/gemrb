@@ -398,7 +398,7 @@ String Button::TooltipText() const
 				s += L"Esc";
 				break;
 			case GEM_RETURN:
-				s += L"Ret";
+				s += L"Enter";
 				break;
 			case GEM_PGUP:
 				s += L"PgUp";
