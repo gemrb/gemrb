@@ -181,7 +181,7 @@ void Video::SetEventMgr(EventMgr* evnt)
 // Flips given sprite according to the flags. If MirrorAnchor=true,
 // flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Sprite2D* Video::MirrorSprite(const Sprite2D* sprite, unsigned int flags, bool MirrorAnchor)
+Sprite2D* Video::MirrorSprite(const Sprite2D* sprite, uint32_t flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
@@ -248,7 +248,7 @@ void Video::BlitTiled(Region rgn, const Sprite2D* img)
 }
 
 void Video::BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
-							   unsigned int flags, Color tint, const Region* clip)
+							   uint32_t flags, Color tint, const Region* clip)
 {
 	if (pal) {
 		Palette* oldpal = spr->GetPalette();

@@ -292,7 +292,7 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void*
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
+void SDLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, uint32_t flags, const Color* tint)
 {
 	assert(spr->BAM == false);
 
@@ -313,7 +313,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region d
 }
 
 void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
-									unsigned int flags, Color tint, const Region* clip)
+									uint32_t flags, Color tint, const Region* clip)
 {
 	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Frame.w, spr->Frame.h));
 	Region drect = (clip) ? *clip : Region(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
@@ -547,7 +547,7 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, uint32_t flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BLIT_MIRRORX or BLIT_MIRRORY is set

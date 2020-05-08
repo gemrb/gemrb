@@ -74,9 +74,9 @@ public:
 								   Color* palette, bool cK = false, int index = 0) override;
 
 	void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
-						  unsigned int flags, const Color* tint = NULL) override;
+						  uint32_t flags, const Color* tint = NULL) override;
 	void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) override;
-	void BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+	void BlitGameSprite(const Sprite2D* spr, int x, int y, uint32_t flags, Color tint,
 								const Region* clip = NULL) override;
 
 	/** Blits a Sprite filling the Region */
@@ -96,9 +96,9 @@ protected:
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, unsigned int renderflags, const Color* = NULL);
 
-	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, unsigned int flags = 0, const Color* tint = NULL);
+	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL)=0;
+	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL);
 
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/

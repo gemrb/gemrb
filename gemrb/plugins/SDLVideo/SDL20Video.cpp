@@ -170,7 +170,7 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 	return static_cast<SDLTextureVideoBuffer*>(stencilBuffer)->GetTexture();
 }
 
-int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
+int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 {
 	// TODO: add support for BLIT_HALFTRANS, BLIT_TINTED, and others (no use for them ATM)
 
@@ -207,7 +207,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, unsigned int flags)
 	return 0;
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
 {
 	Palette* pal = spr->GetPalette();
 
@@ -234,7 +234,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
 {
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
@@ -297,7 +297,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 	}
 }
 
-void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint, const Region* clip)
 {
 	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();

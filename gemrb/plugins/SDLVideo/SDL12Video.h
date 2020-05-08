@@ -52,7 +52,7 @@ public:
 
 	bool SupportsBAMSprites() override { return true; }
 
-	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:
@@ -64,10 +64,10 @@ private:
 	int ProcessEvent(const SDL_Event & event) override;
 
 	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
-							  unsigned int flags = 0, const Color* tint = NULL) override;
+							  uint32_t flags = 0, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
-								 unsigned int flags = 0, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags, Color tint);
+								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;
+	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, Color tint);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags) override;
 

@@ -231,7 +231,7 @@ public:
 	
 	bool TouchInputEnabled() override;
 
-	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
 						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:
@@ -241,7 +241,7 @@ private:
 
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
-	int UpdateRenderTarget(const Color* color = NULL, unsigned int flags = 0);
+	int UpdateRenderTarget(const Color* color = NULL, uint32_t flags = 0);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0) override;
 	void DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0);
@@ -259,8 +259,8 @@ private:
 	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Region& /*src*/, const Region& /*dst*/,
 					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
-								 unsigned int flags = 0, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, unsigned int flags = 0, const SDL_Color* tint = NULL);
+								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;
+	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL);
 
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* = NULL);
 

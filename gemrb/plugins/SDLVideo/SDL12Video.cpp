@@ -104,7 +104,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 }
 
 void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
-											unsigned int flags, const Color* t)
+											uint32_t flags, const Color* t)
 {
 	Color tint(255,255,255,255);
 	if (t) {
@@ -243,7 +243,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	SDL_UnlockSurface(currentBuf);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, const SDL_Color* tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
 {
 	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
 	SDL_Surface* surf = sdlspr->GetSurface();
@@ -266,7 +266,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, unsigned int flags, Color tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, Color tint)
 {
 	// non-BAM Blitting
 
@@ -356,7 +356,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	}
 }
 
-void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& p, unsigned int flags, const Color* tint, const Region* clip)
+void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint, const Region* clip)
 {
 	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 	const Region& r = buf->Rect();

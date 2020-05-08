@@ -196,7 +196,7 @@ public:
 	virtual bool SupportsBAMSprites() { return false; }
 
 	virtual void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
-						  unsigned int flags, const Color* tint = NULL) = 0;
+						  uint32_t flags, const Color* tint = NULL) = 0;
 	void BlitSprite(const Sprite2D* spr, int x, int y,
 					const Region* clip = NULL);
 	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) = 0;
@@ -204,13 +204,13 @@ public:
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
 	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
-								unsigned int flags, Color tint,
+								uint32_t flags, Color tint,
 								const Region* clip = NULL) = 0;
 
 	void BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
-				   unsigned int flags, Color tint, const Region* clip = NULL);
+				   uint32_t flags, Color tint, const Region* clip = NULL);
 
-	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, unsigned int flags,
+	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
 								 const Color* tint = nullptr, const Region* clip = nullptr) = 0;
 
 	/** Return GemRB window screenshot.
@@ -219,7 +219,7 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
 
-	void DrawPoint(const Point&, const Color& color, unsigned int flags = 0);
+	void DrawPoint(const Point&, const Color& color, uint32_t flags = 0);
 	void DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
 
 	/** Draws a circle */
@@ -239,7 +239,7 @@ public:
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
-	Sprite2D *MirrorSprite(const Sprite2D *sprite, unsigned int flags, bool MirrorAnchor);
+	Sprite2D *MirrorSprite(const Sprite2D *sprite, uint32_t flags, bool MirrorAnchor);
 	/** Duplicates and transforms sprite to have an alpha channel */
 	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
