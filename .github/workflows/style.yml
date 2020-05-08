@@ -23,11 +23,6 @@ jobs:
   
     - name: python-lint whitespace check
       run: |
-        git branch -a
-        echo +++++++++++++++++++++++++++++++++++++++++++++++++++++
-        git remote -v
-        echo +++++++++++++++++++++++++++++++++++++++++++++++++++++
-        git fetch -v origin
-        echo +++++++++++++++++++++++++++++++++++++++++++++++++++++
+        git fetch origin
         pip install pycodestyle &&
-        git diff -u origin/master... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff
+        git diff -u origin/master... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source
