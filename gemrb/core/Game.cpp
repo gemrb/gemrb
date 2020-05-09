@@ -1755,16 +1755,15 @@ int Game::CanPartyRest(int checks) const
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
 			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
 			// and repurposes these area flags!
-			if (area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)/* == (AF_TUTORIAL|AF_DEADMAGIC)*/) {
-				// get permission 38587
-				return displaymsg->GetStringReference(STR_MAYNOTREST);
-			/* TODO: add all the other strings
+			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
+				// you must obtain permission
+				return 38587;
 			} else if (area->AreaFlags&AF_TUTORIAL) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // here 34601
-				return false;
+				// you cannot rest in this area
+				return 34601;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // actual STR_MAYNOTREST
-				return false;*/
+				// you cannot rest right now
+				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		} else {
 			// you may not rest here, find an inn
