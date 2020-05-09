@@ -1989,12 +1989,13 @@ def RentConfirm ():
 	# TODO: run GemRB.RunRestScripts ()
 	info = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
 	cutscene = info["Cutscene"]
-	if info["Error"]:
-		# TODO: open error modal with reason
-		pass
 
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
+	if info["Error"]:
+		# notify why resting isn't possible
+		ErrorWindow (info["ErrorMsg"])
+
 	Window = StoreRentWindow
 	if cutscene:
 		CloseStoreWindow ()
