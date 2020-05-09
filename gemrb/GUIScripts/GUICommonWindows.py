@@ -2091,7 +2091,7 @@ def RealRestPress ():
 	# outside movies start at 2, 1 is for inns
 	# 15 means run all checks to see if resting is possible
 	info = GemRB.RestParty(15, 0 if GameCheck.IsBG2() else 2, 1)
-	if info["Error"] and info["ErrorMsg"] > 0:
+	if info["Error"]:
 		if GameCheck.IsPST ():
 			# TODO: open error window
 			pass

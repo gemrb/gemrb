@@ -14270,9 +14270,16 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	// Error feedback is eventually handled this way:
 	// - resting outside: popup an error window with the reason in pst, print it to message window elsewhere
 	// - resting in inns: popup a GUISTORE error window with the reason
-	// - if the particular reason strref does not exist, don't print anything
 	PyObject* dict = PyDict_New();
 	int cannotRest = game->CanPartyRest(noareacheck);
+	// fall back to the generic: you may not rest at this time
+	if (cannotRest == -1) {
+		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+			cannotRest = displaymsg->GetStringReference(STR_MAYNOTREST);
+		} else {
+			cannotRest = 10309;
+		}
+	}
 	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest != 0));
 	if (cannotRest) {
 		PyDict_SetItemString(dict, "ErrorMsg", PyInt_FromLong(cannotRest));
