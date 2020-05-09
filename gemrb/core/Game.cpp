@@ -1797,8 +1797,10 @@ bool Game::RestParty(int checks, int dream, int hp)
 	if (checks & REST_AREA) {
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		// TODO: should take time of day into account (GameScript::TimeOfDay)
-		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, core->Time.GetHour(GameTime)/12);
+		Trigger* parameters = new Trigger;
+		parameters->int0Parameter = 0; // TIMEOFDAY_DAY, with a slight preference for daytime interrupts
+		hoursLeft = area->CheckRestInterruptsAndPassTime(leader->Pos, hours, GameScript::TimeOfDay(nullptr, parameters));
+		delete parameters;
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {

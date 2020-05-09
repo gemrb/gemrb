@@ -6164,7 +6164,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	bool condition = false;
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
-	ieDword timeOfDay;
+	Trigger* parameters;
 	Actor *nearest = NULL;
 
 	// check the condition
@@ -6229,10 +6229,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case COND_TIMEOFDAY:
 		// BGEE: Night Club
 		if (actor != target) break;
-		// FIXME: needs to take offsets into account to match time.ids / timeoday.ids
-		// just use GameScript::TimeOfDay parameters->int0Parameter == TIMEOFDAY_NIGHT
-		timeOfDay = core->Time.GetHour(core->GetGame()->GameTime)/4;
-		condition = timeOfDay == fx->IsVariable;
+		parameters = new Trigger;
+		parameters->int0Parameter = fx->IsVariable;
+		condition = GameScript::TimeOfDay(nullptr, parameters);
+		delete parameters;
 		break;
 	case COND_NEARX:
 		// Range([ANYONE], 'Extra')
