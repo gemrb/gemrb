@@ -2089,7 +2089,8 @@ def RestPress ():
 def RealRestPress ():
 	# only bg2 has area-based rest movies
 	# outside movies start at 2, 1 is for inns
-	GemRB.RestParty(0, 0 if GameCheck.IsBG2() else 2, 1)
+	# 15 means run all checks to see if resting is possible
+	GemRB.RestParty(15, 0 if GameCheck.IsBG2() else 2, 1)
 	return
 
 def SwitchPCByKey (wIdx, key, mod):

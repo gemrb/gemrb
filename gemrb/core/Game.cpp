@@ -1714,7 +1714,7 @@ bool Game::CanPartyRest(int checks) const
 {
 	if (checks == REST_NOCHECKS) return true;
 
-	if (!(checks & REST_NOMOVE)) {
+	if (checks & REST_MOVE) {
 		if (!EveryoneStopped()) {
 			return false;
 		}
@@ -1724,7 +1724,7 @@ bool Game::CanPartyRest(int checks) const
 	assert(leader);
 	Map *area = leader->GetCurrentArea();
 	//we let them rest if someone is paralyzed, but the others gather around
-	if (!(checks & REST_NOSCATTER)) {
+	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
 			displaymsg->DisplayConstantString(STR_SCATTERED, DMC_RED);
@@ -1732,7 +1732,7 @@ bool Game::CanPartyRest(int checks) const
 		}
 	}
 
-	if (!(checks & REST_NOCRITTER) ) {
+	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
 			displaymsg->DisplayConstantString(STR_CANTRESTMONS, DMC_RED);
@@ -1746,7 +1746,7 @@ bool Game::CanPartyRest(int checks) const
 	}
 
 	//rest check, if PartyRested should be set, area should return true
-	if (!(checks & REST_NOAREA) ) {
+	if (checks & REST_AREA) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
 			displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED);
@@ -1797,7 +1797,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	// TODO: implement "rest until healed", it's an option in some games
 	int hours = 8;
 	int hoursLeft = 0;
-	if (!(checks&REST_NOAREA) ) {
+	if (checks & REST_AREA) {
 		//area encounters
 		// also advances gametime (so partial rest is possible)
 		// TODO: should take time of day into account (GameScript::TimeOfDay)

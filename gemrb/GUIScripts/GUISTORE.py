@@ -1987,7 +1987,7 @@ def RentConfirm ():
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
 	# TODO: run GemRB.RunRestScripts ()
-	cutscene = GemRB.RestParty (13, 1, RentIndex+1)
+	cutscene = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
 	Window = StoreRentWindow

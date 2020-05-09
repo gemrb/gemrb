@@ -108,11 +108,11 @@ class TableMgr;
 #define WB_HASWEATHER 0x200
 
 //Rest flags
-#define REST_NOAREA     1 //no area check
-#define REST_NOSCATTER  2 //no scatter check
-#define REST_NOMOVE     4 //no movement check
-#define REST_NOCRITTER  8 //no hostiles check
-#define REST_NOCHECKS   (REST_NOAREA|REST_NOSCATTER|REST_NOMOVE|REST_NOCRITTER)
+#define REST_NOCHECKS 0
+#define REST_AREA     1 // area checks
+#define REST_SCATTER  2 // scattered party check
+#define REST_MOVE     4 // movement check
+#define REST_CRITTER  8 // hostiles check
 
 //Song types (hardcoded)
 #define SONG_DAY        0
