@@ -14248,7 +14248,10 @@ scattered). It is possible to play a movie or dream too.\n\
   * movie - a number, see restmov.2da\n\
   * hp    - hit points healed, 0 means full healing\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** dict\n\
+  * Error: True if resting was prevented by one of the checks\n\
+  * ErrorMsg: a strref with a reason for the error\n\
+  * Cutscene: True if a cutscene needs to run\n\
 \n\
 **See also:** StartStore(gamescript)"
 );
@@ -14263,7 +14266,24 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 
-	return PyInt_FromLong(game->RestParty(noareacheck, dream, hp));
+	// check if resting is possible and if not, return the reason, otherwise rest
+	// Error feedback is eventually handled this way:
+	// - resting outside: popup an error window with the reason in pst, print it to message window elsewhere
+	// - resting in inns: popup a GUISTORE error window with the reason
+	// - if the particular reason strref does not exist, don't print anything
+	PyObject* dict = PyDict_New();
+	int cannotRest = game->CanPartyRest(noareacheck);
+	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest != 0));
+	if (cannotRest) {
+		PyDict_SetItemString(dict, "ErrorMsg", PyInt_FromLong(cannotRest));
+		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(0));
+	} else {
+		PyDict_SetItemString(dict, "ErrorMsg", PyInt_FromLong(-1));
+		// all is well, so do the actual resting
+		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(game->RestParty(0, dream, hp)));
+	}
+
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,

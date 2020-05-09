@@ -1987,13 +1987,18 @@ def RentConfirm ():
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
 	# TODO: run GemRB.RunRestScripts ()
-	cutscene = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
+	info = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
+	cutscene = info["Cutscene"]
+	if info["Error"] and info["ErrorMsg"] > 0:
+		# TODO: open error modal with reason
+		pass
+
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
 	Window = StoreRentWindow
 	if cutscene:
 		CloseStoreWindow ()
-	else:
+	elif not info["Error"]:
 		TextArea = Window.GetControl (12)
 		#is there any way to change this???
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))

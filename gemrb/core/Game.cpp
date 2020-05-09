@@ -1710,13 +1710,16 @@ void Game::TextDream()
 	}
 }
 
-bool Game::CanPartyRest(int checks) const
+// returns 0 if it can
+// returns strref or -1 if it can't
+int Game::CanPartyRest(int checks) const
 {
-	if (checks == REST_NOCHECKS) return true;
+	if (checks == REST_NOCHECKS) return 0;
 
 	if (checks & REST_MOVE) {
 		if (!EveryoneStopped()) {
-			return false;
+			// no string in any game — not sure anyone checked for this at all
+			return displaymsg->GetStringReference(STR_SCATTERED);
 		}
 	}
 
@@ -1727,21 +1730,18 @@ bool Game::CanPartyRest(int checks) const
 	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
-			displaymsg->DisplayConstantString(STR_SCATTERED, DMC_RED);
-			return false;
+			return displaymsg->GetStringReference(STR_SCATTERED);
 		}
 	}
 
 	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			displaymsg->DisplayConstantString(STR_CANTRESTMONS, DMC_RED);
-			return false;
+			return displaymsg->GetStringReference(STR_CANTRESTMONS);
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			displaymsg->DisplayConstantString(STR_CANTRESTMONS, DMC_RED);
-			return false;
+			return displaymsg->GetStringReference(STR_CANTRESTMONS);
 		}
 	}
 
@@ -1749,16 +1749,15 @@ bool Game::CanPartyRest(int checks) const
 	if (checks & REST_AREA) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
-			displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED);
-			return false;
+			return displaymsg->GetStringReference(STR_MAYNOTREST);
 		}
 
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
 			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
 			// and repurposes these area flags!
 			if (area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)/* == (AF_TUTORIAL|AF_DEADMAGIC)*/) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // get permission 38587
-				return false;
+				// get permission 38587
+				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			/* TODO: add all the other strings
 			} else if (area->AreaFlags&AF_TUTORIAL) {
 				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // here 34601
@@ -1770,13 +1769,12 @@ bool Game::CanPartyRest(int checks) const
 		} else {
 			// you may not rest here, find an inn
 			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED);
-				return false;
+				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		}
 	}
 
-	return true;
+	return 0;
 }
 
 // checks: can anything prevent us from resting?
@@ -1788,7 +1786,7 @@ bool Game::CanPartyRest(int checks) const
 // returns true if a cutscene dream is about to be played
 bool Game::RestParty(int checks, int dream, int hp)
 {
-	if (!CanPartyRest(checks)) {
+	if (CanPartyRest(checks)) {
 		return false;
 	}
 
