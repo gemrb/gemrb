@@ -1721,10 +1721,7 @@ bool Game::CanPartyRest(int checks) const
 	}
 
 	Actor *leader = GetPC(0, true);
-	if (!leader) {
-		return false;
-	}
-
+	assert(leader);
 	Map *area = leader->GetCurrentArea();
 	//we let them rest if someone is paralyzed, but the others gather around
 	if (!(checks & REST_NOSCATTER)) {
@@ -1796,10 +1793,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	}
 
 	Actor *leader = GetPC(0, true);
-	if (!leader) {
-		return false;
-	}
-
+	assert(leader);
 	// TODO: implement "rest until healed", it's an option in some games
 	int hours = 8;
 	int hoursLeft = 0;
