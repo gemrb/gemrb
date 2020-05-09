@@ -472,6 +472,8 @@ public:
 	/** Runs the script engine on the global script and the area scripts
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
+	/** checks if resting is possible */
+	bool CanPartyRest(int checks) const;
 	/** runs area functionality, sets partyrested trigger */
 	bool RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
