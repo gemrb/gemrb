@@ -1716,10 +1716,12 @@ int Game::CanPartyRest(int checks) const
 {
 	if (checks == REST_NOCHECKS) return 0;
 
-	if (checks & REST_MOVE) {
-		if (!EveryoneStopped()) {
-			// no string in any game — not sure anyone checked for this at all
-			return displaymsg->GetStringReference(STR_SCATTERED);
+	if (checks & REST_CONTROL) {
+		for (auto pc : PCs) {
+			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
+				// You cannot rest at this time because you do not have control of all your party members
+				return displaymsg->GetStringReference(STR_CANTTRESTNOCONTROL);
+			}
 		}
 	}
 

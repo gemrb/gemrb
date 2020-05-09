@@ -111,7 +111,7 @@ class TableMgr;
 #define REST_NOCHECKS 0
 #define REST_AREA     1 // area checks
 #define REST_SCATTER  2 // scattered party check
-#define REST_MOVE     4 // movement check
+#define REST_CONTROL  4 // control check
 #define REST_CRITTER  8 // hostiles check
 
 //Song types (hardcoded)
