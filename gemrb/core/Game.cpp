@@ -306,7 +306,7 @@ Actor *Game::GetGlobalActorByGlobalID(ieDword globalID)
 	return NULL;
 }
 
-Actor* Game::GetPC(unsigned int slot, bool onlyalive)
+Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
 {
 	if (slot >= PCs.size()) {
 		return NULL;

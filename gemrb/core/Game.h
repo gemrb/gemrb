@@ -315,7 +315,7 @@ public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
 	/** Returns actor by slot */
-	Actor* GetPC(unsigned int slot, bool onlyalive);
+	Actor* GetPC(unsigned int slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
