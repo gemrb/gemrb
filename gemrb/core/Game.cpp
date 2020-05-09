@@ -1710,11 +1710,13 @@ void Game::TextDream()
 	}
 }
 
-//noareacheck = no random encounters
-//dream = 0 - based on area non-0 - select from list
-//-1 no dream
-//hp is how much hp the rest will heal
-//returns true if a cutscene dream is about to be played
+// checks: can anything prevent us from resting?
+// dream:
+//   -1: no dream
+//    0, 8+: dream based on area
+//    1-7: dream selected from a fixed list
+// hp: how much hp the rest will heal
+// returns true if a cutscene dream is about to be played
 bool Game::RestParty(int checks, int dream, int hp)
 {
 	if (!(checks&REST_NOMOVE) ) {

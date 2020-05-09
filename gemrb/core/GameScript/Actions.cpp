@@ -5282,11 +5282,12 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 	core->GetGame()->AdvanceTime(delta, false);
 }
 
-//implement pst style parameters:
-//suggested dream - unused
-//if suggested dream is 0, then area flags determine the 'movie'
-//hp - number of hps healed
-//renting - crashes pst, we simply ignore it
+// most games take no parameters: RestParty()
+// pst style parameters: RestParty(I:SuggestedDream*,I:HP*,I:Renting*)
+// - suggested dream: unused and always -1 in the original data
+//   (compatibility: if suggested dream is 0, then area flags determine the 'movie')
+// - hp: number of hps healed
+// - renting: crashes pst, we simply ignore it
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
