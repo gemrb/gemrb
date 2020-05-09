@@ -112,6 +112,7 @@ class TableMgr;
 #define REST_NOSCATTER  2 //no scatter check
 #define REST_NOMOVE     4 //no movement check
 #define REST_NOCRITTER  8 //no hostiles check
+#define REST_NOCHECKS   (REST_NOAREA|REST_NOSCATTER|REST_NOMOVE|REST_NOCRITTER)
 
 //Song types (hardcoded)
 #define SONG_DAY        0

@@ -5290,8 +5290,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-	unsigned int flags = REST_NOAREA|REST_NOMOVE|REST_NOCRITTER|REST_NOSCATTER;
-	game->RestParty(flags, parameters->int0Parameter, parameters->int1Parameter);
+	game->RestParty(REST_NOCHECKS, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5324,7 +5323,7 @@ void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
 //this most likely advances time and heals whole party
 void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
 {
-	core->GetGame()->RestParty(REST_NOSCATTER|REST_NOAREA|REST_NOMOVE|REST_NOCRITTER, 0, 0);
+	core->GetGame()->RestParty(REST_NOCHECKS, 0, 0);
 	Sender->ReleaseCurrentAction();
 }
 
