@@ -313,10 +313,8 @@ Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
 	}
 	if (onlyalive) {
 		for (auto pc : PCs) {
-			if (IsAlive(pc)) {
-				if (!slot--) {
-					return pc;
-				}
+			if (IsAlive(pc) && !slot--) {
+				return pc;
 			}
 		}
 		return NULL;
