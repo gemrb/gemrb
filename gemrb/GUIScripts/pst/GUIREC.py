@@ -1172,7 +1172,7 @@ def OpenLevelUpWindow ():
 	# Displaying level up info
 	overview = ""
 	if CurrWeapProf!=-1 and WeapProfGained>0:
-		overview = overview + '+' + str (WeapProfGained) + ' ' + GemRB.GetString (WeapProfDispStr) + '\n'
+		overview = overview + GemRB.GetString (38715) + '\n' + '+' + str (WeapProfGained) + '\n'
 
 	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
 	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
@@ -1236,7 +1236,7 @@ def HasGainedWeapProf (pc, currProf, currLevel, Class):
 	#hardcoded limit is 4
 	if currProf>3:
 		return False
-	if CurrProf>(currLevel-1)/3:
+	if currProf > (currLevel - 1) / 3:
 		return False
 	return True
 
