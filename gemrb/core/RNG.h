@@ -21,6 +21,8 @@
 #ifndef RNG_H
 #define RNG_H
 
+#include "exports.h"
+
 #include <climits>
 #include <random>
 
@@ -29,7 +31,7 @@
 
 namespace GemRB {
 
-class RNG {
+class GEM_EXPORT RNG {
 	private:
 		RNG();
 
