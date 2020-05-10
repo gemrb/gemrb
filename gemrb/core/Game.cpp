@@ -298,17 +298,15 @@ Actor *Game::GetGlobalActorByGlobalID(ieDword globalID)
 	return NULL;
 }
 
-Actor* Game::GetPC(unsigned int slot, bool onlyalive)
+Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
 {
 	if (slot >= PCs.size()) {
 		return NULL;
 	}
 	if (onlyalive) {
 		for (auto pc : PCs) {
-			if (IsAlive(pc)) {
-				if (!slot--) {
-					return pc;
-				}
+			if (IsAlive(pc) && !slot--) {
+				return pc;
 			}
 		}
 		return NULL;
@@ -1697,83 +1695,99 @@ void Game::TextDream()
 	}
 }
 
-//noareacheck = no random encounters
-//dream = 0 - based on area non-0 - select from list
-//-1 no dream
-//hp is how much hp the rest will heal
-//returns true if a cutscene dream is about to be played
-bool Game::RestParty(int checks, int dream, int hp)
+// returns 0 if it can
+// returns strref or -1 if it can't
+int Game::CanPartyRest(int checks) const
 {
-	if (!(checks&REST_NOMOVE) ) {
-		if (!EveryoneStopped()) {
-			return false;
+	if (checks == REST_NOCHECKS) return 0;
+
+	if (checks & REST_CONTROL) {
+		for (auto pc : PCs) {
+			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
+				// You cannot rest at this time because you do not have control of all your party members
+				return displaymsg->GetStringReference(STR_CANTTRESTNOCONTROL);
+			}
 		}
 	}
-	Actor *leader = GetPC(0, true);
-	if (!leader) {
-		return false;
-	}
 
+	Actor *leader = GetPC(0, true);
+	assert(leader);
 	Map *area = leader->GetCurrentArea();
 	//we let them rest if someone is paralyzed, but the others gather around
-	if (!(checks&REST_NOSCATTER) ) {
-		if (!EveryoneNearPoint( area, leader->Pos, 0 ) ) {
+	if (checks & REST_SCATTER) {
+		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
-			displaymsg->DisplayConstantString( STR_SCATTERED, DMC_RED );
-			return false;
+			return displaymsg->GetStringReference(STR_SCATTERED);
 		}
 	}
 
-	if (!(checks&REST_NOCRITTER) ) {
+	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			displaymsg->DisplayConstantString( STR_CANTRESTMONS, DMC_RED );
-			return false;
+			return displaymsg->GetStringReference(STR_CANTRESTMONS);
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			displaymsg->DisplayConstantString( STR_CANTRESTMONS, DMC_RED );
-			return false;
+			return displaymsg->GetStringReference(STR_CANTRESTMONS);
 		}
 	}
 
 	//rest check, if PartyRested should be set, area should return true
-	// TODO: implement "rest until healed", it's an option in some games
-	int hours = 8;
-	int hoursLeft = 0;
-	if (!(checks&REST_NOAREA) ) {
+	if (checks & REST_AREA) {
 		//you cannot rest here
-		if (area->AreaFlags&AF_NOSAVE) {
-			displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-			return false;
+		if (area->AreaFlags & AF_NOSAVE) {
+			return displaymsg->GetStringReference(STR_MAYNOTREST);
 		}
 
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
 			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
 			// and repurposes these area flags!
-			if (area->AreaFlags&(AF_TUTORIAL|AF_DEADMAGIC)/* == (AF_TUTORIAL|AF_DEADMAGIC)*/) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // get permission 38587
-				return false;
-			/* TODO: add all the other strings
+			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
+				// you must obtain permission
+				return 38587;
 			} else if (area->AreaFlags&AF_TUTORIAL) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // here 34601
-				return false;
+				// you cannot rest in this area
+				return 34601;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
-				displaymsg->DisplayConstantString(STR_MAYNOTREST, DMC_RED); // actual STR_MAYNOTREST
-				return false;*/
+				// you cannot rest right now
+				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		} else {
-			//you may not rest here, find an inn
-			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS)))
-			{
-				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
-				return false;
+			// you may not rest here, find an inn
+			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
+				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		}
+	}
+
+	return 0;
+}
+
+// checks: can anything prevent us from resting?
+// dream:
+//   -1: no dream
+//    0, 8+: dream based on area
+//    1-7: dream selected from a fixed list
+// hp: how much hp the rest will heal
+// returns true if a cutscene dream is about to be played
+bool Game::RestParty(int checks, int dream, int hp)
+{
+	if (CanPartyRest(checks)) {
+		return false;
+	}
+
+	Actor *leader = GetPC(0, true);
+	assert(leader);
+	// TODO: implement "rest until healed", it's an option in some games
+	int hours = 8;
+	int hoursLeft = 0;
+	if (checks & REST_AREA) {
 		//area encounters
 		// also advances gametime (so partial rest is possible)
-		// TODO: should take time of day into account (GameScript::TimeOfDay)
-		hoursLeft = area->CheckRestInterruptsAndPassTime( leader->Pos, hours, core->Time.GetHour(GameTime)/12);
+		Trigger* parameters = new Trigger;
+		parameters->int0Parameter = 0; // TIMEOFDAY_DAY, with a slight preference for daytime interrupts
+		hoursLeft = area->CheckRestInterruptsAndPassTime(leader->Pos, hours, GameScript::TimeOfDay(nullptr, parameters));
+		delete parameters;
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {

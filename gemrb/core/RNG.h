@@ -21,6 +21,8 @@
 #ifndef RNG_H
 #define RNG_H
 
+#include "exports.h"
+
 #include <climits>
 #include <random>
 
@@ -29,17 +31,14 @@
 
 namespace GemRB {
 
-class RNG {
+class GEM_EXPORT RNG {
 	private:
 		RNG();
-
-		uint32_t cdf(uint32_t, uint32_t);
 
 		std::mt19937_64 engine;
 	public:
 		static RNG& getInstance();
-
-		uint32_t rand(int32_t min = 0, int32_t max = INT_MAX-1);
+		int32_t rand(int32_t min = 0, int32_t max = INT_MAX-1);
 };
 
 }

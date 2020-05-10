@@ -97,6 +97,17 @@ def GetKnownSpells(actor, BookType):
 
 	return knownSpells
 
+def GetKnownSpellsDescription(actor, BookType):
+	""" Gets text to display in the chargen spell listing. """
+
+	info = ""
+	spells = GetKnownSpells (actor, BookType)
+	# reverse spells order grouped by SpellLevel
+	spells.sort (lambda fst, snd: -1 if fst['SpellLevel'] == snd['SpellLevel'] else 0)
+	for spell in spells:
+		info += GemRB.GetString (spell['SpellName']) + "\n"
+	return info
+
 def GetKnownSpellsLevel(actor, BookType, level):
 	knownSpells = []
 	spellResRefs = []
@@ -448,7 +459,8 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	return Learnable
 
 # there is no separate druid spell table in the originals
-#FIXME: try to do this in a non-hard way?
+# however Tweaks Anthology adds it for all other games and EE does the same
+# so we can't just change the value in the tables and be done with it
 def GetPriestSpellTable(tablename):
 	if GameCheck.IsIWD2():
 		return tablename # no need for this folly

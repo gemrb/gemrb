@@ -42,6 +42,7 @@
 #include "Palette.h"
 #include "PalettedImageMgr.h"
 #include "ResourceDesc.h"
+#include "RNG.h"
 #include "SaveGameIterator.h"
 #include "Spell.h"
 #include "TileMap.h"
@@ -2859,7 +2860,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 				wm->SetEncounterArea(tmpresref, wal);
 			} else {
 				//regular random encounter, find a valid encounter area
-				int i=rand()%5;
+				int i = RAND(0, 4);
 
 				for(int j=0;j<5;j++) {
 					const char *area = wal->EncounterAreaResRef[(i+j)%5];
@@ -4762,7 +4763,6 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 				}
 				string->resize(pos);
 			}
-			StringToUpper(*string);
 			strings.push_back(*string);
 		} while (++dirit);
 	}
@@ -10033,7 +10033,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 	int percent;
 	const char *ResRef;
 	PARSE_ARGS( args,  "is", &percent, &ResRef);
-	if (rand()%100 >= percent) {
+	if (RAND(0, 99) >= percent) {
 		return PyInt_FromLong( -1 );
 	}
 
@@ -11857,7 +11857,10 @@ scattered). It is possible to play a movie or dream too.\n\
   * movie - a number, see restmov.2da\n\
   * hp    - hit points healed, 0 means full healing\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** dict\n\
+  * Error: True if resting was prevented by one of the checks\n\
+  * ErrorMsg: a strref with a reason for the error\n\
+  * Cutscene: True if a cutscene needs to run\n\
 \n\
 **See also:** StartStore(gamescript)"
 );
@@ -11869,7 +11872,31 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "iii", &noareacheck, &dream, &hp);
 	GET_GAME();
 
-	return PyInt_FromLong(game->RestParty(noareacheck, dream, hp));
+	// check if resting is possible and if not, return the reason, otherwise rest
+	// Error feedback is eventually handled this way:
+	// - resting outside: popup an error window with the reason in pst, print it to message window elsewhere
+	// - resting in inns: popup a GUISTORE error window with the reason
+	PyObject* dict = PyDict_New();
+	int cannotRest = game->CanPartyRest(noareacheck);
+	// fall back to the generic: you may not rest at this time
+	if (cannotRest == -1) {
+		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+			cannotRest = displaymsg->GetStringReference(STR_MAYNOTREST);
+		} else {
+			cannotRest = 10309;
+		}
+	}
+	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest != 0));
+	if (cannotRest) {
+		PyDict_SetItemString(dict, "ErrorMsg", PyInt_FromLong(cannotRest));
+		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(0));
+	} else {
+		PyDict_SetItemString(dict, "ErrorMsg", PyInt_FromLong(-1));
+		// all is well, so do the actual resting
+		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(game->RestParty(0, dream, hp)));
+	}
+
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_ChargeSpells__doc,

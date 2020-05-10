@@ -154,9 +154,12 @@ to display diffs of included binary files (spells and other overrides).
 ## Version tracking
 
 1. Split your changes (commits) into well-rounded units of logic (`git commit -p` can help).
-2. Each commit should compile and run. You can do quick fixups with `git commit --amend -p`.
-3. Commit messages should be descriptive (why is more important than what, include area/creature/script names if possible).
-4. Rebasing and force pushing to pull request branches is fine.
+2. Read the commit diff to verify you're commiting what you think. That indentation matches
+   and that no extraneous changes are included (eg. random style changes from bad IDE settings).
+3. Each commit should compile and run. You can do quick fixups with `git commit --amend -p`.
+4. Commit messages should be descriptive (why is more important than what, include
+   area/creature/script names if possible).
+5. Rebasing and force pushing to pull request branches is fine.
 
 All of this makes reviewing and bisecting for regressions easier.
 

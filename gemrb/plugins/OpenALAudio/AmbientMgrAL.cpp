@@ -22,6 +22,7 @@
 
 #include "Ambient.h"
 #include "Game.h"
+#include "RNG.h"
 #include "Interface.h"
 
 #include <cassert>
@@ -220,7 +221,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 	lastticks = ticks;
 
 	if (ambient->getFlags() & IE_AMBI_RANDOM) {
-		nextref = rand() % ambient->sounds.size();
+		nextref = RAND(0, ambient->sounds.size() - 1);
 	} else if (++nextref >= ambient->sounds.size()) {
 		nextref = 0;
 	}

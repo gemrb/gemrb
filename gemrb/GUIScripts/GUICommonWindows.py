@@ -2052,5 +2052,19 @@ def RestPress ():
 def RealRestPress ():
 	# only bg2 has area-based rest movies
 	# outside movies start at 2, 1 is for inns
-	GemRB.RestParty(0, 0 if GameCheck.IsBG2() else 2, 1)
+	# 15 means run all checks to see if resting is possible
+	info = GemRB.RestParty(15, 0 if GameCheck.IsBG2() else 2, 1)
+	if info["Error"]:
+		if GameCheck.IsPST ():
+			# open error window
+			Window = GemRB.LoadWindow (25, GUICommon.GetWindowPack (), WINDOW_BOTTOM|WINDOW_HCENTER)
+			Label = Window.GetControl (0xfffffff) # -1 in the CHU
+			Label.SetText (info["ErrorMsg"])
+			Button = Window.GetControl (1)
+			Button.SetText (1403)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close ())
+			Window.ShowModal (MODAL_SHADOW_GRAY)
+		else:
+			GemRB.DisplayString (info["ErrorMsg"], 0xff0000)
+
 	return

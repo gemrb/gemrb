@@ -182,7 +182,7 @@ def OpenContainerWindow ():
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2() and Window.HasControl (62):
 		Button = Window.GetControl (62)
 		Label = Button.CreateLabel (0x10000047, "NORMAL", "", IE_FONT_SINGLE_LINE)
 

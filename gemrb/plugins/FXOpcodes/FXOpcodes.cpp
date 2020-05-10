@@ -34,6 +34,7 @@
 #include "Interface.h"
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
+#include "RNG.h"
 #include "ScriptedAnimation.h"
 #include "ScriptEngine.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
@@ -4304,7 +4305,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TODO: create a single list reader that handles src and 2da too
 		SrcVector *rndstr=LoadSrc(fx->Resource);
 		if (rndstr) {
-			fx->Parameter1 = rndstr->at(rand()%rndstr->size());
+			fx->Parameter1 = rndstr->at(RAND(0, rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 			*(ieDword *) &target->overColor=fx->Parameter2;
@@ -6165,7 +6166,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	bool condition = false;
 	bool per_round = true; // 4xxx trigger?
 	const TriggerEntry *entry = NULL;
-	ieDword timeOfDay;
+	Trigger* parameters;
 	Actor *nearest = NULL;
 
 	// check the condition
@@ -6230,10 +6231,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case COND_TIMEOFDAY:
 		// BGEE: Night Club
 		if (actor != target) break;
-		// FIXME: needs to take offsets into account to match time.ids / timeoday.ids
-		// just use GameScript::TimeOfDay parameters->int0Parameter == TIMEOFDAY_NIGHT
-		timeOfDay = core->Time.GetHour(core->GetGame()->GameTime)/4;
-		condition = timeOfDay == fx->IsVariable;
+		parameters = new Trigger;
+		parameters->int0Parameter = fx->IsVariable;
+		condition = GameScript::TimeOfDay(nullptr, parameters);
+		delete parameters;
 		break;
 	case COND_NEARX:
 		// Range([ANYONE], 'Extra')

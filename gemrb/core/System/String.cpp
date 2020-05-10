@@ -127,6 +127,7 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	char* buf = (char*) malloc(out_len);
 	char* buf_out = buf;
 	size_t ret = iconv(cd, &in, &in_len, &buf_out, &out_len_left);
+	iconv_close(cd);
 
 	if (ret == (size_t)-1) {
 		Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
@@ -145,6 +146,7 @@ char* ConvertCharEncoding(const char* string,
 	return strdup(string);
 }
 #endif
+
 
 String* StringFromCString(const char* string)
 {
