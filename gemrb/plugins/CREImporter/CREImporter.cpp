@@ -1668,34 +1668,33 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		str->ReadDword(&tmpDword);
 		check+=totalcount;
 		const ieResRef *tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
-		if(tmp) {
-			CREKnownSpell *known = new CREKnownSpell;
-			known->Level=level;
-			known->Type=type;
-			strnlwrcpy(known->SpellResRef,*tmp,8);
-			sm->known_spells.push_back(known);
-			while(memocount--) {
-				if(totalcount) {
-					totalcount--;
-				} else {
-					Log(ERROR, "CREImporter", "More spells still known than memorised.");
-					break;
-				}
-				CREMemorizedSpell *memory = new CREMemorizedSpell;
-				memory->Flags=1;
-				strnlwrcpy(memory->SpellResRef,*tmp,8);
-				sm->memorized_spells.push_back(memory);
-			}
-
-			while(totalcount--) {
-				CREMemorizedSpell *memory = new CREMemorizedSpell;
-				memory->Flags=0;
-				strnlwrcpy(memory->SpellResRef,*tmp,8);
-				sm->memorized_spells.push_back(memory);
-			}
-		} else {
+		if (!tmp) {
 			error("CREImporter", "Unresolved spell index: %d level:%d, type: %d",
 				spellindex, level+1, type);
+		}
+
+		CREKnownSpell *known = new CREKnownSpell;
+		known->Level = level;
+		known->Type = type;
+		strnlwrcpy(known->SpellResRef, *tmp, 8);
+		sm->known_spells.push_back(known);
+		while (memocount--) {
+			if (totalcount) {
+				totalcount--;
+			} else {
+				Log(ERROR, "CREImporter", "More spells still known than memorised.");
+				break;
+			}
+			CREMemorizedSpell *memory = new CREMemorizedSpell;
+			memory->Flags = 1;
+			strnlwrcpy(memory->SpellResRef, *tmp, 8);
+			sm->memorized_spells.push_back(memory);
+		}
+		while(totalcount--) {
+			CREMemorizedSpell *memory = new CREMemorizedSpell;
+			memory->Flags = 0;
+			strnlwrcpy(memory->SpellResRef, *tmp, 8);
+			sm->memorized_spells.push_back(memory);
 		}
 	}
 	// hacks for domain spells, since their count is not stored and also always 1
