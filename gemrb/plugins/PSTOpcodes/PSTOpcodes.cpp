@@ -758,7 +758,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 2: //black barbed shield (damage opponents)
 		if (target->LastHitter) {
-			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0),0x100000 );
+			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0), 16);
 		}
 		break;
 	case 3: case 16: //pain mirror or balance in all things
