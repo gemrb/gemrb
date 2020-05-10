@@ -36,6 +36,7 @@
 #include "Palette.h"
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
+#include "RNG.h"
 #include "TileMapMgr.h"
 #include "GameScript/GameScript.h"
 #include "Scriptable/Container.h"
@@ -1223,7 +1224,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				anim->startchance=100; //percentage of starting a cycle
 			}
 			if (startFrameRange && (anim->Flags&A_ANI_RANDOM_START) ) {
-				anim->frame = rand() % startFrameRange;
+				anim->frame = RAND(0, startFrameRange - 1);
 			}
 			anim->startFrameRange = 0; //this will never get resaved (iirc)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)

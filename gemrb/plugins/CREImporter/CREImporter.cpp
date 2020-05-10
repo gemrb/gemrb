@@ -28,6 +28,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "RNG.h"
 #include "TableMgr.h"
 #include "GameScript/GameScript.h"
 
@@ -905,13 +906,13 @@ void CREImporter::SetupColor(ieDword &stat)
 		int i;
 		for (i=(int) stat;i>=0;i--) {
 			if (randcolors[i][0]==stat) {
-				stat=randcolors[i][rand()%RandRows];
+				stat = randcolors[i][RAND(0, RandRows - 1)];
 				return;
 			}
 		}
 		for (i=(int) stat+1;i<RandColor;i++) {
 			if (randcolors[i][0]==stat) {
-				stat=randcolors[i][rand()%RandRows];
+				stat = randcolors[i][RAND(0, RandRows - 1)];
 				return;
 			}
 		}

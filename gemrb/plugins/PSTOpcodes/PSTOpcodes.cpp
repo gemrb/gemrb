@@ -27,6 +27,7 @@
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Map.h"
+#include "RNG.h"
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
@@ -319,7 +320,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		int x = 0;
 		int y = 0;
 		if (fx->Parameter2&1) {
-			ieWord tmp =(ieWord) rand();
+			ieWord tmp =(ieWord) RAND_ALL();
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}

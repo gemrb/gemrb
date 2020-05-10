@@ -40,6 +40,7 @@
 #include "Palette.h"
 #include "PalettedImageMgr.h"
 #include "ResourceDesc.h"
+#include "RNG.h"
 #include "SaveGameIterator.h"
 #include "Spell.h"
 #include "TableMgr.h"
@@ -4028,7 +4029,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 				wm->SetEncounterArea(tmpresref, wal);
 			} else {
 				//regular random encounter, find a valid encounter area
-				int i=rand()%5;
+				int i = RAND(0, 4);
 
 				for(int j=0;j<5;j++) {
 					const char *area = wal->EncounterAreaResRef[(i+j)%5];
@@ -12318,7 +12319,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "is", &percent, &ResRef)) {
 		return AttributeError( GemRB_GetRumour__doc );
 	}
-	if (rand()%100 >= percent) {
+	if (RAND(0, 99) >= percent) {
 		return PyInt_FromLong( -1 );
 	}
 
