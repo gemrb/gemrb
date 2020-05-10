@@ -462,7 +462,8 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	return Learnable
 
 # there is no separate druid spell table in the originals
-#FIXME: try to do this in a non-hard way?
+# however Tweaks Anthology adds it for all other games and EE does the same
+# so we can't just change the value in the tables and be done with it
 def GetPriestSpellTable(tablename):
 	if GameCheck.IsIWD2():
 		return tablename # no need for this folly
