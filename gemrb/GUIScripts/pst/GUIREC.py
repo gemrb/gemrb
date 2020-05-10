@@ -932,13 +932,13 @@ def OpenLevelUpWindow ():
 		# Searching for the column name where value is 1
 		for i in range (5):
 			WeapProfName = ClasWeapTable.GetRowName (i)
-			value = ClasWeapTable.GetValue (AvatarName, WeapProfName)
+			value = ClasWeapTable.GetValue (WeapProfName, AvatarName)
 			if value == 1:
 				WeapProfType = i
 				break
 
 	if WeapProfType!=-1:
-		CurrWeapProf = GemRB.GetPlayerStat (pc, IE_WEAPPROF+WeapProfType)
+		CurrWeapProf = GemRB.GetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD + WeapProfType)
 
 	# Recording this avatar's current proficiency level
 	# Since Nameless one is not covered, hammer and club can't occur
