@@ -340,9 +340,7 @@ def LearnSpells(MyChar):
 		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 	if TableName != "*":
 		ClassFlag = GetClassFlag (TableName)
-		if TableName == "MXSPLDRU":
-			#there is no separate druid table, falling back to priest
-			TableName = "MXSPLPRS"
+		TableName = Spellbook.GetPriestSpellTable (TableName)
 
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		Learnable = Spellbook.GetLearnablePriestSpells (ClassFlag, t, 1)
@@ -1563,9 +1561,8 @@ def SkillsPress():
 			ClassFlag = 0x4000
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
 		elif DruidSpell == "MXSPLDRU":
-			#no separate spell progression
-			if DruidSpell == "MXSPLDRU":
-				DruidSpell = "MXSPLPRS"
+			# no separate spell progression by default
+			DruidSpell = Spellbook.GetPriestSpellTable (DruidSpell)
 			ClassFlag = 0x8000
 			PriestSpellsMemorize(DruidSpell, Level, SpellLevel)
 		else:
