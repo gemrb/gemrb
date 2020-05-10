@@ -326,10 +326,7 @@ def LearnSpells(MyChar):
 		j=1
 		for i in range (len(Learnable) ):
 			if SpellBook & j:
-				if MemoBook & j:
-					memorize = LS_MEMO
-				else:
-					memorize = 0
+				memorize = LS_MEMO if MemoBook & j else 0
 				GemRB.LearnSpell (MyChar, Learnable[i], memorize)
 			j=j<<1
 
