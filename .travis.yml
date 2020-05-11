@@ -24,8 +24,8 @@ addons:
     - libfreetype6-dev
     - libvlc-dev
     - libvlccore-dev
-    - libpng16-16
-    - libpng16-dev
+    - libpng12-0
+    - libpng12-dev
     - libvorbis0a
     - libvorbis-dev
     - openssh-client
