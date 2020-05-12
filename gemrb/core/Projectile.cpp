@@ -445,7 +445,7 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(SoundRes1, SFX_CHAN_MISSILE,
+	travel_handle = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
 				Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
@@ -669,7 +669,7 @@ void Projectile::UpdateSound()
 		StopSound();
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes2, SFX_CHAN_MISSILE,
+		travel_handle = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE,
 				Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}

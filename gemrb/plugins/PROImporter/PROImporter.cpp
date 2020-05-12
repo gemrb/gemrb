@@ -68,8 +68,8 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadWord( &AreaExtension );
 	str->ReadWord( &s->Speed );
 	str->ReadDword( &s->SFlags ); //spark, ignore center, looping sound etc
-	str->ReadResRef( s->SoundRes1 ); // firing sound
-	str->ReadResRef( s->SoundRes2 ); // arrival sound
+	str->ReadResRef( s->FiringSound );
+	str->ReadResRef( s->ArrivalSound );
 	str->ReadResRef( s->TravelVVC ); //no original game data uses this feature
 	str->ReadDword( &s->SparkColor );//enabled by PSF_SPARK
 	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left

@@ -197,8 +197,8 @@ public:
 
 	ieWord Speed;
 	ieDword SFlags;
-	ieResRef SoundRes1;
-	ieResRef SoundRes2;
+	ieResRef FiringSound;
+	ieResRef ArrivalSound;
 	ieResRef TravelVVC;
 	ieDword SparkColor;
 	ieDword ExtFlags;
