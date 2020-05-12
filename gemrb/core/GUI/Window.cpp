@@ -263,22 +263,15 @@ bool Window::HitTest(const Point& p) const
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
-	bool left = false;
-	if (target && target != hoverView) {
+	if (target != hoverView) {
 		if (hoverView) {
 			hoverView->MouseLeave(me, drag.get());
-			left = true;
-		}
-	} else if (hoverView) {
-		hoverView->MouseLeave(me, drag.get());
-		left = true;
-	}
-	if (left) {
-		assert(hoverView);
-		if (trackingView && !drag) {
-			drag = trackingView->DragOperation();
+			if (trackingView && !drag) {
+				drag = trackingView->DragOperation();
+			}
 		}
 	}
+	
 	if (target && target != hoverView) {
 		// must create the drag event before calling MouseEnter
 		target->MouseEnter(me, drag.get());
