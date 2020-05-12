@@ -68,11 +68,14 @@ namespace GemRB {
 //projectile travel flags
 #define PTF_COLOUR  1       //fake colours
 #define PTF_SMOKE   2       //has smoke
+// bg2: 4 smoke is false colored
 #define PTF_TINT    8       //tint projectile
+// bg2: 10 height
 #define PTF_SHADOW  32      //has shadow bam
-#define PTF_LIGHT   64      //has light shadow
+#define PTF_LIGHT   64      //has light shadow / glow
 #define PTF_BLEND   128     //blend colours (use alpha)
-#define PTF_BRIGHTEN 256    //brighten alpha
+#define PTF_BRIGHTEN 256    //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
+// 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST BRIGHTEST3DONLYOFF
 #define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
 //projectile extended travel flags (gemrb specific)
@@ -109,7 +112,7 @@ namespace GemRB {
 #define PEF_DELAY      0x10000000//delay payload until travel projectile cycle ends
 
 //projectile area flags
-#define PAF_VISIBLE    1      //the travel projectile is visible until explosion
+#define PAF_VISIBLE    1      //the travel projectile is visible until explosion; CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAM
 #define PAF_INANIMATE  2      //target inanimates
 #define PAF_TRIGGER    4      //explosion needs to be triggered
 #define PAF_SYNC       8      //one explosion at a time
@@ -120,12 +123,12 @@ namespace GemRB {
 #define PAF_TARGET     (64|128)
 #define PAF_LEV_MAGE   256
 #define PAF_LEV_CLERIC 512
-#define PAF_VVC        1024   //
+#define PAF_VVC        1024   // played at center
 #define PAF_CONE       2048   //enable cone shape
-#define PAF_NO_WALL    0x1000 //pass through walls
-#define PAF_TRIGGER_D  0x2000 //delayed trigger (only if animation is over 30)
-#define PAF_DELAY      0x4000 //
-#define PAF_AFFECT_ONE 0x8000 //
+#define PAF_NO_WALL    0x1000 //pass through walls; CPROJECTILEAREAFILEFORMAT_FLAGS_IGNORELOS
+#define PAF_TRIGGER_D  0x2000 //delayed trigger (only if animation is over 30); CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAMWAIT
+#define PAF_DELAY      0x4000 // CPROJECTILEAREAFILEFORMAT_FLAGS_FORCEINITIALDELAY
+#define PAF_AFFECT_ONE 0x8000 // CPROJECTILEAREAFILEFORMAT_FLAGS_ONETARGETONLY
 
 //area projectile flags (in areapro.2da)
 //this functionality was hardcoded in the original engine, so the bit flags are
@@ -169,7 +172,7 @@ struct ProjectileExtension
 	ieWord FragProjIdx;
 	ieByte ExplosionCount;
 	ieByte ExplType;
-	ieWord ExplColor;
+	ieWord ExplColor; // a byte in the original, followed by padding
 	ieWord ExplProjIdx;
 	ieResRef VVCRes;  //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
@@ -221,7 +224,7 @@ public:
 	ieByte Gradients[7];
 	ieByte SmokeSpeed;
 	ieByte SmokeGrad[7];
-	ieByte Aim;
+	ieByte Aim; // original bg2: m_numDirections // list of {1, 5, 9}
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
