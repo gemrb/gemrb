@@ -79,11 +79,13 @@ Projectile::Projectile()
 	ZPos = 0;
 	extension_delay = 0;
 	Range = 0;
-	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = Speed = SFlags = ExtFlags = 0;
+	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = ExtFlags = 0;
 	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
 	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
 	extension_explosioncount = extension_targetcount = 0;
+	Speed = 20;
+	SFlags = PSF_FLYING;
 	memset(&tint, 0, sizeof(tint));
 	if (!server)
 		server = core->GetProjectileServer();
