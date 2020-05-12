@@ -51,7 +51,7 @@ bool PROImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "PRO V1.0", 8 ) == 0) {
 		version = 10;
 	} else {
-		print("[PROImporter]: This file is not a valid PRO File");
+		Log(ERROR, "PROImporter", "This file is not a valid PRO File");
 		return false;
 	}
 
