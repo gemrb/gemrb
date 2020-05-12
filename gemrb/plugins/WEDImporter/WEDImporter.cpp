@@ -39,7 +39,7 @@ using namespace GemRB;
 struct wed_polygon {
 	ieDword FirstVertex;
 	ieDword CountVertex;
-	ieWord Flags;
+	ieWord Flags; // two bytes in the original: type and height with height currently unused
 	ieWord MinX, MaxX, MinY, MaxY;
 };
 
@@ -80,13 +80,21 @@ bool WEDImporter::Open(DataStream* stream)
 	str->ReadDword( &SecHeaderOffset );
 	str->ReadDword( &DoorsOffset );
 	str->ReadDword( &DoorTilesOffset );
+	// currently unused fields from the original
+	//   WORD    nVisiblityRange;
+	//   WORD    nChanceOfRain; - likely unused, since it's present in the ARE file
+	//   WORD    nChanceOfFog; - most likely unused, since it's present in the ARE file
+	//   WORD    nChanceOfSnow; - most likely unused, since it's present in the ARE file
+	//   DWORD   dwFlags;
+
 	str->Seek( OverlaysOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < OverlaysCount; i++) {
 		Overlay o;
 		str->ReadWord( &o.Width );
 		str->ReadWord( &o.Height );
 		str->ReadResRef( o.TilesetResRef );
-		str->ReadDword( &o.unknown );
+		str->ReadWord( &o.UniqueTileCount );
+		str->ReadWord( &o.MovementType );
 		str->ReadDword( &o.TilemapOffset );
 		str->ReadDword( &o.TILOffset );
 		overlays.push_back( o );
@@ -143,8 +151,9 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 			str->ReadWord( &startindex );
 			str->ReadWord( &count );
 			str->ReadWord( &secondary );
-			str->Read( &overlaymask, 1 );
+			str->Read( &overlaymask, 1 ); // bFlags in the original
 			str->Read( &animspeed, 1 );
+			// WORD    wFlags in the original (currently unused)
 			if (animspeed == 0) {
 				animspeed = ANI_DEFAULT_FRAMERATE;
 			}
@@ -211,7 +220,7 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm)
 			tm->AddOverlay( NULL );
 			tm->AddRainOverlay( NULL );
 		} else {
-			// XXX: should fix AddOverlay not to load an overlay twice if there's no rain version!!
+			// FIXME: should fix AddOverlay not to load an overlay twice if there's no rain version!!
 			AddOverlay(tm, &overlays.at(i), false);
 			AddOverlay(tm, &overlays.at(i), true);
 		}
