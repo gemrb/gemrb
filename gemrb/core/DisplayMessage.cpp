@@ -194,8 +194,6 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
 		DisplayMarkupString( newstr );
 		free( newstr );
-
-		ta->GetWindow()->Focus();
 	}
 
 	if (target && l == NULL && ta == NULL) {
