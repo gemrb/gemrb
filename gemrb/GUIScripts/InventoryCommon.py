@@ -977,7 +977,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 	color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
 	Button.SetBorder (0, color, 0,1)
-	color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
+	color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 255}
 	Button.SetBorder (1, color, 0,0, Button.GetInsetFrame(2))
 	color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 	Button.SetBorder (2, color, 0,1)
