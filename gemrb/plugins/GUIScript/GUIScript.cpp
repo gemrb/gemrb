@@ -4759,6 +4759,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (dirs == false) {
 				size_t pos = string->find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
+					delete string;
 					continue;
 				}
 				string->resize(pos);
