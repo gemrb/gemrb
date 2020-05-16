@@ -34,10 +34,10 @@ public:
 	~Tile(void);
 	unsigned char tileIndex;
 	unsigned char om;
-	Color SearchMap[16];
-	Color HeightMap[16];
-	Color LightMap[16];
-	Color NLightMap[16];
+	Color SearchMap[16]{};
+	Color HeightMap[16]{};
+	Color LightMap[16]{};
+	Color NLightMap[16]{};
 	Animation* anim[2];
 };
 

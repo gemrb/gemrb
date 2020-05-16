@@ -57,7 +57,6 @@ Button::Button(Region& frame)
 	Picture = NULL;
 	Clipping = 1.0;
 
-	memset( borders, 0, sizeof( borders ));
 	PushOffset = Point(2, 2);
 }
 

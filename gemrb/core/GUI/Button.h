@@ -199,7 +199,7 @@ private: // Private attributes
 	/** Offset pictures and label move when the button is pressed. */
 	Point PushOffset;
 	/** frame settings */
-	ButtonBorder borders[MAX_NUM_BORDERS];
+	ButtonBorder borders[MAX_NUM_BORDERS]{};
 
 	Holder<EventMgr::EventCallback> HotKeyCallback;
 
