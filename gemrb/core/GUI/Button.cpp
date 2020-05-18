@@ -549,6 +549,8 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 
 	if (dop && AcceptsDragOperation(*dop)) {
 		SetCursor(core->Cursors[IE_CURSOR_SWAP]);
+	} else {
+		SetCursor(nullptr);
 	}
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
