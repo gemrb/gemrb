@@ -89,8 +89,8 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 Sprite2D* TISImporter::GetTile(int index)
 {
 	Color Col[256];
-	Color Palette[256];
-	void* pixels = malloc( 4096 );
+	Color Palette[256]{};
+	void* pixels = calloc(4096, 1);
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
@@ -105,10 +105,6 @@ Sprite2D* TISImporter::GetTile(int index)
 		}
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		memset(pixels, 0, 4096);
-		for (size_t i = 0; i < 256; i++) {
-			Palette[i] = {};
-		}
 		Palette[0].g = 200;
 		return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette );
 	}

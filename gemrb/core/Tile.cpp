@@ -27,12 +27,6 @@ Tile::Tile(Animation* anim, Animation* sec)
 	tileIndex = om = 0;
 	this->anim[0] = anim;
 	this->anim[1] = sec;
-	for (size_t i = 0; i < 16; i++) {
-		SearchMap[i] = {};
-		HeightMap[i] = {};
-		LightMap[i] = {};
-		NLightMap[i] = {};
-	}
 }
 
 Tile::~Tile(void)
