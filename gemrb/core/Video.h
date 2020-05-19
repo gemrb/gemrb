@@ -62,7 +62,6 @@ enum SpriteBlitFlags : uint32_t {
 	BLIT_STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
 	BLIT_STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
 	BLIT_STENCIL_BLUE = 0x10000000 // blend with the stencil buffer using the stencil's b channel as the stencil
-	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
 #define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)

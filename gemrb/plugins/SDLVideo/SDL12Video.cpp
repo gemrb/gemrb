@@ -116,16 +116,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	// global tint is handled by the callers
 
-	// implicit flags:
-	const unsigned int blit_TINTALPHA =    0x40000000U;
-	const unsigned int blit_PALETTEALPHA = 0x80000000U;
-
-	// NB: blit_TINTALPHA isn't directly used or checked, but its presence
-	// affects the special case checks below
-	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
-
-	if (palette->alpha) flags |= blit_PALETTEALPHA;
-
 	// flag combinations which are often used:
 	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
 
@@ -174,7 +164,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
-	if (remflags == BLIT_TINTED) {
+	if (remflags == BLIT_TINTED && tint.a == 255) {
 		SRTinter_Tint<true, true> tinter(tint);
 		SRBlender_Alpha blender;
 
@@ -210,7 +200,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 		if (!(remflags & BLIT_TINTED)) tint.a = 255;
 
 		SRBlender_Alpha blender;
-		if (remflags & blit_PALETTEALPHA) {
+		if (palette->alpha) {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<true> tinter(tint);
 
