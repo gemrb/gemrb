@@ -28,6 +28,7 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
+#include "System/BufferedFileInputStream.h"
 
 using namespace GemRB;
 
@@ -120,12 +121,15 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
-	stream = FileStream::OpenFile(cachePath);
+	BufferedFileInputStream<> *cacheStream = new BufferedFileInputStream<>{cachePath};
 
 	char Signature[8];
-	if (!stream) {
-		FileStream* file = FileStream::OpenFile(path);
+	if (!cacheStream->isOk()) {
+		delete cacheStream;
+
+		BufferedFileInputStream<>* file = new BufferedFileInputStream<>{path};
 		if (!file) {
+			delete file;
 			return GEM_ERROR;
 		}
 		if (file->Read(Signature, 8) == GEM_ERROR) {
@@ -146,10 +150,13 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
+	} else {
+		stream = cacheStream;
 	}
 
-	if (!stream)
+	if (stream == nullptr) {
 		return GEM_ERROR;
+	}
 
 	stream->Read( Signature, 8 );
 
