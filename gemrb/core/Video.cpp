@@ -133,7 +133,7 @@ void Video::PopDrawingBuffer()
 
 void Video::SetStencilBuffer(const VideoBufferPtr& stencil)
 {
-	stencilBuffer = stencil.get();
+	stencilBuffer = stencil;
 }
 
 int Video::SwapBuffers(unsigned int fpscap)

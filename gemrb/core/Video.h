@@ -91,7 +91,7 @@ public:
 	virtual bool RenderOnDisplay(void* display) const = 0;
 };
 
-using VideoBufferPtr = std::unique_ptr<VideoBuffer, std::function<void(VideoBuffer*)>>;
+using VideoBufferPtr = std::shared_ptr<VideoBuffer>;
 
 /**
  * @class Video
@@ -132,7 +132,7 @@ protected:
 	VideoBuffers drawingBuffers;
 	// the current top of drawingBuffers that draw operations occur on
 	VideoBuffer* drawingBuffer;
-	VideoBuffer* stencilBuffer = nullptr;
+	VideoBufferPtr stencilBuffer = nullptr;
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 	virtual void Wait(unsigned long) = 0;

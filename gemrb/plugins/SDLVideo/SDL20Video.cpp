@@ -167,7 +167,7 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer() const
 SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 {
 	assert(stencilBuffer);
-	return static_cast<SDLTextureVideoBuffer*>(stencilBuffer)->GetTexture();
+	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
 }
 
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
