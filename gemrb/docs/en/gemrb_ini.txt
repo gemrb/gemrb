@@ -545,7 +545,7 @@ larger in each of four cardinal directions (SmallFog=0, e.g. in BG2)
 SoundFolders = <bool>
 - - - - - - - - - - -
 If set to 1, then there are separate directories for each player
-character soundset. IWD2 specific.
+character soundset. IWD/HOW/IWD2 specific.
 
 
 SpawnIni = <bool>
