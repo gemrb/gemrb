@@ -29,16 +29,16 @@ namespace GemRB {
 
 class GEM_EXPORT MemoryStream : public DataStream
 {
-private:
+protected:
 	char *data;
 public:
-	MemoryStream(char *name, void* data, unsigned long size);
+	MemoryStream(const char *name, void* data, unsigned long size);
 	~MemoryStream();
-	DataStream* Clone();
+	DataStream* Clone() override;
 
-	int Read(void* dest, unsigned int length);
-	int Write(const void* src, unsigned int length);
-	int Seek(int pos, int startpos);
+	int Read(void* dest, unsigned int length) override;
+	int Write(const void* src, unsigned int length) override;
+	int Seek(int pos, int startpos) override;
 };
 
 }

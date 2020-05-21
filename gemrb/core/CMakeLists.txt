@@ -130,6 +130,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/PCStatStruct.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp
+	System/MappedFileMemoryStream.cpp
 	System/MemoryStream.cpp
 	System/Logger.cpp
 	System/Logger/File.cpp

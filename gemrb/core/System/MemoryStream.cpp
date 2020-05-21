@@ -27,7 +27,7 @@
 
 namespace GemRB {
 
-MemoryStream::MemoryStream(char *name, void* data, unsigned long size)
+MemoryStream::MemoryStream(const char *name, void* data, unsigned long size)
 	: data((char*)data)
 {
 	this->size = size;
