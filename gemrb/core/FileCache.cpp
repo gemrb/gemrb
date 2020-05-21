@@ -22,6 +22,7 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "System/FileStream.h"
+#include "System/MappedFileMemoryStream.h"
 #include "System/VFS.h"
 
 namespace GemRB {
@@ -51,7 +52,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	} else {
 		stream->Seek(length, GEM_CURRENT_POS);
 	}
-	return FileStream::OpenFile(path);
+	return new MappedFileMemoryStream{path};
 }
 
 }
