@@ -13,10 +13,8 @@ only_commits:
     - gemrb/**/*
     - cmake/**/*
     - windows/**/*
+    - .appveyor.yml
 environment:
-  APPVEYOR_DEPS: 'C:'
-  SDLDIR: 'C:'
-  OPENALDIR: 'C:'
   SF_ACC:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
 install:
@@ -42,7 +40,10 @@ install:
     vcpkg integrate install
     popd
 
-cache: c:\tools\vcpkg\installed\
+cache:
+  - c:\tools\vcpkg\installed\
+  - '%LocalAppData%\Chocolatey\lib'
+  - '%LocalAppData%\NuGet\v3-cache'
 before_build:
 - ps: >-
     pushd c:\projects\gemrb
