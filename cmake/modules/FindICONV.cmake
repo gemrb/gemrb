@@ -31,7 +31,9 @@ if(ICONV_INCLUDE_DIR)
   set(ICONV_FIND_QUIETLY TRUE)
 endif()
 
-find_path(ICONV_INCLUDE_DIR iconv.h)
+find_path(ICONV_INCLUDE_DIR iconv.h HINTS
+	C:\tools\vcpkg\installed\x86-windows\include C:\tools\vcpkg\installed\x64-windows\include
+	${VCPKG_ROOT}\installed\x86-windows\include ${VCPKG_ROOT}\installed\x64-windows\include)
 
 if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
