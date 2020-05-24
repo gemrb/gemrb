@@ -23,7 +23,7 @@ the included trivial demo. On non-windows systems either copy it over from
 a windows install, use a compatible installer, WINE or extract it manually
 from the CDs using the unshield tool.
 
-Documentation can be found converted on the [website](http://www.gemrb.org/wiki/doku.php?id=documentation), 
+Documentation can be found on the [website](https://gemrb.github.io/Documentation),
 while the sources are in gemrb/docs/en/ and the 
 [gemrb.6 man page](http://www.gemrb.org/wiki/doku.php?id=docs:manpage).
 
