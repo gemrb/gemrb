@@ -45,6 +45,14 @@ OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(USE_ICONV "Enable Iconv support" ON)
 
+#VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
+IF(WIN32 AND _VCPKG_INSTALLED_DIR)
+	OPTION(VCPKG_AUTO_DEPLOY "Fix VCPKG dependency DLL locations" ON)
+	# This variable disables the built in VCPKG deployment script,
+	# which makes copies of the DLL files in places they are not ever found by the game
+	SET(VCPKG_APPLOCAL_DEPS OFF)
+ENDIF()
+
 # try to extract the version from the source
 FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
 SET(GEMRB_VERSION "")
