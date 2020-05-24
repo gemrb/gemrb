@@ -42,7 +42,8 @@ install:
 
 cache:
   - c:\tools\vcpkg\installed\
-  - C:\ProgramData\chocolatey\lib'
+  - C:\ProgramData\chocolatey\lib
+  - C:\ProgramData\chocolatey\bin
   - '%LocalAppData%\NuGet\v3-cache'
 before_build:
 - ps: |-
