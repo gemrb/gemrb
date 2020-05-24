@@ -151,6 +151,7 @@ IF(WIN32 AND HAVE_ICONV)
 		CodepageToIconv.cpp
 		CodepageToIconvMap.cpp
 	)
+	INCLUDE_DIRECTORIES(${ICONV_INCLUDE_DIR})
 ENDIF()
 
 if (STATIC_LINK)

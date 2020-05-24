@@ -71,6 +71,7 @@ endif(ICONV_FOUND)
 if(ICONV_FOUND)  
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
+    message(STATUS "Found ICONV includes: ${ICONV_INCLUDE_DIR}")
 
     if (NOT DEFINED ICONV_ACCEPTS_NONCONST_INPUT)
         # Display a useful message first time we come through here
