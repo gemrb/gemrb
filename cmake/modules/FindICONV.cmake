@@ -39,7 +39,7 @@ if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
 endif()
 
 if(NOT ICONV_IN_GLIBC)
-    find_library(ICONV_LIBRARY NAMES iconv)
+    find_library(ICONV_LIBRARY NAMES iconv unofficial-iconv)
     set(ICONV_TEST ${ICONV_LIBRARY})
 else()
     set(ICONV_TEST "In glibc")
