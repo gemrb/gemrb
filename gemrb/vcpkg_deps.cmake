@@ -24,10 +24,9 @@ ELSE()
 ENDIF()
 
 # lists of dll files to be deployed to the build/install directory for Win32 builds
+# libcharset is just a relic of the current iconv build
 LIST(APPEND DLL_SET
-
 	${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/SDL${DLL_SDL_VER}.dll # Cmake doesn't actually find the sdl debug libs
-
 	${DLL_DIR}OpenAL32.dll
 	${DLL_DIR}zlib${DLL_SET_DBG}1.dll
 	${DLL_DIR}vorbisfile.dll
@@ -36,6 +35,7 @@ LIST(APPEND DLL_SET
 	${DLL_DIR}libpng16${DLL_SET_DBG}.dll
 	${DLL_DIR}freetype${DLL_SET_DBG}.dll
 	${DLL_DIR}bz2${DLL_SET_DBG}.dll
+	${DLL_DIR}libcharset.dll
 	${DLL_DIR}libiconv.dll )
 
 FOREACH(ENTRY IN LISTS DLL_SET)
