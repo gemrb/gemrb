@@ -1973,7 +1973,6 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//if enemy is in sight
 	//attack them
-	//FIXME: would the circle color change?
 	if (!target->LastTarget) {
 		//depends on whom it considers enemy
 		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
@@ -3717,7 +3716,7 @@ int fx_lower_resistance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		modifier = fx->Parameter1;
 		break;
 	}
-	//FIXME: the original never goes below zero, but i think it is prone to bugs that way
+	// NOTE: the original never goes below zero, but i think it is prone to bugs that way
 	//it is easier to handle this by simply not printing negative values
 	STAT_SUB(IE_RESISTMAGIC, modifier);
 	return FX_APPLIED;
