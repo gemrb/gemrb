@@ -2255,7 +2255,7 @@ Entrance* Map::GetEntrance(const char* Name)
 	return NULL;
 }
 
-bool Map::HasActor(Actor *actor)
+bool Map::HasActor(Actor *actor) const
 {
 	for (Actor *act : actors) {
 		if (act == actor) {
