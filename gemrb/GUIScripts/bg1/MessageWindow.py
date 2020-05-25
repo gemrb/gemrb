@@ -22,7 +22,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
-from GameCheck import MAX_PARTY_SIZE
+from GameCheck import MAX_PARTY_SIZE, HasTOTSC
 from GUIDefines import *
 from ie_restype import RES_2DA
 
@@ -145,5 +145,3 @@ def GameExpansion():
 	GemRB.UpdateWorldMap("WORLDMAP", "AR1000")
 	return
 
-def HasTOTSC ():
-	return GemRB.HasResource ("toscst", RES_2DA)
