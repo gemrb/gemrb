@@ -43,8 +43,8 @@ class Font;
 class Palette;
 class SpriteCover;
 
-// Note: not all these flags make sense together. Specifically:
-// NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
+// Note: not all these flags make sense together.
+// Specifically: BLIT_GREY overrides BLIT_SEPIA
 enum SpriteBlitFlags : uint32_t {
 	BLIT_NO_FLAGS = 0,
 	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
