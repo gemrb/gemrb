@@ -124,7 +124,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture.get(), xOffs + AnimPicture->Frame.x, yOffs + AnimPicture->Frame.y, &rgn );
+			video->BlitSprite( AnimPicture.get(), xOffs, yOffs, &rgn );
 		}
 	}
 
