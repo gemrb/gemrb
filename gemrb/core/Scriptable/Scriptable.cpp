@@ -282,6 +282,11 @@ void Scriptable::DrawOverheadText()
 	palette->release();
 }
 
+Region Scriptable::DrawingRegion() const
+{
+	return BBox;
+}
+
 void Scriptable::ImmediateEvent()
 {
 	InternalFlags |= IF_FORCEUPDATE;
@@ -1797,13 +1802,6 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Spr
 	overColor.a = color.a;
 	circleBitmap[0] = normal_circle;
 	circleBitmap[1] = selected_circle;
-}
-
-//used for creatures
-bool Selectable::ForceDither() const
-{
-	//if actor is selected dither it
-	return Selected;
 }
 
 /***********************

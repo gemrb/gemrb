@@ -112,7 +112,6 @@ static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
-static ieDword always_dither = 1;
 static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword NoExtraDifficultyDmg = 0;
@@ -1827,7 +1826,6 @@ GEM_EXPORT void UpdateActorConfig()
 	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
-	core->GetDictionary()->Lookup("Always Dither", always_dither);
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
@@ -8220,12 +8218,6 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-bool Actor::ForceDither() const
-{
-	if (always_dither) return true;
-	return Selectable::ForceDither();
-}
-
 //there is a similar function in Map for stationary vvcs
 void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const
 {
@@ -8247,31 +8239,14 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 	}
 }
 
-void Actor::DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anims,
+void Actor::DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 							unsigned char Face, const Color& tint, bool useShadowPalette) const
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 
-	uint32_t flags = BLIT_BLENDED;
-
-	// TODO: we could optimize by caching this and update it only when the Selectable moves
-	// unfortunately Pos is public so its a bit hairy to undo that
-	if (area->BehindWall(Point(cx, cy), bbox)) {
-		if (core->FogOfWar&FOG_DITHERSPRITES) { // dithering disabled setting
-			flags |= BLIT_STENCIL_BLUE;
-		} else {
-			flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
-		}
-	}
-
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
-	Game* game = core->GetGame();
-	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-	if (game->TimeStoppedFor(this)) {
-		flags |= BLIT_GREY;
-	}
 
 	// display current frames in the right order
 	const int* zOrder = ca->GetZOrder(Face);
@@ -8498,7 +8473,25 @@ bool Actor::UpdateDrawingState()
 	return true;
 }
 
-void Actor::Draw(const Region& vp) const
+Region Actor::DrawingRegion() const
+{
+	Region r = BBox;
+	
+	// FIXME: I'm not sure why we dont just do this when we recalc the bbox in UpdateDrawingState()
+	// mostly I don't know everything that is making use of bbox
+	int mirrorimages = Modified[IE_MIRRORIMAGES];
+	if (mirrorimages > 0) {
+		int dir = MirrorImageLocation[mirrorimages - 1];
+		r.x += 3*OrientdX[dir];
+		r.y += 3*OrientdY[dir];
+	}
+	
+	// FIXME: we should also be accounting for the ScriptedAnimation (spells) area
+	
+	return r;
+}
+
+void Actor::Draw(const Region& vp, uint32_t flags) const
 {
 	if (!BBox.IntersectsRegion(vp)) {
 		return;
@@ -8608,8 +8601,6 @@ void Actor::Draw(const Region& vp) const
 		// it could be divided so it will become a 0-15 number.
 		//
 
-		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
-		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		Color mirrortint = tint;
 		//mirror images are also half transparent when invis
 		//if (mirrortint.a > 0) mirrortint.a = 255;
@@ -8621,37 +8612,35 @@ void Actor::Draw(const Region& vp) const
 		for (int i = 0; i < 4; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
-				Region sbbox = BBox;
 				int dir = MirrorImageLocation[m];
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
-					sbbox.x += 3*OrientdX[dir];
-					sbbox.y += 3*OrientdY[dir];
-					DrawActorSprite(icx, icy, sbbox, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}
 			}
 		}
 
 		// blur sprites behind the actor
+		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		int blurx = cx;
 		int blury = cy;
 		if (State & STATE_BLUR) {
 			if (Face < 4 || Face >= 12) {
-				Region sbbox = BBox;
-				sbbox.x -= 4*blurdx; sbbox.y -= 4*blurdy;
 				blurx -= 4*blurdx; blury -= 4*blurdy;
 				for (int i = 0; i < 3; ++i) {
-					sbbox.x += blurdx; sbbox.y += blurdy;
 					blurx += blurdx; blury += blurdy;
-					DrawActorSprite(blurx, blury, sbbox, anims, Face, tint);
+					DrawActorSprite(blurx, blury, flags, anims, Face, tint);
 				}
 			}
 		}
 
 		Game* game = core->GetGame();
-		uint32_t flags = !ca->lockPalette ? BLIT_TINTED : BLIT_NO_FLAGS;
+		if (!ca->lockPalette) {
+			flags |= BLIT_TINTED;
+		}
 		game->ApplyGlobalTint(tint, flags);
 
 		// infravision, independent of light map and global light
@@ -8671,20 +8660,18 @@ void Actor::Draw(const Region& vp) const
 
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(cx, cy, BBox, shadowAnimations, Face, tint, true);
+			DrawActorSprite(cx, cy, flags, shadowAnimations, Face, tint, true);
 		}
 
 		// actor itself
-		DrawActorSprite(cx, cy, BBox, anims, Face, tint);
+		DrawActorSprite(cx, cy, flags, anims, Face, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
 			if (Face >= 4 && Face < 12) {
-				Region sbbox = BBox;
 				for (int i = 0; i < 3; ++i) {
-					sbbox.x -= blurdx; sbbox.y -= blurdy;
 					blurx -= blurdx; blury -= blurdy;
-					DrawActorSprite(blurx, blury, sbbox, anims, Face, tint);
+					DrawActorSprite(blurx, blury, flags, anims, Face, tint);
 				}
 			}
 		}
@@ -8693,15 +8680,12 @@ void Actor::Draw(const Region& vp) const
 		for (int i = 4; i < 8; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
-				Region sbbox = BBox;
 				int dir = MirrorImageLocation[m];
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
-					sbbox.x += 3*OrientdX[dir];
-					sbbox.y += 3*OrientdY[dir];
-					DrawActorSprite(icx, icy, sbbox, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}
 			}
 		}

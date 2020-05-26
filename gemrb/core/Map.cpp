@@ -976,7 +976,9 @@ void Map::DrawPile(Region screen, Container* c, bool highlight)
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	c->DrawPile(highlight, screen, tint);
+	uint32_t flags = SetDrawingStencilForScriptable(c);
+	flags |= BLIT_TINTED|BLIT_BLENDED;
+	c->DrawPile(highlight, screen, flags, tint);
 }
 
 Container *Map::GetNextPile(int &index) const
@@ -1143,10 +1145,8 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		TMap->DrawOverlays( viewport, rain, flags );
 	}
 
-	const auto& viewportWalls = WallsCoveringRegion(viewport);
-
-	RedrawStencils(viewport, viewportWalls);
-	video->SetStencilBuffer(wallStencil);
+	const auto& viewportWalls = WallsCoveringRegion(viewport, false);
+	RedrawScreenStencil(viewport, viewportWalls);
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
@@ -1188,7 +1188,12 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		case AOT_ACTOR:
 			assert(actor != NULL);
 			if (actor->UpdateDrawingState()) {
-				actor->Draw( viewport );
+				uint32_t flags = SetDrawingStencilForScriptable(actor);
+				// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
+				if (game->TimeStoppedFor(actor)) {
+					flags |= BLIT_GREY;
+				}
+				actor->Draw(viewport, flags|BLIT_BLENDED);
 			}
 
 			actor = GetNextActor(q, index);
@@ -1207,6 +1212,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			break;
 		case AOT_AREA:
 			//draw animation
+			video->SetStencilBuffer(wallStencil);
 			a->Draw( viewport, this );
 			a = GetNextAreaAnimation(aniidx,gametime);
 			break;
@@ -1318,6 +1324,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 
 	// Show wallpolygons
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
+		const auto& viewportWalls = WallsCoveringRegion(viewport, true);
 		for (const auto& poly : viewportWalls) {
 			const Point& origin = poly->BBox.Origin() - viewport.Origin();
 
@@ -1349,7 +1356,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 	}
 }
 
-Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
+Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r, bool includeDisabled, const Point* loc) const
 {
 	// WallGroups are collections that contain a reference to all wall polygons intersecting
 	// a 640x480 region moving from top left to bottom right of the map
@@ -1369,12 +1376,104 @@ Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r) const
 		for (uint32_t x = xmin; x < xmax; ++x) {
 			const auto& group = wallGroups[y * pitch + x];
 			std::copy_if(group.begin(), group.end(), std::inserter(set, set.end()), [&](const std::shared_ptr<Wall_Polygon>& wp) {
+				if ((wp->wall_flag&WF_DISABLED) && includeDisabled == false) {
+					return false;
+				}
+
+				if (loc && wp->PointBehind(*loc) == false) {
+					return false;
+				}
+
 				return r.IntersectsRegion(wp->BBox);
 			});
 		}
 	}
 
 	return set;
+}
+
+uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
+{
+	const Region& r = scriptable->DrawingRegion();
+	auto walls = WallsCoveringRegion(r, false, nullptr);
+
+	if (walls.empty()) {
+		return 0; // not behind a wall, no stencil required
+	}
+	
+	bool inFront = false;
+	bool requiresStencil = false;
+	for (auto it = walls.begin(); it != walls.end();) {
+		const auto& wp = *it;
+		if (!wp->PointBehind(Pos)) {
+			// remove walls we are in front of
+			it = walls.erase(it);
+			inFront = true;
+		} else {
+			++it;
+			requiresStencil = inFront;
+		}
+	}
+	
+	Video* video = core->GetVideoDriver();
+	if (requiresStencil) {
+		// we are both in front of and behind a wall
+		// so we need a custom stencil
+		VideoBufferPtr stencil = nullptr;
+		auto it = objectStencils.find(scriptable);
+		if (it != objectStencils.end()) {
+			// we already made one
+			const auto& pair = it->second;
+			if (pair.second == r) {
+				// and it is still good
+				stencil = pair.first;
+			}
+		}
+		
+		if (stencil == nullptr) {
+			Region stencilRgn = Region(r.Origin() - scriptable->Pos, r.Dimensions());
+			stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
+			DrawStencil(stencil, r, walls);
+			objectStencils[scriptable] = std::make_pair(stencil, r);
+		} else {
+			// TODO: we only need to do this because a door might have changed state over us
+			// if we could detect that we could avoid doing this expensive operation
+			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
+			stencil->Clear();
+			DrawStencil(stencil, r, walls);
+		}
+		
+		assert(stencil);
+		video->SetStencilBuffer(stencil);
+	} else {
+		video->SetStencilBuffer(wallStencil);
+	}
+	
+	ieDword always_dither;
+	core->GetDictionary()->Lookup("Always Dither", always_dither);
+	
+	uint32_t flags = 0;
+	if (always_dither) {
+		flags = BLIT_STENCIL_ALPHA;
+	} else if (core->FogOfWar&FOG_DITHERSPRITES) {
+		// dithering is set to disabled
+		flags = BLIT_STENCIL_BLUE;
+	} else if (scriptable->Type == ST_ACTOR) {
+		Actor* a = static_cast<Actor*>(scriptable);
+		if (a->IsSelected() || a->Over) {
+			flags = BLIT_STENCIL_ALPHA;
+		} else {
+			flags = BLIT_STENCIL_RED;
+		}
+	} else if (scriptable->Type == ST_CONTAINER) {
+		Container* c = static_cast<Container*>(scriptable);
+		if (c->Highlight) {
+			flags = BLIT_STENCIL_ALPHA;
+		} else {
+			flags = BLIT_STENCIL_RED;
+		}
+	}
+	return flags;
 }
 
 void Map::DrawSearchMap(const Region &vp)
@@ -2063,7 +2162,7 @@ unsigned int Map::GetBlocked(const Point &c) const
 	return GetBlocked(c.x/16, c.y/12);
 }
 
-void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
+void Map::RedrawScreenStencil(const Region& vp, const WallPolygonSet& walls)
 {
 	if (stencilViewport == vp) {
 		return;
@@ -2071,16 +2170,22 @@ void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
 
 	stencilViewport = vp;
 
-	Video* video = core->GetVideoDriver();
-
 	if (wallStencil == NULL) {
 		// FIXME: this should be forced 8bit*4 color format
 		// but currently that is forcing some performance killing converison issues on some platforms
 		// for now things will break if we use 16 bit color settings
-		wallStencil = video->CreateBuffer(vp, Video::DISPLAY_ALPHA);
+		Video* video = core->GetVideoDriver();
+		wallStencil = video->CreateBuffer(Region(Point(), vp.Dimensions()), Video::DISPLAY_ALPHA);
 	}
 
 	wallStencil->Clear();
+
+	DrawStencil(wallStencil, vp, walls);
+}
+
+void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonSet& walls) const
+{
+	Video* video = core->GetVideoDriver();
 
 	// color is used as follows:
 	// the 'r' channel is for the native value for all walls
@@ -2089,11 +2194,9 @@ void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
 	// the 'a' channel is for always dithered (always 0x80, 50% transparent)
 	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
 	Color stencilcol(0, 0, 0xff, 0x80);
-	video->PushDrawingBuffer(wallStencil);
+	video->PushDrawingBuffer(stencilBuffer);
 
 	for (const auto& wp : walls) {
-		if (wp->wall_flag & WF_DISABLED) continue;
-
 		const Point& origin = wp->BBox.Origin() - vp.Origin();
 
 		if (wp->wall_flag & WF_DITHER) {
@@ -2116,17 +2219,8 @@ void Map::RedrawStencils(const Region& vp, const WallPolygonSet& walls)
 
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
-	// TODO: refactor so this only happens for actors on screen
-	const auto& polys = WallsCoveringRegion(r);
-	for (const auto& wp : polys) {
-		if (wp->wall_flag&WF_DISABLED) continue;
-
-		if (wp->PointBehind(pos)) {
-			return true;
-		}
-	}
-
-	return false;
+	const auto& polys = WallsCoveringRegion(r, false, &pos);
+	return polys.size();
 }
 
 //this function determines actor drawing order

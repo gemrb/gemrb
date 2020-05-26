@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -400,6 +401,8 @@ private:
 
 	VideoBufferPtr wallStencil;
 	Region stencilViewport;
+
+	std::unordered_map<Scriptable*, std::pair<VideoBufferPtr, Region>> objectStencils;
 public:
 	Map(void);
 	~Map(void);
@@ -640,8 +643,10 @@ private:
 	void UpdateSpawns();
 
 	using WallPolygonSet = std::set<std::shared_ptr<Wall_Polygon>>;
-	void RedrawStencils(const Region& vp, const WallPolygonSet& walls);
-	WallPolygonSet WallsCoveringRegion(const Region&) const;
+	void RedrawScreenStencil(const Region& vp, const WallPolygonSet& walls);
+	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonSet& walls) const;
+	WallPolygonSet WallsCoveringRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
+	uint32_t SetDrawingStencilForScriptable(Scriptable*);
 };
 
 }

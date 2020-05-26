@@ -68,30 +68,34 @@ Container::~Container()
 	FreeGroundIcons();
 }
 
-void Container::DrawPile(bool highlight, const Region& vp, Color tint)
+Region Container::DrawingRegion() const
+{
+	Region r;
+	
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
+		const Sprite2D* icon = groundicons[i];
+		if (icon) {
+			r = Region::RegionEnclosingRegions(r, icon->Frame);
+		}
+	}
+	
+	r.x = Pos.x - r.x;
+	r.y = Pos.y - r.y;
+	
+	return r;
+}
+
+void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color tint)
 {
 	Video* video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 
 	//draw it with highlight
-	ieDword flags = BLIT_TINTED | BLIT_BLENDED;
 	game->ApplyGlobalTint(tint, flags);
 
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		const Sprite2D* icon = groundicons[i];
 		if (icon) {
-			// TODO: we could optimize by caching this and update it only when the Selectable moves
-			// unfortunately Pos is public so its a bit hairy to undo that
-			Region r = icon->Frame;
-			r.x = Pos.x - r.x;
-			r.y = Pos.y - r.y;
-			if (area->BehindWall(Pos, r)) {
-				if (core->FogOfWar&FOG_DITHERSPRITES) { // dithering disabled setting
-					flags |= BLIT_STENCIL_BLUE;
-				} else {
-					flags |= ForceDither() ? BLIT_STENCIL_ALPHA : BLIT_STENCIL_RED;
-				}
-			}
 			if (highlight) {
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 			} else {
@@ -166,13 +170,6 @@ void Container::RefreshGroundIcons()
 		groundicons[i] = gamedata->GetBAMSprite( itm->GroundIcon, 0, 0 );
 		gamedata->FreeItem( itm, slot->ItemResRef ); //decref
 	}
-}
-
-//used for ground piles
-bool Container::ForceDither()
-{
-	//if pile is highlighted, always dither it
-	return Highlight;
 }
 
 int Container::IsOpen() const

@@ -46,9 +46,9 @@ public:
 	//adds an item to the container's inventory
 	int AddItem(CREItem *item);
 	//draws the ground icons
-	void DrawPile(bool highlight, const Region& viewport, Color tint);
-	//returns dithering option
-	bool ForceDither();
+	Region DrawingRegion() const override;
+	void DrawPile(bool highlight, const Region& viewport, uint32_t flags, Color tint);
+
 	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;

@@ -230,6 +230,7 @@ protected: //let Actor access this
 	unsigned long timeStartDisplaying;
 	String OverheadText;
 public:
+	Region BBox;
 	// State relating to the currently-running action.
 	int CurrentActionState;
 	ieDword CurrentActionTarget;
@@ -345,6 +346,7 @@ public:
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText();
+	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
@@ -381,7 +383,6 @@ class GEM_EXPORT Selectable : public Scriptable {
 public:
 	Selectable(ScriptableType type);
 public:
-	Region BBox;
 	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
 	Color selectedColor;
@@ -397,9 +398,6 @@ public:
 	bool IsSelected() const;
 	void Select(int Value);
 	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
-
-	/* want dithered SpriteCover */
-	bool ForceDither() const;
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {
@@ -409,7 +407,6 @@ public:
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 public:
-	Region BBox;
 	std::shared_ptr<Gem_Polygon> outline;
 	Color outlineColor;
 	ieDword Cursor;

@@ -406,8 +406,10 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(int cx, int cy, const Region& bbox, Animation** anims,
+	void DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 						 unsigned char Face, const Color& tint, bool useShadowPalette = false) const;
+	
+	Region DrawingRegion() const override;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -738,11 +740,10 @@ public:
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
-	Region DrawingRegion() const;
 	void UpdateActorState();
 	/* update internal per frame state and return true if state is suitable for drawing the actor */
 	bool UpdateDrawingState();
-	void Draw(const Region &screen) const;
+	void Draw(const Region &screen, uint32_t flags) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0) override;
 
 	/* add mobile vvc (spell effects) to actor's list */
@@ -758,7 +759,6 @@ public:
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
-	bool ForceDither() const;
 	/* draw videocells */
 	void DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const;
 
