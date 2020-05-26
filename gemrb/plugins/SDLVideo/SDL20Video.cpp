@@ -566,15 +566,28 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			if (SDL_TOUCH_MOUSEID == event.wheel.which) {
-				break;
+			{
+				if (SDL_TOUCH_MOUSEID == event.wheel.which) {
+					break;
+				}
+				
+				// HACK: some mouse devices report the delta in pixels, but others (like regular mouse wheels) are going to be in "clicks"
+				// there is no good way to find which is the case so heuristically we will just switch if we see a delta larger than one
+				// hopefully no devices will be merging several repeated whell clicks together
+				static bool unitIsPixels = false;
+				if (event.wheel.y > 1 || event.wheel.x > 1) {
+					unitIsPixels = true;
+				}
+				
+				int speed = (unitIsPixels) ? 1 : core->GetMouseScrollSpeed();
+				if (SDL_GetModState() & KMOD_SHIFT) {
+					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
+				} else {
+					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
+				}
+				
+				EvntManager->DispatchEvent(e);
 			}
-			if (SDL_GetModState() & KMOD_SHIFT) {
-				e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y, event.wheel.x));
-			} else {
-				e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x, event.wheel.y));
-			}
-			EvntManager->DispatchEvent(e);
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
