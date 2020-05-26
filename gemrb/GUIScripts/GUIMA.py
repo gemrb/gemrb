@@ -113,6 +113,12 @@ def InitMapWindow (Window):
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
+def ToggleMapWindows():
+	if WorldMapWindow:
+		WorldMapWindow.Close()
+	else:
+		ToggleMapWindow()
+
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 

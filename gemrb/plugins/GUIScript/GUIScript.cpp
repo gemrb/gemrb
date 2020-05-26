@@ -2986,8 +2986,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 
 		PyObject* module = PyImport_ImportModule(func->module);
 		if (module == NULL) {
-			PyErr_Print();
-			return NULL;
+			return RuntimeError("Hot key map referenced a module that doesnt exist.");
 		}
 		PyObject* dict = PyModule_GetDict(module);
 
@@ -2995,7 +2994,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		/* pFunc: Borrowed reference */
 		if (!PyCallable_Check(pFunc)) {
 			Py_DECREF(module);
-			return NULL;
+			return RuntimeError("Hot key map referenced a function that doesnt exist.");
 		}
 
 		btn->SetAction(new PythonControlCallback(pFunc));
