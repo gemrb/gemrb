@@ -1415,6 +1415,10 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
 		}
 	}
 	
+	if (inFront && !requiresStencil) {
+		return 0; // if we are in front of every wall we need no stencil at all
+	}
+	
 	Video* video = core->GetVideoDriver();
 	if (requiresStencil) {
 		// we are both in front of and behind a wall
@@ -1473,6 +1477,8 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
 			flags = BLIT_STENCIL_RED;
 		}
 	}
+	
+	assert(flags & BLIT_STENCIL_MASK); // we needed a stencil so we must require a stencil flag
 	return flags;
 }
 
