@@ -54,7 +54,7 @@ public:
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
 	void dump() const;
-	int TrapResets() const { return Flags & CONT_RESET; }
+	int TrapResets() const override { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
