@@ -18,6 +18,7 @@
 #
 import GemRB
 from GUIDefines import *
+from GameCheck import HasTOTSC
 
 StartWindow = 0
 QuitWindow = 0
@@ -74,11 +75,14 @@ def SinglePlayerPress():
 	ExitButton.SetText(15416)
 	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadSingle)
 	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewSingle)
-	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MissionPack)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
 	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
+	if HasTOTSC():
+		MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MissionPack)
+	else:
 		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		MoviesButton.SetStatus(IE_GUI_BUTTON_DISABLED)
+
 	return
 
 def MultiPlayerPress():

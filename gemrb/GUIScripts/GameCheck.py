@@ -20,7 +20,7 @@
 # GameCheck.py - functions to check GameType
 
 import GemRB
-from ie_restype import RES_WMP, RES_ARE
+from ie_restype import RES_WMP, RES_ARE, RES_2DA
 
 MAX_PARTY_SIZE = GemRB.GetVar ("MaxPartySize")
 
@@ -65,3 +65,6 @@ def HasBGT ():
 
 def HasTutu ():
 	return GemRB.HasResource ("fw0125", RES_ARE)
+
+def HasTOTSC ():
+	return GemRB.HasResource ("toscst", RES_2DA)
