@@ -284,7 +284,11 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 /** Mouse wheel scroll */
 bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
-	ScrollDelta(delta);
+	// this control uses the opposite direction
+	Point d = delta;
+	d.x *= -1;
+	d.y *= -1;
+	ScrollDelta(d);
 	return true;
 }
 
