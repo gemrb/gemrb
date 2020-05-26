@@ -566,7 +566,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x, event.wheel.y));
+			if (SDL_TOUCH_MOUSEID == event.wheel.which) {
+				break;
+			}
+			if (SDL_GetModState() & KMOD_SHIFT) {
+				e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y, event.wheel.x));
+			} else {
+				e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x, event.wheel.y));
+			}
 			EvntManager->DispatchEvent(e);
 			break;
 		/* not user input events */
