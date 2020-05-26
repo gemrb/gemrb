@@ -8486,6 +8486,16 @@ Region Actor::DrawingRegion() const
 		r.y += 3*OrientdY[dir];
 	}
 	
+	if (Modified[IE_STATE_ID] & STATE_BLUR) {
+		constexpr int maxFace = 10 * 4; // the maximum value in the OrientXY arrays multiplied by the number of blurs
+		int blurx = (maxFace * Modified[IE_MOVEMENTRATE])/20;
+		int blury = (maxFace * Modified[IE_MOVEMENTRATE])/20;
+		r.x -= blurx;
+		r.w += blurx * 2;
+		r.y -= blury;
+		r.h += blury * 2;
+	}
+	
 	// FIXME: we should also be accounting for the ScriptedAnimation (spells) area
 	
 	return r;
