@@ -2204,9 +2204,9 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 }
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	// gc uses the opposite direction
+	// Game coordinates start at the top left to the bottom right
+	// so we need to invert the 'y' axis
 	Point d = delta;
-	d.x *= -1;
 	d.y *= -1;
 	Scroll(d);
 	return true;

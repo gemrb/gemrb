@@ -284,9 +284,9 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 /** Mouse wheel scroll */
 bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
-	// this control uses the opposite direction
+	// Game coordinates start at the top left to the bottom right
+	// so we need to invert the 'y' axis
 	Point d = delta;
-	d.x *= -1;
 	d.y *= -1;
 	ScrollDelta(d);
 	return true;
