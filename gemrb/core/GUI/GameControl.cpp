@@ -2204,11 +2204,7 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 }
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	// gc uses the opposite direction
-	Point d = delta;
-	d.x *= -1;
-	d.y *= -1;
-	Scroll(d);
+	Scroll(delta);
 	return true;
 }
 

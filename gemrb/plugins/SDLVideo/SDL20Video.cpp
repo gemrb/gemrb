@@ -566,10 +566,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			/*
-			 TODO: need a preference for inverting these
-			 sdl 2.0.4 autodetects (SDL_MOUSEWHEEL_FLIPPED in SDL_MouseWheelEvent)
-			 */
 			e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x, event.wheel.y));
 			EvntManager->DispatchEvent(e);
 			break;
