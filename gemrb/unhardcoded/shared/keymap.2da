@@ -6,7 +6,7 @@ Character_Record      GUIREC           ToggleRecordsWindow                 0
 Character_Stats       GUIREC           ToggleRecordsWindow                 0
 Return_To_Game        GUICommonWindows ReturnToGame                        0
 Journal               GUIJRNL          ToggleJournalWindow                 0
-Map                   GUIMA            ToggleMapWindows                    0
+Map                   GUIMA            ToggleMapWindow                     0
 Wizard_Spells         GUIMG            ToggleSpellWindow                   0
 Mage_Spells           GUIMG            ToggleSpellWindow                   0
 Priest_Spells         GUIPR            TogglePriestWindow                  0

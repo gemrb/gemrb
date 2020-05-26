@@ -30,7 +30,6 @@ from GUIDefines import *
 
 MapWindow = None
 NoteWindow = None
-WorldMapWindow = None
 WorldMapControl = None
 
 def RevealMap ():
@@ -81,7 +80,7 @@ def InitMapWindow (Window):
 
 	# World Map
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: WorldMapWindowCommon (-1))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenWorldMapWindow())
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -109,15 +108,18 @@ def InitMapWindow (Window):
 	Map.Focus()
 
 	return
+	
+def InitWorldMapWindow (Window):
+	WorldMapWindowCommon (Window, -1)
+	return
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
-def ToggleMapWindows():
-	if WorldMapWindow:
-		WorldMapWindow.Close()
-	else:
-		ToggleMapWindow()
+if GameCheck.IsIWD2():
+	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow, WINDOW_TOP|WINDOW_HCENTER)
+else:
+	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
@@ -186,9 +188,10 @@ def AddNoteWindow ():
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NoteLabel.Focus()
 	return
-
-def OpenWorldMapWindow ():
-	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
+	
+def OpenTravelWindow ():
+	Window = OpenWorldMapWindow()
+	WorldMapWindowCommon (Window, GemRB.GetVar ("Travel"))
 	return
 
 def ChangeTooltip ():
@@ -204,16 +207,11 @@ def ChangeTooltip ():
 	WorldMapControl.SetTooltip (tt)
 	return
 
-def WorldMapWindowCommon (Travel):
-	global WorldMapWindow, WorldMapControl
+def WorldMapWindowCommon (Window, Travel):
+	global WorldMapControl
 
-	if GameCheck.IsIWD2():
-		WorldMapWindow = Window = GemRB.LoadWindow (2, "GUIWMAP", WINDOW_TOP|WINDOW_HCENTER)
-	else:
-		WorldMapWindow = Window = GemRB.LoadWindow (0, "GUIWMAP")
+	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 
-	WorldMapWindow.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
-	
 	if GameCheck.IsBG2():
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "floattxt")
 	elif GameCheck.IsBG1():
@@ -277,8 +275,8 @@ def WorldMapWindowCommon (Travel):
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: WorldMapWindow.Close())
-	Button.MakeEscape()
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetHotKey('m')
 
 	return
 

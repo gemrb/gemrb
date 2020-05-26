@@ -2272,7 +2272,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		direction = 0;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
-	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }
