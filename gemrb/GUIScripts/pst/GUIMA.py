@@ -35,7 +35,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenTravelWindow)
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -80,7 +80,7 @@ def InitMapWindow (Window):
 
 	return
 
-def OpenWorldMapWindow ():
+def OpenTravelWindow ():
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	Travel = GemRB.GetVar ("Travel")
