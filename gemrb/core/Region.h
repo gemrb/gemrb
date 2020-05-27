@@ -113,6 +113,8 @@ public:
 	Point Maximum() const { return Point(x + w, y + h); }
 	Size Dimensions() const { return Size(w, h); }
 	
+	void ExpandToPoint(const Point& p);
+	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
 		Point min, max;
 

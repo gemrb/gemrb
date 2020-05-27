@@ -184,4 +184,19 @@ Region Region::Intersect(const Region& rgn) const
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
+void Region::ExpandToPoint(const Point& p)
+{
+	if (p.x <= x) {
+		x = p.x;
+	} else {
+		w = p.x;
+	}
+	
+	if (p.y <= y) {
+		y = p.y;
+	} else {
+		h = p.y;
+	}
+}
+
 }
