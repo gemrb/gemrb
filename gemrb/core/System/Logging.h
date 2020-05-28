@@ -79,7 +79,7 @@ GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
 
 // poison printf
 #if !defined(__MINGW32__)
-#if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
+#if __GNUC__ >= 4
 extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use Log instead.")));
 #elif __GNUC__ >= 4
 extern "C" int printf(const char* message, ...) __attribute__ ((deprecated));
