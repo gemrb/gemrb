@@ -1025,18 +1025,20 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				Log(MESSAGE, "GameControl", "Show traps and infopoints %s", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '5':
-				static uint32_t wallFlags[6] {
-					0,
-					DEBUG_SHOW_DOORS_SECRET,
-					DEBUG_SHOW_DOORS_DISABLED,
-					DEBUG_SHOW_WALLS,
-					DEBUG_SHOW_WALLS_ANIM_COVER,
-					DEBUG_SHOW_WALLS_ALL
-				};
-				static uint32_t flagIdx = 0;
-				DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
-				DebugFlags |= wallFlags[flagIdx++];
-				flagIdx = flagIdx % 6;
+				{
+					static uint32_t wallFlags[6]{
+						0,
+						DEBUG_SHOW_DOORS_SECRET,
+						DEBUG_SHOW_DOORS_DISABLED,
+						DEBUG_SHOW_WALLS,
+						DEBUG_SHOW_WALLS_ANIM_COVER,
+						DEBUG_SHOW_WALLS_ALL
+					};
+					static uint32_t flagIdx = 0;
+					DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
+					DebugFlags |= wallFlags[flagIdx++];
+					flagIdx = flagIdx % 6;
+				}
 				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
