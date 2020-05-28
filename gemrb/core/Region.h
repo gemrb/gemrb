@@ -31,6 +31,7 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include <algorithm>
 #include <vector>
 
 namespace GemRB {
