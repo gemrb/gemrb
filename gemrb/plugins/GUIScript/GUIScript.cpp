@@ -1178,7 +1178,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 		superView->AddSubviewInFrontOfView(subView, siblingView);
 		
 		char* grp = PyString_AsString(attr);
-		if (strcasecmp(grp, "__DEL__") == 0) {
+		if (stricmp(grp, "__DEL__") == 0) {
 			if (id == ScriptingId(-1)) {
 				return RuntimeError("Cannot add deleted view without a valid id parameter.");
 			}
