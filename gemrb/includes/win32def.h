@@ -69,5 +69,10 @@
 #define M_PI_2  1.57079632679489661923 // pi/2
 #endif
 
+ /* WinAPI collision. GetObject from wingdi.h conflicts with a type used in the GUIScript source (core\ScriptEngine.h) */
+#ifdef GetObject
+#undef GetObject
+#endif
+
 #include "System/Logging.h"
 #endif  //! WIN32DEF_H

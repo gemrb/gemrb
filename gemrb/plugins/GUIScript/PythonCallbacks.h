@@ -24,10 +24,6 @@
 
 #include "win32def.h" // For Logging
 
-/* WinAPI collision. */
-#ifdef GetObject
-#undef GetObject
-#endif
 
 #include "Callback.h"
 #include "Interface.h"
