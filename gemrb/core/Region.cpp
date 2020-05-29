@@ -186,16 +186,20 @@ Region Region::Intersect(const Region& rgn) const
 
 void Region::ExpandToPoint(const Point& p)
 {
+	if (PointInside(p)) {
+		return;
+	}
+
 	if (p.x <= x) {
 		x = p.x;
 	} else {
-		w = p.x;
+		w = p.x - x;
 	}
 	
 	if (p.y <= y) {
 		y = p.y;
 	} else {
-		h = p.y;
+		h = p.y - y;
 	}
 }
 
