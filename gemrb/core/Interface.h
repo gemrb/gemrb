@@ -35,6 +35,7 @@
 #include "GameData.h"
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
+#include "GUI/GUIFactory.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
@@ -74,7 +75,6 @@ class Font;
 class Game;
 class GameControl;
 class GlobalTimer;
-class GUIFactory;
 class ITMExtHeader;
 class Image;
 class Item;
