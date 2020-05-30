@@ -663,7 +663,8 @@ def GetColor():
 	ColorTable = GemRB.LoadTable ("clowncol")
 	InventoryWindow = GemRB.GetView ("WIN_INV")
 	InventoryWindow.SetDisabled (True) #darken it
-	ColorPicker=GemRB.LoadWindow (3)
+	ColorPicker = GemRB.LoadWindow (3)
+	ColorPicker.SetFlags (WF_BORDERLESS, OP_OR)
 	GemRB.SetVar ("Selected",-1)
 	if GameCheck.IsIWD2():
 		Button = ColorPicker.GetControl (35)
