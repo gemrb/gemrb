@@ -72,7 +72,6 @@
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/EventMgr.h"
-#include "GUI/GUIFactory.h"
 #include "GUI/GameControl.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
