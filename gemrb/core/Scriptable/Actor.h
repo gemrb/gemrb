@@ -408,8 +408,6 @@ private:
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 						 unsigned char Face, const Color& tint, bool useShadowPalette = false) const;
-	
-	Region DrawingRegion() const override;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -743,6 +741,7 @@ public:
 	void UpdateActorState();
 	/* update internal per frame state and return true if state is suitable for drawing the actor */
 	bool UpdateDrawingState();
+	Region DrawingRegion() const override;
 	void Draw(const Region &screen, uint32_t flags) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0) override;
 
