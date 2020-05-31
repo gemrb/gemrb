@@ -454,7 +454,6 @@ public:
 	Movable(ScriptableType type);
 	virtual ~Movable(void);
 	Point Destination;
-	Sprite2D* lastFrame;
 	ieResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home

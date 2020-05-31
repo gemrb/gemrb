@@ -1962,7 +1962,6 @@ Movable::Movable(ScriptableType type)
 	path = NULL;
 	step = NULL;
 	timeStartStep = 0;
-	lastFrame = NULL;
 	Area[0] = 0;
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;

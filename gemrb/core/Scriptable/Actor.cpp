@@ -5117,7 +5117,6 @@ void Actor::SetPosition(const Point &position, int jump, int radiusx, int radius
 	p.x = position.x/16;
 	p.y = position.y/12;
 	q = p;
-	lastFrame = NULL;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
@@ -8402,6 +8401,8 @@ uint8_t Actor::GetElevation() const
 
 bool Actor::UpdateDrawingState()
 {
+	// TODO: we should update and cache the DrawingRegion here
+
 	Map* area = GetCurrentArea();
 	if (!area) {
 		InternalFlags &= ~IF_TRIGGER_AP;
@@ -8431,29 +8432,23 @@ bool Actor::UpdateDrawingState()
 		int PartCount = ca->GetTotalPartCount();
 		Animation** shadows = ca->GetShadowAnimation(StanceID, Face);
 		AdvanceAnimations(anims, shadows, PartCount);
-
-		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
-
-		// update bounding box and such
-		if (nextFrame && lastFrame != nextFrame) {
-			Region newBBox;
-			if (PartCount == 1) {
-				newBBox.x = Pos.x - nextFrame->Frame.x;
-				newBBox.w = nextFrame->Frame.w;
-				newBBox.y = Pos.y - nextFrame->Frame.y;
-				newBBox.h = nextFrame->Frame.h;
-			} else {
-				// FIXME: currently using the animarea instead
-				// of the real bounding box of this (multi-part) frame.
-				// Shouldn't matter much, though. (wjp)
-				newBBox.x = Pos.x + anims[0]->animArea.x;
-				newBBox.y = Pos.y + anims[0]->animArea.y;
-				newBBox.w = anims[0]->animArea.w;
-				newBBox.h = anims[0]->animArea.h;
+		
+		Region newBBox(Pos, Size());
+		for (int part = 0; part < PartCount; ++part) {
+			Animation* anim = anims[part];
+			if (anim) {
+				Sprite2D* animframe = anim->GetFrame(anim->GetCurrentFrame());
+				assert(animframe);
+				Region partBBox = animframe->Frame;
+				partBBox.x = Pos.x - partBBox.x;
+				partBBox.y = Pos.y - partBBox.y;
+				newBBox = Region::RegionEnclosingRegions(newBBox, partBBox);
 			}
-			lastFrame = nextFrame;
-			SetBBox( newBBox );
 		}
+		
+		newBBox.y -= GetElevation();
+		
+		SetBBox(newBBox);
 	}
 
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
@@ -8489,25 +8484,32 @@ bool Actor::UpdateDrawingState()
 
 Region Actor::DrawingRegion() const
 {
+	// We assume BBox is the the box containing the actor and all its equipment
 	Region r = BBox;
 	
-	// FIXME: I'm not sure why we dont just do this when we recalc the bbox in UpdateDrawingState()
-	// mostly I don't know everything that is making use of bbox
+	// FIXME: we should just do this when we recalc the bbox in UpdateDrawingState()
+	// instead of every time this is called
 	int mirrorimages = Modified[IE_MIRRORIMAGES];
-	if (mirrorimages > 0) {
-		int dir = MirrorImageLocation[mirrorimages - 1];
-		r.x += 3*OrientdX[dir];
-		r.y += 3*OrientdY[dir];
+	for (int i = 0; i < mirrorimages; ++i) {
+		int dir = MirrorImageLocation[i];
+		
+		Region mirrorBox = BBox;
+		mirrorBox.x += 3 * OrientdX[dir];
+		mirrorBox.y += 3 * OrientdY[dir];
+		
+		r = Region::RegionEnclosingRegions(r, mirrorBox);
 	}
 	
 	if (Modified[IE_STATE_ID] & STATE_BLUR) {
-		constexpr int maxFace = 10 * 4; // the maximum value in the OrientXY arrays multiplied by the number of blurs
-		int blurx = (maxFace * Modified[IE_MOVEMENTRATE])/20;
-		int blury = (maxFace * Modified[IE_MOVEMENTRATE])/20;
-		r.x -= blurx;
-		r.w += blurx * 2;
-		r.y -= blury;
-		r.h += blury * 2;
+		int face = GetOrientation();
+		int blurx = (OrientdX[face] * (int)Modified[IE_MOVEMENTRATE])/20;
+		int blury = (OrientdY[face] * (int)Modified[IE_MOVEMENTRATE])/20;
+		
+		Region blurBox = BBox;
+		blurBox.x -= blurx * 3;
+		blurBox.y -= blury * 3;
+		
+		r = Region::RegionEnclosingRegions(r, blurBox);
 	}
 	
 	// FIXME: we should also be accounting for the ScriptedAnimation (spells) area
@@ -8517,7 +8519,7 @@ Region Actor::DrawingRegion() const
 
 void Actor::Draw(const Region& vp, uint32_t flags) const
 {
-	if (!BBox.IntersectsRegion(vp)) {
+	if (!DrawingRegion().IntersectsRegion(vp)) {
 		return;
 	}
 
