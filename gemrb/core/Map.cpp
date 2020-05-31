@@ -1428,7 +1428,7 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
 		if (it != objectStencils.end()) {
 			// we already made one
 			const auto& pair = it->second;
-			if (pair.second == r) {
+			if (pair.second.RectInside(r)) {
 				// and it is still good
 				stencil = pair.first;
 			}
