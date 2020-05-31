@@ -1194,6 +1194,12 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 					flags |= BLIT_GREY;
 				}
 				actor->Draw(viewport, flags|BLIT_BLENDED);
+				
+				if (debugFlags & DEBUG_SHOW_WALLS) {
+					const Region& actorbox = actor->DrawingRegion();
+					const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());
+					video->DrawRect(r, ColorRed, false);
+				}
 			}
 
 			actor = GetNextActor(q, index);
