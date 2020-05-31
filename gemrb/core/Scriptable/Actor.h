@@ -742,6 +742,7 @@ public:
 	/* update internal per frame state and return true if state is suitable for drawing the actor */
 	bool UpdateDrawingState();
 	Region DrawingRegion() const override;
+	uint8_t GetElevation() const;
 	void Draw(const Region &screen, uint32_t flags) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0) override;
 

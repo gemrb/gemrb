@@ -8386,6 +8386,20 @@ bool Actor::HasBodyHeat() const
 	return true;
 }
 
+uint8_t Actor::GetElevation() const
+{
+	uint8_t height = area->HeightMap->GetAt( Pos.x / 16, Pos.y / 12);
+	if (height > 15) {
+		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
+		// cannot work out how they work, so here is an incorrect
+		// hack (probably). please fix!
+		
+		// FIXME: is it possible that this is signed instead of unsigned?
+		height = 15;
+	}
+	return height;
+}
+
 bool Actor::UpdateDrawingState()
 {
 	Map* area = GetCurrentArea();
@@ -8532,14 +8546,6 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	Color tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 	tint.a = (ieByte) (255-Trans);
 
-	unsigned char heightmapindex = area->HeightMap->GetAt( Pos.x / 16, Pos.y / 12);
-	if (heightmapindex > 15) {
-		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
-		// cannot work out how they work, so here is an incorrect
-		// hack (probably). please fix!
-		heightmapindex = 15;
-	}
-
 	//draw videocells under the actor
 	DrawVideocells(Pos - vp.Origin(), vvcShields, tint);
 
@@ -8616,7 +8622,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		//if (mirrortint.a > 0) mirrortint.a = 255;
 
 		int cx = Pos.x - vp.x;
-		int cy = Pos.y - vp.y - heightmapindex;
+		int cy = Pos.y - vp.y - GetElevation();
 
 		// mirror images behind the actor
 		for (int i = 0; i < 4; ++i) {
