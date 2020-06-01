@@ -1197,7 +1197,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 				if (game->TimeStoppedFor(actor)) {
 					flags |= BLIT_GREY;
 				}
-				actor->Draw(viewport, flags|BLIT_BLENDED);
+				actor->Draw(viewport, flags|BLIT_BLENDED, walls);
 				
 				if (debugFlags & DEBUG_SHOW_WALLS) {
 					const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());

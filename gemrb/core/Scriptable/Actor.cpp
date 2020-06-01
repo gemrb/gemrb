@@ -8517,7 +8517,7 @@ Region Actor::DrawingRegion() const
 	return r;
 }
 
-void Actor::Draw(const Region& vp, uint32_t flags) const
+void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls*/) const
 {
 	if (!DrawingRegion().IntersectsRegion(vp)) {
 		return;
@@ -8603,15 +8603,12 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		// * mirror images:
 		//     Drawn without transparency, unless fully invisible.
 		//     Order: W, E, N, S, NW, SE, NE, SW
-		//     Uses extraCovers 3-10
 		// * blurred copies (3 of them)
 		//     Drawn with transparency.
 		//     distance between copies depends on IE_MOVEMENTRATE
 		//     TODO: actually, the direction is the real movement direction,
 		//	not the (rounded) direction given Face
-		//     Uses extraCovers 0-2
 		// * actor itself
-		//     Uses main spritecover
 		//
 		//comments by Avenger:
 		// currently we don't have a real direction, but the orientation field
@@ -8634,6 +8631,10 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
+				// FIXME: I don't know if GetBlocked() is good enough
+				// consider the possibility the mirror image is behind a wall (walls.second)
+				// GetBlocked might be false, but we still should not draw the image
+				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}
@@ -8650,6 +8651,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 				blurx -= 4*blurdx; blury -= 4*blurdy;
 				for (int i = 0; i < 3; ++i) {
 					blurx += blurdx; blury += blurdy;
+					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
 					DrawActorSprite(blurx, blury, flags, anims, Face, tint);
 				}
 			}
@@ -8702,6 +8704,10 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
+				// FIXME: I don't know if GetBlocked() is good enough
+				// consider the possibility the mirror image is in front of a wall (walls.first)
+				// GetBlocked might be false, but we still should not draw the image
+				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}

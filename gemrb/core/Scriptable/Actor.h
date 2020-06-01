@@ -32,6 +32,7 @@
 #include "CombatInfo.h"
 #include "EffectQueue.h"
 #include "Palette.h"
+#include "Polygon.h"
 
 #include <vector>
 
@@ -743,7 +744,7 @@ public:
 	bool UpdateDrawingState();
 	Region DrawingRegion() const override;
 	uint8_t GetElevation() const;
-	void Draw(const Region &screen, uint32_t flags) const;
+	void Draw(const Region &screen, uint32_t flags, const WallPolygonSet&) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0) override;
 
 	/* add mobile vvc (spell effects) to actor's list */
