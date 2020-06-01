@@ -642,11 +642,10 @@ private:
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 
-	using WallPolygonSet = std::set<std::shared_ptr<Wall_Polygon>>;
-	void RedrawScreenStencil(const Region& vp, const WallPolygonSet& walls);
-	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonSet& walls) const;
-	WallPolygonSet WallsCoveringRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
-	uint32_t SetDrawingStencilForScriptable(Scriptable*);
+	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
+	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
+	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
+	uint32_t SetDrawingStencilForScriptable(Scriptable*, const WallPolygonSet&);
 };
 
 }

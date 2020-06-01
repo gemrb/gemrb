@@ -92,6 +92,8 @@ public:
 };
 
 using WallPolygonGroup = std::vector<std::shared_ptr<Wall_Polygon>>;
+// the first of the pair are the walls in front, the second are the walls behind
+using WallPolygonSet = std::pair<WallPolygonGroup, WallPolygonGroup>;
 
 }
 

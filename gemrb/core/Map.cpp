@@ -976,7 +976,9 @@ void Map::DrawPile(Region screen, Container* c, bool highlight)
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	uint32_t flags = SetDrawingStencilForScriptable(c);
+	const Region& box = c->DrawingRegion();
+	auto walls = WallsIntersectingRegion(box, false, nullptr);
+	uint32_t flags = SetDrawingStencilForScriptable(c, walls);
 	flags |= BLIT_TINTED|BLIT_BLENDED;
 	c->DrawPile(highlight, screen, flags, tint);
 }
@@ -1145,8 +1147,8 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		TMap->DrawOverlays( viewport, rain, flags );
 	}
 
-	const auto& viewportWalls = WallsCoveringRegion(viewport, false);
-	RedrawScreenStencil(viewport, viewportWalls);
+	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
+	RedrawScreenStencil(viewport, viewportWalls.first);
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
@@ -1188,7 +1190,9 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		case AOT_ACTOR:
 			assert(actor != NULL);
 			if (actor->UpdateDrawingState()) {
-				uint32_t flags = SetDrawingStencilForScriptable(actor);
+				const Region& actorbox = actor->DrawingRegion();
+				auto walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
+				uint32_t flags = SetDrawingStencilForScriptable(actor, walls);
 				// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 				if (game->TimeStoppedFor(actor)) {
 					flags |= BLIT_GREY;
@@ -1196,7 +1200,6 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 				actor->Draw(viewport, flags|BLIT_BLENDED);
 				
 				if (debugFlags & DEBUG_SHOW_WALLS) {
-					const Region& actorbox = actor->DrawingRegion();
 					const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());
 					video->DrawRect(r, ColorRed, false);
 				}
@@ -1330,8 +1333,8 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 
 	// Show wallpolygons
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
-		const auto& viewportWalls = WallsCoveringRegion(viewport, true);
-		for (const auto& poly : viewportWalls) {
+		const auto& viewportWalls = WallsIntersectingRegion(viewport, true);
+		for (const auto& poly : viewportWalls.first) {
 			const Point& origin = poly->BBox.Origin() - viewport.Origin();
 
 			if (poly->wall_flag&WF_DISABLED) {
@@ -1362,7 +1365,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 	}
 }
 
-Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r, bool includeDisabled, const Point* loc) const
+WallPolygonSet Map::WallsIntersectingRegion(const Region& r, bool includeDisabled, const Point* loc) const
 {
 	// WallGroups are collections that contain a reference to all wall polygons intersecting
 	// a 640x480 region moving from top left to bottom right of the map
@@ -1378,58 +1381,43 @@ Map::WallPolygonSet Map::WallsCoveringRegion(const Region& r, bool includeDisabl
 	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x + r.w, groupWidth));
 
 	WallPolygonSet set;
+	WallPolygonGroup& infront = set.first;
+	WallPolygonGroup& behind = set.second;
+
 	for (uint32_t y = ymin; y < ymax; ++y) {
 		for (uint32_t x = xmin; x < xmax; ++x) {
 			const auto& group = wallGroups[y * pitch + x];
-			std::copy_if(group.begin(), group.end(), std::inserter(set, set.end()), [&](const std::shared_ptr<Wall_Polygon>& wp) {
+			
+			for (const auto& wp : group) {
 				if ((wp->wall_flag&WF_DISABLED) && includeDisabled == false) {
-					return false;
+					continue;
 				}
-
-				if (loc && wp->PointBehind(*loc) == false) {
-					return false;
+				
+				if (!r.IntersectsRegion(wp->BBox)) {
+					continue;
 				}
-
-				return r.IntersectsRegion(wp->BBox);
-			});
+				
+				if (loc == nullptr || wp->PointBehind(*loc)) {
+					infront.push_back(wp);
+				} else {
+					behind.push_back(wp);
+				}
+			}
 		}
 	}
 
 	return set;
 }
 
-uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
+uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallPolygonSet& walls)
 {
-	const Region& r = scriptable->DrawingRegion();
-	auto walls = WallsCoveringRegion(r, false, nullptr);
-
-	if (walls.empty()) {
-		return 0; // not behind a wall, no stencil required
-	}
-	
-	bool inFront = false;
-	bool requiresStencil = false;
-	for (auto it = walls.begin(); it != walls.end();) {
-		const auto& wp = *it;
-		if (!wp->PointBehind(Pos)) {
-			// remove walls we are in front of
-			it = walls.erase(it);
-			inFront = true;
-		} else {
-			++it;
-			requiresStencil = inFront;
-		}
-	}
-	
-	if (inFront && !requiresStencil) {
-		return 0; // if we are in front of every wall we need no stencil at all
-	}
-	
+	VideoBufferPtr stencil = nullptr;
 	Video* video = core->GetVideoDriver();
-	if (requiresStencil) {
+
+	if (walls.first.size() && walls.second.size()) {
+		const Region& r = scriptable->DrawingRegion();
 		// we are both in front of and behind a wall
 		// so we need a custom stencil
-		VideoBufferPtr stencil = nullptr;
 		auto it = objectStencils.find(scriptable);
 		if (it != objectStencils.end()) {
 			// we already made one
@@ -1443,20 +1431,25 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable)
 		if (stencil == nullptr) {
 			Region stencilRgn = Region(r.Origin() - scriptable->Pos, r.Dimensions());
 			stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
-			DrawStencil(stencil, r, walls);
+			DrawStencil(stencil, r, walls.first);
 			objectStencils[scriptable] = std::make_pair(stencil, r);
 		} else {
 			// TODO: we only need to do this because a door might have changed state over us
 			// if we could detect that we could avoid doing this expensive operation
 			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
 			stencil->Clear();
-			DrawStencil(stencil, r, walls);
+			DrawStencil(stencil, r, walls.first);
 		}
-		
-		assert(stencil);
-		video->SetStencilBuffer(stencil);
 	} else {
-		video->SetStencilBuffer(wallStencil);
+		stencil = wallStencil;
+	}
+	stencil = wallStencil;
+	
+	assert(stencil);
+	video->SetStencilBuffer(stencil);
+	
+	if (walls.first.empty()) {
+		return 0; // not behind a wall, no stencil required
 	}
 	
 	ieDword always_dither;
@@ -2176,8 +2169,12 @@ unsigned int Map::GetBlocked(const Point &c) const
 	return GetBlocked(c.x/16, c.y/12);
 }
 
-void Map::RedrawScreenStencil(const Region& vp, const WallPolygonSet& walls)
+void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 {
+	// FIXME: how do we know if a door changed state?
+	// we need to redraw the stencil when that happens
+	// see TODO in Map::SetDrawingStencilForScriptable for another example of something that could use this
+
 	if (stencilViewport == vp) {
 		return;
 	}
@@ -2197,7 +2194,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonSet& walls)
 	DrawStencil(wallStencil, vp, walls);
 }
 
-void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonSet& walls) const
+void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const
 {
 	Video* video = core->GetVideoDriver();
 
@@ -2233,8 +2230,8 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
-	const auto& polys = WallsCoveringRegion(r, false, &pos);
-	return polys.size();
+	const auto& polys = WallsIntersectingRegion(r, false, &pos);
+	return polys.first.size();
 }
 
 //this function determines actor drawing order
