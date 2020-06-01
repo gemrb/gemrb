@@ -1725,6 +1725,7 @@ void Map::DeleteActor(int i)
 	}
 	//remove the actor from the area's actor list
 	actors.erase( actors.begin()+i );
+	objectStencils.erase(actor);
 }
 
 Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
@@ -1952,6 +1953,7 @@ void Map::PurgeArea(bool items)
 				}
 			}
 			TMap->CleanupContainer(c);
+			objectStencils.erase(c);
 		}
 	}
 }
@@ -3654,6 +3656,7 @@ int Map::ConsolidateContainers()
 		Container * c = TMap->GetContainer( containercount);
 
 		if (TMap->CleanupContainer(c) ) {
+			objectStencils.erase(c);
 			continue;
 		}
 		itemcount += c->inventory.GetSlotCount();
