@@ -8394,6 +8394,7 @@ uint8_t Actor::GetElevation() const
 		// hack (probably). please fix!
 		
 		// FIXME: is it possible that this is signed instead of unsigned?
+		// or just the 4 least significant bits? sign magnitude?
 		height = 15;
 	}
 	return height;
@@ -8485,7 +8486,7 @@ bool Actor::UpdateDrawingState()
 Region Actor::DrawingRegion() const
 {
 	// We assume BBox is the the box containing the actor and all its equipment
-	Region r = BBox;
+	Region box = BBox;
 	
 	// FIXME: we should just do this when we recalc the bbox in UpdateDrawingState()
 	// instead of every time this is called
@@ -8497,7 +8498,7 @@ Region Actor::DrawingRegion() const
 		mirrorBox.x += 3 * OrientdX[dir];
 		mirrorBox.y += 3 * OrientdY[dir];
 		
-		r = Region::RegionEnclosingRegions(r, mirrorBox);
+		box.ExpandToRegion(mirrorBox);
 	}
 	
 	if (Modified[IE_STATE_ID] & STATE_BLUR) {
@@ -8509,12 +8510,24 @@ Region Actor::DrawingRegion() const
 		blurBox.x -= blurx * 3;
 		blurBox.y -= blury * 3;
 		
-		r = Region::RegionEnclosingRegions(r, blurBox);
+		box.ExpandToRegion(blurBox);
 	}
 	
-	// FIXME: we should also be accounting for the ScriptedAnimation (spells) area
+	for (const auto& vvc : vvcOverlays) {
+		Region r = vvc->DrawingRegion();
+		r.x += Pos.x;
+		r.y += Pos.y;
+		box.ExpandToRegion(r);
+	}
 	
-	return r;
+	for (const auto& vvc : vvcShields) {
+		Region r = vvc->DrawingRegion();
+		r.x += Pos.x;
+		r.y += Pos.y;
+		box.ExpandToRegion(r);
+	}
+	
+	return box;
 }
 
 void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls*/) const
