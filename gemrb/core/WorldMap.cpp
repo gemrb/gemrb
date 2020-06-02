@@ -83,7 +83,7 @@ void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
 {
 	if (!MapIcon) return;
 	const auto& colors = core->GetPalette256(gradient);
-	MapIcon->SetPalette(new Palette(colors.begin(), colors.end()));
+	MapIcon->SetPalette(new Palette(&colors[0], &colors[256]));
 }
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)

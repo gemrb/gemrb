@@ -490,7 +490,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 
 	constexpr int PALSIZE = 12;
 	const auto& pal16 = core->GetPalette16(gradient);
-	palette->CopyColorRange(pal16.begin(), &pal16[PALSIZE], start);
+	palette->CopyColorRange(&pal16[0], &pal16[PALSIZE], start);
 
 	if (twin) {
 		twin->SetPalette(gradient, start);
