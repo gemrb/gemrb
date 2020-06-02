@@ -42,13 +42,23 @@ MapControl::MapControl(const Region& frame, AnimationFactory* af)
 {
 	ControlType = IE_GUI_MAP;
 	LinkedLabel = NULL;
+	
+	UpdateMap();
+}
 
-	MyMap = core->GetGame()->GetCurrentArea();
-	if (MyMap && MyMap->SmallMap) {
-		MapMOS = MyMap->SmallMap;
-		MapMOS->acquire();
-	} else
-		MapMOS = NULL;
+void MapControl::UpdateMap()
+{
+	Map* newMap = core->GetGame()->GetCurrentArea();
+	if (newMap != MyMap) {
+		MyMap = newMap;
+		if (MyMap && MyMap->SmallMap) {
+			MapMOS = MyMap->SmallMap;
+		} else {
+			MapMOS = nullptr;
+		}
+
+		MarkDirty();
+	}
 }
 
 // Draw fog on the small bitmap
@@ -110,6 +120,8 @@ Point MapControl::ConvertPointFromGame(Point p) const
 	
 void MapControl::WillDraw()
 {
+	UpdateMap();
+
 	if (LinkedLabel) {
 		if (GetValue() == MAP_EDIT_NOTE)
 		{
@@ -148,11 +160,12 @@ Region MapControl::GetViewport() const
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	if (MyMap == NULL)
-		return;
-
 	Video* video = core->GetVideoDriver();
 	video->DrawRect(rgn, ColorBlack, true);
+		
+	if (MyMap == nullptr) {
+		return;
+	}
 
 	if (MapMOS) {
 		video->BlitSprite( MapMOS.get(), mosRgn.x, mosRgn.y, NULL );

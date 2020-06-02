@@ -68,6 +68,7 @@ private:
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	void UpdateCursor();
+	void UpdateMap();
 
 	const MapNote* MapNoteAtPoint(const Point& p) const;
 
