@@ -75,7 +75,7 @@ Region Container::DrawingRegion() const
 	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
 		const Sprite2D* icon = groundicons[i];
 		if (icon) {
-			r = Region::RegionEnclosingRegions(r, icon->Frame);
+			r.ExpandToRegion(icon->Frame);
 		}
 	}
 	

@@ -186,21 +186,27 @@ Region Region::Intersect(const Region& rgn) const
 
 void Region::ExpandToPoint(const Point& p)
 {
-	if (PointInside(p)) {
-		return;
-	}
-
-	if (p.x <= x) {
+	if (p.x < x) {
+		w += x - p.x;
 		x = p.x;
-	} else {
+	} else if (p.x > x + w) {
 		w = p.x - x;
 	}
 	
-	if (p.y <= y) {
+	if (p.y < y) {
+		h += y - p.y;
 		y = p.y;
-	} else {
+	} else if (p.y > y + h) {
 		h = p.y - y;
 	}
+}
+
+void Region::ExpandToRegion(const Region& r)
+{
+	ExpandToPoint(r.Origin());
+	ExpandToPoint(r.Origin() + Point(r.w, 0));
+	ExpandToPoint(r.Maximum());
+	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }
 
 }

@@ -64,7 +64,7 @@ void ScrollView::ContentView::ResizeToSubviews()
 
 		for (++it; it != subViews.end(); ++it) {
 			Region r = (*it)->Frame();
-			bounds = Region::RegionEnclosingRegions(bounds, r);
+			bounds.ExpandToRegion(r);
 		}
 
 		newSize.w = std::max(newSize.w, bounds.w);

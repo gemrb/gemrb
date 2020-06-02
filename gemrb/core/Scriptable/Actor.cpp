@@ -8442,7 +8442,7 @@ bool Actor::UpdateDrawingState()
 				Region partBBox = animframe->Frame;
 				partBBox.x = Pos.x - partBBox.x;
 				partBBox.y = Pos.y - partBBox.y;
-				newBBox = Region::RegionEnclosingRegions(newBBox, partBBox);
+				newBBox.ExpandToRegion(partBBox);
 			}
 		}
 		
