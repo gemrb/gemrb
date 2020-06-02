@@ -119,7 +119,7 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 
 	for (uint8_t idx = METAL; idx < END; ++idx) {
 		const auto& pal16 = core->GetPalette16(Colors[idx]>>s);
-		CopyColorRange(pal16.begin(), &pal16[numCols], 0x04 + (idx*12));
+		CopyColorRange(&pal16[0], &pal16[numCols], 0x04 + (idx*12));
 	}
 	
 	//minor
