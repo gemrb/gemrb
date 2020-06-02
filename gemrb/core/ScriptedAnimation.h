@@ -115,6 +115,7 @@ public:
 public:
 	//draws the next frame of the videocell
 	bool Draw(const Point &Pos, const Color &p_tint, Map *area, bool dither, int orientation, int height);
+	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)

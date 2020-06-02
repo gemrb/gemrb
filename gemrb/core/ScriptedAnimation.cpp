@@ -724,6 +724,12 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 	return false;
 }
 
+Region ScriptedAnimation::DrawingRegion() const
+{
+	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
+	return (anim) ? anim->animArea : Region();
+}
+
 void ScriptedAnimation::PreparePalette()
 {
 	if (Transparency&IE_VVC_BLENDED) {
