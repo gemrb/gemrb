@@ -2196,6 +2196,14 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Adjustments (+8/+6) are being made here, see Map::FindPath()
 	dx = step->x * 16 + 8 - Pos.x;
 	dy = step->y * 12 + 6 - Pos.y;
+	static const float avoidWeight = 0.4;
+	for (auto nearActor : area->GetAllActorsInRadius(Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF, size, this)) {
+		dx += (nearActor->Pos.x - Pos.x) * avoidWeight;
+		dy += (nearActor->Pos.y - Pos.y) * avoidWeight;
+	}
+
+
+
 	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
 	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
 	dx = std::abs(dx);
