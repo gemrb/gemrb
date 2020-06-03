@@ -296,6 +296,8 @@ struct PaletteIterator : public IColorIterator
 
 struct IAlphaIterator
 {
+	virtual ~IAlphaIterator() = default;
+	
 	virtual Uint8 operator*() const=0;
 	virtual void Advance(int)=0;
 	
