@@ -228,44 +228,16 @@ struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 template<typename PTYPE, bool COVER, bool XFLIP, typename Tinter, typename Blender>
 static void BlitSpriteRLE_internal(SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
-            int tx, int ty,
+            const int tx, const int ty,
             int width, int height,
             bool yflip,
             Region clip,
             Uint8 transindex,
-            SDL_Surface* cover,
+            IAlphaIterator& cover,
             unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
-	Uint16 coverpitch = 0;
-	Uint32 covermask = 0;
-	Uint8 covershift = 0;
-
-	if (COVER) {
-		assert(cover);
-		SDL_PixelFormat* fmt = cover->format;
-		assert(fmt->BytesPerPixel == 4);
-		SDL_LockSurface(cover);
-		coverpitch = cover->pitch / 4;
-
-		if (flags&BLIT_STENCIL_RED) {
-			covermask = fmt->Rmask;
-			covershift = fmt->Rshift;
-		} else if (flags&BLIT_STENCIL_GREEN) {
-			covermask = fmt->Gmask;
-			covershift = fmt->Gshift;
-		} else if (flags&BLIT_STENCIL_BLUE) {
-			covermask = fmt->Bmask;
-			covershift = fmt->Bshift;
-		} else {
-			covermask = fmt->Amask;
-			covershift = fmt->Ashift;
-		}
-	}
-
 	int pitch = target->pitch / target->format->BytesPerPixel;
-	int coverx = tx;
-	int covery = ty;
 
 	// We assume the clipping rectangle is the exact rectangle in which we will
 	// paint. This means clip rect <= sprite rect <= cover rect
@@ -295,34 +267,23 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 		clipstartline = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
 	}
 
-	// FIXME: we have a lot of unnecissary branching with COVER
-	// this is because for some reason we chose to mirror the destination rather than the source
-	// if we rewrote this to mirror jsut the source the code would be more simple and probably faster
 	PTYPE *line, *end, *pix;
-	Uint32 *coverline, *coverpix = NULL;
+	
 	if (!yflip) {
 		line = (PTYPE*)target->pixels + ty*pitch;
 		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
-		if (COVER)
-			coverline = (Uint32*)cover->pixels + covery * coverpitch;
 	} else {
 		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
 		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
-		if (COVER)
-			coverline = (Uint32*)cover->pixels + (covery+height-1) * coverpitch;
 	}
 	if (!XFLIP) {
 		pix = line + tx;
 		clipstartpix = line + clip.x;
 		clipendpix = clipstartpix + clip.w;
-		if (COVER)
-			coverpix = coverline + coverx;
 	} else {
 		pix = line + tx + width - 1;
 		clipstartpix = line + clip.x + clip.w - 1;
 		clipendpix = clipstartpix - clip.w;
-		if (COVER)
-			coverpix = coverline + coverx + width - 1;
 	}
 
 	// clipstartpix is the first pixel to draw
@@ -334,7 +295,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	Uint32 amask = target->format->Amask;
 
 	while (line != end) {
-
 		// Fast-forward through the RLE data until we reach clipstartpix
 
 		if (!XFLIP) {
@@ -346,8 +306,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 				else
 					count = 1;
 				pix += count;
-				if (COVER)
-					coverpix += count;
 			}
 		} else {
 			while (pix > clipstartpix) {
@@ -358,8 +316,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 				else
 					count = 1;
 				pix -= count;
-				if (COVER)
-					coverpix -= count;
 			}
 		}
 
@@ -372,18 +328,17 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 				Uint8 p = *srcdata++;
 				if (p == transindex) {
 					int count = (int)(*srcdata++) + 1;
+					if (COVER)
+						cover.Advance(count);
+					
 					if (!XFLIP) {
 						pix += count;
-						if (COVER)
-							coverpix += count;
 					} else {
 						pix -= count;
-						if (COVER)
-							coverpix -= count;
 					}
 				} else {
-					Uint8 maskval = (coverpix) ? (((*coverpix)&covermask) >> covershift) : 0;
-					if (!COVER || (coverpix && maskval < 0xff)) {
+					Uint8 maskval = *cover;
+					if (!COVER || maskval < 0xff) {
 						Uint8 r = col[p].r;
 						Uint8 g = col[p].g;
 						Uint8 b = col[p].b;
@@ -398,13 +353,12 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 						blend(*pix, 255, 255, 255, 255);
 					}
 #endif
+					if (COVER) ++cover;
 
 					if (!XFLIP) {
 						pix++;
-						if (COVER) coverpix++;
 					} else {
 						pix--;
-						if (COVER) coverpix--;
 					}
 				}
 			}
@@ -415,13 +369,9 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 
 		line += yfactor * pitch;
 		pix += yfactor * pitch - xfactor * width;
-		if (COVER)
-			coverpix += yfactor * coverpitch - xfactor * width;
 		clipstartpix += yfactor * pitch;
 		clipendpix += yfactor * pitch;
 	}
-	if (COVER)
-		SDL_UnlockSurface(cover);
 }
 
 // call the BlitSprite{RLE,}_internal instantiation with the specified
@@ -435,25 +385,26 @@ static void BlitSpritePAL_dispatch2(bool XFLIP,
             bool yflip,
             const Region& clip,
             int transindex,
-            SDL_Surface* cover,
+            IAlphaIterator* cover,
             unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
+	static StaticAlphaIterator nomask(0);
 	if (!cover && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, nomask, flags,
 			tint, blend);
 	else if (!cover && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, nomask, flags,
 			tint, blend);
 	else if (cover && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, *cover, flags,
 			tint, blend);
 	else // if (cover && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, *cover, flags,
 			tint, blend);
 }
 
@@ -468,7 +419,7 @@ static void BlitSpritePAL_dispatch(bool XFLIP,
             bool yflip,
             const Region& clip,
             int transindex,
-            SDL_Surface* cover,
+            IAlphaIterator* cover,
             unsigned int flags,
             const Tinter& tint, const Blender& /*dummy*/)
 {
