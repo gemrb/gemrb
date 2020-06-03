@@ -103,6 +103,47 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
+IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskclip) const
+{
+	struct SurfaceAlphaIterator : RGBAChannelIterator {
+		SDLPixelIterator pixit;
+		
+		SurfaceAlphaIterator(SDL_Surface* surface, const SDL_Rect& clip, Uint32 mask, Uint8 shift,
+							 IPixelIterator::Direction x, IPixelIterator::Direction y)
+		: RGBAChannelIterator(&pixit, mask, shift), pixit(x, y, clip, surface) {}
+	} *maskit = nullptr;
+
+	if (flags&BLIT_STENCIL_MASK) {
+		SDL_Surface* maskSurf = CurrentStencilBuffer();
+		SDL_PixelFormat* fmt = maskSurf->format;
+
+		Uint32 mask = 0;
+		Uint8 shift = 0;
+		if (flags&BLIT_STENCIL_RED) {
+			mask = fmt->Rmask;
+			shift = fmt->Rshift;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			mask = fmt->Gmask;
+			shift = fmt->Gshift;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			mask = fmt->Bmask;
+			shift = fmt->Bshift;
+		} else {
+			mask = fmt->Amask;
+			shift = fmt->Ashift;
+		}
+		
+		const Point& stencilOrigin = stencilBuffer->Origin();
+		maskclip.x -= stencilOrigin.x;
+		maskclip.y -= stencilOrigin.y;
+		IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		maskit = new SurfaceAlphaIterator(maskSurf, maskclip, mask, shift, xdir, ydir);
+	}
+	
+	return maskit;
+}
+
 void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
 											uint32_t flags, const Color* t)
 {
@@ -152,47 +193,12 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	bool hflip = bool(spr->renderFlags&BLIT_MIRRORX);
 	bool vflip = bool(spr->renderFlags&BLIT_MIRRORY);
+	
+	IAlphaIterator* maskit = StencilIterator(flags, RectFromRegion(dst));
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY | BLIT_BLENDED);
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
-	
-	struct SurfaceAlphaIterator : RGBAChannelIterator {
-		SDLPixelIterator pixit;
-		
-		SurfaceAlphaIterator(SDL_Surface* surface, const SDL_Rect& clip, Uint32 mask, Uint8 shift,
-							 IPixelIterator::Direction x, IPixelIterator::Direction y)
-		: RGBAChannelIterator(&pixit, mask, shift), pixit(x, y, clip, surface) {}
-	} *maskit = nullptr;
-
-	if (remflags&BLIT_STENCIL_MASK) {
-		SDL_Surface* maskSurf = CurrentStencilBuffer();
-		SDL_PixelFormat* fmt = maskSurf->format;
-
-		Uint32 mask = 0;
-		Uint8 shift = 0;
-		if (flags&BLIT_STENCIL_RED) {
-			mask = fmt->Rmask;
-			shift = fmt->Rshift;
-		} else if (flags&BLIT_STENCIL_GREEN) {
-			mask = fmt->Gmask;
-			shift = fmt->Gshift;
-		} else if (flags&BLIT_STENCIL_BLUE) {
-			mask = fmt->Bmask;
-			shift = fmt->Bshift;
-		} else {
-			mask = fmt->Amask;
-			shift = fmt->Ashift;
-		}
-		
-		SDL_Rect maskclip = RectFromRegion(dst);
-		const Point& stencilOrigin = stencilBuffer->Origin();
-		maskclip.x -= stencilOrigin.x;
-		maskclip.y -= stencilOrigin.y;
-		IPixelIterator::Direction xdir = (hflip) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		IPixelIterator::Direction ydir = (vflip) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		maskit = new SurfaceAlphaIterator(maskSurf, maskclip, mask, shift, xdir, ydir);
-	}
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
@@ -317,11 +323,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
-
-	SDL_Surface* stencilsurf = nullptr;
-	if (remflags&BLIT_STENCIL_MASK) {
-		stencilsurf = CurrentStencilBuffer();
-	}
+	IAlphaIterator* maskIt = StencilIterator(remflags, drect);
 
 	bool halftrans = remflags & BLIT_HALFTRANS;
 	if (halftrans && (remflags ^ BLIT_HALFTRANS)) { // other flags are set too
@@ -340,23 +342,23 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	if (remflags&BLIT_TINTED) {
 		if (remflags&BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
 		} else if (remflags&BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
 		} else {
 			RGBBlendingPipeline<TINT, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
 		}
 	} else if (remflags&BLIT_GREY) {
 		RGBBlendingPipeline<GREYSCALE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
 	} else if (remflags&BLIT_SEPIA) {
 		RGBBlendingPipeline<SEPIA, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
-	} else if (stencilsurf || (remflags&(BLIT_MIRRORX|BLIT_MIRRORY)) || ((surf->flags & SDL_SRCCOLORKEY) == 0 && remflags&BLIT_BLENDED)) {
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
+	} else if (maskIt || (remflags&(BLIT_MIRRORX|BLIT_MIRRORY)) || ((surf->flags & SDL_SRCCOLORKEY) == 0 && remflags&BLIT_BLENDED)) {
 		RGBBlendingPipeline<NONE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, stencilsurf);
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
 	} else {
 		// must be checked afer palette versioning is done
 		
@@ -378,6 +380,8 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		SDL_Rect d = drect;
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
 	}
+	
+	delete maskIt;
 }
 
 void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint, const Region* clip)

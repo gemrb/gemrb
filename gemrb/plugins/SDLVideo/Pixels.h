@@ -573,7 +573,7 @@ static void Blit(SDLPixelIterator src,
 template <typename BLENDER>
 static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 							const SDL_Rect& srcrgn, const SDL_Rect& dstrgn,
-							BLENDER blender, Uint32 flags, SDL_Surface* maskSurf)
+							BLENDER blender, Uint32 flags, IAlphaIterator* maskIt)
 {
 	assert(src && dst);
 	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
@@ -585,28 +585,8 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
 	SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
 
-	if (maskSurf) {
-		SDL_PixelFormat* fmt = maskSurf->format;
-
-		Uint32 mask = 0;
-		Uint8 shift = 0;
-		if (flags&BLIT_STENCIL_RED) {
-			mask = fmt->Rmask;
-			shift = fmt->Rshift;
-		} else if (flags&BLIT_STENCIL_GREEN) {
-			mask = fmt->Gmask;
-			shift = fmt->Gshift;
-		} else if (flags&BLIT_STENCIL_BLUE) {
-			mask = fmt->Bmask;
-			shift = fmt->Bshift;
-		} else {
-			mask = fmt->Amask;
-			shift = fmt->Ashift;
-		}
-
-		SDLPixelIterator maskIt(maskSurf);
-		RGBAChannelIterator alpha(&maskIt, mask, shift);
-		Blit(srcbeg, dstbeg, dstend, alpha, blender);
+	if (maskIt) {
+		Blit(srcbeg, dstbeg, dstend, *maskIt, blender);
 	} else {
 		StaticAlphaIterator alpha(0);
 		Blit(srcbeg, dstbeg, dstend, alpha, blender);

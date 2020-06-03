@@ -59,6 +59,9 @@ private:
 	void SwapBuffers(VideoBuffers&) override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
+	
+	IAlphaIterator* StencilIterator(uint32_t flags, SDL_Rect dst) const;
+	
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
 
 	int ProcessEvent(const SDL_Event & event) override;
