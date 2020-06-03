@@ -263,7 +263,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		glActiveTexture(GL_TEXTURE0);
 		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
 
-		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
+		SDL_Rect stencilRect = drect;
+		stencilRect.x -= stencilBuffer->Origin().x;
+		stencilRect.y -= stencilBuffer->Origin().y;
+		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 
 		SDL_GL_UnbindTexture(stencilTex);
 		glUseProgram(previous_program);
