@@ -969,7 +969,7 @@ void Map::DrawHighlightables(const Region& viewport, uint32_t debugFlags)
 	}
 }
 
-void Map::DrawPile(Region screen, Container* c, bool highlight)
+void Map::DrawPile(const Region& screen, Container* c, bool highlight)
 {
 	assert(c != NULL);
 
@@ -978,7 +978,7 @@ void Map::DrawPile(Region screen, Container* c, bool highlight)
 
 	const Region& box = c->DrawingRegion();
 	auto walls = WallsIntersectingRegion(box, false, nullptr);
-	uint32_t flags = SetDrawingStencilForScriptable(c, walls);
+	uint32_t flags = SetDrawingStencilForScriptable(c, walls, screen.Origin());
 	flags |= BLIT_TINTED|BLIT_BLENDED;
 	c->DrawPile(highlight, screen, flags, tint);
 }
@@ -1193,7 +1193,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 				const Region& actorbox = actor->DrawingRegion();
 				if (actorbox.IntersectsRegion(viewport)) {
 					auto walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
-					uint32_t flags = SetDrawingStencilForScriptable(actor, walls);
+					uint32_t flags = SetDrawingStencilForScriptable(actor, walls, viewport.Origin());
 					// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 					if (game->TimeStoppedFor(actor)) {
 						flags |= BLIT_GREY;
@@ -1411,7 +1411,7 @@ WallPolygonSet Map::WallsIntersectingRegion(const Region& r, bool includeDisable
 	return set;
 }
 
-uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallPolygonSet& walls)
+uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallPolygonSet& walls, const Point& viewPortOrigin)
 {
 	VideoBufferPtr stencil = nullptr;
 	Video* video = core->GetVideoDriver();
@@ -1431,7 +1431,7 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallP
 		}
 		
 		if (stencil == nullptr) {
-			Region stencilRgn = Region(r.Origin() - scriptable->Pos, r.Dimensions());
+			Region stencilRgn = Region(r.Origin() - viewPortOrigin, r.Dimensions());
 			stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
 			DrawStencil(stencil, r, walls.first);
 			objectStencils[scriptable] = std::make_pair(stencil, r);
@@ -1440,12 +1440,12 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallP
 			// if we could detect that we could avoid doing this expensive operation
 			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
 			stencil->Clear();
+			stencil->SetOrigin(r.Origin() - viewPortOrigin);
 			DrawStencil(stencil, r, walls.first);
 		}
 	} else {
 		stencil = wallStencil;
 	}
-	stencil = wallStencil;
 	
 	assert(stencil);
 	video->SetStencilBuffer(stencil);

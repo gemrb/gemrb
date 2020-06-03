@@ -625,7 +625,7 @@ private:
 	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
-	void DrawPile (Region screen, Container* c, bool highlight);
+	void DrawPile (const Region& screen, Container* c, bool highlight);
 	void DrawSearchMap(const Region &vp);
 	void GenerateQueues();
 	void SortQueues();
@@ -645,7 +645,7 @@ private:
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
 	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
 	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
-	uint32_t SetDrawingStencilForScriptable(Scriptable*, const WallPolygonSet&);
+	uint32_t SetDrawingStencilForScriptable(Scriptable*, const WallPolygonSet&, const Point& viewPortOrigin);
 };
 
 }
