@@ -1191,17 +1191,19 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			assert(actor != NULL);
 			if (actor->UpdateDrawingState()) {
 				const Region& actorbox = actor->DrawingRegion();
-				auto walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
-				uint32_t flags = SetDrawingStencilForScriptable(actor, walls);
-				// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-				if (game->TimeStoppedFor(actor)) {
-					flags |= BLIT_GREY;
-				}
-				actor->Draw(viewport, flags|BLIT_BLENDED, walls);
-				
-				if (debugFlags & DEBUG_SHOW_WALLS) {
-					const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());
-					video->DrawRect(r, ColorRed, false);
+				if (actorbox.IntersectsRegion(viewport)) {
+					auto walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
+					uint32_t flags = SetDrawingStencilForScriptable(actor, walls);
+					// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
+					if (game->TimeStoppedFor(actor)) {
+						flags |= BLIT_GREY;
+					}
+					actor->Draw(viewport, flags|BLIT_BLENDED, walls);
+					
+					if (debugFlags & DEBUG_SHOW_WALLS) {
+						const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());
+						video->DrawRect(r, ColorRed, false);
+					}
 				}
 			}
 
