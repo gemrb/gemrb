@@ -427,7 +427,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 // call the BlitSprite{RLE,}_internal instantiation with the specified
 // COVER, XFLIP
 template<typename PTYPE, typename Tinter, typename Blender>
-static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
+static void BlitSpritePAL_dispatch2(bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
@@ -439,19 +439,19 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
-	if (!COVER && !XFLIP)
+	if (!cover && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, false, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
-	else if (!COVER && XFLIP)
+	else if (!cover && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, true, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
-	else if (COVER && !XFLIP)
+	else if (cover && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, false, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
-	else // if (COVER && XFLIP)
+	else // if (cover && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, true, Tinter, Blender>(target,
 			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
@@ -460,7 +460,7 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
 // call the BlitSpritePAL_dispatch2 instantiation with the right pixelformat
 // TODO: Hardcoded/non-hardcoded pixelformat
 template<typename Tinter, typename Blender>
-static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
+static void BlitSpritePAL_dispatch(bool XFLIP,
             SDL_Surface* target,
             const Uint8* srcdata, const Color* col,
             int tx, int ty,
@@ -474,12 +474,12 @@ static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
 {
 	if (target->format->BytesPerPixel == 4) {
 		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
-		BlitSpritePAL_dispatch2<Uint32>(COVER, XFLIP, target, srcdata, col, tx, ty,
+		BlitSpritePAL_dispatch2<Uint32>(XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
 		                                cover, flags, tint, blend);
 	} else {
 		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
-		BlitSpritePAL_dispatch2<Uint16>(COVER, XFLIP, target, srcdata, col, tx, ty,
+		BlitSpritePAL_dispatch2<Uint16>(XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
 		                                cover, flags, tint, blend);
 	}
