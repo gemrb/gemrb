@@ -382,6 +382,8 @@ public:
 		InitImp(pixels, surf->pitch, surf->format->BytesPerPixel);
 
 		pixel = surf->pixels; // always here regardless of direction
+		
+		assert(SDL_MUSTLOCK(surf) == 0);
 	}
 
 	SDLPixelIterator(const SDLPixelIterator& orig)
@@ -574,9 +576,6 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	assert(src && dst);
 	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
 
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
-
 	SDLPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
 	SDLPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
 
@@ -585,7 +584,6 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
 
 	if (maskSurf) {
-		SDL_LockSurface(maskSurf);
 		SDL_PixelFormat* fmt = maskSurf->format;
 
 		Uint32 mask = 0;
@@ -607,14 +605,10 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 		SDLPixelIterator maskIt(maskSurf);
 		RGBAChannelIterator alpha(&maskIt, mask, shift);
 		Blit(srcbeg, dstbeg, dstend, alpha, blender);
-		SDL_UnlockSurface(maskSurf);
 	} else {
 		StaticAlphaIterator alpha(0);
 		Blit(srcbeg, dstbeg, dstend, alpha, blender);
 	}
-
-	SDL_UnlockSurface(dst);
-	SDL_UnlockSurface(src);
 }
 
 template<class BLENDER>
