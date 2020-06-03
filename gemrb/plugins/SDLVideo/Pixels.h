@@ -297,7 +297,12 @@ struct PaletteIterator : public IColorIterator
 struct IAlphaIterator
 {
 	virtual Uint8 operator*() const=0;
-	virtual IAlphaIterator& operator++()=0;
+	virtual void Advance(int)=0;
+	
+	IAlphaIterator& operator++() {
+		Advance(1);
+		return *this;
+	}
 };
 
 // an endless iterator that always returns 'alpha' when dereferenced
@@ -311,9 +316,7 @@ struct StaticAlphaIterator : public IAlphaIterator
 		return alpha;
 	}
 
-	IAlphaIterator& operator++() {
-		return *this;
-	}
+	void Advance(int) {}
 };
 
 struct SDLPixelIterator : IPixelIterator
@@ -539,10 +542,9 @@ struct RGBAChannelIterator : public IAlphaIterator
 	Uint8 operator*() const {
 		return pixelIt->Channel(mask, shift);
 	}
-
-	IAlphaIterator& operator++() {
-		pixelIt->Advance(1);
-		return *this;
+	
+	void Advance(int amt) {
+		pixelIt->Advance(amt);
 	}
 };
 
