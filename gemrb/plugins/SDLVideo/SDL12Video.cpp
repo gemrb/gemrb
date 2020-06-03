@@ -508,7 +508,7 @@ SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer() const
 SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
 {
 	assert(stencilBuffer);
-	return static_cast<SDLSurfaceVideoBuffer*>(stencilBuffer)->Surface();
+	return std::static_pointer_cast<SDLSurfaceVideoBuffer>(stencilBuffer)->Surface();
 }
 
 Sprite2D* SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr& buf)
