@@ -168,19 +168,19 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 		SRTinter_Tint<true, true> tinter(tint);
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 
 	} else if (remflags == BLIT_HALFTRANS) {
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 
 	} else if (remflags == 0) {
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
-		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+		BlitSpritePAL_dispatch(mask, hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 
 	} else {
 		// handling the following effects with conditionals:
@@ -205,24 +205,24 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 				SRTinter_Flags<true> tinter(tint);
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<true> tinter;
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 			}
 		} else {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<false> tinter(tint);
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 			} else {
 				SRTinter_FlagsNoTint<false> tinter;
 
 				BlitSpritePAL_dispatch(mask, hflip,
-									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, spr, remflags, tinter, blender);
+									   currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), mask, remflags, tinter, blender);
 			}
 
 		}

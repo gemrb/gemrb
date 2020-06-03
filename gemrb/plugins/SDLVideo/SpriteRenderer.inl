@@ -234,7 +234,7 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
             Region clip,
             Uint8 transindex,
             SDL_Surface* cover,
-            const Sprite2D* spr, unsigned int flags,
+            unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	Uint16 coverpitch = 0;
@@ -262,7 +262,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 			covershift = fmt->Ashift;
 		}
 	}
-	assert(spr);
 
 	int pitch = target->pitch / target->format->BytesPerPixel;
 	int coverx = tx;
@@ -274,8 +273,6 @@ static void BlitSpriteRLE_internal(SDL_Surface* target,
 	assert(clip.w > 0 && clip.h > 0);
 	assert(clip.x >= tx);
 	assert(clip.y >= ty);
-	assert(clip.x + clip.w <= tx + spr->Frame.w);
-	assert(clip.y + clip.h <= ty + spr->Frame.h);
 
 	// Clipping strategy:
 	// Because we can't jump to the right spot in the RLE data,
@@ -439,24 +436,24 @@ static void BlitSpritePAL_dispatch2(bool COVER, bool XFLIP,
             const Region& clip,
             int transindex,
             SDL_Surface* cover,
-            const Sprite2D* spr, unsigned int flags,
+            unsigned int flags,
             const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
 {
 	if (!COVER && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
 	else if (!COVER && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, false, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
 	else if (COVER && !XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
 	else // if (COVER && XFLIP)
 		BlitSpriteRLE_internal<PTYPE, true, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, spr, flags,
+			srcdata, col, tx, ty, width, height, yflip, clip, transindex, cover, flags,
 			tint, blend);
 }
 
@@ -472,18 +469,18 @@ static void BlitSpritePAL_dispatch(bool COVER, bool XFLIP,
             const Region& clip,
             int transindex,
             SDL_Surface* cover,
-            const Sprite2D* spr, unsigned int flags,
+            unsigned int flags,
             const Tinter& tint, const Blender& /*dummy*/)
 {
 	if (target->format->BytesPerPixel == 4) {
 		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
 		BlitSpritePAL_dispatch2<Uint32>(COVER, XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
-		                                cover, spr, flags, tint, blend);
+		                                cover, flags, tint, blend);
 	} else {
 		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
 		BlitSpritePAL_dispatch2<Uint16>(COVER, XFLIP, target, srcdata, col, tx, ty,
 		                                width, height, yflip, clip, transindex,
-		                                cover, spr, flags, tint, blend);
+		                                cover, flags, tint, blend);
 	}
 }
