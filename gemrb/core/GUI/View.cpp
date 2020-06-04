@@ -629,6 +629,9 @@ bool View::KeyRelease(const KeyboardEvent& key, unsigned short mod)
 
 void View::TextInput(const TextEvent& te)
 {
+	if (eventProxy) {
+		return eventProxy->OnTextInput(te);
+	}
 	OnTextInput(te);
 }
 
