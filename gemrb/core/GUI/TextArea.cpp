@@ -573,6 +573,20 @@ void TextArea::UpdateState(unsigned int optIdx)
 
 	PerformAction(Action::Select);
 }
+
+void TextArea::DidFocus()
+{
+	if (Flags()&Editable) {
+		textContainer->DidFocus();
+	}
+}
+
+void TextArea::DidUnFocus()
+{
+	if (Flags()&Editable) {
+		textContainer->DidUnFocus();
+	}
+}
 	
 int TextArea::TextHeight() const
 {

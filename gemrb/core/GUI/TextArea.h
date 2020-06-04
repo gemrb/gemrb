@@ -132,6 +132,8 @@ public:
 	String QueryText() const;
 	/** Marks textarea for redraw with a new value */
 	void UpdateState(unsigned int optIdx);
+	void DidFocus();
+	void DidUnFocus();
 
 private: // Private attributes
 	// dialog and listbox handling
