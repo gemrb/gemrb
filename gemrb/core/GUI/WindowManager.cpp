@@ -170,8 +170,14 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	// FIXME: this should probably account for modal windows
 	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
 	
+	// FIXME: I guess technically we only need to clear the hover/tracking win if something moves infront of it
+	// however, its probably not important
 	if (hoverWin == win || hoverWin == win2) {
-		hoverWin = NULL;
+		hoverWin = nullptr;
+	}
+	
+	if (trackingWin == win || trackingWin == win2) {
+		trackingWin = nullptr;
 	}
 
 	// if we only have one window, or the 2 windows are the same it is an automatic success
