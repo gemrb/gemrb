@@ -40,30 +40,14 @@ def OnLoad():
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-#quit subwindow
-	QuitWindow = GemRB.LoadWindow(3, "START")
-	QuitTextArea = QuitWindow.GetControl(0)
-	QuitTextArea.SetText(20582)
-
-#main window
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow(0, "START")
 	NewLifeButton = StartWindow.GetControl(0)
 	ResumeLifeButton = StartWindow.GetControl(2)
 	ExitButton = StartWindow.GetControl(3)
 	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewLifePress)
 	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ResumeLifePress)
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.ShowModal (MODAL_SHADOW_GRAY))
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
 	ExitButton.MakeEscape()
-
-	ConfirmButton = QuitWindow.GetControl(1)
-	ConfirmButton.SetText(23787)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
-	ConfirmButton.MakeDefault()
-
-	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetText(23789)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StartWindow.Focus)
-	CancelButton.MakeEscape()
 
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GemRB.Version)
@@ -71,6 +55,24 @@ def OnLoad():
 	StartWindow.Focus()
 
 	GemRB.LoadMusicPL("Main.mus")
+	return
+	
+def QuitPress():
+	QuitWindow = GemRB.LoadWindow(3, "START")
+	QuitTextArea = QuitWindow.GetControl(0)
+	QuitTextArea.SetText(20582)
+	
+	ConfirmButton = QuitWindow.GetControl(1)
+	ConfirmButton.SetText(23787)
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	ConfirmButton.MakeDefault()
+
+	CancelButton = QuitWindow.GetControl(2)
+	CancelButton.SetText(23789)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.MakeEscape()
+	
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
 def NewLifePress():
