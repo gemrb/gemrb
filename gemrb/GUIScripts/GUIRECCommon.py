@@ -480,7 +480,6 @@ def OpenBiographyEditWindow ():
 
 	DoneButton = SubCustomizeWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.MakeDefault()
 
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		RevertButton = SubCustomizeWindow.GetControl (6)
