@@ -191,9 +191,6 @@ public: //Events
 		Editable = 4      // TextArea text is editable
 	};
 
-	/** Mousewheel scroll */
-	bool OnMouseWheelScroll(const Point& delta);
-
 	void ClearSelectOptions();
 };
 

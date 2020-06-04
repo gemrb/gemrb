@@ -392,10 +392,12 @@ void TextArea::FlagsChanged(unsigned int oldflags)
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
 		textContainer->SetEventProxy(NULL);
+		SetEventProxy(textContainer);
 	} else if (oldflags&Editable) {
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
 		textContainer->SetEventProxy(&scrollview);
+		SetEventProxy(&scrollview);
 	}
 }
 
@@ -540,17 +542,6 @@ void TextArea::ScrollToY(int y, ieDword duration)
 	scrollview.ScrollTo(Point(0, y), duration);
 }
 
-/** Mousewheel scroll */
-/** This method is key to touchscreen scrolling */
-bool TextArea::OnMouseWheelScroll(const Point& delta)
-{
-	// the only time we should get this event is when AnimPicture is set
-	// otherwise the scrollview would have recieved this
-	assert(AnimPicture);
-	scrollview.MouseWheelScroll(delta);
-	return true;
-}
-
 void TextArea::UpdateState(unsigned int optIdx)
 {
 	if (!selectOptions) {
@@ -681,9 +672,11 @@ void TextArea::ClearText()
 	textContainer->callback = cb;
 	if (Flags()&Editable) {
 		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		SetEventProxy(textContainer);
 	} else {
 		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
 		textContainer->SetEventProxy(&scrollview);
+		SetEventProxy(&scrollview);
 	}
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
