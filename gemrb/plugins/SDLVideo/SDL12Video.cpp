@@ -214,7 +214,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 		BlitSpritePAL_dispatch(hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), maskit, remflags, tinter, blender);
 
-	} else if (remflags == 0) {
+	} else if (remflags == 0 && palette->alpha == false) {
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
