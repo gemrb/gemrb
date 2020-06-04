@@ -1149,6 +1149,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 
 	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
 	RedrawScreenStencil(viewport, viewportWalls.first);
+	video->SetStencilBuffer(wallStencil);
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
@@ -2178,6 +2179,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 	// see TODO in Map::SetDrawingStencilForScriptable for another example of something that could use this
 
 	if (stencilViewport == vp) {
+		assert(wallStencil);
 		return;
 	}
 
