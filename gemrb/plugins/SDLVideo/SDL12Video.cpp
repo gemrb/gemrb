@@ -408,54 +408,54 @@ void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& 
 void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointSurface<true>(CurrentRenderBuffer(), p, screenClip, color);
+		DrawPointSurface<true>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	} else {
-		DrawPointSurface<false>(CurrentRenderBuffer(), p, screenClip, color);
+		DrawPointSurface<false>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
+		DrawPointsSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawPointsSurface<false>(CurrentRenderBuffer(), points, screenClip, color);
+		DrawPointsSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.unused < 0xff) {
-		DrawPointsSurface<true>(CurrentRenderBuffer(), points, screenClip, reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
-		DrawPointsSurface<false>(CurrentRenderBuffer(), points, screenClip, reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	}
 }
 
 void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);
+		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	} else {
-		DrawPolygonSurface<false>(CurrentRenderBuffer(), poly, origin, screenClip, color, fill);
+		DrawPolygonSurface<false>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	}
 }
 
 void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLineSurface<true>(CurrentRenderBuffer(), start, end, screenClip, color);
+		DrawLineSurface<true>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	} else {
-		DrawLineSurface<false>(CurrentRenderBuffer(), start, end, screenClip, color);
+		DrawLineSurface<false>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLinesSurface<true>(CurrentRenderBuffer(), points, screenClip, color);
+		DrawLinesSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawLinesSurface<false>(CurrentRenderBuffer(), points, screenClip, color);
+		DrawLinesSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 

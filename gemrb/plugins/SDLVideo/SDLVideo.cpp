@@ -320,6 +320,11 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 	BlitSpriteClipped(spr, srect, drect, flags, &tint);
 }
 
+Region SDLVideoDriver::CurrentRenderClip() const
+{
+	return screenClip.Intersect(drawingBuffer->Rect());
+}
+
 // SetPixel is in screen coordinates
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SetPixel(buffer, _x, _y) { \
