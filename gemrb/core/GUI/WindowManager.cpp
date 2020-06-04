@@ -62,7 +62,7 @@ WindowManager::WindowManager(Video* vid)
 	vid->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
+	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_SET);
 	gameWin->SetFrame(screen);
 
 	HUDBuf = vid->CreateBuffer(screen, Video::DISPLAY_ALPHA);
@@ -209,7 +209,9 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 // this is a caching mechanisim in case the window is reopened
 void WindowManager::CloseWindow(Window* win)
 {
-	assert(win);
+	if (win == nullptr || win == gameWin) {
+		return;
+	}
 
 	WindowList::iterator it = WIN_IT(win);
 	if (it == windows.end()) return;
