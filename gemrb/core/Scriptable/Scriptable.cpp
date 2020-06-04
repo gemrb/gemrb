@@ -2012,6 +2012,7 @@ Movable::Movable(ScriptableType type)
 	HomeLocation.y = 0;
 	maxWalkDistance = 0;
 	prevTicks = 0;
+	ResetPathTries();
 }
 
 Movable::~Movable(void)
@@ -2179,8 +2180,8 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 
 	if (!walkScale) {
 		// zero speed: no movement
-		this->timeStartStep = time;
 		StanceID = IE_ANI_READY;
+		this->timeStartStep = time;
 		return true;
 	}
 
@@ -2196,21 +2197,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Adjustments (+8/+6) are being made here, see Map::FindPath()
 	dx = step->x * 16 + 8 - Pos.x;
 	dy = step->y * 12 + 6 - Pos.y;
-	static const float avoidWeight = 0.4;
-	for (auto nearActor : area->GetAllActorsInRadius(Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF, size, this)) {
-		dx += (nearActor->Pos.x - Pos.x) * avoidWeight;
-		dy += (nearActor->Pos.y - Pos.y) * avoidWeight;
-	}
-
-
-
-	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
-	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
-	dx = std::abs(dx);
-	dy = std::abs(dy);
-	dxOrig = dx;
-	dyOrig = dy;
-
+	
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
 		if (step->Next) {
@@ -2222,6 +2209,14 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			return true;
 		}
 	}
+
+	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+	dx = std::abs(dx);
+	dy = std::abs(dy);
+	dxOrig = dx;
+	dyOrig = dy;
+
 	if (time > this->timeStartStep) {
 		const double maxRadius = 2.0;
 		if (dx == 0) {
@@ -2237,8 +2232,17 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		dx = std::min(dx * stepTime / walkScale, dxOrig);
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
-		Pos.x += std::ceil(dx) * xSign;
-		Pos.y += std::ceil(dy) * ySign;
+		dx = std::ceil(dx) * xSign;
+		dy = std::ceil(dy) * ySign;
+
+		if (area->GetBlocked(Pos.x + dx, Pos.y + dy, true)) {
+			NewPath();
+			return true;
+		}
+
+		Pos.x += dx;
+		Pos.y += dy;
+
 
 		SetOrientation(step->orient, false);
 		this->timeStartStep = time;
@@ -2249,7 +2253,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 void Movable::AddWayPoint(const Point &Des)
 {
 	if (!path) {
-		WalkTo(Des);
+		WalkTo(Des, 0);
 		return;
 	}
 	Destination = Des;
@@ -2285,8 +2289,9 @@ void Movable::FixPosition()
 	Pos.y=Pos.y*12+6;
 }
 
-bool Movable::WalkTo(const Point &Des, int distance)
+bool Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 {
+	assert(flags == 0);
 	bool willBump = false;
 	// Rate limiting
 	if (this->Ticks < this->prevTicks + 2) {
@@ -2423,7 +2428,19 @@ void Movable::ClearPath(bool resetDestination)
 	//don't call ReleaseCurrentAction
 }
 
+const int maxPathTries = 15;
 
+void Movable::NewPath()
+{
+	Point tmp = Destination;
+	if (GetPathTries() > maxPathTries) {
+		ClearPath(true);
+		ResetPathTries();
+		return;
+	}
+	WalkTo(tmp, InternalFlags, size);
+	if (!GetPath()) IncrementPathTries();
+}
 
 /**********************
  * Tiled Object Class *

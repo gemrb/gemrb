@@ -463,6 +463,9 @@ private: //these seem to be sensitive, so get protection
 
 protected:
 	ieDword timeStartStep;
+	//the # of previous tries to pick up a new walkpath
+  int PathTries;
+
 public:
 	Movable(ScriptableType type);
 	virtual ~Movable(void);
@@ -474,6 +477,21 @@ public:
 public:
 	PathNode *GetNextStep(int x);
 	PathNode *GetPath() { return path; };
+	inline int GetPathTries() const
+	{
+		return PathTries;
+	}
+
+	inline void IncrementPathTries()
+	{
+		PathTries++;
+	}
+
+	inline void ResetPathTries()
+	{
+		PathTries = 0;
+	}
+
 	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetStep() {
@@ -482,6 +500,8 @@ public:
 		}
 		return step;
 	}
+	/* call this when path needs to be changed */
+	void NewPath();
 
 	unsigned char GetNextFace();
 
@@ -503,7 +523,9 @@ public:
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
 	// Returns true if the movable will have to bump
-	bool WalkTo(const Point &Des, int MinDistance = 0);
+	// Declared virtual since NewPath calls this
+	// and Actor overrides this
+	virtual bool WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
 	void ClearPath(bool resetDestination);

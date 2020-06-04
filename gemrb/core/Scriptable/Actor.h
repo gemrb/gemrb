@@ -382,15 +382,10 @@ public:
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
 	 */
 	ieByte pstColorBytes[10];
-    int GetPathTries() const;
-    void IncrementPathTries();
-    void ResetPathTries();
 	void BumpAway(Point farthest);
 	void BumpBack();
 	void DecreaseBumpBackTimer();
 private:
-	//the # of previous tries to pick up a new walkpath
-	int PathTries;
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;
@@ -727,10 +722,8 @@ public:
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime, bool checkhide) const;
-	/* call this when path needs to be changed */
-	void NewPath();
 	/* overridden method, won't walk if dead */
-	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
+	bool WalkTo(const Point &Des, ieDword flags, int MinDistance = 0) override;
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
 	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;

@@ -1987,7 +1987,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlock
 	return ret;
 }
 
-bool Map::CheckPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
+bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2488,7 +2488,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 									smptChild.y < 0 ||
 									  (unsigned) smptChild.x >= Width ||
 									  (unsigned) smptChild.y >= Height;
-			bool childBlocked = CheckPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
+			bool childBlocked = CheckSearchmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
 												PATH_MAP_PASSABLE, false);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
@@ -2630,7 +2630,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	smptDest.x = d.x / 16;
 	smptDest.y = d.y / 12;
 
-	if (size && CheckPointFlags(d.x, d.y, size, PATH_MAP_PASSABLE, true)) {
+	if (size && CheckSearchmapPointFlags(d.x, d.y, size, PATH_MAP_PASSABLE, true)) {
 		// We don't want to bump a still npc on our target position, we want to stop before
 		AdjustPosition(smptDest);
 	}
@@ -2725,7 +2725,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									smptChild.y < 0 ||
 									(unsigned) smptChild.x >= Width ||
 									(unsigned) smptChild.y >= Height;
-			bool childBlocked = CheckPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
+			bool childBlocked = CheckSearchmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
 												PATH_MAP_PASSABLE, actorsAreBlocking);
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {

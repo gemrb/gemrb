@@ -8125,19 +8125,6 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	return GemRB::Schedule(appearance, gametime);
 }
 
-const int maxPathTries = 15;
-
-void Actor::NewPath()
-{
-	Point tmp = Destination;
-	if (GetPathTries() > maxPathTries) {
-		ClearPath(true);
-		ResetPathTries();
-		return;
-	}
-	WalkTo(tmp, InternalFlags, size);
-	if (!GetPath()) IncrementPathTries();
-}
 
 void Actor::SetInTrap(ieDword setreset)
 {
@@ -8155,15 +8142,16 @@ void Actor::SetRunFlags(ieDword flags)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 }
 
-void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
+bool Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
-		return;
+		return false;
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	SetWillBump(Movable::WalkTo(Des, MinDistance));
-
+	bool willBump = Movable::WalkTo(Des, 0, MinDistance);
+	SetWillBump(willBump);
+	return willBump;
 }
 
 int Actor::WantDither() const
@@ -11407,21 +11395,6 @@ void Actor::PlayArmorSound() const
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
 		delete[] armorSound;
 	}
-}
-
-int Actor::GetPathTries() const
-{
-	return PathTries;
-}
-
-void Actor::IncrementPathTries()
-{
-	PathTries++;
-}
-
-void Actor::ResetPathTries()
-{
-	PathTries = 0;
 }
 
 void Actor::BumpAway(Point farthest)
