@@ -505,6 +505,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	// draw the game window now (beneath everything else); its not part of the windows collection
+	gameWin->SetVisible(true); // gamewin must always be drawn
 	gameWin->Draw();
 
 	bool drawFrame = false;
