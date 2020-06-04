@@ -61,6 +61,7 @@ public:
 
 	/** Refreshes the control after its associated variable has changed */
 	void UpdateState(unsigned int Sum);
+	bool IsAnimated() const { return true; } // map must constantly update actor positions
 
 private:
 	/** Call event handler on click */
