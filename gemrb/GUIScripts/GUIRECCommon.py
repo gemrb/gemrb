@@ -514,6 +514,7 @@ def ClearBiography(ta):
 	#pc is 1 based
 	BioStrRef = 62015+pc
 	ta.SetText ("")
+	ta.Focus()
 	RevertButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
