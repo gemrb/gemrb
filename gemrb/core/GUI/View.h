@@ -237,7 +237,7 @@ public:
 	/* override the standard cursors. default does not override (returns NULL). */
 	virtual Sprite2D* Cursor() const { return cursor.get(); }
 	void SetCursor(Sprite2D* c);
-	void SetEventProxy(View* proxy) { eventProxy = proxy; }
+	void SetEventProxy(View* proxy);
 
 	// GUIScripting
 	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);

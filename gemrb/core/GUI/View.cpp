@@ -83,6 +83,15 @@ void View::SetCursor(Sprite2D* c)
 	cursor = c;
 }
 
+void View::SetEventProxy(View* proxy)
+{
+	while (proxy && proxy->eventProxy) {
+		proxy = proxy->eventProxy;
+	}
+	
+	eventProxy = proxy;
+}
+
 // TODO: while GemRB does support nested subviews, it does not (fully) support overlapping subviews (same superview, intersecting frame)
 // expect weird things to happen with them
 // this method takes the dirty region so the framework exists, but currently this just invalidates any intersecting subviews
