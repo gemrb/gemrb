@@ -233,9 +233,10 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 /** Mousewheel scroll */
 bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
-	if ( State == 0 ){ // don't allow mousewheel to do anything if the slider is being interacted with already.
+	const ValueRange& range = GetValueRange();
+	if (State == 0 && range.second > 0){ // don't allow mousewheel to do anything if the slider is being interacted with already.
 		int pxRange = SliderPxRange();
-		int minDelta = pxRange / GetValueRange().second;
+		int minDelta = pxRange / range.second;
 		
 		Point clampedDelta = delta;
 		if (delta.x < 0 && delta.x > -minDelta) {
