@@ -66,9 +66,6 @@ public:
 	/** Simply returns the pointer to the text, don't modify it! */
 	String QueryText() const;
 
-	/** Use the RGB Color for the Font */
-	bool useRGB;
-
 private: // Private attributes
 	/** Text String Buffer */
 	String Text;

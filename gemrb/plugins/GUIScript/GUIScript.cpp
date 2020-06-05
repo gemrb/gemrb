@@ -2234,8 +2234,7 @@ PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
  * swap - use color as the back color for the palette\n\
  \n\
  **Return value:** N/A\n\
- \n\
- **See also:** [[guiscript:Label_SetUseRGB]]"
+"
  );
 
 static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
@@ -2552,7 +2551,7 @@ for fonts with swapped background and text colors.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:Label_SetUseRGB]], [[guiscript:Label_SetTextColor]]"
+**See also:** [[guiscript:Label_SetTextColor]]"
 );
 
 static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
@@ -3004,38 +3003,6 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 	}
 
 	btn->SetHotKey(hotkey, mods, global);
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Label_SetUseRGB__doc,
-"===== Label_SetUseRGB =====\n\
-\n\
-**Prototype:** GemRB.SetLabelUseRGB (WindowIndex, ControlIndex, status)\n\
-\n\
-**Metaclass Prototype:** SetUseRGB (status)\n\
-\n\
-**Description:** Sets a Label control to use the colors coming from the \n\
-Font. If the font has its own color, you must set this. If a label was set \n\
-to not use the Font's colors you can alter its color by SetLabelTextColor().\n\
-**Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
-  * status                    - boolean\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Label_SetTextColor]]"
-);
-
-static PyObject* GemRB_Label_SetUseRGB(PyObject* self, PyObject* args)
-{
-	int status;
-	PARSE_ARGS( args,  "Oi", &self, &status );
-
-	Label* lab = GetView<Label>(self);
-	ABORT_IF_NULL(lab);
-
-	lab->useRGB = ( status != 0 );
 
 	Py_RETURN_NONE;
 }
@@ -13283,7 +13250,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
-	METHOD(Label_SetUseRGB, METH_VARARGS),
 	METHOD(SaveGame_GetDate, METH_VARARGS),
 	METHOD(SaveGame_GetGameDate, METH_VARARGS),
 	METHOD(SaveGame_GetName, METH_VARARGS),

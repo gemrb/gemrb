@@ -90,7 +90,6 @@ def RollPress():
 	GemRB.SetVar("Ability",0)
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
-	SumLabel.SetUseRGB(1)
 	SumLabel.SetText(str(PointsLeft))
 
 	for i in range(0,6):
@@ -104,7 +103,6 @@ def RollPress():
 		Label.SetText(str(v) )
 
 		Label = AbilityWindow.GetControl(0x10000024+i)
-		Label.SetUseRGB(1)
 		Label.SetTextColor (GetModColor (b))
 		Label.SetText("%+d"%(b))
 	return

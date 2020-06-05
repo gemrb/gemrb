@@ -454,7 +454,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				delete str;
 
 				if (alignment & 1) {
-					lab->useRGB = true;
 					lab->SetColor(f, b);
 				}
 				int align = IE_FONT_ALIGN_CENTER;

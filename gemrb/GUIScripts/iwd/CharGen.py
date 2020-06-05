@@ -1223,7 +1223,6 @@ def AbilitiesPress():
 	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
 
 	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
-	PointsLeftLabel.SetUseRGB (1)
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
@@ -1247,7 +1246,6 @@ def AbilitiesPress():
 		AbilitiesMinusButton.SetActionInterval (200)
 
 		AbilityLabel = AbilitiesWindow.GetControl (0x10000003 + i)
-		AbilityLabel.SetUseRGB (1)
 
 	AbilitiesStoreButton = AbilitiesWindow.GetControl (37)
 	AbilitiesStoreButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1706,7 +1704,6 @@ def ProficienciesSelect():
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	ProficienciesPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
 	PointsLeftLabel = ProficienciesWindow.GetControl (0x10000009)
-	PointsLeftLabel.SetUseRGB (1)
 	PointsLeftLabel.SetText (str(ProficienciesPointsLeft))
 
 	for i in range (8):
@@ -1894,7 +1891,6 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	else:
 		MageSpellsSelectPointsLeft = 2
 	PointsLeftLabel = MageSpellsWindow.GetControl (0x1000001b)
-	PointsLeftLabel.SetUseRGB (1)
 	PointsLeftLabel.SetText (str(MageSpellsSelectPointsLeft))
 
 	for i in range (24):
@@ -2009,7 +2005,6 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 		MageMemorizePointsLeft = MageMemorizePointsLeft + 1
 
 	PointsLeftLabel = MageMemorizeWindow.GetControl (0x1000001b)
-	PointsLeftLabel.SetUseRGB (1)
 	PointsLeftLabel.SetText (str(MageMemorizePointsLeft))
 
 	j = 0
@@ -2132,7 +2127,6 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 		return
 
 	PointsLeftLabel = PriestMemorizeWindow.GetControl (0x1000001b)
-	PointsLeftLabel.SetUseRGB (1)
 	PointsLeftLabel.SetText (str(PriestMemorizePointsLeft))
 
 	for i in range (12):

@@ -87,7 +87,6 @@ def RollPress():
 	PointsLeft = 0
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText("0")
-	SumLabel.SetUseRGB(1)
 
 	if HasStrExtra:
 		if AllPoints18:
@@ -120,7 +119,6 @@ def RollPress():
 				Label.SetText("18/"+str(e) )
 			else:
 				Label.SetText(str(v) )
-			Label.SetUseRGB(1)
 
 	# add a counter to the title
 	SumLabel = AbilityWindow.GetControl (0x10000000)

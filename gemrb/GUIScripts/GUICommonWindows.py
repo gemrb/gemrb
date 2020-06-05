@@ -1632,7 +1632,6 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
 			HPLabel = Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
-			HPLabel.SetUseRGB (True)
 
 		# unlike other buttons, this one lacks extra frames for a selection effect
 		# so we create it and shift it to cover the grooves of the image

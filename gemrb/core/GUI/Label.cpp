@@ -35,7 +35,6 @@ Label::Label(const Region& frame, Font* font, const String& string)
 {
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
-	useRGB = false;
 	palette = NULL;
 	SetColor(ColorWhite, ColorBlack);
 
@@ -52,7 +51,7 @@ Label::~Label()
 void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
-		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
+		font->Print( rgn, Text, (palette) ? palette : NULL, Alignment);
 	}
 
 	if (AnimPicture) {
