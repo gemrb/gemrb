@@ -780,6 +780,7 @@ void ScriptedAnimation::GetPaletteCopy()
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
 				Color shadowalpha = palette->col[1];
+				palette->alpha = true; // FIXME: this should really be automatically adjusted inside Palette
 				shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
 				palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
 				//we need only one palette, so break here
