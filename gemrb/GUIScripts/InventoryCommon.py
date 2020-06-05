@@ -277,6 +277,8 @@ def DisplayItem (slotItem, type):
 
 	Text.Clear ()
 	Text.Append (text)
+	
+	Window.SetEventProxy(Text)
 
 	#left button
 	Button = Window.GetControl(8)
