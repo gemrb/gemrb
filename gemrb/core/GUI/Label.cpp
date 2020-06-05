@@ -36,7 +36,6 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
 	palette = NULL;
-	SetColor(ColorWhite, ColorBlack);
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
 	SetFlags(IgnoreEvents, OP_OR);
