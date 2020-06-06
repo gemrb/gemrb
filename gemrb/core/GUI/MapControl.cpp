@@ -40,9 +40,7 @@ namespace GemRB {
 MapControl::MapControl(const Region& frame, AnimationFactory* af)
 : Control(frame), flags(af)
 {
-	ControlType = IE_GUI_MAP;
-	LinkedLabel = NULL;
-	
+	ControlType = IE_GUI_MAP;	
 	UpdateMap();
 }
 

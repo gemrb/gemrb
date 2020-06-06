@@ -53,9 +53,9 @@ public:
 	// Small map bitmap
 	Holder<Sprite2D> MapMOS;
 	// current map
-	Map *MyMap;
+	Map* MyMap = nullptr;
 	// The MapControl can set the text of this label directly
-	Control *LinkedLabel;
+	Control* LinkedLabel = nullptr;
 
 	MapControl(const Region& frame, AnimationFactory* af);
 
