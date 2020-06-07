@@ -73,7 +73,7 @@ IF(EXISTS ${DLL_DIR}vorbisfile-1.dll )
 ENDIF()
 
 # copy over python core modules, so the buildbot binaries work without python installed
-INSTALL(FILES ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
+INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
 MESSAGE(STATUS "Disable option VCPKG_AUTO_DEPLOY to skip this")
