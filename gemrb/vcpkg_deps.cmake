@@ -10,6 +10,8 @@
 MESSAGE(STATUS "")
 MESSAGE(STATUS "Configuring rules for VCPKG dependency deployment")
 
+SET(VCPKG_DATAROOT "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+
 # we either want SDL1 or 2, no need to copy both
 IF(SDL_BACKEND MATCHES SDL2)
 	SET (DLL_SDL_VER 2)
@@ -17,16 +19,16 @@ ENDIF()
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 	SET(DLL_SET_DBG "d") # all the debug dll's just have 'd' somewhere in the filename if they are different at all
-	SET(DLL_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/bin/")
+	SET(DLL_DIR "${VCPKG_DATAROOT}/debug/bin/")
 ELSE()
 	UNSET(DLL_SET_DBG)
-	SET(DLL_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/")
+	SET(DLL_DIR "${VCPKG_DATAROOT}/bin/")
 ENDIF()
 
 # lists of dll files to be deployed to the build/install directory for Win32 builds
 # libcharset is just a relic of the current iconv build
 LIST(APPEND DLL_SET
-	${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/SDL${DLL_SDL_VER}.dll # Cmake doesn't actually find the sdl debug libs
+	${VCPKG_DATAROOT}/bin/SDL${DLL_SDL_VER}.dll # Cmake doesn't actually find the sdl debug libs
 	${DLL_DIR}python27.dll
 	${DLL_DIR}OpenAL32.dll
 	${DLL_DIR}zlib${DLL_SET_DBG}1.dll
@@ -71,7 +73,7 @@ IF(EXISTS ${DLL_DIR}vorbisfile-1.dll )
 ENDIF()
 
 # copy over python core modules, so the buildbot binaries work without python installed
-INSTALL(FILES ${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/python2/Lib DESTINATION ${BIN_DIR})
+INSTALL(FILES ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
 MESSAGE(STATUS "Disable option VCPKG_AUTO_DEPLOY to skip this")
