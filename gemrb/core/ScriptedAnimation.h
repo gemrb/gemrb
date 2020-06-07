@@ -87,7 +87,7 @@ public:
 	//set to 5, 9, 16
 	Animation* anims[3*MAX_ORIENT];
 	//there is only one palette
-	Palette *palette;
+	Holder<Palette> palette;
 	ieResRef sounds[3];
 	ieResRef PaletteName;
 	Color Tint;
@@ -148,7 +148,6 @@ public:
 	ScriptedAnimation *DetachTwin();
 private:
 	void PrepareAnimation(Animation *anim, ieDword Transparency);
-	void PreparePalette();
 	bool HandlePhase(Sprite2D *&frame);
 	void GetPaletteCopy();
 };

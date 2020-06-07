@@ -71,7 +71,6 @@ ScriptedAnimation::ScriptedAnimation()
 void ScriptedAnimation::Init()
 {
 	memset(anims,0,sizeof(anims));
-	palette = NULL;
 	sounds[0][0] = 0;
 	sounds[1][0] = 0;
 	sounds[2][0] = 0;
@@ -390,7 +389,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 				}
 			}
 		}
-		PreparePalette();
+		if (Transparency&IE_VVC_BLENDED) {
+			GetPaletteCopy();
+		}
 	}
 
 	SetPhase(P_ONSET);
@@ -406,12 +407,7 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		}
 	}
 
-	if (gamedata) {
-		gamedata->FreePalette(palette, PaletteName);
-	} else if (palette) {
-		// we have some static data that doesnt die until after gamedata
-		palette->release();
-	}
+	palette = nullptr;
 
 	if (twin) {
 		delete twin;
@@ -458,8 +454,7 @@ void ScriptedAnimation::PlayOnce()
 
 void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
 {
-	gamedata->FreePalette(palette, PaletteName);
-	palette=gamedata->GetPalette(PaletteResRef);
+	palette = gamedata->GetPalette(PaletteResRef);
 	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
 	if (twin) {
 		twin->SetFullPalette(PaletteResRef);
@@ -716,7 +711,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 		}
 	}
 
-	video->BlitGameSpriteWithPalette(frame, palette, cx, cy, flags, tint);
+	video->BlitGameSpriteWithPalette(frame, palette.get(), cx, cy, flags, tint);
 
 	if (light) {
 		video->BlitGameSprite( light, cx, cy, flags^flag, tint, NULL);
@@ -730,18 +725,6 @@ Region ScriptedAnimation::DrawingRegion() const
 	return (anim) ? anim->animArea : Region();
 }
 
-void ScriptedAnimation::PreparePalette()
-{
-	if (Transparency&IE_VVC_BLENDED) {
-		GetPaletteCopy();
-		if (!palette)
-			return;
-		if (!palette->alpha) {
-			palette->CreateShadedAlphaChannel();
-		}
-	}
-}
-
 void ScriptedAnimation::SetEffectOwned(bool flag)
 {
 	effect_owned=flag;
@@ -752,10 +735,15 @@ void ScriptedAnimation::SetEffectOwned(bool flag)
 
 void ScriptedAnimation::SetBlend()
 {
-	Transparency |= IE_VVC_BLENDED;
-	PreparePalette();
-	if (twin)
-		twin->SetBlend();
+	if ((Transparency&IE_VVC_BLENDED) == 0) {
+		Transparency |= IE_VVC_BLENDED;
+		if (palette) {
+			palette = nullptr;
+		}
+		GetPaletteCopy();
+		if (twin)
+			twin->SetBlend();
+	}
 }
 
 void ScriptedAnimation::SetFade(ieByte initial, int speed)
@@ -779,10 +767,14 @@ void ScriptedAnimation::GetPaletteCopy()
 			Sprite2D* spr = anims[i]->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
-				Color shadowalpha = palette->col[1];
-				palette->alpha = true; // FIXME: this should really be automatically adjusted inside Palette
-				shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
-				palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
+				if ((Transparency&IE_VVC_BLENDED) && palette->alpha == false) {
+					palette->CreateShadedAlphaChannel();
+				} else {
+					palette->alpha = true; // FIXME: this should really be automatically adjusted inside Palette
+					Color shadowalpha = palette->col[1];
+					shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+					palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
+				}
 				//we need only one palette, so break here
 				break;
 			}
@@ -795,7 +787,7 @@ void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
 	GetPaletteCopy();
 	if (!palette)
 		return;
-	palette->SetupGlobalRGBModification(palette,mod);
+	palette->SetupGlobalRGBModification(palette.get(), mod);
 	if (twin) {
 		twin->AlterPalette(mod);
 	}
