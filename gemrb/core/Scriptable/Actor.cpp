@@ -7811,7 +7811,7 @@ void Actor::UpdateActorState()
 			}
 		}
 
-		if (anims[0]->endReached == false) {
+		if (anims && anims[0]->endReached == false) {
 			//check if walk sounds need to be played
 			//dialog, pause game
 			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
