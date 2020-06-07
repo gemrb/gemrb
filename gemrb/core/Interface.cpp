@@ -3163,7 +3163,11 @@ void Interface::SetCutSceneMode(bool active)
 
 	ToggleViewsVisible(!active, "HIDE_CUT");
 
-	if (!active) SetCutSceneRunner(NULL);
+	if (active) {
+		GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CloseTopWindow");
+	} else {
+		SetCutSceneRunner(NULL);
+	}
 }
 
 /** returns true if in dialogue or cutscene */
