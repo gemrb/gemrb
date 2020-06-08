@@ -1713,6 +1713,7 @@ void Map::DeleteActor(int i)
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
 		CopyResRef(actor->Area, "");
+		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
 		if (game->InStore(actor) < 0) {
@@ -1721,7 +1722,6 @@ void Map::DeleteActor(int i)
 	}
 	//remove the actor from the area's actor list
 	actors.erase( actors.begin()+i );
-	objectStencils.erase(actor);
 }
 
 Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)

@@ -4730,7 +4730,8 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 				}
 				string->resize(pos);
 			}
-			strings.push_back(*string);
+			strings.emplace_back(std::move(*string));
+			delete string;
 		} while (++dirit);
 	}
 

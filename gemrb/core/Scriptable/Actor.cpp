@@ -7798,8 +7798,8 @@ void Actor::UpdateActorState()
 	unsigned char StanceID = GetStance();
 	unsigned char Face = GetOrientation();
 	CharAnimations* ca = GetAnims();
-	if (ca) {
-		Animation** anims = ca->GetAnimation( StanceID, Face );
+	Animation** anims = (ca) ? ca->GetAnimation(StanceID, Face) : nullptr;
+	if (ca && anims) {
 		if (attackProjectile) {
 			unsigned int frameCount = anims[0]->GetFrameCount();
 			unsigned int currentFrame = anims[0]->GetCurrentFrame();
@@ -7811,7 +7811,7 @@ void Actor::UpdateActorState()
 			}
 		}
 
-		if (anims && anims[0]->endReached == false) {
+		if (anims[0]->endReached == false) {
 			//check if walk sounds need to be played
 			//dialog, pause game
 			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
