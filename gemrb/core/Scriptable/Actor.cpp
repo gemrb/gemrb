@@ -7799,7 +7799,7 @@ void Actor::UpdateActorState()
 	unsigned char Face = GetOrientation();
 	CharAnimations* ca = GetAnims();
 	Animation** anims = (ca) ? ca->GetAnimation(StanceID, Face) : nullptr;
-	if (ca && anims) {
+	if (anims) {
 		if (attackProjectile) {
 			unsigned int frameCount = anims[0]->GetFrameCount();
 			unsigned int currentFrame = anims[0]->GetCurrentFrame();
