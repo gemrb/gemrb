@@ -1406,9 +1406,14 @@ def SetTopWindow (window, selectionHandler = None):
 	topwin = GemRB.GetView("WIN_TOP")
 	if topwin == window:
 		return
+		
+	pc = GemRB.GameGetSelectedPCSingle()
 	
 	if topwin:
-		topwin.Close()
+		topwin.Close() # invalidates topwin so must use a different variable
+		preserveSelection = True
+	else:
+		preserveSelection = False
 
 	if window:
 		window.AddAlias("WIN_TOP")
@@ -1421,6 +1426,9 @@ def SetTopWindow (window, selectionHandler = None):
 			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
 
 		SetSelectionChangeHandler (selectionHandler)
+		if preserveSelection:
+			# we are going to another topwin so preserve the selection
+			GemRB.GameSelectPCSingle(pc)
 	else:
 		SetSelectionChangeHandler (None)
 
