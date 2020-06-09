@@ -127,6 +127,14 @@ inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
     return bool(rhs);
 }
 
+template<class T, typename... ARGS>
+inline Holder<T> MakeHolder(ARGS&&... args)
+{
+	Holder<T> holder(new T(std::forward<ARGS>(args)...));
+	holder.release();
+	return holder;
+}
+
 }
 
 #endif
