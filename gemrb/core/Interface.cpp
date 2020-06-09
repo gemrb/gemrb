@@ -2874,8 +2874,8 @@ int Interface::PlayMovie(const char* resref)
 		mutable String* cachedSub;
 
 	public:
-		IESubtitles(class Font* fnt, ResRef resref, Color fore = ColorWhite, Color bg = ColorBlack)
-		: MoviePlayer::SubtitleSet(fnt, fore, bg)
+		IESubtitles(class Font* fnt, ResRef resref, Palette* pal = nullptr)
+		: MoviePlayer::SubtitleSet(fnt, pal)
 		{
 			AutoTable sttable(resref);
 			cachedSub = NULL;
@@ -2920,8 +2920,6 @@ int Interface::PlayMovie(const char* resref)
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
 		Holder<Palette> pal = font->GetPalette();
-		Color fore = pal->front;
-		Color bg = pal->back;
 
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
@@ -2929,11 +2927,14 @@ int Interface::PlayMovie(const char* resref)
 
 		if (r || g || b) {
 			// FIXME: this doesn't look very good (IWD2), wrong font?
-			bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
-			fore = Color(0, 0, 0, 0xff);
+			Color bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
+			Color fg = Color(0, 0, 0, 0xff);
+			Palette* pal = new Palette(fg, bg);
+			mp->SetSubtitles(new IESubtitles(font, resref, pal));
+			pal->release();
+		} else {
+			mp->SetSubtitles(new IESubtitles(font, resref));
 		}
-
-		mp->SetSubtitles(new IESubtitles(font, resref, fore, bg));
 	}
 
 	//shutting down music and ambients before movie

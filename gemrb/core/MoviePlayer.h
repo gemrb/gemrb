@@ -54,8 +54,8 @@ public:
 		Font* font;
 	
 	public:
-		SubtitleSet(Font* fnt, Color fore = ColorWhite, Color bg = ColorBlack)
-		: pal((fore.a != 0) ? new Palette(fore, bg) : NULL) {
+		SubtitleSet(Font* fnt, Palette* pal = nullptr)
+		: pal(pal) {
 			font = fnt;
 			assert(font);
 		}
