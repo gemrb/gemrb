@@ -102,7 +102,6 @@ void Palette::Brighten()
 		col[i].r = (col[i].r+256)/2;
 		col[i].g = (col[i].g+256)/2;
 		col[i].b = (col[i].b+256)/2;
-		col[i].a = (col[i].a+256)/2;
 	}
 	version++;
 }
@@ -113,8 +112,8 @@ void Palette::Darken()
 		col[i].r = (col[i].r * 2) / 3;
 		col[i].g = (col[i].g * 2) / 3;
 		col[i].b = (col[i].b * 2) / 3;
-		col[i].a = (col[i].a * 2) / 3;
 	}
+	version++;
 }
 
 Palette* Palette::Copy() const
