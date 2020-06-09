@@ -381,9 +381,11 @@ bool Window::DispatchKey(View* keyView, const Event& event)
 	}
 	
 	if (!handled) {
+		// FIXME: using OnKeyPress to avoid eventProxy from eating esc key
+		// would be better if we could delegate proxies for different event classes (keys, mouse, etc)
 		handled = (event.type == Event::KeyDown)
-		? KeyPress(event.keyboard, event.mod)
-		: KeyRelease(event.keyboard, event.mod);
+		? OnKeyPress(event.keyboard, event.mod)
+		: OnKeyRelease(event.keyboard, event.mod);
 	}
 	return handled;
 }
