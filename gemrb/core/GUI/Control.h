@@ -82,7 +82,7 @@ class GEM_EXPORT Control : public View {
 private:
 	void ClearActionTimer();
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
 
 	void HandleTouchActionTimer(Control*);
     
@@ -123,8 +123,8 @@ public:
 	Control(const Region& frame);
 	virtual ~Control();
 
-	virtual bool IsAnimated() const { return animation; }
-	bool IsOpaque() const;
+	virtual bool IsAnimated() const override { return animation; }
+	bool IsOpaque() const override;
 
 	/** Sets the Text of the current control */
 	void SetText(const String*);
@@ -138,7 +138,7 @@ public:
 	virtual void SetFocus();
 	bool IsFocused();
     
-	bool TracksMouseDown() const { return bool(actionTimer); }
+	bool TracksMouseDown() const override { return bool(actionTimer); }
 
 	//Events
 	void SetAction(ControlEventHandler handler); // default action (left mouse button up)
@@ -164,7 +164,7 @@ public:
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
 	
-	bool HitTest(const Point& p) const;
+	bool HitTest(const Point& p) const override;
 
     // TODO: implement generic handlers for the other types of event actions
 	
@@ -190,18 +190,18 @@ protected:
 		}
 	};
 
-	void FlagsChanged(unsigned int /*oldflags*/);
+	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
 	bool SupportsAction(const ActionKey&);
 	bool PerformAction(const ActionKey&);
 	
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 
-	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
-	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
+	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
 
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay

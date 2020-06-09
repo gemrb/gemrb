@@ -68,12 +68,12 @@ public:
 private:
 	void RecreateBuffer();
 
-	void SubviewAdded(View* view, View* parent);
-	void SubviewRemoved(View* view, View* parent);
+	void SubviewAdded(View* view, View* parent) override;
+	void SubviewRemoved(View* view, View* parent) override;
 
-	void FlagsChanged(unsigned int /*oldflags*/);
-	void SizeChanged(const Size&);
-	void WillDraw();
+	void FlagsChanged(unsigned int /*oldflags*/) override;
+	void SizeChanged(const Size&) override;
+	void WillDraw() override;
 
 	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
 	View* TrySetFocus(View* view);
@@ -89,12 +89,12 @@ private:
 	
 	inline bool DispatchKey(View*, const Event&);
 	
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 	
-	bool OnMouseDrag(const MouseEvent&);
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	bool OnMouseDrag(const MouseEvent&) override;
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 	
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
 
 public:
 	Window(const Region& frame, WindowManager& mgr);
@@ -108,10 +108,10 @@ public:
 	View* FocusedView() const { return focusView; }
 
 	void SetPosition(WindowPosition);
-	String TooltipText() const;
-	Sprite2D* Cursor() const;
-	bool IsDisabledCursor() const;
-	bool IsReceivingEvents() const { return true; }
+	String TooltipText() const override;
+	Sprite2D* Cursor() const override;
+	bool IsDisabledCursor() const override;
+	bool IsReceivingEvents() const override { return true; }
 
 	const VideoBufferPtr& DrawWithoutComposition();
 	void RedrawControls(const char* VarName, unsigned int Sum);
@@ -121,8 +121,8 @@ public:
 	bool UnRegisterHotKeyCallback(Holder<EventMgr::EventCallback>, KeyboardKey key);
 	
 	bool InHandler() const;
-	bool IsOpaque() const { return (Flags()&AlphaChannel) == 0; }
-	bool HitTest(const Point& p) const;
+	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
+	bool HitTest(const Point& p) const override;
 
 private: // Private attributes
 	typedef std::map<KeyboardKey, Holder<EventMgr::EventCallback> > KeyMap;
