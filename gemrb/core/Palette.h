@@ -48,23 +48,25 @@ struct RGBModifier {
 class GEM_EXPORT Palette {
 private:
 	~Palette() {}
+	
+	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst);
+	void UpdateAlpha();
 public:
 	Palette(const Color &color, const Color &back);
 
 	Palette(const Color* begin, const Color* end)
 	: Palette() {
 		std::copy(begin, end, col);
+		UpdateAlpha();
 	}
 
 	Palette() {
-		alpha = false;
 		refcount = 1;
 		named = false;
 		version = 0;
 	}
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
-	bool alpha; //< true if this is a RGBA palette
 	bool named; //< true if the palette comes from a bmp and cached
 
 	void acquire() {
@@ -79,6 +81,7 @@ public:
 
 	unsigned short GetVersion() const { return version; }
 
+	bool HasAlpha() const { return alpha; }
 	void CreateShadedAlphaChannel();
 	void Brighten();
 	void Darken();
@@ -97,6 +100,7 @@ public:
 private:
 	unsigned int refcount;
 	unsigned short version;
+	bool alpha = false; // true if any colors in the palette have an alpha < 255
 	// FIXME: version is not enough since `col` is public
 	// must make it private to fully capture changes to it
 };

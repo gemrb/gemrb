@@ -47,9 +47,29 @@ Palette::Palette(const Color &color, const Color &back)
 	}
 }
 
+void Palette::UpdateAlpha()
+{
+	// skip index 0 which is always the color key
+	for (int i = 1; i < 256; ++i) {
+		if (col[i].a != 0xff) {
+			alpha = true;
+			return;
+		}
+	}
+	
+	alpha = false;
+}
+
+void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst)
+{
+	// no update to alpha or version, hence being private
+	std::copy(srcBeg, srcEnd, dst);
+}
+
 void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst)
 {
-	std::copy(srcBeg, srcEnd, &col[dst]);
+	CopyColorRangePrivate(srcBeg, srcEnd, &col[dst]);
+	UpdateAlpha();
 	version++;
 }
 
@@ -99,9 +119,7 @@ void Palette::Darken()
 
 Palette* Palette::Copy() const
 {
-	Palette* newPal = new Palette(std::begin(col), std::end(col));
-	newPal->alpha = alpha;
-	return newPal;
+	return new Palette(std::begin(col), std::end(col));
 }
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
@@ -117,7 +135,8 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 
 	for (uint8_t idx = METAL; idx < END; ++idx) {
 		const auto& pal16 = core->GetPalette16(Colors[idx]>>s);
-		CopyColorRange(&pal16[0], &pal16[numCols], 0x04 + (idx*12));
+		Color* dest = &col[0x04 + (idx * 12)];
+		CopyColorRangePrivate(&pal16[0], &pal16[numCols], dest);
 	}
 	
 	//minor

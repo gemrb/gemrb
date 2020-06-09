@@ -103,7 +103,6 @@ void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color
 				Palette* p = icon->GetPalette();
 				Color tmpc = p->col[1];
 				p->CopyColorRange(&trans, &trans + 1, 1);
-				p->alpha = true; // FIXME: this should really be automatically adjusted inside Palette
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 				p->release();

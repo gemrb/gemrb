@@ -767,10 +767,9 @@ void ScriptedAnimation::GetPaletteCopy()
 			Sprite2D* spr = anims[i]->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
-				if ((Transparency&IE_VVC_BLENDED) && palette->alpha == false) {
+				if ((Transparency&IE_VVC_BLENDED) && palette->HasAlpha() == false) {
 					palette->CreateShadedAlphaChannel();
 				} else {
-					palette->alpha = true; // FIXME: this should really be automatically adjusted inside Palette
 					Color shadowalpha = palette->col[1];
 					shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
 					palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);

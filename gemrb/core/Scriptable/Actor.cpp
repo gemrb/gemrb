@@ -8258,7 +8258,7 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			if (palette->alpha && TranslucentShadows) {
+			if (palette->HasAlpha() && TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
 				video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);

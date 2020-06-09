@@ -274,7 +274,7 @@ void Projectile::SetBlend(int brighten)
 	GetPaletteCopy(travel, palette);
 	if (!palette)
 		return;
-	if (!palette->alpha) {
+	if (!palette->HasAlpha()) {
 		palette->CreateShadedAlphaChannel();
 	}
 	if (brighten) {
