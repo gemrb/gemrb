@@ -31,8 +31,6 @@
 
 #include "exports.h"
 
-#include "Dialog.h"
-
 namespace GemRB {
 
 class Font;
@@ -61,7 +59,6 @@ private:
 
 public:
 	WorldMapControl(const Region& frame, const char *fontname, int direction);
-	~WorldMapControl(void);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta);
@@ -98,11 +95,11 @@ private:
 	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
 	bool OverrideIconPalette;
 	/** Label color of a visited area */
-	Palette *pal_normal;
+	Holder<Palette> pal_normal;
 	/** Label color of a currently selected area */
-	Palette *pal_selected;
+	Holder<Palette> pal_selected;
 	/** Label color of a not yet visited area */
-	Palette *pal_notvisited;
+	Holder<Palette> pal_notvisited;
 
 };
 

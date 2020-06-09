@@ -23,7 +23,6 @@
 #include "ie_cursors.h"
 
 #include "Game.h"
-#include "GameData.h"
 #include "Interface.h"
 #include "WorldMap.h"
 #include "GUI/EventMgr.h"
@@ -67,27 +66,8 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	} else {
 		ftext = NULL;
 	}
-
-	// initialize label colors
-	// NOTE: it would be better to initialize these colors from
-	//   some 2da file
-	Color normal(0xf0, 0xf0, 0xf0, 0xff);
-	Color selected(0xf0, 0x80, 0x80, 0xff);
-	Color notvisited(0x80, 0x80, 0xf0, 0xff);
-	Color black;
-
-	pal_normal = new Palette ( normal, black );
-	pal_selected = new Palette ( selected, black );
-	pal_notvisited = new Palette ( notvisited, black );
-}
-
-WorldMapControl::~WorldMapControl(void)
-{
-	//Video *video = core->GetVideoDriver();
-
-	gamedata->FreePalette( pal_normal );
-	gamedata->FreePalette( pal_selected );
-	gamedata->FreePalette( pal_notvisited );
+	
+	SetColor(IE_GUI_WMAP_COLOR_BACKGROUND, ColorBlack);
 }
 
 /** Draws the Control on the Output Display */
@@ -112,7 +92,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if( icon ) {
 			if (m == Area && m->HighlightSelected()) {
 				Palette *pal = icon->GetPalette();
-				icon->SetPalette(pal_selected);
+				icon->SetPalette(pal_selected.get());
 				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 				icon->SetPalette(pal);
 				pal->release();
@@ -149,13 +129,13 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (!m->GetCaption())
 			continue;
 
-		Palette* text_pal = pal_normal;
+		Palette* text_pal = pal_normal.get();
 
 		if (Area == m) {
-			text_pal = pal_selected;
+			text_pal = pal_selected.get();
 		} else {
 			if (! (m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				text_pal = pal_notvisited;
+				text_pal = pal_notvisited.get();
 			}
 		}
 
@@ -317,35 +297,28 @@ bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*
 
 void WorldMapControl::SetColor(int which, Color color)
 {
-	Palette* pal;
+	// initialize label colors
+	// NOTE: it would be better to initialize these colors from
+	//   some 2da file
+	static const Color normal(0xf0, 0xf0, 0xf0, 0xff);
+	static const Color selected(0xf0, 0x80, 0x80, 0xff);
+	static const Color notvisited(0x80, 0x80, 0xf0, 0xff);
 	// FIXME: clearly it can cause palettes to be re-created several times,
 	//   because setting background color creates all palettes anew.
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal = new Palette( pal_normal->front, color );
-		gamedata->FreePalette( pal_normal );
-		pal_normal = pal;
-		pal = new Palette( pal_selected->front, color );
-		gamedata->FreePalette( pal_selected );
-		pal_selected = pal;
-		pal = new Palette( pal_notvisited->front, color );
-		gamedata->FreePalette( pal_notvisited );
-		pal_notvisited = pal;
+		pal_normal = MakeHolder<Palette>(normal, color);
+		pal_selected = MakeHolder<Palette>(selected, color);
+		pal_notvisited = MakeHolder<Palette>(notvisited, color);
 		break;
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal = new Palette( color, pal_normal->back );
-		gamedata->FreePalette( pal_normal );
-		pal_normal = pal;
+		pal_normal = MakeHolder<Palette>(normal, color);
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal = new Palette( color, pal_selected->back );
-		gamedata->FreePalette( pal_selected );
-		pal_selected = pal;
+		pal_selected = MakeHolder<Palette>(selected, color);
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal = new Palette( color, pal_notvisited->back );
-		gamedata->FreePalette( pal_notvisited );
-		pal_notvisited = pal;
+		pal_notvisited = MakeHolder<Palette>(notvisited, color);
 		break;
 	default:
 		break;
