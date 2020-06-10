@@ -214,7 +214,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 		BlitSpritePAL_dispatch(hflip, currentBuf, srcdata, palette->col, x, y, w, h, vflip, dst, (Uint8)spr->GetColorKey(), maskit, remflags, tinter, blender);
 
-	} else if (remflags == 0 && palette->alpha == false) {
+	} else if (remflags == 0 && palette->HasAlpha() == false) {
 		SRTinter_NoTint<false> tinter;
 		SRBlender_Alpha blender;
 
@@ -238,7 +238,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 		if (!(remflags & BLIT_TINTED)) tint.a = 255;
 
 		SRBlender_Alpha blender;
-		if (palette->alpha) {
+		if (palette->HasAlpha()) {
 			if (remflags & BLIT_TINTED) {
 				SRTinter_Flags<true> tinter(tint);
 
