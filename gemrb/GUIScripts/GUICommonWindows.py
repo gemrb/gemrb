@@ -1355,7 +1355,8 @@ def TopWindowClosed(window):
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
 	GemRB.GetView ("ACTWIN").SetVisible (True)
-	GemRB.GetView ("MSGWIN").SetVisible(True)
+	if not GameCheck.IsPST(): #PST Doesn't have the message window visible in the main game screen
+		GemRB.GetView ("MSGWIN").SetVisible(True)
 
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
