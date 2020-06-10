@@ -46,3 +46,6 @@ xcuserdata
 /.vs
 /CMakeSettings.json
 /out
+
+**/gemrb_path.txt
+**/GemRB.log

@@ -1,16 +1,14 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2020 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
-
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
-
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -18,29 +16,28 @@
  *
  */
 
-#ifndef MEMORYSTREAM_H
-#define MEMORYSTREAM_H
+#include <algorithm>
 
-#include "System/DataStream.h"
-
-#include "exports.h"
+#include "CodepageToIconv.h"
 
 namespace GemRB {
 
-class GEM_EXPORT MemoryStream : public DataStream
-{
-protected:
-	char *data;
-public:
-	MemoryStream(const char *name, void* data, unsigned long size);
-	~MemoryStream();
-	DataStream* Clone() override;
+const char* GetIconvNameForCodepage(uint32_t codepage) {
+	const CodepageIconvMapEntry searchItem{codepage, ""};
 
-	int Read(void* dest, unsigned int length) override;
-	int Write(const void* src, unsigned int length) override;
-	int Seek(int pos, int startpos) override;
-};
+	auto entry =
+		std::lower_bound(
+			codepageIconvMap.cbegin(),
+			codepageIconvMap.cend(),
+			searchItem,
+			[](const CodepageIconvMapEntry& a, const CodepageIconvMapEntry& b) { return a.first < b.first; }
+		);
 
+	if (entry != codepageIconvMap.cend() && entry->first == codepage) {
+		return entry->second;
+	}
+
+	return nullptr;
 }
 
-#endif
+}

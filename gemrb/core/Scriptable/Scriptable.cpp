@@ -315,9 +315,12 @@ void Scriptable::Update()
 
 	if (UnselectableTimer) {
 		UnselectableTimer--;
-		if (!UnselectableTimer) {
-			if (Type == ST_ACTOR) {
-				((Actor *) this)->SetCircleSize();
+		if (!UnselectableTimer && Type == ST_ACTOR) {
+			Actor *actor = (Actor *) this;
+			actor->SetCircleSize();
+			if (actor->InParty) {
+				core->GetGame()->SelectActor(actor, true, SELECT_QUIET);
+				core->SetEventFlag(EF_PORTRAIT);
 			}
 		}
 	}

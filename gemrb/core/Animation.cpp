@@ -173,7 +173,6 @@ Sprite2D* Animation::NextFrame(void)
 			pos = 0;
 			endReached = true;
 		}
-		starttime = 0;
 	}
 	return ret;
 }

@@ -21,6 +21,7 @@
 // GemRB.cpp : Defines the entry point for the application.
 
 #include "win32def.h" // logging
+#include <clocale> //language encoding
 
 #include "Interface.h"
 
@@ -56,6 +57,7 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
 #	ifdef ANDROID

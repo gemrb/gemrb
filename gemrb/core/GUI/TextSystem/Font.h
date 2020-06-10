@@ -117,9 +117,6 @@ private:
 			~GlyphAtlasPage() {
 				if (Sheet == NULL) {
 					free(pageData);
-				} else {
-					// TODO: need the driver check for shared pixel data
-					// in this case the sprite took ownership of the pixels
 				}
 			}
 		bool AddGlyph(ieWord chr, const Glyph& g);

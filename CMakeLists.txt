@@ -45,6 +45,14 @@ OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(USE_ICONV "Enable Iconv support" ON)
 
+#VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
+IF(WIN32 AND _VCPKG_INSTALLED_DIR)
+	OPTION(VCPKG_AUTO_DEPLOY "Fix VCPKG dependency DLL locations" ON)
+	# This variable disables the built in VCPKG deployment script,
+	# which makes copies of the DLL files in places they are not ever found by the game
+	SET(VCPKG_APPLOCAL_DEPS OFF)
+ENDIF()
+
 # try to extract the version from the source
 FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
 SET(GEMRB_VERSION "")
@@ -207,25 +215,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mo
 IF(NOT STATIC_LINK)
 	# prevent static libraries from being selected by FIND_LIBRARY
 	LIST(REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-ENDIF()
-
-# extra search paths for windows builds through AppVeyor
-IF(WIN32)
-	set(APPVEYOR_DEP_DIR "$ENV{APPVEYOR_DEPS}")
-	set(APPVEYOR_DEP_SEARCH_PATH
-		${APPVEYOR_DEP_DIR}/include/SDL
-		${APPVEYOR_DEP_DIR}/include/AL
-		${APPVEYOR_DEP_DIR}/include/libpng12
-		${APPVEYOR_DEP_DIR}/include/ogg
-		${APPVEYOR_DEP_DIR}/include/vorbis
-		${APPVEYOR_DEP_DIR}/include
-		${APPVEYOR_DEP_DIR}/lib
-		${APPVEYOR_DEP_DIR}
-	)
-	set(CMAKE_PREFIX_PATH ${APPVEYOR_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
-	message(STATUS "SDLDIR: $ENV{SDLDIR}")
-	message(STATUS "APPVEYOR env: ${APPVEYOR_DEP_DIR}")
-	message(STATUS "APPVEYOR paths: ${APPVEYOR_DEP_SEARCH_PATH}")
 ENDIF()
 
 # Check for all the required and optional dependencies

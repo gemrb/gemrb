@@ -421,7 +421,7 @@ def HLARecheckPrereqs (index):
 				HLAAbilities[i][1] = 0
 			else: # can, if it meets pre-reqs
 				if HLAAbilities[i][3] != "*": # check prereqs
-					for j in range (len (HLAAblities)): # search for the prereq ref
+					for j in range (len (HLAAbilities)): # search for the prereq ref
 						if (HLAAbilities[j][0] == HLAAbilities[i][3]) and (HLAAbilities[j][2] > 0): # can learn
 							HLAAbilities[i][1] = 1
 							break

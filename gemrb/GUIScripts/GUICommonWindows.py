@@ -375,6 +375,8 @@ def EmptyControls ():
 		GemRB.SpellCast (pc, -1, 0)
 
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	if not CurrentWindow:
+		return # current case in our game demo (on right-click)
 	for i in range (12):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -2087,7 +2089,22 @@ def RestPress ():
 def RealRestPress ():
 	# only bg2 has area-based rest movies
 	# outside movies start at 2, 1 is for inns
-	GemRB.RestParty(0, 0 if GameCheck.IsBG2() else 2, 1)
+	# 15 means run all checks to see if resting is possible
+	info = GemRB.RestParty(15, 0 if GameCheck.IsBG2() else 2, 1)
+	if info["Error"]:
+		if GameCheck.IsPST ():
+			# open error window
+			GemRB.LoadWindowPack (GUICommon.GetWindowPack())
+			Window = GemRB.LoadWindow (25)
+			Label = Window.GetControl (0xfffffff) # -1 in the CHU
+			Label.SetText (info["ErrorMsg"])
+			Button = Window.GetControl (1)
+			Button.SetText (1403)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda w=Window: w.Unload ())
+			Window.ShowModal (MODAL_SHADOW_GRAY)
+		else:
+			GemRB.DisplayString (info["ErrorMsg"], 0xff0000)
+
 	return
 
 def SwitchPCByKey (wIdx, key, mod):

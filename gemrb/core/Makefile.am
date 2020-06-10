@@ -114,6 +114,7 @@ libgemrb_core_la_SOURCES = \
 	System/FileStream.cpp \
 	System/Logger.cpp \
 	System/Logging.cpp \
+	System/MappedFileMemoryStream.cpp \
 	System/MemoryStream.cpp \
 	System/SlicedStream.cpp \
 	System/String.cpp \

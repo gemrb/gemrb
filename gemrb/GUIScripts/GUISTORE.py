@@ -583,8 +583,8 @@ def OpenStoreDonateWindow ():
 	StoreDonateWindow = Window = GemRB.LoadWindow (windowIDs["donate"])
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
-		oldIDs += (5, 3, 2, 4, 0x10000005, 0x10000006)
-		newIDs += (7, 5, 3, 6, 0x10000007, 0x10000008)
+		oldIDs = (5, 3, 2, 4, 0x10000005, 0x10000006)
+		newIDs = (7, 5, 3, 6, 0x10000007, 0x10000008)
 		Window.ReassignControls (oldIDs, newIDs)
 
 	# graphics
@@ -1987,13 +1987,19 @@ def RentConfirm ():
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
 	# TODO: run GemRB.RunRestScripts ()
-	cutscene = GemRB.RestParty (13, 1, RentIndex+1)
+	info = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
+	cutscene = info["Cutscene"]
+
 	if RentConfirmWindow:
 		RentConfirmWindow.Unload ()
+	if info["Error"]:
+		# notify why resting isn't possible
+		ErrorWindow (info["ErrorMsg"])
+
 	Window = StoreRentWindow
 	if cutscene:
 		CloseStoreWindow ()
-	else:
+	elif not info["Error"]:
 		TextArea = Window.GetControl (12)
 		#is there any way to change this???
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))

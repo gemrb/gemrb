@@ -158,6 +158,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/System/String.cpp \
 		    main/gemrb/core/System/Logging.cpp \
 		    main/gemrb/core/System/FileStream.cpp \
+		    main/gemrb/core/System/MappedFileMemoryStream.cpp \
 		    main/gemrb/core/System/MemoryStream.cpp \
 		    main/gemrb/core/System/DataStream.cpp \
 		    main/gemrb/core/System/SlicedStream.cpp \

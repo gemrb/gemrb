@@ -27,6 +27,7 @@
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Map.h"
+#include "RNG.h"
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
@@ -319,7 +320,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		int x = 0;
 		int y = 0;
 		if (fx->Parameter2&1) {
-			ieWord tmp =(ieWord) rand();
+			ieWord tmp =(ieWord) RAND_ALL();
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}
@@ -758,7 +759,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 2: //black barbed shield (damage opponents)
 		if (target->LastHitter) {
-			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0),0x100000 );
+			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0), 16);
 		}
 		break;
 	case 3: case 16: //pain mirror or balance in all things

@@ -38,7 +38,7 @@
 #	endif
 #	define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
 #else
-#	if (__GNUC__ >= 3) && (__GNUC_MINOR__ >=4 || __GNUC__ > 3)
+#	ifdef __GNUC__
 #		ifdef GEM_BUILD_DLL
 #			define GEM_EXPORT __attribute__ ((visibility("default")))
 #		endif

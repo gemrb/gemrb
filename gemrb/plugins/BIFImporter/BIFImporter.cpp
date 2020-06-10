@@ -28,6 +28,7 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
+#include "System/MappedFileMemoryStream.h"
 
 using namespace GemRB;
 
@@ -60,8 +61,6 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
-	//print( "\nDecompressing file: [..........]" );
-	fflush(stdout);
 	FileStream out;
 	if (!out.Create(path)) {
 		Log(ERROR, "BIFImporter", "Cannot write %s.", path);
@@ -79,22 +78,10 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		finalsize = out.GetPos();
 		if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 			laststep++;
-			/*
-			print( "\b\b\b\b\b\b\b\b\b\b\b" );
-			int l;
-
-			for (l = 0; l < laststep; l++)
-				print( "|" );
-			for (; l < 10; l++)//l starts from laststep
-				print( "." );
-			print( "]" );
-			fflush(stdout);
-			*/
 		}
 	}
-	//print("\n");
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
-	return FileStream::OpenFile(path);
+	return new MappedFileMemoryStream{path};
 }
 
 DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
@@ -120,12 +107,15 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
-	stream = FileStream::OpenFile(cachePath);
+	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
 	char Signature[8];
-	if (!stream) {
-		FileStream* file = FileStream::OpenFile(path);
-		if (!file) {
+	if (!cacheStream->isOk()) {
+		delete cacheStream;
+
+		auto file = new MappedFileMemoryStream{path};
+		if (!file->isOk()) {
+			delete file;
 			return GEM_ERROR;
 		}
 		if (file->Read(Signature, 8) == GEM_ERROR) {
@@ -146,6 +136,8 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
+	} else {
+		stream = cacheStream;
 	}
 
 	if (!stream)

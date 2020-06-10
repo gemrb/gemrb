@@ -32,6 +32,11 @@
 #endif
 #endif
 
+#if HAVE_ICONV
+#include <iconv.h>
+#include <cerrno>
+#endif
+
 namespace GemRB {
 
 static String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
@@ -100,6 +105,49 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	return dbString;
 }
 
+#if HAVE_ICONV
+// returns new string converted to given encoding
+// in case iconv is not available, requested encoding is the same as string encoding,
+// or there is encoding error, copy of original string is returned.
+char* ConvertCharEncoding(const char* string, const char* from, const char* to) {
+	if (strcmp(from, to) == 0) {
+	    return strdup(string);
+	}
+
+	iconv_t cd = iconv_open(to, from);
+	if (cd == (iconv_t)-1) {
+		Log(ERROR, "String", "iconv_open(%s, %s) failed with error: %s", to, from, strerror(errno));
+		return strdup(string);
+	}
+
+
+	char * in = (char *) string;
+	size_t in_len = strlen(string);
+	size_t out_len = (in_len + 1) * 4;
+	size_t out_len_left = out_len;
+	char* buf = (char*) malloc(out_len);
+	char* buf_out = buf;
+	size_t ret = iconv(cd, &in, &in_len, &buf_out, &out_len_left);
+	iconv_close(cd);
+
+	if (ret == (size_t)-1) {
+		Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
+		free(buf);
+		return strdup(string);
+	}
+
+	size_t used = out_len - out_len_left;
+	buf = (char*)realloc(buf, used + 1);
+	buf[used] = '\0';
+	return buf;
+}
+#else
+char* ConvertCharEncoding(const char* string,
+        IGNORE_UNUSED const char* from, IGNORE_UNUSED const char* to) {
+	return strdup(string);
+}
+#endif
+
 String* StringFromCString(const char* string)
 {
 	// if multibyte is false this is basic expansion of cstring to wchar_t
@@ -115,14 +163,17 @@ char* MBCStringFromString(const String& string)
 	// FIXME: depends on locale setting
 	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
 	size_t newlen = wcstombs(cStr, string.c_str(), allocatedBytes);
+
 	if (newlen == static_cast<size_t>(-1)) {
 		// invalid multibyte sequence
+		Log(ERROR, "String", "wcstombs failed to covert string %ls with error: %s", string.c_str(), strerror(errno));
 		free(cStr);
 		return NULL;
 	}
 	// FIXME: assuming compatibility with NTMBS
 	cStr = (char*)realloc(cStr, newlen+1);
 	cStr[newlen] = '\0';
+
 	return cStr;
 }
 

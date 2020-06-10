@@ -79,11 +79,13 @@ Projectile::Projectile()
 	ZPos = 0;
 	extension_delay = 0;
 	Range = 0;
-	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = Speed = SFlags = ExtFlags = 0;
+	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = ExtFlags = 0;
 	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
 	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
 	extension_explosioncount = extension_targetcount = 0;
+	Speed = 20;
+	SFlags = PSF_FLYING;
 	memset(&tint, 0, sizeof(tint));
 	if (!server)
 		server = core->GetProjectileServer();
@@ -443,7 +445,7 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(SoundRes1, SFX_CHAN_MISSILE,
+	travel_handle = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
 				Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
@@ -667,7 +669,7 @@ void Projectile::UpdateSound()
 		StopSound();
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes2, SFX_CHAN_MISSILE,
+		travel_handle = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE,
 				Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}

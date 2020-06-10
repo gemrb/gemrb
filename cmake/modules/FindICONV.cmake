@@ -31,7 +31,9 @@ if(ICONV_INCLUDE_DIR)
   set(ICONV_FIND_QUIETLY TRUE)
 endif()
 
-find_path(ICONV_INCLUDE_DIR iconv.h)
+find_path(ICONV_INCLUDE_DIR iconv.h HINTS
+	C:/tools/vcpkg/installed/x86-windows/include C:/tools/vcpkg/installed/x64-windows/include
+	${VCPKG_ROOT}/installed/x86-windows/include ${VCPKG_ROOT}/installed/x64-windows/include)
 
 if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
@@ -39,7 +41,10 @@ if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
 endif()
 
 if(NOT ICONV_IN_GLIBC)
-    find_library(ICONV_LIBRARY NAMES iconv)
+    find_library(ICONV_LIBRARY NAMES iconv unofficial-iconv libiconv)
+    if(_VCPKG_INSTALLED_DIR)
+        find_library(CHARSET_LIBRARY NAMES libcharset)
+    endif()
     set(ICONV_TEST ${ICONV_LIBRARY})
 else()
     set(ICONV_TEST "In glibc")
@@ -69,6 +74,7 @@ endif(ICONV_FOUND)
 if(ICONV_FOUND)  
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
+    message(STATUS "Found ICONV includes: ${ICONV_INCLUDE_DIR}")
 
     if (NOT DEFINED ICONV_ACCEPTS_NONCONST_INPUT)
         # Display a useful message first time we come through here

@@ -29,7 +29,8 @@ struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
 	ieResRef TilesetResRef;
-	ieDword unknown;
+	ieWord UniqueTileCount; // nNumUniqueTiles in the original (currently unused)
+	ieWord MovementType; // nMovementType in the original (currently unused)
 	ieDword TilemapOffset;
 	ieDword TILOffset;
 };
