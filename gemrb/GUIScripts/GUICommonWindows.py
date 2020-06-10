@@ -1394,7 +1394,7 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			window.SetOnClose(TopWindowClosed)
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
-			if not GameCheck.IsIWD2():
+			if not (GameCheck.IsIWD2() or GameCheck.IsPST()):
 				# hide some windows to declutter higher resolutions and avoid unwanted interaction
 				GemRB.GetView ("ACTWIN").SetVisible(False)
 				GemRB.GetView ("MSGWIN").SetVisible(False)
