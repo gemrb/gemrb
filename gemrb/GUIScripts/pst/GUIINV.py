@@ -34,8 +34,6 @@ from ie_slots import *
 ItemAmountWindow = None
 OverSlot = None
 
-ItemHash = {}
-
 # Control ID's:
 # 0 - 9 eye, rings, earrings, tattoos, etc
 # 10-13 Quick Weapon
@@ -68,19 +66,22 @@ def InitInventoryWindow (Window):
 
 
 	# inventory slots
-	for i in range (44):
-		Button = Window.GetControl (i)
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.SetFont ("NUMBER")
-		Button.SetVarAssoc ("ItemButton", i)
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for slot in range (SlotCount):
+		SlotType = GemRB.GetSlotType (slot)
+		Button = Window.GetControl (SlotType["ID"])
+		if Button:
+			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
+			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
+			Button.SetVarAssoc ("ItemButton", slot)
 
-		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
-		Button.SetBorder (0,color,0,1)
-		color['r'], color['b'] = color['b'], color['r']
-		Button.SetBorder (1,color,0,1)
+			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+			Button.SetFont ("NUMBER")
 
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
+			color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+			Button.SetBorder (0,color,0,1)
+			color['r'], color['b'] = color['b'], color['r']
+			Button.SetBorder (1,color,0,1)
 
 	# Ground Item
 	for i in range (10):
@@ -137,7 +138,7 @@ def InitInventoryWindow (Window):
 
 def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
-	global ItemHash
+
 	global slot_list
 
 	if Window == None:
@@ -154,11 +155,8 @@ def UpdateInventoryWindow (Window = None):
 		Count=1
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	RefreshInventoryWindow (Window)
-	# And now for the items ....
 
-	ItemHash = {}
-
-	# get a list which maps slot number to slot type/icon/tooltip
+	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	slot_list = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
 
@@ -266,7 +264,9 @@ def UpdateSlot (pc, i):
 	# used to assign powers and protections
 
 	using_fists = 0
-	if slot_list[i]<0:
+	if i >= len(slot_list):
+		return #this prevents accidental out of range errors from the avslots list
+	elif slot_list[i]<0:
 		slot = i+1
 		SlotType = GemRB.GetSlotType (slot)
 		slot_item = 0
@@ -292,7 +292,6 @@ def UpdateSlot (pc, i):
 		itemname = ""
 
 	Button = Window.GetControl (ControlID)
-	ItemHash[ControlID] = [slot, slot_item]
 	Button.SetSprites ('IVSLOT', 0, 0, 1, 2, 3)
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
@@ -350,7 +349,7 @@ def UpdateSlot (pc, i):
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
-	if OverSlot == slot-1:
+	if OverSlot == slot:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):
 			Button.SetState (IE_GUI_BUTTON_SELECTED)
 		else:
@@ -363,6 +362,7 @@ def UpdateSlot (pc, i):
 
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
 			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+
 	return
 
 def DefaultWeapon ():
@@ -387,14 +387,20 @@ def OnAutoEquip ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDragItem ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+def OnDragItem (btn, slot):
+	"""Updates dragging."""
 
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	#don't call when splitting items
+	if ItemAmountWindow != None:
+		return
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot_item = GemRB.GetSlotItem (pc, slot)
 
 	if not GemRB.IsDraggingItem ():
-		ResRef = slot_item['ItemResRef']
-		item = GemRB.GetItem (ResRef)
+		if not slot_item:
+			return
+		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 		if slot == 2:
 			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
@@ -408,35 +414,96 @@ def OnDragItem ():
 			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
 
 	UpdateInventoryWindow ()
+	return
 
+# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
+def DecreaseStackAmount ():
+	"""Decreases the split size."""
+
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	number = int ("0"+Amount)-1
+	if number<1:
+		number=1
+	Text.SetText (str (number))
+	return
+
+# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
+def IncreaseStackAmount ():
+	"""Increases the split size."""
+
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	number = int ("0"+Amount)+1
+	if number>StackAmount:
+		number=StackAmount
+	Text.SetText (str (number))
+	return
+
+# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
 def DragItemAmount ():
 	"""Drag a split item."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	item = GemRB.GetItem (slot_item["ItemResRef"])
-	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
-	OpenItemAmountWindow ()
+
+	#emergency dropping
+	if GemRB.IsDraggingItem()==1:
+		GemRB.DropDraggedItem (pc, UsedSlot)
+		UpdateSlot (pc, UsedSlot-1)
+
+	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
+
+	#if dropping didn't help, don't die if slot_item isn't here
+	if slot_item:
+		Text = ItemAmountWindow.GetControl (6)
+		Amount = Text.QueryText ()
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
+	OpenItemAmountWindow (None, UsedSlot)
+
 	return
 
-def OpenItemAmountWindow ():
-	global ItemAmountWindow
+def OpenItemAmountWindow (btn, slot):
+	"""Open the split window."""
+
+	global UsedSlot, OverSlot
+	global ItemAmountWindow, StackAmount
+
+	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
-
+		UsedSlot = None
+		OverSlot = None
+		UpdateInventoryWindow()
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindow (4)
+	UsedSlot = slot
+	if GemRB.IsDraggingItem ()==1:
+		GemRB.DropDraggedItem (pc, UsedSlot)
+		#redraw slot
+		UpdateSlot (pc, UsedSlot-1)
+		# disallow splitting while holding split items (double splitting)
+		if GemRB.IsDraggingItem () == 1:
+			return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
+
+	if slot_item:
+		StackAmount = slot_item["Usages0"]
+	else:
+		StackAmount = 0
+	if StackAmount<=1:
+		UpdateSlot (pc, UsedSlot-1)
+		return
+
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
+
+	ItemAmountWindow = Window = GemRB.LoadWindow (4)
+	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 
 	# item icon
 	Icon = Window.GetControl (0)
@@ -446,9 +513,19 @@ def OpenItemAmountWindow ():
 	# item amount
 	Text = Window.GetControl (6)
 	Text.SetSize (40, 40)
-	Text.SetText ("1")
+	Text.SetText (str (StackAmount//2))
 	Text.SetStatus (IE_GUI_EDIT_NUMBER)
 	Text.Focus()
+
+	# Decrease
+	Button = Window.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseStackAmount)
+	Button.SetActionInterval (200)
+
+	# Increase
+	Button = Window.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseStackAmount)
+	Button.SetActionInterval (200)
 
 	# Done
 	Button = Window.GetControl (2)
@@ -469,36 +546,24 @@ def OpenItemAmountWindow ():
 	# 6 text
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def MouseEnterSlot ():
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
+	return
+def MouseEnterSlot (btn,slot):
 	global OverSlot
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ('ItemButton')
-	if slot not in ItemHash:
-		return
-	OverSlot = ItemHash[slot][0]-1
-	if GemRB.IsDraggingItem ():
-		for i in range(len(slot_list)):
-			if slot_list[i]==OverSlot:
-				UpdateSlot (pc, i)
+	OverSlot = slot
+	if GemRB.IsDraggingItem ()==1:
+		UpdateSlot (pc, slot-1)
 	return
 
-def MouseLeaveSlot ():
+def MouseLeaveSlot (btn,slot):
 	global OverSlot
-
+	#print("mouse leaving slot", slot)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ('ItemButton')
-	if slot not in ItemHash:
-		return
-	slot = ItemHash[slot][0]-1
 	if slot == OverSlot or not GemRB.IsDraggingItem ():
 		OverSlot = None
-
-	for i in range(len(slot_list)):
-		if slot_list[i]==slot:
-			UpdateSlot (pc, i)
+	UpdateSlot (pc, slot-1)
 	return
-
 ###################################################
 # End of file GUIINV.py
