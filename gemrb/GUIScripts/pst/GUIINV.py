@@ -283,6 +283,7 @@ def UpdateSlot (pc, i):
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	# used to assign powers and protections
 
+	using_fists = 0
 	if slot_list[i]<0:
 		slot = i+1
 		SlotType = GemRB.GetSlotType (slot)
@@ -292,8 +293,9 @@ def UpdateSlot (pc, i):
 		SlotType = GemRB.GetSlotType (slot)
 		slot_item = GemRB.GetSlotItem (pc, slot)
 		#PST displays the default weapon in the first slot if nothing else was equipped
-		if slot_item == None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc)==10:
+		if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
 			slot_item = GemRB.GetSlotItem (pc, 0)
+			using_fists = 1
 
 	ControlID = SlotType["ID"]
 	if ControlID<0:
@@ -337,6 +339,10 @@ def UpdateSlot (pc, i):
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
+		#If the slot is being used to display the 'default' weapon, disable dragging.
+		if SlotType["ID"] == 10 and using_fists:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			#dropping is ok, because it will drop in the quick weapon slot and not the default weapon slot.
 	else:
 		Button.SetItemIcon ('')
 		Button.SetText ('')
