@@ -230,11 +230,6 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
-void DialogHandler::DialogChoose(Control* ctl)
-{
-	DialogChoose(ctl->GetValue());
-}
-
 bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
@@ -469,7 +464,9 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	std::reverse(dialogOptions.begin(), dialogOptions.end());
 	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
-	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
+	handler = [this](Control* c) {
+		DialogChoose(c->GetValue());
+	};
 	ta->SetAction(handler, TextArea::Action::Select);
 
 	// this happens if a trigger isn't implemented or the dialog is wrong

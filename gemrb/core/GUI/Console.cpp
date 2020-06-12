@@ -37,10 +37,8 @@ Console::Console(const Region& frame)
 {
 	HistPos = 0;
 
-	EventMgr::EventCallback* cb = new MethodCallback<Console, const Event&, bool>(this, &Console::HandleHotKey);
-	if (!EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL)) {
-		delete cb;
-	}
+	EventMgr::EventCallback cb = METHOD_CALLBACK(&Console::HandleHotKey, this);
+	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
 
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);

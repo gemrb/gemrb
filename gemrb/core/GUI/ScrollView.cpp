@@ -25,9 +25,7 @@
 #include "Interface.h"
 
 namespace GemRB {
-	
-typedef void (ScrollView::*ScrollCB)(Control*);
-	
+
 void ScrollView::ContentView::SizeChanged(const Size& oldsize)
 {
 	// considering it an error for a ContentView to exist outside of a ScrollView
@@ -133,9 +131,10 @@ ScrollView::ScrollView(const Region& frame)
 		// ensure scrollbars are on top
 		View::AddSubviewInFrontOfView(vscroll, &contentView);
 
-		ControlEventHandler handler = NULL;
-		ScrollCB cb = reinterpret_cast<ScrollCB>(&ScrollView::ScrollbarValueChange);
-		handler = new MethodCallback<ScrollView, Control*>(this, cb);
+		ControlEventHandler handler = [this](Control* sb) {
+			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
+		};
+		
 		vscroll->SetAction(handler, Control::ValueChange);
 		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 	}

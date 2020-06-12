@@ -19,57 +19,25 @@
 #ifndef CALLBACK_H
 #define CALLBACK_H
 
-#include "exports.h"
+#include <functional>
 
-#include "Holder.h"
+#define METHOD_CALLBACK(func_ptr, obj_ptr) std::bind(func_ptr, obj_ptr, std::placeholders::_1)
 
 namespace GemRB {
 
-class GEM_EXPORT CallbackBase : public Held<CallbackBase> {
-	public:
-	virtual ~CallbackBase() {};
-};
+template <typename R, typename... ARGS>
+using Callback2 = std::function<R(ARGS...)>;
 
-template<typename P=void, typename R=void>
-class GEM_EXPORT Callback : public CallbackBase {
-public:
-	virtual R operator()(P) const { return R(); }
-};
+using EventHandler = std::function<void()>;
 
-// specialization for no argument
-template<typename R>
-class GEM_EXPORT Callback<void, R> : public Held< Callback<void, R> > {
-public:
-	virtual ~Callback() {}
-	virtual R operator()() const=0;
-};
-
-template<class C, typename P=void, typename R=void>
-class GEM_EXPORT MethodCallback : public Callback<P,R> {
-	typedef R (C::*CallbackMethod)(P);
-private:
-	C* listener;
-	CallbackMethod callback;
-public:
-	MethodCallback(C* l, CallbackMethod cb)
-	: listener(l), callback(cb) {}
-
-	R operator()(P target) const {
-		return (listener->*callback)(target);
-	}
-};
-
-typedef Callback<void, void> VoidCallback;
-
-class GEM_EXPORT EventHandler : public Holder<VoidCallback> {
-public:
-	EventHandler(VoidCallback* ptr = NULL)
-	: Holder<VoidCallback>(ptr) {}
-
-	void operator()() const {
-		return (*ptr)();
-	}
-};
+// std::function has an exlicitly deleted operator== so we nee to write our own comparitor
+// that makes sense for our purposes
+template <typename R, typename... ARGS>
+bool FunctionTargetsEqual(const std::function<R(ARGS...)>& lhs, const std::function<R(ARGS...)>& rhs)
+{
+	typedef R(fnType)(ARGS...);
+	return lhs.template target<fnType*>() == rhs.template target<fnType*>();
+}
 
 }
 

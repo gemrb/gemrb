@@ -45,7 +45,7 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	HotKeyCallback = new MethodCallback<Button, const Event&, bool>(this, &Button::HandleHotKey);
+	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);
 
 	hasText = false;
 	normal_palette = NULL;

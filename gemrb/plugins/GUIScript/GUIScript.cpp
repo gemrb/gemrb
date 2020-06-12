@@ -1625,7 +1625,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 
 	EventHandler handler = NULL;
 	if (PyCallable_Check(function)) {
-		handler = new PythonCallback(function);
+		handler = PythonCallback(function);
 	} else {
 		char buf[256];
 		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
@@ -1683,7 +1683,7 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 	if (ctrl) {
 		ControlEventHandler handler = NULL;
 		if (PyCallable_Check(func)) {
-			handler = new PythonControlCallback(func);
+			handler = PythonControlCallback(func);
 		}
 		ctrl->SetAction(handler, type, button, mod, count);
 
@@ -2996,7 +2996,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 			return RuntimeError("Hot key map referenced a function that doesnt exist.");
 		}
 
-		btn->SetAction(new PythonControlCallback(pFunc));
+		btn->SetAction(PythonControlCallback(pFunc));
 		Py_DECREF(module);
 
 		hotkey = func->key;
@@ -10470,11 +10470,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
-	btn->SetAction(new PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
+	btn->SetAction(PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
 
 	PyObject *Event2 = PyString_FromFormat("Action%sRightPressed", GUIEvent[Index]);
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
-	btn->SetAction(new PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
+	btn->SetAction(PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
 
 	//cannot make this const, because it will be freed
 	if (GUITooltip[Index] != (ieDword) -1) {
@@ -10593,7 +10593,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			continue;
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
-		btn->SetAction(new PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
+		btn->SetAction(PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
 		strcpy(btn->VarName,"Equipment");
 		btn->SetValue( Start+i );
 
@@ -12567,7 +12567,7 @@ static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 	PARSE_ARGS(args, "Oi|i", &function, &interval, &repeats);
 
 	if (PyCallable_Check(function)) {
-		EventHandler handler = new PythonCallback(function);
+		EventHandler handler = PythonCallback(function);
 		core->SetTimer(handler, interval, repeats);
 		Py_RETURN_NONE;
 	} else {

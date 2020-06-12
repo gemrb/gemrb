@@ -22,6 +22,7 @@
 
 #include "globals.h"
 #include "GUI/EventMgr.h"
+#include "Holder.h"
 #include "Region.h"
 #include "ScriptEngine.h"
 

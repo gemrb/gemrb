@@ -38,8 +38,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	textContainer.SetAlignment(IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT);
 	AddSubviewInFrontOfView(&textContainer);
 
-	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextEdit, TextContainer&>(this, &TextEdit::TextChanged);
-	textContainer.callback = cb;
+	textContainer.callback = METHOD_CALLBACK(&TextEdit::TextChanged, this);
 
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};

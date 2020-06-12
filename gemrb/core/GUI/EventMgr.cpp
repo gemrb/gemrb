@@ -113,8 +113,8 @@ void EventMgr::DispatchEvent(Event& e)
 		if (hit != HotKeys.end()) {
 			assert(hit->second.size() > 0);
 			KeyMap::value_type::second_type list = hit->second;
-			Holder<EventCallback> cb = hit->second.front();
-			if ((*cb)(e)) {
+			EventCallback cb = hit->second.front();
+			if (cb(e)) {
 				return;
 			}
 		}
@@ -195,16 +195,15 @@ void EventMgr::DispatchEvent(Event& e)
 	EventTaps tapsCopy = Taps; // copy this because its possible things get unregistered as a result of the event
 	EventTaps::iterator it = tapsCopy.begin();
 	for (; it != tapsCopy.end(); ++it) {
-		const std::pair<Event::EventTypeMask, Holder<EventCallback> >& pair = it->second;
+		const std::pair<Event::EventTypeMask, EventCallback>& pair = it->second;
 		if (pair.first & e.EventMaskFromType(e.type)) {
 			// all matching taps get a copy of the event
-			EventCallback* cb = pair.second.get();
-			(*cb)(e);
+			pair.second(e);
 		}
 	}
 }
 
-bool EventMgr::RegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key, short mod)
+bool EventMgr::RegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
 {
 	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
@@ -217,13 +216,13 @@ bool EventMgr::RegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key,
 	if (it != HotKeys.end()) {
 		it->second.push_front(cb);
 	} else {
-		HotKeys.insert(std::make_pair(flags, std::list<Holder<EventCallback> >(1, cb)));
+		HotKeys.insert(std::make_pair(flags, std::list<EventCallback>(1, cb)));
 	}
 
 	return true;
 }
 
-void EventMgr::UnRegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey key, short mod)
+void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
 {
 	int flags = mod << 16;
 	flags |= key;
@@ -231,7 +230,9 @@ void EventMgr::UnRegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey ke
 	KeyMap::iterator it = HotKeys.find(flags);
 	if (it != HotKeys.end()) {
 		KeyMap::value_type::second_type::iterator cbit;
-		cbit = std::find(it->second.begin(), it->second.end(), cb);
+		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](const decltype(cb)& item) {
+			return FunctionTargetsEqual(cb, item);
+		});
 		if (cbit != it->second.end()) {
 			it->second.erase(cbit);
 			if (it->second.empty()) {
@@ -241,7 +242,7 @@ void EventMgr::UnRegisterHotKeyCallback(Holder<EventCallback> cb, KeyboardKey ke
 	}
 }
 
-EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(Holder<EventCallback> cb, Event::EventTypeMask mask)
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback cb, Event::EventTypeMask mask)
 {
 	static size_t id = 0;
 	Taps[id] = std::make_pair(mask, cb);

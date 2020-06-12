@@ -63,15 +63,7 @@ static_cast<Control::Action>(a)
 #define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
-class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*, void> > {
-public:
-	ControlEventHandler(Callback<Control*, void>* ptr = NULL)
-	: Holder< Callback<Control*, void> >(ptr) {}
-
-	void operator()(Control* ctrl) const {
-		return (*ptr)(ctrl);
-	}
-};
+using ControlEventHandler = Callback2<void, Control*>;
 
 /**
  * @class Control

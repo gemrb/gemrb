@@ -210,7 +210,8 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
 class GEM_EXPORT EventMgr {
 public:
 	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
-	typedef Callback<const Event&, bool> EventCallback;
+	//typedef Callback<const Event&, bool> EventCallback;
+	using EventCallback = Callback2<bool, const Event&>;
 	typedef size_t TapMonitorId;
 
 	static unsigned long DCDelay;
@@ -229,17 +230,17 @@ public:
 	static Event CreateTextEvent(const char* text);
 	static Event CreateTextEvent(const String& text);
 
-	static bool RegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);
-	static void UnRegisterHotKeyCallback(Holder<EventCallback>, KeyboardKey key, short mod = 0);
-	static TapMonitorId RegisterEventMonitor(Holder<EventCallback>, Event::EventTypeMask mask = Event::AllEventsMask);
+	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
+	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
+	static TapMonitorId RegisterEventMonitor(EventCallback, Event::EventTypeMask mask = Event::AllEventsMask);
 	static void UnRegisterEventMonitor(TapMonitorId monitor);
 
 private:
 	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
-	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, Holder<EventCallback> > > EventTaps;
-	typedef std::map<int, std::list<Holder<EventCallback> > > KeyMap;
+	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback> > EventTaps;
+	typedef std::map<int, std::list<EventCallback> > KeyMap;
 
 	static EventTaps Taps;
 	static KeyMap HotKeys;

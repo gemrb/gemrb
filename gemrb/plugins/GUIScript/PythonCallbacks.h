@@ -68,9 +68,8 @@ inline bool CallPython(PyObject* function, PyObject* args = NULL)
 	return CallPython<int, noop<int> >(function, args, &ret);
 }
 
-template <class P=void*, class R=void>
-struct PythonCallbackBase : public Callback<P, R> {
-	PythonCallbackBase(PyObject* fn)
+struct PythonCallback {
+	PythonCallback(PyObject* fn)
 	: Function(fn)
 	{
 		assert(Py_IsInitialized());
@@ -80,8 +79,11 @@ struct PythonCallbackBase : public Callback<P, R> {
 			Function = NULL;
 		}
 	}
+	
+	PythonCallback(const PythonCallback& pcb)
+	: PythonCallback(pcb.Function) {}
 
-	virtual ~PythonCallbackBase() {
+	virtual ~PythonCallback() {
 		Py_XDECREF(Function);
 	}
 
@@ -90,21 +92,19 @@ struct PythonCallbackBase : public Callback<P, R> {
 	}
 
 protected:
-	PyObject *Function;
+	PyObject *Function = nullptr;
 };
 
-template <class P, class R>
-struct PythonComplexCallback : public PythonCallbackBase<P, R> {
-	PythonComplexCallback(PyObject* fn) : PythonCallbackBase<P, R>(fn) {}
+template <class R, class... ARGS>
+struct PythonComplexCallback : public PythonCallback {
+	PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
 
-	 virtual R operator()(P arg) const {
+	virtual R operator()(ARGS...) const {
 		// meant to be overridden by specializations
-		return PythonCallbackBase<P, R>::operator()(arg);
 	 }
 };
 
-typedef PythonCallbackBase<void, void> PythonCallback;
-typedef PythonComplexCallback<Control*, void> PythonControlCallback;
+typedef PythonComplexCallback<void, Control*> PythonControlCallback;
 
 template <>
 void PythonControlCallback::operator() (Control* ctrl) const

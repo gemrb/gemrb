@@ -116,9 +116,9 @@ GameControl::GameControl(const Region& frame)
 	DisplayTextTime = 0;
 	updateVPTimer = true;
 
-	EventMgr::EventCallback* cb = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::OnGlobalMouseMove);
+	EventMgr::EventCallback cb = METHOD_CALLBACK(&GameControl::OnGlobalMouseMove, this);
 	eventMonitors[0] = EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
-	EventMgr::EventCallback *cb2 = new MethodCallback<GameControl, const Event&, bool>(this, &GameControl::DispatchEvent);
+	EventMgr::EventCallback cb2 = METHOD_CALLBACK(&GameControl::DispatchEvent, this);
 	eventMonitors[1] = EventMgr::RegisterEventMonitor(cb2, Event::KeyDownMask);
 }
 

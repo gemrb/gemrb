@@ -77,7 +77,7 @@ public:
 
 	void Invalidate() {
 		valid = false;
-		action.release();
+		action = nullptr;
 	}
 
 	bool IsRunning() const {

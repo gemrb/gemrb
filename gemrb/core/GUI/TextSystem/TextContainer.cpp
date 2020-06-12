@@ -939,7 +939,7 @@ void TextContainer::InsertText(const String& text)
 	AdvanceCursor(int(text.length()));
 
 	if (callback) {
-		(*callback)(*this);
+		callback(*this);
 	}
 }
 
@@ -957,7 +957,7 @@ void TextContainer::DeleteText(size_t len)
 	AdvanceCursor(-int(len));
 
 	if (callback) {
-		(*callback)(*this);
+		callback(*this);
 	}
 }
 

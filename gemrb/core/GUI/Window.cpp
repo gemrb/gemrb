@@ -367,9 +367,9 @@ void Window::DispatchTouchGesture(View* target, const GestureEvent& gesture)
 bool Window::DispatchKey(View* keyView, const Event& event)
 {
 	// hotkeys first
-	std::map<KeyboardKey, Holder<EventMgr::EventCallback> >::iterator it = HotKeys.find(event.keyboard.keycode);
+	std::map<KeyboardKey, EventMgr::EventCallback>::iterator it = HotKeys.find(event.keyboard.keycode);
 	if (it != HotKeys.end()) {
-		return (*it->second)(event);
+		return (it->second)(event);
 	}
 
 	// try the keyView view first, if it fails have the window itself try
@@ -492,13 +492,13 @@ bool Window::InHandler() const
 	return false;
 }
 
-bool Window::RegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, KeyboardKey key)
+bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 {
 	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
 	}
 
-	std::map<KeyboardKey, Holder<EventMgr::EventCallback> >::iterator it;
+	std::map<KeyboardKey, EventMgr::EventCallback>::iterator it;
 	it = HotKeys.find(key);
 	if (it != HotKeys.end()) {
 		// something already registered
@@ -509,10 +509,10 @@ bool Window::RegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, Keyboard
 	return true;
 }
 
-bool Window::UnRegisterHotKeyCallback(Holder<EventMgr::EventCallback> cb, KeyboardKey key)
+bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 {
 	KeyMap::iterator it = HotKeys.find(key);
-	if (it != HotKeys.end() && it->second == cb) {
+	if (it != HotKeys.end() && FunctionTargetsEqual(it->second, cb)) {
 		HotKeys.erase(it);
 		return true;
 	}

@@ -261,8 +261,8 @@ public:
 	void CursorEnd();
 	void AdvanceCursor(int);
 
-	typedef Callback<TextContainer&> EditCallback;
-	Holder<EditCallback> callback;
+	using EditCallback = Callback2<void, TextContainer&>;
+	EditCallback callback;
 };
 
 }

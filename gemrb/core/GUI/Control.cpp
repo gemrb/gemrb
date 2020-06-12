@@ -214,29 +214,18 @@ void Control::ClearActionTimer()
 
 Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int delay)
 {
-	class RepeatControlEventHandler : public Callback<void, void> {
-		const ControlEventHandler action;
-		Control* ctrl;
+	EventHandler h = [this, action] () {
+		// update the timer to use the actual repeatDelay
+		SetActionInterval(repeatDelay);
 
-	public:
-		RepeatControlEventHandler(const ControlEventHandler& handler, Control* c)
-		: action(handler), ctrl(c) {}
-
-		void operator()() const {
-			// update the timer to use the actual repeatDelay
-			ctrl->SetActionInterval(ctrl->repeatDelay);
-
-			if (ctrl->VarName[0] != 0) {
-				ieDword val = ctrl->GetValue();
-				core->GetDictionary()->SetAt( ctrl->VarName, val );
-				ctrl->window->RedrawControls( ctrl->VarName, val );
-			}
-
-			return action(ctrl);
+		if (VarName[0] != 0) {
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt(VarName, val);
+			window->RedrawControls(VarName, val);
 		}
-	};
 
-	EventHandler h = new RepeatControlEventHandler(action, this);
+		return action(this);
+	};
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
 	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
@@ -287,9 +276,10 @@ void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 
 bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
 {
-	MethodCallback<Control, Control*, void>* cb = new MethodCallback<Control, Control*, void>(this, &Control::HandleTouchActionTimer);
-	ControlEventHandler ceh(cb);
-	actionTimer = StartActionTimer(ceh, 500); // TODO: this time value should be configurable
+	ControlEventHandler cb = [this](Control* c) {
+		HandleTouchActionTimer(c);
+	};
+	actionTimer = StartActionTimer(cb, 500); // TODO: this time value should be configurable
 	return true; // always handled
 }
 

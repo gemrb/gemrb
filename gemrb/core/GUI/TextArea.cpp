@@ -75,7 +75,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	if (numbered) {
 		// in a sane world we would simply focus the window and this View
 		// unfortunately, focusing the window makes it overlap with the portwin/optwin...
-		EventMgr::EventCallback* cb = new MethodCallback<SpanSelector, const Event&, bool>(this, &SpanSelector::KeyEvent);
+		EventMgr::EventCallback cb = METHOD_CALLBACK( &SpanSelector::KeyEvent, this);
 		id = EventMgr::RegisterEventMonitor(cb, Event::KeyDownMask);
 	} else {
 		id = -1;
@@ -455,20 +455,9 @@ void TextArea::AppendText(const String& text)
 		if (currHeight > heightLimit) {
 			size_t lines = (currHeight - heightLimit) / LineHeight();
 
-			class AnimationEndEventHandler : public Callback<void, void> {
-				TextArea* ta;
-				const size_t lines;
-
-			public:
-				AnimationEndEventHandler(TextArea* ta, size_t lines)
-				: ta(ta), lines(lines) {}
-
-				void operator()() const {
-					ta->TrimHistory(lines);
-				}
+			EventHandler h = [this, lines]() {
+				TrimHistory(lines);
 			};
-
-			EventHandler h = new AnimationEndEventHandler(this, lines);
 			assert(historyTimer == NULL);
 			historyTimer = &core->SetTimer(h, 500);
 		}
@@ -668,8 +657,7 @@ void TextArea::ClearText()
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext, palettes[PALETTE_NORMAL]);
 	textContainer->SetMargin(textMargins);
-	Holder<TextContainer::EditCallback> cb = new MethodCallback<TextArea, TextContainer&>(this, &TextArea::TextChanged);
-	textContainer->callback = cb;
+	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
 	if (Flags()&Editable) {
 		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
 		SetEventProxy(textContainer);

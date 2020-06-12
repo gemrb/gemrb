@@ -51,8 +51,6 @@ private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
 	void UpdateJournalForTransition(DialogTransition *tr);
-	// internal callback
-	void DialogChoose(Control *ctrl);
 
 	DialogState* ds;
 	Dialog* dlg;

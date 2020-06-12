@@ -52,9 +52,10 @@ WindowManager::WindowManager(Video* vid)
 	modalWin = NULL;
 	trackingWin = NULL;
 
-	eventMgr.RegisterEventMonitor(new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::DispatchEvent));
+	EventMgr::EventCallback cb = METHOD_CALLBACK(&WindowManager::DispatchEvent, this);
+	eventMgr.RegisterEventMonitor(cb);
 
-	EventMgr::EventCallback* cb = new MethodCallback<WindowManager, const Event&, bool>(this, &WindowManager::HotKey);
+	cb = METHOD_CALLBACK(&WindowManager::HotKey, this);
 	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
 
 	screen = Region(Point(), vid->GetScreenSize());
