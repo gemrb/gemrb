@@ -26,7 +26,7 @@
 namespace GemRB {
 
 template <typename R, typename... ARGS>
-using Callback2 = std::function<R(ARGS...)>;
+using Callback = std::function<R(ARGS...)>;
 
 using EventHandler = std::function<void()>;
 

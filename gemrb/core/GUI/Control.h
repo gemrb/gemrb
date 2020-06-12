@@ -63,7 +63,7 @@ static_cast<Control::Action>(a)
 #define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
-using ControlEventHandler = Callback2<void, Control*>;
+using ControlEventHandler = Callback<void, Control*>;
 
 /**
  * @class Control
