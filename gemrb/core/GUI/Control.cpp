@@ -276,9 +276,7 @@ void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 
 bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
 {
-	ControlEventHandler cb = [this](Control* c) {
-		HandleTouchActionTimer(c);
-	};
+	ControlEventHandler cb = METHOD_CALLBACK(&Control::HandleTouchActionTimer, this);
 	actionTimer = StartActionTimer(cb, 500); // TODO: this time value should be configurable
 	return true; // always handled
 }
