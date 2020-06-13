@@ -511,6 +511,7 @@ public:
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes();
 	void ReversePCs();
+	bool OnlyNPCsSelected() const;
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
