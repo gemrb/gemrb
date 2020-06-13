@@ -1361,6 +1361,21 @@ void Targets::dump() const
 	}
 }
 
+void Targets::FilterObjectRect(Object *oC)
+{
+	// can't match anything if the second pair of coordinates (or all of them) are unset
+	if (oC->objectRect.w <= 0 || oC->objectRect.h <= 0) return;
+
+	targetlist::const_iterator m;
+	for (m = objects.begin(); m != objects.end();) {
+		if (!IsInObjectRect((*m).actor->Pos, oC->objectRect)) {
+			m = objects.erase(m);
+		} else {
+			++m;
+		}
+	}
+}
+
 /** releasing global memory */
 static void CleanupIEScript()
 {

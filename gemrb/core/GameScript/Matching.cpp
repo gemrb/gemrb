@@ -251,6 +251,7 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 		tgts = new Targets();
 	}
 	tgts = DoObjectFiltering(Sender, tgts, oC, ga_flags);
+	tgts->FilterObjectRect(oC);
 	return tgts;
 }
 
@@ -384,6 +385,10 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	// [0]/[ANYONE] can match all actors
 	if (!oC) {
 		return true;
+	}
+
+	if (!IsInObjectRect(ac->Pos, oC->objectRect)) {
+		return false;
 	}
 
 	bool filtered = false;
