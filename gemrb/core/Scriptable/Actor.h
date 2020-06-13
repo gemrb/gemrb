@@ -415,7 +415,6 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	Point OldPos;
-	bool WillBump;
 	unsigned BumpBackTimer;
 
 	/** paint the actor itself. Called internally by Draw() */
@@ -726,7 +725,7 @@ public:
 		int phase=-1 );
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	/* overridden method, won't walk if dead */
-	bool WalkTo(const Point &Des, ieDword flags, int MinDistance = 0) override;
+	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0) override;
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
 	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;
@@ -962,8 +961,6 @@ public:
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
-	bool GetWillBump() const;
-	void SetWillBump(bool willBump);
 };
 }
 

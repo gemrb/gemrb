@@ -522,10 +522,9 @@ public:
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
-	// Returns true if the movable will have to bump
 	// Declared virtual since NewPath calls this
 	// and Actor overrides this
-	virtual bool WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
+	virtual void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
 	void ClearPath(bool resetDestination = true);

@@ -6235,6 +6235,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) { return false; }
+		if (BumpBackTimer) { return false; }
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) { return false; }
@@ -8148,16 +8149,14 @@ void Actor::SetRunFlags(ieDword flags)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 }
 
-bool Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
+void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
-		return false;
+		return;
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	bool willBump = Movable::WalkTo(Des, 0, MinDistance);
-	SetWillBump(willBump);
-	return willBump;
+	Movable::WalkTo(Des, 0, MinDistance);
 }
 
 int Actor::WantDither() const
@@ -11427,16 +11426,6 @@ void Actor::DecreaseBumpBackTimer()
 	if (!BumpBackTimer) {
 		BumpBack();
 	}
-}
-
-bool Actor::GetWillBump() const
-{
-	return WillBump;
-}
-
-void Actor::SetWillBump(bool willBump)
-{
-	WillBump = willBump;
 }
 
 }
