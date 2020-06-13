@@ -1825,7 +1825,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	while (i--) {
 		Actor *tar = GetPC(i, true);
-		tar->ClearPath(true);
+		tar->ClearPath();
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
@@ -1843,7 +1843,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	// also let familiars rest
 	for (auto tar : NPCs) {
 		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
-			tar->ClearPath(true);
+			tar->ClearPath();
 			tar->SetModal(MS_NONE, 0);
 			tar->Heal(hp);
 			tar->Rest(hours);
@@ -2350,5 +2350,18 @@ void Game::ResetPartyCommentTimes()
 		pc->ResetCommentTime();
 	}
 }
+
+bool Game::OnlyNPCsSelected() const
+{
+	bool hasPC = false;
+	for (const Actor *selectee : selected) {
+		if (selectee->GetStat(IE_SEX) < SEX_BOTH) {
+			hasPC = true;
+			break;
+		}
+	}
+	return !hasPC;
+}
+
 
 }

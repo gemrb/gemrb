@@ -4727,7 +4727,7 @@ void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-    actor->ClearPath(true);
+	actor->ClearPath();
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)

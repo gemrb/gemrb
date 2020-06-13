@@ -528,7 +528,7 @@ public:
 	virtual bool WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
-	void ClearPath(bool resetDestination);
+	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
