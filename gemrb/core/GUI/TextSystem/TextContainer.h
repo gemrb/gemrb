@@ -199,9 +199,10 @@ protected:
 
 	void DrawSelf(Region drawFrame, const Region& clip);
 	virtual void DrawContents(const Layout& layout, const Point& point);
+	
+	void SizeChanged(const Size& oldSize);
 
 private:
-	void SizeChanged(const Size& oldSize);
 	virtual void ContentRemoved(const Content* /*content*/) {};
 };
 
@@ -236,6 +237,7 @@ private:
 	virtual void DrawContents(const Layout& layout, const Point& point);
 
 	virtual bool Editable() const { return IsReceivingEvents(); }
+	void SizeChanged(const Size& oldSize);
 
 	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
 	ContentIndex FindContentForChar(size_t idx);

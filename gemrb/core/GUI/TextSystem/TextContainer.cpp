@@ -761,6 +761,16 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 	printPos += textLen;
 }
 
+void TextContainer::SizeChanged(const Size& oldSize)
+{
+	ContentContainer::SizeChanged(oldSize);
+	if (Editable() && frame.h == 0) {
+		// we need at least one line of height to draw the cursor
+		frame.h = font->LineHeight;
+	}
+}
+
+
 void TextContainer::MoveCursorToPoint(const Point& p)
 {
 	if (Editable() == false)
