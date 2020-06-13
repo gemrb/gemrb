@@ -899,19 +899,6 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	bool no_more_steps = true;
 	if (actor->BlocksSearchMap()) {
 
-		// Actor bumping
-		auto nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF,actor->size, actor);
-		if (!nearActors.empty()) {
-			if (actor->GetPath()) {
-				if (actor->GetWillBump()) {
-					if (!BumpNPC(actor, nearActors)) {
-						actor->NewPath();
-					}
-				} else {
-					actor->NewPath();
-				}
-			}
-		}
 		ClearSearchMapFor(actor);
 
 	}
@@ -924,27 +911,6 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	}
 
 	return no_more_steps;
-}
-
-bool Map::BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors) {
-	static SearchmapPoint smptFarthest;
-	static NavmapPoint nmptFarthest;
-	for (auto bumped : nearActors) {
-		if (!bumped->GetPath() && IsBumpable(actor, bumped)) {
-			smptFarthest = FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
-			nmptFarthest.x = smptFarthest.x * 16;
-			nmptFarthest.y = smptFarthest.y * 12;
-			Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", bumped->Pos.x, bumped->Pos.y, nmptFarthest.x, nmptFarthest.y);
-			bumped->BumpAway(nmptFarthest);
-		} else {
-			return false;
-		}
-	}
-	return true;
-}
-
-bool Map::IsBumpable(const Actor *actor, const Actor *bumped) {
-	return (actor->IsPartyMember() && bumped->GetStat(IE_EA) < EA_EVILCUTOFF) || actor->GetStat(IE_NPCBUMP) > 0 ;
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
@@ -1655,12 +1621,12 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
-Actor* Map::GetActor(const Point &p, int flags)
+Actor* Map::GetActor(const Point &p, int flags, const Movable* checker)
 {
 	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
 			continue;
-		if (!actor->ValidTarget(flags) ) {
+		if (!actor->ValidTarget(flags, checker) ) {
 			continue;
 		}
 		return actor;

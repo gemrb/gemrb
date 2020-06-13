@@ -159,6 +159,8 @@ namespace GemRB {
 #define GA_DETECT 8192
 //cannot target unscheduled actors
 #define GA_NO_UNSCHEDULED 16384
+// Check if NPC bumping can happen
+#define GA_BUMPING 32768
 
 #define VCONST_COUNT 100
 

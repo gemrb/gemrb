@@ -6233,6 +6233,12 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
 	}
+	if (ga_flags & GA_BUMPING) {
+		if (checker->Type != ST_ACTOR) return false;
+		if ((!((Actor*)(checker))->IsPartyMember() || this->GetStat(IE_EA) >= EA_EVILCUTOFF) && ((Actor*)(this))->GetStat(IE_NPCBUMP) < 1) {
+			return false;
+		}
+	}
 	return true;
 }
 

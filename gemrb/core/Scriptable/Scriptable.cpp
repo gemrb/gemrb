@@ -2165,7 +2165,12 @@ namespace GemRB {
 
 	// returns whether we made all pending steps (so, false if we must be called again this tick)
 	// we can't just do them all here because the caller might have to update searchmap etc
+	// Re-pathing rate is a hyperparameter, trades off path stupidity for performance
+	const int REPATHING_RATE = 5;
 	bool Movable::DoStep(unsigned int walkScale, ieDword time) {
+		if (this->Ticks - this->prevTicks > REPATHING_RATE) {
+			WalkTo(Destination, 0);
+		}
 		// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 		// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
 		int stepTime = 566;
@@ -2192,6 +2197,7 @@ namespace GemRB {
 		if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 			StanceID = IE_ANI_RUN;
 		}
+
 
 		double dx, dxOrig;
 		double dy, dyOrig;
@@ -2237,11 +2243,11 @@ namespace GemRB {
 			dy = std::min(dy * stepTime / walkScale, dyOrig);
 			dx = std::ceil(dx) * xSign;
 			dy = std::ceil(dy) * ySign;
-			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_BUMPING, this);
 			if (bumped && bumped != this) {
 				NewPath();
 				// FIXME: Ugly cast
-				if (Type == ST_ACTOR && !bumped->GetPath() && area->IsBumpable((Actor*)this, bumped))
+				if (Type == ST_ACTOR && !bumped->GetPath())
 				{
 					Point smptFarthest = area->FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
 					Point nmptFarthest;

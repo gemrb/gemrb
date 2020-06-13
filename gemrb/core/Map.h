@@ -433,7 +433,7 @@ public:
 	Container *GetContainerByGlobalID(ieDword objectID);
 	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);
 	Actor* GetActorByGlobalID(ieDword objectID);
-	Actor* GetActor(const Point &p, int flags);
+	Actor* GetActor(const Point &p, int flags, const Movable* checker = NULL);
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	Actor* GetActor(const char* Name, int flags);
@@ -584,8 +584,6 @@ public:
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
 	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
-	bool BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors);
-	bool IsBumpable(const Actor *actor, const Actor *bumped);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
