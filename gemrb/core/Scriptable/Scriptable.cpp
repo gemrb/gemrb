@@ -2237,7 +2237,7 @@ namespace GemRB {
 			dy = std::min(dy * stepTime / walkScale, dyOrig);
 			dx = std::ceil(dx) * xSign;
 			dy = std::ceil(dy) * ySign;
-			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), 0);
+			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			if (bumped && bumped != this) {
 				NewPath();
 				// FIXME: Ugly cast
