@@ -533,7 +533,6 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;
-
 };
 
 //Tiled objects are not used (and maybe not even implemented correctly in IE)

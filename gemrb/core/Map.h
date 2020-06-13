@@ -583,6 +583,9 @@ public:
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
+	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
+	bool BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors);
+	bool IsBumpable(const Actor *actor, const Actor *bumped);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
@@ -604,16 +607,11 @@ private:
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 
-	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
 
 
 	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false, bool actorsAreBlocking = true) const;
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
-	bool BumpNPC(const Actor *actor, const std::vector<Actor *> &nearActors);
-	bool IsBumpable(const Actor *actor, const Actor *bumped);
-
-	inline PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents,
-							 bool backAway) const;
+	PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents, bool backAway) const;
 };
 
 }

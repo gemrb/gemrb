@@ -517,7 +517,7 @@ public:
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
-	char* GetName(int which) const
+	char* GetName(int which) const override
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
@@ -753,7 +753,7 @@ public:
 	void UpdateAnimations();
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
-	bool DoStep(unsigned int walkScale, ieDword time = 0);
+	bool DoStep(unsigned int walkScale, ieDword time = 0) override;
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
@@ -878,7 +878,7 @@ public:
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
 	int GetFavoredPenalties() const;
-	bool BlocksSearchMap() const;
+	bool BlocksSearchMap() const override;
 	bool CannotPassEntrance(ieDword exitID) const;
 	void UseExit(ieDword exitID);
 	//int GetReaction() const;
@@ -944,7 +944,7 @@ public:
 	/* set to trap id if current action is disarm; unset after */
 	void SetDisarmingTrap(ieDword trapId) { disarmTrap = trapId; }
 	ieDword GetDisarmingTrap() const { return disarmTrap; }
-	void ReleaseCurrentAction();
+	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	ieDword GetLastRested() { return TicksLastRested; }
