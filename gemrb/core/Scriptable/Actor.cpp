@@ -6235,7 +6235,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 	}
 	if (ga_flags & GA_BUMPING) {
 		if (checker->Type != ST_ACTOR) return false;
-		if ((!((Actor*)(checker))->IsPartyMember() || this->GetStat(IE_EA) >= EA_EVILCUTOFF) && ((Actor*)(this))->GetStat(IE_NPCBUMP) < 1) {
+		if ((!((Actor*)(checker))->IsPartyMember() || this->GetStat(IE_EA) >= EA_EVILCUTOFF) && GetStat(IE_NPCBUMP) < 1) {
 			return false;
 		}
 	}
@@ -11440,7 +11440,6 @@ void Actor::SetWillBump(bool willBump)
 }
 
 }
-
 
 
 
