@@ -2239,9 +2239,9 @@ namespace GemRB {
 			dy = std::ceil(dy) * ySign;
 			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), 0);
 			if (bumped && bumped != this) {
-				Log(DEBUG, "PathFinderWIP", "hehe");
 				NewPath();
-				if (!bumped->GetPath() && area->IsBumpable((Actor*)this, bumped))
+				// FIXME: Ugly cast
+				if (Type == ST_ACTOR && !bumped->GetPath() && area->IsBumpable((Actor*)this, bumped))
 				{
 					Point smptFarthest = area->FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
 					Point nmptFarthest;
