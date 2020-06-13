@@ -2463,7 +2463,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
-				float newDist = curDist + (dx[i] && dy[i] ? diagWeight : 1);
+				float newDist = curDist + RAND(0, 1) * (dx[i] && dy[i] ? diagWeight : 1);
 				if (newDist < PathLen && newDist > oldDist) {
 					if (newDist > farthestDist) {
 						farthestDist = newDist;
