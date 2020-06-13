@@ -1928,9 +1928,11 @@ static Object* DecodeObject(const char* line)
 	//iwd tolerates the missing rectangle, so we do so too
 	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
+		int tmp[4];
 		for (i = 0; i < 4; i++) {
-			oB->objectRect[i] = ParseInt( line );
+			tmp[i] = ParseInt(line);
 		}
+		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
 		if (*line == ' ')
 			line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
