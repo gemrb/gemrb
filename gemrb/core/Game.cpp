@@ -2351,4 +2351,17 @@ void Game::ResetPartyCommentTimes()
 	}
 }
 
+bool Game::OnlyNPCsSelected() const
+{
+	bool hasPC = false;
+	for (const Actor *selectee : selected) {
+		if (selectee->GetStat(IE_SEX) < SEX_BOTH) {
+			hasPC = true;
+			break;
+		}
+	}
+	return !hasPC;
+}
+
+
 }

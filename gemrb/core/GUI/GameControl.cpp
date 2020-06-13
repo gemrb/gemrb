@@ -1276,6 +1276,13 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
+	// don't allow summons to try travelling (alone), since it causes tons of loading
+	if (nextCursor == IE_CURSOR_TRAVEL && game->OnlyNPCsSelected()) {
+		Owner->Cursor = IE_CURSOR_BLOCKED;
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
+
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
@@ -1953,7 +1960,7 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
-	if (ScreenFlags & SF_DISABLEMOUSE) {
+	if (ScreenFlags & SF_DISABLEMOUSE || Owner->Cursor == IE_CURSOR_BLOCKED) {
 		return;
 	}
 	//heh, i found no better place
