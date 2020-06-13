@@ -6234,11 +6234,10 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		}
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
-		if (!checker) { return false; }
-		if (checker->Type != ST_ACTOR) { return false; }
-		if (GetStat(IE_NPCBUMP) < 1) return true;
-		if (!((Actor*)(checker))->IsPartyMember()) { return false; }
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) { return false; }
+	}
+	if (ga_flags & GA_CAN_BUMP) {
+		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) { return false; }
 	}
 	return true;
 }

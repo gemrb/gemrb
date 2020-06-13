@@ -2243,18 +2243,21 @@ namespace GemRB {
 			dy = std::min(dy * stepTime / walkScale, dyOrig);
 			dx = std::ceil(dx) * xSign;
 			dy = std::ceil(dy) * ySign;
-			Actor* bumped = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_ONLY_BUMPABLE, this);
-			if (bumped && bumped != this) {
+			Actor* actorInTheWay = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF, this);
+			if (actorInTheWay) {
 				NewPath();
-				// FIXME: Ugly cast
-				if (Type == ST_ACTOR && !bumped->GetPath())
+				if (Type == ST_ACTOR && !actorInTheWay->GetPath())
 				{
-					Point smptFarthest = area->FindFarthest(bumped->Pos, bumped->size, bumped->size * 2);
-					Point nmptFarthest;
-					nmptFarthest.x = smptFarthest.x * 16;
-					nmptFarthest.y = smptFarthest.y * 12;
-					Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", bumped->Pos.x, bumped->Pos.y, nmptFarthest.x, nmptFarthest.y);
-					bumped->BumpAway(nmptFarthest);
+					if (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
+						if (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
+							Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, actorInTheWay->size * 2);
+							Point nmptFarthest;
+							nmptFarthest.x = smptFarthest.x * 16;
+							nmptFarthest.y = smptFarthest.y * 12;
+							Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", actorInTheWay->Pos.x, actorInTheWay->Pos.y, nmptFarthest.x, nmptFarthest.y);
+							actorInTheWay->BumpAway(nmptFarthest);
+						}
+					}
 				}
 				return true;
 			}
