@@ -101,6 +101,14 @@ else:
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
 Buttons = [-1] * StoreButtonCount
 
+# center the windows according to game needs and available space
+StoreWindowPlacement = WINDOW_HCENTER | WINDOW_VCENTER
+ResolutionH = GemRB.GetSystemVariable (SV_HEIGHT)
+# iwd2 keeps everything displayed, so we only vertically center when
+# there's enough room to fit bottom windows (934 = (600-433)*2 + 600)
+if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
+	StoreWindowPlacement = WINDOW_HCENTER | WINDOW_TOP
+
 def CloseStoreWindow ():
 	import GUIINV
 	global StoreWindow
@@ -167,7 +175,7 @@ def OpenStoreWindow ():
 
 	GemRB.SetVar ("Action", 0)
 
-	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", WINDOW_HCENTER|WINDOW_VCENTER)
+	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", StoreWindowPlacement)
 	Window.AddAlias("WIN_STORE")
 	Window.SetFlags(WF_BORDERLESS, OP_OR)
 	#this window is static and grey, but good to stick the frame onto
@@ -420,8 +428,8 @@ def UpdateStoreShoppingWindow (Window):
 	RedrawStoreShoppingWindow (Window)
 	return
 
-ToggleStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreShoppingWindow, UpdateStoreShoppingWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreShoppingWindow, UpdateStoreShoppingWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreShoppingWindow, UpdateStoreShoppingWindow, StoreWindowPlacement)
+OpenStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreShoppingWindow, UpdateStoreShoppingWindow, StoreWindowPlacement)
 
 def InitStoreIdentifyWindow (Window):
 	global LeftButton
@@ -495,8 +503,8 @@ def UpdateStoreIdentifyWindow (Window):
 	RedrawStoreIdentifyWindow (Window)
 	return
 
-ToggleStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreIdentifyWindow, UpdateStoreIdentifyWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreIdentifyWindow, UpdateStoreIdentifyWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreIdentifyWindow, UpdateStoreIdentifyWindow, StoreWindowPlacement)
+OpenStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreIdentifyWindow, UpdateStoreIdentifyWindow, StoreWindowPlacement)
 
 def InitStoreStealWindow (Window):
 	global LeftButton
@@ -601,8 +609,8 @@ def UpdateStoreStealWindow (Window):
 	RedrawStoreStealWindow (Window)
 	return
 
-ToggleStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreStealWindow, UpdateStoreStealWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreStealWindow, UpdateStoreStealWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreStealWindow, UpdateStoreStealWindow, StoreWindowPlacement)
+OpenStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreStealWindow, UpdateStoreStealWindow, StoreWindowPlacement)
 
 def InitStoreDonateWindow (Window):
 	Window.AddAlias('WINDONAT')
@@ -669,8 +677,8 @@ def UpdateStoreDonateWindow (Window):
 	Button.SetDisabled(not donation)
 	return
 
-ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreDonateWindow, UpdateStoreDonateWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreDonateWindow, UpdateStoreDonateWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreDonateWindow, UpdateStoreDonateWindow, StoreWindowPlacement)
+OpenStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreDonateWindow, UpdateStoreDonateWindow, StoreWindowPlacement)
 
 def InitStoreHealWindow (Window):
 	GemRB.SetVar ("Index", -1)
@@ -776,8 +784,8 @@ def UpdateStoreHealWindow (Window):
 			Button.SetDisabled (False)
 	return
 
-ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreHealWindow, UpdateStoreHealWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreHealWindow, UpdateStoreHealWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreHealWindow, UpdateStoreHealWindow, StoreWindowPlacement)
+OpenStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreHealWindow, UpdateStoreHealWindow, StoreWindowPlacement)
 
 def InitStoreRumourWindow (Window):
 	GemRB.SetVar ("TopIndex", 0)
@@ -854,8 +862,8 @@ def UpdateStoreRumourWindow (Window):
 				CostLabel.SetText ("")
 	return
 
-ToggleStoreRumourWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rumour"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreRumourWindow, UpdateStoreRumourWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreRumourWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rumour"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreRumourWindow, UpdateStoreRumourWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreRumourWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rumour"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreRumourWindow, UpdateStoreRumourWindow, StoreWindowPlacement)
+OpenStoreRumourWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rumour"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreRumourWindow, UpdateStoreRumourWindow, StoreWindowPlacement)
 
 def InitStoreRentWindow (Window):
 	Window.AddAlias('WINRENT')
@@ -926,8 +934,8 @@ def UpdateStoreRentWindow (Window):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-ToggleStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreRentWindow, UpdateStoreRentWindow, WINDOW_HCENTER|WINDOW_VCENTER)
-OpenStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreRentWindow, UpdateStoreRentWindow, WINDOW_HCENTER|WINDOW_VCENTER)
+ToggleStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreRentWindow, UpdateStoreRentWindow, StoreWindowPlacement)
+OpenStoreRentWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["rent"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreRentWindow, UpdateStoreRentWindow, StoreWindowPlacement)
 
 def UpdateStoreCommon (Window, title, name, gold):
 	if Store['StoreName'] != -1:
@@ -1483,7 +1491,7 @@ def InfoRightWindow ():
 def InfoWindow (Slot, Item):
 	Identify = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
 
-	Window = GemRB.LoadWindow (windowIDs["iteminfo"], "GUISTORE", WINDOW_HCENTER|WINDOW_VCENTER)
+	Window = GemRB.LoadWindow (windowIDs["iteminfo"], "GUISTORE", StoreWindowPlacement)
 	Window.SetFlags(WF_BORDERLESS, OP_OR)
 
 	# TODO: check if we can simplify bg2 vs non-pst games to see which label is which
@@ -1796,7 +1804,7 @@ def InfoHealWindow ():
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
-	Window = GemRB.LoadWindow (windowIDs["cureinfo"], "GUISTORE", WINDOW_HCENTER|WINDOW_VCENTER)
+	Window = GemRB.LoadWindow (windowIDs["cureinfo"], "GUISTORE", StoreWindowPlacement)
 	Window.SetFlags(WF_BORDERLESS, OP_OR)
 
 	Label = Window.GetControl (0x10000000)
