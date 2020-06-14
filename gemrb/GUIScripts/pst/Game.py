@@ -20,16 +20,12 @@
 ###################################################
 
 import GemRB
-import GUICommon
-import CommonWindow
-import CommonTables
-from GUIDefines import *
-	
+import MessageWindow
+from GameCheck import MAX_PARTY_SIZE
+
 def EnterGame():
-	from GameCheck import MAX_PARTY_SIZE
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(0)
 	GemRB.SetInfoTextColor({'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255})
 
-	import MessageWindow
 	MessageWindow.OnLoad()

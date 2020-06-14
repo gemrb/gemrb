@@ -20,19 +20,14 @@
 ###################################################
 
 import GemRB
-import GUICommon
-import CommonWindow
-import CommonTables
-from GUIDefines import *
-	
-def EnterGame():
-	from GameCheck import MAX_PARTY_SIZE
+import MessageWindow
+from GameCheck import MAX_PARTY_SIZE
 
+def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.SetDefaultActions(1,14,16,17)
 
-	import MessageWindow
 	MessageWindow.OnLoad()
 
 #upgrade savegame to next version

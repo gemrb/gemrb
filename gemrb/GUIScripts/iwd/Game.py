@@ -22,17 +22,13 @@
 ###################################################
 
 import GemRB
-import GUICommon
-import CommonWindow
-import CommonTables
-from GUIDefines import *
+import MessageWindow
+from GameCheck import MAX_PARTY_SIZE
 
 def EnterGame():
-	from GameCheck import MAX_PARTY_SIZE
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 
-	import MessageWindow
 	MessageWindow.OnLoad()
 	GemRB.GamePause (0, 0)
 

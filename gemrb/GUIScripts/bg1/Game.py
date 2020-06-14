@@ -20,17 +20,14 @@
 ###################################################
 
 import GemRB
-import GUICommon
-import CommonWindow
-import CommonTables
-from GUIDefines import *
-	
+import MessageWindow
+from ie_restype import RES_2DA
+from GameCheck import MAX_PARTY_SIZE
+
 def EnterGame():
-	from GameCheck import MAX_PARTY_SIZE
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 
-	import MessageWindow
 	MessageWindow.OnLoad()
 
 #upgrade savegame to next version
@@ -44,5 +41,4 @@ def GameExpansion():
 	return
 
 def HasTOTSC ():
-	from ie_restype import RES_2DA
 	return GemRB.HasResource ("toscst", RES_2DA)

@@ -21,17 +21,16 @@
 
 import GemRB
 import GUICommon
-import CommonWindow
 import CommonTables
+import MessageWindow
+from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
-	
+
 def EnterGame():
-	from GameCheck import MAX_PARTY_SIZE
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 
-	import MessageWindow
 	MessageWindow.OnLoad()
 
 def RemoveYoshimo( idx):
