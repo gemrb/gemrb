@@ -1404,8 +1404,6 @@ static void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int ind
 
 static void LoadActionFlags(const char *tableName, int flag, bool critical)
 {
-	int i, j;
-
 	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {
 		if (critical) {
@@ -1418,9 +1416,9 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
-	j = table->GetSize();
+	int j = table->GetSize();
 	while (j--) {
-		i = table->GetValueIndex( j );
+		int i = table->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "%s action %d (%s) is too high, ignoring",
 				tableName, i, table->GetStringIndex( j ) );
@@ -1466,8 +1464,6 @@ void InitializeIEScript()
 		error("GameScript", "A critical scripting file is damaged!\n");
 	}
 
-	int i;
-
 	/* Loading Script Configuration Parameters */
 
 	ObjectIDSCount = atoi( objNameTable->QueryField() );
@@ -1476,7 +1472,7 @@ void InitializeIEScript()
 	}
 
 	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
-	for (i = 0; i < ObjectIDSCount; i++) {
+	for (int i = 0; i < ObjectIDSCount; i++) {
 		const char *idsname;
 		idsname=objNameTable->QueryField( 0, i + 1 );
 		const IDSLink *poi=FindIdentifier( idsname );
@@ -1505,11 +1501,11 @@ void InitializeIEScript()
 	memset( actionflags, 0, sizeof( actionflags ) );
 	memset( objects, 0, sizeof( objects ) );
 
-	int j, max;
+	int max;
 
 	max = triggersTable->GetSize();
-	for (j=0;j<max;j++) {
-		i = triggersTable->GetValueIndex( j );
+	for (int j = 0; j < max; j++) {
+		int i = triggersTable->GetValueIndex(j);
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 
 		bool was_condition = (i & 0x4000);
@@ -1553,7 +1549,7 @@ void InitializeIEScript()
 	}
 
 	for (l = missing_triggers.begin(); l != missing_triggers.end(); ++l) {
-		j = *l;
+		int j = *l;
 		// found later as a different name
 		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
 		if (ii >= MAX_TRIGGERS) {
@@ -1562,7 +1558,7 @@ void InitializeIEScript()
 		
 		TriggerFunction f = triggers[ii];
 		if (f) {
-			for (i = 0; triggernames[i].Name; i++) {
+			for (int i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
 					if (InDebug&ID_TRIGGERS) {
 						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
@@ -1581,8 +1577,8 @@ void InitializeIEScript()
 	}
 
 	max = actionsTable->GetSize();
-	for (j=0;j<max;j++) {
-		i = actionsTable->GetValueIndex( j );
+	for (int j = 0; j < max; j++) {
+		int i = actionsTable->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
 				i, actionsTable->GetStringIndex( j ) );
@@ -1625,8 +1621,8 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideActionsTable->GetSize();
-		for (j=0;j<max;j++) {
-			i = overrideActionsTable->GetValueIndex( j );
+		for (int j = 0; j < max; j++) {
+			int i = overrideActionsTable->GetValueIndex(j);
 			if (i >= MAX_ACTIONS) {
 				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
 					i, overrideActionsTable->GetStringIndex( j ) );
@@ -1664,8 +1660,8 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideTriggersTable->GetSize();
-		for (j=0;j<max;j++) {
-			i = overrideTriggersTable->GetValueIndex( j );
+		for (int j = 0; j < max; j++) {
+			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
 			if (i >= MAX_TRIGGERS) {
@@ -1704,7 +1700,7 @@ void InitializeIEScript()
 	}
 
 	for (l = missing_actions.begin(); l != missing_actions.end(); ++l) {
-		j = *l;
+		int j = *l;
 		// found later as a different name
 		int ii = actionsTable->GetValueIndex( j );
 		if (ii>=MAX_ACTIONS) {
@@ -1713,7 +1709,7 @@ void InitializeIEScript()
 
 		ActionFunction f = actions[ii];
 		if (f) {
-			for (i = 0; actionnames[i].Name; i++) {
+			for (int i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
 					if (InDebug&ID_ACTIONS) {
 						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
@@ -1730,9 +1726,9 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	j = objectsTable->GetSize();
+	int j = objectsTable->GetSize();
 	while (j--) {
-		i = objectsTable->GetValueIndex( j );
+		int i = objectsTable->GetValueIndex(j);
 		if (i >= MAX_OBJECTS) {
 			Log(ERROR, "GameScript", "object %d (%s) is too high, ignoring",
 				i, objectsTable->GetStringIndex( j ) );
@@ -1773,7 +1769,7 @@ void InitializeIEScript()
 
 		ObjectFunction f = objects[ii];
 		if (f) {
-			for (i = 0; objectnames[i].Name; i++) {
+			for (int i = 0; objectnames[i].Name; i++) {
 				if (f == objectnames[i].Function) {
 					Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 						objectsTable->GetStringIndex( j ), objectnames[i].Name );
@@ -1808,7 +1804,7 @@ void InitializeIEScript()
 		}
 		j = savedTriggersTable->GetSize();
 		while (j--) {
-			i = savedTriggersTable->GetValueIndex( j );
+			int i = savedTriggersTable->GetValueIndex(j);
 			i &= 0x3fff;
 			if (i >= MAX_TRIGGERS) {
 				Log(ERROR, "GameScript", "saved trigger %d (%s) is too high, ignoring",
@@ -1930,21 +1926,20 @@ static void ParseString(const char*& src, char* tmp)
 
 static Object* DecodeObject(const char* line)
 {
-	int i;
 	const char *origline = line; // for debug below
 
 	Object* oB = new Object();
-	for (i = 0; i < ObjectFieldsCount; i++) {
+	for (int i = 0; i < ObjectFieldsCount; i++) {
 		oB->objectFields[i] = ParseInt( line );
 	}
-	for (i = 0; i < MaxObjectNesting; i++) {
+	for (int i = 0; i < MaxObjectNesting; i++) {
 		oB->objectFilters[i] = ParseInt( line );
 	}
 	//iwd tolerates the missing rectangle, so we do so too
 	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
 		int tmp[4];
-		for (i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			tmp[i] = ParseInt(line);
 		}
 		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
@@ -1965,7 +1960,7 @@ static Object* DecodeObject(const char* line)
 	if (ExtraParametersCount && *line) {
 		line++;
 	}
-	for (i = 0; i < ExtraParametersCount; i++) {
+	for (int i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
 	if (*line != 'O' || *(line + 1) != 'B') {
@@ -2372,8 +2367,6 @@ int Trigger::Evaluate(Scriptable* Sender)
 
 int ResponseSet::Execute(Scriptable* Sender)
 {
-	size_t i;
-
 	switch(responses.size()) {
 		case 0:
 			return 0;
@@ -2384,7 +2377,7 @@ int ResponseSet::Execute(Scriptable* Sender)
 	int randWeight;
 	int maxWeight = 0;
 
-	for (i = 0; i < responses.size(); i++) {
+	for (size_t i = 0; i < responses.size(); i++) {
 		maxWeight += responses[i]->weight;
 	}
 	if (maxWeight) {
@@ -2394,7 +2387,7 @@ int ResponseSet::Execute(Scriptable* Sender)
 		randWeight = 0;
 	}
 
-	for (i = 0; i < responses.size(); i++) {
+	for (size_t i = 0; i < responses.size(); i++) {
 		Response* rE = responses[i];
 		if (rE->weight > randWeight) {
 			return rE->Execute(Sender);
@@ -2623,20 +2616,18 @@ void Object::dump() const
 
 void Object::dump(StringBuffer& buffer) const
 {
-	int i;
-
 	AssertCanary(__FUNCTION__);
 	if(objectName[0]) {
 		buffer.appendFormatted("Object: %s\n",objectName);
 		return;
 	}
 	buffer.appendFormatted("IDS Targeting: ");
-	for(i=0;i<MAX_OBJECT_FIELDS;i++) {
+	for(int i = 0; i < MAX_OBJECT_FIELDS; i++) {
 		buffer.appendFormatted("%d ",objectFields[i]);
 	}
 	buffer.append("\n");
 	buffer.append("Filters: ");
-	for(i=0;i<MAX_NESTING;i++) {
+	for(int i = 0; i < MAX_NESTING; i++) {
 		buffer.appendFormatted("%d ",objectFilters[i]);
 	}
 	buffer.append("\n");
@@ -2691,13 +2682,11 @@ void Action::dump() const
 
 void Action::dump(StringBuffer& buffer) const
 {
-	int i;
-
 	AssertCanary(__FUNCTION__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
-	for (i=0;i<3;i++) {
+	for (int i = 0; i < 3; i++) {
 		if (objects[i]) {
 			buffer.appendFormatted( "%d. ",i+1);
 			objects[i]->dump(buffer);
