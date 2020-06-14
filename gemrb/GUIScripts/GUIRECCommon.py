@@ -75,7 +75,6 @@ def OpenCustomizeWindow ():
 	GUIREC.ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	CustomizeWindow = GemRB.LoadWindow (17)
-	CustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)
 	PortraitSelectButton.SetText (11961)
@@ -129,7 +128,6 @@ def OpenPortraitSelectWindow ():
 	global PortraitPictureButton, SubCustomizeWindow
 
 	SubCustomizeWindow = GemRB.LoadWindow (18)
-	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
 	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -198,7 +196,6 @@ def OpenCustomPortraitWindow ():
 	global RowCount1, RowCount2
 
 	SubSubCustomizeWindow = GemRB.LoadWindow (19)
-	SubSubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	CustomPortraitDoneButton = SubSubCustomizeWindow.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -298,7 +295,6 @@ def OpenSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
-	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.ListResources(CHR_SOUNDS)
@@ -370,7 +366,6 @@ def OpenScriptWindow ():
 	global ScriptTextArea, SelectedTextArea
 
 	SubCustomizeWindow = GemRB.LoadWindow (11)
-	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
@@ -471,7 +466,6 @@ def OpenBiographyEditWindow ():
 	else:
 		SubCustomizeWindow = GemRB.LoadWindow (23)
 
-	SubCustomizeWindow.SetFlags(WF_BORDERLESS, OP_OR)
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	if GameCheck.IsBG2():
 		ClearButton.SetText (34881)
@@ -545,7 +539,6 @@ def OpenBiographyWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBiographyWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def CloseBiographyWindow ():
@@ -599,7 +592,6 @@ def OpenExportWindow ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
-	ExportWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	NameField.Focus()
 	return
 

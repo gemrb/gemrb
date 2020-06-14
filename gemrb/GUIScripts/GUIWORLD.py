@@ -41,7 +41,7 @@ removable_pcs = []
 
 def OpenDialogButton(id):
 	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack())
-	window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	MsgWin = GemRB.GetView("MSGWIN")
 
@@ -268,7 +268,6 @@ def OpenReformPartyWindow ():
 	CommonWindow.SetGameGUIHidden(hideflag)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def DeathWindow ():

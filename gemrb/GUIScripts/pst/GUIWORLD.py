@@ -83,7 +83,7 @@ def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	ReformPartyWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	ReformPartyWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove
@@ -104,7 +104,7 @@ def OpenFormationWindow ():
 	global FormationWindow
 
 	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	FormationWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	FormationWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Done

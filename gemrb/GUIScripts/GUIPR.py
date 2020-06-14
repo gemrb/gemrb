@@ -228,7 +228,6 @@ def OpenPriestSpellInfoWindow ():
 	Text.SetText (spell['SpellDesc'])
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnPriestMemorizeSpell ():
@@ -256,7 +255,6 @@ def OpenPriestSpellRemoveWindow ():
 	global PriestSpellUnmemorizeWindow
 
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -275,7 +273,6 @@ def OpenPriestSpellRemoveWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def ClosePriestSpellUnmemorizeWindow ():
@@ -308,7 +305,6 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnPriestUnmemorizeSpell ():

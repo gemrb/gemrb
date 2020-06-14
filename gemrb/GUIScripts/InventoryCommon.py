@@ -387,7 +387,6 @@ def DisplayItem (slotItem, type):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(1))
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
-	ItemInfoWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OpenItemInfoWindow (btn, slot):
@@ -514,7 +513,6 @@ def OpenItemAmountWindow (btn, slot):
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def UpdateSlot (pc, slot):
@@ -664,7 +662,6 @@ def GetColor():
 	InventoryWindow = GemRB.GetView ("WIN_INV")
 	InventoryWindow.SetDisabled (True) #darken it
 	ColorPicker = GemRB.LoadWindow (3)
-	ColorPicker.SetFlags (WF_BORDERLESS, OP_OR)
 	GemRB.SetVar ("Selected",-1)
 	if GameCheck.IsIWD2():
 		Button = ColorPicker.GetControl (35)

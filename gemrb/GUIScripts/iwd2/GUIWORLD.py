@@ -38,7 +38,7 @@ ReformPartyWindow = None
 
 def OpenDialogButton(id):
 	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	return window
 

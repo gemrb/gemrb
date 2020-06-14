@@ -137,7 +137,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	FloatMenuWindow = Window = GemRB.LoadWindow (3, "GUIWORLD")
 
-	Window.SetFlags (WF_DRAGGABLE|WF_BORDERLESS|WF_ALPHA_CHANNEL, OP_OR)
+	Window.SetFlags (WF_DRAGGABLE|WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetPos (x, y)
 	Window.SetTooltip (8199)
 

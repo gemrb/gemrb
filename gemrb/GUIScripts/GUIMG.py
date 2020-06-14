@@ -273,7 +273,6 @@ def OpenMageSpellInfoWindow ():
 	Text.SetText (spell['SpellDesc'])
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnMageMemorizeSpell ():
@@ -313,7 +312,6 @@ def OpenMageSpellRemoveWindow ():
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
 
 	Window = MageSpellUnmemorizeWindow
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -332,7 +330,6 @@ def OpenMageSpellRemoveWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OpenMageSpellUnmemorizeWindow ():
@@ -361,7 +358,6 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OnMageUnmemorizeSpell ():
@@ -511,7 +507,6 @@ def OpenSequencerWindow ():
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyOk)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyCancel)
 	ContTypePressed ()
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 	# this is here because core runs the selection change event handler too often

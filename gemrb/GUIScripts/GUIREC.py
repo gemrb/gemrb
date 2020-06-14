@@ -915,7 +915,6 @@ def OpenInformationWindow ():
 	Label.SetText (str (stat['KillsTotalCount']))
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def OpenKitInfoWindow ():
@@ -963,7 +962,6 @@ def OpenKitInfoWindow ():
 	TextArea.SetText (text)
 
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
-	KitInfoWindow.SetFlags (WF_BORDERLESS, OP_OR)
 	return
 
 def KitDonePress():
@@ -983,7 +981,6 @@ def OpenColorWindow ():
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	GUIRECCommon.SubCustomizeWindow = GemRB.LoadWindow (21)
-	GUIRECCommon.SubCustomizeWindow.SetFlags (WF_BORDERLESS, OP_OR)
 
 	PaperdollButton = GUIRECCommon.SubCustomizeWindow.GetControl (0)
 	PaperdollButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)

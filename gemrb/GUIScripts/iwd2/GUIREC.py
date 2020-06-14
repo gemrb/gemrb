@@ -1036,7 +1036,6 @@ def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
 	InformationWindow = Window = GemRB.LoadWindow (57)
-	InformationWindow.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)

@@ -1418,7 +1418,7 @@ def SetTopWindow (window, selectionHandler = None):
 
 	if window:
 		window.AddAlias("WIN_TOP")
-		window.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+		window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
 
 		UpdateClock()
