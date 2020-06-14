@@ -298,13 +298,26 @@ def DisplayItem (slotItem, type):
 	container = (type&1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (type&1) and (item["Type"] == 38)
-	# perhaps it's true everywhere, but it's definitely needed in pst
-	# and yes, the check is reversed, so the bit name is a misnomer in this case
+
+	# The "conversable" bit in PST actually means "usable", eg clot charm
+	# unlike BG2 (which only has the bit set on SW2H14 Lilarcor)
+	# Meanwhile IWD series has the bit set on important quest items
+	# So the widely accepted name of this bit is misleading
+
+	# There are also items in PST, cube.itm and doll.itm 
+	# that are not flagged usable but still have dialog attached.
+	# this is how the original game draws the distinction between 'use item' and 'talk to item'
+
+	# if the item has dialog and is flagged usable = use item string, open dialog
+	# if the item has dialog and is not flagged usable = talk to item, open dialog
+	# if the item has no dialog and is flagged usable = use item string, consume item
+
 	if GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
-		dialog = False
+
 		drink = True # "Use"
 
-	if drink:
+	if drink and not dialog:
+		# Standard consumable item
 		Button.SetText (strrefs[3])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConsumeItem)
 	elif read:
@@ -325,7 +338,12 @@ def DisplayItem (slotItem, type):
 			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
 	elif dialog:
-		Button.SetText (strrefs[5])
+		if drink:
+			# Dialog item that is 'used'
+			Button.SetText (strrefs[3])
+		else:
+			# Dialog item that is 'talked to'
+			Button.SetText (strrefs[5])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
 	elif familiar and not GameCheck.IsPST():
 		# PST earings share a type with familiars, so no
@@ -785,11 +803,10 @@ def DialogItemWindow ():
 	"""Converse with an item."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GameCheck.IsPST():
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot = GemRB.GetVar ("ItemButton")
-		slot_item = GemRB.GetSlotItem (pc, slot)
+
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
