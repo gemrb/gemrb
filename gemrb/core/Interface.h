@@ -611,6 +611,8 @@ public:
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
 	Actor *GetFirstSelectedActor();
+	/** is an area loaded? (prefer Game::GetCurrentArea if including Game.h makes sense) */
+	bool HasCurrentArea() const;
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
 	/** returns a scroll cursor sprite */

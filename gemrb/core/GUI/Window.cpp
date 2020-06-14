@@ -37,6 +37,10 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	lastMouseMoveTime = GetTickCount();
 
 	SetFlags(DestroyOnClose, OP_OR);
+	// default ingame windows to frameless
+	if (core->HasCurrentArea()) {
+		SetFlags(Borderless, OP_OR);
+	}
 	RecreateBuffer();
 }
 

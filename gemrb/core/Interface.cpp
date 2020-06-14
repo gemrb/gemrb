@@ -4296,6 +4296,12 @@ Actor *Interface::GetFirstSelectedActor()
 	return NULL;
 }
 
+bool Interface::HasCurrentArea() const
+{
+	if (!game) return false;
+	return game->GetCurrentArea() != nullptr;
+}
+
 //this is used only for the console
 Sprite2D *Interface::GetCursorSprite()
 {
