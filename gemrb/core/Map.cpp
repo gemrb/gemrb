@@ -1602,7 +1602,7 @@ InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID)
 	}
 }
 
-Actor* Map::GetActorByGlobalID(ieDword objectID)
+Actor* Map::GetActorByGlobalID(ieDword objectID) const
 {
 	if (!objectID) {
 		return NULL;
@@ -1621,7 +1621,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
-Actor* Map::GetActor(const Point &p, int flags, const Movable* checker)
+Actor* Map::GetActor(const Point &p, int flags, const Movable* checker) const
 {
 	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
@@ -1634,7 +1634,7 @@ Actor* Map::GetActor(const Point &p, int flags, const Movable* checker)
 	return NULL;
 }
 
-Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
+Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius) const
 {
 	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
@@ -1948,6 +1948,12 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlock
 		return 0;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
+	static NavmapPoint p;
+	p.x = x;
+	p.y = y;
+	if ((ret&PATH_MAP_NPC) && !GetActor(p, GA_ONLY_BUMPABLE)) {
+		ret &= ~PATH_MAP_PASSABLE;
+	}
 	if (ret&(PATH_MAP_DOOR_IMPASSABLE|(actorsAreBlocking ? PATH_MAP_ACTOR : 0))) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
