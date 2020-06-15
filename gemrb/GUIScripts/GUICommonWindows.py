@@ -1383,13 +1383,14 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 		window = loader(id, pack, pos)
 
 		if window:
+			# set this before calling initer so initer can change it if it wants
+			window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 			if initer:
 				initer(window)
 	
 			if selectionHandler:
 				selectionHandler(window)
 
-			window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 			SetTopWindow (window, selectionHandler)
 			window.SetOnClose(TopWindowClosed)
 			GameWin = GemRB.GetView("GAMEWIN")

@@ -141,8 +141,13 @@ def PositionStoreWinRelativeTo(win):
 	storewin = GemRB.GetView("WIN_STORE")
 	storeframe = storewin.GetFrame()
 
-	storeframe['x'] = winframe['x']
-	storeframe['y'] = winframe['y'] + winframe['h']
+	if GameCheck.IsIWD2():
+		win.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+		storeframe['x'] = winframe['x']
+		storeframe['y'] = winframe['y']
+	else:
+		storeframe['x'] = winframe['x']
+		storeframe['y'] = winframe['y'] + winframe['h']
 
 	storewin.SetFrame(storeframe)
 
@@ -176,6 +181,9 @@ def OpenStoreWindow ():
 	GemRB.SetVar ("Action", 0)
 
 	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", StoreWindowPlacement)
+	if GameCheck.IsIWD2():
+		# IWD2 has weird overlay windows
+		StoreWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.AddAlias("WIN_STORE")
 	#this window is static and grey, but good to stick the frame onto
 
