@@ -42,7 +42,7 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 
 void Gem_Polygon::Rasterize()
 {
-	rasterData.resize(BBox.h - 1);
+	rasterData.resize(BBox.h);
 
 	for (const auto& trap : ComputeTrapezoids()) {
 		int y_top = trap.y1 - BBox.y; // inclusive
