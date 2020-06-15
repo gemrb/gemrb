@@ -264,14 +264,15 @@ bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (MyMap == NULL)
 		return false;
 
-	if (GetValue() == MAP_VIEW_NOTES) {
-		if (me.ButtonState(GEM_MB_ACTION)) {
-			Point p = ConvertPointFromScreen(me.Pos());
-
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		if (GetValue() == MAP_VIEW_NOTES) {
 			const MapNote* mn = MapNoteAtPoint(p);
 			if (!mn || mn->readonly) {
 				UpdateViewport(p);
 			}
+		} else {
+			UpdateViewport(p);
 		}
 	}
 
