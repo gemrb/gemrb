@@ -171,7 +171,7 @@ def RemovePlayer ():
 	wid = 25
 	if GameCheck.IsHOW ():
 		wid = 0 # at least in guiw08, this is the correct window
-	ReformPartyWindow = Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack())
+	ReformPartyWindow = Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack(), WINDOW_BOTTOM)
 
 	#are you sure
 	Label = Window.GetControl (0x0fffffff)
