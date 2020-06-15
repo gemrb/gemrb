@@ -2243,14 +2243,16 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		Actor* actorInTheWay = area->GetActor(Point(Pos.x + 2 * dx, Pos.y + 2 * dy), GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF, this);
-		if (actorInTheWay) {
+		const float COLLISION_LOOKAHEAD = 4;
+		Actor* actorInTheWay = area->GetActorInRadius(Point(Pos.x + COLLISION_LOOKAHEAD * dx, Pos.y + COLLISION_LOOKAHEAD * dy),
+				GA_NO_DEAD|GA_NO_UNSCHEDULED, COLLISION_LOOKAHEAD);
+		if (actorInTheWay && actorInTheWay != this) {
 			NewPath();
 			if (Type == ST_ACTOR && !actorInTheWay->GetPath())
 			{
 				if (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
 					if (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
-						Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, actorInTheWay->size * 2);
+						Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2);
 						Point nmptFarthest;
 						nmptFarthest.x = smptFarthest.x * 16;
 						nmptFarthest.y = smptFarthest.y * 12;

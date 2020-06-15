@@ -500,6 +500,10 @@ public:
 		}
 		return step;
 	}
+
+	inline bool GetIsMoving() const {
+		return step;
+	}
 	/* call this when path needs to be changed */
 	void NewPath();
 

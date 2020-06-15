@@ -2446,7 +2446,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
 	Log(DEBUG, "PathFinderWIP", "Fleeing from (%d %d)\n", d.x, d.y);
 	std::priority_queue<PQNode> open;
-	float diagWeight = sqrt(2);
+	static const float diagWeight = sqrt(2);
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
 	open.push(PQNode(smptFleeFrom, 0));
 	SearchmapPoint smptCurrent;
