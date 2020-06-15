@@ -165,7 +165,7 @@ bool WindowManager::OrderBack(Window* win)
 
 bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
-	if (win == NULL) {
+	if (win == NULL || win == win2) {
 		return false;
 	}
 	// FIXME: this should probably account for modal windows
