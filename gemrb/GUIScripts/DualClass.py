@@ -81,14 +81,13 @@ def DualClassWindow ():
 	DCMainDoneButton.SetText (11973)
 	DCMainDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainDonePress)
 	DCMainDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCMainDoneButton.MakeDefault()
 
 	# cancel button (on)
 	DCMainCancelButton = DCMainWindow.GetControl (1)
 	DCMainCancelButton.SetText (13727)
 	DCMainCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainCancelPress)
 	DCMainCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCMainCancelButton.MakeDefault()
+	DCMainCancelButton.MakeEscape ()
 
 	# class button (on)
 	DCMainClassButton = DCMainWindow.GetControl (3)
@@ -102,7 +101,6 @@ def DualClassWindow ():
 	DCMainSkillsButton.SetText (17372)
 	DCMainSkillsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainSkillsPress)
 	DCMainSkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCMainSkillsButton.MakeDefault()
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
@@ -110,7 +108,6 @@ def DualClassWindow ():
 		DCMainBackButton.SetText (15416)
 	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCMainBackButton.MakeDefault()
 
 	# picture of character
 	DCMainPictureButton = DCMainWindow.GetControl (6)
@@ -333,7 +330,6 @@ def DCMainClassPress ():
 		DCClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassSelect)
 		DCClassButton.SetVarAssoc ("DCClass", i)
 		DCClassButton.SetText (DCClassStrings[i])
-		DCClassButton.MakeDefault()
 
 		# enable only if we can dual into the given class
 		if CanDualInto (i):
@@ -353,7 +349,7 @@ def DCMainClassPress ():
 	DCClassBackButton.SetText (15416)
 	DCClassBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassBackPress)
 	DCClassBackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCClassBackButton.MakeDefault()
+	DCClassBackButton.MakeEscape ()
 
 	# setup the text area with default text
 	DCClassTextArea = DCClassWindow.GetControl (9)
@@ -504,7 +500,7 @@ def DCOpenProfsWindow ():
 	DCProfsCancelButton.SetText (13727)
 	DCProfsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsCancelPress)
 	DCProfsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCProfsCancelButton.MakeDefault()
+	DCProfsCancelButton.MakeEscape ()
 
 	# show the window and draw away
 	DCProfsWindow.ShowModal (MODAL_SHADOW_GRAY)
