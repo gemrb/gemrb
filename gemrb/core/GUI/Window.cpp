@@ -265,6 +265,26 @@ bool Window::HitTest(const Point& p) const
 	return hit;
 }
 
+void Window::SetAction(Responder handler, const ActionKey& key)
+{
+	eventHandlers[key.Value()] = std::move(handler);
+}
+
+bool Window::PerformAction(const ActionKey& key)
+{
+	auto& handler = eventHandlers[key.Value()];
+	if (handler) {
+		(handler)(this);
+		return true;
+	}
+	return false;
+}
+
+bool Window::SupportsAction(const ActionKey& key)
+{
+	return eventHandlers[key.Value()];
+}
+
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
 	if (target != hoverView) {
@@ -485,15 +505,16 @@ bool Window::DispatchEvent(const Event& event)
 	return false;
 }
 	
-bool Window::InHandler() const
+bool Window::InActionHandler() const
 {
 	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
 		Control* ctrl = *c;
-		if (ctrl->InHandler()) {
+		if (ctrl->IsExecutingResponseHandler()) {
 			return true;
 		}
 	}
-	return false;
+	
+	return executingResponseHandler;
 }
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)

@@ -430,7 +430,6 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	int idx = 0;
 	std::vector<SelectOption> dialogOptions;
-	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
@@ -464,7 +463,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	std::reverse(dialogOptions.begin(), dialogOptions.end());
 	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
-	handler = [this](Control* c) {
+	ControlEventHandler handler = [this](Control* c) {
 		DialogChoose(c->GetValue());
 	};
 	ta->SetAction(handler, TextArea::Action::Select);

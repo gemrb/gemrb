@@ -60,17 +60,18 @@ static_cast<Control::Action>(a)
 #define ACTION_IS_SCREEN(a) \
 (a <= Control::MouseLeave)
     
-#define ACTION_DEFAULT ActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
+#define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
-
-using ControlEventHandler = Callback<void, Control*>;
 
 /**
  * @class Control
  * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
  */
 
-class GEM_EXPORT Control : public View {
+using ControlActionResponder = View::ActionResponder<Control*>;
+using ControlEventHandler = ControlActionResponder::Responder;
+
+class GEM_EXPORT Control : public View, public ControlActionResponder {
 private:
 	void ClearActionTimer();
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
@@ -79,7 +80,7 @@ private:
 	void HandleTouchActionTimer(Control*);
     
 public: // Public attributes
-	enum Action {
+	enum Action : ControlActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		// screen events, send coords to callback
 		Click,
@@ -133,14 +134,14 @@ public:
 	bool TracksMouseDown() const override { return bool(actionTimer); }
 
 	//Events
-	void SetAction(ControlEventHandler handler); // default action (left mouse button up)
-	void SetAction(ControlEventHandler handler, Action type, EventButton button = 0,
+	void SetAction(Responder handler, Action type, EventButton button = 0,
                    Event::EventMods mod = 0, short count = 0);
+	void SetAction(Responder handler, const ActionKey& key = ACTION_DEFAULT) override;
 	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
-	/** Run specified handler, it may return error code */
+
 	bool PerformAction(); // perform default action (left mouse button up)
-	bool PerformAction(Action action);
-	bool SupportsAction(Action action);
+	bool PerformAction(const ActionKey&) override;
+	bool SupportsAction(const ActionKey&) override;
 
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
@@ -157,35 +158,29 @@ public:
 	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
 	
 	bool HitTest(const Point& p) const override;
-
-    // TODO: implement generic handlers for the other types of event actions
-	
-	bool InHandler() const { return inHandler; }
 	
 protected:
-	struct ActionKey {
+	using ActionKey = ControlActionResponder::ActionKey;
+	struct ControlActionKey : public ActionKey {
 		uint32_t key;
-
-		ActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
+		
+		static uint32_t BuildKeyValue(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
 			// pack the parameters into the 32 bit key...
 			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
-			key = 0;
+			uint32_t key = 0;
 			uint32_t mask = 0x000000FF;
 			key |= type & mask;
 			key |= (mod & mask) << 8;
 			key |= (button & mask) << 16;
 			key |= (count & mask) << 24;
+			return key;
 		}
 
-		bool operator< (const ActionKey& ak) const {
-			return key < ak.key;
-		}
+		ControlActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
+		: ActionKey(BuildKeyValue(type, mod, button, count) ) {}
 	};
 
 	void FlagsChanged(unsigned int /*oldflags*/) override;
-	
-	bool SupportsAction(const ActionKey&);
-	bool PerformAction(const ActionKey&);
 	
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
@@ -202,9 +197,6 @@ private:
 	typedef std::map<ActionKey, ControlEventHandler>::iterator ActionIterator;
 	std::map<ActionKey, ControlEventHandler> actions;
 	Timer* actionTimer;
-	
-	/** True if we are currently in an event handler */
-	int inHandler;
 
 	/** the value of the control to add to the variable */
 	ieDword Value;

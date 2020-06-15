@@ -93,7 +93,7 @@ void WindowManager::DestroyWindows(WindowList& list)
 	for (; it != list.end();) {
 		Window* win = *it;
 		// IMPORTANT: ensure the window (a control subview) isnt executing a callback before deleting it
-		if (win->InHandler() == false) {
+		if (win->InActionHandler() == false) {
 			delete win;
 			it = list.erase(it);
 		} else {

@@ -41,7 +41,6 @@ const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeri
 Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
-	inHandler = 0;
 	VarName[0] = 0;
 	Value = 0;
 	SetValueRange(MaxValueRange);
@@ -55,8 +54,6 @@ Control::Control(const Region& frame)
 
 Control::~Control()
 {
-	assert(InHandler() == false);
-
 	ClearActionTimer();
 
 	delete animation;
@@ -72,15 +69,15 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-void Control::SetAction(ControlEventHandler handler)
-{
-	actions[ACTION_DEFAULT] = handler;
-}
-
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
 						Event::EventMods mod, short count)
 {
-	ActionKey key(type, mod, button, count);
+	ControlActionKey key(type, mod, button, count);
+	return SetAction(std::move(handler), key);
+}
+
+void Control::SetAction(Responder handler, const ActionKey& key)
+{
 	if (handler) {
 		actions[key] = handler;
 	} else {
@@ -100,11 +97,6 @@ void Control::SetActionInterval(unsigned int interval)
 	}
 }
 
-bool Control::SupportsAction(Action action)
-{
-	return SupportsAction(ActionKey(action));
-}
-
 bool Control::SupportsAction(const ActionKey& key)
 {
 	return actions.count(key);
@@ -115,11 +107,6 @@ bool Control::PerformAction()
 	return PerformAction(ACTION_DEFAULT);
 }
 
-bool Control::PerformAction(Action action)
-{
-	return PerformAction(ActionKey(action));
-}
-
 bool Control::PerformAction(const ActionKey& key)
 {
 	if (IsDisabled()) {
@@ -128,21 +115,11 @@ bool Control::PerformAction(const ActionKey& key)
 	
 	ActionIterator it = actions.find(key);
 	if (it != actions.end()) {
-		if (inHandler) {
-			Log(ERROR, "Control", "Executing nested event handler. This is undefined behavior and may blow up.");
-		}
-
 		if (!window) {
 			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");
 		}
 
-		++inHandler;
-		// TODO: detect caller errors, trap them???
-		// TODO: add support for callbacks that return a bool?
 		(it->second)(this);
-		--inHandler;
-		assert(inHandler >= 0);
-
 		return true;
 	}
 	return false;
@@ -241,7 +218,7 @@ bool Control::HitTest(const Point& p) const
 
 bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Click, mod, me.button, me.repeats);
+	ControlActionKey key(Click, mod, me.button, me.repeats);
 	if (SupportsAction(key)) {
 		PerformAction(key);
 		ClearActionTimer();
@@ -257,7 +234,7 @@ bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Click, mod, me.button, me.repeats);
+	ControlActionKey key(Click, mod, me.button, me.repeats);
 	if (repeatDelay && SupportsAction(key)) {
 		actionTimer = StartActionTimer(actions[key]);
 	}
@@ -303,7 +280,7 @@ void Control::HandleTouchActionTimer(Control* ctrl)
 
 	// long press action (GEM_MB_MENU)
 	// TODO: we could save the mod value from OnTouchDown to support modifiers to the touch, but we dont have a use ATM
-	ActionKey key(Click, 0, GEM_MB_MENU, 1);
+	ControlActionKey key(Click, 0, GEM_MB_MENU, 1);
 	PerformAction(key);
 }
 

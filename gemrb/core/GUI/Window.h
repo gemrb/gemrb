@@ -44,7 +44,9 @@ class Sprite2D;
  * and displaying windows in GUI.
  */
 
-class GEM_EXPORT Window : public ScrollView {
+using WindowActionResponder = View::ActionResponder<Window*>;
+
+class GEM_EXPORT Window : public ScrollView, public WindowActionResponder {
 public:
 	// !!! Keep these synchronized with GUIDefines.py !!!
 	enum WindowPosition {
@@ -56,6 +58,7 @@ public:
 		PosHmid = 12,	// left + right = hmid
 		PosCentered = 15// top + bottom + left + right = center
 	};
+
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
 		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
@@ -64,6 +67,15 @@ public:
 		Modal = 16,
 		NoSounds = 32			// doesn't play the open/close sounds
 	};
+	
+	enum Action : WindowActionResponder::Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		Closed = 0,
+		LostFocus = 1,
+		GainedFocus = 2
+	};
+	
+	using WindowEventHandler = WindowActionResponder::Responder;
 
 private:
 	void RecreateBuffer();
@@ -120,9 +132,13 @@ public:
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
 	bool UnRegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
 	
-	bool InHandler() const;
 	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const override;
+
+	bool InActionHandler() const;
+	void SetAction(Responder handler, const ActionKey& key) override;
+	bool PerformAction(const ActionKey& action) override;
+	bool SupportsAction(const ActionKey& action) override;
 
 private: // Private attributes
 	typedef std::map<KeyboardKey, EventMgr::EventCallback> KeyMap;
@@ -138,6 +154,8 @@ private: // Private attributes
 
 	VideoBufferPtr backBuffer;
 	WindowManager& manager;
+	
+	WindowEventHandler eventHandlers[3];
 };
 
 }

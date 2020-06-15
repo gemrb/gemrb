@@ -210,7 +210,6 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
 class GEM_EXPORT EventMgr {
 public:
 	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
-	//typedef Callback<const Event&, bool> EventCallback;
 	using EventCallback = Callback<bool, const Event&>;
 	typedef size_t TapMonitorId;
 

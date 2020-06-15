@@ -1681,7 +1681,7 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 
 	Control* ctrl = GetView<Control>(self);
 	if (ctrl) {
-		ControlEventHandler handler = NULL;
+		ControlEventHandler handler = nullptr;
 		if (PyCallable_Check(func)) {
 			handler = PythonControlCallback(func);
 		}
@@ -10439,8 +10439,8 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 
 	if (Index<0) {
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
-		btn->SetAction(NULL, Control::Click, GEM_MB_ACTION, 0, 1);
-		btn->SetAction(NULL, Control::Click, GEM_MB_MENU, 0, 1);
+		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
+		btn->SetAction(nullptr, Control::Click, GEM_MB_MENU, 0, 1);
 		btn->SetTooltip(L"");
 		//no incref
 		return Py_None;

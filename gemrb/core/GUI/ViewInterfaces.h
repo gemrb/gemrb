@@ -24,6 +24,130 @@ class Scrollable {
 	public:
 	virtual void ScrollDelta(const Point& p) = 0;
 	virtual void ScrollTo(const Point& p) = 0;
+	
+	virtual ~Scrollable() = default;
 };
 
+template <typename T>
+class ActionResponder {
+public:
+	using Action = uint32_t;
+	
+	const class Responder {
+		using ResponderCallback = Callback<void, T>;
+		ResponderCallback callback = nullptr;
+
+	public:
+		Responder() {}
+		
+		Responder(ResponderCallback cb){
+			callback = std::move(cb);
+		}
+		
+		template <typename F,
+			// SFINE magic to prevent std::forward infinite recursion
+			typename std::enable_if<
+			   !std::is_same<typename std::decay<F>::type, Responder>::value, bool>::type = false
+		>
+		Responder(F&& func) {
+			callback = std::forward<F>(func);
+		}
+		
+		template <typename F>
+		// SFINE magic to disambiguate the multiple assignment operators
+		auto operator=(F&& func) -> typename std::enable_if<
+		! std::is_same<typename std::decay<F>::type, Responder>::value,
+		Responder&
+		>::type {
+			callback = std::forward<F>(func);
+			return *this;
+		}
+		
+		Responder& operator=(ResponderCallback cb) {
+			callback = std::move(cb);
+			return *this;
+		}
+
+		void operator()(T responder) const {
+			assert(responder->executingResponseHandler == nullptr);
+			responder->executingResponseHandler = this;
+			callback(responder);
+			responder->executingResponseHandler = nullptr;
+		}
+		
+		operator bool() const { return bool(callback); }
+	}* executingResponseHandler = nullptr;
+	
+	class ActionKey {
+		uint32_t key;
+	public:
+		ActionKey(uint32_t val) : key(val) {}
+		uint32_t Value() const { return key; }
+		
+		bool operator< (const ActionKey& ak) const {
+			return key < ak.key;
+		}
+		
+		bool operator==(const ActionKey& ak) const {
+			return key == ak.key;
+		}
+	};
+	
+public:
+	bool IsExecutingResponseHandler() const { return executingResponseHandler; }
+
+	virtual void SetAction(Responder handler, const ActionKey& key) = 0;
+	virtual bool PerformAction(const ActionKey& action) = 0;
+	virtual bool SupportsAction(const ActionKey& action) = 0;
+	
+	virtual ~ActionResponder() {
+		assert(executingResponseHandler == nullptr);
+	}
+};
+/*
+template <class RESPONDER_T>
+class ActionResponder {
+public: // Public attributes
+	using Action = uint32_t;
+	
+	class Responder {
+		std::unique_ptr<Callback<RESPONDER_T*, void>> ptr;
+	public:
+		Responder(Callback<RESPONDER_T*, void>* ptr = NULL)
+		: ptr(ptr) {}
+
+		void operator()(RESPONDER_T* responder) const {
+			return (*ptr)(responder);
+		}
+	};
+	
+	class ActionKey {
+		uint32_t key;
+	};
+
+public:
+	void SetAction(Responder handler, ActionKey key)
+	{
+		
+	}
+
+	bool PerformAction(const ActionKey& action)
+	{
+		
+	}
+
+	bool SupportsAction(const ActionKey& action)
+	{
+		
+	}
+
+	bool InHandler() const { return inHandler; }
+	
+private:
+	using ActionIterator = typename std::map<ActionKey, Responder>::iterator;
+	std::map<ActionKey, Responder> actions;
+	
+	int inHandler;
+};
+*/
 #endif /* ViewInterfaces_h */
