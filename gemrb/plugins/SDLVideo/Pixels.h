@@ -207,14 +207,14 @@ struct PixelIterator : IPixelIterator
 
 	PixelIterator(PIXEL* p, int w, int pitch)
 	: IPixelIterator(p, pitch, Forward, Forward), w(w) {
-		assert(w > 0);
+		assert(w >= 0); // == 0 is the same thing as an end iterator so it is valid too
 		assert(pitch >= w);
 		xpos = 0;
 	}
 
 	PixelIterator(PIXEL* p, Direction x, Direction y, int w, int pitch)
 	: IPixelIterator(p, pitch, x, y), w(w) {
-		assert(w > 0);
+		assert(w >= 0); // == 0 is the same thing as an end iterator so it is valid too
 		assert(pitch >= w);
 		xpos = (x == Reverse) ? w-1 : 0;
 	}
