@@ -112,8 +112,7 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 def CloseStoreWindow ():
 	import GUIINV
 	global StoreWindow
-
-	GemRB.SetVar ("Inventory", 0)
+	
 	if StoreWindow:
 		StoreWindow.Close ()
 
@@ -125,14 +124,15 @@ def CloseStoreWindow ():
 
 	GemRB.LeaveStore ()
 
-	if Inventory: # broken if available (huh? pst-related huh?)
+	CureTable = None
+	
+	if GemRB.GetVar ("Inventory"):
+		GemRB.SetVar ("Inventory", 0)
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
 		GUICommonWindows.SetSelectionChangeHandler( None )
-
-	CureTable = None
-	GUICommonWindows.CloseTopWindow()
+		GUICommonWindows.CloseTopWindow()
 	return
 
 def PositionStoreWinRelativeTo(win):
