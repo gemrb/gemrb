@@ -596,6 +596,7 @@ def OpenSkillsWindow ():
 
 	#just go back if we can't assign skills
 	if GemRB.GetVar ("SkillPointsLeft") <= 0:
+		DCSkillsWindow.Close ()
 		return
 
 	# setup the back and done buttons
