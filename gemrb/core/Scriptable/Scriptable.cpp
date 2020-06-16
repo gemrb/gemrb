@@ -2261,7 +2261,9 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 					}
 				}
 			}
-			return true;
+			// Call again
+			StanceID = IE_ANI_READY;
+			return false;
 		}
 
 		Pos.x += dx;
@@ -2336,7 +2338,12 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	}
 
 	area->ClearSearchMapFor(this);
-	auto newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
+	PathNode *newPath;
+	if (Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
+		newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
+	} else {
+		newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
+	}
 
 	if (newPath) {
 		ClearPath(false);

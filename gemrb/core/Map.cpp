@@ -1948,10 +1948,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlock
 		return 0;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
-	static NavmapPoint p;
-	p.x = x;
-	p.y = y;
-	if ((ret&PATH_MAP_NPC) && !GetActor(p, GA_ONLY_BUMPABLE)) {
+	if ((ret&PATH_MAP_NPC) && !GetActor(NavmapPoint(x, y), GA_ONLY_BUMPABLE)) {
 		ret &= ~PATH_MAP_PASSABLE;
 	}
 	if (ret&(PATH_MAP_DOOR_IMPASSABLE|(actorsAreBlocking ? PATH_MAP_ACTOR : 0))) {
@@ -2627,8 +2624,6 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	open.emplace(PQNode(smptSource, 0));
 	unsigned int squaredMinDist = minDistance * minDistance;
 
-	// Avoid calling constructors by declaring object variables here
-	// Yes, there is an overhead in creating a Point a kajillion times
 	SearchmapPoint smptCurrent;
 	SearchmapPoint smptChild;
 	SearchmapPoint smptParent;

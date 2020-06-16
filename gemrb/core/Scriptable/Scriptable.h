@@ -501,7 +501,7 @@ public:
 		return step;
 	}
 
-	inline bool GetIsMoving() const {
+	inline bool IsMoving() const {
 		return step;
 	}
 	/* call this when path needs to be changed */

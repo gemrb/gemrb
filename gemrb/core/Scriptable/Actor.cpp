@@ -6237,7 +6237,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) { return false; }
 		if (BumpBackTimer) { return false; }
 		if (GetStat(IE_ANIMATION_ID) >= 0x4100 && GetStat(IE_ANIMATION_ID) <= 0x4112) { return false; }
-		if (GetIsMoving()) { return false; }
+		if (IsMoving()) { return false; }
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) { return false; }
