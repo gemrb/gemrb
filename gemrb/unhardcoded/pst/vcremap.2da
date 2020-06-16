@@ -7,3 +7,5 @@ SELR3     65            37
 SELR4     66            38
 RESP1     59            58      no second hostile response
 RESP2     60            58      no third hostile response
+CRITMISS  65            90      remap from pst rare select 3
+CRITHIT   66            91      remap from pst rare select 4
