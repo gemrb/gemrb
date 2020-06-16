@@ -643,6 +643,8 @@ void IniSpawn::RespawnNameless()
 	}
 
 	nameless->Resurrect();
+	// resurrect leaves you at 1hp for raise dead, so manually bump it back to max
+	nameless->SetBase(IE_HITPOINTS, 9999);
 	//hardcoded!!!
 	if (NamelessState==36) {
 		nameless->SetStance(IE_ANI_PST_START);
