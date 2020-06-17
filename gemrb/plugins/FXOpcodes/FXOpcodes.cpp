@@ -5524,7 +5524,7 @@ int fx_bounce_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_bounce_spellevel_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (fx->Parameter1<1) {
+	if (fx->Parameter1 < 1 || STATE_GET(STATE_DEAD)) {
 		PlayRemoveEffect("EFF_E02", target, fx);
 		return FX_NOT_APPLIED;
 	}
