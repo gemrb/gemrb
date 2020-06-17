@@ -134,10 +134,7 @@ bool Gem_Polygon::PointIn(const Point& p) const
 
 	for (const auto& seg : rasterData[relative.y]) {
 		if (relative.x >= seg.first.x) {
-			if (relative.x <= seg.second.x) {
-				return true;
-			}
-			return false;
+			return relative.x <= seg.second.x;
 		}
 	}
 
