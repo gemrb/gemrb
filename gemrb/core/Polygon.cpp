@@ -36,12 +36,15 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
-
+	
+	assert(!BBox.Dimensions().IsEmpty());
+	
 	Rasterize();
 }
 
 void Gem_Polygon::Rasterize()
 {
+	assert(BBox.h >= 1);
 	rasterData.resize(BBox.h - 1);
 
 	for (const auto& trap : ComputeTrapezoids()) {

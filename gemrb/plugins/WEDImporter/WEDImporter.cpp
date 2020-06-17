@@ -362,12 +362,16 @@ void WEDImporter::ReadWallPolygons()
 		rgn.y = PolygonHeaders[i].MinY;
 		rgn.w = PolygonHeaders[i].MaxX - PolygonHeaders[i].MinX;
 		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
-		polygonTable[i] = std::make_shared<Wall_Polygon>(points, count, &rgn);
-		delete [] points;
-		if (flags&WF_BASELINE) {
-			polygonTable[i]->SetBaseline(base0, base1);
+		
+		if (!rgn.Dimensions().IsEmpty()) { // PST AR0600 is known to have a polygon with 0 height
+			polygonTable[i] = std::make_shared<Wall_Polygon>(points, count, &rgn);
+			if (flags&WF_BASELINE) {
+				polygonTable[i]->SetBaseline(base0, base1);
+			}
+			polygonTable[i]->SetPolygonFlag(flags);
 		}
-		polygonTable[i]->SetPolygonFlag(flags);
+		
+		delete [] points;
 	}
 	delete [] PolygonHeaders;
 }
