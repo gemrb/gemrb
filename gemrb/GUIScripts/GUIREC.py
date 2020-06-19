@@ -54,7 +54,7 @@ def InitRecordsWindow (Window):
 		GemRB.GamePause (PauseState, 3)
 		TopWindowClosed(Window)
 
-	Window.SetOnClose(OnClose)
+	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
 	# dual class
 	Button = Window.GetControl (0)

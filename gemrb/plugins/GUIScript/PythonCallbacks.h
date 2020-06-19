@@ -104,7 +104,8 @@ struct PythonComplexCallback : public PythonCallback {
 	 }
 };
 
-typedef PythonComplexCallback<void, Control*> PythonControlCallback;
+using PythonControlCallback = PythonComplexCallback<void, Control*>;
+using PythonWindowCallback = PythonComplexCallback<void, Window*>;
 
 template <>
 void PythonControlCallback::operator() (Control* ctrl) const

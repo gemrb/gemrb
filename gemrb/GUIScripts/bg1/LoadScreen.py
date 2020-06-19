@@ -34,7 +34,7 @@ def StartLoadScreen ():
 
 	LoadScreen = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
-	LoadScreen.SetOnClose(lambda win: GemRB.GamePause(0, 0))
+	LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 	Middle = LoadScreen.GetControl (4)
 	#LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	#if LoadPic=="":

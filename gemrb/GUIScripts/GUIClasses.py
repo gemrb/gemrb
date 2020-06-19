@@ -192,12 +192,8 @@ class GWindow(GView, Scrollable):
     'SetupControls': _GemRB.Window_SetupControls,
     'Focus': _GemRB.Window_Focus,
     'ShowModal': _GemRB.Window_ShowModal,
+    'SetAction': _GemRB.Window_SetAction
   }
-
-  OnClose = {}
-
-  def SetOnClose(self, onClose):
-	GWindow.OnClose[self.__hash__()] = onClose
 
   def DeleteControl(self, view): # backwards compatibility
 	if type(view) == int:
@@ -234,11 +230,6 @@ class GWindow(GView, Scrollable):
 	self.Close()
 
   def Close(self):
-	key = self.__hash__()
-	if key in GWindow.OnClose:
-	  GWindow.OnClose[key](self)
-	  del GWindow.OnClose[key]
-	
 	RemoveView(self, False)
 
 class GControl(GView):

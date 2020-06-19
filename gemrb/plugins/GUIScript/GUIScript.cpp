@@ -1638,6 +1638,47 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Window_SetAction__doc,
+"===== Window_SetAction =====\n\
+\n\
+**Prototype:** _GemRB.Window_SetAction (GWindow, PythonFunction, EventType)\n\
+\n\
+**Metaclass Prototype:** SetAction (PythonFunction, EventType)\n\
+\n\
+**Description:** Ties an event of a control to a python function\
+\n\
+**Parameters:** \n\
+  * PythonFunction - a callback for when the event occurs.\n\
+  * EventType - the event type to bind to.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**Examples:**\n\
+    Bar.SetAction (OnWindowClose, ACTION_WINDOW_CLOSED)\n\
+    ...\n\
+  def OnWindowClose (Window):\n\
+    ...\n\
+\n\
+**See also:** [[guiscript:Control_SetAction]]"
+);
+
+static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
+{
+	uint32_t key = -1;
+	PyObject* func = nullptr;
+    PARSE_ARGS(args, "OOk", &self, &func, &key);
+	
+	Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
+	
+	Window::WindowEventHandler handler = nullptr;
+	if (PyCallable_Check(func)) {
+		handler = PythonControlCallback(func);
+	}
+	win->SetAction(handler, static_cast<Window::Action>(key));
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetAction__doc,
 "===== Control_SetAction =====\n\
 \n\
