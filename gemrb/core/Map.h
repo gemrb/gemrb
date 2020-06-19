@@ -515,6 +515,7 @@ public:
 	//PathFinder
 	/* Finds the nearest passable point */
 	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
+	void AdjustPositionSearchmap(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway);
 	/* Returns true if there is no path to d */
@@ -583,7 +584,7 @@ public:
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
-	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const;
+	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int pathLength, int validFlags = PATH_MAP_PASSABLE) const;
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

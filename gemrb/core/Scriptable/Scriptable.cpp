@@ -2243,7 +2243,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				GA_NO_DEAD|GA_NO_UNSCHEDULED, COLLISION_LOOKAHEAD);
 		if (actorInTheWay && actorInTheWay != this) {
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2);
+				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2, ~0);
 				Point nmptFarthest;
 				nmptFarthest.x = smptFarthest.x * 16;
 				nmptFarthest.y = smptFarthest.y * 12;

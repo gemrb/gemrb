@@ -795,7 +795,10 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
-			actor->WalkTo(actor->Destination, 0, actor->size);
+			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
+			if (nearActor && nearActor != actor) {
+				actor->NewPath();
+			}
 		}
 
 		q=Qcount[PR_SCRIPT];
@@ -2394,7 +2397,15 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPositionSearchmap(Point &goal, unsigned int radiusx, unsigned int radiusy)
+{
+	NavmapPoint nmptGoal(goal.x * 16 + 8, goal.y * 12 + 6);
+	AdjustPosition(goal, radiusx, radiusy);
+	goal.x = nmptGoal.x / 16;
+	goal.y = nmptGoal.y / 12;
+}
+
+void Map::AdjustPosition(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;
@@ -2440,21 +2451,20 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 	return FindPath(s, nmptFarthest, size, 0, true, !noBackAway);
 }
 
-SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int PathLen) const
+SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int pathLength, int validFlags) const
 {
-	SearchmapPoint smptFarthest;
 	float *dist = new float[Width * Height]();
 	static const size_t DEGREES_OF_FREEDOM = 8;
 	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
 	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
 	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
-	Log(DEBUG, "PathFinderWIP", "Fleeing from (%d %d)\n", d.x, d.y);
 	std::priority_queue<PQNode> open;
 	static const float diagWeight = sqrt(2);
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
 	open.push(PQNode(smptFleeFrom, 0));
-	SearchmapPoint smptCurrent;
-	SearchmapPoint smptChild;
+	SearchmapPoint smptFarthest;
+	SearchmapPoint smptCurrent = smptFleeFrom;
+	SearchmapPoint smptChild = smptFleeFrom;
 
 	float farthestDist = 0;
 	PQNode newNode = PQNode();
@@ -2465,17 +2475,17 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + sgn * dx[i];
 			smptChild.y = smptCurrent.y + sgn * dy[i];
-			bool childOutsideMap =	smptChild.x < 0 ||
-									smptChild.y < 0 ||
+			bool childOutsideMap =	smptChild.x <= 0 ||
+										smptChild.y <= 0 ||
 									  (unsigned) smptChild.x >= Width ||
 									  (unsigned) smptChild.y >= Height;
 			bool childBlocked = CheckSearchmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
-												PATH_MAP_PASSABLE, false);
+												validFlags, false);
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
 				float newDist = curDist + (dx[i] && dy[i] ? diagWeight : 1);
-				if (newDist < PathLen && newDist > oldDist) {
+				if (newDist <= pathLength && newDist > oldDist) {
 					if (newDist > farthestDist) {
 						farthestDist = newDist;
 						smptFarthest = smptChild;
@@ -2491,7 +2501,6 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	}
 	// Right proper memory management
 	delete[] dist;
-	Log(DEBUG, "PathFinderWIP", "Fleeing to (%d %d)\n", smptFarthest.x, smptFarthest.y);
 	return smptFarthest;
 }
 
@@ -2706,7 +2715,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 									(unsigned) smptChild.y >= Height;
 			bool childBlocked = CheckSearchmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
 												PATH_MAP_PASSABLE, actorsAreBlocking);
-			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x]) {
+			Actor* childActor = GetActor(NavmapPoint(smptChild.x * 16 + 8, smptChild.y * 12 + 6), GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			bool childIsUnbumpable = childActor && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
+			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x] && !childIsUnbumpable) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
 				}
