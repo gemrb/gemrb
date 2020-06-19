@@ -95,40 +95,50 @@ protected:
 	PyObject *Function = nullptr;
 };
 
-template <class R, class... ARGS>
+template <class R, class ARG_T>
 struct PythonComplexCallback : public PythonCallback {
 	PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
+	
+	PyObject* GetArgs(ARG_T arg) const {
+		PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
+		PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
+		const long count = PyInt_AsLong(co_argcount);
+		PyObject* args = nullptr;
+		if (count) {
+			PyObject* obj = gs->ConstructObjectForScriptable(arg->GetScriptingRef());
+			args = BuildArgs(arg, obj, count);
+		}
+		Py_DECREF(func_code);
+		Py_DECREF(co_argcount);
+		
+		return args;
+	}
+	
+	virtual PyObject* BuildArgs(ARG_T, PyObject* obj, long) const {
+		// default implementation just passes the py_object to the callback
+		// override to pass other args
+		return Py_BuildValue("(N)", obj);
+	}
 
-	virtual R operator()(ARGS...) const {
-		// meant to be overridden by specializations
-	 }
+	R operator()(ARG_T arg) const {
+		if (!Function) {
+			return;
+		}
+
+		CallPython(Function, GetArgs(arg));
+	}
 };
 
-using PythonControlCallback = PythonComplexCallback<void, Control*>;
 using PythonWindowCallback = PythonComplexCallback<void, Window*>;
+using PythonControlCallback = PythonComplexCallback<void, Control*>;
 
-template <>
-void PythonControlCallback::operator() (Control* ctrl) const
-{
-	if (!ctrl || !Function) {
-		return;
+template<>
+PyObject* PythonControlCallback::BuildArgs(Control* ctrl, PyObject* obj, long argc) const {
+	if (argc > 1) {
+		return Py_BuildValue("(Ni)", obj, ctrl->GetValue());
+	} else {
+		return Py_BuildValue("(N)", obj);
 	}
-
-	PyObject *args = NULL;
-	PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
-	PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
-	const long count = PyInt_AsLong(co_argcount);
-	if (count) {
-		PyObject* obj = gs->ConstructObjectForScriptable(ctrl->GetScriptingRef());
-		if (count > 1) {
-			args = Py_BuildValue("(Ni)", obj, ctrl->GetValue());
-		} else {
-			args = Py_BuildValue("(N)", obj);
-		}
-	}
-	Py_DECREF(func_code);
-	Py_DECREF(co_argcount);
-	CallPython(Function, args);
 }
 
 }
