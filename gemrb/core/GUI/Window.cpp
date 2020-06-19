@@ -66,6 +66,7 @@ void Window::Close()
 
 void Window::FocusLost()
 {
+	hasFocus = false;
 	if (eventHandlers[LostFocus]) {
 		eventHandlers[LostFocus](this);
 	}
@@ -73,6 +74,7 @@ void Window::FocusLost()
 
 void Window::FocusGained()
 {
+	hasFocus = true;
 	if (eventHandlers[GainedFocus]) {
 		eventHandlers[GainedFocus](this);
 	}

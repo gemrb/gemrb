@@ -194,6 +194,8 @@ class GWindow(GView, Scrollable):
     'ShowModal': _GemRB.Window_ShowModal,
     'SetAction': _GemRB.Window_SetAction
   }
+  
+  __slots__ = ['HasFocus']
 
   def DeleteControl(self, view): # backwards compatibility
 	if type(view) == int:

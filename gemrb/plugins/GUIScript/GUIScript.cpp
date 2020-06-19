@@ -642,7 +642,9 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	Window* win = core->LoadWindow( WindowID, ref, pos );
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, OP_OR);
-	return gs->ConstructObjectForScriptable( win->GetScriptingRef() );
+	PyObject* pyWin = gs->ConstructObjectForScriptable( win->GetScriptingRef() );
+	PyObject_SetAttrString(pyWin, "HasFocus", PyBool_FromLong(win->HasFocus()));
+	return pyWin;
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -1249,7 +1251,11 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	if (ref) {
 		View* retView = GetView(ref);
 		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
-		return gs->ConstructObjectForScriptable(retView->GetScriptingRef());
+		PyObject* obj = gs->ConstructObjectForScriptable(retView->GetScriptingRef());
+		if (Window* win = dynamic_cast<Window*>(retView)) {
+			PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
+		}
+		return obj;
 	}
 	Py_RETURN_NONE;
 }

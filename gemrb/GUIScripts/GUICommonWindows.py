@@ -1380,6 +1380,10 @@ else:
 
 def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos):
 	def ret ():
+		topwin = GemRB.GetView("WIN_TOP")
+		if topwin and topwin.HasFocus == False:
+			return None # we cannot close the current WIN_TOP unless it has focus
+	
 		window = loader(id, pack, pos)
 
 		if window:
