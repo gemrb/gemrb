@@ -1673,7 +1673,7 @@ static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 	
 	Window::WindowEventHandler handler = nullptr;
 	if (PyCallable_Check(func)) {
-		handler = PythonControlCallback(func);
+		handler = PythonWindowCallback(func);
 	}
 	win->SetAction(handler, static_cast<Window::Action>(key));
 	Py_RETURN_NONE;
@@ -13326,6 +13326,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(View_SetTooltip, METH_VARARGS),
 	METHOD(View_Focus, METH_VARARGS),
 	METHOD(Window_Focus, METH_VARARGS),
+	METHOD(Window_SetAction, METH_VARARGS),
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
