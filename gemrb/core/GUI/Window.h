@@ -114,6 +114,9 @@ public:
 	void Close();
 	void Focus();
 	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
+	
+	void FocusLost();
+	void FocusGained();
 
 	/** Sets 'view' as Focused */
 	void SetFocused(View* view);

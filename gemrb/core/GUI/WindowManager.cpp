@@ -204,6 +204,9 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 				trackingWin = nullptr;
 			}
 		}
+		
+		oldFront->FocusLost();
+		frontWin->FocusGained();
 	}
 
 	return true;

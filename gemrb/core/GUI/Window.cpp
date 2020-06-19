@@ -46,6 +46,11 @@ Window::Window(const Region& frame, WindowManager& mgr)
 
 void Window::Close()
 {
+	// fire the onclose handler prior to actually invalidating the window
+	if (eventHandlers[Closed]) {
+		eventHandlers[Closed](this);
+	}
+	
 	if (flags&DestroyOnClose) {
 		ClearScriptingRefs();
 		manager.CloseWindow(this);
@@ -57,6 +62,20 @@ void Window::Close()
 
 	trackingView = NULL;
 	hoverView = NULL;
+}
+
+void Window::FocusLost()
+{
+	if (eventHandlers[LostFocus]) {
+		eventHandlers[LostFocus](this);
+	}
+}
+
+void Window::FocusGained()
+{
+	if (eventHandlers[GainedFocus]) {
+		eventHandlers[GainedFocus](this);
+	}
 }
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
