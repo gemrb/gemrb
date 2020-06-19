@@ -2169,7 +2169,7 @@ unsigned char Movable::GetNextFace()
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
-	int COLLISION_LOOKAHEAD = size * 2;
+	int collisionLookaheadRadius = size * 2 - 1;
 	int stepTime = 566;
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
@@ -2239,11 +2239,11 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		Actor* actorInTheWay = area->GetActorInRadius(Point(Pos.x + COLLISION_LOOKAHEAD * dx, Pos.y + COLLISION_LOOKAHEAD * dy),
-				GA_NO_DEAD|GA_NO_UNSCHEDULED, COLLISION_LOOKAHEAD);
+		Actor* actorInTheWay = area->GetActorInRadius(Point(Pos.x + collisionLookaheadRadius * dx, Pos.y + collisionLookaheadRadius * dy),
+				GA_NO_DEAD|GA_NO_UNSCHEDULED, collisionLookaheadRadius);
 		if (actorInTheWay && actorInTheWay != this) {
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2, ~0);
+				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 2, ~0);
 				Point nmptFarthest;
 				nmptFarthest.x = smptFarthest.x * 16;
 				nmptFarthest.y = smptFarthest.y * 12;
@@ -2444,6 +2444,11 @@ const int maxPathTries = 15;
 
 void Movable::NewPath()
 {
+	if (Destination == Pos) return;
+	if (GetPathTries() == maxPathTries - 1) {
+		tryNotToBump = false;
+	}
+
 	Point tmp = Destination;
 	if (GetPathTries() > maxPathTries) {
 		ClearPath(true);
