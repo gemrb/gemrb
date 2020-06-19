@@ -71,8 +71,8 @@ public:
 	enum Action : WindowActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		Closed = 0,
-		LostFocus = 1,
-		GainedFocus = 2
+		GainedFocus = 1,
+		LostFocus = 2
 	};
 	
 	using WindowEventHandler = WindowActionResponder::Responder;

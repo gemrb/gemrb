@@ -247,6 +247,7 @@ void WindowManager::CloseWindow(Window* win)
 		while (++mit != windows.end()) {
 			if ((*mit)->Flags() & Window::Modal) {
 				modalWin = *mit;
+				modalWin->FocusGained();
 				break;
 			}
 		}
@@ -266,8 +267,12 @@ void WindowManager::CloseWindow(Window* win)
 		Window* newFrontWin = *it;
 		// the window beneath this must get redrawn
 		newFrontWin->MarkDirty();
-		if (isFront && newFrontWin->IsVisible())
+		if (isFront && newFrontWin->IsVisible()) {
 			newFrontWin->Focus();
+			// normally Focus() will call FocusGained(), but it
+			// this case we must do it manually because we have erased from windows so Focus() will think we already have focus
+			newFrontWin->FocusGained();
+		}
 	}
 	closedWindows.push_back(win);
 
