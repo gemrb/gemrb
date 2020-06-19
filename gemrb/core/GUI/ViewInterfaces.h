@@ -104,50 +104,5 @@ public:
 		assert(executingResponseHandler == nullptr);
 	}
 };
-/*
-template <class RESPONDER_T>
-class ActionResponder {
-public: // Public attributes
-	using Action = uint32_t;
-	
-	class Responder {
-		std::unique_ptr<Callback<RESPONDER_T*, void>> ptr;
-	public:
-		Responder(Callback<RESPONDER_T*, void>* ptr = NULL)
-		: ptr(ptr) {}
 
-		void operator()(RESPONDER_T* responder) const {
-			return (*ptr)(responder);
-		}
-	};
-	
-	class ActionKey {
-		uint32_t key;
-	};
-
-public:
-	void SetAction(Responder handler, ActionKey key)
-	{
-		
-	}
-
-	bool PerformAction(const ActionKey& action)
-	{
-		
-	}
-
-	bool SupportsAction(const ActionKey& action)
-	{
-		
-	}
-
-	bool InHandler() const { return inHandler; }
-	
-private:
-	using ActionIterator = typename std::map<ActionKey, Responder>::iterator;
-	std::map<ActionKey, Responder> actions;
-	
-	int inHandler;
-};
-*/
 #endif /* ViewInterfaces_h */
