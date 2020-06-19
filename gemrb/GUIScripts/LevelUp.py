@@ -633,10 +633,8 @@ def LevelUpDonePress():
 			ReactivateBaseClass ()
 
 	if LevelUpWindow:
-		LevelUpWindow.Unload()
+		LevelUpWindow.Close()
 	GUICommonWindows.UpdatePortraitWindow ()
-	# FIXME: we need a generic way to refresh to top window
-	# GUIREC.UpdateRecordsWindow()
 	return
 
 def LevelUpHLAPress ():

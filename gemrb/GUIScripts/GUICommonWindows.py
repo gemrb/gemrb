@@ -1390,9 +1390,11 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 	
 			if selectionHandler:
 				selectionHandler(window)
+				window.SetAction(selectionHandler, ACTION_WINDOW_FOCUS_GAINED)
 
 			SetTopWindow (window, selectionHandler)
 			window.SetAction(TopWindowClosed, ACTION_WINDOW_CLOSED)
+			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
 			if not (GameCheck.IsIWD2() or GameCheck.IsPST()):
