@@ -2400,7 +2400,7 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 void Map::AdjustPositionSearchmap(Point &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	NavmapPoint nmptGoal(goal.x * 16 + 8, goal.y * 12 + 6);
-	AdjustPosition(goal, radiusx, radiusy);
+	AdjustPosition(nmptGoal, radiusx, radiusy);
 	goal.x = nmptGoal.x / 16;
 	goal.y = nmptGoal.y / 12;
 }
@@ -2463,7 +2463,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
 	open.push(PQNode(smptFleeFrom, 0));
 	SearchmapPoint smptFarthest;
-	SearchmapPoint smptCurrent = smptFleeFrom;
+	SearchmapPoint smptCurrent;
 	SearchmapPoint smptChild = smptFleeFrom;
 
 	float farthestDist = 0;
@@ -2471,6 +2471,8 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	while (!open.empty()) {
 		smptCurrent = open.top().point;
 		open.pop();
+		// Randomly search clockwise or counterclockwise
+		// To prevent always fleeing in the same direction
 		int sgn = (RAND(0, 1)) ? -1 : 1;
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + sgn * dx[i];
