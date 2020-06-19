@@ -11407,7 +11407,7 @@ void Actor::BumpAway(Point farthest)
 		OldPos = Pos;
 	}
 	BumpBackTimer = 10;
-	SetPosition(farthest, 1, 0, 0);
+	SetPosition(farthest, 1, size, size);
 }
 
 void Actor::BumpBack()
