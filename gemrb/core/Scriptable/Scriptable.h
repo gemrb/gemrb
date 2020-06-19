@@ -465,6 +465,7 @@ protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
   int PathTries;
+	bool tryNotToBump;
 
 public:
 	Movable(ScriptableType type);

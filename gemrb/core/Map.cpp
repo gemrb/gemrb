@@ -790,6 +790,13 @@ void Map::UpdateScripts()
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 	while (more_steps) {
 		more_steps = false;
+		
+		// Make all actors pathfind
+		q=Qcount[PR_SCRIPT];
+		while (q--) {
+			Actor* actor = queue[PR_SCRIPT][q];
+			actor->WalkTo(actor->Destination, 0, actor->size);
+		}
 
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
@@ -2454,9 +2461,10 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 	while (!open.empty()) {
 		smptCurrent = open.top().point;
 		open.pop();
+		int sgn = (RAND(0, 1)) ? -1 : 1;
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			smptChild.x = smptCurrent.x + dx[i];
-			smptChild.y = smptCurrent.y + dy[i];
+			smptChild.x = smptCurrent.x + sgn * dx[i];
+			smptChild.y = smptCurrent.y + sgn * dy[i];
 			bool childOutsideMap =	smptChild.x < 0 ||
 									smptChild.y < 0 ||
 									  (unsigned) smptChild.x >= Width ||
@@ -2466,7 +2474,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 			if (!childBlocked && !childOutsideMap) {
 				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
 				float oldDist = dist[smptChild.y * Width + smptChild.x];
-				float newDist = curDist + RAND(0, 1) * (dx[i] && dy[i] ? diagWeight : 1);
+				float newDist = curDist + (dx[i] && dy[i] ? diagWeight : 1);
 				if (newDist < PathLen && newDist > oldDist) {
 					if (newDist > farthestDist) {
 						farthestDist = newDist;
@@ -2715,7 +2723,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 					int yDist = smptChild.y - smptDest.y;
 					// Tie-breaking used to smooth out the path
 					int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
-					unsigned int heuristic = weight * (Distance(smptChild, smptDest) + (crossProduct >> 10));
+					unsigned int heuristic = weight * (Distance(smptChild, smptDest) + (crossProduct >> 9));
 					unsigned int estDist = newDist + heuristic;
 					newNode.point = smptChild;
 					newNode.dist = estDist;

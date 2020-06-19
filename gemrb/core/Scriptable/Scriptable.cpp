@@ -2016,6 +2016,7 @@ Movable::Movable(ScriptableType type)
 	maxWalkDistance = 0;
 	prevTicks = 0;
 	ResetPathTries();
+	tryNotToBump = false;
 }
 
 Movable::~Movable(void)
@@ -2165,14 +2166,10 @@ unsigned char Movable::GetNextFace()
 
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
-// Re-pathing rate is a hyperparameter, trades off path stupidity for performance
-const int REPATHING_RATE = 5;
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
-	if (this->Ticks - this->prevTicks > REPATHING_RATE) {
-		WalkTo(Destination, 0);
-	}
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
+	int COLLISION_LOOKAHEAD = size * 2;
 	int stepTime = 566;
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
@@ -2197,7 +2194,6 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
 	}
-
 
 	double dx, dxOrig;
 	double dy, dyOrig;
@@ -2243,32 +2239,24 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		const float COLLISION_LOOKAHEAD = 4;
 		Actor* actorInTheWay = area->GetActorInRadius(Point(Pos.x + COLLISION_LOOKAHEAD * dx, Pos.y + COLLISION_LOOKAHEAD * dy),
 				GA_NO_DEAD|GA_NO_UNSCHEDULED, COLLISION_LOOKAHEAD);
 		if (actorInTheWay && actorInTheWay != this) {
-			NewPath();
-			if (Type == ST_ACTOR && !actorInTheWay->GetPath())
-			{
-				if (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
-					if (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
-						Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2);
-						Point nmptFarthest;
-						nmptFarthest.x = smptFarthest.x * 16;
-						nmptFarthest.y = smptFarthest.y * 12;
-						Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", actorInTheWay->Pos.x, actorInTheWay->Pos.y, nmptFarthest.x, nmptFarthest.y);
-						actorInTheWay->BumpAway(nmptFarthest);
-					}
-				}
+			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
+				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, COLLISION_LOOKAHEAD * 2);
+				Point nmptFarthest;
+				nmptFarthest.x = smptFarthest.x * 16;
+				nmptFarthest.y = smptFarthest.y * 12;
+				Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", actorInTheWay->Pos.x, actorInTheWay->Pos.y, nmptFarthest.x, nmptFarthest.y);
+				actorInTheWay->BumpAway(nmptFarthest);
+			} else {
+				StanceID = IE_ANI_READY;
+				tryNotToBump = true;
+				return true;
 			}
-			// Call again
-			StanceID = IE_ANI_READY;
-			return false;
 		}
-
 		Pos.x += dx;
 		Pos.y += dy;
-
 
 		SetOrientation(step->orient, false);
 		this->timeStartStep = time;
@@ -2322,9 +2310,12 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	if (this->Ticks < this->prevTicks + 2) {
 		return;
 	}
-	// The rate limiting stuff is probably not optimal, since it requires lots of pathfinder calls
+	// Rate limiting stuff is not optimal, since it requires lots of pathfinder calls
 	// An incremental pathfinding algorithm would be preferable, but LOS checks are slow
 	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
+	// Moreover, incremental pathfinding algorithms available as of 2020, to the best of
+	// kmfrick's knowledge, are numerically unstable due to the use of angles
+	// (See Incremental phi-star by Nash and Koenig)
 
 	this->prevTicks = Ticks;
 	Destination = Des;
@@ -2339,7 +2330,7 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 
 	area->ClearSearchMapFor(this);
 	PathNode *newPath;
-	if (Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
+	if (!tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
 	} else {
 		newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
@@ -2432,6 +2423,7 @@ void Movable::ClearPath(bool resetDestination)
 		//is set before ClearPath
 		Destination = Pos;
 
+		tryNotToBump = false;
 		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
 			StanceID = IE_ANI_AWAKE;
 		}
