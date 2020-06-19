@@ -17,7 +17,7 @@ Beta testing:
 
 Release:
 - [ ] Finalise choice of version number, eg. v1.2.3
-- [ ] Update version number in `gemrb/includes/globals.h` and `configure.in`
+- [ ] Update version number in `gemrb/includes/globals.h`
 - [ ] Final `NEWS` update
 - [ ] Amend Roadmap in contributing.md
 - [ ] Create the source tarball with `make dist`
