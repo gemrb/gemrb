@@ -35,7 +35,6 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		
 	LoadScreen = Window = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
-	LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 
@@ -53,6 +52,8 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		GemRB.SetVar ("Progress", 0)
 		Skull = Window.GetControl (1)
 		Skull.SetMOS ("GSKULON")
+		
+		LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 		GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
 		return
 	
