@@ -2239,8 +2239,10 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		Actor* actorInTheWay = area->GetActorInRadius(Point(Pos.x + collisionLookaheadRadius * dx, Pos.y + collisionLookaheadRadius * dy),
-				GA_NO_DEAD|GA_NO_UNSCHEDULED, collisionLookaheadRadius);
+		double xCollision = Pos.x + dx * collisionLookaheadRadius;
+		double yCollision = Pos.y + dy * collisionLookaheadRadius * 0.75;
+		Point nmptCollision(xCollision, yCollision);
+		Actor* actorInTheWay = area->GetActorInRadius(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED, collisionLookaheadRadius / 2);
 		if (actorInTheWay && actorInTheWay != this) {
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
 				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 2, ~0);
@@ -2329,12 +2331,11 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	}
 
 	area->ClearSearchMapFor(this);
-	PathNode *newPath;
-	if (!tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
+	PathNode *newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
+	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
-	} else {
-		newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
 	}
+
 
 	if (newPath) {
 		ClearPath(false);
