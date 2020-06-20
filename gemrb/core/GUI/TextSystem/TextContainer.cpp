@@ -716,7 +716,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		size_t start = 0;
 		size_t stop = text.find_last_of(WHITESPACE_STRING, diff);
 		if (stop == String::npos)
-			stop = 0;
+			stop = diff;
 
 		Point p;
 		Regions::const_iterator rit = layout.regions.begin();
