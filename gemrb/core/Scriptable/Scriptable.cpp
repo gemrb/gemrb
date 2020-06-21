@@ -2243,8 +2243,9 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	char ySign;
 	char xSign;
 	// Adjustments (+8/+6) are being made here, see Map::FindPath()
-	dx = step->x * 16 + 8 - Pos.x;
-	dy = step->y * 12 + 6 - Pos.y;
+	Point nmptStep(step->x * 16 + 8, step->y * 12 + 6);
+	dx = nmptStep.x - Pos.x;
+	dy = nmptStep.y - Pos.y;
 
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
@@ -2292,6 +2293,14 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			actorInTheWay = area->GetActor(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
 		if (actorInTheWay && actorInTheWay != this) {
+			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 4 && std::abs(nmptStep.y - Pos.y) < YEPS * 4) {
+				ClearPath(true);
+				NewOrientation = Orientation;
+				return true;
+			} else {
+				Log(DEBUG, "PathFinderWIP", "(%d %d)", std::abs(nmptStep.x - Pos.x), std::abs(nmptStep.y - Pos.y));
+			}
+
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
 				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 3, ~0);
 				Point nmptFarthest;
@@ -2371,8 +2380,6 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 
 	this->prevTicks = Ticks;
 	Destination = Des;
-	const int XEPS = 32;
-	const int YEPS = 12;
 
 	if (std::abs(Des.x - Pos.x) <= XEPS &&
 			std::abs(Des.y - Pos.y) <= YEPS) {
