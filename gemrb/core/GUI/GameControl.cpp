@@ -2054,7 +2054,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			p = gameClickPoint;
 		}
 	} else {
-		// any other button behaves as left click (scrollwhell buttons are mosue wheel events now)
+		// any other button behaves as left click (scrollwhell buttons are mouse wheel events now)
 		if (isDoubleClick)
 			MoveViewportTo(p, true);
 
@@ -2080,21 +2080,18 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				default: break;
 			}
 		}
-		return true;
-	}
 
-	if (lastCursor == IE_CURSOR_BLOCKED) {
-		// don't allow travel if the destination is actually blocked
-		return false;
-	}
-
-	if (!isFormationRotation) {
 		if (target_mode == TARGET_MODE_NONE) {
 			if (isSelectionRect || lastActorID) {
 				MakeSelection(Mod&GEM_MOD_SHIFT);
 				ClearMouseState();
 				return true;
 			}
+		}
+
+		if (lastCursor == IE_CURSOR_BLOCKED) {
+			// don't allow travel if the destination is actually blocked
+			return false;
 		}
 
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
