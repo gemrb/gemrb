@@ -2341,7 +2341,6 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	if (std::abs(Des.x - Pos.x) <= XEPS &&
 			std::abs(Des.y - Pos.y) <= YEPS) {
 		ClearPath(true);
-		Stop();
 		return;
 	}
 
@@ -2464,7 +2463,6 @@ void Movable::NewPath()
 	if (GetPathTries() > MAX_PATH_TRIES) {
 		ClearPath(true);
 		ResetPathTries();
-		Stop();
 		return;
 	}
 	WalkTo(tmp, InternalFlags, size);
