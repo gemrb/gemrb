@@ -2758,8 +2758,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 }
 
 PathNode *
-Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const std::vector<SearchmapPoint> parents,
-					bool backAway) const {
+Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, 
+		const std::vector<SearchmapPoint> &parents, bool backAway) const {
 	PathNode *resultPath = NULL;
 	smptCurrent = smptDest;
 	while (!resultPath || smptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
