@@ -1,0 +1,101 @@
+version: build-{build}
+branches:
+  only:
+  - master
+image: Visual Studio 2017
+configuration: Release
+clone_depth: 1
+skip_commits:
+  # appveyor only searches for these in the first line by default
+  message: /\[ci skip\]/
+only_commits:
+  files:
+    - gemrb/**/*
+    - cmake/**/*
+    - windows/**/*
+    - .appveyor.yml
+environment:
+  SF_ACC:
+    secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
+install:
+- ps: |-
+    if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      nuget install secure-file -ExcludeVersion
+      choco -r install openssh
+      secure-file\tools\secure-file -decrypt testing\id_travissfbot.av.enc -secret $env:SF_ACC
+    }
+
+    vcpkg install zlib
+    vcpkg install sdl1
+    # sdl mixer: only available for sdl2, as sdl2-mixer
+    vcpkg install python2
+    vcpkg install openal-soft
+    vcpkg install libpng
+    vcpkg install libogg
+    vcpkg install libvorbis
+    vcpkg install freetype
+    vcpkg install libiconv
+    # (lib)vlc is missing
+
+    pushd c:\tools\vcpkg
+    vcpkg integrate install
+    popd
+
+cache:
+  - c:\tools\vcpkg\installed\
+  - C:\ProgramData\chocolatey\lib
+  - C:\ProgramData\chocolatey\bin
+  - '%LocalAppData%\NuGet\v3-cache'
+before_build:
+- ps: |-
+    pushd c:\projects\gemrb
+
+    $git_version = (git rev-parse --short HEAD) | Out-String
+    $env:archive_file = -join("gemrb-win32-", $git_version.Trim(), ".zip")
+    $env:archive_path = -join("c:\projects\gemrb\", $env:archive_file)
+    $env:archive_source = -join("c:\gemrb-win32-", $git_version.Trim())
+    mkdir $env:archive_source
+    pushd $env:archive_source
+    mkdir Cache2
+    popd
+    popd
+
+    # improve the default config
+    $file = 'gemrb/GemRB.cfg.sample.in'
+    $find = '#PluginsPath=@DEFAULT_PLUGINS_DIR@'
+    $replace = "PluginsPath=.\plugins"
+    (Get-Content $file) -replace $find, $replace | Set-Content $file
+
+    cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DINSOURCEBUILD=1 -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
+
+    # set version to version + commit hash
+    $git_version = (git describe --always --all) | Out-String
+    $git_version = -join('"', $git_version, '"')
+    $git_version = $git_version -replace "`n",", " -replace "`r",", "
+    $file = 'gemrb/includes/globals.h'
+    $find = 'define VERSION_GEMRB .*$'
+    $replace = "define VERSION_GEMRB $git_version"
+    (Get-Content $file) -replace $find, $replace | Set-Content $file
+    #sed -i "s/define VERSION_GEMRB .*/define VERSION_GEMRB '$git_version'/" gemrb/includes/globals.h
+build:
+  project: gemrb.sln
+  parallel: true
+  verbosity: minimal
+before_package:
+- ps: |-
+    pushd c:\projects\gemrb
+
+    cmake --build . --target install --config Release
+
+    if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      popd
+      7z a -tzip $env:archive_path $env:archive_source
+    }
+test: off
+artifacts:
+- path: gemrb*.zip
+  name: normal
+deploy_script:
+- cmd: |-
+    cd c:\projects\gemrb
+    scp -v -oStrictHostKeyChecking=no -i testing\id_travissfbot.av gemrb*.zip "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\ Binaries/Windows/AppVeyor/"

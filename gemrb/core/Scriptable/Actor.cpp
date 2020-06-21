@@ -4837,8 +4837,8 @@ void Actor::PlayWalkSound()
 
 	if (Sound[0] != '*') {
 		int l = strlen(Sound);
-		/* IWD2 sometimes appends numbers here, not letters. */
-		if (core->HasFeature(GF_3ED_RULES) && 0 == memcmp(Sound, "FS_", 3)) {
+		/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
+		if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
 			if (l < 8) {
 				Sound[l] = cnt + 0x31;
 				Sound[l+1] = 0;

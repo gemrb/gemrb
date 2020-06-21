@@ -21,6 +21,7 @@
 
 #include <array>
 #include <utility>
+#include <cstdint>
 
 namespace GemRB {
 

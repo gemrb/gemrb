@@ -380,10 +380,10 @@ void Game::ConsolidateParty()
 			}
 		} else i++;
 	}
-	for (auto pc : PCs) {
-		pc->RefreshEffects(NULL);
+	for (auto m = PCs.begin(); m != PCs.end(); ++m) {
+		(*m)->RefreshEffects(NULL);
 		//TODO: how to set up bardsongs
-		pc->SetModalSpell(pc->Modal.State, 0);
+		(*m)->SetModalSpell((*m)->Modal.State, 0);
 	}
 }
 
@@ -944,7 +944,8 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		newMap->LoadIniSpawn();
 	}
 
-	for (auto pc : PCs) {
+	for (size_t i = 0; i < PCs.size(); i++) {
+		Actor *pc = PCs[i];
 		if (stricmp(pc->Area, ResRef) == 0) {
 			newMap->AddActor(pc, false);
 		}
@@ -1556,8 +1557,8 @@ void Game::UpdateScripts()
 
 	PartyAttack = false;
 
-	for (auto map : Maps) {
-		map->UpdateScripts();
+	for (size_t idx = 0; idx < Maps.size(); idx++) {
+		Maps[idx]->UpdateScripts();
 	}
 
 	if (PartyAttack) {
@@ -2337,5 +2338,18 @@ void Game::ResetPartyCommentTimes()
 		pc->ResetCommentTime();
 	}
 }
+
+bool Game::OnlyNPCsSelected() const
+{
+	bool hasPC = false;
+	for (const Actor *selectee : selected) {
+		if (selectee->GetStat(IE_SEX) < SEX_BOTH) {
+			hasPC = true;
+			break;
+		}
+	}
+	return !hasPC;
+}
+
 
 }

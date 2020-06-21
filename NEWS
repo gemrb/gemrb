@@ -1,15 +1,18 @@
-GemRB git (491b32ee02):
+GemRB git (6193dc5a):
   New features:
     - 
+    - non-ascii data filename support
 
   Improved features:
     - 
+    - iwd chargen
     - audio, pst ini handling, savegame compatibility
     - effects, projectiles, actions, range calculations
     - bugfixes
 
   Notes:
     - switched to c++11 and cmake 3.1 as a minimum
+    - dropped windows 9x compatibility
 
 GemRB v0.8.6 (2019-11-24):
   New features:

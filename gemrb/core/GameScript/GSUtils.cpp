@@ -1868,6 +1868,21 @@ SrcVector *LoadSrc(const ieResRef resname)
 	return src;
 }
 
+// checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
+// also returns true if the trigger is supposed to succeed
+bool IsInObjectRect(const Point &pos, Region &rect)
+{
+	if (!HasAdditionalRect) return true;
+	if (rect.w <= 0 || rect.h <= 0) return true;
+
+	// iwd2: testing shows the first point must be 0.0 for matching to work
+	if (core->HasFeature(GF_3ED_RULES) && (rect.x != 0 || rect.y != 0)) {
+		return false;
+	}
+
+	return rect.PointInside(pos);
+}
+
 #define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
 
 static Object *ObjectCopy(Object *object)
@@ -1876,7 +1891,7 @@ static Object *ObjectCopy(Object *object)
 	Object *newObject = new Object();
 	MEMCPY( newObject->objectFields, object->objectFields );
 	MEMCPY( newObject->objectFilters, object->objectFilters );
-	MEMCPY( newObject->objectRect, object->objectRect );
+	newObject->objectRect = object->objectRect;
 	MEMCPY( newObject->objectName, object->objectName );
 	return newObject;
 }

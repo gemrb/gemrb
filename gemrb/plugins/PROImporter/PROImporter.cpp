@@ -51,7 +51,7 @@ bool PROImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "PRO V1.0", 8 ) == 0) {
 		version = 10;
 	} else {
-		print("[PROImporter]: This file is not a valid PRO File");
+		Log(ERROR, "PROImporter", "This file is not a valid PRO File");
 		return false;
 	}
 
@@ -68,10 +68,11 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadWord( &AreaExtension );
 	str->ReadWord( &s->Speed );
 	str->ReadDword( &s->SFlags ); //spark, ignore center, looping sound etc
-	str->ReadResRef( s->SoundRes1 );
-	str->ReadResRef( s->SoundRes2 );
+	str->ReadResRef( s->FiringSound );
+	str->ReadResRef( s->ArrivalSound );
 	str->ReadResRef( s->TravelVVC ); //no original game data uses this feature
 	str->ReadDword( &s->SparkColor );//enabled by PSF_SPARK
+	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left
 	str->ReadDword( &s->ExtFlags ) ; //gemrb extension flags
 	str->ReadDword( &s->StrRef );    //gemrb extension strref
 	str->ReadDword( &s->RGB );       //gemrb extension rgb pulse
@@ -83,7 +84,7 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadWord( &s->IDSType2);    //gemrb extension IDS targeting
 	str->ReadResRef( s->FailSpell);  //gemrb extension fail effect
 	str->ReadResRef( s->SuccSpell);  //gemrb extension implicit effect
-	str->Seek(172, GEM_CURRENT_POS); //skipping unused (unknown) bytes
+	str->Seek(172, GEM_CURRENT_POS); // skipping unused bytes
 	//we should stand at offset 0x100 now
 	str->ReadDword( &s->TFlags ); //other projectile flags
 	str->ReadResRef( s->BAMRes1 );
@@ -105,6 +106,9 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadWord( &s->TrailSpeed[0] );
 	str->ReadWord( &s->TrailSpeed[1] );
 	str->ReadWord( &s->TrailSpeed[2] );
+	// TODO: check if this was used
+	// IESDP: 0 - puff at target, 1 - puff at source
+	// original bg2: DWORD  m_dwPuffFlags and then just reserved space
 	str->Seek(172, GEM_CURRENT_POS);
 	if (AreaExtension!=3) {
 		return s;
@@ -146,9 +150,10 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 		tmp=359;
 	}
 	e->ConeWidth = tmp;
-	str->ReadWord( &tmp);
+	str->ReadWord(&tmp); // padding
 
 	//These are GemRB specific, not used in the original engine
+	// bg2 has 216 bytes of reserved space here instead
 	str->ReadResRef( e->Spread );
 	str->ReadResRef( e->Secondary );
 	str->ReadResRef( e->AreaSound );

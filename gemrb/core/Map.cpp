@@ -1551,8 +1551,9 @@ void Map::AddAnimation(AreaAnimation* panim)
 //this might be unnecessary later
 void Map::UpdateEffects()
 {
-	for (auto actor : actors) {
-		actor->RefreshEffects(NULL);
+	size_t i = actors.size();
+	while (i--) {
+		actors[i]->RefreshEffects(NULL);
 	}
 }
 
@@ -1645,7 +1646,10 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 //call this once, after area was loaded
 void Map::InitActors()
 {
-	for (auto actor : actors) {
+	// setting the map can run effects, so play on the safe side and ignore any actors that might get added
+	size_t i = actors.size();
+	while (i--) {
+		Actor *actor = actors[i];
 		actor->SetMap(this);
 		InitActor(actor);
 	}
@@ -2451,7 +2455,7 @@ Entrance* Map::GetEntrance(const char* Name)
 	return NULL;
 }
 
-bool Map::HasActor(Actor *actor)
+bool Map::HasActor(Actor *actor) const
 {
 	for (Actor *act : actors) {
 		if (act == actor) {
@@ -3566,7 +3570,8 @@ void Map::UpdateFog()
 		SetMapVisibility( 0 );
 	}
 
-	for (auto actor : actors) {
+	for (size_t i = 0; i < actors.size(); i++) {
+		Actor *actor = actors[i];
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		if (core->FogOfWar&FOG_DRAWFOG) {
 			int state = actor->Modified[IE_STATE_ID];

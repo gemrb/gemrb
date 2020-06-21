@@ -477,7 +477,7 @@ public:
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
 	Actor* GetActorByScriptName(const char* name);
-	bool HasActor(Actor *actor);
+	bool HasActor(Actor *actor) const;
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
 

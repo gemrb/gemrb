@@ -6,10 +6,6 @@
 cmake_install.cmake
 CMakeFiles
 Makefile
-Makefile.in
-.deps
-.libs
-.dirstamp
 
 # Mac/Xcode junk
 DerivedData
@@ -21,23 +17,8 @@ apple/ios/lib
 xcuserdata
 *.pbxuser
 
-/aclocal.m4
-/admin/config.guess
-/admin/config.sub
-/admin/depcomp
-/admin/install-sh
-/admin/ltmain.sh
-/admin/missing
-/autom4te.cache/
 /config.h
-/config.h.in
-/config.log
-/config.status
-/configure
-/gemrb.spec
 /gemrb/gemrb
-/libtool
-/stamp-h1
 /cmake_uninstall.cmake
 /CMakeCache.txt
 /build
@@ -46,3 +27,6 @@ xcuserdata
 /.vs
 /CMakeSettings.json
 /out
+
+**/gemrb_path.txt
+**/GemRB.log

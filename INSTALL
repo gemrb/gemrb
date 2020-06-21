@@ -9,7 +9,7 @@ Tools you will need to build GemRB:
 Required dependencies:
   - ZLib
   - Python 2.3 or better, compiled with shared libraries
-  - SDL 1.2 or SDL 2.0+
+  - SDL 1.2 or SDL 2.0+ (2.0.12 has a palette issue causing piles to have black outlines)
 
 Optional dependencies:
   - OpenAL (for sound; preferred)
@@ -63,6 +63,13 @@ install and using SDL2 backend. Then, if you want the standard driver, pass
 
 Please let us know if you encounter any problems while building.
 
+Building GemRB with MSVC
+------------------------
+
+Check this guide with detailed instructions for installing dependencies
+and building GemRB: https://gemrb.github.io/MSVC-build.html
+
+
 Building GemRB with mingw
 -------------------------
 
@@ -77,4 +84,4 @@ By default, GemRB is installed into c:\Program Files\GemRB . Supporting
 files are mostly installed into the same directory.
 
 See the following for an extensive build walkthrough:
-http://www.gemrb.org/wiki/doku.php?id=install:windows
+https://gemrb.github.io/MSYS2-build.html

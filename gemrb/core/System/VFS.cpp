@@ -47,6 +47,7 @@
 
 #ifndef WIN32
 #include <dirent.h>
+#include <sys/mman.h>
 #endif
 
 #ifdef __APPLE__
@@ -487,6 +488,44 @@ GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
 	return outPath;
 }
 
+#ifdef WIN32
+
+void* readonly_mmap(void *fd) {
+	HANDLE mappingHandle =
+		CreateFileMapping(
+			static_cast<HANDLE>(fd),
+			nullptr,
+			PAGE_READONLY,
+			0,
+			0,
+			nullptr
+		);
+
+	if (mappingHandle == nullptr) {
+		return nullptr;
+	}
+
+	void *start = MapViewOfFile(mappingHandle, FILE_MAP_READ, 0, 0, 0);
+	CloseHandle(mappingHandle);
+
+	return start;
+}
+
+void munmap(void *start, size_t) {
+	UnmapViewOfFile(start);
+}
+
+#else
+
+void* readonly_mmap(void *vfd) {
+	int fd = fileno(static_cast<FILE*>(vfd));
+	struct stat statData;
+	fstat(fd, &statData);
+
+	return mmap(nullptr, statData.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+}
+
+#endif
 
 DirectoryIterator::DirectoryIterator(const char *path)
 	: predicate(NULL), Directory(NULL), Entry(NULL)

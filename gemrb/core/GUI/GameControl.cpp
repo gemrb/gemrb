@@ -1307,6 +1307,12 @@ void GameControl::UpdateCursor()
 		return;
 	}
 
+	// don't allow summons to try travelling (alone), since it causes tons of loading
+	if (nextCursor == IE_CURSOR_TRAVEL && core->GetGame()->OnlyNPCsSelected()) {
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
+
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
@@ -2074,7 +2080,15 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				default: break;
 			}
 		}
+		return true;
+	}
 
+	if (lastCursor == IE_CURSOR_BLOCKED) {
+		// don't allow travel if the destination is actually blocked
+		return false;
+	}
+
+	if (!isFormationRotation) {
 		if (target_mode == TARGET_MODE_NONE) {
 			if (isSelectionRect || lastActorID) {
 				MakeSelection(Mod&GEM_MOD_SHIFT);
@@ -2082,6 +2096,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				return true;
 			}
 		}
+
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
 			PerformSelectedAction(p);
 			ClearMouseState();
