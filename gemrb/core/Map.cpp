@@ -791,7 +791,7 @@ void Map::UpdateScripts()
 	while (more_steps) {
 		more_steps = false;
 		
-		// Make all actors pathfind
+		// Make all actors pathfind if they are blocked
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
@@ -2629,9 +2629,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
-	bool *isClosed = new bool[Width * Height]();
-	auto *parents = new SearchmapPoint[Width * Height];
-	auto *distFromStart = new unsigned short[Width * Height]();
+	std::vector<bool> isClosed(Width * Height);
+	std::vector<SearchmapPoint> parents(Width * Height);
+	std::vector<unsigned short> distFromStart(Width * Height);
 
 	int dxCross = smptDest.x - smptSource.x;
 	int dyCross = smptDest.y - smptSource.y;
@@ -2748,19 +2748,13 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 	if (foundPath) {
 		return BuildActorPath(smptCurrent, smptDest, parents, backAway);
-	} else {
-		//Log(DEBUG, "PathFinderWIP", "Pathfinder destination is unreachable");
 	}
-	// Right proper memory management
-	delete[] isClosed;
-	delete[] parents;
-	delete[] distFromStart;
 
 	return NULL;
 }
 
 PathNode *
-Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents,
+Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const std::vector<SearchmapPoint> parents,
 					bool backAway) const {
 	PathNode *resultPath = NULL;
 	smptCurrent = smptDest;

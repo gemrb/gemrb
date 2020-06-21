@@ -608,9 +608,11 @@ private:
 
 
 
-	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable = false, bool actorsAreBlocking = true) const;
+	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags,
+		bool checkImpassable = false, bool actorsAreBlocking = true) const;
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
-	PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, const SearchmapPoint *parents, bool backAway) const;
+	PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, 
+		const std::vector<SearchmapPoint> parents, bool backAway) const;
 };
 
 }

@@ -2462,7 +2462,10 @@ void Movable::NewPath()
 		return;
 	}
 	WalkTo(tmp, InternalFlags, size);
-	if (!GetPath()) IncrementPathTries();
+	if (!GetPath()) {
+		IncrementPathTries();
+		Log(DEBUG, "PathFinderWIP", "Pathfinding failed for %s, tries: %d", this->GetName(0), GetPathTries());
+	}
 }
 
 /**********************
