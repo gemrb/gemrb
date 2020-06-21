@@ -126,6 +126,8 @@ class SpriteCover;
 #define XP_DISARM     1
 #define XP_LEARNSPELL 2
 
+#define MAX_PATH_TRIES 15
+
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
@@ -466,8 +468,19 @@ protected:
 	//the # of previous tries to pick up a new walkpath
   int PathTries;
 	bool tryNotToBump;
+	int randomBackoff;
 
 public:
+
+	inline int GetRandomBackoff() const
+	{
+		return randomBackoff;
+	}
+	void Backoff();
+	inline void DecreaseBackoff()
+	{
+		randomBackoff--;
+	}
 	Movable(ScriptableType type);
 	virtual ~Movable(void);
 	Point Destination;

@@ -795,6 +795,9 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
+			if (actor->GetRandomBackoff()) {
+				continue;
+			}
 			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
 			if (nearActor && nearActor != actor) {
 				actor->NewPath();
@@ -804,6 +807,10 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
+			if (actor->GetRandomBackoff()) {
+				actor->DecreaseBackoff();
+				continue;
+			}
 			more_steps = !DoStepForActor(actor, actor->speed, time);
 
 		}

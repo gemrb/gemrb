@@ -2017,6 +2017,7 @@ Movable::Movable(ScriptableType type)
 	prevTicks = 0;
 	ResetPathTries();
 	tryNotToBump = false;
+	randomBackoff = 0;
 }
 
 Movable::~Movable(void)
@@ -2164,6 +2165,13 @@ unsigned char Movable::GetNextFace()
 	return Orientation;
 }
 
+
+void Movable::Backoff()
+{
+	randomBackoff = RAND(MAX_PATH_TRIES, MAX_PATH_TRIES * 2);
+}
+
+
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
@@ -2259,6 +2267,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			} else {
 				StanceID = IE_ANI_READY;
 				tryNotToBump = true;
+				Backoff();
 				return true;
 			}
 		}
@@ -2446,17 +2455,15 @@ void Movable::ClearPath(bool resetDestination)
 	//don't call ReleaseCurrentAction
 }
 
-const int maxPathTries = 15;
-
 void Movable::NewPath()
 {
 	if (Destination == Pos) return;
-	if (GetPathTries() == maxPathTries - 1) {
+	if (GetPathTries() == MAX_PATH_TRIES - 1) {
 		tryNotToBump = false;
 	}
 
 	Point tmp = Destination;
-	if (GetPathTries() > maxPathTries) {
+	if (GetPathTries() > MAX_PATH_TRIES) {
 		ClearPath(true);
 		ResetPathTries();
 		return;
