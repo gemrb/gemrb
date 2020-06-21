@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "Variables.h"
+#include "CharAnimations.h"
 
 #include <list>
 #include <map>
@@ -126,7 +127,7 @@ class SpriteCover;
 #define XP_DISARM     1
 #define XP_LEARNSPELL 2
 
-#define MAX_PATH_TRIES 15
+#define MAX_PATH_TRIES 8
 
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
@@ -516,7 +517,7 @@ public:
 	}
 
 	inline bool IsMoving() const {
-		return step;
+		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
 	/* call this when path needs to be changed */
 	void NewPath();

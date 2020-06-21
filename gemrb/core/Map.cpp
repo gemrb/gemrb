@@ -811,8 +811,7 @@ void Map::UpdateScripts()
 				actor->DecreaseBackoff();
 				continue;
 			}
-			more_steps = !DoStepForActor(actor, actor->speed, time);
-
+			more_steps = more_steps || !DoStepForActor(actor, actor->speed, time);
 		}
 	}
 
@@ -2460,7 +2459,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 
 SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int pathLength, int validFlags) const
 {
-	float *dist = new float[Width * Height]();
+	std::vector<float> dist(Width * Height);
 	static const size_t DEGREES_OF_FREEDOM = 8;
 	static const char dx[DEGREES_OF_FREEDOM] = {1, 0, -1, 0, 1, 1, -1, -1};
 	static const char dy[DEGREES_OF_FREEDOM] = {0, 1, 0, -1, 1, -1, 1, -1};
@@ -2508,8 +2507,6 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 			}
 		}
 	}
-	// Right proper memory management
-	delete[] dist;
 	return smptFarthest;
 }
 
