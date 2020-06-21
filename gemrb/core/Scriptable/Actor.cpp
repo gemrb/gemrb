@@ -6233,12 +6233,14 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		}
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
+		if (core->GetGame()->CombatCounter) { return false; }
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) { return false; }
 		if (BumpBackTimer) { return false; }
 		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) { return false; }
 		if (IsMoving()) { return false; }
 	}
 	if (ga_flags & GA_CAN_BUMP) {
+		if (core->GetGame()->CombatCounter) { return false; }
 		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) { return false; }
 	}
 	return true;
