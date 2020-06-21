@@ -385,9 +385,6 @@ public:
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
 	 */
 	ieByte pstColorBytes[10];
-	void BumpAway(Point farthest);
-	void BumpBack();
-	void DecreaseBumpBackTimer();
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -414,8 +411,6 @@ private:
 	ieDword LastFatigueCheck;
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
-	Point OldPos;
-	unsigned BumpBackTimer;
 
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,

@@ -2018,6 +2018,7 @@ Movable::Movable(ScriptableType type)
 	ResetPathTries();
 	tryNotToBump = false;
 	randomBackoff = 0;
+	BumpBackTimer = 0;
 }
 
 Movable::~Movable(void)
@@ -2172,6 +2173,35 @@ void Movable::Backoff()
 }
 
 
+void Movable::BumpAway(Point farthest)
+{
+	if (Type != ST_ACTOR) return;
+  if (!BumpBackTimer) {
+    OldPos = Pos;
+  }
+  BumpBackTimer = 10;
+  ((Actor*)this)->SetPosition(farthest, 1, size, size);
+}
+
+void Movable::BumpBack()
+{
+  assert(!BumpBackTimer);
+	if (Type != ST_ACTOR) return;
+  ((Actor*)this)->SetPosition(OldPos, 1, size, size);
+}
+
+void Movable::DecreaseBumpBackTimer()
+{
+  if (!BumpBackTimer) {
+    return;
+  }
+  BumpBackTimer--;
+  if (!BumpBackTimer) {
+    BumpBack();
+  }
+}
+
+
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
@@ -2195,6 +2225,11 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		// zero speed: no movement
 		StanceID = IE_ANI_READY;
 		this->timeStartStep = time;
+		return true;
+	}
+
+	if (BumpBackTimer) {
+		DecreaseBumpBackTimer();
 		return true;
 	}
 

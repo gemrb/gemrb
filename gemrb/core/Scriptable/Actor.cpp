@@ -456,7 +456,6 @@ Actor::Actor()
 		Modified[i] = 0;
 	}
 	PrevStats = NULL;
-	BumpBackTimer = 0;
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
@@ -11401,31 +11400,6 @@ void Actor::PlayArmorSound() const
 	}
 }
 
-void Actor::BumpAway(Point farthest)
-{
-	if (!BumpBackTimer) {
-		OldPos = Pos;
-	}
-	BumpBackTimer = 10;
-	SetPosition(farthest, 1, size, size);
-}
-
-void Actor::BumpBack()
-{
-	assert(!BumpBackTimer);
-	SetPosition(OldPos, 1, 0, 0);
-}
-
-void Actor::DecreaseBumpBackTimer()
-{
-	if (!BumpBackTimer) {
-		return;
-	}
-	BumpBackTimer--;
-	if (!BumpBackTimer) {
-		BumpBack();
-	}
-}
 
 }
 

@@ -470,6 +470,8 @@ protected:
   int PathTries;
 	bool tryNotToBump;
 	int randomBackoff;
+	Point OldPos;
+	unsigned BumpBackTimer;
 
 public:
 
@@ -490,25 +492,18 @@ public:
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
+	void BumpAway(Point farthest);
+	void BumpBack();
+	void DecreaseBumpBackTimer();
+
 	PathNode *GetNextStep(int x);
-	PathNode *GetPath() { return path; };
-	inline int GetPathTries() const
-	{
-		return PathTries;
-	}
-
-	inline void IncrementPathTries()
-	{
-		PathTries++;
-	}
-
-	inline void ResetPathTries()
-	{
-		PathTries = 0;
-	}
+	inline PathNode *GetPath() const { return path; };
+	inline int GetPathTries() const	{	return PathTries;	}
+	inline void IncrementPathTries() { PathTries++; }
+	inline void ResetPathTries() { PathTries = 0; }
 
 	int GetPathLength();
-//inliners to protect data consistency
+	//inliners to protect data consistency
 	inline PathNode * GetStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);
