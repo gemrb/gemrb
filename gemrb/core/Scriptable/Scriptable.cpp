@@ -2169,7 +2169,7 @@ unsigned char Movable::GetNextFace()
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
-	int collisionLookaheadRadius = size * 2 - 1;
+	int collisionLookaheadRadius = size * 3 - 2;
 	int stepTime = 566;
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
@@ -2239,13 +2239,18 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		double xCollision = Pos.x + dx * collisionLookaheadRadius;
-		double yCollision = Pos.y + dy * collisionLookaheadRadius * 0.75;
-		Point nmptCollision(xCollision, yCollision);
-		Actor* actorInTheWay = area->GetActorInRadius(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED, collisionLookaheadRadius / 2);
+		Actor* actorInTheWay = NULL;
+		// We can't use GetActorInRadius because we want to only check directly along the way
+		// and not be blocked by actors who are on the sides
+		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
+			double xCollision = Pos.x + dx * r;
+			double yCollision = Pos.y + dy * r * 0.75;
+			Point nmptCollision(xCollision, yCollision);
+			actorInTheWay = area->GetActor(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED);
+		}
 		if (actorInTheWay && actorInTheWay != this) {
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 2, ~0);
+				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 3, ~0);
 				Point nmptFarthest;
 				nmptFarthest.x = smptFarthest.x * 16;
 				nmptFarthest.y = smptFarthest.y * 12;
