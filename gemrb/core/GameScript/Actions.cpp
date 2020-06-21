@@ -1105,6 +1105,11 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, IF_NORETICLE, 0 );
 	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -1118,6 +1123,13 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		actor->WalkTo( parameters->pointParameter, IF_NOINT, 0 );
 	}
 	// should we always force IF_NOINT here?
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->Interrupt();
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+
+	}
 }
 
 void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
@@ -1131,6 +1143,11 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_NORETICLE|IF_RUNNING, 0 );
 	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
@@ -1143,6 +1160,11 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
 		actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -1163,6 +1185,13 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 		actor->WalkTo(parameters->pointParameter, 0, parameters->int1Parameter);
 	}
 
+	//hopefully this hack will prevent lockups
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
 	//repeat movement...
 	if (parameters->int0Parameter>0) {
@@ -1194,6 +1223,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		actor->WalkTo( parameters->pointParameter, 0 );
 	}
 
+	// give up if we can't move there (no path was found)
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 //bg2, jumps to saved location in variable
@@ -1238,6 +1273,11 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, 0, 0 );
 	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 //PST
@@ -1260,6 +1300,11 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, IF_RUNNING, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -1287,6 +1332,11 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 		actor->WalkTo( p, 0, 0 );
 	}
 	//what else?
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
@@ -1308,6 +1358,11 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo(p, 0, parameters->int0Parameter);
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -1409,6 +1464,12 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, IF_NOINT, 0 );
 	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->Interrupt();
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
@@ -1421,6 +1482,11 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	Point p(Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y);
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, 0, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
+		Sender->ReleaseCurrentAction();
 	}
 }
 

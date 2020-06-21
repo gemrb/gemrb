@@ -2177,7 +2177,7 @@ void Movable::Backoff()
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
-	int collisionLookaheadRadius = size * 3 - 2;
+	int collisionLookaheadRadius = size * 3 - 3;
 	int stepTime = 566;
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
@@ -2268,6 +2268,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				StanceID = IE_ANI_READY;
 				tryNotToBump = true;
 				Backoff();
+				Log(DEBUG, "PathFinderWIP", "%s blocked by %s", this->GetName(0), actorInTheWay->GetName(0));
 				return true;
 			}
 		}
