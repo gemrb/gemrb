@@ -1349,14 +1349,22 @@ def CloseTopWindow ():
 		window.Close()
 		UpdateClock()
 
-# TODO: this really looks like (most of?) it only applies to the inventory window
-# it woudl be better to move that to GUIINV
 def TopWindowClosed(window):
+	optwin = GemRB.GetView("OPTWIN")
+	btnid = GemRB.GetVar("OPTBTN")
+	button = optwin.GetControl(btnid)
+	button.SetState(IE_GUI_BUTTON_UNPRESSED)
+	button = optwin.GetControl(0) # return to game button
+	button.SetState(IE_GUI_BUTTON_SELECTED)
+
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
 	GemRB.GetView ("ACTWIN").SetVisible (True)
 	if not GameCheck.IsPST(): #PST Doesn't have the message window visible in the main game screen
 		GemRB.GetView ("MSGWIN").SetVisible(True)
+		
+	# TODO: this should be moved to GUIINV and that window should have a custom close handler
+	# that does this stuff then calls this manually
 
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
@@ -1379,7 +1387,7 @@ else:
 	DefaultWinPos = WINDOW_CENTER
 
 def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos):
-	def ret ():
+	def ret (btn = None, val = None):
 		topwin = GemRB.GetView("WIN_TOP")
 		if topwin and topwin.HasFocus == False:
 			return None # we cannot close the current WIN_TOP unless it has focus
@@ -1395,9 +1403,16 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			if selectionHandler:
 				selectionHandler(window)
 				window.SetAction(selectionHandler, ACTION_WINDOW_FOCUS_GAINED)
-
+			
 			SetTopWindow (window, selectionHandler)
 			window.SetAction(TopWindowClosed, ACTION_WINDOW_CLOSED)
+			
+			optwin = GemRB.GetView("OPTWIN")
+			button = optwin.GetControl(0) # return to game button
+			button.SetState(IE_GUI_BUTTON_UNPRESSED)
+			if btn:
+				btn.SetState(IE_GUI_BUTTON_SELECTED)
+				GemRB.SetVar("OPTBTN", val) # cant use btn.ID because it is "too large to convert to C long"
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)

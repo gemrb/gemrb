@@ -526,7 +526,6 @@ def LoadGamePress ():
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
 	GemRB.QuitGame ()
-	GemRB.SetVar ("SelectedWindow", 0)
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
