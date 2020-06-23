@@ -173,9 +173,12 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
-		Button = InitOptionButton(Window,'Return_To_Game', True, False)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
-		Button.MakeEscape()
+		Button = InitOptionButton(Window,'Return_To_Game', True)
+		
+		EscButton = Window.CreateButton (99, 0, 0, 0, 0);
+		EscButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
+		EscButton.MakeEscape()
+		
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
 			Button.SetSprites ("GUILSOP", 0,16,17,28,16)
@@ -1345,7 +1348,8 @@ def SetSelectionChangeMultiHandler (handler):
 
 def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
-	if window:
+	# we cannot close the current WIN_TOP unless it has focus
+	if window and window.HasFocus == True:
 		window.Close()
 		UpdateClock()
 
