@@ -124,6 +124,8 @@
 		A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A244547F1F09BFF8008D5B5E /* GUIAnimation.cpp */; };
 		A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = A24454801F09BFF8008D5B5E /* GUIAnimation.h */; };
 		A2491881141092F20038B170 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
+		A24B088F24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24B088D24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp */; };
+		A24B089024A1DBEF00CA2649 /* MappedFileMemoryStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A24B088E24A1DBEF00CA2649 /* MappedFileMemoryStream.h */; };
 		A24C80AC232C9B56004CB41A /* VLCPlayer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A24C80AD232C9DC1004CB41A /* libvlc.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */; };
 		A24C80AF232C9DC2004CB41A /* libvlccore.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */; };
@@ -1283,6 +1285,8 @@
 		A2462F1113A036B1002D1F02 /* AREImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = AREImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A249187B141075A60038B170 /* CocoaWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaWrapper.m; sourceTree = "<group>"; };
 		A2491880141092F20038B170 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		A24B088D24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MappedFileMemoryStream.cpp; sourceTree = "<group>"; };
+		A24B088E24A1DBEF00CA2649 /* MappedFileMemoryStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MappedFileMemoryStream.h; sourceTree = "<group>"; };
 		A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlccore.9.dylib; path = ../../../../../Applications/VLC.app/Contents/MacOS/lib/libvlccore.9.dylib; sourceTree = "<group>"; };
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
@@ -3312,6 +3316,8 @@
 		A2BFA0571395FF62006ADC12 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				A24B088D24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp */,
+				A24B088E24A1DBEF00CA2649 /* MappedFileMemoryStream.h */,
 				A2BFA05C1395FF62006ADC12 /* DataStream.cpp */,
 				A2BFA05D1395FF62006ADC12 /* DataStream.h */,
 				A2CE96891B70596100E189C4 /* FileFilters.h */,
@@ -3559,6 +3565,7 @@
 				A2E663E3139E884B00310FC8 /* TableMgr.h in Headers */,
 				A2E663E5139E884B00310FC8 /* Tile.h in Headers */,
 				A2E663E7139E884B00310FC8 /* TileMap.h in Headers */,
+				A24B089024A1DBEF00CA2649 /* MappedFileMemoryStream.h in Headers */,
 				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
 				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
 				71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */,
@@ -5333,6 +5340,7 @@
 				A2E66369139E883100310FC8 /* Compressor.cpp in Sources */,
 				A2E6636B139E883100310FC8 /* ControlAnimation.cpp in Sources */,
 				A2E6636D139E883100310FC8 /* Core.cpp in Sources */,
+				A24B088F24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp in Sources */,
 				A2E6636F139E883100310FC8 /* DataFileMgr.cpp in Sources */,
 				A2E66371139E883100310FC8 /* Dialog.cpp in Sources */,
 				A27217031CAE2678005F3976 /* Tooltip.cpp in Sources */,
