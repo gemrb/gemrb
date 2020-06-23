@@ -147,6 +147,10 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	iwd2 = GameCheck.IsIWD2()
 	pst = GameCheck.IsPST()
 	#store these instead of doing 50 calls...
+	
+	EscButton = Window.CreateButton (99, 0, 0, 0, 0);
+	EscButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
+	EscButton.MakeEscape()
 
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
@@ -174,10 +178,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
 		Button = InitOptionButton(Window,'Return_To_Game', True)
-		
-		EscButton = Window.CreateButton (99, 0, 0, 0, 0);
-		EscButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
-		EscButton.MakeEscape()
 		
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
@@ -1444,7 +1444,6 @@ def SetTopWindow (window, selectionHandler = None):
 
 	if window:
 		window.AddAlias("WIN_TOP")
-		window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
 
 		UpdateClock()
