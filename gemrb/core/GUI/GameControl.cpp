@@ -1937,6 +1937,12 @@ static std::map<std::string, std::vector<std::string>> pstWMapExits {
 // has to be a plain travel region and on the whitelist
 bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 {
+
+	//if we havent reached the key area, we need return false to allow regular travel instead
+	Scriptable* Sender = (Scriptable*)pc;
+	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
+	if (!keyAreaVisited) return false;
+
 	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
 
 	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
