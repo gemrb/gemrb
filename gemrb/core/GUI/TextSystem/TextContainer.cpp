@@ -37,13 +37,9 @@ Content::Content(const Size& size)
 	parent = NULL;
 }
 
-Content::~Content()
-{}
-
-Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
+LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	const Region& layoutRgn = Region(rgn.Origin() + p, frame.Dimensions());
-	return Regions(1, layoutRgn);
+	return { std::make_shared<LayoutRegion>(Region(rgn.Origin() + p, frame.Dimensions())) };
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Holder<Palette> pal, const Size* frame)
@@ -90,9 +86,9 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 	return drawRegion;
 }
 
-Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
+LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
-	Regions layoutRegions;
+	LayoutRegions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
 	const Font* layoutFont = LayoutFont();
 	assert(layoutFont);
@@ -203,7 +199,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
-				layoutRegions.push_back(lineLayout);
+				layoutRegions.emplace_back(std::make_shared<LayoutRegion>(lineLayout));
 				lineExclusions.clear();
 			}
 			// FIXME: infinite loop possibility.
@@ -219,17 +215,16 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
-		layoutRegions.push_back(drawRegion);
+		layoutRegions.emplace_back(std::make_shared<LayoutRegion>(drawRegion));
 	}
 	return layoutRegions;
 }
 
-void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
+void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& offset) const
 {
 	size_t charsPrinted = 0;
-	Regions::const_iterator rit = rgns.begin();
-	for (; rit != rgns.end(); ++rit) {
-		Region drawRect = *rit;
+	for (const auto& lrgn : rgns) {
+		Region drawRect = lrgn->region;
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
 		const Font* printFont = LayoutFont();
@@ -263,10 +258,10 @@ ImageSpan::ImageSpan(Sprite2D* im)
 	image = im;
 }
 
-void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
+void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& offset) const
 {
 	// we only care about the first region... (should only be 1 anyway)
-	Region r = rgns.front();
+	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
 	core->GetVideoDriver()->BlitSprite(image, r.x, r.y, &r);
@@ -470,7 +465,16 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 
 Region ContentContainer::BoundingBoxForContent(const Content* c) const
 {
-	return Region::RegionEnclosingRegions(LayoutForContent(c).regions);
+	return BoundingBoxForLayout(LayoutForContent(c).regions);
+}
+
+Region ContentContainer::BoundingBoxForLayout(const LayoutRegions& layoutRgns) const
+{
+	Region r;
+	for (const auto& lrgn : layoutRgns) {
+		r.ExpandToRegion(lrgn->region);
+	}
+	return r;
 }
 
 const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content* c) const
@@ -479,19 +483,17 @@ const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content
 	if (it != layout.end()) {
 		return *it;
 	}
-	static Layout NullLayout(NULL, Regions());
+	static Layout NullLayout(nullptr, LayoutRegions());
 	return NullLayout;
 }
 
 const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 {
-	ContentLayout::const_iterator it = layout.begin();
-	for (; it != layout.end(); ++it) {
-		const Regions& rgns = it->regions;
-		Regions::const_iterator rit = rgns.begin();
-		for (; rit != rgns.end(); ++rit) {
-			if ((*rit).IntersectsRegion(r)) {
-				return &(*rit);
+	for (const auto& layoutRgn : layout) {
+		for (const auto& lrgn : layoutRgn.regions) {
+			const Region& rect = lrgn->region;
+			if (rect.IntersectsRegion(r)) {
+				return &rect;
 			}
 		}
 	}
@@ -547,11 +549,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
-			const Regions& rgns = LayoutForContent(exContent).regions;
-			Regions::const_iterator rit = rgns.begin();
-			for (; rit != rgns.end(); ++rit) {
-				if ((*rit).PointInside(layoutPoint)) {
-					excluded = &(*rit);
+			const LayoutRegions& rgns = LayoutForContent(exContent).regions;
+			for (const auto& lrgn : rgns) {
+				const Region& r = lrgn->region;
+				if (r.PointInside(layoutPoint)) {
+					excluded = &r;
 					break;
 				}
 			}
@@ -567,13 +569,13 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			exContent = ContentAtPoint(layoutPoint);
 			assert(exContent != content);
 		}
-		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
+		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
 		layout.push_back(Layout(content, rgns));
 		exContent = content;
 
 		ieDword flags = Flags();
 		if (flags&(RESIZE_HEIGHT|RESIZE_WIDTH)) {
-			Region bounds = Region::RegionEnclosingRegions(rgns);
+			Region bounds = BoundingBoxForLayout(rgns);
 			bounds.w += margin.left + margin.right;
 			bounds.h += margin.top + margin.bottom;
 			
@@ -719,9 +721,8 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 			stop = diff;
 
 		Point p;
-		Regions::const_iterator rit = layout.regions.begin();
-		for (; rit != layout.regions.end(); ++rit) {
-			const Region& rect = *rit;
+		for (const auto& lrgn : layout.regions) {
+			const Region& rect = lrgn->region;
 			p = rect.Origin();
 			metrics.size = rect.Dimensions();
 
@@ -785,10 +786,8 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};
 		size_t numChars = 0;
 
-		const Regions& regions = layout->regions;
-		Regions::const_iterator rit = regions.begin();
-		for (; rit != regions.end(); ++rit) {
-			const Region& rect = *rit;
+		for (const auto& lrgn : layout->regions) {
+			const Region& rect = lrgn->region;
 
 			if (rect.PointInside(p)) {
 				// find where inside

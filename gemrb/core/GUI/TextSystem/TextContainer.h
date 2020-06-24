@@ -34,6 +34,15 @@ class Sprite2D;
 class ContentContainer;
 class TextContainer;
 
+struct LayoutRegion {
+	Region region;
+	
+	LayoutRegion(Region r)
+	: region(r) {}
+};
+
+using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
+
 // interface for both content and content containers
 // can instantiate to produce empty areas in layout
 class Content {
@@ -46,14 +55,14 @@ protected:
 
 public:
 	Content(const Size& size);
-	virtual ~Content();
+	virtual ~Content() = default;
 
 	virtual Size ContentFrame() const { return frame.Dimensions(); };
 
 protected:
 	// point is relative to Region. Region is a screen region.
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const {};
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	virtual void DrawContentsInRegions(const LayoutRegions&, const Point&) const {};
+	virtual LayoutRegions LayoutForPointInRegion(Point p, const Region&) const;
 };
 
 
@@ -76,8 +85,8 @@ public:
 	unsigned char Alignment;
 
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
+	LayoutRegions LayoutForPointInRegion(Point p, const Region&) const override;
 
 private:
 	inline const Font* LayoutFont() const;
@@ -94,7 +103,7 @@ public:
 	ImageSpan(Sprite2D* image);
 
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
+	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
 };
 
 
@@ -130,24 +139,26 @@ protected:
 
 	struct Layout {
 		const Content* content;
-		Regions regions;
-
-		Layout(const Content* c, const Regions r)
-		: content(c), regions(r) {}
+		LayoutRegions regions;
+		
+		Layout(const Content* c, LayoutRegions rgns)
+		: content(c), regions(std::move(rgns)) {
+			assert(regions.size());
+		}
 
 		bool operator==(const Content* c) const {
 			return c == content;
 		}
 
 		bool operator<(const Point& p) const {
-			const Region& r = regions.back();
+			const Region& r = regions.back()->region;
 			return r.y < p.y || (r.x < p.x && r.y == p.y);
 		}
 
 		bool PointInside(const Point& p) const {
-			Regions::const_iterator rit = regions.begin();
-			for (; rit != regions.end(); ++rit) {
-				if ((*rit).PointInside(p)) {
+			for (const auto& layout : regions) {
+				const Region r = layout->region;
+				if (r.PointInside(p)) {
 					return true;
 				}
 			}
@@ -179,6 +190,7 @@ public:
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
+	Region BoundingBoxForLayout(const LayoutRegions&) const;
 	
 	void SetMargin(Margin m);
 	void SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left);
