@@ -229,6 +229,7 @@ private:
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
 class TextContainer : public ContentContainer {
 private:
+	using TextLayout = TextSpan::TextLayoutRegion;
 	// default font/palette for adding plain text
 	Font* font;
 	Holder<Palette> palette;
@@ -236,6 +237,7 @@ private:
 
 	size_t textLen;
 	size_t cursorPos, printPos;
+	Point cursorPoint;
 
 private:
 	String TextFrom(ContentList::const_iterator) const;
@@ -243,6 +245,7 @@ private:
 	void ContentRemoved(const Content* content);
 
 	void MoveCursorToPoint(const Point& p);
+	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
 
 	// relative to cursor pos
 	void InsertText(const String& text);

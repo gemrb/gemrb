@@ -707,10 +707,22 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 	}
 }
 
-void TextContainer::DrawContents(const Layout& layout, const Point& dp)
+LayoutRegions::const_iterator
+TextContainer::FindCursorRegion(const Layout& layout)
 {
-	using TextLayout = TextSpan::TextLayoutRegion;
-	
+	auto end = layout.regions.end();
+	for (auto it = layout.regions.begin(); it != end; ++it) {
+		const TextLayout& tlrgn = static_cast<const TextLayout&>(**it);
+		
+		if (tlrgn.beginCharIdx <= cursorPos && tlrgn.endCharIdx >= cursorPos) {
+			return it;
+		}
+	}
+	return end;
+}
+
+void TextContainer::DrawContents(const Layout& layout, const Point& dp)
+{	
 	ContentContainer::DrawContents(layout, dp);
 
 	const TextSpan* ts = (const TextSpan*)layout.content;
@@ -719,20 +731,15 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 
 	if (Editable() && printPos < cursorPos && printPos + textLen >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
-
-		Point p;
-		for (const auto& lrgn : layout.regions) {
-			const TextLayout& tlrgn = static_cast<const TextLayout&>(*lrgn);
-			
-			size_t begin = tlrgn.beginCharIdx;
-			size_t end = tlrgn.endCharIdx;
-			if (begin <= cursorPos && end >= cursorPos) {
-				const Region& rect = tlrgn.region;
-				p = rect.Origin();
-				const String& substr = text.substr(begin, cursorPos - begin);
-				p.x += printFont->StringSizeWidth(substr, 0);
-				break;
-			}
+		
+		auto it = FindCursorRegion(layout);
+		if (it != layout.regions.end()) {
+			auto cursorRegion = static_cast<const TextLayout&>(**it);
+			size_t begin = cursorRegion.beginCharIdx;
+			const Region& rect = cursorRegion.region;
+			cursorPoint = rect.Origin();
+			const String& substr = text.substr(begin, cursorPos - begin);
+			cursorPoint.x += printFont->StringSizeWidth(substr, 0);
 		}
 
 		Video* video = core->GetVideoDriver();
@@ -740,7 +747,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		video->SetScreenClip(NULL);
 
 		Sprite2D* cursor = core->GetCursorSprite();
-		video->BlitSprite(cursor, p.x + dp.x, p.y + dp.y + cursor->Frame.y);
+		video->BlitSprite(cursor, cursorPoint.x + dp.x, cursorPoint.y + dp.y + cursor->Frame.y);
 		cursor->release();
 
 		video->SetScreenClip(&sc);
@@ -756,7 +763,6 @@ void TextContainer::SizeChanged(const Size& oldSize)
 		frame.h = font->LineHeight;
 	}
 }
-
 
 void TextContainer::MoveCursorToPoint(const Point& p)
 {
@@ -847,6 +853,40 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 			return true;
 		case GEM_RIGHT:
 			AdvanceCursor(1);
+			return true;
+		case GEM_UP:
+		case GEM_DOWN:
+			{
+				size_t offset = 0;
+				const Layout* layout = LayoutAtPoint(cursorPoint);
+				LayoutRegions::const_iterator it;
+				if (layout) {
+					it = FindCursorRegion(*layout);
+					assert(it != layout->regions.end());
+					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					offset = cursorPos - cursorRegion.beginCharIdx;
+				} else { // cursor is at end of text
+					return true;
+				}
+				
+				if (key.keycode == GEM_UP) {
+					if (it == layout->regions.begin()) {
+						return true;
+					}
+					it--;
+				} else {
+					if (it == layout->regions.end()) {
+						return true;
+					}
+					it++;
+				}
+				
+				if (it != layout->regions.end()) {
+					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					cursorPos = cursorRegion.beginCharIdx + offset;
+					MarkDirty();
+				}
+			}
 			return true;
 		case GEM_DELETE:
 			if (cursorPos < textLen) {
