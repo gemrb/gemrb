@@ -74,6 +74,14 @@ private:
 	String text;
 	const Font* font;
 	Holder<Palette> palette;
+	
+	struct TextLayoutRegion : LayoutRegion {
+		size_t beginCharIdx;
+		size_t endCharIdx;
+		
+		TextLayoutRegion(Region r, size_t begin, size_t end)
+		: LayoutRegion(r), beginCharIdx(begin), endCharIdx(end) {}
+	};
 
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL

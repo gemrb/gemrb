@@ -117,6 +117,9 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 
 				lineSegment = lineRgn;
 			}
+			
+			size_t begin = 0;
+			size_t end = 0;
 			do {
 				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
 				// check for intersections with other content
@@ -174,6 +177,9 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
+					
+					begin = numPrinted;
+					end = begin + numOnLine;
 
 					bool noFit = !metrics.forceBreak && numOnLine == 0;
 					bool lineFilled = lineSegment.x + lineSegment.w == lineRgn.w;
@@ -199,7 +205,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
-				layoutRegions.emplace_back(std::make_shared<LayoutRegion>(lineLayout));
+				layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(lineLayout, begin, end));
 				lineExclusions.clear();
 			}
 			// FIXME: infinite loop possibility.
@@ -215,7 +221,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
-		layoutRegions.emplace_back(std::make_shared<LayoutRegion>(drawRegion));
+		layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(drawRegion, 0, text.length()));
 	}
 	return layoutRegions;
 }
@@ -703,6 +709,8 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 
 void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 {
+	using TextLayout = TextSpan::TextLayoutRegion;
+	
 	ContentContainer::DrawContents(layout, dp);
 
 	const TextSpan* ts = (const TextSpan*)layout.content;
@@ -711,42 +719,20 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 
 	if (Editable() && printPos < cursorPos && printPos + textLen >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
-		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};
-
-		// diff is the length of the TextSpan we want however, it may fall inside of a word
-		size_t diff = cursorPos - printPos;
-		size_t start = 0;
-		size_t stop = text.find_last_of(WHITESPACE_STRING, diff);
-		if (stop == String::npos)
-			stop = diff;
 
 		Point p;
 		for (const auto& lrgn : layout.regions) {
-			const Region& rect = lrgn->region;
-			p = rect.Origin();
-			metrics.size = rect.Dimensions();
-
-			const String& substr = text.substr(start, stop);
-			printFont->StringSize(substr, &metrics);
-
-			if (metrics.numChars == stop) {
-				if (text[start+stop] == '\n') {
-					// FIXME: technically ought to use the next rect rather then assume we can jump down a line
-					p.y += printFont->LineHeight;
-					++start;
-				} else if (metrics.numChars > 0) {
-					p.x += metrics.size.w;
-				}
-				// found it
-				if (stop < diff) {
-					// inside a word
-					const String& substr = text.substr(start + stop, diff - start - metrics.numChars);
-					p.x += printFont->StringSizeWidth(substr, 0);
-				}
+			const TextLayout& tlrgn = static_cast<const TextLayout&>(*lrgn);
+			
+			size_t begin = tlrgn.beginCharIdx;
+			size_t end = tlrgn.endCharIdx;
+			if (begin <= cursorPos && end >= cursorPos) {
+				const Region& rect = tlrgn.region;
+				p = rect.Origin();
+				const String& substr = text.substr(begin, cursorPos - begin);
+				p.x += printFont->StringSizeWidth(substr, 0);
 				break;
 			}
-			start += metrics.numChars;
-			stop -= metrics.numChars;
 		}
 
 		Video* video = core->GetVideoDriver();
