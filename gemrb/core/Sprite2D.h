@@ -53,9 +53,9 @@ private:
 	int RefCount;
 protected:
 	bool freePixels;
+	void* pixels;
 
 public:
-	void* pixels;
 	Region Frame;
 	int Bpp;
 

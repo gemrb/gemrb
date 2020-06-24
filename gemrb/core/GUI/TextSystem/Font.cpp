@@ -84,8 +84,9 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		if (Sheet) {
 			// if we already have a sheet we need to destroy it before we can add more glyphs
 			pageData = (ieByte*)calloc(SheetRegion.w, glyphH);
-			const ieByte* pixels = static_cast<const ieByte*>(Sheet->pixels);
+			const ieByte* pixels = static_cast<const ieByte*>(Sheet->LockSprite());
 			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h), pageData);
+			Sheet->UnlockSprite();
 			Sprite2D::FreeSprite(Sheet);
 		} else {
 			pageData = (ieByte*)realloc(pageData, SheetRegion.w * glyphH);
