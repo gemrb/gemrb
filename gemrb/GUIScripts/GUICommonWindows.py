@@ -105,7 +105,7 @@ else: # Baldurs Gate, Icewind Dale
 
 # Generic option button init. Pass it the options window. Index is a key to the dicts,
 # IsPage means whether the game should mark the button selected
-def InitOptionButton(Window, Index, IsPage=True, HotKey=True):
+def InitOptionButton(Window, Index, HotKey=True):
 	Button = Window.GetControl (OptionControl[Index])
 	if not Button:
 		print "InitOptionButton cannot find the button: " + Index
@@ -114,9 +114,11 @@ def InitOptionButton(Window, Index, IsPage=True, HotKey=True):
 	Button.SetTooltip (OptionTip[Index])
 	if HotKey:
 		Button.SetHotKey (Index, True)
-	if IsPage:
-		Button.SetVarAssoc ("SelectedWindow", OptionControl[Index])
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		
+	# this variable isnt used anywhere (tho it might be useful to use it for knowing what window is open)
+	# however, we still need to set one because we do depend on the button having a value
+	Button.SetVarAssoc ("OPT_BTN", OptionControl[Index])
+
 	return Button
 
 ##these defaults don't seem to break the games other than pst
@@ -155,29 +157,29 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
 
-		Button = InitOptionButton(Window, MageSpellsKey, True)
+		Button = InitOptionButton(Window, MageSpellsKey)
 
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
 		AIPress (0) #this initialises the state and tooltip
 
 		# Select All
-		Button = InitOptionButton(Window, 'SelectAll', True, False)
+		Button = InitOptionButton(Window, 'SelectAll', False)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 	elif pst: #pst has these three controls here instead of portrait pane
 		# (Un)Lock view on character
-		Button = InitOptionButton(Window, 'Follow', True, False)  # or 41648 Unlock ...
+		Button = InitOptionButton(Window, 'Follow', False)  # or 41648 Unlock ...
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
 		AIPress(0) #this initialises the state and tooltip
 
 		# Message popup FIXME disable on non game screen...
-		Button = InitOptionButton(Window, 'Expand', True, False)# or 41661 Close ...
+		Button = InitOptionButton(Window, 'Expand', False)# or 41661 Close ...
 
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
-		Button = InitOptionButton(Window,'Return_To_Game', True)
+		Button = InitOptionButton(Window,'Return_To_Game')
 		
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
@@ -197,28 +199,28 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetTooltip (OptionTip['Party'])
 
 	# Map
-	Button = InitOptionButton(Window, 'Map', True)
+	Button = InitOptionButton(Window, 'Map')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
-	Button = InitOptionButton(Window, 'Journal', True)
+	Button = InitOptionButton(Window, 'Journal')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
-	Button = InitOptionButton(Window, 'Inventory', True)
+	Button = InitOptionButton(Window, 'Inventory')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
-	Button = InitOptionButton(Window, CharacterStatsKey, True)
+	Button = InitOptionButton(Window, CharacterStatsKey)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
 	if iwd1:
@@ -226,21 +228,21 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
-		Button = InitOptionButton(Window, MageSpellsKey, True)
+		Button = InitOptionButton(Window, MageSpellsKey)
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 		# Priest
-		Button = InitOptionButton(Window, 'Priest_Spells', True)
+		Button = InitOptionButton(Window, 'Priest_Spells')
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
-	Button = InitOptionButton(Window, 'Options', True)
+	Button = InitOptionButton(Window, 'Options')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if iwd1:
