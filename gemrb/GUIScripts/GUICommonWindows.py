@@ -1358,8 +1358,9 @@ def TopWindowClosed(window):
 	btnid = GemRB.GetVar("OPTBTN")
 	button = optwin.GetControl(btnid)
 	button.SetState(IE_GUI_BUTTON_UNPRESSED)
-	button = optwin.GetControl(0) # return to game button
-	button.SetState(IE_GUI_BUTTON_SELECTED)
+	rtgbtn = optwin.GetControl(0) # return to game button
+	if rtgbtn: # not in PST or IWD2
+		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
@@ -1412,8 +1413,9 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			window.SetAction(TopWindowClosed, ACTION_WINDOW_CLOSED)
 			
 			optwin = GemRB.GetView("OPTWIN")
-			button = optwin.GetControl(0) # return to game button
-			button.SetState(IE_GUI_BUTTON_UNPRESSED)
+			rtgbtn = optwin.GetControl(0) # return to game button
+			if rtgbtn: # not in PST or IWD2
+				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			if btn:
 				btn.SetState(IE_GUI_BUTTON_SELECTED)
 				GemRB.SetVar("OPTBTN", val) # cant use btn.ID because it is "too large to convert to C long"
