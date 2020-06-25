@@ -3917,6 +3917,11 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
 	Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
+	if (pic == nullptr) {
+		// use any / the smaller icon if the dragging one is unavailable
+		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
+	}
+
 	if (pic) {
 		winmgr->GetGameWindow()->SetCursor(pic);
 		pic->release();
