@@ -645,6 +645,13 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	UpdateScrollview();
 }
 
+void TextArea::SelectAvailableOption(size_t idx)
+{
+	if (selectOptions) {
+		selectOptions->MakeSelection(idx);
+	}
+}
+
 void TextArea::TextChanged(TextContainer& /*tc*/)
 {
 	PerformAction(Action::Change);

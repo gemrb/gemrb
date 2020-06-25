@@ -124,6 +124,8 @@ public:
 
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
 						  const Color* color, const Color* hiColor, const Color* selColor);
+	
+	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
 	void SetAnimPicture(Sprite2D* Picture);
