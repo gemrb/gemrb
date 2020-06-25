@@ -32,9 +32,12 @@
 
 namespace GemRB {
 
-Console::Console(const Region& frame)
-: Control(frame), History(5), textContainer(Region(0,0,0,frame.h), core->GetTextFont(), NULL)
+constexpr size_t HistoryMaxSize = 5;
+
+Console::Console(const Region& frame, TextArea* ta)
+: Control(frame), History(HistoryMaxSize), textContainer(Region(0, std::max<int>(0, frame.h - 25), 0, 25), core->GetTextFont(), NULL)
 {
+	textArea = ta;
 	HistPos = 0;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&Console::HandleHotKey, this);
@@ -44,10 +47,28 @@ Console::Console(const Region& frame)
 	textContainer.SetPalette(palette);
 	palette->release();
 	textContainer.SetMargin(3);
-	textContainer.SetFrameSize(Dimensions());
 
 	textContainer.SetAlignment(IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
 	AddSubviewInFrontOfView(&textContainer);
+	
+	if (textArea) {
+		Size s = Dimensions();
+		s.h -= 25;
+		textArea->SetFrameSize(s);
+		AddSubviewInFrontOfView(textArea);
+		
+		ControlEventHandler handler = [this](Control* c) {
+			auto val = c->GetValue();
+			size_t histSize = History.Size();
+			size_t selected = histSize - val;
+			if (selected <= histSize) {
+				HistPos = selected;
+				SetText(c->QueryText());
+			}
+			this->window->SetFocused(this);
+		};
+		textArea->SetAction(handler, TextArea::Action::Select);
+	}
 }
 
 Console::~Console()
@@ -64,6 +85,7 @@ bool Console::HandleHotKey(const Event& e)
 		window->Close();
 	} else {
 		window->Focus();
+		window->SetFocused(this);
 	}
 	return true;
 }
@@ -94,6 +116,25 @@ void Console::SetText(const String& string)
 	Region rect(Point(), Dimensions());
 	textContainer.DeleteContentsInRect(rect);
 	textContainer.AppendText(string);
+	MarkDirty();
+}
+
+void Console::UpdateTextArea()
+{
+	if (textArea) {
+		std::vector<SelectOption> options;
+		for (auto item : History) {
+			options.push_back(item);
+		}
+		textArea->SetValue(-1);
+		textArea->SetSelectOptions(options, false, nullptr, &SelectOptionHover, &SelectOptionSelected);
+		//textArea->SelectAvailableOption(History.Size() - HistPos);
+		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
+		// then we can change the color to red for failed commands and green for successfull ones
+		// and the highlight can be just a darker shade of those
+	}
+	
+	MarkDirty();
 }
 
 /** Key Press Event */
@@ -117,10 +158,8 @@ bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 					core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
 					free(cBuf);
 					HistoryAdd();
-					HistPos = 0;
 
 					SetText(L"");
-					MarkDirty();
 				}
 			}
 			break;
@@ -135,25 +174,31 @@ bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 
 void Console::HistoryBack()
 {
-	String text = textContainer.Text();
-	if (text.length() && HistPos == 0 && History.Retrieve(HistPos) != text) {
-		HistoryAdd();
+	if (HistPos < History.Size()) {
 		HistPos++;
-	}
-
-	SetText(History.Retrieve(HistPos));
-	if (++HistPos >= (int)History.Size()) {
-		HistPos--;
+		if (textArea) {
+			textArea->SelectAvailableOption(History.Size() - HistPos);
+		} else {
+			SetText(History.Retrieve(HistPos - 1).second);
+		}
 	}
 }
 
 void Console::HistoryForward()
 {
-	if (--HistPos < 0) {
+	if (HistPos <= 1) {
 		SetText(L"");
-		HistPos++;
+		HistPos = 0;
+		if (textArea) {
+			textArea->SelectAvailableOption(-1);
+		}
 	} else {
-		SetText(History.Retrieve(HistPos));
+		--HistPos;
+		if (textArea) {
+			textArea->SelectAvailableOption(History.Size() - HistPos);
+		} else {
+			SetText(History.Retrieve(HistPos - 1).second);
+		}
 	}
 }
 
@@ -161,7 +206,9 @@ void Console::HistoryAdd(bool force)
 {
 	String text = textContainer.Text();
 	if (force || text.length()) {
-		History.Append(text, !force);
+		History.Append(std::make_pair(History.Size(), text), !force);
+		HistPos = 0;
+		UpdateTextArea();
 	}
 }
 

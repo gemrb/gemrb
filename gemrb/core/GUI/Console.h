@@ -29,7 +29,7 @@
 
 #include "CircularBuffer.h"
 #include "GUI/Control.h"
-#include "GUI/TextSystem/TextContainer.h"
+#include "GUI/TextArea.h"
 
 namespace GemRB {
 
@@ -47,14 +47,15 @@ class Palette;
 class Console : public Control {
 private:
 	/** History Buffer */
-	CircularBuffer<String> History;
+	CircularBuffer<SelectOption> History;
 	/** History Position and size */
-	int HistPos;
+	size_t HistPos;
 
 	TextContainer textContainer;
+	TextArea* textArea = nullptr;
 
 public:
-	Console(const Region& frame);
+	Console(const Region& frame, TextArea* ta);
 	~Console();
 
 	/** Sets the Text of the current control */
@@ -65,6 +66,7 @@ public:
 	void DidUnFocus() { textContainer.DidUnFocus(); }
 
 private:
+	void UpdateTextArea();
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);

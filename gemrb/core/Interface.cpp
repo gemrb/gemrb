@@ -439,10 +439,12 @@ GameControl* Interface::StartGameControl()
 
 void Interface::CreateConsole()
 {
-	Region frame(0, 0, 640, 25);
+	Region frame(0, 0, 640, 100);
 	
 	Window* consoleWin = winmgr->MakeWindow(frame);
-	Console* console = new Console(frame);
+	TextArea* ta = new TextArea(frame, GetTextFont());
+	Console* console = new Console(frame, ta);
+
 	consoleWin->AddSubviewInFrontOfView(console);
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
