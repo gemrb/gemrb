@@ -1446,6 +1446,9 @@ def SetTopWindow (window, selectionHandler = None):
 
 	if window:
 		window.AddAlias("WIN_TOP")
+		# ignore the esc key, normally it would be fine, but we have situations like GUISTORE where we have multiple windows
+		# that join together. We have a button on GUIOPT that we bind to esc to handle it so esc still will close these windows
+		window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 		window.Focus()
 
 		UpdateClock()

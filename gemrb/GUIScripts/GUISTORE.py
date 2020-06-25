@@ -139,6 +139,9 @@ def PositionStoreWinRelativeTo(win):
 	winframe = win.GetFrame()
 
 	storewin = GemRB.GetView("WIN_STORE")
+	if not storewin:
+		return
+	
 	storeframe = storewin.GetFrame()
 
 	if GameCheck.IsIWD2():
@@ -158,6 +161,21 @@ def OpenStoreWindow ():
 	global SpellTable, RepModTable
 	global Inventory, BarteringPC
 	global CureTable
+	
+	store_funcs = (OpenStoreShoppingWindow,
+					OpenStoreIdentifyWindow,OpenStoreStealWindow,
+					OpenStoreHealWindow, OpenStoreDonateWindow,
+					OpenStoreRumourWindow,OpenStoreRentWindow )
+	
+	Store = GemRB.GetStore ()
+	#based on shop type, these buttons will change
+	store_buttons = Store['StoreButtons']
+	BarteringPC = GemRB.GameGetFirstSelectedPC ()
+	
+	# we have to load the "top win" first
+	# the code doesn't permit a "normal win" to sit between 2 "top win"
+	# normal windows are considered children of the "top win" below them
+	topwin = store_funcs[store_buttons[0]] ()
 
 	if GameCheck.IsPST():
 		CureTable = GemRB.LoadTable("speldesc") #additional info not supported by core
@@ -165,11 +183,6 @@ def OpenStoreWindow ():
 		if not GameCheck.IsIWD2(): # present from before, resulting in a 10x price increase
 			RepModTable = GemRB.LoadTable ("repmodst")
 		SpellTable = GemRB.LoadTable ("storespl", 1)
-
-	store_funcs = (OpenStoreShoppingWindow,
-	OpenStoreIdentifyWindow,OpenStoreStealWindow,
-	OpenStoreHealWindow, OpenStoreDonateWindow,
-	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
@@ -181,6 +194,7 @@ def OpenStoreWindow ():
 	GemRB.SetVar ("Action", 0)
 
 	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", StoreWindowPlacement)
+	StoreWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	if GameCheck.IsIWD2():
 		# IWD2 has weird overlay windows
 		StoreWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
@@ -190,21 +204,19 @@ def OpenStoreWindow ():
 	if GameCheck.IsPST():
 		MenuWindow = GemRB.LoadWindow (2)
 
-	Store = GemRB.GetStore ()
-	BarteringPC = GemRB.GameGetFirstSelectedPC ()
+	PositionStoreWinRelativeTo(topwin)
 
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["done"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
+	Button.MakeEscape()
 
 	#Store type icon
 	if not GameCheck.IsIWD2():
 		Button = Window.GetControl (5)
 		Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
-	#based on shop type, these buttons will change
-	store_buttons = Store['StoreButtons']
 	for i in range (StoreButtonCount):
 		Buttons[i] = Button = Window.GetControl (i+1)
 		Action = store_buttons[i]
@@ -228,8 +240,6 @@ def OpenStoreWindow ():
 			Button.SetTooltip ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	store_funcs[store_buttons[0]] ()
 
 	return
 
