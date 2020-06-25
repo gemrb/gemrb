@@ -68,6 +68,16 @@ public:
 		static T none;
 		return none;
 	}
+	
+	CacheIterator begin()
+	{
+		return _cache.begin();
+	}
+	
+	CacheIterator end()
+	{
+		return _cache.end();
+	}
 };
 
 }
