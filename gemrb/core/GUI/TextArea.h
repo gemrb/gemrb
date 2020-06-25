@@ -36,6 +36,9 @@ namespace GemRB {
 
 typedef std::pair<int, String> SelectOption;
 
+static const Color SelectOptionHover(255, 180, 0, 0);  // default hover color for SelectOption
+static const Color SelectOptionSelected(55, 100, 0, 0);// default selected color for SelectOption
+
 /**
  * @class TextArea
  * Widget capable of displaying long paragraphs of text.

@@ -4703,10 +4703,6 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
-// FIXME: probably could use a better home, and probably vary from game to game;
-static const Color Hover(255, 180, 0, 0);
-static const Color Selected(55, 100, 0, 0);
-
 PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
 "===== TextArea_ListResources =====\n\
 \n\
@@ -4787,7 +4783,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	for (size_t i =0; i < strings.size(); i++) {
 		TAOptions.push_back(std::make_pair(i, strings[i]));
 	}
-	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+	ta->SetSelectOptions(TAOptions, false, NULL, &SelectOptionHover, &SelectOptionSelected);
 
 	return MakePyList<const String&, PyString_FromStringObj>(strings);
 }
@@ -4840,7 +4836,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		TAOptions.push_back(std::make_pair(i, *string));
 		delete string;
 	}
-	ta->SetSelectOptions(TAOptions, false, NULL, &Hover, &Selected);
+	ta->SetSelectOptions(TAOptions, false, NULL, &SelectOptionHover, &SelectOptionSelected);
 
 	Py_RETURN_NONE;
 }
