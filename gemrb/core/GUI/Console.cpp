@@ -62,8 +62,13 @@ Console::Console(const Region& frame, TextArea* ta)
 			size_t histSize = History.Size();
 			size_t selected = histSize - val;
 			if (selected <= histSize) {
-				HistPos = selected;
-				SetText(c->QueryText());
+				if (EventMgr::ModState(GEM_MOD_ALT)) {
+					Execute(c->QueryText());
+					textArea->SelectAvailableOption(-1);
+				} else {
+					HistPos = selected;
+					SetText(c->QueryText());
+				}
 			}
 			this->window->SetFocused(this);
 		};
@@ -138,6 +143,23 @@ void Console::UpdateTextArea()
 	MarkDirty();
 }
 
+bool Console::Execute(const String& text)
+{
+	bool ret = false;
+	if (text.length()) {
+		char* cBuf = MBCStringFromString(text);
+		assert(cBuf);
+		ScriptEngine::FunctionParameters params;
+		params.push_back(ScriptEngine::Parameter(cBuf));
+		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+		free(cBuf);
+		HistoryAdd();
+
+		SetText(L"");
+	}
+	return ret;
+}
+
 /** Key Press Event */
 bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
@@ -149,20 +171,7 @@ bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			HistoryForward();
 			break;
 		case GEM_RETURN:
-			{
-				String text = textContainer.Text();
-				if (text.length()) {
-					char* cBuf = MBCStringFromString(text);
-					assert(cBuf);
-					ScriptEngine::FunctionParameters params;
-					params.push_back(ScriptEngine::Parameter(cBuf));
-					core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
-					free(cBuf);
-					HistoryAdd();
-
-					SetText(L"");
-				}
-			}
+			Execute(textContainer.Text());
 			break;
 		default:
 			if (textContainer.KeyPress(key, mod)) {

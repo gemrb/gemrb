@@ -61,6 +61,7 @@ public:
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	bool SetEvent(int eventType, ControlEventHandler handler);
+	bool Execute(const String&);
 
 	void DidFocus() { textContainer.DidFocus(); }
 	void DidUnFocus() { textContainer.DidUnFocus(); }
