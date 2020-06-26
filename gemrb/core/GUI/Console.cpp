@@ -116,6 +116,7 @@ void Console::SetText(const String& string)
 	Region rect(Point(), Dimensions());
 	textContainer.DeleteContentsInRect(rect);
 	textContainer.AppendText(string);
+	textContainer.CursorEnd();
 	MarkDirty();
 }
 
