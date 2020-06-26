@@ -220,6 +220,8 @@ TextArea::TextArea(const Region& frame, Font* text)
 {
 	palettes[PALETTE_NORMAL] = text->GetPalette();
 	finit = ftext;
+	
+	parser.ResetAttributes(text, palettes[PALETTE_NORMAL], text, palettes[PALETTE_NORMAL]);
 	Init();
 }
 
