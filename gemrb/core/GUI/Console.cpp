@@ -86,6 +86,7 @@ Console::Console(const Region& frame, TextArea* ta)
 
 Console::~Console()
 {
+	RemoveSubview(&feedbackLabel);
 	RemoveSubview(&textContainer);
 }
 
