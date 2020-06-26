@@ -540,7 +540,12 @@ void TextArea::UpdateState(unsigned int optIdx)
 		return;
 	}
 
-	if (!VarName[0] || optIdx >= selectOptions->NumOpts()) {
+	if (!VarName[0]) {
+		return;
+	}
+	
+	if (optIdx >= selectOptions->NumOpts()) {
+		selectOptions->MakeSelection(-1);
 		return;
 	}
 
