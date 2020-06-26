@@ -35,28 +35,35 @@ namespace GemRB {
 constexpr size_t HistoryMaxSize = 5;
 
 Console::Console(const Region& frame, TextArea* ta)
-: Control(frame), History(HistoryMaxSize), textContainer(Region(0, std::max<int>(0, frame.h - 25), 0, 25), core->GetTextFont(), NULL)
+: Control(frame), History(HistoryMaxSize),
+	textContainer(Region(0, std::max<int>(0, frame.h - 25), 0, 25), core->GetTextFont(), nullptr),
+	feedbackLabel(Region(3, std::max<int>(0, frame.h - 37), frame.w - 6, 12), core->GetTextFont(), L"")
 {
 	textArea = ta;
 	HistPos = 0;
+	uint8_t align = IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&Console::HandleHotKey, this);
 	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
+	
+	AddSubviewInFrontOfView(&feedbackLabel);
+	feedbackLabel.AssignScriptingRef(1, "CONSOLE");
+	feedbackLabel.SetColor(ColorRed, ColorBlack);
+	feedbackLabel.SetAlignment(align);
 
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);
 	palette->release();
 	textContainer.SetMargin(3);
 
-	textContainer.SetAlignment(IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
+	textContainer.SetAlignment(align);
 	AddSubviewInFrontOfView(&textContainer);
 	
 	if (textArea) {
 		Size s = Dimensions();
-		s.h -= 25;
+		s.h -= 40;
 		textArea->SetFrameSize(s);
 		AddSubviewInFrontOfView(textArea);
-		textArea->AssignScriptingRef(1, "CONSOLE");
 		
 		ControlEventHandler handler = [this](Control* c) {
 			auto val = c->GetValue();

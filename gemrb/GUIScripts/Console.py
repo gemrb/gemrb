@@ -31,7 +31,7 @@ def Exec(cmd):
 	try:
 		return eval(cmd)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
-		ta = GemRB.GetView("CONSOLE", 1)
-		if ta:
-			ta.SetText("[color=ff0000]" + str(error) + "[/color]\n")
+		con = GemRB.GetView("CONSOLE", 1)
+		if con:
+			con.SetText(str(error))
 		

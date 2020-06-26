@@ -29,6 +29,7 @@
 
 #include "CircularBuffer.h"
 #include "GUI/Control.h"
+#include "GUI/Label.h"
 #include "GUI/TextArea.h"
 
 namespace GemRB {
@@ -52,6 +53,7 @@ private:
 	size_t HistPos;
 
 	TextContainer textContainer;
+	Label feedbackLabel;
 	TextArea* textArea = nullptr;
 
 public:

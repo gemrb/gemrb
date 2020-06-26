@@ -439,7 +439,7 @@ GameControl* Interface::StartGameControl()
 
 void Interface::CreateConsole()
 {
-	Region frame(0, 0, 640, 100);
+	Region frame(0, 0, 640, 105);
 	
 	Window* consoleWin = winmgr->MakeWindow(frame);
 	TextArea* ta = new TextArea(frame, GetTextFont());
