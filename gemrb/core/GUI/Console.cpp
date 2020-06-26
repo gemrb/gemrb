@@ -71,7 +71,7 @@ Console::Console(const Region& frame, TextArea* ta)
 					SetText(c->QueryText());
 				}
 			}
-			this->window->SetFocused(&textContainer);
+			this->window->SetFocused(this);
 		};
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
