@@ -251,7 +251,9 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 		tgts = new Targets();
 	}
 	tgts = DoObjectFiltering(Sender, tgts, oC, ga_flags);
-	tgts->FilterObjectRect(oC);
+	if (tgts) {
+		tgts->FilterObjectRect(oC);
+	}
 	return tgts;
 }
 
