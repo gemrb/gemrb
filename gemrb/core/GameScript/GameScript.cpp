@@ -962,7 +962,7 @@ static const ActionLink actionnames[] = {
 	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE},
 	{"startcombatcounter", GameScript::StartCombatCounter, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
-	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
+	{"startcutsceneex", GameScript::StartCutSceneEx, 0}, //pst (unknown), EE perhaps as of PST:EE
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
 	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialoginterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
