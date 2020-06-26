@@ -28,4 +28,10 @@ def cv(var, context="GLOBAL"):
 
 # the actual function that the GemRB::Console calls
 def Exec(cmd):
-	return eval(cmd)
+	try:
+		return eval(cmd)
+	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
+		ta = GemRB.GetView("CONSOLE", 1)
+		if ta:
+			ta.SetText("[color=ff0000]" + str(error) + "[/color]\n")
+		

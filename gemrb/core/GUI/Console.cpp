@@ -56,6 +56,7 @@ Console::Console(const Region& frame, TextArea* ta)
 		s.h -= 25;
 		textArea->SetFrameSize(s);
 		AddSubviewInFrontOfView(textArea);
+		textArea->AssignScriptingRef(1, "CONSOLE");
 		
 		ControlEventHandler handler = [this](Control* c) {
 			auto val = c->GetValue();
