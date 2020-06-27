@@ -476,11 +476,16 @@ Region ContentContainer::BoundingBoxForContent(const Content* c) const
 
 Region ContentContainer::BoundingBoxForLayout(const LayoutRegions& layoutRgns) const
 {
-	Region r;
-	for (const auto& lrgn : layoutRgns) {
-		r.ExpandToRegion(lrgn->region);
+	auto it = layoutRgns.begin();
+	if (it != layoutRgns.end()) {
+		Region r = (*it++)->region;
+		for (; it != layoutRgns.end(); ++it) {
+			r.ExpandToRegion((*it)->region);
+		}
+		return r;
 	}
-	return r;
+	
+	return Region();
 }
 
 const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content* c) const
