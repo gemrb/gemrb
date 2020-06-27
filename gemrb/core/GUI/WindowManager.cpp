@@ -190,20 +190,18 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	
 	if (oldFront != frontWin) {
 		if (front) {
-			if (hoverWin == win2) {
-				hoverWin = nullptr;
-			}
 			if (trackingWin == win2) {
 				trackingWin = nullptr;
 			}
 		} else {
-			if (hoverWin == win) {
-				hoverWin = nullptr;
-			}
 			if (trackingWin == win) {
 				trackingWin = nullptr;
 			}
 		}
+
+		auto event = eventMgr.CreateMouseMotionEvent(eventMgr.MousePos());
+		WindowList::const_iterator it = windows.begin();
+		hoverWin = NextEventWindow(event, it);
 		
 		oldFront->FocusLost();
 		frontWin->FocusGained();
