@@ -200,6 +200,8 @@ static RETURN* GetView(PyObject* obj) {
 	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
 }
 
+static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
+
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
 {
 	return actor->StrRefs[Str];
@@ -642,7 +644,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	Window* win = core->LoadWindow( WindowID, ref, pos );
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, OP_OR);
-	PyObject* pyWin = gs->ConstructObjectForScriptable( win->GetScriptingRef() );
+	PyObject* pyWin = ConstructObjectForScriptableView( win->GetScriptingRef() );
 	PyObject_SetAttrString(pyWin, "HasFocus", PyBool_FromLong(win->HasFocus()));
 	return pyWin;
 }
@@ -1186,12 +1188,12 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			}
 			// replace the ref with a new one and return it
 			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, ref);
-			return gs->ConstructObjectForScriptable(newref);
+			return ConstructObjectForScriptableView(newref);
 		} else if (oldwin == NULL || id != ScriptingId(-1)) {
 			// create a new reference and return it
 			ScriptingId sid = (id == ScriptingId(-1)) ? ref->Id : id;
             const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
-			return gs->ConstructObjectForScriptable(newref);
+			return ConstructObjectForScriptableView(newref);
 		} else {
 			// return the ref we already have
 			return pySubview;
@@ -1251,7 +1253,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	if (ref) {
 		View* retView = GetView(ref);
 		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
-		PyObject* obj = gs->ConstructObjectForScriptable(retView->GetScriptingRef());
+		PyObject* obj = ConstructObjectForScriptableView(retView->GetScriptingRef());
 		if (Window* win = dynamic_cast<Window*>(retView)) {
 			PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
 		}
@@ -1981,7 +1983,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			assert(delref);
 			view->RemoveFromSuperview();
 
-			return gs->ConstructObjectForScriptable(delref);
+			return ConstructObjectForScriptableView(delref);
 		}
 	}
 	return AttributeError("Invalid view");
@@ -2133,7 +2135,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		RegisterScriptableControl(static_cast<Control*>(view), id);
 	}
 
-	return gs->ConstructObjectForScriptable(view->GetScriptingRef());
+	return ConstructObjectForScriptableView(view->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
@@ -13737,6 +13739,15 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	return obj;
+}
+
+PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
+{
+	PyObject* pyView = gs->ConstructObjectForScriptable(ref);
+	if (pyView) {
+		PyObject_SetAttrString(pyView, "Flags", PyInt_FromLong(ref->GetObject()->Flags()));
+	}
+	return pyView;
 }
 
 PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)

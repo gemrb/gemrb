@@ -91,7 +91,7 @@ class GView:
 	'Focus': _GemRB.View_Focus
 	}
 
-	__slots__ = ['SCRIPT_GROUP']
+	__slots__ = ['SCRIPT_GROUP', 'Flags']
 	
 	def __eq__(self, rhs):
 		if rhs == None:
