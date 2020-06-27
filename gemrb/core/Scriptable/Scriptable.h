@@ -475,7 +475,6 @@ protected:
 	bool tryNotToBump;
 	int randomBackoff;
 	Point OldPos;
-	unsigned BumpBackTimer;
 
 public:
 
@@ -497,8 +496,6 @@ public:
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
 	void BumpAway(Point farthest);
-	void BumpBack();
-	void DecreaseBumpBackTimer();
 
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };

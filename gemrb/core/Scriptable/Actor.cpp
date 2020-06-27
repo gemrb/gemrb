@@ -1546,7 +1546,7 @@ static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newVal
 {
 	Map *map = actor->GetCurrentArea();
 	if (!map) return;
-	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_FREE : PATH_MAP_NPC);
+	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_UNMARKED : PATH_MAP_NPC);
 }
 
 //spell casting or other buttons disabled/reenabled
@@ -6236,7 +6236,6 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (core->GetGame()->CombatCounter) { return false; }
 		if (core->InCutSceneMode()) { return false; }
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) { return false; }
-		if (BumpBackTimer) { return false; }
 		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) { return false; }
 		if (IsMoving()) { return false; }
 	}

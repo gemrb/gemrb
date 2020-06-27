@@ -1999,6 +1999,7 @@ bool Highlightable::PossibleToSeeTrap() const
 Movable::Movable(ScriptableType type)
 	: Selectable( type )
 {
+	OldPos = Pos;
 	Destination = Pos;
 	Orientation = 0;
 	NewOrientation = 0;
@@ -2018,7 +2019,6 @@ Movable::Movable(ScriptableType type)
 	ResetPathTries();
 	tryNotToBump = false;
 	randomBackoff = 0;
-	BumpBackTimer = 0;
 }
 
 Movable::~Movable(void)
@@ -2175,45 +2175,36 @@ void Movable::Backoff()
 
 void Movable::BumpAway(Point farthest)
 {
-	if (Type != ST_ACTOR) return;
-  if (!BumpBackTimer) {
-    OldPos = Pos;
-  }
-  BumpBackTimer = 10;
-  ((Actor*)this)->SetPosition(farthest, 1, size, size);
+	OldPos = Pos;
+	area->ClearSearchMapFor(this);
+	((Actor*)this)->SetPosition(farthest, 1, size, size);
 }
-
-void Movable::BumpBack()
-{
-  assert(!BumpBackTimer);
-	if (Type != ST_ACTOR) return;
-  ((Actor*)this)->SetPosition(OldPos, 1, size, size);
-}
-
-void Movable::DecreaseBumpBackTimer()
-{
-  if (!BumpBackTimer) {
-    return;
-  }
-  BumpBackTimer--;
-  if (!BumpBackTimer) {
-    BumpBack();
-  }
-}
-
 
 // returns whether we made all pending steps (so, false if we must be called again this tick)
 // we can't just do them all here because the caller might have to update searchmap etc
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
-	int collisionLookaheadRadius = size * 3 - 3;
 	int stepTime = 566;
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
 	}
-
-	if (!path) return true;
+	int collisionLookaheadRadius = size * 3 - 3;
+	
+	// Only bump back if you are not moving
+	if (!path) {
+		if (OldPos == Pos) {
+			return true;
+		}
+		if (!(area->GetBlocked(OldPos.x / 16, OldPos.y / 12, true) & PATH_MAP_PASSABLE)) {
+			return true;
+		}
+		if (Type == ST_ACTOR) {
+			area->ClearSearchMapFor(this);
+			((Actor*)this)->SetPosition(OldPos, 1, 0, 0);
+		}
+		return true;
+	}
 	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
@@ -2227,12 +2218,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		this->timeStartStep = time;
 		return true;
 	}
-
-	if (BumpBackTimer) {
-		DecreaseBumpBackTimer();
-		return true;
-	}
-
+	
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
@@ -2293,7 +2279,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			actorInTheWay = area->GetActor(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
 		if (actorInTheWay && actorInTheWay != this) {
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 4 && std::abs(nmptStep.y - Pos.y) < YEPS * 4) {
+			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 5 && std::abs(nmptStep.y - Pos.y) < YEPS * 5) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				return true;
@@ -2302,7 +2288,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius * 3, ~0);
+				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius, ~0);
 				Point nmptFarthest;
 				nmptFarthest.x = smptFarthest.x * 16;
 				nmptFarthest.y = smptFarthest.y * 12;
@@ -2318,6 +2304,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		Pos.x += dx;
 		Pos.y += dy;
+		OldPos = Pos;
 
 		SetOrientation(step->orient, false);
 		this->timeStartStep = time;

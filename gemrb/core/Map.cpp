@@ -918,7 +918,6 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 		ClearSearchMapFor(actor);
 
 	}
-	actor->DecreaseBumpBackTimer();
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 		no_more_steps = actor->DoStep(walkScale, time);
 		if (actor->BlocksSearchMap()) {
@@ -931,7 +930,7 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 
 void Map::ClearSearchMapFor( Movable *actor ) {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3);
-	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
+	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., 0).
@@ -1958,13 +1957,14 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
+// Args are in searchmap coordinates
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking) const
 {
 	if (y>=Height || x>=Width) {
 		return 0;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
-	if ((ret&PATH_MAP_NPC) && !GetActor(NavmapPoint(x, y), GA_ONLY_BUMPABLE)) {
+	if ((ret&PATH_MAP_NPC) && !GetActor(NavmapPoint(x * 16 + 8, y * 12 + 6), GA_ONLY_BUMPABLE)) {
 		ret &= ~PATH_MAP_PASSABLE;
 	}
 	if (ret&(PATH_MAP_DOOR_IMPASSABLE|(actorsAreBlocking ? PATH_MAP_ACTOR : 0))) {
@@ -2403,7 +2403,7 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPositionSearchmap(Point &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPositionSearchmap(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	NavmapPoint nmptGoal(goal.x * 16 + 8, goal.y * 12 + 6);
 	AdjustPosition(nmptGoal, radiusx, radiusy);
@@ -3236,7 +3236,7 @@ void Map::UpdateFog()
 	}
 }
 
-//Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
+//Valid values are - PATH_MAP_UNMARKED, PATH_MAP_PC, PATH_MAP_NPC
 void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value)
 {
 	// We block a circle of radius size-1 around (px,py)
