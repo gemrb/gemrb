@@ -171,6 +171,7 @@ public:
 	Scriptable *GetTarget(unsigned int index, int Type);
 	void AddTarget(Scriptable* target, unsigned int distance, int flags);
 	void Clear();
+	void FilterObjectRect(Object *oC);
 };
 
 class Canary {
@@ -205,12 +206,11 @@ public:
 		memset( objectName, 0, 65 );
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
 		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
-		memset( objectRect, 0, 4 * sizeof( int ) );
 	}
 public:
 	int objectFields[MAX_OBJECT_FIELDS];
 	int objectFilters[MAX_NESTING];
-	int objectRect[4];
+	Region objectRect{};
 	char objectName[65];
 
 public:
@@ -1372,6 +1372,7 @@ public:
 	static void SpellPointNoDec(Scriptable* Sender, Action* parameters);
 	static void StartCombatCounter(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
+	static void StartCutSceneEx(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);
 	static void StartDialogueInterrupt(Scriptable* Sender, Action* parameters);

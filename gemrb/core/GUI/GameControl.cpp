@@ -1960,7 +1960,7 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
 {
-	if (ScreenFlags & SF_DISABLEMOUSE || Owner->Cursor == IE_CURSOR_BLOCKED) {
+	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
 	//heh, i found no better place
@@ -1989,6 +1989,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 		free( ab );
 		DrawSelectionRect = false;
+		return;
+	}
+
+	if (Owner->Cursor == IE_CURSOR_BLOCKED) {
+		// don't allow travel if the destination is actually blocked
 		return;
 	}
 

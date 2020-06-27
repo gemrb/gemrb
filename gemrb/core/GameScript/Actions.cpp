@@ -821,6 +821,19 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	delete( gs );
 }
 
+// StartCutScene("my_nifty_cut_scene") = StartCutSceneEx("my_nifty_cut_scene",FALSE)
+void GameScript::StartCutSceneEx(Scriptable* Sender, Action* parameters)
+{
+	if (parameters->int0Parameter) {
+		// TODO: ee, don't skip trigger evaluation
+		// not needed in pst, since the only two uses just have True conditions
+		// see ifdef in GameScript::EvaluateAllBlocks
+	}
+	GameScript *gs = new GameScript(parameters->string0Parameter, Sender);
+	gs->EvaluateAllBlocks();
+	delete gs;
+}
+
 void GameScript::CutSceneID(Scriptable *Sender, Action* /*parameters*/)
 {
 	// shouldn't get called

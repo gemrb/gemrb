@@ -1814,7 +1814,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_morale_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	if (STAT_GET(IE_STATE_ID) & STATE_BERSERK) {
+	if (STATE_GET(STATE_BERSERK)) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -5429,7 +5429,7 @@ int fx_ignore_dialogpause_modifier (Scriptable* /*Owner*/, Actor* target, Effect
 int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_familiar_constitution_loss(%2d): Loss: %d", fx->Opcode,(signed) fx->Parameter1);
-	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
+	if (!STATE_GET(STATE_NOSAVE)) {
 		return FX_APPLIED;
 	}
 	Effect *newfx;
@@ -5486,7 +5486,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
+	if (!STATE_GET(STATE_NOSAVE)) {
 		game->familiarBlock=true;
 		return FX_APPLIED;
 	}
@@ -5524,7 +5524,7 @@ int fx_bounce_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_bounce_spellevel_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (fx->Parameter1<1) {
+	if (fx->Parameter1 < 1 || STATE_GET(STATE_DEAD)) {
 		PlayRemoveEffect("EFF_E02", target, fx);
 		return FX_NOT_APPLIED;
 	}

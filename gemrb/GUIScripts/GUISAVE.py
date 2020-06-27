@@ -127,7 +127,7 @@ def ScrollBarPress():
 
 		if ActPos < len(Games):
 			Slotname = Games[ActPos].GetName()
-			Slottime = Games[ActPos].GetDate ()
+			Slottime = Games[ActPos].GetGameDate ()
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == len(Games):
 			Slotname = strs['empty']
