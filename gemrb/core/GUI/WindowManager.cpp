@@ -393,7 +393,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 				if (event.type == Event::MouseDown || event.type == Event::TouchDown) {
 					trackingWin = target;
 				}
-			} else if (target->IsDisabled() && event.type == Event::KeyDown && event.keyboard.keycode == GEM_ESCAPE) {
+			} else if ((target->Flags()&(View::IgnoreEvents|View::Disabled)) == View::Disabled
+					   && event.type == Event::KeyDown && event.keyboard.keycode == GEM_ESCAPE) {
+				// force close disabled windows if they arent also ignoreing events
 				target->Close();
 			}
 			return true;

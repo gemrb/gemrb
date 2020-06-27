@@ -136,12 +136,14 @@ def CloseStoreWindow ():
 	return
 
 def PositionStoreWinRelativeTo(win):
-	winframe = win.GetFrame()
-
 	storewin = GemRB.GetView("WIN_STORE")
 	if not storewin:
 		return
 	
+	# ignore the esc key, normally it would be fine, but we have multiple windows that join together.
+	win.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	
+	winframe = win.GetFrame()
 	storeframe = storewin.GetFrame()
 
 	if GameCheck.IsIWD2():
