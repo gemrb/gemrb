@@ -1,4 +1,6 @@
 
+from __future__ import print_function # so that print(blah) will work in console
+
 from ie_stats import *
 from GUIDefines import *
 import GemRB
@@ -6,7 +8,7 @@ from GemRB import * # we dont want to have to type 'GemRB.Command' instead of si
 
 # /handy/ shorthand forms
 def gps(stat, base=0):
-	print GemRB.GetPlayerStat(GemRB.GameGetFirstSelectedPC(), stat, base)
+	print (GemRB.GetPlayerStat(GemRB.GameGetFirstSelectedPC(), stat, base))
 
 def sps(stat, value, pcf=1):
 	GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC(), stat, value, pcf)
