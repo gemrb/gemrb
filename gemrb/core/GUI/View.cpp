@@ -71,9 +71,10 @@ View::~View()
 	}
 }
 
-void View::SetBackground(Sprite2D* bg)
+void View::SetBackground(Sprite2D* bg, const Color* c)
 {
 	background = bg;
+	if (c) backgroundColor = *c;
 
 	MarkDirty();
 }
@@ -193,11 +194,25 @@ Region View::DrawingFrame() const
 
 void View::DrawBackground(const Region* rgn) const
 {
-	// FIXME: technically its possible for the BG to be smaller than the view
+	Video* video = core->GetVideoDriver();
+	if (backgroundColor.a > 0) {
+		if (rgn) {
+			Point p = ConvertPointToWindow(rgn->Origin());
+			video->DrawRect(Region(p, rgn->Dimensions()), backgroundColor, true);
+		} else if (window) {
+			Point p = ConvertPointToWindow(frame.Origin());
+			video->DrawRect(Region(p, Dimensions()), backgroundColor, true);
+		} else {
+			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
+			video->DrawRect(Region(Point(), Dimensions()), backgroundColor, true);
+		}
+	}
+		
+	// NOTE: technically it's possible for the BG to be smaller than the view
 	// if this were to happen then the areas outside the BG wouldnt get redrawn
-	// we should probably draw black in those areas...
+	// you should make sure the backgound color is set to something suitable in those cases
+
 	if (background) {
-		Video* video = core->GetVideoDriver();
 		if (rgn) {
 			Region intersect = rgn->Intersect(background->Frame);
 			Point screenPt = ConvertPointToWindow(intersect.Origin());
@@ -428,6 +443,10 @@ void View::RemovedFromView(View*)
 
 bool View::IsOpaque() const
 {
+	if (backgroundColor.a == 0xff) {
+		return true;
+	}
+	
 	return background && background->HasTransparency() == false;
 }
 

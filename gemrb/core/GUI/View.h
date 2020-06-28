@@ -69,6 +69,7 @@ public:
 		IgnoreEvents = 1 << 28
 	};
 private:
+	Color backgroundColor;
 	Holder<Sprite2D> background;
 	Holder<Sprite2D> cursor;
 	std::vector<ViewScriptingRef*> scriptingRefs;
@@ -187,7 +188,7 @@ public:
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
-	void SetBackground(Sprite2D*);
+	void SetBackground(Sprite2D*, const Color* = nullptr);
 
 	// FIXME: I don't think I like this being virtual. Currently required because ScrollView is "overriding" this
 	// we perhapps should instead have ScrollView implement SubviewAdded and move the view to its contentView there
