@@ -45,7 +45,7 @@ def Exec(cmd):
 			if self.buffer.endswith("\n"):
 				out = self.buffer
 				if out:
-					con.Append("[color=00ff00]" + out + "[/color]\n")
+					con.Append(cmd + ": [color=00ff00]" + out + "[/color]\n")
 				self.buffer = ""
 	
 	try:
@@ -57,7 +57,7 @@ def Exec(cmd):
 		return eval(cmd)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
 		if con:
-			con.Append("[color=ff0000]" + str(error) + "[/color]\n")
+			con.Append(cmd + ": [color=ff0000]" + str(error) + "[/color]\n")
 			
 		sys.stderr.write(error)
 	finally:
