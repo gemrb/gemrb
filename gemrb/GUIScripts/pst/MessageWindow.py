@@ -61,7 +61,8 @@ def OnLoad():
 	GemRB.SetVar ("OptionsPosition", 1) #Bottom
 	GemRB.SetVar ("MessagePosition", 1) #Bottom
 	GemRB.SetVar ("OtherPosition", 0) #Left
-	
+	GemRB.SetVar ("PortraitPosition", 1)
+
 	GemRB.GameSetScreenFlags (0, OP_SET)
 	
 	CloseButton= MessageWindow.GetControl (0)
