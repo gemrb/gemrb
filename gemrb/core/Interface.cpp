@@ -439,7 +439,7 @@ GameControl* Interface::StartGameControl()
 
 void Interface::CreateConsole()
 {
-	Region frame(0, 0, 640, 105);
+	Region frame(0, 0, 640, 200);
 	
 	Window* consoleWin = winmgr->MakeWindow(frame);
 	TextArea* ta = new TextArea(frame, GetTextFont());
@@ -449,6 +449,7 @@ void Interface::CreateConsole()
 	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
+	consoleWin->SetBackground(nullptr, &ColorBlack);
 	
 	console->AssignScriptingRef(0, "CONSOLE");
 	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);

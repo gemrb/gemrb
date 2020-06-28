@@ -29,7 +29,6 @@
 
 #include "CircularBuffer.h"
 #include "GUI/Control.h"
-#include "GUI/Label.h"
 #include "GUI/TextArea.h"
 
 namespace GemRB {
@@ -53,7 +52,7 @@ private:
 	size_t HistPos;
 
 	TextContainer textContainer;
-	Label feedbackLabel;
+	TextArea feedback;
 	TextArea* textArea = nullptr;
 
 public:
@@ -74,9 +73,6 @@ private:
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
 	bool HandleHotKey(const Event& e);
-
-	/** Draws the Console on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
 	
 protected:
 	/** Key Press Event */

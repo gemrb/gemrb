@@ -28,6 +28,7 @@
 #include "ScriptEngine.h"
 #include "Sprite2D.h"
 #include "GUI/EventMgr.h"
+#include "GUI/Label.h"
 #include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
@@ -36,9 +37,11 @@ constexpr size_t HistoryMaxSize = 5;
 
 Console::Console(const Region& frame, TextArea* ta)
 : Control(frame), History(HistoryMaxSize),
-	textContainer(Region(0, std::max<int>(0, frame.h - 25), 0, 25), core->GetTextFont(), nullptr),
-	feedbackLabel(Region(3, std::max<int>(0, frame.h - 37), frame.w - 6, 12), core->GetTextFont(), L"")
+	textContainer(Region(0, 0, 0, 25), core->GetTextFont(), nullptr),
+	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont())
 {
+	// TODO: move all the control composition to Console.py
+
 	textArea = ta;
 	HistPos = 0;
 	uint8_t align = IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE;
@@ -46,10 +49,9 @@ Console::Console(const Region& frame, TextArea* ta)
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&Console::HandleHotKey, this);
 	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
 	
-	AddSubviewInFrontOfView(&feedbackLabel);
-	feedbackLabel.AssignScriptingRef(1, "CONSOLE");
-	feedbackLabel.SetColor(ColorRed, ColorBlack);
-	feedbackLabel.SetAlignment(align);
+	AddSubviewInFrontOfView(&feedback);
+	feedback.AssignScriptingRef(1, "CONSOLE");
+	feedback.SetFlags(TextArea::AutoScroll | TextArea::ClearHistory, OP_OR);
 
 	Palette* palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);
@@ -60,9 +62,18 @@ Console::Console(const Region& frame, TextArea* ta)
 	AddSubviewInFrontOfView(&textContainer);
 	
 	if (textArea) {
-		Size s = Dimensions();
-		s.h -= 40;
-		textArea->SetFrameSize(s);
+		Region frame = feedback.Frame();
+		frame.y = frame.y + frame.h;
+		frame.h = 12;
+		
+		Label* label = new Label(frame, core->GetTextFont(), L"History:");
+		AddSubviewInFrontOfView(label);
+		label->SetAlignment(align);
+		
+		frame.y = frame.y + frame.h;
+		frame.h = feedback.Frame().h;
+		
+		textArea->SetFrame(frame);
 		AddSubviewInFrontOfView(textArea);
 		
 		ControlEventHandler handler = [this](Control* c) {
@@ -82,11 +93,13 @@ Console::Console(const Region& frame, TextArea* ta)
 		};
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
+
+	SetBackground(nullptr, &ColorBlack);
 }
 
 Console::~Console()
 {
-	RemoveSubview(&feedbackLabel);
+	RemoveSubview(&feedback);
 	RemoveSubview(&textContainer);
 }
 
@@ -115,13 +128,6 @@ bool Console::OnMouseDown(const MouseEvent& me, unsigned short mod)
 void Console::OnTextInput(const TextEvent& te)
 {
 	textContainer.TextInput(te);
-}
-
-/** Draws the Console on the Output Display */
-void Console::DrawSelf(Region drawFrame, const Region& /*clip*/)
-{
-	Video* video = core->GetVideoDriver();
-	video->DrawRect( drawFrame, ColorBlack );
 }
 
 /** Sets the Text of the current control */

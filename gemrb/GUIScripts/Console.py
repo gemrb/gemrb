@@ -30,11 +30,35 @@ def cv(var, context="GLOBAL"):
 
 # the actual function that the GemRB::Console calls
 def Exec(cmd):
+	import sys
+	
+	con = GemRB.GetView("CONSOLE", 1)
+	
+	class OutputCapture(object):
+		def __init__(self, out):
+			self.out = out
+			self.buffer = ""
+		
+		def write(self, message):
+			self.out.write(message)
+			self.buffer += str(message)
+			if self.buffer.endswith("\n"):
+				out = self.buffer
+				if out:
+					con.Append("[color=00ff00]" + out + "[/color]\n")
+				self.buffer = ""
+	
 	try:
+		stdout = sys.stdout
+
+		if con:
+			sys.stdout = OutputCapture(stdout)
+
 		return eval(cmd)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
-		con = GemRB.GetView("CONSOLE", 1)
 		if con:
-			con.SetText(str(error))
+			con.Append("[color=ff0000]" + str(error) + "[/color]\n")
 			
-		raise error # rethrow for other handlers
+		sys.stderr.write(error)
+	finally:
+		sys.stdout = stdout
