@@ -603,6 +603,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 		print "ARGHH, no slot item at slot %d, bailing out!" %(combatdet["Slot"])
 		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
+
 	ammo = None
 	if not left: # only the main hand can have ranged weapons, even one-handed
 		ammoslot = GemRB.GetEquippedAmmunition (pc)
@@ -612,13 +613,23 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 
 	# Main Hand - weapon name
 	#  or Ranged - ammo
+	name = "ItemName"
+	if slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED:
+		name = "ItemNameIdentified"
 	if combatdet["Flags"]&15 == 2 and ammo: # this is basically wi.wflags & WEAPON_STYLEMASK == WEAPON_RANGED
-		RecordsTextArea.Append (DelimitedStrRefs (41123, ammo["ItemNameIdentified"], 0, " - "))
+		RecordsTextArea.Append (DelimitedStrRefs (41123, ammo[name], 0, " - "))
 	else:
 		if dualwielding and left:
-			RecordsTextArea.Append (DelimitedStrRefs (733, item["ItemNameIdentified"], 0, " - "))
+			RecordsTextArea.Append (DelimitedStrRefs (733, item[name], 0, " - "))
 		else:
-			RecordsTextArea.Append (DelimitedStrRefs (734, item["ItemNameIdentified"], 0, " - "))
+			RecordsTextArea.Append (DelimitedStrRefs (734, item[name], 0, " - "))
+
+	# don't spoil it for unidentified items
+	# Unidentified - Details Unknown
+	if not (slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED):
+		AddIndent()
+		RecordsTextArea.Append (DelimitedText(41121, "", 0, ""))
+		return
 
 	# Damage
 	# display the unresolved damage string (2d6)
