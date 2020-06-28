@@ -3769,7 +3769,18 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	ret = roll + save + modifier;
 	int spellLevel = fx->SpellLevel;
 	int saveBonus = fx->SavingThrowBonus;
-	if (ret > 10 + spellLevel + saveBonus) {
+	int saveDC = 10 + spellLevel + saveBonus;
+	// handle animal taming last
+	// must roll a Will Save of 5 + player's total skill or higher to save
+	if (stricmp(fx->Source, "SPIN108") && fx->Opcode == 5) {
+		saveDC = 5;
+		Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		if (caster) {
+			saveDC += caster->GetSkill(IE_ANIMALS);
+		}
+	}
+
+	if (ret > saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
 		displaymsg->DisplayRollStringName(40974, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return true;
