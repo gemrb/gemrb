@@ -3735,6 +3735,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
+	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
 
@@ -3761,7 +3762,6 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	}
 
 	int roll = ret;
-	// NOTE: assuming criticals apply to iwd2 too
 	// NOTE: we use GetStat, assuming the stat save bonus can never be negated like some others
 	int save = GetStat(savingthrows[type]);
 	// intentionally not adding luck, which seems to have been handled separately
@@ -3770,6 +3770,52 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	int spellLevel = fx->SpellLevel;
 	int saveBonus = fx->SavingThrowBonus;
 	int saveDC = 10 + spellLevel + saveBonus;
+
+	// handle special bonuses (eg. vs poison, which doesn't have a separate stat any more)
+	// same hardcoded list as in the original
+	if (savingthrows[type] == IE_SAVEFORTITUDE && fx->Opcode == 25) {
+		if (BaseStats[IE_RACE] == 4 /* DWARF */) ret += 2;
+		if (HasFeat(FEAT_SNAKE_BLOOD)) ret += 2;
+		if (HasFeat(FEAT_RESIST_POISON)) ret += 4;
+	}
+
+	// the original had a sourceType == TRIGGER check, but we handle more than ST_TRIGGER
+	Scriptable *caster = area->GetScriptableByGlobalID(fx->CasterID);
+	if (savingthrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
+		// TODO: loop over all classes and add TRAPSAVE.2DA values to the bonus
+		ret += 0;
+	}
+
+	if (savingthrows[type] == IE_SAVEWILL) {
+		// aura of courage
+		if (Modified[IE_EA] < EA_GOODCUTOFF && stricmp(fx->Source, "SPWI420")) {
+			// look if an ally paladin of at least level 2 is near
+			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
+			for (Actor *ally : neighbours) {
+				if (ally->GetPaladinLevel() >= 2 && !ally->CheckSilenced()) {
+					ret += 4;
+					break;
+				}
+			}
+		}
+
+		if (fx->Opcode == 24 && BaseStats[IE_RACE] == 5 /* HALFLING */) ret += 2;
+		if (GetSubRace() == 0x20001 /* DROW */) ret += 2;
+	}
+
+	// general bonuses
+	// TODO: Heart of Fury upgraded creature get +5
+	// FIXME: externalize these two two difflvls.2da
+	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_EASY) ret -= 4;
+	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_NORMAL) ret -= 2;
+	// (half)elven resistance to enchantment, gnomish to illusions and dwarven to spells
+	if ((BaseStats[IE_RACE] == 2 || BaseStats[IE_RACE] == 3) && fx->PrimaryType == 4) ret += 2;
+	if (BaseStats[IE_RACE] == 6 && fx->PrimaryType == 5) ret += 2;
+	if (BaseStats[IE_RACE] == 4 && fx->Resistance <= FX_CAN_RESIST_CAN_DISPEL) ret += 2;
+	// monk's clear mind and mage specialists
+	if (GetMonkLevel() >= 3 && fx->PrimaryType == 4) ret += 2;
+	if (GetMageLevel() && (1 << (fx->PrimaryType + 5)) & BaseStats[IE_KIT]) ret += 2;
+
 	// handle animal taming last
 	// must roll a Will Save of 5 + player's total skill or higher to save
 	if (stricmp(fx->Source, "SPIN108") && fx->Opcode == 5) {
