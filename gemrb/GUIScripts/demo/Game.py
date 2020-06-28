@@ -31,3 +31,6 @@ def EnterGame():
 	import MessageWindow
 	MessageWindow.OnLoad()
 	GemRB.GamePause (0, 0)
+
+def GameExpansion():
+	pass
