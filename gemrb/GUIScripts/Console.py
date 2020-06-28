@@ -34,4 +34,5 @@ def Exec(cmd):
 		con = GemRB.GetView("CONSOLE", 1)
 		if con:
 			con.SetText(str(error))
-		
+			
+		raise error # rethrow for other handlers
