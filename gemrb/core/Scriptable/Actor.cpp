@@ -3801,6 +3801,13 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 
 		if (fx->Opcode == 24 && BaseStats[IE_RACE] == 5 /* HALFLING */) ret += 2;
 		if (GetSubRace() == 0x20001 /* DROW */) ret += 2;
+
+		// Tyrant's dictum for clerics of Bane
+		if (caster && caster->Type == ST_ACTOR) {
+			Actor *cleric = (Actor *) caster;
+			if (cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) saveDC += 1;
+			// the original limited this to domain spells, but that's pretty lame
+		}
 	}
 
 	// general bonuses
