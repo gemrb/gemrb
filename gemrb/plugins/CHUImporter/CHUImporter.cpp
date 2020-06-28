@@ -230,17 +230,18 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-				//ignorebuttonframes is a terrible hack
-				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize(Cycle) == 4 )
-						SelectedIndex=2;
+				// work around several controls not setting all the indices
+				int cycleSize = bam->GetCycleSize(Cycle);
+				bool resetIndex = false;
+				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
+						resetIndex = true;
+				}
+				if (resetIndex) {
+						SelectedIndex = 2;
+						if (cycleSize == 4) DisabledIndex = 3;
 				}
 				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
-						DisabledIndex=3;
-				}
 				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 			}
