@@ -30,6 +30,7 @@ import GUIRECCommon
 import IDLUCommon
 import LUCommon
 from GUIDefines import *
+from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
 from ie_stats import *
 from ie_restype import *
 from ie_feats import FEAT_ARMORED_ARCANA
@@ -63,15 +64,6 @@ def Exportable(pc):
 def InitRecordsWindow (Window):
 	global RecordsWindow, SelectWindow
 	global BonusSpellTable, HateRaceTable
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-
-	def OnClose(Window):
-		GemRB.GamePause (PauseState, 3)
-		TopWindowClosed(Window)
-
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
 	RecordsWindow = Window
 
@@ -1018,8 +1010,8 @@ def UpdateRecordsWindow (Window):
 
 	return
 
-ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow)
-OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow)
+ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
 
 def CloseHelpWindow ():
 	global DescTable, InformationWindow

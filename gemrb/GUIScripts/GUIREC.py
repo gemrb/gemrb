@@ -32,6 +32,7 @@ import GUIWORLD
 import DualClass
 import GUIRECCommon
 from GUIDefines import *
+from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
 from ie_stats import *
 from ie_restype import *
 ###################################################
@@ -46,15 +47,6 @@ SelectedTextArea = None
 
 def InitRecordsWindow (Window):
 	"""Open Records Window"""
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-
-	def OnClose(Window):
-		GemRB.GamePause (PauseState, 3)
-		TopWindowClosed(Window)
-
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -229,8 +221,8 @@ def UpdateRecordsWindow (Window):
 
 	return
 
-ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow)
-OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow)
+ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
 
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():

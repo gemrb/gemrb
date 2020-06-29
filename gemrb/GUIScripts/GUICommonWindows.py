@@ -1363,6 +1363,10 @@ def TopWindowClosed(window):
 	rtgbtn = optwin.GetControl(0) # return to game button
 	if rtgbtn: # not in PST or IWD2
 		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
+		
+	print "pause state " + str(CreateTopWinLoader.PauseState)
+	if CreateTopWinLoader.PauseState is not None:
+		GemRB.GamePause (CreateTopWinLoader.PauseState, 3)
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
@@ -1393,7 +1397,7 @@ if GameCheck.IsIWD2():
 else:
 	DefaultWinPos = WINDOW_CENTER
 
-def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos):
+def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos, pause = False):
 	def ret (btn = None, val = None):
 		topwin = GemRB.GetView("WIN_TOP")
 		if topwin and topwin.HasFocus == False:
@@ -1402,6 +1406,12 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 		window = loader(id, pack, pos)
 
 		if window:
+			if pause:
+				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
+				GemRB.GamePause (1, 3)
+			else:
+				CreateTopWinLoader.PauseState = None
+
 			# set this before calling initer so initer can change it if it wants
 			window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 			if initer:
