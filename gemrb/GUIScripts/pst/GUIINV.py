@@ -35,6 +35,7 @@ from ie_slots import *
 InventoryWindow = None
 ItemAmountWindow = None
 OverSlot = None
+PauseState = None
 
 def OpenInventoryWindowClick ():
 	tmp = GemRB.GetVar ("PressedPortrait")
@@ -69,7 +70,7 @@ def OpenInventoryWindow ():
 	"""Opens the inventory window."""
 
 	global AvSlotsTable
-	global InventoryWindow
+	global InventoryWindow, PauseState
 
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 
@@ -82,7 +83,11 @@ def OpenInventoryWindow ():
 		GemRB.SetVar ("MessageLabel", -1)
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
-		return
+		GemRB.GamePause (PauseState, 3)
+		return	
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")

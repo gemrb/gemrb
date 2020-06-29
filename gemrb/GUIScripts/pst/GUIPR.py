@@ -34,10 +34,10 @@ PriestWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
-
+PauseState = None
 
 def OpenPriestWindow ():
-	global PriestWindow
+	global PriestWindow, PauseState
 
 	if GUICommon.CloseOtherWindow (OpenPriestWindow):
 		GemRB.HideGUI ()
@@ -49,7 +49,11 @@ def OpenPriestWindow ():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
-		return
+		GemRB.GamePause (PauseState, 3)
+		return	
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIPR")
