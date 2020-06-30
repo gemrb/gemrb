@@ -567,10 +567,12 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 
 static inline void ConvertTiming(Effect *fx, int Duration)
 {
-	fx->Duration = Duration;
+	// GameTime will be added in by EffectQueue
+	fx->Duration = Duration ? Duration * AI_UPDATE_TIME : 1;
+	if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
+		fx->Duration += core->GetGame()->GameTime;
+	}
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	ieDword GameTime = core->GetGame()->GameTime;
-	PrepareDuration(fx);
 }
 
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
