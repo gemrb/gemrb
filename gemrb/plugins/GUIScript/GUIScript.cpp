@@ -1972,9 +1972,9 @@ static PyObject* GemRB_Window_HasControl(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
 "===== Control_QueryText =====\n\
 \n\
-**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex)\n\
+**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex[, UseSystemEncoding])\n\
 \n\
-**Metaclass Prototype:** QueryText ()\n\
+**Metaclass Prototype:** QueryText (UseSystemEncoding=False)\n\
 \n\
 **Description:** Returns the Text of a TextEdit/TextArea/Label control. \n\
 In case of a TextArea, it will return the selected row, not the entire \n\
@@ -1982,6 +1982,7 @@ textarea.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
+  * UseSystemEncoding - whether returned text should use OS encoding, False by default\n\
 \n\
 **Return value:** string, may be empty\n\
 \n\
@@ -1992,15 +1993,19 @@ The above example retrieves the character's name typed into the TextEdit control
 \n\
   GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
 The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
+If returned string will be used to e.g. as filename, string should be using system encoding, or file might be not found if it contains non-ASCII letters.\n\
+**Example**\n\
+  Filename = CharImportList.QueryText (True)\n\
+  GemRB.CreatePlayer (Filename, MyChar|0x8000, 1)\n\
 \n\
 **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
 );
 
 static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci;
+	int wi, ci, useSystemEncoding = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
+	if (!PyArg_ParseTuple( args, "ii|i", &wi, &ci, &useSystemEncoding )) {
 		return AttributeError( GemRB_Control_QueryText__doc );
 	}
 
@@ -2011,12 +2016,16 @@ static PyObject* GemRB_Control_QueryText(PyObject * /*self*/, PyObject* args)
 
 	String wstring = ctrl->QueryText();
 	std::string nstring(wstring.begin(), wstring.end());
-	char * cStr = ConvertCharEncoding(nstring.c_str(),
+	if (useSystemEncoding) {
+		char* cStr = ConvertCharEncoding(nstring.c_str(),
 		core->TLKEncoding.encoding.c_str(), core->SystemEncoding);
-	if (cStr) {
-		PyObject* pyStr = PyString_FromString(cStr);
-		free(cStr);
-		return pyStr;
+		if (cStr) {
+		    PyObject* pyStr = PyString_FromString(cStr);
+		    free(cStr);
+		    return pyStr;
+		}
+	} else {
+	    return PyString_FromString(nstring.c_str());
 	}
 	Py_RETURN_NONE;
 }
