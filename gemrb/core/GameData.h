@@ -116,6 +116,7 @@ public:
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
+	int GetSpellAbilityDieRoll(Actor *target, int which);
 private:
 	void ReadItemSounds();
 private:

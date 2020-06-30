@@ -73,6 +73,7 @@ static void ReleasePalette(void *poi)
 }
 
 GEM_EXPORT GameData* gamedata;
+static int *spell_abilities = NULL;
 
 GameData::GameData()
 {
@@ -83,6 +84,7 @@ GameData::~GameData()
 {
 	delete factory;
 	ItemSounds.clear();
+	free(spell_abilities);
 }
 
 void GameData::ClearCaches()
@@ -642,6 +644,35 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	char profString[5];
 	snprintf(profString, sizeof(profString), "%u", proficiency);
 	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
+}
+
+#define CSA_CNT 2
+static ieDword splabcount = 0;
+int GameData::GetSpellAbilityDieRoll(Actor *target, int which)
+{
+	if (which >= CSA_CNT) return 6;
+
+	ieDword cls = target->GetActiveClass();
+	if (!spell_abilities) {
+		AutoTable tab("clssplab");
+		if (!tab) {
+			spell_abilities = (int *) malloc(sizeof(int) * CSA_CNT);
+			for (int ab = 0; ab < CSA_CNT; ab++) {
+				spell_abilities[ab * splabcount] = 6;
+			}
+			splabcount = 1;
+			return 6;
+		}
+		splabcount = tab->GetRowCount();
+		spell_abilities = (int *) malloc(sizeof(int) * splabcount * CSA_CNT);
+		for (int ab = 0; ab < CSA_CNT; ab++) {
+			for (ieDword i = 0; i < splabcount; i++) {
+				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
+			}
+		}
+	}
+	if (cls >= splabcount) cls = 0;
+	return spell_abilities[which * splabcount + cls];
 }
 
 }
