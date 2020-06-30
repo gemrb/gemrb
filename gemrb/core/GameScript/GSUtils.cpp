@@ -2184,7 +2184,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	}
 }
 
-ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
+ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid)
 {
 	char newVarName[8];
 	const char *poi;
@@ -2241,7 +2241,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	return value;
 }
 
-ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid)
+ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
 	char newVarName[8];
 	ieDword value = 0;
