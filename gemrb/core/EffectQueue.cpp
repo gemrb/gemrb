@@ -1276,7 +1276,12 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			if( fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
 			}
-			PrepareDuration(fx);
+			if (pstflags) {
+				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
+				fx->Duration = (fx->Duration ? fx->Duration : 1) + GameTime;
+			} else {
+				PrepareDuration(fx);
+			}
 		}
 	}
 	//check if the effect has triggered or expired
