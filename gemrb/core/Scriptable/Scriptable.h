@@ -495,7 +495,7 @@ public:
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
-	void BumpAway(Point farthest);
+	void BumpAway();
 
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };

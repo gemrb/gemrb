@@ -791,7 +791,7 @@ void Map::UpdateScripts()
 	while (more_steps) {
 		more_steps = false;
 		
-		// Make all actors pathfind if they are blocked
+		// Make all actors pathfind
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
@@ -914,9 +914,7 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 
 	bool no_more_steps = true;
 	if (actor->BlocksSearchMap()) {
-
 		ClearSearchMapFor(actor);
-
 	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 		no_more_steps = actor->DoStep(walkScale, time);
@@ -929,14 +927,14 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3);
+	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
-	// have been cleared by this BlockSearchMap(..., 0).
+	// have been cleared by this BlockSearchMap(..., PATH_MAP_UNMARKED).
 	// (Necessary since blocked areas of actors may overlap.)
 	for (auto neighbour : nearActors) {
-		if (neighbour != actor && neighbour->BlocksSearchMap()) {
+		if (neighbour->BlocksSearchMap()) {
 			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 		}
 	}
@@ -2403,15 +2401,15 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPositionSearchmap(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
 {
-	NavmapPoint nmptGoal(goal.x * 16 + 8, goal.y * 12 + 6);
-	AdjustPosition(nmptGoal, radiusx, radiusy);
-	goal.x = nmptGoal.x / 16;
-	goal.y = nmptGoal.y / 12;
+	NavmapPoint smptGoal(goal.x / 16, goal.y / 12);
+	AdjustPosition(smptGoal, radiusx, radiusy);
+	goal.x = smptGoal.x * 16 + 8;
+	goal.y = smptGoal.y * 12 + 6;
 }
 
-void Map::AdjustPosition(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
 {
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;

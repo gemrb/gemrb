@@ -2173,11 +2173,10 @@ void Movable::Backoff()
 }
 
 
-void Movable::BumpAway(Point farthest)
+void Movable::BumpAway()
 {
-	OldPos = Pos;
 	area->ClearSearchMapFor(this);
-	((Actor*)this)->SetPosition(farthest, 1, size, size);
+	area->AdjustPositionNavmap(Pos);
 }
 
 // returns whether we made all pending steps (so, false if we must be called again this tick)
@@ -2276,24 +2275,19 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
 			Point nmptCollision(xCollision, yCollision);
-			actorInTheWay = area->GetActor(nmptCollision,	GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
 		if (actorInTheWay && actorInTheWay != this) {
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 5 && std::abs(nmptStep.y - Pos.y) < YEPS * 5) {
+			// Give up instead of bumping if you are close to the goal
+			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 3 && std::abs(nmptStep.y - Pos.y) < YEPS * 3) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				return true;
-			} else {
-				Log(DEBUG, "PathFinderWIP", "(%d %d)", std::abs(nmptStep.x - Pos.x), std::abs(nmptStep.y - Pos.y));
-			}
-
+			} 
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Point smptFarthest = area->FindFarthest(actorInTheWay->Pos, actorInTheWay->size, collisionLookaheadRadius, ~0);
-				Point nmptFarthest;
-				nmptFarthest.x = smptFarthest.x * 16;
-				nmptFarthest.y = smptFarthest.y * 12;
-				Log(DEBUG, "PathFinderWIP", "Bumping (%d %d) -> (%d %d)\n", actorInTheWay->Pos.x, actorInTheWay->Pos.y, nmptFarthest.x, nmptFarthest.y);
-				actorInTheWay->BumpAway(nmptFarthest);
+				Log(DEBUG, "PathFinderWIP", "Bumping (%d %d)", actorInTheWay->Pos.x, actorInTheWay->Pos.y);
+				actorInTheWay->BumpAway();
+				Log(DEBUG, "PathFinderWIP", "Bumped to (%d %d)", actorInTheWay->Pos.x, actorInTheWay->Pos.y);
 			} else {
 				StanceID = IE_ANI_READY;
 				tryNotToBump = true;
@@ -2447,6 +2441,7 @@ void Movable::MoveTo(const Point &Des)
 {
 	area->ClearSearchMapFor(this);
 	Pos = Des;
+	OldPos = Des;
 	Destination = Des;
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
