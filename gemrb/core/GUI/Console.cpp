@@ -36,7 +36,7 @@ namespace GemRB {
 constexpr size_t HistoryMaxSize = 5;
 
 Console::Console(const Region& frame, TextArea* ta)
-: Control(frame), History(HistoryMaxSize),
+: View(frame), History(HistoryMaxSize),
 	textContainer(Region(0, 0, 0, 25), core->GetTextFont(), nullptr),
 	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont())
 {

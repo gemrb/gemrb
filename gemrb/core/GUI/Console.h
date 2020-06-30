@@ -44,7 +44,7 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-class Console : public Control {
+class Console : public View {
 private:
 	/** History Buffer */
 	CircularBuffer<SelectOption> History;
