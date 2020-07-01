@@ -3783,8 +3783,12 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	// the original had a sourceType == TRIGGER check, but we handle more than ST_TRIGGER
 	Scriptable *caster = area->GetScriptableByGlobalID(fx->CasterID);
 	if (savingthrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
-		// TODO: loop over all classes and add TRAPSAVE.2DA values to the bonus
-		ret += 0;
+		// loop over all classes and add TRAPSAVE.2DA values to the bonus
+		for (int cls = 0; cls < ISCLASSES; cls++) {
+			int level = GetClassLevel(cls);
+			if (!level) continue;
+			ret += gamedata->GetTrapSaveBonus(level, classesiwd2[cls]);
+		}
 	}
 
 	if (savingthrows[type] == IE_SAVEWILL) {

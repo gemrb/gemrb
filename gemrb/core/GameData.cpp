@@ -660,4 +660,15 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 	return atoi(spellAbilityDie->QueryField(cls, which));
 }
 
+int GameData::GetTrapSaveBonus(ieDword level, int cls)
+{
+	if (!core->HasFeature(GF_3ED_RULES)) return 0;
+
+	if (!trapSaveBonus->GetRowCount()) {
+		trapSaveBonus.load("trapsave", true);
+	}
+
+	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
+}
+
 }
