@@ -967,9 +967,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
 
-	if (InDebug&ID_VARIABLES) {
-		Log(MESSAGE, "GSUtils", "BeginDialog core");
-	}
+	ScriptDebugLog(ID_VARIABLES, "BeginDialog core");
+
 	tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
 	if (Flags & BD_OWN) {
 		scr = tar;
@@ -2106,10 +2105,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 {
 	char newVarName[8+33];
 
-	if (InDebug&ID_VARIABLES) {
-		Log(DEBUG, "GSUtils", "Setting variable(\"%s%s\", %d)", Context,
-			VarName, value );
-	}
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
 
 	strlcpy( newVarName, Context, 7 );
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
@@ -2152,9 +2148,8 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		poi++;
 	}
 
-	if (InDebug&ID_VARIABLES) {
-		Log(DEBUG, "GSUtils", "Setting variable(\"%s\", %d)", VarName, value );
-	}
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s\", %d)", VarName, value);
+
 	strlcpy( newVarName, VarName, 7 );
 	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
@@ -2199,24 +2194,18 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid
 
 	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( poi, value );
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d", VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 		return value;
 	}
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
 		Sender->locals->Lookup( poi, value );
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d", VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 		return value;
 	}
 	Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( poi, value );
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s: %d", VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 		return value;
 	}
 	if (stricmp(newVarName,"GLOBAL") ) {
@@ -2227,17 +2216,12 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid
 			if (valid) {
 				*valid=false;
 			}
-			if (InDebug&ID_VARIABLES) {
-				Log(WARNING, "GameScript", "Invalid variable %s in checkvariable",
-					VarName);
-			}
+			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s in CheckVariable", VarName);
 		}
 	} else {
 		game->locals->Lookup( poi, value );
 	}
-	if (InDebug&ID_VARIABLES) {
-		print("CheckVariable %s: %d", VarName, value);
-	}
+	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 	return value;
 }
 
@@ -2249,9 +2233,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	strlcpy(newVarName, Context, 7);
 	if (stricmp( newVarName, "MYAREA" ) == 0) {
 		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d", Context, VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
@@ -2260,17 +2242,13 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 				*valid = false;
 			}
 		}
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d", Context, VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
 	Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( VarName, value );
-		if (InDebug&ID_VARIABLES) {
-			print("CheckVariable %s%s: %d", Context, VarName, value);
-		}
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
 	if (stricmp(newVarName,"GLOBAL") ) {
@@ -2281,17 +2259,12 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 			if (valid) {
 				*valid=false;
 			}
-			if (InDebug&ID_VARIABLES) {
-				Log(WARNING, "GameScript", "Invalid variable %s %s in checkvariable",
-					Context, VarName);
-			}
+			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s %s in checkvariable", Context, VarName);
 		}
 	} else {
 		game->locals->Lookup( VarName, value );
 	}
-	if (InDebug&ID_VARIABLES) {
-		print("CheckVariable %s%s: %d", Context, VarName, value);
-	}
+	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 	return value;
 }
 

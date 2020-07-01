@@ -5902,9 +5902,8 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
-	if (InDebug&ID_ACTIONS) {
-		Log(MESSAGE, "Actions", "EscapeArea/EscapeAreaMove");
-	}
+	ScriptDebugLog(ID_ACTIONS, "EscapeArea/EscapeAreaMove");
+
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5930,9 +5929,8 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 
 void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 {
-	if (InDebug&ID_ACTIONS) {
-		Log(MESSAGE, "Actions", "EscapeAreaNoSee");
-	}
+	ScriptDebugLog(ID_ACTIONS, "EscapeAreaNoSee");
+
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
