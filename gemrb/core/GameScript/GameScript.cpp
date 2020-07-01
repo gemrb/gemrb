@@ -1563,8 +1563,8 @@ void InitializeIEScript()
 					if (InDebug&ID_TRIGGERS) {
 						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 							triggersTable->GetStringIndex( j ), triggernames[i].Name );
-						break;
 					}
+					break;
 				}
 			}
 			continue;
@@ -1714,8 +1714,8 @@ void InitializeIEScript()
 					if (InDebug&ID_ACTIONS) {
 						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
 							actionsTable->GetStringIndex( j ), actionnames[i].Name );
-						break;
 					}
+					break;
 				}
 			}
 			continue;
