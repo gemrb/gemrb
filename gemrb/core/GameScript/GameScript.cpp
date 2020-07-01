@@ -2377,8 +2377,8 @@ int ResponseSet::Execute(Scriptable* Sender)
 	int randWeight;
 	int maxWeight = 0;
 
-	for (size_t i = 0; i < responses.size(); i++) {
-		maxWeight += responses[i]->weight;
+	for (const Response *response : responses) {
+		maxWeight += response->weight;
 	}
 	if (maxWeight) {
 		randWeight = RAND(0, maxWeight-1);
@@ -2387,12 +2387,11 @@ int ResponseSet::Execute(Scriptable* Sender)
 		randWeight = 0;
 	}
 
-	for (size_t i = 0; i < responses.size(); i++) {
-		Response* rE = responses[i];
-		if (rE->weight > randWeight) {
-			return rE->Execute(Sender);
+	for (Response *response : responses) {
+		if (response->weight > randWeight) {
+			return response->Execute(Sender);
 		}
-		randWeight-=rE->weight;
+		randWeight -= response->weight;
 	}
 	return 0;
 }
@@ -2622,13 +2621,13 @@ void Object::dump(StringBuffer& buffer) const
 		return;
 	}
 	buffer.appendFormatted("IDS Targeting: ");
-	for(int i = 0; i < MAX_OBJECT_FIELDS; i++) {
-		buffer.appendFormatted("%d ",objectFields[i]);
+	for (auto objectField : objectFields) {
+		buffer.appendFormatted("%d ", objectField);
 	}
 	buffer.append("\n");
 	buffer.append("Filters: ");
-	for(int i = 0; i < MAX_NESTING; i++) {
-		buffer.appendFormatted("%d ",objectFilters[i]);
+	for (auto objectFilter : objectFilters) {
+		buffer.appendFormatted("%d ", objectFilter);
 	}
 	buffer.append("\n");
 }

@@ -648,7 +648,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 
 #define CSA_CNT 2
 static ieDword splabcount = 0;
-int GameData::GetSpellAbilityDieRoll(Actor *target, int which)
+int GameData::GetSpellAbilityDieRoll(const Actor *target, int which)
 {
 	if (which >= CSA_CNT) return 6;
 

@@ -1890,7 +1890,7 @@ SrcVector *LoadSrc(const ieResRef resname)
 
 // checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
 // also returns true if the trigger is supposed to succeed
-bool IsInObjectRect(const Point &pos, Region &rect)
+bool IsInObjectRect(const Point &pos, const Region &rect)
 {
 	if (!HasAdditionalRect) return true;
 	if (rect.w <= 0 || rect.h <= 0) return true;

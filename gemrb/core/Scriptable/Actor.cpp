@@ -3730,7 +3730,7 @@ void Actor::RollSaves()
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
 
 /** returns true if actor made the save against saving throw type */
-bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
+bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 {
 	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
@@ -3767,6 +3767,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	// intentionally not adding luck, which seems to have been handled separately
 	// eg. 11hfamlk.itm uses an extra opcode for the saving throw bonus
 	ret = roll + save + modifier;
+	assert(fx);
 	int spellLevel = fx->SpellLevel;
 	int saveBonus = fx->SavingThrowBonus;
 	int saveDC = 10 + spellLevel + saveBonus;
@@ -3791,7 +3792,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 		if (Modified[IE_EA] < EA_GOODCUTOFF && stricmp(fx->Source, "SPWI420")) {
 			// look if an ally paladin of at least level 2 is near
 			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
-			for (Actor *ally : neighbours) {
+			for (const Actor *ally : neighbours) {
 				if (ally->GetPaladinLevel() >= 2 && !ally->CheckSilenced()) {
 					ret += 4;
 					break;
@@ -3804,7 +3805,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 
 		// Tyrant's dictum for clerics of Bane
 		if (caster && caster->Type == ST_ACTOR) {
-			Actor *cleric = (Actor *) caster;
+			const Actor *cleric = (Actor *) caster;
 			if (cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) saveDC += 1;
 			// the original limited this to domain spells, but that's pretty lame
 		}
@@ -3827,7 +3828,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, Effect *fx)
 	// must roll a Will Save of 5 + player's total skill or higher to save
 	if (stricmp(fx->Source, "SPIN108") && fx->Opcode == 5) {
 		saveDC = 5;
-		Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
 		if (caster) {
 			saveDC += caster->GetSkill(IE_ANIMALS);
 		}

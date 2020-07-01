@@ -121,7 +121,7 @@ GEM_EXPORT Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho);
 GEM_EXPORT Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho);
 GEM_EXPORT void FreeSrc(SrcVector *poi, const ieResRef key);
 GEM_EXPORT SrcVector *LoadSrc(const ieResRef resname);
-bool IsInObjectRect(const Point &pos, Region &rect);
+bool IsInObjectRect(const Point &pos, const Region &rect);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
