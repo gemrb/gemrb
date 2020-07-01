@@ -73,7 +73,6 @@ static void ReleasePalette(void *poi)
 }
 
 GEM_EXPORT GameData* gamedata;
-static int *spell_abilities = NULL;
 
 GameData::GameData()
 {
@@ -84,7 +83,6 @@ GameData::~GameData()
 {
 	delete factory;
 	ItemSounds.clear();
-	free(spell_abilities);
 }
 
 void GameData::ClearCaches()
@@ -646,33 +644,20 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
 }
 
-#define CSA_CNT 2
-static ieDword splabcount = 0;
-int GameData::GetSpellAbilityDieRoll(const Actor *target, int which)
+static bool loadedSpellAbilityDie = false;
+int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
-	if (which >= CSA_CNT) return 6;
-
-	ieDword cls = target->GetActiveClass();
-	if (!spell_abilities) {
-		AutoTable tab("clssplab");
-		if (!tab) {
-			spell_abilities = (int *) malloc(sizeof(int) * CSA_CNT);
-			for (int ab = 0; ab < CSA_CNT; ab++) {
-				spell_abilities[ab * splabcount] = 6;
-			}
-			splabcount = 1;
+	if (!loadedSpellAbilityDie) {
+		if (!spellAbilityDie.load("clssplab", true)) {
+			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
 			return 6;
 		}
-		splabcount = tab->GetRowCount();
-		spell_abilities = (int *) malloc(sizeof(int) * splabcount * CSA_CNT);
-		for (int ab = 0; ab < CSA_CNT; ab++) {
-			for (ieDword i = 0; i < splabcount; i++) {
-				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
-			}
-		}
+		loadedSpellAbilityDie = true;
 	}
-	if (cls >= splabcount) cls = 0;
-	return spell_abilities[which * splabcount + cls];
+
+	ieDword cls = target->GetActiveClass();
+	if (cls >= spellAbilityDie->GetRowCount()) cls = 0;
+	return atoi(spellAbilityDie->QueryField(cls, which));
 }
 
 }

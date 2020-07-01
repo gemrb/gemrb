@@ -1497,7 +1497,7 @@ int fx_dexterity_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	////how cat's grace: value is based on class
 	if (fx->Parameter2==3) {
-		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDieRoll(target, 0), 0);
+		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDie(target, 0), 0);
 		fx->Parameter2 = 0;
 	}
 
@@ -2213,7 +2213,7 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	////how strength: value is based on class
 	////pst power of one also depends on this!
 	if (fx->Parameter2==3) {
-		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDieRoll(target, 1), 0);
+		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), 0);
 		fx->Parameter2 = 0;
 	}
 

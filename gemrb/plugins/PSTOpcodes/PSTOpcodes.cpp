@@ -711,7 +711,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			// if anyone complains about Improved strength having class based limits, add them to clssplab.2da
 			// duration and saving bonus fields are reused; these are eff v1
 			ieDword strLimit = fx->Duration - 1;
-			int bonus = core->Roll(1, gamedata->GetSpellAbilityDieRoll(target, 1), fx->SavingThrowBonus);
+			int bonus = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), fx->SavingThrowBonus);
 			if (target->Modified[IE_STR] + bonus >= strLimit) {
 				bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
 			}
