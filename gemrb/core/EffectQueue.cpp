@@ -1276,8 +1276,9 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			if( fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
 			}
-			if (pstflags) {
+			if (pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION)) {
 				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
+				// unless it's our unhardcoded spells which use iwd2-style simplified duration in rounds per level
 				fx->Duration = (fx->Duration ? fx->Duration : 1) + GameTime;
 			} else {
 				PrepareDuration(fx);
