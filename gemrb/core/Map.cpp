@@ -2530,7 +2530,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL|(actorsAreBlocking ? PATH_MAP_ACTOR : 0), true, actorsAreBlocking);
+	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL | (actorsAreBlocking ? PATH_MAP_ACTOR : 0), true, actorsAreBlocking);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
