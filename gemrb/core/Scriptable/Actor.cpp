@@ -8222,6 +8222,23 @@ void Actor::SetRunFlags(ieDword flags)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 }
 
+void Actor::NewPath()
+{
+        if (Destination == Pos) return;
+
+        Point tmp = Destination;
+        if (GetPathTries() > MAX_PATH_TRIES) {
+                ClearPath(true);
+                ResetPathTries();
+                return;
+        }
+        WalkTo(tmp, InternalFlags, size);
+        if (!GetPath()) {
+                IncrementPathTries();
+        }
+}
+
+
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
@@ -8229,7 +8246,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	Movable::WalkTo(Des, 0, MinDistance);
+	Movable::WalkTo(Des, MinDistance);
 }
 
 int Actor::WantDither() const

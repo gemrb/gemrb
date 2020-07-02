@@ -13,9 +13,9 @@
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*
-*/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ */
 
 #include "Scriptable/Scriptable.h"
 
@@ -417,7 +417,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	// don't run scripts if we're in dialog
 	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
-			(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
+		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
 		return;
 	}
 
@@ -604,7 +604,7 @@ void Scriptable::ProcessActions()
 	// FIXME
 	/*if (InternalFlags&IF_IDLE) {
 		Deactivate();
-		}*/
+	}*/
 }
 
 bool Scriptable::InMove() const
@@ -1034,15 +1034,15 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
-		case 1:
-			SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
-			break;
-		case 2:
-			SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
-			break;
-		default:
-			SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
-			break;
+	case 1:
+		SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+		break;
+	case 2:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+		break;
+	default:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+		break;
 	}
 
 	ResetCastingState(caster);
@@ -1104,15 +1104,15 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
-		case 1:
-			SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
-			break;
-		case 2:
-			SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
-			break;
-		default:
-			SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
-			break;
+	case 1:
+		SendTriggerToAll(TriggerEntry(trigger_spellcast, GetGlobalID(), spellID));
+		break;
+	case 2:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastpriest, GetGlobalID(), spellID));
+		break;
+	default:
+		SendTriggerToAll(TriggerEntry(trigger_spellcastinnate, GetGlobalID(), spellID));
+		break;
 	}
 
 	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
@@ -1175,15 +1175,15 @@ int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
 	ieDword chance = 0;
 	switch(spl->SpellType)
 	{
-		case IE_SPL_PRIEST:
-			chance = actor->GetSpellFailure(false);
-			break;
-		case IE_SPL_WIZARD:
-			chance = actor->GetSpellFailure(true);
-			break;
-		case IE_SPL_INNATE:
-			chance = actor->Modified[IE_SPELLFAILUREINNATE];
-			break;
+	case IE_SPL_PRIEST:
+		chance = actor->GetSpellFailure(false);
+		break;
+	case IE_SPL_WIZARD:
+		chance = actor->GetSpellFailure(true);
+		break;
+	case IE_SPL_INNATE:
+		chance = actor->Modified[IE_SPELLFAILUREINNATE];
+		break;
 	}
 	if (chance >= roll) {
 		failed = true;
@@ -1733,14 +1733,14 @@ void Selectable::SetBBox(const Region &newBBox)
 void Selectable::DrawCircle(const Region &vp)
 {
 	/* BG2 colours ground circles as follows:
-		 dark green for unselected party members
-		 bright green for selected party members
-		 flashing green/white for a party member the mouse is over
-		 bright red for enemies
-		 yellow for panicked actors
-		 flashing red/white for enemies the mouse is over
-		 flashing cyan/white for neutrals the mouse is over
-		 */
+	dark green for unselected party members
+	bright green for selected party members
+	flashing green/white for a party member the mouse is over
+	bright red for enemies
+	yellow for panicked actors
+	flashing red/white for enemies the mouse is over
+	flashing cyan/white for neutrals the mouse is over
+	*/
 
 	if (size<=0) {
 		return;
@@ -2186,7 +2186,7 @@ void Movable::BumpAway()
 // The bumping logic checks if there would be a collision if the actor was to move according to this
 // displacement vector and then, if that is the case, checks if that actor can be bumped
 // In that case, it bumps it and goes on with its step, otherwise it either stops and waits
-// for a random time (inspired by network media access control algorithms) or just stops if 
+// for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
@@ -2195,7 +2195,6 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
 	}
-	
 	// Only bump back if you are not moving
 	if (!path) {
 		if (OldPos == Pos) {
@@ -2216,28 +2215,24 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		this->timeStartStep = time;
 		return true;
 	}
-
 	if (!walkScale) {
 		// zero speed: no movement
 		StanceID = IE_ANI_READY;
 		this->timeStartStep = time;
 		return true;
 	}
-	
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
 	}
-
 	double dx, dxOrig;
 	double dy, dyOrig;
 	char ySign;
 	char xSign;
-	// Adjustments (+8/+6) are being made here, see Map::FindPath()
+	// Adjustments (+8/+6) are being made here, see Map::FindPath() in PathFinder.cpp
 	Point nmptStep(step->x * 16 + 8, step->y * 12 + 6);
 	dx = nmptStep.x - Pos.x;
 	dy = nmptStep.y - Pos.y;
-
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
 		if (step->Next) {
@@ -2249,14 +2244,12 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			return true;
 		}
 	}
-
 	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
 	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
 	dx = std::abs(dx);
 	dy = std::abs(dy);
 	dxOrig = dx;
 	dyOrig = dy;
-
 	if (time > this->timeStartStep) {
 		const double maxRadius = 2.0;
 		if (dx == 0) {
@@ -2290,7 +2283,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				return true;
-			} 
+			}
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
 				actorInTheWay->BumpAway();
 			} else {
@@ -2303,7 +2296,6 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.x += dx;
 		Pos.y += dy;
 		OldPos = Pos;
-
 		SetOrientation(step->orient, false);
 		this->timeStartStep = time;
 	}
@@ -2349,19 +2341,13 @@ void Movable::FixPosition()
 	Pos.y=Pos.y*12+6;
 }
 
-void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
+// This function is called at each tick if an actor is following another actor
+// Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
+void Movable::WalkTo(const Point &Des, int distance)
 {
-	assert(flags == 0);
-	// Rate limiting
 	if (this->Ticks < this->prevTicks + 2) {
 		return;
 	}
-	// Rate limiting stuff is not optimal, since it requires lots of pathfinder calls
-	// An incremental pathfinding algorithm would be preferable, but LOS checks are slow
-	// and not pre-cachable, while incremental pathfinding requires quite a lot of checks
-	// Moreover, incremental pathfinding algorithms available as of 2020, to the best of
-	// kmfrick's knowledge, are numerically unstable due to the use of angles
-	// (See Incremental phi-star by Nash and Koenig)
 
 	this->prevTicks = Ticks;
 	Destination = Des;
@@ -2377,7 +2363,6 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT);
 	}
-
 
 	if (newPath) {
 		ClearPath(false);
@@ -2484,21 +2469,6 @@ void Movable::ClearPath(bool resetDestination)
 	//don't call ReleaseCurrentAction
 }
 
-void Movable::NewPath()
-{
-	if (Destination == Pos) return;
-
-	Point tmp = Destination;
-	if (GetPathTries() > MAX_PATH_TRIES) {
-		ClearPath(true);
-		ResetPathTries();
-		return;
-	}
-	WalkTo(tmp, InternalFlags, size);
-	if (!GetPath()) {
-		IncrementPathTries();
-	}
-}
 
 /**********************
  * Tiled Object Class *

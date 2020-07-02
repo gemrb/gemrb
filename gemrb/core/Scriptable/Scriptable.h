@@ -515,8 +515,6 @@ public:
 	inline bool IsMoving() const {
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
-	/* call this when path needs to be changed */
-	void NewPath();
 
 	unsigned char GetNextFace();
 
@@ -537,9 +535,7 @@ public:
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
-	// Declared virtual since NewPath calls this
-	// and Actor overrides this
-	virtual void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
+	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();
 	void ClearPath(bool resetDestination = true);

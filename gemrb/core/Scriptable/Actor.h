@@ -719,8 +719,9 @@ public:
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime, bool checkhide) const;
+	void NewPath();
 	/* overridden method, won't walk if dead */
-	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0) override;
+	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
 	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;

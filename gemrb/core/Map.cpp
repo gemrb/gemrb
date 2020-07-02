@@ -784,14 +784,15 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 	}
 
-	// We need to step through the list of actors until all of them are done
-	// taking steps.
+	// We need to step through the list of actors until
+	// all of them are done taking steps
 	bool more_steps = true;
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 	while (more_steps) {
 		more_steps = false;
 		
-		// Make all actors pathfind
+		// Make all actors pathfind if there are others nearby
+		// in order to avoid bumping when possible
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
