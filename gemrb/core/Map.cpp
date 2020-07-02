@@ -2895,7 +2895,7 @@ void Map::UpdateFog()
 	}
 }
 
-//Valid values are - PATH_MAP_UNMARKED, PATH_MAP_PC, PATH_MAP_NPC
+// Valid values are - PATH_MAP_UNMARKED, PATH_MAP_PC, PATH_MAP_NPC
 void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value)
 {
 	// We block a circle of radius size-1 around (px,py)
