@@ -398,7 +398,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
 //internal flags for calculating to hit
-#define WEAPON_FIST	    0
+#define WEAPON_FIST        0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -3649,7 +3649,7 @@ void Actor::UpdateFatigue()
 		updated = true;
 	} else if (LastFatigueCheck) {
 		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
-		                	- (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+				    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
 		if (FatigueDiff) {
 			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
 			updated = true;
@@ -4296,7 +4296,7 @@ bool Actor::PlayWarCry(int range) const
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
-#define SEL_ACTION_COUNT_ALL	 7
+#define SEL_ACTION_COUNT_ALL     7
 
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action, bool clearPath)
@@ -4973,10 +4973,10 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		case DAMAGE_CRUSHING: type = 3; break; //crushing
 		case DAMAGE_MISSILE: type = 4; break;  //missile
 		case DAMAGE_ELECTRICITY: type = 5; levels = false; break; //electricity
-		case DAMAGE_COLD: type = 6; levels = false; break;	 //cold
+		case DAMAGE_COLD: type = 6; levels = false; break;     //cold
 		case DAMAGE_MAGIC: type = 7; levels = false; break;
 		case DAMAGE_STUNNING: type = -3; break;
-		default: return;					   //other
+		default: return;                       //other
 	}
 
 	ieResRef Sound;
@@ -5276,9 +5276,9 @@ ieDword Actor::GetXPLevel(int modified) const
 // returns the guessed caster level by passed spell type
 // FIXME: add more logic for cross-type kits (like avengers)?
 // FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
-//		that is, it takes the correct level, not first or average or min or max.
-//		We need to propagate the spellbook info all through here. :/
-//		NOTE: this is only problematic for multiclassed actors
+//        that is, it takes the correct level, not first or average or min or max.
+//	  We need to propagate the spellbook info all through here. :/
+//	  NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;

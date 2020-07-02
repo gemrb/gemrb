@@ -471,7 +471,7 @@ private: //these seem to be sensitive, so get protection
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
-  int PathTries;
+	int PathTries;
 	bool tryNotToBump;
 	int randomBackoff;
 	Point OldPos;
@@ -499,7 +499,7 @@ public:
 
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };
-	inline int GetPathTries() const	{	return PathTries;	}
+	inline int GetPathTries() const	{ return PathTries; }
 	inline void IncrementPathTries() { PathTries++; }
 	inline void ResetPathTries() { PathTries = 0; }
 
