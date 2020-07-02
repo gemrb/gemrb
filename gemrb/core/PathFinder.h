@@ -54,6 +54,12 @@ struct PathNode {
 typedef Point NavmapPoint;
 typedef Point SearchmapPoint;
 
+enum {
+        PF_SIGHT = 1,
+        PF_BACKAWAY = 2,
+        PF_ACTORS_ARE_BLOCKING = 4
+};
+
 class PQNode {
 public:
 	PQNode(Point p, unsigned int l):point(p), dist(l) {};

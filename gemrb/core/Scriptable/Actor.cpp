@@ -5207,7 +5207,6 @@ void Actor::SetMap(Map *map)
 // Position should be a navmap point
 void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy)
 {
-	Log(DEBUG, "PathFinderWIP", "Call SetPosition((%d %d) -> (%d %d))\n", Pos.x, Pos.y, nmptTarget.x, nmptTarget.y);
 	ResetPathTries();
 	ClearPath(true);
 	Point p, q;

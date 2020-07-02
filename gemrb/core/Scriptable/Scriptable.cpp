@@ -2179,8 +2179,15 @@ void Movable::BumpAway()
 	area->AdjustPositionNavmap(Pos);
 }
 
-// returns whether we made all pending steps (so, false if we must be called again this tick)
-// we can't just do them all here because the caller might have to update searchmap etc
+// Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
+// Returns whether the actor made all pending steps (so, false if it must be called again this tick).
+// The movement logic is a proportional regulator: the displacement/movement vector has a
+// fixed radius, based on actor walk speed, and its direction heads towards the next waypoint.
+// The bumping logic checks if there would be a collision if the actor was to move according to this
+// displacement vector and then, if that is the case, checks if that actor can be bumped
+// In that case, it bumps it and goes on with its step, otherwise it either stops and waits
+// for a random time (inspired by network media access control algorithms) or just stops if 
+// the goal is close enough.
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
 	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
@@ -2188,7 +2195,6 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
 		stepTime = 425;
 	}
-	int collisionLookaheadRadius = size * 3 - 3;
 	
 	// Only bump back if you are not moving
 	if (!path) {
@@ -2271,6 +2277,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Actor* actorInTheWay = NULL;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
+		int collisionLookaheadRadius = size * 3 - 3;
 		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
@@ -2285,14 +2292,11 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				return true;
 			} 
 			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
-				Log(DEBUG, "PathFinderWIP", "Bumping (%d %d)", actorInTheWay->Pos.x, actorInTheWay->Pos.y);
 				actorInTheWay->BumpAway();
-				Log(DEBUG, "PathFinderWIP", "Bumped to (%d %d)", actorInTheWay->Pos.x, actorInTheWay->Pos.y);
 			} else {
 				StanceID = IE_ANI_READY;
 				tryNotToBump = true;
 				Backoff();
-				Log(DEBUG, "PathFinderWIP", "%s blocked by %s", this->GetName(0), actorInTheWay->GetName(0));
 				return true;
 			}
 		}
@@ -2369,9 +2373,9 @@ void Movable::WalkTo(const Point &Des, ieDword flags, int distance)
 	}
 
 	area->ClearSearchMapFor(this);
-	PathNode *newPath = area->FindPath(Pos, Des, size, distance, true, false, true);
+	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
 	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
-		newPath = area->FindPath(Pos, Des, size, distance, true, false, false);
+		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT);
 	}
 
 
@@ -2493,7 +2497,6 @@ void Movable::NewPath()
 	WalkTo(tmp, InternalFlags, size);
 	if (!GetPath()) {
 		IncrementPathTries();
-		Log(DEBUG, "PathFinderWIP", "Pathfinding failed for %s, tries: %d", this->GetName(0), GetPathTries());
 	}
 }
 

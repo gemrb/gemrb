@@ -527,7 +527,7 @@ public:
 	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, bool sight = true, bool backAway = false, bool actorsAreBlocking = false);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT);
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
