@@ -55,7 +55,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 	SearchmapPoint smptFarthest = FindFarthest(d, size, PathLen);
 	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
 	int flags = PF_SIGHT;
-	if (!noBackAway) { flags |= PF_BACKAWAY; }
+	if (!noBackAway) flags |= PF_BACKAWAY;
 	return FindPath(s, nmptFarthest, size, 0, flags);
 }
 
@@ -379,4 +379,3 @@ Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest,
 	return resultPath;
 }
 }
-
