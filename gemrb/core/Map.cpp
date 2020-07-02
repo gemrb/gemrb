@@ -1314,9 +1314,9 @@ void Map::DrawSearchMap(const Region &screen)
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12, false);
-			block.x=screen.x+x*16-(rgn.x % 16);
-			block.y=screen.y+y*12-(rgn.y % 12);
+			unsigned char blockvalue = GetBlocked(x + rgn.x / 16, y + rgn.y / 12, false);
+			block.x = screen.x + x * 16 - (rgn.x % 16);
+			block.y = screen.y + y * 12 - (rgn.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
 					vid->DrawRect(block,impassible);
