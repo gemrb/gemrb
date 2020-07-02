@@ -35,6 +35,7 @@
 // which is solved with a P regulator, see Scriptable.cpp
 
 #include "Map.h"
+#include "FibonacciHeap.h"
 #include "PathFinder.h"
 #include "RNG.h"
 #include "Scriptable/Actor.h"
