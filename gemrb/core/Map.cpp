@@ -926,7 +926,7 @@ bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 
 void Map::ClearSearchMapFor( Movable *actor ) {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
-	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_UNMARKED);
+	BlockSearchMap(actor->Pos, actor->size, PATH_MAP_UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., PATH_MAP_UNMARKED).
