@@ -3649,7 +3649,7 @@ void Actor::UpdateFatigue()
 		updated = true;
 	} else if (LastFatigueCheck) {
 		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
-				    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+		                    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
 		if (FatigueDiff) {
 			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
 			updated = true;
@@ -5277,8 +5277,8 @@ ieDword Actor::GetXPLevel(int modified) const
 // FIXME: add more logic for cross-type kits (like avengers)?
 // FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
 //        that is, it takes the correct level, not first or average or min or max.
-//	  We need to propagate the spellbook info all through here. :/
-//	  NOTE: this is only problematic for multiclassed actors
+//        We need to propagate the spellbook info all through here. :/
+//        NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
 	int level = 0;
@@ -11494,6 +11494,3 @@ void Actor::PlayArmorSound() const
 
 
 }
-
-
-

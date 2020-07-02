@@ -504,7 +504,7 @@ public:
 	inline void ResetPathTries() { PathTries = 0; }
 
 	int GetPathLength();
-	//inliners to protect data consistency
+//inliners to protect data consistency
 	inline PathNode * GetStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);

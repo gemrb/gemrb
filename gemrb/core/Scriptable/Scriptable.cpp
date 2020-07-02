@@ -287,7 +287,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	core->GetVideoDriver()->ConvertToScreen(x, y);
 	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
 	core->GetTextFont()->Print( rgn, OverheadText, palette,
-			IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
+							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
 
 	palette->release();
 }
@@ -1775,7 +1775,7 @@ void Selectable::DrawCircle(const Region &vp)
 		if (csize < 4) csize = 3;
 
 		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
-				(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col );
+		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col );
 	}
 }
 
@@ -2060,8 +2060,8 @@ Point Movable::GetMostLikelyPosition()
 		return Pos;
 	}
 
-	//actually, sometimes middle path would be better, if
-	//we stand in Destination already
+//actually, sometimes middle path would be better, if
+//we stand in Destination already
 	int halfway = GetPathLength()/2;
 	PathNode *node = GetNextStep(halfway);
 	if (node) {
