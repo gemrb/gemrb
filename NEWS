@@ -1,11 +1,14 @@
-GemRB git (6193dc5a):
+GemRB git (052986b):
   New features:
     - 
+    - animal taming, iwd2 hardcoded saving throw bonuses
+    - vcpkg and out-of-the box msvc support
     - non-ascii data filename support
 
   Improved features:
     - 
-    - iwd chargen
+    - windows speedups, ease of setup
+    - iwd chargen, pst spell timing
     - audio, pst ini handling, savegame compatibility
     - effects, projectiles, actions, range calculations
     - bugfixes

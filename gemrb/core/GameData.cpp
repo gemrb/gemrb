@@ -644,4 +644,31 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
 }
 
+static bool loadedSpellAbilityDie = false;
+int GameData::GetSpellAbilityDie(const Actor *target, int which)
+{
+	if (!loadedSpellAbilityDie) {
+		if (!spellAbilityDie.load("clssplab", true)) {
+			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
+			return 6;
+		}
+		loadedSpellAbilityDie = true;
+	}
+
+	ieDword cls = target->GetActiveClass();
+	if (cls >= spellAbilityDie->GetRowCount()) cls = 0;
+	return atoi(spellAbilityDie->QueryField(cls, which));
+}
+
+int GameData::GetTrapSaveBonus(ieDword level, int cls)
+{
+	if (!core->HasFeature(GF_3ED_RULES)) return 0;
+
+	if (!trapSaveBonus->GetRowCount()) {
+		trapSaveBonus.load("trapsave", true);
+	}
+
+	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
+}
+
 }

@@ -58,10 +58,12 @@ global BeastImage
 BeastImage = None
 StartTime = 0
 
+PauseState = None
+
 ###################################################
 def OpenJournalWindow ():
 	global JournalWindow, PortraitWindow, ActionsWindow
-	global StartTime
+	global StartTime, PauseState
 
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE")
@@ -84,7 +86,11 @@ def OpenJournalWindow ():
 
 		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
-		return
+		GemRB.GamePause (PauseState, 3)
+		return	
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL")

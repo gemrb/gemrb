@@ -78,11 +78,13 @@ LevelUpWindow = None
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+PauseState = None
 
 ###################################################
 def OpenRecordsWindow ():
 	global RecordsWindow
 	global StatTable
+	global PauseState
 
 	StatTable = GemRB.LoadTable("abcomm")
 	
@@ -97,7 +99,11 @@ def OpenRecordsWindow ():
 		GUICommonWindows.SetSelectionChangeHandler (None)
 
 		GemRB.UnhideGUI ()
+		GemRB.GamePause (PauseState, 3)
 		return	
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIREC")

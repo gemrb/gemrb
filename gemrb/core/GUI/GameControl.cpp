@@ -1939,6 +1939,9 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 {
 	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
 
+	bool keyAreaVisited = CheckVariable(pc, "AR0500_Visited", "GLOBAL") == 1;
+	if (!keyAreaVisited) return false;
+
 	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
 	if (!teamMoved) return false;
 

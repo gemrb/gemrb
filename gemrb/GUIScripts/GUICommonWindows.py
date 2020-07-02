@@ -1011,6 +1011,8 @@ def ActionTurnPressed ():
 	return
 
 def ActionTamingPressed ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SpellCast (pc, -3, 0, "spin108")
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return

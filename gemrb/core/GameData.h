@@ -116,6 +116,8 @@ public:
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
+	int GetSpellAbilityDie(const Actor *target, int which);
+	int GetTrapSaveBonus(ieDword level, int cls);
 private:
 	void ReadItemSounds();
 private:
@@ -129,6 +131,8 @@ private:
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
 	AutoTable raceTHAC0Bonus;
+	AutoTable spellAbilityDie;
+	AutoTable trapSaveBonus;
 };
 
 extern GEM_EXPORT GameData * gamedata;

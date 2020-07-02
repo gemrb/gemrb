@@ -55,6 +55,12 @@
 #include "RNG.h"
 #include "System/StringBuffer.h"
 
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
+
 namespace GemRB {
 
 //debug flags
@@ -1241,7 +1247,15 @@ void SetScriptDebugMode(int arg)
 	InDebug=arg;
 }
 
+void ScriptDebugLog(int bit, const char *message, ...)
+{
+	if (!(InDebug & bit)) return;
 
+	va_list ap;
+	va_start(ap, message);
+	Log(DEBUG, "GameScript", message, ap);
+	va_end(ap);
+}
 
 /********************** Targets **********************************/
 
@@ -1560,11 +1574,8 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
-					if (InDebug&ID_TRIGGERS) {
-						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
-							triggersTable->GetStringIndex( j ), triggernames[i].Name );
-						break;
-					}
+					ScriptDebugLog(ID_TRIGGERS, "%s is a synonym of %s", triggersTable->GetStringIndex(j), triggernames[i].Name);
+					break;
 				}
 			}
 			continue;
@@ -1711,11 +1722,8 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
-					if (InDebug&ID_ACTIONS) {
-						Log(MESSAGE, "GameScript", "%s is a synonym of %s",
-							actionsTable->GetStringIndex( j ), actionnames[i].Name );
-						break;
-					}
+					ScriptDebugLog(ID_ACTIONS, "%s is a synonym of %s", actionsTable->GetStringIndex(j), actionnames[i].Name);
+					break;
 				}
 			}
 			continue;
@@ -1839,9 +1847,7 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		if (InDebug&ID_REFERENCE) {
-			Log(DEBUG, "GameScript", "One instance of %s is dropped from %d.", Name, BcsCache.RefCount(Name) );
-		}
+		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name, BcsCache.RefCount(Name));
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
@@ -1863,9 +1869,7 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
 	if ( newScript ) {
-		if (InDebug&ID_REFERENCE) {
-			Log(DEBUG, "GameScript", "Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
-		}
+		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", ResRef, BcsCache.RefCount(ResRef));
 		return newScript;
 	}
 
@@ -1881,9 +1885,7 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 	}
 	newScript = new Script( );
 	BcsCache.SetAt( ResRef, (void *) newScript );
-	if (InDebug&ID_REFERENCE) {
-		Log(DEBUG, "GameScript", "Caching %s for the %d. time", ResRef, BcsCache.RefCount(ResRef) );
-	}
+	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", ResRef, BcsCache.RefCount(ResRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -2354,10 +2356,8 @@ int Trigger::Evaluate(Scriptable* Sender)
 			triggerID, tmpstr );
 		return 0;
 	}
-	if (InDebug&ID_TRIGGERS) {
-		Log(WARNING, "GameScript", "Executing trigger code: 0x%04x %s",
-				triggerID, tmpstr );
-	}
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s", triggerID, tmpstr);
+
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
 		return !ret;
@@ -2377,8 +2377,8 @@ int ResponseSet::Execute(Scriptable* Sender)
 	int randWeight;
 	int maxWeight = 0;
 
-	for (size_t i = 0; i < responses.size(); i++) {
-		maxWeight += responses[i]->weight;
+	for (const Response *response : responses) {
+		maxWeight += response->weight;
 	}
 	if (maxWeight) {
 		randWeight = RAND(0, maxWeight-1);
@@ -2387,12 +2387,11 @@ int ResponseSet::Execute(Scriptable* Sender)
 		randWeight = 0;
 	}
 
-	for (size_t i = 0; i < responses.size(); i++) {
-		Response* rE = responses[i];
-		if (rE->weight > randWeight) {
-			return rE->Execute(Sender);
+	for (Response *response : responses) {
+		if (response->weight > randWeight) {
+			return response->Execute(Sender);
 		}
-		randWeight-=rE->weight;
+		randWeight -= response->weight;
 	}
 	return 0;
 }
@@ -2452,10 +2451,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
-			if (InDebug&ID_ACTIONS) {
-				Log(WARNING, "GameScript", "Sender %s ran ActionOverride on %s",
-					Sender->GetScriptName(), scr->GetScriptName() );
-			}
+			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
 			scr->ReleaseCurrentAction();
 			scr->AddAction(ParamCopyNoOverride(aC));
 			if (!(actionflags[actionID] & AF_INSTANT)) {
@@ -2531,9 +2527,8 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 Trigger* GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if (InDebug&ID_TRIGGERS) {
-		Log(WARNING, "GameScript", "Compiling:%s", String);
-	}
+	ScriptDebugLog(ID_TRIGGERS, "Compiling: %s", String);
+
 	int negate = 0;
 	if (*String == '!') {
 		String++;
@@ -2561,9 +2556,8 @@ Action* GenerateAction(const char* String)
 	char* actionString = strdup(String);
 	// the only thing we seem to need a copy for is the call to strlwr...
 	strlwr( actionString );
-	if (InDebug&ID_ACTIONS) {
-		Log(WARNING, "GameScript", "Compiling:%s", String);
-	}
+	ScriptDebugLog(ID_ACTIONS, "Compiling: %s", String);
+
 	int len = strlench(String,'(')+1; //including (
 	char *src = actionString+len;
 	int i = -1;
@@ -2622,13 +2616,13 @@ void Object::dump(StringBuffer& buffer) const
 		return;
 	}
 	buffer.appendFormatted("IDS Targeting: ");
-	for(int i = 0; i < MAX_OBJECT_FIELDS; i++) {
-		buffer.appendFormatted("%d ",objectFields[i]);
+	for (auto objectField : objectFields) {
+		buffer.appendFormatted("%d ", objectField);
 	}
 	buffer.append("\n");
 	buffer.append("Filters: ");
-	for(int i = 0; i < MAX_NESTING; i++) {
-		buffer.appendFormatted("%d ",objectFilters[i]);
+	for (auto objectFilter : objectFilters) {
+		buffer.appendFormatted("%d ", objectFilter);
 	}
 	buffer.append("\n");
 }

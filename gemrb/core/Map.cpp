@@ -2268,7 +2268,7 @@ Entrance* Map::GetEntrance(const char* Name)
 	return NULL;
 }
 
-bool Map::HasActor(Actor *actor) const
+bool Map::HasActor(const Actor *actor) const
 {
 	for (Actor *act : actors) {
 		if (act == actor) {
@@ -3218,7 +3218,7 @@ void Map::UpdateFog()
 	}
 
 	for (size_t i = 0; i < actors.size(); i++) {
-		Actor *actor = actors[i];
+		const Actor *actor = actors[i];
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		if (core->FogOfWar&FOG_DRAWFOG) {
 			int state = actor->Modified[IE_STATE_ID];
