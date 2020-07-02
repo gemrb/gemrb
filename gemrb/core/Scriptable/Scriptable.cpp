@@ -2469,7 +2469,6 @@ void Movable::ClearPath(bool resetDestination)
 	//don't call ReleaseCurrentAction
 }
 
-
 /**********************
  * Tiled Object Class *
  **********************/

@@ -477,7 +477,6 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 
 	//delete the original searchmap
 	delete sr;
-
 }
 
 void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor)

@@ -334,7 +334,6 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-
 	ArmorClass AC;
 	ToHitStats ToHit;
 	ModalState Modal;
@@ -411,7 +410,6 @@ private:
 	ieDword LastFatigueCheck;
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
-
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,

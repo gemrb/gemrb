@@ -5214,7 +5214,6 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 	p.y = nmptTarget.y / 12;
 
 	q = p;
-
 	lastFrame = NULL;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();

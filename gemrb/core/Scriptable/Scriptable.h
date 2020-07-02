@@ -457,8 +457,6 @@ public:
 class GEM_EXPORT Movable : public Selectable {
 	const int XEPS = 32;
 	const int YEPS = 12;
-
-
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
@@ -467,7 +465,6 @@ private: //these seem to be sensitive, so get protection
 	PathNode* path; //whole path
 	PathNode* step; //actual step
 	unsigned int prevTicks;
-
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
@@ -475,9 +472,7 @@ protected:
 	bool tryNotToBump;
 	int randomBackoff;
 	Point OldPos;
-
 public:
-
 	inline int GetRandomBackoff() const
 	{
 		return randomBackoff;
@@ -496,13 +491,11 @@ public:
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
 	void BumpAway();
-
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return PathTries; }
 	inline void IncrementPathTries() { PathTries++; }
 	inline void ResetPathTries() { PathTries = 0; }
-
 	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetStep() {

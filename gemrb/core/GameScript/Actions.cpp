@@ -1141,7 +1141,6 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		actor->Interrupt();
 		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
-
 	}
 }
 

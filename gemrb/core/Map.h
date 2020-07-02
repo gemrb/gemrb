@@ -597,7 +597,6 @@ private:
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
-
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised */
@@ -605,9 +604,6 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-
-
-
 	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags,
 		bool checkImpassable = false, bool actorsAreBlocking = true) const;
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
