@@ -1988,10 +1988,10 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 	for (unsigned int i=0; i<size-1; i++) {
 		for (unsigned int j=0; j<size-1; j++) {
 			if (i*i+j*j <= r) {
-				if (!(GetBlocked(ppx+i,ppy+j, actorsAreBlocking)&flags)) return true;
-				if (!(GetBlocked(ppx+i,ppy-j, actorsAreBlocking)&flags)) return true;
-				if (!(GetBlocked(ppx-i,ppy+j, actorsAreBlocking)&flags)) return true;
-				if (!(GetBlocked(ppx-i,ppy-j, actorsAreBlocking)&flags)) return true;
+				if (!(GetBlocked(ppx + i, ppy + j, actorsAreBlocking) & flags)) return true;
+				if (!(GetBlocked(ppx + i, ppy - j, actorsAreBlocking) & flags)) return true;
+				if (!(GetBlocked(ppx - i , ppy + j, actorsAreBlocking) & flags)) return true;
+				if (!(GetBlocked(ppx - i, ppy - j, actorsAreBlocking) & flags)) return true;
 			}
 		}
 	}
