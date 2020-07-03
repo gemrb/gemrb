@@ -8223,19 +8223,19 @@ void Actor::SetRunFlags(ieDword flags)
 
 void Actor::NewPath()
 {
-        if (Destination == Pos) return;
+	if (Destination == Pos) return;
 	// WalkTo's and FindPath's first argument is passed by reference
 	// And we don't want to modify Destination so we use a temporary
-        Point tmp = Destination;
-        if (GetPathTries() > MAX_PATH_TRIES) {
-                ClearPath(true);
-                ResetPathTries();
-                return;
-        }
-        WalkTo(tmp, InternalFlags, size);
-        if (!GetPath()) {
-                IncrementPathTries();
-        }
+	Point tmp = Destination;
+	if (GetPathTries() > MAX_PATH_TRIES) {
+		ClearPath(true);
+		ResetPathTries();
+		return;
+	}
+	WalkTo(tmp, InternalFlags, size);
+	if (!GetPath()) {
+		IncrementPathTries();
+	}
 }
 
 
