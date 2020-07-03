@@ -116,7 +116,7 @@ SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsign
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
 {
 	int flags = PF_SIGHT;
-	if (actorsAreBlocking) { flags |= PF_ACTORS_ARE_BLOCKING; }
+	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
 	return FindPath(s, d, size, 0, flags) == NULL;
 }
 
