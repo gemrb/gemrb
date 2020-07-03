@@ -166,7 +166,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 
 	int Count = 0;
 	int Max = Distance(start, dest);
-	for (int Steps = 0; Steps<Max; Steps++) {
+	for (int Steps = 0; Steps < Max; Steps++) {
 		Point p;
 		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
 		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
@@ -174,10 +174,10 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix
 		//the crash in projectiles
-		if ((signed) p.x<0 || (signed) p.y<0) {
+		if ((signed) p.x < 0 || (signed) p.y < 0) {
 			return Return;
 		}
-		if ((ieWord) p.x>Width*16 || (ieWord) p.y>Height*12) {
+		if ((ieWord) p.x > Width * 16 || (ieWord) p.y > Height * 12) {
 			return Return;
 		}
 
@@ -186,7 +186,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 			StartNode->Next->Parent = StartNode;
 			StartNode = StartNode->Next;
 			StartNode->Next = NULL;
-			Count=Speed;
+			Count = Speed;
 		} else {
 			Count--;
 		}
@@ -197,7 +197,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		bool wall = GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_DOOR_IMPASSABLE | PATH_MAP_SIDEWALL);
 		if (wall) switch (flags) {
 			case GL_REBOUND:
-				Orientation = (Orientation + 8) &15;
+				Orientation = (Orientation + 8) & 15;
 				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
@@ -272,7 +272,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			foundPath = true;
 			break;
 		} else if (minDistance) {
-			int xDist = nmptCurrentAdjusted.x  - d.x;
+			int xDist = nmptCurrentAdjusted.x - d.x;
 			int yDist = nmptCurrentAdjusted.y - d.y;
 			unsigned int squaredDist = xDist * xDist + yDist * yDist;
 			if (parents[smptCurrent.y * Width + smptCurrent.x] != smptCurrent &&
