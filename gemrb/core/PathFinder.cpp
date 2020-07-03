@@ -129,7 +129,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int flags)
 
 PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags)
 {
-	Point dest=start;
+	Point dest = start;
 
 	double xoff, yoff, mult;
 	if (Orientation <= 4) {
