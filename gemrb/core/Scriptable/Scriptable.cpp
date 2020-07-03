@@ -2046,7 +2046,6 @@ PathNode *Movable::GetNextStep(int x)
 {
 	if (!step) {
 		error("GetNextStepWIP", "GetNextStep hit with step = null");
-		DoStep((unsigned int) ~0);
 	}
 	PathNode *node = step;
 	while(node && x--) {
