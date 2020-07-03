@@ -173,9 +173,10 @@ namespace GemRB {
 #define  GF_FIXED_MORALE_OPCODE         79 // bg2
 #define  GF_HAPPINESS                   80 // all except pst and iwd2
 #define  GF_EFFICIENT_OR                81 // does the OR trigger shortcircuit on success or not? Only in iwd2
+#define  GF_LAYERED_WATER_TILES			82 // TileOverlay for water has an extra half transparent layer (all but BG1)
 
 //update this or bad things can happen
-#define GF_COUNT 82
+#define GF_COUNT 83
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

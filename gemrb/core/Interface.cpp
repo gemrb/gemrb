@@ -2230,6 +2230,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
 		"Happiness",          //80GF_HAPPINESS
 		"EfficientORTrigger", //81GF_EFFICIENT_OR
+		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
