@@ -768,21 +768,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->GetNextAnimation();
 				}
 				break;
-			case 'b': //draw a path to the target (pathfinder debug)
-				//You need to select an origin with ctrl-o first
-				if (drawPath) {
-					PathNode* nextNode = drawPath->Next;
-					PathNode* thisNode = drawPath;
-					while (true) {
-						delete( thisNode );
-						thisNode = nextNode;
-						if (!thisNode)
-							break;
-						nextNode = thisNode->Next;
-					}
-				}
-				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p, lastActor?lastActor->size:1 );
-				break;
+			// b
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
 				//target is the door/actor currently under the pointer
@@ -913,12 +899,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'n': //prints a list of all the live actors in the area
 				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
-			case 'o': //set up the origin for the pathfinder
-				// origin
-				pfs.x = lastMouseX;
-				pfs.y = lastMouseY;
-				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
-				break;
+			// o
 			case 'p': //center on actor
 				ScreenFlags|=SF_CENTERONACTOR;
 				ScreenFlags^=SF_ALWAYSCENTER;
