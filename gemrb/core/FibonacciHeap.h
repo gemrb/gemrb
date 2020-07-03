@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FIBONACCI_HEAP_H
 #define FIBONACCI_HEAP_H
 
+#include <cstddef>
+
 template <class V> class FibonacciHeap;
 
 template <class V> struct node {
