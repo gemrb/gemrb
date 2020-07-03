@@ -165,7 +165,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	StartNode->orient = Orientation;
 
 	int Count = 0;
-	int Max = Distance(start,dest);
+	int Max = Distance(start, dest);
 	for (int Steps = 0; Steps<Max; Steps++) {
 		Point p;
 		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
