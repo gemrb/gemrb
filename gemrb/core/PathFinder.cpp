@@ -312,8 +312,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			smptChild.x = smptCurrent.x + dx[i];
 			smptChild.y = smptCurrent.y + dy[i];
-			bool childOutsideMap =	smptChild.x < 0 ||
-				smptChild.y < 0 ||
+			bool childOutsideMap =	smptChild.x <= 0 ||
+				smptChild.y <= 0 ||
 				(unsigned) smptChild.x >= Width ||
 				(unsigned) smptChild.y >= Height;
 			bool childBlocked = CheckSearchmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
