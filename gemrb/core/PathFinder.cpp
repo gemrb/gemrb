@@ -146,7 +146,7 @@ PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 		yoff = -1.0 + (Orientation - 8) / 4.0;
 	}
 
-	mult = 1.0 / (std::fabs(xoff) > std::fabs(yoff) ? std::fabs(xoff) : std::fabs(yoff));
+	mult = 1.0 / std::max(std::fabs(xoff), std::fabs(yoff));
 
 	dest.x += Steps * mult * xoff + 0.5;
 	dest.y += Steps * mult * yoff + 0.5;
