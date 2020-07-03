@@ -23,8 +23,8 @@
 
 #include "exports.h"
 
-#include "Variables.h"
 #include "CharAnimations.h"
+#include "Variables.h"
 
 #include <list>
 #include <map>

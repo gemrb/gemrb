@@ -38,6 +38,7 @@
 #include "GUI/TextSystem/Font.h"
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
+
 #include <cmath>
 
 namespace GemRB {
@@ -2212,19 +2213,20 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
-		this->timeStartStep = time;
+		timeStartStep = time;
 		return true;
 	}
 	if (!walkScale) {
 		// zero speed: no movement
 		StanceID = IE_ANI_READY;
-		this->timeStartStep = time;
+		timeStartStep = time;
 		return true;
 	}
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
 		StanceID = IE_ANI_RUN;
 	}
+
 	double dx, dxOrig;
 	double dy, dyOrig;
 	char ySign;
@@ -2250,7 +2252,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	dy = std::abs(dy);
 	dxOrig = dx;
 	dyOrig = dy;
-	if (time > this->timeStartStep) {
+	if (time > timeStartStep) {
 		const double maxRadius = 2.0;
 		if (dx == 0) {
 			dy = maxRadius;
@@ -2267,7 +2269,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		dy = std::min(dy * stepTime / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
-		Actor* actorInTheWay = NULL;
+		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
 		int collisionLookaheadRadius = size * 3 - 3;
@@ -2284,7 +2286,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				NewOrientation = Orientation;
 				return true;
 			}
-			if (Type == ST_ACTOR && (((Actor*)this)->ValidTarget(GA_CAN_BUMP)) && (actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE))) {
+			if (Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 				actorInTheWay->BumpAway();
 			} else {
 				StanceID = IE_ANI_READY;
@@ -2297,7 +2299,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.y += dy;
 		OldPos = Pos;
 		SetOrientation(step->orient, false);
-		this->timeStartStep = time;
+		timeStartStep = time;
 	}
 	return true;
 }
@@ -2345,11 +2347,11 @@ void Movable::FixPosition()
 // Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
 void Movable::WalkTo(const Point &Des, int distance)
 {
-	if (this->Ticks < this->prevTicks + 2) {
+	if (Ticks < prevTicks + 2) {
 		return;
 	}
 
-	this->prevTicks = Ticks;
+	prevTicks = Ticks;
 	Destination = Des;
 
 	if (std::abs(Des.x - Pos.x) <= XEPS &&
@@ -2360,7 +2362,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	area->ClearSearchMapFor(this);
 	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
-	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)(this))->ValidTarget(GA_CAN_BUMP)) {
+	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT);
 	}
 
@@ -2375,7 +2377,7 @@ void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Des, size, PathLength, noBackAway );
+	path = area->RunAway(Pos, Des, size, PathLength, noBackAway);
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
