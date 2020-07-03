@@ -156,7 +156,7 @@ PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 
 PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags)
 {
-	PathNode* StartNode = new PathNode;
+	PathNode *StartNode = new PathNode;
 	PathNode *Return = StartNode;
 	StartNode->Next = NULL;
 	StartNode->Parent = NULL;
