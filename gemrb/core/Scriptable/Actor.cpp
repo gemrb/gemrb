@@ -6305,7 +6305,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
 		if (core->InCutSceneMode()) return false;
-		if (core->GetGame()->CombatCounter) return false;
+		if (core->GetGame()->CombatCounter && !InParty) return false;
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false;
 		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false;
 		if (IsMoving()) return false;

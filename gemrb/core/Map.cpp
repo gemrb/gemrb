@@ -794,7 +794,7 @@ void Map::UpdateScripts()
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
-			if (actor->GetRandomBackoff()) {
+			if (actor->GetRandomBackoff() || !actor->GetStep()) {
 				continue;
 			}
 			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
@@ -1972,7 +1972,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlock
 	return ret;
 }
 
-bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
+bool Map::CheckNavmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -1981,16 +1981,16 @@ bool Map::CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned in
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 2) size = 2;
 
-	unsigned int ppx = px/16;
-	unsigned int ppy = py/12;
-	unsigned int r=(size-2)*(size-2)+1;
+	unsigned int ppx = px / 16;
+	unsigned int ppy = py / 12;
+	unsigned int r = (size - 2) * (size - 2) + 1;
 	if (size == 2) r = 0;
-	for (unsigned int i=0; i<size-1; i++) {
-		for (unsigned int j=0; j<size-1; j++) {
-			if (i*i+j*j <= r) {
+	for (unsigned int i = 0; i < size - 1; i++) {
+		for (unsigned int j = 0; j < size - 1; j++) {
+			if (i * i + j * j <= r) {
 				if (!(GetBlocked(ppx + i, ppy + j, actorsAreBlocking) & flags)) return true;
 				if (!(GetBlocked(ppx + i, ppy - j, actorsAreBlocking) & flags)) return true;
-				if (!(GetBlocked(ppx - i , ppy + j, actorsAreBlocking) & flags)) return true;
+				if (!(GetBlocked(ppx - i, ppy + j, actorsAreBlocking) & flags)) return true;
 				if (!(GetBlocked(ppx - i, ppy - j, actorsAreBlocking) & flags)) return true;
 			}
 		}
@@ -2464,7 +2464,7 @@ bool Map::IsVisible(const Point &pos, int explored)
 	return (VisibleBitmap[by] & bi)!=0;
 }
 
-bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable, bool actorsAreBlocking) const
+bool Map::CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable, bool actorsAreBlocking) const
 {
 	int sX = s.x / 16;
 	int sY = s.y / 12;
@@ -2525,12 +2525,12 @@ bool Map::CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int f
 
 bool Map::IsVisibleLOS(const Point &s, const Point &d) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL);
+	return CheckNavmapLineFlags(s, d, PATH_MAP_SIDEWALL);
 }
 
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking) const
 {
-	return CheckSearchmapLineFlags(s, d, PATH_MAP_SIDEWALL | (actorsAreBlocking ? PATH_MAP_ACTOR : 0), true, actorsAreBlocking);
+	return CheckNavmapLineFlags(s, d, PATH_MAP_SIDEWALL | (actorsAreBlocking ? PATH_MAP_ACTOR : 0), true, actorsAreBlocking);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary

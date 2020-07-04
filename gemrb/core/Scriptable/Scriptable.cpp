@@ -2294,6 +2294,11 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				return true;
 			}
 		}
+		if (area->GetBlocked((Pos.x + dx) / 16, (Pos.y + dy) / 12, false) & PATH_MAP_SIDEWALL) {
+			ClearPath(true);
+			NewOrientation = Orientation;
+			return true;
+		}
 		Pos.x += dx;
 		Pos.y += dy;
 		OldPos = Pos;

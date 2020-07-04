@@ -426,7 +426,7 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool CheckSearchmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = true) const;
+	bool CheckNavmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
@@ -604,7 +604,7 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-	bool CheckSearchmapLineFlags(const Point &s, const Point &d, unsigned int flags,
+	bool CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int flags,
 		bool checkImpassable = false, bool actorsAreBlocking = true) const;
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
 	PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, 
