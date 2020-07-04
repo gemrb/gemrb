@@ -46,15 +46,18 @@ ContTarg = None
 SpellType = None
 Level = 1
 
-def ToggleSpellWindow():
+def ToggleSpellWindow(btn, val):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+	
+	ToggleSpellWindow.Args = (btn, val)
+	
 	if Sorcerer:
-		ToggleSorcererWindow()
+		ToggleSorcererWindow(btn, val)
 	else:
-		ToggleMageWindow()
+		ToggleMageWindow(btn, val)
 
 def InitMageWindow (window):
 	global MageWindow
@@ -191,15 +194,19 @@ def UpdateMageWindow (MageWindow):
 	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 	return
 
-def MageSelectionChanged (Window):
-	def SelectionChanged ():
-		pc = GemRB.GameGetSelectedPCSingle()
-		# start from scratch because its easier
-		Window.Close()
-		ToggleSpellWindow()
-		GemRB.GameSelectPCSingle (pc)
+def MageSelectionChanged (oldwin):
+	global Sorcerer
+	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
+	
+	UpdateMageWindow(oldwin)
+	
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
 
-	GUICommonWindows.SetSelectionChangeHandler(SelectionChanged)
+	if Sorcerer:
+		OpenSorcererWindow(*ToggleSpellWindow.Args)
+	else:
+		OpenMageWindow(*ToggleSpellWindow.Args)
 
 ToggleMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
 OpenMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
