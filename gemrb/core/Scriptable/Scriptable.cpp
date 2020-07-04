@@ -2369,6 +2369,8 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
+	} else {
+		Log(DEBUG, "PathFinderWIP", "Pathing failed for %s", GetName(0));
 	}
 }
 

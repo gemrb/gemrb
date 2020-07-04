@@ -231,6 +231,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// We don't want to bump a still npc on our target position, we want to stop before
 		AdjustPosition(smptDest);
 	}
+	// This should probably only be done in combat, although it doesn't
+	// seem to cause any major issues
+	AdjustPosition(smptSource, size ? size : 1);
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
@@ -320,6 +323,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 					PATH_MAP_PASSABLE, flags & PF_ACTORS_ARE_BLOCKING);
 			Actor* childActor = GetActor(NavmapPoint(smptChild.x * 16 + 8, smptChild.y * 12 + 6), GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			bool childIsUnbumpable = childActor && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
+			if (smptCurrent == smptSource) {
+				if (childBlocked) Log(DEBUG, "PathFinderWIP", "Source + (%d %d) is blocked as %d", dx[i], dy[i], GetBlocked(smptChild.x, smptChild.y));
+				if (childIsUnbumpable) Log(DEBUG, "PathFinderWIP", "Source + (%d %d) is blocked by an unbumpable", dx[i], dy[i]);
+			}
 			if (!childOutsideMap && !childBlocked && !isClosed[smptChild.y * Width + smptChild.x] && !childIsUnbumpable) {
 				if (!distFromStart[smptChild.y * Width + smptChild.x] && smptChild != smptSource) {
 					distFromStart[smptChild.y * Width + smptChild.x] = MAX_PATH_COST;
