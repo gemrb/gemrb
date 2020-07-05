@@ -1953,6 +1953,11 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
+unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y, bool actorsAreBlocking) const
+{
+	return GetBlocked(x / 16, y / 12, actorsAreBlocking);
+}
+
 // Args are in searchmap coordinates
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking) const
 {
@@ -2466,54 +2471,50 @@ bool Map::IsVisible(const Point &pos, int explored)
 
 bool Map::CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable, bool actorsAreBlocking) const
 {
-	int sX = s.x / 16;
-	int sY = s.y / 12;
-	int dX = d.x / 16;
-	int dY = d.y / 12;
-	int diffx = sX - dX;
-	int diffy = sY - dY;
+	int diffx = s.x - d.x;
+	int diffy = s.y - d.y;
 
-	// we basically draw a 'line' from (sX, sY) to (dX, dY)
+	// we basically draw a 'line' from (s.x, s.y) to (d.x, d.y)
 	// we want to move along the larger axis, to make sure we don't miss anything
 	if (abs(diffx) >= abs(diffy)) {
-		// (sX - startX)/elevationy = (sX - startX)/fabs(diffx) * diffy
+		// (s.x - startX)/elevationy = (s.x - startX)/fabs(diffx) * diffy
 		double elevationy = std::fabs((double) diffx) / diffy;
-		if (sX > dX) {
+		if (s.x > d.x) {
 			// right to left
-			for (int startx = sX; startx >= dX; startx--) {
-				// sX - startx >= 0, so subtract (due to sign of diffy)
-				int blockStatus = GetBlocked(startx, sY - (int) ((sX - startx) / elevationy), actorsAreBlocking);
+			for (int startx = s.x; startx >= d.x; startx--) {
+				// s.x - startx >= 0, so subtract (due to sign of diffy)
+				int blockStatus = GetBlockedNavmap(startx, s.y - (int) ((s.x - startx) / elevationy), actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
 		} else {
 			// left to right
-			for (int startx = sX; startx <= dX; startx++) {
-				// sX - startx <= 0, so add (due to sign of diffy)
-				int blockStatus = GetBlocked(startx, sY + (int) ((sX - startx) / elevationy), actorsAreBlocking);
+			for (int startx = s.x; startx <= d.x; startx++) {
+				// s.x - startx <= 0, so add (due to sign of diffy)
+				int blockStatus = GetBlockedNavmap(startx, s.y + (int) ((s.x - startx) / elevationy), actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
 		}
 	} else {
-		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
+		// (s.y - startY)/elevationx = (s.y - startY)/fabs(diffy) * diffx
 		double elevationx = std::fabs((double) diffy) / diffx;
-		if (sY > dY) {
+		if (s.y > d.y) {
 			// bottom to top
-			for (int starty = sY; starty >= dY; starty--) {
-				// sY - starty >= 0, so subtract (due to sign of diffx)
-				int blockStatus = GetBlocked(sX - (int) ((sY - starty) / elevationx), starty, actorsAreBlocking);
+			for (int starty = s.y; starty >= d.y; starty--) {
+				// s.y - starty >= 0, so subtract (due to sign of diffx)
+				int blockStatus = GetBlockedNavmap(s.x - (int) ((s.y - starty) / elevationx), starty, actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}
 			}
 		} else {
 			// top to bottom
-			for (int starty = sY; starty <= dY; starty++) {
-				// sY - starty <= 0, so add (due to sign of diffx)
-				int blockStatus = GetBlocked(sX + (int) ((sY - starty) / elevationx), starty, actorsAreBlocking);
+			for (int starty = s.y; starty <= d.y; starty++) {
+				// s.y - starty <= 0, so add (due to sign of diffx)
+				int blockStatus = GetBlockedNavmap(s.x + (int) ((s.y - starty) / elevationx), starty, actorsAreBlocking);
 				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
 					return false;
 				}

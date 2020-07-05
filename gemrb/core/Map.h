@@ -428,6 +428,7 @@ public:
 	bool AnyEnemyNearPoint(const Point &p);
 	bool CheckNavmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
+	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
