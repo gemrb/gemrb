@@ -2193,12 +2193,6 @@ void Movable::BumpAway()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 bool Movable::DoStep(unsigned int walkScale, ieDword time) {
-	// Magical values from trial-and-error in order to match the speeds from the original game as closely as possible
-	// See https://github.com/gemrb/gemrb/issues/106#issuecomment-475985677
-	int stepTime = 566;
-	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) { // BG1
-		stepTime = 425;
-	}
 	// Only bump back if you are not moving
 	if (!path) {
 		if (OldPos == Pos) {
@@ -2268,8 +2262,8 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			// Speed on the y axis is downscaled (12 / 16) in order to correct searchmap scaling and avoid curved paths
 			dy = sqrt(dy * dy * ratio) * 0.75;
 		}
-		dx = std::min(dx * stepTime / walkScale, dxOrig);
-		dy = std::min(dy * stepTime / walkScale, dyOrig);
+		dx = std::min(dx * gamedata->GetStepTime() / walkScale, dxOrig);
+		dy = std::min(dy * gamedata->GetStepTime() / walkScale, dyOrig);
 		dx = std::ceil(dx) * xSign;
 		dy = std::ceil(dy) * ySign;
 		Actor *actorInTheWay = nullptr;
@@ -2300,6 +2294,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		// Stop if there's a door in the way
 		if (area->GetBlocked((Pos.x + dx) / 16, (Pos.y + dy) / 12, false) & PATH_MAP_SIDEWALL) {
+
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return true;
