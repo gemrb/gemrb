@@ -227,6 +227,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	smptDest.x = d.x / 16;
 	smptDest.y = d.y / 12;
 
+	Actor *caller = GetActor(s, 0);
+
 	if (size && CheckNavmapPointFlags(d.x, d.y, size, PATH_MAP_PASSABLE, true)) {
 		// We don't want to bump a still npc on our target position, we want to stop before
 		AdjustPosition(smptDest);
@@ -318,7 +320,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			bool childBlocked = CheckNavmapPointFlags(smptChild.x * 16 + 8, smptChild.y * 12 + 6, size,
 					PATH_MAP_PASSABLE, flags & PF_ACTORS_ARE_BLOCKING);
 			Actor* childActor = GetActor(NavmapPoint(smptChild.x * 16 + 8, smptChild.y * 12 + 6), GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
+			bool childIsUnbumpable = childActor && childActor != caller && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
 			if (smptCurrent == smptSource) {
 				if (childBlocked) Log(DEBUG, "PathFinderWIP", "Source + (%d %d) is blocked as %d", dx[i], dy[i], GetBlocked(smptChild.x, smptChild.y));
 				if (childIsUnbumpable) Log(DEBUG, "PathFinderWIP", "Source + (%d %d) is blocked by an unbumpable", dx[i], dy[i]);
