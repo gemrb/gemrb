@@ -2169,7 +2169,11 @@ unsigned char Movable::GetNextFace()
 
 void Movable::Backoff()
 {
-	randomBackoff = RAND(MAX_PATH_TRIES, MAX_PATH_TRIES * 2);
+	if (InternalFlags & IF_RUNNING) {
+		randomBackoff = RAND(MAX_PATH_TRIES * 2 / 3, MAX_PATH_TRIES * 4 / 3);
+	} else {
+		randomBackoff = RAND(MAX_PATH_TRIES, MAX_PATH_TRIES * 2);
+	}
 }
 
 
