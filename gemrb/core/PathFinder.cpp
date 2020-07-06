@@ -378,4 +378,34 @@ PathNode *Map::BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint 
 	}
 	return resultPath;
 }
+
+void Map::NormalizeDeltas(double &dx, double &dy, const double &factor)
+{
+        const double STEP_RADIUS = 2.0;
+        double dxOrig;
+        double dyOrig;
+        char ySign;
+        char xSign;
+        ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+        xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+        dx = std::abs(dx);
+        dy = std::abs(dy);
+        dxOrig = dx;
+        dyOrig = dy;
+        if (dx == 0) {
+                dy = STEP_RADIUS;
+        } else if (dy == 0) {
+                dx = STEP_RADIUS;
+        } else {
+                double squaredRadius = dx * dx + dy * dy;
+                double ratio = (STEP_RADIUS * STEP_RADIUS) / squaredRadius;
+                dx = sqrt(dx * dx * ratio);
+                // Speed on the y axis is downscaled (12 / 16) in order to correct searchmap scaling and avoid curved paths
+                dy = sqrt(dy * dy * ratio) * 0.75;
+        }
+        dx = std::min(dx * factor, dxOrig);
+        dy = std::min(dy * factor, dyOrig);
+        dx = std::ceil(dx) * xSign;
+        dy = std::ceil(dy) * ySign;
+}
 }

@@ -369,6 +369,7 @@ public:
 	Map(void);
 	~Map(void);
 	static void ReleaseMemory();
+	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 
 	/** prints useful information on console */
 	void dump(bool show_actors=0) const;

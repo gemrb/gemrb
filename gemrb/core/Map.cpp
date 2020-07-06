@@ -2471,54 +2471,16 @@ bool Map::IsVisible(const Point &pos, int explored)
 
 bool Map::CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int flags, bool checkImpassable, bool actorsAreBlocking) const
 {
-	int diffx = s.x - d.x;
-	int diffy = s.y - d.y;
-
-	// we basically draw a 'line' from (s.x, s.y) to (d.x, d.y)
-	// we want to move along the larger axis, to make sure we don't miss anything
-	if (abs(diffx) >= abs(diffy)) {
-		// (s.x - startX)/elevationy = (s.x - startX)/fabs(diffx) * diffy
-		double elevationy = std::fabs((double) diffx) / diffy;
-		if (s.x > d.x) {
-			// right to left
-			for (int startx = s.x; startx >= d.x; startx--) {
-				// s.x - startx >= 0, so subtract (due to sign of diffy)
-				int blockStatus = GetBlockedNavmap(startx, s.y - (int) ((s.x - startx) / elevationy), actorsAreBlocking);
-				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
-					return false;
-				}
-			}
-		} else {
-			// left to right
-			for (int startx = s.x; startx <= d.x; startx++) {
-				// s.x - startx <= 0, so add (due to sign of diffy)
-				int blockStatus = GetBlockedNavmap(startx, s.y + (int) ((s.x - startx) / elevationy), actorsAreBlocking);
-				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
-					return false;
-				}
-			}
-		}
-	} else {
-		// (s.y - startY)/elevationx = (s.y - startY)/fabs(diffy) * diffx
-		double elevationx = std::fabs((double) diffy) / diffx;
-		if (s.y > d.y) {
-			// bottom to top
-			for (int starty = s.y; starty >= d.y; starty--) {
-				// s.y - starty >= 0, so subtract (due to sign of diffx)
-				int blockStatus = GetBlockedNavmap(s.x - (int) ((s.y - starty) / elevationx), starty, actorsAreBlocking);
-				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
-					return false;
-				}
-			}
-		} else {
-			// top to bottom
-			for (int starty = s.y; starty <= d.y; starty++) {
-				// s.y - starty <= 0, so add (due to sign of diffx)
-				int blockStatus = GetBlockedNavmap(s.x + (int) ((s.y - starty) / elevationx), starty, actorsAreBlocking);
-				if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
-					return false;
-				}
-			}
+	Point p = s;
+	while (p != d) {
+		double dx = d.x - p.x;
+		double dy = d.y - p.y;
+		NormalizeDeltas(dx, dy);
+		p.x += dx;
+		p.y += dy;
+		int blockStatus = GetBlockedNavmap(p.x, p.y, actorsAreBlocking);
+		if (blockStatus & flags || (checkImpassable && !(blockStatus & PATH_MAP_PASSABLE))) {
+			return false;
 		}
 	}
 	return true;

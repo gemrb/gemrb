@@ -2224,14 +2224,10 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		StanceID = IE_ANI_RUN;
 	}
 
-	double dx, dxOrig;
-	double dy, dyOrig;
-	char ySign;
-	char xSign;
 	// Adjustments (+8/+6) are being made here, see Map::FindPath() in PathFinder.cpp
 	Point nmptStep(step->x * 16 + 8, step->y * 12 + 6);
-	dx = nmptStep.x - Pos.x;
-	dy = nmptStep.y - Pos.y;
+	double dx = nmptStep.x - Pos.x;
+	double dy = nmptStep.y - Pos.y;
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
 		if (step->Next) {
@@ -2243,29 +2239,8 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			return true;
 		}
 	}
-	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
-	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
-	dx = std::abs(dx);
-	dy = std::abs(dy);
-	dxOrig = dx;
-	dyOrig = dy;
+	Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
 	if (time > timeStartStep) {
-		const double maxRadius = 2.0;
-		if (dx == 0) {
-			dy = maxRadius;
-		} else if (dy == 0) {
-			dx = maxRadius;
-		} else {
-			double squaredRadius = dx * dx + dy * dy;
-			double ratio = (maxRadius * maxRadius) / squaredRadius;
-			dx = sqrt(dx * dx * ratio);
-			// Speed on the y axis is downscaled (12 / 16) in order to correct searchmap scaling and avoid curved paths
-			dy = sqrt(dy * dy * ratio) * 0.75;
-		}
-		dx = std::min(dx * gamedata->GetStepTime() / walkScale, dxOrig);
-		dy = std::min(dy * gamedata->GetStepTime() / walkScale, dyOrig);
-		dx = std::ceil(dx) * xSign;
-		dy = std::ceil(dy) * ySign;
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
