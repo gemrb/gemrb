@@ -324,9 +324,6 @@ IF(IS_RPI)
     MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
   ENDIF()
 
-  SET(OPENGL_BACKEND GLES)
-  SET(SDL_BACKEND SDL2)
-
   SET_PATH(RPI_INCLUDE ${RPI_GLES_PATH}/include)
   SET_PATH(RPI_LIBS ${RPI_GLES_PATH}/lib)
   
