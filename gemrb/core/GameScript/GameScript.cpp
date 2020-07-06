@@ -26,6 +26,7 @@
 #include "win32def.h"
 
 #include "Game.h"
+#include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
@@ -77,7 +78,7 @@ static const TriggerLink triggernames[] = {
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
-	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
+	{"checkareadifflevel", GameScript::CheckAreaDiffLevel, 0}, //iwd2
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
 	{"checkitemslot", GameScript::HasItemSlot, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
@@ -279,7 +280,7 @@ static const TriggerLink triggernames[] = {
 	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
-	{"nexttriggerobject", GameScript::NextTriggerObject, 0},
+	{"nexttriggerobject", NULL, 0}, // handled inline
 	{"nightmaremodeon", GameScript::NightmareModeOn, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
@@ -468,7 +469,7 @@ static const ActionLink actionnames[] = {
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
-	{"addxpvar", GameScript::AddXP2DA, 0},
+	{"addxpvar", GameScript::AddXPVar, 0},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
@@ -749,8 +750,7 @@ static const ActionLink actionnames[] = {
 	{"movetopointnorecticle", GameScript::MoveToPointNoRecticle,AF_BLOCKING|AF_ALIVE},//the same until we know better
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_MERGESTRINGS|AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
-	//FIXME: why doesn't this have MERGESTRINGS like the above entry?
-	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
+	{"movetosavedlocationn", GameScript::MoveToSavedLocation, AF_MERGESTRINGS|AF_BLOCKING},
 	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
 	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
@@ -1284,7 +1284,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 			}
 			index--;
 		}
-		m++;
+		++m;
 	}
 	return NULL;
 }
@@ -1515,7 +1515,7 @@ void InitializeIEScript()
 			triggerflags[i] |= TF_CONDITION;
 	}
 
-	for (l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
+	for (l = missing_triggers.begin(); l != missing_triggers.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
@@ -1666,7 +1666,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_actions.begin(); l!=missing_actions.end();l++) {
+	for (l = missing_actions.begin(); l != missing_actions.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = actionsTable->GetValueIndex( j );
@@ -1726,7 +1726,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (l = missing_objects.begin(); l!=missing_objects.end();l++) {
+	for (l = missing_objects.begin(); l != missing_objects.end(); ++l) {
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );
@@ -1977,6 +1977,9 @@ static Trigger* ReadTrigger(DataStream* stream)
 	return tR;
 }
 
+// NOTE: keep these in sync with gemtrig.ids!
+#define NEXT_TRIGGER_OBJECT_EX 0x4100
+#define NEXT_TRIGGER_OBJECT_EE 0x40e0
 static Condition* ReadCondition(DataStream* stream)
 {
 	char line[10];
@@ -1986,10 +1989,31 @@ static Condition* ReadCondition(DataStream* stream)
 		return NULL;
 	}
 	Condition* cO = new Condition();
+	Object *triggerer = NULL;
 	while (true) {
 		Trigger* tR = ReadTrigger( stream );
-		if (!tR)
+		if (!tR) {
+			if (triggerer) delete triggerer;
 			break;
+		}
+
+		// handle NextTriggerObject
+		/* Defines the object that the next trigger will be evaluated in reference to. This trigger
+		 * does not evaluate and does not count as a trigger in an OR() block. This trigger ignores
+		 * the Eval() trigger when finding the next trigger to evaluate the object for. If the object
+		 * cannot be found, the next trigger will evaluate to false.
+		 */
+		if (triggerer) {
+			delete tR->objectParameter; // not using Release, so we don't have to check if it's null
+			tR->objectParameter = triggerer;
+			triggerer = NULL;
+		} else if (tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EX) || tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EE)) {
+			triggerer = tR->objectParameter;
+			tR->objectParameter = NULL;
+			delete tR;
+			continue;
+		}
+
 		cO->triggers.push_back( tR );
 	}
 	return cO;
@@ -2036,6 +2060,11 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
 						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+						if (core->HasFeature(GF_3ED_RULES)) {
+							if (done) *done = true;
+						}
 						return false;
 					}
 
@@ -2328,8 +2357,6 @@ int ResponseSet::Execute(Scriptable* Sender)
 		Response* rE = responses[i];
 		if (rE->weight > randWeight) {
 			return rE->Execute(Sender);
-			/* this break is only symbolic */
-			break;
 		}
 		randWeight-=rE->weight;
 	}
@@ -2359,7 +2386,7 @@ int Response::Execute(Scriptable* Sender)
 				Sender->AddAction( aC );
 				ret = 0;
 				break;
-			case AF_CONTINUE:
+			case AF_CONTINUE: // this is never reached, since Continue also has AF_IMMEDIATE
 			case AF_MASK:
 				ret = 1;
 				break;
@@ -2377,6 +2404,13 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
 
+	// reallow area scripts after us, if they were disabled
+	if (aC->flags & ACF_REALLOW_SCRIPTS) {
+		core->GetGameControl()->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_NAND);
+	}
+
+	// check for ActionOverride
+	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
 
@@ -2385,7 +2419,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 		if (scr) {
 			if (InDebug&ID_ACTIONS) {
-				Log(WARNING, "GameScript", "Sender: %s-->override: %s",
+				Log(WARNING, "GameScript", "Sender %s ran ActionOverride on %s",
 					Sender->GetScriptName(), scr->GetScriptName() );
 			}
 			scr->ReleaseCurrentAction();
@@ -2400,7 +2434,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				scr->CurrentActionInterruptable = false;
 			}
 		} else {
-			Log(ERROR, "GameScript", "Actionoverride failed for object: ");
+			Log(ERROR, "GameScript", "ActionOverride failed for object: ");
 			aC->objects[0]->dump();
 		}
 
@@ -2421,7 +2455,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			Sender->Activate();
 			if (actionflags[actionID]&AF_ALIVE) {
 				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death");
+					Log(WARNING, "GameScript", "Aborted action due to death!");
 					Sender->ReleaseCurrentAction();
 					return;
 				}

@@ -66,8 +66,7 @@ public:
 		if (str == NULL) {
 			Clear();
 		} else {
-			strncpy(ref, str, sizeof(ref)-1 );
-			ref[sizeof(ref)-1] = '\0';
+			strlcpy(ref, str, sizeof(ref));
 		}
 	}
 

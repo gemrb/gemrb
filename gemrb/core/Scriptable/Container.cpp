@@ -99,8 +99,7 @@ void Container::CreateGroundIconCover()
 	int width = 0;
 	int height = 0;
 
-	int i; //msvc6.0
-	for (i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			if (xpos < spr.XPos) {
@@ -237,14 +236,14 @@ void Container::TryPickLock(Actor *actor)
 	if (stat < LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL); //AMB_D21
+		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS); //AMB_D21
 		return;
 	}
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
-	core->PlaySound(DS_PICKLOCK); //AMB_D21D
+	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();

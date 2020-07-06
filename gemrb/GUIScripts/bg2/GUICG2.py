@@ -126,7 +126,7 @@ def SetClass():
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	#multiclassed gnomes 
-	if MageSchool and not KitIndex:
+	if MageSchool and not KitIndex and "MAGE" in ClassName:
 		SchoolTable = GemRB.LoadTable ("magesch")
 		KitIndex = CommonTables.KitList.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
 		KitValue = (0x4000 + KitIndex)

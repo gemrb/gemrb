@@ -1,6 +1,6 @@
 Description: This table assigns sounds to item types. The itemtypes must be defined by itemtype.2da. The last four itemtypes are reserved for armourlevel based sounds of body armors.
 
-Columns: Sound resource references for the TAKE and the DROP sound.
+Columns: Sound resource references for the TAKE and the DROP sound. The remaining ones are set in weapons for swing sounds.
 
 Rows: Item types. They must follow the item types in itemtype.2da. There must be four extra item types at the end:
 DEFAULT

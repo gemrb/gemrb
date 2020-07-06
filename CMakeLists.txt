@@ -107,7 +107,7 @@ if (${LAYOUT} MATCHES "home")
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX} )
 	SET_PATH( EXAMPLE_CONF_DIR ${CMAKE_INSTALL_PREFIX} )
 elseif (${LAYOUT} MATCHES "fhs")
-	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib/gemrb )
+	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX}/gemrb )
 	SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
 	SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/gemrb )
 	SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/share/man/man6 )
@@ -125,7 +125,7 @@ elseif (${LAYOUT} MATCHES "fhs")
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
 elseif (${LAYOUT} MATCHES "opt")
-	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib )
+	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX} )
 	SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
 	SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/ )
 	SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6 )
@@ -166,10 +166,20 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 			# clang ignores -Wno-error
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
+		else()
+			# hit in python2 includes
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-register")
 		endif ()
 	endif ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith ")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long")
+	# only later c++ standards conditionally allow function/object pointer casts
+	# gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+	elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6 OR APPLE))
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+	endif ()
 	# mark chars explicitly signed (ARM defaults to unsigned)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 	# only export symbols explicitly marked to be exported.
@@ -575,11 +585,13 @@ CONFIGURE_FILE(
 ADD_SUBDIRECTORY( gemrb )
 IF (NOT APPLE)
 	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR} )
-	INSTALL( FILES artwork/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png )
-	INSTALL( FILES artwork/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg )
-	INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
+	if (NOT HAIKU)
+		INSTALL( FILES artwork/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png )
+		INSTALL( FILES artwork/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg )
+		INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
+	ENDIF()
 ENDIF()
-INSTALL( FILES README INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
+INSTALL( FILES README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
 INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
 		PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
@@ -603,7 +615,7 @@ ADD_CUSTOM_TARGET( uninstall
 # make dist for a gzipped tarball of current HEAD
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
 add_custom_target( dist
-	COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+	COMMAND git archive --worktree-attributes --prefix=${ARCHIVE_NAME}/ HEAD
 		| gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
@@ -645,3 +657,8 @@ message(STATUS "")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Target bitness: ${CMAKE_SIZEOF_VOID_P}*8")
 message(STATUS "")
+if ((NOT DISABLE_WERROR) AND GIT_VERSION)
+	message(STATUS "Compiler warnings are fatal.")
+	message(STATUS "If you hit one, let us know and rerun cmake with -DDISABLE_WERROR=1 to continue.")
+	message(STATUS "")
+endif()

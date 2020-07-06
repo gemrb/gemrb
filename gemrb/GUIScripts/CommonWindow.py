@@ -18,6 +18,7 @@
 #
 import GemRB
 import GameCheck
+import InventoryCommon
 from GUIDefines import GS_DIALOGMASK, OP_SET
 
 # message window expansion
@@ -118,7 +119,7 @@ def RedrawContainerWindow ():
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
 		else:
-			GUICommon.UpdateInventorySlot (pc, Button, Slot, "container")
+			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "container")
 
 	for i in range (4):
 		if i+RightTopIndex < RightCount:
@@ -139,7 +140,7 @@ def RedrawContainerWindow ():
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
 		else:
-			GUICommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
+			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 	# shade the inventory icon if it is full
 	if Window.HasControl (54):
@@ -251,10 +252,8 @@ def OpenContainerWindow ():
 	Button = Window.GetControl (51)
 	if GameCheck.IsPST():
 		Button.SetText (1403)
-	elif GameCheck.IsIWD2():
-		Button.SetText ("")
 	else:
-		Button.SetText (11973)
+		Button.SetText ("")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 

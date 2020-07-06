@@ -389,7 +389,7 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 			return (Content*)(*it).content;
 		}
 		if (*it < p) {
-			it++;
+			++it;
 			count -= step + 1;
 		} else {
 			std::advance(it, -step);

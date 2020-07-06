@@ -128,7 +128,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		mastarea.reserve(i);
 		while(i--) {
 			char *tmp = (char *) malloc(9);
-			strnuprcpy (tmp,table->QueryField(i,0),8);
+			strnuprcpy(tmp, table->GetRowName(i), 8);
 			mastarea.push_back( tmp );
 		}
 	}
@@ -408,7 +408,7 @@ void Game::ConsolidateParty()
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		(*m)->RefreshEffects(NULL);
 		//TODO: how to set up bardsongs
-		(*m)->SetModalSpell((*m)->ModalState, 0);
+		(*m)->SetModalSpell((*m)->Modal.State, 0);
 	}
 }
 
@@ -439,6 +439,7 @@ int Game::LeaveParty (Actor* actor)
 
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		// we must reset various existing scripts
+		actor->SetScript("", SCR_DEFAULT );
 		actor->SetScript("", SCR_CLASS, false);
 		actor->SetScript("", SCR_RACE, false);
 		actor->SetScript("WTASIGHT", SCR_GENERAL, false);
@@ -506,7 +507,7 @@ int Game::JoinParty(Actor* actor, int join)
 {
 	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
-	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), false); // init actor's action bar
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		InitActorPos(actor);
@@ -516,11 +517,15 @@ int Game::JoinParty(Actor* actor, int join)
 		return slot;
 	}
 	size_t size = PCs.size();
-	//set the lastjoined trigger
 
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
-		actor->ApplyKit(false);
+		ieDword baseclass = 0;
+		if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+			// get the class for iwd2; luckily there are no NPCs, everyone joins at level 1, so multi-kit annoyances can be ignored
+			baseclass = actor->GetBase(IE_CLASS);
+		}
+		actor->ApplyKit(false, baseclass);
 		//update the quickslots
 		actor->ReinitQuickSlots();
 		//set the joining date
@@ -535,6 +540,7 @@ int Game::JoinParty(Actor* actor, int join)
 			}
 		}
 
+		//set the lastjoined trigger
 		if (size) {
 			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
@@ -714,7 +720,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 // Gets sum of party level, if onlyalive is true, then counts only living PCs
 // If you need average party level, divide this with GetPartySize
-int Game::GetPartyLevel(bool onlyalive) const
+int Game::GetTotalPartyLevel(bool onlyalive) const
 {
 	int amount = 0;
 
@@ -759,9 +765,9 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
-			area->SetupAmbients();
 			//change the tileset if needed
 			area->ChangeMap(IsDay());
+			area->SetupAmbients();
 			ChangeSong(false, true);
 			Infravision();
 
@@ -784,12 +790,46 @@ bool Game::MasterArea(const char *area)
 {
 	unsigned int i=(int) mastarea.size();
 	while(i--) {
-		if (strnicmp(mastarea[i], area, 8) ) {
+		if (!strnicmp(mastarea[i], area, 8)) {
 			return true;
 		}
 	}
 	return false;
 }
+
+// guess the master area by comparing the area name to entries in mastarea.2da
+// returns the area numerically closest to the passed one
+// pst has also areas named arNNNNc, bgt araNNNN (which we mishandle)
+// TODO: consider caching with an internal field or even a separate table to map the relation
+/*
+Map* Game::GetMasterArea(const char *area)
+{
+	unsigned int areaNum;
+	unsigned int masterNum;
+	unsigned int prevDiff = 0;
+	ieResRef prevArea;
+	sscanf(area, "%*c%*c%u%*c", &areaNum);
+
+	// mastarea.2da is not sorted, so make sure to check all the rows/areas
+	unsigned int i=(int) mastarea.size();
+	while(i--) {
+		sscanf(mastarea[i], "%*c%*c%u%*c", &masterNum);
+		if (areaNum > masterNum) {
+			continue;
+		} else if (areaNum == masterNum) {
+			return NULL; // optimisation, should never be called with a masterarea already
+		}
+		if (prevDiff == 0 || (prevDiff > masterNum - areaNum && masterNum < areaNum)) {
+			// first master bigger than us or
+			// this area is numerically closer than the last choice, but still smaller
+			CopyResRef(prevArea, mastarea[i+1]);
+			prevDiff = masterNum - areaNum;
+		}
+	}
+	// this could be slow, loading a full map!
+	// luckily when queried from subareas, it should already be cached and fast
+	return GetMap(prevArea, false);
+}*/
 
 void Game::SetMasterArea(const char *area)
 {
@@ -811,49 +851,44 @@ int Game::AddMap(Map* map)
 	return i;
 }
 
+// this function should archive the area, and remove it only if the area
+// contains no active actors (combat, partymembers, etc)
 int Game::DelMap(unsigned int index, int forced)
 {
-//this function should archive the area, and remove it only if the area
-//contains no active actors (combat, partymembers, etc)
 	if (index >= Maps.size()) {
 		return -1;
 	}
 	Map *map = Maps[index];
 
-	if (MapIndex==(int) index) { //can't remove current map in any case
+	if (MapIndex == (int) index) { //can't remove current map in any case
 		const char *name = map->GetScriptName();
-		memcpy(AnotherArea, name, sizeof(AnotherArea) );
+		memcpy(AnotherArea, name, sizeof(AnotherArea));
 		return -1;
 	}
 
-
 	if (!map) { //this shouldn't happen, i guess
 		Log(WARNING, "Game", "Erased NULL Map");
-		Maps.erase( Maps.begin()+index);
-		if (MapIndex>(int) index) {
+		Maps.erase(Maps.begin() + index);
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
 	}
 
-	if (forced || (Maps.size()>MAX_MAPS_LOADED) )
-	{
+	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
 		const char *name = map->GetScriptName();
-		if (MasterArea(name)) {
-			if(!AnotherArea[0]) {
-				memcpy(AnotherArea, name, sizeof(AnotherArea));
-				if (!forced) {
-					return -1;
-				}
+		if (MasterArea(name) && !AnotherArea[0]) {
+			memcpy(AnotherArea, name, sizeof(AnotherArea));
+			if (!forced) {
+				return -1;
 			}
 		}
 		//this check must be the last, because
 		//after PurgeActors you cannot keep the
 		//area in memory
 		//Or the queues should be regenerated!
-		if (!map->CanFree())
-		{
+		if (!map->CanFree()) {
 			return 1;
 		}
 		//if there are still selected actors on the map (e.g. summons)
@@ -869,10 +904,10 @@ int Game::DelMap(unsigned int index, int forced)
 
 		//remove map from memory
 		core->SwapoutArea(Maps[index]);
-		delete( Maps[index] );
-		Maps.erase( Maps.begin()+index);
+		delete(Maps[index]);
+		Maps.erase(Maps.begin() + index);
 		//current map will be decreased
-		if (MapIndex>(int) index) {
+		if (MapIndex > (int) index) {
 			MapIndex--;
 		}
 		return 1;
@@ -981,11 +1016,11 @@ bool Game::CheckForReplacementActor(int i)
 	}
 
 	Actor* act = NPCs[i];
-	ieDword level = GetPartyLevel(false) / GetPartySize(false);
+	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
 		std::vector<std::vector<char *> >::iterator it;
-		for (it = npclevels.begin(); it != npclevels.end(); it++) {
+		for (it = npclevels.begin(); it != npclevels.end(); ++it) {
 			if (!stricmp((*it)[0], act->GetScriptName()) && (level > 2)) {
 				// the tables have entries only up to level 24
 				ieDword safeLevel = npclevels[0].size();
@@ -1031,6 +1066,11 @@ int Game::AddNPC(Actor* npc)
 	} //can't add as npc already in party
 	npc->SetPersistent(0);
 	NPCs.push_back( npc );
+
+	if (npc->Selected) {
+		npc->Selected = 0; // don't confuse SelectActor!
+		SelectActor(npc, true, SELECT_NORMAL);
+	}
 
 	return (int) NPCs.size() - 1;
 }
@@ -1249,7 +1289,7 @@ int Game::GetXPFromCR(int cr)
 	if (!size) return 0; // everyone just died anyway
 	// NOTE: this is an average of averages; if it turns out to be wrong,
 	// compute the party average directly
-	int level = GetPartyLevel(true) / size;
+	int level = GetTotalPartyLevel(true) / size;
 	if (cr >= MAX_CRLEVEL) {
 		cr = MAX_CRLEVEL;
 	} else if (cr-1 < 0) {
@@ -1284,10 +1324,13 @@ void Game::ShareXP(int xp, int flags)
 		return;
 	}
 
-	if (xp>0) {
-		displaymsg->DisplayConstantStringValue( STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp); //you have gained ... xp
-	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp); //you have lost ... xp
+	//you have gained/lost ... xp
+	if (core->HasFeedback(FT_MISC)) {
+		if (xp > 0) {
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword) xp);
+		} else {
+			displaymsg->DisplayConstantStringValue(STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp);
+		}
 	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -1300,7 +1343,7 @@ void Game::ShareXP(int xp, int flags)
 bool Game::EveryoneStopped() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->GetNextStep() ) return false;
+		if (PCs[i]->InMove()) return false;
 	}
 	return true;
 }
@@ -1391,9 +1434,9 @@ void Game::SetReputation(ieDword r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	if (Reputation>r) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
 	} else if (Reputation<r) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
@@ -1438,10 +1481,12 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
+	// and delay most idle actions
 	// but only if we skip for at least an hour
 	if (add >= core->Time.hour_size) {
 		for (unsigned int i=0; i<PCs.size(); i++) {
 			Actor *pc = PCs[i];
+			pc->ResetCommentTime();
 			int conHealRate = pc->GetConHealAmount();;
 			// 1. regeneration as an effect
 			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
@@ -1472,6 +1517,8 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//play the daylight transition movie appropriate for the area
 		//it is needed to play only when the area truly changed its tileset
 		//this is signalled by ChangeMap
+		// ... but don't do it for a scripted DayNight change
+		if (!fatigue) return;
 		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
 		ieResRef *res;
 
@@ -1521,7 +1568,8 @@ bool Game::EveryoneDead() const
 	}
 	if (protagonist==PM_NO) {
 		Actor *nameless = PCs[0];
-		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+		// don't trigger this outside pst, our game loop depends on it
+		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GF_PST_STATE_FLAGS)) {
 			if (area->INISpawn) {
 				area->INISpawn->RespawnNameless();
 			}
@@ -1757,7 +1805,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			}
 		} else {
 			//you may not rest here, find an inn
-			if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS)))
 			{
 				displaymsg->DisplayConstantString( STR_MAYNOTREST, DMC_RED );
 				return false;
@@ -1790,7 +1838,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	while (i--) {
 		Actor *tar = GetPC(i, true);
-		tar->Stop();
+		tar->ClearPath();
 		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
@@ -1803,6 +1851,19 @@ bool Game::RestParty(int checks, int dream, int hp)
 		tar->Rest(hours);
 		if (!hoursLeft)
 			tar->PartyRested();
+	}
+
+	// also let familiars rest
+	i = GetNPCCount();
+	while (i--) {
+		Actor *tar = GetNPC(i);
+		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
+			tar->ClearPath();
+			tar->SetModal(MS_NONE, 0);
+			tar->Heal(hp);
+			tar->Rest(hours);
+			if (!hoursLeft) tar->PartyRested();
+		}
 	}
 
 	// abort the partial rest; we got what we wanted
@@ -2041,7 +2102,6 @@ void Game::Infravision()
 static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
 static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
 static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
-static const Color FogTint={0xff,0xff,0xff,0x40};      //whitish
 static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
@@ -2065,9 +2125,6 @@ const Color *Game::GetGlobalTint() const
 		//get weather tint
 		if (WeatherBits&WB_RAIN) {
 			return &DarkTint;
-		}
-		if (WeatherBits&WB_FOG) {
-			return &FogTint;
 		}
 	}
 
@@ -2171,24 +2228,24 @@ void Game::StartRainOrSnow(bool conditional, int w)
 		if (WeatherBits&WB_INCREASESTORM) {
 			//already raining
 			if (GameTime&1) {
-				core->PlaySound(DS_LIGHTNING1);
+				core->PlaySound(DS_LIGHTNING1, SFX_CHAN_AREA_AMB);
 			} else {
-				core->PlaySound(DS_LIGHTNING2);
+				core->PlaySound(DS_LIGHTNING2, SFX_CHAN_AREA_AMB);
 			}
 		} else {
 			//start raining (far)
-			core->PlaySound(DS_LIGHTNING3);
+			core->PlaySound(DS_LIGHTNING3, SFX_CHAN_AREA_AMB);
 		}
 	}
 	if (w&WB_SNOW) {
-		core->PlaySound(DS_SNOW);
+		core->PlaySound(DS_SNOW, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w&WB_RAIN) {
-		core->PlaySound(DS_RAIN);
+		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColor(SPARK_COLOR_STONE);

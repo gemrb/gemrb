@@ -50,6 +50,7 @@ class DialogHandler;
 #define DF_IN_CONTAINER   32
 #define DF_OPENCONTINUEWINDOW 64
 #define DF_OPENENDWINDOW 128
+#define DF_POSTPONE_SCRIPTS 256
 
 //screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -229,7 +230,7 @@ public:
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	Point GetFormationPoint(Map *map, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
-	void CreateMovement(Actor *actor, const Point &p);
+	void CreateMovement(Actor *actor, const Point &p, bool append=true);
 	/** checks if the actor should be running instead of walking */
 	bool ShouldRun(Actor *actor) const;
 	/** Displays a string over an object */

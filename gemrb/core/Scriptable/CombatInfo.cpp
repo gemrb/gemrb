@@ -67,7 +67,6 @@ static void SetBonusInternal(int& current, int bonus, int mod)
 			break;
 		default:
 			error("CombatInfo", "Bad bonus mod type: %d", mod);
-			break;
 	}
 
 	current = newBonus;
@@ -220,7 +219,7 @@ int ToHitStats::GetTotal() const
 
 void ToHitStats::RefreshTotal()
 {
-	total = base + proficiencyBonus + armorBonus + shieldBonus + abilityBonus + weaponBonus + genericBonus;
+	total = base + proficiencyBonus + armorBonus + shieldBonus + abilityBonus + weaponBonus + genericBonus + fxBonus;
 	if (Owner) { // not true for a short while during init, but we make amends immediately
 		Owner->Modified[IE_TOHIT] = total;
 	}
@@ -234,6 +233,7 @@ void ToHitStats::ResetAll() {
 	abilityBonus = 0;
 	proficiencyBonus = 0;
 	genericBonus = 0;
+	fxBonus = 0;
 	RefreshTotal();
 }
 
@@ -276,6 +276,11 @@ void ToHitStats::SetGenericBonus(int bonus, int mod)
 	SetBonus(genericBonus, bonus, mod);
 }
 
+void ToHitStats::SetFxBonus(int bonus, int mod)
+{
+	SetBonus(fxBonus, bonus, mod);
+}
+
 void ToHitStats::SetBonus(int& current, int bonus, int mod)
 {
 	SetBonusInternal(current, bonus, mod);
@@ -294,9 +299,9 @@ void ToHitStats::HandleFxBonus(int mod, bool permanent)
 	}
 	// this was actually aditively modifying Modified directly before
 	if (Owner->IsReverseToHit()) {
-		SetGenericBonus(-mod, 0);
+		SetFxBonus(-mod, 0);
 	} else {
-		SetGenericBonus(mod, 0);
+		SetFxBonus(mod, 0);
 	}
 }
 
@@ -322,9 +327,9 @@ void ToHitStats::dump() const
 	StringBuffer buffer;
 	buffer.appendFormatted("Debugdump of ToHit of %s:\n", Owner->GetName(1));
 	buffer.appendFormatted("TOTAL: %d\n", total);
-	buffer.appendFormatted("Base: %2d\tGeneric: %d\tAbility: %d\n", base, genericBonus, abilityBonus);
+	buffer.appendFormatted("Base: %2d\tGeneric: %d\tEffect: %d\n", base, genericBonus, fxBonus);
 	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);
-	buffer.appendFormatted("Weapon: %d\tProficiency: %d\n\n", weaponBonus, proficiencyBonus);
+	buffer.appendFormatted("Weapon: %d\tProficiency: %d\tAbility: %d\n\n", weaponBonus, proficiencyBonus, abilityBonus);
 	Log(DEBUG, "ToHit", buffer);
 }
 

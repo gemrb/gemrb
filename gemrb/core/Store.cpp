@@ -33,6 +33,24 @@
 
 namespace GemRB {
 
+STOItem::STOItem() {
+	ItemResRef[0] = 0;
+	PurchasedAmount = Flags = Weight = MaxStackAmount = AmountInStock = InfiniteSupply = 0;
+	for (int i=0; i<CHARGE_COUNTERS; i++) Usages[i] = 0;
+	triggers = NULL;
+}
+
+STOItem::STOItem(CREItem *item) {
+	CopyResRef(ItemResRef, item->ItemResRef);
+	PurchasedAmount = 0; // Expired in STOItem
+	memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
+	Flags = item->Flags;
+	Weight = item->Weight;
+	MaxStackAmount = item->MaxStackAmount;
+	AmountInStock = InfiniteSupply = 0;
+	triggers = NULL;
+}
+
 STOItem::~STOItem(void)
 {
 	if (triggers) triggers->Release();
@@ -126,13 +144,13 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		ret &= ~IE_STORE_BUY;
 
 	if (pc && (Type<STT_BG2CONT) ) {
-		//can't sell critical items
+		//don't allow selling of non destructible items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
 			ret &= ~IE_STORE_SELL;
 		}
-		//don't allow selling of non destructible items
-		//don't allow selling of critical items (they could still be put in bags)
-		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_CRITICAL))!=IE_INV_ITEM_DESTRUCTIBLE) {
+
+		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
+		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
 			ret &= ~IE_STORE_SELL;
 		}
 
@@ -309,11 +327,7 @@ void Store::AddItem(CREItem *item)
 		return;
 	}
 
-	temp = new STOItem();
-	//It is important to initialize these fields, if STOItem ever changes to
-	//a real class from struct, make sure the fields are cleared
-	memset( temp, 0, sizeof (STOItem ) );
-	memcpy( temp, item, sizeof( CREItem ) );
+	temp = new STOItem(item);
 	temp->AmountInStock = 1;
 	if (temp->MaxStackAmount && temp->Usages[0] > 1) {
 		// For now, we do what bg2 does and add new items in stacks of 1.

@@ -18,10 +18,6 @@
  *
  */
 
-#ifdef ANDROID
-#include "swab.h"
-#endif
-
 #include "WEDImporter.h"
 
 #include "win32def.h"
@@ -33,7 +29,10 @@
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#undef swab
 #endif
+
+#include "System/swab.h"
 
 using namespace GemRB;
 
@@ -154,7 +153,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
 			str->Read( indices, count * sizeof(ieWord) );
 			if( DataStream::IsEndianSwitch()) {
-				swab( (char*) indices, (char*) indices, count * sizeof(ieWord) );
+				swabs(indices, count * sizeof(ieWord));
 			}
 			Tile* tile;
 			if (secondary == 0xffff) {
@@ -281,7 +280,7 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
 	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
 	if( DataStream::IsEndianSwitch()) {
-		swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
+		swabs(DoorTiles, DoorTileCount * sizeof(ieWord));
 	}
 	*count = DoorTileCount;
 	BaseClosed = DoorClosed != 0;
@@ -298,8 +297,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 
 	str->Seek (PolygonsOffset, GEM_STREAM_START);
 	
-	ieDword i; //msvc6.0 isn't ISO compatible, so this variable cannot be declared in 'for'
-	for (i=0;i<polygonCount;i++) {
+	for (ieDword i=0; i < polygonCount; i++) {
 		str->ReadDword ( &PolygonHeaders[i].FirstVertex);
 		str->ReadDword ( &PolygonHeaders[i].CountVertex);
 		str->ReadWord ( &PolygonHeaders[i].Flags);
@@ -309,7 +307,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 		str->ReadWord ( &PolygonHeaders[i].MaxY);
 	}
 
-	for (i=0;i<polygonCount;i++) {
+	for (ieDword i=0; i < polygonCount; i++) {
 		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
 		//compose polygon
 		ieDword count = PolygonHeaders[i].CountVertex;
@@ -333,7 +331,7 @@ Wall_Polygon **WEDImporter::GetWallGroups()
 		Point *points = new Point[count];
 		str->Read (points, count * sizeof (Point) );
 		if( DataStream::IsEndianSwitch()) {
-			swab( (char*) points, (char*) points, count * sizeof (Point) );
+			swabs(points, count * sizeof (Point));
 		}
 
 		if (!(flags&WF_BASELINE) ) {

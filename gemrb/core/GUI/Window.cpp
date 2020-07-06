@@ -394,7 +394,7 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 	ScrollBar* sb = NULL;
 	TextArea* ta = NULL;
 	std::vector< Control*>::iterator m;
-	for (m = Controls.begin(); m != Controls.end(); m++) {
+	for (m = Controls.begin(); m != Controls.end(); ++m) {
 		if (( *m )->Owner != this)
 			continue;
 		if (( *m )->ControlType == IE_GUI_SCROLLBAR) {

@@ -72,7 +72,7 @@ extern Gem_Polygon **polygons;
 #define MIC_GOTITEM 1
 
 GEM_EXPORT int GetReaction(Actor *target, Scriptable *Sender);
-int GetHappiness(Scriptable *Sender, int reputation);
+GEM_EXPORT int GetHappiness(Scriptable *Sender, int reputation);
 int GetHPPercent(Scriptable *Sender);
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname);
 bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags);
@@ -84,7 +84,7 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
-void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
+void PolymorphCopyCore(Actor *src, Actor *tar);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count = 0);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
@@ -145,6 +145,7 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag);
 void SpellCore(Scriptable *Sender, Action *parameters, int flags);
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags);
 Gem_Polygon *GetPolygon2DA(ieDword index);
+void AddXPCore(Action *parameters, bool divide = false);
 
 inline int Bones(ieDword value)
 {

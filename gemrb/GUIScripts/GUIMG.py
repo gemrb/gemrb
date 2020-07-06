@@ -50,10 +50,17 @@ SpellType = None
 Level = 1
 
 def OpenMageWindow ():
-	global MageWindow, OptionsWindow, PortraitWindow
+	global MageWindow, OptionsWindow, PortraitWindow, OtherWindow, MageSpellInfoWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if GUICommon.CloseOtherWindow (OpenMageWindow):
+		CloseMageSpellUnmemorizeWindow ()
+		if MageSpellInfoWindow:
+			MageSpellInfoWindow.Unload ()
+			MageSpellInfoWindow = None
+		if OtherWindow:
+			OtherWindow.Unload ()
+			OtherWindow = None
 		if MageWindow:
 			MageWindow.Unload ()
 		if OptionsWindow:
@@ -180,6 +187,7 @@ def UpdateMageWindow ():
 	if not BookType:
 		for i in range (12):
 			Button = Window.GetControl (3 + i)
+			Button.SetAnimation ("")
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
@@ -217,6 +225,7 @@ def UpdateMageWindow ():
 
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = Window.GetControl (27 + i)
+		Button.SetAnimation ("")
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)

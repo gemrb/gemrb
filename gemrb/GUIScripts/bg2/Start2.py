@@ -29,13 +29,15 @@ OptionsButton = 0
 MultiPlayerButton = 0
 MoviesButton = 0
 BackButton = 0
+skip_videos = None
 
 def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
-	global SinglePlayerButton
+	global SinglePlayerButton, skip_videos
 
-	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if skip_videos is None:
+		skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
@@ -73,11 +75,13 @@ def OnLoad():
 	if GemRB.GetVar("oldgame")==1:
 		if GameCheck.HasTOB():
 			StartWindow.SetPicture("STARTOLD")
-		if not skip_videos:
+		if not skip_videos and not skip_videos&4:
 			GemRB.PlayMovie ("INTRO15F", 1)
+			skip_videos |= 4
 	else:
-		if not skip_videos:
+		if not skip_videos and not skip_videos&2:
 			GemRB.PlayMovie ("INTRO", 1)
+			skip_videos |= 2
 
 	#end ToB specific part
 	SinglePlayerButton = StartWindow.GetControl (0)
@@ -88,7 +92,7 @@ def OnLoad():
 	BackButton = StartWindow.GetControl (5)
 	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label=StartWindow.GetControl (0x0fff0000)
-	Label.SetText (GEMRB_VERSION)
+	Label.SetText (GemRB.Version)
 	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)

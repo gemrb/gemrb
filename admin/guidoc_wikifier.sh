@@ -46,6 +46,8 @@ function dumpDocs() {
   rm "$out_dir"/doc_template.txt
 
   echo "Done, now manually copy the contents of $out_dir to wiki/data/pages/guiscript"
+  echo "Tar it up and move to FRS via the web UI or via SCP, eg.:"
+  echo "  scp gsd.tgz USERNAME@frs.sourceforge.net:/home/frs/project/gemrb"
 }
 
 function convertDocs() {

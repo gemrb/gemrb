@@ -40,15 +40,18 @@ static void TranslateColor(const char *value, Color &color)
 	int r = 0;
 	int g = 0;
 	int b = 0;
-	//if not RGB then try to interpret it as a dword
+
 	if (strnicmp(value,"RGB(",4)) {
+		//if not RGB then try to interpret it as a dword
 		r = strtol(value,NULL,0);
 		color.r = r&0xff;
 		color.g = (r>>8)&0xff;
 		color.b = (r>>16)&0xff;
 		color.a = (r>>24)&0xff;
+	} else {
+		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
 	}
-	sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
+
 	color.r=r;
 	color.g=g;
 	color.b=b;
@@ -89,8 +92,7 @@ static void InitSparks()
 
 Particles::Particles(int s)
 {
-	points = (Element *) malloc(s*sizeof(Element) );
-	memset(points, -1, s*sizeof(Element) );
+	points = (Element *) calloc(s, sizeof(Element) );
 	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		bitmap[i]=NULL;

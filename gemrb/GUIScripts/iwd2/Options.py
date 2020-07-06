@@ -49,7 +49,7 @@ def OnLoad():
 	OptionsWindow.SetFrame ()
 
 	VersionLabel = OptionsWindow.GetControl(0x1000000B)
-	VersionLabel.SetText(GEMRB_VERSION)
+	VersionLabel.SetText(GemRB.Version)
 
 	GraphicsButton = OptionsWindow.GetControl(7)
 	SoundButton = OptionsWindow.GetControl(8)

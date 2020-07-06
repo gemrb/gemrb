@@ -357,8 +357,8 @@ def PlaySoundPressed():
 	global SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
+	pc = GemRB.GameGetSelectedPCSingle ()
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-		pc = GemRB.GameGetSelectedPCSingle ()
 		GemRB.SetPlayerSound (pc, CharSound)
 		VoiceSet = GemRB.GetPlayerSound (pc, 1)
 	else:
@@ -370,7 +370,7 @@ def PlaySoundPressed():
 			break
 	else:
 		NextSound()
-	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], 0, 0, 5)
+	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, 5)
 	return
 
 def NextSound():
@@ -646,7 +646,8 @@ def CloseSubCustomizeWindow ():
 	if SubCustomizeWindow:
 		SubCustomizeWindow.Unload ()
 		SubCustomizeWindow = None
-	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if CustomizeWindow:
+		CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CloseSubSubCustomizeWindow ():
@@ -655,5 +656,6 @@ def CloseSubSubCustomizeWindow ():
 	if SubSubCustomizeWindow:
 		SubSubCustomizeWindow.Unload ()
 		SubSubCustomizeWindow = None
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	if SubCustomizeWindow:
+		SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

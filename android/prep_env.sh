@@ -89,11 +89,11 @@ function setup_dir_struct {
   # and do what it says in its README.android
   echo -en "Creating the directory structure for the project..." &&
   mkdir -p build &&
-  cp -r "$ENVROOT/SDL/android-project" build/ &&
-  cp -r "$ENVROOT/build/android-project" "$ENVROOT/build/gemrb" &&
+  cp -rL "$ENVROOT/SDL/android-project-ant" build &&
+  cp -r "$ENVROOT/build/android-project-ant" "$ENVROOT/build/gemrb" &&
   echo -en "Done.\n" &&
   echo -en "Symlinking the GemRB-git path..." &&
-  mkdir -p "$ENVROOT/build/gemrb/jni" &&
+  mkdir -p "$ENVROOT/build/gemrb/jni/src" &&
   rm -fr "$ENVROOT/build/gemrb/jni/SDL" "$ENVROOT/build/gemrb/jni/src/main" &&
   ln -sf "$GEMRB_GIT_PATH" "$ENVROOT/build/gemrb/jni/src/main" &&
   ln -sf "$ENVROOT/SDL" "$ENVROOT/build/gemrb/jni/SDL"
@@ -195,13 +195,13 @@ function move_and_edit_projectfiles {
   prepare_config "$GEMRB_GIT_PATH/gemrb/GemRB.cfg.sample.in" "$ENVROOT/packaged.GemRB.cfg" &&
   mv "$ENVROOT/packaged.GemRB.cfg" "$ENVROOT/build/gemrb/assets" &&
 
-  mkdir -p "$ENVROOT/build/gemrb/res"/drawable-{l,m,h,xh,xxh}dpi &&
+  mkdir -p "$ENVROOT/build/gemrb/res"/mipmap-{l,m,h,xh,xxh}dpi &&
   # copy the icons
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/drawable-ldpi/ic_launcher.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/drawable-mdpi/ic_launcher.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-72px.png" "$ENVROOT/build/gemrb/res/drawable-hdpi/ic_launcher.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-96px.png" "$ENVROOT/build/gemrb/res/drawable-xhdpi/ic_launcher.png" &&
-  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-144px.png" "$ENVROOT/build/gemrb/res/drawable-xxhdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-36px.png" "$ENVROOT/build/gemrb/res/mipmap-ldpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-48px.png" "$ENVROOT/build/gemrb/res/mipmap-mdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-72px.png" "$ENVROOT/build/gemrb/res/mipmap-hdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-96px.png" "$ENVROOT/build/gemrb/res/mipmap-xhdpi/ic_launcher.png" &&
+  cp "$GEMRB_GIT_PATH/artwork/gemrb-logo-glow-144px.png" "$ENVROOT/build/gemrb/res/mipmap-xxhdpi/ic_launcher.png" &&
 
   # copy the makefile
   cp "$ENVROOT/GEMRB_Android.mk" "$ENVROOT/build/gemrb/jni/src/Android.mk" &&
@@ -210,9 +210,9 @@ function move_and_edit_projectfiles {
   cp "$ENVROOT/GEMRB_Application.mk" "$ENVROOT/build/gemrb/jni/Application.mk" &&
   echo -en "Done.\n" &&
 
-  # add the neccessary libraries to the base activity
-  echo -en "Performing neccessary edits...\n" &&
-  app="$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java"
+  # add the necessary libraries to the base activity
+  echo -en "Performing necessary edits...\n" &&
+  local app="$ENVROOT/build/gemrb/src/org/libsdl/app/SDLActivity.java"
   if ! grep -q python <<< "$app"; then
     sed -i 's/"SDL2_image",/&\n "ogg", "vorbis", "openal", "python2.6",/' "$app"
   fi &&
@@ -223,12 +223,13 @@ function move_and_edit_projectfiles {
   sed -i -e 's,//exit,exit,' "$ENVROOT/build/gemrb/jni/SDL/src/main/android/SDL_android_main.c" &&
 
   # change activity class and application name, as well as enable debuggable
-  sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
-  sed -i -e s,SDLActivity,GemRB, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
-  sed -i -e 's/android:name="GemRB"\s*$/& android:screenOrientation="landscape"/' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
-  sed -i -e s,android:versionName=.*,android:versionName=$GEMRB_VERSION, "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
+  local manifest="$ENVROOT/build/gemrb/AndroidManifest.xml"
+  sed -i -e s,org.libsdl.app,net.sourceforge.gemrb, "$manifest" &&
+  sed -i -e s,SDLActivity,GemRB, "$manifest" &&
+  sed -i -e 's/android:name="GemRB"\s*$/& android:screenOrientation="landscape"/' "$manifest" &&
+  sed -i -e s,android:versionName=.*,android:versionName=$GEMRB_VERSION, "$manifest" &&
   sed -i -e '21 a\
-                 android:debuggable="true"' "$ENVROOT/build/gemrb/AndroidManifest.xml" &&
+                 android:debuggable="true"' "$manifest" &&
   sed -i -e s,SDL\ App,GemRB, build/gemrb/res/values/strings.xml &&
 
   echo -en "Copying GemRB override, unhardcoded and GUIScripts folders..." &&
@@ -243,7 +244,7 @@ function move_and_edit_projectfiles {
 function finished {
   popd # back from $ENVROOT
   local build_path=${ENVROOT##$PWD/}
-  echo -en "That should be it, provided all the commands ran succesfully.\n\n" # TODO: Error checking beyond $1
+  echo -en "That should be it, provided all the commands ran successfully.\n\n" # TODO: Error checking beyond $1
   echo -en "To build:\n"
   echo -en "  cd $build_path/build/gemrb\n"
   echo -en "  ndk-build && ant debug\n\n"

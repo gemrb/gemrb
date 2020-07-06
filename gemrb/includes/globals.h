@@ -34,7 +34,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.8.5"
+#define VERSION_GEMRB "0.8.6"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
@@ -56,6 +56,7 @@
 #include "System/DataStream.h"
 #include "System/String.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #ifndef WIN32
@@ -168,9 +169,11 @@ namespace GemRB {
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
 #define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
 #define  GF_RANDOM_BANTER_DIALOGS       77 // bg1
+#define  GF_FIXED_MORALE_OPCODE         78 // bg2
+#define  GF_HAPPINESS                   79 // all except pst and iwd2
 
 //update this or bad things can happen
-#define GF_COUNT 78
+#define GF_COUNT 80
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
@@ -197,11 +200,12 @@ GEM_EXPORT unsigned int SquaredDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
+GEM_EXPORT double Feet2Pixels(int feet, double angle);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
-#define SCHEDULE_MASK(time)	(1 << core->Time.GetHour(time + core->Time.hour_size/2))
+#define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
 #ifndef WIN32
 inline unsigned long GetTickCount()
@@ -218,6 +222,12 @@ inline bool valid_number(const char* string, long& val)
 
 	val = (long) strtoul( string, &endpr, 0 );
 	return ( const char * ) endpr != string;
+}
+
+template <typename T>
+inline T Clamp(const T& n, const T& lower, const T& upper)
+{
+	return std::max(lower, std::min(n, upper));
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

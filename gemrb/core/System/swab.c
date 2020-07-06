@@ -18,6 +18,8 @@
 
 #include "swab.h"
 
+// fallback for platforms that don't have it
+// plus making it work with overlapping buffers (undefined in POSIX)
 void swab (const void *bfrom, void *bto, ssize_t n)
 {
   const char *from = (const char *) bfrom;
@@ -30,4 +32,9 @@ void swab (const void *bfrom, void *bto, ssize_t n)
       to[n] = b0;
       to[n + 1] = b1;
     }
+}
+
+void swabs (void *buf, ssize_t n)
+{
+	swab(buf, buf, n);
 }

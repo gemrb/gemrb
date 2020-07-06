@@ -290,12 +290,14 @@ GEM_RK_DOUBLESPEED = 1
 GEM_RK_DISABLE = 2
 GEM_RK_QUADRUPLESPEED = 4
 
+# !!! Keep this synchronized with Store.h !!!
 SHOP_BUY    = 1
 SHOP_SELL   = 2
 SHOP_ID     = 4
 SHOP_STEAL  = 8
 SHOP_SELECT = 0x40
-SHOP_FULL   = 0x8000
+SHOP_NOREPADJ = 0x2000 # IE_STORE_NOREPADJ
+SHOP_FULL   = 0x10000 # IE_STORE_CAPACITY
 
 #game constants
 
@@ -313,8 +315,6 @@ SV_WIDTH = 1
 SV_HEIGHT = 2
 SV_GAMEPATH = 3
 SV_TOUCH = 4
-global GEMRB_VERSION
-GEMRB_VERSION = -1
 
 # GUIEnhancements bits
 GE_SCROLLBARS = 1
@@ -357,3 +357,9 @@ UAW_QITEMS = 13
 # item extended header location field
 ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection
 ITEM_LOC_EQUIPMENT = 3 # show on quick item ability selection
+
+# item function types
+ITM_F_DRINK = 1
+ITM_F_READ = 2
+ITM_F_CONTAINER = 4
+ITM_F_ABILITIES = 8

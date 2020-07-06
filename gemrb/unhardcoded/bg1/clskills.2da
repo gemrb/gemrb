@@ -7,7 +7,7 @@ FIGHTER             *          *           *          *          *          *   
 CLERIC              *          MXSPLPRS    *          *          *          *          1          1          *          *          0         -3       *
 THIEF               *          *           *          *          SKILLS     *          0          0          *          *          0         -3       *
 BARD                *          *           MXSPLBRD   SKILLBRD   *          *          0          1          *          *          0         -3       *
-PALADIN             *          MXSPLPAL    *          *          *          PALADIN    5          1          *          CLABPALA   2         -2       *
+PALADIN             *          MXSPLPAL    *          *          *          LAYHANDS   5          1          *          CLABPALA   2         -2       *
 FIGHTER_MAGE        *          *           MXSPLWIZ   *          *          *          0          1          *          *          0         -2       *
 FIGHTER_CLERIC      *          MXSPLPRS    *          *          *          *          0          1          *          *          0         -2       *
 FIGHTER_THIEF       *          *           *          *          SKILLS     *          0          0          *          *          0         -2       *

@@ -6,8 +6,6 @@ compiler:
   - clang
   - gcc
 
-sudo: false
-
 addons:
   apt:
     packages:
@@ -43,13 +41,18 @@ before_script:
   - cmake --version
 
 script:
-  - mkdir build && cd build
-  - if [ $TRAVIS_OS_NAME != osx ]; then static="-DSTATIC_LINK=1"; fi
-  - cmake -DCMAKE_INSTALL_PREFIX=iprefix $static ..
-  - make
-  - if [ $TRAVIS_OS_NAME != osx ]; then sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample; fi
-  - if [ $TRAVIS_OS_NAME != osx ]; then gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample; fi # minimal test
-  - make install
+  - |
+    mkdir build && cd build &&
+    if [ $TRAVIS_OS_NAME != osx ]; then
+      static="-DSTATIC_LINK=1"
+    fi &&
+    cmake -DCMAKE_INSTALL_PREFIX=iprefix $static .. &&
+    make &&
+    if [ $TRAVIS_OS_NAME != osx ]; then
+      sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&
+      gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample
+    fi &&
+    make install
 
 deploy:
   skip_cleanup: true

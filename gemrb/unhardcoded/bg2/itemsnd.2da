@@ -1,46 +1,46 @@
 2DA V1.0
 *
-	TAKE	DROP
-MISC	GAM_21A	GAM_21B
-AMULET	GAM_14A	GAM_14B
-ARMOR	GAM_21A	GAM_21B
-BELT	GAM_18A	GAM_18B
-BOOT	GAM_18A	GAM_18B
-ARROW	GAM_20A	GAM_20B
-BRACER	GAM_18A	GAM_18B
-HELMET	GAM_22A	GAM_22B
-KEY	GAM_23A	GAM_23B
-POTION	GAM_38A	GAM_38B
-RING	GAM_43A	GAM_43B
-SCROLL	GAM_25A	GAM_25B
-SHIELD	GAM_26A	GAM_26B
-FOOD	GAM_21A	GAM_21B
-BULLET	GAM_27A	GAM_27B
-BOW	GAM_28A	GAM_28B
-DAGGER	GAM_29A	GAM_29B
-MACE	GAM_30A	GAM_30B
-SLING	GAM_31A	GAM_31B
-SMSWORD	GAM_41A	GAM_41B
-BGSWORD	GAM_41A	GAM_41B
-HAMMER	GAM_33A	GAM_33B
-MSTAR	GAM_34A	GAM_34B
-FLAIL	GAM_34A	GAM_34B
-DART	GAM_21A	GAM_21B
-AXE	GAM_33A	GAM_33B
-STAFF	GAM_39A	GAM_39B
-XBOW	GAM_40A	GAM_40B
-FIST	GAM_21A	GAM_21B
-SPEAR	GAM_39A	GAM_39B
-POLEARM	GAM_32A	GAM_32B
-BOLT	GAM_20A	GAM_20B
-CLOAK	GAM_36A	GAM_36B
-COIN	GAM_37A	GAM_37B
-GEM	GAM_24A	GAM_24B
-WAND	GAM_39A	GAM_39B
-BAG	GAM_21A	GAM_21B
-BROKEN1	GAM_21A	GAM_21B
-BROKEN2	GAM_21A	GAM_21B
-DEFAULT	GAM_21A	GAM_21B
-LEATHER	GAM_15A	GAM_15B
-CHAIN	GAM_16A	GAM_16B
-PLATE	GAM_17A	GAM_17B
+          DROP       TAKE     SWING1  SWING2   SWING3   SWING4   SWING5
+MISC      GAM_21B    GAM_21A  *       *        *        *        *
+AMULET    GAM_14B    GAM_14A  *       *        *        *        *
+ARMOR     GAM_21B    GAM_21A  *       *        *        *        *
+BELT      GAM_18B    GAM_18A  *       *        *        *        *
+BOOT      GAM_18B    GAM_18A  *       *        *        *        *
+ARROW     GAM_20B    GAM_20A  *       *        *        *        *
+BRACER    GAM_18B    GAM_18A  *       *        *        *        *
+HELMET    GAM_22B    GAM_22A  *       *        *        *        *
+KEY       GAM_23B    GAM_23A  *       *        *        *        *
+POTION    GAM_38B    GAM_38A  *       *        *        *        *
+RING      GAM_43B    GAM_43A  *       *        *        *        *
+SCROLL    GAM_25B    GAM_25A  *       *        *        *        *
+SHIELD    GAM_26B    GAM_26A  *       *        *        *        *
+FOOD      GAM_21B    GAM_21A  *       *        *        *        *
+BULLET    GAM_27B    GAM_27A  *       *        *        *        *
+BOW       GAM_28B    GAM_28A  SWI_02  SWI_02a  SWI_02b  SWI_02c  SWI_02d
+DAGGER    GAM_29B    GAM_29A  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+MACE      GAM_30B    GAM_30A  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+SLING     GAM_31B    GAM_31A  SWI_05  SWI_05a  SWI_05b  SWI_05c  SWI_05d
+SMSWORD   GAM_41B    GAM_41A  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+BGSWORD   GAM_41B    GAM_41A  SWI_04  SWI_04a  SWI_04b  SWI_04c  SWI_04d
+HAMMER    GAM_33B    GAM_33A  SWI_06  SWI_06a  SWI_06b  SWI_06c  SWI_06d
+MSTAR     GAM_34B    GAM_34A  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+FLAIL     GAM_34B    GAM_34A  SWI_07  SWI_07a  SWI_07b  SWI_07c  SWI_07d
+DART      GAM_21B    GAM_21A  *       *        *        *        *
+AXE       GAM_33B    GAM_33A  SWI_01  SWI_01a  SWI_01b  SWI_01c  SWI_01d
+STAFF     GAM_39B    GAM_39A  SWI_06  SWI_06a  SWI_06b  SWI_06c  SWI_06d
+XBOW      GAM_40B    GAM_40A  SWI_03  SWI_03a  SWI_03b  SWI_03c  SWI_03d
+FIST      GAM_21B    GAM_21A  *       *        *        *        *
+SPEAR     GAM_39B    GAM_39A  SWI_06  SWI_06a  SWI_06b  SWI_06c  SWI_06d
+POLEARM   GAM_32B    GAM_32A  SWI_06  SWI_06a  SWI_06b  SWI_06c  SWI_06d
+BOLT      GAM_20B    GAM_20A  *       *        *        *        *
+CLOAK     GAM_36B    GAM_36A  *       *        *        *        *
+COIN      GAM_37B    GAM_37A  *       *        *        *        *
+GEM       GAM_24B    GAM_24A  *       *        *        *        *
+WAND      GAM_39B    GAM_39A  *       *        *        *        *
+BAG       GAM_21B    GAM_21A  *       *        *        *        *
+BROKEN1   GAM_21B    GAM_21A  *       *        *        *        *
+BROKEN2   GAM_21B    GAM_21A  *       *        *        *        *
+DEFAULT   GAM_21B    GAM_21A  *       *        *        *        *
+LEATHER   GAM_15B    GAM_15A  *       *        *        *        *
+CHAIN     GAM_16B    GAM_16A  *       *        *        *        *
+PLATE     GAM_17B    GAM_17A  *       *        *        *        *

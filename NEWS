@@ -1,4 +1,17 @@
-GemRB git (2017-11-26):
+GemRB v0.8.6 (2019-11-24):
+  New features:
+    - more audio, especially in bg1 and pst
+    - sndchann.2da support
+    - using bags in stores, NPC breaking points, worldmap travel in pst
+
+  Improved features:
+    - better megamod and detectable spells compatibility
+    - iwd2 and pst levelup, infopoints, gui feedback, dualclassing, ranges
+    - verbal constants, (tobex) opcodes, falling, paperdolls, projectiles
+    - pst area animations, multipalette animations
+    - bugfixes
+
+GemRB v0.8.5 (2017-11-26):
   New features:
     - SDL2 resolution-independent window scaling, environmental audio, IRIX compatibility
     - regeneration during sleep, time dilation

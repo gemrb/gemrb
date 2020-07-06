@@ -198,7 +198,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 					allSpells += GetUsableMemorizedSpells (actor, i)
 			if not len(allSpells):
 				raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
-				return
 
 	if BookType == -1:
 		memorizedSpells = allSpells
@@ -556,7 +555,7 @@ def CannotLearnSlotSpell ():
 		return LSR_LEVEL
 
 	spell_count = GemRB.GetKnownSpellsCount (pc, booktype, level-1)
-	if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
+	if spell_count >= GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
 		return LSR_FULL
 
 	return 0
@@ -682,7 +681,7 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 		ret = GemRB.LearnSpell (pc, spellref, flags, booktype)
 		if ret != LSR_OK and ret != LSR_KNOWN:
 			raise RuntimeError, "Failed learning spell: %s !" %(spellref)
-			return
+
 		SpellIndex = HasSpell (pc, booktype, level, spellref)
 		count -= 1
 
@@ -692,8 +691,17 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 	if SpellIndex == -1:
 		# should never happen
 		raise RuntimeError, "LearnSpell: Severe spellbook problems: %s !" %(spellref)
-		return
 
 	for j in range(count):
 		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex, flags&LS_MEMO)
 
+def LearnFromScroll (pc, slot):
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+
+	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP)
+
+	# destroy the scroll, just one in case of a stack
+	GemRB.RemoveItem (pc, slot, 1)
+
+	return ret

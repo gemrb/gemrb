@@ -44,7 +44,7 @@ bool NullSound::Init(void)
 	return true;
 }
 
-Holder<SoundHandle> NullSound::Play(const char*, int, int, unsigned int, unsigned int *len)
+Holder<SoundHandle> NullSound::Play(const char*, unsigned int, int, int, unsigned int, unsigned int *len)
 {
 	if (len) *len = 1000; //Returning 1 Second Length
 	return Holder<SoundHandle>();
@@ -96,7 +96,7 @@ void NullSound::GetListenerPos(int& x, int& y)
 	y = YPos;
 }
 
-int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
+int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, int)
 {
 	return -1;
 }

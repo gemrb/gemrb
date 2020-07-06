@@ -132,6 +132,12 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 		case ST_ACTOR:
 			string = StringFromCString(speaker->GetName(-1));
 			core->GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
+			// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
+			if (ActorColor[4].r + ActorColor[4].g + ActorColor[4].b < 75) {
+				ActorColor[4].r = 75;
+				ActorColor[4].g = 75;
+				ActorColor[4].b = 75;
+			}
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER:
@@ -333,7 +339,7 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 
 void DisplayMessage::DisplayStringName(const String& text, unsigned int color, const Scriptable *speaker) const
 {
-	if (!text.length()) return;
+	if (!text.length() || !text.compare(L" ")) return;
 
 	unsigned int speaker_color;
 	String name;

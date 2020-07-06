@@ -20,6 +20,7 @@
 
 import GemRB
 from ie_restype import RES_2DA
+from ie_sounds import CHAN_GUI
 from GUIDefines import *
 import GUICommon
 import GameCheck
@@ -45,6 +46,7 @@ def StartTextScreen ():
 	global TextScreen, TextArea, TableName, Row
 
 	GemRB.GamePause (1, 3)
+	ToggleAmbients (0)
 
 	ID = -1
 	MusicName = "*"
@@ -149,16 +151,31 @@ def StartTextScreen ():
 	ReplayTextScreen()
 	return
 
+# FIXME: move to GUIScript as a PauseAmbients method that works directly with the AmbientMgr
+AmbientVolume = 0
+def ToggleAmbients (state):
+	global AmbientVolume
+
+	if state:
+		GemRB.SetVar ("Volume Ambients", AmbientVolume)
+	else:
+		AmbientVolume = GemRB.GetVar ("Volume Ambients")
+		GemRB.SetVar ("Volume Ambients", 0)
+
+	GemRB.UpdateAmbientsVolume ()
+
 def EndTextScreen ():
 	global TextScreen, TableName
 
 	if TextScreen:
 		TextScreen.SetVisible (WINDOW_INVISIBLE)
 		TextScreen.Unload ()
-		GemRB.PlaySound(None, 0, 0, 4)
+		GemRB.HardEndPL ()
+		GemRB.PlaySound(None, CHAN_GUI, 0, 0, 4)
 
 	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
+	ToggleAmbients (1)
 	GemRB.GamePause (0, 3)
 
 	if TableName == "25ecred":
@@ -169,7 +186,7 @@ def ReplayTextScreen ():
 	global TextArea, TableName, Row
 
 	# stop any current speech, flag of 5 = GEM_SND_RELATIVE|GEM_SND_SPEECH
-	GemRB.PlaySound(None, 0, 0, 5)
+	GemRB.PlaySound(None, CHAN_GUI, 0, 0, 5)
 
 	Table = GemRB.LoadTable (TableName)
 	Count = Table.GetColumnCount (Row)

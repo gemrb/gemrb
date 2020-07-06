@@ -223,7 +223,7 @@ void GameControl::ClearMouseState()
 
 // generate an action to do the actual movement
 // only PST supports RunToPoint
-void GameControl::CreateMovement(Actor *actor, const Point &p)
+void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
 {
 	char Tmp[256];
 	Action *action = NULL;
@@ -238,11 +238,16 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 			CanRun = false;
 	}
 	if (!action) {
-		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+		if (append) {
+			sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
+		} else {
+			sprintf(Tmp, "MoveToPoint([%d.%d])", p.x, p.y);
+		}
 		action = GenerateAction( Tmp );
 	}
 
-	actor->CommandActor(action);
+	actor->CommandActor(action, !append);
+	actor->Destination = p; // just to force target reticle drawing if paused
 }
 
 // were we instructed to run and can handle it (no movement impairments)?
@@ -505,16 +510,13 @@ void GameControl::DrawInternal(Region& screen)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-
-			int i = 0;
-			while(monsters[i]) {
-				Actor *target = monsters[i++];
-				if (target->InParty) continue;
-				if (target->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(screen, target->Pos, viewport, ColorBlack);
+			std::vector<Actor *> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
+			std::vector<Actor *>::iterator monster;
+			for (monster = monsters.begin(); monster != monsters.end(); ++monster) {
+				if ((*monster)->IsPartyMember()) continue;
+				if ((*monster)->GetStat(IE_NOTRACKING)) continue;
+				DrawArrowMarker(screen, (*monster)->Pos, viewport, ColorBlack);
 			}
-			free(monsters);
 		} else {
 			trackerID = 0;
 		}
@@ -1094,8 +1096,12 @@ void GameControl::DisplayTooltip() {
 					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
 					// normal tooltips
 					if (actor->InParty) {
-						// in party: display hp
-						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						// in party: display hp unless instructed otherwise
+						if (actor->HasVisibleHP()) {
+							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						} else {
+							snprintf(buffer, 100, "%s\n?", name);
+						}
 					} else if (neutral) {
 						// neutral: display name only
 						snprintf(buffer, 100, "%s", name);
@@ -1331,6 +1337,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 
+		// don't change the cursor for birds
+		if (lastActor && (lastActor->GetStat(IE_DONOTJUMP) == DNJ_BIRD)) return;	
+		
 		if (lastActor) {
 			lastActorID = lastActor->GetGlobalID();
 			lastActor->SetOver( true );
@@ -1632,9 +1641,10 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1691,9 +1701,10 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
 		action->int2Parameter = UI_SILENT;
-                //for multi-shot items like BG wand of lightning
-                if (spellCount)
-                    action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		//for multi-shot items like BG wand of lightning
+		if (spellCount) {
+			action->int2Parameter |= UI_NOAURA|UI_NOCHARGE;
+		}
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1903,7 +1914,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+	unsigned short Mod)
 {
 	unsigned int i;
 	char Tmp[256];
@@ -2049,20 +2060,32 @@ formation_handling:
 
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
-			actor->Stop();
+			// don't stop the party if we're trying to add a waypoint
+			if (!(Mod & GEM_MOD_SHIFT)) {
+				actor->Stop();
+			}
 
 			if (i || party.size() > 1) {
 				Map* map = actor->GetCurrentArea();
 				move = GetFormationPoint(map, i, src, p);
 			}
-			CreateMovement(actor, move);
+			CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
 		}
 		if (DoubleClick) Center(x,y);
 
 		//p is a searchmap travel region
-		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+		// or if it's a plain travel region (pst doesn't use the searchmap for this in ar0500)
+		bool teamMoved = core->HasFeature(GF_TEAM_MOVEMENT) && party[0]->GetInternalFlag() & IF_USEEXIT;
+		if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || (overInfoPoint && overInfoPoint->Type == ST_TRAVEL && teamMoved)) {
 			sprintf( Tmp, "NIDSpecial2()" );
-			party[0]->AddAction( GenerateAction( Tmp) );
+			if (teamMoved) {
+				// not clearing the queue means one can exit the worldmap and travel like it wasn't there
+				// remove if necessary
+				// we need to add the action at the top of the queue to override the movetoarea from the travel region itself
+				party[0]->AddActionInFront(GenerateAction(Tmp));
+			} else {
+				party[0]->AddAction(GenerateAction(Tmp));
+			}
 		}
 	} else if (actor) {
 		if (actor->GetStat(IE_EA)<EA_CHARMED
@@ -2497,7 +2520,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 			areaname = pc->Area;
 		}
 		game->GetMap( areaname, true );
-		ScreenFlags|=SF_CENTERONACTOR;
+		if (!core->InCutSceneMode()) {
+			// don't interfere with any scripted moves of the viewport
+			// checking core->timer->ViewportIsMoving() is not enough
+			ScreenFlags |= SF_CENTERONACTOR;
+		}
 	}
 	//center on first selected actor
 	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {

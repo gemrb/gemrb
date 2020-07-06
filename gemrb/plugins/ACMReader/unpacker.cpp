@@ -117,6 +117,9 @@ int CValueUnpacker::get_bits(int bits)
 int CValueUnpacker::init_unpacker()
 {
 	//using malloc, supposed to be faster
+	if (amp_buffer) {
+		free(amp_buffer);
+	}
 	amp_buffer =(short *) malloc(sizeof(short)*0x10000);
 	if (!amp_buffer) {
 		return 0;
@@ -171,7 +174,7 @@ int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 int CValueUnpacker::linear_fill(int pass, int ind)
 {
 	int mask = ( 1 << ind ) - 1;
-	short* lb_ptr = buff_middle + ( ((size_t)-1) << ( ind - 1 ) );
+	short* lb_ptr = buff_middle + int( ((size_t)-1) << ( ind - 1 ) );
 
 	for (int i = 0; i < subblocks; i++)
 		block_ptr[i * sb_size + pass] = lb_ptr[get_bits( ind ) & mask];

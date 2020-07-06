@@ -223,6 +223,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
+	// always refresh, as even if eqfx is null, other effects may have been selfapplied from the block
 	Owner->RefreshEffects(eqfx);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
@@ -234,11 +235,12 @@ void Inventory::AddSlotEffects(ieDword index)
 //is stored in them
 void Inventory::RemoveSlotEffects(ieDword index)
 {
-	Owner->fxqueue.RemoveEquippingEffects(index);
-	Owner->RefreshEffects(NULL);
-	//call gui for possible paperdoll animation changes
-	if (Owner->InParty) {
-		core->SetEventFlag(EF_UPDATEANIM);
+	if (Owner->fxqueue.RemoveEquippingEffects(index)) {
+		Owner->RefreshEffects(NULL);
+		//call gui for possible paperdoll animation changes
+		if (Owner->InParty) {
+			core->SetEventFlag(EF_UPDATEANIM);
+		}
 	}
 }
 
@@ -359,7 +361,6 @@ void Inventory::KillSlot(unsigned int index)
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		error("Inventory", "Invalid item: %s!", item->ItemResRef);
-		return;
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
@@ -424,7 +425,7 @@ void Inventory::KillSlot(unsigned int index)
 			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_HEAD:
-			Owner->SetUsedHelmet("");
+			Owner->SetUsedHelmet("\0");
 			break;
 		case SLOT_EFFECT_ITEM:
 			//remove the armor type only if this item is responsible for it
@@ -563,7 +564,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	}
 }
 
-int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
+int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 {
 	int twohanded = item->Flags&IE_INV_ITEM_TWOHANDED;
 	if (slot >= 0) {
@@ -573,7 +574,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		//check for equipping weapons
-		if (WhyCantEquip(slot,twohanded)) {
+		if (WhyCantEquip(slot, twohanded, ranged)) {
 			return ASI_FAILED;
 		}
 
@@ -642,8 +643,8 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 	// just set up STOItem)
 	while (item->PurchasedAmount) {
 		//the first part of a STOItem is essentially a CREItem
-		temp = new CREItem();
-		memcpy( temp, item, sizeof( CREItem ) );
+		temp = new CREItem(item);
+
 		//except the Expired flag
 		temp->Expired=0;
 		if (action==STA_STEAL && !core->HasFeature(GF_PST_STATE_FLAGS)) {
@@ -901,6 +902,12 @@ bool Inventory::EquipItem(ieDword slot)
 		//if weapon is bow, then find quarrel for it and equip that
 		weaponslot = GetWeaponQuickSlot(slot);
 		EquippedHeader = 0;
+		if (Owner->PCStats) {
+			int eheader = Owner->PCStats->GetHeaderForSlot(slot);
+			if (eheader >= 0) {
+				EquippedHeader = eheader;
+			}
+		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
 			ieDword equip;
@@ -1200,7 +1207,7 @@ int Inventory::GetEquippedSlot() const
 	return Equipped+SLOT_MELEE;
 }
 
-bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
+bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 {
 	EquippedHeader = header;
 
@@ -1250,12 +1257,14 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects(newslot);
-
-		//in case of missiles also look for an appropriate launcher
-		if (effects == SLOT_EFFECT_MISSILE) {
-			newslot = FindRangedWeapon();
+		if (!noFX) {
 			AddSlotEffects(newslot);
+
+			//in case of missiles also look for an appropriate launcher
+			if (effects == SLOT_EFFECT_MISSILE) {
+				newslot = FindRangedWeapon();
+				AddSlotEffects(newslot);
+			}
 		}
 	}
 	UpdateWeaponAnimation();
@@ -1763,7 +1772,7 @@ inline bool Inventory::TwoHandedInSlot(int slot) const
 	return false;
 }
 
-int Inventory::WhyCantEquip(int slot, int twohanded) const
+int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 {
 	// check only for hand slots
 	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
@@ -1776,7 +1785,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 		return STR_MAGICWEAPON;
 	}
 
-	//can't equip in shield slot if a weapon slot is twohanded
+	//can't equip in shield slot if a weapon slot is twohanded or ranged
 	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
 		//see GetShieldSlot
 		int otherslot;
@@ -1789,6 +1798,9 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 			if (TwoHandedInSlot(i)) {
 				return STR_TWOHANDED_USED;
 			}
+			if (ranged) {
+				return STR_NO_RANGED_OFFHAND;
+			}
 		}
 	}
 
@@ -1797,10 +1809,8 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
 				return STR_NOT_IN_OFFHAND;
 			}
-		} else {
-			if (slot==SLOT_LEFT) {
-				return STR_NOT_IN_OFFHAND;
-			}
+		} else if (slot == SLOT_LEFT) {
+			return STR_NOT_IN_OFFHAND;
 		}
 		if (IsSlotBlocked(slot)) {
 		//cannot equip two handed while shield slot is in use?

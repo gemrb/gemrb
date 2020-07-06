@@ -99,9 +99,9 @@ static bool FindFiles( char* path, std::list<char*> &files )
 {
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
-	long hFile;
+	intptr_t hFile;
 	strcat( path, "*.dll" );
-	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) {
+	if (( hFile = _findfirst( path, &c_file ) ) == -1L) {
 		//If there is no file matching our search
 		Log(ERROR, "PluginLoader", "Error looking up dlls.");
 		return false;
@@ -194,10 +194,10 @@ void LoadPlugins(char* pluginpath)
 		//printStatus( "OK", LIGHT_GREEN );
 		//using C bindings, so we don't need to jump through extra hoops
 		//with the symbol name
-		Version_t LibVersion = ( Version_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
-		Description_t Description = ( Description_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
-		ID_t ID = ( ID_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
-		Register_t Register = ( Register_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
+		Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
+		Description_t Description = ( Description_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
+		ID_t ID = ( ID_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
+		Register_t Register = ( Register_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
 
 		//printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {

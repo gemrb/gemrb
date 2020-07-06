@@ -126,7 +126,23 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		return NULL;
 	}
 
-	Picture2 = frames[1]->copy();
+	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
+	int first = -1, second = -1; // top and bottom half
+	int ff = cycles[0].FirstFrame;
+	for (int f=0; f < cycles[0].FramesCount; f++) {
+		int idx = FLTable[ff+f];
+		if (first == -1) {
+			first = idx;
+		} else if (second == -1 && idx != first) {
+			second = idx;
+			break;
+		}
+	}
+	if (second == -1) {
+		return NULL;
+	}
+
+	Picture2 = frames[second]->copy();
 	if (!Picture2) {
 		return NULL;
 	}
@@ -137,10 +153,10 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->release();
 	}
 
-	Picture2->XPos = (short)frames[1]->XPos;
-	Picture2->YPos = (short)frames[1]->YPos - 80;
+	Picture2->XPos = (short)frames[second]->XPos;
+	Picture2->YPos = (short)frames[second]->YPos - 80;
 
-	Sprite2D* spr = frames[0]->copy();
+	Sprite2D* spr = frames[first]->copy();
 	if (Colors) {
 		Palette* palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
@@ -148,8 +164,8 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->release();
 	}
 
-	spr->XPos = (short)frames[0]->XPos;
-	spr->YPos = (short)frames[0]->YPos;
+	spr->XPos = (short)frames[first]->XPos;
+	spr->YPos = (short)frames[first]->YPos;
 
 	return spr;
 }

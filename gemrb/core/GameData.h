@@ -39,6 +39,8 @@
 
 namespace GemRB {
 
+static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
+
 class Actor;
 struct Effect;
 class Factory;
@@ -111,6 +113,12 @@ public:
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache
 	void SaveAllStores();
+
+	// itemsnd.2da functions
+	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	int GetSwingCount(ieDword ItemType);
+private:
+	void ReadItemSounds();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -120,6 +128,7 @@ private:
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;
 	StoreMap stores;
+	std::map<ieDword, std::vector<const char*> > ItemSounds;
 };
 
 extern GEM_EXPORT GameData * gamedata;

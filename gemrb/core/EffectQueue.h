@@ -115,12 +115,11 @@ class StringBuffer;
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
-#define STAT_ADD_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 1 )
 #define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
 #define STAT_SET_PCF(stat, mod) target->SetStat( stat, ( mod ), 1 )
-#define STAT_BIT_OR_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 1 )
+#define STAT_BIT_OR_PCF(stat, mod) target->NewStat(stat, (mod), MOD_BITOR)
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
@@ -208,14 +207,14 @@ public:
 	/** adds an effect to the queue, it could also insert it if flagged so
 	 *  fx should be freed by the caller
 	 */
-	void AddEffect(Effect* fx, bool insert=false);
+	void AddEffect(const Effect* fx, bool insert=false);
 	/** Adds an Effect to the queue, subject to level and other checks.
-	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
+	 * Returns FX_ABORT if unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
 	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const;
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
-	bool RemoveEffect(Effect* fx);
+	bool RemoveEffect(const Effect* fx);
 
 	int AddAllEffects(Actor* target, const Point &dest) const;
 	void ApplyAllEffects(Actor* target) const;
@@ -232,7 +231,7 @@ public:
 	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
 
 	/* removes equipping effects with specified inventory slot code */
-	void RemoveEquippingEffects(ieDwordSigned slotcode) const;
+	bool RemoveEquippingEffects(ieDwordSigned slotcode) const;
 
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(const ieResRef Removed) const;
@@ -248,11 +247,12 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
 	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ieResRef resource) const;
 	void RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword flags, ieDword match) const;
+	void DispelEffects(Effect *dispeller, ieDword level) const;
 
 	/* returns true if the timing method supports simplified duration */
-	static bool HasDuration(Effect *fx);
+	static bool HasDuration(const Effect *fx);
 	/* returns true if the effect should be saved */
-	static bool Persistent(Effect* fx);
+	static bool Persistent(const Effect* fx);
 	/* returns next saved effect, increases index */
 	std::list< Effect* >::const_iterator GetFirstEffect() const
 	{
@@ -262,15 +262,17 @@ public:
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
+	void ModifyAllEffectSources(Point &source);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
+	unsigned int GetEffectOrder(EffectRef &effect_reference, const Effect *fx) const;
 	/* this method hacks the offhand weapon color effects */
-	static void HackColorEffects(Actor *Owner, Effect *fx);
+	static void HackColorEffects(const Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
 	EffectQueue *CopySelf() const;
-	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
-	static Effect *CreateUnsummonEffect(Effect *fx);
+	static Effect *CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
+	static Effect *CreateUnsummonEffect(const Effect *fx);
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference) const;
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
@@ -286,7 +288,7 @@ public:
 	int MaxParam1(EffectRef &effect_reference, bool positive) const;
 	bool HasAnyDispellableEffect() const;
 	//getting summarised effects
-	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
+	int BonusAgainstCreature(EffectRef &effect_reference, const Actor *actor) const;
 	//getting weapon immunity flag
 	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
 	int SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const;
@@ -301,17 +303,17 @@ public:
 	int CheckImmunity(Actor *target) const;
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
-	void AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
+	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump() const;
 	void dump(StringBuffer&) const;
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
-	static bool match_ids(Actor *target, int table, ieDword value);
+	static bool match_ids(const Actor *target, int table, ieDword value);
 	/** returns true if the process should abort applying a stack of effects */
 	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance=1) const;
 	/** just checks if it is a particularly stupid effect that needs its target reset */
-	static bool OverrideTarget(Effect *fx);
+	static bool OverrideTarget(const Effect *fx);
 	bool HasHostileEffects() const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
@@ -319,7 +321,7 @@ private:
 	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const;
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
-	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
+	static Effect *CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const;
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const;
 	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ieResRef resource) const;
@@ -333,7 +335,7 @@ private:
 	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const;
 	int BonusForParam2(ieDword opcode, ieDword param2) const;
 	int MaxParam1(ieDword opcode, bool positive) const;
-	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
+	int BonusAgainstCreature(ieDword opcode, const Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };
 

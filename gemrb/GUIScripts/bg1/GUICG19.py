@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_restype import RES_WAV
+from ie_sounds import CHAN_CHAR1
 import CharGenCommon
 import GUICommon
 
@@ -77,7 +78,7 @@ def PlayPress():
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], CHAN_CHAR1, 0, 0, 4)
 	NextSound()
 	return
 

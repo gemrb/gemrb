@@ -56,10 +56,12 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_SELECT   0x40   //valid when these flags used as store action
 #define IE_STORE_RENT     128    //gemrb extension
 #define IE_STORE_QUALITY  0x600  //2 bits
+// unknown 0x800
 #define IE_STORE_FENCE    0x1000 //
+#define IE_STORE_NOREPADJ 0x2000 // Reputation doesn't affect prices (BGEE)
 #define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
-#define IE_STORE_CAPACITY 0x8000 //used for error reporting purposes
-
+#define IE_STORE_BUYCRITS 0x8000 // User allowed to sell critical items (BGEE)
+#define IE_STORE_CAPACITY 0x10000 //used for error reporting purposes
 
 /**
  * @struct STOItem
@@ -79,7 +81,9 @@ struct GEM_EXPORT STOItem {
 	Condition *triggers;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
-	
+
+	STOItem();
+	STOItem(CREItem *item);
 	~STOItem();
 };
 

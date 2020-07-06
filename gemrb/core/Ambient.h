@@ -32,10 +32,11 @@
 namespace GemRB {
 
 #define IE_AMBI_ENABLED 1
-#define IE_AMBI_LOOPING 2
+#define IE_AMBI_LOOPING 2	/* useless: if unset, the original looped the sound only when the game isn't paused */
 #define IE_AMBI_MAIN    4	/* ignore origin/radius */
 #define IE_AMBI_RANDOM  8	/* random selection instead of sequential */
 #define IE_AMBI_HIMEM	16	/* skip on low-mem systems */
+#define IE_AMBI_NOSAVE	32	/* GemRB internal flag: don't save to area */
 
 class GEM_EXPORT Ambient {
 public:

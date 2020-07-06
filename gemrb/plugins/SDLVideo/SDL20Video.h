@@ -56,6 +56,7 @@ public:
 	~SDL20VideoDriver(void);
 
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
+	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
 	int SwapBuffers(void);
 	int PollEvents();
 

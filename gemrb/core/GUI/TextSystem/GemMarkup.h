@@ -82,6 +82,7 @@ private:
 		}
 
 		TextAttributes& operator=(const TextAttributes& ta) {
+			if (&ta == this) return *this;
 			TextFont = ta.TextFont;
 			SwapFont = ta.SwapFont;
 			palette = ta.palette;

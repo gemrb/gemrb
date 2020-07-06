@@ -60,6 +60,19 @@ def OpenInventoryWindow ():
 			if GemRB.IsDraggingItem () == 1:
 				GemRB.DropDraggedItem (pc, -2)
 
+		InventoryCommon.CloseIdentifyItemWindow ()
+		InventoryCommon.CloseAbilitiesItemWindow ()
+		InventoryCommon.CancelColor()
+		if InventoryCommon.ItemInfoWindow:
+			InventoryCommon.ItemInfoWindow.Unload ()
+			InventoryCommon.ItemInfoWindow = None
+		if InventoryCommon.ItemAmountWindow:
+			InventoryCommon.ItemAmountWindow.Unload ()
+			InventoryCommon.ItemAmountWindow = None
+		if InventoryCommon.ErrorWindow:
+			InventoryCommon.ErrortWindow.Unload ()
+			InventoryCommon.ErrortWindow = None
+
 		if InventoryWindow:
 			InventoryWindow.Unload ()
 		if OptionsWindow:
@@ -137,9 +150,7 @@ def OpenInventoryWindow ():
 	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
 		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
-	# armor class
-	Label = Window.GetControl (0x10000038)
-	Label.SetTooltip (17183)
+	# armor class handled on refresh
 
 	# hp current
 	Label = Window.GetControl (0x10000039)
@@ -221,23 +232,31 @@ def RefreshInventoryWindow ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+	# disable coloring and equipment for non-humanoid dolls (shapes/morphs, mod additions)
+	# ... which doesn't include ogres and flinds, who are also clown-colored
+	# if one more exception needs to be added, rather externalise this to a new pdolls.2da flags column
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	if (anim_id < 0x5000 or anim_id >= 0x7000 or anim_id == 0x6404) and (anim_id != 0x8000 and anim_id != 0x9000):
+		Color1 = -1
 	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+	# disable equipment for flinds and ogres and Sarevok (Recovery Mod)
+	if anim_id == 0x8000 or anim_id == 0x9000 or anim_id == 0x6404:
+		Color1 = -1
 
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
 	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	# Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
-	if slot_item:
+	if slot_item and Color1 != -1:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 
 	# Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
-	if slot_item:
+	if slot_item and Color1 != -1:
 		itemname = slot_item["ItemResRef"]
 		item = GemRB.GetItem (itemname)
 		if (item['AnimationType'] != ''):
@@ -250,7 +269,7 @@ def RefreshInventoryWindow ():
 
 	# Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
-	if slot_item:
+	if slot_item and Color1 != -1:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
@@ -259,10 +278,7 @@ def RefreshInventoryWindow ():
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	Label = Window.GetControl (0x10000038)
-	Label.SetText (str (ac))
-	Label.SetTooltip (10339)
+	GUICommon.DisplayAC (pc, Window, 0x10000038)
 
 	# hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
@@ -307,9 +323,9 @@ def RefreshInventoryWindow ():
 		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None) #TODO: implement OpenGroundItemAmountWindow
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
 
-		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	# making window visible/shaded depending on the pc's state
 	GUICommon.AdjustWindowVisibility (Window, pc, False)

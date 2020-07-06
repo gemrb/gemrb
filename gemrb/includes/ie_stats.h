@@ -39,6 +39,7 @@ namespace GemRB {
 #define EA_ALLY			4
 #define EA_CONTROLLED  		5
 #define EA_CHARMED 		6
+//#define EA_REALLYCHARMED 		7 // added by EE for the charm opcode, while 6 is for shaman's spirits
 #define EA_CONTROLLABLE         15
 #define EA_GOODBUTRED  		28
 #define EA_GOODBUTBLUE 		29
@@ -51,7 +52,7 @@ namespace GemRB {
 #define EA_EVILCUTOFF  		200
 #define EA_EVILBUTGREEN		201
 #define EA_EVILBUTBLUE 		202
-#define EA_CHARMEDPC            254
+#define EA_CHARMEDPC            254 // EVILBYCHARM in the original
 #define EA_ENEMY   		255
 
 //GENERAL values
@@ -199,7 +200,7 @@ namespace GemRB {
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800  // iwd2: either different meaning or leftover cruft (set in a few creatures)
-#define MC_HIDE_HP              0x1000  //also 'large creature' according to IE dev info
+#define MC_HIDE_HP              0x1000  // also 'large creature' according to IE dev info (definitely something else in pst)
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
 #define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
 #define MC_LIMBO_CREATURE       0x4000
@@ -466,6 +467,16 @@ namespace GemRB {
 //180 IE_HIDE_IN_SHADOWS_BONUS
 //181 DETECT_ILLUSIONS_BONUS
 //182 SET_TRAPS_BONUS
+
+// some bg2 mods use these
+#define IE_SCRIPTINGSTATE21	 176
+#define IE_SCRIPTINGSTATE22	 177
+#define IE_SCRIPTINGSTATE23	 178
+#define IE_SCRIPTINGSTATE24	 179
+#define IE_SCRIPTINGSTATE25	 180
+#define IE_SCRIPTINGSTATE26	 181
+#define IE_SCRIPTINGSTATE27	 182
+
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // affects the displaying of EXISTANCE strings
 #define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
@@ -492,12 +503,7 @@ namespace GemRB {
 //these are temporary only
 #define IE_XP_MAGE              176 // XP2 
 #define IE_XP_THIEF             177 // XP3
-#define IE_DIALOGRANGE          178 // iwd2
-#define IE_MOVEMENTRATE         179
-#define IE_MORALE               180 // this has no place
-#define IE_BOUNCE               181 // has projectile bouncing effect
-#define IE_MIRRORIMAGES         182 
-//
+//the rest are relocated at 250+
 
 #define IE_ETHEREALNESS         202
 #define IE_IMMUNITY             203
@@ -554,14 +560,13 @@ namespace GemRB {
 // place for 2 more classes
 #define IE_LEVELCLASS12          248
 #define IE_LEVELCLASS13          249
-// these are iwd2 spell states, iwd2 uses ~180, we have place for 192
-// TODO: consider dropping these (move them to class variable) if unused by guiscript
-#define IE_SPLSTATE_ID1          250
-#define IE_SPLSTATE_ID2          251
-#define IE_SPLSTATE_ID3          252
-#define IE_SPLSTATE_ID4          253
-#define IE_SPLSTATE_ID5          254
-#define IE_SPLSTATE_ID6          255
+
+//more GemRB internal stats
+#define IE_DIALOGRANGE          250 // iwd2
+#define IE_MOVEMENTRATE         251
+#define IE_MORALE               252 // this has no place
+#define IE_BOUNCE               253 // has projectile bouncing effect
+#define IE_MIRRORIMAGES         254
 
 }
 

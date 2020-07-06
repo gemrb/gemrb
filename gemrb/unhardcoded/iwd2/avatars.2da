@@ -80,7 +80,7 @@
 0x6005     CHMB1      CHMB2      CHMB3      CHMC4      0          2          0          L
 0x6010     CHFB1      CHFB2      CHFB3      CHFC4      0          2          0          N
 0x6011     CEFB1      CEFB2      CEFB3      CEFC4      0          2          0          M
-0x6012     CDMB1      CDMB2      CDMB3      CDMC4      0          2          0          S
+0x6012     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          S
 0x6013     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          S
 0x6014     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          S
 0x6015     CHFB1      CHFB2      CHFB3      CHFC4      0          2          0          N
@@ -92,7 +92,7 @@
 0x6105     CHMB1      CHMB2      CHMB3      CHMF4      0          2          0          L
 0x6110     CHFB1      CHFB2      CHFB3      CHFF4      0          2          0          N
 0x6111     CEFB1      CEFB2      CEFB3      CEFF4      0          2          0          M
-0x6112     CDMB1      CDMB2      CDMB3      CDMF4      0          2          0          S
+0x6112     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          S
 0x6113     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          S
 0x6114     CIFB1      CIFB2      CIFB3      CIFF4      0          2          0          S
 0x6115     CHFB1      CHFB2      CHFB3      CHFF4      0          2          0          N
@@ -116,7 +116,7 @@
 0x6305     CHMT1      CHMT2      CHMT3      CHMF4      0          2          0          L
 0x6310     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          N
 0x6311     CEFT1      CEFT2      CEFT3      CEFF4      0          2          0          M
-0x6312     CDMT1      CDMT2      CDMT3      CDMF4      0          2          0          S
+0x6312     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
 0x6313     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
 0x6314     CIFT1      CIFT2      CIFT3      CIFF4      0          2          0          S
 0x6315     CHFT1      CHFT2      CHFT3      CHFF4      0          2          0          N
@@ -243,12 +243,12 @@
 0xB600     NNOML      NNOML      NNOML      NNOML      3          2          0          *
 0xB610     NNOWL      NNOWL      NNOWL      NNOWL      3          2          0          *
 0xB700     NSLVL      NSLVL      NSLVL      NSLVL      3          2          0          *
-0xC000     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC000     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC100     ACAT       ACAT       ACAT       ACAT       3          1          1          *
 0xC200     ACHK       ACHK       ACHK       ACHK       3          1          1          *
 0xC300     ARAT       ARAT       ARAT       ARAT       3          1          1          *
 0xC400     ASQU       ASQU       ASQU       ASQU       3          1          1          *
-0xC500     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC500     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC600     NBEGH      NBEGH      NBEGH      NBEGH      3          2          0          *
 0xC610     NPROH      NPROH      NPROH      NPROH      3          2          0          *
 0xC700     NBOY       NBOY       NBOY       NBOY       18         2          0          *
@@ -390,7 +390,7 @@
 0xEB39     MBE1       MBE1       MBE1       MBE1       9          2          1          *
 0xEB49     MBE2       MBE2       MBE2       MBE2       9          2          1          *
 0xEB79     MLER       MLER       MLER       MLER       9          2          1          *
-0xEC0B     MWDR       MWDR       MWDR       MWDR       9          2          1          *
+0xEC0B     MWDR       MWDR       MWDR       MWDR       9          5          1          *
 0xEC2B     MSHE       MSHE       MSHE       MSHE       9          2          1          *
 0xEC33     MCHI       MCHI       MCHI       MCHI       9          2          1          *
 0xEC4B     MDH1       MDH1       MDH1       MDH1       9          2          1          *

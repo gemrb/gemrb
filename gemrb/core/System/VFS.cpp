@@ -31,6 +31,11 @@
 #include <unistd.h>
 #endif
 
+// in case unistd isn't there or nonconformant
+#ifndef R_OK
+#define R_OK 04
+#endif
+
 #if defined(__sgi)
 #  include <stdarg.h>
 #else
@@ -65,7 +70,7 @@ struct DIR {
 	char path[_MAX_PATH];
 	bool is_first;
 	struct _finddata_t c_file;
-	long hFile;
+	intptr_t hFile;
 };
 
 struct dirent {
@@ -92,11 +97,11 @@ static dirent* readdir(DIR* dirp)
 
 	if (dirp->is_first) {
 		dirp->is_first = 0;
-		dirp->hFile = ( long ) _findfirst( dirp->path, &c_file );
+		dirp->hFile = _findfirst( dirp->path, &c_file );
 		if (dirp->hFile == -1L)
 			return NULL;
 	} else {
-		if (( long ) _findnext( dirp->hFile, &c_file ) != 0) {
+		if (_findnext( dirp->hFile, &c_file ) != 0) {
 			return NULL;
 		}
 	}
@@ -413,7 +418,7 @@ bool MakeDirectories(const char* path)
 	assert(strnlen(path, _MAX_PATH/2) < _MAX_PATH/2);
 	strcpy(Tokenized, path);
 
-	char* Token = strtok(Tokenized, &PathDelimiter);
+	char* Token = strtok(Tokenized, SPathDelimiter);
 	while(Token != NULL) {
 		if(TempFilePath[0] == 0) {
 			if(path[0] == PathDelimiter) {
@@ -428,7 +433,7 @@ bool MakeDirectories(const char* path)
 		if(!MakeDirectory(TempFilePath))
 			return false;
 
-		Token = strtok(NULL, &PathDelimiter);
+		Token = strtok(NULL, SPathDelimiter);
 	}
 	return true;
 }

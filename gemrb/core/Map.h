@@ -66,6 +66,11 @@ class Wall_Polygon;
 #define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
 //                        6 // pst: "You must obtain permission to rest here."
 #define AF_DREAM          8 // unused in pst
+/* TODO: implement these EE bits (plus PST:EE merged both worlds, bleargh)
+#define AF_NOFATALITY    16 // Player1 death does not end the game
+#define AF_NOREST        32 // Resting not allowed
+#define AF_NOTRAVEL      64 // Travel not allowed
+*/
 
 //area types
 #define AT_OUTDOOR        1
@@ -75,7 +80,7 @@ class Wall_Polygon;
 #define AT_FOREST         0x10
 #define AT_DUNGEON        0x20
 #define AT_EXTENDED_NIGHT 0x40
-#define AT_CAN_REST       0x80
+#define AT_CAN_REST_INDOORS 0x80
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible
@@ -91,6 +96,11 @@ class Wall_Polygon;
 #define A_ANI_PALETTE         0x400    //has own palette set
 #define A_ANI_MIRROR          0x800    //mirrored
 #define A_ANI_COMBAT          0x1000   //draw in combat too
+#define A_ANI_PSTBIT14        0x2000   // PST-only: unknown and rare, see #163 for area list
+// TODO: BGEE extended flags:
+// 0x2000: Use WBM resref
+// 0x4000: Underground?
+// 0x8000: Use PVRZ resref
 
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
@@ -122,6 +132,14 @@ class Wall_Polygon;
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
+	// used in bg1, set for a few copied areas in bg2 (but no files!)
+	// everyone else uses the normal ARE ambients instead
+	ieResRef MainDayAmbient1;
+	ieResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
+	ieDword MainDayAmbientVol;
+	ieResRef MainNightAmbient1;
+	ieResRef MainNightAmbient2;
+	ieDword MainNightAmbientVol;
 	ieDword reverbID;
 };
 
@@ -178,8 +196,13 @@ public:
 		if (text) {
 			//update custom strref
 			char* mbstring = MBCStringFromString(*text);
-			strref = core->UpdateString( strref, mbstring);
-			free(mbstring);
+			if (mbstring) {
+				strref = core->UpdateString( strref, mbstring);
+				free(mbstring);
+			} else {
+				strref = core->UpdateString(strref, "?");
+				Log(WARNING, "Map", "Failed to update string from map note, possibly an enconding issue.");
+			}
 		}
 	}
 	MapNote(const ieStrRef ref, ieWord color)
@@ -210,6 +233,7 @@ public:
 	ieWord DayChance;
 	ieWord NightChance;
 	ieDword NextSpawn;
+	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 	Spawn();
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
@@ -247,6 +271,8 @@ public:
 	Point Pos;
 	ieDword appearance;
 	ieDword Flags;
+	// flags that must be touched by PST a bit only
+	ieDword originalFlags;
 	//these are on one dword
 	ieWord sequence;
 	ieWord frame;
@@ -262,9 +288,11 @@ public:
 	ieVariable Name;
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
+	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	Palette* palette;
 	SpriteCover** covers;
 	AreaAnimation();
+	AreaAnimation(AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
@@ -399,9 +427,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
-	unsigned int GetBlocked(unsigned int x, unsigned int y);
-	unsigned int GetBlocked(const Point &p);
+	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	unsigned int GetBlocked(const Point &p) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -409,9 +437,9 @@ public:
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(const Point &p, int flags);
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
-	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, Scriptable *see=NULL);
+	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	Actor* GetActor(const char* Name, int flags);
-	Actor* GetActor(int i, bool any);
+	Actor* GetActor(int i, bool any) const;
 	Scriptable* GetActorByDialog(const char* resref);
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
@@ -506,7 +534,7 @@ public:
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisibleLOS(const Point &s, const Point &d);
+	bool IsVisibleLOS(const Point &s, const Point &d) const;
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
@@ -514,7 +542,7 @@ public:
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
 	Ambient *GetAmbient(int i) { return ambients[i]; }
-	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
+	unsigned int GetAmbientCount(bool toSave=false);
 
 	//mapnotes
 	void AddMapNote(const Point &point, int color, String* text);

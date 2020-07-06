@@ -158,9 +158,7 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	}
 	Actor* ab = ( Actor* ) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
-	if (reputation > 200) {
-		reputation = 200;
-	}
+	reputation = Clamp(reputation, 10, 200);
 	return happiness[alignment-1][reputation/10-1];
 }
 
@@ -295,7 +293,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 	if (idx == (unsigned int) -1) return false;
 
 	STOItem *si = store->GetItem(idx, false);
-	memcpy( &item, si, sizeof( CREItem ) );
+	item.CopySTOItem(si);
 	if (item.MaxStackAmount) {
 		item.Usages[0] = count;
 	}
@@ -453,6 +451,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	char Sound[_MAX_PATH] = "";
 	ieResRef soundRef = {};
+	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
@@ -485,6 +484,12 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (charactersubtitles) {
 			flags |= DS_CONSOLE;
 		}
+
+		if (actor->InParty > 0) {
+			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+		} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+			channel = SFX_CHAN_MONSTER;
+		}
 	}
 
 	if ((Strref != -1) && !soundRef[0]) {
@@ -509,12 +514,25 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {
-		ieDword speech = GEM_SND_RELATIVE; //disable position
-		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
+		ieDword speech = 0;
+		Point pos(Sender->Pos.x, Sender->Pos.y);
+		if (flags&DS_SPEECH) {
+			speech = GEM_SND_SPEECH;
+		}
+		// disable position, but only for party
+		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty) {
+			speech |= GEM_SND_RELATIVE;
+			pos.x = pos.y = 0;
+		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play( Sound,0,0,speech,&len );
+		core->GetAudioDrv()->Play(Sound, channel, pos.x, pos.y, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+
+		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
+			reinterpret_cast<Actor*>(Sender)->SetAnimatedTalking(len);
+		}
+
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
 	}
@@ -669,23 +687,29 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
-		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		if (gotitem) {
+			if (target->Type == ST_ACTOR) {
+				if (((Actor *) target)->InParty) {
+					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
+				}
+			}
+			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
+		}
 		return MIC_FULL;
 	}
 	if (gotitem&&!lostitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 	return MIC_GOTITEM;
 }
 
-/*FIXME: what is 'base'*/
-void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
+void PolymorphCopyCore(Actor *src, Actor *tar)
 {
 	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
-	if (!base) {
-		tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
-		for (int i=0;i<7;i++) {
-			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
-		}
+
+	tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
+	for (int i=0;i<7;i++) {
+		tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 	}
+
 	tar->SetName(src->GetName(0),0);
 	tar->SetName(src->GetName(1),1);
 	//add more attribute copying
@@ -784,7 +808,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (flags & CC_COPY) {
-		PolymorphCopyCore ( (Actor *) tmp, ab, false);
+		PolymorphCopyCore ( (Actor *) tmp, ab);
 	}
 }
 
@@ -860,6 +884,9 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
 				if(!Sender->InMove()) print("At least it said so...");
+				// ensure the action doesn't get interrupted
+				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
+				Sender->CurrentActionInterruptable = false;
 				return;
 			}
 		}
@@ -1062,6 +1089,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			}
 			break;
 		case BD_SOURCE:
+			// can't handle swap as BD_TARGET, since it just breaks dialog with PCs (eg. Maadeen in the gov. district)
+			// freeing Minsc requires skipping the non-interruptible check for the second dialog to properly start
+			if (speaker) {
+				Dialog = speaker->GetDialog(swap ? GD_NORMAL : GD_FEEDBACK);
+			} else {
+				Dialog = scr->GetDialog();
+			}
+			break;
 		case BD_TARGET:
 			// Don't check for the target being non-interruptible if we swapped speakers
 			// or if the speaker is the target, otherwise do (and request feedback on failure).
@@ -1221,6 +1256,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 		}
 	}
 	actor->SetPosition(position, adjust);
+	actor->SetStance(IE_ANI_READY);
 	if (face !=-1) {
 		actor->SetOrientation( face, false );
 	}
@@ -1377,10 +1413,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (!Sender->CurrentActionTicks) {
-			//play attack sound for party members
-			if (actor->InParty) {
-				//pick from all 5 possible verbal constants
-				actor->VerbalConstant(VB_ATTACK, 5);
+			// play the battle cry
+			// pick from all 5 possible verbal constants
+			if (!actor->PlayWarCry(5)) {
+				// for monsters also try their 2da/ini file sounds
+				if (!actor->InParty) {
+					ieResRef sound;
+					actor->GetSoundFromFile(sound, 200);
+					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos.x, actor->Pos.y);
+				}
 			}
 			//display attack message
 			if (target->GetGlobalID() != Sender->LastTarget) {
@@ -1415,6 +1456,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	actor->FaceTarget(target);
 
 	Sender->LastTarget = target->GetGlobalID();
+	Sender->LastTargetPersistent = Sender->LastTarget;
 	actor->PerformAttack(core->GetGame()->GameTime);
 }
 
@@ -1437,11 +1479,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	int idsfile=core->LoadSymbol(idsname);
 	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
-		//FIXME:missing ids file!!!
-		if (InDebug&ID_TRIGGERS) {
-			Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!",
-				idsname, symbol);
-		}
+		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;
 	}
 	char *newsymbol;
@@ -1553,7 +1591,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				//str++;
 				delete newAction;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -1913,7 +1950,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				//str++;
 				delete newTrigger;
 				return NULL;
-				break;
 
 			case 'p': //Point
 				SKIP_ARGUMENT();
@@ -2202,7 +2238,11 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		return value;
 	}
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		Sender->locals->Lookup( VarName, value );
+		if (!Sender->locals->Lookup(VarName, value)) {
+			if (valid) {
+				*valid = false;
+			}
+		}
 		if (InDebug&ID_VARIABLES) {
 			print("CheckVariable %s%s: %d", Context, VarName, value);
 		}
@@ -2477,7 +2517,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 	if (dist>0xff000000) {
 		return dist;
 	}
-	return dist*15;
+	return dist*VOODOO_ITM_RANGE_F;
 }
 
 //read the wish 2da
@@ -2488,7 +2528,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	int *selects;
 	int i,j;
 
-	//FIXME: find out what the original really used the picks parameter for
+	// in the original, picks was at first the number of wish choices to set up,
+	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
 	AutoTable tm("wish");
@@ -2499,6 +2540,13 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 	selects = (int *) malloc(picks*sizeof(int));
 	count = tm->GetRowCount();
+	// handle the unused SetupWishObject, which passes WIS instead of a column
+	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
+	int cols = tm->GetColumnCount();
+	if (column > cols) {
+		column = (column-1)/6;
+		if (column == 4) column = RAND(0, 3);
+	}
 
 	for(i=0;i<99;i++) {
 		snprintf(varname,32, "wishpower%02d", i);
@@ -2873,6 +2921,38 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
+}
+
+void AddXPCore(Action *parameters, bool divide)
+{
+	AutoTable xptable;
+
+	if (core->HasFeature(GF_HAS_EXPTABLE)) {
+		xptable.load("exptable");
+	} else {
+		xptable.load("xplist");
+	}
+
+	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
+		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
+	}
+	if (!xptable) {
+		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");
+		return;
+	}
+	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0"); // level is unused
+
+	if (divide) {
+		// force divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue), SX_DIVIDE);
+	} else if (xpvalue[0] == 'P' && xpvalue[1] == '_') {
+		// divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE);
+	} else {
+		// give xp to everyone
+		core->GetGame()->ShareXP(atoi(xpvalue), 0);
+	}
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 }

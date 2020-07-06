@@ -193,7 +193,7 @@ public:
 	/** removes a spell from memory/book */
 	bool RemoveSpell(CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
-	void RemoveSpell(const ieResRef ResRef);
+	void RemoveSpell(const ieResRef ResRef, bool onlyknown=false);
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 

@@ -222,6 +222,9 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 
 // just returns the integer part of the log
 // perfect for deducing kit values, since they are bitfields and we don't care about any noise
+
+namespace GemRB {
+// FIXME: delete this when we switch to c++11
 static int log2(int value)
 {
 	int pow = -1;
@@ -230,6 +233,8 @@ static int log2(int value)
 		pow++;
 	}
 	return pow;
+}
+
 }
 
 int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
@@ -247,7 +252,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 	// still needs to happen first or the laxer check below can misclassify
 	// first translate the actual kit to a column index to make them comparable
 	// luckily they are in order
-	int kit2 = log2(kit/0x8000); // 0x8000 is the first cleric kit
+	int kit2 = GemRB::log2(kit/0x8000); // 0x8000 is the first cleric kit
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
@@ -346,7 +351,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		}
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
-		kit = log2(kit/0x8000); // 0x8000 is the first cleric kit
+		kit = GemRB::log2(kit/0x8000); // 0x8000 is the first cleric kit
 		ret = domlist[index].FindSpell(level, kit);
 		if (ret) {
 			return ret;
@@ -360,7 +365,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 			break;
 		}
 		// translate the actual kit to a column index to make them comparable
-		kit = log2(kit/0x40); // 0x40 is the first mage kit
+		kit = GemRB::log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
 		ret = maglist[index].FindSpell(level, kit);
 		if ( ret) {
@@ -393,15 +398,6 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 	}
 
 	error("CREImporter", "Doing extra mage spell lookups!");
-	// FIXME: is this really needed? reachable only if wizard index was too high
-	kit = log2(kit/0x40); // 0x40 is the first mage kit
-	int i;
-	for(i=0;i<magcount;i++) {
-		if (maglist[i].Equals(*ret)) {
-			return maglist[i].FindSpell(level, kit);
-		}
-	}
-	return NULL;
 }
 
 static void ReleaseMemoryCRE()
@@ -1147,7 +1143,7 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -1270,8 +1266,6 @@ void CREImporter::GetActorPST(Actor *act)
 void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	ieWord *indices = (ieWord *) calloc(Inventory_Size, sizeof(ieWord));
-	//CREItem** items;
-	unsigned int i,j,k;
 	ieWordSigned eqslot;
 	ieWord eqheader;
 
@@ -1279,13 +1273,14 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
 
 	//first read the indices
-	for (i = 0;i<Inventory_Size; i++) {
+	for (unsigned int i = 0; i < Inventory_Size; i++) {
 		str->ReadWord(indices+i);
 	}
 	//this word contains the equipping info (which slot is selected)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
+	// -1 is one of the plain inventory slots, but creatures like belhif.cre have it set as the equipped slot; see below
 	//the equipping effects are delayed until the actor gets an area
 	str->ReadWordSigned(&eqslot);
 	//the equipped slot's selected ability is stored here
@@ -1294,7 +1289,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
-	for (i = 0;i<Inventory_Size;) {
+	for (unsigned int i = 0; i < Inventory_Size;) {
 		//the index was intentionally increased here, the fist slot isn't saved
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
@@ -1315,6 +1310,13 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 
+	// now that we have all items, check if we need to jump through hoops to get a proper equipped slot
+	// move to fx_summon_creature2 if it turns out something else relies on having nothing equipped
+	if (eqslot == -1) {
+		act->inventory.SetEquipped(0, eqheader); // just reset Equipped, so EquipBestWeapon does its job
+		act->inventory.EquipBestWeapon(EQUIP_MELEE);
+	}
+
 	free (indices);
 
 	// Reading spellbook
@@ -1322,20 +1324,20 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREMemorizedSpell *) );
 
 	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < KnownSpellsCount; i++) {
+	for (unsigned int i = 0; i < KnownSpellsCount; i++) {
 		known_spells[i]=GetKnownSpell();
 	}
 
 	str->Seek( MemorizedSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < MemorizedSpellsCount; i++) {
+	for (unsigned int i = 0; i < MemorizedSpellsCount; i++) {
 		memorized_spells[i]=GetMemorizedSpell();
 	}
 
 	str->Seek( SpellMemorizationOffset+CREOffset, GEM_STREAM_START );
-	for (i = 0; i < SpellMemorizationCount; i++) {
+	for (unsigned int i = 0; i < SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(act);
 
-		j=KnownSpellsCount;
+		unsigned int j = KnownSpellsCount;
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
@@ -1348,7 +1350,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			}
 		}
 		for (j = 0; j < MemorizedCount; j++) {
-			k = MemorizedIndex+j;
+			unsigned int k = MemorizedIndex + j;
 			assert(k < MemorizedSpellsCount);
 			if (memorized_spells[k]) {
 				sm->memorized_spells.push_back( memorized_spells[k]);
@@ -1359,7 +1361,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 
-	i=KnownSpellsCount;
+	unsigned int i = KnownSpellsCount;
 	while(i--) {
 		if (known_spells[i]) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
@@ -1487,7 +1489,7 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
 	act->BaseStats[IE_TRACKING]=tmpByte;
-	for (int i=0;i<100;i++) {
+	for (int i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	return 0;
@@ -1581,7 +1583,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -1818,8 +1820,8 @@ void CREImporter::GetActorIWD2(Actor *act)
 	for (i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
+	ReadScript( act, SCR_SPECIFICS);
 	ReadScript( act, SCR_AREA);
-	ReadScript( act, SCR_RESERVED);
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->ReadDword( &act->BaseStats[IE_FEATS1]);
 	str->ReadDword( &act->BaseStats[IE_FEATS2]);
@@ -2119,7 +2121,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (i=0;i<100;i++) {
+	for (i=0; i<VCONST_COUNT; i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -2671,7 +2673,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 32);
-		for (i=0;i<100;i++) {
+		for (i=0; i<VCONST_COUNT; i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
 		tmpByte = actor->BaseStats[IE_LEVEL];
@@ -2946,7 +2948,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
-			for (unsigned int k=0;k<count;k++) {
+			for (int k=count-1;k>=0;k--) {
 				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);

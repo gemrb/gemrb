@@ -155,6 +155,7 @@ namespace GemRB {
 #define APF_INVERT_TARGET 2048
 //tiled AoE animation
 #define APF_TILED 4096
+#define APF_PLAYONCE 8192
 
 struct ProjectileExtension
 {
@@ -223,6 +224,7 @@ public:
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
+	unsigned int Range;
 	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
@@ -315,7 +317,7 @@ public:
 
 	void SetIdentifiers(const char *name, ieWord type);
 
-	void SetEffectsCopy(EffectQueue *eq);
+	void SetEffectsCopy(EffectQueue *eq, Point &source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
@@ -386,6 +388,7 @@ private:
 	int AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
 	void LineTarget();      //line projectiles (walls, scorchers)
+	void LineTarget(PathNode* beg, unsigned int depth);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall

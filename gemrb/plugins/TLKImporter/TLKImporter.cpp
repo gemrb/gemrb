@@ -56,7 +56,7 @@ TLKImporter::TLKImporter(void)
 		charname=0;
 	}
 	str = NULL;
-	override = NULL;
+	OverrideTLK = NULL;
 	StrRefCount = Offset = Language = 0;
 
 	AutoTable tm("gender");
@@ -93,18 +93,18 @@ TLKImporter::~TLKImporter(void)
 
 void TLKImporter::CloseAux()
 {
-	if (override) {
-		delete override;
+	if (OverrideTLK) {
+		delete OverrideTLK;
 	}
-	override = NULL;
+	OverrideTLK = NULL;
 }
 
 void TLKImporter::OpenAux()
 {
 	CloseAux();
-	override = new CTlkOverride();
-	if (override) {
-		if (!override->Init()) {
+	OverrideTLK = new CTlkOverride();
+	if (OverrideTLK) {
+		if (!OverrideTLK->Init()) {
 			CloseAux();
 			Log(ERROR, "TlkImporter", "Cannot open tlk override!");
 		}
@@ -127,6 +127,10 @@ bool TLKImporter::Open(DataStream* stream)
 	str->ReadWord( &Language ); // English is 0
 	str->ReadDword( &StrRefCount );
 	str->ReadDword( &Offset );
+	if (StrRefCount >= STRREF_START) {
+		Log(ERROR, "TLKImporter", "Too many strings (%d), increase STRREF_START.", StrRefCount);
+		return false;
+	}
 	return true;
 }
 
@@ -195,7 +199,7 @@ int TLKImporter::ClassStrRef(int slot)
 
 	act=GetActorFromSlot(slot);
 	if (act) {
-		clss=act->GetStat(IE_CLASS);
+		clss = act->GetActiveClass();
 	} else {
 		clss=0;
 	}
@@ -406,12 +410,12 @@ bool TLKImporter::GetNewStringLength(char* string, int& Length)
 
 ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 {
-	if (!override) {
+	if (!OverrideTLK) {
 		Log(ERROR, "TLKImporter", "Custom string is not supported by this game format.");
 		return 0xffffffff;
 	}
 
-	return override->UpdateString(strref, newvalue);
+	return OverrideTLK->UpdateString(strref, newvalue);
 }
 
 String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
@@ -435,8 +439,8 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 
 	if((strref>=STRREF_START) || (strref>=BIO_START && strref<=BIO_END) ) {
 empty:
-		if (override) {
-			string = override->ResolveAuxString(strref, Length);
+		if (OverrideTLK) {
+			string = OverrideTLK->ResolveAuxString(strref, Length);
 		} else {
 			string = (char *) malloc(1);
 			Length = 0;
@@ -452,6 +456,7 @@ empty:
 		}
 		str->ReadWord( &type );
 		str->ReadResRef( SoundResRef );
+		// volume and pitch variance fields are known to be unused at minimum in bg1
 		str->ReadDword( &Volume );
 		str->ReadDword( &Pitch );
 		str->ReadDword( &StrOffset );
@@ -494,7 +499,7 @@ empty:
 			int ypos = 0;
 			unsigned int flag = GEM_SND_RELATIVE | (flags&(GEM_SND_SPEECH|GEM_SND_QUEUE));
 			//IE_STR_SPEECH will stop the previous sound source
-			core->GetAudioDrv()->Play( SoundResRef, xpos, ypos, flag);
+			core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, xpos, ypos, flag);
 		}
 	}
 	if (flags & IE_STR_STRREFON) {

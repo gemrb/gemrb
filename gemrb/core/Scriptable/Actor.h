@@ -77,6 +77,14 @@ namespace GemRB {
 #define MOD_ADDITIVE  0
 #define MOD_ABSOLUTE  1
 #define MOD_PERCENT   2
+#define MOD_MULTIPLICATIVE 3
+#define MOD_DIVISIVE  4
+#define MOD_MODULUS   5
+#define MOD_LOGAND    6
+#define MOD_LOGOR     7
+#define MOD_BITAND    8
+#define MOD_BITOR     9
+#define MOD_INVERSE   10
 
 //'do not jump' flags
 #define DNJ_FIT        1
@@ -105,7 +113,8 @@ namespace GemRB {
 #define DIFF_NORMAL        2
 #define DIFF_CORE          3
 #define DIFF_HARD          4
-#define DIFF_NIGHTMARE     5
+#define DIFF_INSANE        5
+#define DIFF_NIGHTMARE     6 // rather check against the ini var where needed
 
 /** flags for GetActor */
 //default action
@@ -244,6 +253,7 @@ struct WeaponInfo {
 	int slot;
 	ieDword enchantment;
 	unsigned int range;
+	ieDword itemtype;
 	ieDword itemflags;
 	ieDword prof;
 	bool backstabbing;
@@ -252,13 +262,32 @@ struct WeaponInfo {
 	int critrange; // the lower value of the critical range (eg. 19 in 19-20/x3)
 	int profdmgbon;
 	int launcherdmgbon;
-	WeaponInfo(): slot(0), enchantment(0), range(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
+	WeaponInfo(): slot(0), enchantment(0), range(0), itemtype(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
 };
 
 struct BABTable {
 	ieDword level;
 	int bab; // basic attack bonus
 	int apr; // attacks per round
+};
+
+struct ModalStatesStruct {
+	ieResRef spell;
+	char action[16];
+	unsigned int entering_str;
+	unsigned int leaving_str;
+	unsigned int failed_str;
+	unsigned int aoe_spell;
+	unsigned int repeat_msg;
+};
+
+struct ModalState {
+	ieDword State;
+	ieResRef Spell;             //apply this spell once per round
+	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
+	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
+	ieDword LastApplyTime;      //last time the modal effect used
+	bool FirstApply;            //running for the first time?
 };
 
 extern void ReleaseMemoryActor();
@@ -272,8 +301,6 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef ModalSpell;             //apply this spell once per round
-	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
 	ieResRef BackstabResRef;         //apply on successful backstab
 
@@ -304,10 +331,10 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-	ieDword ModalState;
 	int PathTries; //the # of previous tries to pick up a new walkpath
 	ArmorClass AC;
 	ToHitStats ToHit;
+	ModalState Modal;
 public:
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
@@ -333,8 +360,6 @@ public:
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
-	ieDword modalTime;           //last time the modal effect used
-	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword nextComment;         //do something random (area comment, interaction)
 	ieDword nextBored;           //do something when bored
@@ -347,12 +372,18 @@ public:
 	PolymorphCache *polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods;
 	ieByte DifficultyMargin;
+	ieDword *spellStates;
+	// set after modifying maxhp, adjusts hp next tick
+	int checkHP;
+	// to determine that a tick has passed
+	ieDword checkHPTime;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	CharAnimations *shadowAnimations;
 	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
+	ieByte weapSlotCount;
 	// true when command has been played after select
 	bool playedCommandSound;
 	//true every second round of attack
@@ -369,10 +400,13 @@ private:
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
+	ieDword LastFatigueCheck;
+	unsigned int remainingTalkSoundTime;
+	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint);
+				unsigned char Face, const Color& tint, bool useShadowPalette = false);
 
 	/** fixes the palette */
 	void SetupColors();
@@ -404,6 +438,9 @@ private:
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
+	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
+	char GetArmorCode() const;
+	const char* GetArmorSound() const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -438,7 +475,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags, Scriptable *checker = NULL) const;
+	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
 	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
 	/** Returns a Stat value */
@@ -518,8 +555,10 @@ public:
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
 	void PlaySelectionSound();
+	/* play a roar if the setting isn't disabled */
+	bool PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
-	void CommandActor(Action* action);
+	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
 	bool OverrideActions();
 	/** handle idle actions, that shouldn't mess with scripting */
@@ -535,9 +574,9 @@ public:
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count, bool queue=false) const;
+	bool VerbalConstant(int start, int count=1, int flags=0) const;
 	/* display string or verbal constant depending on what is available */
-	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const;
+	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
@@ -556,7 +595,7 @@ public:
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
-	bool CheckSilenced();
+	bool CheckSilenced() const;
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
@@ -566,7 +605,8 @@ public:
 	/* play a random footstep sound */
 	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
-	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix);
+	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
+	void PlaySwingSound(WeaponInfo &wi) const;
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
@@ -595,7 +635,7 @@ public:
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */
-	void Die(Scriptable *killer);
+	void Die(Scriptable *killer, bool grantXP = true);
 	/* debug function */
 	void GetNextAnimation();
 	/* debug function */
@@ -676,8 +716,9 @@ public:
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
-	void GetSoundFromINI(ieResRef Sound, unsigned int index) const;
-	void GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFromINI(ieResRef Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
@@ -767,10 +808,10 @@ public:
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
-	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
+	void SetUsedWeapon(const char (&AnimationType)[2], ieWord *MeleeAnimation,
 		int WeaponType=-1);
-	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
-	void SetUsedHelmet(const char *AnimationType);
+	void SetUsedShield(const char (&AnimationType)[2], int WeaponType=-1);
+	void SetUsedHelmet(const char (&AnimationType)[2]);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;
@@ -798,6 +839,8 @@ public:
 	void ApplyExtraSettings();
 	/* Set up all the missing stats on load time, chargen, or after level up */
 	void CreateDerivedStats();
+	/* Resets the internal multiclass bitfield */
+	void ResetMC();
 	/* Checks if the actor is multiclassed (excluding dualclassed actors)) */
 	bool IsMultiClassed() const;
 	/* Checks if the actor is dualclassed */
@@ -878,10 +921,11 @@ public:
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool IsDead() const;
-	bool IsInvisibleTo(Scriptable *checker) const;
+	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(char *command);
 	/* shows hp/maxhp as overhead text */
+	bool HasVisibleHP() const;
 	void DisplayHeadHPRatio();
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
@@ -894,12 +938,17 @@ public:
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	ieDword GetLastRested() { return TicksLastRested; }
-	void IncreaseLastRested(int inc) { TicksLastRested += inc; }
+	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
+	ieDword GetActiveClass() const;
+	bool IsKitInactive() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
 	unsigned int GetAdjustedTime(unsigned int time) const;
+	void SetAnimatedTalking(unsigned int);
+	bool HasPlayerClass() const;
+	void PlayArmorSound() const;
 };
 }
 

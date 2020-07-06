@@ -47,6 +47,7 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 BonusSpellTable = None
 HateRaceTable = None
+PauseState = None
 
 if not BonusSpellTable:
 	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
@@ -66,9 +67,17 @@ def Exportable(pc):
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
-	global BonusSpellTable, HateRaceTable
+	global BonusSpellTable, HateRaceTable, PauseState
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
+
+		GUIRECCommon.CloseSubSubCustomizeWindow ()
+		GUIRECCommon.CloseSubCustomizeWindow ()
+		GUIRECCommon.CloseCustomizeWindow ()
+		GUIRECCommon.ExportCancelPress()
+		GUIRECCommon.CloseBiographyWindow ()
+		CloseHelpWindow ()
+
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:
@@ -85,7 +94,11 @@ def OpenRecordsWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
+		GemRB.GamePause (PauseState, 3)
 		return
+
+	PauseState = GemRB.GamePause (3, 1)
+	GemRB.GamePause (1, 3)
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
@@ -798,7 +811,7 @@ def DisplayWeapons (pc):
 			RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(5*failure["Shield"])+"%", 0))
 		if arcana:
 			AddIndent()
-			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(arcana)+"%", 0))
+			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(-arcana)+"%", 0))
 		# Other, just a guess to show the remainder
 		if other:
 			AddIndent()
@@ -896,23 +909,7 @@ def DisplayMisc (pc):
 	#most powerful vanquished, time spent, xp and kills
 	RecordsTextArea.Append (DelimitedStrRefs (11947, stat['BestKilledName'], 0))
 
-	days, hours = GUICommon.SetCurrentDateTokens (stat)
-	# iwd2 is special here
-	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
-	if days == 1:
-		time = GemRB.GetString (10698)
-	else:
-		time = GemRB.GetString (10697)
-	time += " " + GemRB.GetString (10699) + " "
-	if days == 0:
-		# only display hours
-		time = ""
-
-	if hours == 1:
-		time += GemRB.GetString (10701)
-	else:
-		time += GemRB.GetString (10700)
-
+	time = GUICommon.SetCurrentDateTokens (stat)
 	RecordsTextArea.Append (DelimitedText (11948, time, 0))
 
 	# Experience Value of Kills
@@ -1243,9 +1240,9 @@ def OpenLevelUpWindow ():
 
 		# disable monks/paladins due to order restrictions?
 		specflag = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
-		if specflag&8 and i == 7: # SPECF_MONKOFF
+		if specflag&SPECF_MONKOFF and i == 7:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-		elif specflag&4 and i == 8: # SPECF_PALADINOFF
+		elif specflag&SPECF_PALADINOFF and i == 8:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1303,6 +1300,57 @@ def LUClassPress ():
 		level = GemRB.GetPlayerStat (pc, Classes[i])
 		Label.SetText (str(level + LevelDiff))
 
+# if the pc is a paladin or a monk, multiclassing is limited;
+# only their school's favoured class is fair game, otherwise
+# they lose access to further paladin/monk progression
+def HandleSpecFlagExclusion(pc, lucls, lukit):
+	# RESEARCH: it's unclear what happened if you multiclassed into a (monk) from a bad class
+	monkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
+	paladinLevel = GemRB.GetPlayerStat (pc, IE_LEVELPALADIN)
+	if monkLevel == 0 and paladinLevel == 0 and lucls != 6 and lucls != 7:
+		return
+
+	# TODO: unhardcode this kit->kit/class dict
+	# paladins: ilmater, helm->fighter, mystra->wizard
+	# monks: old->rogue, broken->ilmater, dark moon->sorcerer
+	orderFavs = { 1: 0x8000, 2: 5, 4: 11, 8: 9, 0x10: 0x8000, 0x20: 10 }
+	kit = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+
+	# the most common level-up paths - same class
+	if GemRB.GetPlayerStat (pc, IDLUCommon.Levels[lucls-1]) > 0:
+		if lukit == 0:
+			# kitless class, matching current one(s)
+			# not going to happen with vanilla data
+			return
+		else:
+			# picked kit, matching current one(s)
+			if lukit&kit:
+				return
+			else:
+				raise RuntimeError, "Picked second or non-existing kit (%d) of same class (%d)!?" %(lukit, lucls)
+	else: # picked a new class
+		kitBits = [((kit >> x) & 1)<<x  for x in range(31, -1, -1)]
+		kitBits = filter(lambda v: v > 0, kitBits)
+		# check all the current kits - kit bits
+		for k in kitBits:
+			if k not in orderFavs:
+				continue
+			# picked a new kitless class
+			if lukit == 0 and orderFavs[k] == lucls:
+				return
+			# picked a new kit
+			if lukit > 0 and orderFavs[k] == lukit:
+				return
+
+	# only bad combinations remain
+	# disable further level-ups in the base class
+	specFlags = GemRB.GetPlayerStat (pc, IE_SPECFLAGS)
+	if monkLevel:
+		specFlags |= SPECF_MONKOFF
+	if paladinLevel:
+		specFlags |= SPECF_PALADINOFF
+	GemRB.SetPlayerStat (pc, IE_SPECFLAGS, specFlags)
+
 def OpenLUKitWindow ():
 	global LUKitWindow
 
@@ -1317,6 +1365,11 @@ def OpenLUKitWindow ():
 	hasKits = CommonTables.Classes.FindValue ("CLASS", LUClassID)
 	kitIndex = GUICommonWindows.GetKitIndex (pc, LUClass)
 	if hasKits == -1 or kitIndex > 0:
+		kitName = CommonTables.Classes.GetRowName (kitIndex)
+		kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
+		if hasKits == -1:
+			kitID = 0
+		HandleSpecFlagExclusion(pc, LUClassID, kitID)
 		LUNextPress ()
 		return
 
@@ -1384,6 +1437,8 @@ def LUKitPress ():
 	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
 	pc = GemRB.GameGetSelectedPCSingle ()
+	HandleSpecFlagExclusion(pc, LUClassID, kitID)
+
 	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
 	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|kitID)
 

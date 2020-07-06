@@ -125,13 +125,14 @@ public:
 	ieDword   LastLeft;   //trigger
 	ieDword   LastJoined; //trigger
 	ieDword   Interact[MAX_INTERACT];
-	ieWord    Happiness;
+	ieWordSigned Happiness;
 	std::list<int> ClassLevels;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
 	PCStatsStruct(std::list<int> levels);
+	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void Init(bool all=true);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);

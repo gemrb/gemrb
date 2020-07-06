@@ -107,7 +107,7 @@ def RollPress():
 	return
 
 def OnLoad():
-	OpenAbilitiesWindow (1, 16)
+	OpenAbilitiesWindow (1, GemRB.GetVar ("DefaultCharGenPointsPool"))
 
 def OpenAbilitiesWindow(chargen, points):
 	global AbilityWindow, TextAreaControl, DoneButton

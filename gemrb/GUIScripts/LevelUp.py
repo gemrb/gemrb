@@ -97,22 +97,6 @@ def OpenLevelUpWindow():
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
 
-	if GameCheck.IsBG1() or GameCheck.IsIWD1():
-		# armorclass
-		Label = LevelUpWindow.GetControl (0x10000057)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
-		Label.SetTooltip (17183)
-
-		# hp now
-		Label = LevelUpWindow.GetControl (0x10000058)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
-		Label.SetTooltip (17184)
-
-		# hp max
-		Label = LevelUpWindow.GetControl (0x10000059)
-		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
-		Label.SetTooltip (17378)
-
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	OldThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
@@ -159,7 +143,7 @@ def OpenLevelUpWindow():
 	if not IsMulti:
 		# check if we're dual classed
 		IsDual = GUICommon.IsDualClassed (pc, 1)
-		Classes = [IsDual[2], IsDual[1]] # make sure the new class is first
+		Classes = []
 
 		# either dual or single only care about 1 class
 		NumClasses = 1
@@ -167,12 +151,15 @@ def OpenLevelUpWindow():
 		# not dual, must be single
 		if IsDual[0] == 0:
 			Classes = [Class]
-		else: # make sure Classes[1] is a class, not a kit
-			if IsDual[0] == 1: # kit
-				Classes[1] = CommonTables.KitList.GetValue (IsDual[1], 7)
-			else: # class
-				TmpClassName = GUICommon.GetClassRowName (Classes[1], "index")
-				Classes[1] = CommonTables.Classes.GetValue (TmpClassName, "ID")
+		else: # resolve kits to classes (new class goes first)
+			if IsDual[0] == 3: # 1st kit
+				Classes.append (CommonTables.KitList.GetValue (IsDual[2], 7))
+			else: # 1st class
+				Classes.append (CommonTables.Classes.GetValue (IsDual[2], 5))
+			if IsDual[0] == 1: # 2nd kit
+				Classes.append (CommonTables.KitList.GetValue (IsDual[1], 7))
+			else: # 2nd class
+				Classes.append (CommonTables.Classes.GetValue (IsDual[1], 5))
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
@@ -189,8 +176,6 @@ def OpenLevelUpWindow():
 		DualSwap = GUICommon.IsDualSwap (pc)
 		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
-		Classes[0] = CommonTables.Classes.GetValue (ClassName, "ID")
-		# Class[1] is taken care of above
 
 		# we need the old level as well
 		if DualSwap:
@@ -306,6 +291,23 @@ def OpenLevelUpWindow():
 	LUCommon.SetupLore (pc, LevelDiff)
 	LUCommon.SetupHP (pc, Level, LevelDiff)
 
+	# we set up these labels so late, so they can show the new HP
+	if GameCheck.IsBG1() or GameCheck.IsIWD1():
+		# armorclass
+		Label = LevelUpWindow.GetControl (0x10000057)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
+		Label.SetTooltip (17183)
+
+		# hp now
+		Label = LevelUpWindow.GetControl (0x10000058)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+		Label.SetTooltip (17184)
+
+		# hp max
+		Label = LevelUpWindow.GetControl (0x10000059)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+		Label.SetTooltip (17378)
+
 	# use total levels for HLAs
 	HLACount = 0
 	if GameCheck.HasTOB(): # make sure SoA doesn't try to get it
@@ -379,7 +381,7 @@ def OpenLevelUpWindow():
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
-	for c in range(len(Classes)):
+	for c in range(NumClasses):
 		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
 			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
 
@@ -458,13 +460,14 @@ def GetLevelUpNews():
 			BackstabMult = BackstabTable.GetValue (0, Level[i])
 
 		# lay on hands
-		if (CommonTables.ClassSkills.GetValue (TmpClassName, "LAYHANDS") != "*"):
+		LOHTable = CommonTables.ClassSkills.GetValue (TmpClassName, "LAYHANDS")
+		if LOHTable != "*":
 			# inquisitors and undead hunters don't get lay on hands out the chute, whereas cavaliers
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
 			if (Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
-				LOHTable = GemRB.LoadTable ("layhands")
+				LOHTable = GemRB.LoadTable (LOHTable)
 				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
 	# saving throws
@@ -661,6 +664,11 @@ def ReactivateBaseClass ():
 	# we construct the Classes array, so that the active class is always first and the base is second
 	ClassName = GUICommon.GetClassRowName (Classes[1], "class")
 	KitIndex = GUICommon.GetKitIndex (pc)
+
+	# force reinitialization of the actionbar by forcing the PCF to run
+	ClassID = GemRB.GetPlayerStat (pc, IE_CLASS)
+	GemRB.SetPlayerStat (pc, IE_CLASS, 0, 0)
+	GemRB.SetPlayerStat (pc, IE_CLASS, ClassID)
 
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTable ("weapprof")

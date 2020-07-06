@@ -186,7 +186,20 @@ public:
 		MaxStackAmount=0;
 		Flags = 0;
 		Expired = 0;
-	}
+	};
+	CREItem(STOItem *item)
+	{
+		CopySTOItem(item);
+	};
+	void CopySTOItem(STOItem *item)
+	{
+		CopyResRef(ItemResRef, item->ItemResRef);
+		Expired = 0; // PurchasedAmount in STOItem
+		memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
+		Flags = item->Flags;
+		Weight = item->Weight;
+		MaxStackAmount = item->MaxStackAmount;
+	};
 };
 
 /**
@@ -252,7 +265,7 @@ public:
 	** more slots. If slot == -3 then finds the first empty inventory slot
 	** Returns 2 if completely successful, 1 if partially, 0 else.
 	** slottype is an optional filter for searching eligible slots */
-	int AddSlotItem(CREItem* item, int slot, int slottype=-1);
+	int AddSlotItem(CREItem* item, int slot, int slottype = -1, bool ranged = false);
 	/** tries to equip all inventory items in a given slot */
 	void TryEquipAll(int slot);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
@@ -275,7 +288,7 @@ public:
 	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc);
-	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header);
+	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
 	int GetEquipped() const;
 	int GetEquippedHeader() const;
 	ITMExtHeader *GetEquippedExtHeader(int header=0) const;
@@ -331,7 +344,7 @@ public:
 	/** returns true if a two handed weapon is in slot */
 	inline bool TwoHandedInSlot(int slot) const;
 	/** returns the strref for the reason why the item cannot be equipped */
-	int WhyCantEquip(int slot, int twohanded) const;
+	int WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
 	/** returns a slot that has a stealable item */
 	int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */

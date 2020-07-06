@@ -37,8 +37,6 @@
 
 using namespace GemRB;
 
-static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
-
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
 
@@ -95,7 +93,6 @@ static Trigger *Enemy = NULL;
 #define ES_RAPIDSHOT    7
 
 static int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* Owner, Actor* target, Effect* fx);//0
-static int fx_damage_bonus_modifier (Scriptable* Owner, Actor* target, Effect* fx);//49
 static int fx_draw_upon_holy_might (Scriptable* Owner, Actor* target, Effect* fx);//84 (iwd2)
 static int fx_ironskins (Scriptable* Owner, Actor* target, Effect* fx);//da (iwd2)
 static int fx_fade_rgb (Scriptable* Owner, Actor* target, Effect* fx);//e8
@@ -109,7 +106,7 @@ static int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); //ee
 static int fx_slow_poison (Scriptable* Owner, Actor* target, Effect* fx); //ef
 static int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx); //f0
 static int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx); //f1
-// int fx_overlay f2 (same as PST)
+static int fx_overlay_iwd (Scriptable* Owner, Actor* target, Effect* fx); //f2 (iwd1)
 static int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx);//f3
 static int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx); //f4
 static int fx_curse (Scriptable* Owner, Actor* target, Effect* fx); //f5
@@ -247,7 +244,6 @@ static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectDesc effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1 }, //0
-	{ "DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1 },//84 (iwd2)
 	{ "IronSkins", fx_ironskins, 0, -1 }, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, 0, -1 }, //e8
@@ -260,6 +256,7 @@ static EffectDesc effectnames[] = {
 	{ "SlowPoison", fx_slow_poison, 0, -1 }, //ef
 	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1 }, //f0
 	{ "VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1 }, //f1
+	{ "Overlay2", fx_overlay_iwd, 0, -1 }, //f2
 	{ "AnimateDead", fx_animate_dead, 0, -1 }, //f3
 	{ "Prayer2", fx_prayer, 0, -1 }, //f4
 	{ "Curse2", fx_curse, 0, -1 }, //f5
@@ -402,6 +399,8 @@ static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //4
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
+static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
+static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -694,35 +693,6 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 	}
 
 	return FX_PERMANENT;
-}
-
-// 0x49 DamageBonusModifier
-// iwd/iwd2 supports different damage types, but only flat and percentage boni
-// only the special type of 0 means a flat bonus
-int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if(0) print("fx_damage_bonus_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
-	switch (fx->Parameter2) {
-		case 0:
-			STAT_MOD(IE_DAMAGEBONUS);
-			break;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-			// no stat to save to, so we handle it when dealing damage
-			break;
-		default:
-			return FX_NOT_APPLIED;
-	}
-	return FX_APPLIED;
 }
 
 // 0x84 DrawUponHolyMight
@@ -1392,6 +1362,13 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
@@ -1539,6 +1516,13 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		return FX_NOT_APPLIED;
+	}
+
 	bool enemyally = true;
 	Scriptable *caster = target->GetCurrentArea()->GetActorByGlobalID(fx->CasterID);
 	if (caster && caster->Type==ST_ACTOR) {
@@ -1631,6 +1615,12 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
+		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1792,6 +1782,13 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_soul_eater(%2d): Damage %d", fx->Opcode, fx->Parameter1);
+
+	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
+		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		return FX_NOT_APPLIED;
+	}
+
 	// Soul Eater has no effect on undead, constructs, and elemental creatures,
 	// but this is handled in the spells via fx_resist_spell_and_message
 	int damage = fx->Parameter1;
@@ -2339,7 +2336,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
-	core->GetAudioDrv()->Play(fx->Resource2, target->Pos.x, target->Pos.y);
+	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos.x, target->Pos.y);
 
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
@@ -2570,7 +2567,7 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		fx->Parameter1=1;
 	}
-	//TODO: damage reduction (all types)
+	// damage reduction (all types)
 	STAT_ADD(IE_RESISTFIRE,fx->Parameter1 );
 	STAT_ADD(IE_RESISTCOLD,fx->Parameter1 );
 	STAT_ADD(IE_RESISTELECTRICITY,fx->Parameter1 );
@@ -2580,6 +2577,9 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTCRUSHING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTPIERCING,fx->Parameter1 );
 	STAT_ADD(IE_RESISTMISSILE,fx->Parameter1 );
+	STAT_ADD(IE_RESISTPOISON, fx->Parameter1);
+	STAT_ADD(IE_RESISTMAGICCOLD, fx->Parameter1);
+	STAT_ADD(IE_RESISTMAGICFIRE, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_FAITHARMOR);
 	}
@@ -2802,6 +2802,66 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
+}
+
+// 0xf2 Overlay
+// modelled on fx_visual_effect_iwd2
+int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if(0) print("fx_overlay_iwd(%2d) Type: %d", fx->Opcode, fx->Parameter2);
+	unsigned int type = fx->Parameter2;
+	switch(type) {
+		case 0:
+			STAT_BIT_OR(IE_MINORGLOBE, 1);
+			target->SetOverlay(OV_GLOBE);
+			break;
+		case 1:
+			target->SetOverlay(OV_SHROUD);
+			break;
+		case 2:
+			target->SetOverlay(OV_ANTIMAGIC);
+			break;
+		case 3:
+			target->SetOverlay(OV_RESILIENT);
+			break;
+		case 4:
+			target->SetOverlay(OV_NORMALMISS);
+			break;
+		case 5:
+			target->SetOverlay(OV_CLOAKFEAR);
+			break;
+		case 6:
+			target->SetOverlay(OV_ENTROPY);
+			break;
+		case 7:
+			target->SetOverlay(OV_FIREAURA);
+			break;
+		case 8:
+			target->SetOverlay(OV_FROSTAURA);
+			break;
+		case 9:
+			target->SetOverlay(OV_INSECT);
+			break;
+		case 10:
+			target->SetOverlay(OV_STORMSHELL);
+			break;
+		case 11:
+			target->SetOverlay(OV_LATH1);
+			target->SetOverlay(OV_LATH2);
+			break;
+		case 12:
+			target->SetOverlay(OV_GLATH1);
+			target->SetOverlay(OV_GLATH2);
+			break;
+		case 13:
+			target->SetOverlay(OV_SEVENEYES);
+			target->SetOverlay(OV_SEVENEYES2);
+			break;
+		default:
+			Log(ERROR, "IWDOpcodes", "fx_overlay_iwd called with unknown mode: %d", type);
+			break;
+	}
+	return FX_APPLIED;
 }
 
 //414 ResilientSphere
@@ -3400,6 +3460,7 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->attackcount=fx->Parameter1;
 			target->FaceTarget(enemy);
 			target->LastTarget=target->LastSeen;
+			target->LastTargetPersistent = target->LastSeen;
 			//linger around for more
 			return FX_APPLIED;
 		}

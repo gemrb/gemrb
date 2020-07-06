@@ -241,7 +241,7 @@ IDS
 0xef    SlowPoison
 0xf0    IWDMonsterSummoning
 0xf1	VampiricTouch
-0xf2	Overlay
+0xf2	Overlay2
 0xf3	AnimateDead
 0xf4	Prayer2
 0xf5	Curse2

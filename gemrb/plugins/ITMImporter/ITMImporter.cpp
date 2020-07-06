@@ -282,10 +282,10 @@ Item* ITMImporter::GetItem(Item *s)
 		}
 	}
 
-	// handle iwd1 weapon "peculiarity"
+	// handle iwd1/iwd2 weapon "peculiarity"
 	bool zzWeapon = false;
 	int extraFeatureCount = 0;
-	if (!strnicmp(s->Name, "ZZ", 2) && version == 10) {
+	if (!strnicmp(s->Name, "ZZ", 2) && version != 11) {
 		zzWeapon = true;
 		// reserve space in the effect array
 		extraFeatureCount = 2;
@@ -361,39 +361,37 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 		eh->ProjectileAnimation = 78;
 	}
 
-	unsigned int i; //msvc6.0 can't cope with index variable scope
-
-	for (i = 0; i < 3; i++) {
+	for (unsigned int i = 0; i < 3; i++) {
 		str->ReadWord( &eh->MeleeAnimation[i] );
 	}
-	ieWord tmp;
 
-	i = 0;
+	ieWord tmp;
+	ieDword pq = 0;
 	str->ReadWord( &tmp ); //arrow
-	if (tmp) i|=PROJ_ARROW;
+	if (tmp) pq |= PROJ_ARROW;
 	str->ReadWord( &tmp ); //xbow
-	if (tmp) i|=PROJ_BOLT;
+	if (tmp) pq |= PROJ_BOLT;
 	str->ReadWord( &tmp ); //bullet
-	if (tmp) i|=PROJ_BULLET;
+	if (tmp) pq |= PROJ_BULLET;
 	//this hack is required for Nordom's crossbow in PST
-	if (!i && (eh->AttackType==ITEM_AT_BOW) ) {
-		i|=PROJ_BOLT;
+	if (!pq && (eh->AttackType == ITEM_AT_BOW)) {
+		pq |= PROJ_BOLT;
 	}
 
 	//this hack is required for the practicing arrows in BG1
-	if (!i && (eh->AttackType==ITEM_AT_PROJECTILE) ) {
+	if (!pq && (eh->AttackType == ITEM_AT_PROJECTILE)) {
 		//0->0
 		//1->1
 		//2->2
 		//3->4
-		i|=(1<<ProjectileType)>>1;
+		pq |= (1<<ProjectileType)>>1;
 	}
-	eh->ProjectileQualifier=i;
+	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
 	eh->features = core->GetFeatures(eh->FeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
-	for (i = 0; i < eh->FeatureCount; i++) {
+	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
 		GetFeature(eh->features+i, s);
 	}
 }

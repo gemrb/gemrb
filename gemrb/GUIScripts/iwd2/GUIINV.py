@@ -57,6 +57,19 @@ def OpenInventoryWindow ():
 			if GemRB.IsDraggingItem () == 1:
 				GemRB.DropDraggedItem (pc, -2)
 
+		InventoryCommon.CloseIdentifyItemWindow ()
+		InventoryCommon.CloseAbilitiesItemWindow ()
+		InventoryCommon.CancelColor()
+		if InventoryCommon.ItemInfoWindow:
+			InventoryCommon.ItemInfoWindow.Unload ()
+			InventoryCommon.ItemInfoWindow = None
+		if InventoryCommon.ItemAmountWindow:
+			InventoryCommon.ItemAmountWindow.Unload ()
+			InventoryCommon.ItemAmountWindow = None
+		if InventoryCommon.ErrorWindow:
+			InventoryCommon.ErrortWindow.Unload ()
+			InventoryCommon.ErrortWindow = None
+
 		if InventoryWindow:
 			InventoryWindow.Unload ()
 		if OptionsWindow:
@@ -309,9 +322,9 @@ def RefreshInventoryWindow ():
 		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None) #TODO: implement OpenGroundItemAmountWindow
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
 
-		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, False)

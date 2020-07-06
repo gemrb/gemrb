@@ -29,6 +29,7 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
+from ie_sounds import CHAN_HITS
 from GameCheck import MAX_PARTY_SIZE
 import GameCheck
 import GUICommon
@@ -803,7 +804,6 @@ def ActionQWeaponPressed (which):
 # TODO: implement full weapon set switching instead
 def ActionQWeaponRightPressed (action):
 	"""Selects the used ability of the quick weapon."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
 	UpdateActionsWindow ()
@@ -987,7 +987,7 @@ def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
-	GemRB.PlaySound ("act_07")
+	GemRB.PlaySound ("act_07", CHAN_HITS)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
@@ -1056,7 +1056,6 @@ def ActionQItem5Pressed ():
 
 def ActionQItemRightPressed (action):
 	"""Selects the used ability of the quick item."""
-	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
 	UpdateActionsWindow ()
@@ -1711,7 +1710,7 @@ def UpdateAnimatedPortrait (Window,i):
 	Button.SetAnimation (pic, cycle)
 	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 
-	if hp_max<1:
+	if hp_max < 1 or hp is "?":
 		ratio = 0.0
 	else:
 		ratio = (hp + 0.0) / hp_max
@@ -1720,7 +1719,7 @@ def UpdateAnimatedPortrait (Window,i):
 	r = int (255 * (1.0 - ratio))
 	g = int (255 * ratio)
 
-	ButtonHP.SetText ("%d / %d" %(hp, hp_max))
+	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
 	ButtonHP.SetTextColor (r, g, 0, False)
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)

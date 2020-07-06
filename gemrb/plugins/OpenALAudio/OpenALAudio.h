@@ -118,8 +118,9 @@ public:
 	~OpenALAudioDriver(void);
 	void PrintDeviceList();
 	bool Init(void);
-	Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos,
-					unsigned int flags = 0, unsigned int *length = 0);
+	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+					int XPos, int YPos, unsigned int flags = 0,
+					unsigned int *length = 0);
 	void UpdateVolume(unsigned int flags);
 	bool CanPlay();
 	void ResetMusics();
@@ -132,7 +133,7 @@ public:
 	void GetListenerPos( int &XPos, int &YPos );
 	bool ReleaseStream(int stream, bool HardStop);
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
-					ieWord gain, bool point, bool Ambient );
+					ieWord gain, bool point, int ambientRange);
 	int QueueAmbient(int stream, const char* sound);
 	void SetAmbientStreamVolume(int stream, int volume);
 	void SetAmbientStreamPitch(int stream, int pitch);
@@ -158,7 +159,7 @@ private:
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
-	ALenum GetFormatEnum(int channels, int bits);
+	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
 	bool stayAlive;
 	short* music_memory;

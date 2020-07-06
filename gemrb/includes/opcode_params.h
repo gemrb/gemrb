@@ -71,6 +71,14 @@ namespace GemRB {
 #define COND_TOOKDAMAGE 11
 #define COND_KILLER 12
 #define COND_TIMEOFDAY 13
+#define COND_NEARX 14
+#define COND_STATECHECK 15
+#define COND_DIED_ME 16
+#define COND_DIED_ANY 17
+#define COND_TURNEDBY 18
+#define COND_HP_LT 19
+#define COND_HP_PERCENT_LT 20
+#define COND_SPELLSTATE 21
 
 //resources for the seven eyes effect
 #define EYE_MIND   0
@@ -210,8 +218,6 @@ namespace GemRB {
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179
-
-#define SS_MAX          192
 
 }
 

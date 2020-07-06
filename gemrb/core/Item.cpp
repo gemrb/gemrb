@@ -24,6 +24,7 @@
 #include "Item.h"
 
 #include "win32def.h"
+#include "voodooconst.h"
 
 #include "Interface.h"
 #include "Projectile.h"
@@ -93,6 +94,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		Effect *fx = features+i;
 		fx->InventorySlot = invslot;
 		fx->CasterLevel = ITEM_CASTERLEVEL; //items all have casterlevel 10
+		fx->CasterID = self->GetGlobalID();
 		if (usage >= 0) {
 			//this is not coming from the item header, but from the recharge flags
 			fx->SourceFlags = ext_headers[usage].RechargeFlags;
@@ -239,6 +241,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
 		pro->SetEffects(fx);
 	}
+	pro->Range = eh->Range;
 	return pro;
 }
 

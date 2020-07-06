@@ -140,6 +140,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/SlicedStream.cpp
 	System/String.cpp
 	System/StringBuffer.cpp
+	System/swab.c
 	System/VFS.cpp
 	${PLATFORM_SRC}
 	)

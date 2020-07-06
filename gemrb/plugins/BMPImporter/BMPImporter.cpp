@@ -99,6 +99,7 @@ bool BMPImporter::Open(DataStream* stream)
 		else
 			NumColors = 16;
 		Palette = ( Color * ) malloc( 4 * NumColors );
+		memset(Palette, 0, 4 * NumColors);
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read( &Palette[i].b, 1 );
 			str->Read( &Palette[i].g, 1 );

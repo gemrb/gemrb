@@ -96,7 +96,6 @@ GUIScript *GemRB::gs = NULL;
 static int SpecialItemsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
-static int ItemSoundsCount = -1;
 
 //Check removal/equip/swap of item based on item name and actor's scriptname
 #define CRI_REMOVE 0
@@ -121,8 +120,6 @@ typedef char EventNameType[17];
 #define IS_DROP	0
 #define IS_GET	1
 
-typedef ieResRef ResRefPairs[2];
-
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *SpecialItems = NULL;
@@ -131,7 +128,6 @@ static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
-static ResRefPairs *ItemSounds = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -146,6 +142,8 @@ static bool QuitOnError = false;
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
 static int CHUHeight = 0;
+
+static Store *rhstore = NULL;
 
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
@@ -280,47 +278,6 @@ static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int 
 	return core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "", -1);
 }
 
-static void ReadItemSounds()
-{
-	int table = gamedata->LoadTable( "itemsnd" );
-	if (table<0) {
-		ItemSoundsCount = 0;
-		ItemSounds = NULL;
-		return;
-	}
-	Holder<TableMgr> tab = gamedata->GetTable( table );
-	ItemSoundsCount = tab->GetRowCount();
-	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
-	for (int i = 0; i < ItemSoundsCount; i++) {
-		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
-		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
-	}
-	gamedata->DelTable( table );
-}
-
-static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
-{
-	Sound[0]=0;
-	if (Col>1) {
-		return;
-	}
-
-	if (ItemSoundsCount<0) {
-		ReadItemSounds();
-	}
-
-	if (ID[1]=='A') {
-		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
-		//item animation types
-		ItemType = ItemSoundsCount-4+ID[0]-'1';
-	}
-
-	if (ItemType>=(ieDword) ItemSoundsCount) {
-		return;
-	}
-	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
-}
-
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
 {
 	return actor->StrRefs[Str];
@@ -363,7 +320,11 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
 			return actor->GetSkill(StatID);
 		} else {
-			return actor->GetStat(StatID);
+			if (StatID != IE_HITPOINTS || actor->HasVisibleHP()) {
+				return actor->GetStat(StatID);
+			} else {
+				return 0xdadadada;
+			}
 		}
 	}
 	return actor->GetBase( StatID );
@@ -486,7 +447,7 @@ position value:\n\
   * 1  - bottom\n\
   * 2  - right\n\
   * 3  - top\n\
-  * 4  - bottom (cummulative)\n\
+  * 4  - bottom (cumulative)\n\
 \n\
 **Parameters:** N/A\n\
 \n\
@@ -539,11 +500,11 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 			return PyString_FromString("");
 		}
 		switch(Index&15) {
-		case 0:
+		case 0: // STR_LOADMOS
 			return PyString_FromString( game->LoadMos );
-		case 1:
+		case 1: // STR_AREANAME
 			return PyString_FromString( game->CurrentArea );
-		case 2:
+		case 2: // STR_TEXTSCREEN
 			return PyString_FromString( game->TextScreen );
 		}
 	}
@@ -2464,7 +2425,7 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	core->PlaySound(DS_WINDOW_OPEN);
+	core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
 	Py_RETURN_NONE;
 }
 
@@ -2594,7 +2555,7 @@ PyDoc_STRVAR( GemRB_Window_SetKeyPressEvent__doc,
 \n\
 **Parameters:**\n\
   * callback - Python function that accepts (windowIndex, key, mod) arguments and returns\n\
-	* 					 1 indicating succesful key press consumption or 0 otherwise. \n\
+	* 					 1 indicating successful key press consumption or 0 otherwise. \n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -2862,7 +2823,7 @@ static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Can't unload window!" );
 		}
 
-		core->PlaySound(DS_WINDOW_CLOSE);
+		core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 	}
 	Py_RETURN_NONE;
 }
@@ -4105,7 +4066,7 @@ ignored).\n\
   * ControlID   - the new control will be available via this controlID\n\
   * x,y,w,h     - X position, Y position, Width and Height of the control\n\
   * direction   - travel direction (-1 to ignore)\n\
-  * font        - font uused to display names of map locations\n\
+  * font        - font used to display names of map locations\n\
   * recolor     - recolor map icons (bg1)\n\
 \n\
 **Return value:** N/A\n\
@@ -5275,34 +5236,34 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
+	// NOTE: it seems nobody actually wants to use external palettes!
+	// the only users with external plts are in bg2, but they don't match the bam:
+	//   lvl9 shapeshift targets: troll, golem, fire elemental, illithid, wolfwere
+	// 1pp deliberately breaks palettes for the bam to be used (so the original did support)
+	// TODO: if this turns out to be resiliently true, also remove-revert useCorrupt
+	//ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
 
-	if (im == NULL ) {
+//	if (im == NULL) {
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
-			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s",
-				ResRef);
-			if (type == 0)
-				return NULL;
-			else {
-				Py_RETURN_NONE;
-			}
+			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s", ResRef);
+			Py_RETURN_NONE;
 		}
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			print("Picture == NULL");
-			return NULL;
+			Log(ERROR, "Button_SetPLT", "Paperdoll picture == NULL (%s)", ResRef);
+			Py_RETURN_NONE;
 		}
-	} else {
+/*	} else {
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
-			print("Picture == NULL");
+			Log(ERROR, "Button_SetPLT", "Picture == NULL (%s)", ResRef);
 			return NULL;
 		}
-	}
+	}*/
 
 	if (type == 0)
 		btn->ClearPictureList();
@@ -5534,6 +5495,7 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
+	if (!anim->HasControl()) Py_RETURN_NONE;
 
 	if (Blend) {
 		anim->SetBlend(true);
@@ -5554,7 +5516,7 @@ being visible, selectable, dead, etc.\n\
 \n\
 **Parameters:** \n\
   * PartyID - party ID or global ID of the actor to check\n\
-  * flags   - bits to check agains (see GameControlSetTargetMode)\n\
+  * flags   - bits to check against (see GameControlSetTargetMode)\n\
 \n\
 **See also:** [[guiscript:GameControlSetTargetMode]]\n\
 \n\
@@ -5600,6 +5562,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, str;
 	char Sound[_MAX_PATH];
+	unsigned int channel;
 
 	if (!PyArg_ParseTuple( args, "ii", &globalID, &str )) {
 		return AttributeError( GemRB_VerbalConstant__doc );
@@ -5615,7 +5578,8 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	//get soundset based string constant
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
 		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
-	core->GetAudioDrv()->Play( Sound, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
+	core->GetAudioDrv()->Play(Sound, channel, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
 }
 
@@ -5623,8 +5587,8 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlaySound__doc,
 "===== PlaySound =====\n\
 \n\
-**Prototype:** GemRB.PlaySound (SoundResource[, xpos, ypos, type])\n\
-**Prototype:** GemRB.PlaySound (DefSoundIndex)\n\
+**Prototype:** GemRB.PlaySound (SoundResource[, channel, xpos, ypos, type])\n\
+**Prototype:** GemRB.PlaySound (DefSoundIndex[, channel])\n\
 **Prototype:** GemRB.PlaySound (None)\n\
 \n\
 **Description:** Plays a sound identified by resource reference or \n\
@@ -5633,8 +5597,9 @@ sound as if it was said by that PC (EAX).\n\
 \n\
 **Parameters:**\n\
   * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
-  * x coordinate of the position where the sound should be played (optional)\n\
-  *  y coordinate of the position where the sound should be played (optional)\n\
+  * channel - the name of the channel the sound should be played on (optional, defaults to \"GUI\"\n\
+  * xpos - x coordinate of the position where the sound should be played (optional)\n\
+  * ypos - y coordinate of the position where the sound should be played (optional)\n\
   * type - defaults to 1, use 4 for speeches or other sounds that should stop the previous sounds (optional)\n\
 \n\
 **Return value:** N/A\n\
@@ -5645,20 +5610,29 @@ sound as if it was said by that PC (EAX).\n\
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char *ResRef;
+	char *channel_name = NULL;
 	int xpos = 0;
 	int ypos = 0;
-	unsigned int flags = 1; //GEM_SND_RELATIVE
+	unsigned int flags = GEM_SND_RELATIVE;
+	unsigned int channel = SFX_CHAN_GUI;
 	int index;
 
-	if (PyArg_ParseTuple( args, "i", &index) ) {
-		core->PlaySound(index);
+	if (PyArg_ParseTuple( args, "i|z", &index, &channel_name) ) {
+		if (channel_name != NULL) {
+			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		}
+		core->PlaySound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
-		if (!PyArg_ParseTuple( args, "z|iii", &ResRef, &xpos, &ypos, &flags )) {
+		if (!PyArg_ParseTuple(args, "z|ziii", &ResRef, &channel_name, &xpos, &ypos, &flags)) {
 			return AttributeError( GemRB_PlaySound__doc );
 		}
 
-		core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
+		if (channel_name != NULL) {
+			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		}
+
+		core->GetAudioDrv()->Play(ResRef, channel, xpos, ypos, flags);
 	}
 
 	Py_RETURN_NONE;
@@ -6119,7 +6093,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
 "===== PlayMovie =====\n\
 \n\
-**Prototype:** GemRB.PlayMovie (MOVResRef[, flag])\n\
+**Prototype:** GemRB.PlayMovie (MOVResRef[, flag=0])\n\
 \n\
 **Description:** Plays the named movie. Sets the configuration variable \n\
 MOVResRef to 1. If flag was set to 1 it won't play the movie if the \n\
@@ -6127,7 +6101,9 @@ configuration variable was already set (saved in game ini).\n\
 \n\
 **Parameters:**\n\
   * MOVResRef - a .mve/.bik (or vlc compatible) resource reference.\n\
-  *      flag - don't play movie twice\n\
+  * flag:\n\
+      * 0 - only play the movie if it has never been played before\n\
+      * 1 - always play\n\
 \n\
 **Return value:**\n\
   * 0 - movie played\n\
@@ -6241,6 +6217,7 @@ PyDoc_STRVAR( GemRB_SaveConfig__doc,
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
 {
+	UpdateActorConfig(); // Button doesn't trigger this in its OnMouseUp handler where it calls SetVar
 	return PyBool_FromLong(core->SaveConfig());
 }
 
@@ -7789,10 +7766,10 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "KillsTotalXP", PyInt_FromLong (ps->KillsTotalXP));
 	PyDict_SetItemString(dict, "KillsTotalCount", PyInt_FromLong (ps->KillsTotalCount));
 
-	// FIXME!!!
 	if (ps->FavouriteSpells[0][0]) {
 		int largest = 0;
 
+		// 0 already has the top candidate, but we double check for old saves
 		for (int i = 1; i < 4; ++i) {
 			if (ps->FavouriteSpellsCount[i] > ps->FavouriteSpellsCount[largest]) {
 				largest = i;
@@ -7811,9 +7788,6 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (-1));
 	}
 
-
-
-	// FIXME!!!
 	if (ps->FavouriteWeapons[0][0]) {
 		int largest = 0;
 
@@ -8219,7 +8193,13 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 
 	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = GetCreatureStat( actor, StatID, !BaseStat );
-	return PyInt_FromLong( StatValue );
+
+	// special handling for the hidden hp
+	if ((unsigned)StatValue == 0xdadadada) {
+		return PyString_FromString("?");
+	} else {
+		return PyInt_FromLong(StatValue);
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
@@ -8272,7 +8252,7 @@ default to the class script slot (customisable by players).\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
-  * Index - script index (see scrlevel.2da)\n\
+  * Index - script index (see scrlev.ids)\n\
 \n\
 **Return value:** the player's script (.bcs or .baf resref)\n\
 \n\
@@ -8309,7 +8289,7 @@ script is customisable via the GUI (used if Index is omitted).\n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
   * ScriptName - the script resource\n\
-  * Index      - the script index (see scrlevel.2da)\n\
+  * Index      - the script index (see scrlev.ids)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -8380,7 +8360,7 @@ must be called once after a character was created and before EnterGame().\n\
   * Portrait2 - small portrait\n\
   * clear - clear all the quickslot/spell/item fields?\n\
 \n\
-avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cummulative values to the animationID. \n\
+avprefix.2da is a gemrb specific table. Its first row contains the base animationID used for the actor. Its optional additional rows contain other table resrefs which refine the animationID by different player stats. The first row of these tables contain the stat which affects the animationID. The other rows assign cumulative values to the animationID. \n\
 \n\
 **For example:**\n\
 avprefix.2da\n\
@@ -8445,7 +8425,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->SetOver( false );
-	actor->InitButtons(actor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
+	actor->InitButtons(actor->GetActiveClass(), true); // force re-init of actor's action bar
 
 	//what about multiplayer?
 	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {
@@ -8762,6 +8742,59 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_LoadRighthandStore__doc,
+"===== LoadRighthandStore =====\n\
+\n\
+**Prototype:** GemRB.LoadRighthandStore (StoreResRef)\n\
+\n\
+**Description:** Loads a secondary (right-hand) store.  Used for trading to/from\n\
+containers. The previous right-hand store, if any, is saved to cache.\n\
+\n\
+**Parameters:**\n\
+  * StoreResRef - the store's resource name\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:CloseRighthandStore]], [[guiscript:GetStore]], [[guiscript:GetStoreItem]], [[guiscript:SetPurchasedAmount]]\n\
+"
+);
+
+static PyObject* GemRB_LoadRighthandStore(PyObject * /*self*/, PyObject* args)
+{
+	const char* StoreResRef;
+	if (!PyArg_ParseTuple(args, "s", &StoreResRef)) {
+		return AttributeError(GemRB_LoadRighthandStore__doc);
+	}
+
+	Store *newrhstore = gamedata->GetStore(StoreResRef);
+	if (rhstore && rhstore != newrhstore) {
+		gamedata->SaveStore(rhstore);
+	}
+	rhstore = newrhstore;
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_CloseRighthandStore__doc,
+"===== CloseRighthandStore =====\n\
+\n\
+**Prototype:** GemRB.CloseRighthandStore ()\n\
+\n\
+**Description:** Unloads the current right-hand store and saves it to cache.\n\
+If there was no right-hand store opened, the function does nothing.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:LoadRighthandStore]]\n\
+"
+);
+
+static PyObject* GemRB_CloseRighthandStore(PyObject * /*self*/, PyObject* /*args*/)
+{
+	gamedata->SaveStore(rhstore);
+	rhstore = NULL;
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_LeaveContainer__doc,
 "===== LeaveContainer =====\n\
 \n\
@@ -9023,7 +9056,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -9053,7 +9086,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 				memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
@@ -9068,7 +9101,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 
 	//keep weight up to date
@@ -9079,12 +9112,13 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetStore__doc,
 "===== GetStore =====\n\
 \n\
-**Prototype:** GemRB.GetStore ()\n\
+**Prototype:** GemRB.GetStore ([righthand])\n\
 \n\
 **Description:** Gets the basic header information of the current store and \n\
 returns it in a dictionary.\n\
 \n\
-**Parameters:** N/A\n\
+**Parameters:**\n\
+  * righthand - set to non-zero to query the right-hand store (bag) instead\n\
 \n\
 **Return value:** dictionary\n\
   * 'StoreType'       - numeric (see IESDP)\n\
@@ -9127,11 +9161,17 @@ IE_STORE_CURE,IE_STORE_DONATE,IE_STORE_DRINK,IE_STORE_RENT};
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
-	if (!PyArg_ParseTuple( args, "" )) {
+	int rh = 0;
+	if (!PyArg_ParseTuple( args, "|i", &rh )) {
 		return AttributeError( GemRB_GetStore__doc );
 	}
 
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (rh) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -9208,6 +9248,7 @@ for buying, selling, identifying or stealing. If Type is 1, then this is a \n\
   * type - which inventory to look at?\n\
     * 0 - PC\n\
     * 1 - store\n\
+    * 2 - right-hand store (bag)\n\
 \n\
 **Return value:** bitfield\n\
   * 1 - valid for buy\n\
@@ -9239,7 +9280,12 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	ieDword Flags;
 
 	if (type) {
-		STOItem* si = store->GetItem( Slot, true );
+		STOItem* si = NULL;
+		if (type != 2) {
+			si = store->GetItem( Slot, true );
+		} else if (rhstore) {
+			si = rhstore->GetItem(Slot, true);
+		}
 		if (!si) {
 			return PyInt_FromLong(0);
 		}
@@ -9260,7 +9306,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong(0);
 	}
 
-	ret = store->AcceptableItemType( item->ItemType, Flags, !type );
+	ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
 
 	//don't allow putting a bag into itself
 	if (!strnicmp(ItemResRef, store->Name, sizeof(ieResRef)) ) {
@@ -9274,6 +9320,22 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	//don't allow overstuffing bags
 	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
 		ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_SELL;
+	}
+
+	//buying into bags respects bags' limitations
+	if (rhstore && type != 0) {
+		int accept = rhstore->AcceptableItemType(item->ItemType, Flags, 1);
+		if (!(accept & IE_STORE_SELL)) {
+			ret &= ~IE_STORE_BUY;
+		}
+		//probably won't happen in sane games, but doesn't hurt to check
+		if (!(accept & IE_STORE_BUY)) {
+			ret &= ~IE_STORE_SELL;
+		}
+
+		if (rhstore->Capacity && rhstore->Capacity<=rhstore->GetRealStockSize()) {
+			ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_BUY;
+		}
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
@@ -9329,7 +9391,7 @@ static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
 "===== SetPurchasedAmount =====\n\
 \n\
-**Prototype:** GemRB.SetPurchasedAmount (Index, Amount)\n\
+**Prototype:** GemRB.SetPurchasedAmount (Index, Amount[, type])\n\
 \n\
 **Description:** Sets the amount of purchased items of a type. If it is 0, \n\
 then the item will be deselected from the purchase list. This function \n\
@@ -9338,6 +9400,7 @@ works only with an active store.\n\
 **Parameters:**\n\
   * Index  - the store item's index\n\
   * Amount - a numeric value not less than 0\n\
+  * type - set to non-zero to affect right-hand store (bag)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -9349,12 +9412,18 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 {
 	int Slot, tmp;
 	ieDword amount;
+	int type = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &Slot, &tmp)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &Slot, &tmp, &type)) {
 		return AttributeError( GemRB_SetPurchasedAmount__doc );
 	}
 	amount = (ieDword) tmp;
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (type) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -9378,6 +9447,33 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+// a bunch of duplicated code moved from GemRB_ChangeStoreItem()
+static int SellBetweenStores(STOItem* si, int action, Store *store)
+{
+	CREItem ci(si);
+	ci.Flags &= ~IE_INV_ITEM_SELECTED;
+	if (action == IE_STORE_STEAL) {
+		ci.Flags |= IE_INV_ITEM_STOLEN;
+	}
+
+	while (si->PurchasedAmount) {
+		//store/bag is at full capacity
+		if (store->Capacity && (store->Capacity <= store->GetRealStockSize())) {
+			Log(MESSAGE, "GUIScript", "Store is full.");
+			return ASI_FAILED;
+		}
+		if (si->InfiniteSupply!=-1) {
+			if (!si->AmountInStock) {
+				break;
+			}
+			si->AmountInStock--;
+		}
+		si->PurchasedAmount--;
+		store->AddItem(&ci);
+	}
+	return ASI_SUCCESS;
+}
+
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 "===== ChangeStoreItem =====\n\
 \n\
@@ -9385,6 +9481,8 @@ PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 \n\
 **Description:** Performs a buy, sell, identify or steal action. It has the \n\
 same bit values as IsValidStoreItem. It can also toggle the selection of an item.\n\
+If a right-hand store is currently loaded, it will be acted upon instead of\n\
+the PC's inventory.\n\
 \n\
 **Parameters:**\n\
   * PartyID - the PC's position in the party\n\
@@ -9432,14 +9530,21 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (action == IE_STORE_STEAL) {
 			si->PurchasedAmount=1;
 		}
-		//the amount of items is stored in si->PurchasedAmount
-		//it will adjust AmountInStock/PurchasedAmount
-		actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
+		if (!rhstore) {
+			//the amount of items is stored in si->PurchasedAmount
+			//it will adjust AmountInStock/PurchasedAmount
+			actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
+		} else {
+			SellBetweenStores(si, action, rhstore);
+		}
 		if (si->PurchasedAmount) {
 			//was not able to buy it due to lack of space
 			res = ASI_FAILED;
 			break;
 		}
+		// save the resref, since the pointer may get freed
+		ieResRef itemResRef;
+		CopyResRef(itemResRef, si->ItemResRef);
 		//if no item remained, remove it
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
@@ -9448,17 +9553,43 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			delete si;
 		}
 		//keep encumbrance labels up to date
-		actor->CalculateSpeed(false);
+		if (!rhstore) {
+			actor->CalculateSpeed(false);
+		}
+
+		// play the item's inventory sound
+		ieResRef Sound;
+		Item *item = gamedata->GetItem(itemResRef);
+		if (item) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
+			} else {
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+			}
+			gamedata->FreeItem(item, itemResRef, 0);
+			if (Sound[0]) {
+				// speech means we'll only play the last sound if multiple items were bought
+				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
+			}
+		}
 		res = ASI_SUCCESS;
 		break;
 	}
 	case IE_STORE_ID:
 	{
-		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+		if (!rhstore) {
+			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			si->Flags |= IE_INV_ITEM_IDENTIFIED;
+		} else {
+			STOItem* si = rhstore->GetItem( Slot, true );
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
-		si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -9481,12 +9612,25 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	case IE_STORE_SELECT|IE_STORE_SELL:
 	case IE_STORE_SELECT|IE_STORE_ID:
 	{
-		//this is not removeitem, because the item is just marked
-		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+		if (!rhstore) {
+			//this is not removeitem, because the item is just marked
+			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+		} else {
+			STOItem* si = rhstore->GetItem( Slot, true );
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+                        if (si->Flags & IE_INV_ITEM_SELECTED) {
+                                si->PurchasedAmount=1;
+                        } else {
+                                si->PurchasedAmount=0;
+                        }
 		}
-		si->Flags ^= IE_INV_ITEM_SELECTED;
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -9498,21 +9642,38 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 			break;
 		}
-		//this is removeitem, because the item leaves our inventory
-		CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
-		if (!si) {
-			return RuntimeError( "Item not found!" );
+
+		if (rhstore) {
+			STOItem *si = rhstore->GetItem(Slot, true);
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			res = SellBetweenStores(si, action, store);
+
+			//if no item remained, remove it
+			if (si->AmountInStock) {
+				si->Flags &= ~IE_INV_ITEM_SELECTED;
+			} else {
+				rhstore->RemoveItem(si);
+				delete si;
+			}
+		} else {
+			//this is removeitem, because the item leaves our inventory
+			CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			//well, it shouldn't be sold at all, but if it is here
+			//it will vanish!!!
+			if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
+				si->Flags &= ~IE_INV_ITEM_SELECTED;
+				store->AddItem( si );
+			}
+			delete si;
+			//keep encumbrance labels up to date
+			actor->CalculateSpeed(false);
+			res = ASI_SUCCESS;
 		}
-		//well, it shouldn't be sold at all, but if it is here
-		//it will vanish!!!
-		if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
-			si->Flags &= ~IE_INV_ITEM_SELECTED;
-			store->AddItem( si );
-		}
-		delete si;
-		//keep encumbrance labels up to date
-		actor->CalculateSpeed(false);
-		res = ASI_SUCCESS;
 		break;
 	}
 	}
@@ -9522,7 +9683,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
 "===== GetStoreItem =====\n\
 \n\
-**Prototype:** GemRB.GetStoreItem (index)\n\
+**Prototype:** GemRB.GetStoreItem (index[, righthand])\n\
 \n\
 **Description:** Gets the item resref, price and other details of a store \n\
 item referenced by the index. In case of PST stores the item's availability \n\
@@ -9530,6 +9691,7 @@ is also checked against the availability triggers.\n\
 \n\
 **Parameters:**\n\
   * index - the number of the item in the store list\n\
+  * righthand - set to non-zero to query the right-hand store (bag) instead\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemResRef' - the ResRef of the item\n\
@@ -9550,11 +9712,17 @@ is also checked against the availability triggers.\n\
 static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int index;
+	int rh = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &index )) {
+	if (!PyArg_ParseTuple( args, "i|i", &index, &rh )) {
 		return AttributeError( GemRB_GetStoreItem__doc );
 	}
-	Store *store = core->GetCurrentStore();
+	Store *store;
+	if (rh) {
+		store = rhstore;
+	} else {
+		store = core->GetCurrentStore();
+	}
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -10506,7 +10674,7 @@ parameter matches the arguments.\n\
 **Parameters:** \n\
   * globalID  - party ID or global ID of the actor to use\n\
   * EffectName - effect reference name (eg. 'State:Helpless')\n\
-  * Parameter2 - parameter2 of targetted effect\n\
+  * Parameter2 - parameter2 of targeted effect\n\
 \n\
 **Return value:** N/A"
 );
@@ -11030,7 +11198,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 \n\
 **Parameters:**\n\
   * ResRef - the resource reference of the item\n\
-  * PartyID - the resource reference of the item\n\
+  * PartyID - the pc you want to check usability against (defaults to the selected one)\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemName'           - strref of unidentified name.\n\
@@ -11386,12 +11554,12 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 			memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 		} else {
-			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
+			gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
 		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 
 	//if res is positive, it is gold!
@@ -11475,11 +11643,11 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
-				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
-				core->GetAudioDrv()->Play(Sound);
+				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 			}
 		}
 		if (res == 2) {
@@ -11513,14 +11681,15 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
 		displaymsg->DisplayConstantString(STR_TOOFARAWAY, DMC_WHITE);
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
 
 	CREItem * slotitem = core->GetDraggedItem();
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {
-		return PyInt_FromLong( -1 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
+	bool ranged = item->GetWeaponHeader(true) != NULL;
 
 	// can't equip item because of similar already equipped
 	if (Effect) {
@@ -11528,7 +11697,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			displaymsg->DisplayConstantString(STR_ITEMEXCL, DMC_WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11536,7 +11705,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		CREItem *item = actor->inventory.GetUsedWeapon(false, Effect); //recycled variable
 		if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11546,14 +11715,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (eh && eh->IDReq) {
 			displaymsg->DisplayConstantString(STR_ITEMID, DMC_WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
 	//it is always possible to put these items into the inventory
 	if (!(Slottype&SLOT_INVENTORY)) {
 		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 	}
 
@@ -11564,15 +11733,15 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		memcpy(Sound, item->ReplacementItem, 9);
 	} else {
-		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
+		gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
 
 	//freeing the item before returning
 	gamedata->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
-		return PyInt_FromLong( 0 );
+		return PyInt_FromLong(ASI_FAILED);
 	}
-	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+	res = actor->inventory.AddSlotItem(slotitem, Slot, Slottype, ranged);
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
@@ -11586,15 +11755,15 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
 		//swapping won't cure this
-		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
+		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED, ranged);
 		if (res) {
 			displaymsg->DisplayConstantString(res, DMC_WHITE);
-			return PyInt_FromLong( 0 );
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
 		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
 			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
-			return PyInt_FromLong(0);
+			return PyInt_FromLong(ASI_FAILED);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
@@ -11619,7 +11788,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound[0]) {
-		core->GetAudioDrv()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 	return PyInt_FromLong( res );
 }
@@ -11811,7 +11980,6 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	//the animation is cloned by AddAnimation, so we can keep the original on
 	//the stack
 	AreaAnimation anim;
-	memset(&anim,0,sizeof(anim));
 
 	if (!PyArg_ParseTuple( args, "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height)) {
 		return AttributeError( GemRB_SetMapAnimation__doc );
@@ -12845,8 +13013,11 @@ static bool CanUseActionButton(Actor *pcc, int type)
 		case ACT_THIEVING:
 			capability = pcc->GetSkill(IE_LOCKPICKING) + pcc->GetSkill(IE_PICKPOCKET);
 			break;
+		case ACT_SEARCH:
+			capability = 1; // everyone can try to search
+			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	} else {
 		// use levels instead, so inactive dualclasses work as expected
@@ -12857,8 +13028,11 @@ static bool CanUseActionButton(Actor *pcc, int type)
 		case ACT_THIEVING:
 			capability = pcc->GetThiefLevel() + pcc->GetBardLevel();
 			break;
+		case ACT_SEARCH:
+			capability = pcc->GetThiefLevel();
+			break;
 		default:
-			Log(WARNING, "GUIScript", "Uknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
 		}
 	}
 	return capability > 0;
@@ -12974,7 +13148,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		}
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
-		ieDword modalstate = actor->ModalState;
+		ieDword modalstate = actor->Modal.State;
 		int type;
 		switch (action) {
 		case ACT_INNATE:
@@ -13071,10 +13245,12 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_SEARCH:
 			//in IWD2 everyone can try to search, in bg2 only thieves get the icon
-			//so there is no problem, if you absolutely want to disable this button
-			//check the search skill
-			if (modalstate==MS_DETECTTRAPS) {
-				state = IE_GUI_BUTTON_SELECTED;
+			if (!CanUseActionButton(actor, action)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			} else {
+				if (modalstate == MS_DETECTTRAPS) {
+					state = IE_GUI_BUTTON_SELECTED;
+				}
 			}
 			break;
 		case ACT_THIEVING:
@@ -13186,6 +13362,7 @@ jump_label2:
 			}
 			// fall through as a synonym
 			// should eventually get replaced with proper +0-9 recognition
+			// intentional fallthrough
 		case ACT_QSLOT1:
 			tmp=0;
 			goto jump_label;
@@ -13240,10 +13417,12 @@ jump_label:
 		ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
 		if (action<0 || (action <= ACT_SKILLS && (disabledbutton & (1<<action) ))) {
 			state = IE_GUI_BUTTON_DISABLED;
+		} else if (action >= ACT_QSPELL1 && action <= ACT_QSPELL3 && (disabledbutton & (1<<ACT_CAST))) {
+			state = IE_GUI_BUTTON_DISABLED;
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
-		//FIXME: is this really state==IE_GUI_BUTTON_DISABLED ??? That means active border for a disabled button
+		// this state check looks bizzare, but without it most buttons get misrendered
 		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
 	Py_RETURN_NONE;
@@ -13277,7 +13456,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	if (!(actor->GetNextStep()) && !actor->ModalState && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
+	if (!(actor->GetStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -13576,7 +13755,9 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 
 	actor->SetModal( (ieDword) state, 0);
 	actor->SetModalSpell(state, spell);
-	actor->ApplyModal(actor->ModalSpell); // force immediate effect
+	if (actor->ModalSpellSkillCheck()) {
+		actor->ApplyModal(actor->Modal.Spell); // force immediate effect
+	}
 
 	Py_RETURN_NONE;
 }
@@ -13687,14 +13868,14 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 
 	print("Cast spell: %s", spelldata.spellname);
 	print("Slot: %d", spelldata.slot);
-	print("Type: %d", spelldata.type);
+	print("Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
 	//cannot make this const, because it will be freed
 	char *tmp = core->GetCString(spelldata.strref);
 	print("Spellname: %s", tmp);
 	core->FreeString(tmp);
 	print("Target: %d", spelldata.Target);
 	print("Range: %d", spelldata.Range);
-	if(!((1<<spelldata.type) & type)) {
+	if (type > 0 && !((1<<spelldata.type) & type)) {
 		return RuntimeError( "Wrong type of spell!");
 	}
 
@@ -14037,11 +14218,11 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
 				}
 				GameScript* restscript = new GameScript(resref, tar, 0, 0);
-				restscript->Update();
-				delete restscript;
-				if (tar->GetLastRested() == core->GetGame()->GameTime) {
+				if (restscript->Update()) {
+					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
 					dreamed = 1;
 				}
+				delete restscript;
 			}
 		}
 	}
@@ -14602,8 +14783,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
 	}
 
-// 	actor->AC.dump();
-	actor->ToHit.dump();
 	PyObject *ac = PyDict_New();
 	PyDict_SetItemString(ac, "Total", PyInt_FromLong (actor->AC.GetTotal()));
 	PyDict_SetItemString(ac, "Natural", PyInt_FromLong (actor->AC.GetNatural()));
@@ -14621,7 +14800,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Armor", PyInt_FromLong (actor->ToHit.GetArmorBonus()));
 	PyDict_SetItemString(tohits, "Shield", PyInt_FromLong (actor->ToHit.GetShieldBonus()));
 	PyDict_SetItemString(tohits, "Proficiency", PyInt_FromLong (actor->ToHit.GetProficiencyBonus()));
-	PyDict_SetItemString(tohits, "Generic", PyInt_FromLong (actor->ToHit.GetGenericBonus()));
+	PyDict_SetItemString(tohits, "Generic", PyInt_FromLong (actor->ToHit.GetGenericBonus() + actor->ToHit.GetFxBonus()));
 	PyDict_SetItemString(tohits, "Ability", PyInt_FromLong (actor->ToHit.GetAbilityBonus()));
 	PyDict_SetItemString(tohits, "Weapon", PyInt_FromLong (actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);
@@ -14636,7 +14815,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		return 0;
+		Log(WARNING, "Actor", "Invalid weapon wielded by %s!", actor->GetName(1));
+		return dict;
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
@@ -14855,7 +15035,7 @@ PyDoc_STRVAR( GemRB_SetTickHook__doc,
 This is useful for things like running a twisted reactor.\n\
 \n\
 **Parameters:**\n\
-  * callback - pyton function to run\
+  * callback - python function to run\
 \n\
 **Return value:** N/A"
 );
@@ -14966,13 +15146,12 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m2;
 	switch(index) {
 		case ME_OVERRIDE:
-			m->override = value;
+			m->me_override = value;
 			break;
 		default:
 		case ME_VALID:
 		case ME_ACCESSIBLE:
 			return AttributeError( GemRB_SetMazeEntry__doc );
-			break;
 		case ME_TRAP: //trapped/traptype
 			if (value==-1) {
 				m->trapped = 0;
@@ -15164,7 +15343,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	maze_entry *m = reinterpret_cast<maze_entry *> (game->mazedata+entry*MAZE_ENTRY_SIZE);
-	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
+	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->me_override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
 	if (m->trapped) {
@@ -15349,6 +15528,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CheckSpecialSpell, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
 	METHOD(ClearActions, METH_VARARGS),
+	METHOD(CloseRighthandStore, METH_NOARGS),
 	METHOD(CountEffects, METH_VARARGS),
 	METHOD(CountSpells, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
@@ -15476,6 +15656,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(LoadGame, METH_VARARGS),
 	METHOD(LoadMusicPL, METH_VARARGS),
+	METHOD(LoadRighthandStore, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
@@ -15685,15 +15866,10 @@ GUIScript::~GUIScript(void)
 		free(UsedItems);
 		UsedItems=NULL;
 	}
-	if (ItemSounds) {
-		free(ItemSounds);
-		ItemSounds=NULL;
-	}
 
 	StoreSpellsCount = -1;
 	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
-	ItemSoundsCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;
@@ -15753,7 +15929,7 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
-	char string[_MAX_PATH+20];
+	char string[_MAX_PATH+200];
 
 	sprintf( string, "import sys" );
 	if (PyRun_SimpleString( string ) == -1) {
@@ -15783,6 +15959,9 @@ bool GUIScript::Init(void)
 		Log(ERROR, "GUIScript", "Error running: %s", string);
 		return false;
 	}
+
+	sprintf(string, "GemRB.Version = '%s'", VERSION_GEMRB);
+	PyRun_SimpleString(string);
 
 	// Detect GameType if it was set to auto
 	if (stricmp( core->GameType, "auto" ) == 0) {
@@ -16074,14 +16253,14 @@ PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 	strncat(classname, type, _MAX_PATH - 2);
 	if (!pGUIClasses) {
 		char buf[256];
-		snprintf(buf, sizeof(buf), "Tried to use an object (%s) before script compiled!", classname);
+		snprintf(buf, sizeof(buf), "Tried to use an object (%.50s) before script compiled!", classname);
 		return RuntimeError(buf);
 	}
 
 	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
 	if (!cobj) {
 		char buf[256];
-		snprintf(buf, sizeof(buf), "Failed to lookup name '%s'", classname);
+		snprintf(buf, sizeof(buf), "Failed to lookup name '%.50s'", classname);
 		return RuntimeError(buf);
 	}
 	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);

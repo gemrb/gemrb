@@ -71,7 +71,7 @@ public:
 	void SetDirection(int direction);
 	/** Set color for one type of area labels */
 	void SetColor(int which, Color color);
-	void SetOverrideIconPalette(bool override) { OverrideIconPalette = override; };
+	void SetOverrideIconPalette(bool ipOverride) { OverrideIconPalette = ipOverride; };
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;

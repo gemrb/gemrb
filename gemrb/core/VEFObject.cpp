@@ -72,7 +72,7 @@ void VEFObject::Init()
 {
 	std::list<ScheduleEntry>::iterator iter;
 
-	for(iter=entries.begin();iter!=entries.end();iter++) {
+	for(iter = entries.begin(); iter != entries.end(); ++iter) {
 		if (!(*iter).ptr) continue;
 		switch((*iter).type) {
 			case VEF_BAM:
@@ -137,7 +137,7 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 
 	std::list<ScheduleEntry>::iterator iter;
 
-	for(iter=entries.begin();iter!=entries.end();iter++) {
+	for (iter = entries.begin(); iter != entries.end(); ++iter) {
 		//don't render the animation if it is outside of the cycle
 		if ( (*iter).start>GameTime) continue;
 		if ( (*iter).length<GameTime) continue;
@@ -155,13 +155,15 @@ bool VEFObject::Draw(const Region &screen, Point &position, const Color &p_tint,
 					if ( (*iter).ptr ) {
 						break;
 					}
-					// fall back to VEF, intentional fallthrough
+					// fall back to VEF
+					// intentional fallthrough
 				case VEF_VEF: //vanilla engine implementation of composite video effects
 					(*iter).ptr = CreateObject( (*iter).resourceName, IE_VEF_CLASS_ID);
 					if ( (*iter).ptr ) {
 						break;
 					}
-					//fall back to BAM or VVC, intentional fallthrough
+					// fall back to BAM or VVC
+					// intentional fallthrough
 				case VEF_BAM: //just a BAM
 				case VEF_VVC: //videocell (can contain a BAM)
 					(*iter).ptr = CreateCell( (*iter).resourceName, (*iter).length, (*iter).start);

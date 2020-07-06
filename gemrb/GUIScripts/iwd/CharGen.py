@@ -313,14 +313,13 @@ def CancelPress():
 def AcceptPress():
 	#mage spells
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
-	KitIndex = KitTable.FindValue (3, Kit)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if TableName != "*":
-		#todo: set up ALL spell levels not just level 1
+		# setting up just the first spell level is enough, since the rest will be granted on level-up
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = Spellbook.GetLearnableMageSpells (KitIndex, t, 1)
+		Learnable = Spellbook.GetLearnableMageSpells (Kit, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
@@ -410,7 +409,8 @@ def AcceptPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	#10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	if not ImportedChar:
+		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:
@@ -838,7 +838,7 @@ def PortraitCustomPress():
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (Portrait)+"L"
-	Button.SetPicture (PortraitName, "NOPORTMD")
+	Button.SetPicture (PortraitName, "NOPORTLG")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	Button = Window.GetControl (1)
@@ -1204,12 +1204,9 @@ def AlignmentPress():
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	GemRB.SetVar ("Alignment", 0)
 
-	for i in range (2, 11):
-		AlignmentSelectButton = AlignmentWindow.GetControl (i)
-		AlignmentSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-
 	for i in range (9):
 		AlignmentSelectButton = AlignmentWindow.GetControl (i + 2)
+		AlignmentSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if ClassAlignmentTable.GetValue (ClassName, CommonTables.Aligns.GetValue(i, 4)) == 0:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
@@ -1290,7 +1287,7 @@ def AbilitiesPress():
 	PointsLeftLabel.SetUseRGB (1)
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "SAVE") == "SAVEWAR"
+	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
 
 	for i in range (6):
 		AbilitiesLabelButton = AbilitiesWindow.GetControl (30 + i)
@@ -2373,7 +2370,7 @@ def DrawAvatar():
 	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
 	table = GemRB.LoadTable ("avprefc")
 	lookup = GUICommon.GetClassRowName (MyChar)
-	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
+	AvatarID = AvatarID + table.GetValue (lookup, "CLASS")
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID + table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX), GTV_STR)
 
@@ -2722,7 +2719,7 @@ def ImportDonePress():
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1) )
 	PortraitName = GemRB.GetPlayerPortrait (MyChar, 0)
 	GemRB.SetToken ("LargePortrait", PortraitName )
-	PortraitButton.SetPicture (PortraitName)
+	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	Portrait = -1
 
 	ImportedChar = 1

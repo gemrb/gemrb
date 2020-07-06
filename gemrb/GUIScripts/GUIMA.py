@@ -26,6 +26,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
+import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
@@ -343,46 +344,6 @@ def OpenWorldMapWindow ():
 	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
 
-def MoveToNewArea ():
-	global WorldMapWindow, WorldMapControl
-
-	tmp = WorldMapControl.GetDestinationArea (1)
-	hours = tmp["Distance"]
-	OpenWorldMapWindow ()
-
-	if tmp["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
-		return
-	elif hours == -1:
-		print "Invalid target", tmp
-		return
-
-	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
-
-	if hours == 0:
-		return
-
-	# distance is stored in hours, but the action needs seconds
-	GemRB.ExecuteString ("AdvanceTime(%d)"%(hours*300))
-
-	# ~The journey took <DURATION>.~ but pst has it without the token
-	# HOWEVER: pst has its own GUIMA + uses only neighbour travel (no MoveToNewArea)??
-	if GameCheck.IsPST():
-		# GemRB.DisplayString can only deal with resrefs, so cheat until noticed
-		if hours > 1:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19313))
-		else:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19312))
-	else:
-		time = ""
-		GemRB.SetToken ("HOUR", str(hours))
-		if hours > 1:
-			time =  GemRB.GetString (10700)
-		else:
-			time =  GemRB.GetString (10701)
-		GemRB.SetToken ("DURATION", time)
-		GemRB.DisplayString (10689, 0xffffff)
-	return
-
 def ChangeTooltip ():
 	global WorldMapWindow, WorldMapControl
 
@@ -459,7 +420,7 @@ def WorldMapWindowCommon (Travel):
 		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = Window.GetControl (4)
 	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
 	# center on current area
 	MapC()

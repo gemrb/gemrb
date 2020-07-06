@@ -88,18 +88,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsTableOffset = profTableOffset
 	ProfsType = type
 
-	if type == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG2(): #chargen
-		ProfsOffsetSum = 9
-		ProfsOffsetButton1 = 11
-		ProfsOffsetStar = 27
-		ProfsOffsetLabel = 1
-		ProfsOffsetPress = 69
-		ProfsNumButtons = 8
-		ProfsTextArea = ProfsWindow.GetControl (68)
-		ProfsTextArea.SetText (9588)
-		if (scroll):
-			ProfsScrollBar = ProfsWindow.GetControl (78)
-	elif type == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG1(): #chargen
+	if type == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2()): #chargen
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
 		ProfsOffsetStar = 27
@@ -198,6 +187,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	IsDual = GUICommon.IsDualClassed (pc, 1)
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
+	elif IsDual[0] == 3:
+		Class = CommonTables.KitList.GetValue (IsDual[2], 7)
 	elif IsDual[0]:
 		Class = GUICommon.GetClassRowName(IsDual[2], "index")
 		Class = CommonTables.Classes.GetValue (Class, "ID")
@@ -219,8 +210,19 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			# don't give too many points; exact formula unknown, but this works with f/m and f/m/t
 			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate
 		else:
-			# sum the levels, since the rate is for the combined multiclass
-			ProfsPointsLeft += (sum(level2) - sum(level1))/ProfsRate
+			# just look at the fastest prof-gaining class in the bunch and consider their level
+			# eg. a m/t should get a point at 3/4 and 7/8 (rate of 4)
+			BestRate = 100
+			for cls in IsMulti[1:]:
+				if cls == 0:
+					break
+				ClsName = GUICommon.GetClassRowName (cls, "class")
+				Rate = ProfsTable.GetValue (ClsName, "RATE")
+				if Rate < BestRate:
+					BestRate = Rate
+					ProfIndex = IsMulti[1:].index(cls)
+
+			ProfsPointsLeft += level2[ProfIndex]/ProfsRate - level1[ProfIndex]/ProfsRate
 	else:
 		if GUICommon.IsDualSwap (pc):
 			ProfIndex = 1
@@ -241,8 +243,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsColumn = ClassWeaponsTable.GetRowIndex (ClassName)
 	else:
 		Kit = GUICommon.GetKitIndex (pc)
-		if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and not IsDual[0]:
-			#if we do kit with dualclass, we'll get the old kit
+		if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and IsDual[0] in [0, 3]:
+			#if we do kit with dualclass, we'll get the old kit (usually)
 			#also don't want to worry about kitted multis
 			ProfsColumn = CommonTables.KitList.GetValue (Kit, 5)
 		else:

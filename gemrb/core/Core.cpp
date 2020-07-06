@@ -181,6 +181,19 @@ unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
+// 1 foot = 16px horizontally, 12px vertically and all in between
+// we use them to construct an ellipse and through its central angle get the adjusted "radius"
+// Potential optimisation through precomputing:
+// rounding the angle into 5° intervals [0-90] gives these values per foot:
+// 16 16 16 16 15 15 15 14 14 14 13 13 13 12 12 12 12 12 12
+double Feet2Pixels(int feet, double angle)
+{
+	double sin2 = pow(sin(angle) / 16, 2);
+	double cos2 = pow(cos(angle) / 12, 2);
+	double r = sqrt(1 / (cos2 + sin2));
+	return r * feet;
+}
+
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
 int EARelation(Scriptable* Owner, Actor* target)

@@ -91,7 +91,7 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 			msg += L"[/color]\n";
 		}
 		delete str;
-		displaymsg->DisplayMarkupString(msg);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMarkupString(msg);
 	}
 }
 
@@ -196,6 +196,11 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
+	if (!dlg) {
+		return;
+	}
+
+	// FIXME: is this useful for anything concrete? Currently never true, since nothing sets DF_UNBREAKABLE (unused since it was introduced)
 	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
 		return;
 	}
@@ -327,16 +332,18 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
 			// FIXME: figure out if pst needs something similar (action missing)
 			//        (not conditional on GenerateAction to prevent console spam)
-			if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+			if (!core->HasFeature(GF_AREA_OVERRIDE) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
 				target->AddAction(GenerateAction("BreakInstants()"));
 			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
+				if (i == tr->actions.size() - 1) tr->actions[i]->flags |= ACF_REALLOW_SCRIPTS;
 				target->AddAction(tr->actions[i]);
 			}
 			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
+			if (tr->actions.size()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
 			EndDialog();
 			ta->AppendText(L"\n");
 			return false;

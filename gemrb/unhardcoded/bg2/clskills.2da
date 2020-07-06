@@ -7,7 +7,7 @@ FIGHTER             *          *           *          89000      *          *   
 CLERIC              *          MXSPLPRS    *          89000      *          *          *          1          1          *          CLABPR01   -3         2500000    *           0          *
 THIEF               *          *           *          89000      *          SKILLS     *          0          0          *          CLABTH01   -3         2500000    *           0          *
 BARD                *          *           MXSPLBRD   89000      SKILLBRD   *          *          0          1          *          CLABBA01   -3         2500000    *           0          *
-PALADIN             *          MXSPLPAL    *          89000      *          *          PALADIN    5          1          *          CLABPA01   -2         2500000    *           2          *
+PALADIN             *          MXSPLPAL    *          89000      *          *          LAYHANDS   5          1          *          CLABPA01   -2         2500000    *           2          *
 FIGHTER_MAGE        *          *           MXSPLWIZ   89000      *          *          *          0          1          *          CLABFI01   -2         2500000    *           0          *
 FIGHTER_CLERIC      *          MXSPLPRS    *          89000      *          *          *          1          1          *          FI01,PR01  -2         2500000    *           0          *
 FIGHTER_THIEF       *          *           *          89000      *          SKILLS     *          0          0          *          FI01,TH01  -2         2500000    *           0          *

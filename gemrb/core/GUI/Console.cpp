@@ -86,11 +86,20 @@ void Console::SetBackGround(Sprite2D* back)
 	//if 'back' is NULL then no BackGround will be drawn
 	Back = back;
 }
+
+/* Inserts the given text right behind the cursor position. */
+void Console::InsertText(const String& string)
+{
+	Buffer.insert(CurPos, string);
+	CurPos += string.size();
+}
+
 /** Sets the Text of the current control */
 void Console::SetText(const String& string)
 {
 	Buffer = string;
 }
+
 /** Key Press Event */
 bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {

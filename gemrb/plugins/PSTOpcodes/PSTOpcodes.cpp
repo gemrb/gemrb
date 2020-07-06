@@ -618,7 +618,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			break;
 		case 6: //duplication
-			core->GetAudioDrv()->Play("magic02", target->Pos.x, target->Pos.y);
+			core->GetAudioDrv()->Play("magic02", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 			break;
 		case 7: //armor
 			target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);
@@ -947,10 +947,10 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xd1 fx_hostile_image
+//0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
 int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_hostile_image(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if(1) print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 

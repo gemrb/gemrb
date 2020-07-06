@@ -140,6 +140,22 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 	if(AvatarsRowNum==~0u) return stance;
 	return AvatarTable[AvatarsRowNum].StanceOverride[stance];
 }
+/*
+ * For some actors (Arundel, FFG, fire giants) a new stance requires a
+ * different palette to use. Presumably, this is relevant for PAL_MAIN only.
+ */
+void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
+	if (previousStanceID != StanceID) {
+		// Test if the palette in question is actually different to the one loaded.
+		if (*palette[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
+			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef[PAL_MAIN]);
+			PaletteResRef[PAL_MAIN][0] = 0;
+
+			palette[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
+			SetupColors(PAL_MAIN);
+		}
+	}
+}
 
 static ieResRef EmptySound={0};
 
@@ -238,10 +254,9 @@ void CharAnimations::SetWeaponType(int wt)
 
 void CharAnimations::SetHelmetRef(const char* ref)
 {
-	HelmetRef[0] = ref[0];
-	HelmetRef[1] = ref[1];
+	strlcpy(HelmetRef, ref, sizeof(HelmetRef)+1);
 
-	// TODO: Only drop helmet anims?
+	// Only drop helmet anims?
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
@@ -287,6 +302,7 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 }
 
+// NOTE: change if MAX_ANIMS is increased
 //                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
 static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
 static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','0','0','0','1','1','1','1','1'};
@@ -480,6 +496,10 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[type];
 }
 
+Palette* CharAnimations::GetShadowPalette() const {
+	return shadowPalette;
+}
+
 static inline int compare_avatars(const void *a, const void *b)
 {
 	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
@@ -528,7 +548,7 @@ void CharAnimations::InitAvatarsTable()
 
 		if (resdata) {
 			char section[12];
-			snprintf(section,10,"%d", i);
+			snprintf(section, 10, "%d", i%100000); // the mod is just to silent warnings, since we know i is small enough
 
 			if (!resdata->GetKeysCount(section)) continue;
 
@@ -654,7 +674,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
-	nextStanceID = 0;
+	shadowPalette = NULL;
+	previousStanceID = nextStanceID = 0;
 	StanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
@@ -746,6 +767,10 @@ CharAnimations::~CharAnimations(void)
 		gamedata->FreePalette(palette[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
+
+	if (shadowPalette) {
+		gamedata->FreePalette(shadowPalette, 0);
+	}
 
 	for (i = 0; i < MAX_ANIMS; ++i) {
 		for (int j = 0; j < MAX_ORIENT; ++j) {
@@ -1003,6 +1028,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	Animation** anims = Anims[StanceID][Orient];
 
 	if (anims) {
+		MaybeUpdateMainPalette(anims);
+		previousStanceID = StanceID;
+
 		return anims;
 	}
 
@@ -1112,6 +1140,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				palette[ptype] = a->GetFrame(0)->GetPalette()->Copy();
 				// ...and setup the colours properly
 				SetupColors(ptype);
+			} else if (ptype == PAL_MAIN) {
+				MaybeUpdateMainPalette(anims);
 			}
 		} else if (part == actorPartCount) {
 			if (!palette[PAL_WEAPON]) {
@@ -1261,6 +1291,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			error("CharAnimations", "Unknown animation type\n");
 	}
 	delete equipdat;
+	previousStanceID = StanceID;
 
 	return Anims[StanceID][Orient];
 }
@@ -1330,10 +1361,8 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 			return NULL;
 		}
 
-		PaletteType paletteType = PAL_MAIN;
-		if (!palette[paletteType]) {
-			palette[paletteType] = animation->GetFrame(0)->GetPalette()->Copy();
-			SetupColors(paletteType);
+		if (!shadowPalette) {
+			shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
 		}
 
 		switch (StanceID) {
@@ -1365,7 +1394,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 	return NULL;
 }
 
-static const int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
+static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 					 unsigned char Orient,
@@ -1505,7 +1534,6 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 			break;
 		default:
 			error("CharAnimations", "Unsupported animation type for equipment animation.\n");
-		break;
 	}
 }
 
@@ -1663,7 +1691,6 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 }
 
@@ -1735,7 +1762,6 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "VHR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 }
 
@@ -1798,7 +1824,6 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	size_t last = strnlen(ResRef, 6);
@@ -1862,7 +1887,6 @@ void CharAnimations::AddFF2Suffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames 2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	size_t last = strnlen(ResRef, 6);
@@ -1876,7 +1900,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], Part+1,
+	snprintf(prefix, 9, "%s%c%d%c%d", ResRef, StancePrefix[StanceID], (Part+1)%100,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
@@ -2004,7 +2028,6 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "VHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	EquipData->Cycle = Cycle;
 }
@@ -2081,7 +2104,6 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 
 	}
 	if (Orient>9) {
@@ -2130,7 +2152,6 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient>=4) {
 		strcat( ResRef, "g1e" );
@@ -2252,7 +2273,6 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient>=5) {
 		strcat( ResRef, "e" );
@@ -2441,7 +2461,6 @@ void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2502,7 +2521,6 @@ void CharAnimations::AddTwoPieceSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "Two-piece Animation: unhandled stance: %s %d", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2572,7 +2590,6 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2646,7 +2663,6 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2720,7 +2736,6 @@ void CharAnimations::AddMMR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2798,7 +2813,6 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
-			break;
 	}
 	if (!mirror && Orient > 9) {
 		strcat( ResRef, "e" );
@@ -2856,7 +2870,6 @@ void CharAnimations::AddHLSuffix(char* ResRef, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "HL Animation: unhandled stance: %s %d", ResRef, StanceID);
-			break;
 	}
 	strcat(ResRef, offset ? "hg1" : "lg1");
 	if (Orient > 9) {

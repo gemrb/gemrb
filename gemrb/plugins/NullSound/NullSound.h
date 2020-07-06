@@ -30,7 +30,8 @@ public:
 	NullSound(void);
 	~NullSound(void);
 	bool Init(void);
-	Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos,  unsigned int flags = 0, unsigned int *length = 0);
+	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
 	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();
@@ -42,7 +43,7 @@ public:
 	void GetListenerPos(int& XPos, int& YPos);
 	void UpdateVolume(unsigned int) {}
 
-	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, bool Ambient);
+	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange);
 	int QueueAmbient(int stream, const char* sound);
 	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);

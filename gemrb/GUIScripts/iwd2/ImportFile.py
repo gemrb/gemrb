@@ -77,6 +77,7 @@ def DonePress():
 	#either we take the important stats and destroy the object
 	#or start with an object from the beginning
 	#or use a different script here???
+	GemRB.SetVar ("ImportedChar", 1)
 	GemRB.SetNextScript("CharGen7")
 	return
 	

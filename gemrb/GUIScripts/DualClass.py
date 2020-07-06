@@ -145,6 +145,28 @@ def DualClassWindow ():
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def DumpUnusableItems (pc):
+	"""Dumps everything in the inventory that is now unusable."""
+
+	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
+	for type in SlotTypes:
+		Slots = GemRB.GetSlots (pc, type)
+		if not len(Slots):
+			# nothing there
+			continue
+
+		for slot in Slots:
+			SlotType = GemRB.GetSlotType (slot, pc)
+			CREItem = GemRB.GetSlotItem (pc, slot)
+
+			if not GemRB.CanUseItemType (SlotType["Type"], CREItem["ItemResRef"], pc):
+				# move it to a free inventory slot by mimicking dragging
+				Item = GemRB.GetItem (CREItem["ItemResRef"])
+				GemRB.DragItem (pc, slot, Item["ItemIcon"])
+				if not GemRB.DropDraggedItem (pc, -3): # ASI_FAILED
+					# inventory was probably too full, drop to ground
+					GemRB.DropDraggedItem (pc, -2)
+
 def DCMainDonePress ():
 	"""Saves our dualclass changes and closes the window.
 
@@ -184,24 +206,45 @@ def DCMainDonePress ():
 	# save our thief skills if we have them
 	LUSkillsSelection.SkillsSave (pc)
 
-	# save our new class and say was multi
+	# NOTE: the ordering here is very deliberate, don't touch!
+	# for the dc detection code to work in core, some level and mc bits info has to be there
+	# 3 PCF functions (class, kit, level) all need more info
+	# testcase: dualclassing and checking how the actionbar evolves
+
+	# mark the actor as dualclassed
+	OldMCFlags = GemRB.GetPlayerStat (pc, IE_MC_FLAGS, 1)
+	NewMCBit = CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT)
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, OldMCFlags|NewMCBit)
+
+	# calculate new dc/mc class combo
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
 	MultClassId = CommonTables.Classes.FindValue ("MULTI", MultClassId)
 	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
 	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
+
+	# fake update our levels (no PCF), so the PCF can be ran later on correct values
+	# core only looks at the level difference when determining dc class order
+	DSOverride = { "old": OldClassId, "new": NewClassId, "mc": MultClassId }
+	Level1 = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	if GUICommon.IsDualSwap (pc, DSOverride):
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, 0, 0)
+	else:
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level1 - 1, 0)
+		GemRB.SetPlayerStat (pc, IE_LEVEL, 0, 0)
+
+	# finally set the new class
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	OldMCFlags = GemRB.GetPlayerStat (pc, IE_MC_FLAGS, 1)
-	NewMCBit = CommonTables.Classes.GetValue (OldClassName, "MC_WAS_ID", GTV_INT)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, OldMCFlags|NewMCBit)
 
 	# update our levels and xp
-	if GUICommon.IsDualSwap (pc):
+	if GUICommon.IsDualSwap (pc, DSOverride):
 		GemRB.SetPlayerStat (pc, IE_LEVEL2, 1)
 	else:
-		GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL), 0)
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level1, 0)
 		GemRB.SetPlayerStat (pc, IE_LEVEL, 1)
 	GemRB.SetPlayerStat (pc, IE_XP, 0)
+
+	# END of order matters NOTE
 
 	# new thac0
 	ThacoTable = GemRB.LoadTable ("THAC0")
@@ -214,22 +257,7 @@ def DCMainDonePress ():
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
 
 	# dump any equipped items that are now unusable
-	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
-	for type in SlotTypes:
-		Slots = GemRB.GetSlots (pc, type)
-		if not len(Slots):
-			# nothing there
-			continue
-		for slot in Slots:
-			SlotType = GemRB.GetSlotType (slot, pc)
-			CREItem = GemRB.GetSlotItem (pc, slot)
-			if not GemRB.CanUseItemType (SlotType["Type"], CREItem["ItemResRef"], pc):
-				# move it to a free inventory slot by mimicking dragging
-				Item = GemRB.GetItem (CREItem["ItemResRef"])
-				GemRB.DragItem (pc, slot, Item["ItemIcon"])
-				if not GemRB.DropDraggedItem (pc, -3): # ASI_FAILED
-					# inventory was probably too full, drop to ground
-					GemRB.DropDraggedItem (pc, -2)
+	DumpUnusableItems (pc)
 
 	# close our window
 	if DCMainWindow:
@@ -420,7 +448,7 @@ def CanDualInto (index):
 	for stat in range (6): # loop through each stat
 		minimum = StatTable.GetValue (ClassStatIndex, stat)
 		name = StatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (pc, eval("IE_" + name[4:])) < minimum: # see if we're under the minimum
+		if GemRB.GetPlayerStat (pc, GUICommon.SafeStatEval ("IE_" + name[4:])) < minimum:
 			return 0
 
 	# if we made it here, we can dual to the class
@@ -431,6 +459,7 @@ def DCClassBackPress ():
 	# close the class window
 	if DCClassWindow:
 		DCClassWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DCMainSkillsPress ():
@@ -546,6 +575,7 @@ def DCProfsCancelPress ():
 	# close out the profs window and go back a step
 	if DCProfsWindow:
 		DCProfsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	DCMainBackPress ()
 	return
@@ -609,6 +639,7 @@ def DCSkillsBackPress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	LUSkillsSelection.SkillsNullify ()
 	DCMainBackPress ()
 	return
@@ -618,5 +649,6 @@ def DCSkillsDonePress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
+	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return

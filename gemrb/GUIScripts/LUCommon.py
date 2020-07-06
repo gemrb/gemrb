@@ -31,7 +31,7 @@ def GetNextLevelExp (Level, Class):
 	"""Returns the amount of XP required to gain the next level."""
 	Row = CommonTables.NextLevel.GetRowIndex (Class)
 	if Level < CommonTables.NextLevel.GetColumnCount (Row):
-		return str (CommonTables.NextLevel.GetValue (Row, Level) )
+		return CommonTables.NextLevel.GetValue (Row, Level, GTV_STR)
 
 	# we could display the current level's max, but likely nobody cares
 	# if you change it, check that all callers can handle it
@@ -65,20 +65,24 @@ def CanLevelUp(actor):
 			# if any class can level, return 1
 			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")
 			tmpNext = int(GetNextLevelExp (Levels[i], TmpClassName))
-			if tmpNext != 0 and tmpNext <= xp:
+			if (tmpNext != 0 or Levels[i] == 0) and tmpNext <= xp:
 				return 1
 
 		# didn't find a class that could level
 		return 0
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
-		Class = CommonTables.Classes.GetRowName (Dual[2])
+		if Dual[0] == 3:
+			ClassID = CommonTables.KitList.GetValue (Dual[2], 7)
+			Class = GUICommon.GetClassRowName (ClassID, "class")
+		else:
+			Class = GUICommon.GetClassRowName(Dual[2], "index")
 		if GUICommon.IsDualSwap(actor):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 
 	# check the class that can be level (single or dual)
 	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
-	return (tmpNext != 0 and tmpNext <= xp)
+	return ((tmpNext != 0 or Levels[0] == 0) and tmpNext <= xp)
 
 # expects a list of character levels of all classes
 # returns sparse list of class ids (of same length)
@@ -116,8 +120,11 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		NumClasses = Multi[0]
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
-		Class = GUICommon.GetClassRowName(Dual[2], "index")
-		Class = [CommonTables.Classes.GetValue (Class, "ID")]
+		if Dual[0] == 3:
+			Class = [CommonTables.KitList.GetValue (Dual[2], 7)]
+		else:
+			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
+			Class = [CommonTables.Classes.GetValue (ClassRow, "ID")]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -293,8 +300,11 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		#we only get the hp bonus if the old class is reactivated
 		if (Levels[0]<=Levels[1]):
 			return
-		Class = GUICommon.GetClassRowName(Dual[2], "index")
-		Class = [CommonTables.Classes.GetValue (Class, "ID")]
+		if Dual[0] == 3:
+			Class = [CommonTables.KitList.GetValue (Dual[2], 7)]
+		else:
+			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
+			Class = [CommonTables.Classes.GetValue (ClassRow, "ID")]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]

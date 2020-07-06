@@ -78,6 +78,7 @@ Projectile::Projectile()
 	drawSpark = 0;
 	ZPos = 0;
 	extension_delay = 0;
+	Range = 0;
 	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = Speed = SFlags = ExtFlags = 0;
 	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
@@ -97,7 +98,13 @@ Projectile::~Projectile()
 	}
 	delete effects;
 
-	gamedata->FreePalette(palette, PaletteRes);
+	if (TFlags&PTF_COLOUR) {
+		// unnamed palette, but PaletteRes may be set (eg. pshammb.pro of the Hammers mod)
+		gamedata->FreePalette(palette, NULL);
+	} else {
+		gamedata->FreePalette(palette, PaletteRes);
+	}
+
 	ClearPath();
 
 	if (travel_handle) {
@@ -182,6 +189,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
+// FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
 void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq)
 {
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
@@ -281,7 +289,7 @@ void Projectile::SetBlend(int brighten)
 void Projectile::CreateIteration()
 {
 	Projectile *pro = server->GetProjectileByIndex(type-1);
-	pro->SetEffectsCopy(effects);
+	pro->SetEffectsCopy(effects, Pos);
 	pro->SetCaster(Caster, Level);
 	if (ExtFlags&PEF_CURVE) {
 		pro->bend=bend+1;
@@ -380,7 +388,10 @@ void Projectile::Setup()
 		Color tmpColor[PALSIZE];
 
 		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
-		StaticTint(tmpColor[PALSIZE/2]);
+		// PALSIZE is usually 12, but pst has it at 32, which is now the default, so make sure we're not trying to read an empty (black) entry
+		unsigned int idx = PALSIZE/2;
+		if (tmpColor[idx].r + tmpColor[idx].g + tmpColor[idx].b == 0) idx = 6;
+		StaticTint(tmpColor[idx]);
 	}
 
 	CreateAnimations(travel, BAMRes1, Seq1);
@@ -432,7 +443,8 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+	travel_handle = core->GetAudioDrv()->Play(SoundRes1, SFX_CHAN_MISSILE,
+				Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -554,69 +566,72 @@ bool Projectile::FailedIDS(Actor *target) const
 
 void Projectile::Payload()
 {
-	Actor *target;
-	Scriptable *Owner;
-
 	if(Shake) {
 		core->timer->SetScreenShake( Shake, Shake, Shake);
 		Shake = 0;
 	}
 
-	//allow area affecting projectile with a spell	
+	//allow area affecting projectile with a spell
 	if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
 		return;
 	}
 
-	if (Target) {
-		target = GetTarget();
-		if (!target) {
-			//projectile resisted or failed to bounce properly
-			return;
-		}
-	} else {
-		//the target will be the original caster
-		//in case of single point area target (dimension door)
-		if (FakeTarget) {
-			target = area->GetActorByGlobalID(FakeTarget);
-			if (!target) {
-				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
-			}
-		} else {
-			target = area->GetActorByGlobalID(Caster);			
-		}
-	}
-	
-	Owner = area->GetScriptableByGlobalID(Caster);
-	if (!Owner) {
-		Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
-		Owner = target;
-	}
+	// PEF_CONTINUE never has a Target (LightningBolt)
+	// if we were to try to get one we would end up damaging
+	// either the caster, or the original target of the spell
+	// which are probably both nowhere near the projectile at this point
+	// all effects are applied as the projectile travels
+	if((ExtFlags&PEF_CONTINUE) == 0)
+	{
+		Actor *target;
+		Scriptable *Owner;
 
-	if (target) {
-		//apply this spell on target when the projectile fails
-		if (FailedIDS(target)) {
-			if (FailSpell[0]) {
-				if (Target) {
-					core->ApplySpell(FailSpell, target, Owner, Level);
-				} else {
-					//no Target, using the fake target as owner
-					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+		if (Target) {
+			target = GetTarget();
+		} else {
+			//the target will be the original caster
+			//in case of single point area target (dimension door)
+			if (FakeTarget) {
+				target = area->GetActorByGlobalID(FakeTarget);
+				if (!target) {
+					target = core->GetGame()->GetActorByGlobalID(FakeTarget);
 				}
+			} else {
+				target = area->GetActorByGlobalID(Caster);
 			}
-		} else {
-			//apply this spell on the target when the projectile succeeds
-			if (SuccSpell[0]) {
-				core->ApplySpell(SuccSpell, target, Owner, Level);
-			}
+		}
 
-			if(ExtFlags&PEF_RGB) {
-				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-					RGB >> 8, RGB >> 16, RGB >> 24);
+		if (target) {
+			Owner = area->GetScriptableByGlobalID(Caster);
+			if (!Owner) {
+				Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
+				Owner = target;
 			}
+			//apply this spell on target when the projectile fails
+			if (FailedIDS(target)) {
+				if (FailSpell[0]) {
+					if (Target) {
+						core->ApplySpell(FailSpell, target, Owner, Level);
+					} else {
+						//no Target, using the fake target as owner
+						core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+					}
+				}
+			} else {
+				//apply this spell on the target when the projectile succeeds
+				if (SuccSpell[0]) {
+					core->ApplySpell(SuccSpell, target, Owner, Level);
+				}
 
-			if (effects) {
-				effects->SetOwner(Owner);
-				effects->AddAllEffects(target, Destination);
+				if(ExtFlags&PEF_RGB) {
+					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+						RGB >> 8, RGB >> 16, RGB >> 24);
+				}
+
+				if (effects) {
+					effects->SetOwner(Owner);
+					effects->AddAllEffects(target, Destination);
+				}
 			}
 		}
 	}
@@ -649,7 +664,8 @@ void Projectile::UpdateSound()
 		StopSound();
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
+		travel_handle = core->GetAudioDrv()->Play(SoundRes2, SFX_CHAN_MISSILE,
+				Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}
 }
@@ -680,7 +696,7 @@ void Projectile::ChangePhase()
 	if (!Extension) {
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		if (phase ==P_TRAVEL) {
+		if (phase == P_TRAVEL) {
 			if(ExtFlags&PEF_DEFSPELL) {
 				ApplyDefault();
 			}
@@ -734,10 +750,7 @@ int Projectile::CalculateExplosionCount()
 	}
 
 	if (!count) {
-		 count = Extension->ExplosionCount;
-	}
-	if (!count) {
-		count = 1;
+		 count = std::max<int>(1, Extension->ExplosionCount);
 	}
 	return count;
 }
@@ -867,6 +880,14 @@ void Projectile::DoStep(unsigned int walk_speed)
 		timeStartStep = timeStartStep + walk_speed;
 	}
 
+	if (ExtFlags&PEF_CONTINUE) {
+		// FIXME: should this depth be > 1?
+		// Also, should we look behind as well?
+		// the test case is lightning bolt, its a long projectile,
+		// so its possible we should search starting from step->Parent with depth 2
+		LineTarget(step, 1);
+	}
+
 	SetOrientation (step->orient, false);
 
 	Pos.x=step->x;
@@ -936,7 +957,9 @@ void Projectile::NextTarget(const Point &p)
 		Destination = Pos;
 		return;
 	}
-	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
+
+	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
+	path = area->GetLine( Pos, Destination, Speed, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)
@@ -962,18 +985,28 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		phase = P_EXPIRED;
 		return;
 	}
-	//replan the path in case the target moved
-	if(target->Pos!=Destination) {
-		NextTarget(target->Pos);
-		return;
-	}
 
-	//replan the path in case the source moved (only for line projectiles)
-	if(ExtFlags&PEF_LINE) {
-		Actor *c = area->GetActorByGlobalID(Caster);
-		if(c && c->Pos!=Pos) {
-			Pos=c->Pos;
+	if (ExtFlags&PEF_CONTINUE) {
+		const Point& A = Origin;
+		const Point& B = target->Pos;
+		double angle = atan2(B.y - A.y, B.x - A.x);
+		double adjustedRange = Feet2Pixels(Range, angle);
+		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
+		SetTarget(C);
+	} else {
+		//replan the path in case the target moved
+		if(target->Pos!=Destination) {
 			NextTarget(target->Pos);
+			return;
+		}
+
+		//replan the path in case the source moved (only for line projectiles)
+		if(ExtFlags&PEF_LINE) {
+			Actor *c = area->GetActorByGlobalID(Caster);
+			if(c && c->Pos!=Pos) {
+				Pos=c->Pos;
+				NextTarget(target->Pos);
+			}
 		}
 	}
 }
@@ -1001,35 +1034,37 @@ void Projectile::ClearPath()
 int Projectile::CalculateTargetFlag()
 {
 	//if there are any, then change phase to exploding
-	int flags = GA_NO_DEAD;
+	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
 
-	if (Extension->AFlags&PAF_NO_WALL) {
-		flags|=GA_NO_LOS;
-	}
+	if (Extension) {
+		if (Extension->AFlags&PAF_NO_WALL) {
+			flags|=GA_NO_LOS;
+		}
 
-	//projectiles don't affect dead/inanimate normally
-	if (Extension->AFlags&PAF_INANIMATE) {
-		flags&=~GA_NO_DEAD;
-	}
+		//projectiles don't affect dead/inanimate normally
+		if (Extension->AFlags&PAF_INANIMATE) {
+			flags&=~GA_NO_DEAD;
+		}
 
-	//affect only enemies or allies
-	switch (Extension->AFlags&PAF_TARGET) {
-	case PAF_ENEMY:
-		flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
-		break;
-	case PAF_PARTY: //this doesn't exist in IE
-		flags|=GA_NO_ENEMY;
-		break;
-	case PAF_TARGET:
-		flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
-		break;
-	default:
-		return flags;
-	}
+		//affect only enemies or allies
+		switch (Extension->AFlags&PAF_TARGET) {
+		case PAF_ENEMY:
+			flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
+			break;
+		case PAF_PARTY: //this doesn't exist in IE
+			flags|=GA_NO_ENEMY;
+			break;
+		case PAF_TARGET:
+			flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
+			break;
+		default:
+			return flags;
+		}
 
-	//this is the only way to affect neutrals and enemies
-	if (Extension->APFlags&APF_INVERT_TARGET) {
-		flags^=(GA_NO_ALLY|GA_NO_ENEMY);
+		//this is the only way to affect neutrals and enemies
+		if (Extension->APFlags&APF_INVERT_TARGET) {
+			flags^=(GA_NO_ALLY|GA_NO_ENEMY);
+		}
 	}
 
 	Actor *caster = area->GetActorByGlobalID(Caster);
@@ -1067,7 +1102,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq)
+void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
 {
 	if(effects) delete effects;
 	if(!eq) {
@@ -1075,9 +1110,15 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 		return;
 	}
 	effects = eq->CopySelf();
+	effects->ModifyAllEffectSources(source);
 }
 
 void Projectile::LineTarget()
+{
+	LineTarget(path, -1);
+}
+
+void Projectile::LineTarget(PathNode* beg, unsigned int depth)
 {
 	if(!effects) {
 		return;
@@ -1085,8 +1126,8 @@ void Projectile::LineTarget()
 
 	Actor *original = area->GetActorByGlobalID(Caster);
 	Actor *prev = NULL;
-	PathNode *iter = path;
-	while(iter) {
+	PathNode *iter = beg;
+	while(iter && depth > 0) {
 		Point pos(iter->x,iter->y);
 		Actor *target = area->GetActorInRadius(pos, CalculateTargetFlag(), 1);
 		if (target && target->GetGlobalID()!=Caster && prev!=target) {
@@ -1105,6 +1146,7 @@ void Projectile::LineTarget()
 			}
 		}
 		iter = iter->Next;
+		--depth;
 	}
 }
 
@@ -1116,16 +1158,29 @@ void Projectile::SecondaryTarget()
 	bool fail= !!(Extension->APFlags&APF_SPELLFAIL) && !(ExtFlags&PEF_DEFSPELL);
 	int mindeg = 0;
 	int maxdeg = 0;
+	int degOffset = 0;
+	char saneOrientation = Orientation;
 
 	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
-		mindeg=(Orientation*45-Extension->ConeWidth)/2;
-		maxdeg=mindeg+Extension->ConeWidth;
-	}
+		// see CharAnimations.cpp for a nice visualization of the orientation directions
+		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
+		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
+		saneOrientation = 12 - Orientation;
+		if (saneOrientation < 0) saneOrientation = MAX_ORIENT + saneOrientation;
 
-	int radius = Extension->ExplosionRadius;
-	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
-	Actor **poi=actors;
+		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
+		// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations
+		mindeg = (saneOrientation * (720 / MAX_ORIENT) - Extension->ConeWidth) / 2;
+		if (mindeg < 0) {
+			degOffset = -mindeg;
+			//mindeg = 0;
+		} else if (mindeg + Extension->ConeWidth > 360) {
+			degOffset = -(mindeg - 360 + Extension->ConeWidth);
+		}
+		mindeg += degOffset;
+		maxdeg = mindeg + Extension->ConeWidth;
+	}
 
 	if (Extension->DiceCount) {
 		//precalculate the maximum affected target count in case of PAF_AFFECT_ONE 
@@ -1135,25 +1190,25 @@ void Projectile::SecondaryTarget()
 		extension_targetcount = 1;
 	}
 
-	while(*poi) {
+	int radius = Extension->ExplosionRadius;
+	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
+	std::vector<Actor *>::iterator poi;
+	for (poi = actors.begin(); poi != actors.end(); ++poi) {
 		ieDword Target = (*poi)->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
-			poi++;
 			continue;
 		}
 
 		//IDS targeting for area projectiles
 		if (FailedIDS(*poi)) {
-			poi++;
 			continue;
 		}
 
 		if (Extension->AFlags&PAF_CONE) {
 			//cone never affects the caster
 			if(Caster==Target) {
-				poi++;
 				continue;
 			}
 			double xdiff = (*poi)->Pos.x-Pos.x;
@@ -1165,24 +1220,26 @@ void Projectile::SecondaryTarget()
 
 			//unsigned int dist = (unsigned int) sqrt(xdiff*xdiff+ydiff*ydiff);
 			//int width = (*poi)->GetAnims()->GetCircleSize();
-
 			if (ydiff) {
-				deg = (int) (std::atan(xdiff/ydiff)*180/M_PI);
-				if(ydiff>0) deg+=180;
+				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
+				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
+				deg = ((deg % 360) + 360 + degOffset) % 360;
 			} else {
-				if (xdiff<0) deg=90;
-				else deg = 270;
+				if (xdiff < 0) {
+					deg = 180;
+				} else {
+					deg = 0;
+				}
 			}
 
 			//not in the right sector of circle
 			if (mindeg>deg || maxdeg<deg) {
-				poi++;
 				continue;
 			}
 		}
 
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects);
+		pro->SetEffectsCopy(effects, Pos);
 		//copy the additional effects reference to the child projectile
 		//but only when there is a spell to copy
 		if (SuccSpell[0])
@@ -1193,8 +1250,6 @@ void Projectile::SecondaryTarget()
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)
 		area->AddProjectile(pro, Pos, Target, false);
-
-		poi++;
 		fail=false;
 
 		//we already got one target affected in the AOE, this flag says
@@ -1206,14 +1261,12 @@ void Projectile::SecondaryTarget()
 			//if target counting is per HD and this target is an actor, use the xp level field
 			//otherwise count it as one
 			if ((Extension->APFlags&APF_COUNT_HD) && ((*poi)->Type==ST_ACTOR) ) {
-				Actor *actor = (Actor *) *poi;
-				extension_targetcount-= actor->GetXPLevel(true);
+				extension_targetcount-= (*poi)->GetXPLevel(true);
 			} else {
 				extension_targetcount--;
 			}
 		}
 	}
-	free(actors);
 
 	//In case of utter failure, apply a spell of the same name on the caster
 	//this feature is used by SCHARGE, PRTL_OP and PRTL_CL in the HoW pack
@@ -1418,7 +1471,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 		//play VVC in center
 		//FIXME: make it possible to play VEF too?
 		if (aoeflags&PAF_VVC) {
@@ -1451,7 +1504,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		
 		phase=P_EXPLODING2;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
 	}
 	
 	//the spreading animation is in the first column
@@ -1561,7 +1614,18 @@ void Projectile::DrawExplosion(const Region &screen)
 			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
 				pro->ExtFlags|=PEF_RANDOM;
 			}
+
 			pro->Setup();
+
+			// currently needed by bg2/how Web (less obvious in bg1)
+			// TODO: original behaviour was: play once, wait in final frame, hide, wait, repeat
+			if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
+				// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
+				for (int i=0; i<MAX_ORIENT; i++) {
+					if (pro->travel[i]) pro->travel[i]->Flags |= A_ANI_PLAYONCE;
+				}
+			}
+
 			children[i]=pro;
 		}
 	}

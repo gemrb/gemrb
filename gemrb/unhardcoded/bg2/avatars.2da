@@ -48,6 +48,7 @@
 0x5011     CEFB1      CEFB2      CEFB3      CEFC4      0          2          0          M
 0x5012     CDMB1      CDMB2      CDMB3      CDMC4      0          2          0          S
 0x5013     CIFB1      CIFB2      CIFB3      CIFC4      0          2          0          S
+0x502F     MBE1       MBE1       MBE1       MBE1       9          2          1          *
 0x5100     CHMB1      CHMB2      CHMB3      CHMF4      0          2          0          L
 0x5101     CEMB1      CEMB2      CEMB3      CHMF4      0          2          0          M
 0x5102     CDMB1      CDMB2      CDMB3      CDMF4      0          2          0          S
@@ -64,6 +65,8 @@
 0x5211     CEFW1      CEFW2      CEFW3      CEFW4      0          2          0          M
 0x5212     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          S
 0x5213     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          S
+0x5269     MHAR       MHAR       MHAR       MHAR       9          2          1          *
+0x5294     _DJ        _DJ        _DJ        _DJ        9          2          1          *    
 0x5300     CHMB1      CHMT2      CHMB3      CHMF4      0          2          0          L
 0x5301     CEMB1      CEMT2      CEMB3      CEMF4      0          2          0          M
 0x5302     CDMB1      CDMT2      CDMB3      CDMF4      0          2          0          S
@@ -106,7 +109,7 @@
 0x6211     CEFW1      CEFW2      CEFW3      CEFW4      0          2          0          M
 0x6212     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          S
 0x6213     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          S
-0x6214     CDMW1      CIFW2      CIFW3      CIFW4      0          2          0          S
+0x6214     CDMW1      CDMW2      CDMW3      CDMW4      0          2          0          S
 0x6215     CHFW1      CHFW2      CHFW3      CHFW4      0          2          0          N
 0x6300     CHMB1      CHMT2      CHMB3      CHMF4      0          2          0          L
 0x6301     CEMB1      CEMT2      CEMB3      CEMF4      0          2          0          M
@@ -126,7 +129,7 @@
 0x6403     MSKL1      MSKL1      MSKL1      MSKL1      6          2          1          M
 0x6404     USAR1      USAR1      USAR1      USAR1      6          2          1          *
 0x6405     MDGU1      MDGU1      MDGU1      MDGU1      6          2          0          M
-0x6406     MDGU1      MDGU1      MDGU1      MDGU1      6          2          0          L
+0x6406     MDGU1      MDGU1      MDGU1      MDGU1      6          4          0          L
 0x6500     CHMM1      CHMB2      CHMB3      CHMC4      0          2          0          L
 0x6510     CHFM1      CHFB2      CHFB3      CHFC4      0          2          0          N
 0x7000     MOGH       MOGH       MOGH       MOGH       14         2          0          *
@@ -254,12 +257,12 @@
 0xB600     NNOM       NNOM       NNOM       NNOM       18         2          0          *
 0xB610     NNOW       NNOW       NNOW       NNOW       18         2          0          *
 0xB700     NSLV       NSLV       NSLV       NSLV       18         2          0          *
-0xC000     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC000     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC100     ACAT       ACAT       ACAT       ACAT       3          1          1          *
 0xC200     ACHK       ACHK       ACHK       ACHK       3          1          1          *
 0xC300     ARAT       ARAT       ARAT       ARAT       3          1          1          *
 0xC400     ASQU       ASQU       ASQU       ASQU       3          1          1          *
-0xC500     ABAT       ABAT       ABAT       ABAT       3          1          1          *
+0xC500     ABAT       ABAT       ABAT       ABAT       3          0          1          *
 0xC600     NBEG       NBEG       NBEG       NBEG       18         2          0          *
 0xC610     NPRO       NPRO       NPRO       NPRO       18         2          0          *
 0xC700     NBOY       NBOY       NBOY       NBOY       18         2          0          *
