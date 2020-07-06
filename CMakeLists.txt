@@ -306,7 +306,6 @@ IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 ENDIF()
 
 IF(IS_RPI)
-IF(IS_RPI)
 
   IF(SDL_FOUND)
     MESSAGE(STATUS "Looking for SDL: found")
@@ -349,9 +348,7 @@ IF(IS_RPI)
     
   #OPTION(IS_RPI "Select this for Raspberry Pi support. This will enable SDL2 and GLES and look for GLES." "None")
   #OPTION(RPI_GLES_PATH "The path for GLES" "/opt/vc/")
-ENDIF()
-  
-  
+
 ELSE()
   # backward compatibility notice - remove USE_SDL2 and OPENGL_BACKEND in the future (added mid 2016)
   IF(USE_SDL2)
