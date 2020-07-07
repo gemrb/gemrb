@@ -2224,8 +2224,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 		StanceID = IE_ANI_RUN;
 	}
 
-	// Adjustments (+8/+6) are being made here, see Map::FindPath() in PathFinder.cpp
-	Point nmptStep(step->x * 16 + 8, step->y * 12 + 6);
+	Point nmptStep(step->x, step->y);
 	double dx = nmptStep.x - Pos.x;
 	double dy = nmptStep.y - Pos.y;
 	bool reachedStep = (dx == 0 && dy == 0);
@@ -2268,8 +2267,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (area->GetBlocked((Pos.x + dx) / 16, (Pos.y + dy) / 12, false) & PATH_MAP_SIDEWALL) {
-
+		if (!area->IsWalkableTo(Pos, nmptStep, false, Type == ST_ACTOR ? (Actor*)this : NULL)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return true;
@@ -2349,9 +2347,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
-	} else {
-		Log(DEBUG, "PathFinderWIP", "Pathing failed for %s", GetName(0));
-	}
+	} 
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)

@@ -31,6 +31,8 @@
 #include <algorithm>
 #include <queue>
 
+template <class V> class FibonacciHeap;
+
 namespace GemRB {
 
 class Actor;
@@ -320,6 +322,7 @@ typedef std::list<VEFObject*>::iterator scaIterator;
 typedef std::list<Projectile*>::iterator proIterator;
 typedef std::list<Particles*>::iterator spaIterator;
 
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -365,6 +368,11 @@ private:
 	Actor** queue[QUEUE_COUNT];
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
+	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
+	static const size_t DEGREES_OF_FREEDOM = 4;
+	static const std::array<char, DEGREES_OF_FREEDOM> dx;
+	static const std::array<char, DEGREES_OF_FREEDOM> dy;
+
 public:
 	Map(void);
 	~Map(void);
@@ -427,9 +435,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool CheckNavmapPointFlags(unsigned int px, unsigned int py, unsigned int size, unsigned int flags, bool actorsAreBlocking = true) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
-	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y, bool actorsAreBlocking = true) const;
+	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, bool actorsAreBlocking, unsigned int size) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking) const;
+	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y, bool actorsAreBlocking) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -533,7 +541,8 @@ public:
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
-	bool IsVisibleLOS(const Point &s, const Point &d) const;
+	bool IsVisibleLOS(const Point &s, const Point &d, const Actor *caller = NULL) const;
+	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
@@ -601,16 +610,16 @@ private:
 	void DeleteActor(int i);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
-	//separated position adjustment, so their order could be randomised */
+	//separated position adjustment, so their order could be randomised
 	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-	bool CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int flags,
-		bool checkImpassable = false, bool actorsAreBlocking = true) const;
-	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking = true) const;
-	PathNode *BuildActorPath(SearchmapPoint &smptCurrent, const SearchmapPoint &smptDest, 
-		const std::vector<SearchmapPoint> &parents, bool backAway) const;
+	bool CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int mapFlags,
+		bool checkImpassable = false, bool actorsAreBlocking = true, const Actor *caller = NULL) const;
+	PathNode *BuildActorPath(const NavmapPoint &nmptDest, const std::vector<NavmapPoint> &parents, bool backAway) const;
+	void UpdateVertex(const NavmapPoint &s, const NavmapPoint &d, const NavmapPoint &nmptCurrent, const NavmapPoint &nmptChild, 
+			std::vector<unsigned short> &distFromStart, std::vector<NavmapPoint> &parents, FibonacciHeap<PQNode> &open, const Actor *caller) const;
 };
 
 }

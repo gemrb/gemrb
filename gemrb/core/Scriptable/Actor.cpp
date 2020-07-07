@@ -8695,7 +8695,7 @@ void Actor::Draw(const Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if (area->GetBlocked(iPos.x / 16, iPos.y / 12, true) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
@@ -8788,7 +8788,7 @@ void Actor::Draw(const Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if (area->GetBlocked(iPos.x / 16, iPos.y / 12, true) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
