@@ -368,11 +368,9 @@ private:
 	Actor** queue[QUEUE_COUNT];
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
-	static const unsigned short MAX_PATH_COST = std::numeric_limits<unsigned short>::max();
 	static const size_t DEGREES_OF_FREEDOM = 4;
 	static const std::array<char, DEGREES_OF_FREEDOM> dx;
 	static const std::array<char, DEGREES_OF_FREEDOM> dy;
-
 public:
 	Map(void);
 	~Map(void);

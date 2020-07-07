@@ -48,8 +48,8 @@
 
 namespace GemRB {
 
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx = {1, 0, -1, 0};
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy = {0, 1, 0, -1};
+constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
+constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
 
 
 // Find the best path of limited length that brings us the farthest from dX, dY
@@ -274,7 +274,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(Width * Height, false);
 	std::vector<NavmapPoint> parents(Width * Height, Point(0, 0));
-	std::vector<unsigned short> distFromStart(Width * Height, MAX_PATH_COST);
+	std::vector<unsigned short> distFromStart(Width * Height, std::numeric_limits<unsigned short>::max());
 	distFromStart[smptSource.y * Width + smptSource.x] = 0;
 	parents[smptSource.y * Width + smptSource.x] = s;
 	open.emplace(PQNode(s, 0));
