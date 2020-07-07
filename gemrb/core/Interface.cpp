@@ -2352,8 +2352,7 @@ bool Interface::LoadGemRBINI()
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
 	// the speeds from the original games.
-	gamedata->SetStepTime(ini->GetKeyAsInt("resources",  "StepTime", 566)); // Defaults to BG2's value
-	Log(DEBUG, "PathFinder", "StepTime = %d", gamedata->GetStepTime());
+	gamedata->SetStepTime(ini->GetKeyAsInt("resources", "StepTime", 566)); // Defaults to BG2's value
 
 	// The format of GroundCircle can be:
 	// GroundCircleBAM1 = wmpickl/3

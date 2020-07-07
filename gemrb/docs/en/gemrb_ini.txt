@@ -570,7 +570,7 @@ Determines whether a detected stealing attempt causes the shopkeep to turn hosti
 
 StepTime = <number>
 - - - - - - - - - -
-Determines how long a single step is, i.e. how fast characters move
+Determines how long a single step is, i.e. how fast characters move. For measurements see #106.
 
 
 StrrefSaveGame = <bool>
