@@ -1344,7 +1344,7 @@ void Map::DrawSearchMap(const Region &screen)
 	block.h = 6;
 	while (step) {
 		block.x = (step->x+64) - rgn.x;
-		block.y = (step->y+12) - rgn.y - 6;
+		block.y = (step->y+6) - rgn.y;
 		print("Waypoint %d at (%d, %d)", i, step->x, step->y);
 		vid->DrawRect(block, waypoint);
 		step = step->Next;
@@ -2501,7 +2501,7 @@ int Map::WhichEdge(const Point &s)
 {
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
-	if (!(GetBlocked(sX, sY, true)&PATH_MAP_TRAVEL)) {
+	if (!(GetBlocked(sX, sY, true) & PATH_MAP_TRAVEL)) {
 		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
 			sX, sY);
 		return -1;

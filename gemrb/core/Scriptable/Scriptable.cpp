@@ -2045,7 +2045,7 @@ int Movable::GetPathLength()
 PathNode *Movable::GetNextStep(int x)
 {
 	if (!step) {
-		error("GetNextStepWIP", "GetNextStep hit with step = null");
+		error("GetNextStep", "Hit with step = null");
 	}
 	PathNode *node = step;
 	while(node && x--) {
