@@ -9,6 +9,9 @@ This list can be incomplete and obsolete - for current status, look into
 gemrb/plugins/Core/GameControl.cpp, functions GameControl::OnKeyRelease() 
 and GameControl::Draw().
 
+For an easier read, check out the more comprehensive version of this doc
+on the website: https://gemrb.org/Cheats.html
+
 Cheat keys are enabled by default. To activate them, either type command
 GemRB.EnableCheatKeys(1) on console (pops-up with CTRL+SPACE key combination),
 put EnableCheatKeys=1 in the GemRB config or Cheats=1 under game options in
@@ -20,9 +23,6 @@ might be needed to 'click' the GameControl (i.e. map) first.
 
 Ctrl-A - Alters the animation ID of the actor. You have to hover your
          mouse over it.
-
-Ctrl-B - Draws path from start point marked by Ctrl-O to current mouse 
-         position.
 
 Ctrl-C - Force casts a hardcoded spell. The last selected actor is the
          caster and the target is the door/actor currently under the
@@ -46,9 +46,6 @@ Ctrl-L - Plays the S056ICBL animation over the actor. (This exists in PST only)
 
 Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
-
-Ctrl-O - Marks current mouse position as start point (origin) for path drawn
-         with Ctrl-B
 
 Ctrl-P - Centers the viewport on the selected actor.
 
