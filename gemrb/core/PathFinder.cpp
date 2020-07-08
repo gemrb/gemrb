@@ -255,7 +255,7 @@ void Map::UpdateVertex(const NavmapPoint &s, const NavmapPoint &d, const NavmapP
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags)
+PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller)
 {
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
@@ -268,8 +268,6 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	}
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
-
-	Actor *caller = GetActor(s, GA_NO_UNSCHEDULED|GA_NO_DEAD);
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;

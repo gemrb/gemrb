@@ -2338,7 +2338,12 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	area->ClearSearchMapFor(this);
-	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
+	PathNode *newPath;
+	if (Type == ST_ACTOR) {
+		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, (Actor*)this);
+	} else {
+		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
+	}
 	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT);
 	}
