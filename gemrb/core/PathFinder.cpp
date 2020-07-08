@@ -269,7 +269,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 
-	Actor *caller = GetActor(s, 0);
+	Actor *caller = GetActor(s, GA_NO_UNSCHEDULED|GA_NO_DEAD);
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
