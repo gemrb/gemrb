@@ -4717,7 +4717,8 @@ PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
 **Parameters:** \n\
   * WindowIndex, ControlIndex - control IDs\n\
   * type - one of CHR_PORTRAITS, CHR_SOUNDS, CHR_EXPORTS or CHR_SCRIPTS\n\
-  * flags -  currently only used for CHR_PORTRAITS: 0 means the portraits with 'M' as the suffix, anything else 'S'\n\
+  * flags:\n\
+    - for CHR_PORTRAITS chooses suffix: 0 'M', 1 'S', 2 'L'\n\
 \n\
 **Return value:** list - the list of options added to the TextArea"
 );
