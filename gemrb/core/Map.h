@@ -389,7 +389,7 @@ public:
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);
-	bool DoStepForActor(Actor *actor, int walkScale, ieDword time);
+	void DoStepForActor(Actor *actor, int walkScale, ieDword time);
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
@@ -445,7 +445,7 @@ public:
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any) const;
-	Actor* GetActor(const Point &p, int flags, const Movable* checker = NULL) const;
+	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable* GetActorByDialog(const char* resref);
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);

@@ -783,35 +783,30 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 	}
 
-	// We need to step through the list of actors until
-	// all of them are done taking steps
-	bool more_steps = true;
 	ieDword time = game->Ticks; // make sure everything moves at the same time
-	while (more_steps) {
-		more_steps = false;
-		// Make all actors pathfind if there are others nearby
-		// in order to avoid bumping when possible
-		q=Qcount[PR_SCRIPT];
-		while (q--) {
-			Actor* actor = queue[PR_SCRIPT][q];
-			if (actor->GetRandomBackoff() || !actor->GetStep()) {
-				continue;
-			}
-			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
-			if (nearActor && nearActor != actor) {
-				actor->NewPath();
-			}
+	// Make actors pathfind if there are others nearby
+	// in order to avoid bumping when possible
+	q=Qcount[PR_SCRIPT];
+	while (q--) {
+		Actor* actor = queue[PR_SCRIPT][q];
+		if (actor->GetRandomBackoff() || !actor->GetStep()) {
+			continue;
 		}
-		q = Qcount[PR_SCRIPT];
-		while (q--) {
-			Actor* actor = queue[PR_SCRIPT][q];
-			if (actor->GetRandomBackoff()) {
-				actor->DecreaseBackoff();
-				continue;
-			}
-			more_steps = more_steps || !DoStepForActor(actor, actor->speed, time);
+		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
+		if (nearActor && nearActor != actor) {
+			actor->NewPath();
 		}
 	}
+	q = Qcount[PR_SCRIPT];
+	while (q--) {
+		Actor* actor = queue[PR_SCRIPT][q];
+		if (actor->GetRandomBackoff()) {
+			actor->DecreaseBackoff();
+			continue;
+		}
+		DoStepForActor(actor, actor->speed, time);
+	}
+
 
 	//Check if we need to start some door scripts
 	int doorCount = 0;
@@ -903,25 +898,16 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	}
 }
 
-bool Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
+void Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
-		return true;
+		return;
 	}
 
-	bool no_more_steps = true;
-	if (actor->BlocksSearchMap()) {
-		ClearSearchMapFor(actor);
-	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-		no_more_steps = actor->DoStep(walkScale, time);
-		if (actor->BlocksSearchMap()) {
-			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-		}
+		actor->DoStep(walkScale, time);
 	}
-
-	return no_more_steps;
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
@@ -1711,8 +1697,10 @@ void Map::JumpActors(bool jump)
 {
 	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
-			if (jump) {
-				actor->FixPosition();
+			if (jump && !(actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD)) {
+				ClearSearchMapFor(actor);
+				AdjustPositionNavmap(actor->Pos);
+				actor->ImpedeBumping();
 			}
 			actor->SetBase(IE_DONOTJUMP,0);
 		}
@@ -1985,17 +1973,21 @@ unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, bool acto
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 2) size = 2;
-	unsigned int ret = ~0;
+	unsigned int ret = 0;
 
 	unsigned int r = (size - 2) * (size - 2) + 1;
 	if (size == 2) r = 0;
 	for (unsigned int i = 0; i < size - 1; i++) {
 		for (unsigned int j = 0; j < size - 1; j++) {
 			if (i * i + j * j <= r) {
-				ret &= GetBlockedNavmap(px + i * 16, py + j * 12, actorsAreBlocking);
-				ret &= GetBlockedNavmap(px + i * 16, py - j * 12, actorsAreBlocking);
-				ret &= GetBlockedNavmap(px - i * 16, py + j * 12, actorsAreBlocking);
-				ret &= GetBlockedNavmap(px - i * 16, py - j * 12, actorsAreBlocking);
+				unsigned int retBotRight = GetBlockedNavmap(px + i * 16, py + j * 12, actorsAreBlocking);
+				unsigned int retTopRight = GetBlockedNavmap(px + i * 16, py - j * 12, actorsAreBlocking);
+				unsigned int retBotLeft = GetBlockedNavmap(px - i * 16, py + j * 12, actorsAreBlocking);
+				unsigned int retTopLeft = GetBlockedNavmap(px - i * 16, py - j * 12, actorsAreBlocking);
+				if (retBotRight == PATH_MAP_IMPASSABLE || retBotLeft == PATH_MAP_IMPASSABLE || retTopRight == PATH_MAP_IMPASSABLE || retTopLeft == PATH_MAP_IMPASSABLE) {
+					return PATH_MAP_IMPASSABLE;
+				}
+				ret |= (retBotRight | retTopRight | retBotLeft | retTopLeft);
 			}
 		}
 	}

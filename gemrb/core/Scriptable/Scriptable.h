@@ -471,7 +471,8 @@ protected:
 	int PathTries;
 	bool tryNotToBump;
 	int randomBackoff;
-	Point OldPos;
+	Point oldPos;
+	bool bumped;
 public:
 	inline int GetRandomBackoff() const
 	{
@@ -490,7 +491,10 @@ public:
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
+	inline void ImpedeBumping() { oldPos = Pos; bumped = false; }
+	void AdjustPosition();
 	void BumpAway();
+	inline bool IsBumped() { return bumped; }
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return PathTries; }
@@ -522,12 +526,11 @@ public:
 	void SetStance(unsigned int arg);
 	void SetOrientation(int value, bool slow);
 	void SetAttackMoveChances(ieWord *amc);
-	virtual bool DoStep(unsigned int walkScale, ieDword time = 0);
+	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, int noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
-	void FixPosition();
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();

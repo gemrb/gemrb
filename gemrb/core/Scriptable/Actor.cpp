@@ -6747,12 +6747,12 @@ int Actor::Immobile() const
 	return 0;
 }
 
-bool Actor::DoStep(unsigned int walkScale, ieDword time)
+void Actor::DoStep(unsigned int walkScale, ieDword time)
 {
 	if (Immobile()) {
-		return true;
+		return;
 	}
-	return Movable::DoStep(walkScale, time);
+	Movable::DoStep(walkScale, time);
 }
 
 ieDword Actor::GetNumberOfAttacks()

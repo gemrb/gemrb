@@ -2000,7 +2000,8 @@ bool Highlightable::PossibleToSeeTrap() const
 Movable::Movable(ScriptableType type)
 	: Selectable( type )
 {
-	OldPos = Pos;
+	bumped = false;
+	oldPos = Pos;
 	Destination = Pos;
 	Orientation = 0;
 	NewOrientation = 0;
@@ -2180,11 +2181,11 @@ void Movable::Backoff()
 void Movable::BumpAway()
 {
 	area->ClearSearchMapFor(this);
+	bumped = true;
 	area->AdjustPositionNavmap(Pos);
 }
 
 // Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
-// Returns whether the actor made all pending steps (so, false if it must be called again this tick).
 // The movement logic is a proportional regulator: the displacement/movement vector has a
 // fixed radius, based on actor walk speed, and its direction heads towards the next waypoint.
 // The bumping logic checks if there would be a collision if the actor was to move according to this
@@ -2192,32 +2193,41 @@ void Movable::BumpAway()
 // In that case, it bumps it and goes on with its step, otherwise it either stops and waits
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
-bool Movable::DoStep(unsigned int walkScale, ieDword time) {
-	// Only bump back if you are not moving
+void Movable::DoStep(unsigned int walkScale, ieDword time) {
+	// Only bump back if not moving
+	// Actors can be bumped while moving if they are backing off
 	if (!path) {
-		if (OldPos == Pos) {
-			return true;
+		if (Destination != Pos) {
+			WalkTo(Destination);
+			return;
 		}
-		if (!(area->GetBlocked(OldPos.x / 16, OldPos.y / 12, true) & PATH_MAP_PASSABLE)) {
-			return true;
+		if (!IsBumped()) {
+			return;
 		}
-		if (Type == ST_ACTOR) {
-			area->ClearSearchMapFor(this);
-			((Actor*)this)->SetPosition(OldPos, 1, 0, 0);
+		area->ClearSearchMapFor(this);
+		unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y, true);
+		if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
+			// Bump back if the actor is "blocking" itself
+			if (!(oldPosBlockStatus & PATH_MAP_ACTOR && Type == ST_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == (Actor*)this)) {
+				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
+				return;
+			}
 		}
-		return true;
+		bumped = false;
+		MoveTo(oldPos);
+		return;
 	}
 	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
 		timeStartStep = time;
-		return true;
+		return;
 	}
 	if (!walkScale) {
 		// zero speed: no movement
 		StanceID = IE_ANI_READY;
 		timeStartStep = time;
-		return true;
+		return;
 	}
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
@@ -2229,14 +2239,6 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 	double dy = nmptStep.y - Pos.y;
 	bool reachedStep = (dx == 0 && dy == 0);
 	if (reachedStep) {
-		if (step->Next) {
-			step = step->Next;
-			return false;
-		} else {
-			ClearPath(true);
-			NewOrientation = Orientation;
-			return true;
-		}
 	}
 	Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
 	if (time > timeStartStep) {
@@ -2255,7 +2257,7 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 3 && std::abs(nmptStep.y - Pos.y) < YEPS * 3) {
 				ClearPath(true);
 				NewOrientation = Orientation;
-				return true;
+				return;
 			}
 			if (Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 				actorInTheWay->BumpAway();
@@ -2263,22 +2265,42 @@ bool Movable::DoStep(unsigned int walkScale, ieDword time) {
 				StanceID = IE_ANI_READY;
 				tryNotToBump = true;
 				Backoff();
-				return true;
+				return;
 			}
 		}
 		// Stop if there's a door in the way
 		if (!area->IsWalkableTo(Pos, nmptStep, false, Type == ST_ACTOR ? (Actor*)this : NULL)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
-			return true;
+			return;
+		}
+		if (Type == ST_ACTOR && BlocksSearchMap()) {
+			area->ClearSearchMapFor(this);
 		}
 		Pos.x += dx;
 		Pos.y += dy;
-		OldPos = Pos;
+		oldPos = Pos;
+		if (Type == ST_ACTOR && BlocksSearchMap()) {
+			area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
+		}
+
 		SetOrientation(step->orient, false);
 		timeStartStep = time;
+		if (Pos == nmptStep) {
+			if (step->Next) {
+				step = step->Next;
+			} else {
+				ClearPath(true);
+				NewOrientation = Orientation;
+			}
+		}
 	}
-	return true;
+}
+
+void Movable::AdjustPosition()
+{
+	area->AdjustPosition(Pos); 
+	ImpedeBumping();
 }
 
 void Movable::AddWayPoint(const Point &Des)
@@ -2300,24 +2322,6 @@ void Movable::AddWayPoint(const Point &Des)
 	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
 	path2->Parent = endNode;
-}
-
-void Movable::FixPosition()
-{
-	if (Type!=ST_ACTOR) {
-		return;
-	}
-	Actor *actor = (Actor *) this;
-	if (actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD ) {
-		return;
-	}
-	//before fixposition, you should remove own shadow
-	area->ClearSearchMapFor(this);
-	Pos.x/=16;
-	Pos.y/=12;
-	GetCurrentArea()->AdjustPosition(Pos);
-	Pos.x=Pos.x*16+8;
-	Pos.y=Pos.y*12+6;
 }
 
 // This function is called at each tick if an actor is following another actor
@@ -2345,7 +2349,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
 	}
 	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
-		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT);
+		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, (Actor*) this);
 	}
 
 	if (newPath) {
@@ -2353,6 +2357,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		path = newPath;
 		step = path;
 	} 
+	area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
@@ -2414,7 +2419,7 @@ void Movable::MoveTo(const Point &Des)
 {
 	area->ClearSearchMapFor(this);
 	Pos = Des;
-	OldPos = Des;
+	oldPos = Des;
 	Destination = Des;
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);

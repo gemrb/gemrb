@@ -749,7 +749,7 @@ public:
 	void UpdateAnimations();
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
-	bool DoStep(unsigned int walkScale, ieDword time = 0) override;
+	void DoStep(unsigned int walkScale, ieDword time = 0) override;
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
