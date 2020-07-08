@@ -257,12 +257,8 @@ void Map::UpdateVertex(const NavmapPoint &s, const NavmapPoint &d, const NavmapP
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags)
 {
-	SearchmapPoint smptSource(s.x / 16, s.y / 12);
-	SearchmapPoint smptDest(d.x / 16, d.y / 12);
-	SearchmapPoint nmptDest = d;
-
-	Actor *caller = GetActor(s, 0);
-
+	NavmapPoint nmptDest = d;
+	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d.x, d.y, true, size) & PATH_MAP_PASSABLE)) {
 		// If the desired target is blocked, find the path
 		// to the nearest reachable point.
@@ -270,14 +266,19 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
+	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
+	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
+
+	Actor *caller = GetActor(s, 0);
+
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(Width * Height, false);
 	std::vector<NavmapPoint> parents(Width * Height, Point(0, 0));
 	std::vector<unsigned short> distFromStart(Width * Height, std::numeric_limits<unsigned short>::max());
 	distFromStart[smptSource.y * Width + smptSource.x] = 0;
-	parents[smptSource.y * Width + smptSource.x] = s;
-	open.emplace(PQNode(s, 0));
+	parents[smptSource.y * Width + smptSource.x] = nmptSource;
+	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
@@ -306,7 +307,6 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				}
 			}
 		}
-
 		isClosed[smptCurrent.y * Width + smptCurrent.x] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
@@ -323,7 +323,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 			unsigned childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, flags & PF_ACTORS_ARE_BLOCKING, size);
 			bool childBlocked = !(childBlockStatus & PATH_MAP_PASSABLE);
-			if (!childBlocked) UpdateVertex(s, smptDest, nmptCurrent, nmptChild, distFromStart, parents, open, caller);
+			if (!childBlocked) UpdateVertex(nmptSource, nmptDest, nmptCurrent, nmptChild, distFromStart, parents, open, caller);
 		}
 	}
 
