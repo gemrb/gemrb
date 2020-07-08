@@ -58,10 +58,10 @@ If you're a web developer, check the website [reports](https://github.com/gemrb/
 
 1. GemRB comes with a bundled demo, but it is trivial. The challenge is to enhance it, but
 a lot of (compatibly licensed) art is missing. See also the docs on
-[creating a new game](http://www.gemrb.org/wiki/doku.php?id=newgame:newgame)
+[creating a new game](https://gemrb.org/New-game.html)
 
 2. Some GemRB mods are in the [gemrb-mods repo](https://github.com/lynxlynxlynx/gemrb-mods).
-The [mod idea page](http://www.gemrb.org/wiki/doku.php?id=developers:mods) also lists 
+The [mod idea page](https://gemrb.org/Modding.html) also lists
 several ideas from simple tweaks to more complex mods.  If you know WeiDU, a good task would be to add
 more of the documented tweaks (idea page) to the tweakpack.
 
@@ -123,8 +123,8 @@ so we can improve our process and documentation!
 
 ## Useful links
 - [IESDP](https://gibberlings3.github.io/iesdp/), 
-- [engine overview](http://www.gemrb.org/wiki/doku.php?id=engine:start), 
-- [GUIScript documentation](http://www.gemrb.org/wiki/doku.php?id=documentation),
+- [engine overview](https://gemrb.org/Engine-overview.html),
+- [GUIScript documentation](https://gemrb.org/GUIScript/Index.html),
 - [plaintext dumps](http://lynxlynx.info/ie/string-dumps.zip) of game strings with matching strrefs,
 - the buildbots are accessible through any PR or commit
 - the tools mentioned in the README links section

@@ -323,6 +323,8 @@ def SpellsDonePress ():
 			SpellLevel = 0
 			# bump it for specialists and iwd2 casters with high stats
 			SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
+			# FIXME: setting the proper count here breaks original characters, see #680
+			#GemRB.SetMemorizableSpellsCount (pc, SpellsSelectPointsLeft[SpellLevel], SpellBookType, SpellLevel)
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			Memorization = 1
 			ShowKnownSpells()

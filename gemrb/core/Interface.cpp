@@ -2413,7 +2413,7 @@ bool Interface::LoadEncoding()
 
 	// TODO: lists are incomplete
 	// maybe want to externalize this
-	// list compiled form wiki: http://www.gemrb.org/wiki/doku.php?id=engine:encodings
+	// list compiled form wiki: https://gemrb.org/Text-encodings.html
 	const char* wideEncodings[] = {
 		// Chinese
 		"GBK", "BIG5",

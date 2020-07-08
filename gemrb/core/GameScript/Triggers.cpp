@@ -3526,10 +3526,20 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Map *map = (Map *) Sender;
-	if ( map->CanFree() ) {
-		return 1;
+	// map->CanFree() has side effects, don't use it here! Would make some loot and corpses disappear immediately
+	int i = map->GetActorCount(true);
+	while (i--) {
+		Actor *actor= map->GetActor(i, true);
+		bool usedExit = actor->GetInternalFlag() & IF_USEEXIT;
+		if (actor->IsPartyMember()) {
+			if (!usedExit) {
+				return 0;
+			}
+		} else if (usedExit) {
+			return 0;
+		}
 	}
-	return 0;
+	return 1;
 }
 
 //this trigger always checks the right hand weapon?
