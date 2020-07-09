@@ -954,6 +954,7 @@ public:
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
+	bool ShouldModifyMorale() const;
 };
 }
 

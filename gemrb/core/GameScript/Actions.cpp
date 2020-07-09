@@ -1511,6 +1511,9 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove()) {
 		// we should make sure our existing walk is a 'run away', or fix moving/path code
 		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+		if (actor->ShouldModifyMorale()) {
+			actor->NewBase(IE_MORALE, 20, MOD_ABSOLUTE);
+		}
 	}
 
 	//repeat movement...
@@ -2967,6 +2970,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
+// these two didn't work in the original (bg2, ee) and were unused
 void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -2982,9 +2986,10 @@ void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->SetBase(IE_MORALE, parameters->int0Parameter+act->GetBase(IE_MORALE) );
+	act->SetBase(IE_MORALE, parameters->int0Parameter + act->GetBase(IE_MORALE));
 }
 
+// these three are present in all engines
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -2995,7 +3000,7 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->SetBase(IE_MORALEBREAK, parameters->int0Parameter);
+	act->SetBase(IE_MORALE, parameters->int0Parameter);
 }
 
 void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
@@ -3008,7 +3013,7 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->SetBase(IE_MORALEBREAK, act->GetBase(IE_MORALEBREAK)+parameters->int0Parameter);
+	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) + parameters->int0Parameter);
 }
 
 void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
@@ -3021,7 +3026,7 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->SetBase(IE_MORALEBREAK, act->GetBase(IE_MORALEBREAK)-parameters->int0Parameter);
+	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) - parameters->int0Parameter);
 }
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)

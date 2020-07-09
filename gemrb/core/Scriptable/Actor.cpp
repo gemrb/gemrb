@@ -1042,6 +1042,8 @@ void Actor::ApplyClab(const char *clab, ieDword max, int remove, int diff)
 //cannot use old or new value, because it is called two ways
 static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
+	if (!actor->ShouldModifyMorale()) return;
+
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
@@ -3497,9 +3499,9 @@ void Actor::RefreshPCStats() {
 	RefreshHP();
 
 	Game *game = core->GetGame();
-	//morale recovery every xth AI cycle
+	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
-	if (mrec) {
+	if (mrec && ShouldModifyMorale()) {
 		if (!(game->GameTime%mrec)) {
 			int morale = (signed) BaseStats[IE_MORALE];
 			if (morale < 10) {
@@ -4778,6 +4780,19 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
 		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
+
+		// impact morale when hp thresholds (50 %, 25 %) are crossed for the first time
+		int currentRatio = 100 * chp / (signed) BaseStats[IE_MAXHITPOINTS];
+		int newRatio = 100 * (chp + damage) / (signed) BaseStats[IE_MAXHITPOINTS];
+		if (ShouldModifyMorale()) {
+			if (currentRatio > 50 && newRatio < 25) {
+				NewBase(IE_MORALE, (ieDword) -4, MOD_ADDITIVE);
+			} else if (currentRatio > 50 && newRatio < 50) {
+				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+			} else if (currentRatio > 25 && newRatio < 25) {
+				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+			}
+		}
 	}
 
 	// can be negative if we're healing on 100%+ resistance
@@ -4793,7 +4808,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	} else if (damage < 20) { // a guess; impacts what blood bam we play, while elemental damage types are unaffected
 		damagelevel = 1;
 	} else {
-		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 		damagelevel = 2;
 	}
 
@@ -5469,7 +5483,7 @@ void Actor::Resurrect()
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
-	SetBase(IE_MORALE, 10);
+	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp
 	SetBase(IE_HITPOINTS, 1);
@@ -5512,11 +5526,30 @@ static const char *GetVarName(const char *table, int value)
 	return NULL;
 }
 
+// [EA.FACTION.TEAM.GENERAL.RACE.CLASS.SPECIFIC.GENDER.ALIGN] has to be the same for both creatures
+static bool OfType(Actor *a, Actor *b)
+{
+	bool same = a->GetStat(IE_EA) == b->GetStat(IE_EA) &&
+		a->GetStat(IE_RACE) == b->GetStat(IE_RACE) &&
+		a->GetStat(IE_GENERAL) == b->GetStat(IE_GENERAL) &&
+		a->GetStat(IE_SPECIFIC) == b->GetStat(IE_SPECIFIC) &&
+		a->GetStat(IE_CLASS) == b->GetStat(IE_CLASS) &&
+		a->GetStat(IE_TEAM) == b->GetStat(IE_TEAM) &&
+		a->GetStat(IE_FACTION) == b->GetStat(IE_FACTION) &&
+		a->GetStat(IE_SEX) == b->GetStat(IE_SEX) &&
+		a->GetStat(IE_ALIGNMENT) == b->GetStat(IE_ALIGNMENT);
+	if (!same) return false;
+
+	if (!third) return true;
+
+	return a->GetStat(IE_SUBRACE) == b->GetStat(IE_SUBRACE);
+}
+
 void Actor::SendDiedTrigger()
 {
 	if (!area) return;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
-	ieDword ea = Modified[IE_EA];
+	int ea = Modified[IE_EA];
 
 	std::vector<Actor *>::iterator poi;
 	for (poi = neighbours.begin(); poi != neighbours.end(); poi++) {
@@ -5524,11 +5557,15 @@ void Actor::SendDiedTrigger()
 		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
 
 		// allies take a hit on morale and nobody cares about neutrals
+		if (!(*poi)->ShouldModifyMorale()) continue;
 		int pea = (*poi)->GetStat(IE_EA);
-		if (ea < EA_GOODCUTOFF && pea < EA_GOODCUTOFF) {
+		if (ea == EA_PC && pea == EA_PC) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
-		} else if (ea > EA_EVILCUTOFF && pea > EA_EVILCUTOFF) {
+		} else if (OfType(this, *poi)) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		// are we an enemy of poi, regardless if we're good or evil?
+		} else if (abs(ea - pea) > 30) {
+			(*poi)->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
 		}
 	}
 }
@@ -5596,6 +5633,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			// for unknown reasons the original only sends the trigger if the killer is ok
 			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
 				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
+				if (act->ShouldModifyMorale()) act->NewBase(IE_MORALE, 3, MOD_ADDITIVE);
 			}
 			killerPC = act->InParty > 0;
 		}
@@ -9484,10 +9522,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
 			critical = false;
 		} else {
-			//a critical surely raises the morale?
-			//only if it is successful it raises the morale of the attacker
 			VerbalConstant(VB_CRITHIT);
-			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
 
@@ -11471,6 +11506,12 @@ void Actor::PlayArmorSound() const
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
 		delete[] armorSound;
 	}
+}
+
+bool Actor::ShouldModifyMorale() const
+{
+	// pst ignores it for pcs, treating it more like reputation
+	return !pstflags || Modified[IE_EA] != EA_PC;
 }
 
 }
