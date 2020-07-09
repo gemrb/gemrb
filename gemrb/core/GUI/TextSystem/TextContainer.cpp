@@ -371,10 +371,8 @@ void ContentContainer::SubviewAdded(View* view, View* parent)
 		// ContentContainer should grow to the size of its (immidiate) subviews automatically
 		const Region& subViewFrame = view->Frame();
 		Size s;
-		s.h = subViewFrame.y + subViewFrame.h;
-		s.h = (s.h > frame.h) ? s.h : frame.h;
-		s.w = subViewFrame.x + subViewFrame.w;
-		s.w = (s.w > frame.w) ? s.w : frame.w;
+		s.h = std::max(subViewFrame.y + subViewFrame.h, frame.h);
+		s.w = std::max(subViewFrame.x + subViewFrame.w, frame.w);
 		SetFrameSize(s);
 	}
 }
