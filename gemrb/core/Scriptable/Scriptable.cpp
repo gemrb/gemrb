@@ -2209,7 +2209,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
 			// Bump back if the actor is "blocking" itself
 			if (!(oldPosBlockStatus & PATH_MAP_ACTOR && Type == ST_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == (Actor*)this)) {
-				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
+				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 				return;
 			}
 		}
@@ -2281,7 +2281,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.y += dy;
 		oldPos = Pos;
 		if (Type == ST_ACTOR && BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
+			area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 		}
 
 		SetOrientation(step->orient, false);
@@ -2357,7 +2357,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		path = newPath;
 		step = path;
 	} 
-	area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
+	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
