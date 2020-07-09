@@ -8374,8 +8374,45 @@ bool Actor::ShouldDrawCircle() const
 			return false;
 		}
 	}
+	
+	GameControl* gc = core->GetGameControl();
+	if (gc->GetScreenFlags()&SF_CUTSCENE) {
+		// ground circles are not drawn in cutscenes
+		// except for the speaker
+		if (gc->dialoghandler->IsTarget(this) == false) {
+			return false;
+		}
+	}
+	
+	bool drawcircle = true; // we always show circle/target on pause
+	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+		// check marker feedback level
+		ieDword markerfeedback = 4;
+		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
+		if (Selected) {
+			// selected creature
+			drawcircle = markerfeedback >= 2;
+		} else if (IsPC()) {
+			// selectable
+			drawcircle = markerfeedback >= 3;
+		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
+			// hostile
+			drawcircle = markerfeedback >= 4;
+		} else {
+			// all
+			drawcircle = markerfeedback >= 5;
+		}
+	}
+	
+	return drawcircle;
+}
 
-	return true;
+bool Actor::ShouldDrawReticle() const
+{
+	if (ShouldDrawCircle()){
+		return (!(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
+	}
+	return false;
 }
 
 bool Actor::HasBodyHeat() const
@@ -8564,46 +8601,12 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 	//draw videocells under the actor
 	DrawVideocells(Pos - vp.Origin(), vvcShields, tint);
 
-	bool shoulddrawcircle = ShouldDrawCircle();
-	bool drawcircle = shoulddrawcircle;
-	GameControl *gc = core->GetGameControl();
-	if (gc->GetScreenFlags()&SF_CUTSCENE) {
-		// ground circles are not drawn in cutscenes
-		drawcircle = false;
-	}
-	// the speaker should get a circle even in cutscenes
-	if (shoulddrawcircle && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
-		drawcircle = true;
-	}
-	bool drawtarget = false;
-	// we always show circle/target on pause
-	if (drawcircle && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
-		// check marker feedback level
-		ieDword markerfeedback = 4;
-		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
-		if (Over) {
-			// picked creature, should always be true
-			drawcircle = true;
-		} else if (Selected) {
-			// selected creature
-			drawcircle = markerfeedback >= 2;
-		} else if (IsPC()) {
-			// selectable
-			drawcircle = markerfeedback >= 3;
-		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
-			// hostile
-			drawcircle = markerfeedback >= 4;
-		} else {
-			// all
-			drawcircle = markerfeedback >= 5;
-		}
-	}
-
-	if (drawcircle) {
+	if (ShouldDrawCircle()) {
 		DrawCircle(vp.Origin());
-		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
 	}
-	if (drawtarget) {
+	
+	GameControl *gc = core->GetGameControl();
+	if (ShouldDrawReticle()) {
 		gc->DrawTargetReticle(Destination, (size - 1) * 4, true, Over, Selected); //we could set this to !paused if we wanted to only animate when not paused
 	}
 

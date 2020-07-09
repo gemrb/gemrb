@@ -744,6 +744,7 @@ public:
 	bool UpdateDrawingState();
 	Region DrawingRegion() const override;
 	uint8_t GetElevation() const;
+	bool ShouldDrawReticle() const;
 	void Draw(const Region &screen, uint32_t flags, const WallPolygonSet&) const;
 	bool DoStep(unsigned int walk_speed, ieDword time = 0) override;
 
