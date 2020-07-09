@@ -75,7 +75,7 @@ bool Point::isempty() const
 	return (x == -1) && (y == -1);
 }
 
-bool Point::isWithinRadius(int r, const Point& p)
+bool Point::isWithinRadius(int r, const Point& p) const
 {
 	Point d = operator-(p);
 	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
