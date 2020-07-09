@@ -132,12 +132,18 @@ public:
 	int target_types;
 
 private:
+	using FormationPoints = std::vector<Point>;
 	Map* CurrentArea() const;
 
 	Region SelectionRect() const;
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color);
+	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
+	
+	Point GetFormationPoint(const Point& origin, size_t pos, double angle, int radius = 0, const FormationPoints& exclude = FormationPoints()) const;
+	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, double angle, int radius = 0) const;
+	
 	void Scroll(const Point& amt);
 
 	//containers
@@ -170,8 +176,9 @@ public:
 
 	// GameControl always needs to redraw unless we arent in a game (disabled)
 	bool IsAnimated() const { return !IsDisabled(); }
+	void DrawTargetReticle(int size, const Color& color, const Point& p) const;
 	/** Draws the target reticle for Actor movement. */
-	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
+	void DrawTargetReticle(const Movable* target, const Point& point) const;
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
@@ -215,7 +222,6 @@ public:
 
 	void MakeSelection(bool extend = false);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
-	Point GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append=true);
 	/** checks if the actor should be running instead of walking */

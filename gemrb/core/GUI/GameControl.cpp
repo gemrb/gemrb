@@ -171,47 +171,118 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 	return formations[formation][pos];
 }
 
-//WARNING: don't pass p as a reference because it gets modified
-Point GameControl::GetFormationPoint(Map *map, unsigned int pos, const Point& src, Point p)
+double AngleFromPoints(const Point& p1, const Point& p2)
 {
-	int formation=core->GetGame()->GetFormation();
-	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-
-	// calculate angle
-	double angle;
-	double xdiff = src.x - p.x;
-	double ydiff = src.y - p.y;
-	if (ydiff == 0) {
-		if (xdiff > 0) {
+	double angle = 0.0;
+	Point diff = p1 - p2;
+	if (diff.y == 0) {
+		if (diff.x > 0) {
 			angle = M_PI_2;
 		} else {
 			angle = -M_PI_2;
 		}
 	} else {
-		angle = std::atan(xdiff/ydiff);
-		if (ydiff < 0) angle += M_PI;
+		angle = std::atan(diff.x / diff.y);
+		if (diff.y < 0) angle += M_PI;
 	}
+	return angle;
+}
 
-	// calculate new coordinates by rotating formation around (0,0)
-	double newx = -formations[formation][pos].x * std::cos(angle) + formations[formation][pos].y * std::sin(angle);
-	double newy = formations[formation][pos].x * std::sin(angle) + formations[formation][pos].y * std::cos(angle);
-	p.x += (int)newx;
-	p.y += (int)newy;
+Point RotatePoint(const Point& p, double angle)
+{
+	int newx = -p.x * std::cos(angle) + p.y * std::sin(angle);
+	int newy = p.x * std::sin(angle) + p.y * std::cos(angle);
+	return Point(newx, newy);
+}
 
-	if (p.x < 0) p.x = 8;
-	if (p.y < 0) p.y = 8;
-	if (p.x > map->GetWidth()*16) p.x = map->GetWidth()*16 - 8;
-	if (p.y > map->GetHeight()*12) p.y = map->GetHeight()*12 - 8;
+Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, int radius, const std::vector<Point>& exclude) const
+{
+	Point vec;
+	
+	Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+	assert(area);
 
-	if(map->GetCursor(p) == IE_CURSOR_BLOCKED) {
-		//we can't get there --> adjust position
-		p.x/=16;
-		p.y/=12;
-		map->AdjustPosition(p);
-		p.x*=16;
-		p.y*=12;
+	const auto& formation = game->GetFormation();
+	assert(formation < formationcount);
+
+	Point step;
+
+	if (pos < FORMATIONSIZE) {
+		// calculate new coordinates by rotating formation around (0,0)
+		vec = RotatePoint(formations[formation][pos], angle);
+		step.y = radius;
+	} else {
+		int magnitudeAdjustment = (pos % 2 == 0) ? 1 : -1;
+		// create a line formation perpendicular to the formation start point and beginning at the last point
+		// of the formation table. Alternate between +90 degrees and -90 degrees to keep it balanced
+		// the formation table is created along the x axis starting at (0,0)
+		Point p = formations[formation][FORMATIONSIZE-1];
+		vec = RotatePoint(p, angle);
+		step.x = radius * magnitudeAdjustment;
 	}
-	return p;
+	
+	// adjust the point if the actor cant get there
+	// we do this by extending the vector until either it goes out of bounds
+	// or until the spot is valid
+	Point dest = vec + origin;
+	
+	
+	auto NextStep = [&]() {
+		vec = vec + RotatePoint(step, angle);
+		dest = vec + origin;
+	};
+
+	while (true) {
+		auto it = std::find_if(exclude.begin(), exclude.end(), [&](const Point& p) {
+			// look for points within some radius
+			return p.isWithinRadius(radius, dest);
+		});
+
+		if (it != exclude.end()) {
+			NextStep();
+			continue;
+		}
+		
+		// if we go out of bounds we stop searching
+		// the actor movement will take them as close to the point as possible, but we cant predict where that will be
+		if (dest.x < 0 || dest.y < 0) {
+			break;
+		}
+		
+		if (dest.x >= area->GetWidth() * 16 || dest.y >= area->GetHeight() * 12) {
+			break;
+		}
+		
+		if (area->GetCursor(dest) == IE_CURSOR_BLOCKED) {
+			NextStep();
+			continue;
+		}
+		
+		break;
+	}
+	
+	return dest;
+}
+
+GameControl::FormationPoints GameControl::GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors,
+															 double angle, int radius) const
+{
+	FormationPoints formation;
+	for (size_t i = 0; i < actors.size(); ++i) {
+		formation.emplace_back(GetFormationPoint(origin, i, angle, radius, formation));
+	}
+	return formation;
+}
+
+void GameControl::DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const
+{
+	constexpr int magnitude = 36 / 2; // 36 diameter is copied from make_formation.py
+
+	std::vector<Point> formationPoints = GetFormationPoints(formationPoint, actors, angle, magnitude);
+	for (size_t i = 0; i < actors.size(); ++i) {
+		DrawTargetReticle(actors[i], formationPoints[i] - vpOrigin);
+	}
 }
 
 void GameControl::ClearMouseState()
@@ -321,36 +392,39 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 	spr->release();
 }
 
-void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash, bool actorSelected)
+void GameControl::DrawTargetReticle(int size, const Color& color, const Point& p) const
 {
-	// reticles are never drawn in cutscenes
-	if (GetScreenFlags()&SF_CUTSCENE)
-		return;
-
-	unsigned short offset = (animate) ? GlobalColorCycle.Step() >> 1 : 0;
-	size = std::max(size, 3);
-
+	Video* video = core->GetVideoDriver();
+	
+	uint8_t offset = GlobalColorCycle.Step() >> 1;
+	
 	/* segments should not go outside selection radius */
 	unsigned short xradius = (size * 4) - 5;
 	unsigned short yradius = (size * 3) - 5;
 
-	const Color& green = (actorSelected) ? ColorGreen : ColorGreenDark;
-	const Color& color = (flash) ? GlobalColorCycle.Blend(ColorWhite, green) : green;
-
-	p = p - vpOrigin;
 	// NOTE: 0.5 and 0.7 are pretty much random values
 	// right segment
-	core->GetVideoDriver()->DrawEllipseSegment( p + Point(offset, 0),
-											   xradius, yradius, color, -0.5, 0.5, true);
+	video->DrawEllipseSegment( p + Point(offset, 0),
+							  xradius, yradius, color, -0.5, 0.5, true);
 	// top segment
-	core->GetVideoDriver()->DrawEllipseSegment( p - Point(0, offset),
-											   xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2, true);
+	video->DrawEllipseSegment( p - Point(0, offset),
+							  xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2, true);
 	// left segment
-	core->GetVideoDriver()->DrawEllipseSegment( p - Point(offset, 0),
-											   xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI, true);
+	video->DrawEllipseSegment( p - Point(offset, 0),
+							  xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI, true);
 	// bottom segment
-	core->GetVideoDriver()->DrawEllipseSegment( p + Point(0, offset),
-											   xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2, true);
+	video->DrawEllipseSegment( p + Point(0, offset),
+							  xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2, true);
+}
+
+void GameControl::DrawTargetReticle(const Movable* target, const Point& p) const
+{
+	int size = std::max((target->size - 1) * 4, 3);
+
+	const Color& green = target->selectedColor;
+	const Color& color = (target->Over) ? GlobalColorCycle.Blend(target->overColor, green) : green;
+
+	DrawTargetReticle(size, color, p);
 }
 	
 void GameControl::WillDraw()
@@ -544,19 +618,8 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	Point gameMousePos = GameMousePos();
 	// draw reticles
 	if (isFormationRotation) {
-		Actor *actor;
-		int max = game->GetPartySize(false);
-		// we only care about PCs and not summons for this. the summons will be included in
-		// the final mouse up event.
-		int formationPos = 0;
-		for(int idx = 1; idx<=max; idx++) {
-			actor = game->FindPC(idx);
-			if (actor && actor->IsSelected()) {
-				// transform the formation point
-				Point p = GetFormationPoint(actor->GetCurrentArea(), formationPos++, gameMousePos, gameClickPoint);
-				DrawTargetReticle(p, 4, false);
-			}
-		}
+		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
+		DrawFormation(game->selected, gameClickPoint, angle);
 	}
 
 	// Draw path
@@ -2183,28 +2246,27 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 	if (party.empty())
 		return;
 
-	// party formation movement
-	Point src;
-	Point move = p;
+	double angle = 0.0;
 	if (isFormationRotation) {
-		src = GameMousePos();
-	} else {
-		src = party[0]->Pos;
+		angle = AngleFromPoints(GameMousePos(), p);
 	}
 
 	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
+	
+	std::vector<Point> formationPoints = GetFormationPoints(p, party, angle, 36/2);
 	for (size_t i = 0; i < party.size(); i++) {
 		Actor *actor = party[i];
 		// don't stop the party if we're just trying to add a waypoint
 		if (!(Mod & GEM_MOD_SHIFT)) {
 			actor->Stop();
 		}
-
-		if (party.size() > 1) {
-			Map* map = actor->GetCurrentArea();
-			move = GetFormationPoint(map, i, src, p);
+		
+		if (party.size() > 1 || isFormationRotation) {
+			CreateMovement(actor, formationPoints[i], Mod & GEM_MOD_SHIFT);
+		} else {
+			CreateMovement(actor, p, Mod & GEM_MOD_SHIFT);
 		}
-		CreateMovement(actor, move, Mod & GEM_MOD_SHIFT);
+		
 		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
 		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
 	}

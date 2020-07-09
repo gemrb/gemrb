@@ -8607,7 +8607,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 	
 	GameControl *gc = core->GetGameControl();
 	if (ShouldDrawReticle()) {
-		gc->DrawTargetReticle(Destination, (size - 1) * 4, true, Over, Selected); //we could set this to !paused if we wanted to only animate when not paused
+		gc->DrawTargetReticle(this, Destination);
 	}
 
 	unsigned char StanceID = GetStance();
