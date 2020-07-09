@@ -2269,7 +2269,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (!area->IsWalkableTo(Pos, nmptStep, false, Type == ST_ACTOR ? (Actor*)this : NULL)) {
+		if (area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy, size) & PATH_MAP_SIDEWALL) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
