@@ -30,7 +30,7 @@
 namespace GemRB {
 	
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
-: ContentContainer(Region()), ta(ta)
+: ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
 {
 	SetFlags(RESIZE_WIDTH, OP_NAND);
 
@@ -39,11 +39,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	size = opts.size();
 
-	Size s = ta.Dimensions();
-	s.h = 0; // will dynamically size itself
-
 	SetMargin(m);
-	SetFrameSize(s);
 
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	Point origin(margin.left, margin.top);
@@ -69,8 +65,10 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			// keeping the options spaced out (for touch screens)
 			r.y += ta.LineHeight();
 		}
-		r.y += selOption->Dimensions().h; // FIXME: this can overflow the height
+		r.y += selOption->Dimensions().h;
 	}
+	
+	SetFrameSize(Size(r.w, r.y)); // r.y is not a typo, its the location where the next option would have been
 
 	if (numbered) {
 		// in a sane world we would simply focus the window and this View
@@ -106,7 +104,11 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 			// keeping the options spaced out (for touch screens)
 			origin.y += ta.LineHeight();
 		}
-		origin.y += selOption->Dimensions().h; // FIXME: this can overflow the height
+		origin.y += selOption->Dimensions().h;
+	}
+	
+	if (origin.y > frame.h) {
+		frame.h = origin.y;
 	}
 }
 
