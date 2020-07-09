@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # code shared between the common GUIREC and that of iwd2 (pst)
+import collections
 import GemRB
 import GameCheck
 import GUICommon
@@ -361,9 +362,19 @@ def NextSound():
 		SoundIndex = 0
 	return
 
+def FindScriptFile(selected):
+	script = ""
+	for (filename, idx) in options:
+		if idx == selected:
+			script = filename
+			break
+	return script
+
+options = {}
 def OpenScriptWindow ():
 	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
+	global options
 
 	SubCustomizeWindow = GemRB.LoadWindow (11)
 
@@ -371,9 +382,14 @@ def OpenScriptWindow ():
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
 	defaultCount = ScriptsTable.GetRowCount ()
 
-	options = []
+	# (filename, idx in list of descriptions) indexing descriptions
+	options = collections.OrderedDict()
+	idx = 0
+	# prepend the entry for none.bs manually, so we preserve the display order
+	options[("none", idx)] = "None\n"
 	for script in scripts:
 		scriptindex = -1
+		# can't use FindValue due to the need for lowercasing for case insensitive filesystems
 		for i in range(defaultCount):
 			name = ScriptsTable.GetRowName (i)
 			GemRB.SetToken ("script", name)
@@ -381,32 +397,37 @@ def OpenScriptWindow ():
 				scriptindex = i
 				break;
 
-		GemRB.SetToken ("script", script)
+		idx = idx + 1
 		if scriptindex == -1:
 			# custom
-			options.append (17167)
+			GemRB.SetToken ("script", script)
+			options[(script, idx)] = GemRB.GetString (17167)
 		else:
-			title = ScriptsTable.GetValue (i,0)
-			if title!=-1:
-				desc = ScriptsTable.GetValue (i,1)
-				txt = GemRB.GetString (title)
-				if (desc!=-1):
-					txt += GemRB.GetString (desc) + "\n"
-				options.append(txt)
+			title = ScriptsTable.GetValue (scriptindex, 0, GTV_REF)
+			if title:
+				desc = ScriptsTable.GetValue (scriptindex, 1, GTV_REF)
+				txt = title
+				if desc:
+					txt += " " + desc.rstrip()
+				options[(script, idx)] = txt + "\n"*1
 			else:
-				options.append (ScriptsTable.GetRowName (i) + "\n")
+				# none
+				idx = idx - 1
+
+	ScriptTextArea.SetOptions (options.values())
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)
 	if script == None:
-		script = "NONE"
+		script = "None"
 
 	scriptindex = ScriptsTable.GetRowIndex (script)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
 
 	def UpdateScriptSelection(ta, val):
-		SelectedTextArea.SetText (options[val])
+		name = FindScriptFile (val)
+		SelectedTextArea.SetText (options[(name, val)])
 		return
 	
 	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
@@ -428,7 +449,8 @@ def OpenScriptWindow ():
 
 def DoneScriptWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	script = ScriptsTable.GetRowName (GemRB.GetVar ("Selected") )
+	selected = GemRB.GetVar ("Selected")
+	script = FindScriptFile (selected)
 	GemRB.SetPlayerScript (pc, script)
 	CloseSubCustomizeWindow ()
 	return
