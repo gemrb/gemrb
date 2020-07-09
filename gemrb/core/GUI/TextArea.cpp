@@ -30,7 +30,7 @@
 namespace GemRB {
 	
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
-: TextContainer(Region(), ta.ftext, ta.palettes[PALETTE_SELECTED]), ta(ta)
+: ContentContainer(Region()), ta(ta)
 {
 	SetFlags(RESIZE_WIDTH, OP_NAND);
 
@@ -212,7 +212,7 @@ bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
 	ClearHover();
-	TextContainer::OnMouseLeave(me, op);
+	ContentContainer::OnMouseLeave(me, op);
 }
 
 TextArea::TextArea(const Region& frame, Font* text)

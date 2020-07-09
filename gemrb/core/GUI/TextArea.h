@@ -50,7 +50,7 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	
-	class SpanSelector : public TextContainer {
+	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
 			OptSpan(const Region& frame, Font* font, Holder<Palette> pal)
 			: TextContainer(frame, font, pal) {}
