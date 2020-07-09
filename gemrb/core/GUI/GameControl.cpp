@@ -620,6 +620,15 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	if (isFormationRotation) {
 		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		DrawFormation(game->selected, gameClickPoint, angle);
+	} else {
+		int max = game->GetPartySize(false);
+		for (int idx = 1; idx <= max; idx++) {
+			Actor* actor = game->FindPC(idx);
+			assert(actor);
+			if (actor->ShouldDrawReticle()) {
+				DrawTargetReticle(actor, actor->Destination - vpOrigin);
+			}
+		}
 	}
 
 	// Draw path

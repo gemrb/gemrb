@@ -8604,11 +8604,6 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 	if (ShouldDrawCircle()) {
 		DrawCircle(vp.Origin());
 	}
-	
-	GameControl *gc = core->GetGameControl();
-	if (ShouldDrawReticle()) {
-		gc->DrawTargetReticle(this, Destination);
-	}
 
 	unsigned char StanceID = GetStance();
 	unsigned char Face = GetOrientation();
