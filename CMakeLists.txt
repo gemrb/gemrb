@@ -30,6 +30,13 @@ ENDIF(DEFINED CMAKE_BUILD_TYPE)
 
 PROJECT(gemrb)
 
+# check for RaspberryPi
+IF(UNIX)
+	SET(RPI_GLES_PATH "/opt/vc")
+	SET(RPI_GLES_PATH "/opt/vc" CACHE STRING "The Raspberry Pi GLES path. Defaults to /opt/vc")
+	FIND_FILE(RPI NAMES bcm_host.h PATHS "${RPI_GLES_PATH}/include")
+ENDIF()
+
 # Options list
 SET(SDL_BACKEND "Auto" CACHE STRING "libSDL version (possible values: Auto, SDL or SDL2)")
 SET_PROPERTY(CACHE SDL_BACKEND PROPERTY STRINGS Auto SDL SDL2)
@@ -44,6 +51,12 @@ OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(USE_ICONV "Enable Iconv support" ON)
+
+IF(RPI)
+	SET(OPENGL_BACKEND GLES)
+	SET(SDL_BACKEND SDL2)
+ENDIF()
+
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
 IF(WIN32 AND _VCPKG_INSTALLED_DIR)
@@ -300,6 +313,18 @@ IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
 	IF(SDL_BACKEND STREQUAL "SDL")
 		MESSAGE(FATAL_ERROR "SDL2 is required for the OpenGL driver!")
 	ENDIF()
+	IF(RPI)
+		SET(_OPENGL_INCLUDE_PATH ${RPI_GLES_PATH}/include)
+		SET(_OPENGL_LIB_PATH ${RPI_GLES_PATH}/lib)
+		# for newer cmake
+		IF(EXISTS ${RPI_INCLUDE}/GLES2/GL2.h AND EXISTS ${RPI_LIBS})
+			SET(OpenGL_EGL_FOUND "True")
+			SET(OPENGL_EGL_INCLUDE_DIRS ${RPI_INCLUDE})
+			SET(OPENGL_LIBRARIES ${RPI_LIBS})
+		ENDIF()
+	ENDIF()
+		  
+
 	INCLUDE(FindOpenGL)
 	IF(NOT OPENGL_FOUND)
 		MESSAGE(FATAL_ERROR "OpenGL library not found!")
