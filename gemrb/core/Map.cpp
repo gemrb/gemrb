@@ -84,6 +84,7 @@ static Variables Spawns;
 static int LargeFog;
 static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
+static ieDword oldGameTime = 0;
 
 static void ReleaseSpawnGroup(void *poi)
 {
@@ -1090,7 +1091,6 @@ VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 	return *iter;
 }
 
-static ieDword oldgametime = 0;
 
 //Draw the game area (including overlays, actors, animations, weather)
 void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
@@ -1247,7 +1247,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		case AOT_PROJECTILE:
 			{
 				int drawn;
-				if (gametime>oldgametime) {
+				if (gametime > oldGameTime) {
 					drawn = pro->Update();
 				} else {
 					drawn = 1;
@@ -1265,7 +1265,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		case AOT_SPARK:
 			{
 				int drawn;
-				if (gametime>oldgametime) {
+				if (gametime > oldGameTime) {
 					drawn = spark->Update();
 				} else {
 					drawn = 1;
@@ -1332,7 +1332,7 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		actor->DrawOverheadText();
 	}
 
-	oldgametime=gametime;
+	oldGameTime = gametime;
 
 	// Show wallpolygons
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
