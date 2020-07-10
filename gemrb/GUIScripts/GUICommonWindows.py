@@ -2054,7 +2054,7 @@ def SetPSTGamedaysAndHourToken ():
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
 def UpdateClock ():
-	global OptionsWindow
+	OptionsWindow = GemRB.GetView("OPTWIN")
 
 	ActionsWindow = GemRB.GetView("ACTWIN")
 
@@ -2075,8 +2075,13 @@ def UpdateClock ():
 				Clock = OptionsWindow.GetControl (10)
 			elif OptionsWindow.GetControl(9):
 				Clock = OptionsWindow.GetControl (9)
-		elif ActionsWindow and ActionsWindow.GetControl (62):
+				
+			if Clock.IsVisible() == False:
+				Clock = None
+		
+		if Clock is None and ActionsWindow:
 			Clock = ActionsWindow.GetControl (62)
+		
 		if Clock and (Clock.HasAnimation("CGEAR") or GameCheck.IsIWD2()):
 			Hours = (GemRB.GetGameTime () % 7200) / 300
 			GUICommon.SetGamedaysAndHourToken ()

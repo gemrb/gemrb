@@ -56,7 +56,7 @@ def OnLoad():
 	Button = ActionsWindow.GetControl(60)
 	if Button:
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
-		Button=ActionsWindow.GetControl(61)
+		Button = ActionsWindow.GetControl(61)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
 
 	if GameCheck.HasHOW():
@@ -126,7 +126,8 @@ def MWinBG(size, width=None):
 MinimizedWindows = {}
 def ToggleWindowMinimize(win, GSFlag = 0):
 	key = win.ID
-	if key in MinimizedWindows:
+	maximize = True if key in MinimizedWindows else False
+	if maximize:
 		# restore to original size
 		win.SetSize(*MinimizedWindows[key])
 		del MinimizedWindows[key]
@@ -142,6 +143,14 @@ def ToggleWindowMinimize(win, GSFlag = 0):
 
 		if GSFlag: # stored in save
 			GemRB.GameSetScreenFlags(GSFlag, OP_OR)
+			
+	if key == GemRB.GetView("OPTWIN").ID:
+		ToggleActionbarClock(not maximize)
+
+def ToggleActionbarClock(show):
+	actwin = GemRB.GetView("ACTWIN")
+	clock = actwin.GetControl (62)
+	clock.SetVisible(show)
 
 MTARestoreSize = None
 def UpdateControlStatus(init = False):
@@ -207,6 +216,8 @@ def UpdateControlStatus(init = False):
 		if GSFlags&GS_OPTIONPANE:
 			win = GemRB.GetView("OPTWIN")
 			ToggleWindowMinimize(win)
+		else:
+			ToggleActionbarClock(False)
 		if GSFlags&GS_PORTRAITPANE:
 			win = GemRB.GetView("PORTWIN")
 			ToggleWindowMinimize(win)
