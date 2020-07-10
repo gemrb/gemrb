@@ -2356,6 +2356,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
+		Destination = Des;
 	} 
 	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
