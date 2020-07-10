@@ -786,7 +786,7 @@ void Map::UpdateScripts()
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 	// Make actors pathfind if there are others nearby
 	// in order to avoid bumping when possible
-	q=Qcount[PR_SCRIPT];
+	q = Qcount[PR_SCRIPT];
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->GetRandomBackoff() || !actor->GetStep()) {

@@ -266,6 +266,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
+	if (!(GetBlockedInRadius(s.x, s.y, true, size) & PATH_MAP_PASSABLE)) {
+		AdjustPositionNavmap(nmptSource);
+	}
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 
@@ -315,12 +318,14 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			// Already visited
 			if (isClosed[smptChild.y * Width + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
-			Actor* childActor = GetActor(nmptChild, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
-			if (childIsUnbumpable) continue;
+			if (flags & PF_ACTORS_ARE_BLOCKING) {
+				Actor* childActor = GetActor(nmptChild, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+				bool childIsUnbumpable = childActor && childActor != caller && !childActor->ValidTarget(GA_ONLY_BUMPABLE);
+				if (childIsUnbumpable) continue;
+			}
 
-			unsigned childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, flags & PF_ACTORS_ARE_BLOCKING, size);
-			bool childBlocked = !(childBlockStatus & PATH_MAP_PASSABLE);
+			unsigned childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, false, size);
+			bool childBlocked = !(childBlockStatus & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR));
 			if (!childBlocked) UpdateVertex(nmptSource, nmptDest, nmptCurrent, nmptChild, distFromStart, parents, open, caller);
 		}
 	}
