@@ -192,6 +192,8 @@ namespace GemRB {
 class Scriptable;
 class Actor;
 
+GEM_EXPORT double AngleFromPoints(const Point& p1, const Point& p2);
+GEM_EXPORT Point RotatePoint(const Point& p, double angle);
 GEM_EXPORT unsigned char GetOrient(const Point &s, const Point &d);
 GEM_EXPORT unsigned int Distance(const Point pos, const Point pos2);
 GEM_EXPORT unsigned int Distance(const Point pos, const Scriptable *b);

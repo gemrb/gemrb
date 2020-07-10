@@ -48,8 +48,6 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
-#include <cmath>
-
 namespace GemRB {
 
 #define FORMATIONSIZE 10
@@ -169,30 +167,6 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 	if (formation>=formationcount) formation = 0;
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 	return formations[formation][pos];
-}
-
-double AngleFromPoints(const Point& p1, const Point& p2)
-{
-	double angle = 0.0;
-	Point diff = p1 - p2;
-	if (diff.y == 0) {
-		if (diff.x > 0) {
-			angle = M_PI_2;
-		} else {
-			angle = -M_PI_2;
-		}
-	} else {
-		angle = std::atan(diff.x / diff.y);
-		if (diff.y < 0) angle += M_PI;
-	}
-	return angle;
-}
-
-Point RotatePoint(const Point& p, double angle)
-{
-	int newx = -p.x * std::cos(angle) + p.y * std::sin(angle);
-	int newy = p.x * std::sin(angle) + p.y * std::cos(angle);
-	return Point(newx, newy);
 }
 
 Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, int radius, const std::vector<Point>& exclude) const
