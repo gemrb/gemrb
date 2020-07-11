@@ -1,6 +1,6 @@
 Description: This table lists fonts. Only fonts listed here could be used as a font resource.
 
-Note: the font system is described in depth on the wiki: http://gemrb.sourceforge.net/wiki/doku.php?id=plugins:ttf
+Note: the font system is described in depth here: https://gemrb.org/Fonts
 
 Columns: RESREF  - the .bam ResRef of the font
    NEED_PALETTE  - if the font has no own palette, set this to 1
