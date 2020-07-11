@@ -329,6 +329,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 	if (foundPath) {
 		return BuildActorPath(nmptDest, parents, flags & PF_BACKAWAY);
+	} else if (caller) {
+		Log(DEBUG, "FindPath", "Pathing failed for %s", caller->GetName(0));
+	} else {
+		Log(DEBUG, "FindPath", "Pathing failed");
 	}
 
 	return NULL;

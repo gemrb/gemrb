@@ -8241,6 +8241,7 @@ void Actor::NewPath()
 
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
+	ResetPathTries();
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}

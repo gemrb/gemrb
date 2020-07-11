@@ -469,7 +469,6 @@ protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
 	int PathTries;
-	bool tryNotToBump;
 	int randomBackoff;
 	Point oldPos;
 	bool bumped;

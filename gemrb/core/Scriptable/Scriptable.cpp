@@ -2019,7 +2019,6 @@ Movable::Movable(ScriptableType type)
 	maxWalkDistance = 0;
 	prevTicks = 0;
 	ResetPathTries();
-	tryNotToBump = false;
 	randomBackoff = 0;
 }
 
@@ -2197,7 +2196,10 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
-		if (Destination != Pos) {
+		if (Destination != Pos && !IsBumped()) {
+			if (Type == ST_ACTOR && ((Actor*)this)->InParty) {
+				Log(DEBUG, "DoStep", "%s has no path to Des, calling WalkTo", GetName(0));
+			}
 			WalkTo(Destination);
 			return;
 		}
@@ -2245,7 +2247,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
-		int collisionLookaheadRadius = size * 3 - 3;
+		int collisionLookaheadRadius = (size - 1) * 3;
 		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
@@ -2263,13 +2265,13 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 				actorInTheWay->BumpAway();
 			} else {
 				StanceID = IE_ANI_READY;
-				tryNotToBump = true;
 				Backoff();
 				return;
 			}
 		}
 		// Stop if there's a door in the way
 		if (area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy, size) & PATH_MAP_SIDEWALL) {
+			Log(DEBUG, "DoStep", "%s stopping because of a door", GetName(0));
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
@@ -2348,7 +2350,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	} else {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
 	}
-	if (!newPath && !tryNotToBump && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
+	if (!newPath && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, (Actor*) this);
 	}
 
@@ -2356,7 +2358,6 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
-		Destination = Des;
 	} 
 	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
@@ -2442,7 +2443,6 @@ void Movable::ClearPath(bool resetDestination)
 		//is set before ClearPath
 		Destination = Pos;
 
-		tryNotToBump = false;
 		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
 			StanceID = IE_ANI_AWAKE;
 		}
