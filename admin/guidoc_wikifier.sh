@@ -51,10 +51,7 @@ function dumpDocs() {
        }
      }' || return 1
 
-  echo "Done, now manually copy the contents of $out_dir to wiki/data/pages/guiscript"
-  echo "Tar it up and move to FRS via the web UI or via SCP, eg.:"
-  echo "  scp gsd.tgz USERNAME@frs.sourceforge.net:/home/frs/project/gemrb"
+  echo "Done, now manually copy the contents of $out_dir to the website repo, review, commit and push."
 }
 
-# old logic switch; all paths or no paths
 dumpDocs

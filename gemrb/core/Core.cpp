@@ -86,6 +86,14 @@ unsigned int Distance(Point p, Point q)
 	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
+/** Calculates squared distance between 2 points */
+unsigned int SquaredDistance(Point p, Point q)
+{
+	long x = p.x - q.x;
+	long y = p.y - q.y;
+	return x * x + y * y;
+}
+
 /** Calculates distance squared from a point to a scriptable */
 unsigned int SquaredMapDistance(Point p, const Scriptable *b)
 {
@@ -145,9 +153,7 @@ unsigned int Distance(const Scriptable *a, const Scriptable *b)
 /** Calculates distance squared between 2 scriptables */
 unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b)
 {
-	long x = ( a->Pos.x - b->Pos.x );
-	long y = ( a->Pos.y - b->Pos.y );
-	return (unsigned int) ( x* x + y* y );
+	return SquaredDistance(a->Pos, b->Pos);
 }
 
 /** Calculates distance between 2 scriptables, including feet circle if applicable */
