@@ -433,9 +433,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, bool actorsAreBlocking, unsigned int size) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y, bool actorsAreBlocking) const;
-	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y, bool actorsAreBlocking) const;
+	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
@@ -613,11 +613,7 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-	bool CheckNavmapLineFlags(const Point &s, const Point &d, unsigned int mapFlags,
-		bool checkImpassable = false, bool actorsAreBlocking = true, const Actor *caller = NULL) const;
-	PathNode *BuildActorPath(const NavmapPoint &nmptDest, const std::vector<NavmapPoint> &parents, bool backAway) const;
-	void UpdateVertex(const NavmapPoint &s, const NavmapPoint &d, const NavmapPoint &nmptCurrent, const NavmapPoint &nmptChild, 
-			std::vector<unsigned short> &distFromStart, std::vector<NavmapPoint> &parents, FibonacciHeap<PQNode> &open, const Actor *caller) const;
+	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 };
 
 }

@@ -2020,6 +2020,7 @@ Movable::Movable(ScriptableType type)
 	prevTicks = 0;
 	ResetPathTries();
 	randomBackoff = 0;
+	pathfindingDistance = size;
 }
 
 Movable::~Movable(void)
@@ -2169,6 +2170,7 @@ unsigned char Movable::GetNextFace()
 
 void Movable::Backoff()
 {
+	StanceID = IE_ANI_READY;
 	if (InternalFlags & IF_RUNNING) {
 		randomBackoff = RAND(MAX_PATH_TRIES * 2 / 3, MAX_PATH_TRIES * 4 / 3);
 	} else {
@@ -2180,6 +2182,7 @@ void Movable::Backoff()
 void Movable::BumpAway()
 {
 	area->ClearSearchMapFor(this);
+	if (!IsBumped()) oldPos = Pos;
 	bumped = true;
 	area->AdjustPositionNavmap(Pos);
 }
@@ -2196,22 +2199,16 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
-		if (Destination != Pos && !IsBumped()) {
-			if (Type == ST_ACTOR && ((Actor*)this)->InParty) {
-				Log(DEBUG, "DoStep", "%s has no path to Des, calling WalkTo", GetName(0));
-			}
-			WalkTo(Destination);
-			return;
-		}
 		if (!IsBumped()) {
 			return;
 		}
 		area->ClearSearchMapFor(this);
-		unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y, true);
+		unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y);
 		if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
-			// Bump back if the actor is "blocking" itself
+			// Do bump back if the actor is "blocking" itself
 			if (!(oldPosBlockStatus & PATH_MAP_ACTOR && Type == ST_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == (Actor*)this)) {
 				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+				Log(DEBUG, "DoStep", "%s not bumping back, blocked by %d", GetName(0), oldPosBlockStatus);
 				return;
 			}
 		}
@@ -2239,9 +2236,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	Point nmptStep(step->x, step->y);
 	double dx = nmptStep.x - Pos.x;
 	double dy = nmptStep.y - Pos.y;
-	bool reachedStep = (dx == 0 && dy == 0);
-	if (reachedStep) {
-	}
 	Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
 	if (time > timeStartStep) {
 		Actor *actorInTheWay = nullptr;
@@ -2264,13 +2258,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			if (Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 				actorInTheWay->BumpAway();
 			} else {
-				StanceID = IE_ANI_READY;
 				Backoff();
 				return;
 			}
 		}
 		// Stop if there's a door in the way
-		if (area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy, size) & PATH_MAP_SIDEWALL) {
+		if (area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
 			Log(DEBUG, "DoStep", "%s stopping because of a door", GetName(0));
 			ClearPath(true);
 			NewOrientation = Orientation;
@@ -2294,6 +2287,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			} else {
 				ClearPath(true);
 				NewOrientation = Orientation;
+				pathfindingDistance = size;
 			}
 		}
 	}
@@ -2301,14 +2295,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 
 void Movable::AdjustPosition()
 {
-	area->AdjustPosition(Pos); 
+	area->AdjustPosition(Pos);
 	ImpedeBumping();
 }
 
 void Movable::AddWayPoint(const Point &Des)
 {
 	if (!path) {
-		WalkTo(Des, 0);
+		WalkTo(Des);
 		return;
 	}
 	Destination = Des;
@@ -2337,8 +2331,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	prevTicks = Ticks;
 	Destination = Des;
 
-	if (std::abs(Des.x - Pos.x) <= XEPS &&
-			std::abs(Des.y - Pos.y) <= YEPS) {
+	if (std::abs(Des.x - Pos.x) <= XEPS && std::abs(Des.y - Pos.y) <= YEPS) {
 		ClearPath(true);
 		return;
 	}
@@ -2351,6 +2344,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
 	}
 	if (!newPath && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
+		Log(DEBUG, "WalkTo", "%s re-pathing ignoring actors", GetName(0));
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, (Actor*) this);
 	}
 
@@ -2358,7 +2352,9 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
-	} 
+	}  else {
+		pathfindingDistance = std::max(size, distance);
+	}
 	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 

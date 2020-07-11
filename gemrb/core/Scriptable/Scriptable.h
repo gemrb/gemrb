@@ -472,6 +472,7 @@ protected:
 	int randomBackoff;
 	Point oldPos;
 	bool bumped;
+	int pathfindingDistance;
 public:
 	inline int GetRandomBackoff() const
 	{

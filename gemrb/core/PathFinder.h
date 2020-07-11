@@ -57,7 +57,7 @@ typedef Point SearchmapPoint;
 enum {
 	PF_SIGHT = 1,
 	PF_BACKAWAY = 2,
-	PF_ACTORS_ARE_BLOCKING = 4,
+	PF_ACTORS_ARE_BLOCKING = 4
 };
 
 
