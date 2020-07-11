@@ -9609,24 +9609,27 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 	//1 Ignore invisible requirement and positioning requirement
 	//2 Ignore invisible requirement only
 	//4 Ignore positioning requirement only
-	if (invisible || (always&0x3) ) {
-		if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
-			if (target->Modified[IE_DISABLEBACKSTAB]) {
-				// The backstab seems to have failed
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-				wi.backstabbing = false;
+	if (!invisible && !(always&0x3)) {
+		return backstabDamage;
+	}
+
+	if (!(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5)) {
+		if (target->Modified[IE_DISABLEBACKSTAB]) {
+			// The backstab seems to have failed
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+			wi.backstabbing = false;
+		} else {
+			if (wi.backstabbing) {
+				backstabDamage = multiplier * damage;
+				// display a simple message instead of hardcoding multiplier names
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
 			} else {
-				if (wi.backstabbing) {
-					backstabDamage = multiplier * damage;
-					// display a simple message instead of hardcoding multiplier names
-					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
-				} else {
-					// weapon is unsuitable for backstab
-					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-				}
+				// weapon is unsuitable for backstab
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 			}
 		}
 	}
+
 	return backstabDamage;
 }
 
