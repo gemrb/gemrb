@@ -2000,6 +2000,7 @@ bool Highlightable::PossibleToSeeTrap() const
 Movable::Movable(ScriptableType type)
 	: Selectable( type )
 {
+	bumpBackTries = 0;
 	bumped = false;
 	oldPos = Pos;
 	Destination = Pos;
@@ -2184,6 +2185,7 @@ void Movable::BumpAway()
 	area->ClearSearchMapFor(this);
 	if (!IsBumped()) oldPos = Pos;
 	bumped = true;
+	bumpBackTries = 0;
 	area->AdjustPositionNavmap(Pos);
 }
 
@@ -2209,11 +2211,25 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			if (!(oldPosBlockStatus & PATH_MAP_ACTOR && Type == ST_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == (Actor*)this)) {
 				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 				Log(DEBUG, "DoStep", "%s not bumping back, blocked by %d", GetName(0), oldPosBlockStatus);
+				if (Type == ST_ACTOR && ((Actor*)this)->GetStat(IE_EA) < EA_GOODCUTOFF) {
+					bumpBackTries++;
+					if (bumpBackTries > MAX_BUMP_BACK_TRIES) {
+						int xDist = Pos.x - oldPos.x;
+						int yDist = Pos.y - oldPos.y;
+						if (xDist * xDist + yDist * yDist < size * 16 * size * 16) {
+							oldPos = Pos;
+							bumped = false;
+							bumpBackTries = 0;
+						}
+					}
+				}
+
 				return;
 			}
 		}
 		bumped = false;
 		MoveTo(oldPos);
+		bumpBackTries = 0;
 		return;
 	}
 	if (!time) time = core->GetGame()->Ticks;

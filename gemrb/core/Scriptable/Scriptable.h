@@ -128,6 +128,7 @@ class SpriteCover;
 #define XP_LEARNSPELL 2
 
 #define MAX_PATH_TRIES 8
+#define MAX_BUMP_BACK_TRIES 16
 
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
@@ -465,6 +466,7 @@ private: //these seem to be sensitive, so get protection
 	PathNode* path; //whole path
 	PathNode* step; //actual step
 	unsigned int prevTicks;
+	int bumpBackTries;
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
