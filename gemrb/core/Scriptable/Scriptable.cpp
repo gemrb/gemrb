@@ -2214,12 +2214,13 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 				if (Type == ST_ACTOR && ((Actor*)this)->GetStat(IE_EA) < EA_GOODCUTOFF) {
 					bumpBackTries++;
 					if (bumpBackTries > MAX_BUMP_BACK_TRIES) {
-						int xDist = Pos.x - oldPos.x;
-						int yDist = Pos.y - oldPos.y;
-						if (xDist * xDist + yDist * yDist < size * 16 * size * 16) {
+						if (SquaredDistance(Pos, oldPos) < size * 16 * size * 16) {
 							oldPos = Pos;
 							bumped = false;
 							bumpBackTries = 0;
+							if (SquaredDistance(Pos, Destination) < size * 16 * size * 16) {
+								ClearPath(true);
+							}
 						}
 					}
 				}
