@@ -626,7 +626,8 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 
 		# make sure that we get the original kit, if we have one
 		if kit:
-			originalkit = GetKitIndex (pc)
+			import GUICommon
+			originalkit = GUICommon.GetKitIndex (pc)
 
 			if originalkit: # kitted; find the class value
 				originalkit = CommonTables.KitList.GetValue (originalkit, 7)

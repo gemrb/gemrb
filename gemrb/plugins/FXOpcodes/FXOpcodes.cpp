@@ -1463,7 +1463,9 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//these two bits are turned off on death
 		BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
 	}
-	BASE_SET(IE_MORALE, 10);
+	if (target->ShouldModifyMorale()) {
+		BASE_SET(IE_MORALE, 10);
+	}
 
 	// don't give xp in cutscenes
 	bool giveXP = true;
@@ -1790,7 +1792,9 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	STAT_MOD( IE_MORALE );
+	if (target->ShouldModifyMorale()) {
+		STAT_MOD(IE_MORALE);
+	}
 	return FX_APPLIED;
 }
 
@@ -4012,7 +4016,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->SetSpellState(SS_BLESS);
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
-	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
+	if (target->ShouldModifyMorale()) STAT_ADD(IE_MORALE, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLESS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xc0, 0x80, 0);
