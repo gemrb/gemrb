@@ -258,7 +258,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			unsigned int squaredDist = xDist * xDist + yDist * yDist;
 			if (parents[smptCurrent.y * Width + smptCurrent.x] != nmptCurrent &&
 					squaredDist < squaredMinDist) {
-				if (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d, caller)) {
+				if (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d)) {
 					smptDest = smptCurrent;
 					nmptDest = nmptCurrent;
 					foundPath = true;
