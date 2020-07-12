@@ -532,7 +532,7 @@ public:
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, int noBackAway);
 	void RandomWalk(bool can_stop, bool run);
-	void MoveLine(int steps, int Pass, ieDword Orient);
+	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop();

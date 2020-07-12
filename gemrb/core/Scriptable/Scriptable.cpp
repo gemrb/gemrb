@@ -2139,15 +2139,13 @@ void Movable::SetAttackMoveChances(ieWord *amc)
 }
 
 //this could be used for WingBuffet as well
-void Movable::MoveLine(int steps, int Pass, ieDword orient)
+void Movable::MoveLine(int steps, ieDword orient)
 {
 	if (path || !steps) {
 		return;
 	}
-	Point p = Pos;
 	// DoStep takes care of stopping on walls if necessary
-	if (Pass) Pass = 0;
-	path = area->GetLine(p, steps, orient);
+	path = area->GetLine(Pos, steps, orient);
 }
 
 unsigned char Movable::GetNextFace()
