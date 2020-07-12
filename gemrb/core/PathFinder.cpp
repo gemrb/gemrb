@@ -51,68 +51,51 @@ namespace GemRB {
 constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
 constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
 
+// Cosines
+constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.924,  0.707,  0.383,  0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383,  0.000,  0.383,  0.707,  0.924,  1.000}};
+// Sines
+constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{0.383,  0.707,  0.924,  1.000,  0.924,  0.707,  0.383,  0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383,  0.000}};
 
-// Find the best path of limited length that brings us the farthest from dX, dY
+// Find the best path of limited length that brings us the farthest from d
 // The 5th parameter is controlling the orientation of the actor
 // 0 - back away, 1 - face direction
-PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway)
+PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int maxPathLength, int noBackAway, bool findPath, const Actor* caller)
 {
-	SearchmapPoint smptFarthest = FindFarthest(d, size, PathLen);
-	NavmapPoint nmptFarthest = NavmapPoint(smptFarthest.x * 16, smptFarthest.y * 12);
-	int flags = PF_SIGHT;
-	if (!noBackAway) flags |= PF_BACKAWAY;
-	return FindPath(s, nmptFarthest, size, 0, flags);
-}
-
-SearchmapPoint Map::FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int pathLength, int validFlags) const
-{
-	std::vector<float> dist(Width * Height);
-	SearchmapPoint smptFleeFrom = SearchmapPoint(d.x / 16, d.y / 12);
-	std::priority_queue<PQNode> open;
-	static const float diagWeight = sqrt(2);
-	dist[smptFleeFrom.y * Width + smptFleeFrom.x] = 0;
-	open.push(PQNode(smptFleeFrom, 0));
-	SearchmapPoint smptFarthest;
-	SearchmapPoint smptCurrent;
-	SearchmapPoint smptChild = smptFleeFrom;
-
-	float farthestDist = 0;
-	PQNode newNode = PQNode();
-	while (!open.empty()) {
-		smptCurrent = open.top().point;
-		open.pop();
-		// Randomly search clockwise or counterclockwise
-		// To prevent always fleeing in the same direction
-		int sgn = (RAND(0, 1)) ? -1 : 1;
-		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			smptChild.x = smptCurrent.x + sgn * dx[i];
-			smptChild.y = smptCurrent.y + sgn * dy[i];
-			bool childOutsideMap =
-				smptChild.x <= 0 ||
-				smptChild.y <= 0 ||
-				(unsigned) smptChild.x >= Width ||
-				(unsigned) smptChild.y >= Height;
-
-			bool childBlocked = GetBlockedInRadius(smptChild.x * 16 + 8, smptChild.y * 12 + 8, size) & validFlags;
-			if (!childBlocked && !childOutsideMap) {
-				float curDist = dist[smptCurrent.y * Width + smptCurrent.x];
-				float oldDist = dist[smptChild.y * Width + smptChild.x];
-				float newDist = curDist + (dx[i] && dy[i] ? diagWeight : 1);
-				if (newDist <= pathLength && newDist > oldDist) {
-					if (newDist > farthestDist) {
-						farthestDist = newDist;
-						smptFarthest = smptChild;
-					}
-					dist[smptChild.y * Width + smptChild.x] = newDist;
-					newNode.point.x = smptChild.x;
-					newNode.point.y = smptChild.y;
-					newNode.dist = newDist;
-					open.push(newNode);
-				}
-			}
+	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+	NavmapPoint p = d;
+	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
+	char xSign = 1, ySign = 1;
+	size_t tries = 0;
+	while (SquaredDistance(p, s) < maxPathLength * SEARCHMAP_SQUARE_DIAGONAL) {
+		if (!(GetBlockedNavmap(p.x + 3 * xSign * dxRand[i], p.y + 3 * ySign * dyRand[i]) & PATH_MAP_PASSABLE)) {
+			if (!findPath && p != d) break;
+			// Random rotation upon hitting a wall
+			xSign = RAND(0, 1) ? -1 : 1;
+			ySign = RAND(0, 1) ? -1 : 1;
+			tries++;
+			// Give up and call the pathfinder if backed into a corner
+			if (tries > RAND_DEGREES_OF_FREEDOM) break;
+		} else {
+			p.x += 3 * xSign * dxRand[i];
+			p.y += 3 * ySign * dyRand[i];
 		}
 	}
-	return smptFarthest;
+	if (!findPath) {
+		PathNode *path = new PathNode;
+		path->x = p.x;
+		path->y = p.y;
+		path->Parent = NULL;
+		path->Next = NULL;
+		if (noBackAway) {
+			path->orient = GetOrient(p, s);
+		} else {
+			path->orient = GetOrient(s, p);
+		}
+		return path;
+	}
+	int flags = PF_SIGHT;
+	if (!noBackAway) flags |= PF_BACKAWAY;
+	return FindPath(s, p, size, 0, flags, caller);
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
@@ -216,7 +199,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller)
 {
-	Log(DEBUG, "FindPath", "caller = %s, dist = %d, size = %d", caller ? caller->GetName(0) : "NULL", minDistance, size);
+	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "NULL", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d.x, d.y, size) & PATH_MAP_PASSABLE)) {

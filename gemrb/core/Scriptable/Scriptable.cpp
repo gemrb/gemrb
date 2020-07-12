@@ -2395,39 +2395,18 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (run) {
 		InternalFlags|=IF_RUNNING;
 	}
-	//the commenting-out of the clear search map call was removed in 0.4.0
-	//if you want to put it back for some reason, check
-	//if the searchmap is not eaten up
-	area->ClearSearchMapFor(this);
-	Point p = Pos;
 
-	//selecting points around a circle's edge around actor (didn't work better)
-	//int x = core->Roll(1,100,-50);
-	//p.x+=x;
-	//p.y+=(int) sqrt(100-x*x);
-
-	//selecting points in a square around actor (by default -25 to +25)
-	short x1 = std::max(p.x - 25, 0);
-	short x2 = std::min(p.x + 25, area->GetWidth() * 16);
-	short y1 = std::max(p.y - 25, 0);
-	short y2 = std::min(p.y + 25, area->GetHeight() * 12);
-	if (maxWalkDistance > 0) {
-		short minx = std::max(HomeLocation.x - maxWalkDistance, 0);
-		short maxx = std::min(HomeLocation.x + maxWalkDistance, area->GetWidth() * 16);
-		short miny = std::max(HomeLocation.y - maxWalkDistance, 0);
-		short maxy = std::min(HomeLocation.y + maxWalkDistance, area->GetHeight() * 12);
-
-		if (p.x <= minx) x2 = p.x;
-		else if (p.x >= maxx) x1 = p.x;
-		if (p.y <= miny) y2 = p.y;
-		else if (p.y >= maxy) y1 = p.y;
+	if (BlocksSearchMap()) {
+		area->ClearSearchMapFor(this);
 	}
-	p.x += core->Roll(1, x2 - x1 + 1, x1 - p.x - 1);
-	p.y += core->Roll(1, y2 - y1 + 1, y1 - p.y - 1);
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RunAway( Pos, p, size, 50, 1 );
+	path = area->RunAway(Pos, Pos, size, 25, 1, false, (Type == ST_ACTOR ? (Actor*)this : NULL));
+	if (BlocksSearchMap()) {
+		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+	}
+
 }
 
 void Movable::MoveTo(const Point &Des)

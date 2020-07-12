@@ -369,8 +369,12 @@ private:
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
 	static const size_t DEGREES_OF_FREEDOM = 4;
+	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
 	static const std::array<char, DEGREES_OF_FREEDOM> dx;
 	static const std::array<char, DEGREES_OF_FREEDOM> dy;
+	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dyRand;
+	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dxRand;
+
 public:
 	Map(void);
 	~Map(void);
@@ -525,7 +529,7 @@ public:
 	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
 	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0);
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int noBackAway);
+	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int maxPathLen, int noBackAway, bool findPath = true, const Actor* caller = NULL);
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false);
 	/* returns true if there is enemy visible */
@@ -593,7 +597,7 @@ public:
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
-	SearchmapPoint FindFarthest(const NavmapPoint &d, unsigned int size, unsigned int pathLength, int validFlags = PATH_MAP_PASSABLE) const;
+
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

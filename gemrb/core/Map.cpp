@@ -1965,6 +1965,7 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 	return ret;
 }
 
+// Args are in navmap coordinates
 unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
