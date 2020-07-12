@@ -2214,11 +2214,11 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 				if (Type == ST_ACTOR && ((Actor*)this)->GetStat(IE_EA) < EA_GOODCUTOFF) {
 					bumpBackTries++;
 					if (bumpBackTries > MAX_BUMP_BACK_TRIES) {
-						if (SquaredDistance(Pos, oldPos) < size * 16 * size * 16) {
+						if (SquaredDistance(Pos, oldPos) < size * 32 * size * 32) {
 							oldPos = Pos;
 							bumped = false;
 							bumpBackTries = 0;
-							if (SquaredDistance(Pos, Destination) < size * 16 * size * 16) {
+							if (SquaredDistance(Pos, Destination) < size * 32 * size * 32) {
 								ClearPath(true);
 							}
 						}
@@ -2280,13 +2280,13 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
+		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
 			Log(DEBUG, "DoStep", "%s stopping because of a door", GetName(0));
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
 		}
-		if (Type == ST_ACTOR && BlocksSearchMap()) {
+		if (BlocksSearchMap()) {
 			area->ClearSearchMapFor(this);
 		}
 		Pos.x += dx;
