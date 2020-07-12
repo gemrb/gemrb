@@ -2402,7 +2402,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RunAway(Pos, Pos, size, 25, 1, false, (Type == ST_ACTOR ? (Actor*)this : NULL));
+	path = area->RunAway(Pos, Pos, size, maxWalkDistance ? std::min(25, (int)maxWalkDistance) : 25, 1, false, (Type == ST_ACTOR ? (Actor*)this : NULL));
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 	}
