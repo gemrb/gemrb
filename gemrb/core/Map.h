@@ -537,9 +537,10 @@ public:
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode* GetLine(const Point &start, const Point &dest, int flags);
-	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
-	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
+	PathNode* GetLine(const Point &start, const Point &dest, int flags) const;
+	PathNode* GetLine(const Point &start, int steps, int orient) const;
+	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags) const;
+	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags) const;
 	/* Finds the path which leads to near d */
 	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
 

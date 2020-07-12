@@ -2145,9 +2145,9 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 		return;
 	}
 	Point p = Pos;
-	p.x/=16;
-	p.y/=12;
-	path = area->GetLine( p, steps, orient, Pass );
+	// DoStep takes care of stopping on walls if necessary
+	if (Pass) Pass = 0;
+	path = area->GetLine(p, steps, orient);
 }
 
 unsigned char Movable::GetNextFace()

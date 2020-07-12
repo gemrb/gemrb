@@ -53,12 +53,12 @@ constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
 constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
 
 // Cosines
-constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.924,  0.707,  0.383,  0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383,  0.000,  0.383,  0.707,  0.924,  1.000}};
+constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
 // Sines
-constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{0.383,  0.707,  0.924,  1.000,  0.924,  0.707,  0.383,  0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383,  0.000}};
+constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{-1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
-PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller) const
+PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller) const
 {
 	if (!caller || !caller->speed) return NULL;
 	Point p = s;
@@ -67,14 +67,14 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	char xSign = 1, ySign = 1;
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
-	while (SquaredDistance(p, s) < maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL) {
+	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		if (!(GetBlockedNavmap(p.x + 3 * xSign * dx, p.y + 3 * ySign * dy) & PATH_MAP_PASSABLE)) {
-			// Random rotation
-			xSign = RAND(0, 1) ? -1 : 1;
-			ySign = RAND(0, 1) ? -1 : 1;
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
+			// Random rotation
+			xSign = RAND(0, 1) ? -1 : 1;
+			ySign = RAND(0, 1) ? -1 : 1;
 
 		}
 		p.x += dx;
@@ -85,15 +85,14 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	return FindPath(s, p, size, size, flags, caller);
 }
 
-PathNode* Map::RandomWalk(const Point &s, int radius) const
+PathNode *Map::RandomWalk(const Point &s, int radius) const
 {
 	NavmapPoint p = s;
 	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
 	char xSign = 1, ySign = 1;
 	size_t tries = 0;
-	while (SquaredDistance(p, s) < radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL) {
+	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		if (!(GetBlockedNavmap(p.x + 3 * xSign * dxRand[i], p.y + 3 * ySign * dyRand[i]) & PATH_MAP_PASSABLE)) {
-			if (p != s) break;
 			// Random rotation
 			xSign = RAND(0, 1) ? -1 : 1;
 			ySign = RAND(0, 1) ? -1 : 1;
@@ -122,13 +121,13 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 }
 
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
-PathNode* Map::GetLine(const Point &start, const Point &dest, int flags)
+PathNode *Map::GetLine(const Point &start, const Point &dest, int flags) const
 {
 	int Orientation = GetOrient(start, dest);
 	return GetLine(start, dest, 1, Orientation, flags);
 }
 
-PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags)
+PathNode *Map::GetLine(const Point &start, int Steps, int Orientation, int flags) const
 {
 	Point dest = start;
 
@@ -155,7 +154,7 @@ PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 	return GetLine(start, dest, 2, Orientation, flags);
 }
 
-PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags)
+PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
 {
 	PathNode *StartNode = new PathNode;
 	PathNode *Return = StartNode;
@@ -209,6 +208,17 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	}
 
 	return Return;
+}
+
+PathNode *Map::GetLine(const Point &p, int steps, int orient) const
+{
+	PathNode *step = new PathNode;
+	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
+	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	step->orient = orient;
+	step->Next = NULL;
+	step->Parent = NULL;
+	return step;
 }
 
 // Find a path from start to goal, ending at the specified distance from the
