@@ -2375,11 +2375,11 @@ void Movable::WalkTo(const Point &Des, int distance)
 	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
-void Movable::RunAwayFrom(const Point &Des, int PathLength, int backAway)
+void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Des, size, PathLength, backAway, Type == ST_ACTOR ? (Actor*)this : NULL);
+	path = area->RunAway(Pos, Des, size, PathLength, !noBackAway, Type == ST_ACTOR ? (Actor*)this : NULL);
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
