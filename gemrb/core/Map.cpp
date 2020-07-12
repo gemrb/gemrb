@@ -803,6 +803,9 @@ void Map::UpdateScripts()
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
+			if (!actor->GetRandomBackoff()) {
+				actor->NewPath();
+			}
 			continue;
 		}
 		DoStepForActor(actor, actor->speed, time);
@@ -1953,7 +1956,7 @@ unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 {
 	if (y>=Height || x>=Width) {
-		return 0;
+		return PATH_MAP_IMPASSABLE;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
 	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR)) {
@@ -1994,6 +1997,13 @@ unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned 
 			}
 		}
 	}
+	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR|PATH_MAP_SIDEWALL)) {
+		ret &= ~PATH_MAP_PASSABLE;
+	}
+	if (ret & PATH_MAP_DOOR_OPAQUE) {
+		ret = PATH_MAP_SIDEWALL;
+	}
+
 	return ret;
 }
 

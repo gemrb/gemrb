@@ -55,7 +55,7 @@ constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
 // Cosines
 constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
 // Sines
-constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{-1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924}};
+constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller) const
@@ -68,7 +68,7 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedNavmap(p.x + 3 * xSign * dx, p.y + 3 * ySign * dy) & PATH_MAP_PASSABLE)) {
+		if (!(GetBlockedInRadius(p.x + 3 * xSign * dx, p.y + 3 * ySign * dy, size) & PATH_MAP_PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
@@ -85,24 +85,38 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	return FindPath(s, p, size, size, flags, caller);
 }
 
-PathNode *Map::RandomWalk(const Point &s, int radius) const
+PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
 {
+	if (!caller || !caller->speed) return NULL;
 	NavmapPoint p = s;
 	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
-	char xSign = 1, ySign = 1;
+	double dx = 3 * dxRand[i];
+	double dy = 3 * dyRand[i];
+
+	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
 	size_t tries = 0;
 	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedNavmap(p.x + 3 * xSign * dxRand[i], p.y + 3 * ySign * dyRand[i]) & PATH_MAP_PASSABLE)) {
-			// Random rotation
-			xSign = RAND(0, 1) ? -1 : 1;
-			ySign = RAND(0, 1) ? -1 : 1;
+		if (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & PATH_MAP_PASSABLE)) {
 			tries++;
-			// Give up and call the pathfinder if backed into a corner
-			if (tries > RAND_DEGREES_OF_FREEDOM) break;
+			// Give up if backed into a corner
+			if (tries > RAND_DEGREES_OF_FREEDOM) {
+				return NULL;
+			}
+			// Random rotation
+			i = RAND(0, RAND_DEGREES_OF_FREEDOM);
+			dx = 3 * dxRand[i];
+			dy = 3 * dyRand[i];
+			NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
+			p = s;
 		} else {
-			p.x += 3 * xSign * dxRand[i];
-			p.y += 3 * ySign * dyRand[i];
+			p.x += dx;
+			p.y += dy;
 		}
+	}
+	while (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR))) {
+
+		p.x -= dx;
+		p.y -= dy;
 	}
 	PathNode *path = new PathNode;
 	path->x = p.x;
@@ -210,12 +224,16 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	return Return;
 }
 
-PathNode *Map::GetLine(const Point &p, int steps, int orient) const
+PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 {
 	PathNode *step = new PathNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
-	step->orient = orient;
+	if (step->x < 1) step->x = 1;
+	if (step->y < 1) step->y = 1;
+	if (step->x > Width * 16) step->x = Width * 16;
+	if (step->y > Height * 12) step->y = Height * 12;
+	step->orient = GetOrient(Point(step->x, step->y), p);
 	step->Next = NULL;
 	step->Parent = NULL;
 	return step;

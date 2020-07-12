@@ -5571,7 +5571,7 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
 	//fly in this direction for 20 steps
-	actor->MoveLine(20, actor->GetOrientation() );
+	actor->MoveLine(20, actor->GetOrientation());
 }
 
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)

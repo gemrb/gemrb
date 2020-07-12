@@ -2256,14 +2256,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
-		int collisionLookaheadRadius = (size - 1) * 3;
+		int collisionLookaheadRadius = ((size < 3 ? 3 : size) - 1) * 3;
 		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
 			Point nmptCollision(xCollision, yCollision);
 			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
-		if (actorInTheWay && actorInTheWay != this) {
+		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
 			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 3 && std::abs(nmptStep.y - Pos.y) < YEPS * 3) {
 				ClearPath(true);
@@ -2400,9 +2400,12 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RandomWalk(Pos, maxWalkDistance ? std::min(25, (int)maxWalkDistance) : 25);
+	path = area->RandomWalk(Pos, size, maxWalkDistance ? std::min(5, (int)maxWalkDistance) : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+	}
+	if (path) {
+		Destination = Point(path->x, path->y);
 	}
 
 }
