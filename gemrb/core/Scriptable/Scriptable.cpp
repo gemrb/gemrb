@@ -2375,11 +2375,11 @@ void Movable::WalkTo(const Point &Des, int distance)
 	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
-void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
+void Movable::RunAwayFrom(const Point &Des, int PathLength, int backAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Des, size, PathLength, noBackAway);
+	path = area->RunAway(Pos, Des, size, PathLength, backAway, Type == ST_ACTOR ? (Actor*)this : NULL);
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
@@ -2402,7 +2402,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RunAway(Pos, Pos, size, maxWalkDistance ? std::min(25, (int)maxWalkDistance) : 25, 1, false, (Type == ST_ACTOR ? (Actor*)this : NULL));
+	path = area->RandomWalk(Pos, maxWalkDistance ? std::min(25, (int)maxWalkDistance) : 25);
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 	}

@@ -2384,7 +2384,7 @@ void Map::dump(bool show_actors) const
 	Log(DEBUG, "Map", buffer);
 }
 
-bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy)
+bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy) const
 {
 	unsigned int minx = 0;
 	if ((unsigned int) goal.x > radiusx)
@@ -2412,7 +2412,7 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy)
+bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const
 {
 	unsigned int miny = 0;
 	if ((unsigned int) goal.y > radiusy)
@@ -2439,7 +2439,7 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
 {
 	NavmapPoint smptGoal(goal.x / 16, goal.y / 12);
 	AdjustPosition(smptGoal, radiusx, radiusy);
@@ -2447,7 +2447,7 @@ void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned
 	goal.y = smptGoal.y * 12 + 6;
 }
 
-void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
 {
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;

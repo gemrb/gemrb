@@ -35,6 +35,7 @@
 // which is solved with a P regulator, see Scriptable.cpp
 
 #include "FibonacciHeap.h"
+#include "GameData.h"
 #include "Map.h"
 #include "PathFinder.h"
 #include "RNG.h"
@@ -57,19 +58,43 @@ constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.924,  0
 constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{0.383,  0.707,  0.924,  1.000,  0.924,  0.707,  0.383,  0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383,  0.000}};
 
 // Find the best path of limited length that brings us the farthest from d
-// The 5th parameter is controlling the orientation of the actor
-// 0 - back away, 1 - face direction
-PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int maxPathLength, int noBackAway, bool findPath, const Actor* caller)
+PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller) const
 {
-	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
-	NavmapPoint p = d;
+	if (!caller || !caller->speed) return NULL;
+	Point p = s;
+	double dx = s.x - d.x;
+	double dy = s.y - d.y;
+	char xSign = 1, ySign = 1;
+	size_t tries = 0;
+	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
+	while (SquaredDistance(p, s) < maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL) {
+		if (!(GetBlockedNavmap(p.x + 3 * xSign * dx, p.y + 3 * ySign * dy) & PATH_MAP_PASSABLE)) {
+			// Random rotation
+			xSign = RAND(0, 1) ? -1 : 1;
+			ySign = RAND(0, 1) ? -1 : 1;
+			tries++;
+			// Give up and call the pathfinder if backed into a corner
+			if (tries > RAND_DEGREES_OF_FREEDOM) break;
+
+		}
+		p.x += dx;
+		p.y += dy;
+	}
+	int flags = PF_SIGHT;
+	if (backAway) flags |= PF_BACKAWAY;
+	return FindPath(s, p, size, size, flags, caller);
+}
+
+PathNode* Map::RandomWalk(const Point &s, int radius) const
+{
+	NavmapPoint p = s;
 	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
 	char xSign = 1, ySign = 1;
 	size_t tries = 0;
-	while (SquaredDistance(p, s) < maxPathLength * SEARCHMAP_SQUARE_DIAGONAL) {
+	while (SquaredDistance(p, s) < radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL) {
 		if (!(GetBlockedNavmap(p.x + 3 * xSign * dxRand[i], p.y + 3 * ySign * dyRand[i]) & PATH_MAP_PASSABLE)) {
-			if (!findPath && p != d) break;
-			// Random rotation upon hitting a wall
+			if (p != s) break;
+			// Random rotation
 			xSign = RAND(0, 1) ? -1 : 1;
 			ySign = RAND(0, 1) ? -1 : 1;
 			tries++;
@@ -80,22 +105,13 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 			p.y += 3 * ySign * dyRand[i];
 		}
 	}
-	if (!findPath) {
-		PathNode *path = new PathNode;
-		path->x = p.x;
-		path->y = p.y;
-		path->Parent = NULL;
-		path->Next = NULL;
-		if (noBackAway) {
-			path->orient = GetOrient(p, s);
-		} else {
-			path->orient = GetOrient(s, p);
-		}
-		return path;
-	}
-	int flags = PF_SIGHT;
-	if (!noBackAway) flags |= PF_BACKAWAY;
-	return FindPath(s, p, size, 0, flags, caller);
+	PathNode *path = new PathNode;
+	path->x = p.x;
+	path->y = p.y;
+	path->Parent = NULL;
+	path->Next = NULL;
+	path->orient = GetOrient(p, s);
+	return path;
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
@@ -197,7 +213,7 @@ PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller)
+PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
 	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "NULL", minDistance, size);
 	NavmapPoint nmptDest = d;

@@ -374,6 +374,7 @@ private:
 	static const std::array<char, DEGREES_OF_FREEDOM> dy;
 	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dyRand;
 	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dxRand;
+	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
 
 public:
 	Map(void);
@@ -526,10 +527,11 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
-	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0);
+	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0) const;
+	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0) const;
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int maxPathLen, int noBackAway, bool findPath = true, const Actor* caller = NULL);
+	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller = NULL) const;
+	PathNode* RandomWalk(const Point &s, int radius) const;
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false);
 	/* returns true if there is enemy visible */
@@ -539,7 +541,7 @@ public:
 	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
 
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
@@ -613,8 +615,8 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy);
-	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
+	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
+	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
 	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
