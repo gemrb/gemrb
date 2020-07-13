@@ -229,10 +229,8 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 	PathNode *step = new PathNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
-	if (step->x < 1) step->x = 1;
-	if (step->y < 1) step->y = 1;
-	if (step->x > Width * 16) step->x = Width * 16;
-	if (step->y > Height * 12) step->y = Height * 12;
+	step->x = Clamp(step->x, 1u, Width * 16);
+	step->y = Clamp(step->y, 1u, Height * 12);
 	step->orient = GetOrient(Point(step->x, step->y), p);
 	step->Next = NULL;
 	step->Parent = NULL;

@@ -46,8 +46,8 @@ enum {
 struct PathNode {
 	PathNode* Parent;
 	PathNode* Next;
-	unsigned short x;
-	unsigned short y;
+	unsigned int x;
+	unsigned int y;
 	unsigned int orient;
 };
 
