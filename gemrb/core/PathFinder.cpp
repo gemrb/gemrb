@@ -118,13 +118,15 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 		p.x -= dx;
 		p.y -= dy;
 	}
-	PathNode *path = new PathNode;
-	path->x = p.x;
-	path->y = p.y;
-	path->Parent = NULL;
-	path->Next = NULL;
-	path->orient = GetOrient(p, s);
-	return path;
+	PathNode *step = new PathNode;
+	step->x = p.x;
+	step->y = p.y;
+	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
+	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
+	step->Parent = NULL;
+	step->Next = NULL;
+	step->orient = GetOrient(p, s);
+	return step;
 }
 
 bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
@@ -229,8 +231,8 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 	PathNode *step = new PathNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
-	step->x = Clamp(step->x, 1u, Width * 16);
-	step->y = Clamp(step->y, 1u, Height * 12);
+	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
+	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
 	step->orient = GetOrient(Point(step->x, step->y), p);
 	step->Next = NULL;
 	step->Parent = NULL;
