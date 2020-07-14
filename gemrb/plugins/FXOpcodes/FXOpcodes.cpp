@@ -4325,7 +4325,6 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		sca->YPos+=fx->PosY+ypos_by_direction[target->GetOrientation()];
 		sca->ZPos+=heightmod;
 		sca->SetBlend();
-		sca->PlayOnce();
 		if (fx->Duration) {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 		} else {
