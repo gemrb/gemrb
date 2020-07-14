@@ -2351,7 +2351,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		return;
 	}
 
-	area->ClearSearchMapFor(this);
+	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
 	PathNode *newPath;
 	if (Type == ST_ACTOR) {
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, (Actor*)this);
@@ -2369,8 +2369,10 @@ void Movable::WalkTo(const Point &Des, int distance)
 		step = path;
 	}  else {
 		pathfindingDistance = std::max(size, distance);
+		if (BlocksSearchMap()) {
+			area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+		}
 	}
-	area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
 void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
