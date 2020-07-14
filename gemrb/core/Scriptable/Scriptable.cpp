@@ -2445,16 +2445,18 @@ void Movable::Stop()
 
 void Movable::ClearPath(bool resetDestination)
 {
-	if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
-		StanceID = IE_ANI_AWAKE;
-	}
+
 	if (resetDestination) {
-		// this is to make sure attackers come to us
-		// make sure ClearPath doesn't screw Destination (in the rare cases Destination
-		// is set before ClearPath)
+		//this is to make sure attackers come to us
+		//make sure ClearPath doesn't screw Destination (in the rare cases Destination
+		//is set before ClearPath
 		Destination = Pos;
+
+		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
+			StanceID = IE_ANI_AWAKE;
+		}
+		InternalFlags &= ~IF_NORETICLE;
 	}
-	InternalFlags &= ~IF_NORETICLE;
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;
