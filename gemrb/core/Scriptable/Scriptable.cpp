@@ -2233,14 +2233,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		return;
 	}
 	if (!time) time = core->GetGame()->Ticks;
-	if (!step) {
-		step = path;
-		timeStartStep = time;
-		return;
-	}
 	if (!walkScale) {
 		// zero speed: no movement
 		StanceID = IE_ANI_READY;
+		timeStartStep = time;
+		return;
+	}
+	if (!step) {
+		step = path;
 		timeStartStep = time;
 		return;
 	}
