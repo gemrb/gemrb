@@ -2244,10 +2244,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		timeStartStep = time;
 		return;
 	}
-	StanceID = IE_ANI_WALK;
-	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
-		StanceID = IE_ANI_RUN;
-	}
 
 	Point nmptStep(step->x, step->y);
 	double dx = nmptStep.x - Pos.x;
@@ -2287,6 +2283,10 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		if (BlocksSearchMap()) {
 			area->ClearSearchMapFor(this);
+		}
+		StanceID = IE_ANI_WALK;
+		if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
+			StanceID = IE_ANI_RUN;
 		}
 		Pos.x += dx;
 		Pos.y += dy;
