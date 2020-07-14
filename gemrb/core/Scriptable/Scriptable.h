@@ -129,6 +129,7 @@ class SpriteCover;
 
 #define MAX_PATH_TRIES 8
 #define MAX_BUMP_BACK_TRIES 16
+#define MAX_RAND_WALK 5
 
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
@@ -470,11 +471,12 @@ private: //these seem to be sensitive, so get protection
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
-	int PathTries;
+	int pathTries;
 	int randomBackoff;
 	Point oldPos;
 	bool bumped;
 	int pathfindingDistance;
+	int randomWalkCounter;
 public:
 	inline int GetRandomBackoff() const
 	{
@@ -499,9 +501,9 @@ public:
 	inline bool IsBumped() { return bumped; }
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };
-	inline int GetPathTries() const	{ return PathTries; }
-	inline void IncrementPathTries() { PathTries++; }
-	inline void ResetPathTries() { PathTries = 0; }
+	inline int GetPathTries() const	{ return pathTries; }
+	inline void IncrementPathTries() { pathTries++; }
+	inline void ResetPathTries() { pathTries = 0; }
 	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetStep() {

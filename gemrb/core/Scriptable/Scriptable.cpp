@@ -2019,9 +2019,10 @@ Movable::Movable(ScriptableType type)
 	HomeLocation.y = 0;
 	maxWalkDistance = 0;
 	prevTicks = 0;
-	ResetPathTries();
+	pathTries = 0;
 	randomBackoff = 0;
 	pathfindingDistance = size;
+	randomWalkCounter = 0;
 }
 
 Movable::~Movable(void)
@@ -2392,6 +2393,14 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		SetWait(RAND(7,14));
 		return;
 	}
+	randomWalkCounter++;
+	if (randomWalkCounter > MAX_RAND_WALK) {
+		randomWalkCounter = 0;
+		Log(DEBUG, "RandomWalk", "%s returning to HomeLocation (%d, %d) as randomWalkCounter exhausted", GetName(0), HomeLocation.x, HomeLocation.y);
+		WalkTo(HomeLocation);
+		return;
+	}
+
 	if (run) {
 		InternalFlags|=IF_RUNNING;
 	}
@@ -2408,6 +2417,11 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	}
 	if (path) {
 		Destination = Point(path->x, path->y);
+	} else {
+		Log(DEBUG, "RandomWalk", "%s returning to HomeLocation (%d, %d) as it couldn't random walk", GetName(0), HomeLocation.x, HomeLocation.y);
+		randomWalkCounter = 0;
+		WalkTo(HomeLocation);
+		return;
 	}
 
 }
