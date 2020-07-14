@@ -253,6 +253,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
+	if (nmptDest == nmptSource) return NULL;
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 
