@@ -332,12 +332,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			}
 
 			if (distFromStart[smptChild.y * Width + smptChild.x] < oldDist) {
-				SearchmapPoint smptDest(d.x  / 16, d.y / 12);
 				// Calculate heuristic
 				int xDist = smptChild.x - smptDest.x;
 				int yDist = smptChild.y - smptDest.y;
 				// Tie-breaking used to smooth out the path
-				SearchmapPoint smptSource(s.x  / 16, s.y / 12);
 				int dxCross = smptDest.x - smptSource.x;
 				int dyCross = smptDest.y - smptSource.y;
 				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
