@@ -431,6 +431,7 @@ int Game::LeaveParty (Actor* actor)
 		}
 	}
 	actor->SetBase( IE_EA, EA_NEUTRAL );
+	AddTrigger(TriggerEntry(trigger_leaves, actor->GetGlobalID()));
 	return ( int ) NPCs.size() - 1;
 }
 
@@ -533,6 +534,7 @@ int Game::JoinParty(Actor* actor, int join)
 		} else {
 			Reputation = actor->GetStat(IE_REPUTATION);
 		}
+		AddTrigger(TriggerEntry(trigger_joins, actor->GetGlobalID()));
 	}
 	slot = InStore( actor );
 	if (slot >= 0) {
