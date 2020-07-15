@@ -2415,14 +2415,13 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RandomWalk(Pos, size, maxWalkDistance ? std::min(5, (int)maxWalkDistance) : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
+	path = area->RandomWalk(Pos, size, maxWalkDistance ? maxWalkDistance : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
 	if (BlocksSearchMap()) {
 		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
 	}
 	if (path) {
 		Destination = Point(path->x, path->y);
 	} else {
-		Log(DEBUG, "RandomWalk", "%s returning to HomeLocation (%d, %d) as it couldn't random walk", GetName(0), HomeLocation.x, HomeLocation.y);
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);
 		return;
