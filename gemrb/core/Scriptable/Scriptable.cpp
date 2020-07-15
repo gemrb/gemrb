@@ -1902,6 +1902,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
+	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
 	// uncanny dodge trap save bonus
 	if (third) {
 		// no info anywhere, but 3ed rules add +1 reflex saves and +1 AC
