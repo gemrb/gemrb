@@ -1632,7 +1632,7 @@ int GameScript::Disarmed(Scriptable* Sender, Trigger* parameters)
 //stealing from a store failed, owner triggered
 int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
+	return Sender->MatchTriggerWithObject(trigger_stealfailed, parameters->objectParameter);
 }
 
 int GameScript::PickpocketFailed(Scriptable* Sender, Trigger* parameters)
