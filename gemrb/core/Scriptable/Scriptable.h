@@ -498,7 +498,8 @@ public:
 	inline void ImpedeBumping() { oldPos = Pos; bumped = false; }
 	void AdjustPosition();
 	void BumpAway();
-	inline bool IsBumped() { return bumped; }
+	void BumpBack();
+	inline bool IsBumped() const { return bumped; }
 	PathNode *GetNextStep(int x);
 	inline PathNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return pathTries; }
@@ -532,7 +533,7 @@ public:
 	void SetAttackMoveChances(ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
-	void RunAwayFrom(const Point &Des, int PathLength, int noBackAway);
+	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);

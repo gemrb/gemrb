@@ -58,9 +58,9 @@ constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0
 constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
-PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor* caller) const
+PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
 {
-	if (!caller || !caller->speed) return NULL;
+	if (!caller || !caller->speed) return nullptr;
 	Point p = s;
 	double dx = s.x - d.x;
 	double dy = s.y - d.y;
@@ -87,7 +87,7 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 
 PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
 {
-	if (!caller || !caller->speed) return NULL;
+	if (!caller || !caller->speed) return nullptr;
 	NavmapPoint p = s;
 	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
 	double dx = 3 * dxRand[i];
@@ -100,7 +100,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 			tries++;
 			// Give up if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) {
-				return NULL;
+				return nullptr;
 			}
 			// Random rotation
 			i = RAND(0, RAND_DEGREES_OF_FREEDOM);
@@ -123,8 +123,8 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 	step->y = p.y;
 	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
 	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
-	step->Parent = NULL;
-	step->Next = NULL;
+	step->Parent = nullptr;
+	step->Next = nullptr;
 	step->orient = GetOrient(p, s);
 	return step;
 }
@@ -133,7 +133,7 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 {
 	int flags = PF_SIGHT;
 	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
-	return FindPath(s, d, size, 0, flags) == NULL;
+	return FindPath(s, d, size, 0, flags) == nullptr;
 }
 
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
@@ -174,8 +174,8 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 {
 	PathNode *StartNode = new PathNode;
 	PathNode *Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
+	StartNode->Next = nullptr;
+	StartNode->Parent = nullptr;
 	StartNode->x = start.x;
 	StartNode->y = start.y;
 	StartNode->orient = Orientation;
@@ -201,7 +201,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 			StartNode->Next = new PathNode;
 			StartNode->Next->Parent = StartNode;
 			StartNode = StartNode->Next;
-			StartNode->Next = NULL;
+			StartNode->Next = nullptr;
 			Count = Speed;
 		} else {
 			Count--;
@@ -234,8 +234,8 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
 	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
 	step->orient = GetOrient(Point(step->x, step->y), p);
-	step->Next = NULL;
-	step->Parent = NULL;
+	step->Next = nullptr;
+	step->Parent = nullptr;
 	return step;
 }
 
@@ -243,7 +243,7 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
-	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "NULL", minDistance, size);
+	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d.x, d.y, size) & PATH_MAP_PASSABLE)) {
@@ -253,7 +253,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (nmptDest == nmptSource) return NULL;
+	if (nmptDest == nmptSource) return nullptr;
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 
@@ -348,7 +348,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	}
 
 	if (foundPath) {
-		PathNode *resultPath = NULL;
+		PathNode *resultPath = nullptr;
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
@@ -358,7 +358,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			newStep->x = nmptCurrent.x;
 			newStep->y = nmptCurrent.y;
 			newStep->Next = resultPath;
-			newStep->Parent = NULL;
+			newStep->Parent = nullptr;
 			if (flags & PF_BACKAWAY) {
 				newStep->orient = GetOrient(nmptParent, nmptCurrent);
 			} else {
@@ -372,15 +372,15 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 			smptCurrent.x = nmptCurrent.x / 16;
 			smptCurrent.y = nmptCurrent.y / 12;
-	}
-	return resultPath;
+		}
+		return resultPath;
 	} else if (caller) {
 		Log(DEBUG, "FindPath", "Pathing failed for %s", caller->GetName(0));
 	} else {
 		Log(DEBUG, "FindPath", "Pathing failed");
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void Map::NormalizeDeltas(double &dx, double &dy, const double &factor)

@@ -1622,7 +1622,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID) const
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
-Actor* Map::GetActor(const Point &p, int flags, const Movable* checker) const
+Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 {
 	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
@@ -1701,7 +1701,7 @@ void Map::JumpActors(bool jump)
 {
 	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
-			if (jump && !(actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD)) {
+			if (jump && !(actor->GetStat(IE_DONOTJUMP) & DNJ_BIRD)) {
 				ClearSearchMapFor(actor);
 				AdjustPositionNavmap(actor->Pos);
 				actor->ImpedeBumping();
@@ -2042,10 +2042,10 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) cons
 }
 
 // Used by the pathfinder, so PATH_MAP_IMPASSABLE obstructs walkability
-bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor* caller) const
+bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
 	unsigned ret = GetBlockedInLine(s, d, true, caller);
-	return (ret & (PATH_MAP_PASSABLE | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR)));
+	return ret & (PATH_MAP_PASSABLE | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
 }
 
 //flags:0 - never dither (full cover)

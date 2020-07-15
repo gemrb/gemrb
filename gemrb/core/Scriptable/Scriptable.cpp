@@ -2188,6 +2188,38 @@ void Movable::BumpAway()
 	area->AdjustPositionNavmap(Pos);
 }
 
+void Movable::BumpBack()
+{
+	if (Type != ST_ACTOR) return;
+	Actor *actor = (Actor*)this;
+	area->ClearSearchMapFor(this);
+	unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y);
+	if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
+		// Do bump back if the actor is "blocking" itself
+		if (!(oldPosBlockStatus & PATH_MAP_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
+			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+			Log(DEBUG, "DoStep", "%s not bumping back, blocked by %d", GetName(0), oldPosBlockStatus);
+			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
+				bumpBackTries++;
+				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
+					oldPos = Pos;
+					bumped = false;
+					bumpBackTries = 0;
+					if (SquaredDistance(Pos, Destination) < unsigned(size * 32 * size * 32)) {
+						ClearPath(true);
+					}
+
+				}
+			}
+			return;
+		}
+	}
+	bumped = false;
+	MoveTo(oldPos);
+	bumpBackTries = 0;
+}
+
+
 // Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
 // The movement logic is a proportional regulator: the displacement/movement vector has a
 // fixed radius, based on actor walk speed, and its direction heads towards the next waypoint.
@@ -2197,39 +2229,14 @@ void Movable::BumpAway()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
+	Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (Actor*)this;
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
-		if (!IsBumped()) {
-			return;
+		if (IsBumped()) {
+			BumpBack();
 		}
-		area->ClearSearchMapFor(this);
-		unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y);
-		if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
-			// Do bump back if the actor is "blocking" itself
-			if (!(oldPosBlockStatus & PATH_MAP_ACTOR && Type == ST_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == (Actor*)this)) {
-				area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
-				Log(DEBUG, "DoStep", "%s not bumping back, blocked by %d", GetName(0), oldPosBlockStatus);
-				if (Type == ST_ACTOR && ((Actor*)this)->GetStat(IE_EA) < EA_GOODCUTOFF) {
-					bumpBackTries++;
-					if (bumpBackTries > MAX_BUMP_BACK_TRIES) {
-						if (SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
-							oldPos = Pos;
-							bumped = false;
-							bumpBackTries = 0;
-							if (SquaredDistance(Pos, Destination) < unsigned(size * 32 * size * 32)) {
-								ClearPath(true);
-							}
-						}
-					}
-				}
-
-				return;
-			}
-		}
-		bumped = false;
-		MoveTo(oldPos);
-		bumpBackTries = 0;
 		return;
 	}
 	if (!time) time = core->GetGame()->Ticks;
@@ -2267,7 +2274,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 				NewOrientation = Orientation;
 				return;
 			}
-			if (Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
+			if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 				actorInTheWay->BumpAway();
 			} else {
 				Backoff();
@@ -2276,7 +2283,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		// Stop if there's a door in the way
 		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
-			Log(DEBUG, "DoStep", "%s stopping because of a door", GetName(0));
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
@@ -2285,14 +2291,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			area->ClearSearchMapFor(this);
 		}
 		StanceID = IE_ANI_WALK;
-		if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
+		if (InternalFlags & IF_RUNNING) {
 			StanceID = IE_ANI_RUN;
 		}
 		Pos.x += dx;
 		Pos.y += dy;
 		oldPos = Pos;
-		if (Type == ST_ACTOR && BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, ((Actor*)this)->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+		if (actor && BlocksSearchMap()) {
+			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 		}
 
 		SetOrientation(step->orient, false);
@@ -2340,9 +2346,13 @@ void Movable::AddWayPoint(const Point &Des)
 // Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
 void Movable::WalkTo(const Point &Des, int distance)
 {
+
 	if (Ticks < prevTicks + 2) {
 		return;
 	}
+
+	Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (Actor*)this;
 
 	prevTicks = Ticks;
 	Destination = Des;
@@ -2353,15 +2363,10 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	PathNode *newPath;
-	if (Type == ST_ACTOR) {
-		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, (Actor*)this);
-	} else {
-		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING);
-	}
-	if (!newPath && Type == ST_ACTOR && ((Actor*)this)->ValidTarget(GA_CAN_BUMP)) {
+	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
+	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "%s re-pathing ignoring actors", GetName(0));
-		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, (Actor*) this);
+		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
 	}
 
 	if (newPath) {
@@ -2376,7 +2381,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 }
 
-void Movable::RunAwayFrom(const Point &Des, int PathLength, int noBackAway)
+void Movable::RunAwayFrom(const Point &Des, int PathLength, bool noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
@@ -2396,7 +2401,6 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	randomWalkCounter++;
 	if (randomWalkCounter > MAX_RAND_WALK) {
 		randomWalkCounter = 0;
-		Log(DEBUG, "RandomWalk", "%s returning to HomeLocation (%d, %d) as randomWalkCounter exhausted", GetName(0), HomeLocation.x, HomeLocation.y);
 		WalkTo(HomeLocation);
 		return;
 	}
