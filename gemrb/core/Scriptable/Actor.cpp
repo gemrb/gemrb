@@ -5619,6 +5619,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 	AddTrigger(TriggerEntry(trigger_die));
 	SendDiedTrigger();
+	if (pstflags) {
+		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
+	}
 
 	Actor *act=NULL;
 	if (!killer) {
