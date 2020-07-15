@@ -373,6 +373,7 @@ void Highlightable::TryDisarm(Actor *actor)
 		core->GetGameControl()->ResetTargetMode();
 		core->PlaySound(DS_DISARMED, SFX_CHAN_HITS);
 	} else {
+		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
 			displaymsg->DisplayRollStringName(39266, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
