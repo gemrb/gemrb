@@ -200,17 +200,17 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	
 	Point dest = vec + origin;
 	int step = 0;
-	constexpr int maxStep = 5;
+	constexpr int maxStep = 4;
 	double stepAngle = 0.0;
 	const Point& start = vec;
 	
-	auto NextStep = [&]() {
+	auto NextDest = [&]() -> Point {
 		// adjust the point if the actor cant get to `dest`
 		// we do this by sweeping an M_PI arc a `radius` (stepVec) away from the point
 		// and oriented according to `direction`
 		// if nothing is found, reset to `start` and increase the `stepVec` and sweep again
 		// each incremental sweep step the `stepAngle` increment shrinks because we have more area to fit
-		// if nothing is found after 4 sweeps we just give up and leave it to the path finder to work out
+		// if nothing is found after `maxStep` sweeps we just give up and leave it to the path finder to work out
 		
 		// FIXME: we should precalculate these into a table and use step as an index
 		// there is a precission/rounding problem here with comparing against M_PI
@@ -226,7 +226,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			}
 		}
 		
-		dest = origin + start + RotatePoint(stepVec, angle + stepAngle);
+		return origin + start + RotatePoint(stepVec, angle + stepAngle);
 	};
 
 	while (step < maxStep) {
@@ -236,22 +236,12 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 		});
 
 		if (it != exclude.end()) {
-			NextStep();
+			dest = NextDest();
 			continue;
 		}
 		
-		// if we go out of bounds we stop searching
-		// the actor movement will take them as close to the point as possible, but we cant predict where that will be
-		if (dest.x < 0 || dest.y < 0) {
-			break;
-		}
-		
-		if (dest.x >= area->GetWidth() * 16 || dest.y >= area->GetHeight() * 12) {
-			break;
-		}
-		
-		if (area->IsVisible(dest, true) == false || (area->GetBlocked(dest)&PATH_MAP_PASSABLE) == 0) {
-			NextStep();
+		if (area->IsVisible(dest, true) == false || (area->GetBlocked(dest) & PATH_MAP_PASSABLE) == 0) {
+			dest = NextDest();
 			continue;
 		}
 		
