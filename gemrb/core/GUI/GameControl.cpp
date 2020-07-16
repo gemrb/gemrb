@@ -169,7 +169,7 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 	return formations[formation][pos];
 }
 
-Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, int radius, const std::vector<Point>& exclude) const
+Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, const std::vector<Point>& exclude) const
 {
 	Point vec;
 	
@@ -177,83 +177,100 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	Map* area = game->GetCurrentArea();
 	assert(area);
 
+	static constexpr int radius = 36 / 2; // 36 diameter is copied from make_formation.py
 	const auto& formation = game->GetFormation();
 	assert(formation < formationcount);
 
-	Point step;
+	Point stepVec;
+	int direction = (pos % 2 == 0) ? 1 : -1;
 
 	if (pos < FORMATIONSIZE) {
 		// calculate new coordinates by rotating formation around (0,0)
 		vec = RotatePoint(formations[formation][pos], angle);
-		step.y = radius;
+		stepVec.y = radius;
 	} else {
-		int magnitudeAdjustment = (pos % 2 == 0) ? 1 : -1;
+		
 		// create a line formation perpendicular to the formation start point and beginning at the last point
 		// of the formation table. Alternate between +90 degrees and -90 degrees to keep it balanced
 		// the formation table is created along the x axis starting at (0,0)
 		Point p = formations[formation][FORMATIONSIZE-1];
 		vec = RotatePoint(p, angle);
-		step.x = radius * magnitudeAdjustment;
+		stepVec.x = radius * direction;
 	}
 	
-	// adjust the point if the actor cant get there
-	// we do this by extending the vector until either it goes out of bounds
-	// or until the spot is valid
 	Point dest = vec + origin;
+	int step = 0;
+	constexpr int maxStep = 4;
+	double stepAngle = 0.0;
+	const Point& start = vec;
 	
-	
-	auto NextStep = [&]() {
-		vec = vec + RotatePoint(step, angle);
-		dest = vec + origin;
+	auto NextDest = [&]() -> Point {
+		// adjust the point if the actor cant get to `dest`
+		// we do this by sweeping an M_PI arc a `radius` (stepVec) away from the point
+		// and oriented according to `direction`
+		// if nothing is found, reset to `start` and increase the `stepVec` and sweep again
+		// each incremental sweep step the `stepAngle` increment shrinks because we have more area to fit
+		// if nothing is found after `maxStep` sweeps we just give up and leave it to the path finder to work out
+		
+		// FIXME: we should precalculate these into a table and use step as an index
+		// there is a precission/rounding problem here with comparing against M_PI
+		// and we may not use one of the arc end points
+		stepAngle += (M_PI_4 / (step + 1)) * direction;
+		if (stepAngle > M_PI || stepAngle < -M_PI) {
+			++step;
+			stepAngle = 0.0;
+			if (stepVec.y != 0) {
+				stepVec.y += radius;
+			} else {
+				stepVec.x += radius * direction;
+			}
+		}
+		
+		return origin + start + RotatePoint(stepVec, angle + stepAngle);
 	};
 
-	while (true) {
+	while (step < maxStep) {
 		auto it = std::find_if(exclude.begin(), exclude.end(), [&](const Point& p) {
 			// look for points within some radius
 			return p.isWithinRadius(radius, dest);
 		});
 
 		if (it != exclude.end()) {
-			NextStep();
+			dest = NextDest();
 			continue;
 		}
 		
-		// if we go out of bounds we stop searching
-		// the actor movement will take them as close to the point as possible, but we cant predict where that will be
-		if (dest.x < 0 || dest.y < 0) {
-			break;
-		}
-		
-		if (dest.x >= area->GetWidth() * 16 || dest.y >= area->GetHeight() * 12) {
-			break;
-		}
-		
-		if (area->GetCursor(dest) == IE_CURSOR_BLOCKED) {
-			NextStep();
+		if (area->IsVisible(dest, true) == false || (area->GetBlocked(dest) & PATH_MAP_PASSABLE) == 0) {
+			dest = NextDest();
 			continue;
 		}
 		
 		break;
 	}
 	
+	if (step == maxStep) {
+		// we never found a suitable point
+		// to garauntee a point that is reachable just fall back to origin
+		// let the pathfinder sort it out
+		return origin;
+	}
+	
 	return dest;
 }
 
 GameControl::FormationPoints GameControl::GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors,
-															 double angle, int radius) const
+															 double angle) const
 {
 	FormationPoints formation;
 	for (size_t i = 0; i < actors.size(); ++i) {
-		formation.emplace_back(GetFormationPoint(origin, i, angle, radius, formation));
+		formation.emplace_back(GetFormationPoint(origin, i, angle, formation));
 	}
 	return formation;
 }
 
 void GameControl::DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const
 {
-	constexpr int magnitude = 36 / 2; // 36 diameter is copied from make_formation.py
-
-	std::vector<Point> formationPoints = GetFormationPoints(formationPoint, actors, angle, magnitude);
+	std::vector<Point> formationPoints = GetFormationPoints(formationPoint, actors, angle);
 	for (size_t i = 0; i < actors.size(); ++i) {
 		DrawTargetReticle(actors[i], formationPoints[i] - vpOrigin);
 	}
@@ -2222,7 +2239,7 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 
 	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
 	
-	std::vector<Point> formationPoints = GetFormationPoints(p, party, angle, 36/2);
+	std::vector<Point> formationPoints = GetFormationPoints(p, party, angle);
 	for (size_t i = 0; i < party.size(); i++) {
 		Actor *actor = party[i];
 		// don't stop the party if we're just trying to add a waypoint
