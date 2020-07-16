@@ -37,7 +37,6 @@
 #include "ImageMgr.h"
 #include "Palette.h"
 #include "Particles.h"
-#include "PathFinder.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
 #include "SaveGameIterator.h"
@@ -59,6 +58,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <limits>
 
 namespace GemRB {
 
@@ -332,7 +332,6 @@ Map::Map(void)
 	LightMap = NULL;
 	HeightMap = NULL;
 	SmallMap = NULL;
-	MapSet = NULL;
 	SrchMap = NULL;
 	Walls = NULL;
 	WallCount = 0;
@@ -374,7 +373,6 @@ Map::Map(void)
 
 Map::~Map(void)
 {
-	free( MapSet );
 	free( SrchMap );
 	free( MaterialMap );
 
@@ -463,8 +461,6 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
-	//Filling Matrices
-	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 	//Internal Searchmap
 	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
@@ -732,7 +728,7 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 
 		//if the actor is immobile, don't run the scripts
-		//FIXME: this is not universaly true, only some states have this effect
+		//FIXME: this is not universally true, only some states have this effect
 		// paused targets do something similar, but are handled in the effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
@@ -787,19 +783,34 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 	}
 
-	// We need to step through the list of actors until all of them are done
-	// taking steps.
-	bool more_steps = true;
 	ieDword time = game->Ticks; // make sure everything moves at the same time
-	while (more_steps) {
-		more_steps = false;
-
-		q=Qcount[PR_SCRIPT];
-		while (q--) {
-			Actor* actor = queue[PR_SCRIPT][q];
-			more_steps = !DoStepForActor(actor, actor->speed, time);
+	// Make actors pathfind if there are others nearby
+	// in order to avoid bumping when possible
+	q = Qcount[PR_SCRIPT];
+	while (q--) {
+		Actor* actor = queue[PR_SCRIPT][q];
+		if (actor->GetRandomBackoff() || !actor->GetStep()) {
+			continue;
+		}
+		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
+		if (nearActor && nearActor != actor) {
+			actor->NewPath();
 		}
 	}
+
+	q = Qcount[PR_SCRIPT];
+	while (q--) {
+		Actor* actor = queue[PR_SCRIPT][q];
+		if (actor->GetRandomBackoff()) {
+			actor->DecreaseBackoff();
+			if (!actor->GetRandomBackoff()) {
+				actor->NewPath();
+			}
+			continue;
+		}
+		DoStepForActor(actor, actor->speed, time);
+	}
+
 
 	//Check if we need to start some door scripts
 	int doorCount = 0;
@@ -891,44 +902,27 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	}
 }
 
-bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
+void Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
-		return true;
+		return;
 	}
 
-	bool no_more_steps = true;
-	if (actor->BlocksSearchMap()) {
-		ClearSearchMapFor(actor);
-
-		PathNode * step = actor->GetStep();
-		if (step && step->Next) {
-			//we should actually wait for a short time and check then
-			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
-				actor->NewPath();
-			}
-		}
-	}
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-		no_more_steps = actor->DoStep( speed, time );
-		if (actor->BlocksSearchMap()) {
-			BlockSearchMap( actor->Pos, actor->size, actor->IsPartyMember()?PATH_MAP_PC:PATH_MAP_NPC);
-		}
+		actor->DoStep(walkScale, time);
 	}
-
-	return no_more_steps;
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3);
-	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
+	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
+	BlockSearchMap(actor->Pos, actor->size, PATH_MAP_UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
-	// have been cleared by this BlockSearchMap(..., 0).
+	// have been cleared by this BlockSearchMap(..., PATH_MAP_UNMARKED).
 	// (Necessary since blocked areas of actors may overlap.)
 	for (auto neighbour : nearActors) {
-		if (neighbour != actor && neighbour->BlocksSearchMap()) {
+		if (neighbour->BlocksSearchMap()) {
 			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 		}
 	}
@@ -1298,6 +1292,7 @@ void Map::DrawSearchMap(const Region &screen)
 	Color inaccessible = { 128, 128, 128, 128 };
 	Color impassible = { 128, 64, 64, 128 }; // red-ish
 	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
+	Color actor = { 128, 64, 128, 128 }; // purple-ish
 	Video *vid=core->GetVideoDriver();
 	Region rgn=vid->GetViewport();
 	Region block;
@@ -1309,17 +1304,20 @@ void Map::DrawSearchMap(const Region &screen)
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
+			unsigned char blockvalue = GetBlocked(x + rgn.x / 16, y + rgn.y / 12);
+			block.x = screen.x + x * 16 - (rgn.x % 16);
+			block.y = screen.y + y * 12 - (rgn.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
-				block.x=screen.x+x*16-(rgn.x % 16);
-				block.y=screen.y+y*12-(rgn.y % 12);
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
 					vid->DrawRect(block,impassible);
 				} else if (blockvalue & PATH_MAP_SIDEWALL) {
 					vid->DrawRect(block,sidewall);
-				} else {
+				} else if (!(blockvalue & PATH_MAP_ACTOR)){
 					vid->DrawRect(block,inaccessible);
 				}
+			}
+			if (blockvalue & PATH_MAP_ACTOR) {
+				vid->DrawRect(block, actor);
 			}
 		}
 	}
@@ -1335,9 +1333,9 @@ void Map::DrawSearchMap(const Region &screen)
 	block.w = 8;
 	block.h = 6;
 	while (step) {
-		block.x = (step->x+4)*16 - rgn.x;
-		block.y = (step->y+1)*12 - rgn.y - 6;
-		print("Waypoint %d at roughly (%d, %d)", i, block.x, block.y);
+		block.x = (step->x+64) - rgn.x;
+		block.y = (step->y+6) - rgn.y;
+		print("Waypoint %d at (%d, %d)", i, step->x, step->y);
 		vid->DrawRect(block, waypoint);
 		step = step->Next;
 		i++;
@@ -1605,7 +1603,7 @@ InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID)
 	}
 }
 
-Actor* Map::GetActorByGlobalID(ieDword objectID)
+Actor* Map::GetActorByGlobalID(ieDword objectID) const
 {
 	if (!objectID) {
 		return NULL;
@@ -1624,12 +1622,12 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
-Actor* Map::GetActor(const Point &p, int flags)
+Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 {
 	for (auto actor : actors) {
 		if (!actor->IsOver( p ))
 			continue;
-		if (!actor->ValidTarget(flags) ) {
+		if (!actor->ValidTarget(flags, checker) ) {
 			continue;
 		}
 		return actor;
@@ -1637,7 +1635,7 @@ Actor* Map::GetActor(const Point &p, int flags)
 	return NULL;
 }
 
-Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
+Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius) const
 {
 	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
@@ -1666,7 +1664,7 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 				continue;
 			}
 		}
-		neighbours.push_back(actor);
+		neighbours.emplace_back(actor);
 	}
 	return neighbours;
 }
@@ -1703,8 +1701,10 @@ void Map::JumpActors(bool jump)
 {
 	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
-			if (jump) {
-				actor->FixPosition();
+			if (jump && !(actor->GetStat(IE_DONOTJUMP) & DNJ_BIRD)) {
+				ClearSearchMapFor(actor);
+				AdjustPositionNavmap(actor->Pos);
+				actor->ImpedeBumping();
 			}
 			actor->SetBase(IE_DONOTJUMP,0);
 		}
@@ -1945,22 +1945,31 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
+unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
+{
+	return GetBlocked(x / 16, y / 12);
+}
+
+// Args are in searchmap coordinates
+// The default behavior is for actors to be blocking
+// If they shouldn't be, the caller should check for PATH_MAP_PASSABLE | PATH_MAP_ACTOR
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
 {
 	if (y>=Height || x>=Width) {
-		return 0;
+		return PATH_MAP_IMPASSABLE;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
-	if (ret&(PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR)) {
-		ret&=~PATH_MAP_PASSABLE;
+	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR)) {
+		ret &= ~PATH_MAP_PASSABLE;
 	}
-	if (ret&PATH_MAP_DOOR_OPAQUE) {
-		ret=PATH_MAP_SIDEWALL;
+	if (ret & PATH_MAP_DOOR_OPAQUE) {
+		ret = PATH_MAP_SIDEWALL;
 	}
 	return ret;
 }
 
-bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
+// Args are in navmap coordinates
+unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -1968,27 +1977,75 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size) const
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 2) size = 2;
+	unsigned int ret = 0;
 
-	unsigned int ppx = px/16;
-	unsigned int ppy = py/12;
-	unsigned int r=(size-2)*(size-2)+1;
+	unsigned int r = (size - 2) * (size - 2) + 1;
 	if (size == 2) r = 0;
-	for (unsigned int i=0; i<size-1; i++) {
-		for (unsigned int j=0; j<size-1; j++) {
-			if (i*i+j*j <= r) {
-				if (!(GetBlocked(ppx+i,ppy+j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx+i,ppy-j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx-i,ppy+j)&PATH_MAP_PASSABLE)) return true;
-				if (!(GetBlocked(ppx-i,ppy-j)&PATH_MAP_PASSABLE)) return true;
+	for (unsigned int i = 0; i < size - 1; i++) {
+		for (unsigned int j = 0; j < size - 1; j++) {
+			if (i * i + j * j <= r) {
+				unsigned int retBotRight = GetBlockedNavmap(px + i * 16, py + j * 12);
+				unsigned int retTopRight = GetBlockedNavmap(px + i * 16, py - j * 12);
+				unsigned int retBotLeft = GetBlockedNavmap(px - i * 16, py + j * 12);
+				unsigned int retTopLeft = GetBlockedNavmap(px - i * 16, py - j * 12);
+				if (stopOnImpassable) {
+					if (retBotRight == PATH_MAP_IMPASSABLE || retBotLeft == PATH_MAP_IMPASSABLE || retTopRight == PATH_MAP_IMPASSABLE || retTopLeft == PATH_MAP_IMPASSABLE) {
+						return PATH_MAP_IMPASSABLE;
+					}
+				}
+				ret |= (retBotRight | retTopRight | retBotLeft | retTopLeft);
 			}
 		}
 	}
-	return false;
+	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR|PATH_MAP_SIDEWALL)) {
+		ret &= ~PATH_MAP_PASSABLE;
+	}
+	if (ret & PATH_MAP_DOOR_OPAQUE) {
+		ret = PATH_MAP_SIDEWALL;
+	}
+
+	return ret;
 }
 
-unsigned int Map::GetBlocked(const Point &c) const
+unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller) const
 {
-	return GetBlocked(c.x/16, c.y/12);
+	unsigned int ret = 0;
+	Point p = s;
+	while (p != d) {
+		double dx = d.x - p.x;
+		double dy = d.y - p.y;
+		double factor = caller ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
+		NormalizeDeltas(dx, dy, factor);
+		p.x += dx;
+		p.y += dy;
+		int blockStatus = GetBlockedInRadius(p.x, p.y, caller ? caller->size : 0, stopOnImpassable);
+		if (stopOnImpassable && blockStatus == PATH_MAP_IMPASSABLE) {
+			return PATH_MAP_IMPASSABLE;
+		}
+		ret |= blockStatus;
+	}
+	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR|PATH_MAP_SIDEWALL)) {
+		ret &= ~PATH_MAP_PASSABLE;
+	}
+	if (ret & PATH_MAP_DOOR_OPAQUE) {
+		ret = PATH_MAP_SIDEWALL;
+	}
+
+	return ret;
+}
+
+// PATH_MAP_SIDEWALL obstructs LOS, while PATH_MAP_IMPASSABLE doesn't
+bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) const
+{
+	unsigned ret = GetBlockedInLine(s, d, false, caller);
+	return !(ret & PATH_MAP_SIDEWALL);
+}
+
+// Used by the pathfinder, so PATH_MAP_IMPASSABLE obstructs walkability
+bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
+{
+	unsigned ret = GetBlockedInLine(s, d, true, caller);
+	return ret & (PATH_MAP_PASSABLE | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
 }
 
 //flags:0 - never dither (full cover)
@@ -2275,7 +2332,7 @@ void Map::RemoveActor(Actor* actor)
 	while (i--) {
 		if (actors[i] == actor) {
 			//path is invalid outside this area, but actions may be valid
-			actor->ClearPath();
+			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
 			CopyResRef(actor->Area, "");
@@ -2337,54 +2394,7 @@ void Map::dump(bool show_actors) const
 	Log(DEBUG, "Map", buffer);
 }
 
-/******************************************************************************/
-
-void Map::Leveldown(unsigned int px, unsigned int py,
-	unsigned int& level, Point &n, unsigned int& diff)
-{
-	int pos;
-	unsigned int nlevel;
-
-	if (( px >= Width ) || ( py >= Height )) {
-		return;
-	} //walked off the map
-	pos = py * Width + px;
-	nlevel = MapSet[pos];
-	if (!nlevel) {
-		return;
-	} //not even considered
-	if (level <= nlevel) {
-		return;
-	}
-	unsigned int ndiff = level - nlevel;
-	if (ndiff > diff) {
-		level = nlevel;
-		diff = ndiff;
-		n.x = (ieWord) px;
-		n.y = (ieWord) py;
-	}
-}
-
-void Map::SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost)
-{
-	unsigned int pos;
-
-	if (( x >= Width ) || ( y >= Height )) {
-		return;
-	}
-	pos = y * Width + x;
-	if (MapSet[pos]) {
-		return;
-	}
-	if (GetBlocked(x*16+8,y*12+6,size)) {
-		MapSet[pos] = 65535;
-		return;
-	}
-	MapSet[pos] = (ieWord) Cost;
-	InternalStack.push( ( x << 16 ) | y );
-}
-
-bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy)
+bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy) const
 {
 	unsigned int minx = 0;
 	if ((unsigned int) goal.x > radiusx)
@@ -2395,14 +2405,14 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 
 	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 		if ((unsigned int) goal.y >= radiusy) {
-			if (GetBlocked( scanx, goal.y - radiusy ) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(scanx, goal.y - radiusy) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y - radiusy);
 				return true;
 			}
 		}
 		if (goal.y + radiusy < Height) {
-			if (GetBlocked( scanx, goal.y + radiusy ) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(scanx, goal.y + radiusy) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y + radiusy);
 				return true;
@@ -2412,7 +2422,7 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy)
+bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const
 {
 	unsigned int miny = 0;
 	if ((unsigned int) goal.y > radiusy)
@@ -2422,14 +2432,14 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 		maxy = Height;
 	for (unsigned int scany = miny; scany < maxy; scany++) {
 		if ((unsigned int) goal.x >= radiusx) {
-			if (GetBlocked( goal.x - radiusx, scany ) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(goal.x - radiusx, scany) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) (goal.x - radiusx);
 				goal.y = (ieWord) scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < Width) {
-			if (GetBlocked( goal.x + radiusx, scany ) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(goal.x + radiusx, scany) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) (goal.x + radiusx);
 				goal.y = (ieWord) scany;
 				return true;
@@ -2439,7 +2449,15 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy)
+void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
+{
+	NavmapPoint smptGoal(goal.x / 16, goal.y / 12);
+	AdjustPosition(smptGoal, radiusx, radiusy);
+	goal.x = smptGoal.x * 16 + 8;
+	goal.y = smptGoal.y * 12 + 6;
+}
+
+void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
 {
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;
@@ -2474,478 +2492,6 @@ void Map::AdjustPosition(Point &goal, unsigned int radiusx, unsigned int radiusy
 	}
 }
 
-//run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags)
-{
-	Point start(s.x/16, s.y/12);
-	Point goal (d.x/16, d.y/12);
-	unsigned int dist;
-
-	//MapSet entries are made of 16 bits
-	if (PathLen>65535) {
-		PathLen = 65535;
-	}
-
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	if (!( GetBlocked( start.x, start.y) & PATH_MAP_PASSABLE )) {
-		AdjustPosition( start );
-	}
-	unsigned int pos = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[start.y * Width + start.x] = 1;
-	dist = 0;
-	Point best = start;
-	while (InternalStack.size()) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-		long tx = (long) x - goal.x;
-		long ty = (long) y - goal.y;
-		unsigned int distance = (unsigned int) std::sqrt( ( double ) ( tx* tx + ty* ty ) );
-		if (dist<distance) {
-			best.x=(ieWord) x;
-			best.y=(ieWord) y;
-			dist=distance;
-		}
-
-		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
-		if (Cost > PathLen) {
-			break;
-		}
-		SetupNode( x - 1, y - 1, size, Cost );
-		SetupNode( x + 1, y - 1, size, Cost );
-		SetupNode( x + 1, y + 1, size, Cost );
-		SetupNode( x - 1, y + 1, size, Cost );
-
-		Cost += AdditionalCost;
-		SetupNode( x, y - 1, size, Cost );
-		SetupNode( x + 1, y, size, Cost );
-		SetupNode( x, y + 1, size, Cost );
-		SetupNode( x - 1, y, size, Cost );
-	}
-
-	//find path backwards from best to start
-	PathNode* StartNode = new PathNode;
-	PathNode* Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->x = best.x;
-	StartNode->y = best.y;
-	if (flags) {
-		StartNode->orient = GetOrient( start, best );
-	} else {
-		StartNode->orient = GetOrient( best, start );
-	}
-	Point p = best;
-	unsigned int pos2 = start.y * Width + start.x;
-	while (( pos = p.y * Width + p.x ) != pos2) {
-		Return = new PathNode;
-		StartNode->Parent = Return;
-		Return->Next = StartNode;
-		StartNode = Return;
-		unsigned int level = MapSet[pos];
-		unsigned int diff = 0;
-		Point n;
-		Leveldown( p.x, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y, level, n, diff );
-		Leveldown( p.x - 1, p.y, level, n, diff );
-		Leveldown( p.x, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		Return->x = n.x;
-		Return->y = n.y;
-
-		if (flags) {
-			Return->orient = GetOrient( p, n );
-		} else {
-			Return->orient = GetOrient( n, p );
-		}
-		p = n;
-		if (!diff) {
-			break;
-		}
-	}
-	Return->Parent = NULL;
-	return Return;
-}
-
-bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
-{
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	if (GetBlocked( d.x, d.y, size )) {
-		return true;
-	}
-	if (GetBlocked( s.x, s.y, size )) {
-		return true;
-	}
-
-	unsigned int pos = ( goal.x << 16 ) | goal.y;
-	unsigned int pos2 = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[goal.y * Width + goal.x] = 1;
-
-	while (InternalStack.size() && pos!=pos2) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-
-		SetupNode( x - 1, y - 1, size, 1 );
-		SetupNode( x + 1, y - 1, size, 1 );
-		SetupNode( x + 1, y + 1, size, 1 );
-		SetupNode( x - 1, y + 1, size, 1 );
-		SetupNode( x, y - 1, size, 1 );
-		SetupNode( x + 1, y, size, 1 );
-		SetupNode( x, y + 1, size, 1 );
-		SetupNode( x - 1, y, size, 1 );
-	}
-	return pos!=pos2;
-}
-
-/* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
-*/
-
-PathNode* Map::GetLine(const Point &start, const Point &dest, int flags)
-{
-	int Orientation = GetOrient(start, dest);
-	return GetLine(start, dest, 1, Orientation, flags);
-}
-
-PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags)
-{
-	Point dest=start;
-
-	double xoff, yoff, mult;
-	if (Orientation <= 4) {
-		xoff = -Orientation / 4.0;
-	} else if (Orientation <= 12) {
-		xoff = -1.0 + (Orientation - 4) / 4.0;
-	} else {
-		xoff = 1.0 - (Orientation - 12) / 4.0;
-	}
-
-	if (Orientation <= 8) {
-		yoff = 1.0 - Orientation / 4.0;
-	} else {
-		yoff = -1.0 + (Orientation - 8) / 4.0;
-	}
-
-	mult = 1.0 / (std::fabs(xoff) > std::fabs(yoff) ? std::fabs(xoff) : std::fabs(yoff));
-
-	dest.x += Steps * mult * xoff + 0.5;
-	dest.y += Steps * mult * yoff + 0.5;
-	
-	return GetLine(start, dest, 2, Orientation, flags);
-}
-
-PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags)
-{
-	PathNode* StartNode = new PathNode;
-	PathNode *Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
-	StartNode->x = start.x;
-	StartNode->y = start.y;
-	StartNode->orient = Orientation;
-
-	int Count = 0;
-	int Max = Distance(start,dest);
-	for (int Steps = 0; Steps<Max; Steps++) {
-		Point p;
-		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
-		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
-
-		//the path ends here as it would go off the screen, causing problems
-		//maybe there is a better way, but i needed a quick hack to fix
-		//the crash in projectiles
-		if ((signed) p.x<0 || (signed) p.y<0) {
-			return Return;
-		}
-		if ((ieWord) p.x>Width*16 || (ieWord) p.y>Height*12) {
-			return Return;
-		}
-
-		if (!Count) {
-			StartNode->Next = new PathNode;
-			StartNode->Next->Parent = StartNode;
-			StartNode = StartNode->Next;
-			StartNode->Next = NULL;
-			Count=Speed;
-		} else {
-			Count--;
-		}
-
-		StartNode->x = p.x;
-		StartNode->y = p.y;
-		StartNode->orient = Orientation;
-		bool wall = GetBlocked( p ) & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_SIDEWALL);
-		if (wall) switch (flags) {
-			case GL_REBOUND:
-				Orientation = (Orientation + 8) &15;
-				// TODO: recalculate dest (mirror it)
-				break;
-			case GL_PASS:
-				break;
-			default: //premature end
-				return Return;
-		}
-	}
-
-	return Return;
-}
-
-/*
- * find a path from start to goal, ending at the specified distance from the
- * target (the goal must be in sight of the end, if 'sight' is specified)
- *
- * if you don't need to find an optimal path near the goal then use FindPath
- * instead, but don't change this one without testing with combat and dialog,
- * you can't predict the goal point for those, you *must* path!
- */
-PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance, bool sight)
-{
-	// adjust the start/goal points to be searchmap locations
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	Point orig_goal = goal;
-
-	// re-initialise the path finding structures
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	// set the start point in the path finding structures
-	unsigned int pos2 = ( goal.x << 16 ) | goal.y;
-	unsigned int pos = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[start.y * Width + start.x] = 1;
-
-	unsigned int squaredmindistance = MinDistance * MinDistance;
-	bool found_path = false;
-	while (InternalStack.size()) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-
-		if (pos == pos2) {
-			// we got all the way to the target!
-			found_path = true;
-			break;
-		} else if (MinDistance) {
-			/* check minimum distance:
-			 * as an obvious optimisation we only check squared distance: this is a
-			 * possible overestimate since the sqrt Distance() rounds down
-			 * (some other optimisations could be made here, but you'd be better off
-			 * fixing the pathfinder to do A* properly)
-			 * caller should have already done PersonalDistance adjustments, this is
-			 * simply between the specified points
-			 */
-
-			int distx = (x*16 + 8) - d.x;
-			int disty = (y*12 + 6) - d.y;
-			if ((unsigned int)(distx*distx + disty*disty) <= squaredmindistance) {
-				// we are within the minimum distance of the goal
-				Point ourpos(x*16 + 8, y*12 + 6);
-				// sight check is *slow* :(
-				if (!sight || IsVisibleLOS(ourpos, d)) {
-					// we got all the way to a suitable goal!
-					goal = Point(x, y);
-					found_path = true;
-					break;
-				}
-			}
-		}
-
-		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
-		if (Cost > 65500) {
-			// cost is far too high, no path found
-			break;
-		}
-
-		// diagonal movements
-		SetupNode( x - 1, y - 1, size, Cost );
-		SetupNode( x + 1, y - 1, size, Cost );
-		SetupNode( x + 1, y + 1, size, Cost );
-		SetupNode( x - 1, y + 1, size, Cost );
-
-		// direct movements
-		Cost += AdditionalCost;
-		SetupNode( x, y - 1, size, Cost );
-		SetupNode( x + 1, y, size, Cost );
-		SetupNode( x, y + 1, size, Cost );
-		SetupNode( x - 1, y, size, Cost );
-	}
-
-	// find path from goal to start
-	PathNode* StartNode = new PathNode;
-	PathNode* Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
-	if (!found_path) {
-		// this is not really great, we should be finding the path that
-		// went nearest to where we wanted
-		StartNode->x = start.x;
-		StartNode->y = start.y;
-		StartNode->orient = GetOrient( goal, start );
-		return Return;
-	}
-	StartNode->x = goal.x;
-	StartNode->y = goal.y;
-	bool fixup_orient = false;
-	if (orig_goal != goal) {
-		StartNode->orient = GetOrient( orig_goal, goal );
-	} else {
-		// we pathed all the way to original goal!
-		// we don't know correct orientation until we find previous step
-		fixup_orient = true;
-		StartNode->orient = GetOrient( goal, start );
-	}
-	Point p = goal;
-	pos2 = start.y * Width + start.x;
-	while (( pos = p.y * Width + p.x ) != pos2) {
-		unsigned int level = MapSet[pos];
-		unsigned int diff = 0;
-		Point n;
-		Leveldown( p.x, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y, level, n, diff );
-		Leveldown( p.x - 1, p.y, level, n, diff );
-		Leveldown( p.x, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff)
-			return Return;
-
-		if (fixup_orient) {
-			// don't change orientation at end of path? this seems best
-			StartNode->orient = GetOrient( p, n );
-		}
-
-		Return = new PathNode;
-		Return->Next = StartNode;
-		Return->Next->Parent = Return;
-		StartNode = Return;
-
-		StartNode->x = n.x;
-		StartNode->y = n.y;
-		StartNode->orient = GetOrient( p, n );
-		p = n;
-	}
-
-	return Return;
-}
-
-PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance)
-{
-	Point start( s.x/16, s.y/12 );
-	Point goal ( d.x/16, d.y/12 );
-	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
-	while (InternalStack.size())
-		InternalStack.pop();
-
-	if (GetBlocked( d.x, d.y, size )) {
-		AdjustPosition( goal );
-	}
-	unsigned int pos = ( goal.x << 16 ) | goal.y;
-	unsigned int pos2 = ( start.x << 16 ) | start.y;
-	InternalStack.push( pos );
-	MapSet[goal.y * Width + goal.x] = 1;
-
-	while (InternalStack.size()) {
-		pos = InternalStack.front();
-		InternalStack.pop();
-		unsigned int x = pos >> 16;
-		unsigned int y = pos & 0xffff;
-
-		if (pos == pos2) {
-			//We've found _a_ path
-			//print("GOAL!!!");
-			break;
-		}
-		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
-		if (Cost > 65500) {
-			//print("Path not found!");
-			break;
-		}
-		SetupNode( x - 1, y - 1, size, Cost );
-		SetupNode( x + 1, y - 1, size, Cost );
-		SetupNode( x + 1, y + 1, size, Cost );
-		SetupNode( x - 1, y + 1, size, Cost );
-
-		Cost += AdditionalCost;
-		SetupNode( x, y - 1, size, Cost );
-		SetupNode( x + 1, y, size, Cost );
-		SetupNode( x, y + 1, size, Cost );
-		SetupNode( x - 1, y, size, Cost );
-	}
-
-	//find path from start to goal
-	PathNode* StartNode = new PathNode;
-	PathNode* Return = StartNode;
-	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
-	StartNode->x = start.x;
-	StartNode->y = start.y;
-	StartNode->orient = GetOrient( goal, start );
-	if (pos != pos2) {
-		return Return;
-	}
-	Point p = start;
-	pos2 = goal.y * Width + goal.x;
-	while (( pos = p.y * Width + p.x ) != pos2) {
-		StartNode->Next = new PathNode;
-		StartNode->Next->Parent = StartNode;
-		StartNode = StartNode->Next;
-		StartNode->Next = NULL;
-		unsigned int level = MapSet[pos];
-		unsigned int diff = 0;
-		Point n;
-		Leveldown( p.x, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y, level, n, diff );
-		Leveldown( p.x - 1, p.y, level, n, diff );
-		Leveldown( p.x, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y + 1, level, n, diff );
-		Leveldown( p.x + 1, p.y - 1, level, n, diff );
-		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff)
-			return Return;
-		StartNode->x = n.x;
-		StartNode->y = n.y;
-		StartNode->orient = GetOrient( n, p );
-		p = n;
-	}
-	//stepping back on the calculated path
-	if (MinDistance) {
-		while (StartNode->Parent) {
-			Point tar;
-
-			tar.x=StartNode->Parent->x*16;
-			tar.y=StartNode->Parent->y*12;
-			int dist = Distance(tar,d);
-			if (dist+14>=MinDistance) {
-				break;
-			}
-			StartNode = StartNode->Parent;
-			delete StartNode->Next;
-			StartNode->Next = NULL;
-		}
-	}
-	return Return;
-}
-
 //single point visible or not (visible/exploredbitmap)
 //if explored = true then explored otherwise currently visible
 bool Map::IsVisible(const Point &pos, int explored)
@@ -2968,68 +2514,12 @@ bool Map::IsVisible(const Point &pos, int explored)
 	return (VisibleBitmap[by] & bi)!=0;
 }
 
-//point a is visible from point b (searchmap)
-bool Map::IsVisibleLOS(const Point &s, const Point &d) const
-{
-	int sX=s.x/16;
-	int sY=s.y/12;
-	int dX=d.x/16;
-	int dY=d.y/12;
-	int diffx = sX - dX;
-	int diffy = sY - dY;
-
-	// we basically draw a 'line' from (sX, sY) to (dX, dY)
-	// we want to move along the larger axis, to make sure we don't miss anything
-	if (abs( diffx ) >= abs( diffy )) {
-		// (sX - startX)/elevationy = (sX - startX)/fabs(diffx) * diffy
-		double elevationy = std::fabs((double)diffx ) / diffy;
-		if (sX > dX) {
-			// right to left
-			for (int startx = sX; startx >= dX; startx--) {
-				// sX - startx >= 0, so subtract (due to sign of diffy)
-				//if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
-					return false;
-			}
-		} else {
-			// left to right
-			for (int startx = sX; startx <= dX; startx++) {
-				// sX - startx <= 0, so add (due to sign of diffy)
-				//if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
-					return false;
-			}
-		}
-	} else {
-		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
-		double elevationx = std::fabs((double)diffy ) / diffx;
-		if (sY > dY) {
-			// bottom to top
-			for (int starty = sY; starty >= dY; starty--) {
-				// sY - starty >= 0, so subtract (due to sign of diffx)
-				//if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
-					return false;
-			}
-		} else {
-			// top to bottom
-			for (int starty = sY; starty <= dY; starty++) {
-				// sY - starty <= 0, so add (due to sign of diffx)
-				//if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
-				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
-					return false;
-			}
-		}
-	}
-	return true;
-}
-
 //returns direction of area boundary, returns -1 if it isn't a boundary
 int Map::WhichEdge(const Point &s)
 {
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
-	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
+	if (!(GetBlocked(sX, sY) & PATH_MAP_TRAVEL)) {
 		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
 			sX, sY);
 		return -1;
@@ -3340,7 +2830,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 			if (los) {
 				if (!block) {
-					int type = GetBlocked(Tile);
+					int type = GetBlocked(Tile.x / 16, Tile.y / 12);
 					if (type & PATH_MAP_NO_SEE) {
 						block=true;
 					} else if (type & PATH_MAP_SIDEWALL) {
@@ -3386,7 +2876,7 @@ void Map::UpdateFog()
 	}
 }
 
-//Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
+// Valid values are - PATH_MAP_UNMARKED, PATH_MAP_PC, PATH_MAP_NPC
 void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value)
 {
 	// We block a circle of radius size-1 around (px,py)
@@ -3627,7 +3117,7 @@ int Map::GetCursor( const Point &p)
 	if (!IsVisible( p, true ) ) {
 		return IE_CURSOR_INVALID;
 	}
-	switch (GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
+	switch (GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL)) {
 		case 0:
 			return IE_CURSOR_BLOCKED;
 		case PATH_MAP_PASSABLE:

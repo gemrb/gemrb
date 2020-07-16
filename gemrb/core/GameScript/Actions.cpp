@@ -1120,6 +1120,7 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1138,6 +1139,7 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
 		actor->Interrupt();
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1155,6 +1157,7 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1172,6 +1175,7 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1196,6 +1200,7 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1233,6 +1238,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	// give up if we can't move there (no path was found)
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1281,6 +1287,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1308,6 +1315,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1338,6 +1346,7 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	//what else?
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1364,6 +1373,7 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1469,6 +1479,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
 		actor->Interrupt();
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -1486,6 +1497,7 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
+		actor->ClearPath();
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -5559,7 +5571,7 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
 	//fly in this direction for 20 steps
-	actor->MoveLine(20, GL_PASS, actor->GetOrientation() );
+	actor->MoveLine(20, actor->GetOrientation());
 }
 
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)

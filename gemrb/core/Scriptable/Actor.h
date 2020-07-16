@@ -160,6 +160,9 @@ namespace GemRB {
 //cannot target unscheduled actors
 #define GA_NO_UNSCHEDULED 16384
 
+#define GA_ONLY_BUMPABLE 32768
+#define GA_CAN_BUMP 65536
+
 #define VCONST_COUNT 100
 
 //interact types
@@ -331,7 +334,6 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
-	int PathTries; //the # of previous tries to pick up a new walkpath
 	ArmorClass AC;
 	ToHitStats ToHit;
 	ModalState Modal;
@@ -464,7 +466,7 @@ public:
 	/** places the actor on the map */
 	void SetMap(Map *map);
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(const Point &position, int jump, int radiusx=0, int radiusy=0);
+	void SetPosition(const Point &nmptTarget, int jump, int radiusx=0, int radiusy=0);
 	/** you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
@@ -510,7 +512,7 @@ public:
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
-	char* GetName(int which) const
+	char* GetName(int which) const override
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
@@ -715,7 +717,6 @@ public:
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime, bool checkhide) const;
-	/* call this when path needs to be changed */
 	void NewPath();
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
@@ -748,7 +749,7 @@ public:
 	void UpdateAnimations();
 	/* if necessary, draw actor */
 	void Draw(const Region &screen);
-	bool DoStep(unsigned int walk_speed, ieDword time = 0);
+	void DoStep(unsigned int walkScale, ieDword time = 0) override;
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
@@ -873,7 +874,7 @@ public:
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
 	int GetFavoredPenalties() const;
-	bool BlocksSearchMap() const;
+	bool BlocksSearchMap() const override;
 	bool CannotPassEntrance(ieDword exitID) const;
 	void UseExit(ieDword exitID);
 	//int GetReaction() const;
@@ -939,7 +940,7 @@ public:
 	/* set to trap id if current action is disarm; unset after */
 	void SetDisarmingTrap(ieDword trapId) { disarmTrap = trapId; }
 	ieDword GetDisarmingTrap() const { return disarmTrap; }
-	void ReleaseCurrentAction();
+	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	ieDword GetLastRested() { return TicksLastRested; }
