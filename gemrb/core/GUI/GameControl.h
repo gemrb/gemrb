@@ -141,8 +141,8 @@ private:
 	void DrawArrowMarker(Point p, const Color& color);
 	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
 	
-	Point GetFormationPoint(const Point& origin, size_t pos, double angle, int radius = 0, const FormationPoints& exclude = FormationPoints()) const;
-	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, double angle, int radius = 0) const;
+	Point GetFormationPoint(const Point& origin, size_t pos, double angle, const FormationPoints& exclude = FormationPoints()) const;
+	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, double angle) const;
 	
 	void Scroll(const Point& amt);
 
