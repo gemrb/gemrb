@@ -568,6 +568,11 @@ StealIsAttack = <bool>
 Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
 
 
+StepTime = <number>
+- - - - - - - - - -
+Determines how long a single step is, i.e. how fast characters move. For measurements see #106.
+
+
 StrrefSaveGame = <bool>
 - - - - - - - - - - -
 Determines whether the GameScript action SaveGame uses the int0 paramater

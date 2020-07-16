@@ -240,7 +240,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			continue;
 		}
 		
-		if (area->IsVisible(dest, true) == false || (area->GetBlocked(dest) & PATH_MAP_PASSABLE) == 0) {
+		if (area->IsVisible(dest, true) == false || (area->GetBlockedNavmap(dest) & PATH_MAP_PASSABLE) == 0) {
 			dest = NextDest();
 			continue;
 		}

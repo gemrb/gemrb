@@ -438,7 +438,6 @@ Actor::Actor()
 		Modified[i] = 0;
 	}
 	PrevStats = NULL;
-
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
@@ -467,7 +466,7 @@ Actor::Actor()
 	nextWalk = 0;
 	lastattack = 0;
 	InTrap = 0;
-	PathTries = 0;
+	ResetPathTries();
 	TargetDoor = 0;
 	attackProjectile = NULL;
 	lastInit = 0;
@@ -1525,7 +1524,7 @@ static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newVal
 {
 	Map *map = actor->GetCurrentArea();
 	if (!map) return;
-	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_FREE : PATH_MAP_NPC);
+	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_UNMARKED : PATH_MAP_NPC);
 }
 
 //spell casting or other buttons disabled/reenabled
@@ -4280,7 +4279,7 @@ bool Actor::PlayWarCry(int range) const
 void Actor::CommandActor(Action* action, bool clearPath)
 {
 	Scriptable::Stop(); // stop what you were doing
-	if (clearPath) ClearPath();
+	if (clearPath) ClearPath(true);
 	AddAction(action); // now do this new thing
 
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
@@ -5196,13 +5195,15 @@ void Actor::SetMap(Map *map)
 	}
 }
 
-void Actor::SetPosition(const Point &position, int jump, int radiusx, int radiusy)
+// Position should be a navmap point
+void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy)
 {
-	PathTries = 0;
-	ClearPath();
+	ResetPathTries();
+	ClearPath(true);
 	Point p, q;
-	p.x = position.x/16;
-	p.y = position.y/12;
+	p.x = nmptTarget.x / 16;
+	p.y = nmptTarget.y / 12;
+
 	q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();
@@ -5211,7 +5212,7 @@ void Actor::SetPosition(const Point &position, int jump, int radiusx, int radius
 		map->AdjustPosition( p, radiusx, radiusy );
 	}
 	if (p==q) {
-		MoveTo( position );
+		MoveTo(nmptTarget);
 	} else {
 		p.x = p.x * 16 + 8;
 		p.y = p.y * 12 + 6;
@@ -5686,7 +5687,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	ReleaseCurrentAction();
-	ClearPath();
+	ClearPath(true);
 	SetModal( MS_NONE );
 
 	ieDword value = 0;
@@ -6319,6 +6320,19 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 			if (Modified[IE_CHECKFORBERSERK]) return false;
 		}
 	}
+	if (ga_flags & GA_ONLY_BUMPABLE) {
+		if (core->InCutSceneMode()) return false;
+		if (core->GetGame()->CombatCounter) return false;
+		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false;
+		// Skip sitting patrons
+		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false;
+		if (IsMoving()) return false;
+	}
+	if (ga_flags & GA_CAN_BUMP) {
+		if (core->InCutSceneMode()) return false;
+		if (core->GetGame()->CombatCounter) return false;
+		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) return false;
+	}
 	return true;
 }
 
@@ -6757,13 +6771,12 @@ int Actor::Immobile() const
 	return 0;
 }
 
-bool Actor::DoStep(unsigned int walk_speed, ieDword time)
+void Actor::DoStep(unsigned int walkScale, ieDword time)
 {
 	if (Immobile()) {
-		return true;
+		return;
 	}
-
-	return Movable::DoStep(walk_speed, time);
+	Movable::DoStep(walkScale, time);
 }
 
 ieDword Actor::GetNumberOfAttacks()
@@ -8293,16 +8306,6 @@ bool Actor::Schedule(ieDword gametime, bool checkhide) const
 	return GemRB::Schedule(appearance, gametime);
 }
 
-void Actor::NewPath()
-{
-	PathTries++;
-	Point tmp = Destination;
-	ClearPath();
-	if (PathTries>10) {
-		return;
-	}
-	Movable::WalkTo(tmp, size );
-}
 
 void Actor::SetInTrap(ieDword setreset)
 {
@@ -8320,9 +8323,27 @@ void Actor::SetRunFlags(ieDword flags)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 }
 
+void Actor::NewPath()
+{
+	if (Destination == Pos) return;
+	// WalkTo's and FindPath's first argument is passed by reference
+	// And we don't want to modify Destination so we use a temporary
+	Point tmp = Destination;
+	if (GetPathTries() > MAX_PATH_TRIES) {
+		ClearPath(true);
+		ResetPathTries();
+		return;
+	}
+	WalkTo(tmp, InternalFlags, pathfindingDistance);
+	if (!GetPath()) {
+		IncrementPathTries();
+	}
+}
+
+
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
-	PathTries = 0;
+	ResetPathTries();
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}
@@ -8760,7 +8781,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// consider the possibility the mirror image is behind a wall (walls.second)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
+				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}
 			}
@@ -8833,7 +8854,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// consider the possibility the mirror image is in front of a wall (walls.first)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
+				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
 				}
 			}

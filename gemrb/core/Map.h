@@ -26,10 +26,13 @@
 
 #include "Interface.h"
 #include "Scriptable/Scriptable.h"
+#include "PathFinder.h"
 
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
+
+template <class V> class FibonacciHeap;
 
 namespace GemRB {
 
@@ -352,6 +355,7 @@ typedef std::list<VEFObject*>::iterator scaIterator;
 typedef std::list<Projectile*>::iterator proIterator;
 typedef std::list<Particles*>::iterator spaIterator;
 
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -380,10 +384,8 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	unsigned short* MapSet;
 	unsigned short* SrchMap; //internal searchmap
 	unsigned short* MaterialMap;
-	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
@@ -403,10 +405,19 @@ private:
 	Region stencilViewport;
 
 	std::unordered_map<Scriptable*, std::pair<VideoBufferPtr, Region>> objectStencils;
+	static const size_t DEGREES_OF_FREEDOM = 4;
+	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
+	static const std::array<char, DEGREES_OF_FREEDOM> dx;
+	static const std::array<char, DEGREES_OF_FREEDOM> dy;
+	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dyRand;
+	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dxRand;
+	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+
 public:
 	Map(void);
 	~Map(void);
 	static void ReleaseMemory();
+	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 
 	/** prints useful information on console */
 	void dump(bool show_actors=0) const;
@@ -420,7 +431,7 @@ public:
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);
-	bool DoStepForActor(Actor *actor, int speed, ieDword time);
+	void DoStepForActor(Actor *actor, int walkScale, ieDword time);
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
@@ -459,20 +470,21 @@ public:
 	int CountSummons(ieDword flag, ieDword sex);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
-	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size) const;
+	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
-	unsigned int GetBlocked(const Point &p) const;
+	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;
+	unsigned int GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
 	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);
-	Actor* GetActorByGlobalID(ieDword objectID);
-	Actor* GetActor(const Point &p, int flags);
-	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
+	Actor* GetActorByGlobalID(ieDword objectID) const;
+	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius) const;
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	int GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any) const;
+	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable* GetActorByDialog(const char* resref);
 	Scriptable* GetItemByDialog(ieResRef resref);
 	Actor* GetActorByResource(const char* resref);
@@ -549,25 +561,28 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0);
+	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0) const;
+	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0) const;
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags);
+	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
+	PathNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size);
+	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false);
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode* GetLine(const Point &start, const Point &dest, int flags);
-	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
-	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
+	PathNode* GetLine(const Point &start, const Point &dest, int flags) const;
+	PathNode* GetLine(const Point &start, int steps, unsigned int orient) const;
+	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags) const;
+	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	PathNode* FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance = 0, bool sight = true);
-	/* Finds the path which leads to d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance = 0);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
+
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(const Point &s, int explored);
-	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisibleLOS(const Point &s, const Point &d) const;
+	bool IsVisibleLOS(const Point &s, const Point &d, const Actor *caller = NULL) const;
+	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const;
+
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(const Point &s);
 
@@ -619,6 +634,7 @@ public:
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
+
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
@@ -631,17 +647,14 @@ private:
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
-	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
-		Point &p, unsigned int& diff);
-	void SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
-	//separated position adjustment, so their order could be randomised */
-	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy);
-	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy);
+	//separated position adjustment, so their order could be randomised
+	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
+	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void UpdateSpawns();
-
+	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
 	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
 	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
