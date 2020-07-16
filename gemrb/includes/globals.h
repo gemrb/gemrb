@@ -186,12 +186,12 @@ class Scriptable;
 class Actor;
 
 GEM_EXPORT unsigned char GetOrient(const Point &s, const Point &d);
-GEM_EXPORT unsigned int Distance(const Point pos, const Point pos2);
-GEM_EXPORT unsigned int Distance(const Point pos, const Scriptable *b);
-GEM_EXPORT unsigned int SquaredDistance(const Point pos, const Point pos2);
-GEM_EXPORT unsigned int SquaredMapDistance(Point pos, const Scriptable *b);
-GEM_EXPORT unsigned int PersonalDistance(Point p, const Scriptable *b);
-GEM_EXPORT unsigned int SquaredPersonalDistance(Point pos, const Scriptable *b);
+GEM_EXPORT unsigned int Distance(const Point &pos, const Point &pos2);
+GEM_EXPORT unsigned int Distance(const Point &pos, const Scriptable *b);
+GEM_EXPORT unsigned int SquaredDistance(const Point &pos, const Point &pos2);
+GEM_EXPORT unsigned int SquaredMapDistance(const Point &pos, const Scriptable *b);
+GEM_EXPORT unsigned int PersonalDistance(const Point &p, const Scriptable *b);
+GEM_EXPORT unsigned int SquaredPersonalDistance(const Point &pos, const Scriptable *b);
 GEM_EXPORT unsigned int Distance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b);

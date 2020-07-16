@@ -79,7 +79,7 @@ unsigned char GetOrient(const Point &s, const Point &d)
 }
 
 /** Calculates distance between 2 points */
-unsigned int Distance(Point p, Point q)
+unsigned int Distance(const Point &p, const Point &q)
 {
 	long x = ( p.x - q.x );
 	long y = ( p.y - q.y );
@@ -87,7 +87,7 @@ unsigned int Distance(Point p, Point q)
 }
 
 /** Calculates squared distance between 2 points */
-unsigned int SquaredDistance(Point p, Point q)
+unsigned int SquaredDistance(const Point &p, const Point &q)
 {
 	long x = p.x - q.x;
 	long y = p.y - q.y;
@@ -95,7 +95,7 @@ unsigned int SquaredDistance(Point p, Point q)
 }
 
 /** Calculates distance squared from a point to a scriptable */
-unsigned int SquaredMapDistance(Point p, const Scriptable *b)
+unsigned int SquaredMapDistance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x/16 - b->Pos.x/16 );
 	long y = ( p.y/12 - b->Pos.y/12 );
@@ -103,14 +103,14 @@ unsigned int SquaredMapDistance(Point p, const Scriptable *b)
 }
 
 /** Calculates distance between 2 points */
-unsigned int Distance(Point p, const Scriptable *b)
+unsigned int Distance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
 	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
 }
 
-unsigned int PersonalDistance(Point p, const Scriptable *b)
+unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
@@ -122,7 +122,7 @@ unsigned int PersonalDistance(Point p, const Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(Point p, const Scriptable *b)
+unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
