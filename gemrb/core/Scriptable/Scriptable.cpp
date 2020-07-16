@@ -2198,7 +2198,6 @@ void Movable::BumpBack()
 		// Do bump back if the actor is "blocking" itself
 		if (!(oldPosBlockStatus & PATH_MAP_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
 			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
-			Log(DEBUG, "DoStep", "%s not bumping back, blocked by %d", GetName(0), oldPosBlockStatus);
 			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
 				bumpBackTries++;
 				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
