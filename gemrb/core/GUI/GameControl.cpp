@@ -200,6 +200,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	
 	Point dest = vec + origin;
 	int step = 0;
+	constexpr int maxStep = 5;
 	double stepAngle = 0.0;
 	const Point& start = vec;
 	
@@ -228,7 +229,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 		dest = origin + start + RotatePoint(stepVec, angle + stepAngle);
 	};
 
-	while (step < 4) {
+	while (step < maxStep) {
 		auto it = std::find_if(exclude.begin(), exclude.end(), [&](const Point& p) {
 			// look for points within some radius
 			return p.isWithinRadius(radius, dest);
@@ -249,12 +250,19 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			break;
 		}
 		
-		if (area->GetCursor(dest) == IE_CURSOR_BLOCKED) {
+		if (area->IsVisible(dest, true) == false || (area->GetBlocked(dest)&PATH_MAP_PASSABLE) == 0) {
 			NextStep();
 			continue;
 		}
 		
 		break;
+	}
+	
+	if (step == maxStep) {
+		// we never found a suitable point
+		// to garauntee a point that is reachable just fall back to origin
+		// let the pathfinder sort it out
+		return origin;
 	}
 	
 	return dest;
