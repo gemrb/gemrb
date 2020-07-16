@@ -1632,7 +1632,7 @@ int GameScript::Disarmed(Scriptable* Sender, Trigger* parameters)
 //stealing from a store failed, owner triggered
 int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
+	return Sender->MatchTriggerWithObject(trigger_stealfailed, parameters->objectParameter);
 }
 
 int GameScript::PickpocketFailed(Scriptable* Sender, Trigger* parameters)
@@ -2882,28 +2882,9 @@ int GameScript::AreaRestDisabled(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
-//new optional parameter: size of actor (to reach target)
-int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
+int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 1; //well, if it doesn't exist it is unreachable
-	}
-	Map *map=Sender->GetCurrentArea();
-	if (!map) {
-		return 1;
-	}
-	unsigned int size = parameters->int0Parameter;
-
-	if (!size) {
-		if (Sender->Type==ST_ACTOR) {
-			size = ((Movable *) Sender)->size;
-		}
-		else {
-			size = 1;
-		}
-	}
-	return map->TargetUnreachable( Sender->Pos, tar->Pos, size);
+	return Sender->MatchTrigger(trigger_targetunreachable);
 }
 
 int GameScript::PartyCountEQ(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3526,10 +3507,20 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Map *map = (Map *) Sender;
-	if ( map->CanFree() ) {
-		return 1;
+	// map->CanFree() has side effects, don't use it here! Would make some loot and corpses disappear immediately
+	int i = map->GetActorCount(true);
+	while (i--) {
+		Actor *actor= map->GetActor(i, true);
+		bool usedExit = actor->GetInternalFlag() & IF_USEEXIT;
+		if (actor->IsPartyMember()) {
+			if (!usedExit) {
+				return 0;
+			}
+		} else if (usedExit) {
+			return 0;
+		}
 	}
-	return 0;
+	return 1;
 }
 
 //this trigger always checks the right hand weapon?

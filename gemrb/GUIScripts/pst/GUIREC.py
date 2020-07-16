@@ -818,10 +818,10 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, SavThrows[2])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, SavThrows[3])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SavThrows[4])
-	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)
-	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
 	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPGained+oldhp)
+	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
 	#increase weapon proficiency if needed
 	if WeapProfType!=-1:
 		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained )

@@ -479,7 +479,7 @@ public:
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */
-	bool GetSavingThrow(ieDword type, int modifier, int spellLevel=0, int saveBonus=0);
+	bool GetSavingThrow(ieDword type, int modifier, const Effect *fx = nullptr);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
@@ -951,6 +951,7 @@ public:
 	void SetAnimatedTalking(unsigned int);
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
+	bool ShouldModifyMorale() const;
 };
 }
 

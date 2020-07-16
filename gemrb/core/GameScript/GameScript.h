@@ -539,6 +539,7 @@ struct IDSLink {
 #define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
 extern void SetScriptDebugMode(int arg);
+extern void ScriptDebugLog(int bit, const char* message, ...);
 extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
@@ -1373,6 +1374,7 @@ public:
 	static void SpellPointNoDec(Scriptable* Sender, Action* parameters);
 	static void StartCombatCounter(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
+	static void StartCutSceneEx(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);
 	static void StartDialogueInterrupt(Scriptable* Sender, Action* parameters);

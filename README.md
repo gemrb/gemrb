@@ -9,7 +9,7 @@
 
 ## Introduction
 
-[GemRB](http://gemrb.org) (Game Engine Made with preRendered Background) is a portable open-source
+[GemRB](https://gemrb.org) (Game Engine Made with preRendered Background) is a portable open-source
 reimplementation of the Infinity Engine that underpinned Baldur's Gate,
 Icewind Dale and Planescape: Torment. It sports a cleaner design, greater
 extensibility and several innovations.
@@ -23,9 +23,9 @@ the included trivial demo. On non-windows systems either copy it over from
 a windows install, use a compatible installer, WINE or extract it manually
 from the CDs using the unshield tool.
 
-Documentation can be found on the [website](https://gemrb.github.io/Documentation),
+Documentation can be found on the [website](https://gemrb.org/Documentation),
 while the sources are in gemrb/docs/en/ and the 
-[gemrb.6 man page](http://www.gemrb.org/wiki/doku.php?id=docs:manpage).
+[gemrb.6 man page](https://gemrb.org/Manpage.html).
 
 If you want to help out, start by reading this
 list of [options, tips and priorities](https://github.com/gemrb/gemrb/blob/master/CONTRIBUTING.md).
@@ -50,7 +50,7 @@ See the INSTALL [file](https://github.com/gemrb/gemrb/blob/master/INSTALL).
 ## Contacts
 
 There are several ways you can get in touch:
-* [Homepage](http://gemrb.org)
+* [Homepage](https://gemrb.org)
 * [GemRB forum](https://www.gibberlings3.net/forums/forum/91-gemrb/)
 * [IRC channel](http://webchat.freenode.net/?channels=GemRB), #GemRB on the FreeNode IRC network
 * [Discord channel](https://discord.gg/64rEVAk) (Gibberlings3 server)

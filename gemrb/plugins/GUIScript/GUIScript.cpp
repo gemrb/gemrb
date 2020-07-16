@@ -1288,9 +1288,9 @@ static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  "===== Control_QueryText =====\n\
  \n\
- **Prototype:** GemRB.QueryText (WindowIndex, ControlIndex)\n\
+**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex[, UseSystemEncoding])\n\
  \n\
- **Metaclass Prototype:** QueryText ()\n\
+**Metaclass Prototype:** QueryText (UseSystemEncoding=False)\n\
  \n\
  **Description:** Returns the Text of a TextEdit/TextArea/Label control. \n\
  In case of a TextArea, it will return the selected row, not the entire \n\
@@ -1298,6 +1298,7 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  \n\
  **Parameters:**\n\
  * WindowIndex, ControlIndex - the control's reference\n\
+  * UseSystemEncoding - whether returned text should use OS encoding, False by default\n\
  \n\
  **Return value:** string, may be empty\n\
  \n\
@@ -1308,24 +1309,33 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  \n\
  GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
  The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
+If returned string will be used to e.g. as filename, string should be using system encoding, or file might be not found if it contains non-ASCII letters.\n\
+**Example**\n\
+  Filename = CharImportList.QueryText (True)\n\
+  GemRB.CreatePlayer (Filename, MyChar|0x8000, 1)\n\
  \n\
  **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
  );
 
 static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 {
-	PARSE_ARGS(args, "O", &self);
+	int useSystemEncoding = 0;
+	PARSE_ARGS(args, "O|i", &self, &useSystemEncoding);
 	Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
 	String wstring = ctrl->QueryText();
 	std::string nstring(wstring.begin(), wstring.end());
-	char * cStr = ConvertCharEncoding(nstring.c_str(),
+	if (useSystemEncoding) {
+		char* cStr = ConvertCharEncoding(nstring.c_str(),
 		core->TLKEncoding.encoding.c_str(), core->SystemEncoding);
-	if (cStr) {
-		PyObject* pyStr = PyString_FromString(cStr);
-		free(cStr);
-		return pyStr;
+		if (cStr) {
+		    PyObject* pyStr = PyString_FromString(cStr);
+		    free(cStr);
+		    return pyStr;
+		}
+	} else {
+	    return PyString_FromString(nstring.c_str());
 	}
 	Py_RETURN_NONE;
 }
@@ -11461,16 +11471,20 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 PyDoc_STRVAR( GemRB_SpellCast__doc,
 "===== SpellCast =====\n\
 \n\
-**Prototype:** GemRB.SpellCast (PartyID, Type, Spell)\n\
+**Prototype:** GemRB.SpellCast (PartyID, Type, Spell[, ResRef])\n\
 \n\
 **Description:** Makes PartyID cast a spell of Type. This handles targeting \n\
-and executes the appropriate scripting command. If type is -1, then the \n\
-castable spell list will be deleted and no spell will be cast.\n\
+and executes the appropriate scripting command.\n\
 \n\
 **Parameters:**\n\
   * PartyID - player character's index in the party\n\
-  * Type    - spell type bitfield (1-mage, 2-priest, 4-innate)\n\
+  * Type    - switch between casting modes:\n\
+    * spell(book) type bitfield (1-mage, 2-priest, 4-innate and iwd2 versions)\n\
+    * -1: don't cast, but reinit the GUI spell list\n\
+    * -2: cast from a quickspell slot\n\
+    * -3: cast directly, does not require the spell to be memorized\n\
   * Spell   - spell's index in the memorised list\n\
+  * ResRef  - (optional) spell resref for type -3 casts\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -11483,7 +11497,8 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	unsigned int globalID;
 	int type;
 	unsigned int spell;
-	PARSE_ARGS( args,  "iii", &globalID, &type, &spell);
+	ieResRef *resRef;
+	PARSE_ARGS( args,  "iii|s", &globalID, &type, &spell, &resRef);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -11495,8 +11510,10 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	}
 
 	SpellExtHeader spelldata; // = SpellArray[spell];
-
-	if (type==-2) {
+	if (type == -3) {
+		actor->spellbook.SetCustomSpellInfo(resRef, nullptr, 1);
+		actor->spellbook.GetSpellInfo(&spelldata, 255, 0, 1);
+	} else if (type == -2) {
 		//resolve quick spell slot
 		if (!actor->PCStats) {
 			//no quick slots for this actor, is this an error?

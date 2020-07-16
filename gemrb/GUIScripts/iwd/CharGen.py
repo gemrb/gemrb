@@ -2622,12 +2622,12 @@ def ImportDonePress():
 	global CharGenState, SkillsState, Portrait, ImportedChar, HasStrExtra
 
 	# Import the character from the chosen name
-	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
+	GemRB.CreatePlayer (CharImportList.QueryText(True), MyChar|0x8000, 1)
 
-	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (MyChar) )
+	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (MyChar))
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1)["ResRef"])
 	Portrait = GemRB.GetPlayerPortrait (MyChar, 0)
-	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
+	GemRB.SetToken ("LargePortrait", PortraitName)
 	PortraitButton.SetPicture (Portrait["Sprite"], "NOPORTLG")
 	Portrait = -1
 

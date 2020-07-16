@@ -496,7 +496,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 
 //returns true if iwd ids targeting resists the spell
 //FIXME: the constant return values do not match the rest
-static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type)
+static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
 {
 	if (spellrescnt==-1) {
 		ReadSpellProtTable("splprot");
@@ -534,13 +534,13 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 	case STI_TWO_ROWS:
 		//used in checks where any of two matches are ok (golem or undead etc)
-		if (check_iwd_targeting(Owner, target, value, rel)) return 1;
-		if (check_iwd_targeting(Owner, target, value, val)) return 1;
+		if (check_iwd_targeting(Owner, target, value, rel, fx)) return 1;
+		if (check_iwd_targeting(Owner, target, value, val, fx)) return 1;
 		return 0;
 	case STI_NOT_TWO_ROWS:
 		//this should be the opposite as above
-		if (check_iwd_targeting(Owner, target, value, rel)) return 0;
-		if (check_iwd_targeting(Owner, target, value, val)) return 0;
+		if (check_iwd_targeting(Owner, target, value, rel, fx)) return 0;
+		if (check_iwd_targeting(Owner, target, value, val, fx)) return 0;
 		return 1;
 	case STI_SOURCE_TARGET:
 		if (Owner==target) {
@@ -561,8 +561,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 			if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
 				return 0;
 			}
-			// FIXME: if it is used, make sure to pass correct values here (pulled from the effect)
-			val = target->GetSavingThrow(4, 0); // reflex
+			val = target->GetSavingThrow(4, 0, fx); // reflex
 		} else {
 			if (target->GetThiefLevel() < 7 ) {
 				return 0;
@@ -1190,7 +1189,7 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 	//check saving throw
 	bool st;
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
-		st = target->GetSavingThrow(2, 0, fx->SpellLevel, fx->SavingThrowBonus); // fortitude
+		st = target->GetSavingThrow(2, 0, fx); // fortitude
 	} else {
 		st = target->GetSavingThrow(0,0); //spell
 	}
@@ -1327,16 +1326,16 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 		if (PersonalDistance(target, victim)>300) continue;
 
 		//check if target is golem/umber hulk/minotaur, the effect is not working
-		if (check_iwd_targeting(Owner, victim, 0, 17)) { //umber hulk
+		if (check_iwd_targeting(Owner, victim, 0, 17, fx)) { //umber hulk
 			continue;
 		}
-		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
+		if (check_iwd_targeting(Owner, victim, 0, 27, fx)) { //golem
 			continue;
 		}
-		if (check_iwd_targeting(Owner, victim, 0, 29)) { //minotaur
+		if (check_iwd_targeting(Owner, victim, 0, 29, fx)) { //minotaur
 			continue;
 		}
-		if (check_iwd_targeting(Owner, victim, 0, 23)) { //blind
+		if (check_iwd_targeting(Owner, victim, 0, 23, fx)) { //blind
 			continue;
 		}
 
@@ -1393,10 +1392,10 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		if (PersonalDistance(target, victim)>20) continue;
 
 		//check if target is golem/umber hulk/minotaur, the effect is not working
-		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
+		if (check_iwd_targeting(Owner, victim, 0, 27, fx)) { //golem
 			continue;
 		}
-		if (check_iwd_targeting(Owner, victim, 0, 1)) { //undead
+		if (check_iwd_targeting(Owner, victim, 0, 1, fx)) { //undead
 			continue;
 		}
 
@@ -2196,7 +2195,7 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 	//check iwd ids targeting
 	// was the opposite for a while (cure light wounds resisted by undead), but that spell uses 0x122 anyway
 	// eg. bard songs check for non-allies and deaf actors to exclude them
-	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
 		return FX_ABORT;
 	}
 
@@ -2216,7 +2215,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
 	//changed this to the opposite (cure light wounds resisted by undead)
-	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -2254,20 +2253,20 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 //if golem: 5% death or 1d8+3 damage
 //if outsider: 5% 8d3 damage or nothing
 //otherwise: nothing
-int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* /*fx*/)
+int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_rod_of_smithing(%2d): ResRef:%s Anim:%s Type: %d", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2);
 	int damage = 0;
 	int five_percent = core->Roll(1,100,0)<5;
 
-	if (check_iwd_targeting(Owner, target, 0, 27)) { //golem
+	if (check_iwd_targeting(Owner, target, 0, 27, fx)) { //golem
 			if(five_percent) {
 				//instant death
 				damage = -1;
 			} else {
 				damage = core->Roll(1,8,3);
 			}
-	} else if (check_iwd_targeting(Owner, target, 0, 92)) { //outsider
+	} else if (check_iwd_targeting(Owner, target, 0, 92, fx)) { //outsider
 			if (five_percent) {
 				damage = core->Roll(8,3,0);
 			}
@@ -2535,7 +2534,7 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	//after iwd2 style ids targeting, apply the spell named in the resource field
-	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
 		return FX_NOT_APPLIED;
 	}
 	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
@@ -2711,7 +2710,7 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
 		fx->Parameter3 = 0;
-		if (target->GetSavingThrow(IE_SAVEWILL, 0, fx->SpellLevel, fx->SavingThrowBonus)) {
+		if (target->GetSavingThrow(IE_SAVEWILL, 0, fx)) {
 			return FX_NOT_APPLIED;
 		}
 	}
@@ -3319,8 +3318,8 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword penalty;
 
 	//the original engine let the effect stay on non affected races, doing the same so the spell state sticks
-	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 1; //dark elf
-	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
+	if (check_iwd_targeting(Owner, target, 0, 82, fx)) penalty = 1; //dark elf
+	else if (check_iwd_targeting(Owner, target, 0, 84, fx)) penalty = 2; //duergar
 	else return FX_APPLIED;
 
 	target->AddPortraitIcon(PI_DAYBLINDNESS);

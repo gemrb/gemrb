@@ -539,6 +539,7 @@ static EffectRef fx_magicdamage_ref = { "MagicDamageResistanceModifier", -1 };
 static EffectRef fx_dispel_ref = { "DispelEffects", -1 };
 static EffectRef fx_miscast_ref = { "MiscastMagicModifier", -1 };
 static EffectRef fx_set_state_ref = { "SetStatus", -1 };
+static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 
 static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 {
@@ -569,10 +570,12 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 
 static inline void ConvertTiming(Effect *fx, int Duration)
 {
-	fx->Duration = Duration;
+	// GameTime will be added in by EffectQueue
+	fx->Duration = Duration ? Duration * AI_UPDATE_TIME : 1;
+	if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
+		fx->Duration += core->GetGame()->GameTime;
+	}
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	ieDword GameTime = core->GetGame()->GameTime;
-	PrepareDuration(fx);
 }
 
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
@@ -704,6 +707,33 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			target->ApplyEffectCopy(fx, fx_colorpulse_ref, Owner, 0x615AB400, 0x30000C);
 			playonce = true;
+			break;
+		case 17: // gemrb extension: strength spells
+			// bump strength, but only up to a limit
+			// if anyone complains about Improved strength having class based limits, add them to clssplab.2da
+			// duration and saving bonus fields are reused; these are eff v1
+			ieDword strLimit = fx->Duration - 1;
+			int bonus = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), fx->SavingThrowBonus);
+			if (target->Modified[IE_STR] + bonus >= strLimit) {
+				bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
+			}
+
+			int duration = 60 * core->Time.hour_sec * fx->CasterLevel;
+			if (fx->SavingThrowBonus == 1) { // power of one
+				duration /= 2;
+			} else if (fx->SavingThrowBonus == 4) { // improved strength
+				duration = 5 * fx->CasterLevel;
+			}
+			ConvertTiming (fx, duration);
+
+			// improved strength also has a pulse we need to adjust
+			Effect *efx = target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->Source);
+			if (efx) {
+				ConvertTiming (efx, duration);
+			}
+
+			target->ApplyEffectCopy(fx, fx_str_ref, Owner, bonus, 0);
+			playonce = true; // there's no resource set any way
 			break;
 		}
 

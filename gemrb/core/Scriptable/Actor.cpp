@@ -1018,6 +1018,8 @@ void Actor::ApplyClab(const char *clab, ieDword max, int remove, int diff)
 //cannot use old or new value, because it is called two ways
 static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
+	if (!actor->ShouldModifyMorale()) return;
+
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
@@ -3470,9 +3472,9 @@ void Actor::RefreshPCStats() {
 	RefreshHP();
 
 	Game *game = core->GetGame();
-	//morale recovery every xth AI cycle
+	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
-	if (mrec) {
+	if (mrec && ShouldModifyMorale()) {
 		if (!(game->GameTime%mrec)) {
 			int morale = (signed) BaseStats[IE_MORALE];
 			if (morale < 10) {
@@ -3705,11 +3707,12 @@ void Actor::RollSaves()
 static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
 
 /** returns true if actor made the save against saving throw type */
-bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveBonus)
+bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 {
 	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
+	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
 
@@ -3736,11 +3739,83 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, int spellLevel, int saveB
 	}
 
 	int roll = ret;
-	// NOTE: assuming criticals apply to iwd2 too
 	// NOTE: we use GetStat, assuming the stat save bonus can never be negated like some others
 	int save = GetStat(savingthrows[type]);
+	// intentionally not adding luck, which seems to have been handled separately
+	// eg. 11hfamlk.itm uses an extra opcode for the saving throw bonus
 	ret = roll + save + modifier;
-	if (ret > 10 + spellLevel + saveBonus) {
+	assert(fx);
+	int spellLevel = fx->SpellLevel;
+	int saveBonus = fx->SavingThrowBonus;
+	int saveDC = 10 + spellLevel + saveBonus;
+
+	// handle special bonuses (eg. vs poison, which doesn't have a separate stat any more)
+	// same hardcoded list as in the original
+	if (savingthrows[type] == IE_SAVEFORTITUDE && fx->Opcode == 25) {
+		if (BaseStats[IE_RACE] == 4 /* DWARF */) ret += 2;
+		if (HasFeat(FEAT_SNAKE_BLOOD)) ret += 2;
+		if (HasFeat(FEAT_RESIST_POISON)) ret += 4;
+	}
+
+	// the original had a sourceType == TRIGGER check, but we handle more than ST_TRIGGER
+	Scriptable *caster = area->GetScriptableByGlobalID(fx->CasterID);
+	if (savingthrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
+		// loop over all classes and add TRAPSAVE.2DA values to the bonus
+		for (int cls = 0; cls < ISCLASSES; cls++) {
+			int level = GetClassLevel(cls);
+			if (!level) continue;
+			ret += gamedata->GetTrapSaveBonus(level, classesiwd2[cls]);
+		}
+	}
+
+	if (savingthrows[type] == IE_SAVEWILL) {
+		// aura of courage
+		if (Modified[IE_EA] < EA_GOODCUTOFF && stricmp(fx->Source, "SPWI420")) {
+			// look if an ally paladin of at least level 2 is near
+			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
+			for (const Actor *ally : neighbours) {
+				if (ally->GetPaladinLevel() >= 2 && !ally->CheckSilenced()) {
+					ret += 4;
+					break;
+				}
+			}
+		}
+
+		if (fx->Opcode == 24 && BaseStats[IE_RACE] == 5 /* HALFLING */) ret += 2;
+		if (GetSubRace() == 0x20001 /* DROW */) ret += 2;
+
+		// Tyrant's dictum for clerics of Bane
+		if (caster && caster->Type == ST_ACTOR) {
+			const Actor *cleric = (Actor *) caster;
+			if (cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) saveDC += 1;
+			// the original limited this to domain spells, but that's pretty lame
+		}
+	}
+
+	// general bonuses
+	// TODO: Heart of Fury upgraded creature get +5
+	// FIXME: externalize these two two difflvls.2da
+	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_EASY) ret -= 4;
+	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_NORMAL) ret -= 2;
+	// (half)elven resistance to enchantment, gnomish to illusions and dwarven to spells
+	if ((BaseStats[IE_RACE] == 2 || BaseStats[IE_RACE] == 3) && fx->PrimaryType == 4) ret += 2;
+	if (BaseStats[IE_RACE] == 6 && fx->PrimaryType == 5) ret += 2;
+	if (BaseStats[IE_RACE] == 4 && fx->Resistance <= FX_CAN_RESIST_CAN_DISPEL) ret += 2;
+	// monk's clear mind and mage specialists
+	if (GetMonkLevel() >= 3 && fx->PrimaryType == 4) ret += 2;
+	if (GetMageLevel() && (1 << (fx->PrimaryType + 5)) & BaseStats[IE_KIT]) ret += 2;
+
+	// handle animal taming last
+	// must roll a Will Save of 5 + player's total skill or higher to save
+	if (stricmp(fx->Source, "SPIN108") && fx->Opcode == 5) {
+		saveDC = 5;
+		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		if (caster) {
+			saveDC += caster->GetSkill(IE_ANIMALS);
+		}
+	}
+
+	if (ret > saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
 		displaymsg->DisplayRollStringName(40974, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return true;
@@ -4680,6 +4755,19 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
 		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
+
+		// impact morale when hp thresholds (50 %, 25 %) are crossed for the first time
+		int currentRatio = 100 * chp / (signed) BaseStats[IE_MAXHITPOINTS];
+		int newRatio = 100 * (chp + damage) / (signed) BaseStats[IE_MAXHITPOINTS];
+		if (ShouldModifyMorale()) {
+			if (currentRatio > 50 && newRatio < 25) {
+				NewBase(IE_MORALE, (ieDword) -4, MOD_ADDITIVE);
+			} else if (currentRatio > 50 && newRatio < 50) {
+				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+			} else if (currentRatio > 25 && newRatio < 25) {
+				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+			}
+		}
 	}
 
 	// can be negative if we're healing on 100%+ resistance
@@ -4695,7 +4783,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	} else if (damage < 20) { // a guess; impacts what blood bam we play, while elemental damage types are unaffected
 		damagelevel = 1;
 	} else {
-		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 		damagelevel = 2;
 	}
 
@@ -5372,7 +5459,7 @@ void Actor::Resurrect()
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
-	SetBase(IE_MORALE, 10);
+	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp
 	SetBase(IE_HITPOINTS, 1);
@@ -5415,11 +5502,30 @@ static const char *GetVarName(const char *table, int value)
 	return NULL;
 }
 
+// [EA.FACTION.TEAM.GENERAL.RACE.CLASS.SPECIFIC.GENDER.ALIGN] has to be the same for both creatures
+static bool OfType(Actor *a, Actor *b)
+{
+	bool same = a->GetStat(IE_EA) == b->GetStat(IE_EA) &&
+		a->GetStat(IE_RACE) == b->GetStat(IE_RACE) &&
+		a->GetStat(IE_GENERAL) == b->GetStat(IE_GENERAL) &&
+		a->GetStat(IE_SPECIFIC) == b->GetStat(IE_SPECIFIC) &&
+		a->GetStat(IE_CLASS) == b->GetStat(IE_CLASS) &&
+		a->GetStat(IE_TEAM) == b->GetStat(IE_TEAM) &&
+		a->GetStat(IE_FACTION) == b->GetStat(IE_FACTION) &&
+		a->GetStat(IE_SEX) == b->GetStat(IE_SEX) &&
+		a->GetStat(IE_ALIGNMENT) == b->GetStat(IE_ALIGNMENT);
+	if (!same) return false;
+
+	if (!third) return true;
+
+	return a->GetStat(IE_SUBRACE) == b->GetStat(IE_SUBRACE);
+}
+
 void Actor::SendDiedTrigger()
 {
 	if (!area) return;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
-	ieDword ea = Modified[IE_EA];
+	int ea = Modified[IE_EA];
 
 	std::vector<Actor *>::iterator poi;
 	for (poi = neighbours.begin(); poi != neighbours.end(); poi++) {
@@ -5427,11 +5533,15 @@ void Actor::SendDiedTrigger()
 		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
 
 		// allies take a hit on morale and nobody cares about neutrals
+		if (!(*poi)->ShouldModifyMorale()) continue;
 		int pea = (*poi)->GetStat(IE_EA);
-		if (ea < EA_GOODCUTOFF && pea < EA_GOODCUTOFF) {
+		if (ea == EA_PC && pea == EA_PC) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
-		} else if (ea > EA_EVILCUTOFF && pea > EA_EVILCUTOFF) {
+		} else if (OfType(this, *poi)) {
 			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		// are we an enemy of poi, regardless if we're good or evil?
+		} else if (abs(ea - pea) > 30) {
+			(*poi)->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
 		}
 	}
 }
@@ -5485,6 +5595,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 	AddTrigger(TriggerEntry(trigger_die));
 	SendDiedTrigger();
+	if (pstflags) {
+		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
+	}
 
 	Actor *act=NULL;
 	if (!killer) {
@@ -5499,6 +5612,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			// for unknown reasons the original only sends the trigger if the killer is ok
 			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
 				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
+				if (act->ShouldModifyMorale()) act->NewBase(IE_MORALE, 3, MOD_ADDITIVE);
 			}
 			killerPC = act->InParty > 0;
 		}
@@ -9409,10 +9523,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
 			critical = false;
 		} else {
-			//a critical surely raises the morale?
-			//only if it is successful it raises the morale of the attacker
 			VerbalConstant(VB_CRITHIT);
-			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
 
@@ -9499,24 +9610,27 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 	//1 Ignore invisible requirement and positioning requirement
 	//2 Ignore invisible requirement only
 	//4 Ignore positioning requirement only
-	if (invisible || (always&0x3) ) {
-		if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5) ) {
-			if (target->Modified[IE_DISABLEBACKSTAB]) {
-				// The backstab seems to have failed
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-				wi.backstabbing = false;
+	if (!invisible && !(always&0x3)) {
+		return backstabDamage;
+	}
+
+	if (!(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5)) {
+		if (target->Modified[IE_DISABLEBACKSTAB]) {
+			// The backstab seems to have failed
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
+			wi.backstabbing = false;
+		} else {
+			if (wi.backstabbing) {
+				backstabDamage = multiplier * damage;
+				// display a simple message instead of hardcoding multiplier names
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
 			} else {
-				if (wi.backstabbing) {
-					backstabDamage = multiplier * damage;
-					// display a simple message instead of hardcoding multiplier names
-					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
-				} else {
-					// weapon is unsuitable for backstab
-					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-				}
+				// weapon is unsuitable for backstab
+				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
 			}
 		}
 	}
+
 	return backstabDamage;
 }
 
@@ -11397,6 +11511,12 @@ void Actor::PlayArmorSound() const
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
 		delete[] armorSound;
 	}
+}
+
+bool Actor::ShouldModifyMorale() const
+{
+	// pst ignores it for pcs, treating it more like reputation
+	return !pstflags || Modified[IE_EA] != EA_PC;
 }
 
 }

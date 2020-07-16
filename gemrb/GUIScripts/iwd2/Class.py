@@ -18,10 +18,11 @@
 #
 #character generation, class (GUICG2)
 import GemRB
-from GUIDefines import *
 import GUICommon
 import CharOverview
 import CommonTables
+from GUIDefines import *
+from ie_stats import IE_CLASS, IE_KIT
 
 ClassWindow = 0
 TextAreaControl = 0

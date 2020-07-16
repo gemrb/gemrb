@@ -45,7 +45,6 @@ static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
 static bool pst_flags = false;
-static ieResRef UncannyDodgeBonus = {"UNCANNY"};
 static unsigned short ClearActionsID = 133; // same for all games
 
 /***********************
@@ -1859,18 +1858,8 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
-	// uncanny dodge trap save bonus
-	if (third) {
-		// no info anywhere, but 3ed rules add +1 reflex saves and +1 AC
-		// we approx that by applying this bonus for half a round
-		Actor *victim = core->GetGame()->GetActorByGlobalID(ID);
-		if (victim) {
-			ieDword bonus = victim->GetStat(IE_UNCANNY_DODGE) & 0xff;
-			if (bonus) {
-				core->ApplySpell(UncannyDodgeBonus, victim, this, bonus);
-			}
-		}
-	}
+	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
+
 	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
 	// should we always send Entered instead, also when !Trapped? Does not appear so, see history of InfoPoint::TriggerTrap
 	if (!TrapResets() && (TrapDetectionDiff && TrapRemovalDiff)) {

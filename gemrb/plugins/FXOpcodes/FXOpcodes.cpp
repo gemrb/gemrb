@@ -95,8 +95,6 @@ static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
 static ieResRef *spell_hits = NULL;
 static int shcount = -1;
-static int *spell_abilities = NULL;
-static ieDword splabcount = 0;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
 
@@ -856,8 +854,6 @@ static void Cleanup()
 {
 	core->FreeResRefTable(casting_glows, cgcount);
 	core->FreeResRefTable(spell_hits, shcount);
-	if(spell_abilities) free(spell_abilities);
-	spell_abilities=NULL;
 	if(polymorph_stats) free(polymorph_stats);
 	polymorph_stats=NULL;
 }
@@ -1466,7 +1462,9 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//these two bits are turned off on death
 		BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
 	}
-	BASE_SET(IE_MORALE, 10);
+	if (target->ShouldModifyMorale()) {
+		BASE_SET(IE_MORALE, 10);
+	}
 
 	// don't give xp in cutscenes
 	bool giveXP = true;
@@ -1494,44 +1492,13 @@ int fx_cure_frozen_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 }
 
 // 0x0F DexterityModifier
-
-#define CSA_DEX 0
-#define CSA_STR 1
-#define CSA_CNT 2
-static int SpellAbilityDieRoll(Actor *target, int which)
-{
-	if (which>=CSA_CNT) return 6;
-
-	ieDword cls = target->GetActiveClass();
-	if (!spell_abilities) {
-		AutoTable tab("clssplab");
-		if (!tab) {
-			spell_abilities = (int *) malloc(sizeof(int)*CSA_CNT);
-			for (int ab=0;ab<CSA_CNT;ab++) {
-				spell_abilities[ab*splabcount]=6;
-			}
-			splabcount=1;
-			return 6;
-		}
-		splabcount = tab->GetRowCount();
-		spell_abilities=(int *) malloc(sizeof(int)*splabcount*CSA_CNT);
-		for (int ab=0;ab<CSA_CNT;ab++) {
-			for (ieDword i=0;i<splabcount;i++) {
-				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
-			}
-		}
-	}
-	if (cls>=splabcount) cls=0;
-	return spell_abilities[which*splabcount+cls];
-}
-
 int fx_dexterity_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_dexterity_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	////how cat's grace: value is based on class
 	if (fx->Parameter2==3) {
-		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,0),0);
+		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDie(target, 0), 0);
 		fx->Parameter2 = 0;
 	}
 
@@ -1824,7 +1791,9 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	STAT_MOD( IE_MORALE );
+	if (target->ShouldModifyMorale()) {
+		STAT_MOD(IE_MORALE);
+	}
 	return FX_APPLIED;
 }
 
@@ -2247,7 +2216,7 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	////how strength: value is based on class
 	////pst power of one also depends on this!
 	if (fx->Parameter2==3) {
-		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,1),0);
+		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), 0);
 		fx->Parameter2 = 0;
 	}
 
@@ -4046,7 +4015,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->SetSpellState(SS_BLESS);
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
-	STAT_ADD( IE_MORALEBREAK, fx->Parameter1);
+	if (target->ShouldModifyMorale()) STAT_ADD(IE_MORALE, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLESS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xc0, 0x80, 0);
@@ -4355,7 +4324,6 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		sca->YPos+=fx->PosY+ypos_by_direction[target->GetOrientation()];
 		sca->ZPos+=heightmod;
 		sca->SetBlend();
-		sca->PlayOnce();
 		if (fx->Duration) {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 		} else {

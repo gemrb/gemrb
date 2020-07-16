@@ -269,7 +269,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# see splspec.2da for all the reasons; silence is handled elsewhere
 		specialSpell = GemRB.CheckSpecialSpell(actor, Spell['SpellResRef'])
 		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == UAW_ALLMAGE)
-		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x20000: # SF_IGNORES_SILENCE
+		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x2000000: # SF_IGNORES_SILENCE
 			specialSpell ^= SP_SILENCE
 		if specialSpell or (disabled_spellcasting&spellType):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -623,7 +623,8 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 
 		# make sure that we get the original kit, if we have one
 		if kit:
-			originalkit = GetKitIndex (pc)
+			import GUICommon
+			originalkit = GUICommon.GetKitIndex (pc)
 
 			if originalkit: # kitted; find the class value
 				originalkit = CommonTables.KitList.GetValue (originalkit, 7)

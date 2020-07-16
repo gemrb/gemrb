@@ -26,6 +26,7 @@ import MessageWindow
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
+from ie_stats import IE_ALIGNMENT, IE_XP
 
 def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
@@ -165,8 +166,8 @@ def GameExpansion():
 		if name != "none":
 			newScript = PDialogTable.GetValue (name.upper(), "25OVERRIDE_SCRIPT_FILE")
 			newDialog = PDialogTable.GetValue (name.upper(), "25JOIN_DIALOG_FILE")
-			SetPlayerScript (idx, newScript, 0) # 0 is SCR_OVERRIDE, the override script slot
-			SetPlayerDialog (idx, newDialog)
+			GemRB.SetPlayerScript (idx, newScript, 0) # 0 is SCR_OVERRIDE, the override script slot
+			GemRB.SetPlayerDialog (idx, newDialog)
 		
 			if name == "yoshimo":
 				RemoveYoshimo(idx)

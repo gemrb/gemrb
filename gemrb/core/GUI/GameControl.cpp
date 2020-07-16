@@ -825,21 +825,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					lastActor->GetNextAnimation();
 				}
 				break;
-			case 'b': //draw a path to the target (pathfinder debug)
-				//You need to select an origin with ctrl-o first
-				if (drawPath) {
-					PathNode* nextNode = drawPath->Next;
-					PathNode* thisNode = drawPath;
-					while (true) {
-						delete( thisNode );
-						thisNode = nextNode;
-						if (!thisNode)
-							break;
-						nextNode = thisNode->Next;
-					}
-				}
-				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, gameMousePos, lastActor?lastActor->size:1 );
-				break;
+			// b
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
 				//target is the door/actor currently under the pointer
@@ -970,10 +956,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'n': //prints a list of all the live actors in the area
 				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
-			case 'o': //set up the origin for the pathfinder
-				// origin
-				pfs = gameMousePos;
-				break;
+			// o
 			case 'p': //center on actor
 				ScreenFlags|=SF_CENTERONACTOR;
 				ScreenFlags^=SF_ALWAYSCENTER;
@@ -2060,6 +2043,9 @@ static std::map<std::string, std::vector<std::string>> pstWMapExits {
 bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 {
 	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
+
+	bool keyAreaVisited = CheckVariable(pc, "AR0500_Visited", "GLOBAL") == 1;
+	if (!keyAreaVisited) return false;
 
 	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
 	if (!teamMoved) return false;

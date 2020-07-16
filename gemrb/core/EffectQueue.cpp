@@ -1170,7 +1170,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->SavingThrowType&(1<<i)) {
 			// FIXME: first bonus handling for iwd2 is just a guess
 			if (iwd2fx) {
-				saved = actor->GetSavingThrow(i, bonus-fx->SavingThrowBonus, fx->SpellLevel, fx->SavingThrowBonus);
+				saved = actor->GetSavingThrow(i, bonus - fx->SavingThrowBonus, fx);
 			} else {
 				saved = actor->GetSavingThrow(i, bonus);
 			}
@@ -1269,7 +1269,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			if( fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
 			}
-			PrepareDuration(fx);
+			if (pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION)) {
+				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
+				// unless it's our unhardcoded spells which use iwd2-style simplified duration in rounds per level
+				fx->Duration = (fx->Duration ? fx->Duration : 1) + GameTime;
+			} else {
+				PrepareDuration(fx);
+			}
 		}
 	}
 	//check if the effect has triggered or expired
