@@ -43,7 +43,7 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-class Console : public Control {
+class GEM_EXPORT Console : public Control {
 public:
 	Console(const Region& frame);
 	~Console(void);
