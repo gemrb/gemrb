@@ -1187,8 +1187,15 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			if (actor->UpdateDrawingState()) {
 				const Region& actorbox = actor->DrawingRegion();
 				if (actorbox.IntersectsRegion(viewport)) {
-					auto walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
-					uint32_t flags = SetDrawingStencilForScriptable(actor, walls, viewport.Origin());
+					uint32_t flags = 0;
+					WallPolygonSet walls;
+					
+					// birds are never occluded
+					if ((actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD) == 0) {
+						walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
+						flags = SetDrawingStencilForScriptable(actor, walls, viewport.Origin());
+					}
+					
 					// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 					if (game->TimeStoppedFor(actor)) {
 						flags |= BLIT_GREY;
