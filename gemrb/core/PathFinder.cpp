@@ -89,7 +89,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 {
 	if (!caller || !caller->speed) return nullptr;
 	NavmapPoint p = s;
-	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM);
+	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
 	double dx = 3 * dxRand[i];
 	double dy = 3 * dyRand[i];
 
@@ -103,7 +103,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 				return nullptr;
 			}
 			// Random rotation
-			i = RAND(0, RAND_DEGREES_OF_FREEDOM);
+			i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
 			dx = 3 * dxRand[i];
 			dy = 3 * dyRand[i];
 			NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
