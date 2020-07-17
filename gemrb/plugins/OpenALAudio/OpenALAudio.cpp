@@ -415,13 +415,13 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		return 0;
 	}
 	int cnt = acm->get_length();
-	int riff_chans = acm->get_channels();
+	unsigned int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
 	int rawsize = cnt * 2;
 	short* memory = (short*) malloc(rawsize);
 	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples( memory, cnt ) * 2;
+	unsigned int cnt1 = acm->read_samples( memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits

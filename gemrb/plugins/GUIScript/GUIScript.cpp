@@ -13220,7 +13220,8 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		case ACT_USE:
 			//returns true if there is ANY equipment
-			if (!actor->inventory.GetEquipmentInfo(NULL, 0, 0)) {
+			ItemExtHeader itemdata;
+			if (!actor->inventory.GetEquipmentInfo(&itemdata, 0, 0)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;

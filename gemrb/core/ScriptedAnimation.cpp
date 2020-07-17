@@ -426,7 +426,9 @@ ScriptedAnimation::~ScriptedAnimation(void)
 			delete( anims[i] );
 		}
 	}
-	gamedata->FreePalette(palette, PaletteName);
+	if (gamedata) { // avoid UBSAN warning; it's on exit, so we don't care about potential leaks
+		gamedata->FreePalette(palette, PaletteName);
+	}
 
 	if (cover) {
 		SetSpriteCover(NULL);
