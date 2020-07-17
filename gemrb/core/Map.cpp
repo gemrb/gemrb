@@ -1764,6 +1764,14 @@ void Map::PurgeArea(bool items)
 			TMap->CleanupContainer(c);
 		}
 	}
+	// 3. reset living neutral actors to their HomeLocation,
+	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
+	for (Actor *actor : actors) {
+		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
+		if (actor->Pos != actor->HomeLocation) {
+			actor->Pos = actor->HomeLocation;
+		}
+	}
 }
 
 Actor* Map::GetActor(int index, bool any) const
