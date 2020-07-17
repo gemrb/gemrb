@@ -2382,8 +2382,9 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		return;
 	}
 	//if not continous random walk, then stops for a while
-	if (can_stop && !RAND(0,3)) {
-		SetWait(RAND(7,14));
+	if (can_stop && RAND(0, 9) < 4) {
+		if (RAND(0, 2)) SetOrientation(RAND(0, MAX_ORIENT), true);
+		SetWait(RAND(core->Time.round_size / 2, 2 * core->Time.round_size));
 		return;
 	}
 	randomWalkCounter++;
