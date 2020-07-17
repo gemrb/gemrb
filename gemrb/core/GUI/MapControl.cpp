@@ -225,7 +225,7 @@ void MapControl::DrawInternal(Region& rgn)
 	Game *game = core->GetGame();
 	i = game->GetPartySize(true);
 	while (i--) {
-		Actor* actor = game->GetPC( i, true );
+		const Actor *actor = game->GetPC(i, true);
 		if (MyMap->HasActor(actor) ) {
 			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
 		}

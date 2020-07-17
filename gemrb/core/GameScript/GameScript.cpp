@@ -1375,7 +1375,7 @@ void Targets::dump() const
 	}
 }
 
-void Targets::FilterObjectRect(Object *oC)
+void Targets::FilterObjectRect(const Object *oC)
 {
 	// can't match anything if the second pair of coordinates (or all of them) are unset
 	if (oC->objectRect.w <= 0 || oC->objectRect.h <= 0) return;
@@ -1903,10 +1903,16 @@ static int ParseInt(const char*& src)
 	char number[33];
 
 	char* tmp = number;
+	int i = 1;
 	while (isdigit(*src) || *src=='-') {
+		if (i == 33) {
+			Log(ERROR, "GameScript", "Truncating too big integer!");
+			break;
+		}
 		*tmp = *src;
 		tmp++;
 		src++;
+		i++;
 	}
 	*tmp = 0;
 	if (*src)

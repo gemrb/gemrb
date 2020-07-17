@@ -5528,7 +5528,7 @@ static const char *GetVarName(const char *table, int value)
 }
 
 // [EA.FACTION.TEAM.GENERAL.RACE.CLASS.SPECIFIC.GENDER.ALIGN] has to be the same for both creatures
-static bool OfType(Actor *a, Actor *b)
+static bool OfType(const Actor *a, const Actor *b)
 {
 	bool same = a->GetStat(IE_EA) == b->GetStat(IE_EA) &&
 		a->GetStat(IE_RACE) == b->GetStat(IE_RACE) &&
@@ -5631,16 +5631,14 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	bool killerPC = false;
-	if (killer) {
-		if (killer->Type==ST_ACTOR) {
-			act = (Actor *) killer;
-			// for unknown reasons the original only sends the trigger if the killer is ok
-			if (act && !(act->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
-				killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
-				if (act->ShouldModifyMorale()) act->NewBase(IE_MORALE, 3, MOD_ADDITIVE);
-			}
-			killerPC = act->InParty > 0;
+	if (killer && killer->Type == ST_ACTOR) {
+		act = (Actor *) killer;
+		// for unknown reasons the original only sends the trigger if the killer is ok
+		if (act && !(act->GetStat(IE_STATE_ID) & (STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
+			killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
+			if (act->ShouldModifyMorale()) act->NewBase(IE_MORALE, 3, MOD_ADDITIVE);
 		}
+		killerPC = act->InParty > 0;
 	}
 
 	if (InParty) {
