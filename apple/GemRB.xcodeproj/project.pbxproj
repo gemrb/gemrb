@@ -433,6 +433,8 @@
 		A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D0505414D0C17500D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
+		A2D33FEB24C203110081AC31 /* FibonacciHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D33FEA24C203110081AC31 /* FibonacciHeap.h */; };
+		A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */; };
 		A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DB1B30F24400264D16 /* GUIFactory.cpp */; };
 		A2D672DE1B30F24400264D16 /* GUIFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672DC1B30F24400264D16 /* GUIFactory.h */; };
 		A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
@@ -1757,6 +1759,8 @@
 		A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollView.h; sourceTree = "<group>"; };
 		A2CE96891B70596100E189C4 /* FileFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileFilters.h; sourceTree = "<group>"; };
 		A2D0505014D0B06C00D8CD77 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
+		A2D33FEA24C203110081AC31 /* FibonacciHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FibonacciHeap.h; sourceTree = "<group>"; };
+		A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PathFinder.cpp; sourceTree = "<group>"; };
 		A2D4C51E13A978110086BCC4 /* defsounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defsounds.h; sourceTree = "<group>"; };
 		A2D4C51F13A978110086BCC4 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
 		A2D4C52013A978110086BCC4 /* exports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exports.h; sourceTree = "<group>"; };
@@ -3081,6 +3085,7 @@
 				A2BF9FBF1395FF61006ADC12 /* Factory.h */,
 				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
+				A2D33FEA24C203110081AC31 /* FibonacciHeap.h */,
 				A20E4ACF197344BD00A6BC96 /* FileCache.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
 				A28D249B143BEA5800A27897 /* FontManager.h */,
@@ -3133,6 +3138,7 @@
 				A2BFA0121395FF62006ADC12 /* PalettedImageMgr.h */,
 				A2BFA0131395FF62006ADC12 /* Particles.cpp */,
 				A2BFA0141395FF62006ADC12 /* Particles.h */,
+				A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */,
 				A2BFA0151395FF62006ADC12 /* PathFinder.h */,
 				A2BFA0161395FF62006ADC12 /* Plugin.cpp */,
 				A2BFA0171395FF62006ADC12 /* Plugin.h */,
@@ -3503,6 +3509,7 @@
 				A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */,
 				A2E6637D139E883100310FC8 /* EffectQueue.h in Headers */,
 				A2E6637F139E883100310FC8 /* Factory.h in Headers */,
+				A2D33FEB24C203110081AC31 /* FibonacciHeap.h in Headers */,
 				A2E66381139E883100310FC8 /* FactoryObject.h in Headers */,
 				A2E66383139E883100310FC8 /* Font.h in Headers */,
 				A2E66385139E883100310FC8 /* Game.h in Headers */,
@@ -5400,6 +5407,7 @@
 				A2E663D6139E884500310FC8 /* Sprite2D.cpp in Sources */,
 				A2E663DA139E884500310FC8 /* Store.cpp in Sources */,
 				A2E663DC139E884500310FC8 /* StoreMgr.cpp in Sources */,
+				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
 				A2E663DE139E884500310FC8 /* StringMgr.cpp in Sources */,
 				A2E663E0139E884500310FC8 /* SymbolMgr.cpp in Sources */,
 				A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */,
