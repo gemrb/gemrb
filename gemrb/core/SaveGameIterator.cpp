@@ -187,11 +187,15 @@ SaveGameIterator::~SaveGameIterator(void)
 }
 
 // mission pack save dir or the main one?
+static char saveDir[10];
 static const char* SaveDir()
 {
-	char saveDir[10] = "save";
-	core->GetTokenDictionary()->Lookup("SaveDir", saveDir, 9);
-	return strdup(saveDir);
+	if (core->GetTokenDictionary()->GetValueLength("SaveDir")) {
+		core->GetTokenDictionary()->Lookup("SaveDir", saveDir, 9);
+		return saveDir;
+	} else {
+		return "save";
+	}
 }
 
 #define FormatQuickSavePath(destination, i) \
