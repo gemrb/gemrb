@@ -25,6 +25,7 @@
 import GemRB
 import LoadScreen
 import GameCheck
+import GUICommon
 from GameCheck import MAX_PARTY_SIZE
 
 LoadWindow = 0
@@ -36,8 +37,8 @@ def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
 	if GameCheck.IsIWD1():
-		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
-		GemRB.SetToken ("SaveDir", "mpsave") # iwd is always using 'mpsave'
+		GemRB.SetVar ("PlayMode", 0) # old code, not sure if needed
+	GUICommon.SetSaveDir ()
 	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow (0)
 	LoadWindow.SetFrame ()

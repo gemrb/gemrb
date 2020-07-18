@@ -775,6 +775,14 @@ def SetCurrentDateTokens (stat, plural=False):
 
 	return time
 
+def SetSaveDir():
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+		GemRB.SetToken ("SaveDir", "mpsave")
+	elif GameCheck.IsBG1() and GemRB.GetVar ("PlayMode") == 1:
+		GemRB.SetToken ("SaveDir", "mpsave")
+	else:
+		GemRB.SetToken ("SaveDir", "save")
+
 # gray out window or mark it as visible depending on the actor's state
 # Always greys it out for actors that are: dead, berserking
 # The third parameter is another check which must be 0 to maintain window visibility

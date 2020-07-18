@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GUICommon
 import LoadScreen
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -71,6 +72,7 @@ def OnLoad ():
 
 	ScrollBar=LoadWindow.GetControl (13)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	GUICommon.SetSaveDir ()
 	Games=GemRB.GetSaveGames () #count of games in save folder?
 	if len(Games)>3:
 		TopIndex = len(Games)-4
