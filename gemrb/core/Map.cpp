@@ -2907,24 +2907,21 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 				unsigned int ppypj = ppy+j;
 				unsigned int ppxmi = ppx-i;
 				unsigned int ppymj = ppy-j;
-				if ((ppxpi<Width) && (ppypj<Height)) {
-					unsigned int pos = ppypj*Width+ppxpi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				unsigned int pos = ppypj * Width + ppxpi;
+				if (ppxpi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxpi<Width) && (ppymj<Height)) {
-					unsigned int pos = (ppymj)*Width+ppxpi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppymj * Width + ppxpi;
+				if (ppxpi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxmi<Width) && (ppypj<Height)) {
-					unsigned int pos = (ppypj)*Width+ppxmi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppypj * Width + ppxmi;
+				if (ppxmi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxmi<Width) && (ppymj<Height)) {
-					unsigned int pos = (ppymj)*Width+ppxmi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppymj * Width + ppxmi;
+				if (ppxmi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
 			}
 		}
