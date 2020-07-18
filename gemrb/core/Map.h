@@ -372,8 +372,8 @@ private:
 	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
 	static const std::array<char, DEGREES_OF_FREEDOM> dx;
 	static const std::array<char, DEGREES_OF_FREEDOM> dy;
-	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dyRand;
-	static const std::array<float, RAND_DEGREES_OF_FREEDOM> dxRand;
+	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand;
+	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand;
 	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
 
 public:
