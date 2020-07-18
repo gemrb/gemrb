@@ -133,7 +133,17 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 {
 	int flags = PF_SIGHT;
 	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
-	return FindPath(s, d, size, 0, flags) == nullptr;
+	PathNode *path = FindPath(s, d, size, 0, flags);
+	bool targetUnreachable = path == nullptr;
+	if (!targetUnreachable) {
+		PathNode *thisNode = path;
+		while (thisNode) {
+			PathNode *nextNode = thisNode->Next;
+			delete(thisNode);
+			thisNode = nextNode;
+		}
+	}
+	return targetUnreachable;
 }
 
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
