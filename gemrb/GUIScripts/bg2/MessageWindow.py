@@ -293,7 +293,6 @@ def GameExpansion():
 		return
 
 	#upgrade to ToB only
-	GemRB.SetToken ("SaveDir", "mpsave")
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetGlobal("INTOB","GLOBAL",1)
 	GemRB.SetGlobal("HADELLESIMEDREAM1","GLOBAL", 1)

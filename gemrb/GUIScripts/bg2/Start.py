@@ -19,6 +19,7 @@
 #ToB start window, precedes the SoA window
 import GemRB
 import GameCheck
+from GUIDefines import SV_GAMEPATH
 
 try:
 	import os
@@ -44,6 +45,10 @@ def OnLoad():
 		GemRB.EnterGame()
 		# with delayed execution, more of the game files get loaded
 		threading.Timer(1, EndTest).start() # the 1s varies!
+
+	# migrate mpsave saves if possible and needed
+	if os:
+		MigrateSaveDir ()
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
@@ -112,3 +117,28 @@ def ToBPress():
 def ExitPress():
 	GemRB.Quit()
 	return
+
+def MigrateSaveDir():
+	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
+	mpSaveDir = os.path.join (gamePath, "mpsave")
+	saveDir = os.path.join (gamePath, "save")
+
+	if not os.path.isdir (mpSaveDir) or not os.access (saveDir, os.W_OK):
+		return
+
+	saves = os.listdir (mpSaveDir)
+	if len(saves) == 0:
+		return
+
+	print "Migrating saves from old location ...",
+	if not os.path.isdir (saveDir):
+		os.mkdir (saveDir)
+
+	for save in saves:
+		# make sure not to overwrite any saves, which is most likely with auto and quicksaves
+		newSave = os.path.join (saveDir, save)
+		if os.path.isdir (newSave):
+			newSave = os.path.join (saveDir, save + "- moved from ToB")
+		os.rename (os.path.join (mpSaveDir, save), newSave)
+
+	print "done."
