@@ -32,7 +32,7 @@ import LUCommon
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from CharGenEnd import GiveEquipment
-from ie_stats import IE_ALIGNMENT, IE_XP
+from ie_stats import *
 
 MessageWindow = 0
 PortraitWindow = 0
