@@ -89,7 +89,6 @@ def OnLoad ():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
 	if not GameCheck.HasHOW():
-		GemRB.SetVar ("SaveDir",1) #using mpsave??
 		GemRB.SetVar ("PlayMode",0) #using second row??
 	else:
 		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
@@ -97,11 +96,10 @@ def OnLoad ():
 			GemRB.SetGlobal ("9101_SPAWN_HOBART", "GLOBAL", 1)
 		if GemRB.GetVar("ExpansionGame") == 1:
 			GemRB.SetGlobal ("CHAPTER", "GLOBAL", 1)
-			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",2) #using second row
 		else:
-			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",0) #using first row
+	GemRB.SetToken ("SaveDir", "mpsave")
 
 	LoadScreen.CloseLoadScreen()
 	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)

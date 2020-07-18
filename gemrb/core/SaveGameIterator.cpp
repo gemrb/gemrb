@@ -186,15 +186,12 @@ SaveGameIterator::~SaveGameIterator(void)
 {
 }
 
-/* mission pack save */
+// mission pack save dir or the main one?
 static const char* SaveDir()
 {
-	ieDword playmode = 0;
-	core->GetDictionary()->Lookup( "SaveDir", playmode );
-	if (playmode == 1) {
-		return "mpsave";
-	}
-	return "save";
+	char saveDir[10] = "save";
+	core->GetTokenDictionary()->Lookup("SaveDir", saveDir, 9);
+	return strdup(saveDir);
 }
 
 #define FormatQuickSavePath(destination, i) \

@@ -72,7 +72,7 @@ def OnLoad():
 	NewGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	LoadGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 
-	GemRB.SetVar("SaveDir",1)
+	GemRB.SetToken ("SaveDir", "mpsave")
 	Games=GemRB.GetSaveGames()
 
 	#looking for the quicksave

@@ -201,10 +201,10 @@ def LoadSingle():
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
-		GemRB.SetVar ("SaveDir", 1)
+		GemRB.SetToken ("SaveDir", "mpsave")
 	else:
 		GemRB.SetVar ("PlayMode", 0)
-		GemRB.SetVar ("SaveDir", 0)
+		GemRB.SetToken ("SaveDir", "save")
 
 	GemRB.SetNextScript ("GUILOAD")
 	return
@@ -218,10 +218,10 @@ def NewSingle():
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
-		GemRB.SetVar ("SaveDir", 1)
+		GemRB.SetToken ("SaveDir", "mpsave")
 	else:
 		GemRB.SetVar ("PlayMode", 0)
-		GemRB.SetVar ("SaveDir", 0)
+		GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
@@ -236,7 +236,7 @@ def ImportGame():
 		TutorialWindow.Unload()
 	#now this is tricky, we need to load old games, but set up the expansion
 	GemRB.SetVar ("PlayMode", 0)
-	GemRB.SetVar ("SaveDir", 0)
+	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetNextScript ("GUILOAD")
 	return
 	
@@ -253,7 +253,7 @@ def PlayPress():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	GemRB.SetVar("PlayMode",1) #tutorial
-	GemRB.SetVar("SaveDir",0)
+	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")

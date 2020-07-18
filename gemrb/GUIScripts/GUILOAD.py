@@ -37,7 +37,7 @@ def OnLoad ():
 
 	if GameCheck.IsIWD1():
 		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
-		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
+		GemRB.SetToken ("SaveDir", "mpsave") # iwd is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow (0)
 	LoadWindow.SetFrame ()

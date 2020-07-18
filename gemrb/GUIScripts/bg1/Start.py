@@ -122,7 +122,7 @@ def LoadSingle():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
-	GemRB.SetVar("SaveDir",0)
+	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
@@ -132,7 +132,7 @@ def MissionPack():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",1)
-	GemRB.SetVar("SaveDir",1) #use mpsave for saved games
+	GemRB.SetToken ("SaveDir", "mpsave")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
