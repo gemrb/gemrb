@@ -401,7 +401,7 @@ def GetClassTitles (pc,LevelDiff):
 				stats.append ( (GemRB.GetString (19720),1,'d') )
 				stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 			else:
-				GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+				GemRB.SetToken ("NEXTLEVEL", str(LUCommon.GetNextLevelExp (Levels[i]+LevelDiff[i], Class)))
 				stats.append ( (GemRB.GetString (16480),"",'d') )
 			stats.append ("\n")
 			print "\t\tClass (Level):",Class,"(",Levels[i],")"
@@ -434,7 +434,7 @@ def GetClassTitles (pc,LevelDiff):
 			stats.append ( (GemRB.GetString (19720),1,'d') )
 			stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 		else:
-			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[0], Class) )
+			GemRB.SetToken ("NEXTLEVEL", str(LUCommon.GetNextLevelExp (Levels[0], Class)))
 			stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append ("\n")
 
@@ -476,7 +476,7 @@ def GetClassTitles (pc,LevelDiff):
 			stats.append ( (19720,1,'c') )
 			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
 		else:
-			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Level, Class) )
+			GemRB.SetToken ("NEXTLEVEL", str(LUCommon.GetNextLevelExp (Level, Class)))
 			stats.append ( (16480,1,'c') )
 		stats.append ("\n")
 		print "\t\tClass (Level):",Class,"(",Level,")"

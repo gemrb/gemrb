@@ -31,11 +31,11 @@ def GetNextLevelExp (Level, Class):
 	"""Returns the amount of XP required to gain the next level."""
 	Row = CommonTables.NextLevel.GetRowIndex (Class)
 	if Level < CommonTables.NextLevel.GetColumnCount (Row):
-		return CommonTables.NextLevel.GetValue (Row, Level, GTV_STR)
+		return CommonTables.NextLevel.GetValue (Row, Level, GTV_INT)
 
 	# we could display the current level's max, but likely nobody cares
 	# if you change it, check that all callers can handle it
-	return "0"
+	return 0
 
 def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
@@ -64,7 +64,7 @@ def CanLevelUp(actor):
 		for i in range (Multi[0]):
 			# if any class can level, return 1
 			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")
-			tmpNext = int(GetNextLevelExp (Levels[i], TmpClassName))
+			tmpNext = GetNextLevelExp (Levels[i], TmpClassName)
 			if (tmpNext != 0 or Levels[i] == 0) and tmpNext <= xp:
 				return 1
 
@@ -81,7 +81,7 @@ def CanLevelUp(actor):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 
 	# check the class that can be level (single or dual)
-	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
+	tmpNext = GetNextLevelExp (Levels[0], Class)
 	return ((tmpNext != 0 or Levels[0] == 0) and tmpNext <= xp)
 
 # expects a list of character levels of all classes
