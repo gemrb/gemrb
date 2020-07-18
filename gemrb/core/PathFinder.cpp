@@ -53,9 +53,9 @@ constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
 constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
 
 // Cosines
-constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
+constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
 // Sines
-constexpr std::array<float, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
+constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
@@ -68,7 +68,7 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(p.x + 3 * xSign * dx, p.y + 3 * ySign * dy, size) & PATH_MAP_PASSABLE)) {
+		if (!(GetBlockedInRadius(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy), size) & PATH_MAP_PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
@@ -133,7 +133,17 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 {
 	int flags = PF_SIGHT;
 	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
-	return FindPath(s, d, size, 0, flags) == nullptr;
+	PathNode *path = FindPath(s, d, size, 0, flags);
+	bool targetUnreachable = path == nullptr;
+	if (!targetUnreachable) {
+		PathNode *thisNode = path;
+		while (thisNode) {
+			PathNode *nextNode = thisNode->Next;
+			delete(thisNode);
+			thisNode = nextNode;
+		}
+	}
+	return targetUnreachable;
 }
 
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
@@ -297,7 +307,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dx[i], nmptCurrent.y + 12 * dy[i]);
 			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
 			// Outside map
-			if (smptChild.x <= 0 ||	smptChild.y <= 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
+			if (smptChild.x < 0 ||	smptChild.y < 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
 			// Already visited
 			if (isClosed[smptChild.y * Width + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
@@ -306,7 +316,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			if (childIsUnbumpable) continue;
 
 			unsigned childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, size);
-			bool childBlocked = !(childBlockStatus & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR));
+			bool childBlocked = !(childBlockStatus & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR | PATH_MAP_TRAVEL));
 			if (childBlocked) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
@@ -338,9 +348,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				// Tie-breaking used to smooth out the path
 				int dxCross = smptDest.x - smptSource.x;
 				int dyCross = smptDest.y - smptSource.y;
-				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
-				unsigned int heuristic = HEURISTIC_WEIGHT * (Distance(smptChild, smptDest) + (crossProduct >> 9));
-				unsigned int estDist = distFromStart[smptChild.y * Width + smptChild.x] + heuristic;
+				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+				double distance = std::sqrt(xDist * xDist + yDist * yDist);
+				double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+				double estDist = distFromStart[smptChild.y * Width + smptChild.x] + heuristic;
 				PQNode newNode(nmptChild, estDist);
 				open.emplace(newNode);
 			}

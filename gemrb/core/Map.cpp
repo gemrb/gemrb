@@ -2053,7 +2053,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) cons
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
 	unsigned ret = GetBlockedInLine(s, d, true, caller);
-	return ret & (PATH_MAP_PASSABLE | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
+	return ret & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
 }
 
 //flags:0 - never dither (full cover)
@@ -2907,24 +2907,21 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 				unsigned int ppypj = ppy+j;
 				unsigned int ppxmi = ppx-i;
 				unsigned int ppymj = ppy-j;
-				if ((ppxpi<Width) && (ppypj<Height)) {
-					unsigned int pos = ppypj*Width+ppxpi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				unsigned int pos = ppypj * Width + ppxpi;
+				if (ppxpi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxpi<Width) && (ppymj<Height)) {
-					unsigned int pos = (ppymj)*Width+ppxpi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppymj * Width + ppxpi;
+				if (ppxpi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxmi<Width) && (ppypj<Height)) {
-					unsigned int pos = (ppypj)*Width+ppxmi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppypj * Width + ppxmi;
+				if (ppxmi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
-
-				if ((ppxmi<Width) && (ppymj<Height)) {
-					unsigned int pos = (ppymj)*Width+ppxmi;
-					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+				pos = ppymj * Width + ppxmi;
+				if (ppxmi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
 				}
 			}
 		}
