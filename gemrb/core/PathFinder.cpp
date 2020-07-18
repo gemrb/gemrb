@@ -348,9 +348,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				// Tie-breaking used to smooth out the path
 				int dxCross = smptDest.x - smptSource.x;
 				int dyCross = smptDest.y - smptSource.y;
-				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross);
-				unsigned int heuristic = HEURISTIC_WEIGHT * (Distance(smptChild, smptDest) + (crossProduct >> 9));
-				unsigned int estDist = distFromStart[smptChild.y * Width + smptChild.x] + heuristic;
+				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+				double distance = std::sqrt(xDist * xDist + yDist * yDist);
+				double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+				double estDist = distFromStart[smptChild.y * Width + smptChild.x] + heuristic;
 				PQNode newNode(nmptChild, estDist);
 				open.emplace(newNode);
 			}
