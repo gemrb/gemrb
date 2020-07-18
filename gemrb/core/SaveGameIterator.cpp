@@ -264,7 +264,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[0], "wmp");
 	if (access( ftmp, R_OK )) {
-		Log(WARNING, "SaveGameIterator", "Ignoring slot %s because of no appropriate worldmap!", dtmp);
 		return false;
 	}
 
