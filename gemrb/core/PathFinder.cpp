@@ -307,7 +307,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dx[i], nmptCurrent.y + 12 * dy[i]);
 			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
 			// Outside map
-			if (smptChild.x <= 0 ||	smptChild.y <= 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
+			if (smptChild.x < 0 ||	smptChild.y < 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
 			// Already visited
 			if (isClosed[smptChild.y * Width + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
@@ -316,7 +316,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			if (childIsUnbumpable) continue;
 
 			unsigned childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, size);
-			bool childBlocked = !(childBlockStatus & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR));
+			bool childBlocked = !(childBlockStatus & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR | PATH_MAP_TRAVEL));
 			if (childBlocked) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster

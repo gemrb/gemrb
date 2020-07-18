@@ -2053,7 +2053,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) cons
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
 	unsigned ret = GetBlockedInLine(s, d, true, caller);
-	return ret & (PATH_MAP_PASSABLE | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
+	return ret & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
 }
 
 //flags:0 - never dither (full cover)
