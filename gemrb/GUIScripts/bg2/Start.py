@@ -19,11 +19,15 @@
 #ToB start window, precedes the SoA window
 import GemRB
 import GameCheck
+from GUIDefines import SV_GAMEPATH
 
 StartWindow = 0
 
 def OnLoad():
 	global StartWindow, skip_videos
+
+	# migrate mpsave saves if possible and needed
+	MigrateSaveDir ()
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
@@ -77,3 +81,33 @@ def ToBPress():
 		StartWindow.Close()
 	GemRB.SetNextScript("Start2")
 	return
+
+def MigrateSaveDir():
+	try:
+		import os
+	except ImportError:
+		print "No os module, cannot migrate save dir"
+
+	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
+	mpSaveDir = os.path.join (gamePath, "mpsave")
+	saveDir = os.path.join (gamePath, "save")
+
+	if not os.path.isdir (mpSaveDir) or not os.access (saveDir, os.W_OK):
+		return
+
+	saves = os.listdir (mpSaveDir)
+	if len(saves) == 0:
+		return
+
+	print "Migrating saves from old location ...",
+	if not os.path.isdir (saveDir):
+		os.mkdir (saveDir)
+
+	for save in saves:
+		# make sure not to overwrite any saves, which is most likely with auto and quicksaves
+		newSave = os.path.join (saveDir, save)
+		if os.path.isdir (newSave):
+			newSave = os.path.join (saveDir, save + "- moved from ToB")
+		os.rename (os.path.join (mpSaveDir, save), newSave)
+
+	print "done."

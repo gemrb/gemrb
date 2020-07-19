@@ -171,7 +171,7 @@ public:
 	Scriptable *GetTarget(unsigned int index, int Type);
 	void AddTarget(Scriptable* target, unsigned int distance, int flags);
 	void Clear();
-	void FilterObjectRect(Object *oC);
+	void FilterObjectRect(const Object *oC);
 };
 
 class Canary {

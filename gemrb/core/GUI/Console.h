@@ -44,7 +44,7 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-class Console : public View {
+class GEM_EXPORT Console : public View {
 private:
 	/** History Buffer */
 	CircularBuffer<SelectOption> History;

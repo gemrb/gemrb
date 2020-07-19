@@ -3506,11 +3506,11 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 	if (Sender->Type!=ST_AREA) {
 		return 0;
 	}
-	Map *map = (Map *) Sender;
+	const Map *map = (Map *) Sender;
 	// map->CanFree() has side effects, don't use it here! Would make some loot and corpses disappear immediately
 	int i = map->GetActorCount(true);
 	while (i--) {
-		Actor *actor= map->GetActor(i, true);
+		const Actor *actor = map->GetActor(i, true);
 		bool usedExit = actor->GetInternalFlag() & IF_USEEXIT;
 		if (actor->IsPartyMember()) {
 			if (!usedExit) {

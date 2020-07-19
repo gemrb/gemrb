@@ -25,7 +25,9 @@
 import GemRB
 import LoadScreen
 import GameCheck
+import GUICommon
 import GUICommonWindows
+
 from GameCheck import MAX_PARTY_SIZE
 
 LoadWindow = 0
@@ -37,8 +39,9 @@ def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
 	if GameCheck.IsIWD1():
-		GemRB.SetVar ("PlayMode",0)   #iwd is always using 'mpsave'
-		GemRB.SetVar ("SaveDir",1)   #iwd is always using 'mpsave'
+		GemRB.SetVar ("PlayMode", 0) # old code, not sure if needed
+		
+	GUICommon.SetSaveDir ()
 	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 
 	CancelButton=LoadWindow.GetControl (34)

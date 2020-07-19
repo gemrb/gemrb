@@ -179,7 +179,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(true);
 	while (i--) {
-		Actor* actor = game->GetPC( i, true );
+		const Actor *actor = game->GetPC(i, true);
 		if (MyMap->HasActor(actor) ) {
 			Point pos = ConvertPointFromGame(actor->Pos);
 			video->DrawEllipse( pos, 3, 2, actor->Selected ? ColorGreen : ColorGreenDark );
