@@ -216,7 +216,7 @@ struct PixelIterator : IPixelIterator
 	: IPixelIterator(p, pitch, x, y), w(w) {
 		assert(w >= 0); // == 0 is the same thing as an end iterator so it is valid too
 		assert(pitch >= w);
-		xpos = (x == Reverse) ? w-1 : 0;
+		xpos = (x == Reverse) ? w - 1 : 0;
 	}
 
 	virtual PIXEL& operator*() const {
@@ -245,7 +245,7 @@ struct PixelIterator : IPixelIterator
 
 			xpos = w + tmp;
 			ptr += pitch * ydir; // shift rows
-			ptr += (w + amt) * sizeof(PIXEL);
+			ptr += int((w + amt) * sizeof(PIXEL));
 		} else if (tmp >= w) {
 			assert((xdir == Forward && dx > 0) || (xdir == Reverse && dx < 0));
 
@@ -254,7 +254,7 @@ struct PixelIterator : IPixelIterator
 			ptr += int((amt - w) * sizeof(PIXEL));
 		} else {
 			xpos += amt;
-			ptr += amt * sizeof(PIXEL);
+			ptr += int(amt * sizeof(PIXEL));
 		}
 
 		pixel = ptr;
