@@ -35,12 +35,14 @@
 
 namespace GemRB {
 
-#define SV_BPP 0
-#define SV_WIDTH 1
-#define SV_HEIGHT 2
-#define SV_GAMEPATH 3
-#define SV_TOUCH 4
-#define SV_SAVEPATH 5
+enum {
+	SV_BPP,
+	SV_WIDTH,
+	SV_HEIGHT,
+	SV_GAMEPATH,
+	SV_TOUCH,
+	SV_SAVEPATH
+};
 
 class GUIScript : public ScriptEngine {
 public:
