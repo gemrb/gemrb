@@ -7927,7 +7927,7 @@ void Actor::UpdateActorState()
 	if (anims) {
 		if (attackProjectile) {
 			unsigned int frameCount = anims[0]->GetFrameCount();
-			unsigned int currentFrame = anims[0]->GetCurrentFrame();
+			unsigned int currentFrame = anims[0]->GetCurrentFrameIndex();
 			//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
 			// however some critters don't have that long animations (eg. squirrel 0xC400)
 			if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
@@ -7943,7 +7943,7 @@ void Actor::UpdateActorState()
 				//footsteps option set, stance
 				if (footsteps && (GetStance() == IE_ANI_WALK)) {
 					//frame reached 0
-					if (!anims[0]->GetCurrentFrame()) {
+					if (!anims[0]->GetCurrentFrameIndex()) {
 						PlayWalkSound();
 					}
 				}
@@ -8386,15 +8386,15 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 		int partnum = part;
 		if (zOrder) partnum = zOrder[part];
 		Animation* anim = anims[partnum];
-		Sprite2D* nextFrame = 0;
-		if (anim)
-			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-		if (nextFrame) {
+		if (anim == nullptr) continue;
+		
+		Sprite2D* currentFrame = anim->CurrentFrame();
+		if (currentFrame) {
 			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
 			if (palette->HasAlpha() && TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
-				video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
+				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 				palette->col[1].a = tmpa;
 			} else if (TranslucentShadows) {
 				Palette* cpy = palette->Copy();
@@ -8402,10 +8402,10 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
 				for (int i = 2; i < 256; ++i) {
 					cpy->col[i].a = tint.a;
 				}
-				video->BlitGameSpriteWithPalette(nextFrame, cpy, cx, cy, flags, tint);
+				video->BlitGameSpriteWithPalette(currentFrame, cpy, cx, cy, flags, tint);
 				cpy->release();
 			} else {
-				video->BlitGameSpriteWithPalette(nextFrame, palette, cx, cy, flags, tint);
+				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 			}
 		}
 	}
@@ -8608,7 +8608,7 @@ bool Actor::UpdateDrawingState()
 		for (int part = 0; part < PartCount; ++part) {
 			Animation* anim = anims[part];
 			if (anim) {
-				Sprite2D* animframe = anim->GetFrame(anim->GetCurrentFrame());
+				Sprite2D* animframe = anim->CurrentFrame();
 				assert(animframe);
 				Region partBBox = animframe->Frame;
 				partBBox.x = Pos.x - partBBox.x;

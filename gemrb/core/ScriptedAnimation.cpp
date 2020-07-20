@@ -515,7 +515,7 @@ int ScriptedAnimation::GetCurrentFrame()
 {
 	Animation *anim = anims[P_HOLD*MAX_ORIENT];
 	if (anim) {
-		return anim->GetCurrentFrame();
+		return anim->GetCurrentFrameIndex();
 	}
 	return 0;
 }

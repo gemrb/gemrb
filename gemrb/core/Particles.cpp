@@ -244,7 +244,7 @@ void Particles::Draw(const Region &vp)
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
 				if (anims) {
 					Animation* anim = anims[0];
-					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
 					ieDword flags = 0;
 					if (game) game->ApplyGlobalTint(clr, flags);

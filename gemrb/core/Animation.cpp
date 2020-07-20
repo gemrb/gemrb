@@ -98,11 +98,16 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 	}
 }
 
-unsigned int Animation::GetCurrentFrame() const
+unsigned int Animation::GetCurrentFrameIndex() const
 {
 	if (playReversed)
 		return indicesCount-pos-1;
 	return pos;
+}
+
+Sprite2D* Animation::CurrentFrame() const
+{
+	return GetFrame(GetCurrentFrameIndex());
 }
 
 Sprite2D* Animation::LastFrame(void)
@@ -204,7 +209,7 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Sprite2D* Animation::GetFrame(unsigned int i)
+Sprite2D* Animation::GetFrame(unsigned int i) const
 {
 	if (i >= indicesCount) {
 		return NULL;

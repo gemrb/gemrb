@@ -1084,7 +1084,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 		//passed a hardcoded sequence number
 		if (Extension->AFlags&PAF_TRIGGER_D) {
 			if (travel[Orientation]) {
-				int anim = travel[Orientation]->GetCurrentFrame();
+				int anim = travel[Orientation]->GetCurrentFrameIndex();
 				if (anim<30)
 					return;
 			}
@@ -1640,7 +1640,7 @@ void Projectile::DrawExplosion(const Region& vp)
 int Projectile::GetTravelPos(int face) const
 {
 	if (travel[face]) {
-		return travel[face]->GetCurrentFrame();
+		return travel[face]->GetCurrentFrameIndex();
 	}
 	return 0;
 }
@@ -1648,7 +1648,7 @@ int Projectile::GetTravelPos(int face) const
 int Projectile::GetShadowPos(int face) const
 {
 	if (shadow[face]) {
-		return shadow[face]->GetCurrentFrame();
+		return shadow[face]->GetCurrentFrameIndex();
 	}
 	return 0;
 }
