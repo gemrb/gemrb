@@ -167,6 +167,10 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 
 	if (p.x >= clip.x + clip.w) return;
 	if (x2 < clip.x) return;
+	
+	if (p.y >= dst->h || p.x >= dst->w) {
+		return;
+	}
 
 	if (p.x < clip.x) p.x = clip.x;
 	x2 = Clamp<int>(x2, p.x, clip.x + clip.w);
