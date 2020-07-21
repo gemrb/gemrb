@@ -8603,6 +8603,8 @@ bool Actor::UpdateDrawingState()
 		int PartCount = ca->GetTotalPartCount();
 		Animation** shadows = ca->GetShadowAnimation(StanceID, Face);
 		AdvanceAnimations(anims, shadows, PartCount);
+		// AdvanceAnimations might update the stance
+		StanceID = GetStance();
 		
 		Region newBBox(Pos, Size());
 		for (int part = 0; part < PartCount; ++part) {
