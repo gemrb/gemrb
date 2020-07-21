@@ -8471,10 +8471,8 @@ void Actor::UpdateAnimations()
 		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
 			//footsteps option set, stance
 			if (footsteps && (GetStance() == IE_ANI_WALK)) {
-				//frame reached 0
-				if (!anims[0]->GetCurrentFrame()) {
-					PlayWalkSound();
-				}
+				// sound lengths ensure proper pacing; haste was ignored
+				PlayWalkSound();
 			}
 		}
 	}
