@@ -8371,26 +8371,17 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 	}
 }
 
-void Actor::DrawActorSprite(int cx, int cy, uint32_t flags, Animation** anims,
-							unsigned char Face, const Color& tint, bool useShadowPalette) const
+void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
+							const std::vector<AnimationPart>& anims, const Color& tint) const
 {
-	CharAnimations* ca = GetAnims();
-	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 
-	if (!ca->lockPalette) flags |= BLIT_TINTED;
+	for (const auto& part : anims) {
+		Animation* anim = part.first;
+		Palette* palette = part.second;
 
-	// display current frames in the right order
-	const int* zOrder = ca->GetZOrder(Face);
-	for (int part = 0; part < PartCount; ++part) {
-		int partnum = part;
-		if (zOrder) partnum = zOrder[part];
-		Animation* anim = anims[partnum];
-		if (anim == nullptr) continue;
-		
 		Sprite2D* currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
 			if (palette->HasAlpha() && TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
@@ -8765,9 +8756,29 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		Color mirrortint = tint;
 		//mirror images are also half transparent when invis
 		//if (mirrortint.a > 0) mirrortint.a = 255;
+		
+		if (!ca->lockPalette) {
+			flags |= BLIT_TINTED;
+		}
 
 		int cx = Pos.x - vp.x;
 		int cy = Pos.y - vp.y - GetElevation();
+		
+		// TODO: refactor CharAnimations to not use C style arrays
+		// and handle the zordering itself so this is not required
+		std::vector<AnimationPart> sortedAnims;
+		
+		// display current frames in the right order
+		const int* zOrder = ca->GetZOrder(Face);
+		const int partCount = ca->GetTotalPartCount();
+		for (int part = 0; part < partCount; ++part) {
+			int partnum = part;
+			if (zOrder) partnum = zOrder[part];
+			Animation* anim = anims[partnum];
+			if (anim != nullptr) {
+				sortedAnims.emplace_back(anim, ca->GetPartPalette(partnum));
+			}
+		}
 
 		// mirror images behind the actor
 		for (int i = 0; i < 4; ++i) {
@@ -8782,7 +8793,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, flags, sortedAnims, mirrortint);
 				}
 			}
 		}
@@ -8798,7 +8809,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				for (int i = 0; i < 3; ++i) {
 					blurx += blurdx; blury += blurdy;
 					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
-					DrawActorSprite(blurx, blury, flags, anims, Face, tint);
+					DrawActorSprite(blurx, blury, flags, sortedAnims, tint);
 				}
 			}
 		}
@@ -8826,18 +8837,24 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 
 		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
 		if (shadowAnimations) {
-			DrawActorSprite(cx, cy, flags, shadowAnimations, Face, tint, true);
+			std::vector<AnimationPart> shadows;
+			// shadows don't need to be sorted
+			for (int part = 0; part < partCount; ++part) {
+				Animation* anim = shadowAnimations[part];
+				shadows.emplace_back(anim, ca->GetShadowPalette());
+			}
+			DrawActorSprite(cx, cy, flags, shadows, tint);
 		}
 
 		// actor itself
-		DrawActorSprite(cx, cy, flags, anims, Face, tint);
+		DrawActorSprite(cx, cy, flags, sortedAnims, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
 			if (Face >= 4 && Face < 12) {
 				for (int i = 0; i < 3; ++i) {
 					blurx -= blurdx; blury -= blurdy;
-					DrawActorSprite(blurx, blury, flags, anims, Face, tint);
+					DrawActorSprite(blurx, blury, flags, sortedAnims, tint);
 				}
 			}
 		}
@@ -8855,7 +8872,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, anims, Face, mirrortint);
+					DrawActorSprite(icx, icy, flags, sortedAnims, mirrortint);
 				}
 			}
 		}
