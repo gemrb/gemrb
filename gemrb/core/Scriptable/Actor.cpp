@@ -4946,28 +4946,28 @@ void Actor::PlayWalkSound()
 	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef)-1 );
 	area->ResolveTerrainSound(Sound, Pos);
 
-	if (Sound[0] != '*') {
-		int l = strlen(Sound);
-		/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-		if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
+	if (Sound[0] == '*') return;
+
+	int l = strlen(Sound);
+	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
+	if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
+		if (l < 8) {
+			Sound[l] = cnt + 0x31;
+			Sound[l+1] = 0;
+		}
+	} else {
+		if (cnt) {
 			if (l < 8) {
-				Sound[l] = cnt + 0x31;
+				Sound[l] = cnt + 0x60; // append 'a'-'g'
 				Sound[l+1] = 0;
 			}
-		} else {
-			if (cnt) {
-				if (l < 8) {
-					Sound[l] = cnt + 0x60; // append 'a'-'g'
-					Sound[l+1] = 0;
-				}
-			}
 		}
-
-		unsigned int len = 0;
-		unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
-		core->GetAudioDrv()->Play(Sound, channel, Pos.x, Pos.y, 0, &len);
-		nextWalk = thisTime + len;
 	}
+
+	unsigned int len = 0;
+	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
+	core->GetAudioDrv()->Play(Sound, channel, Pos.x, Pos.y, 0, &len);
+	nextWalk = thisTime + len;
 }
 
 // guesses from audio:               bone  chain studd leather splint none other plate
