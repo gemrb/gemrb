@@ -1408,12 +1408,6 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 		window = loader(id, pack, pos)
 
 		if window:
-			if pause:
-				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
-				GemRB.GamePause (1, 3)
-			else:
-				CreateTopWinLoader.PauseState = None
-
 			# set this before calling initer so initer can change it if it wants
 			window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 			if initer:
@@ -1425,7 +1419,13 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			
 			SetTopWindow (window, selectionHandler)
 			window.SetAction(TopWindowClosed, ACTION_WINDOW_CLOSED)
-			
+
+			if pause:
+				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
+				GemRB.GamePause (1, 3)
+			else:
+				CreateTopWinLoader.PauseState = None
+
 			optwin = GemRB.GetView("OPTWIN")
 			rtgbtn = optwin.GetControl(0) # return to game button
 			if rtgbtn: # not in PST or IWD2
