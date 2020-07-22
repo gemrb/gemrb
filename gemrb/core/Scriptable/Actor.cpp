@@ -7919,11 +7919,11 @@ void Actor::UpdateActorState()
 		}
 	}
 
-	Animation** anims = currentStance.anim;
+	const auto& anim = currentStance.anim;
 	if (attackProjectile) {
 		// default so that the projectile fires if we dont have an animation for some reason
-		unsigned int frameCount = (anims) ? anims[0]->GetFrameCount() : 9;
-		unsigned int currentFrame = (anims) ? anims[0]->GetCurrentFrameIndex() : 8;
+		unsigned int frameCount = anim.empty() ? 9 : anim[0].first->GetFrameCount();
+		unsigned int currentFrame = anim.empty() ? 8 : anim[0].first->GetCurrentFrameIndex();
 
 		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
 		// however some critters don't have that long animations (eg. squirrel 0xC400)
@@ -7933,13 +7933,13 @@ void Actor::UpdateActorState()
 		}
 	}
 
-	if (anims && anims[0]->endReached == false) {
+	if (!anim.empty() && anim[0].first->endReached == false) {
 		//check if walk sounds need to be played
 		//dialog, pause game
 		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
 			//footsteps option set, stance
 			if (footsteps && (GetStance() == IE_ANI_WALK)) {
-				if (anims[0]->GetCurrentFrameIndex() == 0) {
+				if (anim[0].first->GetCurrentFrameIndex() == 0) {
 					PlayWalkSound();
 				}
 			}
@@ -8432,20 +8432,42 @@ bool Actor::AdvanceAnimations()
 {
 	assert(anims);
 	anims->PulseRGBModifiers();
+	
+	currentStance.anim.clear();
+	currentStance.shadow.clear();
 
 	unsigned char stanceID = GetStance();
 	unsigned char face = GetNextFace();
-	currentStance.anim = anims->GetAnimation(stanceID, face);
-	currentStance.shadow = anims->GetShadowAnimation(stanceID, face);
-	currentStance.count = anims->GetTotalPartCount();
-	currentStance.zOrder = anims->GetZOrder(face);
+	Animation** stanceAnim = anims->GetAnimation(stanceID, face);
 	
-	if (currentStance.anim == nullptr) {
+	if (stanceAnim == nullptr) {
 		return false;
 	}
 	
-	Animation* first = currentStance.anim[0];
-	Animation* firstShadow = (currentStance.shadow) ? currentStance.shadow[0] : nullptr;
+	Animation** shadows = anims->GetShadowAnimation(stanceID, face);
+	
+	const auto count = anims->GetTotalPartCount();
+	const auto zOrder = anims->GetZOrder(face);
+	
+	// display current frames in the right order
+	for (int part = 0; part < count; ++part) {
+		int partnum = part;
+		if (zOrder) partnum = zOrder[part];
+		Animation* anim = stanceAnim[partnum];
+		if (anim) {
+			currentStance.anim.emplace_back(anim, anims->GetPartPalette(partnum));
+		}
+		
+		if (shadows) {
+			Animation* anim = shadows[partnum];
+			if (anim) {
+				currentStance.shadow.emplace_back(anim, anims->GetShadowPalette());
+			}
+		}
+	}
+	
+	Animation* first = currentStance.anim[0].first;
+	Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 	
 	// advance first (main) animation by one frame (in sync)
 	if (Immobile()) {
@@ -8463,9 +8485,9 @@ bool Actor::AdvanceAnimations()
 	}
 
 	// update all other animation parts, in sync with the first part
-	for (int part = 1; part < currentStance.count; ++part) {
-		if (currentStance.anim[part])
-			currentStance.anim[part]->GetSyncedNextFrame(first);
+	auto it = currentStance.anim.begin() + 1;
+	for (; it != currentStance.anim.end(); ++it) {
+		it->first->GetSyncedNextFrame(first);
 	}
 
 	if (first->endReached) {
@@ -8593,26 +8615,24 @@ bool Actor::UpdateDrawingState()
 	
 	if (AdvanceAnimations()) {
 		auto StanceID = GetStance();
-		Animation** anims = currentStance.anim;
+		Animation* first = currentStance.anim[0].first;
 		if (Immobile() || !ShouldDrawCircle()) {
 			//set the last frame if actor is died and deactivated
 			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
-				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
+				first->SetPos(first->GetFrameCount() - 1);
 			}
 		}
 		
 		Region newBBox(Pos, Size());
-		for (int part = 0; part < currentStance.count; ++part) {
-			Animation* anim = anims[part];
-			if (anim) {
-				Sprite2D* animframe = anim->CurrentFrame();
-				assert(animframe);
-				Region partBBox = animframe->Frame;
-				partBBox.x = Pos.x - partBBox.x;
-				partBBox.y = Pos.y - partBBox.y;
-				newBBox.ExpandToRegion(partBBox);
-				assert(newBBox.RectInside(partBBox));
-			}
+		for (const auto& part : currentStance.anim) {
+			Animation* anim = part.first;
+			Sprite2D* animframe = anim->CurrentFrame();
+			assert(animframe);
+			Region partBBox = animframe->Frame;
+			partBBox.x = Pos.x - partBBox.x;
+			partBBox.y = Pos.y - partBBox.y;
+			newBBox.ExpandToRegion(partBBox);
+			assert(newBBox.RectInside(partBBox));
 		}
 				
 		newBBox.y -= GetElevation();
@@ -8738,7 +8758,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		DrawCircle(vp.Origin());
 	}
 
-	if (currentStance.anim != nullptr) {
+	if (!currentStance.anim.empty()) {
 		unsigned char face = GetOrientation();
 		// Drawing the actor:
 		// * mirror images:
@@ -8770,20 +8790,6 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 
 		int cx = Pos.x - vp.x;
 		int cy = Pos.y - vp.y - GetElevation();
-		
-		// TODO: refactor CharAnimations to not use C style arrays
-		// and handle the zordering itself so this is not required
-		std::vector<AnimationPart> sortedAnims;
-		
-		// display current frames in the right order
-		for (int part = 0; part < currentStance.count; ++part) {
-			int partnum = part;
-			if (currentStance.zOrder) partnum = currentStance.zOrder[part];
-			Animation* stanceanim = currentStance.anim[partnum];
-			if (stanceanim != nullptr) {
-				sortedAnims.emplace_back(stanceanim, anims->GetPartPalette(partnum));
-			}
-		}
 
 		// mirror images behind the actor
 		for (int i = 0; i < 4; ++i) {
@@ -8798,7 +8804,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, sortedAnims, mirrortint);
+					DrawActorSprite(icx, icy, flags, currentStance.anim, mirrortint);
 				}
 			}
 		}
@@ -8814,7 +8820,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				for (int i = 0; i < 3; ++i) {
 					blurx += blurdx; blury += blurdy;
 					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
-					DrawActorSprite(blurx, blury, flags, sortedAnims, tint);
+					DrawActorSprite(blurx, blury, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8834,25 +8840,19 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 			}
 		}
 
-		if (currentStance.shadow) {
-			std::vector<AnimationPart> shadows;
-			// shadows don't need to be sorted
-			for (int part = 0; part < currentStance.count; ++part) {
-				Animation* anim = currentStance.shadow[part];
-				shadows.emplace_back(anim, anims->GetShadowPalette());
-			}
-			DrawActorSprite(cx, cy, flags, shadows, tint);
+		if (!currentStance.shadow.empty()) {
+			DrawActorSprite(cx, cy, flags, currentStance.shadow, tint);
 		}
 
 		// actor itself
-		DrawActorSprite(cx, cy, flags, sortedAnims, tint);
+		DrawActorSprite(cx, cy, flags, currentStance.anim, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
 			if (face >= 4 && face < 12) {
 				for (int i = 0; i < 3; ++i) {
 					blurx -= blurdx; blury -= blurdy;
-					DrawActorSprite(blurx, blury, flags, sortedAnims, tint);
+					DrawActorSprite(blurx, blury, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8870,7 +8870,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, sortedAnims, mirrortint);
+					DrawActorSprite(icx, icy, flags, currentStance.anim, mirrortint);
 				}
 			}
 		}

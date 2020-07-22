@@ -387,11 +387,10 @@ private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	
+	using AnimationPart = std::pair<Animation*, Palette*>;
 	struct {
-		Animation** anim = nullptr;
-		Animation** shadow = nullptr;
-		int count = 0;
-		const int* zOrder = nullptr;
+		std::vector<AnimationPart> anim;
+		std::vector<AnimationPart> shadow;
 	} currentStance;
 
 	ieByte SavingThrow[5];
@@ -416,7 +415,6 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	using AnimationPart = std::pair<Animation*, Palette*>;
 	void DrawActorSprite(int cx, int cy, uint32_t flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
 
