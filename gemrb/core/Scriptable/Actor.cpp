@@ -8506,6 +8506,13 @@ bool Actor::AdvanceAnimations()
 	for (; it != currentStance.anim.end(); ++it) {
 		it->first->GetSyncedNextFrame(first);
 	}
+	
+	it = currentStance.shadow.begin();
+	if (it != currentStance.shadow.end()) {
+		for (++it; it != currentStance.shadow.end(); ++it) {
+			it->first->GetSyncedNextFrame(firstShadow);
+		}
+	}
 
 	return true;
 }
