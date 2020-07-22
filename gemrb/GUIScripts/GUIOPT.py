@@ -368,7 +368,7 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18042, 20619, HelpTextArea, Window, 47, 46, 20618, 'Weather')
 	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18042, 2242, HelpTextArea, Window, 50, 48, 2241, 'Heal Party on Rest')
-	elif GameCheck.IsIWD2():
+	elif GameCheck.IsIWD2() or GameCheck.IsIWD():
 		GUIOPTControls.OptCheckbox (18042, 15136, HelpTextArea, Window, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
