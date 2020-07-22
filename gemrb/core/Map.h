@@ -370,8 +370,8 @@ private:
 	unsigned int lastActorCount[QUEUE_COUNT];
 	static const size_t DEGREES_OF_FREEDOM = 4;
 	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
-	static const std::array<char, DEGREES_OF_FREEDOM> dx;
-	static const std::array<char, DEGREES_OF_FREEDOM> dy;
+	static const std::array<char, DEGREES_OF_FREEDOM> dxAdjacent;
+	static const std::array<char, DEGREES_OF_FREEDOM> dyAdjacent;
 	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand;
 	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand;
 	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)

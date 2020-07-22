@@ -49,8 +49,8 @@
 
 namespace GemRB {
 
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
+constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dxAdjacent{{1, 0, -1, 0}};
+constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dyAdjacent{{0, 1, 0, -1}};
 
 // Cosines
 constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
@@ -304,7 +304,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		isClosed[smptCurrent.y * Width + smptCurrent.x] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			NavmapPoint nmptChild(nmptCurrent.x + 16 * dx[i], nmptCurrent.y + 12 * dy[i]);
+			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
 			// Outside map
 			if (smptChild.x < 0 ||	smptChild.y < 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
