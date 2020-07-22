@@ -7932,15 +7932,32 @@ void Actor::UpdateActorState()
 			attackProjectile = NULL;
 		}
 	}
+	
+	if (!anim.empty()) {
+		Animation* first = anim[0].first;
+		Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+		
+		if (first->endReached) {
+			// possible stance change
+			if (HandleActorStance()) {
+				// restart animation for next time it is needed
+				first->endReached = false;
+				first->SetPos(0);
 
-	if (!anim.empty() && anim[0].first->endReached == false) {
-		//check if walk sounds need to be played
-		//dialog, pause game
-		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-			//footsteps option set, stance
-			if (footsteps && (GetStance() == IE_ANI_WALK)) {
-				if (anim[0].first->GetCurrentFrameIndex() == 0) {
-					PlayWalkSound();
+				if (firstShadow) {
+					firstShadow->endReached = false;
+					firstShadow->SetPos(0);
+				}
+			}
+		} else {
+			//check if walk sounds need to be played
+			//dialog, pause game
+			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+				//footsteps option set, stance
+				if (footsteps && (GetStance() == IE_ANI_WALK)) {
+					if (anim[0].first->GetCurrentFrameIndex() == 0) {
+						PlayWalkSound();
+					}
 				}
 			}
 		}
@@ -8490,19 +8507,6 @@ bool Actor::AdvanceAnimations()
 		it->first->GetSyncedNextFrame(first);
 	}
 
-	if (first->endReached) {
-		if (HandleActorStance()) {
-			// restart animation
-			first->endReached = false;
-			first->SetPos(0);
-
-			if (firstShadow) {
-				firstShadow->endReached = false;
-				firstShadow->SetPos(0);
-			}
-		}
-	}
-	
 	return true;
 }
 
@@ -8614,15 +8618,6 @@ bool Actor::UpdateDrawingState()
 	}
 	
 	if (AdvanceAnimations()) {
-		auto StanceID = GetStance();
-		Animation* first = currentStance.anim[0].first;
-		if (Immobile() || !ShouldDrawCircle()) {
-			//set the last frame if actor is died and deactivated
-			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
-				first->SetPos(first->GetFrameCount() - 1);
-			}
-		}
-		
 		Region newBBox(Pos, Size());
 		for (const auto& part : currentStance.anim) {
 			Animation* anim = part.first;
