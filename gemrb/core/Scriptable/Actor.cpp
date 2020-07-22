@@ -442,7 +442,6 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
-	shadowAnimations = NULL;
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
@@ -7920,32 +7919,28 @@ void Actor::UpdateActorState()
 		}
 	}
 
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetOrientation();
-	CharAnimations* ca = GetAnims();
-	Animation** anims = (ca) ? ca->GetAnimation(StanceID, Face) : nullptr;
-	if (anims) {
-		if (attackProjectile) {
-			unsigned int frameCount = anims[0]->GetFrameCount();
-			unsigned int currentFrame = anims[0]->GetCurrentFrameIndex();
-			//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
-			// however some critters don't have that long animations (eg. squirrel 0xC400)
-			if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-				GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-				attackProjectile = NULL;
-			}
-		}
+	Animation** anims = currentStance.anim;
+	if (attackProjectile) {
+		// default so that the projectile fires if we dont have an animation for some reason
+		unsigned int frameCount = (anims) ? anims[0]->GetFrameCount() : 9;
+		unsigned int currentFrame = (anims) ? anims[0]->GetCurrentFrameIndex() : 8;
 
-		if (anims[0]->endReached == false) {
-			//check if walk sounds need to be played
-			//dialog, pause game
-			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-				//footsteps option set, stance
-				if (footsteps && (GetStance() == IE_ANI_WALK)) {
-					//frame reached 0
-					if (!anims[0]->GetCurrentFrameIndex()) {
-						PlayWalkSound();
-					}
+		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+		// however some critters don't have that long animations (eg. squirrel 0xC400)
+		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			attackProjectile = NULL;
+		}
+	}
+
+	if (anims && anims[0]->endReached == false) {
+		//check if walk sounds need to be played
+		//dialog, pause game
+		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+			//footsteps option set, stance
+			if (footsteps && (GetStance() == IE_ANI_WALK)) {
+				if (anims[0]->GetCurrentFrameIndex() == 0) {
+					PlayWalkSound();
 				}
 			}
 		}
@@ -8433,42 +8428,60 @@ bool Actor::ShouldHibernate() {
 	return true;
 }
 
-void Actor::AdvanceAnimations(Animation** anims, Animation** shadowAnimations, size_t count)
+bool Actor::AdvanceAnimations()
 {
+	assert(anims);
+	anims->PulseRGBModifiers();
+
+	unsigned char stanceID = GetStance();
+	unsigned char face = GetNextFace();
+	currentStance.anim = anims->GetAnimation(stanceID, face);
+	currentStance.shadow = anims->GetShadowAnimation(stanceID, face);
+	currentStance.count = anims->GetTotalPartCount();
+	currentStance.zOrder = anims->GetZOrder(face);
+	
+	if (currentStance.anim == nullptr) {
+		return false;
+	}
+	
+	Animation* first = currentStance.anim[0];
+	Animation* firstShadow = (currentStance.shadow) ? currentStance.shadow[0] : nullptr;
+	
 	// advance first (main) animation by one frame (in sync)
 	if (Immobile()) {
 		// update animation, continue last-displayed frame
-		anims[0]->LastFrame();
-		if (shadowAnimations) {
-			shadowAnimations[0]->LastFrame();
+		first->LastFrame();
+		if (firstShadow) {
+			firstShadow->LastFrame();
 		}
 	} else {
 		// update animation, maybe advance a frame (if enough time has passed)
-		anims[0]->NextFrame();
-		if (shadowAnimations) {
-			shadowAnimations[0]->NextFrame();
+		first->NextFrame();
+		if (firstShadow) {
+			firstShadow->NextFrame();
 		}
 	}
 
 	// update all other animation parts, in sync with the first part
-
-	for (size_t part = 1; part < count; ++part) {
-		if (anims[part])
-			anims[part]->GetSyncedNextFrame(anims[0]);
+	for (int part = 1; part < currentStance.count; ++part) {
+		if (currentStance.anim[part])
+			currentStance.anim[part]->GetSyncedNextFrame(first);
 	}
 
-	if (anims[0]->endReached) {
+	if (first->endReached) {
 		if (HandleActorStance()) {
 			// restart animation
-			anims[0]->endReached = false;
-			anims[0]->SetPos(0);
+			first->endReached = false;
+			first->SetPos(0);
 
-			if (shadowAnimations) {
-				shadowAnimations[0]->endReached = false;
-				shadowAnimations[0]->SetPos(0);
+			if (firstShadow) {
+				firstShadow->endReached = false;
+				firstShadow->SetPos(0);
 			}
 		}
 	}
+	
+	return true;
 }
 
 bool Actor::IsDead() const
@@ -8577,28 +8590,19 @@ bool Actor::UpdateDrawingState()
 		InternalFlags &= ~IF_TRIGGER_AP;
 		return false;
 	}
-
-	ca->PulseRGBModifiers();
-
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetNextFace();
-	Animation** anims = ca->GetAnimation( StanceID, Face );
-	if (anims) {
+	
+	if (AdvanceAnimations()) {
+		auto StanceID = GetStance();
+		Animation** anims = currentStance.anim;
 		if (Immobile() || !ShouldDrawCircle()) {
 			//set the last frame if actor is died and deactivated
 			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
 				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
 			}
 		}
-
-		int PartCount = ca->GetTotalPartCount();
-		Animation** shadows = ca->GetShadowAnimation(StanceID, Face);
-		AdvanceAnimations(anims, shadows, PartCount);
-		// AdvanceAnimations might update the stance
-		StanceID = GetStance();
 		
 		Region newBBox(Pos, Size());
-		for (int part = 0; part < PartCount; ++part) {
+		for (int part = 0; part < currentStance.count; ++part) {
 			Animation* anim = anims[part];
 			if (anim) {
 				Sprite2D* animframe = anim->CurrentFrame();
@@ -8607,9 +8611,10 @@ bool Actor::UpdateDrawingState()
 				partBBox.x = Pos.x - partBBox.x;
 				partBBox.y = Pos.y - partBBox.y;
 				newBBox.ExpandToRegion(partBBox);
+				assert(newBBox.RectInside(partBBox));
 			}
 		}
-		
+				
 		newBBox.y -= GetElevation();
 		
 		SetBBox(newBBox);
@@ -8681,6 +8686,7 @@ Region Actor::DrawingRegion() const
 		r.x += Pos.x;
 		r.y += Pos.y;
 		box.ExpandToRegion(r);
+		assert(r.w <= box.w && r.h <= box.h);
 	}
 	
 	for (const auto& vvc : vvcShields) {
@@ -8688,6 +8694,7 @@ Region Actor::DrawingRegion() const
 		r.x += Pos.x;
 		r.y += Pos.y;
 		box.ExpandToRegion(r);
+		assert(r.w <= box.w && r.h <= box.h);
 	}
 	
 	return box;
@@ -8731,11 +8738,8 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		DrawCircle(vp.Origin());
 	}
 
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetOrientation();
-	CharAnimations* ca = GetAnims();
-	Animation** anims = ca->GetAnimation( StanceID, Face );
-	if (anims) {
+	if (currentStance.anim != nullptr) {
+		unsigned char face = GetOrientation();
 		// Drawing the actor:
 		// * mirror images:
 		//     Drawn without transparency, unless fully invisible.
@@ -8757,9 +8761,12 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		//mirror images are also half transparent when invis
 		//if (mirrortint.a > 0) mirrortint.a = 255;
 		
-		if (!ca->lockPalette) {
+		if (!anims->lockPalette) {
 			flags |= BLIT_TINTED;
 		}
+		
+		Game* game = core->GetGame();
+		game->ApplyGlobalTint(tint, flags);
 
 		int cx = Pos.x - vp.x;
 		int cy = Pos.y - vp.y - GetElevation();
@@ -8769,14 +8776,12 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		std::vector<AnimationPart> sortedAnims;
 		
 		// display current frames in the right order
-		const int* zOrder = ca->GetZOrder(Face);
-		const int partCount = ca->GetTotalPartCount();
-		for (int part = 0; part < partCount; ++part) {
+		for (int part = 0; part < currentStance.count; ++part) {
 			int partnum = part;
-			if (zOrder) partnum = zOrder[part];
-			Animation* anim = anims[partnum];
-			if (anim != nullptr) {
-				sortedAnims.emplace_back(anim, ca->GetPartPalette(partnum));
+			if (currentStance.zOrder) partnum = currentStance.zOrder[part];
+			Animation* stanceanim = currentStance.anim[partnum];
+			if (stanceanim != nullptr) {
+				sortedAnims.emplace_back(stanceanim, anims->GetPartPalette(partnum));
 			}
 		}
 
@@ -8799,12 +8804,12 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 		}
 
 		// blur sprites behind the actor
-		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
-		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		int blurdx = (OrientdX[face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		int blurdy = (OrientdY[face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		int blurx = cx;
 		int blury = cy;
 		if (State & STATE_BLUR) {
-			if (Face < 4 || Face >= 12) {
+			if (face < 4 || face >= 12) {
 				blurx -= 4*blurdx; blury -= 4*blurdy;
 				for (int i = 0; i < 3; ++i) {
 					blurx += blurdx; blury += blurdy;
@@ -8813,12 +8818,6 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 				}
 			}
 		}
-
-		Game* game = core->GetGame();
-		if (!ca->lockPalette) {
-			flags |= BLIT_TINTED;
-		}
-		game->ApplyGlobalTint(tint, flags);
 
 		// infravision, independent of light map and global light
 		if ( HasBodyHeat() &&
@@ -8835,13 +8834,12 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 			}
 		}
 
-		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
-		if (shadowAnimations) {
+		if (currentStance.shadow) {
 			std::vector<AnimationPart> shadows;
 			// shadows don't need to be sorted
-			for (int part = 0; part < partCount; ++part) {
-				Animation* anim = shadowAnimations[part];
-				shadows.emplace_back(anim, ca->GetShadowPalette());
+			for (int part = 0; part < currentStance.count; ++part) {
+				Animation* anim = currentStance.shadow[part];
+				shadows.emplace_back(anim, anims->GetShadowPalette());
 			}
 			DrawActorSprite(cx, cy, flags, shadows, tint);
 		}
@@ -8851,7 +8849,7 @@ void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
-			if (Face >= 4 && Face < 12) {
+			if (face >= 4 && face < 12) {
 				for (int i = 0; i < 3; ++i) {
 					blurx -= blurdx; blury -= blurdy;
 					DrawActorSprite(blurx, blury, flags, sortedAnims, tint);

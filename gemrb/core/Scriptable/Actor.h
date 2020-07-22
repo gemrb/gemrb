@@ -386,7 +386,14 @@ public:
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
-	CharAnimations *shadowAnimations;
+	
+	struct {
+		Animation** anim = nullptr;
+		Animation** shadow = nullptr;
+		int count = 0;
+		const int* zOrder = nullptr;
+	} currentStance;
+
 	ieByte SavingThrow[5];
 	ieByte weapSlotCount;
 	// true when command has been played after select
@@ -447,7 +454,7 @@ private:
 	char GetArmorCode() const;
 	const char* GetArmorSound() const;
 
-	void AdvanceAnimations(Animation** anims, Animation** shadows, size_t count);
+	bool AdvanceAnimations();
 	/* applies modal spell etc, if needed */
 	void UpdateModalState(ieDword gameTime);
 public:
