@@ -322,7 +322,8 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 
 Region SDLVideoDriver::CurrentRenderClip() const
 {
-	return screenClip.Intersect(drawingBuffer->Rect());
+	Region bufferRegion(Point(), drawingBuffer->Size());
+	return screenClip.Intersect(bufferRegion);
 }
 
 // SetPixel is in screen coordinates
