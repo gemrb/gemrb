@@ -135,7 +135,7 @@ private:
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;
 	AutoTable trapSaveBonus;
-	int stepTime;
+	int stepTime = 0;
 };
 
 extern GEM_EXPORT GameData * gamedata;

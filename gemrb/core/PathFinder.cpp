@@ -49,13 +49,16 @@
 
 namespace GemRB {
 
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dxAdjacent{{1, 0, -1, 0}};
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dyAdjacent{{0, 1, 0, -1}};
+constexpr size_t DEGREES_OF_FREEDOM = 4;
+constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
+constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent{{1, 0, -1, 0}};
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent{{0, 1, 0, -1}};
 
 // Cosines
-constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
+constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
 // Sines
-constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
+constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
