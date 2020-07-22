@@ -7935,7 +7935,6 @@ void Actor::UpdateActorState()
 	
 	if (!anim.empty()) {
 		Animation* first = anim[0].first;
-		Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 		
 		if (first->endReached) {
 			// possible stance change
@@ -7944,6 +7943,7 @@ void Actor::UpdateActorState()
 				first->endReached = false;
 				first->SetPos(0);
 
+				Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 				if (firstShadow) {
 					firstShadow->endReached = false;
 					firstShadow->SetPos(0);
@@ -7955,7 +7955,7 @@ void Actor::UpdateActorState()
 			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
 				//footsteps option set, stance
 				if (footsteps && (GetStance() == IE_ANI_WALK)) {
-					if (anim[0].first->GetCurrentFrameIndex() == 0) {
+					if (first->GetCurrentFrameIndex() == 0) {
 						PlayWalkSound();
 					}
 				}
