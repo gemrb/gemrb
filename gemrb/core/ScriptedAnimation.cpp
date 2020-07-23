@@ -421,10 +421,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 ScriptedAnimation::~ScriptedAnimation(void)
 {
-	for(unsigned int i=0;i<3*MAX_ORIENT;i++) {
-		if (anims[i]) {
-			delete( anims[i] );
-		}
+	for (Animation *anim : anims) {
+		delete anim;
 	}
 	if (gamedata) { // avoid UBSAN warning; it's on exit, so we don't care about potential leaks
 		gamedata->FreePalette(palette, PaletteName);
@@ -467,9 +465,9 @@ void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
 void ScriptedAnimation::PlayOnce()
 {
 	SequenceFlags&=~IE_VVC_LOOP;
-	for (unsigned int i=0;i<3*MAX_ORIENT;i++) {
-		if (anims[i]) {
-			anims[i]->Flags |= S_ANI_PLAYONCE;
+	for (Animation *anim : anims) {
+		if (anim) {
+			anim->Flags |= S_ANI_PLAYONCE;
 		}
 	}
 	if (twin) {
@@ -791,9 +789,9 @@ void ScriptedAnimation::GetPaletteCopy()
 		return;
 	//it is not sure that the first position will have a resource in it
 	//therefore the cycle
-	for (unsigned int i=0;i<3*MAX_ORIENT;i++) {
-		if (anims[i]) {
-			Sprite2D* spr = anims[i]->GetFrame(0);
+	for (Animation *anim : anims) {
+		if (anim) {
+			Sprite2D* spr = anim->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
 				//we need only one palette, so break here
