@@ -45,6 +45,8 @@ namespace GemRB {
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------
+// bg1 and bg2 have some dead bcs code - perhaps the first implementation
+// of morale, since the uses suggest being able to detect panic
 int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
