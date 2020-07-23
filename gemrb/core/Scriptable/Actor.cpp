@@ -316,7 +316,7 @@ static int d_gradient[DAMAGE_LEVELS] = {
 static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
-static ieDword hc_locations=0x2ba80030;
+static ieDword hc_locations = 0;
 static int hc_flags[OVERLAY_COUNT];
 #define HC_INVISIBLE 1
 
