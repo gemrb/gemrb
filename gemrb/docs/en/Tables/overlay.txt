@@ -1,5 +1,7 @@
 Description: This table lists the hardcoded overlay animations.
 
-Columns - <N/A>
+Columns:
+- lower: affects Z-ordering; 1 if it should be drawn as a shield (below the actor), 0 if it should be drawn as an overlay
+- flags: bit 0 enables drawing of the overlay for invisible creatures
 
 Rows - resrefs for each overlay type (the slots are mandatory)
