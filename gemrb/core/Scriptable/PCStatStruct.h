@@ -141,7 +141,7 @@ public:
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
 	void RegisterFavourite(ieResRef fav, int what);
-	void UpdateClassLevels(std::list<int> levels);
+	void UpdateClassLevels(const std::list<int> &levels);
 };
 }
 

@@ -10423,7 +10423,7 @@ Actor *Actor::CopySelf(bool mislead) const
 		newActor->inventory.CopyFrom(this);
 		if (PCStats) {
 			newActor->CreateStats();
-			newActor->PCStats = PCStats;
+			*newActor->PCStats = *PCStats;
 		}
 	}
 
