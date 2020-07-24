@@ -236,27 +236,35 @@ struct PixelIterator : IPixelIterator
 	}
 
 	void Advance(int dx) {
+		if (dx == 0) return;
+
 		Uint8* ptr = static_cast<Uint8*>(pixel);
-		int amt = xdir * dx;
-		int tmp = xpos + amt;
-		// FIXME: if |amt| is > w things will blow up
-		if (tmp < 0) {
-			assert((xdir == Reverse && dx > 0) || (xdir == Forward && dx < 0));
-
-			xpos = w + tmp;
-			ptr += pitch * ydir; // shift rows
-			ptr += int((w + amt) * sizeof(PIXEL));
-		} else if (tmp >= w) {
-			assert((xdir == Forward && dx > 0) || (xdir == Reverse && dx < 0));
-
-			xpos = tmp - w;
-			ptr += pitch * ydir; // shift rows
-			ptr += int((amt - w) * sizeof(PIXEL));
-		} else {
-			xpos += amt;
-			ptr += int(amt * sizeof(PIXEL));
+		
+		int pixelsToAdvance = xdir * dx;
+		int rowsToAdvance = std::abs(pixelsToAdvance / w);
+		int xToAdvance = pixelsToAdvance % w;
+		int tmpx = xpos + xToAdvance;
+		
+		if (tmpx < 0) {
+			++rowsToAdvance;
+			tmpx = w + tmpx;
+			xToAdvance = tmpx - xpos;
+		} else if (tmpx >= w) {
+			++rowsToAdvance;
+			tmpx = tmpx - w;
+			xToAdvance = tmpx - xpos;
 		}
-
+		
+		if (dx < 0) {
+			ptr -= pitch * rowsToAdvance * ydir;
+		} else {
+			ptr += pitch * rowsToAdvance * ydir;
+		}
+		
+		ptr += xToAdvance * sizeof(PIXEL);
+		
+		xpos = tmpx;
+		assert(xpos >= 0 && xpos < w);
 		pixel = ptr;
 	}
 };
