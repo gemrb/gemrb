@@ -465,6 +465,12 @@ public:
 	void Advance(int amt) {
 		imp->Advance(amt);
 	}
+	
+	Color ReadRGBA() const {
+		Color c;
+		ReadRGBA(c.r, c.g, c.b, c.a);
+		return c;
+	}
 
 	void ReadRGBA(Uint8& r, Uint8& g, Uint8& b, Uint8& a) const {
 		Uint32 pixel = 0;

@@ -18,9 +18,6 @@
  *
  */
 
-// For debugging:
-//#define HIGHLIGHTCOVER
-
 using namespace GemRB;
 
 // For pixel formats:
@@ -224,214 +221,170 @@ struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 	}
 };
 
-// RLE, palette
-template<typename PTYPE, bool COVER, bool XFLIP, typename Tinter, typename Blender>
-static void BlitSpriteRLE_internal(SDL_Surface* target,
-            const Uint8* srcdata, const Color* col,
-            const int tx, const int ty,
-            int width, int height,
-            bool yflip,
-            Region clip,
-            Uint8 transindex,
-            IAlphaIterator& cover,
-            unsigned int flags,
-            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
+// these always change together
+#define ADVANCE_ITERATORS(count) dest.Advance(count); cover.Advance(count);
+
+template<typename PTYPE, typename Tinter, typename Blender>
+void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, Uint8 amask,
+					   Color col, uint32_t flags,
+					   const Tinter& tint, const Blender& blend)
 {
-	int pitch = target->pitch / target->format->BytesPerPixel;
-
-	// We assume the clipping rectangle is the exact rectangle in which we will
-	// paint. This means clip rect <= sprite rect <= cover rect
-
-	assert(clip.w > 0 && clip.h > 0);
-	assert(clip.x >= tx);
-	assert(clip.y >= ty);
-
-	// Clipping strategy:
-	// Because we can't jump to the right spot in the RLE data,
-	// we have to process the full sprite.
-	// We fast-forward through the bits outside of the clipping rectangle.
-
-	// This is done line-by-line.
-	// To avoid having to fast-forward, blit, fast-forward for each line,
-	// we consider the end of each line to be directly behind the clipping
-	// rectangle, so that we only do a single fast-forward loop followed by a
-	// blit loop.
-
-
-	PTYPE *clipstartpix, *clipendpix;
-	PTYPE *clipstartline;
-
-	if (!yflip) {
-		clipstartline = (PTYPE*)target->pixels + clip.y*pitch;
-	} else {
-		clipstartline = (PTYPE*)target->pixels + (clip.y + clip.h - 1)*pitch;
+	if (maskval < 0xff) {
+		tint(col.r, col.g, col.b, col.a, flags);
+		col.a = col.a - maskval;
+		blend(dest, col.r, col.g, col.b, col.a);
+		// FIXME: we should probably address this in the blenders instead
+		dest |= amask; // color keyed surface is 100% opaque
 	}
+}
 
-	PTYPE *line, *end, *pix;
-	
-	if (!yflip) {
-		line = (PTYPE*)target->pixels + ty*pitch;
-		end = (PTYPE*)target->pixels + (clip.y + clip.h)*pitch;
-	} else {
-		line = (PTYPE*)target->pixels + (ty + height-1)*pitch;
-		end = (PTYPE*)target->pixels + (clip.y-1)*pitch;
-	}
-	if (!XFLIP) {
-		pix = line + tx;
-		clipstartpix = line + clip.x;
-		clipendpix = clipstartpix + clip.w;
-	} else {
-		pix = line + tx + width - 1;
-		clipstartpix = line + clip.x + clip.w - 1;
-		clipendpix = clipstartpix - clip.w;
-	}
+// use this when you need to copy the entire source sprite
+template<typename PTYPE, typename Tinter, typename Blender>
+static void BlitSpriteRLE_Total(const Uint8* rledata,
+								const Color* pal, Uint8 transindex,
+								SDLPixelIterator& dest, IAlphaIterator& cover,
+								uint32_t flags, const Tinter& tint, const Blender& blend)
+{
+	assert(pal);
 
-	// clipstartpix is the first pixel to draw
-	// clipendpix is one past the last pixel to draw (in either x direction)
-
-	const int yfactor = yflip ? -1 : 1;
-	const int xfactor = XFLIP ? -1 : 1;
-
-	Uint32 amask = target->format->Amask;
-
-	while (line != end) {
-		// Fast-forward through the RLE data until we reach clipstartpix
-
-		if (!XFLIP) {
-			while (pix < clipstartpix) {
-				Uint8 p = *srcdata++;
-				int count;
-				if (p == transindex)
-					count = (*srcdata++) + 1;
-				else
-					count = 1;
-				pix += count;
-			}
-		} else {
-			while (pix > clipstartpix) {
-				Uint8 p = *srcdata++;
-				int count;
-				if (p == transindex)
-					count = (*srcdata++) + 1;
-				else
-					count = 1;
-				pix -= count;
-			}
+	SDLPixelIterator end = SDLPixelIterator::end(dest);
+	while (dest != end) {
+		Uint8 p = *rledata++;
+		if (p == transindex) {
+			int count = (*rledata++) + 1;
+			ADVANCE_ITERATORS(count);
+			continue;
 		}
+		
+		MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, dest.format->Amask, pal[p], flags, tint, blend);
+		ADVANCE_ITERATORS(1);
+	}
+}
 
-		// Blit a line, if it's not vertically clipped
+// use this when you need a partial copy of the source sprite
+template<typename PTYPE, typename Tinter, typename Blender>
+static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const Region& srect,
+								  const Color* pal, Uint8 transindex,
+								  SDLPixelIterator& dest, IAlphaIterator& cover,
+								  uint32_t flags, const Tinter& tint, const Blender& blend)
+{
+	const int endy = srect.y + srect.h;
 
-		if ((!yflip && pix >= clipstartline) || (yflip && pix < clipstartline+pitch))
-		{
-			while ( (!XFLIP && pix < clipendpix) || (XFLIP && pix > clipendpix) )
-			{
-				Uint8 p = *srcdata++;
-				if (p == transindex) {
-					int count = (int)(*srcdata++) + 1;
-					if (COVER)
-						cover.Advance(count);
-					
-					if (!XFLIP) {
-						pix += count;
+	int count = srect.y * pitch + srect.x;
+	while (count > 0) {
+		Uint8 p = *rledata++;
+		if (p == transindex) {
+			count -= (*rledata++) + 1;
+		} else {
+			--count;
+		}
+	}
+	
+	int transQueue = -count;	
+	int endx = srect.x + srect.w;
+	for (int y = srect.y; y < endy; ++y) {
+		// We assume 'dest' and 'cover' are setup appropriately to accept 'srect.size'
+		
+		if (transQueue >= pitch) {
+			transQueue -= pitch;
+			ADVANCE_ITERATORS(srect.w);
+			continue;
+		}
+		
+		for (int x = 0; x < pitch;) {
+			assert(transQueue >= 0);
+
+			if (transQueue > 0) {
+				if (x >= srect.x && x < endx) {
+					int remain = endx - x - 1;
+					if (transQueue >= remain) {
+						transQueue -= remain;
+						ADVANCE_ITERATORS(remain);
+						x += remain + 1;
 					} else {
-						pix -= count;
+						ADVANCE_ITERATORS(transQueue);
+						x += transQueue + 1;
+						transQueue = 0;
 					}
 				} else {
-					Uint8 maskval = *cover;
-					if (!COVER || maskval < 0xff) {
-						Uint8 r = col[p].r;
-						Uint8 g = col[p].g;
-						Uint8 b = col[p].b;
-						Uint8 a = col[p].a;
-						tint(r, g, b, a, flags);
-						a = a - maskval;
-						blend(*pix, r, g, b, a);
-						*pix |= amask; // color keyed surface is 100% opaque
+					--transQueue;
+					++x;
+				}
+			} else {
+				Uint8 p = *rledata++;
+				if (p == transindex) {
+					transQueue = (*rledata++) + 1;
+				} else {
+					if (x >= srect.x && x < endx) {
+						MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, dest.format->Amask, pal[p], flags, tint, blend);
+						ADVANCE_ITERATORS(1);
 					}
-#ifdef HIGHLIGHTCOVER
-					else if (COVER) {
-						blend(*pix, 255, 255, 255, 255);
-					}
-#endif
-					if (COVER) ++cover;
-
-					if (!XFLIP) {
-						pix++;
-					} else {
-						pix--;
-					}
+					++x;
 				}
 			}
+			
+			assert(x <= pitch);
 		}
-
-		// We pretend we ended the sprite line here, and move all
-		// pointers to the next line
-
-		line += yfactor * pitch;
-		pix += yfactor * pitch - xfactor * width;
-		clipstartpix += yfactor * pitch;
-		clipendpix += yfactor * pitch;
 	}
 }
 
-// call the BlitSprite{RLE,}_internal instantiation with the specified
-// COVER, XFLIP
-template<typename PTYPE, typename Tinter, typename Blender>
-static void BlitSpritePAL_dispatch2(bool XFLIP,
-            SDL_Surface* target,
-            const Uint8* srcdata, const Color* col,
-            int tx, int ty,
-            int width, int height,
-            bool yflip,
-            const Region& clip,
-            int transindex,
-            IAlphaIterator* cover,
-            unsigned int flags,
-            const Tinter& tint, const Blender& blend, PTYPE /*dummy*/ = 0)
+template<typename Blender, typename Tinter>
+static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
+						  SDL_Surface* dst, const Region& drect,
+						  IAlphaIterator* cover,
+						  uint32_t flags, const Tinter& tint)
 {
+	assert(spr->BAM);
+
+	if (srect.Dimensions().IsEmpty())
+		return;
+	
+	if (drect.Dimensions().IsEmpty())
+		return;
+	
+	Palette* palette = spr->GetPalette();
+	const Uint8* rledata = (const Uint8*)spr->LockSprite();
+	uint8_t ck = spr->GetColorKey();
+	
+	bool partial = spr->Frame.Dimensions() != srect.Dimensions();
+		
+	IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+	IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+	
+	SDLPixelIterator dstit = SDLPixelIterator(xdir, ydir, RectFromRegion(drect), dst);
+	
 	static StaticAlphaIterator nomask(0);
-	if (!cover && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, nomask, flags,
-			tint, blend);
-	else if (!cover && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, false, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, nomask, flags,
-			tint, blend);
-	else if (cover && !XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, false, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, *cover, flags,
-			tint, blend);
-	else // if (cover && XFLIP)
-		BlitSpriteRLE_internal<PTYPE, true, true, Tinter, Blender>(target,
-			srcdata, col, tx, ty, width, height, yflip, clip, transindex, *cover, flags,
-			tint, blend);
+	if (cover == nullptr) {
+		cover = &nomask;
+	}
+	
+	switch (dstit.format->BytesPerPixel) {
+		case 4:
+		{
+			SRBlender<Uint32, Blender, SRFormat_Hard> blend;
+			if (partial) {
+				BlitSpriteRLE_Partial<Uint32>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
+			} else {
+				BlitSpriteRLE_Total<Uint32>(rledata, palette->col, ck, dstit, *cover, flags, tint, blend);
+			}
+			break;
+		}
+		case 2:
+		{
+			SRBlender<Uint16, Blender, SRFormat_Hard> blend;
+			if (partial) {
+				BlitSpriteRLE_Partial<Uint16>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
+			} else {
+				BlitSpriteRLE_Total<Uint16>(rledata, palette->col, ck, dstit, *cover, flags, tint, blend);
+			}
+			break;
+		}
+		default:
+			Log(ERROR, "SpriteRenderer", "Invalid Bpp");
+			break;
+	}
+	
+	palette->release();
 }
 
-// call the BlitSpritePAL_dispatch2 instantiation with the right pixelformat
-// TODO: Hardcoded/non-hardcoded pixelformat
-template<typename Tinter, typename Blender>
-static void BlitSpritePAL_dispatch(bool XFLIP,
-            SDL_Surface* target,
-            const Uint8* srcdata, const Color* col,
-            int tx, int ty,
-            int width, int height,
-            bool yflip,
-            const Region& clip,
-            int transindex,
-            IAlphaIterator* cover,
-            unsigned int flags,
-            const Tinter& tint, const Blender& /*dummy*/)
-{
-	if (target->format->BytesPerPixel == 4) {
-		SRBlender<Uint32, Blender, SRFormat_Hard> blend;
-		BlitSpritePAL_dispatch2<Uint32>(XFLIP, target, srcdata, col, tx, ty,
-		                                width, height, yflip, clip, transindex,
-		                                cover, flags, tint, blend);
-	} else {
-		SRBlender<Uint16, Blender, SRFormat_Hard> blend;
-		BlitSpritePAL_dispatch2<Uint16>(XFLIP, target, srcdata, col, tx, ty,
-		                                width, height, yflip, clip, transindex,
-		                                cover, flags, tint, blend);
-	}
-}
+#undef ADVANCE_ITERATORS
