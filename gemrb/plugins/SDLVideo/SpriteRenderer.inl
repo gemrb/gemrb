@@ -279,8 +279,8 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 			--count;
 		}
 	}
-	
-	int transQueue = -count;	
+
+	int transQueue = -count;
 	int endx = srect.x + srect.w;
 	for (int y = srect.y; y < endy; ++y) {
 		// We assume 'dest' and 'cover' are setup appropriately to accept 'srect.size'
@@ -295,20 +295,32 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 			assert(transQueue >= 0);
 
 			if (transQueue > 0) {
-				if (x >= srect.x && x < endx) {
-					int remain = endx - x - 1;
-					if (transQueue >= remain) {
-						transQueue -= remain;
-						ADVANCE_ITERATORS(remain);
-						x += remain + 1;
-					} else {
-						ADVANCE_ITERATORS(transQueue);
-						x += transQueue + 1;
-						transQueue = 0;
-					}
+				int segment = 0;
+				bool advance = false;
+				if (x < srect.x) {
+					segment = srect.x - x;
+				} else if (x >= endx) {
+					segment = pitch - x;
 				} else {
-					--transQueue;
-					++x;
+					segment = endx - x;
+					advance = true;
+				}
+				assert(segment > 0);
+				
+				if (transQueue < segment) {
+					if (advance) {
+						ADVANCE_ITERATORS(transQueue);
+					}
+					
+					x += transQueue;
+					transQueue = 0;
+				} else {
+					if (advance) {
+						ADVANCE_ITERATORS(segment);
+					}
+
+					transQueue -= segment;
+					x += segment;
 				}
 			} else {
 				Uint8 p = *rledata++;
