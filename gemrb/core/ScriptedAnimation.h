@@ -81,6 +81,12 @@ class Sprite2D;
 //gemrb specific sequence flags
 #define IE_VVC_FREEZE     0x80000000
 
+//orientation flags
+#define IE_VVC_FACE_TARGET		0x00000001
+#define IE_VVC_FACE_TARGET_DIRECTION	0x00000002 // follow target
+#define IE_VVC_FACE_TRAVEL_DIRECTION	0x00000004 // follow path
+#define IE_VVC_FACE_FIXED		0x00000008
+
 //phases
 #define P_NOTINITED -1
 #define P_ONSET   0
@@ -94,10 +100,9 @@ public:
 	ScriptedAnimation(DataStream* stream);
 	void Init();
 	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
-	void Override(ScriptedAnimation *templ);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
-	//the anims could also be used 'orientation based' if FaceTarget is
+	//the anims could also be used 'orientation based' if NumOrientations is
 	//set to 5, 9, 16
 	Animation* anims[3*MAX_ORIENT];
 	//there is only one palette
@@ -114,13 +119,15 @@ public:
 	ieDword LightX, LightY, LightZ;
 	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
 	ieDword FrameRate;
-	ieDword FaceTarget;
-	ieByte Orientation;
+	ieDword NumOrientations;
+	ieDword Orientation;
+	ieDword OrientationFlags;
 	ieDword Duration;
 	ieDword Delay;
 	bool justCreated;
 	ieResRef ResName;
 	int Phase;
+	int SoundPhase;
 	SpriteCover* cover;
 	ScriptedAnimation *twin;
 	bool active;
@@ -165,10 +172,15 @@ public:
 	/* returns possible twin after altering it to become underlay */
 	ScriptedAnimation *DetachTwin();
 private:
-	void PrepareAnimation(Animation *anim, ieDword Transparency);
+	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false);
 	void PreparePalette();
 	bool HandlePhase(Sprite2D *&frame);
 	void GetPaletteCopy();
+	void IncrementPhase();
+	/* stops any sound playing */
+	void StopSound();
+	/* updates the sound playing */
+	void UpdateSound(const Point &pos);
 };
 
 }
