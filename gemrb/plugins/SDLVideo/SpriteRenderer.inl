@@ -270,7 +270,7 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 {
 	const int endy = srect.y + srect.h;
 
-	int count = srect.y * pitch + srect.x;
+	int count = srect.y * pitch;
 	while (count > 0) {
 		Uint8 p = *rledata++;
 		if (p == transindex) {
