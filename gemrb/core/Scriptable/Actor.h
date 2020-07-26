@@ -653,6 +653,7 @@ public:
 	void GetPrevAnimation();
 	/* debug function */
 	void GetNextStance();
+	void ClearCurrentStanceAnims();
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */

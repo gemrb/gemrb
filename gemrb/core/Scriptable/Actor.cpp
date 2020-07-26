@@ -8450,8 +8450,7 @@ bool Actor::AdvanceAnimations()
 	assert(anims);
 	anims->PulseRGBModifiers();
 	
-	currentStance.anim.clear();
-	currentStance.shadow.clear();
+	ClearCurrentStanceAnims();
 
 	unsigned char stanceID = GetStance();
 	unsigned char face = GetNextFace();
@@ -9869,6 +9868,12 @@ void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 	}
 }
 
+void Actor::ClearCurrentStanceAnims()
+{
+	currentStance.anim.clear();
+	currentStance.shadow.clear();
+}
+
 void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation, int wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
@@ -9900,6 +9905,8 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 		return;
 	}
 	AttackStance = IE_ANI_ATTACK;
+	
+	ClearCurrentStanceAnims();
 }
 
 void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
@@ -9918,6 +9925,8 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
+	
+	ClearCurrentStanceAnims();
 }
 
 void Actor::SetUsedHelmet(const char (&AnimationType)[2])
@@ -9930,6 +9939,8 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
+	
+	ClearCurrentStanceAnims();
 }
 
 // initializes the fist data the first time it is called
