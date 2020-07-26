@@ -268,8 +268,6 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 								  SDLPixelIterator& dest, IAlphaIterator& cover,
 								  uint32_t flags, const Tinter& tint, const Blender& blend)
 {
-	const int endy = srect.y + srect.h;
-
 	int count = srect.y * pitch;
 	while (count > 0) {
 		Uint8 p = *rledata++;
@@ -281,7 +279,8 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 	}
 
 	int transQueue = -count;
-	int endx = srect.x + srect.w;
+	const int endx = srect.x + srect.w;
+	const int endy = srect.y + srect.h;
 	for (int y = srect.y; y < endy; ++y) {
 		// We assume 'dest' and 'cover' are setup appropriately to accept 'srect.size'
 		
