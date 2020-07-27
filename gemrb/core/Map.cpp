@@ -1365,6 +1365,10 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			}
 
 			video->DrawPolygon( poly.get(), origin, c, true, BLIT_BLENDED|BLIT_HALFTRANS);
+			
+			if (poly->wall_flag & WF_BASELINE) {
+				video->DrawLine(poly->base0 - viewport.Origin(), poly->base1 - viewport.Origin(), ColorMagenta);
+			}
 		}
 	}
 }
