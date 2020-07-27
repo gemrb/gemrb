@@ -225,7 +225,7 @@ struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
 #define ADVANCE_ITERATORS(count) dest.Advance(count); cover.Advance(count);
 
 template<typename PTYPE, typename Tinter, typename Blender>
-void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, Uint8 amask,
+void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, PTYPE amask,
 					   Color col, uint32_t flags,
 					   const Tinter& tint, const Blender& blend)
 {
@@ -234,6 +234,7 @@ void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, Uint8 amask,
 		col.a = col.a - maskval;
 		blend(dest, col.r, col.g, col.b, col.a);
 		// FIXME: we should probably address this in the blenders instead
+		
 		dest |= amask; // color keyed surface is 100% opaque
 	}
 }
@@ -245,8 +246,6 @@ static void BlitSpriteRLE_Total(const Uint8* rledata,
 								SDLPixelIterator& dest, IAlphaIterator& cover,
 								uint32_t flags, const Tinter& tint, const Blender& blend)
 {
-	assert(pal);
-
 	SDLPixelIterator end = SDLPixelIterator::end(dest);
 	while (dest != end) {
 		Uint8 p = *rledata++;
