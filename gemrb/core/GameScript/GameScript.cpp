@@ -927,6 +927,7 @@ static const ActionLink actionnames[] = {
 	{"setnamelessdisguise", GameScript::SetNamelessDisguise, 0},
 	{"setnooneontrigger", GameScript::SetNoOneOnTrigger, 0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo, 0},
+	{"setoriginalclass", GameScript::SetOriginalClass, 0},
 	{"setplayersound", GameScript::SetPlayerSound, 0},
 	{"setquestdone", GameScript::SetQuestDone, 0},
 	{"setregularnamestrref", GameScript::SetRegularName, 0},

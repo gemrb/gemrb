@@ -7337,4 +7337,21 @@ void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* paramete
 	actor->inventory.DestroyItem("", parameters->int0Parameter, ~0);
 }
 
+void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
+	int classBit = parameters->int0Parameter & MC_WAS_ANY;
+	if (!tar || tar->Type != ST_ACTOR || !classBit) {
+		return;
+	}
+
+	Actor *actor = (Actor *) tar;
+	if (parameters->int1Parameter == OP_SET) {
+		// only reset the class bits
+		actor->SetMCFlag(MC_WAS_ANY, OP_NAND);
+		parameters->int1Parameter = OP_OR;
+	}
+	actor->SetMCFlag(classBit, parameters->int1Parameter);
+}
+
 }
