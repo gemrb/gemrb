@@ -6768,6 +6768,7 @@ void Actor::StopAttack()
 	}
 }
 
+// checks for complete immobility — to the point of inaction
 int Actor::Immobile() const
 {
 	if (GetStat(IE_CASTERHOLD)) {
@@ -8282,7 +8283,7 @@ void Actor::NewPath()
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	ResetPathTries();
-	if (InternalFlags&IF_REALLYDIED) {
+	if (InternalFlags & IF_REALLYDIED || speed == 0) {
 		return;
 	}
 	SetRunFlags(flags);

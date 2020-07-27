@@ -789,7 +789,7 @@ void Map::UpdateScripts()
 	q = Qcount[PR_SCRIPT];
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
-		if (actor->GetRandomBackoff() || !actor->GetStep()) {
+		if (actor->GetRandomBackoff() || !actor->GetStep() || actor->speed == 0) {
 			continue;
 		}
 		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
@@ -803,7 +803,7 @@ void Map::UpdateScripts()
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
-			if (!actor->GetRandomBackoff()) {
+			if (!actor->GetRandomBackoff() && actor->speed > 0) {
 				actor->NewPath();
 			}
 			continue;
@@ -904,7 +904,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 
 void Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	// Immobile, dead and actors in another map can't walk here
-	if (actor->Immobile() || actor->GetCurrentArea() != this
+	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return;
 	}
