@@ -1369,11 +1369,11 @@ WallPolygonSet Map::WallsIntersectingRegion(const Region& r, bool includeDisable
 	constexpr uint32_t groupWidth = 640;
 
 	uint32_t pitch = CeilDiv<uint32_t>(TMap->XCellCount * 64, groupWidth);
-	uint32_t ymin = r.y / groupHeight;
+	uint32_t ymin = std::max(r.y, 0) / groupHeight;
 	uint32_t maxHeight = CeilDiv<uint32_t>(TMap->YCellCount * 64, groupHeight);
-	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(r.y + r.h, groupHeight));
-	uint32_t xmin = r.x / groupWidth;
-	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x + r.w, groupWidth));
+	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(std::max(r.y, 0) + r.h, groupHeight));
+	uint32_t xmin = std::max(r.x, 0) / groupWidth;
+	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(std::max(r.x, 0) + r.w, groupWidth));
 
 	WallPolygonSet set;
 	WallPolygonGroup& infront = set.first;
