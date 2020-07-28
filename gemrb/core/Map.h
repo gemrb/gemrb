@@ -644,7 +644,7 @@ private:
 	
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
 	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
-	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
+	WallPolygonSet WallsIntersectingRegion(Region, bool includeDisabled = false, const Point* loc = nullptr) const;
 	
 	void SetDrawingStencilForObject(void*, const Region&, const WallPolygonSet&, const Point& viewPortOrigin);
 	uint32_t SetDrawingStencilForScriptable(Scriptable*, const Region& viewPort);
