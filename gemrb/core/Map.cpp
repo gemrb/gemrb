@@ -1540,7 +1540,7 @@ uint32_t Map::SetDrawingStencilForAreaAnimation(AreaAnimation* anim, const Regio
 		return 0; // not behind a wall, no stencil required
 	}
 
-	return (anim->Flags & A_ANI_NO_WALL) ? 0 : BLIT_STENCIL_GREEN;
+	return (anim->Flags & A_ANI_NO_WALL) ? BLIT_NO_FLAGS : BLIT_STENCIL_GREEN;
 }
 
 void Map::DrawSearchMap(const Region &vp)
