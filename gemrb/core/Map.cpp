@@ -3702,10 +3702,7 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 
 int AreaAnimation::GetHeight() const
 {
-	if (Flags&A_ANI_BACKGROUND) return ANI_PRI_BACKGROUND;
-	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
-		return ANI_PRI_BACKGROUND;
-	return Pos.y+height;
+	return (Flags&A_ANI_BACKGROUND) ? ANI_PRI_BACKGROUND : height;
 }
 
 Region AreaAnimation::DrawingRegion() const
