@@ -150,7 +150,8 @@ def ToggleWindowMinimize(win, GSFlag = 0):
 def ToggleActionbarClock(show):
 	actwin = GemRB.GetView("ACTWIN")
 	clock = actwin.GetControl (62)
-	clock.SetVisible(show)
+	if clock:
+		clock.SetVisible(show)
 
 MTARestoreSize = None
 def UpdateControlStatus(init = False):
