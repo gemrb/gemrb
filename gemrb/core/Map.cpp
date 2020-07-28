@@ -920,7 +920,7 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	}
 }
 
-void Map::DrawHighlightables(const Region& viewport, uint32_t debugFlags)
+void Map::DrawHighlightables(const Region& viewport)
 {
 	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
@@ -971,9 +971,7 @@ void Map::DrawPile(const Region& screen, Container* c, bool highlight)
 	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 	tint.a = 255;
 
-	const Region& box = c->DrawingRegion();
-	auto walls = WallsIntersectingRegion(box, false, nullptr);
-	uint32_t flags = SetDrawingStencilForScriptable(c, walls, screen.Origin());
+	uint32_t flags = SetDrawingStencilForScriptable(c, screen);
 	flags |= BLIT_TINTED|BLIT_BLENDED;
 	c->DrawPile(highlight, screen, flags, tint);
 }
@@ -1087,9 +1085,10 @@ VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter)
 
 
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
+void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 {
 	assert(TMap);
+	debugFlags = dFlags;
 
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
@@ -1149,13 +1148,13 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 	aniIterator aniidx = animations.begin();
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
-		a->Draw(viewport, this);
+		a->Draw(viewport, this, BLIT_TINTED | BLIT_BLENDED);
 		a = GetNextAreaAnimation(aniidx, gametime);
 	}
 
 	if (!bgoverride) {
 		//Draw Outlines
-		DrawHighlightables(viewport, debugFlags);
+		DrawHighlightables(viewport);
 	}
 
 	//drawing queues 1 and 0
@@ -1185,28 +1184,12 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 		case AOT_ACTOR:
 			assert(actor != NULL);
 			if (actor->UpdateDrawingState()) {
-				const Region& actorbox = actor->DrawingRegion();
-				if (actorbox.IntersectsRegion(viewport)) {
-					uint32_t flags = 0;
-					WallPolygonSet walls;
-					
-					// birds are never occluded
-					if ((actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD) == 0) {
-						walls = WallsIntersectingRegion(actorbox, false, &actor->Pos);
-						flags = SetDrawingStencilForScriptable(actor, walls, viewport.Origin());
-					}
-					
-					// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-					if (game->TimeStoppedFor(actor)) {
-						flags |= BLIT_GREY;
-					}
-					actor->Draw(viewport, flags|BLIT_BLENDED, walls);
-					
-					if (debugFlags & DEBUG_SHOW_WALLS) {
-						const Region& r = Region(actorbox.Origin() - viewport.Origin(), actorbox.Dimensions());
-						video->DrawRect(r, ColorRed, false);
-					}
+				uint32_t flags = SetDrawingStencilForScriptable(actor, viewport);
+				// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
+				if (game->TimeStoppedFor(actor)) {
+					flags |= BLIT_GREY;
 				}
+				actor->Draw(viewport, flags|BLIT_BLENDED);
 			}
 
 			actor = GetNextActor(q, index);
@@ -1224,10 +1207,14 @@ void Map::DrawMap(const Region& viewport, uint32_t debugFlags)
 			}
 			break;
 		case AOT_AREA:
-			//draw animation
-			video->SetStencilBuffer(wallStencil);
-			a->Draw( viewport, this );
-			a = GetNextAreaAnimation(aniidx,gametime);
+			{
+				//draw animation
+				uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
+				flags |= BLIT_TINTED | BLIT_BLENDED;
+
+				a->Draw(viewport, this, flags);
+				a = GetNextAreaAnimation(aniidx,gametime);
+			}
 			break;
 		case AOT_SCRIPTED:
 			{
@@ -1417,45 +1404,80 @@ WallPolygonSet Map::WallsIntersectingRegion(const Region& r, bool includeDisable
 	return set;
 }
 
-uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallPolygonSet& walls, const Point& viewPortOrigin)
+void Map::SetDrawingStencilForObject(void* object, const Region& objectRgn, const WallPolygonSet& walls, const Point& viewPortOrigin)
 {
 	VideoBufferPtr stencil = nullptr;
 	Video* video = core->GetVideoDriver();
+	Color debugColor = ColorGray;
 
 	if (walls.first.size() && walls.second.size()) {
-		const Region& r = scriptable->DrawingRegion();
 		// we are both in front of and behind a wall
 		// so we need a custom stencil
-		auto it = objectStencils.find(scriptable);
+		auto it = objectStencils.find(object);
 		if (it != objectStencils.end()) {
 			// we already made one
 			const auto& pair = it->second;
-			if (pair.second.RectInside(r)) {
+			if (pair.second.RectInside(objectRgn)) {
 				// and it is still good
 				stencil = pair.first;
 			}
 		}
 		
 		if (stencil == nullptr) {
-			Region stencilRgn = Region(r.Origin() - viewPortOrigin, r.Dimensions());
+			Region stencilRgn = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
 			stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
-			DrawStencil(stencil, r, walls.first);
-			objectStencils[scriptable] = std::make_pair(stencil, r);
+			DrawStencil(stencil, objectRgn, walls.first);
+			objectStencils[object] = std::make_pair(stencil, objectRgn);
 		} else {
 			// TODO: we only need to do this because a door might have changed state over us
 			// if we could detect that we could avoid doing this expensive operation
 			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
 			stencil->Clear();
-			stencil->SetOrigin(r.Origin() - viewPortOrigin);
-			DrawStencil(stencil, r, walls.first);
+			stencil->SetOrigin(objectRgn.Origin() - viewPortOrigin);
+			DrawStencil(stencil, objectRgn, walls.first);
 		}
+		
+		debugColor = ColorRed;
 	} else {
 		stencil = wallStencil;
+		
+		if (walls.first.size()) {
+			// behind a wall, but not in front of a wall
+			debugColor = ColorBlue;
+		} else if (walls.second.size()) {
+			// in front of a wall, but not behind a wall
+			debugColor = ColorMagenta;
+		}
 	}
 	
 	assert(stencil);
 	video->SetStencilBuffer(stencil);
 	
+	if (debugFlags & DEBUG_SHOW_WALLS) {
+		const Region& r = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
+		video->DrawRect(r, debugColor, false);
+	}
+}
+
+uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const Region& vp)
+{
+	if (scriptable->Type == ST_ACTOR) {
+		Actor* actor = static_cast<Actor*>(scriptable);
+		// birds are never occluded
+		if ((actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD)) {
+			return 0;
+		}
+	}
+	
+	const Region& bbox = scriptable->DrawingRegion();
+	if (bbox.IntersectsRegion(vp) == false) {
+		return 0;
+	}
+	
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
+	SetDrawingStencilForObject(scriptable, scriptable->DrawingRegion(), walls, vp.Origin());
+	
+	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
 		return 0; // not behind a wall, no stencil required
 	}
@@ -1487,6 +1509,28 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const WallP
 	
 	assert(flags & BLIT_STENCIL_MASK); // we needed a stencil so we must require a stencil flag
 	return flags;
+}
+
+uint32_t Map::SetDrawingStencilForAreaAnimation(AreaAnimation* anim, const Region& vp)
+{
+	const Region& bbox = anim->DrawingRegion();
+	if (bbox.IntersectsRegion(vp) == false) {
+		return 0;
+	}
+	
+	Point p = anim->Pos;
+	p.y += anim->height;
+
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
+	
+	SetDrawingStencilForObject(anim, bbox, walls, vp.Origin());
+	
+	// check this after SetDrawingStencilForObject for debug drawing purposes
+	if (walls.first.empty()) {
+		return 0; // not behind a wall, no stencil required
+	}
+
+	return (anim->Flags & A_ANI_NO_WALL) ? 0 : BLIT_STENCIL_GREEN;
 }
 
 void Map::DrawSearchMap(const Region &vp)
@@ -3664,11 +3708,24 @@ int AreaAnimation::GetHeight() const
 	return Pos.y+height;
 }
 
+Region AreaAnimation::DrawingRegion() const
+{
+	Region r(Pos, Size());
+	int ac = animcount;
+	while (ac--) {
+		Animation *anim = animation[ac];
+		Region animRgn = anim->animArea;
+		animRgn.x += Pos.x;
+		animRgn.y += Pos.y;
+		
+		r.ExpandToRegion(animRgn);
+	}
+	return r;
+}
 
-void AreaAnimation::Draw(const Region& viewport, Map *area)
+void AreaAnimation::Draw(const Region& viewport, Map *area, uint32_t flags)
 {
 	Video* video = core->GetVideoDriver();
-	Game *game = core->GetGame();
 
 	//always draw the animation tinted because tint is also used for
 	//transparency
@@ -3678,25 +3735,14 @@ void AreaAnimation::Draw(const Region& viewport, Map *area)
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}
-	ieDword flags = BLIT_TINTED|BLIT_BLENDED;
-	if (game) game->ApplyGlobalTint(tint, flags);
-	bool covered = true;
-
-	// TODO: This needs more testing. The HOW ar9101 roast seems to need it.
-	// The conditional on height<=0 is unverified.
-	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
-		covered = false;
-
-	if (Flags&A_ANI_NO_WALL)
-		covered = false;
+	
+	core->GetGame()->ApplyGlobalTint(tint, flags);
 
 	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();
-		if (covered == true) {
-			flags |= BLIT_STENCIL_GREEN;
-		}
+		
 		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y, flags, tint);
 	}
 }

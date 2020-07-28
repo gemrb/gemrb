@@ -321,7 +321,8 @@ public:
 	void SetPalette(ieResRef PaletteRef);
 	void BlendAnimation();
 	bool Schedule(ieDword gametime) const;
-	void Draw(const Region &screen, Map *area);
+	Region DrawingRegion() const;
+	void Draw(const Region &screen, Map *area, uint32_t flags);
 	int GetHeight() const;
 private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
@@ -381,6 +382,7 @@ public:
 	MapReverb *reverb;
 
 private:
+	uint32_t debugFlags;
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
@@ -404,7 +406,7 @@ private:
 	VideoBufferPtr wallStencil;
 	Region stencilViewport;
 
-	std::unordered_map<Scriptable*, std::pair<VideoBufferPtr, Region>> objectStencils;
+	std::unordered_map<void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 	static const size_t DEGREES_OF_FREEDOM = 4;
 	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
 	static const std::array<char, DEGREES_OF_FREEDOM> dx;
@@ -439,9 +441,7 @@ public:
 	void CopyGroundPiles(Map *othermap, const Point &Pos);
 	/* transfers all ever visible piles (loose items) to the specified position */
 	void MoveVisibleGroundPiles(const Point &Pos);
-	/* draws stationary vvc graphics */
-	//void DrawVideocells(Region screen);
-	void DrawHighlightables(const Region& viewport, uint32_t debugFlags);
+	
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
@@ -641,8 +641,20 @@ private:
 	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	Container *GetNextPile (int &index) const;
+	
+	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
+	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
+	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
+	
+	void SetDrawingStencilForObject(void*, const Region&, const WallPolygonSet&, const Point& viewPortOrigin);
+	uint32_t SetDrawingStencilForScriptable(Scriptable*, const Region& viewPort);
+	uint32_t SetDrawingStencilForAreaAnimation(AreaAnimation*, const Region& viewPort);
+	
 	void DrawPile (const Region& screen, Container* c, bool highlight);
 	void DrawSearchMap(const Region &vp);
+	void DrawPortal(InfoPoint *ip, int enable);
+	void DrawHighlightables(const Region& viewport);
+	
 	void GenerateQueues();
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
@@ -652,13 +664,10 @@ private:
 	//separated position adjustment, so their order could be randomised
 	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
-	void DrawPortal(InfoPoint *ip, int enable);
+	
 	void UpdateSpawns();
 	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
-	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
-	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
-	WallPolygonSet WallsIntersectingRegion(const Region&, bool includeDisabled = false, const Point* loc = nullptr) const;
-	uint32_t SetDrawingStencilForScriptable(Scriptable*, const WallPolygonSet&, const Point& viewPortOrigin);
+
 };
 
 }

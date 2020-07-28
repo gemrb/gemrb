@@ -8721,7 +8721,7 @@ Region Actor::DrawingRegion() const
 	return box;
 }
 
-void Actor::Draw(const Region& vp, uint32_t flags, const WallPolygonSet& /*walls*/) const
+void Actor::Draw(const Region& vp, uint32_t flags) const
 {
 	if (!DrawingRegion().IntersectsRegion(vp)) {
 		return;
