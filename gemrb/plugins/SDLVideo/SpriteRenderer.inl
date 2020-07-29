@@ -20,40 +20,6 @@
 
 using namespace GemRB;
 
-// For pixel formats:
-// We hardcode a single pixel format per bit depth.
-
-#if TARGET_OS_MAC
-
-const unsigned int RLOSS16 = 3;
-const unsigned int GLOSS16 = 2;
-const unsigned int BLOSS16 = 3;
-const unsigned int RSHIFT16 = 11;
-const unsigned int GSHIFT16 = 5;
-const unsigned int BSHIFT16 = 0;
-
-const unsigned int RSHIFT32 = 8;
-const unsigned int GSHIFT32 = 16;
-const unsigned int BSHIFT32 = 24;
-
-#else
-
-const unsigned int RLOSS16 = 3;
-const unsigned int GLOSS16 = 2;
-const unsigned int BLOSS16 = 3;
-const unsigned int RSHIFT16 = 11;
-const unsigned int GSHIFT16 = 5;
-const unsigned int BSHIFT16 = 0;
-
-const unsigned int RSHIFT32 = 16;
-const unsigned int GSHIFT32 = 8;
-const unsigned int BSHIFT32 = 0;
-
-#endif
-
-const Uint16 halfmask16 = ((0xFFU >> (RLOSS16+1)) << RSHIFT16) | ((0xFFU >> (GLOSS16+1)) << GSHIFT16) | ((0xFFU >> (BLOSS16+1)) << BSHIFT16);
-const Uint32 halfmask32 = ((0xFFU >> 1) << RSHIFT32) | ((0xFFU >> 1) << GSHIFT32) | ((0xFFU >> 1) << BSHIFT32);
-
 template<bool PALALPHA>
 struct SRTinter_NoTint {
 	void operator()(Uint8&, Uint8&, Uint8&, Uint8& a, unsigned int) const {
@@ -143,83 +109,117 @@ struct SRBlender_NoAlpha { };
 struct SRBlender_HalfAlpha { };
 struct SRBlender_Alpha { };
 
-struct SRFormat_Hard { };
-struct SRFormat_Soft { };
-
-template<typename PTYPE, typename BLENDER, typename PIXELFORMAT>
+template<typename PTYPE, typename BLENDER>
 struct SRBlender {
-	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const { assert(false); }
+	SRBlender(SDL_PixelFormat* format);
+
+	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
 
+template<typename BLENDER>
+struct SRBlender<Uint16, BLENDER> {
+	uint8_t RLOSS;
+	uint8_t GLOSS;
+	uint8_t BLOSS;
 
+	uint8_t RSHIFT;
+	uint8_t GSHIFT;
+	uint8_t BSHIFT;
+	
+	uint8_t AMASK;
+	Uint16 halfmask;
 
-// 16 bpp, 565
-template<>
-struct SRBlender<Uint16, SRBlender_NoAlpha, SRFormat_Hard> {
-	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = ((r >> RLOSS16) << RSHIFT16) |
-		      ((g >> GLOSS16) << GSHIFT16) |
-		      ((b >> BLOSS16) << BSHIFT16);
+	SRBlender(SDL_PixelFormat* fmt) {
+		RLOSS = fmt->Rloss;
+		GLOSS = fmt->Gloss;
+		BLOSS = fmt->Bloss;
+		
+		RSHIFT = fmt->Rshift;
+		GSHIFT = fmt->Gshift;
+		BSHIFT = fmt->Bshift;
+		
+		AMASK = fmt->Amask;
+		
+		halfmask = ((0xFFU >> (RLOSS + 1)) << RSHIFT) | ((0xFFU >> (GLOSS + 1)) << GSHIFT) | ((0xFFU >> (BLOSS + 1)) << BSHIFT);
 	}
+	
+	void operator()(Uint16& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
 
-template<>
-struct SRBlender<Uint16, SRBlender_HalfAlpha, SRFormat_Hard> {
-	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = ((pix >> 1) & halfmask16) +
-		      ((((r >> (RLOSS16+1)) << RSHIFT16) | ((g >> (GLOSS16+1)) << GSHIFT16) | ((b >> (BLOSS16+1)) << BSHIFT16)) & halfmask16);
+template<typename BLENDER>
+struct SRBlender<Uint32, BLENDER> {
+	uint8_t RSHIFT;
+	uint8_t GSHIFT;
+	uint8_t BSHIFT;
+	
+	uint8_t AMASK;
+	Uint32 halfmask;
+
+	SRBlender(SDL_PixelFormat* fmt) {
+		RSHIFT = fmt->Rshift;
+		GSHIFT = fmt->Gshift;
+		BSHIFT = fmt->Bshift;
+		
+		AMASK = fmt->Amask;
+		
+		halfmask = ((0xFFU >> 1) << RSHIFT) | ((0xFFU >> 1) << GSHIFT) | ((0xFFU >> 1) << BSHIFT);
 	}
+	
+	void operator()(Uint32& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
 
-template<>
-struct SRBlender<Uint16, SRBlender_Alpha, SRFormat_Hard> {
-	void operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-		unsigned int dr = 1 + a*(r >> RLOSS16) + (255-a)*((pix >> RSHIFT16) & ((1 << (8-RLOSS16))-1));
-		unsigned int dg = 1 + a*(g >> GLOSS16) + (255-a)*((pix >> GSHIFT16) & ((1 << (8-GLOSS16))-1));
-		unsigned int db = 1 + a*(b >> BLOSS16) + (255-a)*((pix >> BSHIFT16) & ((1 << (8-BLOSS16))-1));
+template<> // 16 bpp, 565
+void SRBlender<Uint16, SRBlender_NoAlpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+	pix = ((r >> RLOSS) << RSHIFT) |
+		  ((g >> GLOSS) << GSHIFT) |
+		  ((b >> BLOSS) << BSHIFT);
+}
 
-		r = (dr + (dr>>8)) >> 8;
-		g = (dg + (dg>>8)) >> 8;
-		b = (db + (db>>8)) >> 8;
-		pix = (r << RSHIFT16) |
-		      (g << GSHIFT16) |
-		      (b << BSHIFT16);
-	}
-};
+template<> // 16 bpp, 565
+void SRBlender<Uint16, SRBlender_HalfAlpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+	pix = ((pix >> 1) & halfmask) +
+	((((r >> (RLOSS + 1)) << RSHIFT) | ((g >> (GLOSS + 1)) << GSHIFT) | ((b >> (BLOSS + 1)) << BSHIFT)) & halfmask);
+}
 
-// 32 bpp, 888
-template<>
-struct SRBlender<Uint32, SRBlender_NoAlpha, SRFormat_Hard> {
-	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = (r << RSHIFT32) |
-		      (g << GSHIFT32) |
-		      (b << BSHIFT32);
-	}
-};
+template<> // 16 bpp, 565
+void SRBlender<Uint16, SRBlender_Alpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
+	unsigned int dr = 1 + a*(r >> RLOSS) + (255-a)*((pix >> RSHIFT) & ((1 << (8-RLOSS))-1));
+	unsigned int dg = 1 + a*(g >> GLOSS) + (255-a)*((pix >> GSHIFT) & ((1 << (8-GLOSS))-1));
+	unsigned int db = 1 + a*(b >> BLOSS) + (255-a)*((pix >> BSHIFT) & ((1 << (8-BLOSS))-1));
 
-template<>
-struct SRBlender<Uint32, SRBlender_HalfAlpha, SRFormat_Hard> {
-	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-		pix = ((pix >> 1) & halfmask32) +
-		      ((((r << RSHIFT32) | (g << GSHIFT32) | (b << BSHIFT32)) >> 1) & halfmask32);
-	}
-};
+	r = (dr + (dr>>8)) >> 8;
+	g = (dg + (dg>>8)) >> 8;
+	b = (db + (db>>8)) >> 8;
+	pix = (r << RSHIFT) |
+		  (g << GSHIFT) |
+		  (b << BSHIFT);
+}
 
+template<> // 32 bpp, 888
+void SRBlender<Uint32, SRBlender_NoAlpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+	pix = (r << RSHIFT) |
+	(g << GSHIFT) |
+	(b << BSHIFT);
+}
 
-template<>
-struct SRBlender<Uint32, SRBlender_Alpha, SRFormat_Hard> {
-	void operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-		unsigned int dr = 1 + a*r + (255-a)*((pix >> RSHIFT32) & 0xFF);
-		unsigned int dg = 1 + a*g + (255-a)*((pix >> GSHIFT32) & 0xFF);
-		unsigned int db = 1 + a*b + (255-a)*((pix >> BSHIFT32) & 0xFF);
-		r = (dr + (dr>>8)) >> 8;
-		g = (dg + (dg>>8)) >> 8;
-		b = (db + (db>>8)) >> 8;
-		pix = (r << RSHIFT32) |
-		      (g << GSHIFT32) |
-		      (b << BSHIFT32);
-	}
-};
+template<> // 32 bpp, 888
+void SRBlender<Uint32, SRBlender_HalfAlpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
+	pix = ((pix >> 1) & halfmask) +
+	((((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT)) >> 1) & halfmask);
+}
+
+template<> // 32 bpp, 888
+void SRBlender<Uint32, SRBlender_Alpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
+	unsigned int dr = 1 + a*r + (255-a)*((pix >> RSHIFT) & 0xFF);
+	unsigned int dg = 1 + a*g + (255-a)*((pix >> GSHIFT) & 0xFF);
+	unsigned int db = 1 + a*b + (255-a)*((pix >> BSHIFT) & 0xFF);
+	r = (dr + (dr>>8)) >> 8;
+	g = (dg + (dg>>8)) >> 8;
+	b = (db + (db>>8)) >> 8;
+	pix = (r << RSHIFT) |
+		  (g << GSHIFT) |
+		  (b << BSHIFT);
+}
 
 // these always change together
 #define ADVANCE_ITERATORS(count) dest.Advance(count); cover.Advance(count);
@@ -371,7 +371,7 @@ static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
 	switch (dstit.format->BytesPerPixel) {
 		case 4:
 		{
-			SRBlender<Uint32, Blender, SRFormat_Hard> blend;
+			SRBlender<Uint32, Blender> blend(dstit.format);
 			if (partial) {
 				BlitSpriteRLE_Partial<Uint32>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
 			} else {
@@ -381,7 +381,7 @@ static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
 		}
 		case 2:
 		{
-			SRBlender<Uint16, Blender, SRFormat_Hard> blend;
+			SRBlender<Uint16, Blender> blend(dstit.format);
 			if (partial) {
 				BlitSpriteRLE_Partial<Uint16>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
 			} else {
