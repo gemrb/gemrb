@@ -382,7 +382,7 @@ public:
 	MapReverb *reverb;
 
 private:
-	uint32_t debugFlags;
+	uint32_t debugFlags = 0;
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
