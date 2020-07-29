@@ -236,7 +236,7 @@ struct PixelIterator : IPixelIterator
 	}
 
 	void Advance(int dx) {
-		if (dx == 0) return;
+		if (dx == 0 || w == 0) return;
 
 		Uint8* ptr = static_cast<Uint8*>(pixel);
 		
