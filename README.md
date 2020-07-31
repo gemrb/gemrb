@@ -4,26 +4,40 @@ It's quite of a WIP hackjob right now, that crashed on character creation, but f
 
 ## Prerequisites
 libpython is required for GemRB.
+
 This one 
+
 https://github.com/uyjulian/python_vita
-Or this one are both working fine (checkout and just do make && make install)
+
+Or this one (checkout and just do make && make install)
+
 https://github.com/Northfear/Python-2.7.3-vita
 
+are both working fine 
+
 ## Build
+```
 mkdir build && cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DLAYOUT=home -DPREFIX="vitabuild" -DUSE_OPENAL=false -DUSE_FREETYPE=false
 make
+```
+Linking should fail at this point with "cannot find -ldl" message. 
 
-Linking should fail at this point with "cannot find -ldl" message. Edit build/gemrb/CMakeFiles/gemrb.dir/link.txt file and remove "-ldl" from it
-
+Edit build/gemrb/CMakeFiles/gemrb.dir/link.txt file and remove "-ldl" from it
+```
 make install && cd vitabuild/vitabuild/ && make -f Makefile.vita
-
+```
 Install gemrb.vpk to your Vita system.
+
 Copy content of build/vitabuild/vitabuild folder into ux0:data/GemRB/
+
 Rename GemRB.cfg.vita in it into GemRB.cfg and edit it (Set your game folder. Game auto detection isn't working too, so set GameType accordingly)
 
 Debug output can be prewieved with psp2shell
+
 https://github.com/Cpasjuste/psp2shell
+
+The game is pretty IO heavy for Vita, so loading times can be quite long
 
 
 # GemRB
