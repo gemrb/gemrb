@@ -28,7 +28,9 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
+#ifndef VITA
 #include "System/MappedFileMemoryStream.h"
+#endif
 
 using namespace GemRB;
 
@@ -81,7 +83,11 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		}
 	}
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
+#ifndef VITA
 	return new MappedFileMemoryStream{path};
+#else
+	return FileStream::OpenFile(path);
+#endif
 }
 
 DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
@@ -107,6 +113,7 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
+#ifndef VITA
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
 	char Signature[8];
@@ -116,6 +123,14 @@ int BIFImporter::OpenArchive(const char* path)
 		auto file = new MappedFileMemoryStream{path};
 		if (!file->isOk()) {
 			delete file;
+#else
+	stream = FileStream::OpenFile(cachePath);
+
+	char Signature[8];
+	if (!stream) {
+		FileStream* file = FileStream::OpenFile(path);
+	if (!file) {
+#endif
 			return GEM_ERROR;
 		}
 		if (file->Read(Signature, 8) == GEM_ERROR) {
@@ -136,8 +151,10 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
+#ifndef VITA
 	} else {
 		stream = cacheStream;
+#endif
 	}
 
 	if (!stream)

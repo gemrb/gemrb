@@ -55,8 +55,33 @@ static void appPutToForeground()
 #endif
 #endif
 
+#ifdef VITA
+#include <psp2/kernel/processmgr.h>
+#include <psp2/power.h>
+
+int _newlib_heap_size_user = 192 * 1024 * 1024;
+
+typedef void (*ScePowerCallback)(int notifyId, int notifyCount, int powerInfo);
+
+int powerCallback(int notifyId, int notifyCount, int powerInfo, void *common)
+{
+	Log(MESSAGE, "VitaPower", std::to_string(powerInfo).c_str());
+}
+#endif
+
 int main(int argc, char* argv[])
 {
+#ifdef VITA
+    scePowerSetArmClockFrequency(444);
+    scePowerSetBusClockFrequency(222);
+    scePowerSetGpuClockFrequency(222);
+    scePowerSetGpuXbarClockFrequency(166);
+    
+    int cbid;
+    cbid = sceKernelCreateCallback("Power Callback", 0, powerCallback, NULL);
+    //scePowerRegisterCallback(cbid);
+#endif
+
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
@@ -72,7 +97,7 @@ int main(int argc, char* argv[])
 // due to fragmentation since we use a lot of small objects. On the other hand
 // if the threshold is too low, free() starts to permanently ask the kernel
 // about shrinking the heap.
-	#ifdef HAVE_UNISTD_H
+	#if defined(HAVE_UNISTD_H) && !defined(VITA)
 		int pagesize = sysconf(_SC_PAGESIZE);
 	#else
 		int pagesize = 4*1024;
@@ -90,6 +115,10 @@ int main(int argc, char* argv[])
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
+#ifdef VITA
+		//scePowerUnregisterCallback(cbid);
+        sceKernelExitProcess(0);
+#endif
 		return -1;
 	}
 	delete config;
@@ -101,5 +130,9 @@ int main(int argc, char* argv[])
 	core->Main();
 	delete( core );
 	ShutdownLogging();
+#ifdef VITA
+	//scePowerUnregisterCallback(cbid);
+    sceKernelExitProcess(0);
+#endif
 	return 0;
 }

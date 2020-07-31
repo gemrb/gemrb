@@ -45,6 +45,33 @@ extern "C" double round(double);
 
 using namespace GemRB;
 
+#ifdef VITA
+#define JOY_DEADZONE 1000
+#define JOY_ANALOG
+#define JOY_XAXISL 0
+#define JOY_YAXISL 1
+#define JOY_XAXISR 2
+#define JOY_YAXISR 3
+
+enum {
+	BTN_LEFT		= 7,
+	BTN_DOWN		= 6,
+	BTN_RIGHT		= 9,
+	BTN_UP			= 8,
+
+	BTN_START		= 11,
+	BTN_SELECT		= 10,
+
+	BTN_SQUARE		= 3,
+	BTN_CROSS		= 2,
+	BTN_CIRCLE		= 1,
+	BTN_TRIANGLE	= 0,
+
+	BTN_R1			= 5,
+	BTN_L1			= 4
+};
+#endif
+
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
@@ -82,6 +109,10 @@ SDLVideoDriver::~SDLVideoDriver(void)
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
 
+#ifdef VITA
+    SDL_JoystickClose(gGameController);
+#endif
+
 	SDL_Quit();
 
 	// This sprite needs to have been freed earlier, because
@@ -96,9 +127,22 @@ int SDLVideoDriver::Init(void)
 		Log(ERROR, "SDLVideo", "InitSubSystem failed: %s", SDL_GetError());
 		return GEM_ERROR;
 	}
+
+#ifdef VITA
+	if (SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == -1) {
+		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+		return GEM_ERROR;
+	}
+#endif
+
 	if (!(MouseFlags&MOUSE_HIDDEN)) {
 		SDL_ShowCursor( SDL_DISABLE );
 	}
+
+#ifdef VITA
+    gGameController = SDL_JoystickOpen(0);
+#endif
+
 	return GEM_OK;
 }
 
@@ -214,6 +258,17 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			if (!core->ConsolePopped && ( key != 0 ))
 				EvntManager->KeyRelease( key, modstate );
 			break;
+
+#ifdef VITA
+            case SDL_JOYAXISMOTION:
+                HandleJoyAxisEvent(event.jaxis);
+                break;
+            case SDL_JOYBUTTONDOWN:
+            case SDL_JOYBUTTONUP:
+                HandleJoyButtonEvent(event.jbutton);
+                break;
+#endif
+
 		case SDL_KEYDOWN:
 			if ((sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
 				core->PopupConsole();
@@ -355,8 +410,107 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 			break;
 	}
+
+#ifdef VITA
+	ProcessAxisMotion();
+#endif
+
 	return GEM_OK;
 }
+
+#ifdef VITA
+Sint16 xaxis_value = 0;
+Sint16 yaxis_value = 0;
+float xaxis_float = 0;
+float yaxis_float = 0;
+Uint32 lastAxisMovementTime = 0;
+
+void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
+{
+    if (motion.axis == JOY_XAXISL)
+    {
+        if(std::abs(motion.value) > JOY_DEADZONE)
+            xaxis_value = motion.value;
+        else
+            xaxis_value = 0;
+    }
+    else if (motion.axis == JOY_YAXISL)
+    {
+        if(std::abs(motion.value) > JOY_DEADZONE)
+            yaxis_value = motion.value;
+        else
+            yaxis_value = 0;
+    }
+}
+
+void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
+{
+	int buttonCode = -1;
+
+    if(button.button == BTN_CROSS)
+    {
+		buttonCode = 1;
+	}
+	else if(button.button == BTN_CIRCLE)
+    {
+		buttonCode = 3;
+	}
+
+	if (buttonCode == -1)
+		return;
+
+	if(button.state == SDL_PRESSED)
+	{
+		lastMouseDownTime = EvntManager->GetRKDelay();
+		if (lastMouseDownTime != (unsigned long) ~0)
+		{
+			lastMouseDownTime += lastMouseDownTime+lastTime;
+		}
+		if (CursorIndex != VID_CUR_DRAG)
+			CursorIndex = VID_CUR_DOWN;
+		if (!core->ConsolePopped)
+			EvntManager->MouseDown( static_cast<int>(xaxis_float), static_cast<int>(yaxis_float), 1 << ( buttonCode - 1 ), GetModState() );
+	}
+	else
+	{
+		if (CursorIndex != VID_CUR_DRAG)
+			CursorIndex = VID_CUR_UP;
+		if (!core->ConsolePopped)
+			EvntManager->MouseUp( static_cast<int>(xaxis_float), static_cast<int>(yaxis_float), 1 << ( buttonCode - 1 ), GetModState() );
+    }
+}
+
+void SDLVideoDriver::ProcessAxisMotion()
+{
+	float vita_pointer_speed = 10;
+
+    float movementSpeed = 8192 * 20;
+    //float settingsSpeedMod = static_cast<float>(vita_pointer_speed) / 10.0f;
+	float settingsSpeedMod = vita_pointer_speed / 10.0f;
+    
+    Uint32 currentTime = SDL_GetTicks();
+    Uint32 deltaTime = currentTime - lastAxisMovementTime;
+    lastAxisMovementTime = currentTime;
+    
+    if (xaxis_value == 0 && yaxis_value == 0)
+        return;
+    
+    xaxis_float += ((pow(abs(xaxis_value), 1.03f) * (xaxis_value / abs(xaxis_value)) * deltaTime) / movementSpeed) * settingsSpeedMod;
+    yaxis_float += ((pow(abs(yaxis_value), 1.03f) * (yaxis_value / abs(yaxis_value)) * deltaTime) / movementSpeed) * settingsSpeedMod;
+
+    if(xaxis_float < 0) 
+		xaxis_float = 0;
+    if(yaxis_float < 0) 
+		yaxis_float = 0;
+
+    if(xaxis_float > 640)
+		xaxis_float = GetWidth();
+    if(yaxis_float > 480)
+		yaxis_float = GetHeight();
+    
+	MouseMovement(static_cast<int>(xaxis_float), static_cast<int>(yaxis_float));
+}
+#endif
 
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)

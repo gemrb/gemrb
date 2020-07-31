@@ -35,7 +35,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
-#else
+#elif !defined(VITA)
 #include <sys/types.h>
 #include <dirent.h>
 #include <fnmatch.h>
@@ -74,6 +74,7 @@ typedef const char* (*Description_t)(void);
 typedef PluginID (*ID_t)();
 typedef bool (* Register_t)(PluginMgr*);
 
+#ifndef VITA
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
 typedef void *(* voidvoid)(void);
 static inline voidvoid my_dlsym(void *handle, const char *symbol)
@@ -138,9 +139,11 @@ static bool FindFiles(char* path, std::list<char*> &files)
 	return true;
 }
 #endif  // ! WIN32
+#endif // ! VITA
 
 void LoadPlugins(char* pluginpath)
 {
+#ifndef VITA
 	std::set<PluginID> libs;
 
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
@@ -256,6 +259,7 @@ void LoadPlugins(char* pluginpath)
 		// We do not need the basename anymore now
 		free(t_file);
 	}
+#endif
 }
 
 }

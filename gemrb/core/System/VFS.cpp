@@ -46,8 +46,12 @@
 #include <cerrno>
 
 #ifndef WIN32
+#ifndef VITA
 #include <dirent.h>
 #include <sys/mman.h>
+#else
+#include <psp2/io/dirent.h>
+#endif
 #endif
 
 #ifdef __APPLE__
@@ -128,6 +132,63 @@ static void closedir(DIR* dirp)
 }
 
 #endif // WIN32
+
+#ifdef VITA
+
+using namespace GemRB;
+
+struct DIR {
+    bool is_first;
+    SceUID descriptor;
+};
+
+struct dirent {
+	char d_name[_MAX_PATH];
+};
+
+// buffer which readdir returns
+static dirent de;
+
+static DIR* opendir(const char* filename)
+{
+	DIR* dirp = (DIR*) malloc(sizeof(DIR));
+    dirp->is_first = 1;
+    dirp->descriptor = sceIoDopen(filename);
+
+    if (dirp->descriptor <= 0)
+	{
+        return NULL;
+	}
+
+	return dirp;
+}
+
+static dirent* readdir(DIR* dirp)
+{
+    //vitasdk kind of skips current directory entry..
+    if (dirp->is_first) 
+    {
+        dirp->is_first = 0;
+        strcpy( de.d_name, "." );
+	} 
+    else 
+    {
+        SceIoDirent dir;
+        if (sceIoDread(dirp->descriptor, &dir) <= 0)
+            return NULL;
+        strcpy( de.d_name, dir.d_name );
+	}
+
+	return &de;
+}
+
+static void closedir(DIR* dirp)
+{
+    sceIoDclose(dirp->descriptor);
+	free(dirp);
+}
+
+#endif // VITA
 
 namespace GemRB {
 #if __APPLE__
@@ -449,6 +510,11 @@ bool MakeDirectories(const char* path)
 
 bool MakeDirectory(const char* path)
 {
+#ifdef VITA
+    sceIoMkdir(path, 0777);
+    return true;
+#endif
+
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
@@ -547,7 +613,7 @@ void munmap(void *start, size_t) {
 	UnmapViewOfFile(start);
 }
 
-#else
+#elif !defined(VITA)
 
 void* readonly_mmap(void *vfd) {
 	int fd = fileno(static_cast<FILE*>(vfd));

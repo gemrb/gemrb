@@ -49,7 +49,7 @@ void *av_malloc(unsigned int size)
 		ptr = NULL;
 #elif HAVE_ALIGNED_MALLOC
 	ptr = _aligned_malloc(size, 16);
-#elif HAVE_MEMALIGN
+#elif defined(HAVE_MEMALIGN) && !defined(VITA)
 	ptr = memalign(16, size);
 #else
 	ptr = malloc(size + 16);

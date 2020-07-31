@@ -65,6 +65,11 @@ protected:
 
 	String *subtitletext;
 	ieDword subtitlestrref;
+
+#ifdef VITA
+	SDL_Joystick* gGameController = NULL;
+#endif
+
 public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
@@ -172,6 +177,12 @@ protected:
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
+
+#ifdef VITA
+	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
+	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
+	void ProcessAxisMotion();
+#endif
 
 public:
 	// static functions for manipulating surfaces

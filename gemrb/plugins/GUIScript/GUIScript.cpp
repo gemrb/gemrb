@@ -15960,6 +15960,13 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 bool GUIScript::Init(void)
 {
+#ifdef VITA
+	Py_NoSiteFlag = 1;
+    Py_IgnoreEnvironmentFlag = 1;
+    Py_NoUserSiteDirectory = 1;
+	Py_SetPythonHome((char*)"ux0:/data/GemRB/python2.7");
+#endif
+
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;

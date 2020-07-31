@@ -22,7 +22,9 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "System/FileStream.h"
+#ifndef VITA
 #include "System/MappedFileMemoryStream.h"
+#endif
 #include "System/VFS.h"
 
 namespace GemRB {
@@ -52,7 +54,11 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	} else {
 		stream->Seek(length, GEM_CURRENT_POS);
 	}
+#ifndef VITA
 	return new MappedFileMemoryStream{path};
+#else
+	return FileStream::OpenFile(path);
+#endif
 }
 
 }

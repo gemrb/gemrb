@@ -454,6 +454,17 @@ IF(APPLE)
 	SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -DTARGET_OS_MAC")
 ENDIF(APPLE)
 
+IF(VITA)
+    ADD_DEFINITIONS("-DVITA")
+	INSTALL( FILES Makefile.vita DESTINATION ${BIN_DIR} )
+	INSTALL( FILES sce_sys/icon0.png DESTINATION ${BIN_DIR}/sce_sys/ )
+	INSTALL( FILES sce_sys/livearea/contents/bg.png DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
+	INSTALL( FILES sce_sys/livearea/contents/startup.png DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
+	INSTALL( FILES sce_sys/livearea/contents/template.xml DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mcpu=cortex-a9 -mfloat-abi=hard -ffast-math -D_GLIBCXX_USE_C99_MATH=0")
+	SET(CMAKE_CXX_STANDARD_LIBRARIES "-lvorbis -logg -lmikmod -lSceAudio_stub -lSceCtrl_stub -lvita2d -lSceGxm_stub -lSceHid_stub -lSceDisplay_stub -lSceSysmodule_stub -lSceAppMgr_stub -lSceCommonDialog_stub -lScePower_stub")
+ENDIF()
+
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
 	SET (PLUGIN_BUILD_FILES ${ARGN})
