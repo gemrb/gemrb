@@ -550,11 +550,12 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 	}
 
 retry:
+	if (Phase > P_RELEASE) {
+		return true;
+	}
+
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (!anim) {
-		if (Phase >= P_RELEASE) {
-			return true;
-		}
 		IncrementPhase();
 		goto retry;
 	}
