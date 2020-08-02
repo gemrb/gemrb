@@ -410,6 +410,11 @@ public:
 
 	static SDLPixelIterator end(const SDLPixelIterator& beg)
 	{
+		if (beg.clip.w == 0 || beg.clip.h == 0) {
+			// already at the end
+			return SDLPixelIterator(beg);
+		}
+		
 		Direction xdir = (beg.xdir == Forward) ? Reverse : Forward;
 		Direction ydir = (beg.ydir == Forward) ? Reverse : Forward;
 		SDLPixelIterator it(beg);
