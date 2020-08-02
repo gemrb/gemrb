@@ -4844,6 +4844,11 @@ int fx_cure_hold_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa3 FreeAction
+// if needed, make this match bg2 behaviour more closely: it removed 0x7e (126) effects with duration/permanent
+// and param2 == MOD_ABSOLUTE IF the modified movement rate is lower than the original. This is, of course,
+// crap. It should remove individual 0x7e effects if they lower the movement rate (or remove all of them, which
+// is what we do now).
+// NOTE: it didn't remove 0xb0 effects, so perhaps fx_movement_modifier_ref needs to be changed to refer to 0x7e
 int fx_cure_slow_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_cure_slow_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
