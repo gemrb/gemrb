@@ -2026,7 +2026,7 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		int blockStatus = GetBlockedInRadius(p.x, p.y, caller ? caller->size : 0, stopOnImpassable);
+		int blockStatus = GetBlockedNavmap(p.x, p.y);
 		if (stopOnImpassable && blockStatus == PATH_MAP_IMPASSABLE) {
 			return PATH_MAP_IMPASSABLE;
 		}
