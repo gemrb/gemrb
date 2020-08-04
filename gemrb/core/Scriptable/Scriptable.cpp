@@ -2257,7 +2257,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 3 && std::abs(nmptStep.y - Pos.y) < YEPS * 3) {
+			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS && std::abs(nmptStep.y - Pos.y) < YEPS) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				return;

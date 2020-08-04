@@ -457,8 +457,8 @@ public:
 };
 
 class GEM_EXPORT Movable : public Selectable {
-	const int XEPS = 32;
-	const int YEPS = 12;
+	const int XEPS = 72;
+	const int YEPS = 36;
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
