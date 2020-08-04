@@ -5168,6 +5168,7 @@ void Actor::SetMap(Map *map)
 {
 	//Did we have an area?
 	bool effinit=!GetCurrentArea();
+	if (area && BlocksSearchMap()) area->ClearSearchMapFor(this);
 	//now we have an area
 	Scriptable::SetMap(map);
 	//unless we just lost it, in that case clear up some fields and leave
@@ -5216,6 +5217,7 @@ void Actor::SetMap(Map *map)
 		inventory.EquipItem(inventory.GetEquippedSlot());
 		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
+	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
 // Position should be a navmap point
