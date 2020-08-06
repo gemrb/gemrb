@@ -1,8 +1,8 @@
-# Vita Port info
+# GemRB port for PS Vita
 
-It's quite of a WIP hackjob right now, that crashed on character creation, but for anyone interested here's build process..
+## Building
 
-## Prerequisites
+### Prerequisites
 libpython is required for GemRB.
 
 This one 
@@ -15,29 +15,46 @@ https://github.com/Northfear/Python-2.7.3-vita
 
 are both working fine 
 
-## Build
+### Build & installation
 ```
 mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DLAYOUT=home -DPREFIX="vitabuild" -DUSE_OPENAL=false -DUSE_FREETYPE=false
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DLAYOUT=home -DPREFIX="vitabuild" -DUSE_OPENAL=false -DUSE_FREETYPE=false -DCMAKE_BUILD_TYPE=None -DNOCOLOR=1
 make
-```
-Linking should fail at this point with "cannot find -ldl" message. 
-
-Edit build/gemrb/CMakeFiles/gemrb.dir/link.txt file and remove "-ldl" from it
-```
 make install && cd vitabuild/vitabuild/ && make -f Makefile.vita
 ```
 Install gemrb.vpk to your Vita system.
 
-Copy content of build/vitabuild/vitabuild folder into ux0:data/GemRB/
+Copy folders "GUIScripts", "override" and "unhardcoded" from build/vitabuild/vitabuild folder into ux0:data/GemRB/
 
-Rename GemRB.cfg.vita in it into GemRB.cfg and edit it (Set your game folder. Game auto detection isn't working too, so set GameType accordingly)
+Rename GemRB.cfg.vita into GemRB.cfg, copy it to ux0:data/GemRB/ and edit it (Set your game folder. Game auto detection isn't working too, so set GameType accordingly)
 
-Debug output can be prewieved with psp2shell
+Debug output can be previewed with psp2shell
 
 https://github.com/Cpasjuste/psp2shell
 
-The game is pretty IO heavy for Vita, so loading times can be quite long
+## Original game data
+Copy original game directory to ux0:data/GemRB/ and edit ux0:data/GemRB/GemRB.cfg file (set correct "GameType" and "GamePath" parameters)
+
+## Port info
+rePatch reDux0 plugin is required for proper suspend/resume support
+https://github.com/dots-tb/rePatch-reDux0
+
+Performance with 640x480 resolution is "kinda playable". To improve it I STRONGLY recommend disabling character movement and attack sounds in game options. The game is pretty IO heavy for Vita, so loading times can be quite long.
+
+Custom portraits, character imports, voice selection on character creation are not supported right now.
+
+Port probably cointains a lot of bugs, since I haven't tested it much.
+
+## Controls
+- Left analog stick - Pointer movement
+- X button - Left mouse button
+- O button - Right mouse button
+- SQUARE button - Open map
+- TRIANGLE button - Open inventory
+- D-Pad - Map scrolling
+- R1 - Pause
+- L1 - Highlight items
+- SELECT - Open menu
 
 
 # GemRB
