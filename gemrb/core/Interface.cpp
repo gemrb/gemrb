@@ -2653,8 +2653,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			if (vvc) {
 				//This is the final position of the summoned creature
 				//not the original target point
-				vvc->XPos=ab->Pos.x;
-				vvc->YPos=ab->Pos.y;
+				vvc->XPos += ab->Pos.x;
+				vvc->YPos += ab->Pos.y;
 				//force vvc to play only once
 				vvc->PlayOnce();
 				map->AddVVCell( new VEFObject(vvc) );

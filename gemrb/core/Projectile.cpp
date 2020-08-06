@@ -1509,6 +1509,18 @@ void Projectile::DrawExplosion(const Region &screen)
 				//quick hack to use the single object envelope
 				area->AddVVCell(new VEFObject(vvc));
 			}
+			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
+			// until we actually need two vvc fields in the extension, let's just hack around it
+			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
+				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
+				if (vvc) {
+					vvc->XPos += Pos.x;
+					vvc->YPos += Pos.y;
+					vvc->PlayOnce();
+					vvc->SetBlend();
+					area->AddVVCell(new VEFObject(vvc));
+				}
+			}
 		}
 		
 		phase=P_EXPLODING2;
