@@ -7692,6 +7692,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			//  in 0,5% (1d20*1d10==1) cases
 			if ((header->RechargeFlags & IE_ITEM_BREAKABLE) && core->Roll(1, 10, 0) == 1) {
 				inventory.BreakItemSlot(wi.slot);
+				inventory.EquipBestWeapon(EQUIP_MELEE);
 			}
 		}
 		ResetState();
