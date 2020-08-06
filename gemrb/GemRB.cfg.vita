@@ -1,3 +1,6 @@
+VitaCharName = Dude
+VitaPointerSpeed = 10
+
 #####################################################
 #                                                   #
 #  This is the GemRB Configuration file.            #
@@ -79,7 +82,7 @@ Height=480
 Bpp=32
 
 #Fullscreen [Boolean]
-Fullscreen=0
+Fullscreen=1
 
 # Delay before tooltips appear [milliseconds]
 TooltipDelay=500
@@ -134,7 +137,7 @@ GUIEnhancements = 15
 #SkipIntroVideos=1
 
 # Draw Frames per Second info [Boolean]
-DrawFPS=1
+DrawFPS=0
 
 # Hide unexplored parts of a map
 #FogOfWar=1

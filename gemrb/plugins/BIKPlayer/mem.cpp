@@ -23,6 +23,9 @@
  * @file libavutil/mem.c
  * default memory allocator for libavutil
  */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <limits.h>
 #include <stdlib.h>
@@ -49,7 +52,7 @@ void *av_malloc(unsigned int size)
 		ptr = NULL;
 #elif HAVE_ALIGNED_MALLOC
 	ptr = _aligned_malloc(size, 16);
-#elif defined(HAVE_MEMALIGN) && !defined(VITA)
+#elif defined(HAVE_MEMALIGN)
 	ptr = memalign(16, size);
 #else
 	ptr = malloc(size + 16);

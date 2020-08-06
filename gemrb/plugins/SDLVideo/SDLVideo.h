@@ -181,6 +181,8 @@ protected:
 #ifdef VITA
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
+	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
+	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
 	void ProcessAxisMotion();
 #endif
 

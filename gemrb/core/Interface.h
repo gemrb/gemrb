@@ -809,6 +809,10 @@ public:
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
 	char GameType[10];
+#ifdef VITA
+	char VitaCharName[20];
+	int VitaPointerSpeed = 10;
+#endif
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];

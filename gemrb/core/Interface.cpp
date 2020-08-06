@@ -1341,6 +1341,9 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
+#ifdef VITA
+	CONFIG_INT("VitaPointerSpeed", VitaPointerSpeed = );
+#endif
 
 #undef CONFIG_INT
 
@@ -1359,6 +1362,10 @@ int Interface::Init(InterfaceConfig* config)
 	if (stricmp( GameType, "tob" ) == 0) {
 		strlcpy( GameType, "bg2", sizeof(GameType) );
 	}
+
+#ifdef VITA
+	CONFIG_STRING("VitaCharName", VitaCharName, "Anon");
+#endif
 
 #undef CONFIG_STRING
 

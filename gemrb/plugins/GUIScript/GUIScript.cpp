@@ -5927,6 +5927,11 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 
 	//returns only the pointer
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
+#ifdef VITA
+		//return default name if it's empty on Vita (only in character creator hopefully..)
+		if (std::strcmp(Variable, "CHARNAME") == 0)
+			return PyString_FromString(core->VitaCharName);
+#endif
 		return PyString_FromString( "" );
 	}
 
@@ -6646,6 +6651,11 @@ PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
 
 static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* args)
 {
+#ifdef VITA
+	//ListResourses fails on Vita. Just return 0 for now to omit error altogether (and voice/custom portrait selection)
+	return PyInt_FromLong(0);
+#endif
+
 	int wi, ci;
 	RESOURCE_DIRECTORY type;
 	int flags = 0;

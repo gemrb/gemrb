@@ -32,6 +32,13 @@
 #include <unistd.h>
 #endif
 
+#ifdef VITA
+#include <psp2/kernel/processmgr.h>
+#include <psp2/power.h>
+
+int _newlib_heap_size_user = 224 * 1024 * 1024;
+#endif
+
 using namespace GemRB;
 
 #ifdef ANDROID
@@ -55,20 +62,6 @@ static void appPutToForeground()
 #endif
 #endif
 
-#ifdef VITA
-#include <psp2/kernel/processmgr.h>
-#include <psp2/power.h>
-
-int _newlib_heap_size_user = 192 * 1024 * 1024;
-
-typedef void (*ScePowerCallback)(int notifyId, int notifyCount, int powerInfo);
-
-int powerCallback(int notifyId, int notifyCount, int powerInfo, void *common)
-{
-	Log(MESSAGE, "VitaPower", std::to_string(powerInfo).c_str());
-}
-#endif
-
 int main(int argc, char* argv[])
 {
 #ifdef VITA
@@ -76,10 +69,6 @@ int main(int argc, char* argv[])
     scePowerSetBusClockFrequency(222);
     scePowerSetGpuClockFrequency(222);
     scePowerSetGpuXbarClockFrequency(166);
-    
-    int cbid;
-    cbid = sceKernelCreateCallback("Power Callback", 0, powerCallback, NULL);
-    //scePowerRegisterCallback(cbid);
 #endif
 
 	setlocale(LC_ALL, "");
@@ -116,7 +105,6 @@ int main(int argc, char* argv[])
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
 #ifdef VITA
-		//scePowerUnregisterCallback(cbid);
         sceKernelExitProcess(0);
 #endif
 		return -1;
@@ -131,7 +119,6 @@ int main(int argc, char* argv[])
 	delete( core );
 	ShutdownLogging();
 #ifdef VITA
-	//scePowerUnregisterCallback(cbid);
     sceKernelExitProcess(0);
 #endif
 	return 0;

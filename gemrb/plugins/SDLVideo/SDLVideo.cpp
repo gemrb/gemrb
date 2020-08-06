@@ -445,26 +445,93 @@ void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
 
 void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 {
-	int buttonCode = -1;
+	switch(button.button)
+	{
+		//LMB event
+		case BTN_CROSS:
+		{
+			GamepadMouseEvent(1, button.state);
+			break;
+		}
+		//RMB event
+		case BTN_CIRCLE:
+		{
+			GamepadMouseEvent(3, button.state);
+			break;
+		}
+		//scroll map
+		case BTN_LEFT:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_LEFT);
+			break;
+		}
+		case BTN_RIGHT:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+			break;
+		}
+		case BTN_UP:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_UP);
+			break;
+		}
+		case BTN_DOWN:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_DOWN);
+			break;
+		}
+		//open menu
+		case BTN_SELECT:
+		{
+			GamepadKeyboardEvent(SDLK_o, button.state);
+			break;
+		}
+		//pause combat
+		case BTN_R1:
+		{
+			GamepadKeyboardEvent(SDLK_SPACE, button.state);
+			break;
+		}
+		//highlight items
+		case BTN_L1:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_ALT);
+			else
+				EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
+			
+			break;
+		}
+		//inventory
+		case BTN_TRIANGLE:
+		{
+			GamepadKeyboardEvent(SDLK_i, button.state);
+			break;
+		}
+		//map
+		case BTN_SQUARE:
+		{
+			GamepadKeyboardEvent(SDLK_m, button.state);
+			break;
+		}
 
-    if(button.button == BTN_CROSS)
-    {
-		buttonCode = 1;
+		default:
+			return;
 	}
-	else if(button.button == BTN_CIRCLE)
-    {
-		buttonCode = 3;
-	}
+}
 
-	if (buttonCode == -1)
-		return;
-
-	if(button.state == SDL_PRESSED)
+void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
+{
+	if (buttonState == SDL_PRESSED)
 	{
 		lastMouseDownTime = EvntManager->GetRKDelay();
 		if (lastMouseDownTime != (unsigned long) ~0)
 		{
-			lastMouseDownTime += lastMouseDownTime+lastTime;
+			lastMouseDownTime += lastMouseDownTime + lastTime;
 		}
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
@@ -477,16 +544,21 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 			CursorIndex = VID_CUR_UP;
 		if (!core->ConsolePopped)
 			EvntManager->MouseUp( static_cast<int>(xaxis_float), static_cast<int>(yaxis_float), 1 << ( buttonCode - 1 ), GetModState() );
-    }
+	}
+}
+
+void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
+{
+	if (buttonState == SDL_PRESSED)
+		EvntManager->KeyPress(keyCode, KMOD_NONE);
+	else
+		EvntManager->KeyRelease(keyCode, KMOD_NONE);
 }
 
 void SDLVideoDriver::ProcessAxisMotion()
 {
-	float vita_pointer_speed = 10;
-
-    float movementSpeed = 8192 * 20;
-    //float settingsSpeedMod = static_cast<float>(vita_pointer_speed) / 10.0f;
-	float settingsSpeedMod = vita_pointer_speed / 10.0f;
+    float movementSpeedMod = 2000000;
+	float settingsSpeed = core->VitaPointerSpeed;
     
     Uint32 currentTime = SDL_GetTicks();
     Uint32 deltaTime = currentTime - lastAxisMovementTime;
@@ -495,17 +567,17 @@ void SDLVideoDriver::ProcessAxisMotion()
     if (xaxis_value == 0 && yaxis_value == 0)
         return;
     
-    xaxis_float += ((pow(abs(xaxis_value), 1.03f) * (xaxis_value / abs(xaxis_value)) * deltaTime) / movementSpeed) * settingsSpeedMod;
-    yaxis_float += ((pow(abs(yaxis_value), 1.03f) * (yaxis_value / abs(yaxis_value)) * deltaTime) / movementSpeed) * settingsSpeedMod;
+    xaxis_float += ((pow(abs(xaxis_value), 1.03f) * (xaxis_value / abs(xaxis_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
+    yaxis_float += ((pow(abs(yaxis_value), 1.03f) * (yaxis_value / abs(yaxis_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
 
     if(xaxis_float < 0) 
 		xaxis_float = 0;
     if(yaxis_float < 0) 
 		yaxis_float = 0;
 
-    if(xaxis_float > 640)
+    if(xaxis_float > GetWidth())
 		xaxis_float = GetWidth();
-    if(yaxis_float > 480)
+    if(yaxis_float > GetHeight())
 		yaxis_float = GetHeight();
     
 	MouseMovement(static_cast<int>(xaxis_float), static_cast<int>(yaxis_float));
@@ -1586,6 +1658,13 @@ int SDLVideoDriver::PollMovieEvents()
 						break;
 				}
 				break;
+#ifdef VITA
+			//skip videos with buttons
+            case SDL_JOYBUTTONDOWN:
+				if (event.jbutton.button == BTN_START || event.jbutton.button == BTN_CROSS || event.jbutton.button == BTN_CIRCLE)
+					return 1;
+				break;
+#endif
 			default:
 				break;
 		}
