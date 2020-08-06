@@ -893,6 +893,9 @@ bool Inventory::EquipItem(ieDword slot)
 		return false;
 	}
 	switch (effect) {
+	case SLOT_EFFECT_FIST:
+		SetEquippedSlot(IW_NO_EQUIPPED, 0);
+		break;
 	case SLOT_EFFECT_LEFT:
 		//no idea if the offhand weapon has style, or simply the right
 		//hand style is dominant
