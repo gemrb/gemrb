@@ -5198,6 +5198,7 @@ void Actor::SetMap(Map *map)
 			int slottype = core->QuerySlotEffects( Slot );
 			switch (slottype) {
 			case SLOT_EFFECT_NONE:
+			case SLOT_EFFECT_FIST:
 			case SLOT_EFFECT_MELEE:
 			case SLOT_EFFECT_MISSILE:
 				break;
