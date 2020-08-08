@@ -5499,7 +5499,7 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	ieDword autopause_flags = 0;
 	vars->Lookup("Auto Pause State", autopause_flags);
 
-	if ((autopause_flags & (1<<flag))) {
+	if (autopause_flags & (1<<flag)) {
 		if (SetPause(PAUSE_ON, PF_QUIET)) {
 			displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
 

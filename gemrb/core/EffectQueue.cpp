@@ -1016,7 +1016,7 @@ static int check_type(Actor* actor, const Effect* fx)
 
 	//level decrementing bounce check
 	if (fx->Power) {
-		if( (bounce&BNC_LEVEL_DEC)) {
+		if (bounce & BNC_LEVEL_DEC) {
 			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
 			if( efx) {
 				if (DecreaseEffect(efx)) {

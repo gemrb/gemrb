@@ -7929,7 +7929,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		if (BaseStats[IE_CHECKFORBERSERK]) {
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
-		if ((state&STATE_CONFUSED)) {
+		if (state & STATE_CONFUSED) {
 			const char* actionString = NULL;
 			int tmp = core->Roll(1,3,0);
 			switch (tmp) {

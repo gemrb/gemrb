@@ -3471,7 +3471,7 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 	//transparency
 	ieByte inverseTransparency = 255-transparency;
 	Color tint = {255,255,255,inverseTransparency};
-	if ((Flags&A_ANI_NO_SHADOW)) {
+	if (Flags & A_ANI_NO_SHADOW) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}
