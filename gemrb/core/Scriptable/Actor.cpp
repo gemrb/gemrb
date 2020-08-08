@@ -4733,8 +4733,13 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
-		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
+		bool allowChunking = !Modified[IE_DISABLECHUNKING] && GameDifficulty > DIFF_NORMAL;
+		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && allowChunking) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
+			LastDamageType |= DAMAGE_CHUNKING;
+		}
+		// chunky death when you're reduced below -10 hp
+		if ((ieDword) damage >= Modified[IE_HITPOINTS] + 10 && allowChunking) {
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
 		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
