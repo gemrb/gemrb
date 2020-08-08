@@ -217,7 +217,6 @@ static ieByte featmax[MAX_FEATS]={0
 };
 
 //holds the wspecial table for weapon prof bonuses
-#define WSPECIAL_COLS 3
 static int wspecial_max = 0;
 static int wspattack_rows = 0;
 static int wspattack_cols = 0;
@@ -2486,7 +2485,7 @@ static void InitActorTables()
 		wspecial = (int **) calloc(wspecial_max+1, sizeof(int *));
 
 		for (i=0; i<=wspecial_max; i++) {
-			wspecial[i] = (int *) calloc(WSPECIAL_COLS, sizeof(int));
+			wspecial[i] = (int *) calloc(cols, sizeof(int));
 			for (int j=0; j<cols; j++) {
 				wspecial[i][j] = atoi(tm->QueryField(i, j));
 			}
