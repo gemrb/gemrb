@@ -5490,6 +5490,7 @@ void Actor::Resurrect()
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
+	SetBase(IE_AVATARREMOVAL, 0);
 	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp
@@ -5970,7 +5971,11 @@ bool Actor::CheckOnDeath()
 	if (disintegrated) return true;
 
 	// party actors are never removed
-	if (Persistent()) return false;
+	if (Persistent()) {
+		// hide the corpse artificially
+		SetBase(IE_AVATARREMOVAL, 1);
+		return false;
+	}
 
 	//TODO: verify removal times
 	ieDword time = core->GetGame()->GameTime;
