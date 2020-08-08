@@ -155,11 +155,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	if (table.load(tn)) {
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
-		int i, j;
 		npclevels.reserve(rows);
-		for (i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; i++) {
 			npclevels.push_back (std::vector<char *>(cols+1));
-			for(j = -1; j < cols; j++) {
+			for (int j = -1; j < cols; j++) {
 				char *ref = new char[9];
 				if (j == -1) {
 					CopyResRef(ref, table->GetRowName(i));

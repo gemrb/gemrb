@@ -86,17 +86,16 @@ int Dialog::FindFirstState(Scriptable* target)
 
 int Dialog::FindRandomState(Scriptable* target)
 {
-	unsigned int i;
 	unsigned int max = TopLevelCount;
 	if (!max) return -1;
 	unsigned int pick = RAND(0, max-1);
-	for (i=pick; i < max; i++) {
+	for (unsigned int i = pick; i < max; i++) {
 		Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;
 		}
 	}
-	for (i=0; i < pick; i++) {
+	for (unsigned int i = 0; i < pick; i++) {
 		Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;

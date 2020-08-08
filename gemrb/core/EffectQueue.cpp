@@ -258,8 +258,6 @@ static inline void ResolveEffectRef(EffectRef &effect_reference)
 
 bool Init_EffectQueue()
 {
-	int i;
-
 	if( initialized) {
 		return true;
 	}
@@ -267,7 +265,7 @@ bool Init_EffectQueue()
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 
 	memset( Opcodes, 0, sizeof( Opcodes ) );
-	for(i=0;i<MAX_EFFECTS;i++) {
+	for (size_t i = 0; i < MAX_EFFECTS; i++) {
 		Opcodes[i].Strref=-1;
 	}
 
@@ -286,7 +284,7 @@ bool Init_EffectQueue()
 		return false;
 	}
 
-	for (i = 0; i < MAX_EFFECTS; i++) {
+	for (unsigned int i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
 		if( efftextTable) {
 			int row = efftextTable->GetRowCount();
