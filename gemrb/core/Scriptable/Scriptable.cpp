@@ -2335,7 +2335,7 @@ void Movable::AddWayPoint(const Point &Des)
 void Movable::WalkTo(const Point &Des, int distance)
 {
 
-	if (Ticks < prevTicks + 2) {
+	if (prevTicks && Ticks < prevTicks + 2) {
 		return;
 	}
 
