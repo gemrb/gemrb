@@ -1188,7 +1188,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			}
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
-			// TODO: remove corpse at removal time?
 			ab->RemovalTime = RemovalTime;
 			ab->RefreshEffects(NULL);
 		}
