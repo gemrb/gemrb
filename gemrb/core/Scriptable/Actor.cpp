@@ -9967,7 +9967,10 @@ void Actor::SetupFist()
 			ItemResRef = fistres[i][col];
 		}
 	}
-	inventory.SetSlotItemRes(ItemResRef, slot);
+	CREItem *currentFist = inventory.GetSlotItem(slot);
+	if (!currentFist || stricmp(currentFist->ItemResRef, ItemResRef)) {
+		inventory.SetSlotItemRes(ItemResRef, slot);
+	}
 }
 
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
