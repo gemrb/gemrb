@@ -318,7 +318,7 @@ IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
 		MESSAGE(STATUS "RPI: ${RPI}")
 		MESSAGE(STATUS "Setting _OPENGL_INCLUDE_PATH: ${RPI_GLES_PATH}/include")
 		MESSAGE(STATUS "Setting _OPENGL_LIB_PATH: ${RPI_GLES_PATH}/libs")                                                                                                         
-	SET(_OPENGL_INCLUDE_PATH ${RPI_GLES_PATH}/include)
+		SET(_OPENGL_INCLUDE_PATH ${RPI_GLES_PATH}/include)
 		SET(_OPENGL_LIB_PATH ${RPI_GLES_PATH}/lib)
 		# for newer cmake
 		MESSAGE(STATUS "Checking for ${RPI_GLES_PATH}/GLES2/GL2.h and ${RPI_GLES_PATH}/lib")
