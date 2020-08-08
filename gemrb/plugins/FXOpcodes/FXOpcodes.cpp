@@ -958,7 +958,7 @@ static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 	if (area && target->GetCurrentArea()!=area) {
 		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
 	}
-	target->Resurrect();
+	target->Resurrect(p);
 }
 
 
@@ -1418,7 +1418,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword damagetype = 0;
 	switch (fx->Parameter2) {
 	case 1:
-		BASE_STATE_SET(STATE_FLAME); //not sure, should be charred
+		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FLAME); //not sure, should be charred
 		damagetype = DAMAGE_FIRE;
 		break;
 	case 2:
@@ -1428,9 +1428,10 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_CRUSHING;
 		break;
 	case 8:
-		// TODO: also play "GORE.WAV" / "GORE2.WAV"
 		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		// bg1 & iwds have this file, bg2 & pst none
+		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 16:
 		BASE_STATE_SET(STATE_PETRIFIED);
@@ -1441,12 +1442,15 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_COLD;
 		break;
 	case 64:
-		BASE_STATE_SET(STATE_PETRIFIED);
+		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		// file only in iwds
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 128:
-		BASE_STATE_SET(STATE_FROZEN);
+		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
@@ -1457,6 +1461,10 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 1024: // destruction, iwd2: maybe internally used for smiting and/or disruption (separate opcodes — see IWDOpcodes)
 	default:
 		damagetype = DAMAGE_ACID;
+	}
+
+	if (target->GetStat(IE_DISABLECHUNKING)) {
+		damagetype &= ~DAMAGE_CHUNKING;
 	}
 
 	if (damagetype!=DAMAGE_COLD) {
@@ -6529,6 +6537,7 @@ int fx_puppet_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_disintegrate(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (target->GetStat(IE_DISABLECHUNKING)) return FX_NOT_APPLIED;
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//convert it to a death opcode or apply the new effect?
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
@@ -7387,7 +7396,9 @@ int fx_existance_delay_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 	STAT_SET( IE_EXISTANCEDELAY, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x127 DisableChunk
+//0x127 DisableChunk / DisablePermanentDeath
+// protects against chunking, disintegration, permanent death from the kill opcode (causes normal death instead)
+// doesn't prevent normal petrification (from the opcode) and doesn't protect from normal freezing (eg. from Cone of Cold)
 int fx_disable_chunk_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_disable_chunk_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);

@@ -187,7 +187,7 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 	Control* ctrl = NULL;
 
 	//Check if we are still on the last control
-	if (( lastC != NULL )) {
+	if (lastC) {
 		if (( XPos + lastC->XPos <= x ) 
 			&& ( YPos + lastC->YPos <= y )
 			&& ( XPos + lastC->XPos + lastC->Width >= x )

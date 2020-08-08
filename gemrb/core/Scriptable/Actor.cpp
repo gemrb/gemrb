@@ -217,7 +217,6 @@ static ieByte featmax[MAX_FEATS]={0
 };
 
 //holds the wspecial table for weapon prof bonuses
-#define WSPECIAL_COLS 3
 static int wspecial_max = 0;
 static int wspattack_rows = 0;
 static int wspattack_cols = 0;
@@ -2486,7 +2485,7 @@ static void InitActorTables()
 		wspecial = (int **) calloc(wspecial_max+1, sizeof(int *));
 
 		for (i=0; i<=wspecial_max; i++) {
-			wspecial[i] = (int *) calloc(WSPECIAL_COLS, sizeof(int));
+			wspecial[i] = (int *) calloc(cols, sizeof(int));
 			for (int j=0; j<cols; j++) {
 				wspecial[i][j] = atoi(tm->QueryField(i, j));
 			}
@@ -4733,8 +4732,13 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
-		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING] && (GameDifficulty > DIFF_NORMAL) ) {
+		bool allowChunking = !Modified[IE_DISABLECHUNKING] && GameDifficulty > DIFF_NORMAL;
+		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && allowChunking) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
+			LastDamageType |= DAMAGE_CHUNKING;
+		}
+		// chunky death when you're reduced below -10 hp
+		if ((ieDword) damage >= Modified[IE_HITPOINTS] + 10 && allowChunking) {
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
 		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
@@ -5198,6 +5202,7 @@ void Actor::SetMap(Map *map)
 			int slottype = core->QuerySlotEffects( Slot );
 			switch (slottype) {
 			case SLOT_EFFECT_NONE:
+			case SLOT_EFFECT_FIST:
 			case SLOT_EFFECT_MELEE:
 			case SLOT_EFFECT_MISSILE:
 				break;
@@ -5474,8 +5479,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	}
 }
 
-//TODO: needs a way to respawn at a point
-void Actor::Resurrect()
+void Actor::Resurrect(const Point &destPoint)
 {
 	if (!(Modified[IE_STATE_ID ] & STATE_DEAD)) {
 		return;
@@ -5484,6 +5488,10 @@ void Actor::Resurrect()
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
+	SetBase(IE_AVATARREMOVAL, 0);
+	if (!destPoint.isnull()) {
+		SetPosition(destPoint, CC_CHECK_IMPASSABLE, 0);
+	}
 	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp
@@ -5964,7 +5972,11 @@ bool Actor::CheckOnDeath()
 	if (disintegrated) return true;
 
 	// party actors are never removed
-	if (Persistent()) return false;
+	if (Persistent()) {
+		// hide the corpse artificially
+		SetBase(IE_AVATARREMOVAL, 1);
+		return false;
+	}
 
 	//TODO: verify removal times
 	ieDword time = core->GetGame()->GameTime;
@@ -7917,7 +7929,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		if (BaseStats[IE_CHECKFORBERSERK]) {
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
-		if ((state&STATE_CONFUSED)) {
+		if (state & STATE_CONFUSED) {
 			const char* actionString = NULL;
 			int tmp = core->Roll(1,3,0);
 			switch (tmp) {

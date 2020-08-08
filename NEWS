@@ -1,14 +1,17 @@
-GemRB git (052986b):
+GemRB git (a318ab21):
   New features:
     - 
+    - new smarter pathfinder with bumping support
+    - full morale support
     - animal taming, iwd2 hardcoded saving throw bonuses
     - vcpkg and out-of-the box msvc support
     - non-ascii data filename support
 
   Improved features:
     - 
-    - windows speedups, ease of setup
-    - iwd chargen, pst spell timing
+    - disk reading speedups, ease of setup
+    - iwd chargen, pst spell timing, hardcoded overlays
+    - better actor speeds & walk sounds
     - audio, pst ini handling, savegame compatibility
     - effects, projectiles, actions, range calculations
     - bugfixes
