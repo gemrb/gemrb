@@ -47,6 +47,7 @@ using namespace GemRB;
 
 #ifdef VITA
 #define JOY_DEADZONE 1000
+#define JOY_MAP_SCROLL_DEADZONE 25000
 #define JOY_ANALOG
 #define JOY_XAXISL 0
 #define JOY_YAXISL 1
@@ -419,8 +420,10 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 }
 
 #ifdef VITA
-Sint16 xaxis_value = 0;
-Sint16 yaxis_value = 0;
+Sint16 xaxisl_value = 0;
+Sint16 yaxisl_value = 0;
+Sint16 xaxisr_value = 0;
+Sint16 yaxisr_value = 0; 
 float xaxis_float = 0;
 float yaxis_float = 0;
 Uint32 lastAxisMovementTime = 0;
@@ -430,16 +433,24 @@ void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
     if (motion.axis == JOY_XAXISL)
     {
         if(std::abs(motion.value) > JOY_DEADZONE)
-            xaxis_value = motion.value;
+            xaxisl_value = motion.value;
         else
-            xaxis_value = 0;
+            xaxisl_value = 0;
     }
     else if (motion.axis == JOY_YAXISL)
     {
         if(std::abs(motion.value) > JOY_DEADZONE)
-            yaxis_value = motion.value;
+            yaxisl_value = motion.value;
         else
-            yaxis_value = 0;
+            yaxisl_value = 0;
+    }
+	else if (motion.axis == JOY_XAXISR)
+    {
+        xaxisr_value = motion.value;
+    }
+	else if (motion.axis == JOY_YAXISR)
+    {
+        yaxisr_value = motion.value;
     }
 }
 
@@ -488,6 +499,13 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 		case BTN_SELECT:
 		{
 			GamepadKeyboardEvent(SDLK_o, button.state);
+			break;
+		}
+		//F6 shortcut
+		case BTN_START:
+		{
+			if (button.state == SDL_PRESSED)
+				EvntManager->OnSpecialKeyPress(GEM_FUNCTION1 + SDLK_F6-SDLK_F1);
 			break;
 		}
 		//pause combat
@@ -564,23 +582,38 @@ void SDLVideoDriver::ProcessAxisMotion()
     Uint32 deltaTime = currentTime - lastAxisMovementTime;
     lastAxisMovementTime = currentTime;
     
-    if (xaxis_value == 0 && yaxis_value == 0)
-        return;
-    
-    xaxis_float += ((pow(abs(xaxis_value), 1.03f) * (xaxis_value / abs(xaxis_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
-    yaxis_float += ((pow(abs(yaxis_value), 1.03f) * (yaxis_value / abs(yaxis_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
+	//cursor movement
+    if (xaxisl_value != 0 || yaxisl_value != 0)
+    {
+		xaxis_float += ((pow(abs(xaxisl_value), 1.03f) * (xaxisl_value / abs(xaxisl_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
+		yaxis_float += ((pow(abs(yaxisl_value), 1.03f) * (yaxisl_value / abs(yaxisl_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
 
-    if(xaxis_float < 0) 
-		xaxis_float = 0;
-    if(yaxis_float < 0) 
-		yaxis_float = 0;
+		if(xaxis_float < 0) 
+			xaxis_float = 0;
+		if(yaxis_float < 0) 
+			yaxis_float = 0;
 
-    if(xaxis_float > GetWidth())
-		xaxis_float = GetWidth();
-    if(yaxis_float > GetHeight())
-		yaxis_float = GetHeight();
-    
-	MouseMovement(static_cast<int>(xaxis_float), static_cast<int>(yaxis_float));
+		if(xaxis_float > GetWidth())
+			xaxis_float = GetWidth();
+		if(yaxis_float > GetHeight())
+			yaxis_float = GetHeight();
+		
+		MouseMovement(static_cast<int>(xaxis_float), static_cast<int>(yaxis_float));
+	}
+
+	//map scroll
+    if (xaxisr_value != 0 || yaxisr_value != 0)
+    {
+		if (xaxisr_value > JOY_MAP_SCROLL_DEADZONE)
+			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+		else if (xaxisr_value < -JOY_MAP_SCROLL_DEADZONE)
+			EvntManager->OnSpecialKeyPress(GEM_LEFT);
+		
+		if (yaxisr_value > JOY_MAP_SCROLL_DEADZONE)
+			EvntManager->OnSpecialKeyPress(GEM_DOWN);
+		else if (yaxisr_value < -JOY_MAP_SCROLL_DEADZONE)
+			EvntManager->OnSpecialKeyPress(GEM_UP);
+	}
 }
 #endif
 

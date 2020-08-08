@@ -1,9 +1,22 @@
 # GemRB port for PS Vita
 
+## Install
+Download gemrb_data.zip and gemrb.vpk files from https://github.com/Northfear/gemrb-vita/releases.
+
+Install gemrb.vpk to your Vita. Extract "GemRB" folder from gemrb_data.zip to ux0:data.
+
+Copy original game folder to ux0:data/GemRB/ and edit ux0:data/GemRB/GemRB.cfg file (set correct "GameType" and "GamePath" parameters. Game auto detection isn't working, so set "GameType" manually).
+
+rePatch reDux0 plugin is required for proper suspend/resume support
+
+https://github.com/dots-tb/rePatch-reDux0
+
 ## Building
 
 ### Prerequisites
-libpython is required for GemRB.
+- libSDL 1.2
+- SDL_mixer
+- libpython
 
 This one 
 
@@ -13,7 +26,7 @@ Or this one (checkout and just do make && make install)
 
 https://github.com/Northfear/Python-2.7.3-vita
 
-are both working fine 
+are both working fine
 
 ### Build & installation
 ```
@@ -26,24 +39,25 @@ Install gemrb.vpk to your Vita system.
 
 Copy folders "GUIScripts", "override" and "unhardcoded" from build/vitabuild/vitabuild folder into ux0:data/GemRB/
 
-Rename GemRB.cfg.vita into GemRB.cfg, copy it to ux0:data/GemRB/ and edit it (Set your game folder. Game auto detection isn't working too, so set GameType accordingly)
+Rename GemRB.cfg.vita into GemRB.cfg, copy it to ux0:data/GemRB/ and edit it.
 
 Debug output can be previewed with psp2shell
 
 https://github.com/Cpasjuste/psp2shell
 
-## Original game data
-Copy original game directory to ux0:data/GemRB/ and edit ux0:data/GemRB/GemRB.cfg file (set correct "GameType" and "GamePath" parameters)
-
 ## Port info
-rePatch reDux0 plugin is required for proper suspend/resume support
-https://github.com/dots-tb/rePatch-reDux0
+Keyboard input is not supported and there's no virtual keyboard in SDL1. To auto-fill desired character name during character creation, edit VitaCharName parameter in GemRB.cfg.
 
-Performance with 640x480 resolution is "kinda playable". To improve it I STRONGLY recommend disabling character movement and attack sounds in game options. The game is pretty IO heavy for Vita, so loading times can be quite long.
+To input savegame names (it's impossible to save a game with blank name) just use TRIANGLE or SQUARE buttons.
 
-Custom portraits, character imports, voice selection on character creation are not supported right now.
+Pointer movement speed can be changed with 'VitaPointerSpeed' parameter in GemRB.cfg.
 
-Port probably cointains a lot of bugs, since I haven't tested it much.
+Performance with 640x480 resolution is "kinda playable". To improve it I STRONGLY recommend disabling character movement and attack sounds in game options. Disabling sound altogether (by seting "AudioDriver = none" in GemRB.cfg) can improve performance even further.
+The game is pretty IO heavy for Vita, so loading can take some time.
+
+Custom portraits, character imports, voice selection during character creation are not supported right now (but you can copy saves from PC with all of these and they should work fine)
+
+Port probably contains some bugs, since I haven't tested it that much.
 
 ## Controls
 - Left analog stick - Pointer movement
@@ -51,7 +65,7 @@ Port probably cointains a lot of bugs, since I haven't tested it much.
 - O button - Right mouse button
 - SQUARE button - Open map
 - TRIANGLE button - Open inventory
-- D-Pad - Map scrolling
+- D-Pad, Right analog stick  - Map scrolling
 - R1 - Pause
 - L1 - Highlight items
 - SELECT - Open menu

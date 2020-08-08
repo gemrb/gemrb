@@ -43,7 +43,7 @@ VitaPointerSpeed = 10
 #                                                   #
 #####################################################
 
-GameType=bg2
+GameType=test
 
 #####################################################
 #  Game Name [String] Title for GemRB window, use   #
@@ -160,7 +160,7 @@ DrawFPS=0
 #  Remember, EE versions are not supported!         #
 #####################################################
 
-GamePath=ux0:data/GemRB/BG2Demo
+GamePath=ux0:data/GemRB/minimal
 # only set these if the folders are not in your GamePath
 #CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 #CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
