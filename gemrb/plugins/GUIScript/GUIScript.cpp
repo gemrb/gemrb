@@ -11535,9 +11535,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	if ((unsigned int) Slot>core->GetInventorySize()) {
-		return AttributeError( "Invalid slot" );
-	}
 	CREItem* si;
 	if (Type) {
 		Map *map = actor->GetCurrentArea();
@@ -11550,6 +11547,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
+		if ((unsigned int) Slot > core->GetInventorySize()) {
+			return AttributeError("Invalid slot");
+		}
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
 		// make sure the encumbrance labels stay correct
