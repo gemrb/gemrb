@@ -1428,9 +1428,10 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		damagetype = DAMAGE_CRUSHING;
 		break;
 	case 8:
-		// TODO: also play "GORE.WAV" / "GORE2.WAV"
 		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		// bg1 & iwds have this file, bg2 & pst none
+		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 16:
 		BASE_STATE_SET(STATE_PETRIFIED);
@@ -1443,10 +1444,13 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case 64:
 		BASE_STATE_SET(STATE_PETRIFIED);
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		// file only in iwds
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 128:
 		BASE_STATE_SET(STATE_FROZEN);
 		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
 		break;
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
