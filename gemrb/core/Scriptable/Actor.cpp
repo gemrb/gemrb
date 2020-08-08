@@ -5480,8 +5480,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	}
 }
 
-//TODO: needs a way to respawn at a point
-void Actor::Resurrect()
+void Actor::Resurrect(const Point &destPoint)
 {
 	if (!(Modified[IE_STATE_ID ] & STATE_DEAD)) {
 		return;
@@ -5491,6 +5490,9 @@ void Actor::Resurrect()
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_AVATARREMOVAL, 0);
+	if (!destPoint.isnull()) {
+		SetPosition(destPoint, CC_CHECK_IMPASSABLE, 0);
+	}
 	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
 	//raise dead leaves it at 1 hp

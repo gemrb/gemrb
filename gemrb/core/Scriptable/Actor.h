@@ -638,7 +638,7 @@ public:
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
 	void SetPersistent(int partyslot);
 	/* resurrects actor */
-	void Resurrect();
+	void Resurrect(const Point &destPoint);
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */

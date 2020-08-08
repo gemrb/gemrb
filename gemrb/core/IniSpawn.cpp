@@ -642,7 +642,7 @@ void IniSpawn::RespawnNameless()
 		strnuprcpy(NamelessSpawnArea, nameless->Area, 8);
 	}
 
-	nameless->Resurrect();
+	nameless->Resurrect(NamelessSpawnPoint);
 	// resurrect leaves you at 1hp for raise dead, so manually bump it back to max
 	nameless->RefreshEffects(NULL);
 	nameless->SetBase(IE_HITPOINTS, 9999);

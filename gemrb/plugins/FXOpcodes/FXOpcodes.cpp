@@ -958,7 +958,7 @@ static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 	if (area && target->GetCurrentArea()!=area) {
 		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
 	}
-	target->Resurrect();
+	target->Resurrect(p);
 }
 
 
