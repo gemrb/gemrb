@@ -2022,7 +2022,7 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
-		double factor = caller ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
+		double factor = caller && caller->speed ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
