@@ -757,7 +757,7 @@ void Map::UpdateScripts()
 		if (speed) {
 			speed = 1500/speed;
 		}
-		if (core->GetResDataINI()) {
+		if (core->HasFeature(GF_RESDATA_INI)) {
 			ieDword animid = actor->BaseStats[IE_ANIMATION_ID];
 			if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 				animid = animid & 0xff;
@@ -769,7 +769,14 @@ void Map::UpdateScripts()
 				} else if (avatar->WalkScale) {
 					speed = avatar->WalkScale;
 				} else {
-					//print("no walkscale for anim %d!", actor->BaseStats[IE_ANIMATION_ID]);
+					// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
+				}
+				// the speeds are already inverted, so we need to increase them to slow down
+				int encumbranceFactor = actor->GetEncumbranceFactor(false);
+				if (encumbranceFactor <= 2) {
+					speed *= encumbranceFactor;
+				} else {
+					speed = 0;
 				}
 			}
 		}
