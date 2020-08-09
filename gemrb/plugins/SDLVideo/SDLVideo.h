@@ -179,6 +179,10 @@ protected:
 	virtual int ProcessEvent(const SDL_Event & event);
 
 #ifdef VITA
+#if SDL_VERSION_ATLEAST(1,3,0)
+#define SDLKey SDL_Keycode
+#endif
+
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
 	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
