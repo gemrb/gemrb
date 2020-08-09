@@ -554,6 +554,8 @@ public:
 	}
 	void SetName(const char* ptr, unsigned char type);
 	void SetName(int strref, unsigned char type);
+	/* Returns by how much movement speed should be divided to account for loot weight */
+	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
 	int CalculateSpeed(bool feedback);
 	/* checks on death of actor, returns true if it should be removed*/

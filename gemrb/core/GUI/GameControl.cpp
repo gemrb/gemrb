@@ -253,8 +253,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
 bool GameControl::ShouldRun(Actor *actor) const
 {
 	if (!actor) return false;
-	ieDword speed = actor->CalculateSpeed(true);
-	if (speed != actor->GetStat(IE_MOVEMENTRATE)) {
+	if (actor->GetEncumbranceFactor(true) != 1) {
 		return false;
 	}
 	return (DoubleClick || AlwaysRun);

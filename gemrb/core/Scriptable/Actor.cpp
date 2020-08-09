@@ -5383,33 +5383,42 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 	return GetBaseCasterLevel(IE_SPL_PRIEST, strict) + GetBaseCasterLevel(IE_SPL_WIZARD, strict);
 }
 
+int Actor::GetEncumbranceFactor(bool feedback) const
+{
+	int encumbrance = inventory.GetWeight();
+	int maxWeight = GetMaxEncumbrance();
+
+	if (encumbrance <= maxWeight || (BaseStats[IE_EA] > EA_GOODCUTOFF && !third)) {
+		return 1;
+	}
+	if (encumbrance <= maxWeight * 2) {
+		if (feedback && core->HasFeedback(FT_STATES)) {
+			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
+		}
+		return 2;
+	}
+	if (feedback && core->HasFeedback(FT_STATES)) {
+		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
+	}
+	return 123456789; // large enough to round to 0 when used as a divisor
+}
+
+// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
 int Actor::CalculateSpeed(bool feedback)
 {
 	int speed = GetStat(IE_MOVEMENTRATE);
-	inventory.CalculateWeight();
 
 	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
 		// cheating bastards (drow in ar2401 for example)
 		return speed;
 	}
 
+	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
+	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-	int maxweight = GetMaxEncumbrance();
 
-	if(encumbrance<=maxweight) {
-		return speed;
-	}
-	if(encumbrance<=maxweight*2) {
-		if (feedback && core->HasFeedback(FT_STATES)) {
-			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
-		}
-		return speed/2;
-	}
-	if (feedback && core->HasFeedback(FT_STATES)) {
-		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
-	}
-	return 0;
+	return speed / encumbranceFactor;
 }
 
 //receive turning
