@@ -2345,7 +2345,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	prevTicks = Ticks;
 	Destination = Des;
 
-	if (std::abs(Des.x - Pos.x) <= XEPS && std::abs(Des.y - Pos.y) <= YEPS) {
+	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
 		ClearPath(true);
 		return;
 	}
