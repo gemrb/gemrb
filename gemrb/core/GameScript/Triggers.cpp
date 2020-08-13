@@ -2194,8 +2194,6 @@ int GameScript::SetSpellTarget(Scriptable* Sender, Trigger* parameters)
 		scr->LastTargetPos.empty();
 		return 1;
 	}
-	scr->LastTarget = 0;
-	scr->LastTargetPersistent = 0;
 	scr->LastTargetPos.empty();
 	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
