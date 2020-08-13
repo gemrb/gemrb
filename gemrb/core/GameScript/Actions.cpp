@@ -5460,7 +5460,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		}
 		//mark spell and target
 		me->LastMarkedSpell = splnum;
-		me->LastMarked = tar->GetGlobalID();
+		me->LastSpellTarget = tar->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
