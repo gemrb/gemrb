@@ -5394,8 +5394,6 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->LastMarked = tar->GetGlobalID();
-	//if this doesn't modify LastSeen, then remove this line
-	actor->LastSeen = actor->LastMarked;
 }
 
 void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)

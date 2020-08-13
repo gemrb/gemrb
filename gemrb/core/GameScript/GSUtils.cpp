@@ -1294,6 +1294,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		dest = ((InfoPoint *)target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
+		Sender->LastSeen = target->GetGlobalID();
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
