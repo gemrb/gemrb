@@ -1462,6 +1462,11 @@ bool GameControl::IsDisabledCursor() const
 
 bool GameControl::OnMouseDrag(const MouseEvent& me)
 {
+	if (me.ButtonState(GEM_MB_MIDDLE)) {
+		Scroll(me.Delta());
+		return true;
+	}
+	
 	if (target_mode != TARGET_MODE_NONE) {
 		// we are in a target mode; nothing here applies
 		return true;
