@@ -2268,14 +2268,6 @@ int GameScript::IsMarkedSpell(Scriptable* Sender, Trigger* parameters)
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
 {
 	int see = SeeCore(Sender, parameters, 0);
-	//don't mark LastSeen for clear!!!
-	if (Sender->Type==ST_ACTOR && see) {
-		Actor *act = (Actor *) Sender;
-		//save lastseen as lastmarked
-		//FIXME: what is this doing?
-		act->LastMarked = act->LastSeen;
-		//Sender->AddTrigger (&act->LastSeen);
-	}
 	return see;
 }
 
