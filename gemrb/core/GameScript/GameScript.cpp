@@ -2309,6 +2309,11 @@ bool Condition::Evaluate(Scriptable* Sender)
 	unsigned int result = 0;
 	bool subresult = true;
 
+	if (triggers.empty()) {
+		Log(ERROR, "GameScript", "Trigger block without triggers encountered!");
+		return false;
+	}
+
 	for (size_t i = 0; i < triggers.size(); i++) {
 		Trigger* tR = triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
