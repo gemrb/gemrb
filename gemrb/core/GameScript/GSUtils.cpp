@@ -613,6 +613,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 			//TODO: maybe set the object references here too
 			return 1;
 		}
+		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = ( Actor* ) Sender;
 			//additional checks for invisibility?

@@ -1497,6 +1497,9 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	if (Sender->GetCurrentArea() != scr->GetCurrentArea()) {
 		return 0;
 	}
+	if (Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = scr->GetGlobalID();
+	}
 	int distance = SquaredMapDistance(Sender, scr);
 	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
 }
@@ -3331,7 +3334,12 @@ int GameScript::IsFacingObject(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	bool match = Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (match && target && Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = target->GetGlobalID();
+	}
+	return match;
 }
 
 int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
@@ -3396,19 +3404,28 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 		case 7: stat = IE_ALIGNMENT; break;
 		default: return 0;
 	}
+	bool match = false;
 	if (stat == IE_CLASS) {
-		return actor->GetActiveClass() == help->GetActiveClass();
+		match = actor->GetActiveClass() == help->GetActiveClass();
 	} else if (actor->GetStat(stat) == help->GetStat(stat)) {
 		// FIXME
 		//Sender->AddTrigger(&actor->LastHelp);
-		return 1;
+		match = true;
 	}
-	return 0;
+	if (match && Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = actor->GetGlobalID();
+	}
+	return match;
 }
 
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
+	 bool match = Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
+	 Scriptable* target = GetActorFromObject(Sender, parameters->objectParameter);
+	 if (match && target && Sender->Type == ST_ACTOR) {
+		 Sender->LastMarked = target->GetGlobalID();
+	 }
+	 return match;
 }
 
 int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)
