@@ -5496,7 +5496,6 @@ void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//TODO: check if spell exists (not really important)
 	actor->LastMarkedSpell = parameters->int0Parameter;
 	return;
 }

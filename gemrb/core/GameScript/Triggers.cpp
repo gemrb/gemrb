@@ -2238,21 +2238,10 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 //Always manages to set spell to 0, otherwise it sets if there was nothing set earlier
 int GameScript::SetMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor *scr = (Actor *) Sender;
-	if (parameters->int0Parameter) {
-		if (scr->LastMarkedSpell) {
-			return 1;
-		}
-		if (!scr->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
-			return 1;
-		}
-	}
-
-	//TODO: check if spell exists (not really important)
-	scr->LastMarkedSpell = parameters->int0Parameter;
+	Action *params = new Action(true);
+	params->int0Parameter = parameters->int0Parameter;
+	GameScript::SetMarkedSpell(Sender, params);
+	delete params;
 	return 1;
 }
 
