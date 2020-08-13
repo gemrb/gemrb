@@ -2047,7 +2047,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				}
 				// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen)
 				// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
-				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ','))) {
+				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ',' && *(src+1) != ')'))) {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;
