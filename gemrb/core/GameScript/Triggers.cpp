@@ -1242,10 +1242,16 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
+
+	if (parameters->int0Parameter == 0 && Sender->LastMarkedSpell == 0) {
+		return false;
+	}
+
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
 		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
 	}
+	if (!parameters->int0Parameter) parameters->int0Parameter = Sender->LastMarkedSpell;
 	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
 }
 

@@ -2701,6 +2701,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	Scriptable *pretarget = NULL;
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
+	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
 	if (third && parameters->int0Parameter == 0) {
 		parameters->int0Parameter = Sender->LastMarkedSpell;
 		pretarget = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastMarked);
