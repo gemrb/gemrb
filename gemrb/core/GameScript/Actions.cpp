@@ -2156,7 +2156,6 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 		actor->LastTargetPersistent = 0;
 		return;
 	}
-	actor->LastSpellTarget = 0;
 	actor->LastTarget = tar->GetGlobalID();
 	actor->LastTargetPersistent = tar->GetGlobalID();
 }
