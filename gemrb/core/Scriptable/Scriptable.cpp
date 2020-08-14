@@ -1304,7 +1304,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
 			return -1;
 		}
 	}
@@ -1339,7 +1339,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
 			return -1;
 		}
 	}
