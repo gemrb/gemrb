@@ -2695,20 +2695,23 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 // shared spellcasting action code for casting on scriptables
 void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres;
+	ieResRef spellres = {};
 	int level = 0;
 	static bool third = core->HasFeature(GF_3ED_RULES);
-	Scriptable *pretarget = NULL;
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
 	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
-	if (third && parameters->int0Parameter == 0) {
-		parameters->int0Parameter = Sender->LastMarkedSpell;
-		pretarget = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastMarked);
+	if (third && parameters->int0Parameter == 0 && !parameters->string0Parameter[0]) {
+		if (!Sender->LastMarkedSpell) {
+			// otherwise we spam a lot
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		ResolveSpellName(spellres, Sender->LastMarkedSpell);
 	}
 
 	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
+	if (!spellres[0] && !ResolveSpellName(spellres, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
@@ -2745,9 +2748,8 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
-	if (pretarget) {
-		tar = pretarget;
-	} else if (!tar) {
+	if (!tar) {
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		if (act) {
 			act->SetStance(IE_ANI_READY);
@@ -2794,6 +2796,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 	if (duration == -1) {
 		// some kind of error
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (duration > 0) {
@@ -2802,11 +2805,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			parameters->int2Parameter = 0;
 		}
 		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+			parameters->int2Parameter = 0;
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
 	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2820,6 +2825,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		Log(ERROR, "GameScript", "SpellCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
+	parameters->int2Parameter = 0;
 	Sender->ReleaseCurrentAction();
 }
 
