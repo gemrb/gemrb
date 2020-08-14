@@ -280,6 +280,7 @@ public:
 	ieDword LastSummoner;
 	ieDword LastFollowed; // gemrb extension (LeaderOf)
 	ieDword LastMarked; // iwd2
+	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
 
 	int LastMarkedSpell; // iwd2
 
