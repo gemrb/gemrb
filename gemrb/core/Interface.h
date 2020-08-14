@@ -812,6 +812,8 @@ public:
 #ifdef VITA
 	char VitaCharName[20];
 	int VitaPointerSpeed = 10;
+	bool VitaKeepAspectRatio = true;
+	bool VitaBilinear = true;
 #endif
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];

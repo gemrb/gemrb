@@ -1,5 +1,7 @@
 VitaCharName = Dude
 VitaPointerSpeed = 10
+VitaKeepAspectRatio = 1
+VitaBilinear = 1
 
 #####################################################
 #                                                   #
@@ -79,7 +81,7 @@ Width=640
 Height=480
 
 #Bits per pixel [Integer:16,32]
-Bpp=32
+Bpp=16
 
 #Fullscreen [Boolean]
 Fullscreen=1

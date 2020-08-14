@@ -91,6 +91,54 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
 
+#ifdef VITA
+	if (width != 960 || height != 544)
+	{
+		int xpos = 0;
+		int ypos = 0;
+
+		if (fullscreen)
+		{
+			//resize to fullscreen
+			int xsize;
+			int ysize;
+
+			if (core->VitaKeepAspectRatio)
+			{
+				if ((960.0 / 544.0) >= ((float)width / height))
+				{
+					float scale = 544.0 / height;
+					xsize = width * scale;
+					ysize = 544;
+					xpos = (960 - xsize) / 2;
+				}
+				else
+				{
+					float scale = 960.0 / width;
+					xsize = 960;
+					ysize = height * scale;
+					ypos = (544 - ysize) / 2;
+				}
+			}
+			else
+			{
+				xsize = 960;
+				ysize = 544;
+			}
+			
+			SDL_SetVideoModeScaling(xpos, ypos, xsize, ysize);
+			SDL_SetVideoModeBilinear(core->VitaBilinear);
+		}
+		else
+		{
+			//center game area
+			xpos = (960 - width) / 2;
+			ypos = (544 - height) / 2;
+			SDL_SetVideoModeScaling(xpos, ypos, width, height);
+		}
+	}
+#endif
+
 	return GEM_OK;
 }
 

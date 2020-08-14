@@ -36,7 +36,7 @@
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h>
 
-int _newlib_heap_size_user = 224 * 1024 * 1024;
+int _newlib_heap_size_user = 320 * 1024 * 1024;
 #endif
 
 using namespace GemRB;

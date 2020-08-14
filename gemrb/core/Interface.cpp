@@ -1343,6 +1343,8 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 #ifdef VITA
 	CONFIG_INT("VitaPointerSpeed", VitaPointerSpeed = );
+	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
+	CONFIG_INT("VitaBilinear", VitaBilinear = );
 #endif
 
 #undef CONFIG_INT
