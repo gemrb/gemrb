@@ -562,8 +562,10 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	// might walk off a memory buffer; we have no danger of that in SDL 2.
 	// This fixes bizzare clipping issues when a "flipped" sprite is partially offscreen
 	// we still will clip with screenClip later so no worries there
-	Region dclipped = dst;
-#else
+	// we still want to do the clipping for the purposes of avoiding calls to BlitSpriteNativeClipped where
+	// expensive calls to RenderSpriteVersion may take place
+	Region originalSrc = src;
+#endif
 	// FIXME?: srect isn't verified
 	Region dclipped = ClippedDrawingRect(dst);
 	int trim = dst.h - dclipped.h;
@@ -586,6 +588,10 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	}
 
 	assert(dclipped.w == src.w && dclipped.h == src.h);
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+	dclipped = dst;
+	src = originalSrc;
 #endif
 
 	if (spr->renderFlags&BLIT_MIRRORX) {
