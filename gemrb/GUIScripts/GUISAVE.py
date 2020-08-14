@@ -161,6 +161,7 @@ def ScrollBarPress():
 
 def QuickSavePressed():
 	Slot = 1
+	GUICommon.SetSaveDir ()
 
 	if GameCheck.IsTOB():
 		Slot = 4
