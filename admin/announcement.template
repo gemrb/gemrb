@@ -16,6 +16,9 @@ Thanks to everyone that contributed their time, including:
 git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
 https://github.com/mntnr/name-your-contributors is preferred
 
+export GITHUB_TOKEN=<get a token first>
+node_modules/.bin/name-your-contributors -o gemrb -a 2019-11-24 | grep -B1 name | sort -u
+
 (Optionally link or copy also the release notes)
 
 If you want to be notified of GemRB releases via email, subscribe to the
