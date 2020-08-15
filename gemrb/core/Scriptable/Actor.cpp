@@ -4850,7 +4850,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (displaymsg->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
+	if (displaymsg->HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -4869,23 +4869,27 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
-			if (hitter && hitter->Type == ST_ACTOR) {
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(1) );
-			} else {
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "trap" );
-			}
+
+			int strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				displaymsg->DisplayConstantStringName(STR_DAMAGE3, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				displaymsg->DisplayConstantStringName(STR_DAMAGE2, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
-				displaymsg->DisplayConstantStringName(STR_DAMAGE1, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL1;
 			}
+			if (hitter && hitter->Type == ST_ACTOR) {
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(1) );
+			} else {
+				// variant without damager
+				strref -= (STR_DAMAGE_DETAIL1 - STR_DAMAGE1);
+			}
+			displaymsg->DisplayConstantStringName(strref, DMC_WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
 			wchar_t dmg[10];
