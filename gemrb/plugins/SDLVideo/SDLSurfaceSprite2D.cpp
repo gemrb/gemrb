@@ -135,13 +135,8 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 {
 	Palette* palette = surface->palette.get();
 
-	if (pal == palette) {
-		if (pal->GetVersion() != palVersion) {
-			Restore();
-		} else {
-			return;
-		}
-	}
+	// we don't use shared palettes because it is a performance bottleneck on SDL2
+	assert(pal != palette);
 
 	if (palette) {
 		palette->release();
@@ -156,9 +151,7 @@ void SDLSurfaceSprite2D::SetPalette(Palette* pal)
 
 	ieDword ck = GetColorKey();
 	if (pal && SetPalette(pal->col) == 0) {
-		palette = pal;
-		palette->acquire();
-
+		palette = pal->Copy();
 		// must reset the color key or SDL 2 wont render properly
 		SetColorKey(ck);
 	}
