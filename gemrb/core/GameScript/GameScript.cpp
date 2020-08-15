@@ -522,7 +522,7 @@ static const ActionLink actionnames[] = {
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
-	{"calllightning", GameScript::Kill, 0}, //TODO: call lightning projectile
+	{"calllightning", GameScript::Kill, 0}, // just an instant death with Param2 = 0x100
 	{"calm", GameScript::Calm, 0},
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changeaitype", GameScript::ChangeAIType, 0},
