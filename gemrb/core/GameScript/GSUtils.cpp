@@ -866,14 +866,14 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	Actor *tar = gamedata->GetCreature(resref);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
-		map->AddActor( tar, true );
 		Point pos = src->Pos;
-		tar->SetOrientation(src->GetOrientation(), false );
 		// make sure to copy the HP, to avoid things like magically-healing trolls
-		tar->BaseStats[IE_HITPOINTS]=src->BaseStats[IE_HITPOINTS];
+		tar->BaseStats[IE_HITPOINTS] = src->BaseStats[IE_HITPOINTS];
+		tar->SetOrientation(src->GetOrientation(), false);
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
-		tar->SetPosition(pos, 1);
+		map->AddActor(tar, true);
+		tar->SetPosition(pos, 1, 8, 8);
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}
