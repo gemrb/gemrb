@@ -454,91 +454,234 @@ void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
     }
 }
 
+unsigned char SDLVideoDriver::GetCurrentKeyValue()
+{
+	unsigned char modKeyValue = vitaKeys[currentCharIndex];
+
+	if (currentUpper && vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
+	{
+		modKeyValue -= 32;
+	}
+
+	return modKeyValue;
+}
+
 void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 {
-	switch(button.button)
+	if (vitaInputActive)
 	{
-		//LMB event
-		case BTN_CROSS:
+		switch(button.button)
 		{
-			GamepadMouseEvent(1, button.state);
-			break;
-		}
-		//RMB event
-		case BTN_CIRCLE:
-		{
-			GamepadMouseEvent(3, button.state);
-			break;
-		}
-		//scroll map
-		case BTN_LEFT:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_LEFT);
-			break;
-		}
-		case BTN_RIGHT:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-			break;
-		}
-		case BTN_UP:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_UP);
-			break;
-		}
-		case BTN_DOWN:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_DOWN);
-			break;
-		}
-		//open menu
-		case BTN_SELECT:
-		{
-			GamepadKeyboardEvent(SDLK_o, button.state);
-			break;
-		}
-		//F6 shortcut
-		case BTN_START:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_FUNCTION1 + SDLK_F6-SDLK_F1);
-			break;
-		}
-		//pause combat
-		case BTN_R1:
-		{
-			GamepadKeyboardEvent(SDLK_SPACE, button.state);
-			break;
-		}
-		//highlight items
-		case BTN_L1:
-		{
-			if (button.state == SDL_PRESSED)
-				EvntManager->OnSpecialKeyPress(GEM_ALT);
-			else
-				EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
-			
-			break;
-		}
-		//inventory
-		case BTN_TRIANGLE:
-		{
-			GamepadKeyboardEvent(SDLK_i, button.state);
-			break;
-		}
-		//map
-		case BTN_SQUARE:
-		{
-			GamepadKeyboardEvent(SDLK_m, button.state);
-			break;
-		}
+			case BTN_LEFT:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
 
-		default:
-			return;
+				if (inputIndexes.empty())
+				{
+					emptyInput = true;
+					currentUpper = true;
+					currentCharIndex = 0;
+				}
+				else
+				{
+					currentCharIndex = inputIndexes.back();
+					inputIndexes.pop_back();
+				}
+					
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				break;
+			}
+			case BTN_RIGHT:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
+
+				if (emptyInput)
+				{
+					emptyInput = false;
+				}
+				else
+				{
+					currentUpper = false;
+					currentCharIndex = 0;
+					inputIndexes.push_back(currentCharIndex);
+				}
+
+				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			}
+			case BTN_UP:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
+
+				if (emptyInput)
+				{
+					emptyInput = false;
+				}
+				else
+				{
+					currentCharIndex++;
+					if (currentCharIndex >= TOTAL_CHARACTERS_VITA)
+						currentCharIndex = 0;
+				}
+
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			}
+			case BTN_DOWN:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
+
+				if (emptyInput)
+				{
+					emptyInput = false;
+				}
+				else
+				{
+					currentCharIndex--;
+					if (currentCharIndex < 0)
+						currentCharIndex = TOTAL_CHARACTERS_VITA - 1;
+				}
+
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			}
+			case BTN_L1:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
+
+				if (emptyInput)
+					emptyInput = false;
+				
+				if (vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
+					currentUpper = !currentUpper;
+
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+
+				break;
+			}
+			case BTN_R1:
+			{
+				if (button.state != SDL_PRESSED)
+					return;
+
+				if (emptyInput)
+					emptyInput = false;
+
+				if (vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
+					currentUpper = !currentUpper;
+
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			}
+			//LMB event
+			case BTN_CROSS:
+			{
+				GamepadMouseEvent(1, button.state);
+				break;
+			}
+			//RMB event
+			case BTN_CIRCLE:
+			{
+				GamepadMouseEvent(3, button.state);
+				break;
+			}
+		}
+	}
+	else
+	{
+		switch(button.button)
+		{
+			//LMB event
+			case BTN_CROSS:
+			{
+				GamepadMouseEvent(1, button.state);
+				break;
+			}
+			//RMB event
+			case BTN_CIRCLE:
+			{
+				GamepadMouseEvent(3, button.state);
+				break;
+			}
+			//scroll map
+			case BTN_LEFT:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_LEFT);
+				break;
+			}
+			case BTN_RIGHT:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+				break;
+			}
+			case BTN_UP:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_UP);
+				break;
+			}
+			case BTN_DOWN:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_DOWN);
+				break;
+			}
+			//open menu
+			case BTN_SELECT:
+			{
+				GamepadKeyboardEvent(SDLK_o, button.state);
+				break;
+			}
+			//F6 shortcut
+			case BTN_START:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_FUNCTION1 + SDLK_F6-SDLK_F1);
+				break;
+			}
+			//pause combat
+			case BTN_R1:
+			{
+				GamepadKeyboardEvent(SDLK_SPACE, button.state);
+				break;
+			}
+			//highlight items
+			case BTN_L1:
+			{
+				if (button.state == SDL_PRESSED)
+					EvntManager->OnSpecialKeyPress(GEM_ALT);
+				else
+					EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
+				
+				break;
+			}
+			//inventory
+			case BTN_TRIANGLE:
+			{
+				GamepadKeyboardEvent(SDLK_i, button.state);
+				break;
+			}
+			//map
+			case BTN_SQUARE:
+			{
+				GamepadKeyboardEvent(SDLK_m, button.state);
+				break;
+			}
+
+			default:
+				return;
+		}
 	}
 }
 

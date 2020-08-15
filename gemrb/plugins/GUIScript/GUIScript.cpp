@@ -5927,11 +5927,6 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 
 	//returns only the pointer
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
-#ifdef VITA
-		//return default name if it's empty on Vita (only in character creator hopefully..)
-		if (std::strcmp(Variable, "CHARNAME") == 0)
-			return PyString_FromString(core->VitaCharName);
-#endif
 		return PyString_FromString( "" );
 	}
 
@@ -6660,7 +6655,8 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 		return AttributeError( GemRB_TextArea_ListResources__doc );
 	}
 #else
-	// Do custom tuple parse here. It can't get any worse anyway (PyArg_ParseTuple returns wrong params)
+	// Do custom tuple parse here. It can't get any worse anyway, since PyArg_ParseTuple returns wrong values here (wi or ci is 0)
+	// This is pretty damn bad, but so far seems like the only visibly affected place (other (iii|i) parses are accurate)
 	PyObject* objectsRepresentation = PyObject_Repr(args);
 	char* str = PyString_AsString(objectsRepresentation);
 

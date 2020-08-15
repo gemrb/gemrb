@@ -328,16 +328,30 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
+#ifdef VITA
+	Log(WARNING, "SDL 1.2 Driver", "Vita input active");
+	vitaInputActive = true;
+	emptyInput = true;
+	currentUpper = true;
+	currentCharIndex = 0;
+	inputIndexes.clear();
+#else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 	}
+#endif
 }
 
 void SDL12VideoDriver::HideSoftKeyboard()
 {
+#ifdef VITA
+	Log(WARNING, "SDL 1.2 Driver", "Vita input inactive");
+	vitaInputActive = false;
+#else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 	}
+#endif
 }
 
 bool SDL12VideoDriver::TouchInputEnabled() const

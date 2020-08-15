@@ -1365,10 +1365,6 @@ int Interface::Init(InterfaceConfig* config)
 		strlcpy( GameType, "bg2", sizeof(GameType) );
 	}
 
-#ifdef VITA
-	CONFIG_STRING("VitaCharName", VitaCharName, "Anon");
-#endif
-
 #undef CONFIG_STRING
 
 // assumes that default value does not need to be resolved or fixed in any way

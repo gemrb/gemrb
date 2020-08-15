@@ -183,11 +183,60 @@ protected:
 #define SDLKey SDL_Keycode
 #endif
 
+	static const int TOTAL_CHARACTERS_VITA = 37;
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
 	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
 	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
 	void ProcessAxisMotion();
+	unsigned char GetCurrentKeyValue();
+
+	bool vitaInputActive = false;
+	bool emptyInput = false;
+	bool currentUpper = false;
+	int currentCharIndex;
+	std::vector <int> inputIndexes;
+
+	unsigned char vitaKeys[TOTAL_CHARACTERS_VITA] = 
+	{
+		97,
+		98,
+		99,
+		100,
+		101,
+		102,
+		103,
+		104,
+		105,
+		106,
+		107,
+		108,
+		109,
+		110,
+		111,
+		112,
+		113,
+		114,
+		115,
+		116,
+		117,
+		118,
+		119,
+		120,
+		121,
+		122,
+		32,
+		48,
+		49,
+		50,
+		51,
+		52,
+		53,
+		54,
+		55,
+		56,
+		57
+	};
 #endif
 
 public:
