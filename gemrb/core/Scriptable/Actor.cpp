@@ -11427,7 +11427,9 @@ ieDword Actor::GetActiveClass() const
 		if (newclassmask == mask) return newclass;
 	}
 
-	error("Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass); // return 0 if this ever needs to be hit only as a warning
+	// can be hit when starting a dual class
+	Log(ERROR, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d), using old class!", GetName(1), oldclass, multiclass);
+	return oldclass;
 }
 
 // like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
