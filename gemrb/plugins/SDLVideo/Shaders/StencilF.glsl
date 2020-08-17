@@ -13,17 +13,9 @@ void main()
 	if (u_dither == 1 && gl_FragColor.a > 0.0) {
 		vec2 p = vec2(floor(gl_FragCoord.x), floor(gl_FragCoord.y));
 		if (mod(p.y, 2.0) == 0.0) {
-			if (mod(p.x, 2.0) == 0.0) {
-				gl_FragColor.a = 1.0;
-			} else {
-				gl_FragColor.a = 0.0;
-			}
+			gl_FragColor.a = float(mod(p.x, 2.0) == 0.0);
 		} else {
-			if (mod(p.x, 2.0) != 0.0) {
-				gl_FragColor.a = 1.0;
-			} else {
-				gl_FragColor.a = 0.0;
-			}
+			gl_FragColor.a = float(mod(p.x, 2.0) != 0.0);
 		}
 	}
 }
