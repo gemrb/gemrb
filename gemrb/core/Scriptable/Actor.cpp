@@ -706,6 +706,12 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		Log(WARNING, "Actor", "Unable to determine movement rate for animation %04x!", AnimID);
 	}
 
+	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
+	int walkSpeed = CalculateSpeed(false);
+	if (walkSpeed) {
+		walkSpeed = 1500/walkSpeed;
+	}
+	speed = walkSpeed;
 }
 
 CharAnimations* Actor::GetAnims() const
