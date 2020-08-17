@@ -2277,7 +2277,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
 			ClearPath(true);
 			NewOrientation = Orientation;
-			pathAbandoned = true;
 			return;
 		}
 		if (BlocksSearchMap()) {
