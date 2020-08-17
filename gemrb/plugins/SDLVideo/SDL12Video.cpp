@@ -329,7 +329,6 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
 #ifdef VITA
-	Log(WARNING, "SDL 1.2 Driver", "Vita input active");
 	vitaInputActive = true;
 	emptyInput = true;
 	currentUpper = true;
@@ -345,7 +344,6 @@ void SDL12VideoDriver::ShowSoftKeyboard()
 void SDL12VideoDriver::HideSoftKeyboard()
 {
 #ifdef VITA
-	Log(WARNING, "SDL 1.2 Driver", "Vita input inactive");
 	vitaInputActive = false;
 #else
 	if(core->UseSoftKeyboard){

@@ -470,6 +470,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 {
 	if (vitaInputActive)
 	{
+		//name editing phase
 		switch(button.button)
 		{
 			case BTN_LEFT:
@@ -487,6 +488,8 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				{
 					currentCharIndex = inputIndexes.back();
 					inputIndexes.pop_back();
+					if (inputIndexes.empty())
+						currentUpper = true;
 				}
 					
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
@@ -504,14 +507,14 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				else
 				{
 					currentUpper = false;
-					currentCharIndex = 0;
 					inputIndexes.push_back(currentCharIndex);
+					currentCharIndex = 0;
 				}
 
 				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
-			case BTN_UP:
+			case BTN_DOWN:
 			{
 				if (button.state != SDL_PRESSED)
 					return;
@@ -531,7 +534,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
-			case BTN_DOWN:
+			case BTN_UP:
 			{
 				if (button.state != SDL_PRESSED)
 					return;
@@ -594,10 +597,14 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				GamepadMouseEvent(3, button.state);
 				break;
 			}
+
+			default:
+				return;
 		}
 	}
 	else
 	{
+		//gameplay bindings
 		switch(button.button)
 		{
 			//LMB event

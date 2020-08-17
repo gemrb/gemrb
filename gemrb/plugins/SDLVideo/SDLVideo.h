@@ -199,6 +199,7 @@ protected:
 
 	unsigned char vitaKeys[TOTAL_CHARACTERS_VITA] = 
 	{
+		//lowercase letters
 		97,
 		98,
 		99,
@@ -225,7 +226,9 @@ protected:
 		120,
 		121,
 		122,
+		//space
 		32,
+		//nums
 		48,
 		49,
 		50,
