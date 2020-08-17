@@ -225,7 +225,7 @@ void SRBlender<Uint32, SRBlender_Alpha>::operator()(Uint32& pix, Uint8 r, Uint8 
 #define ADVANCE_ITERATORS(count) dest.Advance(count); cover.Advance(count);
 
 template<typename PTYPE, typename Tinter, typename Blender>
-void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, PTYPE amask,
+void MaskedTintedBlend(PTYPE& dest, Uint8 maskval,
 					   Color col, uint32_t flags,
 					   const Tinter& tint, const Blender& blend)
 {
@@ -235,7 +235,7 @@ void MaskedTintedBlend(PTYPE& dest, Uint8 maskval, PTYPE amask,
 		blend(dest, col.r, col.g, col.b, col.a);
 		// FIXME: we should probably address this in the blenders instead
 		
-		dest |= amask; // color keyed surface is 100% opaque
+		dest |= blend.AMASK; // color keyed surface is 100% opaque
 	}
 }
 
@@ -255,7 +255,7 @@ static void BlitSpriteRLE_Total(const Uint8* rledata,
 			continue;
 		}
 		
-		MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, dest.format->Amask, pal[p], flags, tint, blend);
+		MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, pal[p], flags, tint, blend);
 		ADVANCE_ITERATORS(1);
 	}
 }
@@ -326,7 +326,7 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 					transQueue = (*rledata++) + 1;
 				} else {
 					if (x >= srect.x && x < endx) {
-						MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, dest.format->Amask, pal[p], flags, tint, blend);
+						MaskedTintedBlend<PTYPE>((PTYPE&)*dest, *cover, pal[p], flags, tint, blend);
 						ADVANCE_ITERATORS(1);
 					}
 					++x;
