@@ -259,6 +259,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 
 		stencilShader->Use();
 		stencilShader->SetUniformValue("u_channel", 1, channel);
+		stencilShader->SetUniformValue("u_dither", 1, 1); // TODO: make dithering optional
 
 		glActiveTexture(GL_TEXTURE0);
 		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
