@@ -126,7 +126,7 @@ struct SRBlender<Uint16, BLENDER> {
 	uint8_t GSHIFT;
 	uint8_t BSHIFT;
 	
-	uint8_t AMASK;
+	Uint16 AMASK;
 	Uint16 halfmask;
 
 	SRBlender(SDL_PixelFormat* fmt) {
@@ -152,7 +152,7 @@ struct SRBlender<Uint32, BLENDER> {
 	uint8_t GSHIFT;
 	uint8_t BSHIFT;
 	
-	uint8_t AMASK;
+	Uint32 AMASK;
 	Uint32 halfmask;
 
 	SRBlender(SDL_PixelFormat* fmt) {
