@@ -2012,6 +2012,7 @@ Movable::Movable(ScriptableType type)
 	randomBackoff = 0;
 	pathfindingDistance = size;
 	randomWalkCounter = 0;
+	pathAbandoned = false;
 }
 
 Movable::~Movable(void)
@@ -2207,7 +2208,6 @@ void Movable::BumpBack()
 	bumpBackTries = 0;
 }
 
-
 // Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
 // The movement logic is a proportional regulator: the displacement/movement vector has a
 // fixed radius, based on actor walk speed, and its direction heads towards the next waypoint.
@@ -2255,11 +2255,15 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			Point nmptCollision(xCollision, yCollision);
 			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
+
 		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
 			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS && std::abs(nmptStep.y - Pos.y) < YEPS) {
 				ClearPath(true);
 				NewOrientation = Orientation;
+				// Do not call ReleaseCurrentAction() since other actions
+				// than MoveToPoint can cause movement
+				pathAbandoned = true;
 				return;
 			}
 			if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
@@ -2273,6 +2277,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
 			ClearPath(true);
 			NewOrientation = Orientation;
+			pathAbandoned = true;
 			return;
 		}
 		if (BlocksSearchMap()) {
@@ -2335,6 +2340,7 @@ void Movable::AddWayPoint(const Point &Des)
 void Movable::WalkTo(const Point &Des, int distance)
 {
 
+	Log(DEBUG, "WalkTo", "%s %d %d", GetName(0), Des.x, Des.y);
 	if (prevTicks && Ticks < prevTicks + 2) {
 		return;
 	}
@@ -2344,9 +2350,15 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	prevTicks = Ticks;
 	Destination = Des;
+	if (pathAbandoned) {
+		Log(DEBUG, "WalkTo", "%s: Path was just abandoned", GetName(0));
+		ClearPath(true);
+		return;
+	}
 
 	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
 		ClearPath(true);
+		SetOrientation(GetOrient(Des, Pos), true);
 		return;
 	}
 
@@ -2437,6 +2449,7 @@ void Movable::Stop()
 
 void Movable::ClearPath(bool resetDestination)
 {
+	pathAbandoned = false;
 
 	if (resetDestination) {
 		//this is to make sure attackers come to us

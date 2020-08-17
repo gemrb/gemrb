@@ -468,6 +468,7 @@ private: //these seem to be sensitive, so get protection
 	PathNode* step; //actual step
 	unsigned int prevTicks;
 	int bumpBackTries;
+	bool pathAbandoned;
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
