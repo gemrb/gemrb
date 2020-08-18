@@ -8942,7 +8942,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		if (!map) {
 			return RuntimeError("No current area!");
 		}
-		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+		container = map->GetPile(actor->Pos);
 	} else {
 		container = core->GetCurrentContainer();
 	}
