@@ -39,9 +39,7 @@
 namespace GemRB {
 
 class EventMgr;
-class Font;
 class Palette;
-class SpriteCover;
 
 // Note: not all these flags make sense together.
 // Specifically: BLIT_GREY overrides BLIT_SEPIA

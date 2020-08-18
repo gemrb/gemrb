@@ -25,6 +25,8 @@
 
 namespace GemRB {
 
+class Font;
+
 class TooltipBackground {
 	int animationSpeed;
 	mutable int animationPos;
