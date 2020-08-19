@@ -3884,6 +3884,7 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				fx->Parameter1 = 8;
 				break;
 			case 11:
+			case 30:
 				fx->Parameter1 = 15;
 				break;
 			default:

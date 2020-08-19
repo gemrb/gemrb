@@ -161,6 +161,7 @@ static bool raresnd = false;
 static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
+static AutoTable extspeed;
 
 //item animation override array
 struct ItemAnimType {
@@ -696,14 +697,30 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	SetCircleSize();
 	anims->SetColors(BaseStats+IE_COLORS);
 
-	//Speed is determined by the number of frames in each cycle of its animation
-	// (beware! GetAnimation has side effects!)
-	// TODO: we should have a more efficient way to look this up
-	Animation** anim = anims->GetAnimation(IE_ANI_WALK, 0);
-	if (anim && anim[0]) {
-		SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount()) ;
-	} else {
-		Log(WARNING, "Actor", "Unable to determine movement rate for animation %04x!", AnimID);
+	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
+	// the rest had it hardcoded
+	if (!core->HasFeature(GF_RESDATA_INI)) {
+		// handle default speed and per-animation overrides
+		int row = -1;
+		if (extspeed.ok()) {
+			char animHex[10];
+			snprintf(animHex, 10, "0x%04X", AnimID);
+			row = extspeed->FindTableValue((unsigned int) 0, animHex);
+			if (row != -1) {
+				int rate = atoi(extspeed->QueryField(row, 1));
+				SetBase(IE_MOVEMENTRATE, rate);
+			}
+		} else {
+			Log(MESSAGE, "Actor", "No moverate.2da found, using animation (0x%04X) for speed fallback!", AnimID);
+		}
+		if (row == -1) {
+			Animation **anim = anims->GetAnimation(IE_ANI_WALK, 0);
+			if (anim && anim[0]) {
+				SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount());
+			} else {
+				Log(WARNING, "Actor", "Unable to determine movement rate for animation 0x%04X!", AnimID);
+			}
+		}
 	}
 
 	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
@@ -2792,6 +2809,9 @@ static void InitActorTables()
 	} else {
 		SpellStatesSize = 6;
 	}
+
+	// movement rate adjustments
+	extspeed.load("moverate", true);
 
 	// modal actions/state data
 	ReadModalStates();
@@ -6239,7 +6259,7 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 
 void Actor::InitStatsOnLoad()
 {
-	//default is 9 in Tob (is this true? or just most anims are 9?)
+	//default is 9 in Tob, 6 in bg1
 	SetBase(IE_MOVEMENTRATE, VOODOO_CHAR_SPEED);
 
 	ieWord animID = ( ieWord ) BaseStats[IE_ANIMATION_ID];
