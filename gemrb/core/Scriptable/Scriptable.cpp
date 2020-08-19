@@ -2277,7 +2277,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
 			ClearPath(true);
 			NewOrientation = Orientation;
-			pathAbandoned = true;
 			return;
 		}
 		if (BlocksSearchMap()) {
@@ -2339,9 +2338,8 @@ void Movable::AddWayPoint(const Point &Des)
 // Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
 void Movable::WalkTo(const Point &Des, int distance)
 {
-
-	Log(DEBUG, "WalkTo", "%s %d %d", GetName(0), Des.x, Des.y);
-	if (prevTicks && Ticks < prevTicks + 2) {
+	// Only rate-limit when moving
+	if ((GetPath() || InMove()) && prevTicks && Ticks < prevTicks + 2) {
 		return;
 	}
 
@@ -2358,7 +2356,6 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
 		ClearPath(true);
-		SetOrientation(GetOrient(Des, Pos), true);
 		return;
 	}
 
