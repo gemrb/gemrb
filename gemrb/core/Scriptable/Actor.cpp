@@ -444,6 +444,7 @@ void ReleaseMemoryActor()
 		itemanim = NULL;
 	}
 	FistRows = -1;
+	extspeed.release();
 }
 
 Actor::Actor()
