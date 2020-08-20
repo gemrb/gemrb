@@ -1775,7 +1775,7 @@ void Map::PurgeArea(bool items)
 	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
 	for (Actor *actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
-		if (actor->Pos != actor->HomeLocation) {
+		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.isempty() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
 	}
