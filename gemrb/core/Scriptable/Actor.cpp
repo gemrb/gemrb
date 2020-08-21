@@ -10608,7 +10608,7 @@ ieDword Actor::GetWarriorLevel() const
 
 bool Actor::BlocksSearchMap() const
 {
-	return Modified[IE_DONOTJUMP] < 2;
+	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED && !(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED));
 }
 
 //return true if the actor doesn't want to use an entrance
