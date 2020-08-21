@@ -10,10 +10,13 @@ Final development:
 - [ ] No Coverity Scan issues
 
 Beta testing:
+- [ ] Retest character generation of all games
 - [ ] Playthrough: Chateau Irenicus to Waukeen's promenade
 - [ ] Playthrough: TOB up to Saradush
+- [ ] Playthrough: bg1 prologue
+- [ ] Playthrough: iwd1 prologue
+- [ ] Playthrough: pst to exit of Mortuary
 - [ ] Ideally a full game runthrough of one of the compleatable games
-- [ ] Retest character generation of remaining games
 
 Release:
 - [ ] Finalise choice of version number, eg. v1.2.3
@@ -37,24 +40,22 @@ Deployment:
   - [ ] Forum announcements
   - [ ] Release notes if needed (configuration changes, notes for packagers)
 - [ ] SourceForge
-  - [ ] Upload source package to SourceForge
+  - [ ] Upload source package to SourceForge, maintaining the naming format under Releases
     - [ ] Upload any release notes alongside
-  - [ ] Mark release's AppVeyor build as a Windows default on SourceForge and source for everyone else
+  - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
   - [ ] (optional) regenerate android build
   - [ ] Test downloads
 - [ ] Runtime tests of release packages
 - [ ] Announce on
-  - [ ] homepage: sidebar (versions and news), news, start (version), changelog (status
-      and log swap), old_changelogs
+  - [ ] homepage: _config (bump version), index, news, potentially features/status, install (recheck the new links)
   - [ ] Gibberlings3 forums
     - [ ] GemRB forum
     - [ ] modding news (a template is available in `admin/announcement.template`)
   - [ ] SourceForge project page news section
-  - [ ] #GemRB in channel and title
-  - [ ] Discord channel
+  - [ ] #GemRB in channel and title; Discord channel only if it doesn't propagate there automatically
 
 Post-release:
 - [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
 - [ ] Update versions back to the `-git` suffix
 - [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
-- [ ] If the manpage changed, adapt the web copy (pandoc can convert it to markdown)
+- [ ] If the manpage changed (`git log v0.8.6.. gemrb.6.in`), adapt the web copy (pandoc can convert it to markdown)
