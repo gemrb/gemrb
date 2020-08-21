@@ -270,9 +270,9 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
 		return nullptr;
 	}
-	if (nmptDest == nmptSource) return nullptr;
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
+	if (smptDest == smptSource) return nullptr;
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
