@@ -873,7 +873,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
 		map->AddActor(tar, true);
-		tar->SetPosition(pos, 1, 8, 8);
+		tar->SetPosition(pos, 1, 8*effect, 8*effect);
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}
