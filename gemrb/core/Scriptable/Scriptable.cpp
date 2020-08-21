@@ -2217,6 +2217,8 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
+	const int XEPS = 72;
+	const int YEPS = 36;
 	Actor *actor = nullptr;
 	if (Type == ST_ACTOR) actor = (Actor*)this;
 	// Only bump back if not moving
