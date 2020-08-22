@@ -266,7 +266,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (!(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & PATH_MAP_PASSABLE)) {
+	if (!(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR))) {
 		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
 		return nullptr;
 	}
