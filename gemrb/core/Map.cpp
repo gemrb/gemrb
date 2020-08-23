@@ -757,7 +757,7 @@ void Map::UpdateScripts()
 		if (speed) {
 			speed = 1500/speed;
 		}
-		if (core->GetResDataINI()) {
+		if (core->HasFeature(GF_RESDATA_INI)) {
 			ieDword animid = actor->BaseStats[IE_ANIMATION_ID];
 			if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 				animid = animid & 0xff;
@@ -769,7 +769,14 @@ void Map::UpdateScripts()
 				} else if (avatar->WalkScale) {
 					speed = avatar->WalkScale;
 				} else {
-					//print("no walkscale for anim %d!", actor->BaseStats[IE_ANIMATION_ID]);
+					// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
+				}
+				// the speeds are already inverted, so we need to increase them to slow down
+				int encumbranceFactor = actor->GetEncumbranceFactor(false);
+				if (encumbranceFactor <= 2) {
+					speed *= encumbranceFactor;
+				} else {
+					speed = 0;
 				}
 			}
 		}
@@ -1766,12 +1773,13 @@ void Map::PurgeArea(bool items)
 	}
 	// 3. reset living neutral actors to their HomeLocation,
 	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
+/* figure out why this misplaces bg2 freed Hendak out of the map (it was so bad even SetPosition would probably misplace)
 	for (Actor *actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
-		if (actor->Pos != actor->HomeLocation) {
+		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.isempty() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
-	}
+	}*/
 }
 
 Actor* Map::GetActor(int index, bool any) const
@@ -2022,11 +2030,11 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
-		double factor = caller ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
+		double factor = caller && caller->speed ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		int blockStatus = GetBlockedInRadius(p.x, p.y, caller ? caller->size : 0, stopOnImpassable);
+		int blockStatus = GetBlockedNavmap(p.x, p.y);
 		if (stopOnImpassable && blockStatus == PATH_MAP_IMPASSABLE) {
 			return PATH_MAP_IMPASSABLE;
 		}

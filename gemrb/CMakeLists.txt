@@ -86,6 +86,7 @@ ELSE(APPLE)
 	ENDIF()
 
 	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" GemRB.cfg.noinstall.sample DESTINATION ${EXAMPLE_CONF_DIR} )
+	INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" RENAME GemRB.cfg DESTINATION ${EXAMPLE_CONF_DIR})
 ENDIF(APPLE)
 
 # we need to add gemrb target before processing plugins or COCOA plugins don't work right.

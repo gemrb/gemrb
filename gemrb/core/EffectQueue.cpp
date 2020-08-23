@@ -284,7 +284,7 @@ bool Init_EffectQueue()
 		return false;
 	}
 
-	for (unsigned int i = 0; i < MAX_EFFECTS; i++) {
+	for (long i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
 		if( efftextTable) {
 			int row = efftextTable->GetRowCount();
@@ -305,7 +305,7 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				error("EffectQueue", "Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
+				error("EffectQueue", "Clashing Opcodes FN: %ld vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
 		}

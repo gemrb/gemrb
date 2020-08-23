@@ -127,7 +127,7 @@ static int MagicBit = 0;
 
 Interface::Interface()
 {
-	Log(MESSAGE, "Core", "GemRB Core Version v%s Loading...", VERSION_GEMRB );
+	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 
 	// default to the correct endianswitch
 	ieWord endiantest = 1;

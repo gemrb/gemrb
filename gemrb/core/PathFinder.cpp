@@ -266,9 +266,13 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (nmptDest == nmptSource) return nullptr;
+	if (!(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR))) {
+		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
+		return nullptr;
+	}
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
+	if (smptDest == smptSource) return nullptr;
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;

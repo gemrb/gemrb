@@ -2147,18 +2147,13 @@ void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 // the spell target and attack target are different only in iwd2
 void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 {
-	Actor *actor = (Actor *) Sender;
 	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1]);
-	actor->LastTargetPos.empty();
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
-		actor->LastTarget = 0;
-		actor->LastTargetPersistent = 0;
+		Sender->MyTarget = 0;
 		return;
 	}
-	actor->LastSpellTarget = 0;
-	actor->LastTarget = tar->GetGlobalID();
-	actor->LastTargetPersistent = tar->GetGlobalID();
+	Sender->MyTarget = tar->GetGlobalID();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -5394,8 +5389,6 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->LastMarked = tar->GetGlobalID();
-	//if this doesn't modify LastSeen, then remove this line
-	actor->LastSeen = actor->LastMarked;
 }
 
 void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
@@ -5462,7 +5455,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		}
 		//mark spell and target
 		me->LastMarkedSpell = splnum;
-		me->LastMarked = tar->GetGlobalID();
+		me->LastSpellTarget = tar->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
@@ -5496,7 +5489,6 @@ void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//TODO: check if spell exists (not really important)
 	actor->LastMarkedSpell = parameters->int0Parameter;
 	return;
 }

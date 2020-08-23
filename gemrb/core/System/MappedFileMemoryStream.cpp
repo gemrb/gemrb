@@ -59,7 +59,8 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 
 	if (fileOpened) {
 		struct stat statData{};
-		fstat(fileno(static_cast<FILE*>(fileHandle)), &statData);
+		int ret = fstat(fileno(static_cast<FILE*>(fileHandle)), &statData);
+		assert(ret != -1);
 		this->size = statData.st_size;
 	}
 #endif

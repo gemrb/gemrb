@@ -613,6 +613,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 			//TODO: maybe set the object references here too
 			return 1;
 		}
+		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = ( Actor* ) Sender;
 			//additional checks for invisibility?
@@ -865,14 +866,14 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	Actor *tar = gamedata->GetCreature(resref);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
-		map->AddActor( tar, true );
 		Point pos = src->Pos;
-		tar->SetOrientation(src->GetOrientation(), false );
 		// make sure to copy the HP, to avoid things like magically-healing trolls
-		tar->BaseStats[IE_HITPOINTS]=src->BaseStats[IE_HITPOINTS];
+		tar->BaseStats[IE_HITPOINTS] = src->BaseStats[IE_HITPOINTS];
+		tar->SetOrientation(src->GetOrientation(), false);
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
-		tar->SetPosition(pos, 1);
+		map->AddActor(tar, true);
+		tar->SetPosition(pos, 1, 8*effect, 8*effect);
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}
@@ -1293,6 +1294,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		dest = ((InfoPoint *)target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
+		Sender->LastSeen = target->GetGlobalID();
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
@@ -2045,7 +2047,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				}
 				// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen)
 				// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
-				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ','))) {
+				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ',' && *(src+1) != ')'))) {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;
@@ -2693,19 +2695,23 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 // shared spellcasting action code for casting on scriptables
 void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres;
+	ieResRef spellres = {};
 	int level = 0;
 	static bool third = core->HasFeature(GF_3ED_RULES);
-	Scriptable *pretarget = NULL;
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
-	if (third && parameters->int0Parameter == 0) {
-		parameters->int0Parameter = Sender->LastMarkedSpell;
-		pretarget = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastMarked);
+	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
+	if (third && parameters->int0Parameter == 0 && !parameters->string0Parameter[0]) {
+		if (!Sender->LastMarkedSpell) {
+			// otherwise we spam a lot
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		ResolveSpellName(spellres, Sender->LastMarkedSpell);
 	}
 
 	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
+	if (!spellres[0] && !ResolveSpellName(spellres, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
@@ -2742,9 +2748,8 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
-	if (pretarget) {
-		tar = pretarget;
-	} else if (!tar) {
+	if (!tar) {
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		if (act) {
 			act->SetStance(IE_ANI_READY);
@@ -2791,6 +2796,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 	if (duration == -1) {
 		// some kind of error
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (duration > 0) {
@@ -2799,11 +2805,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			parameters->int2Parameter = 0;
 		}
 		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+			parameters->int2Parameter = 0;
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
 	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2817,6 +2825,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		Log(ERROR, "GameScript", "SpellCore: Action (%d) lost target somewhere!", parameters->actionID);
 	}
+	parameters->int2Parameter = 0;
 	Sender->ReleaseCurrentAction();
 }
 

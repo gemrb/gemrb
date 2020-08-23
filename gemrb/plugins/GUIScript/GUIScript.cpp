@@ -8975,7 +8975,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		if (!map) {
 			return RuntimeError("No current area!");
 		}
-		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+		container = map->GetPile(actor->Pos);
 	} else {
 		container = core->GetCurrentContainer();
 	}
@@ -11568,9 +11568,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	if ((unsigned int) Slot>core->GetInventorySize()) {
-		return AttributeError( "Invalid slot" );
-	}
 	CREItem* si;
 	if (Type) {
 		Map *map = actor->GetCurrentArea();
@@ -11583,6 +11580,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
+		if ((unsigned int) Slot > core->GetInventorySize()) {
+			return AttributeError("Invalid slot");
+		}
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
 		// make sure the encumbrance labels stay correct

@@ -522,7 +522,7 @@ static const ActionLink actionnames[] = {
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
-	{"calllightning", GameScript::Kill, 0}, //TODO: call lightning projectile
+	{"calllightning", GameScript::Kill, 0}, // just an instant death with Param2 = 0x100
 	{"calm", GameScript::Calm, 0},
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changeaitype", GameScript::ChangeAIType, 0},
@@ -1178,6 +1178,8 @@ static const IDSLink idsnames[] = {
 	{ NULL,NULL}
 };
 
+static int NextTriggerObjectID = 0;
+
 static const TriggerLink* FindTrigger(const char* triggername)
 {
 	if (!triggername) {
@@ -1676,12 +1678,15 @@ void InitializeIEScript()
 			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
+			const char *trName = overrideTriggersTable->GetStringIndex(j);
 			if (i >= MAX_TRIGGERS) {
-				Log(ERROR, "GameScript", "trigger %d (%s) is too high, ignoring",
-					i, overrideTriggersTable->GetStringIndex( j ) );
+				Log(ERROR, "GameScript", "Trigger %d (%s) is too high, ignoring", i, trName);
 				continue;
 			}
-			const TriggerLink *poi = FindTrigger( overrideTriggersTable->GetStringIndex( j ));
+			if (!NextTriggerObjectID && !stricmp(trName, "NextTriggerObject(O:Object*)")) {
+				NextTriggerObjectID = i;
+			}
+			const TriggerLink *poi = FindTrigger(trName);
 			if (!poi) {
 				StringBuffer buffer;
 
@@ -1693,8 +1698,7 @@ void InitializeIEScript()
 			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=tf) ) ) {
 				StringBuffer buffer;
 
-				buffer.appendFormatted("%s overrides existing trigger ",
-					overrideTriggersTable->GetStringIndex( j ) );
+				buffer.appendFormatted("%s overrides existing trigger ", trName);
 				int x = triggersTable->FindValue(i);
 				if (x<0) x = triggersTable->FindValue(i|0x4000);
 				if (x>=0) {
@@ -2020,9 +2024,6 @@ static Trigger* ReadTrigger(DataStream* stream)
 	return tR;
 }
 
-// NOTE: keep these in sync with gemtrig.ids!
-#define NEXT_TRIGGER_OBJECT_EX 0x4100
-#define NEXT_TRIGGER_OBJECT_EE 0x40e0
 static Condition* ReadCondition(DataStream* stream)
 {
 	char line[10];
@@ -2050,7 +2051,7 @@ static Condition* ReadCondition(DataStream* stream)
 			delete tR->objectParameter; // not using Release, so we don't have to check if it's null
 			tR->objectParameter = triggerer;
 			triggerer = NULL;
-		} else if (tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EX) || tR->triggerID == (0x3fff&NEXT_TRIGGER_OBJECT_EE)) {
+		} else if (tR->triggerID == NextTriggerObjectID) {
 			triggerer = tR->objectParameter;
 			tR->objectParameter = NULL;
 			delete tR;
@@ -2307,6 +2308,11 @@ bool Condition::Evaluate(Scriptable* Sender)
 	int ORcount = 0;
 	unsigned int result = 0;
 	bool subresult = true;
+
+	if (triggers.empty()) {
+		Log(ERROR, "GameScript", "Trigger block without triggers encountered!");
+		return false;
+	}
 
 	for (size_t i = 0; i < triggers.size(); i++) {
 		Trigger* tR = triggers[i];

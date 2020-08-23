@@ -204,15 +204,12 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.8.7 is to make the subviews branch ready for release.
-It will also mark the switch to the C++11 standard. Once the branch is
-merged, we can also start working on the port to python3. Naturally the
-release will contain also other unrelated fixes, so just look at the tracker.
-The first priority is to fix the issues tagged with "subviews" and thoroughly
-test it out.
+The plan for 0.8.8 is to make the subviews branch ready for release.
+Once the branch is merged, we can also start working on the port to python3.
+Naturally the release will contain also other unrelated fixes, so just look at
+the tracker. The first priority is to fix the issues tagged with "subviews" and
+thoroughly test it out.
 
-Since it is in a branch, the subviews windowing rewrite (and more) is not
-bound to any release, so work can continue independently. Due to the volume
-of changes and the merge&refactoring problems they introduce,
-making it ready for prime time is the **single most important TODO item**.
-Any help in stabilising the branch is greatly appreciated!
+Due to the volume of changes and the merge&refactoring problems they introduce,
+making the subviews branch ready for prime time is the **single most important
+TODO item**. Any help in stabilising the branch is greatly appreciated!

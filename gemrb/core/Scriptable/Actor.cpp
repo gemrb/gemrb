@@ -161,6 +161,7 @@ static bool raresnd = false;
 static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
+static AutoTable extspeed;
 
 //item animation override array
 struct ItemAnimType {
@@ -443,6 +444,7 @@ void ReleaseMemoryActor()
 		itemanim = NULL;
 	}
 	FistRows = -1;
+	extspeed.release();
 }
 
 Actor::Actor()
@@ -696,16 +698,38 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	SetCircleSize();
 	anims->SetColors(BaseStats+IE_COLORS);
 
-	//Speed is determined by the number of frames in each cycle of its animation
-	// (beware! GetAnimation has side effects!)
-	// TODO: we should have a more efficient way to look this up
-	Animation** anim = anims->GetAnimation(IE_ANI_WALK, 0);
-	if (anim && anim[0]) {
-		SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount()) ;
-	} else {
-		Log(WARNING, "Actor", "Unable to determine movement rate for animation %04x!", AnimID);
+	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
+	// the rest had it hardcoded
+	if (!core->HasFeature(GF_RESDATA_INI)) {
+		// handle default speed and per-animation overrides
+		int row = -1;
+		if (extspeed.ok()) {
+			char animHex[10];
+			snprintf(animHex, 10, "0x%04X", AnimID);
+			row = extspeed->FindTableValue((unsigned int) 0, animHex);
+			if (row != -1) {
+				int rate = atoi(extspeed->QueryField(row, 1));
+				SetBase(IE_MOVEMENTRATE, rate);
+			}
+		} else {
+			Log(MESSAGE, "Actor", "No moverate.2da found, using animation (0x%04X) for speed fallback!", AnimID);
+		}
+		if (row == -1) {
+			Animation **anim = anims->GetAnimation(IE_ANI_WALK, 0);
+			if (anim && anim[0]) {
+				SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount());
+			} else {
+				Log(WARNING, "Actor", "Unable to determine movement rate for animation 0x%04X!", AnimID);
+			}
+		}
 	}
 
+	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
+	int walkSpeed = CalculateSpeed(false);
+	if (walkSpeed) {
+		walkSpeed = 1500/walkSpeed;
+	}
+	speed = walkSpeed;
 }
 
 CharAnimations* Actor::GetAnims() const
@@ -2787,6 +2811,9 @@ static void InitActorTables()
 		SpellStatesSize = 6;
 	}
 
+	// movement rate adjustments
+	extspeed.load("moverate", true);
+
 	// modal actions/state data
 	ReadModalStates();
 }
@@ -3365,7 +3392,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// iwd2 barbarian speed increase isn't handled like for monks (normal clab)!?
-	// TODO: recheck when we have unhardcoded actor speeds (just add it there instead)
 	if (third && GetBarbarianLevel()) {
 		Modified[IE_MOVEMENTRATE] += 1;
 	}
@@ -4851,7 +4877,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (displaymsg->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
+	if (displaymsg->HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -4870,23 +4896,27 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
-			if (hitter && hitter->Type == ST_ACTOR) {
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(1) );
-			} else {
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "trap" );
-			}
+
+			int strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				displaymsg->DisplayConstantStringName(STR_DAMAGE3, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				displaymsg->DisplayConstantStringName(STR_DAMAGE2, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
-				displaymsg->DisplayConstantStringName(STR_DAMAGE1, DMC_WHITE, this);
+				strref = STR_DAMAGE_DETAIL1;
 			}
+			if (hitter && hitter->Type == ST_ACTOR) {
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(1) );
+			} else {
+				// variant without damager
+				strref -= (STR_DAMAGE_DETAIL1 - STR_DAMAGE1);
+			}
+			displaymsg->DisplayConstantStringName(strref, DMC_WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
 			wchar_t dmg[10];
@@ -5108,13 +5138,12 @@ void Actor::dump(StringBuffer& buffer) const
 		buffer.appendFormatted( " %.8s", poi );
 	}
 	buffer.append("\n");
-	buffer.appendFormatted("Area:       %.8s ([%d.%d])   ", Area, Pos.x, Pos.y);
-	buffer.appendFormatted("Dialog:     %.8s\n", Dialog );
+	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area, Pos.x, Pos.y);
+	buffer.appendFormatted("Dialog:     %.8s    TalkCount:  %d\n", Dialog, TalkCount);
 	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
 	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
 	buffer.appendFormatted("Int. Flags: 0x%x    ", InternalFlags);
 	buffer.appendFormatted("MC Flags: 0x%x    ", Modified[IE_MC_FLAGS]);
-	buffer.appendFormatted("TalkCount:  %d   \n", TalkCount );
 	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	buffer.appendFormatted("Class:      %d   current class:%d    Kit: %d (base: %d)\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT] );
 	buffer.appendFormatted("Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
@@ -5124,7 +5153,8 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	buffer.appendFormatted("Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	buffer.appendFormatted("Fatigue: %d (current: %d)   Luck: %d\n\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
+	buffer.appendFormatted("Fatigue: %d (current: %d)   Luck: %d\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
+	buffer.appendFormatted("Movement rate: %d (current: %d)\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
 
 	//this works for both level slot style
 	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
@@ -5172,6 +5202,7 @@ void Actor::SetMap(Map *map)
 {
 	//Did we have an area?
 	bool effinit=!GetCurrentArea();
+	if (area && BlocksSearchMap()) area->ClearSearchMapFor(this);
 	//now we have an area
 	Scriptable::SetMap(map);
 	//unless we just lost it, in that case clear up some fields and leave
@@ -5221,6 +5252,7 @@ void Actor::SetMap(Map *map)
 		inventory.EquipItem(inventory.GetEquippedSlot());
 		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
+	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
 }
 
 // Position should be a navmap point
@@ -5384,33 +5416,42 @@ ieDword Actor::GetAnyActiveCasterLevel() const
 	return GetBaseCasterLevel(IE_SPL_PRIEST, strict) + GetBaseCasterLevel(IE_SPL_WIZARD, strict);
 }
 
+int Actor::GetEncumbranceFactor(bool feedback) const
+{
+	int encumbrance = inventory.GetWeight();
+	int maxWeight = GetMaxEncumbrance();
+
+	if (encumbrance <= maxWeight || (BaseStats[IE_EA] > EA_GOODCUTOFF && !third)) {
+		return 1;
+	}
+	if (encumbrance <= maxWeight * 2) {
+		if (feedback && core->HasFeedback(FT_STATES)) {
+			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
+		}
+		return 2;
+	}
+	if (feedback && core->HasFeedback(FT_STATES)) {
+		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
+	}
+	return 123456789; // large enough to round to 0 when used as a divisor
+}
+
+// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
 int Actor::CalculateSpeed(bool feedback)
 {
 	int speed = GetStat(IE_MOVEMENTRATE);
-	inventory.CalculateWeight();
 
 	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
 		// cheating bastards (drow in ar2401 for example)
 		return speed;
 	}
 
+	inventory.CalculateWeight();
 	int encumbrance = inventory.GetWeight();
+	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-	int maxweight = GetMaxEncumbrance();
 
-	if(encumbrance<=maxweight) {
-		return speed;
-	}
-	if(encumbrance<=maxweight*2) {
-		if (feedback && core->HasFeedback(FT_STATES)) {
-			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
-		}
-		return speed/2;
-	}
-	if (feedback && core->HasFeedback(FT_STATES)) {
-		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
-	}
-	return 0;
+	return speed / encumbranceFactor;
 }
 
 //receive turning
@@ -6219,7 +6260,7 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 
 void Actor::InitStatsOnLoad()
 {
-	//default is 9 in Tob (is this true? or just most anims are 9?)
+	//default is 9 in Tob, 6 in bg1
 	SetBase(IE_MOVEMENTRATE, VOODOO_CHAR_SPEED);
 
 	ieWord animID = ( ieWord ) BaseStats[IE_ANIMATION_ID];
@@ -9967,7 +10008,10 @@ void Actor::SetupFist()
 			ItemResRef = fistres[i][col];
 		}
 	}
-	inventory.SetSlotItemRes(ItemResRef, slot);
+	CREItem *currentFist = inventory.GetSlotItem(slot);
+	if (!currentFist || stricmp(currentFist->ItemResRef, ItemResRef)) {
+		inventory.SetSlotItemRes(ItemResRef, slot);
+	}
 }
 
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
@@ -10564,7 +10608,7 @@ ieDword Actor::GetWarriorLevel() const
 
 bool Actor::BlocksSearchMap() const
 {
-	return Modified[IE_DONOTJUMP] < 2;
+	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED && !(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED));
 }
 
 //return true if the actor doesn't want to use an entrance
@@ -11412,7 +11456,9 @@ ieDword Actor::GetActiveClass() const
 		if (newclassmask == mask) return newclass;
 	}
 
-	error("Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d)!", GetName(1), oldclass, multiclass); // return 0 if this ever needs to be hit only as a warning
+	// can be hit when starting a dual class
+	Log(ERROR, "Actor", "Dual-classed actor %s (old class %d) has wrong multiclass bits (%d), using old class!", GetName(1), oldclass, multiclass);
+	return oldclass;
 }
 
 // like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
