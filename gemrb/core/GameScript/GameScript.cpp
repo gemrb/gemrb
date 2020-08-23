@@ -2458,7 +2458,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	// check for ActionOverride
 	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
-		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
+		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0], GA_NO_DEAD);
 
 		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
