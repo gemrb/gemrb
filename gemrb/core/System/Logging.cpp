@@ -82,7 +82,7 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 	for (size_t i = 0; i < theLogger.size(); ++i) {
 		theLogger[i]->log(level, owner, buf, color);
 	}
-	delete buf;
+	delete[] buf;
 }
 
 void print(const char *message, ...)
