@@ -77,14 +77,12 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
     const size_t len = vsnprintf(NULL, 0, message, ap_copy);
     va_end(ap_copy);
 
-#if defined(__GNUC__)
-	__extension__ // Variable-length arrays
-#endif
-	char buf[len+1];
+	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);
 	for (size_t i = 0; i < theLogger.size(); ++i) {
 		theLogger[i]->log(level, owner, buf, color);
 	}
+	delete buf;
 }
 
 void print(const char *message, ...)
