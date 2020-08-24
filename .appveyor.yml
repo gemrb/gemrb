@@ -93,7 +93,16 @@ before_package:
       popd
       7z a -tzip $env:archive_path $env:archive_source
     }
-test: off
+test_script:
+- cmd: >-
+    cd C:/gemrb-win32*
+    cp GemRB.cfg.sample GmRB.cfg.bots
+    echo GamePath=minimal >> GemRB.cfg.bots
+    echo GameType=test >> GemRB.cfg.bots
+    echo AudioDriver=none >> GemRB.cfg.bots
+
+    gemrb.exe -c GemRB.cfg.bots
+    rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip
   name: normal
