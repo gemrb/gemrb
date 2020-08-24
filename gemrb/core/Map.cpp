@@ -1681,8 +1681,9 @@ Actor* Map::GetActor(const char* Name, int flags)
 {
 	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
+			// there can be more with the same scripting name, see bg2/ar0014.baf
 			if (!actor->ValidTarget(flags) ) {
-				return NULL;
+				continue;
 			}
 			return actor;
 		}
