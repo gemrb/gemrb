@@ -29,6 +29,8 @@ ENDIF()
 # libcharset is just a relic of the current iconv build
 LIST(APPEND DLL_SET
 	${VCPKG_DATAROOT}/bin/SDL${DLL_SDL_VER}.dll # Cmake doesn't actually find the sdl debug libs
+	${DLL_DIR}SDL2_mixer.dll
+	${DLL_DIR}glew32.dll
 	${DLL_DIR}python27.dll
 	${DLL_DIR}OpenAL32.dll
 	${DLL_DIR}zlib${DLL_SET_DBG}1.dll

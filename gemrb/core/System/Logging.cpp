@@ -125,11 +125,6 @@ void Log(log_level level, const char* owner, const char* message, ...)
 	va_end(ap);
 }
 
-void Log(log_level level, const char* owner, const char* message, va_list args)
-{
-	vLog(level, owner, message, WHITE, args);
-}
-
 void Log(log_level level, const char* owner, StringBuffer const& buffer)
 {
 	for (size_t i = 0; i < theLogger.size(); ++i) {
