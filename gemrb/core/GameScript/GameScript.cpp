@@ -1256,7 +1256,7 @@ void ScriptDebugLog(int bit, const char *message, ...)
 
 	va_list ap;
 	va_start(ap, message);
-	Log(DEBUG, "GameScript", message, ap);
+	LogVA(DEBUG, "GameScript", message, ap);
 	va_end(ap);
 }
 

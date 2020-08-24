@@ -71,7 +71,7 @@ GEM_EXPORT void error(const char* owner, const char* message, ...)
 GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
 	PRINTF_FORMAT(3, 4);
 
-GEM_EXPORT void Log(log_level level, const char* owner, const char* message, va_list args);
+GEM_EXPORT void LogVA(log_level level, const char* owner, const char* message, va_list args);
 
 GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
 

@@ -115,7 +115,7 @@ void Log(log_level level, const char* owner, const char* message, ...)
 	va_end(ap);
 }
 
-void Log(log_level level, const char* owner, const char* message, va_list args)
+void LogVA(log_level level, const char* owner, const char* message, va_list args)
 {
 	vLog(level, owner, message, WHITE, args);
 }
