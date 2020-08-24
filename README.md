@@ -46,18 +46,34 @@ Debug output can be previewed with psp2shell
 https://github.com/Cpasjuste/psp2shell
 
 ## Port info
-Keyboard input is not supported and there's no virtual keyboard in SDL1. To auto-fill desired character name during character creation, edit VitaCharName parameter in GemRB.cfg.
 
-To input savegame names (it's impossible to save a game with blank name) just use TRIANGLE or SQUARE buttons.
+### Input
+
+Keyboard input is done with D-Pad (on character creation and game saves. 'a-z', '0-9' and 'space' are supported).
+
+- Left - Remove character
+- Right - Add new character
+- Down - Next character (alphabetically)
+- Up - Previous character
+- R1, L1 - Switch current character between uppercase/lowercase
+
+### Vita specific options
 
 Pointer movement speed can be changed with 'VitaPointerSpeed' parameter in GemRB.cfg.
 
-Performance with 640x480 resolution is "kinda playable". To improve it I STRONGLY recommend disabling character movement and attack sounds in game options. Disabling sound altogether (by seting "AudioDriver = none" in GemRB.cfg) can improve performance even further.
-The game is pretty IO heavy for Vita, so loading can take some time.
+Use "Fullscreen=1" to scale game area to native Vita resolution or "Fullscreen=0" to keep game area at the center of the screen.
 
-Custom portraits, character imports, voice selection during character creation are not supported right now (but you can copy saves from PC with all of these and they should work fine)
+VitaKeepAspectRatio=1 keeps aspect ratio of original image when scaling. VitaKeepAspectRatio=0 just scales it to 960x544.
 
-Port probably contains some bugs, since I haven't tested it that much.
+VitaBilinear=1 uses bilinear filtering when scaling.
+
+### Performance
+
+Widescreen mod is supported, but performance with native resolution can be poor in areas with a lot of characters.
+
+The game is pretty IO heavy. Loading can take quite some time. And a big number of sound effects playing at the same time can cause a lot of stuttering. To improve the situation I STRONGLY recommend disabling character movement and attack sounds in game options. Disabling sound altogether (by seting "AudioDriver = none" in GemRB.cfg) can improve it even further.
+
+"Bpp=16" option is recommended for better performance.
 
 ## Controls
 - Left analog stick - Pointer movement
@@ -69,6 +85,7 @@ Port probably contains some bugs, since I haven't tested it that much.
 - R1 - Pause
 - L1 - Highlight items
 - SELECT - Open menu
+- START - Escape
 
 
 # GemRB

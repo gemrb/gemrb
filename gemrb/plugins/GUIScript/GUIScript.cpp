@@ -15997,7 +15997,6 @@ bool GUIScript::Init(void)
 	Py_NoSiteFlag = 1;
     Py_IgnoreEnvironmentFlag = 1;
     Py_NoUserSiteDirectory = 1;
-	Py_SetPythonHome((char*)"ux0:/data/GemRB/python2.7");
 #endif
 
 	Py_Initialize();

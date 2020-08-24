@@ -1,6 +1,6 @@
-VitaPointerSpeed = 10
-VitaKeepAspectRatio = 1
-VitaBilinear = 1
+VitaPointerSpeed=10
+VitaKeepAspectRatio=1
+VitaBilinear=1
 
 #####################################################
 #                                                   #

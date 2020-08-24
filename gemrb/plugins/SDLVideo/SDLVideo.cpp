@@ -159,6 +159,10 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
+#ifdef VITA
+	ProcessAxisMotion();
+#endif
+
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
 		if (MouseFlags&MOUSE_GRAYED) {
@@ -412,10 +416,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 	}
 
-#ifdef VITA
-	ProcessAxisMotion();
-#endif
-
 	return GEM_OK;
 }
 
@@ -650,11 +650,11 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				GamepadKeyboardEvent(SDLK_o, button.state);
 				break;
 			}
-			//F6 shortcut
+			//ESC
 			case BTN_START:
 			{
 				if (button.state == SDL_PRESSED)
-					EvntManager->OnSpecialKeyPress(GEM_FUNCTION1 + SDLK_F6-SDLK_F1);
+					EvntManager->OnSpecialKeyPress(GEM_ESCAPE);
 				break;
 			}
 			//pause combat
