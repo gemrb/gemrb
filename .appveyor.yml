@@ -66,7 +66,9 @@ before_build:
     $replace = "PluginsPath=.\plugins"
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 
-    cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DINSOURCEBUILD=1 -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
+    cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWIN32_USE_STDIO=1 \
+      -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DINSOURCEBUILD=1 \
+      -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
     # set version to version + commit hash
     $git_version = (git describe --always --all) | Out-String
