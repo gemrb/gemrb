@@ -72,20 +72,10 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 	if (theLogger.empty())
 		return;
 
-	// Copied from System/StringBuffer.cpp
-#ifndef __va_copy
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	const size_t len = 4095;
-#else
     va_list ap_copy;
-    // __va_copy should always be defined
-    // va_copy is only defined by C99 (C++11 and up)
-    __va_copy(ap_copy, ap);
+    va_copy(ap_copy, ap);
     const size_t len = vsnprintf(NULL, 0, message, ap_copy);
     va_end(ap_copy);
-#endif
 
 #if defined(__GNUC__)
 	__extension__ // Variable-length arrays
