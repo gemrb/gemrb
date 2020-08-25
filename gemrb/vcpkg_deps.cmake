@@ -11,68 +11,64 @@ MESSAGE(STATUS "")
 MESSAGE(STATUS "Configuring rules for VCPKG dependency deployment")
 
 SET(VCPKG_DATAROOT "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
-
-# we either want SDL1 or 2, no need to copy both
-IF(SDL_BACKEND MATCHES SDL2)
-	SET (DLL_SDL_VER 2)
-ENDIF()
-
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-	SET(DLL_SET_DBG "d") # all the debug dll's just have 'd' somewhere in the filename if they are different at all
-	SET(DLL_DIR "${VCPKG_DATAROOT}/debug/bin/")
-ELSE()
-	UNSET(DLL_SET_DBG)
-	SET(DLL_DIR "${VCPKG_DATAROOT}/bin/")
-ENDIF()
+SET(DLL_DIR_DEBUG ${VCPKG_DATAROOT}/debug/bin)
+SET(DLL_DIR_RELEASE ${VCPKG_DATAROOT}/bin)
 
 # lists of dll files to be deployed to the build/install directory for Win32 builds
 # libcharset is just a relic of the current iconv build
-LIST(APPEND DLL_SET
-	${VCPKG_DATAROOT}/bin/SDL${DLL_SDL_VER}.dll # Cmake doesn't actually find the sdl debug libs
-	${DLL_DIR}SDL2_mixer.dll
-	${DLL_DIR}glew32.dll
-	${DLL_DIR}python27.dll
-	${DLL_DIR}OpenAL32.dll
-	${DLL_DIR}zlib${DLL_SET_DBG}1.dll
-	${DLL_DIR}vorbisfile.dll
-	${DLL_DIR}ogg.dll
-	${DLL_DIR}vorbis.dll
-	${DLL_DIR}libpng16${DLL_SET_DBG}.dll
-	${DLL_DIR}freetype${DLL_SET_DBG}.dll
-	${DLL_DIR}bz2${DLL_SET_DBG}.dll
-	${DLL_DIR}libcharset.dll
-	${DLL_DIR}libiconv.dll )
+LIST(APPEND DLL_SET_DEBUG
+	brotlicommon.dll
+	brotlidec.dll
+	bz2d.dll
+	freetyped.dll
+	glew32d.dll
+	libcharset.dll
+	libiconv.dll
+	libpng16d.dll
+	ogg.dll
+	OpenAL32.dll
+	python27_d.dll
+	SDL.dll
+	SDL2d.dll
+	SDL2_mixer.dll
+	vorbis.dll
+	vorbisfile.dll
+	zlibd1.dll )
 
-FOREACH(ENTRY IN LISTS DLL_SET)
+LIST(APPEND DLL_SET_RELEASE
+	brotlicommon.dll
+	brotlidec.dll
+	bz2.dll
+	freetype.dll
+	glew32.dll
+	libcharset.dll
+	libiconv.dll
+	libpng16.dll
+	ogg.dll
+	OpenAL32.dll
+	python27.dll
+	SDL.dll
+	SDL2.dll
+	SDL2_mixer.dll
+	vorbis.dll
+	vorbisfile.dll
+	zlib1.dll )
 
-	IF(NOT EXISTS ${ENTRY})
-		LIST(REMOVE_ITEM DLL_SET ${ENTRY})
-		CONTINUE()
+FOREACH(ENTRY IN LISTS DLL_SET_DEBUG)
+	IF(EXISTS ${DLL_DIR_DEBUG}/${ENTRY})
+		LIST(APPEND DLL_PATHS_DEBUG ${DLL_DIR_DEBUG}/${ENTRY})
 	ENDIF()
-
 ENDFOREACH()
 
-ADD_CUSTOM_COMMAND(TARGET gemrb POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-	${DLL_SET}
-	${CMAKE_BINARY_DIR}/gemrb/)
+FOREACH(ENTRY IN LISTS DLL_SET_RELEASE)
+	IF(EXISTS ${DLL_DIR_RELEASE}/${ENTRY})
+		LIST(APPEND DLL_PATHS_RELEASE ${DLL_DIR_RELEASE}/${ENTRY})
+	ENDIF()
+ENDFOREACH()
 
 # if a user decides to install, they also need a copy of the dll in their game directory.
-INSTALL(FILES ${DLL_SET} DESTINATION ${BIN_DIR})
-
-# the ogg plugin doesn't actually find the vorbisfile-1.dll built by vcpkg
-# after checking dependencies with dumpbin, turns out it is looking for a vorbisfile.dll
-# this may be because the .lib file differs in name from the .dll file
-IF(EXISTS ${DLL_DIR}vorbisfile-1.dll )
-
-	ADD_CUSTOM_COMMAND(TARGET gemrb POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		${DLL_DIR}vorbisfile-1.dll
-		${CMAKE_BINARY_DIR}/gemrb/vorbisfile.dll)
-
-	INSTALL(FILES ${DLL_DIR}vorbisfile-1.dll DESTINATION ${BIN_DIR} RENAME vorbisfile.dll)
-
-ENDIF()
+INSTALL(FILES ${DLL_PATHS_DEBUG} CONFIGURATIONS Debug DESTINATION ${BIN_DIR})
+INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release DESTINATION ${BIN_DIR})
 
 # copy over python core modules, so the buildbot binaries work without python installed
 INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
