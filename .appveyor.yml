@@ -90,7 +90,7 @@ before_package:
       7z a -tzip $env:archive_path $env:archive_source
     }
 test_script:
-- cmd: >-
+- cmd: |-
     cd C:/gemrb-win32*
     cp GemRB.cfg.sample GmRB.cfg.bots
     echo GamePath=minimal >> GemRB.cfg.bots
