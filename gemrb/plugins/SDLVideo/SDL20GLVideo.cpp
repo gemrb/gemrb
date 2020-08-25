@@ -1,15 +1,6 @@
 
 #include "OpenGLEnv.h"
 
-#if _MSC_VER
-	#if USE_GL
-		#pragma comment(lib, "glew32")
-		#pragma comment(lib, "opengl32")
-	#else
-		#pragma comment(lib, "libGLESv2")
-	#endif
-#endif
-
 #include <algorithm>
 #include "SDL20GLVideo.h"
 #include "Interface.h"
