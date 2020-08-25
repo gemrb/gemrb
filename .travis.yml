@@ -2,7 +2,7 @@
 # TODO: run the minimal test also from the installed gemrb
 language: cpp
 
-dist: xenial
+dist: bionic
 compiler:
   - clang
   - gcc
@@ -24,8 +24,8 @@ addons:
     - libfreetype6-dev
     - libvlc-dev
     - libvlccore-dev
-    - libpng12-0
-    - libpng12-dev
+    - libpng16-16
+    - libpng-dev
     - libvorbis0a
     - libvorbis-dev
     - openssh-client
