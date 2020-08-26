@@ -448,6 +448,8 @@ private:
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
 	const char* GetArmorSound() const;
+	void CalculateSpeedFromRate(bool feedback);
+	void CalculateSpeedFromINI(bool feedback);
 public:
 	Actor(void);
 	~Actor(void);

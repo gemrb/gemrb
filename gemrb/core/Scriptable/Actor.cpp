@@ -725,11 +725,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 
 	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
-	int walkSpeed = CalculateSpeed(false);
-	if (walkSpeed) {
-		walkSpeed = 1500/walkSpeed;
-	}
-	speed = walkSpeed;
+	CalculateSpeed(false);
 }
 
 CharAnimations* Actor::GetAnims() const
@@ -5436,18 +5432,56 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 	return 123456789; // large enough to round to 0 when used as a divisor
 }
 
-// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
 int Actor::CalculateSpeed(bool feedback)
 {
-	int speed = GetStat(IE_MOVEMENTRATE);
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		CalculateSpeedFromINI(feedback);
+	} else {
+		CalculateSpeedFromRate(feedback);
+	}
+	return speed;
+}
 
+// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
+void Actor::CalculateSpeedFromRate(bool feedback)
+{
+	int movementRate = GetStat(IE_MOVEMENTRATE);
+	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
 		// cheating bastards (drow in ar2401 for example)
-		return speed;
+	} else {
+		movementRate /= encumbranceFactor;
 	}
+	if (movementRate) {
+		speed = 1500 / movementRate;
+	} else {
+		speed = 0;
+	}
+}
 
+void Actor::CalculateSpeedFromINI(bool feedback)
+{
 	int encumbranceFactor = GetEncumbranceFactor(feedback);
-	return speed / encumbranceFactor;
+	ieDword animid = BaseStats[IE_ANIMATION_ID];
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		animid = animid & 0xff;
+	}
+	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
+	AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
+		speed = avatar->RunScale;
+	} else if (avatar->WalkScale) {
+		speed = avatar->WalkScale;
+	} else {
+		// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
+		speed = 0;
+	}
+	// the speeds are already inverted, so we need to increase them to slow down
+	if (encumbranceFactor <= 2) {
+		speed *= encumbranceFactor;
+	} else {
+		speed = 0;
+	}
 }
 
 //receive turning
