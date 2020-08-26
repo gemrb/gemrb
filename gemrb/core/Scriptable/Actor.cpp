@@ -5446,11 +5446,7 @@ int Actor::CalculateSpeed(bool feedback)
 		return speed;
 	}
 
-	inventory.CalculateWeight();
-	int encumbrance = inventory.GetWeight();
 	int encumbranceFactor = GetEncumbranceFactor(feedback);
-	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-
 	return speed / encumbranceFactor;
 }
 
@@ -6279,7 +6275,6 @@ void Actor::InitStatsOnLoad()
 			SetStance( IE_ANI_AWAKE );
 		}
 	}
-	inventory.CalculateWeight();
 	CreateDerivedStats();
 	Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
 	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
