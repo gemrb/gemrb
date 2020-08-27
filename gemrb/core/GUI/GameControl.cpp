@@ -452,7 +452,7 @@ void GameControl::DrawInternal(Region& screen)
 		if (d->VisibleTrap(0)) {
 			d->outlineColor = ColorRed; // traps
 		} else if (d->Flags & DOOR_SECRET) {
-			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
+			if (d->Flags & DOOR_FOUND) {
 				d->outlineColor = ColorMagenta; // found hidden door
 			} else {
 				// secret door is invisible
@@ -1149,19 +1149,6 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 //returns the appropriate cursor over a door
 int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
-	if (!overDoor->Visible()) {
-		if (target_mode == TARGET_MODE_NONE) {
-			// most secret doors are in walls, so default to the blocked cursor to not give them away
-			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
-			Game *game = core->GetGame();
-			if (!game) return IE_CURSOR_BLOCKED;
-			Map *area = game->GetCurrentArea();
-			if (!area) return IE_CURSOR_BLOCKED;
-			return area->GetCursor(overDoor->Pos);
-		} else {
-			return lastCursor|IE_CURSOR_GRAY;
-		}
-	}
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overDoor->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
@@ -1254,12 +1241,32 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	overInfoPoint = area->TMap->GetInfoPoint( p, true );
+	if (overDoor) {
+		overDoor->Highlight = false;
+	}
+	if (overContainer) {
+		overContainer->Highlight = false;
+	}
+	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
+	if (lastActor) {
+		lastActor->SetOver( false );
+	}
+
+	overDoor = area->TMap->GetDoor(p);
+	if (overDoor && !overDoor->Visible()) {
+		// ignore the door and what might be beneath it (e.g. iwd ar6010)
+		overDoor = 0;
+		overContainer = 0;
+		overInfoPoint = 0;
+	} else {
+		overContainer = area->TMap->GetContainer(p);
+		overInfoPoint = area->TMap->GetInfoPoint(p, true);
+	}
+
 	if (overInfoPoint) {
-		//nextCursor = overInfoPoint->Cursor;
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
-	// recheck in case the positioon was different, resulting in a new isVisible check
+	// recheck in case the position was different, resulting in a new isVisible check
 	if (nextCursor == IE_CURSOR_INVALID) {
 		Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
@@ -1273,20 +1280,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	if (overDoor) {
-		overDoor->Highlight = false;
-	}
-	if (overContainer) {
-		overContainer->Highlight = false;
-	}
-	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-	if (lastActor) {
-		lastActor->SetOver( false );
-	}
-
-	overDoor = area->TMap->GetDoor( p );
-	overContainer = area->TMap->GetContainer( p );
-
 	if (!DrawSelectionRect) {
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
@@ -1295,7 +1288,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		if (overContainer) {
 			nextCursor = GetCursorOverContainer(overContainer);
 		}
-		// recheck in case the positioon was different, resulting in a new isVisible check
+		// recheck in case the position was different, resulting in a new isVisible check
 		// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
 		if (nextCursor == IE_CURSOR_INVALID) {
 			Owner->Cursor = IE_CURSOR_BLOCKED;
