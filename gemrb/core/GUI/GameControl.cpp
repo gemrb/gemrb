@@ -451,7 +451,7 @@ void GameControl::DrawInternal(Region& screen)
 		if (d->VisibleTrap(0)) {
 			d->outlineColor = ColorRed; // traps
 		} else if (d->Flags & DOOR_SECRET) {
-			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
+			if (d->Flags & DOOR_FOUND) {
 				d->outlineColor = ColorMagenta; // found hidden door
 			} else {
 				// secret door is invisible
