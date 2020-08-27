@@ -80,6 +80,7 @@ public:
 	void ShowSoftKeyboard();
 	void HideSoftKeyboard();
 	void MoveMouse(unsigned int x, unsigned int y);
+	virtual void CaptureMouse(bool enabled);
 private:
 	bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha);
 

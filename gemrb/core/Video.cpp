@@ -209,6 +209,11 @@ void Video::SetMouseGrayed(bool grayed)
 	}
 }
 
+/** Captures the mouse so that mouse movement and interaction is tracked even if out of the game window */
+void Video::CaptureMouse(bool enabled)
+{
+}
+
 /** Get the fullscreen mode */
 bool Video::GetFullscreenMode() const
 {

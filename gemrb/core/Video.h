@@ -233,6 +233,8 @@ public:
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
+	virtual void CaptureMouse(bool enabled);
+
 	bool GetFullscreenMode() const;
 	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
 	void SetCursor(Sprite2D* cur, enum CursorType curIdx);

@@ -735,10 +735,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				 * As being SDL2-only, try to query the clipboard state to
 				 * paste when middle clicking the mouse.
 				 */
+				//Balrog994: that's a pretty unstandard way of pasting text, seems pretty hacky to me...
+				//changing to require CTRL to be pressed
+				SDL_Keymod modstate = SDL_GetModState();
+
 				if (
 					   event.button.button == SDL_BUTTON_MIDDLE
 					&& event.type == SDL_MOUSEBUTTONDOWN
 					&& SDL_HasClipboardText()
+					&& ((modstate & KMOD_CTRL) == KMOD_CTRL)
 				) {
 					char *pasteValue = SDL_GetClipboardText();
 
@@ -890,6 +895,12 @@ float SDL20VideoDriver::ScaleCoordinateVertical(float y)
 bool SDL20VideoDriver::TouchInputEnabled() const
 {
 	return SDL_GetNumTouchDevices() > 0;
+}
+
+/** Captures the mouse so that mouse movement and interaction is tracked even if out of the game window */
+void SDL20VideoDriver::CaptureMouse(bool enabled)
+{
+	SDL_CaptureMouse((SDL_bool)enabled);
 }
 
 #ifndef USE_OPENGL

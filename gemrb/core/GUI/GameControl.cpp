@@ -102,6 +102,7 @@ GameControl::GameControl(const Region& frame)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
+	IsPanning = false;
 
 	ieDword tmp=0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
@@ -1220,15 +1221,24 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	Video *video = core->GetVideoDriver();
 
+	if (IsPanning) {
+		Region viewport = video->GetViewport();
+		int newX = viewport.x - (x - lastMouseX);
+		int newY = viewport.y - (y - lastMouseY);
+		MoveViewportTo(newX, newY, false);
+	}
+
 	lastMouseX = x;
 	lastMouseY = y;
-	Point p( x,y );
-	video->ConvertToGame( p.x, p.y );
+	Point p(x, y);
+	video->ConvertToGame(p.x, p.y);
+
 	if (MouseIsDown && ( !DrawSelectionRect )) {
 		if (( abs( p.x - ClickPoint.x ) > 5 ) || ( abs( p.y - ClickPoint.y ) > 5 )) {
 			DrawSelectionRect = true;
 		}
 	}
+
 	if (FormationRotation) {
 		return;
 	}
@@ -1409,6 +1419,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 	}
+
 end_function:
 	if (lastCursor != nextCursor) {
 		Owner->Cursor = nextCursor;
@@ -1428,6 +1439,10 @@ void GameControl::OnGlobalMouseMove(short x, short y)
 	}
 
 	if (Owner->Visible!=WINDOW_VISIBLE) {
+		return;
+	}
+
+	if (IsPanning) {
 		return;
 	}
 
@@ -1856,7 +1871,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 	ClickPoint.x = x;
 	ClickPoint.y = y;
-	core->GetVideoDriver()->ConvertToGame( ClickPoint.x, ClickPoint.y );
+	Video* video = core->GetVideoDriver();
+	video->ConvertToGame( ClickPoint.x, ClickPoint.y );
 
 	ClearMouseState(); // cancel existing mouse action, we dont support multibutton actions
 	switch(Button) {
@@ -1888,6 +1904,10 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 			SelectionRect.w = 0;
 			SelectionRect.h = 0;
 		}
+		break;
+	case GEM_MB_PAN:
+		IsPanning = true;
+		video->CaptureMouse(true);
 		break;
 	}
 	if (core->GetGame()->selected.size() <= 1
@@ -1949,9 +1969,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
+	Video* video = core->GetVideoDriver();
+
 	MouseIsDown = false;
+	IsPanning = false;
+	video->CaptureMouse(false);
+
 	Point p(x,y);
-	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
+	video->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
 	if (!game) return;
 	Map* area = game->GetCurrentArea( );
@@ -2039,7 +2064,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				}
 			}
 			doMove = (!actor && target_mode == TARGET_MODE_NONE);
-		} else if (Button & GEM_MB_MENU) {
+		}
+		else if (Button & GEM_MB_MENU) {
 			// we used to check mod in this case,
 			// but it doesnt make sense to initiate an action based on a mod on mouse down
 			// then cancel that action because the mod disapeared before mouse up

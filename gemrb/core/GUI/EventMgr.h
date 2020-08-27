@@ -63,6 +63,7 @@ class Window;
 
 // Mouse buttons
 #define GEM_MB_ACTION           1
+#define GEM_MB_PAN	            2
 #define GEM_MB_MENU             4
 #define GEM_MB_SCRLUP           8
 #define GEM_MB_SCRLDOWN         16

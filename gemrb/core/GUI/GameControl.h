@@ -115,6 +115,7 @@ private:
 	bool DrawSelectionRect;
 	bool FormationRotation;
 	bool MouseIsDown;
+	bool IsPanning;
 	bool DoubleClick;
 	Region SelectionRect;
 	Point FormationApplicationPoint;
