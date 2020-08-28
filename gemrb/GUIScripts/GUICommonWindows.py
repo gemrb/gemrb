@@ -1361,7 +1361,8 @@ def TopWindowClosed(window):
 	optwin = GemRB.GetView("OPTWIN")
 	btnid = GemRB.GetVar("OPTBTN")
 	button = optwin.GetControl(btnid)
-	button.SetState(IE_GUI_BUTTON_UNPRESSED)
+	if button:
+		button.SetState(IE_GUI_BUTTON_UNPRESSED)
 	rtgbtn = optwin.GetControl(0) # return to game button
 	if rtgbtn: # not in PST or IWD2
 		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
