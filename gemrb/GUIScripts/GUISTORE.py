@@ -526,7 +526,7 @@ def UpdateStoreIdentifyWindow (Window):
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetVarAssoc ("TopIndex", Count-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("TopIndex", max(0, Count - ItemButtonCount))
 	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow (Window)
 	return
