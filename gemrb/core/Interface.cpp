@@ -2534,9 +2534,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	int cnt=10;
 	Actor * ab = NULL;
 
-	//TODO:
-	//decrease the number of summoned creatures with the number of already summoned creatures here
-	//the summoned creatures have a special IE_SEX
 	Map *map;
 	if (target) {
 		map = target->GetCurrentArea();
@@ -2551,17 +2548,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
 			return NULL;
-		}
-		ieDword sex = tmp->GetStat(IE_SEX);
-		//TODO: make this external as summlimt.2da
-		int limit = 0;
-		switch (sex) {
-		case SEX_SUMMON: case SEX_SUMMON_DEMON:
-			limit = 5;
-			break;
-		case SEX_BOTH:
-			limit = 1;
-			break;
 		}
 
 		//if summoner is an actor, filter out opponent summons
@@ -2580,6 +2566,10 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			}
 		}
 
+		// only allow up to the summoning limit of new summoned creatures
+		// the summoned creatures have a special IE_SEX
+		ieDword sex = tmp->GetStat(IE_SEX);
+		int limit = gamedata->GetSummoningLimit(sex);
 		if (limit && sexmod && map->CountSummons(flag, sex)>=limit) {
 			//summoning limit reached
 			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
