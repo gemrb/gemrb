@@ -1148,6 +1148,19 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 //returns the appropriate cursor over a door
 int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
+	if (!overDoor->Visible()) {
+		if (target_mode == TARGET_MODE_NONE) {
+			// most secret doors are in walls, so default to the blocked cursor to not give them away
+			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
+			Game *game = core->GetGame();
+			if (!game) return IE_CURSOR_BLOCKED;
+			Map *area = game->GetCurrentArea();
+			if (!area) return IE_CURSOR_BLOCKED;
+			return area->GetCursor(overDoor->Pos);
+		} else {
+			return lastCursor|IE_CURSOR_GRAY;
+		}
+	}
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overDoor->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
@@ -1242,14 +1255,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		lastActor->SetOver( false );
 	}
 
+	overInfoPoint = 0;
+	overContainer = 0;
+
 	overDoor = area->TMap->GetDoor(p);
-	if (overDoor && !overDoor->Visible()) {
-		// ignore the door and what might be beneath it (e.g. iwd ar6010)
-		overDoor = 0;
-		overContainer = 0;
-		overInfoPoint = 0;
-	} else {
-		overContainer = area->TMap->GetContainer(p);
+	// ignore infopoints beneath invisible doors
+	if (!overDoor || overDoor->Visible()) {
 		overInfoPoint = area->TMap->GetInfoPoint(p, true);
 	}
 
@@ -1270,9 +1281,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
+	overContainer = area->TMap->GetContainer(p);
+
 	if (!DrawSelectionRect) {
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
+			if (!overDoor->Visible()) {
+				overDoor = 0;
+			}
 		}
 
 		if (overContainer) {
