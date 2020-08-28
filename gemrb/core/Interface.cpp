@@ -2566,6 +2566,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			}
 		}
 
+		// mark the summon, but only if they don't have a special sex already
+		if (sexmod && tmp->BaseStats[IE_SEX] < SEX_EXTRA && tmp->BaseStats[IE_SEX] != SEX_ILLUSION) {
+			tmp->SetBase(IE_SEX, SEX_SUMMON);
+		}
+
 		// only allow up to the summoning limit of new summoned creatures
 		// the summoned creatures have a special IE_SEX
 		ieDword sex = tmp->GetStat(IE_SEX);
@@ -2618,11 +2623,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			break;
 		default:
 			break;
-		}
-
-		// mark the summon, but only if they don't have a special sex already
-		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA && ab->BaseStats[IE_SEX] != SEX_ILLUSION) {
-			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
 		map->AddActor(ab, true);
