@@ -164,10 +164,20 @@ def OpenStoreWindow ():
 	global Inventory, BarteringPC
 	global CureTable
 	
-	store_funcs = (OpenStoreShoppingWindow,
-					OpenStoreIdentifyWindow,OpenStoreStealWindow,
-					OpenStoreHealWindow, OpenStoreDonateWindow,
-					OpenStoreRumourWindow,OpenStoreRentWindow )
+	def ChangeStoreView(func):
+		# WIN_TOP needs to be focused for us to change it (see CreateTopWinLoader)
+		top = GemRB.GetView("WIN_TOP")
+		if top:
+			top.Focus()
+		return func()
+	
+	store_funcs = (lambda: ChangeStoreView(OpenStoreShoppingWindow),
+					lambda: ChangeStoreView(OpenStoreIdentifyWindow),
+					lambda: ChangeStoreView(OpenStoreStealWindow),
+					lambda: ChangeStoreView(OpenStoreHealWindow),
+					lambda: ChangeStoreView(OpenStoreDonateWindow),
+					lambda: ChangeStoreView(OpenStoreRumourWindow),
+					lambda: ChangeStoreView(OpenStoreRentWindow) )
 	
 	Store = GemRB.GetStore ()
 	#based on shop type, these buttons will change
