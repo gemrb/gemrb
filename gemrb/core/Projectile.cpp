@@ -1041,6 +1041,7 @@ int Projectile::CalculateTargetFlag()
 {
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
+	bool checkingEA = false;
 
 	if (Extension) {
 		if (Extension->AFlags&PAF_NO_WALL) {
@@ -1066,6 +1067,9 @@ int Projectile::CalculateTargetFlag()
 		default:
 			return flags;
 		}
+		if (Extension->AFlags & PAF_TARGET) {
+			checkingEA = true;
+		}
 
 		//this is the only way to affect neutrals and enemies
 		if (Extension->APFlags&APF_INVERT_TARGET) {
@@ -1073,8 +1077,8 @@ int Projectile::CalculateTargetFlag()
 		}
 	}
 
-	Actor *caster = area->GetActorByGlobalID(Caster);
-	if (caster && ((Actor *) caster)->GetStat(IE_EA)<EA_GOODCUTOFF) {
+	Scriptable *caster = area->GetScriptableByGlobalID(Caster);
+	if (caster && (!checkingEA || (caster->Type == ST_ACTOR && ((Actor *) caster)->GetStat(IE_EA) < EA_GOODCUTOFF))) {
 		return flags;
 	}
 
