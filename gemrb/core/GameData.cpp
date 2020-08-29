@@ -685,6 +685,7 @@ int GameData::GetSummoningLimit(ieDword sex)
 			break;
 		case SEX_BOTH:
 			row = 1;
+			break;
 		default:
 			break;
 	}
