@@ -4234,8 +4234,8 @@ bool Actor::GetPartyComment()
 
 	//not an NPC
 	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
-	//don't even bother
-	if (game->NPCAreaViewed<2) return false;
+	// don't bother if we're not around
+	if (GetCurrentArea() != game->GetCurrentArea()) return false;
 	ieDword size = game->GetPartySize(true);
 	//don't even bother, again
 	if (size<2) return false;

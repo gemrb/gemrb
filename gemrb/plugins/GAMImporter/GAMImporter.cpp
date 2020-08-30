@@ -837,7 +837,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 		}
 	}
 	stream->WriteDword( &game->PartyGold );
-	//hack because we don't need this
+	// we don't need this field, since you can only save if everyone is in the same area
 	game->NPCAreaViewed = PCCount - 1;
 	stream->WriteWord( &game->NPCAreaViewed );
 	stream->WriteWord( &game->WeatherBits );
