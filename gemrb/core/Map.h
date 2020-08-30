@@ -102,7 +102,7 @@ class Wall_Polygon;
 #define A_ANI_PSTBIT14        0x2000   // PST-only: unknown and rare, see #163 for area list
 // TODO: BGEE extended flags:
 // 0x2000: Use WBM resref
-// 0x4000: Underground?
+// 0x4000: Draw stenciled (can be used to stencil animations using the water overlay mask of the tileset, eg. to give water surface a more natural look)
 // 0x8000: Use PVRZ resref
 
 //creature area flags
