@@ -2980,7 +2980,13 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 	if (previous!=Value) {
 		if (pcf) {
 			PostChangeFunctionType f = post_change_functions[StatIndex];
-			if (f) (*f)(this, previous, Value);
+			if (f) {
+				(*f)(this, previous, Value);
+				// FIXME: this was added to fix an inventory crash when removing armor
+				// why do we not have SetUsedArmor like we do with helmet/shield/weapon
+				// that would be a less hacky fix
+				ClearCurrentStanceAnims();
+			}
 		}
 	}
 	return true;
@@ -9880,6 +9886,9 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 	if (wt != -1) WeaponType = wt;
 	if (!anims)
 		return;
+	
+	ClearCurrentStanceAnims();
+	
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	SetAttackMoveChances(MeleeAnimation);
@@ -9905,8 +9914,6 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 		return;
 	}
 	AttackStance = IE_ANI_ATTACK;
-	
-	ClearCurrentStanceAnims();
 }
 
 void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
@@ -9919,14 +9926,14 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
 
 	if (!anims)
 		return;
+	
+	ClearCurrentStanceAnims();
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
-	
-	ClearCurrentStanceAnims();
 }
 
 void Actor::SetUsedHelmet(const char (&AnimationType)[2])
@@ -9934,13 +9941,13 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)
 		return;
+	
+	ClearCurrentStanceAnims();
 	anims->SetHelmetRef(AnimationType);
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
-	
-	ClearCurrentStanceAnims();
 }
 
 // initializes the fist data the first time it is called
