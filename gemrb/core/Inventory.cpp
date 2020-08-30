@@ -160,7 +160,7 @@ void Inventory::AddItem(CREItem *item)
 	CalculateWeight();
 }
 
-void Inventory::CalculateWeight() const
+void Inventory::CalculateWeight()
 {
 	Weight = 0;
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -1500,8 +1500,6 @@ void Inventory::dump(StringBuffer& buffer) const
 	}
 
 	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);
-	Changed = true;
-	CalculateWeight();
 	buffer.appendFormatted( "Total weight: %d\n", Weight );
 }
 
