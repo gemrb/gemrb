@@ -295,7 +295,6 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		}
 	}
 
-	//TODO: these need to be corrected!
 	if (SavedLocCount && SavedLocOffset) {
 		ieWord PosX, PosY;
 
