@@ -1045,6 +1045,12 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		break;
 	}
 
+	Actor *target = area->GetActor(LastTargetPos, GA_NO_UNSCHEDULED|GA_NO_HIDDEN);
+	if (target) {
+		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
+		target->LastSpellOnMe = spellID;
+	}
+
 	ResetCastingState(caster);
 }
 
