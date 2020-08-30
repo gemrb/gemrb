@@ -169,6 +169,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->ReadDword( &PPLocOffset );
 			str->ReadDword( &PPLocCount );
 			str->Seek( 52, GEM_CURRENT_POS);
+			// TODO: EEs used up these bits, see https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
 			break;
 
 		case GAM_VER_PST:
