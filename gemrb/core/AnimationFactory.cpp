@@ -143,7 +143,6 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	if (Colors) {
 		Palette* palette = Picture2->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		Picture2->SetPalette(palette);
 		palette->release();
 	}
 
@@ -154,7 +153,6 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	if (Colors) {
 		Palette* palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		spr->SetPalette(palette);
 		palette->release();
 	}
 
