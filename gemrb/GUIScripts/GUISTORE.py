@@ -932,13 +932,16 @@ def InitStoreRentWindow (Window):
 		Button.SetText (roomnames[i])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreRentWindow(Window))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetVarAssoc ("RentIndex", i)
+		
 		if GameCheck.IsBG1():
 			#these bioware guys screw up everything possible
 			#remove this line if you fixed guistore
 			Button.SetSprites ("GUISTROC",0, 1,2,0,3)
+		
 		if ok<0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		else:
+			Button.SetVarAssoc ("RentIndex", i)
 
 	# Rent
 	Button = Window.GetControlAlias ('RENTBTN')
