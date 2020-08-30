@@ -58,7 +58,7 @@ class Sprite2D;
 static_cast<Control::Action>(a)
 	
 #define ACTION_IS_SCREEN(a) \
-(a <= Control::MouseLeave)
+(a <= Control::HoverEnd)
     
 #define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
