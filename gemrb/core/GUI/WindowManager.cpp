@@ -482,8 +482,8 @@ void WindowManager::DrawTooltip(Point pos) const
 		}
 
 		// clamp pos so that the TT is all visible (TT draws centered at pos)
-		int halfW = tt.TextSize().w/2 + 10;
-		int halfH = tt.TextSize().h/2 + 5;
+		int halfW = tt.TextSize().w/2 + 16;
+		int halfH = tt.TextSize().h/2 + 11;
 		pos.x = Clamp<int>(pos.x, halfW, screen.w - halfW);
 		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
