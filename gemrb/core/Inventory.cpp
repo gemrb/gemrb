@@ -94,7 +94,6 @@ Inventory::Inventory()
 {
 	Owner = NULL;
 	InventoryType = INVENTORY_HEAP;
-	Changed = false;
 	Weight = 0;
 	Equipped = IW_NO_EQUIPPED;
 	EquippedHeader = 0;
@@ -139,7 +138,6 @@ void Inventory::CopyFrom(const Actor *source)
 	Equipped = source->inventory.GetEquipped();
 	EquippedHeader = source->inventory.GetEquippedHeader();
 
-	Changed = true;
 	CalculateWeight();
 }
 
@@ -151,7 +149,7 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	}
 	CREItem *item = Slots[slot];
 	Slots.erase(Slots.begin()+slot);
-	Changed = true;
+	CalculateWeight();
 	return item;
 }
 
@@ -159,14 +157,11 @@ void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
-	Changed = true;
+	CalculateWeight();
 }
 
-void Inventory::CalculateWeight() const
+void Inventory::CalculateWeight()
 {
-	if (!Changed) {
-		return;
-	}
 	Weight = 0;
 	for (size_t i = 0; i < Slots.size(); i++) {
 		CREItem *slot = Slots[i];
@@ -195,7 +190,10 @@ void Inventory::CalculateWeight() const
 			Weight += slot->Weight * ((slot->Usages[0] && slot->MaxStackAmount) ? slot->Usages[0] : 1);
 		}
 	}
-	Changed = false;
+
+	if (Owner) {
+		Owner->SetBase(IE_ENCUMBRANCE, Weight);
+	}
 }
 
 void Inventory::AddSlotEffects(ieDword index)
@@ -351,7 +349,8 @@ void Inventory::KillSlot(unsigned int index)
 	}
 
 	Slots[index] = NULL;
-	Changed = true;
+	CalculateWeight();
+
 	int effect = core->QuerySlotEffects( index );
 	if (!effect) {
 		return;
@@ -463,7 +462,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
-		//use unequip stuff, decrease encumbrance etc,
+		//use unequip stuff etc,
 		//until that, we simply erase it
 		ieDword removed;
 
@@ -485,7 +484,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if (count && (destructed>=count) )
 			break;
 	}
-	if (Changed && Owner && Owner->InParty) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
+	if (destructed && Owner && Owner->InParty) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
 
 	return destructed;
 }
@@ -512,7 +511,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	CREItem *returned = new CREItem(*item);
 	item->Usages[0]-=count;
 	returned->Usages[0]=(ieWord) count;
-	Changed = true;
+	CalculateWeight();
 	return returned;
 }
 
@@ -553,10 +552,11 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		InvalidSlot(slot);
 		return;
 	}
-	Changed = true;
 
 	delete Slots[slot];
 	Slots[slot] = item;
+
+	CalculateWeight();
 
 	//update the action bar next time
 	if (Owner->IsSelected()) {
@@ -665,7 +665,6 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 		}
 		item->PurchasedAmount--;
 	}
-	CalculateWeight();
 	return ret;
 }
 
@@ -1409,7 +1408,6 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 				delete TmpItem;
 			}
 		}
-		CalculateWeight();
 	} else {
 		delete TmpItem;
 	}
@@ -1428,7 +1426,6 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 		//if the item isn't creatable, we still destroy the old item
 		KillSlot( SlotID );
 	}
-	CalculateWeight();
 }
 
 ieWord Inventory::GetShieldItemType() const
@@ -1503,8 +1500,6 @@ void Inventory::dump(StringBuffer& buffer) const
 	}
 
 	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);
-	Changed = true;
-	CalculateWeight();
 	buffer.appendFormatted( "Total weight: %d\n", Weight );
 }
 
@@ -1927,8 +1922,8 @@ int Inventory::MergeItems(int slot, CREItem *item)
 		slotitem->Flags |= IE_INV_ITEM_ACQUIRED;
 		slotitem->Usages[0] = (ieWord) (slotitem->Usages[0] + chunk);
 		item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
-		Changed = true;
 		EquipItem(slot);
+		CalculateWeight();
 		if (item->Usages[0] == 0) {
 			delete item;
 			return ASI_SUCCESS;

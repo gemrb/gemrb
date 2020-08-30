@@ -9120,9 +9120,6 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	if (Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
-
-	//keep weight up to date
-	actor->CalculateSpeed(false);
 	Py_RETURN_NONE;
 }
 
@@ -9569,10 +9566,6 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			store->RemoveItem(si);
 			delete si;
 		}
-		//keep encumbrance labels up to date
-		if (!rhstore) {
-			actor->CalculateSpeed(false);
-		}
 
 		// play the item's inventory sound
 		ieResRef Sound;
@@ -9687,8 +9680,6 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 				store->AddItem( si );
 			}
 			delete si;
-			//keep encumbrance labels up to date
-			actor->CalculateSpeed(false);
 			res = ASI_SUCCESS;
 		}
 		break;
@@ -11552,8 +11543,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
-		// make sure the encumbrance labels stay correct
-		actor->CalculateSpeed(false);
 		actor->ReinitQuickSlots();
 		core->SetEventFlag(EF_SELECTION);
 	}
@@ -11758,8 +11747,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
-			// make sure the encumbrance labels stay correct
-			actor->CalculateSpeed(false);
 			core->ReleaseDraggedItem ();
 		}
 		// res == ASI_PARTIAL
@@ -11789,8 +11776,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_SWAPPED;
 			//EquipItem (in AddSlotItem) already called RefreshEffects
 			actor->RefreshEffects(NULL);
-			// make sure the encumbrance labels stay correct
-			actor->CalculateSpeed(false);
 			actor->ReinitQuickSlots();
 			core->SetEventFlag(EF_SELECTION);
 		} else {
