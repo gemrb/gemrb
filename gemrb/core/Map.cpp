@@ -1746,13 +1746,13 @@ void Map::PurgeArea(bool items)
 	}
 	// 3. reset living neutral actors to their HomeLocation,
 	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
-/* figure out why this misplaces bg2 freed Hendak out of the map (it was so bad even SetPosition would probably misplace)
 	for (Actor *actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
+		if (!actor->GetRandomWalkCounter()) continue;
 		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.isempty() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
-	}*/
+	}
 }
 
 Actor* Map::GetActor(int index, bool any) const
