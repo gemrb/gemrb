@@ -261,7 +261,7 @@ struct PixelIterator : IPixelIterator
 			ptr += pitch * rowsToAdvance * ydir;
 		}
 		
-		ptr += xToAdvance * sizeof(PIXEL);
+		ptr += int(xToAdvance * sizeof(PIXEL));
 		
 		xpos = tmpx;
 		assert(xpos >= 0 && xpos < w);
