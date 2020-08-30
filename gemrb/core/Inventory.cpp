@@ -953,7 +953,7 @@ bool Inventory::EquipItem(ieDword slot)
 		//adjusting armour level if needed
 		{
 			int l = itm->AnimationType[0]-'1';
-			if (l>=0 && l<=3) {
+			if (l >= IE_ANI_NO_ARMOR && l <= IE_ANI_HEAVY_ARMOR) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			} else {
 				UpdateShieldAnimation(itm);
