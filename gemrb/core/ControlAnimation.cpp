@@ -141,13 +141,11 @@ void ControlAnimation::UpdateAnimationSprite () {
 		if (is_blended) {
 			palette->CreateShadedAlphaChannel();
 		}
-		pic->SetPalette(palette);
 		palette->release();
 	} else {
 		if (is_blended) {
 			Palette* palette = pic->GetPalette();
 			palette->CreateShadedAlphaChannel();
-			pic->SetPalette(palette);
 			palette->release();
 		}
 	}
