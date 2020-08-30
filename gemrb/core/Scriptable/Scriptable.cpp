@@ -1115,7 +1115,6 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		break;
 	}
 
-	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
 	Actor *target = area->GetActorByGlobalID(LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
