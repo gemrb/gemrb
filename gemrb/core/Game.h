@@ -289,7 +289,7 @@ public:
 	ieWord  WhichFormation;
 	ieWord  Formations[5];
 	ieDword PartyGold;
-	ieWord NpcInParty;
+	ieWord NPCAreaViewed = 0;
 	ieWord WeatherBits;
 	ieDword CurrentLink; //named currentLink in original engine (set to -1)
 	ieDword Reputation;

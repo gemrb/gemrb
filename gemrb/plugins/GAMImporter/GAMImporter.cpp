@@ -138,7 +138,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 	str->ReadDword( &newGame->PartyGold );
 	//npc count in party???
-	str->ReadWord( &newGame->NpcInParty );  //in ToB this is named 'nPCAreaViewed'
+	str->ReadWord( &newGame->NPCAreaViewed ); //in ToB this is named 'nPCAreaViewed'
 	str->ReadWord( &newGame->WeatherBits );
 	str->ReadDword( &PCOffset );
 	str->ReadDword( &PCCount );
@@ -838,8 +838,8 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 	}
 	stream->WriteDword( &game->PartyGold );
 	//hack because we don't need this
-	game->NpcInParty=PCCount-1;
-	stream->WriteWord( &game->NpcInParty );
+	game->NPCAreaViewed = PCCount - 1;
+	stream->WriteWord( &game->NPCAreaViewed );
 	stream->WriteWord( &game->WeatherBits );
 	stream->WriteDword( &PCOffset );
 	stream->WriteDword( &PCCount );
