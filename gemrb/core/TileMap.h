@@ -97,7 +97,7 @@ public:
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
 	Point GetMapSize();
 public:
-	int XCellCount, YCellCount;
+	int XCellCount = 0, YCellCount = 0;
 };
 
 }
