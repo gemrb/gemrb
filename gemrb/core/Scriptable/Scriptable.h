@@ -318,7 +318,6 @@ public:
 	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void SetScript(int index, GameScript* script);
 	void SetOverheadText(const String& text, bool display = true);
 	const String& GetOverheadText() { return OverheadText; };
 	bool DisplayOverheadText(bool);

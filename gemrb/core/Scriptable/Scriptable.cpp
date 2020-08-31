@@ -202,20 +202,6 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	}
 }
 
-void Scriptable::SetScript(int index, GameScript* script)
-{
-	if (index >= MAX_SCRIPTS) {
-		Log(ERROR, "Scriptable", "Invalid script index!");
-		return;
-	}
-	if (Scripts[index] && Scripts[index]->running) {
-		Scripts[index]->dead = true;
-	} else {
-		delete Scripts[index];
-	}
-	Scripts[index] = script;
-}
-
 void Scriptable::SetSpellResRef(ieResRef resref) {
 	strnuprcpy(SpellResRef, resref, 8);
 }
