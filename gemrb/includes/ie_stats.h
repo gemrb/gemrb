@@ -211,7 +211,7 @@ namespace GemRB {
 #define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
-#define MC_IGNORE_RETURN        0x100000 // TODO: iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
+#define MC_IGNORE_RETURN        0x100000 // iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
 #define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess), elsewhere unused
 #define MC_NO_NIGHTMARE_MODS    0x400000 // TODO: ee
 //#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
