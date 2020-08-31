@@ -66,7 +66,7 @@ class Wall_Polygon;
 //area flags (pst uses them only for resting purposes!)
 #define AF_NOSAVE         1
 #define AF_TUTORIAL       2 // pst: "You cannot rest here."
-#define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
+#define AF_DEADMAGIC      4 // pst: "You cannot rest right now.", TODO iwd2: LOCKBATTLEMUSIC in areaflag.ids
 //                        6 // pst: "You must obtain permission to rest here."
 #define AF_DREAM          8 // unused in pst
 /* TODO: implement these EE bits (plus PST:EE merged both worlds, bleargh)

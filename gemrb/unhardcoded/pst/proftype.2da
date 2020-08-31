@@ -27,7 +27,7 @@
 23_FLAIL   -1
 24_DART    -1
 25_AXE     3
-26_STAFF   4
+26_STAFF   4 # club in wprof.ids
 27_XBOW    5
 28_HAND    0
 29_SPEAR   -1

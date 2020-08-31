@@ -49,20 +49,20 @@ class Projectile;
 #define IE_ITEM_CURSED       0x00000010
 #define IE_ITEM_NOT_COPYABLE 0x00000020
 #define IE_ITEM_MAGICAL      0x00000040
-#define IE_ITEM_BOW          0x00000080
+#define IE_ITEM_BOW          0x00000080 // TODO: ee lefthanded
 #define IE_ITEM_SILVER       0x00000100
 #define IE_ITEM_COLD_IRON    0x00000200
-#define IE_ITEM_STOLEN       0x00000400
+#define IE_ITEM_STOLEN       0x00000400 // TODO: ee offhanded
 #define IE_ITEM_CONVERSABLE  0x00000800
-#define IE_ITEM_PULSATING    0x00001000
+#define IE_ITEM_PULSATING    0x00001000 // TODO: ee fake offhand
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN ) // beware: IE_STORE_BUYCRITS may override the first half
 // see IESDP for details
-#define IE_ITEM_FORCE_2H     0x00002000 // TODO: ee, Force two-handed animation
+#define IE_ITEM_FORCE_2H     0x00002000 // TODO: ee, Force two-handed animation DISABLE_OFFHAND
 #define IE_ITEM_NOT_OFFHAND  0x00004000 // TODO: ee, Not usable in off-hand
-#define IE_ITEM_INV_USABLE   0x00008000 // TODO: pstee, usable in inventory
-#define IE_ITEM_ADAMANTINE   0x00010000
+#define IE_ITEM_INV_USABLE   0x00008000 // TODO: ee ADAMANTINE (itemflag.ids); pstee, usable in inventory
+#define IE_ITEM_ADAMANTINE   0x00010000 // RECHECK vs IE_ITEM_INV_USABLE (missing from ids)
 //tobex modder extensions, please note, these are not copied into the local slot bits
-#define IE_ITEM_NO_DISPEL    0x01000000 // TODO: disables destruction by dispelling
+#define IE_ITEM_NO_DISPEL    0x01000000 // TODO: disables destruction by dispelling; named BODYPART in ee - different?
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
 #define IE_ITEM_NO_INVIS     0x04000000 // TODO: don't target invisible
 
