@@ -1473,6 +1473,9 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 				pc->Heal(add / conHealRate);
 			}
 		}
+
+		// bg1 also closed doors
+		GetCurrentArea()->AutoLockDoors();
 	}
 
 	Ticks+=add*interval;

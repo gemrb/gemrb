@@ -385,6 +385,7 @@ public:
 	void ChangeTileMap(Image* lm, Sprite2D* sm);
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
+	void AutoLockDoors();
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);
 	void DoStepForActor(Actor *actor, int walkScale, ieDword time);

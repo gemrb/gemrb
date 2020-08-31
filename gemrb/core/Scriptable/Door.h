@@ -102,6 +102,7 @@ public:
 	bool Visible();
 	void dump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
+	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
 	void SetNewOverlay(TileOverlay *Overlay);
 };
 
