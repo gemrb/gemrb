@@ -2982,10 +2982,6 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 			PostChangeFunctionType f = post_change_functions[StatIndex];
 			if (f) {
 				(*f)(this, previous, Value);
-				// FIXME: this was added to fix an inventory crash when removing armor
-				// why do we not have SetUsedArmor like we do with helmet/shield/weapon
-				// that would be a less hacky fix
-				ClearCurrentStanceAnims();
 			}
 		}
 	}
@@ -9886,9 +9882,7 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 	if (wt != -1) WeaponType = wt;
 	if (!anims)
 		return;
-	
-	ClearCurrentStanceAnims();
-	
+		
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	SetAttackMoveChances(MeleeAnimation);
@@ -9927,7 +9921,6 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
 	if (!anims)
 		return;
 	
-	ClearCurrentStanceAnims();
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	if (InParty) {
@@ -9942,7 +9935,6 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 	if (!anims)
 		return;
 	
-	ClearCurrentStanceAnims();
 	anims->SetHelmetRef(AnimationType);
 	if (InParty) {
 		//update the paperdoll weapon animation

@@ -892,6 +892,9 @@ bool Inventory::EquipItem(ieDword slot)
 		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
 		return false;
 	}
+	
+	Owner->ClearCurrentStanceAnims();
+	
 	switch (effect) {
 	case SLOT_EFFECT_LEFT:
 		//no idea if the offhand weapon has style, or simply the right
@@ -990,6 +993,8 @@ bool Inventory::UnEquipItem(ieDword slot, bool removecurse)
 			return false;
 		}
 	}
+	
+	Owner->ClearCurrentStanceAnims();
 	item->Flags &= ~IE_INV_ITEM_EQUIPPED; //no idea if this is needed, won't hurt
 	return true;
 }
@@ -1210,7 +1215,7 @@ int Inventory::GetEquippedSlot() const
 bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 {
 	EquippedHeader = header;
-
+	
 	//doesn't work if magic slot is used, refresh the magic slot just in case
 	if (MagicSlotEquipped() && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
