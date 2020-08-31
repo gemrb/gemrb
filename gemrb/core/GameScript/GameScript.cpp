@@ -2067,6 +2067,9 @@ static Condition* ReadCondition(DataStream* stream)
  * if you pass non-NULL parameters, continuing is set to whether we Continue()ed
  * (should start false and be passed to next script's Update),
  * and done is set to whether we processed a block without Continue()
+ *
+ * NOTE: After calling, callers should deallocate this object if `dead==true`.
+ *  Scripts can replace themselves while running but it's up to the caller to clean up.
  */
 bool GameScript::Update(bool *continuing, bool *done)
 {
@@ -2120,7 +2123,9 @@ bool GameScript::Update(bool *continuing, bool *done)
 				}
 				lastAction=a;
 			}
+			running = true;
 			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
+			running = false;
 			if (continuing) *continuing = continueExecution;
 			if (!continueExecution) {
 				if (done) *done = true;
@@ -2134,7 +2139,10 @@ bool GameScript::Update(bool *continuing, bool *done)
 //IE simply takes the first action's object for cutscene object
 //then adds these actions to its queue:
 // SetInterrupt(false), <actions>, SetInterrupt(true)
-
+/*
+ * NOTE: After calling, callers should deallocate this object if `dead==true`.
+ *  Scripts can replace themselves while running but it's up to the caller to clean up.
+ */
 void GameScript::EvaluateAllBlocks()
 {
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
