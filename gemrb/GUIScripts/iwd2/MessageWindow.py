@@ -80,13 +80,13 @@ def UpdateControlStatus():
 
 	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
-	Override = GSFlags&GS_DIALOG
+	InDialog = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 
 	largeMW = GemRB.GetView("MSGWINLG")
 
 	#a dialogue is running, setting messagewindow size to maximum
-	if Override:
+	if InDialog:
 		Expand = GS_LARGEDIALOG
 		largeMW.SetVisible(True)
 		largeMW.SetDisabled(False)
@@ -117,7 +117,7 @@ def UpdateControlStatus():
 	newSmallMTA.SetFrame(smallFrame)
 	newSmallMTA.AddAlias("MTA_SM", 0, True)
 	
-	if Override:
+	if InDialog:
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
@@ -130,6 +130,8 @@ def UpdateControlStatus():
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
+	else:
+		newSmallMTA.ScrollTo(0, -9999) # scroll to the bottom
 		
 	return
 

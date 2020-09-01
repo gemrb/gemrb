@@ -529,6 +529,16 @@ ieWord TextArea::LineHeight() const
 	return ftext->LineHeight;
 }
 
+void TextArea::ScrollDelta(const Point& p)
+{
+	scrollview.ScrollTo(p);
+}
+
+void TextArea::ScrollTo(const Point& p)
+{
+	scrollview.ScrollTo(p);
+}
+
 /** Will scroll y pixels over duration */
 void TextArea::ScrollToY(int y, ieDword duration)
 {

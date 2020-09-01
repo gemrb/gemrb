@@ -45,7 +45,7 @@ static const Color SelectOptionSelected(55, 100, 0, 0);// default selected color
  * It is usually scrolled with a ScrollBar widget
  */
 
-class GEM_EXPORT TextArea : public Control {
+class GEM_EXPORT TextArea : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
@@ -116,6 +116,8 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
+	void ScrollDelta(const Point& p);
+	void ScrollTo(const Point& p);
 	void ScrollToY(int y, ieDword lineduration = 0);
 	int ContentHeight() const;
 

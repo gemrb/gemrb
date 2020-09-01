@@ -285,7 +285,7 @@ class GLabel(GControl):
     'SetTextColor': _GemRB.Label_SetTextColor
   }
 
-class GTextArea(GControl):
+class GTextArea(GControl, Scrollable):
   methods = {
     'ChapterText': _GemRB.TextArea_SetChapterText,
     'Append': _GemRB.TextArea_Append,
