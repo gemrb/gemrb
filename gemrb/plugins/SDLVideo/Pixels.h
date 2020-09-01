@@ -374,6 +374,7 @@ struct SDLPixelIterator : IPixelIterator
 public:
 	SDL_PixelFormat* format;
 	SDL_Rect clip;
+	int colorKey = -1;
 
 	SDLPixelIterator(SDL_Surface* surf)
 	: SDLPixelIterator(SurfaceRect(surf), surf)
@@ -394,6 +395,14 @@ public:
 		pixel = surf->pixels; // always here regardless of direction
 		
 		assert(SDL_MUSTLOCK(surf) == 0);
+		
+#if SDL_VERSION_ATLEAST(1,3,0)
+		SDL_GetColorKey(surf, reinterpret_cast<Uint32*>(&colorKey));
+#else
+		if (surf->flags & SDL_SRCCOLORKEY) {
+			colorKey = surf->format->colorkey;
+		}
+#endif
 	}
 
 	SDLPixelIterator(const SDLPixelIterator& orig)
@@ -402,6 +411,7 @@ public:
 		clip = orig.clip;
 		format = orig.format;
 		imp = orig.imp->Clone();
+		colorKey = orig.colorKey;
 	}
 
 	~SDLPixelIterator() {
@@ -494,17 +504,15 @@ public:
 				g = format->palette->colors[pixel].g;
 				b = format->palette->colors[pixel].b;
 
+				if (colorKey != -1 && pixel == Uint32(colorKey)) {
+					a = SDL_ALPHA_TRANSPARENT;
+				} else {
 #if SDL_VERSION_ATLEAST(1,3,0)
-				// FIXME: I guess we dont support colorkey? (no surface to query)... do we need it?
-				//Uint32 ck;
-				//if (SDL_GetColorKey(surface, &ck) != -1 && ck == pixel) c.a = SDL_ALPHA_TRANSPARENT;
-				a = format->palette->colors[pixel].a;
+					a = format->palette->colors[pixel].a;
 #else
-				// For now we are ignoring colorkeys
-				//if (format->colorkey == pixel) a = SDL_ALPHA_TRANSPARENT;
-				//else
-				a = format->palette->colors[pixel].unused; // unused is alpha
+					a = format->palette->colors[pixel].unused; // unused is alpha
 #endif
+				}
 				return;
 			default:
 				ERROR_UNKNOWN_BPP;
