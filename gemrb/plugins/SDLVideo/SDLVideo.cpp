@@ -261,23 +261,8 @@ Sprite2D* SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask
 Sprite2D* SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
 										Palette* palette, bool cK, int index)
 {
-	if (palette) {
-		return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
-	} else {
-		// an alpha only sprite. used by SpriteCover or as a mask passed to BlitTile
-		sprite_t* spr = new sprite_t(rgn, 8, pixels, 0, 0, 0, 0);
-#if SDL_VERSION_ATLEAST(1,3,0)
-		SDL_Surface* mask = spr->GetSurface();
-		for (int i = 0; i < mask->format->palette->ncolors; ++i) {
-			SDL_Color* c = &mask->format->palette->colors[i];
-			c->r = 0;
-			c->g = 0;
-			c->b = 0;
-			c->a = i;
-		}
-#endif
-		return spr;
-	}
+	assert(palette);
+	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 
 Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
