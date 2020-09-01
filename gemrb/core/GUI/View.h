@@ -246,6 +246,7 @@ public:
 	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group);
 	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
+	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ResRef group) const;
 };
 
 }

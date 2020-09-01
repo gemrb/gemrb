@@ -809,6 +809,15 @@ const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, ResRef group)
 		return NULL;
 	}
 }
+
+const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ResRef group) const
+{
+	auto it = std::find_if(scriptingRefs.begin(), scriptingRefs.end(), [&](const ViewScriptingRef* ref) {
+		return ref->Id == id && ref->ScriptingGroup() == group;
+	});
+	
+	return (it != scriptingRefs.end()) ? *it : nullptr;
+}
 	
 const ViewScriptingRef* View::GetScriptingRef() const
 {
