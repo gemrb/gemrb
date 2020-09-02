@@ -2422,14 +2422,6 @@ int Response::Execute(Scriptable* Sender)
 {
 	int ret = 0; // continue or not
 	for (size_t i = 0; i < actions.size(); i++) {
-		if (!CheckCanary()) {
-			// FIXME: hack to prevent crashing when a script deletes itself.
-			// this object has been deleted and this should not be considered a fix (it may cause unforseen problems too).
-			Log(ERROR, "GameScript", "Aborting response execution due to object deletion.\n \
-									  This should not happen and we need to fix it.");
-			ret = 0;
-			break;
-		}
 		Action* aC = actions[i];
 		switch (actionflags[aC->actionID] & AF_MASK) {
 			case AF_IMMEDIATE:
