@@ -102,10 +102,16 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 
-GLuint GLSLProgram::buildShader(GLenum type, std::string source)
+GLuint GLSLProgram::buildShader(GLenum type, const std::string source)
 {
+	std::string shader_source = source;
+#ifdef USE_GL
+	shader_source.insert(0, "#version 110\n");
+#else
+	shader_source.insert(0, "#version 100\n");
+#endif
     GLuint id = glCreateShader(type);
-	const char* src = source.c_str();
+	const char* src = shader_source.c_str();
 	glShaderSource(id, 1, &src, 0);
     glCompileShader(id);
     GLint result = GL_FALSE;
