@@ -188,7 +188,11 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
 	}
-	delete Scripts[idx];
+	if (Scripts[idx] && Scripts[idx]->running) {
+		Scripts[idx]->dead = true;
+	} else {
+		delete Scripts[idx];
+	}
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
@@ -204,7 +208,11 @@ void Scriptable::SetScript(int index, GameScript* script)
 		Log(ERROR, "Scriptable", "Invalid script index!");
 		return;
 	}
-	delete Scripts[index];
+	if (Scripts[index] && Scripts[index]->running) {
+		Scripts[index]->dead = true;
+	} else {
+		delete Scripts[index];
+	}
 	Scripts[index] = script;
 }
 
@@ -435,6 +443,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 		GameScript *Script = Scripts[scriptlevel];
 		if (Script) {
 			changed |= Script->Update(&continuing, &done);
+			if (Script->dead) {
+				delete Script;
+			}
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
