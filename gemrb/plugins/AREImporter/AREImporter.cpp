@@ -2374,7 +2374,8 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 				tmpWord = fxqueue->GetSavedEffectsCount();
 			}
 			ieDword ID = pro->GetCaster();
-			Actor *actor = map->GetActorByGlobalID(ID);
+			// lookup caster via Game, since the the current map can already be empty when switching them
+			Actor *actor = core->GetGame()->GetActorByGlobalID(ID);
 			//0xff if not in party
 			//party slot if in party
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);
