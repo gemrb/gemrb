@@ -861,8 +861,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &OpenImpededCount );
 		str->ReadWord( &ClosedImpededCount );
 		str->ReadDword( &ClosedFirstImpeded );
-		str->ReadWord( &hp); //TODO: store these
-		str->ReadWord( &ac); //hitpoints AND armorclass, according to IE dev info
+		str->ReadWord(&hp); // hitpoints
+		str->ReadWord(&ac); // AND armorclass, according to IE dev info
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -1395,8 +1395,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
 		str->ReadWord( &Z );
-		str->Read( &PartyID,1 );  //according to dev info, this is 'targettype'
-		str->Read( &Owner,1 );
+		str->Read(&PartyID, 1);  //according to dev info, this is 'targettype'; "Enemy-ally targetting" on IESDP
+		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
 			Log(ERROR, "AREImporter", "TrapEffectSize in game: %d != %d. Clearing it",
@@ -1417,7 +1417,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Actor * caster = core->GetGame()->FindPC(PartyID);
 		pro->SetEffects(fxqueue);
 		if (caster) {
-			//FIXME: i don't know the level info
+			//FIXME: i don't know the level info, but it matters for the normal thief traps (they scale with level 4 times)
 			pro->SetCaster(caster->GetGlobalID(), 10);
 		}
 		Point pos(X,Y);
@@ -1431,28 +1431,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
-		//these fields could be different size
-		//ieDword ClosedCount, OpenCount;
+		// these fields could be different size: ieDword ClosedCount, OpenCount;
 		ieWord ClosedCount, OpenCount;
 		ieDword ClosedIndex, OpenIndex;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadResRef( ID );
 		str->ReadDword( &Flags );
-		//TODO check this structure again
-/*
-		str->ReadDword( &OpenIndex );
-		str->ReadDword( &OpenCount );
-		str->ReadDword( &ClosedIndex );
-		str->ReadDword( &ClosedCount );
-*/
 		//IE dev info says this:
 		str->ReadDword( &OpenIndex );
 		str->ReadWord( &OpenCount );
 		str->ReadWord( &ClosedCount );
 		str->ReadDword( &ClosedIndex );
 		//end of disputed section
-
 
 		str->Seek( 48, GEM_CURRENT_POS );
 		//absolutely no idea where these 'tile indices' are stored
