@@ -6711,7 +6711,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_trap(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieDword skill, roll;
+	ieDword skill, roll, level;
 	Map *map;
 
 	map = target->GetCurrentArea();
@@ -6733,11 +6733,17 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (Owner->Type==ST_ACTOR) {
-		skill = ((Actor *)Owner)->GetStat(IE_SETTRAPS);
+		Actor *caster = (Actor *) Owner;
+		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
+		// assuming functioning thief, but allowing modded exceptions
+		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
+		level = caster->GetThiefLevel();
+		level = level ? level : caster->GetXPLevel(false);
 	} else {
 		roll=0;
 		skill=0;
+		level = 0;
 	}
 
 	if (roll>skill) {
@@ -6762,7 +6768,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, 0, 1, false);
+	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, level, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
