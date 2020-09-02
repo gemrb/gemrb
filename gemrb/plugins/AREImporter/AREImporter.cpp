@@ -2353,8 +2353,6 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
-	ieWord tmpWord;
-	ieByte tmpByte;
 	ieResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
@@ -2362,7 +2360,8 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 	Offset = EffectOffset;
 	ieDword i = map->GetTrapCount(piter);
 	while(i--) {
-		tmpWord = 0;
+		ieWord tmpWord = 0;
+		ieByte tmpByte = 0xff;
 		Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
@@ -2379,7 +2378,6 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 			//0xff if not in party
 			//party slot if in party
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);
-			else tmpByte = 0xff;
 		}
 
 		stream->WriteResRef( name );
@@ -2391,15 +2389,15 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );  //size in bytes
 		stream->WriteWord( &type );     //missile.ids
 		tmpDword = 0;
-		stream->WriteDword( &tmpDword );//unknown field
+		stream->WriteDword(&tmpDword); // unknown field, Ticks
 		tmpWord = (ieWord) dest.x;
 		stream->WriteWord( &tmpWord );
 		tmpWord = (ieWord) dest.y;
 		stream->WriteWord( &tmpWord );
 		tmpWord = 0;
-		stream->WriteWord( &tmpWord ); //unknown field
-		stream->Write( &tmpByte,1 );   //unknown field
-		stream->Write( &tmpByte,1 );   //InParty flag
+		stream->WriteWord(&tmpWord); // unknown field, Z
+		stream->Write(&tmpByte, 1);   // unknown field, TargetType
+		stream->Write(&tmpByte, 1);   // Owner
 	}
 	return 0;
 }
