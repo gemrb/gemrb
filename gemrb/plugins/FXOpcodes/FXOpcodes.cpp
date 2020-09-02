@@ -6721,7 +6721,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//check if trap count is over an amount (only saved traps count)
 	//actually, only projectiles in trigger phase should count here
-	if (map->GetTrapCount(iter)>6) {
+	if (map->GetTrapCount(iter) > gamedata->GetTrapLimit(Owner)) {
 		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
 	}
