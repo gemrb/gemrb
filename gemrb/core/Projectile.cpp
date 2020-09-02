@@ -1914,6 +1914,11 @@ void Projectile::StaticTint(const Color &newtint)
 	TFlags &= ~PTF_TINT; //turn off area tint
 }
 
+int Projectile::GetPhase() const
+{
+	return phase;
+}
+
 void Projectile::Cleanup()
 {
 	//neutralise the payload

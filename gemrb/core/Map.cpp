@@ -1028,8 +1028,8 @@ Projectile *Map::GetNextTrap(proIterator &iter) const
 	do {
 		pro=GetNextProjectile(iter);
 		if (pro) iter++;
-		//logic to determine dormant traps
-		//if (pro && pro->IsTrap()) break;
+		// find dormant traps (thieves', skull traps, glyphs of warding ...)
+		if (pro && pro->GetPhase() == P_TRIGGER) break;
 	} while(pro);
 	return pro;
 }
