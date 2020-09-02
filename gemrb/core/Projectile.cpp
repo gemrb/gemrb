@@ -1036,6 +1036,7 @@ int Projectile::CalculateTargetFlag()
 {
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
+	bool checkingEA = false;
 
 	if (Extension) {
 		if (Extension->AFlags&PAF_NO_WALL) {
@@ -1061,6 +1062,9 @@ int Projectile::CalculateTargetFlag()
 		default:
 			return flags;
 		}
+		if (Extension->AFlags & PAF_TARGET) {
+			checkingEA = true;
+		}
 
 		//this is the only way to affect neutrals and enemies
 		if (Extension->APFlags&APF_INVERT_TARGET) {
@@ -1068,8 +1072,8 @@ int Projectile::CalculateTargetFlag()
 		}
 	}
 
-	Actor *caster = area->GetActorByGlobalID(Caster);
-	if (caster && ((Actor *) caster)->GetStat(IE_EA)<EA_GOODCUTOFF) {
+	Scriptable *caster = area->GetScriptableByGlobalID(Caster);
+	if (caster && (!checkingEA || (caster->Type == ST_ACTOR && ((Actor *) caster)->GetStat(IE_EA) < EA_GOODCUTOFF))) {
 		return flags;
 	}
 
@@ -1499,6 +1503,18 @@ void Projectile::DrawExplosion(const Region& vp)
 				vvc->SetBlend();
 				//quick hack to use the single object envelope
 				area->AddVVCell(new VEFObject(vvc));
+			}
+			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
+			// until we actually need two vvc fields in the extension, let's just hack around it
+			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
+				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
+				if (vvc) {
+					vvc->XPos += Pos.x;
+					vvc->YPos += Pos.y;
+					vvc->PlayOnce();
+					vvc->SetBlend();
+					area->AddVVCell(new VEFObject(vvc));
+				}
 			}
 		}
 		

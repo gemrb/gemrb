@@ -45,6 +45,8 @@ namespace GemRB {
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------
+// bg1 and bg2 have some dead bcs code - perhaps the first implementation
+// of morale, since the uses suggest being able to detect panic
 int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
@@ -1240,10 +1242,16 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
+
+	if (parameters->int0Parameter == 0 && Sender->LastMarkedSpell == 0) {
+		return false;
+	}
+
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
 		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
 	}
+	if (!parameters->int0Parameter) parameters->int0Parameter = Sender->LastMarkedSpell;
 	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
 }
 
@@ -1494,6 +1502,9 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	}
 	if (Sender->GetCurrentArea() != scr->GetCurrentArea()) {
 		return 0;
+	}
+	if (Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = scr->GetGlobalID();
 	}
 	int distance = SquaredMapDistance(Sender, scr);
 	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
@@ -2183,8 +2194,6 @@ int GameScript::SetSpellTarget(Scriptable* Sender, Trigger* parameters)
 		scr->LastTargetPos.empty();
 		return 1;
 	}
-	scr->LastTarget = 0;
-	scr->LastTargetPersistent = 0;
 	scr->LastTargetPos.empty();
 	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
@@ -2233,21 +2242,10 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
 //Always manages to set spell to 0, otherwise it sets if there was nothing set earlier
 int GameScript::SetMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor *scr = (Actor *) Sender;
-	if (parameters->int0Parameter) {
-		if (scr->LastMarkedSpell) {
-			return 1;
-		}
-		if (!scr->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
-			return 1;
-		}
-	}
-
-	//TODO: check if spell exists (not really important)
-	scr->LastMarkedSpell = parameters->int0Parameter;
+	Action *params = new Action(true);
+	params->int0Parameter = parameters->int0Parameter;
+	GameScript::SetMarkedSpell(Sender, params);
+	delete params;
 	return 1;
 }
 
@@ -2274,14 +2272,6 @@ int GameScript::IsMarkedSpell(Scriptable* Sender, Trigger* parameters)
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
 {
 	int see = SeeCore(Sender, parameters, 0);
-	//don't mark LastSeen for clear!!!
-	if (Sender->Type==ST_ACTOR && see) {
-		Actor *act = (Actor *) Sender;
-		//save lastseen as lastmarked
-		//FIXME: what is this doing?
-		act->LastMarked = act->LastSeen;
-		//Sender->AddTrigger (&act->LastSeen);
-	}
 	return see;
 }
 
@@ -3329,7 +3319,12 @@ int GameScript::IsFacingObject(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	bool match = Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (match && target && Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = target->GetGlobalID();
+	}
+	return match;
 }
 
 int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
@@ -3394,19 +3389,28 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 		case 7: stat = IE_ALIGNMENT; break;
 		default: return 0;
 	}
+	bool match = false;
 	if (stat == IE_CLASS) {
-		return actor->GetActiveClass() == help->GetActiveClass();
+		match = actor->GetActiveClass() == help->GetActiveClass();
 	} else if (actor->GetStat(stat) == help->GetStat(stat)) {
 		// FIXME
 		//Sender->AddTrigger(&actor->LastHelp);
-		return 1;
+		match = true;
 	}
-	return 0;
+	if (match && Sender->Type == ST_ACTOR) {
+		Sender->LastMarked = actor->GetGlobalID();
+	}
+	return match;
 }
 
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
+	 bool match = Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
+	 Scriptable* target = GetActorFromObject(Sender, parameters->objectParameter);
+	 if (match && target && Sender->Type == ST_ACTOR) {
+		 Sender->LastMarked = target->GetGlobalID();
+	 }
+	 return match;
 }
 
 int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)

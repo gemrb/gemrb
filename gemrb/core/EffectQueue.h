@@ -315,7 +315,6 @@ public:
 	Effect *HasEffectWithSource(EffectRef &effect_reference, const ieResRef source) const;
 	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const;
 	int DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const;
-	//int SpecificDamageBonus(ieDword damage_type) const;
 	int BonusForParam2(EffectRef &effect_reference, ieDword param2) const;
 	int MaxParam1(EffectRef &effect_reference, bool positive) const;
 	bool HasAnyDispellableEffect() const;
@@ -326,10 +325,6 @@ public:
 	int SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const;
 	//melee and ranged effects
 	void AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) const;
-	// checks if spells of type "types" are disabled (usually by armor)
-	// returns a bitfield of disabled spelltypes
-	// it is no longer used
-	//int DisabledSpellcasting(int types) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target) const;

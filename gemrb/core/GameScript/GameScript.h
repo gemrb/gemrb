@@ -548,6 +548,9 @@ public:
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 
+	bool dead = false;      // Script replaced itself with another and should be deleted when done running
+	bool running = false;   // Script is currently running so defer any deletion to caller
+
 	const char *GetName() { return Name; }
 	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
@@ -1335,6 +1338,7 @@ public:
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
 	static void SetNoOneOnTrigger(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
+	static void SetOriginalClass(Scriptable* Sender, Action* parameters);
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);
 	static void SetRegularName(Scriptable* Sender, Action* parameters);

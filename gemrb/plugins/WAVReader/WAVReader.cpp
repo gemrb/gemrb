@@ -86,7 +86,7 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	}
 	int res = 0;
 	if (count) {
-		res = str->Read( buffer, count * ( ( is16bit ? 2 : 1 ) ) );
+		res = str->Read(buffer, count * (is16bit ? 2 : 1));
 	}
 	if (!is16bit) {
 		char* alt_buff = ( char* ) buffer;

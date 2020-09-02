@@ -142,7 +142,7 @@ bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, Map
 		if ( (*iter).start>GameTime) continue;
 		if ( (*iter).length<GameTime) continue;
 
-		Point pos = ((*iter).offset);
+		Point pos = (*iter).offset;
 		pos.x+=position.x;
 		pos.y+=position.y;
 

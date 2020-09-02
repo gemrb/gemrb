@@ -336,7 +336,18 @@ Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters, in
 // but IWD2 defines it
 Targets *GameScript::MyTarget(Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	return GetMyTarget(Sender, NULL, parameters, ga_flags);
+	const Scriptable *actor = parameters->GetTarget(0, -1);
+	if (!actor) {
+		actor = Sender;
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->MyTarget);
+		if (target) {
+			parameters->AddTarget(target, 0, ga_flags);
+		}
+	}
+	return parameters;
 }
 
 Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters, int ga_flags)

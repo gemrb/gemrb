@@ -6850,7 +6850,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		if (!map) {
 			return RuntimeError("No current area!");
 		}
-		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+		container = map->GetPile(actor->Pos);
 	} else {
 		container = core->GetCurrentContainer();
 	}
@@ -7024,9 +7024,6 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	if (Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
-
-	//keep weight up to date
-	actor->CalculateSpeed(false);
 	Py_RETURN_NONE;
 }
 
@@ -7464,10 +7461,6 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			store->RemoveItem(si);
 			delete si;
 		}
-		//keep encumbrance labels up to date
-		if (!rhstore) {
-			actor->CalculateSpeed(false);
-		}
 
 		// play the item's inventory sound
 		ieResRef Sound;
@@ -7584,8 +7577,6 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 				store->AddItem( si );
 			}
 			delete si;
-			//keep encumbrance labels up to date
-			actor->CalculateSpeed(false);
 			res = ASI_SUCCESS;
 		}
 		break;
@@ -9322,9 +9313,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found!\n" );
 	}
 
-	if ((unsigned int) Slot>core->GetInventorySize()) {
-		return AttributeError( "Invalid slot" );
-	}
 	CREItem* si;
 	if (Type) {
 		Map *map = actor->GetCurrentArea();
@@ -9337,10 +9325,11 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
+		if ((unsigned int) Slot > core->GetInventorySize()) {
+			return AttributeError("Invalid slot");
+		}
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
-		// make sure the encumbrance labels stay correct
-		actor->CalculateSpeed(false);
 		actor->ReinitQuickSlots();
 		core->SetEventFlag(EF_SELECTION);
 	}
@@ -9539,8 +9528,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
-			// make sure the encumbrance labels stay correct
-			actor->CalculateSpeed(false);
 			core->ReleaseDraggedItem ();
 		}
 		// res == ASI_PARTIAL
@@ -9570,8 +9557,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_SWAPPED;
 			//EquipItem (in AddSlotItem) already called RefreshEffects
 			actor->RefreshEffects(NULL);
-			// make sure the encumbrance labels stay correct
-			actor->CalculateSpeed(false);
 			actor->ReinitQuickSlots();
 			core->SetEventFlag(EF_SELECTION);
 		} else {
@@ -9610,6 +9595,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
     * SV_HEIGHT = 2 - screen height\n\
     * SV_GAMEPATH = 3 - game path\n\
     * SV_TOUCH = 4 - are we using touch input mode?\n\
+    * SV_SAVEPATH = 5 - path to the parent of save/mpsave/bpsave dir\n\
 \n\
 **Return value:** This function returns -1 if the index is invalid.\n\
 \n\
@@ -9628,6 +9614,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_HEIGHT: value = core->Height; break;
 		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
 		case SV_TOUCH: value = EventMgr::TouchInputEnabled; break;
+		case SV_SAVEPATH: strlcpy(path, core->SavePath, _MAX_PATH); break;
 		default: value = -1; break;
 	}
 	if (path[0]) {

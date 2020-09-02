@@ -19,7 +19,7 @@
 #ToB start window, precedes the SoA window
 import GemRB
 import GameCheck
-from GUIDefines import SV_GAMEPATH
+from GUIDefines import SV_SAVEPATH
 
 StartWindow = 0
 
@@ -88,9 +88,9 @@ def MigrateSaveDir():
 	except ImportError:
 		print "No os module, cannot migrate save dir"
 
-	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
-	mpSaveDir = os.path.join (gamePath, "mpsave")
-	saveDir = os.path.join (gamePath, "save")
+	savePath = GemRB.GetSystemVariable (SV_SAVEPATH) # this is the parent dir already
+	mpSaveDir = os.path.join (savePath, "mpsave")
+	saveDir = os.path.join (savePath, "save")
 
 	if not os.path.isdir (mpSaveDir) or not os.access (saveDir, os.W_OK):
 		return

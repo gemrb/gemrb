@@ -66,17 +66,15 @@ before_build:
     $replace = "PluginsPath=.\plugins"
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 
-    cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DINSOURCEBUILD=1 -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
+    cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
-    # set version to version + commit hash
-    $git_version = (git describe --always --all) | Out-String
-    $git_version = -join('"', $git_version, '"')
-    $git_version = $git_version -replace "`n",", " -replace "`r",", "
+    # set version to tag or version + commits since tag + commit hash
+    $git_version = (git describe --always) | Out-String
+    $git_version = $git_version -replace "`t|`n|`r|^v",""
     $file = 'gemrb/includes/globals.h'
     $find = 'define VERSION_GEMRB .*$'
-    $replace = "define VERSION_GEMRB $git_version"
+    $replace = "define VERSION_GEMRB `"$git_version`""
     (Get-Content $file) -replace $find, $replace | Set-Content $file
-    #sed -i "s/define VERSION_GEMRB .*/define VERSION_GEMRB '$git_version'/" gemrb/includes/globals.h
 build:
   project: gemrb.sln
   parallel: true
@@ -91,7 +89,16 @@ before_package:
       popd
       7z a -tzip $env:archive_path $env:archive_source
     }
-test: off
+test_script:
+- cmd: |-
+    cd C:/gemrb-win32*
+    cp GemRB.cfg.sample GmRB.cfg.bots
+    echo GamePath=minimal >> GemRB.cfg.bots
+    echo GameType=test >> GemRB.cfg.bots
+    echo AudioDriver=none >> GemRB.cfg.bots
+
+    gemrb.exe -c GemRB.cfg.bots
+    rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip
   name: normal

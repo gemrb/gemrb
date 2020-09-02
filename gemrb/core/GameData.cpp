@@ -676,4 +676,25 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
 }
 
+int GameData::GetSummoningLimit(ieDword sex)
+{
+	if (!summoningLimit.ok()) {
+		summoningLimit.load("summlimt", true);
+	}
+
+	unsigned int row = 1000;
+	switch (sex) {
+		case SEX_SUMMON:
+		case SEX_SUMMON_DEMON:
+			row = 0;
+			break;
+		case SEX_BOTH:
+			row = 1;
+			break;
+		default:
+			break;
+	}
+	return atoi(summoningLimit->QueryField(row, 0));
+}
+
 }

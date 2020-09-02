@@ -21,7 +21,8 @@
 #ifndef GUISCRIPT_H
 #define GUISCRIPT_H
 
-#include "GemPython.h"
+// NOTE: Python.h has to be included first.
+#include <Python.h>
 
 #include "ScriptEngine.h"
 
@@ -29,11 +30,14 @@ namespace GemRB {
 
 class Control;
 
-#define SV_BPP 0
-#define SV_WIDTH 1
-#define SV_HEIGHT 2
-#define SV_GAMEPATH 3
-#define SV_TOUCH 4
+enum {
+   SV_BPP,
+   SV_WIDTH,
+   SV_HEIGHT,
+   SV_GAMEPATH,
+   SV_TOUCH,
+   SV_SAVEPATH
+};
 
 class GUIScript : public ScriptEngine {
 private:

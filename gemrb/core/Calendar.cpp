@@ -30,7 +30,6 @@ namespace GemRB {
 
 Calendar::Calendar(void)
 {
-	int i;
 	daysinyear = 0;
 	AutoTable tab("months");
 	if (!tab) {
@@ -42,7 +41,7 @@ Calendar::Calendar(void)
 	monthnamecount = tab->GetRowCount();
 	monthnames = (int *) malloc(sizeof(int) * monthnamecount);
 	days = (int *) malloc(sizeof(int) * monthnamecount);
-	for(i=0;i<monthnamecount;i++) {
+	for (int i = 0; i < monthnamecount; i++) {
 		days[i]=atoi(tab->QueryField(i,0));
 		daysinyear+=days[i];
 		monthnames[i]=atoi(tab->QueryField(i,1));

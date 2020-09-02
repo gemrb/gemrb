@@ -118,7 +118,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
 	WhichFormation = 0;
-	NpcInParty = 0;
 	CurrentLink = 0;
 	PartyAttack = false;
 
@@ -156,11 +155,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	if (table.load(tn)) {
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
-		int i, j;
 		npclevels.reserve(rows);
-		for (i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; i++) {
 			npclevels.push_back (std::vector<ResRef>(cols+1));
-			for(j = -1; j < cols; j++) {
+			for(int j = -1; j < cols; j++) {
 				if (j == -1) {
 					npclevels[i][j+1] = table->GetRowName(i);
 				} else {
@@ -1460,6 +1458,9 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 				pc->Heal(add / conHealRate);
 			}
 		}
+
+		// bg1 also closed doors
+		GetCurrentArea()->AutoLockDoors();
 	}
 
 	Ticks+=add*interval;

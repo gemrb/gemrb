@@ -19,7 +19,7 @@
 #ifndef PYTHON_ERRORS_H
 #define PYTHON_ERRORS_H
 
-#include "GemPython.h"
+#include <Python.h>
 
 namespace GemRB {
 /* Sets RuntimeError exception and returns NULL, so this function

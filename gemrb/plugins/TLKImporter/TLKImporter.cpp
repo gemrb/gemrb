@@ -508,6 +508,7 @@ empty:
 		free( string );
 		return string2;
 	}
+
 	return string;
 }
 

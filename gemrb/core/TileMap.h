@@ -59,6 +59,7 @@ public:
 	size_t GetDoorCount() { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
+	void AutoLockDoors();
 
 	/* type is an optional filter for container type*/
 	void AddContainer(Container *c);

@@ -67,7 +67,7 @@ class Wall_Polygon;
 //area flags (pst uses them only for resting purposes!)
 #define AF_NOSAVE         1
 #define AF_TUTORIAL       2 // pst: "You cannot rest here."
-#define AF_DEADMAGIC      4 // pst: "You cannot rest right now."
+#define AF_DEADMAGIC      4 // pst: "You cannot rest right now.", TODO iwd2: LOCKBATTLEMUSIC in areaflag.ids
 //                        6 // pst: "You must obtain permission to rest here."
 #define AF_DREAM          8 // unused in pst
 /* TODO: implement these EE bits (plus PST:EE merged both worlds, bleargh)
@@ -103,7 +103,7 @@ class Wall_Polygon;
 #define A_ANI_PSTBIT14        0x2000   // PST-only: unknown and rare, see #163 for area list
 // TODO: BGEE extended flags:
 // 0x2000: Use WBM resref
-// 0x4000: Underground?
+// 0x4000: Draw stenciled (can be used to stencil animations using the water overlay mask of the tileset, eg. to give water surface a more natural look)
 // 0x8000: Use PVRZ resref
 
 //creature area flags
@@ -407,13 +407,6 @@ private:
 	Region stencilViewport;
 
 	std::unordered_map<void*, std::pair<VideoBufferPtr, Region>> objectStencils;
-	static const size_t DEGREES_OF_FREEDOM = 4;
-	static const size_t RAND_DEGREES_OF_FREEDOM = 16;
-	static const std::array<char, DEGREES_OF_FREEDOM> dx;
-	static const std::array<char, DEGREES_OF_FREEDOM> dy;
-	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand;
-	static const std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand;
-	const unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
 
 public:
 	Map(void);
@@ -431,6 +424,7 @@ public:
 	void ChangeTileMap(Image* lm, Sprite2D* sm);
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
+	void AutoLockDoors();
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);
 	void DoStepForActor(Actor *actor, int walkScale, ieDword time);

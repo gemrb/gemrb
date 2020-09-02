@@ -471,6 +471,9 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	//delete the original searchmap
 	delete sr;
 }
+void Map::AutoLockDoors() {
+	GetTileMap()->AutoLockDoors();
+}
 
 void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor)
 {
@@ -744,28 +747,7 @@ void Map::UpdateScripts()
 		 */
 		actor->Update();
 		actor->UpdateActorState();
-
-		int speed = actor->CalculateSpeed(false);
-		if (speed) {
-			speed = 1500/speed;
-		}
-		if (core->GetResDataINI()) {
-			ieDword animid = actor->BaseStats[IE_ANIMATION_ID];
-			if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
-				animid = animid & 0xff;
-			}
-			if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
-				AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
-				if (avatar->RunScale && (actor->GetInternalFlag() & IF_RUNNING)) {
-					speed = avatar->RunScale;
-				} else if (avatar->WalkScale) {
-					speed = avatar->WalkScale;
-				} else {
-					//print("no walkscale for anim %d!", actor->BaseStats[IE_ANIMATION_ID]);
-				}
-			}
-		}
-		actor->speed = speed;
+		actor->CalculateSpeed(false);
 	}
 
 	//clean up effects on dead actors too
@@ -781,7 +763,7 @@ void Map::UpdateScripts()
 	q = Qcount[PR_SCRIPT];
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
-		if (actor->GetRandomBackoff() || !actor->GetStep()) {
+		if (actor->GetRandomBackoff() || !actor->GetStep() || actor->speed == 0) {
 			continue;
 		}
 		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
@@ -795,7 +777,7 @@ void Map::UpdateScripts()
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
-			if (!actor->GetRandomBackoff()) {
+			if (!actor->GetRandomBackoff() && actor->speed > 0) {
 				actor->NewPath();
 			}
 			continue;
@@ -896,7 +878,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 
 void Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) {
 	// Immobile, dead and actors in another map can't walk here
-	if (actor->Immobile() || actor->GetCurrentArea() != this
+	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
 		return;
 	}
@@ -1930,8 +1912,9 @@ Actor* Map::GetActor(const char* Name, int flags)
 {
 	for (auto actor : actors) {
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
+			// there can be more with the same scripting name, see bg2/ar0014.baf
 			if (!actor->ValidTarget(flags) ) {
-				return NULL;
+				continue;
 			}
 			return actor;
 		}
@@ -2024,8 +2007,10 @@ void Map::PurgeArea(bool items)
 	// 3. reset living neutral actors to their HomeLocation,
 	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
 	for (Actor *actor : actors) {
+		if (!actor->GetRandomWalkCounter()) continue;
+		if (actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) continue;
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
-		if (actor->Pos != actor->HomeLocation) {
+		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.isempty() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
 	}
@@ -2277,11 +2262,11 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
-		double factor = caller ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
+		double factor = caller && caller->speed ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		int blockStatus = GetBlockedInRadius(p.x, p.y, caller ? caller->size : 0, stopOnImpassable);
+		int blockStatus = GetBlockedNavmap(p.x, p.y);
 		if (stopOnImpassable && blockStatus == PATH_MAP_IMPASSABLE) {
 			return PATH_MAP_IMPASSABLE;
 		}
@@ -3738,7 +3723,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area, uint32_t flags)
 	//transparency
 	ieByte inverseTransparency = 255-transparency;
 	Color tint(255, 255, 255, inverseTransparency);
-	if ((Flags&A_ANI_NO_SHADOW)) {
+	if (Flags & A_ANI_NO_SHADOW) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = inverseTransparency;
 	}

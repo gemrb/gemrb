@@ -253,30 +253,27 @@ static inline void ResolveEffectRef(EffectRef &effect_reference)
 
 bool Init_EffectQueue()
 {
-	int i;
-
 	if( initialized) {
 		return true;
 	}
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
-
 	initialized = 1;
 
 	AutoTable efftextTable("efftext");
 
 	int eT = core->LoadSymbol( "effects" );
-	if( eT < 0) {
+	if (eT < 0) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
 		return false;
 	}
 	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
-	if( !effectsTable) {
+	if (!effectsTable) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
 		return false;
 	}
 
-	for (i = 0; i < MAX_EFFECTS; i++) {
+	for (long i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
 
 		EffectDesc* poi = FindEffect( effectname );
@@ -286,12 +283,12 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				error("EffectQueue", "Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
+				error("EffectQueue", "Clashing Opcodes FN: %ld vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
 		}
 		
-		if( efftextTable) {
+		if (efftextTable) {
 			int row = efftextTable->GetRowCount();
 			while (row--) {
 				const char* ret = efftextTable->GetRowName( row );
@@ -303,7 +300,6 @@ bool Init_EffectQueue()
 				}
 			}
 		}
-		//print("-------- FN: %d, %s", i, effectname);
 	}
 	core->DelSymbol( eT );
 
@@ -1012,7 +1008,7 @@ static int check_type(Actor* actor, const Effect* fx)
 
 	//level decrementing bounce check
 	if (fx->Power) {
-		if( (bounce&BNC_LEVEL_DEC)) {
+		if (bounce & BNC_LEVEL_DEC) {
 			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
 			if( efx) {
 				if (DecreaseEffect(efx)) {
@@ -1214,7 +1210,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance) const
 {
-	//print("FX 0x%02x: %s(%d, %d)", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2);
 	if (fx->TimingMode == FX_DURATION_JUST_EXPIRED) {
 		return FX_NOT_APPLIED;
 	}

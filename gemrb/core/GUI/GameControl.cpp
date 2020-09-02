@@ -318,8 +318,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
 bool GameControl::ShouldRun(Actor *actor) const
 {
 	if (!actor) return false;
-	ieDword speed = actor->CalculateSpeed(true);
-	if (speed != actor->GetStat(IE_MOVEMENTRATE)) {
+	if (actor->GetEncumbranceFactor(true) != 1) {
 		return false;
 	}
 	return (isDoubleClick || AlwaysRun);
@@ -889,7 +888,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				}
 				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
 					int size = game->GetPartySize(true);
-					if (size < 2 || game->NpcInParty < 2) break;
+					if (size < 2 || lastActor->GetCurrentArea() != game->GetCurrentArea()) break;
 					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
 						Actor *target = game->GetPC(i%size, true);
 						if (target == lastActor) continue;
@@ -1342,8 +1341,20 @@ void GameControl::UpdateCursor()
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
-
-	overInfoPoint = area->TMap->GetInfoPoint( gameMousePos, true );
+	
+	if (overDoor) {
+		overDoor->Highlight = false;
+	}
+	if (overContainer) {
+		overContainer->Highlight = false;
+	}
+	
+	overDoor = area->TMap->GetDoor(gameMousePos);
+	// ignore infopoints beneath invisible doors
+	if (!overDoor || overDoor->Visible()) {
+		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, true);
+	}
+	
 	if (overInfoPoint) {
 		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
@@ -1359,14 +1370,6 @@ void GameControl::UpdateCursor()
 		return;
 	}
 
-	if (overDoor) {
-		overDoor->Highlight = false;
-	}
-	if (overContainer) {
-		overContainer->Highlight = false;
-	}
-
-	overDoor = area->TMap->GetDoor( gameMousePos );
 	overContainer = area->TMap->GetContainer( gameMousePos );
 
 	if (overDoor) {
@@ -1376,7 +1379,7 @@ void GameControl::UpdateCursor()
 	if (overContainer) {
 		nextCursor = GetCursorOverContainer(overContainer);
 	}
-	// recheck in case the positioon was different, resulting in a new isVisible check
+	// recheck in case the position was different, resulting in a new isVisible check
 	// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
 	if (nextCursor == IE_CURSOR_INVALID) {
 		lastCursor = IE_CURSOR_BLOCKED;

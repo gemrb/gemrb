@@ -122,6 +122,7 @@ public:
 	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
 	int GetSpellAbilityDie(const Actor *target, int which);
 	int GetTrapSaveBonus(ieDword level, int cls);
+	int GetSummoningLimit(ieDword sex);
 	inline int GetStepTime() { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 private:
@@ -139,7 +140,8 @@ private:
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;
 	AutoTable trapSaveBonus;
-	int stepTime;
+	AutoTable summoningLimit;
+	int stepTime = 0;
 };
 
 extern GEM_EXPORT GameData * gamedata;

@@ -437,7 +437,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 
 	e = new CacheEntry;
 	e->Buffer = Buffer;
-	e->Length = ((cnt / riff_chans) * 1000) / samplerate;
+	e->Length = time_length;
 
 	buffercache.SetAt(ResRef, (void*)e);
 	//print("LoadSound: added %s to cache: %d. Cache size now %d", ResRef, e->Buffer, buffercache.GetCount());

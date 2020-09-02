@@ -455,6 +455,10 @@ private:
 	bool AdvanceAnimations();
 	/* applies modal spell etc, if needed */
 	void UpdateModalState(ieDword gameTime);
+
+	void CalculateSpeedFromRate(bool feedback);
+	void CalculateSpeedFromINI(bool feedback);
+
 public:
 	Actor(void);
 	~Actor(void);
@@ -558,6 +562,8 @@ public:
 	}
 	void SetName(const char* ptr, unsigned char type);
 	void SetName(int strref, unsigned char type);
+	/* Returns by how much movement speed should be divided to account for loot weight */
+	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
 	int CalculateSpeed(bool feedback);
 	/* checks on death of actor, returns true if it should be removed*/
@@ -642,7 +648,7 @@ public:
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
 	void SetPersistent(int partyslot);
 	/* resurrects actor */
-	void Resurrect();
+	void Resurrect(const Point &destPoint);
 	/* removes actor in the next update cycle */
 	void DestroySelf();
 	/* schedules actor to die */

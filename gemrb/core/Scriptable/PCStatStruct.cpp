@@ -112,7 +112,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	return *this;
 }
 
-void PCStatsStruct::UpdateClassLevels(std::list<int> levels) {
+void PCStatsStruct::UpdateClassLevels(const std::list<int> &levels) {
 	ClassLevels = levels;
 }
 

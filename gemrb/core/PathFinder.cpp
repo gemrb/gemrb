@@ -49,13 +49,16 @@
 
 namespace GemRB {
 
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dx{{1, 0, -1, 0}};
-constexpr std::array<char, Map::DEGREES_OF_FREEDOM> Map::dy{{0, 1, 0, -1}};
+constexpr size_t DEGREES_OF_FREEDOM = 4;
+constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
+constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent{{1, 0, -1, 0}};
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent{{0, 1, 0, -1}};
 
 // Cosines
-constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
+constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
 // Sines
-constexpr std::array<double, Map::RAND_DEGREES_OF_FREEDOM> Map::dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
+constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
@@ -263,9 +266,13 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (nmptDest == nmptSource) return nullptr;
+	if (!(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR))) {
+		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
+		return nullptr;
+	}
 	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
+	if (smptDest == smptSource) return nullptr;
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
@@ -304,7 +311,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		isClosed[smptCurrent.y * Width + smptCurrent.x] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			NavmapPoint nmptChild(nmptCurrent.x + 16 * dx[i], nmptCurrent.y + 12 * dy[i]);
+			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
 			// Outside map
 			if (smptChild.x < 0 ||	smptChild.y < 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;

@@ -80,12 +80,13 @@ ELSE(APPLE)
 	ADD_SUBDIRECTORY( tests )
 
 	IF(WIN32)
-		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../windows/window.rc)
+		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/window.rc)
 	ELSE(WIN32)
 		ADD_EXECUTABLE(gemrb GemRB.cpp )
 	ENDIF()
 
 	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" GemRB.cfg.noinstall.sample DESTINATION ${EXAMPLE_CONF_DIR} )
+	INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" RENAME GemRB.cfg DESTINATION ${EXAMPLE_CONF_DIR})
 ENDIF(APPLE)
 
 # we need to add gemrb target before processing plugins or COCOA plugins don't work right.

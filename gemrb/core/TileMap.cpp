@@ -154,6 +154,18 @@ void TileMap::UpdateDoors()
 	}
 }
 
+// used during time compression in bg1 ... but potentially problematic, so we don't enable it elsewhere
+void TileMap::AutoLockDoors()
+{
+	if (!core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) return;
+
+	for (Door *door : doors) {
+		if (door->CantAutoClose()) continue;
+		if (core->Roll(1, 2, -1)) continue; // just a guess
+		door->SetDoorOpen(false, false, 0);
+	}
+}
+
 //overlays, allow pushing of NULL
 void TileMap::AddOverlay(TileOverlay* overlay)
 {

@@ -187,7 +187,11 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
 	}
-	delete Scripts[idx];
+	if (Scripts[idx] && Scripts[idx]->running) {
+		Scripts[idx]->dead = true;
+	} else {
+		delete Scripts[idx];
+	}
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
@@ -203,7 +207,11 @@ void Scriptable::SetScript(int index, GameScript* script)
 		Log(ERROR, "Scriptable", "Invalid script index!");
 		return;
 	}
-	delete Scripts[index];
+	if (Scripts[index] && Scripts[index]->running) {
+		Scripts[index]->dead = true;
+	} else {
+		delete Scripts[index];
+	}
 	Scripts[index] = script;
 }
 
@@ -431,6 +439,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 		GameScript *Script = Scripts[scriptlevel];
 		if (Script) {
 			changed |= Script->Update(&continuing, &done);
+			if (Script->dead) {
+				delete Script;
+			}
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
@@ -1039,6 +1050,12 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		break;
 	}
 
+	Actor *target = area->GetActor(LastTargetPos, GA_NO_UNSCHEDULED|GA_NO_HIDDEN);
+	if (target) {
+		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
+		target->LastSpellOnMe = spellID;
+	}
+
 	ResetCastingState(caster);
 }
 
@@ -1109,7 +1126,6 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		break;
 	}
 
-	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
 	Actor *target = area->GetActorByGlobalID(LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
@@ -1298,7 +1314,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
 			return -1;
 		}
 	}
@@ -1333,7 +1349,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell not known or memorized, aborting cast!");
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
 			return -1;
 		}
 	}
@@ -1968,6 +1984,7 @@ Movable::Movable(ScriptableType type)
 	randomBackoff = 0;
 	pathfindingDistance = size;
 	randomWalkCounter = 0;
+	pathAbandoned = false;
 }
 
 Movable::~Movable(void)
@@ -2163,7 +2180,6 @@ void Movable::BumpBack()
 	bumpBackTries = 0;
 }
 
-
 // Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
 // The movement logic is a proportional regulator: the displacement/movement vector has a
 // fixed radius, based on actor walk speed, and its direction heads towards the next waypoint.
@@ -2173,6 +2189,8 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
+	const int XEPS = 72;
+	const int YEPS = 36;
 	Actor *actor = nullptr;
 	if (Type == ST_ACTOR) actor = (Actor*)this;
 	// Only bump back if not moving
@@ -2211,11 +2229,15 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			Point nmptCollision(xCollision, yCollision);
 			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 		}
+
 		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS * 3 && std::abs(nmptStep.y - Pos.y) < YEPS * 3) {
+			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS && std::abs(nmptStep.y - Pos.y) < YEPS) {
 				ClearPath(true);
 				NewOrientation = Orientation;
+				// Do not call ReleaseCurrentAction() since other actions
+				// than MoveToPoint can cause movement
+				pathAbandoned = true;
 				return;
 			}
 			if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
@@ -2290,8 +2312,8 @@ void Movable::AddWayPoint(const Point &Des)
 // Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
 void Movable::WalkTo(const Point &Des, int distance)
 {
-
-	if (Ticks < prevTicks + 2) {
+	// Only rate-limit when moving
+	if ((GetPath() || InMove()) && prevTicks && Ticks < prevTicks + 2) {
 		return;
 	}
 
@@ -2300,8 +2322,13 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	prevTicks = Ticks;
 	Destination = Des;
+	if (pathAbandoned) {
+		Log(DEBUG, "WalkTo", "%s: Path was just abandoned", GetName(0));
+		ClearPath(true);
+		return;
+	}
 
-	if (std::abs(Des.x - Pos.x) <= XEPS && std::abs(Des.y - Pos.y) <= YEPS) {
+	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
 		ClearPath(true);
 		return;
 	}
@@ -2393,6 +2420,7 @@ void Movable::Stop()
 
 void Movable::ClearPath(bool resetDestination)
 {
+	pathAbandoned = false;
 
 	if (resetDestination) {
 		//this is to make sure attackers come to us

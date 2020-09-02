@@ -281,6 +281,7 @@ public:
 	ieDword LastSummoner;
 	ieDword LastFollowed; // gemrb extension (LeaderOf)
 	ieDword LastMarked; // iwd2
+	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
 
 	int LastMarkedSpell; // iwd2
 
@@ -446,8 +447,6 @@ public:
 };
 
 class GEM_EXPORT Movable : public Selectable {
-	const int XEPS = 32;
-	const int YEPS = 12;
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
@@ -457,6 +456,7 @@ private: //these seem to be sensitive, so get protection
 	PathNode* step; //actual step
 	unsigned int prevTicks;
 	int bumpBackTries;
+	bool pathAbandoned;
 protected:
 	ieDword timeStartStep;
 	//the # of previous tries to pick up a new walkpath
@@ -523,6 +523,7 @@ public:
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
 	void RandomWalk(bool can_stop, bool run);
+	int GetRandomWalkCounter() const { return randomWalkCounter; };
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);

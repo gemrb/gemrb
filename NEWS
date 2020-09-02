@@ -1,15 +1,23 @@
-GemRB git (052986b):
+GemRB git (403d908fc):
   New features:
     - 
+
+  Improved features:
+    - 
+    - bugfixes
+
+GemRB v0.8.7 (2020-08-23):
+  New features:
+    - new smarter pathfinder with bumping support
     - animal taming, iwd2 hardcoded saving throw bonuses
     - vcpkg and out-of-the box msvc support
     - non-ascii data filename support
 
   Improved features:
-    - 
-    - windows speedups, ease of setup
-    - iwd chargen, pst spell timing
-    - audio, pst ini handling, savegame compatibility
+    - disk reading speedups, ease of setup
+    - iwd chargen, pst spell timing, hardcoded overlays, iwd2 casting ai
+    - better actor speeds & walk sounds
+    - audio, pst ini handling, savegame compatibility, morale handling
     - effects, projectiles, actions, range calculations
     - bugfixes
 
