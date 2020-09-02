@@ -858,6 +858,8 @@ public:
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
 	static ieDword GetClassID (const ieDword isclass);
+	const char *GetClassName(ieDword classID) const;
+	const char *GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */
 	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
 	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }

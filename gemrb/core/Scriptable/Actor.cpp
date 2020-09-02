@@ -202,7 +202,9 @@ struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
 	std::vector<const char*> clabs;
+	std::vector<const char*> kitNames;
 	const char* clab;
+	const char *className;
 };
 static std::map<int, ClassKits> class2kits;
 
@@ -2052,6 +2054,7 @@ static void InitActorTables()
 			}
 			// everyone but pst (none at all) and iwd2 (different table)
 			class2kits[i].clab = strdup(field);
+			class2kits[i].className = strdup(rowname);
 
 			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
@@ -2257,6 +2260,7 @@ static void InitActorTables()
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
+				class2kits[classcol].kitNames.push_back(strdup(classname));
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
@@ -2490,9 +2494,11 @@ static void InitActorTables()
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
 			int classID = atoi(tm->QueryField(rowName, "CLASS"));
 			const char *clab = tm->QueryField(rowName, "ABILITIES");
+			const char *kitName = tm->QueryField(rowName, "ROWNAME");
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.push_back(strdup(clab));
+			class2kits[classID].kitNames.push_back(strdup(kitName));
 		}
 	}
 
@@ -11524,6 +11530,27 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 
 ieDword Actor::GetClassID (const ieDword isclass) {
 	return classesiwd2[isclass];
+}
+
+const char *Actor::GetClassName(ieDword classID) const
+{
+	return class2kits[classID].className;
+}
+
+// NOTE: returns first kit name for multikit chars
+const char *Actor::GetKitName(ieDword kitID) const
+{
+	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+	for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
+		std::vector<ieDword> kits = class2kits[cidx].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int kidx = 0; it != kits.end(); it++, kidx++) {
+			if (kitID & (*it)) {
+				return class2kits[cidx].kitNames[kidx];
+			}
+		}
+	}
+	return "";
 }
 
 void Actor::SetAnimatedTalking (unsigned int length) {
