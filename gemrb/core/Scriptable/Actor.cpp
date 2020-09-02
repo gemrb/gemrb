@@ -11499,17 +11499,15 @@ ieDword Actor::GetActiveClass() const
 // like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
 bool Actor::IsKitInactive() const
 {
+	if (third) return false;
 	if (!IsDualInactive()) return false;
 
-	const int CLASS = 7;
-
-	int table = gamedata->LoadTable("kitlist");
-	if (table == -1) return false;
-	Holder<TableMgr> tm = gamedata->GetTable(table);
-	if (tm) {
-		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
-		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));
-		if (kitclass == GetActiveClass()) return false;
+	ieDword baseclass = GetActiveClass();
+	ieDword kit = GetStat(IE_KIT);
+	std::vector<ieDword> kits = class2kits[baseclass].ids;
+	std::vector<ieDword>::iterator it = kits.begin();
+	for (int idx = 0; it != kits.end(); it++, idx++) {
+		if (kit & (*it)) return false;
 	}
 	return true;
 }
