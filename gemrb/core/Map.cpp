@@ -1013,7 +1013,7 @@ Particles *Map::GetNextSpark(spaIterator &iter)
 }
 
 //doesn't increase iterator, because we might need to erase it from the list
-Projectile *Map::GetNextProjectile(proIterator &iter)
+Projectile *Map::GetNextProjectile(proIterator &iter) const
 {
 	if (iter==projectiles.end()) {
 		return NULL;
@@ -1021,7 +1021,7 @@ Projectile *Map::GetNextProjectile(proIterator &iter)
 	return *iter;
 }
 
-Projectile *Map::GetNextTrap(proIterator &iter)
+Projectile *Map::GetNextTrap(proIterator &iter) const
 {
 	Projectile *pro;
 
@@ -1034,15 +1034,15 @@ Projectile *Map::GetNextTrap(proIterator &iter)
 	return pro;
 }
 
-size_t Map::GetProjectileCount(proIterator &iter)
+size_t Map::GetProjectileCount(proIterator &iter) const
 {
 	iter = projectiles.begin();
 	return projectiles.size();
 }
 
-ieDword Map::GetTrapCount(proIterator &iter)
+int Map::GetTrapCount(proIterator &iter) const
 {
-	ieDword cnt=0;
+	int cnt = 0;
 	iter=projectiles.begin();
 	while(GetNextTrap(iter)) {
 		cnt++;

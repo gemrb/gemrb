@@ -319,7 +319,7 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJ
 
 typedef std::list<AreaAnimation*>::iterator aniIterator;
 typedef std::list<VEFObject*>::iterator scaIterator;
-typedef std::list<Projectile*>::iterator proIterator;
+typedef std::list<Projectile*>::const_iterator proIterator;
 typedef std::list<Particles*>::iterator spaIterator;
 
 
@@ -467,13 +467,13 @@ public:
 	int AreaDifficulty;
 
 	//count of all projectiles that are saved
-	size_t GetProjectileCount(proIterator &iter);
+	size_t GetProjectileCount(proIterator &iter) const;
 	//get the next projectile
-	Projectile *GetNextProjectile(proIterator &iter);
+	Projectile *GetNextProjectile(proIterator &iter) const;
 	//count of unexploded projectiles that are saved
-	ieDword GetTrapCount(proIterator &iter);
+	int GetTrapCount(proIterator &iter) const;
 	//get the next saved projectile
-	Projectile* GetNextTrap(proIterator &iter);
+	Projectile *GetNextTrap(proIterator &iter) const;
 	//add a projectile to the area
 	void AddProjectile(Projectile* pro, const Point &source, ieWord actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
