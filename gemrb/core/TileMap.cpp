@@ -168,7 +168,7 @@ void TileMap::UpdateDoors()
 }
 
 // used during time compression in bg1 ... but potentially problematic, so we don't enable it elsewhere
-void TileMap::AutoLockDoors()
+void TileMap::AutoLockDoors() const
 {
 	if (!core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) return;
 
@@ -437,10 +437,8 @@ Container* TileMap::GetContainer(const char* Name) const
 Container* TileMap::GetContainer(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type!=-1) {
-			if (container->Type != type) {
-				continue;
-			}
+		if (type != -1 && type != container->Type) {
+			continue;
 		}
 		if (container->outline->BBox.x > position.x)
 			continue;
@@ -469,10 +467,8 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type!=-1) {
-			if (container->Type != type) {
-				continue;
-			}
+		if (type != -1 && type != container->Type) {
+			continue;
 		}
 
 		if (container->Pos.x != position.x || container->Pos.y != position.y) {

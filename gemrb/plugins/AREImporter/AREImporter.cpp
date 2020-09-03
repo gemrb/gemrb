@@ -2349,7 +2349,7 @@ int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 	return 0;
 }
 
-int AREImporter::PutTraps( DataStream *stream, Map *map)
+int AREImporter::PutTraps( DataStream *stream, const Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
@@ -2375,7 +2375,7 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 			}
 			ieDword ID = pro->GetCaster();
 			// lookup caster via Game, since the the current map can already be empty when switching them
-			Actor *actor = core->GetGame()->GetActorByGlobalID(ID);
+			const Actor *actor = core->GetGame()->GetActorByGlobalID(ID);
 			//0xff if not in party
 			//party slot if in party
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);

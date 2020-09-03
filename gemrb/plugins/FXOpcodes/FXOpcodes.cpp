@@ -6732,7 +6732,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (Owner->Type==ST_ACTOR) {
-		Actor *caster = (Actor *) Owner;
+		const Actor *caster = (Actor *) Owner;
 		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
 		// assuming functioning thief, but allowing modded exceptions
@@ -7127,7 +7127,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_remove_projectile(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (!target) return FX_NOT_APPLIED;
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;
 
 	switch (fx->Parameter2) {

@@ -4879,7 +4879,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (displaymsg->HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
+	if (DisplayMessage::HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -5473,7 +5473,7 @@ void Actor::CalculateSpeedFromINI(bool feedback)
 		animid = animid & 0xff;
 	}
 	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
-	AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
 	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
 		speed = avatar->RunScale;
 	} else if (avatar->WalkScale) {

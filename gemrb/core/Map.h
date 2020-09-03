@@ -469,7 +469,7 @@ public:
 	//count of all projectiles that are saved
 	size_t GetProjectileCount(proIterator &iter) const;
 	//get the next projectile
-	Projectile *GetNextProjectile(proIterator &iter) const;
+	Projectile *GetNextProjectile(const proIterator &iter) const;
 	//count of unexploded projectiles that are saved
 	int GetTrapCount(proIterator &iter) const;
 	//get the next saved projectile

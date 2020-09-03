@@ -89,7 +89,7 @@ private:
 	int PutAmbients(DataStream *stream, Map *map);
 	int PutMapnotes(DataStream *stream, Map *map);
 	int PutEffects( DataStream *stream, EffectQueue *fxqueue);
-	int PutTraps(DataStream *stream, Map *map);
+	int PutTraps(DataStream *stream, const Map *map);
 	int PutExplored(DataStream *stream, Map *map);
 	int PutTiles(DataStream *stream, Map *map);
 	int PutRestHeader(DataStream *stream, Map *map);

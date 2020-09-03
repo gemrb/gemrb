@@ -681,7 +681,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 		return 6; // not using table default, since EE's file has it at 0
 	}
 
-	Actor *caster = (Actor *) trapper;
+	const Actor *caster = (Actor *) trapper;
 	ieDword kit = caster->GetStat(IE_KIT);
 	const char *rowName;
 	if (kit != 0x4000) { // KIT_BASECLASS

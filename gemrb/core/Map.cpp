@@ -1013,7 +1013,7 @@ Particles *Map::GetNextSpark(spaIterator &iter)
 }
 
 //doesn't increase iterator, because we might need to erase it from the list
-Projectile *Map::GetNextProjectile(proIterator &iter) const
+Projectile *Map::GetNextProjectile(const proIterator &iter) const
 {
 	if (iter==projectiles.end()) {
 		return NULL;
