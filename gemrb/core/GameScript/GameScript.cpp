@@ -2602,7 +2602,7 @@ Action* GenerateAction(const char* String)
 	return action;
 }
 
-Action* GenerateActionDirect(const char *String, Scriptable *object)
+Action *GenerateActionDirect(const char *String, const Scriptable *object)
 {
 	Action* action = GenerateAction(String);
 	if (!action) return NULL;

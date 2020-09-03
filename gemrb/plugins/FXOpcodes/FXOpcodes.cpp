@@ -6712,9 +6712,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_trap(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword skill, roll, level;
-	Map *map;
-
-	map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_NOT_APPLIED;
 
 	proIterator iter;

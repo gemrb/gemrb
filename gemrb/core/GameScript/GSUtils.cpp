@@ -543,7 +543,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
+int CanSee(Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
 {
 	Map *map;
 
@@ -2368,7 +2368,7 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 	return 0;
 }
 
-int GetGroup(Actor *actor)
+int GetGroup(const Actor *actor)
 {
 	int type = 2; //neutral, has no enemies
 	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -2380,7 +2380,7 @@ int GetGroup(Actor *actor)
 	return type;
 }
 
-Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
+Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 {
 	//determining the allegiance of the origin
 	int type = GetGroup(origin);
@@ -2426,7 +2426,7 @@ Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 	return ac;
 }
 
-Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
+Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 {
 	Targets *tgts = new Targets();
 

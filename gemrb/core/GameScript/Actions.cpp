@@ -4860,7 +4860,7 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	Actor *act = (Actor *) Sender;
-	Actor *target;
+	const Actor *target;
 
 	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
 		//anyone

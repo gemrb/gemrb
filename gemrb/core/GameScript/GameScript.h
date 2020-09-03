@@ -1556,7 +1556,7 @@ public:
 };
 
 GEM_EXPORT Action* GenerateAction(const char* String);
-Action* GenerateActionDirect(const char* String, Scriptable *object);
+Action *GenerateActionDirect(const char *String, const Scriptable *object);
 GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
 void InitializeIEScript();
