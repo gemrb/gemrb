@@ -31,7 +31,7 @@ namespace GemRB
 		GLuint program;
 		std::map<std::string, GLint> uniforms;
 		bool buildProgram(std::string vertexSource, const std::string& fragmentSource);
-		GLuint buildShader(GLenum type, const std::string& source);
+		GLuint buildShader(GLenum type, std::string source);
 		GLint getUniformLocation(std::string uniformName);
 		bool storeUniformLocation(std::string uniformName);
 	};

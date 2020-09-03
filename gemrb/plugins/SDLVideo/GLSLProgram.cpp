@@ -107,9 +107,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 
-GLuint GLSLProgram::buildShader(GLenum type, const std::string& source)
+GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source)
 {
-	std::string shader_source = source;
 #ifdef USE_GL
 	shader_source.insert(0, "#version 110\n");
 #else
