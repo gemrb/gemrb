@@ -7011,6 +7011,7 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DOPENGL_BACKEND=1",
+					"-DUSE_GL=1",
 				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
@@ -7040,6 +7041,7 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DOPENGL_BACKEND=1",
+					"-DUSE_GL=1",
 				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
