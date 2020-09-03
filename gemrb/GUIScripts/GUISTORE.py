@@ -1775,17 +1775,27 @@ def DonateGold ():
 
 	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
-	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
-	if GemRB.IncreaseReputation (donation):
-		TextArea.Append (strrefs['donorgood'])
-		TextArea.Append ("\n\n")
-		GemRB.PlaySound (DEF_DONATE1)
-		UpdateStoreDonateWindow ()
-		return
 
-	TextArea.Append (strrefs['donorfail'])
+	# for some reason temple donations get a boost to rumour generation,
+	# even though comparatively they're higher than drink prices and with
+	# the default factor of 3, very quickly guarantee a rumour
+	RumourTable = GemRB.LoadTable ("donarumr")
+	RumourFactor = RumourTable.GetValue ("RUMORRATE", "VALUE", GTV_INT)
+	RumourChance = min(RumourFactor * donation, 100) # cap is from the original
+	text = GemRB.GetRumour (RumourChance, Store['TempleRumour'])
+	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
+	feedbackSound = DEF_DONATE2
+	feedbackString = strrefs['donorfail']
+	if GemRB.IncreaseReputation (donation):
+		feedbackSound = DEF_DONATE1
+		feedbackString = strrefs['donorgood']
+
+	TextArea.Append (feedbackString)
 	TextArea.Append ("\n\n")
-	GemRB.PlaySound (DEF_DONATE2)
+	if text > -1:
+		TextArea.Append (text)
+		TextArea.Append ("\n\n")
+	GemRB.PlaySound (feedbackSound)
 	UpdateStoreDonateWindow ()
 	return
 
