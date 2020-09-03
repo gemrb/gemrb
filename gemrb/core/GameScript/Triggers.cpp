@@ -3413,6 +3413,7 @@ int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 	 return match;
 }
 
+// a few values are named in order.ids
 int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)
 {
 	return Sender->MatchTriggerWithObject(trigger_receivedorder, parameters->objectParameter, parameters->int0Parameter);
@@ -3876,7 +3877,7 @@ int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 	return 0;
 }
 
-//this is a PST action, it's using delta, not diffmode
+//this is a PST action, it's using delta.ids, not diffmode.ids
 int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
