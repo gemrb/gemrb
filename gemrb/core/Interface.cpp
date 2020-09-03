@@ -4976,6 +4976,8 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
 
+	// forcefully rerandomize
+	RandomNumValue = RAND_ALL();
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {
