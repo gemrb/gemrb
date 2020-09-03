@@ -60,8 +60,13 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	//SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
 
+#if OPENGL_BACKEND
 #if OPENGL_BACKEND == OpenGL
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+	const char* driverName = "opengl";
+#elif
+	const char* driverName = "opengles2";
+#endif
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
 
 	/*
 	 these have no effect on the context created by SDL_CreateRenderer
@@ -70,8 +75,6 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	*/
-#elif OPENGL_BACKEND
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
 #endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 10)
@@ -95,11 +98,6 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	}
 
 #if OPENGL_BACKEND
-#if OPENGL_BACKEND == OpenGL
-	const char* driverName = "opengl";
-#elif
-	const char* driverName = "opengles2";
-#endif
 	if (strcmp(info.name, driverName) != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
 		return GEM_ERROR;
