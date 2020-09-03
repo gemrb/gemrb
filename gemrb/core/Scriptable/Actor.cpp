@@ -162,6 +162,7 @@ static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 static AutoTable extspeed;
+static AutoTable wspecial;
 
 //item animation override array
 struct ItemAnimType {
@@ -219,11 +220,8 @@ static ieByte featstats[MAX_FEATS]={0
 static ieByte featmax[MAX_FEATS]={0
 };
 
-//holds the wspecial table for weapon prof bonuses
-static int wspecial_max = 0;
 static int wspattack_rows = 0;
 static int wspattack_cols = 0;
-static int **wspecial = NULL;
 static int **wspattack = NULL;
 
 //holds the weapon style bonuses
@@ -447,6 +445,7 @@ void ReleaseMemoryActor()
 	}
 	FistRows = -1;
 	extspeed.release();
+	wspecial.release();
 }
 
 Actor::Actor()
@@ -1762,15 +1761,6 @@ void Actor::ReleaseMemory()
 			afcomments=NULL;
 		}
 
-		if (wspecial) {
-			for (i=0; i<=wspecial_max; i++) {
-				if (wspecial[i]) {
-					free(wspecial[i]);
-				}
-			}
-			free(wspecial);
-			wspecial=NULL;
-		}
 		if (wspattack) {
 			for (i=0; i<wspattack_rows; i++) {
 				if (wspattack[i]) {
@@ -2503,20 +2493,7 @@ static void InitActorTables()
 	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
-	tm.load("wspecial");
-	if (tm) {
-		//load in the identifiers
-		wspecial_max = tm->GetRowCount()-1;
-		int cols = tm->GetColumnCount();
-		wspecial = (int **) calloc(wspecial_max+1, sizeof(int *));
-
-		for (i=0; i<=wspecial_max; i++) {
-			wspecial[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
-				wspecial[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
+	wspecial.load("wspecial", true);
 
 	//pre-cache attack per round bonuses
 	tm.load("wspatck");
@@ -7162,8 +7139,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
-	if ((signed)stars > wspecial_max) {
-		stars = wspecial_max;
+	static ieDword wspecialMax = wspecial->GetRowCount() - 1;
+	if (stars > wspecialMax) {
+		stars = wspecialMax;
 	}
 
 	int prof = 0;
@@ -7171,12 +7149,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
 	if (InParty && !inventory.FistsEquipped()) {
-		prof += wspecial[stars][0];
+		prof += atoi(wspecial->QueryField(stars, 0));
 	}
 
-	wi.profdmgbon = wspecial[stars][1];
+	wi.profdmgbon = atoi(wspecial->QueryField(stars, 1));
 	DamageBonus += wi.profdmgbon;
-	speed += wspecial[stars][2];
+	// only bg2 wspecial.2da has this column, but all have 0 as the default table value, so this lookup is fine
+	speed += atoi(wspecial->QueryField(stars, 2));
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative
 	if (stars == 0 && !third) {
