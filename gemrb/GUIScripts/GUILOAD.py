@@ -79,14 +79,12 @@ def OnLoad ():
 	Games=GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
-	ScrollBarUpdated ()
 	LoadWindow.SetEventProxy(ScrollBar)
 	LoadWindow.Focus()
 	return
 
-def ScrollBarUpdated ():
+def ScrollBarUpdated (sb, Pos):
 	#draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
 	for i in range (4):
 		ActPos = Pos + i
 
