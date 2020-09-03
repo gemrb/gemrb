@@ -107,7 +107,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 
-GLuint GLSLProgram::buildShader(GLenum type, const std::string source)
+GLuint GLSLProgram::buildShader(GLenum type, const std::string& source)
 {
 	std::string shader_source = source;
 #ifdef USE_GL
@@ -132,7 +132,7 @@ GLuint GLSLProgram::buildShader(GLenum type, const std::string source)
     return id;
 }
 
-bool GLSLProgram::buildProgram(std::string vertexSource, std::string fragmentSource)
+bool GLSLProgram::buildProgram(std::string vertexSource, const std::string& fragmentSource)
 {
 	program = 0;
     program = glCreateProgram();
