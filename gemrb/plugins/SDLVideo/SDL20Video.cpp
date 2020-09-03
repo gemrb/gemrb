@@ -60,7 +60,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	//SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
 
-#if OPENGL_BACKEND
+#if OPENGL_BACKEND == OpenGL
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
 	/*
@@ -70,6 +70,8 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	*/
+#elif OPENGL_BACKEND
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
 #endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 10)
