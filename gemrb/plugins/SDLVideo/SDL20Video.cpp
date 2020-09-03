@@ -95,7 +95,12 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	}
 
 #if OPENGL_BACKEND
-	if (strcmp(info.name, "opengl") != 0) {
+#if OPENGL_BACKEND == OpenGL
+	const char* driverName = "opengl";
+#elif
+	const char* driverName = "opengles2";
+#endif
+	if (strcmp(info.name, driverName) != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
 		return GEM_ERROR;
 	}
