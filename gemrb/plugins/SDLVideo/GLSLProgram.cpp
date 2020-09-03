@@ -64,7 +64,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#ifdef USE_GL
+#if OPENGL_BACKEND == OpenGL
 		// remove precisions
 		if (line.find("precision") == 0) continue;
 #endif
@@ -97,7 +97,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream2, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#ifdef USE_GL
+#if OPENGL_BACKEND == OpenGL
 		// remove precisions
 		if (line.find("precision") == 0) continue;
 #endif
@@ -109,7 +109,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 
 GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source)
 {
-#ifdef USE_GL
+#if OPENGL_BACKEND == OpenGL
 	shader_source.insert(0, "#version 110\n");
 #else
 	shader_source.insert(0, "#version 100\n");

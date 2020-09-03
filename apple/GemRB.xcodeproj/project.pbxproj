@@ -7010,8 +7010,7 @@
 				MACH_O_TYPE = mh_bundle;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"-DOPENGL_BACKEND=1",
-					"-DUSE_GL=1",
+					"-DOPENGL_BACKEND=OpenGL",
 				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
@@ -7040,8 +7039,7 @@
 				MACH_O_TYPE = mh_bundle;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"-DOPENGL_BACKEND=1",
-					"-DUSE_GL=1",
+					"-DOPENGL_BACKEND=OpenGL",
 				);
 				PRODUCT_NAME = SDLVideo;
 				UNEXPORTED_SYMBOLS_FILE = "";
