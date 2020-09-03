@@ -1,3 +1,4 @@
+precision highp float;
 
 varying vec2 v_texCoord;
 varying vec4 v_color;
