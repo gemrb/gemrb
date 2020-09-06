@@ -40,8 +40,8 @@ using namespace GemRB;
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
 
-static int RandColor=-1;
-static int RandRows=-1;
+static unsigned int RandColor = 1;
+static int RandRows = -1;
 static ColorSet* randcolors=NULL;
 static int MagicBit;
 
@@ -391,7 +391,6 @@ static void ReleaseMemoryCRE()
 		delete [] randcolors;
 		randcolors = NULL;
 	}
-	RandColor = -1;
 
 	if (spllist) {
 		delete [] spllist;
@@ -874,47 +873,43 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat)
 {
-	if (RandColor==-1) {
-		RandColor=0;
-		RandRows=0;
+	if (stat < 200 || RandColor == 0) return;
+
+	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
+	if (RandRows == -1) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
-			if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
 		}
-		if (RandRows>1 && RandColor>0) {
-			randcolors = new ColorSet[RandColor];
-			int cols = RandColor;
-			while(cols--)
-			{
-				for (int i=0;i<RandRows;i++) {
-					randcolors[cols][i]=atoi( rndcol->QueryField( i, cols ) );
-				}
-				randcolors[cols][0]-=200;
+		if (RandRows <= 1 || RandColor == 0) {
+			RandRows = RandColor = 0;
+			return;
+		}
+
+		if (RandRows > MAXCOLOR) RandRows = MAXCOLOR;
+		randcolors = new ColorSet[RandColor];
+		int cols = RandColor;
+		while (cols--) {
+			for (int i = 0; i < RandRows; i++) {
+				randcolors[cols][i] = atoi(rndcol->QueryField(i, cols));
 			}
-		}
-		else {
-			RandColor=0;
+			randcolors[cols][0] -= 200;
 		}
 	}
 
-	if (stat<200) return;
-	if (RandColor>0) {
-		stat-=200;
-		//assuming an ordered list, so looking in the middle first
-		int i;
-		for (i=(int) stat;i>=0;i--) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	stat -= 200;
+	// assuming an ordered list, so looking in the middle first
+	for (int i = (int) stat; i >= 0; i--) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
-		for (i=(int) stat+1;i<RandColor;i++) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	}
+	for (unsigned int i = stat + 1; i < RandColor; i++) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
 	}
 }
