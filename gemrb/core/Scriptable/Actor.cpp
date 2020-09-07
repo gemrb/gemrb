@@ -202,10 +202,10 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
-	std::vector<const char*> clabs;
-	std::vector<const char*> kitNames;
-	const char* clab;
-	const char *className;
+	std::vector<char*> clabs;
+	std::vector<char*> kitNames;
+	char *clab;
+	char *className;
 };
 static std::map<int, ClassKits> class2kits;
 
@@ -1824,6 +1824,16 @@ void Actor::ReleaseMemory()
 		IWD2HitTable.clear();
 		BABClassMap.clear();
 		ModalStates.clear();
+		for (auto clskit : class2kits) {
+			free(clskit.second.clab);
+			free(clskit.second.className);
+			for (auto kit : clskit.second.clabs) {
+				free(kit);
+			}
+			for (auto kit : clskit.second.kitNames) {
+				free(kit);
+			}
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
